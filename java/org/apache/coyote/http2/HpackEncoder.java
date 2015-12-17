@@ -211,7 +211,7 @@ public class HpackEncoder {
 
     private void writeHuffmanEncodableName(ByteBuffer target, String headerName) {
         if (hpackHeaderFunction.shouldUseHuffman(headerName)) {
-            if(HPackHuffman.encode(target, headerName.toString(), true)) {
+            if(HPackHuffman.encode(target, headerName, true)) {
                 return;
             }
         }

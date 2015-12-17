@@ -224,9 +224,9 @@ public class SmapUtil {
             addSDE();
 
             // write result
-            FileOutputStream outStream = new FileOutputStream(outClassFile);
-            outStream.write(gen, 0, genPos);
-            outStream.close();
+            try (FileOutputStream outStream = new FileOutputStream(outClassFile);) {
+                outStream.write(gen, 0, genPos);
+            }
         }
 
         static byte[] readWhole(File input) throws IOException {
