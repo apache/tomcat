@@ -669,17 +669,24 @@ public class TestOpenSSLCipherConfigurationParser {
         // checks that the Parser produces a cipher list that is consistent with
         // OpenSSL's preference order by confirming that running through OPenSSL
         // does not change the order.
-        String parserOrderedExpression = listToString(jsseCipherListFromParser, ':');
-        Assert.assertEquals(TesterOpenSSL.getOpenSSLCiphersAsExpression(
-                parserOrderedExpression), parserOrderedExpression);
+        String parserOrderedExpression = listToString(jsseCipherListFromParser, ',');
+        Assert.assertEquals(
+                listToString(OpenSSLCipherConfigurationParser.parseExpression(
+                        parserOrderedExpression), ','),
+                parserOrderedExpression);
     }
 
 
     private String listToString(List<String> list, char separator) {
         StringBuilder sb = new StringBuilder();
+        boolean first = true;
         for (String entry : list) {
+            if (first) {
+                first = false;
+            } else {
+                sb.append(separator);
+            }
             sb.append(entry);
-            sb.append(separator);
         }
         return sb.toString();
     }
