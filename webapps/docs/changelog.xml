@@ -108,6 +108,9 @@
       <fix>
         Correct some typos in the JNDI resources How-To. (markt)
       </fix>
+      <fix>
+        Don't create sessions unnecessarily in the Manager application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
