@@ -1055,6 +1055,14 @@ public class TestCipher {
             "TLS_ECDHE_ECDSA_WITH_AES_128_CCM",
             "TLS_ECDHE_ECDSA_WITH_AES_256_CCM",
             "TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8",
-            "TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8")));
-
+            "TLS_ECDHE_ECDSA_WITH_AES_256_CCM_8",
+            // From https://tools.ietf.org/html/draft-ietf-tls-chacha20-poly1305-04
+            // These might change.
+            "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+            "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+            "TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256",
+            "TLS_PSK_WITH_CHACHA20_POLY1305_SHA256",
+            "TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256",
+            "TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256",
+            "TLS_RSA_PSK_WITH_CHACHA20_POLY1305_SHA256")));
 }
