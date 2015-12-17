@@ -4324,7 +4324,7 @@ public enum Cipher {
             null
     ),
     // draft-ietf-tl\s-chacha20-poly1305-03
-    TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305(
+    TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256(
             0xCCA8,
             "ECDHE-RSA-CHACHA20-POLY1305",
             KeyExchange.EECDH,
@@ -4340,7 +4340,7 @@ public enum Cipher {
             null,
             null
     ),
-    TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305(
+    TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256(
             0xCCA9,
             "ECDHE-ECDSA-CHACHA20-POLY1305",
             KeyExchange.EECDH,
@@ -4356,7 +4356,7 @@ public enum Cipher {
             null,
             null
     ),
-    TLS_DHE_RSA_WITH_CHACHA20_POLY1305(
+    TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256(
             0xCCAA,
             "DHE-RSA-CHACHA20-POLY1305",
             KeyExchange.EDH,
@@ -4372,7 +4372,7 @@ public enum Cipher {
             null,
             null
     ),
-    TLS_PSK_WITH_CHACHA20_POLY1305(
+    TLS_PSK_WITH_CHACHA20_POLY1305_SHA256(
             0xCCAB,
             "PSK-CHACHA20-POLY1305",
             KeyExchange.PSK,
@@ -4388,7 +4388,7 @@ public enum Cipher {
             null,
             null
     ),
-    TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305(
+    TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256(
             0xCCAC,
             "ECDHE-PSK-CHACHA20-POLY1305",
             KeyExchange.ECDHEPSK,
@@ -4404,7 +4404,7 @@ public enum Cipher {
             null,
             null
     ),
-    TLS_DHE_PSK_WITH_CHACHA20_POLY1305(
+    TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256(
             0xCCAD,
             "DHE-PSK-CHACHA20-POLY1305",
             KeyExchange.DHEPSK,
@@ -4420,7 +4420,7 @@ public enum Cipher {
             null,
             null
     ),
-    TLS_RSA_PSK_WITH_CHACHA20_POLY1305(
+    TLS_RSA_PSK_WITH_CHACHA20_POLY1305_SHA256(
             0xCCAE,
             "RSA-PSK-CHACHA20-POLY1305",
             KeyExchange.RSAPSK,
