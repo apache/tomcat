@@ -53,7 +53,7 @@ public class TestOpenSSLCipherConfigurationParserOnly {
     public void testDefaultSort02() throws Exception {
         // Reproducing a failure observed on Gump with OpenSSL 1.1.x
 
-        // ECHDE beats AES
+        // ECHDE should beat AES
         LinkedHashSet<Cipher> input = new LinkedHashSet<>();
         input.add(Cipher.TLS_RSA_WITH_AES_256_CBC_SHA);
         input.add(Cipher.TLS_ECDHE_RSA_WITH_CAMELLIA_256_CBC_SHA384);

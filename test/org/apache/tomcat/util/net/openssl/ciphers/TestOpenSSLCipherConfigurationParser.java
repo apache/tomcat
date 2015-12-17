@@ -660,16 +660,26 @@ public class TestOpenSSLCipherConfigurationParser {
 
         TesterOpenSSL.removeUnimplementedCiphersJsse(jsseCipherListFromParser);
 
-        Assert.assertEquals("Tested '" + specification + "': ",
-                            listToString(jsseCipherListFromOpenSSL), listToString(jsseCipherListFromParser));
+        // First check the lists have the same entries
+        Assert.assertEquals(jsseCipherListFromOpenSSL.size(), jsseCipherListFromParser.size());
+        Assert.assertTrue(jsseCipherListFromOpenSSL.containsAll(jsseCipherListFromParser));
+
+        // OpenSSL treats many ciphers as having equal preference. The order
+        // returned depends on the order they are requested. The following code
+        // checks that the Parser produces a cipher list that is consistent with
+        // OpenSSL's preference order by confirming that running through OPenSSL
+        // does not change the order.
+        String parserOrderedExpression = listToString(jsseCipherListFromParser, ':');
+        Assert.assertEquals(TesterOpenSSL.getOpenSSLCiphersAsExpression(
+                parserOrderedExpression), parserOrderedExpression);
     }
 
 
-    private String listToString(List<String> list) {
+    private String listToString(List<String> list, char separator) {
         StringBuilder sb = new StringBuilder();
         for (String entry : list) {
             sb.append(entry);
-            sb.append(',');
+            sb.append(separator);
         }
         return sb.toString();
     }
