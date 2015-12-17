@@ -1148,7 +1148,7 @@ public class NamingContextListener
             (resourceLink.getType(), resourceLink.getGlobal(), resourceLink.getFactory(), null);
         Iterator<String> i = resourceLink.listProperties();
         while (i.hasNext()) {
-            String key = i.next().toString();
+            String key = i.next();
             Object val = resourceLink.getProperty(key);
             if (val!=null) {
                 StringRefAddr refAddr = new StringRefAddr(key, val.toString());

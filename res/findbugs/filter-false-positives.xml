@@ -171,6 +171,13 @@
     <Bug code="ES"/>
   </Match>
   <Match>
+    <!-- Stream is closed in o.a.juli.ClassLoaderLogManager.readConfiguration
+         (InputStream, ClassLoader) -->
+    <Class name="org.apache.juli.ClassLoaderLogManager"/>
+    <Method name="readConfiguration"/>
+    <Bug code="OBL"/>
+  </Match>
+  <Match>
     <!-- Simpler to catch Exception than to create dummy implementations of the
          necessary exception hierarchy -->
     <Class name="org.apache.naming.factory.SendMailFactory$1" />
