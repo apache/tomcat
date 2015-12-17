@@ -1372,7 +1372,7 @@ public class JspC extends Task implements Options {
 
             Iterator<String> iter = pages.iterator();
             while (iter.hasNext()) {
-                String nextjsp = iter.next().toString();
+                String nextjsp = iter.next();
                 File fjsp = new File(nextjsp);
                 if (!fjsp.isAbsolute()) {
                     fjsp = new File(uriRootF, nextjsp);

@@ -315,7 +315,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
         String url = "service:jmx:rmi://" + bindAddress;
         JMXServiceURL serviceUrl;
         try {
-            serviceUrl = new JMXServiceURL(url.toString());
+            serviceUrl = new JMXServiceURL(url);
         } catch (MalformedURLException e) {
             log.error(sm.getString("jmxRemoteLifecycleListener.invalidURL", serverName, url), e);
             return null;

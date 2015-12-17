@@ -391,7 +391,7 @@ public class Stream {
             match = (Boolean) le.invoke(iterator.next());
         }
 
-        return new Optional(new Boolean(!match.booleanValue()));
+        return new Optional(Boolean.valueOf(!match.booleanValue()));
     }
 
 
