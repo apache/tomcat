@@ -1792,7 +1792,13 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     } catch (SecurityException se) {
                         String error = "Security Violation, attempt to use " +
                             "Restricted Class: " + name;
-                        log.info(error, se);
+                        if (name.endsWith("BeanInfo")) {
+                            // BZ 57906: suppress logging for calls from
+                            // java.beans.Introspector.findExplicitBeanInfo()
+                            log.debug(error, se);
+                        } else {
+                            log.info(error, se);
+                        }
                         throw new ClassNotFoundException(error, se);
                     }
                 }
