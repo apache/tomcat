@@ -247,6 +247,10 @@
       <fix>
         Don't create session unnecessarily in the Manager application. (markt)
       </fix>
+      <fix>
+        Don't create session unnecessarily in the Host Manager application.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
