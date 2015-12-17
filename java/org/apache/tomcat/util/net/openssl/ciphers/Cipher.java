@@ -4323,7 +4323,7 @@ public enum Cipher {
             null,
             null
     ),
-    // draft-ietf-tl\s-chacha20-poly1305-03
+    // Draft: https://tools.ietf.org/html/draft-ietf-tls-chacha20-poly1305-04
     TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256(
             0xCCA8,
             "ECDHE-RSA-CHACHA20-POLY1305",
