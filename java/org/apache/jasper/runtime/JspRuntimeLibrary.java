@@ -542,21 +542,23 @@ public class JspRuntimeLibrary {
      */
 
     public static String escapeQueryString(String unescString) {
-    if ( unescString == null )
-        return null;
+        if (unescString == null) {
+            return null;
+        }
    
-    String escString    = "";
-    String shellSpChars = "&;`'\"|*?~<>^()[]{}$\\\n";
+        StringBuilder escStringBuilder = new StringBuilder();
+        String shellSpChars = "&;`'\"|*?~<>^()[]{}$\\\n";
    
-    for(int index=0; index<unescString.length(); index++) {
-        char nextChar = unescString.charAt(index);
+        for (int index = 0; index < unescString.length(); index++) {
+            char nextChar = unescString.charAt(index);
 
-        if( shellSpChars.indexOf(nextChar) != -1 )
-        escString += "\\";
+            if (shellSpChars.indexOf(nextChar) != -1) {
+                escStringBuilder.append("\\");
+            }
 
-        escString += nextChar;
-    }
-    return escString;
+            escStringBuilder.append(nextChar);
+        }
+        return escStringBuilder.toString();
     }
 
     // __begin lookupReadMethodMethod

@@ -177,30 +177,30 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 @Override
                 public NameEnvironmentAnswer 
                     findType(char[][] compoundTypeName) {
-                    String result = "";
+                    StringBuilder result = new StringBuilder();
                     String sep = "";
                     for (int i = 0; i < compoundTypeName.length; i++) {
-                        result += sep;
-                        result += new String(compoundTypeName[i]);
+                        result.append(sep);
+                        result.append(compoundTypeName[i]);
                         sep = ".";
                     }
-                    return findType(result);
+                    return findType(result.toString());
                 }
 
                 @Override
                 public NameEnvironmentAnswer 
                     findType(char[] typeName, 
                              char[][] packageName) {
-                        String result = "";
-                        String sep = "";
-                        for (int i = 0; i < packageName.length; i++) {
-                            result += sep;
-                            result += new String(packageName[i]);
-                            sep = ".";
-                        }
-                        result += sep;
-                        result += new String(typeName);
-                        return findType(result);
+                    StringBuilder result = new StringBuilder();
+                    String sep = "";
+                    for (int i = 0; i < packageName.length; i++) {
+                        result.append(sep);
+                        result.append(packageName[i]);
+                        sep = ".";
+                    }
+                    result.append(sep);
+                    result.append(typeName);
+                    return findType(result.toString());
                 }
                 
                 private NameEnvironmentAnswer findType(String className) {
@@ -272,25 +272,23 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 @Override
                 public boolean isPackage(char[][] parentPackageName, 
                                          char[] packageName) {
-                    String result = "";
+                    StringBuilder result = new StringBuilder();
                     String sep = "";
                     if (parentPackageName != null) {
                         for (int i = 0; i < parentPackageName.length; i++) {
-                            result += sep;
-                            String str = new String(parentPackageName[i]);
-                            result += str;
+                            result.append(sep);
+                            result.append(parentPackageName[i]);
                             sep = ".";
                         }
                     }
-                    String str = new String(packageName);
-                    if (Character.isUpperCase(str.charAt(0))) {
-                        if (!isPackage(result)) {
+                    if (Character.isUpperCase(packageName[0])) {
+                        if (!isPackage(result.toString())) {
                             return false;
                         }
                     }
-                    result += sep;
-                    result += str;
-                    return isPackage(result);
+                    result.append(sep);
+                    result.append(packageName);
+                    return isPackage(result.toString());
                 }
 
                 @Override
@@ -434,19 +432,18 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                                 ClassFile classFile = classFiles[i];
                                 char[][] compoundName = 
                                     classFile.getCompoundName();
-                                String className = "";
-                                String sep = "";
+                                StringBuilder classFileName = new StringBuilder(outputDir).append('/');
                                 for (int j = 0; 
                                      j < compoundName.length; j++) {
-                                    className += sep;
-                                    className += new String(compoundName[j]);
-                                    sep = ".";
+                                    if(j > 0) {
+                                        classFileName.append('/');
+                                    }
+                                    classFileName.append(compoundName[j]);
                                 }
                                 byte[] bytes = classFile.getBytes();
-                                String outFile = outputDir + "/" + 
-                                    className.replace('.', '/') + ".class";
+                                classFileName.append(".class");
                                 FileOutputStream fout = 
-                                    new FileOutputStream(outFile);
+                                    new FileOutputStream(classFileName.toString());
                                 BufferedOutputStream bos = 
                                     new BufferedOutputStream(fout);
                                 bos.write(bytes);

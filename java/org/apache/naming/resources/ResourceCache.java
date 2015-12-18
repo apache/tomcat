@@ -249,28 +249,26 @@ public class ResourceCache {
                 // Give up, no changes are made to the current cache
                 return false;
             }
-            if (toFree > 0) {
-                // Randomly select an entry in the array
-                int entryPos = -1;
-                boolean unique = false;
-                while (!unique) {
-                    unique = true;
-                    entryPos = random.nextInt(cache.length) ;
-                    // Guarantee uniqueness
-                    for (int i = 0; i < entriesFound; i++) {
-                        if (toRemove[i] == entryPos) {
-                            unique = false;
-                        }
+            // Randomly select an entry in the array
+            int entryPos = -1;
+            boolean unique = false;
+            while (!unique) {
+                unique = true;
+                entryPos = random.nextInt(cache.length) ;
+                // Guarantee uniqueness
+                for (int i = 0; i < entriesFound; i++) {
+                    if (toRemove[i] == entryPos) {
+                        unique = false;
                     }
                 }
-                long entryAccessRatio = 
-                    ((cache[entryPos].accessCount * 100) / accessCount);
-                if (entryAccessRatio < desiredEntryAccessRatio) {
-                    toRemove[entriesFound] = entryPos;
-                    totalSpace += cache[entryPos].size;
-                    toFree -= cache[entryPos].size;
-                    entriesFound++;
-                }
+            }
+            long entryAccessRatio = 
+                ((cache[entryPos].accessCount * 100) / accessCount);
+            if (entryAccessRatio < desiredEntryAccessRatio) {
+                toRemove[entriesFound] = entryPos;
+                totalSpace += cache[entryPos].size;
+                toFree -= cache[entryPos].size;
+                entriesFound++;
             }
             attempts++;
         }
