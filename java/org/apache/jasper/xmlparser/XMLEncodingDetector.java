@@ -157,7 +157,7 @@ public class XMLEncodingDetector {
                 // Special case UTF-8 files with BOM created by Microsoft
                 // tools. It's more efficient to consume the BOM than make
                 // the reader perform extra checks. -Ac
-                if (count > 2 && encoding.equals("UTF-8")) {
+                if (encoding.equals("UTF-8")) {
                     int b0 = b4[0] & 0xFF;
                     int b1 = b4[1] & 0xFF;
                     int b2 = b4[2] & 0xFF;

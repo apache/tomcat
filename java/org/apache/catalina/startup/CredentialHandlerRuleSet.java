@@ -80,29 +80,21 @@ public class CredentialHandlerRuleSet extends RuleSetBase {
      */
     @Override
     public void addRuleInstances(Digester digester) {
-
-        String pattern = prefix;
-
+        StringBuilder pattern = new StringBuilder(prefix);
         for (int i = 0; i < MAX_NESTED_LEVELS; i++) {
-
             if (i > 0) {
-                pattern += "/";
+                pattern.append("/");
             }
-            pattern += "CredentialHandler";
-
-            digester.addObjectCreate(pattern,
-                                     null, // MUST be specified in the element,
-                                     "className");
-            digester.addSetProperties(pattern);
-            if (i == 0) {
-                digester.addSetNext(pattern,
-                                    "setCredentialHandler",
-                                    "org.apache.catalina.CredentialHandler");
-            } else {
-                digester.addSetNext(pattern,
-                                    "addCredentialHandler",
-                                    "org.apache.catalina.CredentialHandler");
-            }
+            pattern.append("CredentialHandler");
+            addRuleInstances(digester, pattern.toString(), i == 0 ? "setCredentialHandler"
+                    : "addCredentialHandler");
         }
+    }
+
+    private void addRuleInstances(Digester digester, String pattern, String methodName) {
+        digester.addObjectCreate(pattern, null /* MUST be specified in the element */,
+                "className");
+        digester.addSetProperties(pattern);
+        digester.addSetNext(pattern, methodName, "org.apache.catalina.CredentialHandler");
     }
 }
