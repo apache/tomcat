@@ -41,7 +41,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
  */
 public class ConnectorStoreAppender extends StoreAppender {
 
-    protected static HashMap<String, String> replacements = new HashMap<>();
+    protected static final HashMap<String, String> replacements = new HashMap<>();
     static {
         replacements.put("backlog", "acceptCount");
         replacements.put("soLinger", "connectionLinger");

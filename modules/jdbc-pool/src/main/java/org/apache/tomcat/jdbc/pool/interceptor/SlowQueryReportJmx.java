@@ -64,7 +64,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
     private static final Log log = LogFactory.getLog(SlowQueryReportJmx.class);
 
 
-    protected static ConcurrentHashMap<String,SlowQueryReportJmxMBean> mbeans =
+    protected static final ConcurrentHashMap<String,SlowQueryReportJmxMBean> mbeans =
         new ConcurrentHashMap<>();
 
 
@@ -99,7 +99,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
 
     protected String poolName = null;
 
-    protected static AtomicLong notifySequence = new AtomicLong(0);
+    protected static final AtomicLong notifySequence = new AtomicLong(0);
 
     protected boolean notifyPool = true;
 

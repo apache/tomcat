@@ -100,7 +100,7 @@ public class TestWsSubprotocols extends TomcatBaseTest {
 
     @ServerEndpoint(value = "/echo", subprotocols = {"sp1","sp2"})
     public static class SubProtocolsEndpoint {
-        public static String PATH_BASIC = "/echo";
+        public static final String PATH_BASIC = "/echo";
         public static volatile List<String> subprotocols;
 
         @OnOpen

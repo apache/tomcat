@@ -37,7 +37,7 @@ public class NioChannel implements ByteChannel {
 
     protected static final StringManager sm = StringManager.getManager(NioChannel.class);
 
-    protected static ByteBuffer emptyBuf = ByteBuffer.allocate(0);
+    protected static final ByteBuffer emptyBuf = ByteBuffer.allocate(0);
 
     protected SocketChannel sc = null;
     protected SocketWrapperBase<NioChannel> socket = null;

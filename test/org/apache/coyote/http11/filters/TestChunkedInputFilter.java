@@ -465,7 +465,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
                 throw ioe;
             }
 
-            pw.write(Integer.valueOf(count).toString());
+            pw.write(Integer.toString(count));
 
             // Headers should be visible now
             dumpHeader("x-trailer1", req, pw);
@@ -521,7 +521,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
                 throw ioe;
             }
 
-            pw.write(Integer.valueOf(countRead).toString());
+            pw.write(Integer.toString(countRead));
         }
 
         public boolean getExceptionDuringRead() {

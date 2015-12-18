@@ -255,7 +255,7 @@ public class TestUdpPackages {
         public byte[] data;
         public byte key;
         public boolean hasNr = false;
-        public static Random r = new Random();
+        public static final Random r = new Random();
         public static Data createRandomData() {
             return createRandomData(ChannelReceiver.MAX_UDP_SIZE);
         }

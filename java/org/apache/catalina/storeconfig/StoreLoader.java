@@ -78,7 +78,7 @@ public class StoreLoader {
     /**
      * The <code>Digester</code> instance used to parse registry descriptors.
      */
-    protected static Digester digester = createDigester();
+    protected static final Digester digester = createDigester();
 
     private StoreRegistry registry;
 

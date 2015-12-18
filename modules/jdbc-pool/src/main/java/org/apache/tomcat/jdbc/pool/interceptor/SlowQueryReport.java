@@ -48,7 +48,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
     /**
      * we will be keeping track of query stats on a per pool basis
      */
-    protected static ConcurrentHashMap<String,ConcurrentHashMap<String,QueryStats>> perPoolStats =
+    protected static final ConcurrentHashMap<String,ConcurrentHashMap<String,QueryStats>> perPoolStats =
         new ConcurrentHashMap<>();
     /**
      * the queries that are used for this interceptor.

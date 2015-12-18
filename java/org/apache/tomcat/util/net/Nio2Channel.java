@@ -33,7 +33,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class Nio2Channel implements AsynchronousByteChannel {
 
-    protected static ByteBuffer emptyBuf = ByteBuffer.allocate(0);
+    protected static final ByteBuffer emptyBuf = ByteBuffer.allocate(0);
 
     protected AsynchronousSocketChannel sc = null;
     protected SocketWrapperBase<Nio2Channel> socket = null;
