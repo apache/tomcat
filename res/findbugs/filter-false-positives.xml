@@ -350,6 +350,12 @@
     <Bug code="ES"/>
   </Match>
   <Match>
+    <!-- Use of == is deliberate, String.intern() is used -->
+    <Class name="org.apache.jasper.xmlparser.XMLEncodingDetector"/>
+    <Method name="scanXMLDeclOrTextDecl"/>
+    <Bug code="ES"/>
+  </Match>
+  <Match>
     <!-- Stream is closed in o.a.juli.ClassLoaderLogManager.readConfiguration
          (InputStream, ClassLoader) -->
     <Class name="org.apache.juli.ClassLoaderLogManager"/>

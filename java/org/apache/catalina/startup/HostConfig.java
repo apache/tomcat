@@ -1832,7 +1832,7 @@ public class HostConfig implements LifecycleListener {
 
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
-            if (event.getType() == Lifecycle.AFTER_STOP_EVENT) {
+            if (Lifecycle.AFTER_STOP_EVENT.equals(event.getType())) {
                 // The context has stopped.
                 Context context = (Context) event.getLifecycle();
 
