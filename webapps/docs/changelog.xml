@@ -81,6 +81,10 @@
         a warning if a class path entry cannot be scanned rather than triggering
         the failure of the web application. (markt)
       </fix>
+      <fix>
+        <bug>58702</bug>: Ensure an access log entry is generated if the client
+        aborts the connection. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
