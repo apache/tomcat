@@ -515,7 +515,7 @@ public class XByteBuffer {
             //assume it does exist
             found = true;
             for (int i = 1; ( (i < findlen) && found); i++)
-                found = found && (find[i] == src[pos + i]);
+                found = (find[i] == src[pos + i]);
             if (found)
                 result = pos;
             else if ( (srclen - pos) < findlen)
