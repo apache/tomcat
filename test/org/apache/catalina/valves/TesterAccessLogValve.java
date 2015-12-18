@@ -43,6 +43,7 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
 
     @Override
     public void log(Request request, Response response, long time) {
+        (new Exception("Do log")).printStackTrace();
         entries.add(new Entry(request.getRequestURI(), response.getStatus(),
                 time));
     }
