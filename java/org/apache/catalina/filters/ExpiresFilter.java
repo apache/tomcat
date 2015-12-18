@@ -218,12 +218,12 @@ import org.apache.juli.logging.LogFactory;
  * {@code
  * <init-param>
  *    <param-name>ExpiresDefault</param-name>
- *    <param-value><base> [plus] {<num> <type>}*</param-value>
+ *    <param-value><base> [plus] (<num> <type>)*</param-value>
  * </init-param>
  *
  * <init-param>
  *    <param-name>ExpiresByType type/encoding</param-name>
- *    <param-value><base> [plus] {<num> <type>}*</param-value>
+ *    <param-value><base> [plus] (<num> <type>)*</param-value>
  * </init-param>
  * }
  * </pre>
