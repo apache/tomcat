@@ -462,7 +462,7 @@ class JspReader {
                 // Move beyond the '{'
                 nextChar();
                 skipELExpression();
-            } else if (ch == firstChar && prev != '\\') {
+            } else if (ch == firstChar) {
                 for (int i = 1 ; i < limlen ; i++) {
                     if (peekChar() == limit.charAt(i))
                         nextChar();
