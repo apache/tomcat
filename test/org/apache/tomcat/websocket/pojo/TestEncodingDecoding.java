@@ -474,7 +474,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
     public static class MsgByteMessageHandler implements
             MessageHandler.Whole<MsgByte> {
 
-        public static Queue<Object> received = new ConcurrentLinkedQueue<>();
+        public static final Queue<Object> received = new ConcurrentLinkedQueue<>();
         private final Session session;
 
         public MsgByteMessageHandler(Session session) {
@@ -498,7 +498,7 @@ public class TestEncodingDecoding extends TomcatBaseTest {
 
     public static class MsgStringMessageHandler implements MessageHandler.Whole<MsgString> {
 
-        public static Queue<Object> received = new ConcurrentLinkedQueue<>();
+        public static final Queue<Object> received = new ConcurrentLinkedQueue<>();
         private final Session session;
 
         public MsgStringMessageHandler(Session session) {

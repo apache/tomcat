@@ -115,7 +115,7 @@ public class TestRemoteProcessException {
         public byte[] data;
         public byte key;
         public boolean error = false;
-        public static Random r = new Random();
+        public static final Random r = new Random();
         public static Data createRandomData(boolean error) {
             int i = r.nextInt();
             i = ( i % 127 );

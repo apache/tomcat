@@ -18,7 +18,7 @@ package javax.el;
 
 public class TesterClass {
 
-    public static String publicStaticString = "publicStaticString";
+    public static final String publicStaticString = "publicStaticString";
     public String publicString = "publicString";
     @SuppressWarnings("unused") // Used in TestStaticFieldELResolver
     private static String privateStaticString = "privateStaticString";

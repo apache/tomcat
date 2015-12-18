@@ -93,7 +93,7 @@ public class TestWsRemoteEndpointImplServer extends TomcatBaseTest {
 
     public static class Bug58624Config extends WsContextListener {
 
-        public static String PATH = "/bug58624";
+        public static final String PATH = "/bug58624";
         @Override
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);
