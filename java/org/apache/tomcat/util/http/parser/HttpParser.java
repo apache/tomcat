@@ -46,7 +46,7 @@ public class HttpParser {
             } else if (i == '(' || i == ')' || i == '<' || i == '>'  || i == '@'  ||
                        i == ',' || i == ';' || i == ':' || i == '\\' || i == '\"' ||
                        i == '/' || i == '[' || i == ']' || i == '?'  || i == '='  ||
-                       i == '{' || i == '}' || i == ' ' || i == '\t') {
+                       i == '{' || i == '}' || i == ' ') {
                 isToken[i] = false;
             } else {
                 isToken[i] = true;
