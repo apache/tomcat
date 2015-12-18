@@ -143,6 +143,10 @@
         the failure of the web application. Includes a test case written by
          Derek Abdine. (markt)
       </fix>
+      <fix>
+        <bug>58702</bug>: Ensure an access log entry is generated if the client
+        aborts the connection. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
