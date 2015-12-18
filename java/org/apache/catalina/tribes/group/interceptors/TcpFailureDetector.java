@@ -160,7 +160,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
                 log.info(sm.getString("tcpFailureDetector.memberDisappeared.verify", member));
             synchronized (membership) {
                 if (!membership.contains(member)) {
-                    if(!shutdown && log.isInfoEnabled())
+                    if(log.isInfoEnabled())
                         log.info(sm.getString("tcpFailureDetector.already.disappeared", member));
                     return;
                 }
@@ -179,11 +179,11 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
                 }
             }
             if ( notify ) {
-                if(!shutdown && log.isInfoEnabled())
+                if(log.isInfoEnabled())
                     log.info(sm.getString("tcpFailureDetector.member.disappeared", member));
                 super.memberDisappeared(member);
             } else {
-                if(!shutdown && log.isInfoEnabled())
+                if(log.isInfoEnabled())
                     log.info(sm.getString("tcpFailureDetector.still.alive", member));
             }
         }
