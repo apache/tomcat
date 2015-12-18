@@ -255,6 +255,12 @@
         Don't create session unnecessarily in the Host Manager application.
         (markt)
       </fix>
+      <fix>
+        <bug>58723</bug>: Clarify documentation and error messages for the text
+        interface of the manager to make clear that version must be used with
+        path when referencing contexts deployed using parallel deployment.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">

@@ -111,7 +111,7 @@ With Ant</a> for more information.</li>
 anyone on the Internet to execute the Manager application on your server.
 Therefore, the Manager application is shipped with the requirement that anyone
 who attempts to use it must authenticate themselves, using a username and
-password that have one of <strong>manager-**</strong> roles associated with
+password that have one of <strong>manager-xxx</strong> roles associated with
 them (the role name depends on what functionality is required).
 Further, there is no username in the default users file
 (<code>$CATALINA_BASE/conf/tomcat-users.xml</code>) that is assigned to those
@@ -158,12 +158,11 @@ what commands to call. You should be cautious when enabling the
 
 <p>To enable access to the Manager web application, you must either create
 a new username/password combination and associate one of the
-<strong>manager-**</strong> roles with it, or add a
-<strong>manager-**</strong> role
+<strong>manager-xxx</strong> roles with it, or add a
+<strong>manager-xxx</strong> role
 to some existing username/password combination.
-As the majority of this document describes the commands of plain textual
-interface, let the role name for further example to be
-<strong>manager-script</strong>.
+As the majority of this document describes the using the text interface, this
+example will use the role name <strong>manager-script</strong>.
 Exactly how the usernames/passwords are configured depends on which
 <a href="config/realm.html">Realm implementation</a> you are using:</p>
 <ul>
@@ -201,9 +200,9 @@ BASIC authentication.  The username and password you enter do not matter,
 as long as they identify a valid user in the users database who possesses
 the role <strong>manager-script</strong>.</p>
 
-<p>In addition to the password restrictions the Manager web application
-could be restricted by the <strong>remote IP address</strong> or host by adding
-a <code>RemoteAddrValve</code> or <code>RemoteHostValve</code>.
+<p>In addition to the password restrictions, access to the Manager web
+application can be restricted by the <strong>remote IP address</strong> or host
+by adding a <code>RemoteAddrValve</code> or <code>RemoteHostValve</code>.
 See <a href="config/valve.html#Remote_Address_Filter">valves documentation</a>
 for details. Here is
 an example of restricting access to the localhost by IP address:</p>
@@ -262,7 +261,10 @@ the host and port appropriately for your installation.</p>
     It is not possible to perform administrative commands on the
     Manager application itself.</li>
 <li><strong>version</strong> - The version of this web application as used by
-    the <a href="config/context.html">parallel deployment</a> feature,</li>
+    the <a href="config/context.html">parallel deployment</a> feature. If you
+    use parallel deployment wherever a path is required you must specify a
+    version in addition to the path and it is the combinationn of path and
+    version that must be unique rather than just the path.</li>
 <li><strong>war</strong> - URL of a web application archive (WAR) file, or
     pathname of a directory which contains the web application, or a
     Context configuration ".xml" file.  You can use URLs in any of the
@@ -311,10 +313,10 @@ version of the messages.</p>
 
 <p>Upload the web application archive (WAR) file that is specified as the
 request data in this HTTP PUT request, install it into the <code>appBase</code>
-directory of our corresponding virtual host, and start , using the directory
-name or the war file name without the .war extension as the path.  The
-application can later be undeployed (and the corresponding application directory
-removed) by use of the <code>/undeploy</code> command.</p>
+directory of our corresponding virtual host, and start , deriving the name for
+the WAR file added to the <code>appBase</code> from the specified path. The
+application can later be undeployed (and the corresponding WAR file removed) by
+use of the <code>/undeploy</code> command.</p>
 
 <p>This command is executed by an HTTP PUT request.</p>
 
@@ -384,9 +386,9 @@ removing it would make the deployment fail.</p>
 <subsection name="Deploy a Directory or WAR by URL">
 
 <p>Deploy a web application directory or ".war" file located on the Tomcat
-server. If no <code>path</code> is specified, the directory name or the war file
-name without the ".war" extension is used as the path. The <code>war</code>
-parameter specifies a URL (including the <code>file:</code> scheme) for either
+server. If no <code>path</code> is specified, the path and version are derived
+from the directory name or the war file name. The <code>war</code> parameter
+specifies a URL (including the <code>file:</code> scheme) for either
 a directory or a web application archive (WAR) file. The supported syntax for
 a URL referring to a WAR file is described on the Javadocs page for the
 <code>java.net.JarURLConnection</code> class.  Use only URLs that refer to
@@ -410,8 +412,8 @@ file without the ".war" extension.</p>
 <subsection name="Deploy a Directory or War from the Host appBase">
 
 <p>Deploy a web application directory or ".war" file located in your Host
-appBase directory. The directory name or the war file name without the ".war"
-extension is used as the path.</p>
+appBase directory. The path and optional version are derived from the directory
+or war file name.</p>
 
 <p>In this example the web application located in a sub directory named
 <code>foo</code> in the Host appBase directory of the Tomcat server is
@@ -547,10 +549,12 @@ error message.  Possible causes for problems include:</p>
 deployed web applications.  A typical response immediately
 after starting Tomcat might look like this:</p>
 <source>OK - Listed applications for virtual host localhost
-/webdav:running:0
-/examples:running:0
-/manager:running:0
-/:running:0</source>
+/webdav:running:0:webdav
+/examples:running:0:examples
+/manager:running:0:manager
+/:running:0:ROOT
+/test:running:0:test##2
+/test:running:0:test##1</source>
 
 </subsection>
 
@@ -563,11 +567,6 @@ be useful when the web application context is not reloadable and you have
 updated classes or property files in the <code>/WEB-INF/classes</code>
 directory or when you have added or updated jar files in the
 <code>/WEB-INF/lib</code> directory.
-</p>
-<p><strong>NOTE:</strong> The <code>/WEB-INF/web.xml</code>
-web application configuration file is not reread on a reload.
-If you have made changes to your web.xml file you must stop
-then start the web application.
 </p>
 
 <p>If this command succeeds, you will see a response like this:</p>
@@ -809,9 +808,8 @@ error message.  Possible causes for problems include:</p>
     <p>The context path must start with a slash character. To reference the
     ROOT web application use "/".</p>
     </li>
-<li><em>No context exists for path /foo</em>
-    <p>There is no deployed application on the context path
-    that you specified.</p>
+<li><em>No context exists named /foo</em>
+    <p>There is no deployed application with the name that you specified.</p>
     </li>
 <li><em>No context path was specified</em>
     The <code>path</code> parameter is required.
@@ -961,7 +959,7 @@ href="config/listeners.html#StoreConfig_Lifecycle_Listener_-_org.apache.catalina
 <section name="Server Status">
 
 <p>From the following links you can view Status information about the server.
-Any one of <strong>manager-**</strong> roles allows access to this page.</p>
+Any one of <strong>manager-xxx</strong> roles allows access to this page.</p>
 
 <source>http://localhost:8080/manager/status
 http://localhost:8080/manager/status/all</source>
