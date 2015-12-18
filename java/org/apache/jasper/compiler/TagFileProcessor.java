@@ -426,7 +426,7 @@ class TagFileProcessor {
         private void checkUniqueName(String name, String type, Node n,
                 TagAttributeInfo attr) throws JasperException {
 
-            HashMap<String, NameEntry> table = (type == VAR_NAME_FROM) ? nameFromTable : nameTable;
+            HashMap<String, NameEntry> table = (VAR_NAME_FROM.equals(type)) ? nameFromTable : nameTable;
             NameEntry nameEntry = table.get(name);
             if (nameEntry != null) {
                 if (!TAG_DYNAMIC.equals(type) ||

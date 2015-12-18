@@ -203,7 +203,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         // When the server starts, configure JMX/RMI
-        if (Lifecycle.START_EVENT == event.getType()) {
+        if (Lifecycle.START_EVENT.equals(event.getType())) {
             // Configure using standard jmx system properties 
             init();
 
@@ -284,7 +284,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
             csPlatform = createServer("Platform", rmiBindAddress, rmiRegistryPortPlatform,
                     rmiServerPortPlatform, env, registryCsf, registrySsf, serverCsf, serverSsf);
             
-        } else if (Lifecycle.STOP_EVENT == event.getType()) {
+        } else if (Lifecycle.STOP_EVENT.equals(event.getType())) {
             destroyServer("Platform", csPlatform);
         }
     }
