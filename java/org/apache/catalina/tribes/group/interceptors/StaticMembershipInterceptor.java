@@ -28,6 +28,7 @@ import org.apache.catalina.tribes.group.AbsoluteOrder;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
+import org.apache.catalina.tribes.membership.StaticMember;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -38,6 +39,10 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
     protected static final byte[] MEMBER_START = new byte[] {
         76, 111, 99, 97, 108, 32, 83, 116, 97, 116, 105, 99, 77, 101, 109, 98, 101, 114, 32, 78,
         111, 116, 105, 102, 105, 99, 97, 116, 105, 111, 110, 32, 68, 97, 116, 97};
+
+    protected static final byte[] MEMBER_STOP = new byte[] {
+        76, 111, 99, 97, 108, 32, 83, 116, 97, 116, 105, 99, 77, 101, 109, 98, 101, 114, 32, 83,
+        104, 117, 116, 100, 111, 119, 110, 32, 68, 97, 116, 97};
 
     protected ArrayList<Member> members = new ArrayList<Member>();
     protected Member localMember = null;
@@ -71,7 +76,18 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
             if (member != null) {
                 super.memberAdded(member);
             }
-            
+        } else if (msg.getMessage().getLength() == MEMBER_STOP.length &&
+                Arrays.equals(MEMBER_STOP, msg.getMessage().getBytes())) {
+            // receive member shutdown
+            Member member = getMember(msg.getAddress());
+            if (member != null && member instanceof StaticMember) {
+                try {
+                    ((StaticMember)member).setCommand(Member.SHUTDOWN_PAYLOAD);
+                    super.memberDisappeared(member);
+                } finally {
+                    ((StaticMember)member).setCommand(new byte[0]);
+                }
+            }
         } else {
             super.messageReceived(msg);
         }
@@ -171,17 +187,32 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Sends local member shutdown.
+     */
+    @Override
+    public void stop(int svc) throws ChannelException {
+        // Sends local member shutdown.
+        Member[] members = getfirstInterceptor().getMembers();
+        sendShutdown(members);
+        super.stop(svc);
+    }
+
     protected void sendLocalMember(Member[] members) {
-        if ( members == null || members.length == 0 ) return;
-        ChannelData data = new ChannelData(true);
-        data.setAddress(getLocalMember(false));
-        data.setTimestamp(System.currentTimeMillis());
-        data.setOptions(getOptionFlag());
-        data.setMessage(new XByteBuffer(MEMBER_START, false));
         try {
-            super.sendMessage(members, data, null);
-        }catch (ChannelException cx) {
+            sendMemberMessage(members, MEMBER_START);
+        } catch (ChannelException cx) {
             log.warn("Local member notification failed.",cx);
+        }
+    }
+
+    protected void sendShutdown(Member[] members) {
+        try {
+            sendMemberMessage(members, MEMBER_STOP);
+        } catch (ChannelException cx) {
+            log.warn("Shutdown notification failed.",cx);
         }
     }
 
@@ -195,4 +226,13 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
         return result;
     }
 
+    protected void sendMemberMessage(Member[] members, byte[] message) throws ChannelException {
+        if ( members == null || members.length == 0 ) return;
+        ChannelData data = new ChannelData(true);
+        data.setAddress(getLocalMember(false));
+        data.setTimestamp(System.currentTimeMillis());
+        data.setOptions(getOptionFlag());
+        data.setMessage(new XByteBuffer(message, false));
+        super.sendMessage(members, data, null);
+    }
 }

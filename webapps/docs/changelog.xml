@@ -137,6 +137,10 @@
         Ignore the unnecessary member remove operation from different domain.
         (kfujino)
       </fix>
+      <fix>
+        Add support for the shutdown notification of local members in the static
+        cluster. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
