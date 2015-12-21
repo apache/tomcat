@@ -199,28 +199,16 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
     }
     
     protected void sendLocalMember(Member[] members) {
-        if ( members == null || members.length == 0 ) return;
-        ChannelData data = new ChannelData(true);
-        data.setAddress(getLocalMember(false));
-        data.setTimestamp(System.currentTimeMillis());
-        data.setOptions(getOptionFlag());
-        data.setMessage(new XByteBuffer(MEMBER_START, false));
         try {
-            super.sendMessage(members, data, null);
+            sendMemberMessage(members, MEMBER_START);
         } catch (ChannelException cx) {
             log.warn(sm.getString("staticMembershipInterceptor.sendLocalMember.failed"),cx);
         }
     }
 
     protected void sendShutdown(Member[] members) {
-        if ( members == null || members.length == 0 ) return;
-        ChannelData data = new ChannelData(true);
-        data.setAddress(getLocalMember(false));
-        data.setTimestamp(System.currentTimeMillis());
-        data.setOptions(getOptionFlag());
-        data.setMessage(new XByteBuffer(MEMBER_STOP, false));
         try {
-            super.sendMessage(members, data, null);
+            sendMemberMessage(members, MEMBER_STOP);
         } catch (ChannelException cx) {
             log.warn(sm.getString("staticMembershipInterceptor.sendShutdown.failed"),cx);
         }
@@ -234,5 +222,15 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
             now = now.getPrevious();
         } while (now.getPrevious() != null);
         return result;
+    }
+
+    protected void sendMemberMessage(Member[] members, byte[] message) throws ChannelException {
+        if ( members == null || members.length == 0 ) return;
+        ChannelData data = new ChannelData(true);
+        data.setAddress(getLocalMember(false));
+        data.setTimestamp(System.currentTimeMillis());
+        data.setOptions(getOptionFlag());
+        data.setMessage(new XByteBuffer(message, false));
+        super.sendMessage(members, data, null);
     }
 }
