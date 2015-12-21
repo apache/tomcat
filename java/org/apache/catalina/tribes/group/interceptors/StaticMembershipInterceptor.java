@@ -83,8 +83,12 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
             // receive member shutdown
             Member member = getMember(msg.getAddress());
             if (member != null) {
-                member.setCommand(Member.SHUTDOWN_PAYLOAD);
-                super.memberDisappeared(member);
+                try {
+                    member.setCommand(Member.SHUTDOWN_PAYLOAD);
+                    super.memberDisappeared(member);
+                } finally {
+                    member.setCommand(new byte[0]);
+                }
             }
         } else {
             super.messageReceived(msg);
