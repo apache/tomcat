@@ -197,7 +197,7 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
         sendShutdown(members);
         super.stop(svc);
     }
-    
+
     protected void sendLocalMember(Member[] members) {
         try {
             sendMemberMessage(members, MEMBER_START);
