@@ -42,6 +42,10 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
         76, 111, 99, 97, 108, 32, 83, 116, 97, 116, 105, 99, 77, 101, 109, 98, 101, 114, 32, 78,
         111, 116, 105, 102, 105, 99, 97, 116, 105, 111, 110, 32, 68, 97, 116, 97};
 
+    protected static final byte[] MEMBER_STOP = new byte[] {
+        76, 111, 99, 97, 108, 32, 83, 116, 97, 116, 105, 99, 77, 101, 109, 98, 101, 114, 32, 83,
+        104, 117, 116, 100, 111, 119, 110, 32, 68, 97, 116, 97};
+
     protected final ArrayList<Member> members = new ArrayList<>();
     protected Member localMember = null;
 
@@ -73,6 +77,14 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
             Member member = getMember(msg.getAddress());
             if (member != null) {
                 super.memberAdded(member);
+            }
+        } else if (msg.getMessage().getLength() == MEMBER_STOP.length &&
+                    Arrays.equals(MEMBER_STOP, msg.getMessage().getBytes())) {
+            // receive member shutdown
+            Member member = getMember(msg.getAddress());
+            if (member != null) {
+                member.setCommand(Member.SHUTDOWN_PAYLOAD);
+                super.memberDisappeared(member);
             }
         } else {
             super.messageReceived(msg);
@@ -169,6 +181,19 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Sends local member shutdown.
+     */
+    @Override
+    public void stop(int svc) throws ChannelException {
+        // Sends local member shutdown.
+        Member[] members = getfirstInterceptor().getMembers();
+        sendShutdown(members);
+        super.stop(svc);
+    }
+    
     protected void sendLocalMember(Member[] members) {
         if ( members == null || members.length == 0 ) return;
         ChannelData data = new ChannelData(true);
@@ -178,8 +203,22 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
         data.setMessage(new XByteBuffer(MEMBER_START, false));
         try {
             super.sendMessage(members, data, null);
-        }catch (ChannelException cx) {
+        } catch (ChannelException cx) {
             log.warn(sm.getString("staticMembershipInterceptor.sendLocalMember.failed"),cx);
+        }
+    }
+
+    protected void sendShutdown(Member[] members) {
+        if ( members == null || members.length == 0 ) return;
+        ChannelData data = new ChannelData(true);
+        data.setAddress(getLocalMember(false));
+        data.setTimestamp(System.currentTimeMillis());
+        data.setOptions(getOptionFlag());
+        data.setMessage(new XByteBuffer(MEMBER_STOP, false));
+        try {
+            super.sendMessage(members, data, null);
+        } catch (ChannelException cx) {
+            log.warn(sm.getString("staticMembershipInterceptor.sendShutdown.failed"),cx);
         }
     }
 
