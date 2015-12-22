@@ -147,6 +147,9 @@
         <bug>58702</bug>: Ensure an access log entry is generated if the client
         aborts the connection. (markt)
       </fix>
+      <fix>
+        Fixed various issues reported by Findbugs. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
