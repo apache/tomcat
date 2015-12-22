@@ -1033,21 +1033,19 @@ public class NamingResources extends LifecycleMBeanBase implements Serializable 
                     name, container, closeMethod));
             return;
         }
-        if (m != null) {
-            try {
-                m.invoke(resource, (Object[]) null);
-            } catch (IllegalArgumentException e) {
-                log.warn(sm.getString("namingResources.cleanupCloseFailed",
-                        closeMethod, name, container), e);
-            } catch (IllegalAccessException e) {
-                log.warn(sm.getString("namingResources.cleanupCloseFailed",
-                        closeMethod, name, container), e);
-            } catch (InvocationTargetException e) {
-                Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
-                ExceptionUtils.handleThrowable(t);
-                log.warn(sm.getString("namingResources.cleanupCloseFailed",
-                        closeMethod, name, container), t);
-            }
+        try {
+            m.invoke(resource, (Object[]) null);
+        } catch (IllegalArgumentException e) {
+            log.warn(sm.getString("namingResources.cleanupCloseFailed",
+                    closeMethod, name, container), e);
+        } catch (IllegalAccessException e) {
+            log.warn(sm.getString("namingResources.cleanupCloseFailed",
+                    closeMethod, name, container), e);
+        } catch (InvocationTargetException e) {
+            Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
+            ExceptionUtils.handleThrowable(t);
+            log.warn(sm.getString("namingResources.cleanupCloseFailed",
+                    closeMethod, name, container), t);
         }
     }
 

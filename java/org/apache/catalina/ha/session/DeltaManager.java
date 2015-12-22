@@ -1168,7 +1168,7 @@ public class DeltaManager extends ClusterManagerBase{
         try {
             
             ClassLoader[] loaders = getClassLoaders();
-            if ( loaders != null && loaders.length > 0) Thread.currentThread().setContextClassLoader(loaders[0]);
+            Thread.currentThread().setContextClassLoader(loaders[0]);
             if (log.isDebugEnabled()) log.debug(sm.getString("deltaManager.receiveMessage.eventType",getName(), msg.getEventTypeString(), sender));
  
             switch (msg.getEventType()) {
