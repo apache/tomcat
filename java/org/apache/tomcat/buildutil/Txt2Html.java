@@ -126,39 +126,48 @@ public class Txt2Html
         throws IOException
     {
         // Open files:
-        BufferedReader in = new BufferedReader( new FileReader( from ) );
-        PrintWriter out = new PrintWriter( new FileWriter( to ) );
+        BufferedReader in = null;
+        PrintWriter out = null;
+        try {
+            in = new BufferedReader( new FileReader( from ) );
+            out = new PrintWriter( new FileWriter( to ) );
+            // Output header:
+            out.println( "<html><body><pre>" );
 
-        // Output header:
-        out.println( "<html><body><pre>" );
+            // Convert, line-by-line:
+            String line;
+            while( (line = in.readLine()) != null ) {
+                StringBuilder result = new StringBuilder();
+                int len = line.length();
+                for( int i = 0; i < len; i++ ) {
+                    char c = line.charAt( i );
+                    switch( c ) {
+                        case '&':
+                            result.append( "&amp;" );
+                            break;
+                        case '<':
+                            result.append( "&lt;" );
+                            break;
+                        default:
+                            result.append( c );
+                    }
+                }
+                out.println( result.toString() );
+            }
 
-        // Convert, line-by-line:
-        String line;
-        while( (line = in.readLine()) != null ) {
-            StringBuilder result = new StringBuilder();
-            int len = line.length();
-            for( int i = 0; i < len; i++ ) {
-                char c = line.charAt( i );
-                switch( c ) {
-                    case '&':
-                        result.append( "&amp;" );
-                        break;
-                    case '<':
-                        result.append( "&lt;" );
-                        break;
-                    default:
-                        result.append( c );
+            // Output footer:
+            out.println( "</pre></body></html>" );
+        } finally {
+            if (out != null) {
+                out.close();
+            }
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
                 }
             }
-            out.println( result.toString() );
         }
-
-        // Output footer:
-        out.println( "</pre></body></html>" );
-
-        // Close streams:
-        out.close();
-        in.close();
     }
 
 }

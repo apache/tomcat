@@ -43,7 +43,6 @@ import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
-
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -619,46 +618,69 @@ public class DefaultServlet
             contentFile.deleteOnExit();
         }
 
-        RandomAccessFile randAccessContentFile =
-            new RandomAccessFile(contentFile, "rw");
-
-        Resource oldResource = null;
+        RandomAccessFile randAccessContentFile = null;
         try {
-            Object obj = resources.lookup(path);
-            if (obj instanceof Resource)
-                oldResource = (Resource) obj;
-        } catch (NamingException e) {
-            // Ignore
-        }
-
-        // Copy data in oldRevisionContent to contentFile
-        if (oldResource != null) {
-            BufferedInputStream bufOldRevStream =
-                new BufferedInputStream(oldResource.streamContent(),
-                                        BUFFER_SIZE);
-
-            int numBytesRead;
-            byte[] copyBuffer = new byte[BUFFER_SIZE];
-            while ((numBytesRead = bufOldRevStream.read(copyBuffer)) != -1) {
-                randAccessContentFile.write(copyBuffer, 0, numBytesRead);
+            randAccessContentFile =
+                    new RandomAccessFile(contentFile, "rw");
+            Resource oldResource = null;
+            try {
+                Object obj = resources.lookup(path);
+                if (obj instanceof Resource)
+                    oldResource = (Resource) obj;
+            } catch (NamingException e) {
+                // Ignore
             }
 
-            bufOldRevStream.close();
-        }
+            // Copy data in oldRevisionContent to contentFile
+            if (oldResource != null) {
+                BufferedInputStream bufOldRevStream = null;
+                try {
+                    bufOldRevStream =
+                            new BufferedInputStream(oldResource.streamContent(),
+                                                    BUFFER_SIZE);
+                    int numBytesRead;
+                    byte[] copyBuffer = new byte[BUFFER_SIZE];
+                    while ((numBytesRead = bufOldRevStream.read(copyBuffer)) != -1) {
+                        randAccessContentFile.write(copyBuffer, 0, numBytesRead);
+                    }
+                } finally {
+                    if (bufOldRevStream != null) {
+                        try {
+                            bufOldRevStream.close();
+                        } catch (IOException e) {
+                        }
+                    }
+                }
+            }
 
-        randAccessContentFile.setLength(range.length);
+            randAccessContentFile.setLength(range.length);
 
-        // Append data in request input stream to contentFile
-        randAccessContentFile.seek(range.start);
-        int numBytesRead;
-        byte[] transferBuffer = new byte[BUFFER_SIZE];
-        BufferedInputStream requestBufInStream =
-            new BufferedInputStream(req.getInputStream(), BUFFER_SIZE);
-        while ((numBytesRead = requestBufInStream.read(transferBuffer)) != -1) {
-            randAccessContentFile.write(transferBuffer, 0, numBytesRead);
+            // Append data in request input stream to contentFile
+            randAccessContentFile.seek(range.start);
+            int numBytesRead;
+            byte[] transferBuffer = new byte[BUFFER_SIZE];
+            BufferedInputStream requestBufInStream = null;
+            try {
+                requestBufInStream = new BufferedInputStream(req.getInputStream(), BUFFER_SIZE);
+                while ((numBytesRead = requestBufInStream.read(transferBuffer)) != -1) {
+                    randAccessContentFile.write(transferBuffer, 0, numBytesRead);
+                }
+            } finally {
+                if (requestBufInStream != null) {
+                    try {
+                        requestBufInStream.close();
+                    } catch (IOException e) {
+                    }
+                }
+            }
+        } finally {
+            if (randAccessContentFile != null) {
+                try {
+                    randAccessContentFile.close();
+                } catch (IOException e) {
+                }
+            }
         }
-        randAccessContentFile.close();
-        requestBufInStream.close();
 
         return contentFile;
 

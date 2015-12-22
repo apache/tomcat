@@ -442,12 +442,20 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                                 }
                                 byte[] bytes = classFile.getBytes();
                                 classFileName.append(".class");
-                                FileOutputStream fout = 
-                                    new FileOutputStream(classFileName.toString());
-                                BufferedOutputStream bos = 
-                                    new BufferedOutputStream(fout);
-                                bos.write(bytes);
-                                bos.close();
+                                FileOutputStream fout = null;
+                                BufferedOutputStream bos = null;
+                                try {
+                                    fout = new FileOutputStream(classFileName.toString());
+                                    bos = new BufferedOutputStream(fout);
+                                    bos.write(bytes);
+                                } finally {
+                                    if (bos != null) {
+                                        try {
+                                            bos.close();
+                                        } catch (IOException e) {
+                                        }
+                                    }
+                                }
                             }
                         }
                     } catch (IOException exc) {

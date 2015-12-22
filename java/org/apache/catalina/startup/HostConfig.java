@@ -943,9 +943,6 @@ public class HostConfig
                         if (context == null) {
                             context = new FailedContext();
                         }
-                        context.setConfigFile(new URL("jar:" +
-                                war.toURI().toString() + "!/" +
-                                Constants.ApplicationContextXml));
                         if (istream != null) {
                             try {
                                 istream.close();
@@ -963,6 +960,9 @@ public class HostConfig
                             }
                             jar = null;
                         }
+                        context.setConfigFile(new URL("jar:" +
+                                war.toURI().toString() + "!/" +
+                                Constants.ApplicationContextXml));
                         digester.reset();
                     }
                 }

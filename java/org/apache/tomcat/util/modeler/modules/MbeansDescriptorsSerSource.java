@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.modeler.modules;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.net.URL;
@@ -74,8 +75,9 @@ public class MbeansDescriptorsSerSource extends ModelerSource
     public void execute() throws Exception {
         if( registry==null ) registry=Registry.getRegistry(null, null);
         long t1=System.currentTimeMillis();
+        InputStream stream = null;
+        ObjectInputStream ois = null;
         try {
-            InputStream stream=null;
             if( source instanceof URL ) {
                 stream=((URL)source).openStream();
             }
@@ -85,7 +87,7 @@ public class MbeansDescriptorsSerSource extends ModelerSource
             if( stream==null ) {
                 throw new Exception( "Can't process "+ source);
             }
-            ObjectInputStream ois=new ObjectInputStream(stream);
+            ois = new ObjectInputStream(stream);
             Thread.currentThread().setContextClassLoader(ManagedBean.class.getClassLoader());
             Object obj=ois.readObject();
             //log.info("Reading " + obj);
@@ -99,6 +101,19 @@ public class MbeansDescriptorsSerSource extends ModelerSource
             log.error( "Error reading descriptors " + source + " " +  ex.toString(),
                     ex);
             throw ex;
+        } finally {
+            if (ois != null) {
+                try {
+                    ois.close();
+                } catch (IOException e) {
+                }
+            }
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                }
+            }
         }
         long t2=System.currentTimeMillis();
         log.info( "Reading descriptors ( ser ) " + (t2-t1));
