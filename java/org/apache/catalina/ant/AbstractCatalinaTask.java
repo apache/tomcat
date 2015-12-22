@@ -243,7 +243,10 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                     }
                     ostream.flush();
                 } finally {
-                    istream.close();
+                    try {
+                        istream.close();
+                    } catch (Exception e) {
+                    }
                 }
             }
 
