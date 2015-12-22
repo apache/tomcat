@@ -361,15 +361,12 @@ public abstract class Compiler {
                 generateClass(smap);
                 // Fix for bugzilla 41606
                 // Set JspServletWrapper.servletClassLastModifiedTime after successful compile
-                String targetFileName = ctxt.getClassFileName();
-                if (targetFileName != null) {
-                    File targetFile = new File(targetFileName);
-                    if (targetFile.exists()) {
-                        targetFile.setLastModified(jspLastModified.longValue());
-                        if (jsw != null) {
-                            jsw.setServletClassLastModifiedTime(
-                                    jspLastModified.longValue());
-                        }
+                File targetFile = new File(ctxt.getClassFileName());
+                if (targetFile.exists()) {
+                    targetFile.setLastModified(jspLastModified.longValue());
+                    if (jsw != null) {
+                        jsw.setServletClassLastModifiedTime(
+                                jspLastModified.longValue());
                     }
                 }
             }
@@ -547,17 +544,14 @@ public abstract class Compiler {
         removeGeneratedClassFiles();
 
         try {
-            String javaFileName = ctxt.getServletJavaFileName();
-            if (javaFileName != null) {
-                File javaFile = new File(javaFileName);
-                if (log.isDebugEnabled())
-                    log.debug("Deleting " + javaFile);
-                if (javaFile.exists()) {
-                    if (!javaFile.delete()) {
-                        log.warn(Localizer.getMessage(
-                                "jsp.warning.compiler.javafile.delete.fail",
-                                javaFile.getAbsolutePath()));
-                    }
+            File javaFile = new File(ctxt.getServletJavaFileName());
+            if (log.isDebugEnabled())
+                log.debug("Deleting " + javaFile);
+            if (javaFile.exists()) {
+                if (!javaFile.delete()) {
+                    log.warn(Localizer.getMessage(
+                            "jsp.warning.compiler.javafile.delete.fail",
+                            javaFile.getAbsolutePath()));
                 }
             }
         } catch (Exception e) {
@@ -569,17 +563,14 @@ public abstract class Compiler {
 
     public void removeGeneratedClassFiles() {
         try {
-            String classFileName = ctxt.getClassFileName();
-            if (classFileName != null) {
-                File classFile = new File(classFileName);
-                if (log.isDebugEnabled())
-                    log.debug("Deleting " + classFile);
-                if (classFile.exists()) {
-                    if (!classFile.delete()) {
-                        log.warn(Localizer.getMessage(
-                                "jsp.warning.compiler.classfile.delete.fail",
-                                classFile.getAbsolutePath()));
-                    }
+            File classFile = new File(ctxt.getClassFileName());
+            if (log.isDebugEnabled())
+                log.debug("Deleting " + classFile);
+            if (classFile.exists()) {
+                if (!classFile.delete()) {
+                    log.warn(Localizer.getMessage(
+                            "jsp.warning.compiler.classfile.delete.fail",
+                            classFile.getAbsolutePath()));
                 }
             }
         } catch (Exception e) {

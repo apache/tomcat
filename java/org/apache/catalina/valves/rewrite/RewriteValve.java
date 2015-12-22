@@ -122,13 +122,11 @@ public class RewriteValve extends ValveBase {
             File file = new File(getConfigBase(), resourceName);
             try {
                 if (!file.exists()) {
-                    if (resourceName != null) {
-                        // Use getResource and getResourceAsStream
-                        is = getClass().getClassLoader()
-                            .getResourceAsStream(resourceName);
-                        if (is != null && container.getLogger().isDebugEnabled()) {
-                            container.getLogger().debug("Read configuration from CL at " + resourceName);
-                        }
+                    // Use getResource and getResourceAsStream
+                    is = getClass().getClassLoader()
+                        .getResourceAsStream(resourceName);
+                    if (is != null && container.getLogger().isDebugEnabled()) {
+                        container.getLogger().debug("Read configuration from CL at " + resourceName);
                     }
                 } else {
                     if (container.getLogger().isDebugEnabled()) {
