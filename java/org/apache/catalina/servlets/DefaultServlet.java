@@ -569,17 +569,17 @@ public class DefaultServlet extends HttpServlet {
 
         // Copy data in oldRevisionContent to contentFile
         if (oldResource.isFile()) {
-            BufferedInputStream bufOldRevStream =
+            try (BufferedInputStream bufOldRevStream =
                 new BufferedInputStream(oldResource.getInputStream(),
-                        BUFFER_SIZE);
+                        BUFFER_SIZE);) {
 
-            int numBytesRead;
-            byte[] copyBuffer = new byte[BUFFER_SIZE];
-            while ((numBytesRead = bufOldRevStream.read(copyBuffer)) != -1) {
-                randAccessContentFile.write(copyBuffer, 0, numBytesRead);
+                int numBytesRead;
+                byte[] copyBuffer = new byte[BUFFER_SIZE];
+                while ((numBytesRead = bufOldRevStream.read(copyBuffer)) != -1) {
+                    randAccessContentFile.write(copyBuffer, 0, numBytesRead);
+                }
+
             }
-
-            bufOldRevStream.close();
         }
 
         randAccessContentFile.setLength(range.length);
@@ -588,13 +588,13 @@ public class DefaultServlet extends HttpServlet {
         randAccessContentFile.seek(range.start);
         int numBytesRead;
         byte[] transferBuffer = new byte[BUFFER_SIZE];
-        BufferedInputStream requestBufInStream =
-            new BufferedInputStream(req.getInputStream(), BUFFER_SIZE);
-        while ((numBytesRead = requestBufInStream.read(transferBuffer)) != -1) {
-            randAccessContentFile.write(transferBuffer, 0, numBytesRead);
+        try (BufferedInputStream requestBufInStream =
+            new BufferedInputStream(req.getInputStream(), BUFFER_SIZE);) {
+            while ((numBytesRead = requestBufInStream.read(transferBuffer)) != -1) {
+                randAccessContentFile.write(transferBuffer, 0, numBytesRead);
+            }
+            randAccessContentFile.close();
         }
-        randAccessContentFile.close();
-        requestBufInStream.close();
 
         return contentFile;
     }
