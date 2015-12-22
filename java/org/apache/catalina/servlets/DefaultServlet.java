@@ -562,38 +562,38 @@ public class DefaultServlet extends HttpServlet {
             contentFile.deleteOnExit();
         }
 
-        RandomAccessFile randAccessContentFile =
-            new RandomAccessFile(contentFile, "rw");
+        try (RandomAccessFile randAccessContentFile =
+            new RandomAccessFile(contentFile, "rw");) {
 
-        WebResource oldResource = resources.getResource(path);
+            WebResource oldResource = resources.getResource(path);
 
-        // Copy data in oldRevisionContent to contentFile
-        if (oldResource.isFile()) {
-            try (BufferedInputStream bufOldRevStream =
-                new BufferedInputStream(oldResource.getInputStream(),
-                        BUFFER_SIZE);) {
+            // Copy data in oldRevisionContent to contentFile
+            if (oldResource.isFile()) {
+                try (BufferedInputStream bufOldRevStream =
+                    new BufferedInputStream(oldResource.getInputStream(),
+                            BUFFER_SIZE);) {
 
-                int numBytesRead;
-                byte[] copyBuffer = new byte[BUFFER_SIZE];
-                while ((numBytesRead = bufOldRevStream.read(copyBuffer)) != -1) {
-                    randAccessContentFile.write(copyBuffer, 0, numBytesRead);
+                    int numBytesRead;
+                    byte[] copyBuffer = new byte[BUFFER_SIZE];
+                    while ((numBytesRead = bufOldRevStream.read(copyBuffer)) != -1) {
+                        randAccessContentFile.write(copyBuffer, 0, numBytesRead);
+                    }
+
                 }
-
             }
-        }
 
-        randAccessContentFile.setLength(range.length);
+            randAccessContentFile.setLength(range.length);
 
-        // Append data in request input stream to contentFile
-        randAccessContentFile.seek(range.start);
-        int numBytesRead;
-        byte[] transferBuffer = new byte[BUFFER_SIZE];
-        try (BufferedInputStream requestBufInStream =
-            new BufferedInputStream(req.getInputStream(), BUFFER_SIZE);) {
-            while ((numBytesRead = requestBufInStream.read(transferBuffer)) != -1) {
-                randAccessContentFile.write(transferBuffer, 0, numBytesRead);
+            // Append data in request input stream to contentFile
+            randAccessContentFile.seek(range.start);
+            int numBytesRead;
+            byte[] transferBuffer = new byte[BUFFER_SIZE];
+            try (BufferedInputStream requestBufInStream =
+                new BufferedInputStream(req.getInputStream(), BUFFER_SIZE);) {
+                while ((numBytesRead = requestBufInStream.read(transferBuffer)) != -1) {
+                    randAccessContentFile.write(transferBuffer, 0, numBytesRead);
+                }
             }
-            randAccessContentFile.close();
         }
 
         return contentFile;
