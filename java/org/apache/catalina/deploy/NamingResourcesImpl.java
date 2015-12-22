@@ -1039,18 +1039,16 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
                     name, container, closeMethod));
             return;
         }
-        if (m != null) {
-            try {
-                m.invoke(resource, (Object[]) null);
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                log.warn(sm.getString("namingResources.cleanupCloseFailed",
-                        closeMethod, name, container), e);
-            } catch (InvocationTargetException e) {
-                Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
-                ExceptionUtils.handleThrowable(t);
-                log.warn(sm.getString("namingResources.cleanupCloseFailed",
-                        closeMethod, name, container), t);
-            }
+        try {
+            m.invoke(resource, (Object[]) null);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            log.warn(sm.getString("namingResources.cleanupCloseFailed",
+                    closeMethod, name, container), e);
+        } catch (InvocationTargetException e) {
+            Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
+            ExceptionUtils.handleThrowable(t);
+            log.warn(sm.getString("namingResources.cleanupCloseFailed",
+                    closeMethod, name, container), t);
         }
     }
 
