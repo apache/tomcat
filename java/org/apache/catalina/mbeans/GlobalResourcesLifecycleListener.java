@@ -177,9 +177,13 @@ public class GlobalResourcesLifecycleListener
             log.debug("Creating UserDatabase MBeans for resource " + name);
             log.debug("Database=" + database);
         }
-        if (MBeanUtils.createMBean(database) == null) {
-            throw new IllegalArgumentException
+        try {
+            MBeanUtils.createMBean(database);
+        } catch(Exception e) {
+            IllegalArgumentException iae = new IllegalArgumentException
                 ("Cannot create UserDatabase MBean for resource " + name);
+            iae.initCause(e);
+            throw iae;
         }
 
         // Create the MBeans for each defined Role
@@ -189,9 +193,13 @@ public class GlobalResourcesLifecycleListener
             if (log.isDebugEnabled()) {
                 log.debug("  Creating Role MBean for role " + role);
             }
-            if (MBeanUtils.createMBean(role) == null) {
-                throw new IllegalArgumentException
+            try {
+                MBeanUtils.createMBean(role);
+            } catch (Exception e) {
+                IllegalArgumentException iae = new IllegalArgumentException
                     ("Cannot create Role MBean for role " + role);
+                iae.initCause(e);
+                throw iae;
             }
         }
 
@@ -202,9 +210,13 @@ public class GlobalResourcesLifecycleListener
             if (log.isDebugEnabled()) {
                 log.debug("  Creating Group MBean for group " + group);
             }
-            if (MBeanUtils.createMBean(group) == null) {
-                throw new IllegalArgumentException
+            try {
+                MBeanUtils.createMBean(group);
+            } catch (Exception e) {
+                IllegalArgumentException iae = new IllegalArgumentException
                     ("Cannot create Group MBean for group " + group);
+                iae.initCause(e);
+                throw iae;
             }
         }
 
@@ -215,9 +227,13 @@ public class GlobalResourcesLifecycleListener
             if (log.isDebugEnabled()) {
                 log.debug("  Creating User MBean for user " + user);
             }
-            if (MBeanUtils.createMBean(user) == null) {
-                throw new IllegalArgumentException
+            try {
+                MBeanUtils.createMBean(user);
+            } catch (Exception e) {
+                IllegalArgumentException iae = new IllegalArgumentException
                     ("Cannot create User MBean for user " + user);
+                iae.initCause(e);
+                throw iae;
             }
         }
 
