@@ -68,6 +68,8 @@ public class TesterOpenSSL {
         unimplemented.add(Cipher.TLS_DHE_DSS_EXPORT1024_WITH_RC4_56_SHA);
         unimplemented.add(Cipher.TLS_RSA_EXPORT1024_WITH_RC4_56_SHA);
         unimplemented.add(Cipher.TLS_RSA_EXPORT1024_WITH_RC4_56_MD5);
+        unimplemented.add(Cipher.TLS_DH_DSS_EXPORT_WITH_DES40_CBC_SHA);
+        unimplemented.add(Cipher.TLS_DH_RSA_EXPORT_WITH_DES40_CBC_SHA);
 
         if (VERSION < 10000) {
             // These were implemented in 1.0.0 so won't be available in any
@@ -103,7 +105,6 @@ public class TesterOpenSSL {
             // version onwards.
             // None at present.
         }
-
 
         if (VERSION < 10001) {
             // These were added in 1.0.1 so won't be available in any earlier
@@ -153,19 +154,12 @@ public class TesterOpenSSL {
         } else {
             // These were removed in 1.0.1 so won't be available from that
             // version onwards.
-            unimplemented.add(Cipher.TLS_RSA_EXPORT1024_WITH_RC4_56_MD5);
-            unimplemented.add(Cipher.TLS_RSA_EXPORT1024_WITH_RC2_CBC_56_MD5);
-            unimplemented.add(Cipher.TLS_RSA_EXPORT1024_WITH_DES_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DHE_DSS_EXPORT1024_WITH_DES_CBC_SHA);
-            unimplemented.add(Cipher.TLS_RSA_EXPORT1024_WITH_RC4_56_SHA);
-            unimplemented.add(Cipher.TLS_DHE_DSS_EXPORT1024_WITH_RC4_56_SHA);
-            unimplemented.add(Cipher.TLS_DHE_DSS_WITH_RC4_128_SHA);
+            // None at present.
         }
 
         if (VERSION < 10002) {
             // These were implemented in 1.0.2 so won't be available in any
             // earlier version
-            unimplemented.add(Cipher.TLS_DH_DSS_EXPORT_WITH_DES40_CBC_SHA);
             unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_128_CBC_SHA);
             unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_256_CBC_SHA);
             unimplemented.add(Cipher.TLS_DH_DSS_WITH_AES_128_CBC_SHA256);
@@ -177,7 +171,6 @@ public class TesterOpenSSL {
             unimplemented.add(Cipher.TLS_DH_DSS_WITH_DES_CBC_SHA);
             unimplemented.add(Cipher.TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA);
             unimplemented.add(Cipher.TLS_DH_DSS_WITH_SEED_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_RSA_EXPORT_WITH_DES40_CBC_SHA);
             unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_128_CBC_SHA);
             unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_256_CBC_SHA);
             unimplemented.add(Cipher.TLS_DH_RSA_WITH_AES_128_CBC_SHA256);
@@ -193,8 +186,7 @@ public class TesterOpenSSL {
         } else {
             // These were removed in 1.0.2 so won't be available from that
             // version onwards.
-            unimplemented.add(Cipher.TLS_DH_RSA_EXPORT_WITH_DES40_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_DSS_EXPORT_WITH_DES40_CBC_SHA);
+            // None at present.
         }
 
         if (VERSION < 10100) {
