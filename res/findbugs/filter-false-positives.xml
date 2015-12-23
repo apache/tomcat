@@ -52,9 +52,44 @@
     <Bug code="IS"/>
   </Match>
   <Match>
+    <!-- request.getCoyoteRequest().getRemoteUser() can be null because
+    o.a.t.util.buf.MessageBytes.toString() can return NULL -->
+    <Class name="org.apache.catalina.authenticator.AuthenticatorBase"/>
+    <Method name="checkForCachedAuthentication"/>
+    <Bug code="RCN"/>
+  </Match>
+  <Match>
+    <!-- request.getQueryString() can be null because
+    o.a.t.util.buf.MessageBytes.toString() can return NULL -->
+    <Class name="org.apache.catalina.authenticator.DigestAuthenticator$DigestInfo"/>
+    <Method name="validate"/>
+    <Bug code="RCN"/>
+  </Match>
+  <Match>
     <!-- Method is synchronized therefore not an issue -->
     <Class name="org.apache.catalina.authenticator.DigestAuthenticator$NonceInfo"/>
     <Bug code="VO"/>
+  </Match>
+  <Match>
+    <!-- request.getPathInfo(), request.getDecodedRequestURI() can return null
+    because o.a.t.util.buf.MessageBytes.toString() can return NULL -->
+    <Class name="org.apache.catalina.authenticator.FormAuthenticator"/>
+    <Or>
+      <Method name="authenticate"/>
+      <Method name="matchRequest"/>
+    </Or>
+    <Bug code="RCN"/>
+  </Match>
+  <Match>
+    <!-- req.getRemoteUser(), req.getAuthType(), request.getQueryString() can
+    return null because o.a.t.util.buf.MessageBytes.toString() can return NULL
+    -->
+    <Class name="org.apache.catalina.connector.CoyoteAdapter"/>
+    <Or>
+      <Method name="doConnectorAuthenticationAuthorization"/>
+      <Method name="postParseRequest"/>
+    </Or>
+    <Bug code="RCN"/>
   </Match>
   <Match>
     <Class name="org.apache.catalina.connector.CoyoteReader"/>
@@ -62,9 +97,27 @@
     <Bug code="RR"/>
   </Match>
   <Match>
+    <!-- request.getPathInfo(), scookie.getDomain() can return null because
+    o.a.t.util.buf.MessageBytes.toString() can return NULL -->
+    <Class name="org.apache.catalina.connector.Request"/>
+    <Or>
+      <Method name="getRequestDispatcher"/>
+      <Method name="getPathTranslated"/>
+      <Method name="convertCookies"/>
+    </Or>
+    <Bug code="RCN"/>
+  </Match>
+  <Match>
     <!-- JNI library can only be loaded once so statics are appropriate -->
     <Class name="org.apache.catalina.core.AprLifecycleListener" />
     <Bug code="ST" />
+  </Match>
+  <Match>
+    <!-- request.getQueryString() can return null because
+    o.a.t.util.buf.MessageBytes.toString() can return NULL -->
+    <Class name="org.apache.catalina.core.AsyncContextImpl"/>
+    <Method name="logDebug"/>
+    <Bug code="RCN"/>
   </Match>
   <Match>
     <!-- Have to trigger GC for leak detection to work. Clearly documented -->
@@ -109,6 +162,16 @@
     <Class name="org.apache.catalina.realm.JDBCRealm" />
     <Field name="containerLog" />
     <Bug code="IS" />
+  </Match>
+  <Match>
+    <!-- request.getRequestPathMB(), request.getQueryString() can be null because
+    o.a.t.util.buf.MessageBytes.toString() can return NULL -->
+    <Class name="org.apache.catalina.realm.RealmBase"/>
+    <Or>
+      <Method name="findSecurityConstraints"/>
+      <Method name="hasUserDataPermission"/>
+    </Or>
+    <Bug code="RCN"/>
   </Match>
   <Match>
   <!-- The header value is safe  -->
@@ -224,11 +287,39 @@
     <Bug code="UG" />
   </Match>
   <Match>
+    <!-- request.getRemoteHost() can be null because
+    o.a.t.util.buf.MessageBytes.toString() can return NULL -->
+    <Class name="org.apache.catalina.valves.AbstractAccessLogValve$HostElement"/>
+    <Method name="addElement"/>
+    <Bug code="RCN"/>
+  </Match>
+  <Match>
+    <!-- request.getMethod() can be null because
+    o.a.t.util.buf.MessageBytes.toString() can return NULL -->
+    <Class name="org.apache.catalina.valves.AbstractAccessLogValve$RequestElement"/>
+    <Method name="addElement"/>
+    <Bug code="RCN"/>
+  </Match>
+  <Match>
     <!-- Non-constant strings are configuration settings rather than client
          supplied -->
     <Class name="org.apache.catalina.valves.JDBCAccessLogValve" />
     <Method name="open" />
     <Bug code="SQL" />
+  </Match>
+  <Match>
+    <!-- request.getQueryString() can be null because
+    o.a.t.util.buf.MessageBytes.toString() can return NULL -->
+    <Class name="org.apache.catalina.valves.rewrite.RewriteValve"/>
+    <Method name="invoke"/>
+    <Bug code="RCN"/>
+  </Match>
+  <Match>
+    <!-- request.getQueryString() can be null because
+    o.a.t.util.buf.MessageBytes.toString() can return NULL -->
+    <Class name="org.apache.catalina.valves.StuckThreadDetectionValve"/>
+    <Method name="invoke"/>
+    <Bug code="RCN"/>
   </Match>
   <Match>
     <!-- Use of synchronisation is required to make a sequence of calls in   -->
@@ -477,6 +568,13 @@
     <!-- server so statics are appropriate -->
     <Class name="org.apache.tomcat.util.buf.StringCache"/>
     <Bug code="ST" />
+  </Match>
+  <Match>
+    <!-- mb.toString() can be null because
+    o.a.t.util.buf.MessageBytes.toString() can return NULL -->
+    <Class name="org.apache.tomcat.util.buf.UDecoder"/>
+    <Method name="convert"/>
+    <Bug code="RCN" />
   </Match>
   <Match>
     <!-- NPE is desired as it indicates an error condition -->
