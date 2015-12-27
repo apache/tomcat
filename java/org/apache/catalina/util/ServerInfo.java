@@ -69,11 +69,11 @@ public class ServerInfo {
             ExceptionUtils.handleThrowable(t);
         }
         if (info == null)
-            info = "Apache Tomcat 8.0.x-dev";
+            info = "Apache Tomcat 9.0.x-dev";
         if (built == null)
             built = "unknown";
         if (number == null)
-            number = "8.0.x";
+            number = "9.0.x";
 
         serverInfo = info;
         serverBuilt = built;
