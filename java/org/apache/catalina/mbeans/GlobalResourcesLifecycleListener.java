@@ -180,10 +180,8 @@ public class GlobalResourcesLifecycleListener
         try {
             MBeanUtils.createMBean(database);
         } catch(Exception e) {
-            IllegalArgumentException iae = new IllegalArgumentException
-                ("Cannot create UserDatabase MBean for resource " + name);
-            iae.initCause(e);
-            throw iae;
+            throw new IllegalArgumentException(
+                    "Cannot create UserDatabase MBean for resource " + name, e);
         }
 
         // Create the MBeans for each defined Role
@@ -196,10 +194,8 @@ public class GlobalResourcesLifecycleListener
             try {
                 MBeanUtils.createMBean(role);
             } catch (Exception e) {
-                IllegalArgumentException iae = new IllegalArgumentException
-                    ("Cannot create Role MBean for role " + role);
-                iae.initCause(e);
-                throw iae;
+                throw new IllegalArgumentException(
+                        "Cannot create Role MBean for role " + role, e);
             }
         }
 
@@ -213,10 +209,8 @@ public class GlobalResourcesLifecycleListener
             try {
                 MBeanUtils.createMBean(group);
             } catch (Exception e) {
-                IllegalArgumentException iae = new IllegalArgumentException
-                    ("Cannot create Group MBean for group " + group);
-                iae.initCause(e);
-                throw iae;
+                throw new IllegalArgumentException(
+                        "Cannot create Group MBean for group " + group, e);
             }
         }
 
@@ -230,10 +224,8 @@ public class GlobalResourcesLifecycleListener
             try {
                 MBeanUtils.createMBean(user);
             } catch (Exception e) {
-                IllegalArgumentException iae = new IllegalArgumentException
-                    ("Cannot create User MBean for user " + user);
-                iae.initCause(e);
-                throw iae;
+                throw new IllegalArgumentException(
+                        "Cannot create User MBean for user " + user, e);
             }
         }
 
