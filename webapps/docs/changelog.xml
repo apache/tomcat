@@ -295,7 +295,8 @@
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
-        Correct evaluation of system property <code>org.apache.tomcat.jdbc.pool.onlyAttemptCurrentClassLoader</code>.
+        Correct evaluation of system property
+        <code>org.apache.tomcat.jdbc.pool.onlyAttemptCurrentClassLoader</code>.
         It was basically ignored before. Reported by coverity scan. (fschumacher)
       </fix>
       <fix>
@@ -316,7 +317,7 @@
       </update>
       <update>
         Update the NSIS Installer used to build the Windows Installers to
-        version 2.49. (markt/kkolinko)
+        version 2.50. (markt/kkolinko)
       </update>
     </changelog>
   </subsection>

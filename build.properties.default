@@ -165,7 +165,7 @@ tomcat-native.win.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-nativ
 tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-win32-bin.zip
 
 # ----- NSIS, version 2.0 or later -----
-nsis.version=2.49
+nsis.version=2.50
 nsis.home=${base.path}/nsis-${nsis.version}
 nsis.exe=${nsis.home}/makensis.exe
 nsis.installoptions.dll=${nsis.home}/Plugins/InstallOptions.dll
