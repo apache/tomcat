@@ -197,6 +197,10 @@
         of Tomcat. Add command line option <code>-no-quoteAttributeEL</code> in
         JspC. (kkolinko)
       </fix>
+      <fix>
+        Fix handling of missing messages in
+        <code>org.apache.el.util.MessageFactory</code>. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
