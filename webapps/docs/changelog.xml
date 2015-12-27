@@ -150,7 +150,7 @@
     <changelog>
       <update>
         Update the NSIS Installer used to build the Windows Installers to
-        version 2.49. (markt/kkolinko)
+        version 2.50. (markt/kkolinko)
       </update>
     </changelog>
   </subsection>
