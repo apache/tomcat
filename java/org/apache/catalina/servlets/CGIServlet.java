@@ -901,7 +901,7 @@ public final class CGIServlet extends HttpServlet {
                 }
                 String nextElement = (String) dirWalker.nextElement();
                 currentLocation = new File(currentLocation, nextElement);
-                cginameBuilder.append("/").append(nextElement);
+                cginameBuilder.append('/').append(nextElement);
             }
             String cginame = cginameBuilder.toString();
             if (!currentLocation.isFile()) {

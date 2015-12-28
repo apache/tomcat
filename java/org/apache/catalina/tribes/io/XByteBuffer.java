@@ -514,14 +514,16 @@ public class XByteBuffer {
                 return -1;
             //assume it does exist
             found = true;
-            for (int i = 1; ( (i < findlen) && found); i++)
+            for (int i = 1; ( (i < findlen) && found); i++) {
                 found = (find[i] == src[pos + i]);
-            if (found)
+            }
+            if (found) {
                 result = pos;
-            else if ( (srclen - pos) < findlen)
+            } else if ( (srclen - pos) < findlen) {
                 return -1; //no more matches possible
-            else
+            } else {
                 pos++;
+            }
         }
         return result;
     }

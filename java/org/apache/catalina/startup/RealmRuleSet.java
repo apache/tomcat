@@ -86,7 +86,7 @@ public class RealmRuleSet extends RuleSetBase {
         StringBuilder pattern = new StringBuilder(prefix);
         for (int i = 0; i < MAX_NESTED_REALM_LEVELS; i++) {
             if (i > 0) {
-                pattern.append("/");
+                pattern.append('/');
             }
             pattern.append("Realm");
             addRuleInstances(digester, pattern.toString(), i == 0 ? "setRealm" : "addRealm");
