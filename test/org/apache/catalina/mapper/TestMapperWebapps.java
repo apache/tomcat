@@ -255,6 +255,7 @@ public class TestMapperWebapps extends TomcatBaseTest{
             File examplesDir = new File(getBuildDirectory(), "webapps/examples");
             org.apache.catalina.Context examples  = tomcat.addWebapp(
                     null, "/examples", examplesDir.getAbsolutePath());
+            examples.setMapperContextRootRedirectEnabled(false);
             // Then block access to the examples to test redirection
             RemoteAddrValve rav = new RemoteAddrValve();
             rav.setDeny(".*");
