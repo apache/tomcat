@@ -41,12 +41,12 @@ public class HttpParser {
     static {
         // Setup the flag arrays
         for (int i = 0; i < 128; i++) {
-            if (i < 32) {
+            if (i <= 32) { // includes '\t' and ' '
                 isToken[i] = false;
             } else if (i == '(' || i == ')' || i == '<' || i == '>'  || i == '@'  ||
                        i == ',' || i == ';' || i == ':' || i == '\\' || i == '\"' ||
                        i == '/' || i == '[' || i == ']' || i == '?'  || i == '='  ||
-                       i == '{' || i == '}' || i == ' ') {
+                       i == '{' || i == '}') {
                 isToken[i] = false;
             } else {
                 isToken[i] = true;

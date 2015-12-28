@@ -83,7 +83,7 @@ public class CredentialHandlerRuleSet extends RuleSetBase {
         StringBuilder pattern = new StringBuilder(prefix);
         for (int i = 0; i < MAX_NESTED_LEVELS; i++) {
             if (i > 0) {
-                pattern.append("/");
+                pattern.append('/');
             }
             pattern.append("CredentialHandler");
             addRuleInstances(digester, pattern.toString(), i == 0 ? "setCredentialHandler"

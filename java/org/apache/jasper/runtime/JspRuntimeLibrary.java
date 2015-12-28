@@ -542,7 +542,6 @@ public class JspRuntimeLibrary {
      * @param unescString The string to shell-escape
      * @return The escaped shell string.
      */
-
     public static String escapeQueryString(String unescString) {
         if (unescString == null) {
             return null;
@@ -555,7 +554,7 @@ public class JspRuntimeLibrary {
             char nextChar = unescString.charAt(index);
 
             if (shellSpChars.indexOf(nextChar) != -1) {
-                escStringBuilder.append("\\");
+                escStringBuilder.append('\\');
             }
 
             escStringBuilder.append(nextChar);
