@@ -88,6 +88,12 @@
       <fix>
         Fixed various issues reported by Findbugs. (violetagg)
       </fix>
+      <fix>
+        <bug>58765</bug>: Change default for
+        <code>mapperContextRootRedirectEnabled</code> to <code>true</code> since
+        this is required for correct session management because of the default
+        for <code>sessionCookiePathUsesTrailingSlash</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

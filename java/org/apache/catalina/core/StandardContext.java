@@ -911,7 +911,7 @@ public class StandardContext extends ContainerBase
 
     private boolean validateClientProvidedNewSessionId = true;
 
-    private boolean mapperContextRootRedirectEnabled = false;
+    private boolean mapperContextRootRedirectEnabled = true;
 
     private boolean mapperDirectoryRedirectEnabled = false;
 
