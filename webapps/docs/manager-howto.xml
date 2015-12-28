@@ -263,7 +263,7 @@ the host and port appropriately for your installation.</p>
 <li><strong>version</strong> - The version of this web application as used by
     the <a href="config/context.html">parallel deployment</a> feature. If you
     use parallel deployment wherever a path is required you must specify a
-    version in addition to the path and it is the combinationn of path and
+    version in addition to the path and it is the combination of path and
     version that must be unique rather than just the path.</li>
 <li><strong>war</strong> - URL of a web application archive (WAR) file, or
     pathname of a directory which contains the web application, or a
@@ -313,7 +313,7 @@ version of the messages.</p>
 
 <p>Upload the web application archive (WAR) file that is specified as the
 request data in this HTTP PUT request, install it into the <code>appBase</code>
-directory of our corresponding virtual host, and start , deriving the name for
+directory of our corresponding virtual host, and start, deriving the name for
 the WAR file added to the <code>appBase</code> from the specified path. The
 application can later be undeployed (and the corresponding WAR file removed) by
 use of the <code>/undeploy</code> command.</p>
