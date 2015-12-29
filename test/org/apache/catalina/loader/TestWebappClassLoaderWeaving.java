@@ -297,14 +297,23 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
             throw new IOException("Resource " + name + " not found on classpath.");
         }
 
-        FileOutputStream os = new FileOutputStream(file);
+        FileOutputStream os = null;
         try {
+            os = new FileOutputStream(file);
             for (int b = is.read(); b >= 0; b = is.read()) {
                 os.write(b);
             }
         } finally {
-            is.close();
-            os.close();
+            try {
+                is.close();
+            } catch (IOException e1) {
+            }
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                }
+            }
         }
 
     }

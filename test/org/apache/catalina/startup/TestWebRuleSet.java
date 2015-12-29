@@ -18,7 +18,7 @@ package org.apache.catalina.startup;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 import static org.junit.Assert.assertEquals;
@@ -124,7 +124,7 @@ public class TestWebRuleSet {
     }
 
     private synchronized void parse(WebXml webXml, String target,
-            boolean fragment, boolean expected) throws FileNotFoundException {
+            boolean fragment, boolean expected) {
 
         Digester d;
         if (fragment) {
@@ -138,11 +138,12 @@ public class TestWebRuleSet {
         d.push(webXml);
 
         File f = new File("test/org/apache/catalina/startup/" + target);
-        InputStream is = new FileInputStream(f);
+        InputStream is = null;
 
         boolean result = true;
 
         try {
+            is = new FileInputStream(f);
             d.parse(is);
         } catch (Exception e) {
             if (expected) {
@@ -150,6 +151,13 @@ public class TestWebRuleSet {
                 e.printStackTrace();
             }
             result = false;
+        } finally {
+           if (is != null) {
+               try {
+                   is.close();
+               } catch (IOException e) {
+               }
+           }
         }
 
         if (expected) {

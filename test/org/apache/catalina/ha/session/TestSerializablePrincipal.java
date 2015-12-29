@@ -71,11 +71,11 @@ public class TestSerializablePrincipal  {
         try {
             // Do the serialization
             FileOutputStream fos = null;
+            ObjectOutputStream oos = null;
             try {
                 fos = new FileOutputStream(file);
-                ObjectOutputStream oos = new ObjectOutputStream(fos);
+                oos = new ObjectOutputStream(fos);
                 SerializablePrincipal.writePrincipal(gpOriginal, oos);
-                oos.close();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 fail("fnfe creating object output stream");
@@ -83,6 +83,13 @@ public class TestSerializablePrincipal  {
                 e.printStackTrace();
                 fail("ioe serializing principal");
             } finally {
+                if (oos != null) {
+                    try {
+                        oos.close();
+                    } catch (IOException ignored) {
+                        // NO OP
+                    }
+                }
                 if (fos != null) {
                     try {
                         fos.close();
@@ -94,9 +101,10 @@ public class TestSerializablePrincipal  {
 
             // De-serialize the Principal
             FileInputStream fis = null;
+            ObjectInputStream ois = null;
             try {
                 fis = new FileInputStream(file);
-                ObjectInputStream ois = new ObjectInputStream(fis);
+                ois = new ObjectInputStream(fis);
                 gpNew = SerializablePrincipal.readPrincipal(ois);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -108,6 +116,13 @@ public class TestSerializablePrincipal  {
                 e.printStackTrace();
                 fail("cnfe de-serializing principal");
             } finally {
+                if (ois != null) {
+                    try {
+                        ois.close();
+                    } catch (IOException ignored) {
+                        // NO OP
+                    }
+                }
                 if (fis != null) {
                     try {
                         fis.close();

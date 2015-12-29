@@ -251,15 +251,30 @@ public class TestVirtualContext extends TomcatBaseTest {
             new File(additionWebInfClasses,
                 MyAnnotatedServlet.class.getPackage().getName().replace('.', '/'));
         Assert.assertTrue(targetPackageForAnnotatedClass.mkdirs());
-        InputStream annotatedServletClassInputStream =
-            this.getClass().getResourceAsStream(
-                MyAnnotatedServlet.class.getSimpleName() + ".class");
-        FileOutputStream annotatedServletClassOutputStream =
-            new FileOutputStream(new File(targetPackageForAnnotatedClass,
-                MyAnnotatedServlet.class.getSimpleName() + ".class"));
-        IOUtils.copy(annotatedServletClassInputStream, annotatedServletClassOutputStream);
-        annotatedServletClassInputStream.close();
-        annotatedServletClassOutputStream.close();
+        InputStream annotatedServletClassInputStream = null;
+        FileOutputStream annotatedServletClassOutputStream = null;
+        try {
+            annotatedServletClassInputStream =
+                this.getClass().getResourceAsStream(
+                    MyAnnotatedServlet.class.getSimpleName() + ".class");
+            annotatedServletClassOutputStream =
+                new FileOutputStream(new File(targetPackageForAnnotatedClass,
+                    MyAnnotatedServlet.class.getSimpleName() + ".class"));
+            IOUtils.copy(annotatedServletClassInputStream, annotatedServletClassOutputStream);
+        } finally {
+            if (annotatedServletClassInputStream != null) {
+                try {
+                    annotatedServletClassInputStream.close();
+                } catch (IOException e) {
+                }
+            }
+            if (annotatedServletClassOutputStream != null) {
+                try {
+                    annotatedServletClassOutputStream.close();
+                } catch (IOException e) {
+                }
+            }
+        }
 
         VirtualWebappLoader loader = new VirtualWebappLoader(ctx.getParentClassLoader());
         loader.setVirtualClasspath("test/webapp-3.0-virtual-webapp/target/classes;" + //
