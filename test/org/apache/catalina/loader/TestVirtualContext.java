@@ -266,15 +266,13 @@ public class TestVirtualContext extends TomcatBaseTest {
             new File(additionWebInfClasses,
                 MyAnnotatedServlet.class.getPackage().getName().replace('.', '/'));
         Assert.assertTrue(targetPackageForAnnotatedClass.mkdirs());
-        InputStream annotatedServletClassInputStream =
-            this.getClass().getResourceAsStream(
+        try (InputStream annotatedServletClassInputStream = this.getClass().getResourceAsStream(
                 MyAnnotatedServlet.class.getSimpleName() + ".class");
-        FileOutputStream annotatedServletClassOutputStream =
-            new FileOutputStream(new File(targetPackageForAnnotatedClass,
-                MyAnnotatedServlet.class.getSimpleName() + ".class"));
-        IOUtils.copy(annotatedServletClassInputStream, annotatedServletClassOutputStream);
-        annotatedServletClassInputStream.close();
-        annotatedServletClassOutputStream.close();
+                FileOutputStream annotatedServletClassOutputStream = new FileOutputStream(new File(
+                        targetPackageForAnnotatedClass, MyAnnotatedServlet.class.getSimpleName()
+                                + ".class"));) {
+            IOUtils.copy(annotatedServletClassInputStream, annotatedServletClassOutputStream);
+        }
 
         ctx.setResources(new StandardRoot(ctx));
         File f1 = new File("test/webapp-virtual-webapp/target/classes");
