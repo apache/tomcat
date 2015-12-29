@@ -86,21 +86,21 @@ public class TestSendFile extends TomcatBaseTest{
     }
 
     public File generateFile(String dir, String suffix, int size) throws IOException {
-        String name = "testSendFile-"+System.currentTimeMillis()+suffix+".txt";
-        File f = new File(dir,name);
-        FileWriter fw = new FileWriter(f, false);
-        BufferedWriter w = new BufferedWriter(fw);
-        int defSize = 8192;
-        while (size > 0) {
-            int bytes = Math.min(size, defSize);
-            char[] b = new char[bytes];
-            Arrays.fill(b, 'X');
-            w.write(b);
-            size = size - bytes;
+        String name = "testSendFile-" + System.currentTimeMillis() + suffix + ".txt";
+        File f = new File(dir, name);
+        try (FileWriter fw = new FileWriter(f, false); BufferedWriter w = new BufferedWriter(fw);) {
+            int defSize = 8192;
+            while (size > 0) {
+                int bytes = Math.min(size, defSize);
+                char[] b = new char[bytes];
+                Arrays.fill(b, 'X');
+                w.write(b);
+                size = size - bytes;
+            }
+            w.flush();
         }
-        w.flush();
-        w.close();
-        System.out.println("Created file:"+f.getAbsolutePath()+" with "+f.length()+" bytes.");
+        System.out.println("Created file:" + f.getAbsolutePath() + " with " + f.length()
+                + " bytes.");
         return f;
 
     }
