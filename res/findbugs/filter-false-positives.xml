@@ -240,6 +240,12 @@
     <Bug code="RCN"/>
   </Match>
   <Match>
+    <!-- Fall-through expected -->
+    <Class name="org.apache.coyote.http11.AbstractHttp11Processor" />
+    <Method name="process"/>
+    <Bug code="SF" />
+  </Match>
+  <Match>
     <!-- JspC will not be used under a security manager -->
     <Class name="org.apache.jasper.JspC"/>
     <Method name="initClassLoader"/>
@@ -336,6 +342,18 @@
       <Method name="updateAttributes"/>
     </Or>
     <Bug code="ES" />
+  </Match>
+  <Match>
+    <!-- Fall-through expected -->
+    <Class name="org.apache.tomcat.util.http.Cookies" />
+    <Method name="processCookieHeader"/>
+    <Bug code="SF" />
+  </Match>
+  <Match>
+    <!-- Fall-through expected -->
+    <Class name="org.apache.tomcat.util.http.Parameters" />
+    <Method name="processParameters"/>
+    <Bug code="SF" />
   </Match>
   <Match>
     <!-- addCount is modified in other threads -->
