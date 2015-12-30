@@ -17,6 +17,39 @@
 <FindBugsFilter>
   <!--  Considered to be false positives -->
   <Match>
+    <!-- Only base null is handled by this resolver -->
+    <Class name="javax.el.BeanNameELResolver"/>
+    <Or>
+      <Method name="getType" />
+      <Method name="getValue" />
+      <Method name="isReadOnly" />
+      <Method name="setValue" />
+    </Or>
+    <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Only base null is handled by this resolver -->
+    <Class name="javax.servlet.jsp.el.ImplicitObjectELResolver"/>
+    <Or>
+      <Method name="getType" />
+      <Method name="getValue" />
+      <Method name="isReadOnly" />
+      <Method name="setValue" />
+    </Or>
+    <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Only base null is handled by this resolver -->
+    <Class name="javax.servlet.jsp.el.ScopedAttributeELResolver"/>
+    <Or>
+      <Method name="getType" />
+      <Method name="getValue" />
+      <Method name="isReadOnly" />
+      <Method name="setValue" />
+    </Or>
+    <Bug code="NP" />
+  </Match>
+  <Match>
     <!--  Cannot do anything about this. API is fixed by the specification. -->
     <Class name="javax.servlet.jsp.tagext.TagData"/>
     <Bug code="CN" />
@@ -164,6 +197,15 @@
     <Bug code="IS" />
   </Match>
   <Match>
+    <!-- roles will be initialized in addAttributeValues -->
+    <Class name="org.apache.catalina.realm.JNDIRealm" />
+    <Or>
+      <Method name="getUserByPattern" />
+      <Method name="getUserBySearch" />
+    </Or>
+    <Bug code="NP" />
+  </Match>
+  <Match>
     <!-- request.getRequestPathMB(), request.getQueryString() can be null because
     o.a.t.util.buf.MessageBytes.toString() can return NULL -->
     <Class name="org.apache.catalina.realm.RealmBase"/>
@@ -225,19 +267,11 @@
   <Match>
     <!-- context is never null -->
     <Class name="org.apache.catalina.startup.HostConfig" />
-    <Method name="deployDescriptor" />
-    <Bug code="NP" />
-  </Match>
-  <Match>
-    <!-- context is never null -->
-    <Class name="org.apache.catalina.startup.HostConfig" />
-    <Method name="deployDirectory" />
-    <Bug code="NP" />
-  </Match>
-  <Match>
-    <!-- context is never null -->
-    <Class name="org.apache.catalina.startup.HostConfig" />
-    <Method name="deployWAR" />
+    <Or>
+      <Method name="deployDescriptor" />
+      <Method name="deployDirectory" />
+      <Method name="deployWAR" />
+    </Or>
     <Bug code="NP" />
   </Match>
   <Match>
@@ -445,6 +479,23 @@
     <Class name="org.apache.jasper.compiler.Parser"/>
     <Method name="parseBody"/>
     <Bug code="ES"/>
+  </Match>
+  <Match>
+    <!-- Only base null is handled by this resolver -->
+    <Class name="org.apache.jasper.el.ELResolverImpl"/>
+    <Or>
+      <Method name="getType" />
+      <Method name="getValue" />
+      <Method name="isReadOnly" />
+      <Method name="setValue" />
+    </Or>
+    <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- base null is handled by this resolver -->
+    <Class name="org.apache.jasper.el.JasperELResolver"/>
+    <Method name="getValue" />
+    <Bug code="NP" />
   </Match>
   <Match>
     <!-- Use of == is deliberate, String.intern() is used -->
