@@ -167,6 +167,15 @@
     <Bug code="IS" />
   </Match>
   <Match>
+    <!-- roles will be initialized in addAttributeValues -->
+    <Class name="org.apache.catalina.realm.JNDIRealm" />
+    <Or>
+      <Method name="getUserByPattern" />
+      <Method name="getUserBySearch" />
+    </Or>
+    <Bug code="NP" />
+  </Match>
+  <Match>
     <!-- request.getRequestPathMB(), request.getQueryString() can be null because
     o.a.t.util.buf.MessageBytes.toString() can return NULL -->
     <Class name="org.apache.catalina.realm.RealmBase"/>
@@ -338,6 +347,12 @@
     <Class name="org.apache.jasper.compiler.Parser"/>
     <Method name="parseBody"/>
     <Bug code="ES"/>
+  </Match>
+  <Match>
+    <!-- base null is handled by this resolver -->
+    <Class name="org.apache.jasper.el.JasperELResolver"/>
+    <Method name="getValue" />
+    <Bug code="NP" />
   </Match>
   <Match>
     <!-- Use of == is deliberate, String.intern() is used -->
