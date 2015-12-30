@@ -129,6 +129,28 @@
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- Sleep is of short duration and lock is required -->
+    <Class name="org.apache.catalina.core.StandardWrapper" />
+    <Method name="unload" />
+    <Bug code="SWL" />
+  </Match>
+  <Match>
+    <!-- The code is adding HTTP request headers, not parameters and the
+         header parsing on input will have removed any CR or LF characters. -->
+    <Class name="org.apache.catalina.filters.CorsFilter" />
+    <Or>
+      <Method name="handlePreflightCORS" />
+      <Method name="handleSimpleCORS" />
+    </Or>
+    <Bug pattern="HRS_REQUEST_PARAMETER_TO_HTTP_HEADER" />
+  </Match>
+  <Match>
+    <!-- shost will not be null in normal usage -->
+    <Class name="org.apache.catalina.ha.backend.CollectedInfo" />
+    <Method name="init" />
+    <Bug code="NP" />
+  </Match>
+  <Match>
     <!-- Field is only modified during Servlet load -->
     <Class name="org.apache.catalina.manager.host.HostManagerServlet" />
     <Bug code="MSF" />
@@ -159,6 +181,16 @@
     <Class name="org.apache.catalina.servlets.DefaultServlet" />
     <Method name="doDirectoryRedirect" />
     <Bug pattern="HRS_REQUEST_PARAMETER_TO_HTTP_HEADER" />
+  </Match>
+  <Match>
+    <!-- Non-constant strings are configuration settings rather than client
+         supplied -->
+    <Class name="org.apache.catalina.session.JDBCStore" />
+    <Or>
+      <Method name="load" />
+      <Method name="save" />
+    </Or>
+    <Bug code="SQL" />
   </Match>
   <Match>
     <!-- We can live with the threading issue. See code comment for details. -->
@@ -194,6 +226,15 @@
     <Bug code="SWL" />
   </Match>
   <Match>
+    <!-- context is never null -->
+    <Class name="org.apache.catalina.startup.HostConfig" />
+    <Or>
+      <Method name="deployDescriptor" />
+      <Method name="deployDirectory" />
+    </Or>
+    <Bug code="NP" />
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
     <Method name="memberAlive"/>
     <Bug code="DE"/>
@@ -214,6 +255,12 @@
     <Bug code="NS"/>
   </Match>
   <Match>
+    <!-- Intentional in case thread is waiting -->
+    <Class name="org.apache.catalina.tribes.transport.RxTaskPool"/>
+    <Method name="returnWorker"/>
+    <Bug code="NN"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.util.LifecycleBase" />
     <Method name="getState"/>
     <Bug code="UG" />
@@ -231,6 +278,13 @@
     <Class name="org.apache.catalina.valves.AccessLogValve$RequestElement"/>
     <Method name="addElement"/>
     <Bug code="RCN"/>
+  </Match>
+  <Match>
+    <!-- Non-constant strings are configuration settings rather than client
+         supplied -->
+    <Class name="org.apache.catalina.valves.JDBCAccessLogValve" />
+    <Method name="open" />
+    <Bug code="SQL" />
   </Match>
   <Match>
     <!-- request.getQueryString() can be null because
@@ -256,6 +310,28 @@
     <Class name="org.apache.jasper.JspC"/>
     <Method name="setValidateXml"/>
     <Bug code="ST" />
+  </Match>
+  <Match>
+    <!-- NPE is not possible -->
+    <Class name="org.apache.jasper.compiler.JspConfig"/>
+    <Method name="selectProperty"/>
+    <Bug code="NP"/>
+  </Match>
+  <Match>
+    <!-- Returning null is intentional -->
+    <Class name="org.apache.jasper.compiler.JspReader"/>
+    <Method name="indexOf"/>
+    <Bug code="NP"/>
+  </Match>
+  <Match>
+    <!-- Node constructors add node to parent. Local variable is used to
+         silence an Eclipse warning -->
+    <Class name="org.apache.jasper.compiler.Parser"/>
+    <Or>
+      <Method name="parseTemplateText"/>
+      <Method name="parseXMLTemplateText"/>
+    </Or>
+    <Bug code="DLS"/>
   </Match>
   <Match>
     <!-- Use of == is deliberate -->
@@ -301,6 +377,11 @@
     <Bug code="CN" />
   </Match>
   <Match>
+    <Class name="org.apache.tomcat.util.IntrospectionUtils" />
+    <Method name="findMethod"/>
+    <Bug code="NP" />
+  </Match>
+  <Match>
     <!-- Class name is appropriate -->
     <Class name="org.apache.tomcat.util.bcel.classfile.CodeException"/>
     <Bug code="Nm" />
@@ -314,6 +395,18 @@
     <!-- Fall-through expected -->
     <Class name="org.apache.tomcat.util.bcel.classfile.Utility"/>
     <Bug code="SF" />
+  </Match>
+  <Match>
+    <!-- Returning null here is fine -->
+    <Class name="org.apache.tomcat.util.buf.ByteChunk"/>
+    <Method name="toString"/>
+    <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Returning null here is fine -->
+    <Class name="org.apache.tomcat.util.buf.CharChunk"/>
+    <Method name="toString"/>
+    <Bug code="NP" />
   </Match>
   <Match>
     <!-- Returning null here is fine -->
@@ -333,6 +426,12 @@
     <Class name="org.apache.tomcat.util.buf.UDecoder"/>
     <Method name="convert"/>
     <Bug code="RCN" />
+  </Match>
+  <Match>
+    <!-- NPE is desired as it indicates an error condition -->
+    <Class name="org.apache.tomcat.util.digester.CallMethodRule"/>
+    <Method name="end"/>
+    <Bug code="NP" />
   </Match>
   <Match>
     <!-- Test really is for the same object rather than equality -->
@@ -356,6 +455,21 @@
     <Bug code="SF" />
   </Match>
   <Match>
+    <!-- Hiding of field in superclass is deliberate -->
+    <Class name="org.apache.tomcat.util.modeler.NotificationInfo"/>
+    <Field name="info" />
+    <Bug code="MF" />
+  </Match>
+  <Match>
+    <!-- JSSE vs APR attribute names. More confusing to change one of them -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint"/>
+    <Or>
+      <Method name="getSSLProtocol"/>
+      <Method name="setSSLProtocol"/>
+    </Or>
+    <Bug code="Nm"/>
+  </Match>
+  <Match>
     <!-- addCount is modified in other threads -->
     <Class name="org.apache.tomcat.util.net.AprEndpoint$Poller"/>
     <Method name="run"/>
@@ -374,15 +488,22 @@
     <Bug code="ML" />
   </Match>
   <Match>
-    <Class name="org.apache.tomcat.util.net.SecureNioChannel"/>
-    <Method name="rehandshake"/>
-    <Bug code="DE" />
-  </Match>
-  <Match>
     <!-- Sync is there to protect referenced object not field -->
     <Class name="org.apache.tomcat.util.net.AprEndpoint$SocketWithOptionsProcessor"/>
     <Method name="run"/>
     <Bug code="ML" />
+  </Match>
+  <Match>
+    <!-- Return value is ignored at this point but logic further up call     -->
+    <!-- stack will ensure that a SocketTimeoutException is thrown           -->
+    <Class name="org.apache.tomcat.util.net.NioEndpoint$KeyAttachment"/>
+    <Method name="awaitLatch"/>
+    <Bug code="RV"/>
+  </Match>
+  <Match>
+    <Class name="org.apache.tomcat.util.net.SecureNioChannel"/>
+    <Method name="rehandshake"/>
+    <Bug code="DE" />
   </Match>
   <Match>
     <!-- Yes the simple name is the same as the super class. Accept it. -->
