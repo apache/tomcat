@@ -354,6 +354,12 @@
     <Bug code="UL"  />
   </Match>
   <Match>
+    <!-- Fall-through expected -->
+    <Class name="org.apache.coyote.http11.Http11Processor" />
+    <Method name="service"/>
+    <Bug code="SF" />
+  </Match>
+  <Match>
     <!-- Locks are always released. Non-standard pattern is required because -->
     <!-- of lock upgrade that is used. -->
     <Class name="org.apache.coyote.http11.InternalAprInputBuffer" />
@@ -592,6 +598,21 @@
     <Bug code="ES" />
   </Match>
   <Match>
+    <!-- Fall-through expected -->
+    <Class name="org.apache.tomcat.util.http.LegacyCookieProcessor" />
+    <Method name="processCookieHeader"/>
+    <Bug code="SF" />
+  </Match>
+  <Match>
+    <!-- Fall-through expected -->
+    <Class name="org.apache.tomcat.util.http.parser.Cookie" />
+    <Or>
+      <Method name="logInvalidHeader"/>
+      <Method name="logInvalidVersion"/>
+    </Or>
+    <Bug code="SF" />
+  </Match>
+  <Match>
     <!-- Hiding of field in superclass is deliberate -->
     <Class name="org.apache.tomcat.util.modeler.NotificationInfo"/>
     <Field name="info" />
@@ -671,6 +692,18 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <!-- Fall-through expected -->
+    <Class name="org.apache.tomcat.util.net.SecureNioChannel" />
+    <Method name="processSNI"/>
+    <Bug code="SF" />
+  </Match>
+  <Match>
+    <!-- Fall-through expected -->
+    <Class name="org.apache.tomcat.util.net.SecureNio2Channel" />
+    <Method name="processSNI"/>
+    <Bug code="SF" />
+  </Match>
+  <Match>
     <!-- Yes the simple name is the same as the super class. Accept it. -->
     <Class name="org.apache.tomcat.util.threads.ThreadPoolExecutor" />
     <Bug code="Nm" />
@@ -680,6 +713,12 @@
     <Class name="org.apache.tomcat.websocket.WsWebSocketContainer" />
     <Method name="connectToServer" />
     <Bug code="DLS" />
+  </Match>
+  <Match>
+    <!-- Fall-through expected -->
+    <Class name="org.apache.tomcat.websocket.server.WsHttpUpgradeHandler" />
+    <Method name="upgradeDispatch"/>
+    <Bug code="SF" />
   </Match>
 
   <!-- Example code -->
