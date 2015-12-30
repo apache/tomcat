@@ -157,7 +157,7 @@
   <Match>
   <!-- The header value is safe  -->
     <Class name="org.apache.catalina.servlets.DefaultServlet" />
-    <Method name="serveResource" />
+    <Method name="doDirectoryRedirect" />
     <Bug pattern="HRS_REQUEST_PARAMETER_TO_HTTP_HEADER" />
   </Match>
   <Match>
