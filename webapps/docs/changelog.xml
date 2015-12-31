@@ -312,7 +312,7 @@
   <subsection name="Other">
     <changelog>
       <update>
-        Update optional Checkstyle library to 6.13. (kkolinko)
+        Update optional Checkstyle library to 6.14.1. (kkolinko)
       </update>
       <update>
         Update the packaged version of the Tomcat Native Library to 1.2.3 to
