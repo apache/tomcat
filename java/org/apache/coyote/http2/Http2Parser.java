@@ -532,11 +532,6 @@ class Http2Parser {
     }
 
 
-    void setHpackDecoder(HpackDecoder hpackDecoder) {
-        this.hpackDecoder = hpackDecoder;
-    }
-
-
     /**
      * Interface that must be implemented by the source of data for the parser.
      */
