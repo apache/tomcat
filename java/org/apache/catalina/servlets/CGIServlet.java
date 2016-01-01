@@ -1061,7 +1061,7 @@ public final class CGIServlet extends HttpServlet {
              * SHOULD NOT be defined.
              *
              */
-            if (sPathInfoCGI != null && !("".equals(sPathInfoCGI))) {
+            if (!("".equals(sPathInfoCGI))) {
                 sPathTranslatedCGI = context.getRealPath(sPathInfoCGI);
             }
             if (sPathTranslatedCGI == null || "".equals(sPathTranslatedCGI)) {
