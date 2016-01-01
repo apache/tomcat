@@ -36,9 +36,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
@@ -322,14 +319,6 @@ public class WsServerContainer extends WsWebSocketContainer
 
     boolean areEndpointsRegistered() {
         return endpointsRegistered;
-    }
-
-
-    public void doUpgrade(HttpServletRequest request,
-            HttpServletResponse response, ServerEndpointConfig sec,
-            Map<String,String> pathParams)
-            throws ServletException, IOException {
-        UpgradeUtil.doUpgrade(this, request, response, sec, pathParams);
     }
 
 
