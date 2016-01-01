@@ -89,6 +89,11 @@
         Fixed various issues reported by Findbugs. (violetagg)
       </fix>
       <fix>
+        <bug>58735</bug>: Add support for the <code>X-XSS-Protection</code>
+        header to the <code>HttpHeaderSecurityFilter</code>. Patch provided by
+        Jacopo Cappellato. (markt)
+      </fix>
+      <fix>
         <bug>58765</bug>: Change default for
         <code>mapperContextRootRedirectEnabled</code> to <code>true</code> since
         this is required for correct session management because of the default
