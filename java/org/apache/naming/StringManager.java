@@ -132,8 +132,11 @@ public class StringManager {
      * Get a string from the underlying resource bundle and format
      * it with the given set of arguments.
      *
-     * @param key
-     * @param args
+     * @param key  The key for the required message
+     * @param args The values to insert into the message
+     *
+     * @return The request string formatted with the provided arguments or the
+     *         key if the key was not found.
      */
     public String getString(final String key, final Object... args) {
         String value = getString(key);
@@ -159,6 +162,8 @@ public class StringManager {
      * StringManager will be created and returned.
      *
      * @param packageName The package name
+     *
+     * @return The instance associated with the given package
      */
     public static final synchronized StringManager getManager(String packageName) {
         StringManager mgr = managers.get(packageName);
