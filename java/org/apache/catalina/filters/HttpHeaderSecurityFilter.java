@@ -88,31 +88,33 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
 
-        if (response.isCommitted()) {
-            throw new ServletException(sm.getString("httpHeaderSecurityFilter.committed"));
-        }
+        if (response instanceof HttpServletResponse) {
+            HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        // HSTS
-        if (hstsEnabled && request.isSecure() && response instanceof HttpServletResponse) {
-            ((HttpServletResponse) response).setHeader(HSTS_HEADER_NAME, hstsHeaderValue);
-        }
+            if (response.isCommitted()) {
+                throw new ServletException(sm.getString("httpHeaderSecurityFilter.committed"));
+            }
 
-        // anti click-jacking
-        if (antiClickJackingEnabled && response instanceof HttpServletResponse) {
-            ((HttpServletResponse) response).setHeader(
-                    ANTI_CLICK_JACKING_HEADER_NAME, antiClickJackingHeaderValue);
-        }
+            // HSTS
+            if (hstsEnabled && request.isSecure()) {
+                httpResponse.setHeader(HSTS_HEADER_NAME, hstsHeaderValue);
+            }
 
-        // Block content type sniffing
-        if (blockContentTypeSniffingEnabled && response instanceof HttpServletResponse) {
-            ((HttpServletResponse) response).setHeader(BLOCK_CONTENT_TYPE_SNIFFING_HEADER_NAME,
-                    BLOCK_CONTENT_TYPE_SNIFFING_HEADER_VALUE);
-        }
+            // anti click-jacking
+            if (antiClickJackingEnabled) {
+                httpResponse.setHeader(ANTI_CLICK_JACKING_HEADER_NAME, antiClickJackingHeaderValue);
+            }
 
-        // cross-site scripting filter protection
-        if (xssProtectionEnabled && response instanceof HttpServletResponse) {
-            ((HttpServletResponse) response).setHeader(XSS_PROTECTION_HEADER_NAME,
-                    XSS_PROTECTION_HEADER_VALUE);
+            // Block content type sniffing
+            if (blockContentTypeSniffingEnabled) {
+                httpResponse.setHeader(BLOCK_CONTENT_TYPE_SNIFFING_HEADER_NAME,
+                        BLOCK_CONTENT_TYPE_SNIFFING_HEADER_VALUE);
+            }
+
+            // cross-site scripting filter protection
+            if (xssProtectionEnabled) {
+                httpResponse.setHeader(XSS_PROTECTION_HEADER_NAME, XSS_PROTECTION_HEADER_VALUE);
+            }
         }
 
         chain.doFilter(request, response);
