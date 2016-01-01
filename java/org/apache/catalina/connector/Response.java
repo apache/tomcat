@@ -1541,7 +1541,7 @@ public class Response
         String contextPath = getContext().getPath();
         if (contextPath != null) {
             String file = url.getFile();
-            if ((file == null) || !file.startsWith(contextPath)) {
+            if (!file.startsWith(contextPath)) {
                 return false;
             }
             String tok = ";" +
