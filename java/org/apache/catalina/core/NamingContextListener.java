@@ -233,11 +233,7 @@ public class NamingContextListener
 
             try {
                 Hashtable<String, Object> contextEnv = new Hashtable<>();
-                try {
-                    namingContext = new NamingContext(contextEnv, getName());
-                } catch (NamingException e) {
-                    // Never happens
-                }
+                namingContext = new NamingContext(contextEnv, getName());
                 ContextAccessController.setSecurityToken(getName(), token);
                 ContextAccessController.setSecurityToken(container, token);
                 ContextBindings.bindContext(container, namingContext, token);

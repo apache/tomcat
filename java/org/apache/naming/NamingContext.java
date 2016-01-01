@@ -67,19 +67,25 @@ public class NamingContext implements Context {
 
 
     /**
-     * Builds a naming context using the given environment.
+     * Builds a naming context.
+     *
+     * @param env The environment to use to construct the naming context
+     * @param name The name to use for the naming context
      */
-    public NamingContext(Hashtable<String,Object> env, String name)
-        throws NamingException {
+    public NamingContext(Hashtable<String,Object> env, String name) {
         this(env, name, new HashMap<String,NamingEntry>());
     }
 
 
     /**
-     * Builds a naming context using the given environment.
+     * Builds a naming context.
+     *
+     * @param env The environment to use to construct the naming context
+     * @param name The name to use for the naming context
+     * @param bindings The initial bindings for the naming context
      */
     public NamingContext(Hashtable<String,Object> env, String name,
-            HashMap<String,NamingEntry> bindings) throws NamingException {
+            HashMap<String,NamingEntry> bindings) {
 
         this.env = new Hashtable<>();
         // FIXME ? Could be put in the environment ?
@@ -678,8 +684,7 @@ public class NamingContext implements Context {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public Name composeName(Name name, Name prefix)
-        throws NamingException {
+    public Name composeName(Name name, Name prefix) throws NamingException {
         prefix = (Name) prefix.clone();
         return prefix.addAll(name);
     }
@@ -691,11 +696,9 @@ public class NamingContext implements Context {
      * @param name a name relative to this context
      * @param prefix the name of this context relative to one of its ancestors
      * @return the composition of prefix and name
-     * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public String composeName(String name, String prefix)
-        throws NamingException {
+    public String composeName(String name, String prefix) {
         return prefix + "/" + name;
     }
 
@@ -707,11 +710,9 @@ public class NamingContext implements Context {
      * @param propName the name of the environment property to add; may not
      * be null
      * @param propVal the value of the property to add; may not be null
-     * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public Object addToEnvironment(String propName, Object propVal)
-        throws NamingException {
+    public Object addToEnvironment(String propName, Object propVal) {
         return env.put(propName, propVal);
     }
 
@@ -721,11 +722,9 @@ public class NamingContext implements Context {
      *
      * @param propName the name of the environment property to remove;
      * may not be null
-     * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public Object removeFromEnvironment(String propName)
-        throws NamingException {
+    public Object removeFromEnvironment(String propName){
         return env.remove(propName);
     }
 
@@ -738,11 +737,9 @@ public class NamingContext implements Context {
      * may be changed using addToEnvironment() and removeFromEnvironment().
      *
      * @return the environment of this context; never null
-     * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public Hashtable<?,?> getEnvironment()
-        throws NamingException {
+    public Hashtable<?,?> getEnvironment() {
         return env;
     }
 
