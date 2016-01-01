@@ -540,9 +540,8 @@ public class Http11Processor extends AbstractProcessor {
             if(userAgentValueMB != null) {
                 String userAgentValue = userAgentValueMB.toString();
 
-                if (noCompressionUserAgents != null &&
-                        noCompressionUserAgents.matcher(userAgentValue).matches()) {
-                        return false;
+                if (noCompressionUserAgents.matcher(userAgentValue).matches()) {
+                    return false;
                 }
             }
         }
