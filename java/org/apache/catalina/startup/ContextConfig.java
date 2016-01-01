@@ -39,7 +39,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.security.auth.message.config.AuthConfigFactory;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
@@ -62,8 +61,6 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.authenticator.jaspic.JaspicAuthenticator;
-import org.apache.catalina.authenticator.jaspic.provider.TomcatAuthConfigProvider;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
@@ -388,15 +385,7 @@ public class ContextConfig implements LifecycleListener {
          */
         Valve authenticator = null;
         if (customAuthenticators != null) {
-            authenticator = (Valve)
-                customAuthenticators.get(loginConfig.getAuthMethod());
-        }
-
-        if (authenticator == null) {
-            String authMethod = loginConfig.getAuthMethod();
-            if (authMethod != null && authMethod.contains("JASPIC")) {
-                authenticator = new JaspicAuthenticator();
-            }
+            authenticator = (Valve) customAuthenticators.get(loginConfig.getAuthMethod());
         }
 
         if (authenticator == null) {
@@ -442,24 +431,6 @@ public class ContextConfig implements LifecycleListener {
         }
     }
 
-
-    /**
-     * Configure and register default JASPIC modules
-     */
-    private void configureDefaultJaspicAuthModules() {
-        if (!(context.getAuthenticator() instanceof JaspicAuthenticator)) {
-            return;
-        }
-        // TODO currently we setup default provider if we have
-        // JaspicAuthenicator registred.
-        // we need to find a better way to decide, if we want embedded provider
-        // or not
-        JaspicAuthenticator authenticator = (JaspicAuthenticator) context.getAuthenticator();
-        AuthConfigFactory authConfigFactory = AuthConfigFactory.getFactory();
-        TomcatAuthConfigProvider provider = new TomcatAuthConfigProvider(context, authenticator.getAuthProperties());
-        authConfigFactory.registerConfigProvider(provider, JaspicAuthenticator.MESSAGE_LAYER,
-                authenticator.getAppContext(), "Apache Tomcat JASPIC");
-    }
 
     /**
      * Create (if necessary) and return a Digester configured to process the
@@ -806,7 +777,6 @@ public class ContextConfig implements LifecycleListener {
         // Configure an authenticator if we need one
         if (ok) {
             authenticatorConfig();
-            configureDefaultJaspicAuthModules();
         }
 
         // Dump the contents of this pipeline if requested
