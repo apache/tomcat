@@ -76,22 +76,20 @@ public class TagPluginManager {
             throw new JasperException(ioe);
         }
 
-        if (urls != null) {
-            while(urls.hasMoreElements()) {
-                URL url = urls.nextElement();
-                InputStream is = null;
-                try {
-                    is = url.openStream();
-                    loadTagPlugins(err, is);
-                } catch(IOException ioe) {
-                    throw new JasperException(ioe);
-                } finally {
-                    if (is != null) {
-                        try {
-                            is.close();
-                        } catch (IOException ioe) {
-                            throw new JasperException(ioe);
-                        }
+        while(urls.hasMoreElements()) {
+            URL url = urls.nextElement();
+            InputStream is = null;
+            try {
+                is = url.openStream();
+                loadTagPlugins(err, is);
+            } catch(IOException ioe) {
+                throw new JasperException(ioe);
+            } finally {
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException ioe) {
+                        throw new JasperException(ioe);
                     }
                 }
             }
