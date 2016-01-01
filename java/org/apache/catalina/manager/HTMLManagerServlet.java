@@ -874,7 +874,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
             StringManager smClient) {
 
         List<Session> sessions = getSessionsForName(cn, smClient);
-        if (sessions == null || sessions.isEmpty()) return null;
+        if (sessions.isEmpty()) return null;
         for(Session session : sessions) {
             if (session.getId().equals(id)) {
                 return session;
