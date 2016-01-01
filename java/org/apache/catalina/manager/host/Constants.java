@@ -111,7 +111,7 @@ public class Constants {
     public static final String HTML_TAIL_SECTION =
         "<hr size=\"1\" noshade=\"noshade\">\n" +
         "<center><font size=\"-1\" color=\"#525D76\">\n" +
-        " <em>Copyright &copy; 1999-2015, Apache Software Foundation</em>" +
+        " <em>Copyright &copy; 1999-2016, Apache Software Foundation</em>" +
         "</font></center>\n" +
         "\n" +
         "</body>\n" +
