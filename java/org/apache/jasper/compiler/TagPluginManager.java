@@ -96,11 +96,9 @@ public class TagPluginManager {
 
             Enumeration<URL> urls =
                     ctxt.getClassLoader().getResources(META_INF_JASPER_TAG_PLUGINS_XML);
-            if (urls != null) {
-                while (urls.hasMoreElements()) {
-                    URL url = urls.nextElement();
-                    parser.parse(url);
-                }
+            while (urls.hasMoreElements()) {
+                URL url = urls.nextElement();
+                parser.parse(url);
             }
 
             URL url = ctxt.getResource(TAG_PLUGINS_XML);

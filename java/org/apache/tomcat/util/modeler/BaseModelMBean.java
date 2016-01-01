@@ -802,8 +802,6 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
 
         // Acquire the set of application notifications
         MBeanNotificationInfo current[] = getMBeanInfo().getNotifications();
-        if (current == null)
-            current = new MBeanNotificationInfo[0];
         MBeanNotificationInfo response[] =
             new MBeanNotificationInfo[current.length + 2];
  //       Descriptor descriptor = null;
