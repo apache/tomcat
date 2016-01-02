@@ -291,7 +291,7 @@ public final class FileStore extends StoreBase {
             if (manager.getContainer().getLogger().isDebugEnabled())
                 manager.getContainer().getLogger().debug("No persisted data file found");
             return (null);
-        } catch (IOException e) {
+        } finally {
             if (bis != null) {
                 try {
                     bis.close();
@@ -306,8 +306,6 @@ public final class FileStore extends StoreBase {
                     // Ignore
                 }
             }
-            throw e;
-        } finally {
             if (ois != null) {
                 // Close the input stream
                 try {
