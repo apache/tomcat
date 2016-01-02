@@ -194,7 +194,7 @@ public final class IntrospectionUtils {
                     install = f1.getCanonicalPath();
                     if (installSysProp != null)
                         System.getProperties().put(installSysProp, install);
-                    if (home == null && homeSysProp != null)
+                    if (homeSysProp != null)
                         System.getProperties().put(homeSysProp, install);
                     return install;
                 } catch (Exception ex) {
