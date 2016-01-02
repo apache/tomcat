@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.modeler;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.management.MBeanNotificationInfo;
-
 
 /**
  * <p>Internal configuration information for a <code>Notification</code>
@@ -28,8 +28,8 @@ import javax.management.MBeanNotificationInfo;
  *
  * @author Craig R. McClanahan
  */
-
 public class NotificationInfo extends FeatureInfo {
+
     static final long serialVersionUID = -6319885418912650856L;
 
     // ----------------------------------------------------- Instance Variables
@@ -41,6 +41,7 @@ public class NotificationInfo extends FeatureInfo {
      */
     transient MBeanNotificationInfo info = null;
     protected String notifTypes[] = new String[0];
+    protected ReadWriteLock notifTypesLock = new ReentrantReadWriteLock();
 
     // ------------------------------------------------------------- Properties
 
@@ -73,7 +74,13 @@ public class NotificationInfo extends FeatureInfo {
      * The set of notification types for this MBean.
      */
     public String[] getNotifTypes() {
-        return (this.notifTypes);
+        Lock readLock = notifTypesLock.readLock();
+        try {
+            readLock.lock();
+            return this.notifTypes;
+        } finally {
+            readLock.unlock();
+        }
     }
 
 
@@ -87,14 +94,18 @@ public class NotificationInfo extends FeatureInfo {
      */
     public void addNotifType(String notifType) {
 
-        synchronized (notifTypes) {
+        Lock writeLock = notifTypesLock.writeLock();
+        try {
+            writeLock.lock();
+
             String results[] = new String[notifTypes.length + 1];
             System.arraycopy(notifTypes, 0, results, 0, notifTypes.length);
             results[notifTypes.length] = notifType;
             notifTypes = results;
             this.info = null;
+        } finally {
+            writeLock.unlock();
         }
-
     }
 
 
@@ -106,7 +117,7 @@ public class NotificationInfo extends FeatureInfo {
 
         // Return our cached information (if any)
         if (info != null)
-            return (info);
+            return info;
 
         // Create and return a new information object
         info = new MBeanNotificationInfo
@@ -114,7 +125,7 @@ public class NotificationInfo extends FeatureInfo {
         //Descriptor descriptor = info.getDescriptor();
         //addFields(descriptor);
         //info.setDescriptor(descriptor);
-        return (info);
+        return info;
 
     }
 
@@ -131,11 +142,14 @@ public class NotificationInfo extends FeatureInfo {
         sb.append(", description=");
         sb.append(description);
         sb.append(", notifTypes=");
-        sb.append(notifTypes.length);
+        Lock readLock = notifTypesLock.readLock();
+        try {
+            readLock.lock();
+            sb.append(notifTypes.length);
+        } finally {
+            readLock.unlock();
+        }
         sb.append("]");
         return (sb.toString());
-
     }
-
-
 }
