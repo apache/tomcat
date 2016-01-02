@@ -18,6 +18,7 @@
 
 package org.apache.catalina.deploy;
 
+import java.io.Serializable;
 
 /**
  * <p>Representation of a security role reference for a web application, as
@@ -27,8 +28,9 @@ package org.apache.catalina.deploy;
  * @author Mark Thomas
  * @since Tomcat 5.5
  */
-public class SecurityRoleRef {
+public class SecurityRoleRef implements Serializable {
 
+    private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties
 
