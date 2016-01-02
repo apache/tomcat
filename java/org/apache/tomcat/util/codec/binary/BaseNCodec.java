@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.codec.binary;
 
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.codec.BinaryDecoder;
 import org.apache.tomcat.util.codec.BinaryEncoder;
 import org.apache.tomcat.util.codec.DecoderException;
@@ -95,8 +96,10 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
         @SuppressWarnings("boxing") // OK to ignore boxing here
         @Override
         public String toString() {
-            return String.format("%s[buffer=%s, currentLinePos=%s, eof=%s, ibitWorkArea=%s, lbitWorkArea=%s, " +
-                    "modulus=%s, pos=%s, readPos=%s]", this.getClass().getSimpleName(), buffer, currentLinePos, eof,
+            return String.format("%s[buffer=%s, currentLinePos=%s, eof=%s, " +
+                    "ibitWorkArea=%s, lbitWorkArea=%s, modulus=%s, pos=%s, " +
+                    "readPos=%s]", this.getClass().getSimpleName(),
+                    HexUtils.toHexString(buffer), currentLinePos, eof,
                     ibitWorkArea, lbitWorkArea, modulus, pos, readPos);
         }
     }
