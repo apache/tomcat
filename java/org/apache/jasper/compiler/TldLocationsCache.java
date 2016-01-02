@@ -244,11 +244,9 @@ public class TldLocationsCache {
             tldScanResourcePaths(WEB_INF);
             
             JarScanner jarScanner = JarScannerFactory.getJarScanner(ctxt);
-            if (jarScanner != null) {
-                jarScanner.scan(ctxt,
-                        Thread.currentThread().getContextClassLoader(),
-                        new TldJarScannerCallback(), noTldJars);
-            }
+            jarScanner.scan(ctxt,
+                    Thread.currentThread().getContextClassLoader(),
+                    new TldJarScannerCallback(), noTldJars);
 
             initialized = true;
         } catch (Exception ex) {

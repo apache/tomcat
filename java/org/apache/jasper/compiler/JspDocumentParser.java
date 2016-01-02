@@ -196,11 +196,9 @@ class JspDocumentParser
             } catch (EnableDTDValidationException e) {
                 saxParser = getSAXParser(true, jspDocParser);
                 jspDocParser.isValidating = true;
-                if (inStream != null) {
-                    try {
-                        inStream.close();
-                    } catch (Exception any) {
-                    }
+                try {
+                    inStream.close();
+                } catch (Exception any) {
                 }
                 inStream = JspUtil.getInputStream(path, jarFile,
                                                   jspDocParser.ctxt,

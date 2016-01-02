@@ -758,17 +758,13 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      */
     public void setWorkDir(File workDir) {
         this.loaderDir = new File(workDir, "loader");
-        if (loaderDir == null) {
-            canonicalLoaderDir = null;
-        } else {
-            try {
-                canonicalLoaderDir = loaderDir.getCanonicalPath();
-                if (!canonicalLoaderDir.endsWith(File.separator)) {
-                    canonicalLoaderDir += File.separator;
-                }
-            } catch (IOException ioe) {
-                canonicalLoaderDir = null;
+        try {
+            canonicalLoaderDir = loaderDir.getCanonicalPath();
+            if (!canonicalLoaderDir.endsWith(File.separator)) {
+                canonicalLoaderDir += File.separator;
             }
+        } catch (IOException ioe) {
+            canonicalLoaderDir = null;
         }
     }
 

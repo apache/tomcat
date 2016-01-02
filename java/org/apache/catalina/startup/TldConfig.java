@@ -280,7 +280,7 @@ public final class TldConfig  implements LifecycleListener {
             log.debug(sm.getString("tldConfig.addListeners",
                     Integer.valueOf(list.length)));
 
-        for( int i=0; list!=null && i<list.length; i++ ) {
+        for( int i=0; i<list.length; i++ ) {
             context.addApplicationListener(
                     new ApplicationListener(list[i], true));
         }

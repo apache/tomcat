@@ -77,10 +77,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         globalNamingResources.setContainer(this);
 
         if (isUseNaming()) {
-            if (namingContextListener == null) {
-                namingContextListener = new NamingContextListener();
-                addLifecycleListener(namingContextListener);
-            }
+            namingContextListener = new NamingContextListener();
+            addLifecycleListener(namingContextListener);
         }
 
     }

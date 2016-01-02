@@ -3036,7 +3036,7 @@ public class Request
         if (!create) {
             return (null);
         }
-        if ((context != null) && (response != null) &&
+        if ((response != null) &&
             context.getServletContext().getEffectiveSessionTrackingModes().
                     contains(SessionTrackingMode.COOKIE) &&
             response.getResponse().isCommitted()) {

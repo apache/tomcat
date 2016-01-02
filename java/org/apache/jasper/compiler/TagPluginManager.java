@@ -130,9 +130,6 @@ public class TagPluginManager {
         ParserUtils pu = new ParserUtils(false, blockExternal);
         
         TreeNode root = pu.parseXMLDocument(TAG_PLUGINS_XML, is);
-        if (root == null) {
-            return;
-        }
 
         if (!TAG_PLUGINS_ROOT_ELEM.equals(root.getName())) {
             err.jspError("jsp.error.plugin.wrongRootElement", TAG_PLUGINS_XML,
@@ -161,13 +158,10 @@ public class TagPluginManager {
                 Class<?> pluginClass =
                         ctxt.getClassLoader().loadClass(pluginClassStr);
                 tagPlugin = (TagPlugin) pluginClass.newInstance();
+                tagPlugins.put(tagClass, tagPlugin);
             } catch (Exception e) {
                 throw new JasperException(e);
             }
-            if (tagPlugin == null) {
-                return;
-            }
-            tagPlugins.put(tagClass, tagPlugin);
         }
         initialized = true;
     }

@@ -797,8 +797,6 @@ public class FileDirContext extends BaseDirContext {
             if ((absoluteBase.length() < absPath.length())
                 && (absoluteBase.length() < canPath.length())) {
                 absPath = absPath.substring(absoluteBase.length() + 1);
-                if (absPath == null)
-                    return null;
                 if (absPath.equals(""))
                     absPath = "/";
                 canPath = canPath.substring(absoluteBase.length() + 1);
