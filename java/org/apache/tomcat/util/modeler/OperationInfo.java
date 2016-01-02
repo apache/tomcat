@@ -14,16 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.modeler;
 
-
 import java.util.Locale;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
-
 
 /**
  * <p>Internal configuration information for an <code>Operation</code>
@@ -32,23 +31,24 @@ import javax.management.MBeanParameterInfo;
  * @author Craig R. McClanahan
  */
 public class OperationInfo extends FeatureInfo {
-    static final long serialVersionUID = 4418342922072614875L;
-    // ----------------------------------------------------------- Constructors
 
+    static final long serialVersionUID = 4418342922072614875L;
+
+    // ----------------------------------------------------------- Constructors
 
     /**
      * Standard zero-arguments constructor.
      */
     public OperationInfo() {
-
         super();
-
     }
    
+
     // ----------------------------------------------------- Instance Variables
 
     protected String impact = "UNKNOWN";
     protected String role = "operation";
+    protected ReadWriteLock parametersLock = new ReentrantReadWriteLock();
     protected ParameterInfo parameters[] = new ParameterInfo[0];
 
 
@@ -59,7 +59,7 @@ public class OperationInfo extends FeatureInfo {
      * string value "ACTION", "ACTION_INFO", "INFO", or "UNKNOWN".
      */
     public String getImpact() {
-        return (this.impact);
+        return this.impact;
     }
 
     public void setImpact(String impact) {
@@ -75,7 +75,7 @@ public class OperationInfo extends FeatureInfo {
      * "constructor").
      */
     public String getRole() {
-        return (this.role);
+        return this.role;
     }
 
     public void setRole(String role) {
@@ -102,7 +102,13 @@ public class OperationInfo extends FeatureInfo {
      * The set of parameters for this operation.
      */
     public ParameterInfo[] getSignature() {
-        return (this.parameters);
+        Lock readLock = parametersLock.readLock();
+        try {
+            readLock.lock();
+            return this.parameters;
+        } finally {
+            readLock.unlock();
+        }
     }
 
     // --------------------------------------------------------- Public Methods
@@ -115,14 +121,17 @@ public class OperationInfo extends FeatureInfo {
      */
     public void addParameter(ParameterInfo parameter) {
 
-        synchronized (parameters) {
+        Lock writeLock = parametersLock.writeLock();
+        try {
+            writeLock.lock();
             ParameterInfo results[] = new ParameterInfo[parameters.length + 1];
             System.arraycopy(parameters, 0, results, 0, parameters.length);
             results[parameters.length] = parameter;
             parameters = results;
             this.info = null;
+        } finally {
+            writeLock.unlock();
         }
-
     }
 
 
