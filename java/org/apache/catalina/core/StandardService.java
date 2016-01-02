@@ -90,6 +90,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
      * The set of Connectors associated with this Service.
      */
     protected Connector connectors[] = new Connector[0];
+    private final Object connectorsLock = new Object();
     
     /**
      * 
@@ -229,7 +230,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     @Override
     public void addConnector(Connector connector) {
 
-        synchronized (connectors) {
+        synchronized (connectorsLock) {
             connector.setService(this);
             Connector results[] = new Connector[connectors.length + 1];
             System.arraycopy(connectors, 0, results, 0, connectors.length);
@@ -294,7 +295,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     @Override
     public void removeConnector(Connector connector) {
 
-        synchronized (connectors) {
+        synchronized (connectorsLock) {
             int j = -1;
             for (int i = 0; i < connectors.length; i++) {
                 if (connector == connectors[i]) {
@@ -451,7 +452,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         }
 
         // Start our defined Connectors second
-        synchronized (connectors) {
+        synchronized (connectorsLock) {
             for (Connector connector: connectors) {
                 try {
                     // If it has already failed, don't try and start it
@@ -480,7 +481,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     protected void stopInternal() throws LifecycleException {
 
         // Pause connectors first
-        synchronized (connectors) {
+        synchronized (connectorsLock) {
             for (Connector connector: connectors) {
                 try {
                     connector.pause();
@@ -504,7 +505,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         }
 
         // Now stop the connectors
-        synchronized (connectors) {
+        synchronized (connectorsLock) {
             for (Connector connector: connectors) {
                 if (!LifecycleState.STARTED.equals(
                         connector.getState())) {
@@ -553,7 +554,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         }
 
         // Initialize our defined Connectors
-        synchronized (connectors) {
+        synchronized (connectorsLock) {
             for (Connector connector : connectors) {
                 try {
                     connector.init();
@@ -572,7 +573,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     @Override
     protected void destroyInternal() throws LifecycleException {
         // Destroy our defined Connectors
-        synchronized (connectors) {
+        synchronized (connectorsLock) {
             for (Connector connector : connectors) {
                 try {
                     connector.destroy();
