@@ -43,7 +43,6 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
-@SuppressWarnings("deprecation")
 final class ApplicationFilterChain implements FilterChain {
 
     // Used to enforce requirements of SRV.8.2 / SRV.14.2.5.1
