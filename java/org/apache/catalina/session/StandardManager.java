@@ -216,17 +216,10 @@ public class StandardManager extends ManagerBase {
             if (loader != null) {
                 classLoader = loader.getClassLoader();
             }
-            if (classLoader != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Creating custom object input stream for class loader ");
-                }
-                ois = new CustomObjectInputStream(bis, classLoader);
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("Creating standard object input stream");
-                }
-                ois = new ObjectInputStream(bis);
+            if (classLoader == null) {
+                classLoader = getClass().getClassLoader();
             }
+            ois = new CustomObjectInputStream(bis, classLoader);
         } catch (FileNotFoundException e) {
             if (log.isDebugEnabled()) {
                 log.debug("No persisted data file found");
