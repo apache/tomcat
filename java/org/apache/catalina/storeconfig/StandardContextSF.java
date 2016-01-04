@@ -267,12 +267,6 @@ public class StandardContextSF extends StoreFactoryBase {
             WebResourceRoot resources = context.getResources();
             storeElement(aWriter, indent, resources);
 
-            // Store nested <InstanceListener> elements
-            @SuppressWarnings("deprecation")
-            String iListeners[] = context.findInstanceListeners();
-            getStoreAppender().printTagArray(aWriter, "InstanceListener",
-                    indent + 2, iListeners);
-
             // Store nested <WrapperListener> elements
             String wLifecycles[] = context.findWrapperLifecycles();
             getStoreAppender().printTagArray(aWriter, "WrapperListener",

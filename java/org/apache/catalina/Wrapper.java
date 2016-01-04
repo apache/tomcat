@@ -171,17 +171,6 @@ public interface Wrapper extends Container {
 
 
     /**
-     * Add a new listener interested in InstanceEvents.
-     *
-     * @param listener The new listener
-     *
-     * @deprecated Will be removed in 9.0.x onwards
-     */
-    @Deprecated
-    public void addInstanceListener(InstanceListener listener);
-
-
-    /**
      * Add a mapping associated with the Wrapper.
      *
      * @param mapping The new wrapper mapping
@@ -290,17 +279,6 @@ public interface Wrapper extends Container {
      * @param name Name of the initialization parameter to remove
      */
     public void removeInitParameter(String name);
-
-
-    /**
-     * Remove a listener no longer interested in InstanceEvents.
-     *
-     * @param listener The listener to remove
-     *
-     * @deprecated Will be removed in 9.0.x onwards
-     */
-    @Deprecated
-    public void removeInstanceListener(InstanceListener listener);
 
 
     /**

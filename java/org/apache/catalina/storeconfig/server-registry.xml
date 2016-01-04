@@ -342,14 +342,6 @@
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description
-        id="org.apache.catalina.core.StandardContext.[InstanceListener]"
-        tag="InstanceListener"
-        standard="true"
-        default="false"
-        attributes="false"
-        storeFactoryClass="org.apache.catalina.storeconfig.InstanceListenerSF">
-     </Description>
-     <Description
         id="org.apache.catalina.core.StandardContext.[WrapperLifecycle]"
         tag="WrapperLifecycle"
         standard="true"

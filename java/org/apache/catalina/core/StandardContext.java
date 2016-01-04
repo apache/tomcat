@@ -88,7 +88,6 @@ import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.CredentialHandler;
 import org.apache.catalina.Globals;
-import org.apache.catalina.InstanceListener;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
@@ -145,7 +144,6 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-@SuppressWarnings("deprecation")
 public class StandardContext extends ContainerBase
         implements Context, NotificationEmitter {
 
@@ -404,15 +402,6 @@ public class StandardContext extends ContainerBase
      * Ignore annotations.
      */
     private boolean ignoreAnnotations = false;
-
-
-    /**
-     * The set of classnames of InstanceListeners that will be added
-     * to each newly created Wrapper by <code>createWrapper()</code>.
-     */
-    private String instanceListeners[] = new String[0];
-
-    private final Object instanceListenersLock = new Object();
 
 
     /**
@@ -2974,28 +2963,6 @@ public class StandardContext extends ContainerBase
         }
     }
 
-    /**
-     * Add the classname of an InstanceListener to be added to each
-     * Wrapper appended to this Context.
-     *
-     * @param listener Java class name of an InstanceListener class
-     *
-     * @deprecated Will be removed in 9.0.x onwards
-     */
-    @Deprecated
-    @Override
-    public void addInstanceListener(String listener) {
-
-        synchronized (instanceListenersLock) {
-            String results[] =new String[instanceListeners.length + 1];
-            for (int i = 0; i < instanceListeners.length; i++)
-                results[i] = instanceListeners[i];
-            results[instanceListeners.length] = listener;
-            instanceListeners = results;
-        }
-        fireContainerEvent("addInstanceListener", listener);
-
-    }
 
     /**
      * Add a Locale Encoding Mapping (see Sec 5.4 of Servlet spec 2.4)
@@ -3290,21 +3257,6 @@ public class StandardContext extends ContainerBase
             wrapper = new StandardWrapper();
         }
 
-        synchronized (instanceListenersLock) {
-            for (int i = 0; i < instanceListeners.length; i++) {
-                try {
-                    Class<?> clazz = Class.forName(instanceListeners[i]);
-                    InstanceListener listener =
-                      (InstanceListener) clazz.newInstance();
-                    wrapper.addInstanceListener(listener);
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    log.error("createWrapper", t);
-                    return (null);
-                }
-            }
-        }
-
         synchronized (wrapperLifecyclesLock) {
             for (int i = 0; i < wrapperLifecycles.length; i++) {
                 try {
@@ -3465,23 +3417,6 @@ public class StandardContext extends ContainerBase
     @Override
     public FilterMap[] findFilterMaps() {
         return filterMaps.asArray();
-    }
-
-
-    /**
-     * Return the set of InstanceListener classes that will be added to
-     * newly created Wrappers automatically.
-     *
-     * @deprecated Will be removed in 9.0.x onwards
-     */
-    @Deprecated
-    @Override
-    public String[] findInstanceListeners() {
-
-        synchronized (instanceListenersLock) {
-            return (instanceListeners);
-        }
-
     }
 
 
@@ -4041,48 +3976,6 @@ public class StandardContext extends ContainerBase
         filterMaps.remove(filterMap);
         // Inform interested listeners
         fireContainerEvent("removeFilterMap", filterMap);
-    }
-
-
-    /**
-     * Remove a class name from the set of InstanceListener classes that
-     * will be added to newly created Wrappers.
-     *
-     * @param listener Class name of an InstanceListener class to be removed
-     *
-     * @deprecated Will be removed in 9.0.x onwards
-     */
-    @Deprecated
-    @Override
-    public void removeInstanceListener(String listener) {
-
-        synchronized (instanceListenersLock) {
-
-            // Make sure this listener is currently present
-            int n = -1;
-            for (int i = 0; i < instanceListeners.length; i++) {
-                if (instanceListeners[i].equals(listener)) {
-                    n = i;
-                    break;
-                }
-            }
-            if (n < 0)
-                return;
-
-            // Remove the specified listener
-            int j = 0;
-            String results[] = new String[instanceListeners.length - 1];
-            for (int i = 0; i < instanceListeners.length; i++) {
-                if (i != n)
-                    results[j++] = instanceListeners[i];
-            }
-            instanceListeners = results;
-
-        }
-
-        // Inform interested listeners
-        fireContainerEvent("removeInstanceListener", listener);
-
     }
 
 
@@ -5614,10 +5507,6 @@ public class StandardContext extends ContainerBase
 
         if (namingResources != null) {
             namingResources.destroy();
-        }
-
-        synchronized (instanceListenersLock) {
-            instanceListeners = new String[0];
         }
 
         Loader loader = getLoader();

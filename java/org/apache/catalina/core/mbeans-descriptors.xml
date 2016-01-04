@@ -395,15 +395,6 @@
                  type="java.lang.String"/>
     </operation>
 
-    <operation name="addInstanceListener"
-               description="Add the classname of an InstanceListener to be added to each Wrapper appended to this Context."
-               impact="ACTION"
-               returnType="void">
-      <parameter name="listener"
-                 description="Java class name of an InstanceListener class"
-                 type="java.lang.String"/>
-    </operation>
-
     <operation name="addLifecycleListener"
                description="Add a lifecycle listener to this Context"
                impact="ACTION"
@@ -617,12 +608,6 @@
                returnType="[Ljava.lang.String;">
     </operation>
 
-    <operation name="findInstanceListeners"
-               description="Return the set of InstanceListener classes that will be added to newly created Wrappers automatically."
-               impact="INFO"
-               returnType="[Ljava.lang.String;">
-    </operation>
-
     <operation name="findLifecycleListenerNames"
                description="Return the set of lifecycle listener class names configured for this application."
                impact="INFO"
@@ -794,15 +779,6 @@
                returnType="void">
       <parameter name="name"
                  description="Name of the existing child Container to be removed"
-                 type="java.lang.String"/>
-    </operation>
-
-    <operation name="removeInstanceListener"
-               description="Remove the application parameter with the specified name from the set for this application."
-               impact="ACTION"
-               returnType="void">
-      <parameter name="listener"
-                 description="Class name of an InstanceListener class to be removed"
                  type="java.lang.String"/>
     </operation>
 

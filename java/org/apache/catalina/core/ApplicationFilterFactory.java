@@ -50,7 +50,6 @@ public final class ApplicationFilterFactory {
      * @return The configured FilterChain instance or null if none is to be
      *         executed.
      */
-    @SuppressWarnings("deprecation")
     public static ApplicationFilterChain createFilterChain
         (ServletRequest request, Wrapper wrapper, Servlet servlet) {
 
@@ -92,9 +91,7 @@ public final class ApplicationFilterFactory {
         }
 
         filterChain.setServlet(servlet);
-
-        filterChain.setSupport
-            (((StandardWrapper)wrapper).getInstanceSupport());
+        filterChain.setServletSupportsAsync(wrapper.isAsyncSupported());
 
         // Acquire the filter mappings for this Context
         StandardContext context = (StandardContext) wrapper.getParent();

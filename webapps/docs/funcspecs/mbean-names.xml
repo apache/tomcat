@@ -173,15 +173,6 @@ corresponding values:</p>
   </tr>
 
   <tr>
-    <td>Server / Service / Engine / Host / Context / InstanceListener</td>
-    <td style="text-align: center;">0..n</td>
-    <td style="text-align: center;">(none)</td>
-    <td><code class="noHighlight">type=${INSTANCE-LISTENER}, sequence=${###},
-        context=${context.name}, host=${host.name},
-        service=${service.name}</code></td>
-  </tr>
-
-  <tr>
     <td>Server / Service / Engine / Host / Context / Listener</td>
     <td style="text-align: center;">0..n</td>
     <td style="text-align: center;">(none)</td>
