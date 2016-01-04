@@ -27,10 +27,13 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 import javax.annotation.PostConstruct;
@@ -41,8 +44,6 @@ import javax.naming.Context;
 import javax.naming.NamingException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
-import javax.servlet.Filter;
-import javax.servlet.Servlet;
 import javax.xml.ws.WebServiceRef;
 
 import org.apache.catalina.ContainerServlet;
@@ -72,9 +73,7 @@ public class DefaultInstanceManager implements InstanceManager {
     protected final ClassLoader containerClassLoader;
     protected final boolean privileged;
     protected final boolean ignoreAnnotations;
-    private final Properties restrictedFilters;
-    private final Properties restrictedListeners;
-    private final Properties restrictedServlets;
+    private final Set<String> restrictedClasses;
     private final Map<Class<?>, AnnotationCacheEntry[]> annotationCache =
         new WeakHashMap<>();
     private final Map<String, String> postConstructMethods;
@@ -89,15 +88,17 @@ public class DefaultInstanceManager implements InstanceManager {
         this.containerClassLoader = containerClassLoader;
         ignoreAnnotations = catalinaContext.getIgnoreAnnotations();
         Log log = catalinaContext.getLogger();
-        restrictedServlets = loadProperties(
+        Set<String> classNames = new HashSet<>();
+        loadProperties(classNames,
                 "org/apache/catalina/core/RestrictedServlets.properties",
                 "defaultInstanceManager.restrictedServletsResource", log);
-        restrictedListeners = loadProperties(
+        loadProperties(classNames,
                 "org/apache/catalina/core/RestrictedListeners.properties",
                 "defaultInstanceManager.restrictedListenersResource", log);
-        restrictedFilters = loadProperties(
+        loadProperties(classNames,
                 "org/apache/catalina/core/RestrictedFilters.properties",
                 "defaultInstanceManager.restrictedFiltersResource", log);
+        restrictedClasses = Collections.unmodifiableSet(classNames);
         this.context = context;
         this.injectionMap = injectionMap;
         this.postConstructMethods = catalinaContext.findPostConstructMethods();
@@ -521,27 +522,17 @@ public class DefaultInstanceManager implements InstanceManager {
         if (privileged) {
             return;
         }
-        if (Filter.class.isAssignableFrom(clazz)) {
-            checkAccess(clazz, restrictedFilters);
-        } else if (Servlet.class.isAssignableFrom(clazz)) {
-            if (ContainerServlet.class.isAssignableFrom(clazz)) {
-                throw new SecurityException("Restricted (ContainerServlet) " +
-                        clazz);
-            }
-            checkAccess(clazz, restrictedServlets);
-        } else {
-            checkAccess(clazz, restrictedListeners);
+        if (ContainerServlet.class.isAssignableFrom(clazz)) {
+            throw new SecurityException(sm.getString(
+                    "defaultInstanceManager.restrictedContainerServlet", clazz));
         }
-    }
-
-    private void checkAccess(Class<?> clazz, Properties restricted) {
         while (clazz != null) {
-            if ("restricted".equals(restricted.getProperty(clazz.getName()))) {
-                throw new SecurityException("Restricted " + clazz);
+            if (restrictedClasses.contains(clazz.getName())) {
+                throw new SecurityException(sm.getString(
+                        "defaultInstanceManager.restrictedClass", clazz));
             }
             clazz = clazz.getSuperclass();
         }
-
     }
 
     /**
@@ -621,19 +612,31 @@ public class DefaultInstanceManager implements InstanceManager {
         }
     }
 
-    private static Properties loadProperties(String resourceName, String messageKey, Log log) {
-        Properties result = new Properties();
+    private static void loadProperties(Set<String> classNames, String resourceName,
+            String messageKey, Log log) {
+        Properties properties = new Properties();
         ClassLoader cl = DefaultInstanceManager.class.getClassLoader();
         try (InputStream is = cl.getResourceAsStream(resourceName)) {
             if (is == null) {
                 log.error(sm.getString(messageKey, resourceName));
             } else {
-                result.load(is);
+                properties.load(is);
             }
         } catch (IOException ioe) {
             log.error(sm.getString(messageKey, resourceName), ioe);
         }
-        return result;
+        if (properties.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<Object, Object> e : properties.entrySet()) {
+            if ("restricted".equals(e.getValue())) {
+                classNames.add(e.getKey().toString());
+            } else {
+                log.warn(sm.getString(
+                        "defaultInstanceManager.restrictedWrongValue",
+                        resourceName, e.getKey(), e.getValue()));
+            }
+        }
     }
 
     private static String normalize(String jndiName){
