@@ -52,13 +52,10 @@ import org.apache.catalina.Container;
 import org.apache.catalina.ContainerServlet;
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
-import org.apache.catalina.InstanceEvent;
-import org.apache.catalina.InstanceListener;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.catalina.util.InstanceSupport;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
@@ -140,14 +137,6 @@ public class StandardWrapper extends ContainerBase
      * Flag that indicates if this instance has been initialized
      */
     protected volatile boolean instanceInitialized = false;
-
-    /**
-     * The support object for our instance listeners.
-     *
-     * @deprecated Will be removed in 9.0.x onwards
-     */
-    @Deprecated
-    protected final InstanceSupport instanceSupport = new InstanceSupport(this);
 
 
     /**
@@ -344,22 +333,7 @@ public class StandardWrapper extends ContainerBase
      * not implement <code>SingleThreadModel</code>.
      */
     public int getCountAllocated() {
-
-        return (this.countAllocated.get());
-
-    }
-
-
-    /**
-     * Return the InstanceSupport object for this Wrapper instance.
-     *
-     * @deprecated Will be removed in 9.0.x onwards
-     */
-    @Deprecated
-    public InstanceSupport getInstanceSupport() {
-
-        return (this.instanceSupport);
-
+        return this.countAllocated.get();
     }
 
 
@@ -728,22 +702,6 @@ public class StandardWrapper extends ContainerBase
             parametersLock.writeLock().unlock();
         }
         fireContainerEvent("addInitParameter", name);
-
-    }
-
-
-    /**
-     * Add a new listener interested in InstanceEvents.
-     *
-     * @param listener The new listener
-     *
-     * @deprecated Will be removed in 9.0.x onwards
-     */
-    @Deprecated
-    @Override
-    public void addInstanceListener(InstanceListener listener) {
-
-        instanceSupport.addInstanceListener(listener);
 
     }
 
@@ -1211,9 +1169,6 @@ public class StandardWrapper extends ContainerBase
 
         // Call the initialization method of this servlet
         try {
-            instanceSupport.fireInstanceEvent(InstanceEvent.BEFORE_INIT_EVENT,
-                                              servlet);
-
             if( Globals.IS_SECURITY_ENABLED) {
                 boolean success = false;
                 try {
@@ -1234,25 +1189,16 @@ public class StandardWrapper extends ContainerBase
             }
 
             instanceInitialized = true;
-
-            instanceSupport.fireInstanceEvent(InstanceEvent.AFTER_INIT_EVENT,
-                                              servlet);
         } catch (UnavailableException f) {
-            instanceSupport.fireInstanceEvent(InstanceEvent.AFTER_INIT_EVENT,
-                                              servlet, f);
             unavailable(f);
             throw f;
         } catch (ServletException f) {
-            instanceSupport.fireInstanceEvent(InstanceEvent.AFTER_INIT_EVENT,
-                                              servlet, f);
             // If the servlet wanted to be unavailable it would have
             // said so, so do not call unavailable(null).
             throw f;
         } catch (Throwable f) {
             ExceptionUtils.handleThrowable(f);
             getServletContext().log("StandardWrapper.Throwable", f );
-            instanceSupport.fireInstanceEvent(InstanceEvent.AFTER_INIT_EVENT,
-                                              servlet, f);
             // If the servlet wanted to be unavailable it would have
             // said so, so do not call unavailable(null).
             throw new ServletException
@@ -1275,22 +1221,6 @@ public class StandardWrapper extends ContainerBase
             parametersLock.writeLock().unlock();
         }
         fireContainerEvent("removeInitParameter", name);
-
-    }
-
-
-    /**
-     * Remove a listener no longer interested in InstanceEvents.
-     *
-     * @param listener The listener to remove
-     *
-     * @deprecated Will be removed in 9.0.x onwards
-     */
-    @Deprecated
-    @Override
-    public void removeInstanceListener(InstanceListener listener) {
-
-        instanceSupport.removeInstanceListener(listener);
 
     }
 
@@ -1424,13 +1354,9 @@ public class StandardWrapper extends ContainerBase
 
             // Call the servlet destroy() method
             try {
-                instanceSupport.fireInstanceEvent
-                  (InstanceEvent.BEFORE_DESTROY_EVENT, instance);
-
                 if( Globals.IS_SECURITY_ENABLED) {
                     try {
-                        SecurityUtil.doAsPrivilege("destroy",
-                                                   instance);
+                        SecurityUtil.doAsPrivilege("destroy", instance);
                     } finally {
                         SecurityUtil.remove(instance);
                     }
@@ -1438,19 +1364,13 @@ public class StandardWrapper extends ContainerBase
                     instance.destroy();
                 }
 
-                instanceSupport.fireInstanceEvent
-                  (InstanceEvent.AFTER_DESTROY_EVENT, instance);
-
                 // Annotation processing
                 if (!((Context) getParent()).getIgnoreAnnotations()) {
                    ((StandardContext)getParent()).getInstanceManager().destroyInstance(instance);
                 }
-
             } catch (Throwable t) {
                 t = ExceptionUtils.unwrapInvocationTargetException(t);
                 ExceptionUtils.handleThrowable(t);
-                instanceSupport.fireInstanceEvent
-                  (InstanceEvent.AFTER_DESTROY_EVENT, instance, t);
                 instance = null;
                 instancePool = null;
                 nInstances = 0;

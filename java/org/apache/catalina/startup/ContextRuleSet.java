@@ -117,8 +117,6 @@ public class ContextRuleSet extends RuleSetBase {
                                 "addChild",
                                 "org.apache.catalina.Container");
         }
-        digester.addCallMethod(prefix + "Context/InstanceListener",
-                               "addInstanceListener", 0);
 
         digester.addObjectCreate(prefix + "Context/Listener",
                                  null, // MUST be specified in the element

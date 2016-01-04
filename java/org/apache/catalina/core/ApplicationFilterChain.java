@@ -30,9 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Globals;
-import org.apache.catalina.InstanceEvent;
 import org.apache.catalina.security.SecurityUtil;
-import org.apache.catalina.util.InstanceSupport;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -68,27 +66,12 @@ final class ApplicationFilterChain implements FilterChain {
     public static final int INCREMENT = 10;
 
 
-    // ----------------------------------------------------------- Constructors
-
-
-    /**
-     * Construct a new chain instance with no defined filters.
-     */
-    public ApplicationFilterChain() {
-
-        super();
-
-    }
-
-
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Filters.
      */
-    private ApplicationFilterConfig[] filters =
-        new ApplicationFilterConfig[0];
+    private ApplicationFilterConfig[] filters = new ApplicationFilterConfig[0];
 
 
     /**
@@ -111,17 +94,15 @@ final class ApplicationFilterChain implements FilterChain {
 
 
     /**
+     * Does the associated servlet instance support async processing?
+     */
+    private boolean servletSupportsAsync = false;
+
+    /**
      * The string manager for our package.
      */
     private static final StringManager sm =
       StringManager.getManager(Constants.Package);
-
-
-    /**
-     * The InstanceSupport instance associated with our Wrapper (used to
-     * send "before filter" and "after filter" events.
-     */
-    private InstanceSupport support = null;
 
 
     /**
@@ -196,13 +177,10 @@ final class ApplicationFilterChain implements FilterChain {
             Filter filter = null;
             try {
                 filter = filterConfig.getFilter();
-                support.fireInstanceEvent(InstanceEvent.BEFORE_FILTER_EVENT,
-                                          filter, request, response);
 
                 if (request.isAsyncSupported() && "false".equalsIgnoreCase(
                         filterConfig.getFilterDef().getAsyncSupported())) {
-                    request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR,
-                            Boolean.FALSE);
+                    request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR, Boolean.FALSE);
                 }
                 if( Globals.IS_SECURITY_ENABLED ) {
                     final ServletRequest req = request;
@@ -211,28 +189,16 @@ final class ApplicationFilterChain implements FilterChain {
                         ((HttpServletRequest) req).getUserPrincipal();
 
                     Object[] args = new Object[]{req, res, this};
-                    SecurityUtil.doAsPrivilege
-                        ("doFilter", filter, classType, args, principal);
-
+                    SecurityUtil.doAsPrivilege ("doFilter", filter, classType, args, principal);
                 } else {
                     filter.doFilter(request, response, this);
                 }
-
-                support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                                          filter, request, response);
             } catch (IOException | ServletException | RuntimeException e) {
-                if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                                              filter, request, response, e);
                 throw e;
             } catch (Throwable e) {
                 e = ExceptionUtils.unwrapInvocationTargetException(e);
                 ExceptionUtils.handleThrowable(e);
-                if (filter != null)
-                    support.fireInstanceEvent(InstanceEvent.AFTER_FILTER_EVENT,
-                                              filter, request, response, e);
-                throw new ServletException
-                  (sm.getString("filterChain.filter"), e);
+                throw new ServletException(sm.getString("filterChain.filter"), e);
             }
             return;
         }
@@ -244,10 +210,7 @@ final class ApplicationFilterChain implements FilterChain {
                 lastServicedResponse.set(response);
             }
 
-            support.fireInstanceEvent(InstanceEvent.BEFORE_SERVICE_EVENT,
-                                      servlet, request, response);
-            if (request.isAsyncSupported()
-                    && !support.getWrapper().isAsyncSupported()) {
+            if (request.isAsyncSupported() && !servletSupportsAsync) {
                 request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR,
                         Boolean.FALSE);
             }
@@ -272,24 +235,14 @@ final class ApplicationFilterChain implements FilterChain {
             } else {
                 servlet.service(request, response);
             }
-            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
-                                      servlet, request, response);
         } catch (IOException e) {
-            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
-                                      servlet, request, response, e);
             throw e;
         } catch (ServletException e) {
-            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
-                                      servlet, request, response, e);
             throw e;
         } catch (RuntimeException e) {
-            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
-                                      servlet, request, response, e);
             throw e;
         } catch (Throwable e) {
             ExceptionUtils.handleThrowable(e);
-            support.fireInstanceEvent(InstanceEvent.AFTER_SERVICE_EVENT,
-                                      servlet, request, response, e);
             throw new ServletException
               (sm.getString("filterChain.servlet"), e);
         } finally {
@@ -353,15 +306,13 @@ final class ApplicationFilterChain implements FilterChain {
      * Release references to the filters and wrapper executed by this chain.
      */
     void release() {
-
         for (int i = 0; i < n; i++) {
             filters[i] = null;
         }
         n = 0;
         pos = 0;
         servlet = null;
-        support = null;
-
+        servletSupportsAsync = false;
     }
 
 
@@ -379,24 +330,11 @@ final class ApplicationFilterChain implements FilterChain {
      * @param servlet The Wrapper for the servlet to be executed
      */
     void setServlet(Servlet servlet) {
-
         this.servlet = servlet;
-
     }
 
 
-    /**
-     * Set the InstanceSupport object used for event notifications
-     * for this filter chain.
-     *
-     * @param support The InstanceSupport object for our Wrapper
-     *
-     * @deprecated Will be removed in 9.0.x onwards
-     */
-    @Deprecated
-    void setSupport(InstanceSupport support) {
-
-        this.support = support;
-
+    void setServletSupportsAsync(boolean servletSupportsAsync) {
+        this.servletSupportsAsync = servletSupportsAsync;
     }
 }
