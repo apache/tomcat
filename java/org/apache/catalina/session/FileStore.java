@@ -235,12 +235,12 @@ public final class FileStore extends StoreBase {
             if (loader != null) {
                 classLoader = loader.getClassLoader();
             }
-            if (classLoader != null) {
-                Thread.currentThread().setContextClassLoader(classLoader);
-                ois = new CustomObjectInputStream(bis, classLoader);
+            if (classLoader == null) {
+                classLoader = getClass().getClassLoader();
             } else {
-                ois = new ObjectInputStream(bis);
+                Thread.currentThread().setContextClassLoader(classLoader);
             }
+            ois = new CustomObjectInputStream(bis, classLoader);
 
             StandardSession session = (StandardSession) manager.createEmptySession();
             session.readObjectData(ois);
