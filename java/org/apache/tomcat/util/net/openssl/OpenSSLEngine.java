@@ -906,7 +906,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (error != SSL.SSL_ERROR_NONE) {
             String err = SSL.getErrorString(error);
             if (logger.isDebugEnabled()) {
-                logger.debug(sm.getString("engine.openSSLError", error, err));
+                logger.debug(sm.getString("engine.openSSLError", Long.toString(error), err));
             }
             // Many errors can occur during handshake and need to be reported
             if (!handshakeFinished) {
