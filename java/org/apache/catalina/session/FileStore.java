@@ -211,11 +211,11 @@ public final class FileStore extends StoreBase {
         // Open an input stream to the specified pathname, if any
         File file = file(id);
         if (file == null) {
-            return (null);
+            return null;
         }
 
-        if (! file.exists()) {
-            return (null);
+        if (!file.exists()) {
+            return null;
         }
         if (manager.getContext().getLogger().isDebugEnabled()) {
             manager.getContext().getLogger().debug(sm.getString(getStoreName()+".loading",
@@ -246,7 +246,7 @@ public final class FileStore extends StoreBase {
                     (StandardSession) manager.createEmptySession();
             session.readObjectData(ois);
             session.setManager(manager);
-            return (session);
+            return session;
         } catch (FileNotFoundException e) {
             if (manager.getContext().getLogger().isDebugEnabled()) {
                 manager.getContext().getLogger().debug("No persisted data file found");
