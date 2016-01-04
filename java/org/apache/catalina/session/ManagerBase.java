@@ -228,7 +228,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /** Returns the name of the implementation class.
+    /**
+     * @return The name of the implementation class.
      */
     public String getClassName() {
         return this.getClass().getName();
@@ -331,7 +332,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
-     * Return the descriptive short name of this Manager implementation.
+     * @return The descriptive short name of this Manager implementation.
      */
     public String getName() {
 
@@ -340,7 +341,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
     /**
-     * Return the secure random number generator class name.
+     * @return The secure random number generator class name.
      */
     public String getSecureRandomClass() {
 
@@ -366,7 +367,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
-     * Return the secure random number generator algorithm name.
+     * @return The secure random number generator algorithm name.
      */
     public String getSecureRandomAlgorithm() {
         return secureRandomAlgorithm;
@@ -385,7 +386,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
-     * Return the secure random number generator provider name.
+     * @return The secure random number generator provider name.
      */
     public String getSecureRandomProvider() {
         return secureRandomProvider;
@@ -444,7 +445,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
     /**
-     * Return the frequency of manager checks.
+     * @return The frequency of manager checks.
      */
     public int getProcessExpiresFrequency() {
 
@@ -902,8 +903,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
-     * Return the maximum number of active Sessions allowed, or -1 for
-     * no limit.
+     * @return The maximum number of active Sessions allowed, or -1 for no
+     *         limit.
      */
     public int getMaxActiveSessions() {
 
@@ -1098,11 +1099,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
-     * For debugging: return a list of all session ids currently active
+     * For debugging.
      *
+     * @return A space separated list of all session IDs currently active
      */
     public String listSessionIds() {
-        StringBuilder sb=new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         Iterator<String> keys = sessions.keySet().iterator();
         while (keys.hasNext()) {
             sb.append(keys.next()).append(" ");
@@ -1112,11 +1114,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
-     * For debugging: get a session attribute
+     * For debugging.
      *
-     * @param sessionId
-     * @param key
-     * @return The attribute value, if found, null otherwise
+     * @param sessionId The ID for the session of interest
+     * @param key       The key for the attribute to obtain
+     *
+     * @return The attribute value for the specified session, if found, null
+     *         otherwise
      */
     public String getSessionAttribute( String sessionId, String key ) {
         Session s = sessions.get(sessionId);
@@ -1309,15 +1313,16 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         }
 
         /**
-         * Time stamp associated with this piece of timing information in
-         * milliseconds.
+         * @return Time stamp associated with this piece of timing information
+         *         in milliseconds.
          */
         public long getTimestamp() {
             return timestamp;
         }
 
         /**
-         * Duration associated with this piece of timing information in seconds.
+         * @return Duration associated with this piece of timing information in
+         *         seconds.
          */
         public int getDuration() {
             return duration;
