@@ -704,7 +704,8 @@ public class OpenSSLCipherConfigurationParser {
     }
 
     /**
-     * Parse the specified expression according to the OpenSSL syntax and returns a list of standard cipher names.
+     * Parse the specified expression according to the OpenSSL syntax and
+     * returns a list of standard JSSE cipher names.
      *
      * @param expression the openssl expression to define a list of cipher.
      * @return the corresponding list of ciphers.
