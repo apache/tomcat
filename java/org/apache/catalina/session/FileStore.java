@@ -242,8 +242,7 @@ public final class FileStore extends StoreBase {
                 ois = new ObjectInputStream(bis);
             }
 
-            StandardSession session =
-                    (StandardSession) manager.createEmptySession();
+            StandardSession session = (StandardSession) manager.createEmptySession();
             session.readObjectData(ois);
             session.setManager(manager);
             return session;
