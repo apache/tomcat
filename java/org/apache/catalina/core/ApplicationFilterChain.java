@@ -45,6 +45,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
+@SuppressWarnings("deprecation")
 final class ApplicationFilterChain implements FilterChain {
 
     // Used to enforce requirements of SRV.8.2 / SRV.14.2.5.1
@@ -389,7 +390,10 @@ final class ApplicationFilterChain implements FilterChain {
      * for this filter chain.
      *
      * @param support The InstanceSupport object for our Wrapper
+     *
+     * @deprecated Will be removed in 9.0.x onwards
      */
+    @Deprecated
     void setSupport(InstanceSupport support) {
 
         this.support = support;

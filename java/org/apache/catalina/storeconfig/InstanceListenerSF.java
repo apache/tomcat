@@ -41,6 +41,7 @@ public class InstanceListenerSF extends StoreFactoryBase {
         if (aElement instanceof StandardContext) {
             StoreDescription elementDesc = getRegistry().findDescription(
                     aElement.getClass().getName() + ".[InstanceListener]");
+            @SuppressWarnings("deprecation")
             String[] listeners = ((StandardContext) aElement)
                     .findInstanceListeners();
             if (elementDesc != null) {

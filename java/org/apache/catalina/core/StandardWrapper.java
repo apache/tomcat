@@ -143,7 +143,10 @@ public class StandardWrapper extends ContainerBase
 
     /**
      * The support object for our instance listeners.
+     *
+     * @deprecated Will be removed in 9.0.x onwards
      */
+    @Deprecated
     protected final InstanceSupport instanceSupport = new InstanceSupport(this);
 
 
@@ -349,7 +352,10 @@ public class StandardWrapper extends ContainerBase
 
     /**
      * Return the InstanceSupport object for this Wrapper instance.
+     *
+     * @deprecated Will be removed in 9.0.x onwards
      */
+    @Deprecated
     public InstanceSupport getInstanceSupport() {
 
         return (this.instanceSupport);
@@ -730,7 +736,10 @@ public class StandardWrapper extends ContainerBase
      * Add a new listener interested in InstanceEvents.
      *
      * @param listener The new listener
+     *
+     * @deprecated Will be removed in 9.0.x onwards
      */
+    @Deprecated
     @Override
     public void addInstanceListener(InstanceListener listener) {
 
@@ -1274,7 +1283,10 @@ public class StandardWrapper extends ContainerBase
      * Remove a listener no longer interested in InstanceEvents.
      *
      * @param listener The listener to remove
+     *
+     * @deprecated Will be removed in 9.0.x onwards
      */
+    @Deprecated
     @Override
     public void removeInstanceListener(InstanceListener listener) {
 

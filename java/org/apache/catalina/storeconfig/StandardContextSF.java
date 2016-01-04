@@ -268,6 +268,7 @@ public class StandardContextSF extends StoreFactoryBase {
             storeElement(aWriter, indent, resources);
 
             // Store nested <InstanceListener> elements
+            @SuppressWarnings("deprecation")
             String iListeners[] = context.findInstanceListeners();
             getStoreAppender().printTagArray(aWriter, "InstanceListener",
                     indent + 2, iListeners);

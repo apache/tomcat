@@ -33,7 +33,10 @@ import javax.servlet.ServletResponse;
  * as opposed to the Wrapper component that manages it.
  *
  * @author Craig R. McClanahan
+ *
+ * @deprecated Will be removed in 9.0.x onwards
  */
+@Deprecated
 public final class InstanceEvent extends EventObject {
 
     private static final long serialVersionUID = 1L;
