@@ -155,6 +155,10 @@
         header to the <code>HttpHeaderSecurityFilter</code>. Patch provided by
         Jacopo Cappellato. (markt)
       </fix>
+      <fix>
+        Add the <code>StatusManagerServlet</code> to the list of Servlets that
+        can only be loaded by privileged applications. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
