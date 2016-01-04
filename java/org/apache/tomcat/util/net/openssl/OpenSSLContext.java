@@ -171,6 +171,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
+    @Override
     public synchronized void destroy() {
         // Guard against multiple destroyPools() calls triggered by construction exception and finalize() later
         if (DESTROY_UPDATER.compareAndSet(this, 0, 1)) {
