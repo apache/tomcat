@@ -25,7 +25,10 @@ package org.apache.catalina;
  * is managing that instance.
  *
  * @author Craig R. McClanahan
+ *
+ * @deprecated Will be removed in 9.0.x onwards
  */
+@Deprecated
 public interface InstanceListener {
 
 

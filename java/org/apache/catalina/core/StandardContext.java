@@ -145,6 +145,7 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
+@SuppressWarnings("deprecation")
 public class StandardContext extends ContainerBase
         implements Context, NotificationEmitter {
 
@@ -2978,7 +2979,10 @@ public class StandardContext extends ContainerBase
      * Wrapper appended to this Context.
      *
      * @param listener Java class name of an InstanceListener class
+     *
+     * @deprecated Will be removed in 9.0.x onwards
      */
+    @Deprecated
     @Override
     public void addInstanceListener(String listener) {
 
@@ -3467,7 +3471,10 @@ public class StandardContext extends ContainerBase
     /**
      * Return the set of InstanceListener classes that will be added to
      * newly created Wrappers automatically.
+     *
+     * @deprecated Will be removed in 9.0.x onwards
      */
+    @Deprecated
     @Override
     public String[] findInstanceListeners() {
 
@@ -4042,7 +4049,10 @@ public class StandardContext extends ContainerBase
      * will be added to newly created Wrappers.
      *
      * @param listener Class name of an InstanceListener class to be removed
+     *
+     * @deprecated Will be removed in 9.0.x onwards
      */
+    @Deprecated
     @Override
     public void removeInstanceListener(String listener) {
 

@@ -174,7 +174,10 @@ public interface Wrapper extends Container {
      * Add a new listener interested in InstanceEvents.
      *
      * @param listener The new listener
+     *
+     * @deprecated Will be removed in 9.0.x onwards
      */
+    @Deprecated
     public void addInstanceListener(InstanceListener listener);
 
 
@@ -293,7 +296,10 @@ public interface Wrapper extends Container {
      * Remove a listener no longer interested in InstanceEvents.
      *
      * @param listener The listener to remove
+     *
+     * @deprecated Will be removed in 9.0.x onwards
      */
+    @Deprecated
     public void removeInstanceListener(InstanceListener listener);
 
 

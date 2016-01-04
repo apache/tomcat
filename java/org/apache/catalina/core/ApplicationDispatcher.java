@@ -61,6 +61,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
+@SuppressWarnings("deprecation")
 final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher {
 
     static final boolean STRICT_SERVLET_COMPLIANCE;

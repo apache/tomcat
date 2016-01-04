@@ -50,6 +50,7 @@ public final class ApplicationFilterFactory {
      * @return The configured FilterChain instance or null if none is to be
      *         executed.
      */
+    @SuppressWarnings("deprecation")
     public static ApplicationFilterChain createFilterChain
         (ServletRequest request, Wrapper wrapper, Servlet servlet) {
 
