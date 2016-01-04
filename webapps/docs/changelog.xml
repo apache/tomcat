@@ -164,6 +164,13 @@
         <code>org.apache.catalina.core.DefaultInstanceManager</code> class.
         (kkolinko)
       </fix>
+      <fix>
+        <bug>58751</bug>: Correctly handle the case where an
+        <code>AsyncListener</code> dispatches to a Servlet on an asynchronous
+        timeout and the Servlet uses <code>sendError()</code> to trigger an
+        error page. Includes a test case based on code provided by Andy
+        Wilkinson.(markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
