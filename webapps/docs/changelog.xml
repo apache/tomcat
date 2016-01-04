@@ -99,6 +99,10 @@
         this is required for correct session management because of the default
         for <code>sessionCookiePathUsesTrailingSlash</code>. (markt)
       </fix>
+      <fix>
+        Add the <code>StatusManagerServlet</code> to the list of Servlets that
+        can only be loaded by privileged applications. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
