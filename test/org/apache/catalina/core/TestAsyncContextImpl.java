@@ -1347,7 +1347,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         @Override
         public void service(ServletRequest req, ServletResponse res)
                 throws ServletException, IOException {
-            res.getWriter().println(ERROR_MESSAGE);
+            res.getWriter().print(ERROR_MESSAGE);
         }
 
     }
@@ -2141,5 +2141,75 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             }
             ac.dispatch(target);
          }
+    }
+
+
+    /*
+     * See https://bz.apache.org/bugzilla/show_bug.cgi?id=58751 comment 1
+     */
+    @Test
+    public void testTimeoutDispatchCustomErrorPage() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context context = tomcat.addContext("", null);
+        tomcat.addServlet("", "timeout", Bug58751AsyncServlet.class.getName())
+                .setAsyncSupported(true);
+        CustomErrorServlet customErrorServlet = new CustomErrorServlet();
+        Tomcat.addServlet(context, "customErrorServlet", customErrorServlet);
+        context.addServletMapping("/timeout", "timeout");
+        context.addServletMapping("/error", "customErrorServlet");
+        ErrorPage errorPage = new ErrorPage();
+        errorPage.setLocation("/error");
+        context.addErrorPage(errorPage);
+        tomcat.start();
+
+        ByteChunk responseBody = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/timeout", responseBody, null);
+
+        Assert.assertEquals(503, rc);
+        Assert.assertEquals(CustomErrorServlet.ERROR_MESSAGE, responseBody.toString());
+    }
+
+
+    public static class Bug58751AsyncServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            if (req.getAttribute("timeout") != null) {
+                resp.sendError(503);
+            }
+            else {
+                final AsyncContext context = req.startAsync();
+                context.setTimeout(5000);
+                context.addListener(new AsyncListener() {
+
+                    @Override
+                    public void onTimeout(AsyncEvent event) throws IOException {
+                        HttpServletResponse response = (HttpServletResponse) event
+                                .getSuppliedResponse();
+                        if (!response.isCommitted()) {
+                            ((HttpServletRequest) event.getSuppliedRequest())
+                                    .setAttribute("timeout", Boolean.TRUE);
+                            context.dispatch();
+                        }
+                    }
+
+                    @Override
+                    public void onStartAsync(AsyncEvent event) throws IOException {
+                    }
+
+                    @Override
+                    public void onError(AsyncEvent event) throws IOException {
+                    }
+
+                    @Override
+                    public void onComplete(AsyncEvent event) throws IOException {
+                    }
+                });
+            }
+        }
+
     }
 }

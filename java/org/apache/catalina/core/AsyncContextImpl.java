@@ -104,8 +104,31 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void fireOnComplete() {
+        // Fire the listeners
+        doFireOnComplete();
+
+        // The application doesn't know it has to stop read and/or writing until
+        // it receives the complete event so the request and response have to be
+        // closed after firing the event.
+        try {
+            // First of all ensure that any data written to the response is
+            // written to the I/O layer.
+            request.getResponse().finishResponse();
+            // Close the request and the response.
+            request.getCoyoteRequest().action(ActionCode.END_REQUEST, null);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            // Catch this here and allow async context complete to continue
+            // normally so a dispatch takes place which ensures that  the
+            // request and response objects are correctly recycled.
+            log.debug(sm.getString("asyncContextImpl.finishResponseError"), t);
+        }
+    }
+
+
+    private void doFireOnComplete() {
         List<AsyncListenerWrapper> listenersCopy =
-            new ArrayList<AsyncListenerWrapper>();
+                new ArrayList<AsyncListenerWrapper>();
         listenersCopy.addAll(listeners);
 
         ClassLoader oldCL;
@@ -142,24 +165,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 Thread.currentThread().setContextClassLoader(oldCL);
             }
         }
-
-        // The application doesn't know it has to stop read and/or writing until
-        // it receives the complete event so the request and response have to be
-        // closed after firing the event.
-        try {
-            // First of all ensure that any data written to the response is
-            // written to the I/O layer.
-            request.getResponse().finishResponse();
-            // Close the request and the response.
-            request.getCoyoteRequest().action(ActionCode.END_REQUEST, null);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            // Catch this here and allow async context complete to continue
-            // normally so a dispatch takes place which ensures that  the
-            // request and response objects are correctly recycled.
-            log.debug(sm.getString("asyncContextImpl.finishResponseError"), t);
-        }
     }
+
 
     public boolean timeout() {
         AtomicBoolean result = new AtomicBoolean();
@@ -416,7 +423,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             dispatch = null;
             runnable.run();
             if (!request.isAsync()) {
-                fireOnComplete();
+                // Uses internal method since we don't want the request/response
+                // to be closed. That will be handled in the adapter.
+                doFireOnComplete();
             }
         } catch (RuntimeException x) {
             // doInternalComplete(true);
