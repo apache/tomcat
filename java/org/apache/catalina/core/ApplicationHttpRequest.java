@@ -87,6 +87,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Construct a new wrapped request around the specified servlet request.
      *
      * @param request The servlet request being wrapped
+     * @param context The target context for the wrapped request
+     * @param crossContext {@code true} if the wrapped request will be a
+     *                     cross-context request, otherwise {@code false}
      */
     public ApplicationHttpRequest(HttpServletRequest request, Context context,
                                   boolean crossContext) {

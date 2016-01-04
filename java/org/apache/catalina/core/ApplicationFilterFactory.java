@@ -40,13 +40,15 @@ public final class ApplicationFilterFactory {
 
 
     /**
-     * Construct and return a FilterChain implementation that will wrap the
-     * execution of the specified servlet instance.  If we should not execute
-     * a filter chain at all, return <code>null</code>.
+     * Construct a FilterChain implementation that will wrap the execution of
+     * the specified servlet instance.
      *
      * @param request The servlet request we are processing
+     * @param wrapper The wrapper managing the servlet instance
      * @param servlet The servlet instance to be wrapped
-
+     *
+     * @return The configured FilterChain instance or null if none is to be
+     *         executed.
      */
     public static ApplicationFilterChain createFilterChain
         (ServletRequest request, Wrapper wrapper, Servlet servlet) {
@@ -67,7 +69,7 @@ public final class ApplicationFilterFactory {
 
         // If there is no servlet to execute, return null
         if (servlet == null)
-            return (null);
+            return null;
 
         // Create and initialize a filter chain object
         ApplicationFilterChain filterChain = null;
