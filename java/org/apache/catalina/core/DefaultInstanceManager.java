@@ -95,11 +95,11 @@ public class DefaultInstanceManager implements InstanceManager {
                 catalinaContext.getLogger());
         restrictedListeners = loadProperties(
                 "org/apache/catalina/core/RestrictedListeners.properties",
-                "defaultInstanceManager.restrictedListenersResources",
+                sm.getString("defaultInstanceManager.restrictedListenersResources"),
                 catalinaContext.getLogger());
         restrictedFilters = loadProperties(
                 "org/apache/catalina/core/RestrictedFilters.properties",
-                "defaultInstanceManager.restrictedFiltersResource",
+                sm.getString("defaultInstanceManager.restrictedFiltersResource"),
                 catalinaContext.getLogger());
         this.context = context;
         this.injectionMap = injectionMap;
