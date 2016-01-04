@@ -159,6 +159,11 @@
         Add the <code>StatusManagerServlet</code> to the list of Servlets that
         can only be loaded by privileged applications. (markt)
       </fix>
+      <fix>
+        Simplify code and fix messages in
+        <code>org.apache.catalina.core.DefaultInstanceManager</code> class.
+        (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
