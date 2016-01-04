@@ -203,7 +203,7 @@ public class StandardManager extends ManagerBase {
         }
         FileInputStream fis = null;
         BufferedInputStream bis = null;
-        ObjectInputStream ois = null;
+        ObjectInputStream ois;
         Loader loader = null;
         ClassLoader classLoader = null;
         try {
