@@ -364,6 +364,7 @@ public final class CipherSuiteConverter {
             handshakeAlgo = "ECDH_anon";
         }
 
+        handshakeAlgo = handshakeAlgo.replace("EDH", "DHE");
         handshakeAlgo = handshakeAlgo.replace('-', '_');
         if (export) {
             return handshakeAlgo + "_EXPORT";
