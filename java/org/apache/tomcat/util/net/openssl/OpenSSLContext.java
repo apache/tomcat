@@ -67,10 +67,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private final List<String> negotiableProtocols;
 
-    private List<String> ciphers = new ArrayList<>();
+    private List<String> jsseCipherNames = new ArrayList<>();
 
-    public List<String> getCiphers() {
-        return ciphers;
+    public List<String> getJsseCipherNames() {
+        return jsseCipherNames;
     }
 
     private String enabledProtocol;
@@ -298,7 +298,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
             // List the ciphers that the client is permitted to negotiate
             String opensslCipherConfig = sslHostConfig.getCiphers();
-            this.ciphers = OpenSSLCipherConfigurationParser.parseExpression(opensslCipherConfig);
+            this.jsseCipherNames = OpenSSLCipherConfigurationParser.parseExpression(opensslCipherConfig);
             SSLContext.setCipherSuite(ctx, opensslCipherConfig);
             // Load Server key and certificate
             if (certificate.getCertificateFile() != null) {
