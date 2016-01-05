@@ -184,11 +184,12 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     /**
-     * Setup the SSL_CTX
+     * Setup the SSL_CTX.
      *
      * @param kms Must contain a KeyManager of the type
-     * {@code OpenSSLKeyManager}
-     * @param tms
+     *            {@code OpenSSLKeyManager}
+     * @param tms Must contain a TrustManager of the type
+     *            {@code X509TrustManager}
      * @param sr Is not used for this implementation.
      */
     @Override
