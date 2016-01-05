@@ -56,7 +56,7 @@ public class ManagedBean implements java.io.Serializable {
     static final Class<?>[] NO_ARGS_PARAM_SIG = new Class[0];
 
 
-    private ReadWriteLock mBeanInfoLock = new ReentrantReadWriteLock();
+    private final ReadWriteLock mBeanInfoLock = new ReentrantReadWriteLock();
 
     /**
      * The <code>ModelMBeanInfo</code> object that corresponds
