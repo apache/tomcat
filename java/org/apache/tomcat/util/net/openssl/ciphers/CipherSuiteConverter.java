@@ -263,6 +263,14 @@ public final class CipherSuiteConverter {
             return "RC2-CBC";
         }
 
+        if ("AES_128".equals(bulkCipher)) {
+            return "AES128";
+        }
+
+        if ("AES_256".equals(bulkCipher)) {
+            return "AES256";
+        }
+
         return bulkCipher.replace('_', '-');
     }
 
