@@ -125,7 +125,11 @@ public final class CipherSuiteConverter {
     }
 
     /**
-     * Converts the specified Java cipher suites to the colon-separated OpenSSL cipher suite specification.
+     * Converts the specified Java cipher suites to the OpenSSL specification.
+     *
+     * @param javaCipherSuites The JSSE cipher suite names to convert
+     *
+     * @return A list of colon-separated OpenSSL cipher suite names
      */
     public static String toOpenSsl(Iterable<String> javaCipherSuites) {
         final StringBuilder buf = new StringBuilder();
@@ -153,6 +157,8 @@ public final class CipherSuiteConverter {
 
     /**
      * Converts the specified Java cipher suite to its corresponding OpenSSL cipher suite name.
+     *
+     * @param javaCipherSuite The JSSE cipher suite name to convert
      *
      * @return {@code null} if the conversion has failed
      */
@@ -182,11 +188,9 @@ public final class CipherSuiteConverter {
         p2j.put("TLS", "TLS_" + javaCipherSuiteSuffix);
         o2j.put(openSslCipherSuite, p2j);
 
-        /* TODO the log looks broken...
         if (logger.isDebugEnabled()) {
             logger.debug(sm.getString("converter.mapping", javaCipherSuite, openSslCipherSuite));
         }
-        */
 
         return openSslCipherSuite;
     }
@@ -315,12 +319,10 @@ public final class CipherSuiteConverter {
         j2o.putIfAbsent(javaCipherSuiteTls, openSslCipherSuite);
         j2o.putIfAbsent(javaCipherSuiteSsl, openSslCipherSuite);
 
-        /* TODO the log looks broken...
         if (logger.isDebugEnabled()) {
-            logger.debug(sm.getString("converter.mapping", javaCipherSuiteTls, openSslCipherSuite));
-            logger.debug(sm.getString("converter.mapping", javaCipherSuiteSsl, openSslCipherSuite));
+            logger.debug(sm.getString("converter.mapping", openSslCipherSuite, javaCipherSuiteTls));
+            logger.debug(sm.getString("converter.mapping", openSslCipherSuite, javaCipherSuiteSsl));
         }
-        */
 
         return p2j;
     }
