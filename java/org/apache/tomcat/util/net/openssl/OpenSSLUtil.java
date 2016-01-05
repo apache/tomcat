@@ -85,7 +85,7 @@ public class OpenSSLUtil implements SSLUtil {
     @Override
     public String[] getEnableableCiphers(SSLContext context) {
         if (enabledCiphers == null) {
-            List<String> enabledCiphersList = ((OpenSSLContext) context).getCiphers();
+            List<String> enabledCiphersList = ((OpenSSLContext) context).getJsseCipherNames();
             enabledCiphers = enabledCiphersList.toArray(new String[enabledCiphersList.size()]);
         }
         return enabledCiphers;
