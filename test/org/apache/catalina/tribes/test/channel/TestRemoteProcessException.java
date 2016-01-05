@@ -22,12 +22,14 @@ import java.util.Arrays;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.tribes.Channel;
+import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
@@ -73,13 +75,32 @@ public class TestRemoteProcessException {
         int errC=0, nerrC=0;
         for (int i=0; i<msgCount; i++) {
             boolean error = Data.r.nextBoolean();
-            channel1.send(channel1.getMembers(),Data.createRandomData(error),Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK);
+            try {
+                channel1.send(channel1.getMembers(),
+                        Data.createRandomData(error),
+                        Channel.SEND_OPTIONS_SYNCHRONIZED_ACK
+                                | Channel.SEND_OPTIONS_USE_ACK);
+                if (error) {
+                    fail("A ChannelException was expected");
+                }
+            } catch (ChannelException e) {
+                if (!error) {
+                    throw e;
+                }
+            }
             if ( error ) errC++; else nerrC++;
         }
         System.err.println("Finished SYNC_ACK");
-        assertEquals("Checking failure messages.",errC,listener1.errCnt);
-        assertEquals("Checking success messages.",nerrC,listener1.noErrCnt);
-        assertEquals("Checking all messages.",msgCount,listener1.noErrCnt+listener1.errCnt);
+
+        // The listener sees 3 copies of the first "error" message,
+        // as it is being re-sent. Thus the listener1 count is off by +2.
+        final int duplicate = 2;
+
+        assertEquals("Checking failure messages.", errC + duplicate,
+                listener1.errCnt);
+        assertEquals("Checking success messages.", nerrC, listener1.noErrCnt);
+        assertEquals("Checking all messages.", msgCount + duplicate,
+                listener1.noErrCnt + listener1.errCnt);
         System.out.println("Listener 1 stats:");
         listener1.printStats(System.out);
     }
