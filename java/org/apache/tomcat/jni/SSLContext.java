@@ -143,7 +143,7 @@ public final class SSLContext {
      * renegotiation with the reconfigured Cipher Suite after the HTTP request
      * was read but before the HTTP response is sent.
      * @param ctx Server or Client context to use.
-     * @param ciphers An SSL cipher specification.
+     * @param ciphers An OpenSSL cipher specification.
      */
     public static native boolean setCipherSuite(long ctx, String ciphers)
         throws Exception;
