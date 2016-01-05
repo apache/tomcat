@@ -414,6 +414,14 @@ public final class CipherSuiteConverter {
             }
         }
 
+        if ("CAMELLIA128".equals(bulkCipher)) {
+            return "CAMELLIA_128_CBC";
+        }
+
+        if ("CAMELLIA256".equals(bulkCipher)) {
+            return "CAMELLIA_256_CBC";
+        }
+
         return bulkCipher.replace('-', '_');
     }
 
