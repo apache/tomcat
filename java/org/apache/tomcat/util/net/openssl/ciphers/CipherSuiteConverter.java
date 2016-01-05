@@ -422,6 +422,10 @@ public final class CipherSuiteConverter {
             return "CAMELLIA_256_CBC";
         }
 
+        if ("SEED".equals(bulkCipher)) {
+            return "SEED_CBC";
+        }
+
         return bulkCipher.replace('-', '_');
     }
 
