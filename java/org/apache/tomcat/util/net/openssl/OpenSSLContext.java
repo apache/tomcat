@@ -25,7 +25,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 import javax.net.ssl.KeyManager;
@@ -49,7 +48,6 @@ import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
-import org.apache.tomcat.util.net.openssl.ciphers.CipherSuiteConverter;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -299,21 +297,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
 
             // List the ciphers that the client is permitted to negotiate
-            String ciphers = sslHostConfig.getCiphers();
-            if (!("ALL".equals(ciphers)) && ciphers.indexOf(':') == -1) {
-                StringTokenizer tok = new StringTokenizer(ciphers, ",");
-                this.ciphers = new ArrayList<>();
-                while (tok.hasMoreTokens()) {
-                    String token = tok.nextToken().trim();
-                    if (!"".equals(token)) {
-                        this.ciphers.add(token);
-                    }
-                }
-                ciphers = CipherSuiteConverter.toOpenSsl(ciphers);
-            } else {
-                this.ciphers = OpenSSLCipherConfigurationParser.parseExpression(ciphers);
-            }
-            SSLContext.setCipherSuite(ctx, ciphers);
+            String opensslCipherConfig = sslHostConfig.getCiphers();
+            this.ciphers = OpenSSLCipherConfigurationParser.parseExpression(opensslCipherConfig);
+            SSLContext.setCipherSuite(ctx, opensslCipherConfig);
             // Load Server key and certificate
             if (certificate.getCertificateFile() != null) {
                 // Set certificate
