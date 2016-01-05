@@ -41,7 +41,7 @@ public class NotificationInfo extends FeatureInfo {
      */
     transient MBeanNotificationInfo info = null;
     protected String notifTypes[] = new String[0];
-    protected ReadWriteLock notifTypesLock = new ReentrantReadWriteLock();
+    protected final ReadWriteLock notifTypesLock = new ReentrantReadWriteLock();
 
     // ------------------------------------------------------------- Properties
 
