@@ -192,6 +192,11 @@ public class SSLHostConfigCertificate {
     }
 
 
+    public String[] getEnabledCiphers() {
+        return getSslContextWrapper().getEnabledCiphers();
+    }
+
+
     // Nested types
 
     public static enum Type {

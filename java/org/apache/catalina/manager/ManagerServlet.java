@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -61,7 +62,7 @@ import org.apache.tomcat.util.Diagnostics;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.SSLHostConfig;
-import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -563,19 +564,16 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         writer.print(Diagnostics.getThreadDump(requestedLocales));
     }
 
-    protected void sslConnectorCiphers(PrintWriter writer, StringManager smClient) {
-        writer.println(smClient.getString("managerServlet.sslConnectorCiphers"));
-        Map<String,Set<Cipher>> connectorCiphers = getConnectorCiphers();
-        for (Map.Entry<String,Set<Cipher>> entry : connectorCiphers.entrySet()) {
+    protected void sslConnectorCiphers(PrintWriter writer,
+            StringManager smClient) {
+        writer.println(smClient.getString(
+                "managerServlet.sslConnectorCiphers"));
+        Map<String,Set<String>> connectorCiphers = getConnectorCiphers();
+        for (Map.Entry<String,Set<String>> entry : connectorCiphers.entrySet()) {
             writer.println(entry.getKey());
-            if (entry.getValue() == null) {
+            for (String cipher : entry.getValue()) {
                 writer.print("  ");
-                writer.println(smClient.getString("managerServlet.notSslConnector"));
-            } else {
-                for (Cipher cipher : entry.getValue()) {
-                    writer.print("  ");
-                    writer.println(cipher);
-                }
+                writer.println(cipher);
             }
         }
     }
@@ -1654,9 +1652,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
-    protected Map<String,Set<Cipher>> getConnectorCiphers() {
-        // TODO: Returned available ciphers rather than configured ciphers.
-        Map<String,Set<Cipher>> result = new HashMap<>();
+    protected Map<String,Set<String>> getConnectorCiphers() {
+        Map<String,Set<String>> result = new HashMap<>();
 
         Engine e = (Engine) host.getParent();
         Service s = e.getService();
@@ -1665,11 +1662,21 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
                 for (SSLHostConfig sslHostConfig : sslHostConfigs) {
-                    result.put(connector.toString() + "-" + sslHostConfig.getHostName(),
-                            sslHostConfig.getCipherList());
+                    for (SSLHostConfigCertificate cert : sslHostConfig.getCertificates()) {
+                        String name = connector.toString() + "-" + sslHostConfig.getHostName() +
+                                "-" + cert.getType();
+                        Set<String> cipherList = new HashSet<>();
+                        String[] cipherNames = cert.getEnabledCiphers();
+                        for (String cipherName : cipherNames) {
+                            cipherList.add(cipherName);
+                        }
+                        result.put(name, cipherList);
+                    }
                 }
             } else {
-                result.put(connector.toString(), null);
+                Set<String> cipherList = new HashSet<>();
+                cipherList.add(sm.getString("managerServlet.notSslConnector"));
+                result.put(connector.toString(), cipherList);
             }
         }
         return result;
