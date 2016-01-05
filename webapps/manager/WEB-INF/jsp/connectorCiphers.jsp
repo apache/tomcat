@@ -19,12 +19,13 @@
 <%@page import="java.util.Map" %>
 <%@page import="java.util.Map.Entry" %>
 <%@page import="java.util.Set" %>
+<%@page import="org.apache.tomcat.util.net.openssl.ciphers.Cipher" %>
 <!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<% Map<String,Set<String>> cipherList = (Map<String,Set<String>>) request.getAttribute("cipherList");
+<% Map<String,Set<Cipher>> cipherList = (Map<String,Set<Cipher>>) request.getAttribute("cipherList");
 %>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
@@ -43,21 +44,27 @@
     <thead>
         <tr>
             <th>Connector</th>
-            <th>Enabled Ciphers</th>
+            <th>Configured Ciphers</th>
         </tr>
     </thead>
     <tbody>
         <%
-        for (Map.Entry<String, Set<String>> entry : cipherList.entrySet()) {
+        for (Map.Entry<String, Set<Cipher>> entry : cipherList.entrySet()) {
         %>
         <tr>
             <td><%=entry.getKey()%></td>
             <td>
             <%
-            for (String cipher : entry.getValue()) {
-            %>
-                <p><%=cipher%></p>
-            <%
+            if (entry.getValue() == null) {
+                %>
+                    <p>Not an SSL connector.</p>
+                <%
+            } else {
+                for (Cipher cipher : entry.getValue()) {
+                %>
+                    <p><%=cipher%></p>
+                <%
+                }
             }
             %>
             </td>
@@ -67,6 +74,10 @@
         %>
     </tbody>
 </table>
+
+<p>Note: The actual ciphers available for clients to use will be the subset of
+those listed above that are supported by the SSL implementation configured for
+the connector.</p>
 
 <form method="get" action="<%=request.getContextPath()%>/html">
   <p style="text-align: center;">
