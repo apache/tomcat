@@ -714,12 +714,44 @@ public class OpenSSLCipherConfigurationParser {
         return convertForJSSE(parse(expression));
     }
 
-    public static String jsseToOpenSSL(String cipher) {
+
+    /**
+     * Converts a JSSE cipher name to an OpenSSL cipher name.
+     *
+     * @param jsseCipherName The JSSE name for a cipher
+     *
+     * @return The OpenSSL name for the specified JSSE cipher
+     */
+    public static String jsseToOpenSSL(String jsseCipherName) {
         if (!initialized) {
             init();
         }
-        return jsseToOpenSSL.get(cipher);
+        return jsseToOpenSSL.get(jsseCipherName);
     }
+
+
+    /**
+     * Converts an OpenSSL cipher name to a JSSE cipher name.
+     *
+     * @param opensslCipherName The OpenSSL name for a cipher
+     *
+     * @return The JSSE name for the specified OpenSSL cipher. If none is known,
+     *         the IANA standard name will be returned instead
+     */
+    public static String openSSLToJsse(String opensslCipherName) {
+        if (!initialized) {
+            init();
+        }
+        List<Cipher> ciphers = aliases.get(opensslCipherName);
+        if (ciphers == null || ciphers.size() != 1) {
+            // Not an OpenSSL cipher name
+            return null;
+        }
+        Cipher cipher = ciphers.get(0);
+        // Each Cipher always has at least one JSSE name
+        return cipher.getJsseNames().iterator().next();
+    }
+
 
     static String displayResult(Collection<Cipher> ciphers, boolean useJSSEFormat, String separator) {
         if (ciphers.isEmpty()) {

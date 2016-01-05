@@ -51,7 +51,7 @@ import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLUtil;
-import org.apache.tomcat.util.net.openssl.ciphers.CipherSuiteConverter;
+import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -85,7 +85,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                         if (c == null || c.length() == 0 || availableCipherSuites.contains(c)) {
                             continue;
                         }
-                        availableCipherSuites.add(CipherSuiteConverter.toJava(c, "ALL"));
+                        availableCipherSuites.add(OpenSSLCipherConfigurationParser.openSSLToJsse(c));
                     }
                 } finally {
                     SSL.freeSSL(ssl);
@@ -700,7 +700,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return new String[0];
         } else {
             for (int i = 0; i < enabled.length; i++) {
-                String mapped = toJavaCipherSuite(enabled[i]);
+                String mapped = OpenSSLCipherConfigurationParser.openSSLToJsse(enabled[i]);
                 if (mapped != null) {
                     enabled[i] = mapped;
                 }
@@ -719,7 +719,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (cipherSuite == null) {
                 break;
             }
-            String converted = CipherSuiteConverter.toOpenSsl(cipherSuite);
+            String converted = OpenSSLCipherConfigurationParser.jsseToOpenSSL(cipherSuite);
             if (converted != null) {
                 cipherSuite = converted;
             }
@@ -977,40 +977,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
 
         return SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING;
-    }
-
-    /**
-     * Converts the specified OpenSSL cipher suite to the Java cipher suite.
-     */
-    private String toJavaCipherSuite(String openSslCipherSuite) {
-        if (openSslCipherSuite == null) {
-            return null;
-        }
-
-        String prefix = toJavaCipherSuitePrefix(SSL.getVersion(ssl));
-        return CipherSuiteConverter.toJava(openSslCipherSuite, prefix);
-    }
-
-    /**
-     * Converts the protocol version string returned by
-     * {@link SSL#getVersion(long)} to protocol family string.
-     */
-    private static String toJavaCipherSuitePrefix(String protocolVersion) {
-        final char c;
-        if (protocolVersion == null || protocolVersion.length() == 0) {
-            c = 0;
-        } else {
-            c = protocolVersion.charAt(0);
-        }
-
-        switch (c) {
-            case 'T':
-                return "TLS";
-            case 'S':
-                return "SSL";
-            default:
-                return "UNKNOWN";
-        }
     }
 
     @Override
@@ -1298,7 +1264,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return INVALID_CIPHER;
             }
             if (cipher == null) {
-                String c = toJavaCipherSuite(SSL.getCipherForSSL(ssl));
+                String c = OpenSSLCipherConfigurationParser.openSSLToJsse(SSL.getCipherForSSL(ssl));
                 if (c != null) {
                     cipher = c;
                 }
