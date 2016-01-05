@@ -222,6 +222,16 @@
     <Bug pattern="HRS_REQUEST_PARAMETER_TO_HTTP_HEADER" />
   </Match>
   <Match>
+    <!-- If encoding is specified it will be used,
+    otherwise platform default encoding will be used -->
+    <Class name="org.apache.catalina.servlets.DefaultServlet"/>
+    <Or>
+      <Method name="copy"/>
+      <Method name="getReadme"/>
+    </Or>
+    <Bug code="Dm" />
+  </Match>
+  <Match>
     <!-- Non-constant strings are configuration settings rather than client
          supplied -->
     <Class name="org.apache.catalina.session.JDBCStore" />
@@ -448,6 +458,16 @@
     <Class name="org.apache.jasper.JspC"/>
     <Method name="setValidateXml"/>
     <Bug code="ST" />
+  </Match>
+  <Match>
+    <!-- If encoding is specified it will be used,
+    otherwise platform default encoding will be used -->
+    <Class name="org.apache.jasper.JspC"/>
+    <Or>
+      <Method name="openWebxmlReader"/>
+      <Method name="openWebxmlWriter"/>
+    </Or>
+    <Bug code="Dm" />
   </Match>
   <Match>
     <!-- Node constructors add node to parent. Local variable is used to

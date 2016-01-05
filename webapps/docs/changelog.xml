@@ -171,6 +171,10 @@
         error page. Includes a test case based on code provided by Andy
         Wilkinson.(markt)
       </fix>
+      <fix>
+        Ensure that the proper file encoding if specified will be used when
+        a readme file is served by DefaultServlet. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
