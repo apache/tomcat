@@ -1084,7 +1084,7 @@
       <p>Only the ciphers that are supported by the SSL implementation will be
       used.</p>
       <p>If not specified, a default (using the OpenSSL notation) of
-      <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA</code> will be 
+      <code>HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA</code> will be
       used.</p>
       <p>Note that, by default, the order in which ciphers are defined is
       treated as an order of preference. See <code>honorCipherOrder</code>.</p>
