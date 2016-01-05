@@ -71,7 +71,7 @@ public final class CipherSuiteConverter {
                     "^(?:(" + // BEGIN handshake algorithm
                         "(?:(?:EXP-)?" +
                             "(?:" +
-                                "(?:DHE|EDH|ECDH|ECDHE|SRP)-(?:DSS|RSA|ECDSA)|" +
+                                "(?:DH|DHE|EDH|ECDH|ECDHE|SRP)-(?:DSS|RSA|ECDSA)|" +
                                 "(?:ADH|AECDH|KRB5|PSK|SRP)" +
                             ')' +
                         ")|" +
