@@ -25,7 +25,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-@Ignore // Currently 262 out of 486 tests fail
+@Ignore // Currently 76 out of 486 tests fail
 @RunWith(Parameterized.class)
 public class TestCipherSuiteConverter {
 
