@@ -380,9 +380,25 @@ public final class CipherSuiteConverter {
             export = null;
         }
 
+        String bulkCipher = m.group(2);
+        String hmacAlgo = m.group(3);
+
+        // CCM is a special case
+        if ("CCM".equals(hmacAlgo)) {
+            bulkCipher += "-CCM";
+            hmacAlgo = "";
+        } else if ("CCM8".equals(hmacAlgo)) {
+            bulkCipher += "-CCM_8";
+            hmacAlgo = "";
+        }
+
         handshakeAlgo = toJavaHandshakeAlgo(handshakeAlgo, export);
-        String bulkCipher = toJavaBulkCipher(m.group(2), export);
-        String hmacAlgo = toJavaHmacAlgo(m.group(3));
+        bulkCipher = toJavaBulkCipher(bulkCipher, export);
+        hmacAlgo = toJavaHmacAlgo(hmacAlgo);
+
+        if (hmacAlgo.length() == 0) {
+            return handshakeAlgo + "_WITH_" + bulkCipher;
+        }
 
         return handshakeAlgo + "_WITH_" + bulkCipher + '_' + hmacAlgo;
     }
