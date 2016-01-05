@@ -18,6 +18,7 @@ package org.apache.tomcat.util.net;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.tomcat.util.net.AbstractJsseEndpoint.SSLContextWrapper;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
@@ -193,7 +194,13 @@ public class SSLHostConfigCertificate {
 
 
     public String[] getEnabledCiphers() {
-        return getSslContextWrapper().getEnabledCiphers();
+        SSLContextWrapper wrapper = getSslContextWrapper();
+        if (wrapper != null) {
+            return wrapper.getEnabledCiphers();
+        }
+
+        return sslHostConfig.getCipherList().stream().map(c -> c.toString()).
+                collect(Collectors.toList()).toArray(new String[0]);
     }
 
 
