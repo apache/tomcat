@@ -51,6 +51,7 @@ import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLUtil;
+import org.apache.tomcat.util.net.openssl.ciphers.CipherSuiteConverter;
 import org.apache.tomcat.util.res.StringManager;
 
 /**

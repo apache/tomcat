@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.util.net.openssl;
+package org.apache.tomcat.util.net.openssl.ciphers;
 
 import java.util.HashMap;
 import java.util.Map;
