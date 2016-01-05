@@ -69,13 +69,13 @@ public final class CipherSuiteConverter {
             // Be very careful not to break the indentation while editing.
             Pattern.compile(
                     "^(?:(" + // BEGIN handshake algorithm
-                        "(?:(?:EXP-)?" +
+                        "(?:(?:EXP-|EXP1024-)?" +
                             "(?:" +
                                 "(?:DH|DHE|EDH|ECDH|ECDHE|RSA|SRP)-(?:DSS|RSA|ECDSA|PSK)|" +
                                 "(?:ADH|AECDH|KRB5|PSK|SRP)" +
                             ')' +
                         ")|" +
-                        "EXP" +
+                        "EXP|EXP1024" +
                     ")-)?" +  // END handshake algorithm
                     "(.*)-(.*)$");
 
@@ -212,9 +212,15 @@ public final class CipherSuiteConverter {
     }
 
     private static String toOpenSslHandshakeAlgo(String handshakeAlgo) {
-        final boolean export = handshakeAlgo.endsWith("_EXPORT");
-        if (export) {
+        final EncryptionLevel export;
+        if (handshakeAlgo.endsWith("_EXPORT")) {
+            export = EncryptionLevel.EXP40;
             handshakeAlgo = handshakeAlgo.substring(0, handshakeAlgo.length() - 7);
+        } else if (handshakeAlgo.endsWith("_EXPORT1024")) {
+            export = EncryptionLevel.EXP56;
+            handshakeAlgo = handshakeAlgo.substring(0, handshakeAlgo.length() - 11);
+        } else {
+            export = null;
         }
 
         if ("RSA".equals(handshakeAlgo)) {
@@ -223,11 +229,19 @@ public final class CipherSuiteConverter {
             handshakeAlgo = 'A' + handshakeAlgo.substring(0, handshakeAlgo.length() - 5);
         }
 
-        if (export) {
+        if (export != null) {
             if (handshakeAlgo.length() == 0) {
-                handshakeAlgo = "EXP";
+                if (export == EncryptionLevel.EXP40) {
+                    handshakeAlgo = "EXP";
+                } else {
+                    handshakeAlgo = "EXP1024";
+                }
             } else {
-                handshakeAlgo = "EXP-" + handshakeAlgo;
+                if (export == EncryptionLevel.EXP40) {
+                    handshakeAlgo = "EXP-" + handshakeAlgo;
+                } else {
+                    handshakeAlgo = "EXP1024-" + handshakeAlgo;
+                }
             }
         }
 
@@ -259,7 +273,7 @@ public final class CipherSuiteConverter {
             return "DES-CBC";
         }
 
-        if ("RC2_CBC_40".equals(bulkCipher)) {
+        if ("RC2_CBC_40".equals(bulkCipher) || "RC2_CBC_56".equals(bulkCipher)) {
             return "RC2-CBC";
         }
 
@@ -269,6 +283,10 @@ public final class CipherSuiteConverter {
 
         if ("AES_256".equals(bulkCipher)) {
             return "AES256";
+        }
+
+        if ("RSA_EXPORT1024".equals(bulkCipher)) {
+            return "EXP1024";
         }
 
         return bulkCipher.replace('_', '-');
@@ -342,18 +360,24 @@ public final class CipherSuiteConverter {
         }
 
         String handshakeAlgo = m.group(1);
-        final boolean export;
+        final EncryptionLevel export;
         if (handshakeAlgo == null) {
             handshakeAlgo = "";
-            export = false;
+            export = null;
         } else if (handshakeAlgo.startsWith("EXP-")) {
             handshakeAlgo = handshakeAlgo.substring(4);
-            export = true;
+            export = EncryptionLevel.EXP40;
+        } else if (handshakeAlgo.startsWith("EXP1024-")) {
+            handshakeAlgo = handshakeAlgo.substring(8);
+            export = EncryptionLevel.EXP56;
         } else if ("EXP".equals(handshakeAlgo)) {
             handshakeAlgo = "";
-            export = true;
+            export = EncryptionLevel.EXP40;
+        } else if ("EXP1024".equals(handshakeAlgo)) {
+            handshakeAlgo = "";
+            export = EncryptionLevel.EXP56;
         } else {
-            export = false;
+            export = null;
         }
 
         handshakeAlgo = toJavaHandshakeAlgo(handshakeAlgo, export);
@@ -363,7 +387,7 @@ public final class CipherSuiteConverter {
         return handshakeAlgo + "_WITH_" + bulkCipher + '_' + hmacAlgo;
     }
 
-    private static String toJavaHandshakeAlgo(String handshakeAlgo, boolean export) {
+    private static String toJavaHandshakeAlgo(String handshakeAlgo, EncryptionLevel export) {
         if (handshakeAlgo.length() == 0) {
             handshakeAlgo = "RSA";
         } else if ("ADH".equals(handshakeAlgo)) {
@@ -374,14 +398,16 @@ public final class CipherSuiteConverter {
 
         handshakeAlgo = handshakeAlgo.replace("EDH", "DHE");
         handshakeAlgo = handshakeAlgo.replace('-', '_');
-        if (export) {
+        if (EncryptionLevel.EXP56 == export) {
+            return handshakeAlgo + "_EXPORT1024";
+        } else if (EncryptionLevel.EXP40 == export) {
             return handshakeAlgo + "_EXPORT";
         } else {
             return handshakeAlgo;
         }
     }
 
-    private static String toJavaBulkCipher(String bulkCipher, boolean export) {
+    private static String toJavaBulkCipher(String bulkCipher, EncryptionLevel export) {
         if (bulkCipher.startsWith("AES")) {
             Matcher m = OPENSSL_AES_CBC_PATTERN.matcher(bulkCipher);
             if (m.matches()) {
@@ -399,7 +425,9 @@ public final class CipherSuiteConverter {
         }
 
         if ("RC4".equals(bulkCipher)) {
-            if (export) {
+            if (EncryptionLevel.EXP56 == export) {
+                return "RC4_56";
+            } else  if (EncryptionLevel.EXP40 == export) {
                 return "RC4_40";
             } else {
                 return "RC4_128";
@@ -407,7 +435,7 @@ public final class CipherSuiteConverter {
         }
 
         if ("DES-CBC".equals(bulkCipher)) {
-            if (export) {
+            if (EncryptionLevel.EXP40 == export) {
                 return "DES40_CBC";
             } else {
                 return "DES_CBC";
@@ -415,7 +443,9 @@ public final class CipherSuiteConverter {
         }
 
         if ("RC2-CBC".equals(bulkCipher)) {
-            if (export) {
+            if (EncryptionLevel.EXP56 == export) {
+                return "RC2_CBC_56";
+            } else  if (EncryptionLevel.EXP40 == export) {
                 return "RC2_CBC_40";
             } else {
                 return "RC2_CBC";
