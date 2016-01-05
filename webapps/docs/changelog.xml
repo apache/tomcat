@@ -115,6 +115,10 @@
         <code>org.apache.catalina.core.DefaultInstanceManager</code> class.
         (kkolinko)
       </fix>
+      <fix>
+        Ensure that the proper file encoding if specified will be used when
+        a readme file is served by DefaultServlet. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

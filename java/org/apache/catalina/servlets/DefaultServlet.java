@@ -1336,7 +1336,7 @@ public class DefaultServlet
      */
     protected InputStream renderXml(String contextPath,
                                     CacheEntry cacheEntry,
-                                    Source xsltSource)
+            Source xsltSource)
         throws IOException, ServletException {
 
         StringBuilder sb = new StringBuilder();
@@ -1656,29 +1656,39 @@ public class DefaultServlet
                 Object obj = directory.lookup(readmeFile);
                 if ((obj != null) && (obj instanceof Resource)) {
                     StringWriter buffer = new StringWriter();
-                    InputStream is = ((Resource) obj).streamContent();
-                    Reader reader = new InputStreamReader(is);
+                    InputStream is = null;
+                    Reader reader = null;
                     try {
+                        is = ((Resource) obj).streamContent();
+                        if (fileEncoding != null) {
+                            reader = new InputStreamReader(is, fileEncoding);
+                        } else {
+                            reader = new InputStreamReader(is);
+                        }
                         copyRange(reader,
                                 new PrintWriter(buffer));
                     } finally {
-                        try {
-                            reader.close();
-                        } catch (IOException e) {
-                            log("Could not close reader", e);
+                        if (reader != null) {
+                            try {
+                                reader.close();
+                            } catch (IOException e) {
+                                log("Could not close reader", e);
+                            }
                         }
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            log("Could not close is", e);
+                        if (is != null) {
+                            try {
+                                is.close();
+                            } catch (IOException e) {
+                                log("Could not close is", e);
+                            }
                         }
                     }
                     return buffer.toString();
                 }
             } catch (NamingException e) {
-                if (debug > 10)
+                if (debug > 10) {
                     log("readme '" + readmeFile + "' not found", e);
-
+                }
                 return null;
             }
         }
