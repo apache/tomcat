@@ -1290,7 +1290,7 @@ public enum Cipher {
             false,
             56,
             128,
-            new String[] {"SSL_RSA_EXPORT1024_WITH_RC2_CBC_56_MD"},
+            new String[] {"SSL_RSA_EXPORT1024_WITH_RC2_CBC_56_MD5"},
             null
     ),
     // Cipher 62
