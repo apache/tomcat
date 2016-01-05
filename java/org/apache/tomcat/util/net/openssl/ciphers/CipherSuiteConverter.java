@@ -399,7 +399,7 @@ public final class CipherSuiteConverter {
 
         if ("DES-CBC".equals(bulkCipher)) {
             if (export) {
-                return "DES_CBC_40";
+                return "DES40_CBC";
             } else {
                 return "DES_CBC";
             }
