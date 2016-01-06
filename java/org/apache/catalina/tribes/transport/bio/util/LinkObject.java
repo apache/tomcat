@@ -28,7 +28,10 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
  * data object and a pointer to the next element.
  *
  * @author Peter Rossbach
+ *
+ * @deprecated Unused. Will be removed in Tomcat 9.0.x
  */
+@Deprecated
 public class LinkObject {
 
     private final ChannelMessage msg;
