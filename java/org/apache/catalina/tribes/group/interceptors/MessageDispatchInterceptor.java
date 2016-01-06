@@ -28,7 +28,6 @@ import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.group.InterceptorPayload;
-import org.apache.catalina.tribes.transport.bio.util.LinkObject;
 import org.apache.catalina.tribes.util.ExecutorFactory;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.catalina.tribes.util.TcclThreadFactory;
@@ -104,17 +103,6 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase {
         };
         executor.execute(r);
         return true;
-    }
-
-
-    /**
-     * @deprecated. Not used. The thread pool contains its own queue. This will
-     *              be removed in Tomcat 9.0.x onwards.
-     *
-     * @return Always null
-     */
-    public LinkObject removeFromQueue() {
-        return null;
     }
 
 
