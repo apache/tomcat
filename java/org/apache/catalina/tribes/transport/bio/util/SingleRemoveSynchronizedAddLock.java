@@ -46,8 +46,10 @@ package org.apache.catalina.tribes.transport.bio.util;
  *
  * @author Peter Rossbach
  * @version 1.1
+ *
+ * @deprecated Unused. Will be removed in Tomcat 9.0.x
  */
-
+@Deprecated
 public class SingleRemoveSynchronizedAddLock {
 
     public SingleRemoveSynchronizedAddLock() {
