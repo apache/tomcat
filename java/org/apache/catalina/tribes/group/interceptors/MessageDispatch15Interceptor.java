@@ -16,106 +16,13 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.catalina.tribes.ChannelMessage;
-import org.apache.catalina.tribes.Member;
-import org.apache.catalina.tribes.group.InterceptorPayload;
-import org.apache.catalina.tribes.transport.bio.util.LinkObject;
-import org.apache.catalina.tribes.util.ExecutorFactory;
-import org.apache.catalina.tribes.util.TcclThreadFactory;
-
 /**
- *
- * Same implementation as the MessageDispatchInterceptor
- * except it uses an atomic long for the currentSize calculation
- * and uses a thread pool for message sending.
- *
- * @version 1.0
+ * @deprecated Originally provided an optional implementation that used Java 5+
+ *             features. Now the minimum Java version is >=5, those features
+ *             have been added to {@link MessageDispatchInterceptor} which
+ *             should be used instead. This class will be removed in Tomcat
+ *             9.0.x onwards.
  */
-
+@Deprecated
 public class MessageDispatch15Interceptor extends MessageDispatchInterceptor {
-
-    protected final AtomicLong currentSize = new AtomicLong(0);
-    protected ExecutorService executor = null;
-    protected int maxThreads = 10;
-    protected int maxSpareThreads = 2;
-    protected long keepAliveTime = 5000;
-
-    @Override
-    public long getCurrentSize() {
-        return currentSize.get();
-    }
-
-    @Override
-    public long addAndGetCurrentSize(long inc) {
-        return currentSize.addAndGet(inc);
-    }
-
-    @Override
-    public long setAndGetCurrentSize(long value) {
-        currentSize.set(value);
-        return value;
-    }
-
-    @Override
-    public boolean addToQueue(ChannelMessage msg, Member[] destination, InterceptorPayload payload) {
-        final LinkObject obj = new LinkObject(msg,destination,payload);
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                sendAsyncData(obj);
-            }
-        };
-        executor.execute(r);
-        return true;
-    }
-
-    @Override
-    public LinkObject removeFromQueue() {
-        return null; //not used, thread pool contains its own queue.
-    }
-
-    @Override
-    public void startQueue() {
-        if ( run ) return;
-        executor = ExecutorFactory.newThreadPool(maxSpareThreads, maxThreads,
-                keepAliveTime, TimeUnit.MILLISECONDS,
-                new TcclThreadFactory("MessageDispatch15Interceptor.MessageDispatchThread"));
-        run = true;
-    }
-
-    @Override
-    public void stopQueue() {
-        run = false;
-        executor.shutdownNow();
-        setAndGetCurrentSize(0);
-    }
-
-    public long getKeepAliveTime() {
-        return keepAliveTime;
-    }
-
-    public int getMaxSpareThreads() {
-        return maxSpareThreads;
-    }
-
-    public int getMaxThreads() {
-        return maxThreads;
-    }
-
-    public void setKeepAliveTime(long keepAliveTime) {
-        this.keepAliveTime = keepAliveTime;
-    }
-
-    public void setMaxSpareThreads(int maxSpareThreads) {
-        this.maxSpareThreads = maxSpareThreads;
-    }
-
-    public void setMaxThreads(int maxThreads) {
-        this.maxThreads = maxThreads;
-    }
-
 }

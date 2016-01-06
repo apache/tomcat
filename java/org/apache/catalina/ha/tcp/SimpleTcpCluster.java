@@ -52,7 +52,7 @@ import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.group.GroupChannel;
-import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
+import org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor;
 import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
@@ -564,7 +564,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         if ( clusterDeployer != null ) clusterDeployer.setCluster(this);
         if ( channel == null ) channel = new GroupChannel();
         if ( channel instanceof GroupChannel && !((GroupChannel)channel).getInterceptors().hasNext()) {
-            channel.addInterceptor(new MessageDispatch15Interceptor());
+            channel.addInterceptor(new MessageDispatchInterceptor());
             channel.addInterceptor(new TcpFailureDetector());
         }
         if (heartbeatBackgroundEnabled) channel.setHeartbeat(false);
