@@ -80,7 +80,8 @@ public class NioChannel implements ByteChannel {
      * @param timeout   Unused. May be used when overridden
      * @return Always returns <code>true</code> since there is no network buffer
      *         in the regular channel
-     * @throws IOException
+     *
+     * @throws IOException Never for non-secure channel
      */
     public boolean flush(boolean block, Selector s, long timeout)
             throws IOException {
@@ -181,7 +182,7 @@ public class NioChannel implements ByteChannel {
      * @param read  Unused in non-secure implementation
      * @param write Unused in non-secure implementation
      * @return Always returns zero
-     * @throws IOException
+     * @throws IOException Never for non-secure channel
      */
     public int handshake(boolean read, boolean write) throws IOException {
         return 0;
@@ -205,8 +206,11 @@ public class NioChannel implements ByteChannel {
     }
 
     /**
-     * Return true if the buffer wrote data
-     * @throws IOException
+     * Return true if the buffer wrote data. NO-OP for non-secure channel.
+     *
+     * @return Always returns {@code false} for non-secure channel
+     *
+     * @throws IOException Never for non-secure channel
      */
     public boolean flushOutbound() throws IOException {
         return false;

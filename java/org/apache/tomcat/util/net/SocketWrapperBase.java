@@ -605,18 +605,17 @@ public abstract class SocketWrapperBase<E> {
 
     public interface CompletionCheck {
         /**
-         * Return true if enough data has been read or written and the
-         * handler should be notified. Return false if the IO is
-         * incomplete (data has not been fully written while it should,
-         * or more data read is needed for further processing) and should
-         * be continued before the completion handler is called.
+         * Determine what call, if any, should be made to the completion
+         * handler.
          *
-         * @param state of the operation (done or done inline since the
+         * @param state of the operation (done or done in-line since the
          *        IO call is done)
          * @param buffers ByteBuffer[] that has been passed to the
          *        original IO call
          * @param offset that has been passed to the original IO call
          * @param length that has been passed to the original IO call
+         *
+         * @return The call, if any, to make to the completion handler
          */
         public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers, int offset, int length);
     }
@@ -653,6 +652,8 @@ public abstract class SocketWrapperBase<E> {
     /**
      * Allows using NIO2 style read/write only for connectors that can
      * efficiently support it.
+     *
+     * @return This default implementation always returns {@code false}
      */
     public boolean hasAsyncIO() {
         return false;
@@ -672,9 +673,10 @@ public abstract class SocketWrapperBase<E> {
      *        ReadPendingException will be thrown; false to
      *        not block but any pending read operation will cause
      *        a ReadPendingException
-     * @param timeout
-     * @param unit
-     * @param attachment
+     * @param timeout timeout duration for the read
+     * @param unit units for the timeout duration
+     * @param attachment an object to attach to the I/O operation that will be
+     *        used when calling the completion handler
      * @param check for the IO operation completion
      * @param handler to call when the IO is complete
      * @param dsts buffers
@@ -706,9 +708,10 @@ public abstract class SocketWrapperBase<E> {
      *        ReadPendingException will be thrown; false to
      *        not block but any pending read operation will cause
      *        a ReadPendingException
-     * @param timeout
-     * @param unit
-     * @param attachment
+     * @param timeout timeout duration for the read
+     * @param unit units for the timeout duration
+     * @param attachment an object to attach to the I/O operation that will be
+     *        used when calling the completion handler
      * @param check for the IO operation completion
      * @param handler to call when the IO is complete
      * @return the completion state (done, done inline, or still pending)
@@ -732,9 +735,10 @@ public abstract class SocketWrapperBase<E> {
      *        WritePendingException will be thrown; false to
      *        not block but any pending write operation will cause
      *        a WritePendingException
-     * @param timeout
-     * @param unit
-     * @param attachment
+     * @param timeout timeout duration for the write
+     * @param unit units for the timeout duration
+     * @param attachment an object to attach to the I/O operation that will be
+     *        used when calling the completion handler
      * @param check for the IO operation completion
      * @param handler to call when the IO is complete
      * @param srcs buffers
@@ -767,9 +771,10 @@ public abstract class SocketWrapperBase<E> {
      *        WritePendingException will be thrown; false to
      *        not block but any pending write operation will cause
      *        a WritePendingException
-     * @param timeout
-     * @param unit
-     * @param attachment
+     * @param timeout timeout duration for the write
+     * @param unit units for the timeout duration
+     * @param attachment an object to attach to the I/O operation that will be
+     *        used when calling the completion handler
      * @param check for the IO operation completion
      * @param handler to call when the IO is complete
      * @return the completion state (done, done inline, or still pending)
