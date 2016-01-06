@@ -39,6 +39,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.HostConfig;
+import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -386,16 +387,9 @@ public class HostManagerServlet
                     OutputStream os = new FileOutputStream(
                             new File(configBaseFile, "manager.xml"))) {
                 byte buffer[] = new byte[512];
-                int len = buffer.length;
-                while (true) {
-                    len = is.read(buffer);
-                    if (len == -1)
-                        break;
-                    os.write(buffer, 0, len);
-                }
+                IOTools.flow(is, os, buffer);
             } catch (IOException e) {
-                writer.println(smClient.getString(
-                        "hostManagerServlet.managerXml"));
+                writer.println(smClient.getString("hostManagerServlet.managerXml"));
                 return;
             }
         }
