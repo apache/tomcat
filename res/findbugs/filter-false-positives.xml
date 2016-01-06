@@ -111,6 +111,13 @@
     <Bug code="RCN"/>
   </Match>
   <Match>
+    <!-- the platform default encoding is a fallback when calculating the
+    lenght of the string -->
+    <Class name="org.apache.catalina.connector.Request"/>
+    <Method name="parseParts"/>
+    <Bug code="Dm" />
+  </Match>
+  <Match>
     <!-- JNI library can only be loaded once so statics are appropriate -->
     <Class name="org.apache.catalina.core.AprLifecycleListener" />
     <Bug code="ST" />
@@ -186,6 +193,13 @@
     <Bug code="RCN"/>
   </Match>
   <Match>
+    <!-- If encoding is specified it will be used,
+    otherwise platform default encoding will be used -->
+    <Class name="org.apache.catalina.realm.RealmBase"/>
+    <Method name="Digest"/>
+    <Bug code="Dm" />
+  </Match>
+  <Match>
   <!-- The header value is safe  -->
     <Class name="org.apache.catalina.servlets.DefaultServlet" />
     <Method name="doDirectoryRedirect" />
@@ -222,6 +236,20 @@
     <Class name="org.apache.catalina.ssi.ExpressionParseTree" />
     <Method name="pushOpp" />
     <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- If encoding is specified it will be used,
+    otherwise platform default encoding will be used -->
+    <Class name="org.apache.catalina.ssi.SSIServlet"/>
+    <Method name="processSSI"/>
+    <Bug code="Dm" />
+  </Match>
+  <Match>
+    <!-- If encoding is specified it will be used,
+    otherwise platform default encoding will be used -->
+    <Class name="org.apache.catalina.ssi.SSIServletExternalResolver"/>
+    <Method name="getFileText"/>
+    <Bug code="Dm" />
   </Match>
   <Match>
     <!-- Catalina isn't used when embedding -->
@@ -283,6 +311,19 @@
     <Class name="org.apache.catalina.util.LifecycleBase" />
     <Method name="getState"/>
     <Bug code="UG" />
+  </Match>
+  <Match>
+    <!-- If encoding is specified it will be used,
+    otherwise platform default encoding will be used -->
+    <Class name="org.apache.catalina.util.RequestUtil"/>
+    <Method name="URLDecode"/>
+    <Bug code="Dm" />
+  </Match>
+  <Match>
+    <!-- the platform default encoding is a fallback -->
+    <Class name="org.apache.catalina.util.URLEncoder"/>
+    <Method name="encode"/>
+    <Bug code="Dm" />
   </Match>
   <Match>
     <!-- request.getRemoteHost() can be null because
@@ -375,6 +416,12 @@
     <Bug code="NP" />
   </Match>
   <Match>
+    <!-- the platform default encoding is a fallback -->
+    <Class name="org.apache.jasper.runtime.JspRuntimeLibrary"/>
+    <Method name="URLEncode"/>
+    <Bug code="Dm" />
+  </Match>
+  <Match>
     <!-- Use of == is deliberate, String.intern() is used -->
     <Class name="org.apache.jasper.xmlparser.XMLEncodingDetector"/>
     <Method name="scanXMLDeclOrTextDecl"/>
@@ -386,6 +433,13 @@
     <Class name="org.apache.juli.ClassLoaderLogManager"/>
     <Method name="readConfiguration"/>
     <Bug code="OBL"/>
+  </Match>
+  <Match>
+    <!-- If encoding is specified it will be used,
+    otherwise platform default encoding will be used -->
+    <Class name="org.apache.juli.FileHandler"/>
+    <Method name="openWriter"/>
+    <Bug code="Dm" />
   </Match>
   <Match>
     <!-- Simpler to catch Exception than to create dummy implementations of the
@@ -463,6 +517,12 @@
     <Bug code="RCN" />
   </Match>
   <Match>
+    <!-- the platform default encoding is a fallback -->
+    <Class name="org.apache.tomcat.util.buf.UDecoder"/>
+    <Method name="URLDecode"/>
+    <Bug code="Dm" />
+  </Match>
+  <Match>
     <!-- NPE is desired as it indicates an error condition -->
     <Class name="org.apache.tomcat.util.digester.CallMethodRule"/>
     <Method name="end"/>
@@ -482,6 +542,24 @@
     <Class name="org.apache.tomcat.util.http.Cookies" />
     <Method name="processCookieHeader"/>
     <Bug code="SF" />
+  </Match>
+  <Match>
+    <!-- the platform default encoding is a fallback -->
+    <Class name="org.apache.tomcat.util.http.fileupload.MultipartStream"/>
+    <Method name="readHeaders"/>
+    <Bug code="Dm" />
+  </Match>
+  <Match>
+    <!-- the platform default encoding is a fallback -->
+    <Class name="org.apache.tomcat.util.http.fileupload.disk.DiskFileItem"/>
+    <Method name="getString"/>
+    <Bug code="Dm" />
+  </Match>
+  <Match>
+    <!-- the platform default encoding is deliberate -->
+    <Class name="org.apache.tomcat.util.http.fileupload.util.Streams"/>
+    <Method name="asString"/>
+    <Bug code="Dm" />
   </Match>
   <Match>
     <!-- Fall-through expected -->
