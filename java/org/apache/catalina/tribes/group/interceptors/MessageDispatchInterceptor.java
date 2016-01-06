@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
+import org.apache.catalina.tribes.ErrorHandler;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
@@ -95,11 +96,10 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase {
 
     public boolean addToQueue(ChannelMessage msg, Member[] destination,
             InterceptorPayload payload) {
-        final LinkObject obj = new LinkObject(msg, destination, payload);
         Runnable r = new Runnable() {
             @Override
             public void run() {
-                sendAsyncData(obj);
+                sendAsyncData(msg, destination, payload);
             }
         };
         executor.execute(r);
@@ -250,34 +250,40 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase {
     }
 
 
-    protected LinkObject sendAsyncData(LinkObject link) {
-        ChannelMessage msg = link.data();
-        Member[] destination = link.getDestination();
+    protected void sendAsyncData(ChannelMessage msg, Member[] destination,
+            InterceptorPayload payload) {
+        ErrorHandler handler = null;
+        if (payload != null) {
+            handler = payload.getErrorHandler();
+        }
         try {
-            super.sendMessage(destination,msg,null);
+            super.sendMessage(destination, msg, null);
             try {
-                if (link.getHandler() != null) {
-                    link.getHandler().handleCompletion(new UniqueId(msg.getUniqueId()));
+                if (handler != null) {
+                    handler.handleCompletion(new UniqueId(msg.getUniqueId()));
                 }
             } catch ( Exception ex ) {
                 log.error(sm.getString("messageDispatchInterceptor.completeMessage.failed"),ex);
             }
         } catch ( Exception x ) {
             ChannelException cx = null;
-            if ( x instanceof ChannelException ) cx = (ChannelException)x;
-            else cx = new ChannelException(x);
-            if ( log.isDebugEnabled() ) log.debug(sm.getString("messageDispatchInterceptor.AsyncMessage.failed"),x);
+            if (x instanceof ChannelException) {
+                cx = (ChannelException) x;
+            } else {
+                cx = new ChannelException(x);
+            }
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("messageDispatchInterceptor.AsyncMessage.failed"),x);
+            }
             try {
-                if (link.getHandler() != null) {
-                    link.getHandler().handleError(cx, new UniqueId(msg.getUniqueId()));
+                if (handler != null) {
+                    handler.handleError(cx, new UniqueId(msg.getUniqueId()));
                 }
             } catch ( Exception ex ) {
                 log.error(sm.getString("messageDispatchInterceptor.errorMessage.failed"),ex);
             }
         } finally {
             addAndGetCurrentSize(-msg.getMessage().getLength());
-            link = link.next();
         }
-        return link;
     }
 }
