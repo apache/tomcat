@@ -40,7 +40,7 @@ import org.apache.juli.logging.LogFactory;
  * <code>Channel.SEND_OPTIONS_ASYNCHRONOUS</code> flag to be set, if it is, it
  * will queue the message for delivery and immediately return to the sender.
  */
-public class MessageDispatchInterceptor extends ChannelInterceptorBase implements Runnable {
+public class MessageDispatchInterceptor extends ChannelInterceptorBase {
 
     private static final Log log = LogFactory.getLog(MessageDispatchInterceptor.class);
     protected static final StringManager sm =
@@ -247,22 +247,6 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
         }
 
         super.stop(svc);
-    }
-
-
-    /**
-     * Deprecated. Unused. Will be removed in 9.0.x
-     */
-    @Deprecated
-    @Override
-    public void run() {
-        while (run) {
-            LinkObject link = removeFromQueue();
-            if ( link == null ) continue; //should not happen unless we exceed wait time
-            while ( link != null && run ) {
-                link = sendAsyncData(link);
-            }
-        }
     }
 
 
