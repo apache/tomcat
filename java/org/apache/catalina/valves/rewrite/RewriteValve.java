@@ -45,11 +45,11 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.catalina.util.UriUtil;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.RequestUtil;
-import org.apache.tomcat.util.net.URL;
 
 public class RewriteValve extends ValveBase {
 
@@ -342,7 +342,7 @@ public class RewriteValve extends ValveBase {
                     // 1. this valve is associated with a context
                     // 2. the url starts with a leading slash
                     // 3. the url isn't absolute
-                    if (context && urlString.charAt(0) == '/' && !URL.hasScheme(urlString)) {
+                    if (context && urlString.charAt(0) == '/' && !UriUtil.hasScheme(urlString)) {
                         urlString.insert(0, request.getContext().getEncodedPath());
                     }
                     response.sendRedirect(urlString.toString());
