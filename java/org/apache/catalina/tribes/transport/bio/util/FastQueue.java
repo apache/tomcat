@@ -33,7 +33,10 @@ import org.apache.juli.logging.LogFactory;
  * length when you have strange producer thread problems.
  *
  * @author Peter Rossbach
+ *
+ * @deprecated Unused. Will be removed in Tomcat 9.0.x.
  */
+@Deprecated
 public class FastQueue {
 
     private static final Log log = LogFactory.getLog(FastQueue.class);
