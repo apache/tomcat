@@ -47,19 +47,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
             StringManager.getManager(MessageDispatchInterceptor.class);
 
     protected long maxQueueSize = 1024*1024*64; //64MB
-    /**
-     * Deprecated. Unused. Will be removed in Tomcat 9.0.x.
-     */
-    @Deprecated
-    // Use fully qualified name to avoid deprecation warning on import.
-    protected final org.apache.catalina.tribes.transport.bio.util.FastQueue queue =
-            new org.apache.catalina.tribes.transport.bio.util.FastQueue();
     protected volatile boolean run = false;
-    /**
-     * Deprecated. Unused. Will be removed in Tomcat 9.0.x.
-     */
-    @Deprecated
-    protected Thread msgDispatchThread = null;
     protected boolean useDeepClone = true;
     protected boolean alwaysSend = true;
 
