@@ -250,6 +250,10 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
     }
 
 
+    /**
+     * Deprecated. Unused. Will be removed in 9.0.x
+     */
+    @Deprecated
     @Override
     public void run() {
         while (run) {
