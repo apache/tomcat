@@ -17,7 +17,7 @@
 
 Notes of things to consider for the next major Tomcat release (9.0.x)
 
- 1. Fix Java 8 Javadoc warnings. Currently ~2300.
+ 1. Fix Java 8 Javadoc warnings. Currently ~2200.
 
  2. DONE.
     Remove BIO AJP and HTTP connector.
