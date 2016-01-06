@@ -61,6 +61,7 @@ import org.apache.catalina.core.AprLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.session.ManagerBase;
 import org.apache.catalina.session.StandardManager;
+import org.apache.catalina.util.IOTools;
 import org.apache.catalina.valves.AccessLogValve;
 import org.apache.catalina.webresources.StandardRoot;
 import org.apache.coyote.http11.Http11NioProtocol;
@@ -597,14 +598,9 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                 throws ServletException, IOException {
             // Beware of clients that try to send the whole request body before
             // reading any of the response. They may cause this test to lock up.
-            byte[] buffer = new byte[8096];
-            int read = 0;
             try (InputStream is = req.getInputStream();
                     OutputStream os = resp.getOutputStream()) {
-                while (read > -1) {
-                    os.write(buffer, 0, read);
-                    read = is.read(buffer);
-                }
+                IOTools.flow(is, os);
             }
         }
     }
