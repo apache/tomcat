@@ -67,7 +67,7 @@ public class JMXAccessorUnregisterTask extends JMXAccessorTask {
     /**
      * Unregister MBean.
      *
-     * @param jmxServerConnection The JMX connection name
+     * @param jmxServerConnection Connection to the JMX server
      * @param name The MBean name
      * @return null (no error message to report other than exception)
      * @throws Exception An error occurred

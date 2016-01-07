@@ -98,7 +98,7 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
      * Call Mbean server for some mbeans with same domain, attributes.
      *  with <em>attributebinding=true</em> you can save all attributes from all found objects
      *
-     * @param jmxServerConnection The JMX connection name
+     * @param jmxServerConnection Connection to the JMX server
      * @param qry The query
      * @return null (no error message to report other than exception)
      */

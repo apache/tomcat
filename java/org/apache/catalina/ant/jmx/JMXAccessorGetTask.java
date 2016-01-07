@@ -98,7 +98,7 @@ public class JMXAccessorGetTask extends JMXAccessorTask {
     /**
      * Get property value.
      *
-     * @param jmxServerConnection The JMX connection name
+     * @param jmxServerConnection Connection to the JMX server
      * @param name The MBean name
      * @return The error message if any
      * @throws Exception An error occurred
