@@ -67,7 +67,7 @@ public interface Host extends Container {
 
 
     /**
-     * Return the XML root for this Host.  This can be an absolute
+     * @return the XML root for this Host.  This can be an absolute
      * pathname, a relative pathname, or a URL.
      * If null, defaults to
      * ${catalina.base}/conf/&lt;engine name&gt;/&lt;host name&gt; directory
@@ -84,20 +84,20 @@ public interface Host extends Container {
     public void setXmlBase(String xmlBase);
 
     /**
-     * Return a default configuration path of this Host. The file will be
+     * @return a default configuration path of this Host. The file will be
      * canonical if possible.
      */
     public File getConfigBaseFile();
 
     /**
-     * Return the application root for this Host.  This can be an absolute
+     * @return the application root for this Host.  This can be an absolute
      * pathname, a relative pathname, or a URL.
      */
     public String getAppBase();
 
 
     /**
-     * Return an absolute {@link File} for the appBase of this Host. The file
+     * @return an absolute {@link File} for the appBase of this Host. The file
      * will be canonical if possible. There is no guarantee that that the
      * appBase exists.
      */
@@ -114,7 +114,7 @@ public interface Host extends Container {
 
 
     /**
-     * Return the value of the auto deploy flag.  If true, it indicates that
+     * @return the value of the auto deploy flag.  If true, it indicates that
      * this host's child webapps should be discovered and automatically
      * deployed dynamically.
      */
@@ -130,7 +130,7 @@ public interface Host extends Container {
 
 
     /**
-     * Return the Java class name of the context configuration class
+     * @return the Java class name of the context configuration class
      * for new web applications.
      */
     public String getConfigClass();
@@ -146,7 +146,7 @@ public interface Host extends Container {
 
 
     /**
-     * Return the value of the deploy on startup flag.  If true, it indicates
+     * @return the value of the deploy on startup flag.  If true, it indicates
      * that this host's child webapps should be discovered and automatically
      * deployed.
      */
@@ -162,7 +162,7 @@ public interface Host extends Container {
 
 
     /**
-     * Return the regular expression that defines the files and directories in
+     * @return the regular expression that defines the files and directories in
      * the host's appBase that will be ignored by the automatic deployment
      * process.
      */
@@ -170,7 +170,7 @@ public interface Host extends Container {
 
 
     /**
-     * Return the compiled regular expression that defines the files and
+     * @return the compiled regular expression that defines the files and
      * directories in the host's appBase that will be ignored by the automatic
      * deployment process.
      */
@@ -181,12 +181,14 @@ public interface Host extends Container {
      * Set the regular expression that defines the files and directories in
      * the host's appBase that will be ignored by the automatic deployment
      * process.
+     *
+     * @param deployIgnore A regular expression matching file names
      */
     public void setDeployIgnore(String deployIgnore);
 
 
     /**
-     * Return the executor that is used for starting and stopping contexts. This
+     * @return the executor that is used for starting and stopping contexts. This
      * is primarily for use by components deploying contexts that want to do
      * this in a multi-threaded manner.
      */
@@ -194,7 +196,7 @@ public interface Host extends Container {
 
 
     /**
-     * Returns true if the Host will attempt to create directories for appBase and xmlBase
+     * Returns <code>true</code> if the Host will attempt to create directories for appBase and xmlBase
      * unless they already exist.
      * @return true if the Host will attempt to create directories
      */
@@ -211,17 +213,19 @@ public interface Host extends Container {
 
 
     /**
-     * Returns true of the Host is configured to automatically undeploy old
+     * @return <code>true</code> of the Host is configured to automatically undeploy old
      * versions of applications deployed using parallel deployment. This only
-     * takes effect is {@link #getAutoDeploy()} also returns true.
+     * takes effect is {@link #getAutoDeploy()} also returns <code>true</code>.
      */
     public boolean getUndeployOldVersions();
 
 
     /**
-     * Set to true if the Host should automatically undeploy old versions of
+     * Set to <code>true</code> if the Host should automatically undeploy old versions of
      * applications deployed using parallel deployment. This only takes effect
-     * if {@link #getAutoDeploy()} returns true.
+     * if {@link #getAutoDeploy()} returns <code>true</code>.
+     *
+     * @param undeployOldVersions The new value for this flag
      */
     public void setUndeployOldVersions(boolean undeployOldVersions);
 
@@ -237,7 +241,7 @@ public interface Host extends Container {
 
 
     /**
-     * Return the set of alias names for this Host.  If none are defined,
+     * @return the set of alias names for this Host.  If none are defined,
      * a zero length array is returned.
      */
     public String[] findAliases();

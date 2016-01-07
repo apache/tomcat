@@ -39,7 +39,7 @@ public interface User extends Principal {
 
 
     /**
-     * Return the full name of this user.
+     * @return the full name of this user.
      */
     public String getFullName();
 
@@ -53,13 +53,13 @@ public interface User extends Principal {
 
 
     /**
-     * Return the set of {@link Group}s to which this user belongs.
+     * @return the set of {@link Group}s to which this user belongs.
      */
     public Iterator<Group> getGroups();
 
 
     /**
-     * Return the logon password of this user, optionally prefixed with the
+     * @return the logon password of this user, optionally prefixed with the
      * identifier of an encoding scheme surrounded by curly braces, such as
      * <code>{md5}xxxxx</code>.
      */
@@ -77,19 +77,19 @@ public interface User extends Principal {
 
 
     /**
-     * Return the set of {@link Role}s assigned specifically to this user.
+     * @return the set of {@link Role}s assigned specifically to this user.
      */
     public Iterator<Role> getRoles();
 
 
     /**
-     * Return the {@link UserDatabase} within which this User is defined.
+     * @return the {@link UserDatabase} within which this User is defined.
      */
     public UserDatabase getUserDatabase();
 
 
     /**
-     * Return the logon username of this user, which must be unique
+     * @return the logon username of this user, which must be unique
      * within the scope of a {@link UserDatabase}.
      */
     public String getUsername();
@@ -127,6 +127,7 @@ public interface User extends Principal {
      * Is this user in the specified {@link Group}?
      *
      * @param group The group to check
+     * @return <code>true</code> if the user is in the specified group
      */
     public boolean isInGroup(Group group);
 
@@ -137,6 +138,7 @@ public interface User extends Principal {
      * {@link Group} membership.
      *
      * @param role The role to check
+     * @return <code>true</code> if the user has the specified role
      */
     public boolean isInRole(Role role);
 

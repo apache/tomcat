@@ -353,6 +353,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
      * priorities to output stream.
      *
      * @param output The output to log. Should not be <code>null</code>.
+     * @param priority The priority level that should be used
      */
     protected void handleOutput(String output, int priority) {
         if (priority == Project.MSG_ERR) {
