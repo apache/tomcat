@@ -155,13 +155,9 @@
       </attribute>
 
       <attribute name="preserveCookieHeader" required="false">
-        <p>If this is <code>true</code> Tomcat will ensure that cookie
-        processing does not modify cookie header returned by
-        <code>HttpServletRequest.getHeader()</code>. If
-        <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set to
-        <code>true</code>, the default of this setting will be
-        <code>true</code>, else the default value will be <code>false</code>.
-        </p>
+        <p>This attribute is no longer used. From Tomcat 8.0.31, Tomcat will
+        always preserve the cookie header returned by
+        <code>HttpServletRequest.getHeader()</code>.</p>
       </attribute>
 
     </attributes>
