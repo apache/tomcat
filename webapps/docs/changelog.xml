@@ -119,6 +119,10 @@
         Ensure that the proper file encoding if specified will be used when
         a readme file is served by DefaultServlet. (violetagg)
       </fix>
+      <fix>
+        Fix declaration of <code>localPort</code> attribute of Connector MBean:
+        it is read-only. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
