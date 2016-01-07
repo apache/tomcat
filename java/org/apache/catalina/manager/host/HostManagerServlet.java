@@ -17,11 +17,11 @@
 package org.apache.catalina.manager.host;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
@@ -39,7 +39,6 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.HostConfig;
-import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -383,11 +382,9 @@ public class HostManagerServlet
                         "hostManagerServlet.configBaseCreateFail", name));
                 return;
             }
-            try (InputStream is = getServletContext().getResourceAsStream("/manager.xml");
-                    OutputStream os = new FileOutputStream(
-                            new File(configBaseFile, "manager.xml"))) {
-                byte buffer[] = new byte[512];
-                IOTools.flow(is, os, buffer);
+            try (InputStream is = getServletContext().getResourceAsStream("/manager.xml")) {
+                Path dest = (new File(configBaseFile, "manager.xml")).toPath();
+                Files.copy(is, dest);
             } catch (IOException e) {
                 writer.println(smClient.getString("hostManagerServlet.managerXml"));
                 return;
