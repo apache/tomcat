@@ -90,6 +90,11 @@ public final class ByteChunk implements Cloneable, Serializable {
         /**
          * Send the bytes ( usually the internal conversion buffer ).
          * Expect 8k output if the buffer is full.
+         *
+         * @param cbuf bytes that will be written
+         * @param off offset in the bytes array
+         * @param len length that will be written
+         * @throws IOException If an I/O occurs while writing the bytes
          */
         public void realWriteBytes(byte cbuf[], int off, int len)
             throws IOException;

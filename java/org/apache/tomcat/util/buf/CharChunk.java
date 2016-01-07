@@ -50,8 +50,14 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
      *  grow the buffer ( up to the limit ) or send it to a channel.
      */
     public static interface CharOutputChannel {
-        /** Send the bytes ( usually the internal conversion buffer ).
-         *  Expect 8k output if the buffer is full.
+        /**
+         * Send the bytes ( usually the internal conversion buffer ).
+         * Expect 8k output if the buffer is full.
+         *
+         * @param cbuf characters that will be written
+         * @param off offset in the characters array
+         * @param len length that will be written
+         * @throws IOException If an I/O occurs while writing the characters
          */
         public void realWriteChars(char cbuf[], int off, int len)
             throws IOException;
