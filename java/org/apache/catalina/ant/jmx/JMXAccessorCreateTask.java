@@ -129,11 +129,11 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
      }
 
     /**
-     * Create new Mbean and when set from ClassLoader Objectname.
+     * Create new MBean from ClassLoader identified by an ObjectName.
      *
-     * @param jmxServerConnection Connection to the JMX server 
+     * @param jmxServerConnection Connection to the JMX server
      * @param name MBean name
-     * @throws Exception Error crating MBean
+     * @throws Exception Error creating MBean
      */
     protected void jmxCreate(MBeanServerConnection jmxServerConnection,
             String name) throws Exception {
