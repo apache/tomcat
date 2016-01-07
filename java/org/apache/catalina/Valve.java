@@ -43,7 +43,7 @@ public interface Valve {
     //-------------------------------------------------------------- Properties
 
     /**
-     * Return the next Valve in the pipeline containing this Valve, if any.
+     * @return the next Valve in the pipeline containing this Valve, if any.
      */
     public Valve getNext();
 

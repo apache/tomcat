@@ -247,11 +247,13 @@ public interface WebResourceRoot extends Lifecycle {
     /**
      * Adds the provided WebResourceSet to this web application as a 'Pre'
      * resource.
+     *
+     * @param webResourceSet the resource set to use
      */
     void addPreResources(WebResourceSet webResourceSet);
 
     /**
-     * Get the list of WebResourceSet configured to this web application
+     * @return the list of WebResourceSet configured to this web application
      * as a 'Pre' resource.
      */
     WebResourceSet[] getPreResources();
@@ -259,11 +261,13 @@ public interface WebResourceRoot extends Lifecycle {
     /**
      * Adds the provided WebResourceSet to this web application as a 'Jar'
      * resource.
+     *
+     * @param webResourceSet the resource set to use
      */
     void addJarResources(WebResourceSet webResourceSet);
 
     /**
-     * Get the list of WebResourceSet configured to this web application
+     * @return the list of WebResourceSet configured to this web application
      * as a 'Jar' resource.
      */
     WebResourceSet[] getJarResources();
@@ -271,22 +275,26 @@ public interface WebResourceRoot extends Lifecycle {
     /**
      * Adds the provided WebResourceSet to this web application as a 'Post'
      * resource.
+     *
+     * @param webResourceSet the resource set to use
      */
     void addPostResources(WebResourceSet webResourceSet);
 
     /**
-     * Get the list of WebResourceSet configured to this web application
+     * @return the list of WebResourceSet configured to this web application
      * as a 'Post' resource.
      */
     WebResourceSet[] getPostResources();
 
     /**
-     * Obtain the web application this WebResourceRoot is associated with.
+     * @return the web application this WebResourceRoot is associated with.
      */
     Context getContext();
 
     /**
      * Set the web application this WebResourceRoot is associated with.
+     *
+     * @param context the associated context
      */
     void setContext(Context context);
 
@@ -313,7 +321,7 @@ public interface WebResourceRoot extends Lifecycle {
     void setCachingAllowed(boolean cachingAllowed);
 
     /**
-     * Get whether or not caching is permitted for this web application.
+     * @return <code>true</code> if caching is permitted for this web application.
      */
     boolean isCachingAllowed();
 
@@ -397,12 +405,21 @@ public interface WebResourceRoot extends Lifecycle {
      */
     void backgroundProcess();
 
+    /**
+     * Add a specified resource to track to be able to later release
+     * resources on stop.
+     * @param trackedResource the resource that will be tracked
+     */
     void registerTrackedResource(TrackedWebResource trackedResource);
 
+    /**
+     * Stop tracking specified resource, once it no longer needs to free resources.
+     * @param trackedResource the resource that was tracked
+     */
     void deregisterTrackedResource(TrackedWebResource trackedResource);
 
     /**
-     * Obtain the set of {@link WebResourceSet#getBaseUrl()} for all
+     * @return the set of {@link WebResourceSet#getBaseUrl()} for all
      * {@link WebResourceSet}s used by this root.
      */
     List<URL> getBaseUrls();
