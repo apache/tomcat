@@ -306,6 +306,7 @@ public class OutputBuffer extends Writer
     /**
      * Flush bytes or chars contained in the buffer.
      *
+     * @param realFlush <code>true</code> if this should also cause a real network flush
      * @throws IOException An underlying IOException occurred
      */
     protected void doFlush(boolean realFlush) throws IOException {

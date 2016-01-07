@@ -466,6 +466,7 @@ public class FormAuthenticator
      * we signaled after successful authentication?
      *
      * @param request The request to be verified
+     * @return <code>true</code> if the requests matched the saved one
      */
     protected boolean matchRequest(Request request) {
         // Has a session been created?
@@ -503,6 +504,8 @@ public class FormAuthenticator
      *
      * @param request The request to be restored
      * @param session The session containing the saved information
+     * @return <code>true</code> if the request was successfully restored
+     * @throws IOException if an IO error occurred during the process
      */
     protected boolean restoreRequest(Request request, Session session)
             throws IOException {
@@ -593,7 +596,7 @@ public class FormAuthenticator
      *
      * @param request The request to be saved
      * @param session The session to contain the saved information
-     * @throws IOException
+     * @throws IOException if an IO error occurred during the process
      */
     protected void saveRequest(Request request, Session session)
         throws IOException {
@@ -656,6 +659,7 @@ public class FormAuthenticator
      * from the saved request so that we can redirect to it.
      *
      * @param session Our current session
+     * @return the original request URL
      */
     protected String savedRequestURL(Session session) {
 

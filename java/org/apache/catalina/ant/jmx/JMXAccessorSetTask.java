@@ -128,14 +128,6 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
     }
     // ------------------------------------------------------ protected Methods
 
-    /**
-     * Execute the specified command, based on the configured properties. The
-     * input stream will be closed upon completion of this task, whether it was
-     * executed successfully or not.
-     *
-     * @exception Exception
-     *                if an error occurs
-     */
     @Override
     public String jmxExecute(MBeanServerConnection jmxServerConnection)
         throws Exception {
@@ -151,9 +143,12 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
      }
 
     /**
-     * @param jmxServerConnection
-     * @param name
-     * @throws Exception
+     * Set property value.
+     *
+     * @param jmxServerConnection The JMX connection name
+     * @param name The MBean name
+     * @return null (no error message to report other than exception)
+     * @throws Exception An error occurred
      */
     protected String jmxSet(MBeanServerConnection jmxServerConnection,
             String name) throws Exception {
@@ -176,11 +171,12 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
 
     /**
      * Get MBean Attribute from Mbean Server
-     * @param jmxServerConnection
-     * @param name
-     * @param attribute
-     * @return The type
-     * @throws Exception
+     *
+     * @param jmxServerConnection The JMX connection name
+     * @param name The MBean name
+     * @param attribute The attribute name
+     * @return The type of the attribute
+     * @throws Exception An error occurred
      */
     protected String getMBeanAttributeType(
             MBeanServerConnection jmxServerConnection,

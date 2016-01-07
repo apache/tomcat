@@ -254,7 +254,10 @@ public class Connector extends LifecycleMBeanBase  {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Return a configured property.
+     * Return a property from the protocol handler.
+     *
+     * @param name the property name
+     * @return the property value
      */
     public Object getProperty(String name) {
         String repl = name;
@@ -266,7 +269,11 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Set a configured property.
+     * Set a property on the protocol handler.
+     *
+     * @param name the property name
+     * @param value the property value
+     * @return <code>true</code> if the property was successfully set
      */
     public boolean setProperty(String name, String value) {
         String repl = name;
@@ -277,7 +284,10 @@ public class Connector extends LifecycleMBeanBase  {
     }
 
     /**
-     * Return a configured property.
+     * Return a property from the protocol handler.
+     *
+     * @param name the property name
+     * @return the property value
      */
     public Object getAttribute(String name) {
         return getProperty(name);
@@ -285,7 +295,10 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Set a configured property.
+     * Set a property on the protocol handler.
+     *
+     * @param name the property name
+     * @param value the property value
      */
     public void setAttribute(String name, Object value) {
         setProperty(name, String.valueOf(value));
@@ -293,7 +306,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the <code>Service</code> with which we are associated (if any).
+     * @return the <code>Service</code> with which we are associated (if any).
      */
     public Service getService() {
 
@@ -315,7 +328,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * True if the TRACE method is allowed.  Default value is "false".
+     * @return <code>true</code> if the TRACE method is allowed. Default value is <code>false</code>.
      */
     public boolean getAllowTrace() {
 
@@ -338,7 +351,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the default timeout for async requests in ms.
+     * @return the default timeout for async requests in ms.
      */
     public long getAsyncTimeout() {
 
@@ -361,7 +374,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the "enable DNS lookups" flag.
+     * @return the "enable DNS lookups" flag.
      */
     public boolean getEnableLookups() {
 
@@ -384,7 +397,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the maximum number of headers that are allowed by the container. A
+     * @return the maximum number of headers that are allowed by the container. A
      * value of less than 0 means no limit.
      */
     public int getMaxHeaderCount() {
@@ -402,7 +415,7 @@ public class Connector extends LifecycleMBeanBase  {
     }
 
     /**
-     * Return the maximum number of parameters (GET plus POST) that will be
+     * @return the maximum number of parameters (GET plus POST) that will be
      * automatically parsed by the container. A value of less than 0 means no
      * limit.
      */
@@ -424,7 +437,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the maximum size of a POST which will be automatically
+     * @return the maximum size of a POST which will be automatically
      * parsed by the container.
      */
     public int getMaxPostSize() {
@@ -448,7 +461,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the maximum size of a POST which will be saved by the container
+     * @return the maximum size of a POST which will be saved by the container
      * during authentication.
      */
     public int getMaxSavePostSize() {
@@ -472,12 +485,21 @@ public class Connector extends LifecycleMBeanBase  {
     }
 
 
+    /**
+     * @return the HTTP methods which will support body parameters parsing
+     */
     public String getParseBodyMethods() {
 
         return this.parseBodyMethods;
 
     }
 
+    /**
+     * Set list of HTTP methods which should allow body parameter
+     * parsing. This defaults to <code>POST</code>.
+     *
+     * @param methods Comma separated list of HTTP method names
+     */
     public void setParseBodyMethods(String methods) {
 
         HashSet<String> methodSet = new HashSet<>();
@@ -502,7 +524,7 @@ public class Connector extends LifecycleMBeanBase  {
     }
 
     /**
-     * Return the port number on which this connector is configured to listen
+     * @return the port number on which this connector is configured to listen
      * for requests. The special value of 0 means select a random free port
      * when the socket is bound.
      */
@@ -527,7 +549,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the port number on which this connector is listening to requests.
+     * @return the port number on which this connector is listening to requests.
      * If the special value for {@link #getPort} of zero is used then this method
      * will report the actual port bound.
      */
@@ -537,7 +559,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the Coyote protocol handler in use.
+     * @return the Coyote protocol handler in use.
      */
     public String getProtocol() {
 
@@ -593,7 +615,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the class name of the Coyote protocol handler in use.
+     * @return the class name of the Coyote protocol handler in use.
      */
     public String getProtocolHandlerClassName() {
 
@@ -616,7 +638,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the protocol handler associated with the connector.
+     * @return the protocol handler associated with the connector.
      */
     public ProtocolHandler getProtocolHandler() {
 
@@ -626,7 +648,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the proxy server name for this Connector.
+     * @return the proxy server name for this Connector.
      */
     public String getProxyName() {
 
@@ -653,7 +675,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the proxy server port for this Connector.
+     * @return the proxy server port for this Connector.
      */
     public int getProxyPort() {
 
@@ -676,7 +698,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the port number to which a request should be redirected if
+     * @return the port number to which a request should be redirected if
      * it comes in on a non-SSL port and is subject to a security constraint
      * with a transport guarantee that requires SSL.
      */
@@ -701,7 +723,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the scheme that will be assigned to requests received
+     * @return the scheme that will be assigned to requests received
      * through this connector.  Default value is "http".
      */
     public String getScheme() {
@@ -725,7 +747,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Return the secure connection flag that will be assigned to requests
+     * @return the secure connection flag that will be assigned to requests
      * received through this connector.  Default value is "false".
      */
     public boolean getSecure() {
@@ -748,7 +770,7 @@ public class Connector extends LifecycleMBeanBase  {
     }
 
      /**
-      * Return the character encoding to be used for the URI using the original
+      * @return the character encoding to be used for the URI using the original
       * case.
       */
      public String getURIEncoding() {
@@ -757,7 +779,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
      /**
-      * Return the character encoding to be used for the URI using lower case.
+      * @return the character encoding to be used for the URI using lower case.
       */
      public String getURIEncodingLower() {
          return this.URIEncodingLower;
@@ -781,7 +803,7 @@ public class Connector extends LifecycleMBeanBase  {
 
 
      /**
-      * Return the true if the entity body encoding should be used for the URI.
+      * @return the true if the entity body encoding should be used for the URI.
       */
      public boolean getUseBodyEncodingForURI() {
 
@@ -805,9 +827,9 @@ public class Connector extends LifecycleMBeanBase  {
 
     /**
      * Indicates whether the generation of an X-Powered-By response header for
-     * servlet-generated responses is enabled or disabled for this Connector.
+     * Servlet-generated responses is enabled or disabled for this Connector.
      *
-     * @return true if generation of X-Powered-By response header is enabled,
+     * @return <code>true</code> if generation of X-Powered-By response header is enabled,
      * false otherwise
      */
     public boolean getXpoweredBy() {
@@ -841,6 +863,8 @@ public class Connector extends LifecycleMBeanBase  {
 
     /**
      * Test if IP-based virtual hosting is enabled.
+     *
+     * @return <code>true</code> if IP vhosts are enabled
      */
     public boolean getUseIPVHosts() {
         return useIPVHosts;
@@ -878,6 +902,8 @@ public class Connector extends LifecycleMBeanBase  {
     /**
      * Create (or allocate) and return a Request object suitable for
      * specifying the contents of a Request to the responsible Container.
+     *
+     * @return a new Servlet request object
      */
     public Request createRequest() {
 
@@ -891,6 +917,8 @@ public class Connector extends LifecycleMBeanBase  {
     /**
      * Create (or allocate) and return a Response object suitable for
      * receiving the contents of a Response from the responsible Container.
+     *
+     * @return a new Servlet response object
      */
     public Response createResponse() {
 
