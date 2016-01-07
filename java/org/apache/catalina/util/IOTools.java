@@ -60,31 +60,22 @@ public class IOTools {
         flow( reader, writer, buf );
     }
 
+
     /**
-     * Read input from input stream and write it to output stream
-     * until there is no more input from input stream.
+     * Read input from input stream and write it to output stream until there is
+     * no more input from input stream using a new buffer of the default size
+     * (4kB).
      *
      * @param is input stream the input stream to read from.
      * @param os output stream the output stream to write to.
-     * @param buf the byte array to use as a buffer
      *
-     * @deprecated Unused. Will be removed in 9.0.x
+     * @throws IOException If an I/O error occurs during the copy
      */
-    @Deprecated
-    public static void flow( InputStream is, OutputStream os, byte[] buf )
-        throws IOException {
+    public static void flow(InputStream is, OutputStream os) throws IOException {
+        byte[] buf = new byte[DEFAULT_BUFFER_SIZE];
         int numRead;
         while ( (numRead = is.read(buf) ) >= 0) {
             os.write(buf, 0, numRead);
         }
-    }
-
-    /**
-     * @see #flow( java.io.InputStream, java.io.OutputStream, byte[] )
-     */
-    public static void flow( InputStream is, OutputStream os )
-        throws IOException {
-        byte[] buf = new byte[DEFAULT_BUFFER_SIZE];
-        flow( is, os, buf );
     }
 }
