@@ -21,13 +21,13 @@ package org.apache.catalina.servlets;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -1166,9 +1166,7 @@ public final class CGIServlet extends HttpServlet {
             }
 
             // create directories
-            String dirPath = destPath.toString().substring(
-                    0,destPath.toString().lastIndexOf('/'));
-            File dir = new File(dirPath);
+            File dir = f.getParentFile();
             if (!dir.mkdirs() && !dir.isDirectory()) {
                 if (debug >= 2) {
                     log("expandCGIScript: failed to create directories for '" +
@@ -1188,19 +1186,13 @@ public final class CGIServlet extends HttpServlet {
                     if (!f.createNewFile()) {
                         return;
                     }
-                    FileOutputStream fos = new FileOutputStream(f);
 
                     try {
-                        // copy data
-                        IOTools.flow(is, fos);
+                        Files.copy(is, f.toPath());
                     } finally {
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            log("Could not close is.", e);
-                        }
-                        fos.close();
+                        is.close();
                     }
+
                     if (debug >= 2) {
                         log("expandCGIScript: expanded '" + srcPath + "' to '" + destPath + "'");
                     }

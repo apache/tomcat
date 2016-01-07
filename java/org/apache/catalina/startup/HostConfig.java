@@ -22,8 +22,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,7 +56,6 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
-import org.apache.catalina.util.IOTools;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -1066,11 +1065,7 @@ public class HostConfig implements LifecycleListener {
                 }
 
                 if (copyThisXml) {
-                    try (InputStream is = new FileInputStream(xml);
-                            OutputStream os = new FileOutputStream(xmlCopy)) {
-                        IOTools.flow(is, os);
-                        // Don't catch IOE - let the outer try/catch handle it
-                    }
+                    Files.copy(xml.toPath(), xmlCopy.toPath());
                     context.setConfigFile(xmlCopy.toURI().toURL());
                 } else {
                     context.setConfigFile(xml.toURI().toURL());
