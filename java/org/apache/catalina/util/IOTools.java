@@ -67,7 +67,10 @@ public class IOTools {
      * @param is input stream the input stream to read from.
      * @param os output stream the output stream to write to.
      * @param buf the byte array to use as a buffer
+     *
+     * @deprecated Unused. Will be removed in 9.0.x
      */
+    @Deprecated
     public static void flow( InputStream is, OutputStream os, byte[] buf )
         throws IOException {
         int numRead;
