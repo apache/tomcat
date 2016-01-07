@@ -84,7 +84,8 @@
 
     <attribute   name="localPort"
           description="The port number on which this connector is listening to requests. If the special value for port of zero is used then this method will report the actual port bound."
-                type="int"/>
+                 type="int"
+            writeable="false"/>
 
     <attribute   name="maxHeaderCount"
           description="The maximum number of headers that are allowed by the container. 100 by default. A value of less than 0 means no limit."
