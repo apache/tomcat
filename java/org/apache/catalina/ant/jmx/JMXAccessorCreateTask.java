@@ -113,14 +113,6 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
 
     // ------------------------------------------------------ protected Methods
 
-    /**
-     * Execute the specified command, based on the configured properties. The
-     * input stream will be closed upon completion of this task, whether it was
-     * executed successfully or not.
-     *
-     * @exception Exception
-     *                if an error occurs
-     */
     @Override
     public String jmxExecute(MBeanServerConnection jmxServerConnection)
         throws Exception {
@@ -132,19 +124,19 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
             throw new BuildException(
                     "Must specify a 'className' for get");
         }
-        return jmxCreate(jmxServerConnection, getName());
+        jmxCreate(jmxServerConnection, getName());
+        return null;
      }
 
     /**
-     * create new Mbean and when set from ClassLoader Objectname
-     * @param jmxServerConnection
-     * @param name
-     * @return The value of the given named attribute
-     * @throws Exception
+     * Create new Mbean and when set from ClassLoader Objectname.
+     *
+     * @param jmxServerConnection Connection to the JMX server 
+     * @param name MBean name
+     * @throws Exception Error crating MBean
      */
-    protected String jmxCreate(MBeanServerConnection jmxServerConnection,
+    protected void jmxCreate(MBeanServerConnection jmxServerConnection,
             String name) throws Exception {
-        String error = null;
         Object argsA[] = null;
         String sigA[] = null;
         if (args != null) {
@@ -182,7 +174,6 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
             else
                 jmxServerConnection.createMBean(className, new ObjectName(name),argsA,sigA);
         }
-        return error;
     }
 
 }

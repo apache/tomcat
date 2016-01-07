@@ -80,14 +80,6 @@ public class JMXAccessorGetTask extends JMXAccessorTask {
 
     // ------------------------------------------------------ protected Methods
 
-    /**
-     * Execute the specified command, based on the configured properties. The
-     * input stream will be closed upon completion of this task, whether it was
-     * executed successfully or not.
-     *
-     * @exception BuildException
-     *                if an error occurs
-     */
     @Override
     public String jmxExecute(MBeanServerConnection jmxServerConnection)
         throws Exception {
@@ -104,12 +96,14 @@ public class JMXAccessorGetTask extends JMXAccessorTask {
 
 
     /**
-     * @param jmxServerConnection
-     * @param name
-     * @return The value of the given named attribute
-     * @throws Exception
+     * Get property value.
+     *
+     * @param jmxServerConnection The JMX connection name
+     * @param name The MBean name
+     * @return The error message if any
+     * @throws Exception An error occurred
      */
-    protected String jmxGet(MBeanServerConnection jmxServerConnection,String name) throws Exception {
+    protected String jmxGet(MBeanServerConnection jmxServerConnection, String name) throws Exception {
         String error = null;
         if(isEcho()) {
             handleOutput("MBean " + name + " get attribute " + attribute );

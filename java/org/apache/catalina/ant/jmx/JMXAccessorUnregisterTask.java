@@ -53,14 +53,6 @@ public class JMXAccessorUnregisterTask extends JMXAccessorTask {
 
     // ------------------------------------------------------ protected Methods
 
-    /**
-     * Execute the specified command, based on the configured properties. The
-     * input stream will be closed upon completion of this task, whether it was
-     * executed successfully or not.
-     *
-     * @exception Exception
-     *                if an error occurs
-     */
     @Override
     public String jmxExecute(MBeanServerConnection jmxServerConnection)
         throws Exception {
@@ -73,11 +65,12 @@ public class JMXAccessorUnregisterTask extends JMXAccessorTask {
 
 
     /**
-     * Unregister Mbean
-     * @param jmxServerConnection
-     * @param name
-     * @return The value of the given named attribute
-     * @throws Exception
+     * Unregister MBean.
+     *
+     * @param jmxServerConnection The JMX connection name
+     * @param name The MBean name
+     * @return null (no error message to report other than exception)
+     * @throws Exception An error occurred
      */
     protected String jmxUuregister(MBeanServerConnection jmxServerConnection,String name) throws Exception {
         String error = null;

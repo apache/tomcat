@@ -82,14 +82,6 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
     // ------------------------------------------------------ protected Methods
 
 
-    /**
-     * Execute the specified command, based on the configured properties. The
-     * input stream will be closed upon completion of this task, whether it was
-     * executed successfully or not.
-     *
-     * @exception Exception
-     *                if an error occurs
-     */
     @Override
     public String jmxExecute(MBeanServerConnection jmxServerConnection)
         throws Exception {
@@ -105,10 +97,10 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
     /**
      * Call Mbean server for some mbeans with same domain, attributes.
      *  with <em>attributebinding=true</em> you can save all attributes from all found objects
-     * as your ant properties
-     * @param jmxServerConnection
-     * @param qry
-     * @return The query result
+     *
+     * @param jmxServerConnection The JMX connection name
+     * @param qry The query
+     * @return null (no error message to report other than exception)
      */
     protected String jmxQuery(MBeanServerConnection jmxServerConnection,
             String qry) {
@@ -134,58 +126,48 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
                 ObjectName oname = it.next();
                 pname = resultproperty + "." + Integer.toString(oindex) + ".";
                 oindex++;
-                    setProperty(pname + "Name", oname.toString());
-                    if (isAttributebinding()) {
-                        bindAttributes(jmxServerConnection, resultproperty, pname, oname);
-
-                    }
+                setProperty(pname + "Name", oname.toString());
+                if (isAttributebinding()) {
+                    bindAttributes(jmxServerConnection, resultproperty, pname, oname);
                 }
+            }
         }
         return isError;
     }
 
-    /**
-     * @param jmxServerConnection
-     * @param resultproperty
-     * @param pname
-     * @param oname
-     */
     protected void bindAttributes(MBeanServerConnection jmxServerConnection, String resultproperty, String pname, ObjectName oname) {
-        if (jmxServerConnection != null  && resultproperty != null
-            && pname != null && oname != null ) {
-            try {
-                MBeanInfo minfo = jmxServerConnection.getMBeanInfo(oname);
-                MBeanAttributeInfo attrs[] = minfo.getAttributes();
-                Object value = null;
+        try {
+            MBeanInfo minfo = jmxServerConnection.getMBeanInfo(oname);
+            MBeanAttributeInfo attrs[] = minfo.getAttributes();
+            Object value = null;
 
-                for (int i = 0; i < attrs.length; i++) {
-                    if (!attrs[i].isReadable())
-                        continue;
-                    String attName = attrs[i].getName();
-                    if (attName.indexOf('=') >= 0 || attName.indexOf(':') >= 0
-                            || attName.indexOf(' ') >= 0) {
-                        continue;
-                    }
-
-                    try {
-                        value = jmxServerConnection
-                                .getAttribute(oname, attName);
-                    } catch (Exception e) {
-                        if (isEcho())
-                            handleErrorOutput("Error getting attribute "
-                                    + oname + " " + pname + attName + " "
-                                    + e.toString());
-                        continue;
-                    }
-                    if (value == null)
-                        continue;
-                    if ("modelerType".equals(attName))
-                        continue;
-                    createProperty(pname + attName, value);
+            for (int i = 0; i < attrs.length; i++) {
+                if (!attrs[i].isReadable())
+                    continue;
+                String attName = attrs[i].getName();
+                if (attName.indexOf('=') >= 0 || attName.indexOf(':') >= 0
+                        || attName.indexOf(' ') >= 0) {
+                    continue;
                 }
-            } catch (Exception e) {
-                // Ignore
+
+                try {
+                    value = jmxServerConnection
+                            .getAttribute(oname, attName);
+                } catch (Exception e) {
+                    if (isEcho())
+                        handleErrorOutput("Error getting attribute "
+                                + oname + " " + pname + attName + " "
+                                + e.toString());
+                    continue;
+                }
+                if (value == null)
+                    continue;
+                if ("modelerType".equals(attName))
+                    continue;
+                createProperty(pname + attName, value);
             }
+        } catch (Exception e) {
+            // Ignore
         }
     }
 }

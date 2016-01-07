@@ -186,7 +186,7 @@ public abstract class LifecycleBase implements Lifecycle {
      * will be called on the failed component but the parent component will
      * continue to start normally.
      *
-     * @throws LifecycleException
+     * @throws LifecycleException Start error occurred
      */
     protected abstract void startInternal() throws LifecycleException;
 
@@ -264,7 +264,7 @@ public abstract class LifecycleBase implements Lifecycle {
      * {@link LifecycleState#STOPPING} during the execution of this method.
      * Changing state will trigger the {@link Lifecycle#STOP_EVENT} event.
      *
-     * @throws LifecycleException
+     * @throws LifecycleException Stop error occurred
      */
     protected abstract void stopInternal() throws LifecycleException;
 
@@ -346,6 +346,7 @@ public abstract class LifecycleBase implements Lifecycle {
      * transition is valid for a sub-class.
      *
      * @param state The new state for this component
+     * @throws LifecycleException when attempting to set an invalid state
      */
     protected synchronized void setState(LifecycleState state)
             throws LifecycleException {
@@ -361,6 +362,7 @@ public abstract class LifecycleBase implements Lifecycle {
      *
      * @param state The new state for this component
      * @param data  The data to pass to the associated {@link Lifecycle} event
+     * @throws LifecycleException when attempting to set an invalid state
      */
     protected synchronized void setState(LifecycleState state, Object data)
             throws LifecycleException {

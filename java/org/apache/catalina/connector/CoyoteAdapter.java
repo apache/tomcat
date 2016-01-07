@@ -847,8 +847,8 @@ public class CoyoteAdapter implements Adapter {
      * interested in the session ID that will be in this form. Other parameters
      * can safely be ignored.
      *
-     * @param req
-     * @param request
+     * @param req The Coyote request object
+     * @param request The Servlet request object
      */
     protected void parsePathParameters(org.apache.coyote.Request req,
             Request request) {
@@ -947,6 +947,8 @@ public class CoyoteAdapter implements Adapter {
     /**
      * Look for SSL session ID if required. Only look for SSL Session ID if it
      * is the only tracking method enabled.
+     *
+     * @param request The Servlet request obejct
      */
     protected void parseSessionSslId(Request request) {
         if (request.getRequestedSessionId() == null &&
@@ -962,6 +964,8 @@ public class CoyoteAdapter implements Adapter {
 
     /**
      * Parse session id in URL.
+     *
+     * @param request The Servlet request obejct
      */
     protected void parseSessionCookiesId(Request request) {
 
@@ -1016,6 +1020,10 @@ public class CoyoteAdapter implements Adapter {
 
     /**
      * Character conversion of the URI.
+     *
+     * @param uri MessageBytes object containing the URI
+     * @param request The Servlet request obejct
+     * @throws IOException if a IO exception occurs sending an error to the client
      */
     protected void convertURI(MessageBytes uri, Request request) throws IOException {
 
@@ -1035,7 +1043,7 @@ public class CoyoteAdapter implements Adapter {
                     conv.recycle();
                 }
             } catch (IOException e) {
-                log.error("Invalid URI encoding; using HTTP default");
+                log.error(sm.getString("coyoteAdapter.invalidEncoding"));
                 connector.setURIEncoding(null);
             }
             if (conv != null) {
@@ -1065,6 +1073,8 @@ public class CoyoteAdapter implements Adapter {
 
     /**
      * Character conversion of the a US-ASCII MessageBytes.
+     *
+     * @param mb The MessageBytes instance contaning the bytes that should be converted to chars
      */
     protected void convertMB(MessageBytes mb) {
 
@@ -1275,6 +1285,11 @@ public class CoyoteAdapter implements Adapter {
     /**
      * Copy an array of bytes to a different position. Used during
      * normalization.
+     *
+     * @param b The bytes that should be copied
+     * @param dest Destination offset
+     * @param src Source offset
+     * @param len Length
      */
     protected static void copyBytes(byte[] b, int dest, int src, int len) {
         for (int pos = 0; pos < len; pos++) {

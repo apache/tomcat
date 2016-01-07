@@ -152,6 +152,8 @@ public class Request implements HttpServletRequest {
 
     /**
      * Get the Coyote request.
+     *
+     * @return the Coyote request object
      */
     public org.apache.coyote.Request getCoyoteRequest() {
         return (this.coyoteRequest);
@@ -536,7 +538,7 @@ public class Request implements HttpServletRequest {
     protected Connector connector;
 
     /**
-     * Return the Connector through which this Request was received.
+     * @return the Connector through which this Request was received.
      */
     public Connector getConnector() {
         return this.connector;
@@ -558,6 +560,8 @@ public class Request implements HttpServletRequest {
      * This is available as soon as the appropriate Context is identified.
      * Note that availability of a Context allows <code>getContextPath()</code>
      * to return a value, and thus enables parsing of the request URI.
+     *
+     * @return the Context mapped with the request
      */
     public Context getContext() {
         return mappingData.context;
@@ -583,6 +587,8 @@ public class Request implements HttpServletRequest {
 
     /**
      * Get filter chain associated with the request.
+     *
+     * @return the associated filter chain
      */
     public FilterChain getFilterChain() {
         return this.filterChain;
@@ -599,7 +605,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the Host within which this Request is being processed.
+     * @return the Host within which this Request is being processed.
      */
     public Host getHost() {
         return mappingData.host;
@@ -612,7 +618,7 @@ public class Request implements HttpServletRequest {
     protected final MappingData mappingData = new MappingData();
 
     /**
-     * Return mapping data.
+     * @return mapping data.
      */
     public MappingData getMappingData() {
         return mappingData;
@@ -625,7 +631,7 @@ public class Request implements HttpServletRequest {
     protected RequestFacade facade = null;
 
     /**
-     * Return the <code>ServletRequest</code> for which this object
+     * @return the <code>ServletRequest</code> for which this object
      * is the facade.  This method must be implemented by a subclass.
      */
     public HttpServletRequest getRequest() {
@@ -642,7 +648,7 @@ public class Request implements HttpServletRequest {
     protected org.apache.catalina.connector.Response response = null;
 
     /**
-     * Return the Response with which this Request is associated.
+     * @return the Response with which this Request is associated.
      */
     public org.apache.catalina.connector.Response getResponse() {
         return this.response;
@@ -658,7 +664,7 @@ public class Request implements HttpServletRequest {
     }
 
     /**
-     * Return the input stream associated with this Request.
+     * @return the input stream associated with this Request.
      */
     public InputStream getStream() {
         if (inputStream == null) {
@@ -673,7 +679,7 @@ public class Request implements HttpServletRequest {
     protected B2CConverter URIConverter = null;
 
     /**
-     * Return the URI converter.
+     * @return the URI converter.
      */
     protected B2CConverter getURIConverter() {
         return URIConverter;
@@ -690,7 +696,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the Wrapper within which this Request is being processed.
+     * @return the Wrapper within which this Request is being processed.
      */
     public Wrapper getWrapper() {
         return mappingData.wrapper;
@@ -716,6 +722,7 @@ public class Request implements HttpServletRequest {
      * Create and return a ServletInputStream to read the content
      * associated with this Request.
      *
+     * @return the created input stream
      * @exception IOException if an input/output error occurs
      */
     public ServletInputStream createInputStream()
@@ -745,7 +752,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the object bound with the specified name to the internal notes
+     * @return the object bound with the specified name to the internal notes
      * for this request, or <code>null</code> if no such binding exists.
      *
      * @param name Name of the note to be returned
@@ -834,7 +841,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the specified request attribute if it exists; otherwise, return
+     * @return the specified request attribute if it exists; otherwise, return
      * <code>null</code>.
      *
      * @param name Name of the request attribute to return
@@ -899,6 +906,8 @@ public class Request implements HttpServletRequest {
 
     /**
      * Test if a given name is one of the special Servlet-spec SSL attributes.
+     *
+     * @return <code>true</code> if this is a special SSL attribute
      */
     static boolean isSSLAttribute(String name) {
         return Globals.CERTIFICATES_ATTR.equals(name) ||
@@ -933,6 +942,8 @@ public class Request implements HttpServletRequest {
      * </ul>
      * Connector implementations may return some, all or none of these
      * attributes and may also support additional attributes.
+     *
+     * @return the attribute names enumeration
      */
     @Override
     public Enumeration<String> getAttributeNames() {
@@ -948,7 +959,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the character encoding for this Request.
+     * @return the character encoding for this Request.
      */
     @Override
     public String getCharacterEncoding() {
@@ -957,7 +968,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the content length for this Request.
+     * @return the content length for this Request.
      */
     @Override
     public int getContentLength() {
@@ -966,7 +977,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the content type for this Request.
+     * @return the content type for this Request.
      */
     @Override
     public String getContentType() {
@@ -976,6 +987,8 @@ public class Request implements HttpServletRequest {
 
     /**
      * Set the content type for this Request.
+     *
+     * @param contentType The content type
      */
     public void setContentType(String contentType) {
         coyoteRequest.setContentType(contentType);
@@ -983,7 +996,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the servlet input stream for this Request.  The default
+     * @return the servlet input stream for this Request.  The default
      * implementation returns a servlet input stream created by
      * <code>createInputStream()</code>.
      *
@@ -1009,7 +1022,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the preferred Locale that the client will accept content in,
+     * @return the preferred Locale that the client will accept content in,
      * based on the value for the first <code>Accept-Language</code> header
      * that was encountered.  If the request did not specify a preferred
      * language, the server's default Locale is returned.
@@ -1030,7 +1043,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the set of preferred Locales that the client will accept
+     * @return the set of preferred Locales that the client will accept
      * content in, based on the values for any <code>Accept-Language</code>
      * headers that were encountered.  If the request did not specify a
      * preferred language, the server's default Locale is returned.
@@ -1053,7 +1066,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the value of the specified request parameter, if any; otherwise,
+     * @return the value of the specified request parameter, if any; otherwise,
      * return <code>null</code>.  If there is more than one value defined,
      * return only the first one.
      *
@@ -1073,7 +1086,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Returns a <code>Map</code> of the parameters of this request.
+     * @return a <code>Map</code> of the parameters of this request.
      * Request parameters are extra information sent with the request.
      * For HTTP servlets, parameters are contained in the query string
      * or posted form data.
@@ -1103,7 +1116,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the names of all defined request parameters for this request.
+     * @return the names of all defined request parameters for this request.
      */
     @Override
     public Enumeration<String> getParameterNames() {
@@ -1118,7 +1131,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the defined values for the specified request parameter, if any;
+     * @return the defined values for the specified request parameter, if any;
      * otherwise, return <code>null</code>.
      *
      * @param name Name of the desired request parameter
@@ -1136,7 +1149,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the protocol and version used to make this Request.
+     * @return the protocol and version used to make this Request.
      */
     @Override
     public String getProtocol() {
@@ -1149,6 +1162,7 @@ public class Request implements HttpServletRequest {
      * default implementation wraps a <code>BufferedReader</code> around the
      * servlet input stream returned by <code>createInputStream()</code>.
      *
+     * @return a buffered reader for the request
      * @exception IllegalStateException if <code>getInputStream()</code>
      *  has already been called for this request
      * @exception IOException if an input/output error occurs
@@ -1172,7 +1186,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the real path of the specified virtual path.
+     * @return the real path of the specified virtual path.
      *
      * @param path Path to be translated
      *
@@ -1201,7 +1215,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the remote IP address making this Request.
+     * @return the remote IP address making this Request.
      */
     @Override
     public String getRemoteAddr() {
@@ -1215,7 +1229,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the remote host name making this Request.
+     * @return the remote host name making this Request.
      */
     @Override
     public String getRemoteHost() {
@@ -1232,7 +1246,7 @@ public class Request implements HttpServletRequest {
     }
 
     /**
-     * Returns the Internet Protocol (IP) source port of the client
+     * @return the Internet Protocol (IP) source port of the client
      * or last proxy that sent the request.
      */
     @Override
@@ -1246,7 +1260,7 @@ public class Request implements HttpServletRequest {
     }
 
     /**
-     * Returns the host name of the Internet Protocol (IP) interface on
+     * @return the host name of the Internet Protocol (IP) interface on
      * which the request was received.
      */
     @Override
@@ -1260,7 +1274,7 @@ public class Request implements HttpServletRequest {
     }
 
     /**
-     * Returns the Internet Protocol (IP) address of the interface on
+     * @return the Internet Protocol (IP) address of the interface on
      * which the request  was received.
      */
     @Override
@@ -1275,7 +1289,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Returns the Internet Protocol (IP) port number of the interface
+     * @return the Internet Protocol (IP) port number of the interface
      * on which the request was received.
      */
     @Override
@@ -1289,7 +1303,7 @@ public class Request implements HttpServletRequest {
     }
 
     /**
-     * Return a RequestDispatcher that wraps the resource at the specified
+     * @return a RequestDispatcher that wraps the resource at the specified
      * path, which may be interpreted as relative to the current request path.
      *
      * @param path Path of the resource to be wrapped
@@ -1340,7 +1354,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the scheme used to make this Request.
+     * @return the scheme used to make this Request.
      */
     @Override
     public String getScheme() {
@@ -1349,7 +1363,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the server name responding to this Request.
+     * @return the server name responding to this Request.
      */
     @Override
     public String getServerName() {
@@ -1358,7 +1372,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the server port responding to this Request.
+     * @return the server port responding to this Request.
      */
     @Override
     public int getServerPort() {
@@ -1367,7 +1381,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Was this request received on a secure connection?
+     * @return <code>true</code> if this request was received on a secure connection.
      */
     @Override
     public boolean isSecure() {
@@ -1464,6 +1478,10 @@ public class Request implements HttpServletRequest {
 
     /**
      * Notify interested listeners that attribute has been assigned a value.
+     *
+     * @param name Attribute name
+     * @param value New attribute value
+     * @param oldValue Old attribute value
      */
     private void notifyAttributeAssigned(String name, Object value,
             Object oldValue) {
@@ -1506,6 +1524,9 @@ public class Request implements HttpServletRequest {
 
     /**
      * Notify interested listeners that attribute has been removed.
+     *
+     * @param name Attribute name
+     * @param value Attribute value
      */
     private void notifyAttributeRemoved(String name, Object value) {
         Context context = getContext();
@@ -2002,6 +2023,8 @@ public class Request implements HttpServletRequest {
      * Return the set of Cookies received with this Request. Triggers parsing of
      * the Cookie HTTP headers followed by conversion to Cookie objects if this
      * has not already been performed.
+     *
+     * @return the array of cookies
      */
     @Override
     public Cookie[] getCookies() {
@@ -2016,6 +2039,8 @@ public class Request implements HttpServletRequest {
      * Return the server representation of the cookies associated with this
      * request. Triggers parsing of the Cookie HTTP headers (but not conversion
      * to Cookie objects) if the headers have not yet been parsed.
+     *
+     * @return the server cookies
      */
     public ServerCookies getServerCookies() {
         parseCookies();
@@ -2028,6 +2053,7 @@ public class Request implements HttpServletRequest {
      * return -1.
      *
      * @param name Name of the requested date header
+     * @return the date as a long
      *
      * @exception IllegalArgumentException if the specified header value
      *  cannot be converted to a date
@@ -2055,6 +2081,7 @@ public class Request implements HttpServletRequest {
      * return <code>null</code>
      *
      * @param name Name of the requested header
+     * @return the header value
      */
     @Override
     public String getHeader(String name) {
@@ -2067,6 +2094,7 @@ public class Request implements HttpServletRequest {
      * return an empty enumeration.
      *
      * @param name Name of the requested header
+     * @return the enumeration with the header values
      */
     @Override
     public Enumeration<String> getHeaders(String name) {
@@ -2075,7 +2103,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the names of all headers received with this request.
+     * @return the names of all headers received with this request.
      */
     @Override
     public Enumeration<String> getHeaderNames() {
@@ -2088,6 +2116,7 @@ public class Request implements HttpServletRequest {
      * is no such header for this request.
      *
      * @param name Name of the requested header
+     * @return the header value as an int
      *
      * @exception IllegalArgumentException if the specified header value
      *  cannot be converted to an integer
@@ -2105,7 +2134,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the HTTP request method used in this Request.
+     * @return the HTTP request method used in this Request.
      */
     @Override
     public String getMethod() {
@@ -2114,7 +2143,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the path information associated with this Request.
+     * @return the path information associated with this Request.
      */
     @Override
     public String getPathInfo() {
@@ -2123,7 +2152,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the extra path information for this request, translated
+     * @return the extra path information for this request, translated
      * to a real path.
      */
     @Override
@@ -2143,7 +2172,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the query string associated with this request.
+     * @return the query string associated with this request.
      */
     @Override
     public String getQueryString() {
@@ -2152,7 +2181,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the name of the remote user that has been authenticated
+     * @return the name of the remote user that has been authenticated
      * for this Request.
      */
     @Override
@@ -2177,7 +2206,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the session identifier included in this request, if any.
+     * @return the session identifier included in this request, if any.
      */
     @Override
     public String getRequestedSessionId() {
@@ -2186,7 +2215,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the request URI for this request.
+     * @return the request URI for this request.
      */
     @Override
     public String getRequestURI() {
@@ -2236,7 +2265,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the portion of the request URI used to select the servlet
+     * @return the portion of the request URI used to select the servlet
      * that will process this request.
      */
     @Override
@@ -2246,7 +2275,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the session associated with this Request, creating one
+     * @return the session associated with this Request, creating one
      * if necessary.
      */
     @Override
@@ -2261,7 +2290,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the session associated with this Request, creating one
+     * @return the session associated with this Request, creating one
      * if necessary and requested.
      *
      * @param create Create a new session if one does not exist
@@ -2278,7 +2307,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return <code>true</code> if the session identifier included in this
+     * @return <code>true</code> if the session identifier included in this
      * request came from a cookie.
      */
     @Override
@@ -2293,7 +2322,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return <code>true</code> if the session identifier included in this
+     * @return <code>true</code> if the session identifier included in this
      * request came from the request URI.
      */
     @Override
@@ -2308,7 +2337,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return <code>true</code> if the session identifier included in this
+     * @return <code>true</code> if the session identifier included in this
      * request came from the request URI.
      *
      * @deprecated As of Version 2.1 of the Java Servlet API, use
@@ -2322,7 +2351,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return <code>true</code> if the session identifier included in this
+     * @return <code>true</code> if the session identifier included in this
      * request identifies a valid session.
      */
     @Override
@@ -2374,7 +2403,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return <code>true</code> if the authenticated user principal
+     * @return <code>true</code> if the authenticated user principal
      * possesses the specified role name.
      *
      * @param role Role name to be validated
@@ -2416,7 +2445,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the principal that has been authenticated for this Request.
+     * @return the principal that has been authenticated for this Request.
      */
     public Principal getPrincipal() {
         return userPrincipal;
@@ -2424,7 +2453,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the principal that has been authenticated for this Request.
+     * @return the principal that has been authenticated for this Request.
      */
     @Override
     public Principal getUserPrincipal() {
@@ -2458,7 +2487,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return the session associated with this Request, creating one
+     * @return the session associated with this Request, creating one
      * if necessary.
      */
     public Session getSessionInternal() {
@@ -2523,7 +2552,7 @@ public class Request implements HttpServletRequest {
     }
 
     /**
-     * Return the session associated with this Request, creating one
+     * @return the session associated with this Request, creating one
      * if necessary and requested.
      *
      * @param create Create a new session if one does not exist
@@ -2534,14 +2563,14 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * return true if we have parsed parameters
+     * @return <code>true</code> if we have parsed parameters
      */
     public boolean isParametersParsed() {
         return parametersParsed;
     }
 
     /**
-     * Return true if bytes are available.
+     * @return <code>true</code> if bytes are available.
      */
     public boolean getAvailable() {
         return (inputBuffer.available() > 0);
@@ -2549,7 +2578,7 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Return true if an attempt has been made to read the request body and all
+     * @return <code>true</code> if an attempt has been made to read the request body and all
      * of the request body has been read
      */
     public boolean isFinished() {
@@ -2568,10 +2597,7 @@ public class Request implements HttpServletRequest {
     }
 
     /**
-     * @throws IOException If an I/O error occurs
-     * @throws IllegalStateException If the response has been committed
-     * @throws ServletException If the caller is responsible for handling the
-     *         error and the container has NOT set the HTTP response code etc.
+     * {@inheritDoc}
      */
     @Override
     public boolean authenticate(HttpServletResponse response)
@@ -3177,8 +3203,13 @@ public class Request implements HttpServletRequest {
 
     /**
      * Read post body in an array.
+     *
+     * @param body The bytes array in which the body will be read
+     * @param len The body length
+     * @return the bytes count that has been read
+     * @throws IOException if an IO exception occurred
      */
-    protected int readPostBody(byte body[], int len)
+    protected int readPostBody(byte[] body, int len)
         throws IOException {
 
         int offset = 0;
@@ -3196,6 +3227,9 @@ public class Request implements HttpServletRequest {
 
     /**
      * Read chunked post body.
+     *
+     * @return the post body as a bytes array
+     * @throws IOException if an IO exception occurred
      */
     protected byte[] readChunkedPostBody() throws IOException {
         ByteChunk body = new ByteChunk();
@@ -3262,6 +3296,9 @@ public class Request implements HttpServletRequest {
 
     /**
      * Parse accept-language header value.
+     *
+     * @param value the header value
+     * @param locales the map that will hold the result
      */
     protected void parseLocalesHeader(String value, TreeMap<Double, ArrayList<Locale>> locales) {
 
