@@ -300,7 +300,7 @@ public class DeltaRequest implements Externalizable {
      * @see DeltaRequest#writeExternal(java.io.ObjectOutput)
      *
      * @return serialized delta request
-     * @throws IOException
+     * @throws IOException IO error serializing
      */
     protected byte[] serialize() throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

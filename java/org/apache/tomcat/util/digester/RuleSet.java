@@ -42,7 +42,7 @@ public interface RuleSet {
 
 
     /**
-     * Return the namespace URI that will be applied to all Rule instances
+     * @return the namespace URI that will be applied to all Rule instances
      * created from this RuleSet.
      */
     public String getNamespaceURI();

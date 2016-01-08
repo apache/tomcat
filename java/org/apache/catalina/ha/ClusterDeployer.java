@@ -37,7 +37,7 @@ public interface ClusterDeployer extends ChannelListener {
 
     /**
      * Stops the cluster deployer, the owning container will invoke this
-     * @throws LifecycleException
+     * @throws LifecycleException Error stopping cluster deployer
      */
     public void stop() throws LifecycleException;
 

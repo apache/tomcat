@@ -287,12 +287,12 @@ public class FarmWarDeployer extends ClusterListener
     }
 
     /**
-     * create factory for all transported war files
+     * Create factory for all transported war files
      *
-     * @param msg
+     * @param msg The file
      * @return Factory for all app message (war files)
-     * @throws java.io.FileNotFoundException
-     * @throws java.io.IOException
+     * @throws java.io.FileNotFoundException Missing file error
+     * @throws java.io.IOException Other IO error
      */
     public synchronized FileMessageFactory getFactory(FileMessage msg)
             throws java.io.FileNotFoundException, java.io.IOException {
@@ -307,9 +307,9 @@ public class FarmWarDeployer extends ClusterListener
     }
 
     /**
-     * Remove file (war) from messages)
+     * Remove file (war) from messages
      *
-     * @param msg
+     * @param msg The file
      */
     public void removeFactory(FileMessage msg) {
         fileFactories.remove(msg.getFileName());
@@ -320,8 +320,7 @@ public class FarmWarDeployer extends ClusterListener
      * receiver to accept or decline the message, In the future, when messages
      * get big, the accept method will only take a message header
      *
-     * @param msg
-     *            ClusterMessage
+     * @param msg ClusterMessage
      * @return boolean - returns true to indicate that messageReceived should be
      *         invoked. If false is returned, the messageReceived method will
      *         not be invoked.
@@ -440,7 +439,7 @@ public class FarmWarDeployer extends ClusterListener
 
     }
 
-    /*
+    /**
      * Modification from watchDir war detected!
      *
      * @see org.apache.catalina.ha.deploy.FileChangeListener#fileModified(File)
@@ -477,7 +476,7 @@ public class FarmWarDeployer extends ClusterListener
         }
     }
 
-    /*
+    /**
      * War remove from watchDir
      *
      * @see org.apache.catalina.ha.deploy.FileChangeListener#fileRemoved(File)
@@ -497,6 +496,8 @@ public class FarmWarDeployer extends ClusterListener
 
     /**
      * Invoke the remove method on the deployer.
+     * @param contextName The context to remove
+     * @throws Exception If an error occurs removing the context
      */
     protected void remove(String contextName) throws Exception {
         // TODO Handle remove also work dir content !
@@ -556,7 +557,7 @@ public class FarmWarDeployer extends ClusterListener
         }
     }
 
-    /*
+    /**
      * Call watcher to check for deploy changes
      *
      * @see org.apache.catalina.ha.ClusterDeployer#backgroundProcess()
@@ -578,7 +579,9 @@ public class FarmWarDeployer extends ClusterListener
     /*--Deployer Operations ------------------------------------*/
 
     /**
-     * Invoke the check method on the deployer.
+     * Check a context for deployment operations.
+     * @param name The context name
+     * @throws Exception Error invoking the deployer
      */
     protected void check(String name) throws Exception {
         String[] params = { name };
@@ -587,7 +590,10 @@ public class FarmWarDeployer extends ClusterListener
     }
 
     /**
-     * Invoke the check method on the deployer.
+     * Verified if a context is being services.
+     * @param name The context name
+     * @return <code>true</code> if the context is being serviced
+     * @throws Exception Error invoking the deployer
      */
     protected boolean isServiced(String name) throws Exception {
         String[] params = { name };
@@ -598,7 +604,9 @@ public class FarmWarDeployer extends ClusterListener
     }
 
     /**
-     * Invoke the check method on the deployer.
+     * Mark a context as being services.
+     * @param name The context name
+     * @throws Exception Error invoking the deployer
      */
     protected void addServiced(String name) throws Exception {
         String[] params = { name };
@@ -607,7 +615,9 @@ public class FarmWarDeployer extends ClusterListener
     }
 
     /**
-     * Invoke the check method on the deployer.
+     * Mark a context as no longer being serviced.
+     * @param name The context name
+     * @throws Exception Error invoking the deployer
      */
     protected void removeServiced(String name) throws Exception {
         String[] params = { name };
@@ -687,7 +697,7 @@ public class FarmWarDeployer extends ClusterListener
     }
 
     /**
-     * Return the frequency of watcher checks.
+     * @return the frequency of watcher checks.
      */
     public int getProcessDeployFrequency() {
 

@@ -136,7 +136,8 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
     /**
      * Check whether the given session attribute should be distributed
      *
-     * @return true if the attribute should be distributed
+     * @param name The attribute name
+     * @return <code>true</code> if the attribute should be distributed
      */
     public boolean willAttributeDistribute(String name) {
         if (sessionAttributePattern == null) {
@@ -171,9 +172,9 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
      * Open Stream and use correct ClassLoader (Container) Switch
      * ThreadClassLoader
      *
-     * @param data
+     * @param data The data
      * @return The object input stream
-     * @throws IOException
+     * @throws IOException An error occurred
      */
     @Override
     public ReplicationStream getReplicationStream(byte[] data) throws IOException {

@@ -112,7 +112,7 @@ public class WarWatcher {
 
     /**
      * add cluster war to the watcher state
-     * @param warfile
+     * @param warfile The WAR to add
      */
     protected void addWarInfo(File warfile) {
         WarInfo info = currentStatus.get(warfile.getAbsolutePath());

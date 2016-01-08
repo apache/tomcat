@@ -778,6 +778,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     /**
      * Get new session class to be used in the doLoad() method.
+     * @return a new session for use with this manager
      */
     protected StandardSession getNewSession() {
         return new StandardSession(this);
@@ -786,6 +787,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     /**
      * Generate and return a new session identifier.
+     * @return a new session id
      */
     protected String generateSessionId() {
 
