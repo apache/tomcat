@@ -21,7 +21,7 @@ import java.io.IOException;
 
 /**
  * A <b>Manager</b> manages the pool of Sessions that are associated with a
- * particular Container.  Different Manager implementations may support
+ * particular Context. Different Manager implementations may support
  * value-added features such as the persistent storage of session data,
  * as well as migrating sessions for distributable web applications.
  * <p>
