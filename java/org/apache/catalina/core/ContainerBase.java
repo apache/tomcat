@@ -487,6 +487,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     /**
      * Return if children of this container will be started automatically when
      * they are added to this container.
+     *
+     * @return <code>true</code> if the children will be started
      */
     public boolean getStartChildren() {
 
@@ -1185,7 +1187,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
 
     /**
-     * Return the abbreviated name of this container for logging messages
+     * @return the abbreviated name of this container for logging messages
      */
     protected String logName() {
 

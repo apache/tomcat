@@ -1174,6 +1174,8 @@ public class StandardContext extends ContainerBase
     /**
      * Return the "follow standard delegation model" flag used to configure
      * our ClassLoader.
+     *
+     * @return <code>true</code> if classloading delegates to the parent classloader first
      */
     public boolean getDelegate() {
 
@@ -1199,7 +1201,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Returns true if the internal naming support is used.
+     * @return true if the internal naming support is used.
      */
     public boolean isUseNaming() {
 
@@ -1210,6 +1212,8 @@ public class StandardContext extends ContainerBase
 
     /**
      * Enables or disables naming.
+     *
+     * @param useNaming <code>true</code> to enable the naming environment
      */
     public void setUseNaming(boolean useNaming) {
         this.useNaming = useNaming;
@@ -1271,6 +1275,8 @@ public class StandardContext extends ContainerBase
     /**
      * Add a listener to the end of the list of initialized application
      * lifecycle listeners.
+     *
+     * @param listener The listener to add
      */
     public void addApplicationLifecycleListener(Object listener) {
         int len = applicationLifecycleListenersObjects.length;
@@ -1282,7 +1288,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the antiResourceLocking flag for this Context.
+     * @return the antiResourceLocking flag for this Context.
      */
     public boolean getAntiResourceLocking() {
 
@@ -1308,7 +1314,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the Locale to character set mapper for this Context.
+     * @return the Locale to character set mapper for this Context.
      */
     public CharsetMapper getCharsetMapper() {
 
@@ -1624,7 +1630,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the display name of this web application.
+     * @return the display name of this web application.
      */
     @Override
     public String getDisplayName() {
@@ -1635,7 +1641,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the alternate Deployment Descriptor name.
+     * @return the alternate Deployment Descriptor name.
      */
     @Override
     public String getAltDDName(){
@@ -1645,6 +1651,8 @@ public class StandardContext extends ContainerBase
 
     /**
      * Set an alternate Deployment Descriptor name.
+     *
+     * @param altDDName The new name
      */
     @Override
     public void setAltDDName(String altDDName) {
@@ -1671,7 +1679,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the distributable flag for this web application.
+     * @return the distributable flag for this web application.
      */
     @Override
     public boolean getDistributable() {
@@ -1706,7 +1714,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the document root for this Context.  This can be an absolute
+     * @return the document root for this Context.  This can be an absolute
      * pathname, a relative pathname, or a URL.
      */
     @Override
@@ -1857,7 +1865,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the boolean on the annotations parsing.
+     * @return the boolean on the annotations parsing.
      */
     @Override
     public boolean getIgnoreAnnotations() {
@@ -1881,7 +1889,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the login configuration descriptor for this web application.
+     * @return the login configuration descriptor for this web application.
      */
     @Override
     public LoginConfig getLoginConfig() {
@@ -1940,7 +1948,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the naming resources associated with this web application.
+     * @return the naming resources associated with this web application.
      */
     @Override
     public NamingResourcesImpl getNamingResources() {
@@ -2006,7 +2014,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the context path for this Context.
+     * @return the context path for this Context.
      */
     @Override
     public String getPath() {
@@ -2047,7 +2055,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the public identifier of the deployment descriptor DTD that is
+     * @return the public identifier of the deployment descriptor DTD that is
      * currently being parsed.
      */
     @Override
@@ -2079,7 +2087,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the reloadable flag for this web application.
+     * @return the reloadable flag for this web application.
      */
     @Override
     public boolean getReloadable() {
@@ -2090,7 +2098,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the default context override flag for this web application.
+     * @return the default context override flag for this web application.
      */
     @Override
     public boolean getOverride() {
@@ -2101,7 +2109,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the original document root for this Context.  This can be an absolute
+     * @return the original document root for this Context.  This can be an absolute
      * pathname, a relative pathname, or a URL.
      * Is only set as deployment has change docRoot!
      */
@@ -2124,7 +2132,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the parent class loader (if any) for this web application.
+     * @return the parent class loader (if any) for this web application.
      * This call is meaningful only <strong>after</strong> a Loader has
      * been configured.
      */
@@ -2142,7 +2150,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the privileged flag for this web application.
+     * @return the privileged flag for this web application.
      */
     @Override
     public boolean getPrivileged() {
@@ -2220,7 +2228,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the servlet context for which this Context is a facade.
+     * @return the servlet context for which this Context is a facade.
      */
     @Override
     public ServletContext getServletContext() {
@@ -2236,7 +2244,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the default session timeout (in minutes) for this
+     * @return the default session timeout (in minutes) for this
      * web application.
      */
     @Override
@@ -2271,7 +2279,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the value of the swallowOutput flag.
+     * @return the value of the swallowOutput flag.
      */
     @Override
     public boolean getSwallowOutput() {
@@ -2301,7 +2309,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the value of the unloadDelay flag.
+     * @return the value of the unloadDelay flag.
      */
     public long getUnloadDelay() {
 
@@ -2330,7 +2338,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Unpack WAR flag accessor.
+     * @return unpack WAR flag.
      */
     public boolean getUnpackWAR() {
 
@@ -2341,6 +2349,8 @@ public class StandardContext extends ContainerBase
 
     /**
      * Unpack WAR flag mutator.
+     *
+     * @param unpackWAR <code>true</code> to unpack WARs on deployment
      */
     public void setUnpackWAR(boolean unpackWAR) {
 
@@ -2349,18 +2359,31 @@ public class StandardContext extends ContainerBase
     }
 
 
+    /**
+     * Flag which indicates if bundled context.xml files should be copied to the
+     * config folder. The doesn't occur by default.
+     *
+     * @return <code>true</code> if the <code>META-INF/context.xml</code> file included
+     *     in a WAR will be copied to the host configuration base folder on deployment
+     */
     public boolean getCopyXML() {
         return copyXML;
     }
 
 
+    /**
+     * Allows copying a bundled context.xml file to the host configuration base
+     * folder on deployment.
+     *
+     * @param copyXML the new flag value
+     */
     public void setCopyXML(boolean copyXML) {
         this.copyXML = copyXML;
     }
 
 
     /**
-     * Return the Java class name of the Wrapper implementation used
+     * @return the Java class name of the Wrapper implementation used
      * for servlets registered in this Context.
      */
     @Override
@@ -2466,7 +2489,7 @@ public class StandardContext extends ContainerBase
     // ------------------------------------------------------ Public Properties
 
     /**
-     * Returns whether or not an attempt to modify the JNDI context will trigger
+     * @return whether or not an attempt to modify the JNDI context will trigger
      * an exception or if the request will be ignored.
      */
     public boolean getJndiExceptionOnFailedWrite() {
@@ -2478,7 +2501,7 @@ public class StandardContext extends ContainerBase
      * Controls whether or not an attempt to modify the JNDI context will
      * trigger an exception or if the request will be ignored.
      *
-     * @param jndiExceptionOnFailedWrite
+     * @param jndiExceptionOnFailedWrite <code>false</code> to avoid an exception
      */
     public void setJndiExceptionOnFailedWrite(
             boolean jndiExceptionOnFailedWrite) {
@@ -2487,7 +2510,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the Locale to character set mapper class for this Context.
+     * @return the Locale to character set mapper class for this Context.
      */
     public String getCharsetMapperClass() {
 
@@ -2535,7 +2558,7 @@ public class StandardContext extends ContainerBase
     }
 
     /**
-     * Return the work directory for this Context.
+     * @return the work directory for this Context.
      */
     public String getWorkDir() {
 
@@ -2560,7 +2583,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the clearReferencesStatic flag for this Context.
+     * @return the clearReferencesStatic flag for this Context.
      */
     public boolean getClearReferencesStatic() {
 
@@ -2586,7 +2609,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the clearReferencesStopThreads flag for this Context.
+     * @return the clearReferencesStopThreads flag for this Context.
      */
     public boolean getClearReferencesStopThreads() {
 
@@ -2613,7 +2636,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the clearReferencesStopTimerThreads flag for this Context.
+     * @return the clearReferencesStopTimerThreads flag for this Context.
      */
     public boolean getClearReferencesStopTimerThreads() {
         return (this.clearReferencesStopTimerThreads);
@@ -2638,7 +2661,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the clearReferencesHttpClientKeepAliveThread flag for this
+     * @return the clearReferencesHttpClientKeepAliveThread flag for this
      * Context.
      */
     public boolean getClearReferencesHttpClientKeepAliveThread() {
@@ -2798,6 +2821,8 @@ public class StandardContext extends ContainerBase
 
     /**
      * Add a security constraint to the set for this web application.
+     *
+     * @param constraint the new security constraint
      */
     @Override
     public void addConstraint(SecurityConstraint constraint) {
@@ -2933,6 +2958,8 @@ public class StandardContext extends ContainerBase
 
     /**
      * Validate the supplied FilterMap.
+     *
+     * @param filterMap the filter mapping
      */
     private void validateFilterMap(FilterMap filterMap) {
         // Validate the proposed filter mapping
@@ -3398,7 +3425,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the set of defined filters for this Context.
+     * @return the set of defined filters for this Context.
      */
     @Override
     public FilterDef[] findFilterDefs() {
@@ -3412,7 +3439,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the set of filter mappings for this Context.
+     * @return the set of filter mappings for this Context.
      */
     @Override
     public FilterMap[] findFilterMaps() {
@@ -3421,7 +3448,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the message destination with the specified name, if any;
+     * @return the message destination with the specified name, if any;
      * otherwise, return <code>null</code>.
      *
      * @param name Name of the desired message destination
@@ -3436,7 +3463,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the set of defined message destinations for this web
+     * @return the set of defined message destinations for this web
      * application.  If none have been defined, a zero-length array
      * is returned.
      */
@@ -3452,7 +3479,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the message destination ref with the specified name, if any;
+     * @return the message destination ref with the specified name, if any;
      * otherwise, return <code>null</code>.
      *
      * @param name Name of the desired message destination ref
@@ -3465,7 +3492,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the set of defined message destination refs for this web
+     * @return the set of defined message destination refs for this web
      * application.  If none have been defined, a zero-length array
      * is returned.
      */
@@ -3477,7 +3504,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the MIME type to which the specified extension is mapped,
+     * @return the MIME type to which the specified extension is mapped,
      * if any; otherwise return <code>null</code>.
      *
      * @param extension Extension to map to a MIME type
@@ -3491,7 +3518,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the extensions for which MIME mappings are defined.  If there
+     * @return the extensions for which MIME mappings are defined.  If there
      * are none, a zero-length array is returned.
      */
     @Override
@@ -3507,7 +3534,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the value for the specified context initialization
+     * @return the value for the specified context initialization
      * parameter name, if any; otherwise return <code>null</code>.
      *
      * @param name Name of the parameter to return
@@ -3519,7 +3546,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the names of all defined context initialization parameters
+     * @return the names of all defined context initialization parameters
      * for this Context.  If no parameters are defined, a zero-length
      * array is returned.
      */
@@ -3537,6 +3564,7 @@ public class StandardContext extends ContainerBase
      * is one.  Otherwise, return the specified role unchanged.
      *
      * @param role Security role to map
+     * @return the role name
      */
     @Override
     public String findRoleMapping(String role) {
@@ -3554,7 +3582,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return <code>true</code> if the specified security role is defined
+     * @return <code>true</code> if the specified security role is defined
      * for this application; otherwise return <code>false</code>.
      *
      * @param role Security role to verify
@@ -3574,7 +3602,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the security roles defined for this application.  If none
+     * @return the security roles defined for this application.  If none
      * have been defined, a zero-length array is returned.
      */
     @Override
@@ -3588,7 +3616,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the servlet name mapped by the specified pattern (if any);
+     * @return the servlet name mapped by the specified pattern (if any);
      * otherwise return <code>null</code>.
      *
      * @param pattern Pattern for which a mapping is requested
@@ -3604,7 +3632,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the patterns of all defined servlet mappings for this
+     * @return the patterns of all defined servlet mappings for this
      * Context.  If no mappings are defined, a zero-length array is returned.
      */
     @Override
@@ -3620,7 +3648,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the context-relative URI of the error page for the specified
+     * @return the context-relative URI of the error page for the specified
      * HTTP status code, if any; otherwise return <code>null</code>.
      *
      * @param status HTTP status code to look up
@@ -3638,7 +3666,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the set of HTTP status codes for which error pages have
+     * @return the set of HTTP status codes for which error pages have
      * been specified.  If none are specified, a zero-length array
      * is returned.
      */
@@ -3658,7 +3686,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return <code>true</code> if the specified welcome file is defined
+     * @return <code>true</code> if the specified welcome file is defined
      * for this Context; otherwise return <code>false</code>.
      *
      * @param name Welcome file to verify
@@ -3678,7 +3706,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the set of watched resources for this Context. If none are
+     * @return the set of watched resources for this Context. If none are
      * defined, a zero length array will be returned.
      */
     @Override
@@ -3690,7 +3718,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the set of welcome files defined for this Context.  If none are
+     * @return the set of welcome files defined for this Context.  If none are
      * defined, a zero-length array is returned.
      */
     @Override
@@ -3704,7 +3732,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the set of LifecycleListener classes that will be added to
+     * @return the set of LifecycleListener classes that will be added to
      * newly created Wrappers automatically.
      */
     @Override
@@ -3718,7 +3746,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the set of ContainerListener classes that will be added to
+     * @return the set of ContainerListener classes that will be added to
      * newly created Wrappers automatically.
      */
     @Override
@@ -4415,8 +4443,9 @@ public class StandardContext extends ContainerBase
     }
 
     /**
-     * hook to register that we need to scan for security annotations.
+     * Hook to register that we need to scan for security annotations.
      * @param wrapper   The wrapper for the Servlet that was added
+     * @return the associated registration
      */
     public ServletRegistration.Dynamic dynamicServletAdded(Wrapper wrapper) {
         Servlet s = wrapper.getServlet();
@@ -4428,8 +4457,8 @@ public class StandardContext extends ContainerBase
     }
 
     /**
-     * hook to track which registrations need annotation scanning
-     * @param servlet
+     * Hook to track which registrations need annotation scanning
+     * @param servlet the Servlet to add
      */
     public void dynamicServletCreated(Servlet servlet) {
         createdServlets.add(servlet);
@@ -4540,7 +4569,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * Configure and initialize the set of filters for this Context.
-     * Return <code>true</code> if all filter initialization completed
+     * @return <code>true</code> if all filter initialization completed
      * successfully, or <code>false</code> otherwise.
      */
     public boolean filterStart() {
@@ -4577,7 +4606,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * Finalize and release the set of filters for this Context.
-     * Return <code>true</code> if all filter finalization completed
+     * @return <code>true</code> if all filter finalization completed
      * successfully, or <code>false</code> otherwise.
      */
     public boolean filterStop() {
@@ -4605,6 +4634,7 @@ public class StandardContext extends ContainerBase
      * specified filter name, if any; otherwise return <code>null</code>.
      *
      * @param name Name of the desired filter
+     * @return the filter config object
      */
     public FilterConfig findFilterConfig(String name) {
 
@@ -4615,7 +4645,8 @@ public class StandardContext extends ContainerBase
 
     /**
      * Configure the set of instantiated application event listeners
-     * for this Context.  Return <code>true</code> if all listeners wre
+     * for this Context.
+     * @return <code>true</code> if all listeners wre
      * initialized successfully, or <code>false</code> otherwise.
      */
     public boolean listenerStart() {
@@ -4730,7 +4761,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * Send an application stop event to all interested listeners.
-     * Return <code>true</code> if all events were sent successfully,
+     * @return <code>true</code> if all events were sent successfully,
      * or <code>false</code> otherwise.
      */
     public boolean listenerStop() {
@@ -4819,8 +4850,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * Allocate resources, including proxy.
-     * Return <code>true</code> if initialization was successfull,
-     * or <code>false</code> otherwise.
+     * @throws LifecycleException if a start error occurs
      */
     public void resourcesStart() throws LifecycleException {
 
@@ -4844,6 +4874,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * Deallocate resources and destroy proxy.
+     * @return <code>true</code> if no error occurred
      */
     public boolean resourcesStop() {
 
@@ -4873,6 +4904,7 @@ public class StandardContext extends ContainerBase
      *
      * @param children Array of wrappers for all currently defined
      *  servlets (including those not declared load on startup)
+     * @return <code>true</code> if load on startup was considered successful
      */
     public boolean loadOnStartup(Container children[]) {
 
@@ -5628,6 +5660,7 @@ public class StandardContext extends ContainerBase
      *
      * @param urlPattern The URL pattern to be adjusted (if needed)
      *  and returned
+     * @return the URL pattern with a leading slash if needed
      */
     protected String adjustURLPattern(String urlPattern) {
 
@@ -5647,6 +5680,8 @@ public class StandardContext extends ContainerBase
 
     /**
      * Are we processing a version 2.2 deployment descriptor?
+     *
+     * @return <code>true</code> if running a legacy Servlet 2.2 application
      */
     @Override
     public boolean isServlet22() {
@@ -5734,7 +5769,7 @@ public class StandardContext extends ContainerBase
 
     /**
      * Bind current thread, both for CL purposes and for JNDI ENC support
-     * during : startup, shutdown and realoading of the context.
+     * during : startup, shutdown and reloading of the context.
      *
      * @return the previous context class loader
      */
@@ -5756,7 +5791,9 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Unbind thread.
+     * Unbind thread and restore the specified context classloader.
+     *
+     * @param oldContextClassLoader the previous classloader
      */
     protected void unbindThread(ClassLoader oldContextClassLoader) {
 
@@ -5841,6 +5878,8 @@ public class StandardContext extends ContainerBase
 
     /**
      * Get naming context full name.
+     *
+     * @return the context name
      */
     private String getNamingContextName() {
         if (namingContextName == null) {
@@ -5867,6 +5906,8 @@ public class StandardContext extends ContainerBase
 
     /**
      * Naming context listener accessor.
+     *
+     * @return the naming context listener associated with the webapp
      */
     public NamingContextListener getNamingContextListener() {
         return namingContextListener;
@@ -5875,6 +5916,8 @@ public class StandardContext extends ContainerBase
 
     /**
      * Naming context listener setter.
+     *
+     * @param namingContextListener the new naming context listener
      */
     public void setNamingContextListener(NamingContextListener namingContextListener) {
         this.namingContextListener = namingContextListener;
@@ -5882,7 +5925,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Return the request processing paused flag for this Context.
+     * @return the request processing paused flag for this Context.
      */
     @Override
     public boolean getPaused() {
@@ -6114,6 +6157,7 @@ public class StandardContext extends ContainerBase
      * for conformance with specification requirements.
      *
      * @param urlPattern URL pattern to be validated
+     * @return <code>true</code> if the URL pattern is conformant
      */
     private boolean validateURLPattern(String urlPattern) {
 
@@ -6330,7 +6374,8 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /* Add a JMX-NotificationListener
+    /**
+     * Add a JMX NotificationListener
      * @see javax.management.NotificationBroadcaster#addNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
     @Override
@@ -6354,7 +6399,7 @@ public class StandardContext extends ContainerBase
     // ------------------------------------------------------------- Attributes
 
     /**
-     * Return the naming resources associated with this web application.
+     * @return the naming resources associated with this web application.
      */
     public String[] getWelcomeFiles() {
 
@@ -6412,7 +6457,7 @@ public class StandardContext extends ContainerBase
 
 
     /**
-     * Support for "stateManageable" JSR77
+     * @return support for "stateManageable" JSR77
      */
     public boolean isStateManageable() {
         return true;

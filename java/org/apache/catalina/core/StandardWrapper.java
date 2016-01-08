@@ -328,7 +328,7 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Return the number of active allocations of this servlet, even if they
+     * @return the number of active allocations of this servlet, even if they
      * are all for the same instance (as will be true for servlets that do
      * not implement <code>SingleThreadModel</code>.
      */
@@ -338,7 +338,7 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Return the load-on-startup order value (negative value means
+     * @return the load-on-startup order value (negative value means
      * load on first call).
      */
     @Override
@@ -393,13 +393,16 @@ public class StandardWrapper extends ContainerBase
         }
     }
 
+    /**
+     * @return the load-on-startup value that was parsed
+     */
     public String getLoadOnStartupString() {
         return Integer.toString( getLoadOnStartup());
     }
 
 
     /**
-     * Return maximum number of instances that will be allocated when a single
+     * @return maximum number of instances that will be allocated when a single
      * thread model servlet is used.
      */
     public int getMaxInstances() {
@@ -447,7 +450,7 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Return the run-as identity for this servlet.
+     * @return the run-as identity for this servlet.
      */
     @Override
     public String getRunAs() {
@@ -473,7 +476,7 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Return the fully qualified servlet class name for this servlet.
+     * @return the fully qualified servlet class name for this servlet.
      */
     @Override
     public String getServletClass() {
@@ -518,7 +521,7 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Return <code>true</code> if the servlet class represented by this
+     * @return <code>true</code> if the servlet class represented by this
      * component implements the <code>SingleThreadModel</code> interface.
      */
     public boolean isSingleThreadModel() {
@@ -549,7 +552,7 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Is this servlet currently unavailable?
+     * @return <code>true</code> if the Servlet has been marked unavailable.
      */
     @Override
     public boolean isUnavailable() {
@@ -605,7 +608,7 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Return the associated servlet instance.
+     * @return the associated servlet instance.
      */
     @Override
     public Servlet getServlet() {
@@ -655,6 +658,7 @@ public class StandardWrapper extends ContainerBase
      * Extract the root cause from a servlet exception.
      *
      * @param e The servlet exception
+     * @return the root cause of the Servlet exception
      */
     public static Throwable getRootCause(ServletException e) {
         Throwable rootCause = e;
@@ -1028,6 +1032,8 @@ public class StandardWrapper extends ContainerBase
      * at least one initialized instance.  This can be used, for example, to
      * load servlets that are marked in the deployment descriptor to be loaded
      * at server startup time.
+     * @return the loaded Servlet instance
+     * @throws ServletException for a Servlet load error
      */
     public synchronized Servlet loadServlet() throws ServletException {
 
@@ -1265,7 +1271,7 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Return a String representation of this component.
+     * @return a String representation of this component.
      */
     @Override
     public String toString() {
@@ -1447,7 +1453,7 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Return the initialization parameter value for the specified name,
+     * @return the initialization parameter value for the specified name,
      * if any; otherwise return <code>null</code>.
      *
      * @param name Name of the initialization parameter to retrieve
@@ -1461,7 +1467,7 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Return the set of initialization parameter names defined for this
+     * @return the set of initialization parameter names defined for this
      * servlet.  If none are defined, an empty Enumeration is returned.
      */
     @Override
@@ -1478,7 +1484,7 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Return the servlet context with which this servlet is associated.
+     * @return the servlet context with which this servlet is associated.
      */
     @Override
     public ServletContext getServletContext() {
@@ -1494,7 +1500,7 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Return the name of this servlet.
+     * @return the name of this servlet.
      */
     @Override
     public String getServletName() {
@@ -1577,7 +1583,7 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Return <code>true</code> if the specified class name represents a
+     * @return <code>true</code> if the specified class name represents a
      * container provided servlet class that should be loaded by the
      * server class loader.
      *
@@ -1780,14 +1786,15 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * JSR 77. Always return false.
+     * @return JSR 77. Always return <code>false</code>.
      */
     public boolean isStateManageable() {
         return false;
     }
 
 
-    /* Remove a JMX notficationListener
+    /**
+     * Remove a JMX notficationListener
      * @see javax.management.NotificationEmitter#removeNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
     @Override
@@ -1798,9 +1805,9 @@ public class StandardWrapper extends ContainerBase
 
     protected MBeanNotificationInfo[] notificationInfo;
 
-    /* Get JMX Broadcaster Info
-     * @TODO use StringManager for international support!
-     * @TODO This two events we not send j2ee.state.failed and j2ee.attribute.changed!
+    /**
+     * Get JMX Broadcaster Info
+     * FIXME: This two events we not send j2ee.state.failed and j2ee.attribute.changed!
      * @see javax.management.NotificationBroadcaster#getNotificationInfo()
      */
     @Override
@@ -1845,7 +1852,8 @@ public class StandardWrapper extends ContainerBase
     }
 
 
-    /* Add a JMX-NotificationListener
+    /**
+     * Add a JMX-NotificationListener
      * @see javax.management.NotificationBroadcaster#addNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
     @Override

@@ -468,6 +468,8 @@ public class DefaultInstanceManager implements InstanceManager {
 
     /**
      * Makes cache size available to unit tests.
+     *
+     * @return the cache size
      */
     protected int getAnnotationCacheSize() {
         synchronized (annotationCache) {

@@ -1259,7 +1259,7 @@ public class ApplicationContext
 
 
     /**
-     * Return the facade associated with this ApplicationContext.
+     * @return the facade associated with this ApplicationContext.
      */
     protected ServletContext getFacade() {
 

@@ -158,6 +158,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
      * @param sessionId   The ID of the session for which the cookie will be
      *                    created
      * @param secure      Should session cookie be configured as secure
+     * @return the cookie for the session
      */
     public static Cookie createSessionCookie(Context context,
             String sessionId, boolean secure) {
