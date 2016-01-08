@@ -43,6 +43,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
 import org.apache.catalina.util.CustomObjectInputStream;
+import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 
 /**
@@ -595,7 +596,8 @@ public class JDBCStore extends StoreBase {
         ClassLoader classLoader = null;
         ObjectInputStream ois = null;
         BufferedInputStream bis = null;
-        org.apache.catalina.Context context = manager.getContext();
+        org.apache.catalina.Context context = getManager().getContext();
+        Log contextLog = context.getLogger();
 
         synchronized (this) {
             int numberOfTries = 2;
@@ -620,10 +622,7 @@ public class JDBCStore extends StoreBase {
                     try (ResultSet rst = preparedLoadSql.executeQuery()) {
                         if (rst.next()) {
                             bis = new BufferedInputStream(rst.getBinaryStream(2));
-
-                            if (context != null) {
-                                loader = context.getLoader();
-                            }
+                            loader = context.getLoader();
                             if (loader != null) {
                                 classLoader = loader.getClassLoader();
                             }
@@ -634,22 +633,22 @@ public class JDBCStore extends StoreBase {
                             }
                             ois = new CustomObjectInputStream(bis, classLoader);
 
-                            if (manager.getContext().getLogger().isDebugEnabled()) {
-                                manager.getContext().getLogger().debug(sm.getString(getStoreName() + ".loading",
-                                        id, sessionTable));
+                            if (contextLog.isDebugEnabled()) {
+                                contextLog.debug(
+                                        sm.getString(getStoreName() + ".loading", id, sessionTable));
                             }
 
                             _session = (StandardSession) manager.createEmptySession();
                             _session.readObjectData(ois);
                             _session.setManager(manager);
-                          } else if (manager.getContext().getLogger().isDebugEnabled()) {
-                            manager.getContext().getLogger().debug(getStoreName() + ": No persisted data object found");
+                        } else if (context.getLogger().isDebugEnabled()) {
+                            contextLog.debug(getStoreName() + ": No persisted data object found");
                         }
                         // Break out after the finally block
                         numberOfTries = 0;
                     }
                 } catch (SQLException e) {
-                    manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
+                    contextLog.error(sm.getString(getStoreName() + ".SQLException", e));
                     if (dbConnection != null)
                         close(dbConnection);
                 } finally {
