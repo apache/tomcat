@@ -4491,7 +4491,7 @@ public class StandardContext extends ContainerBase
         private int insertPoint = 0;
 
         /**
-         * Return the set of filter mappings.
+         * @return The set of filter mappings
          */
         public FilterMap[] asArray() {
             synchronized (lock) {
