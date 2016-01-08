@@ -912,10 +912,9 @@ public class NamingContextListener
     /**
      * Set the specified local EJBs in the naming context.
      *
-     * @param localEjb the EJB descriptor
+     * @param localEjb the EJB descriptor (unused)
      */
-    public void addLocalEjb(
-            @SuppressWarnings("unused") ContextLocalEjb localEjb) {
+    public void addLocalEjb(ContextLocalEjb localEjb) {
         // NO-OP
     }
 
