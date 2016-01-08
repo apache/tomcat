@@ -33,6 +33,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
 import org.apache.catalina.util.CustomObjectInputStream;
+import org.apache.juli.logging.Log;
 
 /**
  * Concrete implementation of the <b>Store</b> interface that utilizes
@@ -217,9 +218,12 @@ public final class FileStore extends StoreBase {
         if (!file.exists()) {
             return null;
         }
-        if (manager.getContext().getLogger().isDebugEnabled()) {
-            manager.getContext().getLogger().debug(sm.getString(getStoreName()+".loading",
-                             id, file.getAbsolutePath()));
+
+        Context context = getManager().getContext();
+        Log contextLog = context.getLogger();
+
+        if (contextLog.isDebugEnabled()) {
+            contextLog.debug(sm.getString(getStoreName()+".loading", id, file.getAbsolutePath()));
         }
 
         ObjectInputStream ois = null;
@@ -228,10 +232,7 @@ public final class FileStore extends StoreBase {
         ClassLoader oldThreadContextCL = Thread.currentThread().getContextClassLoader();
         try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
                 BufferedInputStream bis = new BufferedInputStream(fis)) {
-            Context context = manager.getContext();
-            if (context != null) {
-                loader = context.getLoader();
-            }
+            loader = context.getLoader();
             if (loader != null) {
                 classLoader = loader.getClassLoader();
             }
@@ -247,8 +248,8 @@ public final class FileStore extends StoreBase {
             session.setManager(manager);
             return session;
         } catch (FileNotFoundException e) {
-            if (manager.getContext().getLogger().isDebugEnabled()) {
-                manager.getContext().getLogger().debug("No persisted data file found");
+            if (contextLog.isDebugEnabled()) {
+                contextLog.debug("No persisted data file found");
             }
             return null;
         } finally {
