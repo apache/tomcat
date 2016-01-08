@@ -39,6 +39,7 @@ public final class StandardWrapperFacade
 
     /**
      * Create a new facade around a StandardWrapper.
+     * @param config the associated wrapper
      */
     public StandardWrapperFacade(StandardWrapper config) {
 

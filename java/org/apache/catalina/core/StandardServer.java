@@ -523,7 +523,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     /**
-     * Return the specified Service (if it exists); otherwise return
+     * @return the specified Service (if it exists); otherwise return
      * <code>null</code>.
      *
      * @param name Name of the Service to be returned
@@ -547,7 +547,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     /**
-     * Return the set of Services defined within this Server.
+     * @return the set of Services defined within this Server.
      */
     @Override
     public Service[] findServices() {
@@ -557,7 +557,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     }
 
     /**
-     * Return the JMX service names.
+     * @return the JMX service names.
      */
     public ObjectName[] getServiceNames() {
         ObjectName onames[]=new ObjectName[ services.length ];
@@ -708,6 +708,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      * Write the configuration information for <code>Context</code>
      * out to the specified configuration file.
      *
+     * @param context the context which should save its configuration
      * @exception javax.management.InstanceNotFoundException if the managed resource object
      *  cannot be found
      * @exception javax.management.MBeanException if the initializer of the object throws
@@ -734,7 +735,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     /**
-     * Return true if naming should be used.
+     * @return <code>true</code> if naming should be used.
      */
     private boolean isUseNaming() {
         boolean useNaming = true;

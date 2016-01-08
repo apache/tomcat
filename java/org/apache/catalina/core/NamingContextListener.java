@@ -158,7 +158,7 @@ public class NamingContextListener
     // ------------------------------------------------------------- Properties
 
     /**
-     * Returns whether or not an attempt to modify the JNDI context will trigger
+     * @return whether or not an attempt to modify the JNDI context will trigger
      * an exception or if the request will be ignored.
      */
     public boolean getExceptionOnFailedWrite() {
@@ -178,7 +178,7 @@ public class NamingContextListener
 
 
     /**
-     * Return the "name" property.
+     * @return the "name" property.
      */
     public String getName() {
         return (this.name);
@@ -196,7 +196,7 @@ public class NamingContextListener
 
 
     /**
-     * Return the env context.
+     * @return the naming environment context.
      */
     public javax.naming.Context getEnvContext() {
         return this.envCtx;
@@ -766,6 +766,8 @@ public class NamingContextListener
 
     /**
      * Set the specified EJBs in the naming context.
+     *
+     * @param ejb the EJB descriptor
      */
     public void addEjb(ContextEjb ejb) {
 
@@ -792,6 +794,8 @@ public class NamingContextListener
 
     /**
      * Set the specified environment entries in the naming context.
+     *
+     * @param env the environment entry
      */
     public void addEnvironment(ContextEnvironment env) {
 
@@ -907,6 +911,8 @@ public class NamingContextListener
 
     /**
      * Set the specified local EJBs in the naming context.
+     *
+     * @param localEjb the EJB descriptor
      */
     public void addLocalEjb(
             @SuppressWarnings("unused") ContextLocalEjb localEjb) {
@@ -916,6 +922,8 @@ public class NamingContextListener
 
     /**
      * Set the specified web service in the naming context.
+     *
+     * @param service the web service descriptor
      */
     public void addService(ContextService service) {
 
@@ -1046,6 +1054,8 @@ public class NamingContextListener
 
     /**
      * Set the specified resources in the naming context.
+     *
+     * @param resource the resource descriptor
      */
     public void addResource(ContextResource resource) {
 
@@ -1090,6 +1100,8 @@ public class NamingContextListener
 
     /**
      * Set the specified resources in the naming context.
+     *
+     * @param resourceEnvRef the resource reference
      */
     public void addResourceEnvRef(ContextResourceEnvRef resourceEnvRef) {
 
@@ -1117,6 +1129,8 @@ public class NamingContextListener
 
     /**
      * Set the specified resource link in the naming context.
+     *
+     * @param resourceLink the resource link
      */
     public void addResourceLink(ContextResourceLink resourceLink) {
 
@@ -1149,6 +1163,8 @@ public class NamingContextListener
 
     /**
      * Set the specified EJBs in the naming context.
+     *
+     * @param name the name of the EJB which should be removed
      */
     public void removeEjb(String name) {
 
@@ -1163,6 +1179,8 @@ public class NamingContextListener
 
     /**
      * Set the specified environment entries in the naming context.
+     *
+     * @param name the name of the environment entry which should be removed
      */
     public void removeEnvironment(String name) {
 
@@ -1177,6 +1195,8 @@ public class NamingContextListener
 
     /**
      * Set the specified local EJBs in the naming context.
+     *
+     * @param name the name of the EJB which should be removed
      */
     public void removeLocalEjb(String name) {
 
@@ -1191,6 +1211,8 @@ public class NamingContextListener
 
     /**
      * Set the specified web services in the naming context.
+     *
+     * @param name the name of the web service which should be removed
      */
     public void removeService(String name) {
 
@@ -1205,6 +1227,8 @@ public class NamingContextListener
 
     /**
      * Set the specified resources in the naming context.
+     *
+     * @param name the name of the resource which should be removed
      */
     public void removeResource(String name) {
 
@@ -1224,6 +1248,8 @@ public class NamingContextListener
 
     /**
      * Set the specified resources in the naming context.
+     *
+     * @param name the name of the resource reference which should be removed
      */
     public void removeResourceEnvRef(String name) {
 
@@ -1238,6 +1264,8 @@ public class NamingContextListener
 
     /**
      * Set the specified resources in the naming context.
+     *
+     * @param name the name of the resource link which should be removed
      */
     public void removeResourceLink(String name) {
 
