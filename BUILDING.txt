@@ -387,57 +387,62 @@ For example:
 
         junit.formatter.usefile=false
 
- 5. Optional support is provided for the Cobertura code coverage tool. It
- can be enabled using the following property:
+ 5. It is possible to speed up testing by letting JUnit to run several
+ tests in parallel.
+
+ This is configured by setting "test.threads" property. The recommended
+ value is one thread per core.
+
+ 6. Optional support is provided for the Cobertura code coverage tool.
+
+NOTE: Cobertura is licensed under GPL v2 with parts of it being under
+      Apache License v1.1. See http://cobertura.sf.net for details. Using it
+      during Tomcat build is optional and is off by default.
+
+ Cobertura can be enabled using the following properties:
 
         test.cobertura=true
+        test.threads=1
+
+ Using Cobertura currently requires setting test.threads configuration
+ property to the value of 1. Setting that property to a different value
+ will disable code coverage.
 
  The report files by default are written to
 
         output/coverage
 
-* NOTE: Cobertura is licensed under GPL v2 with parts of it being under
-  Apache License v1.1. See http://cobertura.sf.net for details. Using it
-  during Tomcat build is optional and is off by default.
-
- 6. The performance tests are written to run reasonably powerful machines (such
+ 7. The performance tests are written to run reasonably powerful machines (such
     as a developer may use day to day) assuming no other resource hungry
-    processes are running. These assumptions are not always true (e.g. on CI
-    systems running in a virtual machine) so the performance tests may be
-    disabled by using the following property:
+    processes are running.
+
+    These assumptions are not always true (e.g. on CI systems running in a
+    virtual machine) so the performance tests may be disabled by using the
+    following property:
 
         test.excludePerformance=true
 
- 7. Some tests include checks that the access log valve entries are as expected.
+ 8. Some tests include checks that the access log valve entries are as expected.
     These checks include timings. On slower / loaded systems these checks will
     often fail. The checks may be relaxed by using the following property:
 
         test.relaxTiming=true
 
- 8. It is known that some platforms (e.g. OSX El Capitan) require IPv4 to
+ 9. It is known that some platforms (e.g. OSX El Capitan) require IPv4 to
     be the default for the multicast tests to work. This is configured by
     the following property:
 
         java.net.preferIPv4Stack=true
 
- 9. Optional support is provided for FindBugs. It can be enabled using the
-    following property:
-
-        execute.findbugs=true
-
-    The report file by default is written to
-
-        output/findbugs
-
-* NOTE: Findbugs is licensed under LGPL. Using Findbugs during Tomcat build is
-  optional and is off by default.
 
 (8) Source code checks
 
 (8.1) Checkstyle
 
-* NOTE: Checkstyle is licensed under LGPL. Using Checkstyle during Tomcat
-  build is optional and is off by default.
+NOTE: Checkstyle is licensed under LGPL. Using Checkstyle during Tomcat
+      build is optional and is off by default.
+
+      See http://checkstyle.sourceforge.net/ for more information.
 
 Tomcat comes with a Checkstyle configuration that tests its source code
 for certain conventions, like presence of the license header.
@@ -454,14 +459,36 @@ is located in the following directory:
 
     output/res/checkstyle
 
-It is possible to run the check separately by invoking the "validate"
+It is possible to run the check separately by calling the "validate"
 target. The command is:
 
     cd ${tomcat.source}
     ant -Dexecute.validate=true validate
 
 
-(8.2) End-of-line conventions check
+(8.2) FindBugs
+
+NOTE: FindBugs is licensed under LGPL. Using Findbugs during Tomcat build is
+      optional and is off by default.
+
+      See http://findbugs.sourceforge.net/ for more information.
+
+To enable FindBugs, add the following property to build.properties file:
+
+    execute.findbugs=true
+
+To compile Tomcat classes and generate a FindBugs report, call the
+"findbugs" target. For example:
+
+    cd ${tomcat.source}
+    ant -Dexecute.findbugs=true findbugs
+
+The report file by default is written to
+
+    output/findbugs
+
+
+(8.3) End-of-line conventions check
 
 You usually would not need to run this check. You can skip this section.
 

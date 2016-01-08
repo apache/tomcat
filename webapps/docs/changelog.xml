@@ -297,6 +297,9 @@
         path when referencing contexts deployed using parallel deployment.
         (markt)
       </fix>
+      <add>
+        Document <code>test.threads</code> option in BUILDING.txt. (kkolinko)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">
