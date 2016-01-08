@@ -182,7 +182,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
 
     /**
      * Set the container with which the naming resources are associated.
-     * @param container the associated with the resources 
+     * @param container the associated with the resources
      */
     public void setContainer(Object container) {
         this.container = container;
