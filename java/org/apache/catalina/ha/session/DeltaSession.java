@@ -128,8 +128,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
     /**
      * Returns a diff and sets the dirty map to false
-     * @return byte[]
-     * @throws IOException
+     * @return a serialized view of the difference
+     * @throws IOException IO error serializing
      */
     @Override
     public byte[] getDiff() throws IOException {
@@ -153,10 +153,10 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
 
     /**
      * Applies a diff to an existing object.
-     * @param diff byte[]
-     * @param offset int
-     * @param length int
-     * @throws IOException
+     * @param diff Serialized diff data
+     * @param offset Array offset
+     * @param length Array length
+     * @throws IOException IO error deserializing
      */
     @Override
     public void applyDiff(byte[] diff, int offset, int length) throws IOException, ClassNotFoundException {

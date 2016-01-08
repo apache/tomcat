@@ -333,9 +333,8 @@ public class FileMessageFactory {
      * asked to do. Invoked by readMessage/writeMessage before those methods
      * proceed.
      *
-     * @param openForWrite
-     *            boolean
-     * @throws IllegalArgumentException
+     * @param openForWrite The value to check
+     * @throws IllegalArgumentException if the state is not the expected one
      */
     protected void checkState(boolean openForWrite)
             throws IllegalArgumentException {
@@ -360,7 +359,7 @@ public class FileMessageFactory {
      * @param args
      *            String[], args[0] - read from filename, args[1] write to
      *            filename
-     * @throws Exception
+     * @throws Exception An error occurred
      */
     public static void main(String[] args) throws Exception {
 

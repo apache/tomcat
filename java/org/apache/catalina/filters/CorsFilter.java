@@ -202,14 +202,11 @@ public final class CorsFilter extends GenericFilter {
     /**
      * Handles a CORS request of type {@link CORSRequestType}.SIMPLE.
      *
-     * @param request
-     *            The {@link HttpServletRequest} object.
-     * @param response
-     *            The {@link HttpServletResponse} object.
-     * @param filterChain
-     *            The {@link FilterChain} object.
-     * @throws IOException
-     * @throws ServletException
+     * @param request The {@link HttpServletRequest} object.
+     * @param response The {@link HttpServletResponse} object.
+     * @param filterChain The {@link FilterChain} object.
+     * @throws IOException an IO error occurred
+     * @throws ServletException Servlet error propagation
      * @see <a href="http://www.w3.org/TR/cors/#resource-requests">Simple
      *      Cross-Origin Request, Actual Request, and Redirects</a>
      */
@@ -288,14 +285,11 @@ public final class CorsFilter extends GenericFilter {
     /**
      * Handles CORS pre-flight request.
      *
-     * @param request
-     *            The {@link HttpServletRequest} object.
-     * @param response
-     *            The {@link HttpServletResponse} object.
-     * @param filterChain
-     *            The {@link FilterChain} object.
-     * @throws IOException
-     * @throws ServletException
+     * @param request The {@link HttpServletRequest} object.
+     * @param response The {@link HttpServletResponse} object.
+     * @param filterChain The {@link FilterChain} object.
+     * @throws IOException an IO error occurred
+     * @throws ServletException Servlet error propagation
      */
     protected void handlePreflightCORS(final HttpServletRequest request,
             final HttpServletResponse response, final FilterChain filterChain)
@@ -403,14 +397,11 @@ public final class CorsFilter extends GenericFilter {
      * it is not a cross-origin request. This implementation, just forwards the
      * request down the filter chain.
      *
-     * @param request
-     *            The {@link HttpServletRequest} object.
-     * @param response
-     *            The {@link HttpServletResponse} object.
-     * @param filterChain
-     *            The {@link FilterChain} object.
-     * @throws IOException
-     * @throws ServletException
+     * @param request The {@link HttpServletRequest} object.
+     * @param response The {@link HttpServletResponse} object.
+     * @param filterChain The {@link FilterChain} object.
+     * @throws IOException an IO error occurred
+     * @throws ServletException Servlet error propagation
      */
     private void handleNonCORS(final HttpServletRequest request,
             final HttpServletResponse response, final FilterChain filterChain)
@@ -423,12 +414,9 @@ public final class CorsFilter extends GenericFilter {
     /**
      * Handles a CORS request that violates specification.
      *
-     * @param request
-     *            The {@link HttpServletRequest} object.
-     * @param response
-     *            The {@link HttpServletResponse} object.
-     * @param filterChain
-     *            The {@link FilterChain} object.
+     * @param request The {@link HttpServletRequest} object.
+     * @param response The {@link HttpServletResponse} object.
+     * @param filterChain The {@link FilterChain} object.
      */
     private void handleInvalidCORS(final HttpServletRequest request,
             final HttpServletResponse response, final FilterChain filterChain) {
@@ -471,10 +459,8 @@ public final class CorsFilter extends GenericFilter {
      * 'Access-Control-Request-Headers' header, for pre-flight request.</li>
      * </ul>
      *
-     * @param request
-     *            The {@link HttpServletRequest} object.
-     * @param corsRequestType
-     *            The {@link CORSRequestType} object.
+     * @param request The {@link HttpServletRequest} object.
+     * @param corsRequestType The {@link CORSRequestType} object.
      */
     protected static void decorateCORSProperties(
             final HttpServletRequest request,
@@ -543,10 +529,8 @@ public final class CorsFilter extends GenericFilter {
      * Joins elements of {@link Set} into a string, where each element is
      * separated by the provided separator.
      *
-     * @param elements
-     *            The {@link Set} containing elements to join together.
-     * @param joinSeparator
-     *            The character to be used for separating elements.
+     * @param elements The {@link Set} containing elements to join together.
+     * @param joinSeparator The character to be used for separating elements.
      * @return The joined {@link String}; <code>null</code> if elements
      *         {@link Set} is null.
      */
@@ -580,7 +564,8 @@ public final class CorsFilter extends GenericFilter {
     /**
      * Determines the request type.
      *
-     * @param request
+     * @param request The HTTP Servlet request
+     * @return the CORS type
      */
     protected CORSRequestType checkRequestType(final HttpServletRequest request) {
         CORSRequestType requestType = CORSRequestType.INVALID_CORS;
@@ -668,7 +653,7 @@ public final class CorsFilter extends GenericFilter {
     }
 
 
-    /*
+    /**
      * Return the lower case, trimmed value of the media type from the content
      * type.
      */
@@ -826,7 +811,8 @@ public final class CorsFilter extends GenericFilter {
      * <li>Origin should be a valid {@link URI}</li>
      * </ul>
      *
-     * @param origin
+     * @param origin The origin URI
+     * @return <code>true</code> if the origin was valid
      * @see <a href="http://tools.ietf.org/html/rfc952">RFC952</a>
      */
     protected static boolean isValidOrigin(String origin) {

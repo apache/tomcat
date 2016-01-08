@@ -1563,7 +1563,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
 
     /**
-     * Return the <code>isValid</code> flag for this session without any expiration
+     * @return the <code>isValid</code> flag for this session without any expiration
      * check.
      */
     protected boolean isValidInternal() {
@@ -1721,6 +1721,8 @@ public class StandardSession implements HttpSession, Session, Serializable {
     /**
      * Exclude standard attributes that cannot be serialized.
      * @param name the attribute's name
+     * @return <code>true</code> if the specified attribute should be
+     *    excluded from serialization
      */
     protected boolean exclude(String name){
 
@@ -1760,7 +1762,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
 
     /**
-     * Return the names of all currently defined session attributes
+     * @return the names of all currently defined session attributes
      * as an array of Strings.  If there are no defined attributes, a
      * zero-length array is returned.
      */

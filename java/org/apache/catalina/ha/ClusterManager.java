@@ -70,7 +70,7 @@ public interface ClusterManager extends Manager {
 
    /**
     * Set the name of the manager, at host /context name and at engine hostname+/context
-    * @param name
+    * @param name The manager name
     * @since 5.5.10
     */
    public void setName(String name);
