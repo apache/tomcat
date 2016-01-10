@@ -2967,7 +2967,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <copy file="${tomcat.home}/res/ide-support/eclipse/org.eclipse.jdt.core.prefs.properties" tofile="${tomcat.home}/.settings/org.eclipse.jdt.core.prefs"/>
 
     <echo>Eclipse project files created.
-Read the Building page on the Apache Tomcat documentation site for details on how to configure your Eclipse workplace.</echo>
+Read the Building page on the Apache Tomcat documentation site for details on how to configure your Eclipse workspace.</echo>
   </target>
 
   <target name="ide-eclipse-websocket"
@@ -2984,7 +2984,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     <copy file="${tomcat.home}/res/ide-support/eclipse/org.eclipse.jdt.core.prefs-websocket.properties" tofile="${projectLocation}/.settings/org.eclipse.jdt.core.prefs"/>
 
     <echo>Eclipse project files created at "${projectLocation}".
-Read the Building page on the Apache Tomcat documentation site for details on how to configure your Eclipse workplace.</echo>
+Read the Building page on the Apache Tomcat documentation site for details on how to configure your Eclipse workspace.</echo>
   </target>
 
   <!-- ======================= Macros, Taskdefs etc ======================== -->
