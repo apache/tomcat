@@ -25,7 +25,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLEngine;
@@ -84,10 +84,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     private final long aprPool;
+    private final AtomicInteger aprPoolDestroyed = new AtomicInteger(0);
+
     protected final long ctx;
 
-    private static final AtomicIntegerFieldUpdater<OpenSSLContext> DESTROY_UPDATER
-            = AtomicIntegerFieldUpdater.newUpdater(OpenSSLContext.class, "aprPoolDestroyed");
     static final CertificateFactory X509_CERT_FACTORY;
 
     private static final String BEGIN_KEY = "-----BEGIN RSA PRIVATE KEY-----\n";
@@ -171,7 +171,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     @Override
     public synchronized void destroy() {
         // Guard against multiple destroyPools() calls triggered by construction exception and finalize() later
-        if (DESTROY_UPDATER.compareAndSet(this, 0, 1)) {
+        if (aprPoolDestroyed.compareAndSet(0, 1)) {
             if (ctx != 0) {
                 SSLContext.free(ctx);
             }
