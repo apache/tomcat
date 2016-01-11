@@ -27,11 +27,12 @@ public class TesterBug50640SslImpl extends JSSEImplementation {
 
 
     @Override
-    public SSLUtil getSSLUtil(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
+    public SSLUtil getSSLUtil(SSLHostConfigCertificate certificate) {
+        SSLHostConfig sslHostConfig = certificate.getSSLHostConfig();
         if (sslHostConfig.getProtocols().size() == 1 &&
                 sslHostConfig.getProtocols().contains(PROPERTY_VALUE)) {
             sslHostConfig.setProtocols("TLSv1,TLSv1.1,TLSv1.2");
-            return super.getSSLUtil(sslHostConfig, certificate);
+            return super.getSSLUtil(certificate);
         } else {
             return null;
         }

@@ -78,6 +78,11 @@ public class SSLHostConfigCertificate {
 
     // Common
 
+    public SSLHostConfig getSSLHostConfig() {
+        return sslHostConfig;
+    }
+
+
     public Type getType() {
         return type;
     }

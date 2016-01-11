@@ -57,7 +57,7 @@ import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
-import org.apache.tomcat.util.net.SSLUtil;
+import org.apache.tomcat.util.net.SSLUtilBase;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -69,20 +69,19 @@ import org.apache.tomcat.util.res.StringManager;
  * @author EKR
  * @author Jan Luehe
  */
-public class JSSEUtil implements SSLUtil {
+public class JSSEUtil extends SSLUtilBase {
 
     private static final Log log = LogFactory.getLog(JSSEUtil.class);
     private static final StringManager sm = StringManager.getManager(JSSEUtil.class);
 
     private final SSLHostConfig sslHostConfig;
-    private final SSLHostConfigCertificate certificate;
 
     private final String[] defaultServerProtocols;
 
 
-    public JSSEUtil (SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
-        this.sslHostConfig = sslHostConfig;
-        this.certificate = certificate;
+    public JSSEUtil (SSLHostConfigCertificate certificate) {
+        super(certificate);
+        this.sslHostConfig = certificate.getSSLHostConfig();
 
         SSLContext context;
         try {
