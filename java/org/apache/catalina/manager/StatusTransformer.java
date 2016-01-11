@@ -132,9 +132,6 @@ public class StatusTransformer {
     }
 
 
-    /**
-     *
-     */
     public static void writeFooter(PrintWriter writer, int mode) {
         if (mode == 0){
             // HTML Tail Section
@@ -146,8 +143,11 @@ public class StatusTransformer {
 
 
     /**
-     * Write the OS state. Mode 0 will generate HTML.
-     * Mode 1 will generate XML.
+     * Write the OS state.
+     *
+     * @param writer The output writer
+     * @param mode Mode <code>0</code> will generate HTML.
+     *   Mode <code>1</code> will generate XML.
      */
     public static void writeOSState(PrintWriter writer, int mode) {
         long[] result = new long[16];
@@ -197,8 +197,11 @@ public class StatusTransformer {
 
 
     /**
-     * Write the VM state. Mode 0 will generate HTML.
-     * Mode 1 will generate XML.
+     * Write the VM state.
+     * @param writer The output writer
+     * @param mode Mode <code>0</code> will generate HTML.
+     *   Mode <code>1</code> will generate XML.
+     * @throws Exception Propagated JMX error
      */
     public static void writeVMState(PrintWriter writer, int mode)
         throws Exception {
@@ -273,6 +276,15 @@ public class StatusTransformer {
 
     /**
      * Write connector state.
+     * @param writer The output writer
+     * @param tpName MBean name of the thread pool
+     * @param name Connector name
+     * @param mBeanServer MBean server
+     * @param globalRequestProcessors MBean names for the global request processors
+     * @param requestProcessors MBean names for the request processors
+     * @param mode Mode <code>0</code> will generate HTML.
+     *   Mode <code>1</code> will generate XML.
+     * @throws Exception Propagated JMX error
      */
     public static void writeConnectorState(PrintWriter writer,
             ObjectName tpName, String name, MBeanServer mBeanServer,
@@ -401,6 +413,12 @@ public class StatusTransformer {
 
     /**
      * Write processor state.
+     * @param writer The output writer
+     * @param pName MBean name of the processor
+     * @param  mBeanServer MBean server
+     * @param mode Mode <code>0</code> will generate HTML.
+     *   Mode <code>1</code> will generate XML.
+     * @throws Exception Propagated JMX error
      */
     protected static void writeProcessorState(PrintWriter writer,
                                               ObjectName pName,
@@ -591,6 +609,11 @@ public class StatusTransformer {
 
     /**
      * Write applications state.
+     * @param writer The output writer
+     * @param mBeanServer MBean server
+     * @param mode Mode <code>0</code> will generate HTML.
+     *   Mode <code>1</code> will generate XML.
+     * @throws Exception Propagated JMX error
      */
     public static void writeDetailedState(PrintWriter writer,
                                           MBeanServer mBeanServer, int mode)
@@ -649,6 +672,12 @@ public class StatusTransformer {
 
     /**
      * Write context state.
+     * @param writer The output writer
+     * @param objectName The context MBean name
+     * @param mBeanServer MBean server
+     * @param mode Mode <code>0</code> will generate HTML.
+     *   Mode <code>1</code> will generate XML.
+     * @throws Exception Propagated JMX error
      */
     protected static void writeContext(PrintWriter writer,
                                        ObjectName objectName,
@@ -741,6 +770,12 @@ public class StatusTransformer {
 
     /**
      * Write detailed information about a manager.
+     * @param writer The output writer
+     * @param objectName The manager MBean name
+     * @param mBeanServer MBean server
+     * @param mode Mode <code>0</code> will generate HTML.
+     *   Mode <code>1</code> will generate XML.
+     * @throws Exception Propagated JMX error
      */
     public static void writeManager(PrintWriter writer, ObjectName objectName,
                                     MBeanServer mBeanServer, int mode)
@@ -782,6 +817,12 @@ public class StatusTransformer {
 
     /**
      * Write JSP monitoring information.
+     * @param writer The output writer
+     * @param jspMonitorONs The JSP MBean names
+     * @param mBeanServer MBean server
+     * @param mode Mode <code>0</code> will generate HTML.
+     *   Mode <code>1</code> will generate XML.
+     * @throws Exception Propagated JMX error
      */
     public static void writeJspMonitor(PrintWriter writer,
                                        Set<ObjectName> jspMonitorONs,
@@ -815,6 +856,12 @@ public class StatusTransformer {
 
     /**
      * Write detailed information about a wrapper.
+     * @param writer The output writer
+     * @param objectName The wrapper MBean names
+     * @param mBeanServer MBean server
+     * @param mode Mode <code>0</code> will generate HTML.
+     *   Mode <code>1</code> will generate XML.
+     * @throws Exception Propagated JMX error
      */
     public static void writeWrapper(PrintWriter writer, ObjectName objectName,
                                     MBeanServer mBeanServer, int mode)
@@ -871,6 +918,7 @@ public class StatusTransformer {
      * codes in the request URL that is often reported in error messages.
      *
      * @param obj The message string to be filtered
+     * @return filtered HTML content
      */
     public static String filter(Object obj) {
 
@@ -907,7 +955,9 @@ public class StatusTransformer {
     /**
      * Display the given size in bytes, either as KB or MB.
      *
+     * @param obj The object to format
      * @param mb true to display megabytes, false for kilobytes
+     * @return formatted size
      */
     public static String formatSize(Object obj, boolean mb) {
 
@@ -944,7 +994,9 @@ public class StatusTransformer {
     /**
      * Display the given time in ms, either as ms or s.
      *
+     * @param obj The object to format
      * @param seconds true to display seconds, false for milliseconds
+     * @return formatted time
      */
     public static String formatTime(Object obj, boolean seconds) {
 
@@ -968,8 +1020,7 @@ public class StatusTransformer {
      * Formats the given time (given in seconds) as a string.
      *
      * @param obj Time object to be formatted as string
-     *
-     * @return String formatted time
+     * @return formatted time
      */
     public static String formatSeconds(Object obj) {
 

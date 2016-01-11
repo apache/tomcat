@@ -496,6 +496,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      * Get the instance handle of the object against which we execute
      * all methods in this ModelMBean management interface.
      *
+     * @return the backend managed object
      * @exception InstanceNotFoundException if the managed resource object
      *  cannot be found
      * @exception InvalidTargetObjectTypeException if the managed resource

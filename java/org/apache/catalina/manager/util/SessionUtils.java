@@ -71,8 +71,8 @@ public class SessionUtils {
      * Try to get user locale from the session, if possible.
      * IMPLEMENTATION NOTE: this method has explicit support for Tapestry 3, Struts 1.x and Spring
      * JSF check the browser meta tag "accept languages" to choose what language to display.
-     * @param in_session
-     * @return String
+     * @param in_session The session
+     * @return the locale
      */
     public static Locale guessLocaleFromSession(final Session in_session) {
         return guessLocaleFromSession(in_session.getSession());
@@ -163,8 +163,8 @@ public class SessionUtils {
 
     /**
      * Try to get user from the session, if possible.
-     * @param in_session
-     * @return Object
+     * @param in_session The session
+     * @return the user
      */
     public static Object guessUserFromSession(final Session in_session) {
         if (null == in_session) {
