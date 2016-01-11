@@ -347,7 +347,7 @@
         Update optional Checkstyle library to 6.14.1. (kkolinko)
       </update>
       <update>
-        Update the packaged version of the Tomcat Native Library to 1.2.3 to
+        Update the packaged version of the Tomcat Native Library to 1.2.4 to
         pick up the Windows binaries that are based on OpenSSL 1.0.2e and APR
         1.5.1. (markt)
       </update>
