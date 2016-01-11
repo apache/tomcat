@@ -41,11 +41,6 @@ public class JSSEImplementation extends SSLImplementation {
     }
 
     @Override
-    public String getImplementationName(){
-        return "JSSE";
-    }
-
-    @Override
     public SSLSupport getSSLSupport(SSLSession session) {
         return new JSSESupport(session);
     }
