@@ -47,6 +47,6 @@ public class JSSEImplementation extends SSLImplementation {
 
     @Override
     public SSLUtil getSSLUtil(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
-        return new JSSESocketFactory(sslHostConfig, certificate);
+        return new JSSEUtil(sslHostConfig, certificate);
     }
 }
