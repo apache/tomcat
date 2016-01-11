@@ -61,21 +61,18 @@ import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * SSL server socket factory. It <b>requires</b> a valid RSA key and
- * JSSE.<br>
- * keytool -genkey -alias tomcat -keyalg RSA<br>
- * Use "changeit" as password (this is the default we use).
+ * SSLUtil implementation for JSSE.
  *
  * @author Harish Prabandham
  * @author Costin Manolache
  * @author Stefan Freyr Stefansson
- * @author EKR -- renamed to JSSESocketFactory
+ * @author EKR
  * @author Jan Luehe
  */
-public class JSSESocketFactory implements SSLUtil {
+public class JSSEUtil implements SSLUtil {
 
-    private static final Log log = LogFactory.getLog(JSSESocketFactory.class);
-    private static final StringManager sm = StringManager.getManager(JSSESocketFactory.class);
+    private static final Log log = LogFactory.getLog(JSSEUtil.class);
+    private static final StringManager sm = StringManager.getManager(JSSEUtil.class);
 
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
@@ -83,7 +80,7 @@ public class JSSESocketFactory implements SSLUtil {
     private final String[] defaultServerProtocols;
 
 
-    public JSSESocketFactory (SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
+    public JSSEUtil (SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
         this.sslHostConfig = sslHostConfig;
         this.certificate = certificate;
 

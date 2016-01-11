@@ -26,13 +26,13 @@ import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLUtil;
-import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
+import org.apache.tomcat.util.net.jsse.JSSEUtil;
 
 public class OpenSSLUtil implements SSLUtil {
 
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
-    private final JSSESocketFactory jsseUtil;
+    private final JSSEUtil jsseUtil;
 
     private String[] enabledProtocols = null;
     private String[] enabledCiphers = null;
@@ -42,7 +42,7 @@ public class OpenSSLUtil implements SSLUtil {
         this.certificate = certificate;
         if (certificate.getCertificateFile() == null) {
             // Using JSSE configuration for keystore and truststore
-            jsseUtil = new JSSESocketFactory(sslHostConfig, certificate);
+            jsseUtil = new JSSEUtil(sslHostConfig, certificate);
         } else {
             // Use OpenSSL configuration for certificates
             jsseUtil = null;
