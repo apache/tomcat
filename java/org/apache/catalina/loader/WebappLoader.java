@@ -222,7 +222,7 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     /**
-     * Return the ClassLoader class name.
+     * @return the ClassLoader class name.
      */
     public String getLoaderClass() {
         return (this.loaderClass);

@@ -65,8 +65,8 @@ public class JspHelper {
 
     /**
      * Try to get user name from the session, if possible.
-     * @param in_session
-     * @return String
+     * @param in_session The Servlet session
+     * @return the user name
      */
     public static String guessDisplayUserFromSession(Session in_session) {
         Object user = SessionUtils.guessUserFromSession(in_session);
@@ -202,6 +202,8 @@ public class JspHelper {
      *    ' -&gt; &amp;#039;
      *
      * See also OutSupport.writeEscapedXml().
+     * @param buffer The XML to escape
+     * @return the escaped XML
      */
     @SuppressWarnings("null") // escapedBuffer cannot be null
     public static String escapeXml(String buffer) {
