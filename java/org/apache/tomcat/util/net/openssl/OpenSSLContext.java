@@ -86,8 +86,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private final long aprPool;
     protected final long ctx;
 
-    @SuppressWarnings("unused")
-    private volatile int aprPoolDestroyed;
     private static final AtomicIntegerFieldUpdater<OpenSSLContext> DESTROY_UPDATER
             = AtomicIntegerFieldUpdater.newUpdater(OpenSSLContext.class, "aprPoolDestroyed");
     static final CertificateFactory X509_CERT_FACTORY;
