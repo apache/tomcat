@@ -22,6 +22,11 @@ import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
 
+/**
+ * Provides a common interface for {@link SSLImplementation}s to create the
+ * necessary JSSE implementation objects for TLS connections created via the
+ * JSSE API.
+ */
 public interface SSLUtil {
 
     public SSLContext createSSLContext(List<String> negotiableProtocols) throws Exception;
@@ -60,6 +65,11 @@ public interface SSLUtil {
      */
     public String[] getEnableableProtocols(SSLContext context);
 
+    /**
+     * Optional interface that can be implemented by
+     * {@link javax.net.ssl.SSLEngine}s to indicate that they support ALPN and
+     * can provided the protocol agreed with the client.
+     */
     public interface ProtocolInfo {
         /**
          * ALPN information.
