@@ -25,24 +25,22 @@ import javax.net.ssl.TrustManager;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
-import org.apache.tomcat.util.net.SSLUtil;
+import org.apache.tomcat.util.net.SSLUtilBase;
 import org.apache.tomcat.util.net.jsse.JSSEUtil;
 
-public class OpenSSLUtil implements SSLUtil {
+public class OpenSSLUtil extends SSLUtilBase {
 
-    private final SSLHostConfig sslHostConfig;
-    private final SSLHostConfigCertificate certificate;
     private final JSSEUtil jsseUtil;
 
     private String[] enabledProtocols = null;
     private String[] enabledCiphers = null;
 
-    public OpenSSLUtil(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
-        this.sslHostConfig = sslHostConfig;
-        this.certificate = certificate;
+    public OpenSSLUtil(SSLHostConfigCertificate certificate) {
+        super(certificate);
+
         if (certificate.getCertificateFile() == null) {
             // Using JSSE configuration for keystore and truststore
-            jsseUtil = new JSSEUtil(sslHostConfig, certificate);
+            jsseUtil = new JSSEUtil(certificate);
         } else {
             // Use OpenSSL configuration for certificates
             jsseUtil = null;
@@ -51,7 +49,7 @@ public class OpenSSLUtil implements SSLUtil {
 
     @Override
     public SSLContext createSSLContext(List<String> negotiableProtocols) throws Exception {
-        return new OpenSSLContext(sslHostConfig, certificate, negotiableProtocols);
+        return new OpenSSLContext(certificate, negotiableProtocols);
     }
 
     @Override

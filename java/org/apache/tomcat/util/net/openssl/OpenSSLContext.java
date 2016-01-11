@@ -103,9 +103,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
-    public OpenSSLContext(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate, List<String> negotiableProtocols)
+    public OpenSSLContext(SSLHostConfigCertificate certificate, List<String> negotiableProtocols)
             throws SSLException {
-        this.sslHostConfig = sslHostConfig;
+        this.sslHostConfig = certificate.getSSLHostConfig();
         this.certificate = certificate;
         aprPool = Pool.create(0);
         boolean success = false;
