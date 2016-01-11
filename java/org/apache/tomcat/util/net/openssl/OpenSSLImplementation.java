@@ -27,13 +27,6 @@ import org.apache.tomcat.util.net.jsse.JSSESupport;
 
 public class OpenSSLImplementation extends SSLImplementation {
 
-    public static final String IMPLEMENTATION_NAME = "org.apache.tomcat.util.net.openssl.OpenSSLImplementation";
-
-    @Override
-    public String getImplementationName() {
-        return "OpenSSl";
-    }
-
     @Override
     public SSLSupport getSSLSupport(SSLSession session) {
         return new JSSESupport(session);

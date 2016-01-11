@@ -35,22 +35,11 @@ public abstract class SSLImplementation {
     private static final StringManager sm = StringManager.getManager(SSLImplementation.class);
 
     /**
-     * Obtain an instance (not a singleton) of the default implementation.
-     * Currently, this is the standard JSSE implementation that ships as part of
-     * the JRE. Tomcat also provides an OpenSSL based implementation.
-     *
-     * @return The default implementation
-     */
-    public static SSLImplementation getInstance() {
-        return new JSSEImplementation();
-    }
-
-
-    /**
      * Obtain an instance (not a singleton) of the implementation with the given
      * class name.
      *
-     * @param className The class name of the required implementation
+     * @param className The class name of the required implementation or null to
+     *                  use the default (currently {@link JSSEImplementation}.
      *
      * @return An instance of the required implementation
      *
@@ -60,7 +49,7 @@ public abstract class SSLImplementation {
     public static SSLImplementation getInstance(String className)
             throws ClassNotFoundException {
         if (className == null)
-            return getInstance();
+            return new JSSEImplementation();
 
         try {
             Class<?> clazz = Class.forName(className);
@@ -74,8 +63,6 @@ public abstract class SSLImplementation {
         }
     }
 
-
-    public abstract String getImplementationName();
 
     public abstract SSLSupport getSSLSupport(SSLSession session);
 

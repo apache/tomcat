@@ -64,7 +64,7 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
     @Override
     protected Type getSslConfigType() {
-        if (OpenSSLImplementation.IMPLEMENTATION_NAME.equals(sslImplementationName)) {
+        if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
             return SSLHostConfig.Type.EITHER;
         } else {
             return SSLHostConfig.Type.JSSE;
