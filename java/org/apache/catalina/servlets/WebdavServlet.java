@@ -2571,26 +2571,26 @@ public class WebdavServlet
 
 
         /**
-         * Return true if the lock has expired.
+         * @return true if the lock has expired.
          */
         public boolean hasExpired() {
-            return (System.currentTimeMillis() > expiresAt);
+            return System.currentTimeMillis() > expiresAt;
         }
 
 
         /**
-         * Return true if the lock is exclusive.
+         * @return true if the lock is exclusive.
          */
         public boolean isExclusive() {
-
-            return (scope.equals("exclusive"));
-
+            return scope.equals("exclusive");
         }
 
 
         /**
-         * Get an XML representation of this lock token. This method will
-         * append an XML fragment to the given XML writer.
+         * Get an XML representation of this lock token.
+         *
+         * @param generatedXML The XML write to which the fragment will be
+         *                     appended
          */
         public void toXML(XMLWriter generatedXML) {
 
