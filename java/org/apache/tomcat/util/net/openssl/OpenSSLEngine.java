@@ -68,7 +68,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private static final SSLException ENGINE_CLOSED = new SSLException(sm.getString("engine.engineClosed"));
     private static final SSLException ENCRYPTED_PACKET_OVERSIZED = new SSLException(sm.getString("engine.oversizedPacket"));
 
-    private static final Set<String> AVAILABLE_CIPHER_SUITES;
+    protected static final Set<String> AVAILABLE_CIPHER_SUITES;
 
     static {
         final Set<String> availableCipherSuites = new LinkedHashSet<>(128);
@@ -114,7 +114,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     // Protocols
     static final int VERIFY_DEPTH = 10;
 
-    private static final String[] SUPPORTED_PROTOCOLS = {
+    private static final String[] IMPLEMENTED_PROTOCOLS = {
         Constants.SSL_PROTO_SSLv2Hello,
         Constants.SSL_PROTO_SSLv2,
         Constants.SSL_PROTO_SSLv3,
@@ -122,8 +122,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         Constants.SSL_PROTO_TLSv1_1,
         Constants.SSL_PROTO_TLSv1_2
     };
-    private static final Set<String> SUPPORTED_PROTOCOLS_SET =
-            new HashSet<>(Arrays.asList(SUPPORTED_PROTOCOLS));
+    protected static final Set<String> IMPLEMENTED_PROTOCOLS_SET =
+            new HashSet<>(Arrays.asList(IMPLEMENTED_PROTOCOLS));
 
     // Header (5) + Data (2^14) + Compression (1024) + Encryption (1024) + MAC (20) + Padding (256)
     static final int MAX_ENCRYPTED_PACKET_LENGTH = MAX_CIPHERTEXT_LENGTH + 5 + 20 + 256;
@@ -746,7 +746,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public String[] getSupportedProtocols() {
-        return SUPPORTED_PROTOCOLS.clone();
+        return IMPLEMENTED_PROTOCOLS.clone();
     }
 
     @Override
@@ -790,7 +790,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         boolean tlsv1_1 = false;
         boolean tlsv1_2 = false;
         for (String p : protocols) {
-            if (!SUPPORTED_PROTOCOLS_SET.contains(p)) {
+            if (!IMPLEMENTED_PROTOCOLS_SET.contains(p)) {
                 throw new IllegalArgumentException(sm.getString("engine.unsupportedProtocol", p));
             }
             if (p.equals(Constants.SSL_PROTO_SSLv2)) {

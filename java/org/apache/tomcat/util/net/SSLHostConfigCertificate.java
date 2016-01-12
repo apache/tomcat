@@ -18,9 +18,7 @@ package org.apache.tomcat.util.net;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.apache.tomcat.util.net.AbstractJsseEndpoint.SSLContextWrapper;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 
 
@@ -36,7 +34,7 @@ public class SSLHostConfigCertificate {
     // OpenSSL can handle multiple certs in a single config so the reference to
     // the context is at the virtual host level. JSSE can't so the reference is
     // held here on the certificate.
-    private SSLContextWrapper sslContextWrapper;
+    private SSLContext sslContext;
 
     // Common
     private final SSLHostConfig sslHostConfig;
@@ -66,22 +64,22 @@ public class SSLHostConfigCertificate {
     }
 
 
-    public SSLContextWrapper getSslContextWrapper() {
-        return sslContextWrapper;
+    public SSLContext getSslContext() {
+        return sslContext;
     }
 
 
-    public void setSslContextWrapper(SSLContextWrapper sslContextWrapper) {
-        this.sslContextWrapper = sslContextWrapper;
+    public void setSslContext(SSLContext sslContext) {
+        this.sslContext = sslContext;
     }
 
-
-    // Common
 
     public SSLHostConfig getSSLHostConfig() {
         return sslHostConfig;
     }
 
+
+    // Common
 
     public Type getType() {
         return type;
@@ -195,17 +193,6 @@ public class SSLHostConfigCertificate {
 
     public String getCertificateKeyFile() {
         return certificateKeyFile;
-    }
-
-
-    public String[] getEnabledCiphers() {
-        SSLContextWrapper wrapper = getSslContextWrapper();
-        if (wrapper != null) {
-            return wrapper.getEnabledCiphers();
-        }
-
-        return sslHostConfig.getCipherList().stream().map(c -> c.toString()).
-                collect(Collectors.toList()).toArray(new String[0]);
     }
 
 

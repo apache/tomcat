@@ -33,11 +33,12 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.X509CertSelector;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.KeyManager;
@@ -54,6 +55,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.compat.JreVendor;
 import org.apache.tomcat.util.file.ConfigFileLoader;
+import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
@@ -74,18 +76,13 @@ public class JSSEUtil extends SSLUtilBase {
     private static final Log log = LogFactory.getLog(JSSEUtil.class);
     private static final StringManager sm = StringManager.getManager(JSSEUtil.class);
 
-    private final SSLHostConfig sslHostConfig;
+    private static final Set<String> implementedProtocols;
+    private static final Set<String> implementedCiphers;
 
-    private final String[] defaultServerProtocols;
-
-
-    public JSSEUtil (SSLHostConfigCertificate certificate) {
-        super(certificate);
-        this.sslHostConfig = certificate.getSSLHostConfig();
-
+    static {
         SSLContext context;
         try {
-            context = createSSLContext(null);
+            context = new JSSESSLContext(Constants.SSL_PROTO_TLS);
             context.init(null,  null,  null);
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             // This is fatal for the connector so throw an exception to prevent
@@ -96,83 +93,55 @@ public class JSSEUtil extends SSLUtilBase {
         // There is no standard way to determine the default protocols and
         // cipher suites so create a server socket to see what the defaults are
         SSLServerSocketFactory ssf = context.getServerSocketFactory();
-        SSLServerSocket socket;
-        try {
-            socket = (SSLServerSocket) ssf.createServerSocket();
-        } catch (IOException e) {
-            // This is very likely to be fatal but there is a slim chance that
-            // the JSSE implementation just doesn't like creating unbound
-            // sockets so allow the code to proceed.
-            defaultServerProtocols = new String[0];
-            log.warn(sm.getString("jsse.noDefaultProtocols", sslHostConfig.getHostName()));
-            return;
-        }
-
-        try {
+        implementedProtocols = new HashSet<>();
+        try (SSLServerSocket socket = (SSLServerSocket) ssf.createServerSocket()) {
             // Filter out all the SSL protocols (SSLv2 and SSLv3) from the
             // defaults
             // since they are no longer considered secure
-            List<String> filteredProtocols = new ArrayList<>();
             for (String protocol : socket.getEnabledProtocols()) {
                 if (protocol.toUpperCase(Locale.ENGLISH).contains("SSL")) {
                     log.debug(sm.getString("jsse.excludeDefaultProtocol", protocol));
                     continue;
                 }
-                filteredProtocols.add(protocol);
+                implementedProtocols.add(protocol);
             }
-            defaultServerProtocols =
-                    filteredProtocols.toArray(new String[filteredProtocols.size()]);
-            if (defaultServerProtocols.length == 0) {
-                log.warn(sm.getString("jsse.noDefaultProtocols", sslHostConfig.getHostName()));
-            }
-        } finally {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                log.warn(sm.getString("jsse.exceptionOnClose"), e);
-            }
+        } catch (IOException e) {
+            // This is very likely to be fatal but there is a slim chance that
+            // the JSSE implementation just doesn't like creating unbound
+            // sockets so allow the code to proceed.
+
         }
-    }
 
+        if (implementedProtocols.size() == 0) {
+            log.warn(sm.getString("jsse.noDefaultProtocols"));
+        }
 
-    @Override
-    public String[] getEnableableCiphers(SSLContext context) {
-        List<String> requestedCiphers = sslHostConfig.getJsseCipherNames();
-
-        List<String> ciphers = new ArrayList<>(requestedCiphers);
-        String[] supportedCipherSuiteArray = context.getSupportedSSLParameters().getCipherSuites();
+        String[] implementedCipherSuiteArray = context.getSupportedSSLParameters().getCipherSuites();
         // The IBM JRE will accept cipher suites names SSL_xxx or TLS_xxx but
         // only returns the SSL_xxx form for supported cipher suites. Therefore
         // need to filter the requested cipher suites using both forms with an
         // IBM JRE.
-        List<String> supportedCipherSuiteList;
         if (JreVendor.IS_IBM_JVM) {
-            supportedCipherSuiteList = new ArrayList<>(supportedCipherSuiteArray.length * 2);
-            for (String name : supportedCipherSuiteArray) {
-                supportedCipherSuiteList.add(name);
+            implementedCiphers = new HashSet<>(implementedCipherSuiteArray.length * 2);
+            for (String name : implementedCipherSuiteArray) {
+                implementedCiphers.add(name);
                 if (name.startsWith("SSL")) {
-                    supportedCipherSuiteList.add("TLS" + name.substring(3));
+                    implementedCiphers.add("TLS" + name.substring(3));
                 }
             }
         } else {
-            supportedCipherSuiteList = Arrays.asList(supportedCipherSuiteArray);
+            implementedCiphers = new HashSet<>(implementedCipherSuiteArray.length);
+            implementedCiphers.addAll(Arrays.asList(implementedCipherSuiteArray));
         }
-        ciphers.retainAll(supportedCipherSuiteList);
+    }
 
-        if (ciphers.isEmpty()) {
-            log.warn(sm.getString("jsse.requested_ciphers_not_supported",
-                    sslHostConfig.getCiphers()));
-        }
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("jsse.enableable_ciphers", ciphers));
-            if (ciphers.size() != requestedCiphers.size()) {
-                List<String> skipped = new ArrayList<>(requestedCiphers);
-                skipped.removeAll(ciphers);
-                log.debug(sm.getString("jsse.unsupported_ciphers", skipped));
-            }
-        }
 
-        return ciphers.toArray(new String[ciphers.size()]);
+    private final SSLHostConfig sslHostConfig;
+
+
+    public JSSEUtil (SSLHostConfigCertificate certificate) {
+        super(certificate);
+        this.sslHostConfig = certificate.getSSLHostConfig();
     }
 
 
@@ -259,6 +228,24 @@ public class JSSEUtil extends SSLUtilBase {
         }
 
         return ks;
+    }
+
+
+    @Override
+    protected Log getLog() {
+        return log;
+    }
+
+
+    @Override
+    protected Set<String> getImplementedProtocols() {
+        return implementedProtocols;
+    }
+
+
+    @Override
+    protected Set<String> getImplementedCiphers() {
+        return implementedCiphers;
     }
 
 
@@ -408,33 +395,5 @@ public class JSSEUtil extends SSLUtilBase {
             throw ce;
         }
         return crls;
-    }
-
-    @Override
-    public String[] getEnableableProtocols(SSLContext context) {
-        if (sslHostConfig.getProtocols().size() == 0) {
-            // JSSE fallback used if protocols=""
-            return defaultServerProtocols;
-        }
-
-        List<String> protocols = new ArrayList<>();
-        protocols.addAll(sslHostConfig.getProtocols());
-        protocols.retainAll(Arrays.asList(context.getSupportedSSLParameters()
-                .getProtocols()));
-
-        if (protocols.isEmpty()) {
-            log.warn(sm.getString("jsse.requested_protocols_not_supported",
-                    sslHostConfig.getProtocols()));
-        }
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("jsse.enableable_protocols", protocols));
-            if (protocols.size() != sslHostConfig.getProtocols().size()) {
-                List<String> skipped = new ArrayList<>();
-                skipped.addAll(sslHostConfig.getProtocols());
-                skipped.removeAll(protocols);
-                log.debug(sm.getString("jsse.unsupported_protocols", skipped));
-            }
-        }
-        return protocols.toArray(new String[protocols.size()]);
     }
 }

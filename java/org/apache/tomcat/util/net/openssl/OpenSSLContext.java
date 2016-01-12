@@ -120,7 +120,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (sslHostConfig.getProtocols().size() == 0) {
                 value = SSL.SSL_PROTOCOL_ALL;
             } else {
-                for (String protocol : sslHostConfig.getProtocols()) {
+                for (String protocol : sslHostConfig.getEnabledProtocols()) {
                     if (Constants.SSL_PROTO_SSLv2Hello.equalsIgnoreCase(protocol)) {
                         // NO-OP. OpenSSL always supports SSLv2Hello
                     } else if (Constants.SSL_PROTO_SSLv2.equalsIgnoreCase(protocol)) {

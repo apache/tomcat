@@ -70,10 +70,12 @@ public class SSLHostConfig {
 
     // Configuration properties
 
+    // Internal
+    private String[] enabledCiphers;
+    private String[] enabledProtocols;
     // Nested
     private SSLHostConfigCertificate defaultCertificate = null;
     private Set<SSLHostConfigCertificate> certificates = new HashSet<>(4);
-
     // Common
     private String certificateRevocationListFile;
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
@@ -157,6 +159,38 @@ public class SSLHostConfig {
                         name, getHostName(), configType, this.configType));
             }
         }
+    }
+
+
+    // ----------------------------------------------------- Internal properties
+
+    /**
+     * @see SSLUtil#getEnabledProtocols()
+     *
+     * @return The protocols enabled for this TLS virtual host
+     */
+    public String[] getEnabledProtocols() {
+        return enabledProtocols;
+    }
+
+
+    void setEnabledProtocols(String[] enabledProtocols) {
+        this.enabledProtocols = enabledProtocols;
+    }
+
+
+    /**
+     * @see SSLUtil#getEnabledCiphers()
+     *
+     * @return The ciphers enabled for this TLS virtual host
+     */
+    public String[] getEnabledCiphers() {
+        return enabledCiphers;
+    }
+
+
+    void setEnabledCiphers(String[] enabledCiphers) {
+        this.enabledCiphers = enabledCiphers;
     }
 
 
