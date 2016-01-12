@@ -82,7 +82,7 @@ public class UserMBean extends BaseModelMBean {
 
 
     /**
-     * Return the MBean Names of all groups this user is a member of.
+     * @return the MBean Names of all groups this user is a member of.
      */
     public String[] getGroups() {
 
@@ -109,7 +109,7 @@ public class UserMBean extends BaseModelMBean {
 
 
     /**
-     * Return the MBean Names of all roles assigned to this user.
+     * @return the MBean Names of all roles assigned to this user.
      */
     public String[] getRoles() {
 

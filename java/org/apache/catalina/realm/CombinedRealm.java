@@ -58,6 +58,7 @@ public class CombinedRealm extends RealmBase {
     /**
      * Add a realm to the list of realms that will be used to authenticate
      * users.
+     * @param theRealm realm which should be wrapped by the combined realm
      */
     public void addRealm(Realm theRealm) {
         realms.add(theRealm);
@@ -71,7 +72,7 @@ public class CombinedRealm extends RealmBase {
 
 
     /**
-     * Return the set of Realms that this Realm is wrapping
+     * @return the set of Realms that this Realm is wrapping
      */
     public ObjectName[] getRealms() {
         ObjectName[] result = new ObjectName[realms.size()];
@@ -85,7 +86,7 @@ public class CombinedRealm extends RealmBase {
     }
 
     /**
-     * Return the list of Realms contained by this Realm.
+     * @return the list of Realms contained by this Realm.
      */
     public Realm[] getNestedRealms() {
         return realms.toArray(new Realm[0]);
