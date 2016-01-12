@@ -128,14 +128,28 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
                 oindex++;
                 setProperty(pname + "Name", oname.toString());
                 if (isAttributebinding()) {
-                    bindAttributes(jmxServerConnection, resultproperty, pname, oname);
+                    bindAttributes(jmxServerConnection, pname, oname);
                 }
             }
         }
         return isError;
     }
 
-    protected void bindAttributes(MBeanServerConnection jmxServerConnection, String resultproperty, String pname, ObjectName oname) {
+    /**
+     * @param jmxServerConnection
+     * @param resultproperty
+     * @param pname
+     * @param oname
+     *
+     * @Deprecated Unused. Will be removed in Tomcat 9.0.x
+     */
+    @Deprecated
+    protected void bindAttributes(MBeanServerConnection jmxServerConnection,
+            String resultproperty, String pname, ObjectName oname) {
+        bindAttributes(jmxServerConnection, pname, oname);
+    }
+
+    protected void bindAttributes(MBeanServerConnection jmxServerConnection, String pname, ObjectName oname) {
         try {
             MBeanInfo minfo = jmxServerConnection.getMBeanInfo(oname);
             MBeanAttributeInfo attrs[] = minfo.getAttributes();
