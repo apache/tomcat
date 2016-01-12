@@ -363,7 +363,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     // Native fallback used if protocols=""
                     value = SSL.SSL_PROTOCOL_ALL;
                 } else {
-                    for (String protocol : sslHostConfig.getProtocols()) {
+                    for (String protocol : sslHostConfig.getEnabledProtocols()) {
                         if (Constants.SSL_PROTO_SSLv2Hello.equalsIgnoreCase(protocol)) {
                             // NO-OP. OpenSSL always supports SSLv2Hello
                         } else if (Constants.SSL_PROTO_SSLv2.equalsIgnoreCase(protocol)) {
@@ -377,9 +377,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         } else if (Constants.SSL_PROTO_TLSv1_2.equalsIgnoreCase(protocol)) {
                             value |= SSL.SSL_PROTOCOL_TLSV1_2;
                         } else {
-                            // Protocol not recognized, fail to start as it is safer than
-                            // continuing with the default which might enable more than the
-                            // is required
+                            // Should not happen since filtering to build
+                            // enabled protocols removes invalid values.
                             throw new Exception(sm.getString(
                                     "endpoint.apr.invalidSslProtocol", protocol));
                         }

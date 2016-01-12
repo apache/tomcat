@@ -77,8 +77,14 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
             sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
 
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
+                boolean firstCertificate = true;
                 for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
                     SSLUtil sslUtil = sslImplementation.getSSLUtil(certificate);
+                    if (firstCertificate) {
+                        firstCertificate = false;
+                        sslHostConfig.setEnabledProtocols(sslUtil.getEnabledProtocols());
+                        sslHostConfig.setEnabledCiphers(sslUtil.getEnabledCiphers());
+                    }
 
                     SSLContext sslContext = sslUtil.createSSLContext(negotiableProtocols);
                     sslContext.init(sslUtil.getKeyManagers(), sslUtil.getTrustManagers(), null);
@@ -87,8 +93,7 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
                     if (sessionContext != null) {
                         sslUtil.configureSessionContext(sessionContext);
                     }
-                    SSLContextWrapper sslContextWrapper = new SSLContextWrapper(sslContext, sslUtil);
-                    certificate.setSslContextWrapper(sslContextWrapper);
+                    certificate.setSslContext(sslContext);
                 }
             }
 
@@ -100,8 +105,8 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         if (isSSLEnabled()) {
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
                 for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
-                    if (certificate.getSslContextWrapper() != null) {
-                        SSLContext sslContext = certificate.getSslContextWrapper().getSSLContext();
+                    if (certificate.getSslContext() != null) {
+                        SSLContext sslContext = certificate.getSslContext();
                         if (sslContext != null) {
                             sslContext.destroy();
                         }
@@ -116,13 +121,13 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
         SSLHostConfigCertificate certificate = selectCertificate(sslHostConfig, clientRequestedCiphers);
 
-        SSLContextWrapper sslContextWrapper = certificate.getSslContextWrapper();
-        if (sslContextWrapper == null) {
+        SSLContext sslContext = certificate.getSslContext();
+        if (sslContext == null) {
             throw new IllegalStateException(
                     sm.getString("endpoint.jsse.noSslContext", sniHostName));
         }
 
-        SSLEngine engine = sslContextWrapper.getSSLContext().createSSLEngine();
+        SSLEngine engine = sslContext.createSSLEngine();
         switch (sslHostConfig.getCertificateVerification()) {
         case NONE:
             engine.setNeedClientAuth(false);
@@ -137,8 +142,8 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
             break;
         }
         engine.setUseClientMode(false);
-        engine.setEnabledCipherSuites(sslContextWrapper.getEnabledCiphers());
-        engine.setEnabledProtocols(sslContextWrapper.getEnabledProtocols());
+        engine.setEnabledCipherSuites(sslHostConfig.getEnabledCiphers());
+        engine.setEnabledProtocols(sslHostConfig.getEnabledProtocols());
 
         SSLParameters sslParameters = engine.getSSLParameters();
         sslParameters.setUseCipherSuitesOrder(sslHostConfig.getHonorCipherOrder());
@@ -188,27 +193,8 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
     public void unbind() throws Exception {
         for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
             for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
-                certificate.setSslContextWrapper(null);
+                certificate.setSslContext(null);
             }
         }
-    }
-
-
-    static class SSLContextWrapper {
-
-        private final SSLContext sslContext;
-        private final String[] enabledCiphers;
-        private final String[] enabledProtocols;
-
-        public SSLContextWrapper(SSLContext sslContext, SSLUtil sslUtil) {
-            this.sslContext = sslContext;
-            // Determine which cipher suites and protocols to enable
-            enabledCiphers = sslUtil.getEnableableCiphers(sslContext);
-            enabledProtocols = sslUtil.getEnableableProtocols(sslContext);
-        }
-
-        public SSLContext getSSLContext() { return sslContext;}
-        public String[] getEnabledCiphers() { return enabledCiphers; }
-        public String[] getEnabledProtocols() { return enabledProtocols; }
     }
 }

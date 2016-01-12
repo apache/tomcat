@@ -62,7 +62,6 @@ import org.apache.tomcat.util.Diagnostics;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.SSLHostConfig;
-import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -1707,16 +1706,13 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
                 for (SSLHostConfig sslHostConfig : sslHostConfigs) {
-                    for (SSLHostConfigCertificate cert : sslHostConfig.getCertificates()) {
-                        String name = connector.toString() + "-" + sslHostConfig.getHostName() +
-                                "-" + cert.getType();
-                        Set<String> cipherList = new HashSet<>();
-                        String[] cipherNames = cert.getEnabledCiphers();
-                        for (String cipherName : cipherNames) {
-                            cipherList.add(cipherName);
-                        }
-                        result.put(name, cipherList);
+                    String name = connector.toString() + "-" + sslHostConfig.getHostName();
+                    Set<String> cipherList = new HashSet<>();
+                    String[] cipherNames = sslHostConfig.getEnabledCiphers();
+                    for (String cipherName : cipherNames) {
+                        cipherList.add(cipherName);
                     }
+                result.put(name, cipherList);
                 }
             } else {
                 Set<String> cipherList = new HashSet<>();
