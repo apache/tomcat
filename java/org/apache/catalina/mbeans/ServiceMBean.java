@@ -45,7 +45,7 @@ public class ServiceMBean extends BaseModelMBean {
      * @param isAjp Create a AJP/1.3 Connector
      * @param isSSL Create a secure Connector
      *
-     * @throws MBeanException
+     * @throws MBeanException error creating the connector
      */
     public void addConnector(String address, int port, boolean isAjp, boolean isSSL) throws MBeanException {
 
@@ -75,7 +75,7 @@ public class ServiceMBean extends BaseModelMBean {
     /**
      * Adds a named executor to the service
      * @param type Classname of the Executor to be added
-     * @throws MBeanException
+     * @throws MBeanException error creating the executor
      */
     public void addExecutor(String type) throws MBeanException {
 
@@ -107,7 +107,8 @@ public class ServiceMBean extends BaseModelMBean {
 
     /**
      * Find and return the set of Connectors associated with this Service.
-     * @throws MBeanException
+     * @return an array of string representations of the connectors
+     * @throws MBeanException error accessing the associated service
      */
     public String[] findConnectors() throws MBeanException {
 
@@ -134,8 +135,9 @@ public class ServiceMBean extends BaseModelMBean {
     }
 
     /**
-     * Retrieves all executors
-     * @throws MBeanException
+     * Retrieves all executors.
+     * @return an array of string representations of the executors
+     * @throws MBeanException error accessing the associated service
      */
     public String[] findExecutors() throws MBeanException {
 
@@ -163,7 +165,8 @@ public class ServiceMBean extends BaseModelMBean {
     /**
      * Retrieves executor by name
      * @param name Name of the executor to be retrieved
-     * @throws MBeanException
+     * @return a string representation of the executor
+     * @throws MBeanException error accessing the associated service
      */
     public String getExecutor(String name) throws MBeanException{
 

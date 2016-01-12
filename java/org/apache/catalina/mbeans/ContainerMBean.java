@@ -118,6 +118,7 @@ public class ContainerMBean extends BaseModelMBean {
      * Container.
      *
      * @param name Name of the existing child Container to be removed
+     * @throws MBeanException if the child cannot be removed
      */
     public void removeChild(String name) throws MBeanException{
         if(name != null){
@@ -139,8 +140,8 @@ public class ContainerMBean extends BaseModelMBean {
      * Adds a valve to this Container instance.
      *
      * @param valveType ClassName of the valve to be added
-     *
-     * @exception MBeanException if a component cannot be removed
+     * @return the MBean name of the new valve
+     * @throws MBeanException if adding the valve failed
      */
     public String addValve(String valveType) throws MBeanException{
         Valve valve = null;
@@ -222,7 +223,8 @@ public class ContainerMBean extends BaseModelMBean {
      * Add a LifecycleEvent listener to this component.
      *
      * @param type ClassName of the listener to add
-     */
+     * @throws MBeanException if adding the listener failed
+    */
     public void addLifecycleListener(String type) throws MBeanException{
         LifecycleListener listener = null;
         try {
@@ -254,6 +256,7 @@ public class ContainerMBean extends BaseModelMBean {
      *
      * @param type The ClassName of the listeners to be removed.
      * Note that all the listeners having given ClassName will be removed.
+     * @throws MBeanException propagated from the managed resource access
      */
     public void removeLifecycleListeners(String type) throws MBeanException{
         Container container=null;
@@ -279,6 +282,8 @@ public class ContainerMBean extends BaseModelMBean {
     /**
      * List the class name of each of the lifecycle listeners added to this
      * container.
+     * @return the lifecycle listeners class names
+     * @throws MBeanException propagated from the managed resource access
      */
     public String[] findLifecycleListenerNames() throws MBeanException {
         Container container = null;
@@ -306,6 +311,8 @@ public class ContainerMBean extends BaseModelMBean {
     /**
      * List the class name of each of the container listeners added to this
      * container.
+     * @return the container listeners class names
+     * @throws MBeanException propagated from the managed resource access
      */
     public String[] findContainerListenerNames() throws MBeanException {
         Container container = null;

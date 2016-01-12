@@ -81,7 +81,7 @@ public class GroupMBean extends BaseModelMBean {
 
 
     /**
-     * Return the MBean Names of all authorized roles for this group.
+     * @return the MBean Names of all authorized roles for this group.
      */
     public String[] getRoles() {
 
@@ -108,7 +108,7 @@ public class GroupMBean extends BaseModelMBean {
 
 
     /**
-     * Return the MBean Names of all users that are members of this group.
+     * @return the MBean Names of all users that are members of this group.
      */
     public String[] getUsers() {
 
