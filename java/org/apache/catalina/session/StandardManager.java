@@ -519,6 +519,7 @@ public class StandardManager extends ManagerBase {
     /**
      * Return a File object representing the pathname to our
      * persistence file, if any.
+     * @return the file
      */
     protected File file() {
         if ((pathname == null) || (pathname.length() == 0))

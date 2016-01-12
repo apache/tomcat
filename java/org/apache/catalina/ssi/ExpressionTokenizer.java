@@ -46,6 +46,7 @@ public class ExpressionTokenizer {
 
     /**
      * Creates a new parser for the specified expression.
+     * @param expr The expression
      */
     public ExpressionTokenizer(String expr) {
         this.expr = expr.trim().toCharArray();
@@ -54,7 +55,7 @@ public class ExpressionTokenizer {
 
 
     /**
-     * Returns true if there are more tokens.
+     * @return <code>true</code> if there are more tokens.
      */
     public boolean hasMoreTokens() {
         return index < length;
@@ -62,7 +63,7 @@ public class ExpressionTokenizer {
 
 
     /**
-     * Returns the current index for error reporting purposes.
+     * @return the current index for error reporting purposes.
      */
     public int getIndex() {
         return index;
@@ -76,7 +77,7 @@ public class ExpressionTokenizer {
 
 
     /**
-     * Returns the next token type and initializes any state variables
+     * @return the next token type and initializes any state variables
      * accordingly.
      */
     public int nextToken() {
@@ -176,7 +177,7 @@ public class ExpressionTokenizer {
 
 
     /**
-     * Returns the String value of the token if it was type TOKEN_STRING.
+     * @return the String value of the token if it was type TOKEN_STRING.
      * Otherwise null is returned.
      */
     public String getTokenValue() {

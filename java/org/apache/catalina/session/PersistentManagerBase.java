@@ -686,7 +686,9 @@ public abstract class PersistentManagerBase extends ManagerBase
      * in, but will not be added to the active session list if it
      * is invalid or past its expiration.
      *
+     * @param id The id of the session that should be swapped in
      * @return restored session, or {@code null}, if none is found
+     * @throws IOException an IO error occurred
      */
     protected Session swapIn(String id) throws IOException {
 
@@ -787,7 +789,8 @@ public abstract class PersistentManagerBase extends ManagerBase
      * is past its expiration or invalid, this method does
      * nothing.
      *
-     * @param session The Session to write out.
+     * @param session The Session to write out
+     * @throws IOException an IO error occurred
      */
     protected void swapOut(Session session) throws IOException {
 
@@ -807,6 +810,8 @@ public abstract class PersistentManagerBase extends ManagerBase
      * Write the provided session to the Store without modifying
      * the copy in memory or triggering passivation events. Does
      * nothing if the session is invalid or past its expiration.
+     * @param session The session that should be written
+     * @throws IOException an IO error occurred
      */
     protected void writeSession(Session session) throws IOException {
 

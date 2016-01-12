@@ -90,6 +90,7 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
      * Flush the servletOutputStream or printWriter ( only one will be non-null )
      * This must be called after a requestDispatcher.include, since we can't
      * assume that the included servlet flushed its stream.
+     * @throws IOException an IO error occurred
      */
     public void flushOutputStreamOrWriter() throws IOException {
         if (servletOutputStream != null) {
