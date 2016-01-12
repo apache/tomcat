@@ -135,20 +135,6 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
         return isError;
     }
 
-    /**
-     * @param jmxServerConnection
-     * @param resultproperty
-     * @param pname
-     * @param oname
-     *
-     * @Deprecated Unused. Will be removed in Tomcat 9.0.x
-     */
-    @Deprecated
-    protected void bindAttributes(MBeanServerConnection jmxServerConnection,
-            String resultproperty, String pname, ObjectName oname) {
-        bindAttributes(jmxServerConnection, pname, oname);
-    }
-
     protected void bindAttributes(MBeanServerConnection jmxServerConnection, String pname, ObjectName oname) {
         try {
             MBeanInfo minfo = jmxServerConnection.getMBeanInfo(oname);
