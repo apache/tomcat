@@ -22,7 +22,10 @@ import java.util.Comparator;
 import org.apache.catalina.Session;
 
 /**
- * Comparator which permits to compare on a session's content
+ * Comparator which permits to compare on a session's content.
+ *
+ * @param <T> The type of the session content to be compared
+ *
  * @author C&eacute;drik LIME
  */
 public abstract class BaseSessionComparator<T> implements Comparator<Session> {
