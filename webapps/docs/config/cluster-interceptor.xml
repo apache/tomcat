@@ -44,7 +44,6 @@
    <ul>
     <li><code>org.apache.catalina.tribes.group.interceptors.TcpFailureDetector</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor</code></li>
-    <li><code>org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator</code></li>
     <li><code>org.apache.catalina.tribes.group.interceptors.OrderInterceptor</code></li>
@@ -108,32 +107,8 @@
      </attribute>
    </attributes>
   </subsection>
-  <subsection name="org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor Attributes">
-   <attributes>
-     <attribute name="className" required="true">
-       Required, This dispatcher uses JDK 1.5 java.util.concurrent package
-     </attribute>
-     <attribute name="optionFlag" required="false">
-       The default and hard coded value is <code>8 (org.apache.catalina.tribes.Channel.SEND_OPTIONS_ASYNCHRONOUS)</code>.
-       The dispatcher will trigger on this value only, as it is predefined by Tribes.
-       The other attributes are inherited from its base class <code>org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor</code>.
-     </attribute>
-     <attribute name="maxThreads" required="false">
-       The maximum number of threads in this pool, default is 10.
-     </attribute>
-     <attribute name="maxSpareThreads" required="false">
-       The number of threads to keep in the pool, default is 2.
-     </attribute>
-     <attribute name="keepAliveTime" required="false">
-       Maximum number of milliseconds of until Idle thread terminates. Default value is 5000(5 seconds).
-     </attribute>
-   </attributes>
-  </subsection>
   <subsection name="org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor Attributes">
    <attributes>
-     <attribute name="className" required="true">
-       Required, Same implementation as <code>MessageDispatch15Interceptor</code>, but with JDK 1.4 compliance.
-     </attribute>
      <attribute name="optionFlag" required="false">
        The default and hard coded value is <code>8 (org.apache.catalina.tribes.Channel.SEND_OPTIONS_ASYNCHRONOUS)</code>.
        The dispatcher will trigger on this value only, as it is predefined by Tribes.
@@ -146,6 +121,15 @@
        Size in bytes of the dispatch queue, the default value is <code> 1024*1024*64 (64MB)</code> sets the maximum queue size for the dispatch queue
        if the queue fills up, one can trigger the behavior, if <code>alwaysSend</code> is set to true, the message will be sent synchronously
        if the flag is false, an error is thrown
+     </attribute>
+     <attribute name="maxThreads" required="false">
+       The maximum number of threads in this pool, default is 10.
+     </attribute>
+     <attribute name="maxSpareThreads" required="false">
+       The number of threads to keep in the pool, default is 2.
+     </attribute>
+     <attribute name="keepAliveTime" required="false">
+       Maximum number of milliseconds of until Idle thread terminates. Default value is 5000(5 seconds).
      </attribute>
    </attributes>
   </subsection>
