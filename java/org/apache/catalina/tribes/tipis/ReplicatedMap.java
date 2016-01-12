@@ -142,7 +142,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
             MapMessage msg = new MapMessage(getMapContextName(), MapMessage.MSG_COPY, false,
                     (Serializable) key, (Serializable) value, null,channel.getLocalMember(false), backup);
 
-            getChannel().send(getMapMembers(), msg, getChannelSendOptions());
+            getChannel().send(backup, msg, getChannelSendOptions());
         } catch (ChannelException e) {
             FaultyMember[] faultyMembers = e.getFaultyMembers();
             if (faultyMembers.length == 0) throw e;
