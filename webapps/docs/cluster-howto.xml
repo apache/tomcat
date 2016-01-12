@@ -64,7 +64,7 @@
     <li>The IP broadcasted is <code>java.net.InetAddress.getLocalHost().getHostAddress()</code> (make sure you don't broadcast 127.0.0.1, this is a common error)</li>
     <li>The TCP port listening for replication messages is the first available server socket in range <code>4000-4100</code></li>
     <li>Listener is configured <code>ClusterSessionListener</code></li>
-    <li>Two interceptors are configured <code>TcpFailureDetector</code> and <code>MessageDispatch15Interceptor</code></li>
+    <li>Two interceptors are configured <code>TcpFailureDetector</code> and <code>MessageDispatchInterceptor</code></li>
   </ol>
   <p>
     The following is the default cluster configuration:
@@ -93,7 +93,7 @@
               <Transport className="org.apache.catalina.tribes.transport.nio.PooledParallelSender"/>
             </Sender>
             <Interceptor className="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
-            <Interceptor className="org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor"/>
+            <Interceptor className="org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor"/>
           </Channel>
 
           <Valve className="org.apache.catalina.ha.tcp.ReplicationValve"
@@ -263,7 +263,7 @@ should be completed:</p>
               <Transport className="org.apache.catalina.tribes.transport.nio.PooledParallelSender"/>
             </Sender>
             <Interceptor className="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
-            <Interceptor className="org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor"/>
+            <Interceptor className="org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor"/>
             <Interceptor className="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor"/>
           </Channel>
 
@@ -359,7 +359,7 @@ should be completed:</p>
         <br/>For more info, Please visit the <a href="config/cluster-sender.html">reference documentation</a>
     </p>
     <source><![CDATA[            <Interceptor className="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
-            <Interceptor className="org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor"/>
+            <Interceptor className="org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor"/>
             <Interceptor className="org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor"/>
           </Channel>]]></source>
     <p>
@@ -368,7 +368,7 @@ should be completed:</p>
         Using interceptors, logic can be broken into more manageable pieces of code. The interceptors configured above are:<br/>
         TcpFailureDetector - verifies crashed members through TCP, if multicast packets get dropped, this interceptor protects against false positives,
         ie the node marked as crashed even though it still is alive and running.<br/>
-        MessageDispatch15Interceptor - dispatches messages to a thread (thread pool) to send message asynchronously.<br/>
+        MessageDispatchInterceptor - dispatches messages to a thread (thread pool) to send message asynchronously.<br/>
         ThroughputInterceptor - prints out simple stats on message traffic.<br/>
         Please note that the order of interceptors is important. The way they are defined in server.xml is the way they are represented in the
         channel stack. Think of it as a linked list, with the head being the first most interceptor and the tail the last.
