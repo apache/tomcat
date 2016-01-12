@@ -187,6 +187,10 @@
         Add support for the shutdown notification of local members in the static
         cluster. (kfujino)
       </fix>
+      <fix>
+        Ensure that asynchronous session replication thread is a daemon thread.
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

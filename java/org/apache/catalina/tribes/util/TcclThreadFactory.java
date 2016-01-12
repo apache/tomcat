@@ -64,6 +64,7 @@ public class TcclThreadFactory implements ThreadFactory {
         } else {
             t.setContextClassLoader(this.getClass().getClassLoader());
         }
+        t.setDaemon(true);
         return t;
     }
 
