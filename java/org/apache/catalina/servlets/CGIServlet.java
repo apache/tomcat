@@ -173,8 +173,8 @@ import org.apache.catalina.util.IOTools;
  * and stderr (which should not be too hard).
  * <br>
  * If you find your cgi scripts are timing out receiving input, you can set
- * the init parameter <code></code> of your webapps' cgi-handling servlet
- * to be
+ * the init parameter <code>stderrTimeout</code> of your webapps' cgi-handling
+ * servlet.
  * </p>
  * <p>
  *
@@ -211,7 +211,6 @@ import org.apache.catalina.util.IOTools;
  * <a href="http://cgi-spec.golux.com">http://cgi-spec.golux.com</a>.
  *
  * </p>
- * <p>
  * <h3>TODO:</h3>
  * <ul>
  * <li> Support for setting headers (for example, Location headers don't work)
@@ -231,7 +230,6 @@ import org.apache.catalina.util.IOTools;
  *
  * @author Martin T Dengler [root@martindengler.com]
  * @author Amy Roh
- * @since Tomcat 4.0
  */
 public final class CGIServlet extends HttpServlet {
 
@@ -631,7 +629,7 @@ public final class CGIServlet extends HttpServlet {
     }
 
 
-    /*
+    /**
      * Behaviour depends on the status code and the value of debug.
      *
      * Status < 400  - Always calls setStatus. Returns false. CGI servlet will
@@ -657,11 +655,6 @@ public final class CGIServlet extends HttpServlet {
     /**
      * Encapsulates the CGI environment and rules to derive
      * that environment from the servlet container and request information.
-     *
-     * <p>
-     * </p>
-     *
-     * @since    Tomcat 4.0
      */
     protected class CGIEnvironment {
 
@@ -708,7 +701,7 @@ public final class CGIServlet extends HttpServlet {
          *                   the Servlet API
          * @param  context   ServletContext for information provided by the
          *                   Servlet API
-         *
+         * @throws IOException an IO error occurred
          */
         protected CGIEnvironment(HttpServletRequest req,
                                  ServletContext context) throws IOException {
@@ -744,7 +737,7 @@ public final class CGIServlet extends HttpServlet {
          *
          * @param  req   HttpServletRequest for information provided by
          *               the Servlet API
-         * @throws UnsupportedEncodingException
+         * @throws UnsupportedEncodingException Unknown encoding
          */
         protected void setupFromRequest(HttpServletRequest req)
                 throws UnsupportedEncodingException {
@@ -861,8 +854,6 @@ public final class CGIServlet extends HttpServlet {
          * <code>name</code> -    simple name (no directories) of the
          *                        cgi script, or null if no cgi was found
          * </ul>
-         *
-         * @since Tomcat 4.0
          */
         protected String[] findCGI(String pathInfo, String webAppRootDir,
                                    String contextPath, String servletPath,
@@ -939,6 +930,7 @@ public final class CGIServlet extends HttpServlet {
          *
          * @return   true if environment was set OK, false if there
          *           was a problem and no environment was set
+         * @throws IOException an IO error occurred
          */
         protected boolean setCGIEnvironment(HttpServletRequest req) throws IOException {
 

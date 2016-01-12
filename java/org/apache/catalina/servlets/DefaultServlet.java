@@ -329,6 +329,7 @@ public class DefaultServlet extends HttpServlet {
      * Return the relative path associated with this servlet.
      *
      * @param request The servlet request we are processing
+     * @return the relative path
      */
     protected String getRelativePath(HttpServletRequest request) {
         return getRelativePath(request, false);
@@ -544,6 +545,11 @@ public class DefaultServlet extends HttpServlet {
      * Handle a partial PUT.  New content specified in request is appended to
      * existing content in oldRevisionContent (if present). This code does
      * not support simultaneous partial updates to the same resource.
+     * @param req The Servlet request
+     * @param range The range that will be written
+     * @param path The path
+     * @return the associated file object
+     * @throws IOException an IO error occurred
      */
     protected File executePartialPut(HttpServletRequest req, Range range,
                                      String path)
@@ -642,9 +648,10 @@ public class DefaultServlet extends HttpServlet {
      * @param request   The servlet request we are processing
      * @param response  The servlet response we are creating
      * @param resource  The resource
-     * @return boolean true if the resource meets all the specified conditions,
-     * and false if any of the conditions is not satisfied, in which case
-     * request processing is stopped
+     * @return <code>true</code> if the resource meets all the specified
+     *  conditions, and <code>false</code> if any of the conditions is not
+     *  satisfied, in which case request processing is stopped
+     * @throws IOException an IO error occurred
      */
     protected boolean checkIfHeaders(HttpServletRequest request,
                                      HttpServletResponse response,
@@ -663,6 +670,7 @@ public class DefaultServlet extends HttpServlet {
      * URL rewriter.
      *
      * @param path Path which has to be rewritten
+     * @return the rewritten path
      */
     protected String rewriteUrl(String path) {
         return URLEncoder.DEFAULT.encode( path );
@@ -1047,7 +1055,8 @@ public class DefaultServlet extends HttpServlet {
      *
      * @param request The servlet request we a)re processing
      * @param response The servlet response we are creating
-     * @return Range
+     * @return the range object
+     * @throws IOException an IO error occurred
      */
     protected Range parseContentRange(HttpServletRequest request,
                                       HttpServletResponse response)
@@ -1109,7 +1118,8 @@ public class DefaultServlet extends HttpServlet {
      * @param request   The servlet request we are processing
      * @param response  The servlet response we are creating
      * @param resource  The resource
-     * @return Vector of ranges
+     * @return a list of ranges
+     * @throws IOException an IO error occurred
      */
     protected ArrayList<Range> parseRange(HttpServletRequest request,
             HttpServletResponse response,
@@ -1244,7 +1254,12 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     *  Decide which way to render. HTML or XML.
+     * Decide which way to render. HTML or XML.
+     * @param contextPath The path
+     * @param resource The resource
+     * @return the input stream with the rendered output
+     * @throws IOException an IO error occurred
+     * @throws ServletException rendering error
      */
     protected InputStream render(String contextPath, WebResource resource)
         throws IOException, ServletException {
@@ -1269,6 +1284,11 @@ public class DefaultServlet extends HttpServlet {
      *
      * @param contextPath Context path to which our internal paths are
      *  relative
+     * @param resource The associated resource
+     * @param xsltSource The XSL stylesheet
+     * @return the XML data
+     * @throws IOException an IO error occurred
+     * @throws ServletException rendering error
      */
     protected InputStream renderXml(String contextPath, WebResource resource, Source xsltSource)
         throws IOException, ServletException {
@@ -1399,6 +1419,9 @@ public class DefaultServlet extends HttpServlet {
      *
      * @param contextPath Context path to which our internal paths are
      *  relative
+     * @param resource The resource
+     * @return the HTML data
+     * @throws IOException an IO error occurred
      */
     protected InputStream renderHtml(String contextPath, WebResource resource)
         throws IOException {
@@ -1550,6 +1573,7 @@ public class DefaultServlet extends HttpServlet {
      * Render the specified file size (in bytes).
      *
      * @param size File size (in bytes)
+     * @return the formatted size
      */
     protected String renderSize(long size) {
 
@@ -1565,11 +1589,19 @@ public class DefaultServlet extends HttpServlet {
 
     /**
      * Get the readme file as a string.
+     * @param directory The directory to search
+     * @return the readme for the specified directory
      */
     protected String getReadme(WebResource directory) {
         return getReadme(directory, null);
     }
 
+    /**
+     * Get the readme file as a string.
+     * @param directory The directory to search
+     * @param encoding The readme encoding
+     * @return the readme for the specified directory
+     */
     protected String getReadme(WebResource directory, String encoding) {
 
         if (readmeFile != null) {
@@ -1609,7 +1641,10 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Return a Source for the xsl template (if possible)
+     * Return a Source for the xsl template (if possible).
+     * @param directory The directory to search
+     * @return the source for the specified directory
+     * @throws IOException an IO error occurred
      */
     protected Source findXsltSource(WebResource directory)
         throws IOException {
@@ -1739,6 +1774,14 @@ public class DefaultServlet extends HttpServlet {
 
     /**
      * Check if sendfile can be used.
+     * @param request The Servlet request
+     * @param response The Servlet response
+     * @param resource The resource
+     * @param length The length which will be written (will be used only if
+     *  range is null)
+     * @param range The range that will be written
+     * @return <code>true</code> if sendfile should be used (writing is then
+     *  delegated to the endpoint)
      */
     protected boolean checkSendfile(HttpServletRequest request,
                                   HttpServletResponse response,
@@ -1771,9 +1814,10 @@ public class DefaultServlet extends HttpServlet {
      * @param request   The servlet request we are processing
      * @param response  The servlet response we are creating
      * @param resource  The resource
-     * @return boolean true if the resource meets the specified condition,
-     * and false if the condition is not satisfied, in which case request
-     * processing is stopped
+     * @return <code>true</code> if the resource meets the specified condition,
+     *  and <code>false</code> if the condition is not satisfied, in which case
+     *  request processing is stopped
+     * @throws IOException an IO error occurred
      */
     protected boolean checkIfMatch(HttpServletRequest request,
             HttpServletResponse response, WebResource resource)
@@ -1814,9 +1858,9 @@ public class DefaultServlet extends HttpServlet {
      * @param request   The servlet request we are processing
      * @param response  The servlet response we are creating
      * @param resource  The resource
-     * @return boolean true if the resource meets the specified condition,
-     * and false if the condition is not satisfied, in which case request
-     * processing is stopped
+     * @return <code>true</code> if the resource meets the specified condition,
+     *  and <code>false</code> if the condition is not satisfied, in which case
+     *  request processing is stopped
      */
     protected boolean checkIfModifiedSince(HttpServletRequest request,
             HttpServletResponse response, WebResource resource) {
@@ -1850,9 +1894,10 @@ public class DefaultServlet extends HttpServlet {
      * @param request   The servlet request we are processing
      * @param response  The servlet response we are creating
      * @param resource  The resource
-     * @return boolean true if the resource meets the specified condition,
-     * and false if the condition is not satisfied, in which case request
-     * processing is stopped
+     * @return <code>true</code> if the resource meets the specified condition,
+     *  and <code>false</code> if the condition is not satisfied, in which case
+     *  request processing is stopped
+     * @throws IOException an IO error occurred
      */
     protected boolean checkIfNoneMatch(HttpServletRequest request,
             HttpServletResponse response, WebResource resource)
@@ -1903,8 +1948,8 @@ public class DefaultServlet extends HttpServlet {
      * Check if the user agent supports gzip encoding.
      *
      * @param request   The servlet request we are processing
-     * @return boolean true if the user agent supports gzip encoding,
-     * and false if the user agent does not support gzip encoding
+     * @return <code>true</code> if the user agent supports gzip encoding,
+     * and <code>false</code> if the user agent does not support gzip encoding.
      */
     protected boolean checkIfGzip(HttpServletRequest request) {
         Enumeration<String> headers = request.getHeaders("Accept-Encoding");
@@ -1924,9 +1969,10 @@ public class DefaultServlet extends HttpServlet {
      * @param request   The servlet request we are processing
      * @param response  The servlet response we are creating
      * @param resource  The resource
-     * @return boolean true if the resource meets the specified condition,
-     * and false if the condition is not satisfied, in which case request
-     * processing is stopped
+     * @return <code>true</code> if the resource meets the specified condition,
+     *  and <code>false</code> if the condition is not satisfied, in which case
+     *  request processing is stopped
+     * @throws IOException an IO error occurred
      */
     protected boolean checkIfUnmodifiedSince(HttpServletRequest request,
             HttpServletResponse response, WebResource resource)
@@ -2061,7 +2107,7 @@ public class DefaultServlet extends HttpServlet {
      * @param resource      The source resource
      * @param ostream       The output stream to write to
      * @param ranges        Enumeration of the ranges the client wanted to
- *                          retrieve
+     *                          retrieve
      * @param contentType   Content type of the resource
      * @exception IOException if an input/output error occurs
      */

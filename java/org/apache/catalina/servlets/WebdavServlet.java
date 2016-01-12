@@ -271,6 +271,9 @@ public class WebdavServlet
 
     /**
      * Return JAXP document builder instance.
+     * @return the document builder
+     * @throws ServletException document builder creation failed
+     *  (wrapped <code>ParserConfigurationException</code> exception)
      */
     protected DocumentBuilder getDocumentBuilder()
         throws ServletException {
@@ -418,8 +421,8 @@ public class WebdavServlet
     /**
      * OPTIONS Method.
      *
-     * @param req The request
-     * @param resp The response
+     * @param req The Servlet request
+     * @param resp The Servlet response
      * @throws ServletException If an error occurs
      * @throws IOException If an IO error occurs
      */
@@ -438,6 +441,10 @@ public class WebdavServlet
 
     /**
      * PROPFIND Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws ServletException If an error occurs
+     * @throws IOException If an IO error occurs
      */
     protected void doPropfind(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
@@ -671,6 +678,9 @@ public class WebdavServlet
 
     /**
      * PROPPATCH Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws IOException If an IO error occurs
      */
     protected void doProppatch(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
@@ -692,6 +702,10 @@ public class WebdavServlet
 
     /**
      * MKCOL Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws ServletException If an error occurs
+     * @throws IOException If an IO error occurs
      */
     protected void doMkcol(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
@@ -752,6 +766,10 @@ public class WebdavServlet
 
     /**
      * DELETE Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws ServletException If an error occurs
+     * @throws IOException If an IO error occurs
      */
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
@@ -801,6 +819,9 @@ public class WebdavServlet
 
     /**
      * COPY Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws IOException If an IO error occurs
      */
     protected void doCopy(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
@@ -817,6 +838,9 @@ public class WebdavServlet
 
     /**
      * MOVE Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws IOException If an IO error occurs
      */
     protected void doMove(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
@@ -842,6 +866,10 @@ public class WebdavServlet
 
     /**
      * LOCK Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws ServletException If an error occurs
+     * @throws IOException If an IO error occurs
      */
     protected void doLock(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
@@ -1303,6 +1331,9 @@ public class WebdavServlet
 
     /**
      * UNLOCK Method.
+     * @param req The Servlet request
+     * @param resp The Servlet response
+     * @throws IOException If an IO error occurs
      */
     protected void doUnlock(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
@@ -1384,9 +1415,9 @@ public class WebdavServlet
      * has give the appropriate lock tokens.
      *
      * @param req Servlet request
-     * @return boolean true if the resource is locked (and no appropriate
-     * lock token has been found for at least one of the non-shared locks which
-     * are present on the resource).
+     * @return <code>true</code> if the resource is locked (and no appropriate
+     *  lock token has been found for at least one of
+     *  the non-shared locks which are present on the resource).
      */
     private boolean isLocked(HttpServletRequest req) {
 
@@ -1410,9 +1441,9 @@ public class WebdavServlet
      *
      * @param path Path of the resource
      * @param ifHeader "If" HTTP header which was included in the request
-     * @return boolean true if the resource is locked (and no appropriate
-     * lock token has been found for at least one of the non-shared locks which
-     * are present on the resource).
+     * @return <code>true</code> if the resource is locked (and no appropriate
+     *  lock token has been found for at least one of
+     *  the non-shared locks which are present on the resource).
      */
     private boolean isLocked(String path, String ifHeader) {
 
@@ -1475,6 +1506,7 @@ public class WebdavServlet
      * @param req Servlet request
      * @param resp Servlet response
      * @return boolean true if the copy is successful
+     * @throws IOException If an IO error occurs
      */
     private boolean copyResource(HttpServletRequest req,
                                  HttpServletResponse resp)
@@ -1631,6 +1663,7 @@ public class WebdavServlet
      * during the copy operation
      * @param source Path of the resource to be copied
      * @param dest Destination path
+     * @return <code>true</code> if the copy was successful
      */
     private boolean copyResource(Hashtable<String,Integer> errorList,
             String source, String dest) {
@@ -1696,7 +1729,8 @@ public class WebdavServlet
      *
      * @param req Servlet request
      * @param resp Servlet response
-     * @return boolean true if the copy is successful
+     * @return <code>true</code> if the delete is successful
+     * @throws IOException If an IO error occurs
      */
     private boolean deleteResource(HttpServletRequest req,
                                    HttpServletResponse resp)
@@ -1717,6 +1751,8 @@ public class WebdavServlet
      * @param resp Servlet response
      * @param setStatus Should the response status be set on successful
      *                  completion
+     * @return <code>true</code> if the delete is successful
+     * @throws IOException If an IO error occurs
      */
     private boolean deleteResource(String path, HttpServletRequest req,
                                    HttpServletResponse resp, boolean setStatus)
@@ -1771,7 +1807,7 @@ public class WebdavServlet
 
     /**
      * Deletes a collection.
-     *
+     * @param req The Servlet request
      * @param path Path to the collection to be deleted
      * @param errorList Contains the list of the errors which occurred
      */
@@ -1834,6 +1870,7 @@ public class WebdavServlet
      * @param req Servlet request
      * @param resp Servlet response
      * @param errorList List of error to be displayed
+     * @throws IOException If an IO error occurs
      */
     private void sendReport(HttpServletRequest req, HttpServletResponse resp,
                             Hashtable<String,Integer> errorList)
@@ -2405,7 +2442,7 @@ public class WebdavServlet
      *
      * @param path Path
      * @param generatedXML XML data to which the locks info will be appended
-     * @return true if at least one lock was displayed
+     * @return <code>true</code> if at least one lock was displayed
      */
     private boolean generateLockDiscovery
         (String path, XMLWriter generatedXML) {
@@ -2446,6 +2483,7 @@ public class WebdavServlet
 
     /**
      * Get creation date in ISO format.
+     * @return the formatted creation date
      */
     private String getISOCreationDate(long creationDate) {
         return creationDateFormat.format(new Date(creationDate));
@@ -2453,7 +2491,8 @@ public class WebdavServlet
 
     /**
      * Determines the methods normally allowed for the resource.
-     *
+     * @param req The Servlet request
+     * @return a string builder with the allowed HTTP methods
      */
     private StringBuilder determineMethodsAllowed(HttpServletRequest req) {
 
@@ -2487,17 +2526,6 @@ public class WebdavServlet
      * Holds a lock information.
      */
     private class LockInfo {
-
-
-        // -------------------------------------------------------- Constructor
-
-
-        /**
-         * Constructor.
-         */
-        public LockInfo() {
-            // Ignore
-        }
 
 
         // ------------------------------------------------- Instance Variables

@@ -50,6 +50,9 @@ public class ExpressionParseTree {
 
     /**
      * Creates a new parse tree for the specified expression.
+     * @param expr The expression string
+     * @param ssiMediator Used to evaluated the expressions
+     * @throws ParseException a parsing error occurred
      */
     public ExpressionParseTree(String expr, SSIMediator ssiMediator)
             throws ParseException {
@@ -61,6 +64,7 @@ public class ExpressionParseTree {
     /**
      * Evaluates the tree and returns true or false. The specified SSIMediator
      * is used to resolve variable references.
+     * @return the evaluation result
      */
     public boolean evaluateTree() {
         return root.evaluate();
@@ -70,6 +74,7 @@ public class ExpressionParseTree {
     /**
      * Pushes a new operator onto the opp stack, resolving existing opps as
      * needed.
+     * @param node The operator node
      */
     private void pushOpp(OppNode node) {
         // If node is null then it's just a group marker
@@ -115,6 +120,8 @@ public class ExpressionParseTree {
 
     /**
      * Parses the specified expression into a tree of parse nodes.
+     * @param expr The expression to parse
+     * @throws ParseException a parsing error occurred
      */
     private void parseExpression(String expr) throws ParseException {
         StringNode currStringNode = null;
