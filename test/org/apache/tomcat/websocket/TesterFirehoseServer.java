@@ -19,19 +19,15 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.servlet.ServletContextEvent;
-import javax.websocket.DeploymentException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.RemoteEndpoint.Basic;
 import javax.websocket.Session;
-import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
 
-import org.apache.tomcat.websocket.server.Constants;
-import org.apache.tomcat.websocket.server.WsContextListener;
+import org.apache.tomcat.websocket.server.TesterEndpointConfig;
 
 /**
  * Sends {@link #MESSAGE_COUNT} messages of size {@link #MESSAGE_SIZE} bytes as
@@ -54,21 +50,13 @@ public class TesterFirehoseServer {
     }
 
 
-    public static class Config extends WsContextListener {
+    public static class Config extends TesterEndpointConfig {
 
         public static final String PATH = "/firehose";
 
         @Override
-        public void contextInitialized(ServletContextEvent sce) {
-            super.contextInitialized(sce);
-            ServerContainer sc =
-                    (ServerContainer) sce.getServletContext().getAttribute(
-                            Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
-            try {
-                sc.addEndpoint(Endpoint.class);
-            } catch (DeploymentException e) {
-                throw new IllegalStateException(e);
-            }
+        protected Class<?> getEndpointClass() {
+            return Endpoint.class;
         }
     }
 

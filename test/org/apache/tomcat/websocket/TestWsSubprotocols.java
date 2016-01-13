@@ -20,15 +20,12 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.ServletContextEvent;
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
-import javax.websocket.DeploymentException;
 import javax.websocket.EndpointConfig;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
-import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 
@@ -41,8 +38,7 @@ import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
-import org.apache.tomcat.websocket.server.Constants;
-import org.apache.tomcat.websocket.server.WsContextListener;
+import org.apache.tomcat.websocket.server.TesterEndpointConfig;
 
 public class TestWsSubprotocols extends TomcatBaseTest {
 
@@ -115,18 +111,11 @@ public class TestWsSubprotocols extends TomcatBaseTest {
 
     }
 
-    public static class Config extends WsContextListener {
+    public static class Config extends TesterEndpointConfig {
+
         @Override
-        public void contextInitialized(ServletContextEvent sce) {
-            super.contextInitialized(sce);
-            ServerContainer sc = (ServerContainer) sce.getServletContext()
-                    .getAttribute(Constants.
-                            SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
-            try {
-                sc.addEndpoint(SubProtocolsEndpoint.class);
-            } catch (DeploymentException e) {
-                throw new IllegalStateException(e);
-            }
+        protected Class<?> getEndpointClass() {
+            return SubProtocolsEndpoint.class;
         }
     }
 }

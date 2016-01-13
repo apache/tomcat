@@ -23,10 +23,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.servlet.ServletContextEvent;
 import javax.websocket.CloseReason;
 import javax.websocket.ContainerProvider;
-import javax.websocket.DeploymentException;
 import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
@@ -36,7 +34,6 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
-import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.junit.Ignore;
@@ -91,26 +88,17 @@ public class TestWsRemoteEndpointImplServer extends TomcatBaseTest {
         session.close();
     }
 
-    public static class Bug58624Config extends WsContextListener {
+    public static class Bug58624Config extends TesterEndpointConfig {
 
         public static final String PATH = "/bug58624";
+
+
         @Override
-        public void contextInitialized(ServletContextEvent sce) {
-            super.contextInitialized(sce);
-
-            ServerContainer sc = (ServerContainer) sce.getServletContext().getAttribute(
-                    Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
-
+        protected ServerEndpointConfig getServerEndpointConfig() {
             List<Class<? extends Encoder>> encoders = new ArrayList<>();
             encoders.add(Bug58624Encoder.class);
-            ServerEndpointConfig sec = ServerEndpointConfig.Builder.create(
+            return ServerEndpointConfig.Builder.create(
                     Bug58624Endpoint.class, PATH).encoders(encoders).build();
-
-            try {
-                sc.addEndpoint(sec);
-            } catch (DeploymentException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 

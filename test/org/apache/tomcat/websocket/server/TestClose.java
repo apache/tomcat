@@ -22,17 +22,14 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletContextEvent;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.DeploymentException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
@@ -350,29 +347,13 @@ public class TestClose extends TomcatBaseTest {
     }
 
 
-    public abstract static class BaseEndpointConfig extends WsContextListener {
+    public abstract static class BaseEndpointConfig extends TesterEndpointConfig {
 
         public static final String PATH = "/test";
 
-        protected abstract Class<?> getEndpointClass();
-
         @Override
-        public void contextInitialized(ServletContextEvent sce) {
-            super.contextInitialized(sce);
-
-            ServerContainer sc = (ServerContainer) sce
-                    .getServletContext()
-                    .getAttribute(
-                            Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
-
-            ServerEndpointConfig sec = ServerEndpointConfig.Builder.create(
-                    getEndpointClass(), PATH).build();
-
-            try {
-                sc.addEndpoint(sec);
-            } catch (DeploymentException e) {
-                throw new RuntimeException(e);
-            }
+        protected ServerEndpointConfig getServerEndpointConfig() {
+            return ServerEndpointConfig.Builder.create(getEndpointClass(), PATH).build();
         }
     }
 }
