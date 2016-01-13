@@ -77,6 +77,8 @@ public class ContextRuleSet extends RuleSetBase {
      *
      * @param prefix Prefix for matching pattern rules (including the
      *  trailing slash character)
+     * @param create <code>true</code> if the main context instance should be
+     *  created
      */
     public ContextRuleSet(String prefix, boolean create) {
         this.namespaceURI = null;

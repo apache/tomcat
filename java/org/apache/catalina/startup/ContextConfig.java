@@ -435,6 +435,7 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Create (if necessary) and return a Digester configured to process the
      * context configuration descriptor for an application.
+     * @return the digester for context.xml files
      */
     protected Digester createContextDigester() {
         Digester digester = new Digester();
@@ -455,6 +456,7 @@ public class ContextConfig implements LifecycleListener {
 
     /**
      * Process the default configuration file, if it exists.
+     * @param digester The digester that will be used for XML parsing
      */
     protected void contextConfig(Digester digester) {
 
@@ -505,6 +507,8 @@ public class ContextConfig implements LifecycleListener {
 
     /**
      * Process a context.xml.
+     * @param digester The digester that will be used for XML parsing
+     * @param contextXml The URL to the context.xml configuration
      */
     protected void processContextConfig(Digester digester, URL contextXml) {
 
@@ -573,6 +577,7 @@ public class ContextConfig implements LifecycleListener {
 
     /**
      * Adjust docBase.
+     * @throws IOException cannot access the context base path
      */
     protected void fixDocBase()
         throws IOException {
@@ -1665,6 +1670,8 @@ public class ContextConfig implements LifecycleListener {
      * configure this application to see if they also contain static resources.
      * If static resources are found, add them to the context. Resources are
      * added in web-fragment.xml priority order.
+     * @param fragments The set of fragments that will be scanned for
+     *  static resources
      */
     protected void processResourceJARs(Set<WebXml> fragments) {
         for (WebXml fragment : fragments) {
@@ -1708,6 +1715,7 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Identify the default web.xml to be used and obtain an input source for
      * it.
+     * @return an input source to the default web.xml
      */
     protected InputSource getGlobalWebXmlSource() {
         // Is a default web.xml specified for the Context?
@@ -1730,6 +1738,7 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Identify the host web.xml to be used and obtain an input source for
      * it.
+     * @return an input source to the default per host web.xml
      */
     protected InputSource getHostWebXmlSource() {
         File hostConfigBase = getHostConfigBase();
@@ -1742,6 +1751,7 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Identify the application web.xml to be used and obtain an input source
      * for it.
+     * @return an input source to the context web.xml
      */
     protected InputSource getContextWebXmlSource() {
         InputStream stream = null;
@@ -1799,10 +1809,11 @@ public class ContextConfig implements LifecycleListener {
     }
 
     /**
-     *
+     * Utility method to create an input source from the specified XML file.
      * @param filename  Name of the file (possibly with one or more leading path
      *                  segments) to read
      * @param path      Location that filename is relative to
+     * @return the input source
      */
     protected InputSource getWebXmlSource(String filename, String path) {
         File file = new File(filename);
@@ -1855,6 +1866,7 @@ public class ContextConfig implements LifecycleListener {
      * <code>null</code> will be used if no web-fragment.xml was found. Any JARs
      * known not contain fragments will be skipped.
      *
+     * @param application The main web.xml metadata
      * @return A map of JAR name to processed web fragment (if any)
      */
     protected Map<String,WebXml> processJarsForWebFragments(WebXml application) {
@@ -2043,7 +2055,7 @@ public class ContextConfig implements LifecycleListener {
      * For classes packaged with the web application, the class and each
      * super class needs to be checked for a match with {@link HandlesTypes} or
      * for an annotation that matches {@link HandlesTypes}.
-     * @param javaClass
+     * @param javaClass the class to check
      */
     protected void checkHandlesTypes(JavaClass javaClass) {
 
@@ -2356,9 +2368,9 @@ public class ContextConfig implements LifecycleListener {
      * process filter annotation and merge with existing one!
      * FIXME: refactoring method too long and has redundant subroutines with
      *        processAnnotationWebServlet!
-     * @param className
-     * @param ae
-     * @param fragment
+     * @param className The filter class name
+     * @param ae The filter annotation
+     * @param fragment The corresponding fragment
      */
     protected void processAnnotationWebFilter(String className,
             AnnotationEntry ae, WebXml fragment) {
