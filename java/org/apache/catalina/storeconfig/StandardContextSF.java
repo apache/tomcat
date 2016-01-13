@@ -58,11 +58,11 @@ public class StandardContextSF extends StoreFactoryBase {
 
     private static Log log = LogFactory.getLog(StandardContextSF.class);
 
-    /*
+    /**
      * Store a Context as Separate file as configFile value from context exists.
      * filename can be relative to catalina.base.
      *
-     * @see org.apache.catalina.config.IStoreFactory#store(java.io.PrintWriter,
+     * @see org.apache.catalina.storeconfig.IStoreFactory#store(java.io.PrintWriter,
      *      int, java.lang.Object)
      */
     @Override
@@ -110,10 +110,10 @@ public class StandardContextSF extends StoreFactoryBase {
      * Store a Context without backup add separate file or when configFile =
      * null a aWriter.
      *
-     * @param aWriter
-     * @param indent
-     * @param aContext
-     * @throws Exception
+     * @param aWriter Current output writer
+     * @param indent Indentation level
+     * @param aContext The context which will be stored
+     * @throws Exception Configuration storing error
      */
     protected void storeContextSeparate(PrintWriter aWriter, int indent,
             StandardContext aContext) throws Exception {
@@ -146,10 +146,10 @@ public class StandardContextSF extends StoreFactoryBase {
     }
 
     /**
-     * Store the Context with a Backup
+     * Store the Context with a Backup.
      *
-     * @param aContext
-     * @throws Exception
+     * @param aContext The context which will be stored
+     * @throws Exception Configuration storing error
      */
     protected void storeWithBackup(StandardContext aContext) throws Exception {
         StoreFileMover mover = getConfigFileWriter(aContext);
@@ -188,9 +188,9 @@ public class StandardContextSF extends StoreFactoryBase {
     /**
      * Get explicit writer for context (context.getConfigFile()).
      *
-     * @param context
+     * @param context The context which will be stored
      * @return The file mover
-     * @throws IOException
+     * @throws Exception Error getting a writer for the configuration file
      */
     protected StoreFileMover getConfigFileWriter(Context context)
             throws Exception {
@@ -210,17 +210,13 @@ public class StandardContextSF extends StoreFactoryBase {
     }
 
     /**
-     * Store the specified Host properties.
+     * Store the specified context element children.
      *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aContext
-     *            Context whose properties are being stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
+     * @param aWriter Current output writer
+     * @param indent Indentation level
+     * @param aContext Context to store
+     * @param parentDesc The element description
+     * @throws Exception Configuration storing error
      */
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aContext,
@@ -304,6 +300,8 @@ public class StandardContextSF extends StoreFactoryBase {
     /**
      * Return a File object representing the "configuration root" directory for
      * our associated Host.
+     * @param context The context instance
+     * @return a file to the configuration base path
      */
     protected File configBase(Context context) {
 
@@ -327,16 +325,16 @@ public class StandardContextSF extends StoreFactoryBase {
     }
 
     /**
-     * filter out the default watched resources
+     * Filter out the default watched resources, to remove standard ones.
      *
-     * @param context
-     * @param wresources
-     * @return The watched resources
-     * @throws IOException
-     * TODO relative watchedresource
+     * @param context The context instance
+     * @param wresources The raw watched resources list
+     * @return The filtered watched resources
+     * @throws Exception Configuration storing error
+     * TODO relative watched resources
      * TODO absolute handling configFile
      * TODO Filename case handling for Windows?
-     * TODO digester variable subsitution $catalina.base, $catalina.home
+     * TODO digester variable substitution $catalina.base, $catalina.home
      */
     protected String[] filterWatchedResources(StandardContext context,
             String[] wresources) throws Exception {

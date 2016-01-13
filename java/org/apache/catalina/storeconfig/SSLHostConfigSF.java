@@ -28,12 +28,8 @@ import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 public class SSLHostConfigSF extends StoreFactoryBase {
 
     /**
-     * Store SSLHostConfig description
-     *
-     * @param aWriter
-     * @param indent
-     * @param aSSLHostConfig
-     * @throws Exception
+     * Store nested SSLHostConfigCertificate elements.
+     * {@inheritDoc}
      */
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aSSLHostConfig,

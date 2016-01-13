@@ -42,11 +42,11 @@ public class StoreAppender {
             Short.TYPE, InetAddress.class };
 
     /**
-     * print the closing tag
+     * Print the closing tag.
      *
-     * @param aWriter
-     * @param aDesc
-     * @throws Exception
+     * @param aWriter The output writer
+     * @param aDesc Store description of the current element
+     * @throws Exception A store error occurred
      */
     public void printCloseTag(PrintWriter aWriter, StoreDescription aDesc)
             throws Exception {
@@ -56,13 +56,13 @@ public class StoreAppender {
     }
 
     /**
-     * print only the open tag with all attributes
+     * Print only the open tag with all attributes.
      *
-     * @param aWriter
-     * @param indent
-     * @param bean
-     * @param aDesc
-     * @throws Exception
+     * @param aWriter The output writer
+     * @param indent Indentation level
+     * @param bean The current bean that is stored
+     * @param aDesc Store description of the current element
+     * @throws Exception A store error occurred
      */
     public void printOpenTag(PrintWriter aWriter, int indent, Object bean,
             StoreDescription aDesc) throws Exception {
@@ -76,11 +76,11 @@ public class StoreAppender {
     /**
      * Print tag with all attributes
      *
-     * @param aWriter
-     * @param indent
-     * @param bean
-     * @param aDesc
-     * @throws Exception
+     * @param aWriter The output writer
+     * @param indent Indentation level
+     * @param bean The current bean that is stored
+     * @param aDesc Store description of the current element
+     * @throws Exception A store error occurred
      */
     public void printTag(PrintWriter aWriter, int indent, Object bean,
             StoreDescription aDesc) throws Exception {
@@ -92,12 +92,12 @@ public class StoreAppender {
     }
 
     /**
-     * print the value from tag as content
+     * Print the value from tag as content.
      *
-     * @param aWriter
-     * @param tag
-     * @param content
-     * @throws Exception
+     * @param aWriter The output writer
+     * @param tag The element name
+     * @param content Element content
+     * @throws Exception A store error occurred
      */
     public void printTagContent(PrintWriter aWriter, String tag, String content)
             throws Exception {
@@ -111,12 +111,12 @@ public class StoreAppender {
     }
 
     /**
-     * print an array of values
+     * Print an array of values.
      *
-     * @param aWriter
-     * @param tag
-     * @param indent
-     * @param elements
+     * @param aWriter The output writer
+     * @param tag The element name
+     * @param indent Indentation level
+     * @param elements Array of element values
      */
     public void printTagValueArray(PrintWriter aWriter, String tag, int indent,
             String[] elements) {
@@ -139,12 +139,13 @@ public class StoreAppender {
     }
 
     /**
-     * print a array of elements
+     * Print an array of elements.
      *
-     * @param aWriter
-     * @param tag
-     * @param indent
-     * @param elements
+     * @param aWriter The output writer
+     * @param tag The element name
+     * @param indent Indentation level
+     * @param elements Array of elements
+     * @throws Exception Store error occurred
      */
     public void printTagArray(PrintWriter aWriter, String tag, int indent,
             String[] elements) throws Exception {
@@ -157,11 +158,10 @@ public class StoreAppender {
     }
 
     /**
-     * Print some spaces
+     * Print some spaces.
      *
-     * @param aWriter
-     * @param indent
-     *            number of spaces
+     * @param aWriter The output writer
+     * @param indent The number of spaces
      */
     public void printIndent(PrintWriter aWriter, int indent) {
         for (int i = 0; i < indent; i++) {
@@ -174,10 +174,11 @@ public class StoreAppender {
      * <code>className</code> attribute defining the fully qualified Java
      * class name of the bean.
      *
-     * @param writer
-     *            PrintWriter to which we are storing
+     * @param writer PrintWriter to which we are storing
+     * @param indent Indentation level
      * @param bean
      *            Bean whose properties are to be rendered as attributes,
+     * @param desc Store description of the current element
      *
      * @exception Exception
      *                if an exception occurs while storing
@@ -192,8 +193,8 @@ public class StoreAppender {
     /**
      * Store the relevant attributes of the specified JavaBean.
      *
-     * @param writer
-     *            PrintWriter to which we are storing
+     * @param writer PrintWriter to which we are storing
+     * @param indent Indentation level
      * @param include
      *            Should we include a <code>className</code> attribute?
      * @param bean
@@ -268,13 +269,15 @@ public class StoreAppender {
     }
 
     /**
-     * @param writer
-     * @param indent
-     * @param bean
-     * @param desc
-     * @param attributeName
-     * @param bean2
-     * @param value
+     * Store the specified of the specified JavaBean.
+     *
+     * @param writer PrintWriter to which we are storing
+     * @param indent Indentation level
+     * @param bean The current bean
+     * @param desc RegistryDescrpitor from this bean
+     * @param attributeName The attribute name to store
+     * @param bean2 A default instance of the bean for comparison
+     * @param value The attribute value
      */
     protected void printAttribute(PrintWriter writer, int indent, Object bean, StoreDescription desc, String attributeName, Object bean2, Object value) {
         if (isPrintValue(bean, bean2, attributeName, desc))
@@ -282,7 +285,7 @@ public class StoreAppender {
     }
 
     /**
-     * print this Attribute value or not
+     * Determine if the attribute value needs to be stored.
      *
      * @param bean
      *            orginal bean
@@ -292,7 +295,7 @@ public class StoreAppender {
      *            attribute name
      * @param desc
      *            StoreDescription from bean
-     * @return True if it's a printing value
+     * @return <code>true</code> if the value should be stored
      */
     public boolean isPrintValue(Object bean, Object bean2, String attrName,
             StoreDescription desc) {
@@ -308,12 +311,12 @@ public class StoreAppender {
     }
 
     /**
-     * generate default Instance
+     * Generate default Instance for the specified bean.
      *
-     * @param bean
+     * @param bean The bean
      * @return an object from same class as bean parameter
-     * @throws InstantiationException
-     * @throws IllegalAccessException
+     * @throws InstantiationException Error creating a new instance
+     * @throws IllegalAccessException Another error occurred
      */
     public Object defaultInstance(Object bean) throws InstantiationException,
             IllegalAccessException {
@@ -321,11 +324,12 @@ public class StoreAppender {
     }
 
     /**
-     * print an attribute value
+     * Print an attribute value.
      *
-     * @param writer
-     * @param name
-     * @param value
+     * @param writer PrintWriter to which we are storing
+     * @param indent Indentation level
+     * @param name Attribute name
+     * @param value Attribute value
      */
     public void printValue(PrintWriter writer, int indent, String name,
             Object value) {
@@ -348,6 +352,8 @@ public class StoreAppender {
     /**
      * Given a string, this method replaces all occurrences of '&lt;', '&gt;',
      * '&amp;', and '"'.
+     * @param input The string to escape
+     * @return the escaped string
      */
     public String convertStr(String input) {
 
@@ -378,6 +384,7 @@ public class StoreAppender {
      *
      * @param clazz
      *            Java class to be tested
+     * @return <code>true</code> if the specified class should be stored
      */
     protected boolean isPersistable(Class<?> clazz) {
 

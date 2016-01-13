@@ -41,6 +41,9 @@ public class StoreFactoryRule extends Rule {
      * @param attributeName
      *            Name of the attribute that optionally includes an override
      *            name of the IStoreFactory class
+     * @param storeAppenderClass The store appender class
+     * @param appenderAttributeName The attribute name for the store
+     *  appender class
      */
     public StoreFactoryRule(String storeFactoryClass, String attributeName,
             String storeAppenderClass, String appenderAttributeName) {
@@ -74,11 +77,10 @@ public class StoreFactoryRule extends Rule {
     /**
      * Handle the beginning of an XML element.
      *
-     * @param attributes
-     *            The attributes of this element
-     *
-     * @exception Exception
-     *                if a processing error occurs
+     * @param namespace XML namespace
+     * @param name The element name
+     * @param attributes The attributes of this element
+     * @exception Exception if a processing error occurs
      */
     @Override
     public void begin(String namespace, String name, Attributes attributes)
@@ -99,15 +101,15 @@ public class StoreFactoryRule extends Rule {
     }
 
     /**
-     * create new instance from attribte className!
+     * Create new instance from attribute className!
      *
      * @param attr class Name attribute
      * @param defaultName Default Class
      * @param attributes current digester attribute elements
-     * @return new config object instance
-     * @throws ClassNotFoundException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
+     * @return new configured object instance
+     * @throws ClassNotFoundException Class was not found
+     * @throws InstantiationException Error creating an instance
+     * @throws IllegalAccessException Security exception
      */
     protected Object newInstance(String attr, String defaultName,
             Attributes attributes) throws ClassNotFoundException,

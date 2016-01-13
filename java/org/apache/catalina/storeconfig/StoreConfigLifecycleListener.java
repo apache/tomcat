@@ -53,8 +53,8 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
     private String storeRegistry = null;
     private ObjectName oname = null;
 
-    /*
-     * register StoreRegistry after Start the complete Server
+    /**
+     * Register StoreRegistry after Start the complete Server.
      *
      * @see org.apache.catalina.LifecycleListener#lifecycleEvent(org.apache.catalina.LifecycleEvent)
      */
@@ -75,8 +75,9 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
      }
 
     /**
-     * create StoreConfig MBean and load StoreRgistry MBeans name is
-     * <i>Catalina:type=StoreConfig </i>
+     * Create StoreConfig MBean and load StoreRgistry MBeans name is
+     * <code>Catalina:type=StoreConfig</code>.
+     * @param server The Server instance
      */
     protected void createMBean(Server server) {
         StoreLoader loader = new StoreLoader();
@@ -107,11 +108,11 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
     }
 
     /**
-     * Create a ManagedBean (StoreConfig)
+     * Create a ManagedBean (StoreConfig).
      *
-     * @param object
-     * @return The bean
-     * @throws Exception
+     * @param object The object to manage
+     * @return an MBean wrapping the object
+     * @throws Exception if an error occurred
      */
     protected DynamicMBean getManagedBean(Object object) throws Exception {
         ManagedBean managedBean = registry.findManagedBean("StoreConfig");
@@ -119,7 +120,7 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
     }
 
     /**
-     * @return Returns the storeConfig.
+     * @return the store config instance
      */
     public IStoreConfig getStoreConfig() {
         return storeConfig;
@@ -134,7 +135,7 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
     }
 
     /**
-     * @return Returns the storeConfigClass.
+     * @return the main store config class name
      */
     public String getStoreConfigClass() {
         return storeConfigClass;
@@ -149,7 +150,7 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
     }
 
     /**
-     * @return Returns the storeRegistry.
+     * @return the store registry
      */
     public String getStoreRegistry() {
         return storeRegistry;

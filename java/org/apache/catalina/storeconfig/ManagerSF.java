@@ -67,6 +67,7 @@ public class ManagerSF extends StoreFactoryBase {
      *
      * @param smanager
      *            Manager to be tested
+     * @return <code>true</code> if this is an instance of the default manager
      */
     protected boolean isDefaultManager(StandardManager smanager) {
 
