@@ -67,6 +67,7 @@ public final class ClassLoaderFactory {
      * or <code>null</code> for no directories of JAR files to be considered
      * @param parent Parent class loader for the new class loader, or
      *  <code>null</code> for the system class loader.
+     * @return the new class loader
      *
      * @exception Exception if an error occurs constructing the class loader
      */
@@ -142,6 +143,7 @@ public final class ClassLoaderFactory {
      *                     the class loader.
      * @param parent Parent class loader for the new class loader, or
      *  <code>null</code> for the system class loader.
+     * @return the new class loader
      *
      * @exception Exception if an error occurs constructing the class loader
      */
