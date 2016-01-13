@@ -50,6 +50,8 @@ public final class RequestUtil {
      * codes in the request URL that is often reported in error messages.
      *
      * @param message The message string to be filtered
+     *
+     * @return the filtered message
      */
     public static String filter(String message) {
 
