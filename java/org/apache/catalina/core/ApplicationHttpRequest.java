@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
 import javax.servlet.DispatcherType;
@@ -40,7 +39,8 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
-import org.apache.catalina.util.RequestUtil;
+import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.Parameters;
 
 
 /**
@@ -885,24 +885,32 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             return;
 
         HashMap<String, String[]> queryParameters = new HashMap<>();
-        String encoding = getCharacterEncoding();
-        if (encoding == null)
-            encoding = "ISO-8859-1";
-        RequestUtil.parseParameters(queryParameters, queryParamString,
-                encoding);
-        for (Entry<String, String[]> entry : parameters.entrySet()) {
-            String entryKey = entry.getKey();
-            String[] entryValue = entry.getValue();
-            Object value = queryParameters.get(entryKey);
-            if (value == null) {
-                queryParameters.put(entryKey, entryValue);
+
+        // Parse the query string from the dispatch target
+        Parameters paramParser = new Parameters();
+        MessageBytes queryMB = MessageBytes.newInstance();
+        queryMB.setString(queryParamString);
+        paramParser.setQuery(queryMB);
+        paramParser.setQueryStringEncoding(getCharacterEncoding());
+        paramParser.handleQueryParameters();
+
+        // Copy the original parameters
+        queryParameters.putAll(parameters);
+
+        // Insert the additional parameters from the dispatch target
+        Enumeration<String> dispParamNames = paramParser.getParameterNames();
+        while (dispParamNames.hasMoreElements()) {
+            String dispParamName = dispParamNames.nextElement();
+            String[] dispParamValues = paramParser.getParameterValues(dispParamName);
+            String[] originalValues = queryParameters.get(dispParamName);
+            if (originalValues == null) {
+                queryParameters.put(dispParamName, dispParamValues);
                 continue;
             }
-            queryParameters.put
-                (entryKey, mergeValues(value, entryValue));
+            queryParameters.put(dispParamName, mergeValues(dispParamValues, originalValues));
         }
-        parameters = queryParameters;
 
+        parameters = queryParameters;
     }
 
 
