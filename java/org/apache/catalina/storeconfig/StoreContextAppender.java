@@ -30,13 +30,8 @@ import org.apache.catalina.core.StandardHost;
 public class StoreContextAppender extends StoreAppender {
 
     /**
-     * @param writer
-     * @param indent
-     * @param bean
-     * @param desc
-     * @param attributeName
-     * @param bean2
-     * @param value
+     * {@inheritDoc}
+     * Adds special handling for <code>docBase</code>.
      */
     @Override
     protected void printAttribute(PrintWriter writer, int indent, Object bean, StoreDescription desc, String attributeName, Object bean2, Object value) {
@@ -52,14 +47,14 @@ public class StoreContextAppender extends StoreAppender {
         }
     }
 
-    /*
-     * Print Context Values. <ul><li> Spezial handling to default workDir.
+    /**
+     * Print Context Values. <ul><li> Special handling to default workDir.
      * </li><li> Don't save path at external context.xml </li><li> Don't
      * generate docBase for host.appBase webapps <LI></ul>
      *
-     * @see org.apache.catalina.config.StoreAppender#isPrintValue(java.lang.Object,
+     * @see org.apache.catalina.storeconfig.StoreAppender#isPrintValue(java.lang.Object,
      *      java.lang.Object, java.lang.String,
-     *      org.apache.catalina.config.StoreDescription)
+     *      org.apache.catalina.storeconfig.StoreDescription)
      */
     @Override
     public boolean isPrintValue(Object bean, Object bean2, String attrName,
@@ -123,7 +118,7 @@ public class StoreContextAppender extends StoreAppender {
     /**
      * Make default Work Dir.
      *
-     * @param context
+     * @param context The context
      * @return The default working directory for the context.
      */
     protected String getDefaultWorkDir(StandardContext context) {
@@ -150,11 +145,11 @@ public class StoreContextAppender extends StoreAppender {
         return defaultWorkDir;
     }
 
-    /*
+    /**
      * Generate a real default StandardContext TODO read and interpret the
      * default context.xml and context.xml.default TODO Cache a Default
      * StandardContext ( with reloading strategy) TODO remove really all
-     * elements, but detection is hard... To Listener or Valve from same class?>
+     * elements, but detection is hard... To Listener or Valve from same class?
      *
      * @see org.apache.catalina.storeconfig.StoreAppender#defaultInstance(java.lang.Object)
      */

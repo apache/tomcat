@@ -32,12 +32,13 @@ import org.apache.catalina.core.StandardService;
 public class StandardServiceSF extends StoreFactoryBase {
 
     /**
-     * Store Children from this StandardService description
+     * Store the specified service element children.
      *
-     * @param aWriter
-     * @param indent
-     * @param aService
-     * @throws Exception
+     * @param aWriter Current output writer
+     * @param indent Indentation level
+     * @param aService Service to store
+     * @param parentDesc The element description
+     * @throws Exception Configuration storing error
      */
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aService,

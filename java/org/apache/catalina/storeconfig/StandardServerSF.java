@@ -54,13 +54,13 @@ public class StandardServerSF extends StoreFactoryBase {
     }
 
     /**
-     * Store Children from this StandardServer description
+     * Store the specified server element children.
      *
-     * @param aWriter
-     * @param indent
-     * @param aObject
-     * @param parentDesc
-     * @throws Exception
+     * @param aWriter Current output writer
+     * @param indent Indentation level
+     * @param aObject Server to store
+     * @param parentDesc The element description
+     * @throws Exception Configuration storing error
      */
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aObject,
