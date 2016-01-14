@@ -254,6 +254,7 @@ public class MemoryUser extends AbstractUser {
      * the reader that processes this entry will accept either
      * <code>username</code> or <code>name</code> for the username
      * property.</p>
+     * @return the XML representation
      */
     public String toXml() {
 

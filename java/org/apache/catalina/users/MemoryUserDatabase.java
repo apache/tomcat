@@ -139,7 +139,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
-     * Return the set of {@link Group}s defined in this user database.
+     * @return the set of {@link Group}s defined in this user database.
      */
     @Override
     public Iterator<Group> getGroups() {
@@ -152,7 +152,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
-     * Return the unique global identifier of this user database.
+     * @return the unique global identifier of this user database.
      */
     @Override
     public String getId() {
@@ -163,7 +163,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
-     * Return the relative or absolute pathname to the persistent storage file.
+     * @return the relative or absolute pathname to the persistent storage file.
      */
     public String getPathname() {
 
@@ -187,7 +187,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
-     * Returning the readonly status of the user database
+     * @return the readonly status of the user database
      */
     public boolean getReadonly() {
 
@@ -209,7 +209,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
-     * Return the set of {@link Role}s defined in this user database.
+     * @return the set of {@link Role}s defined in this user database.
      */
     @Override
     public Iterator<Role> getRoles() {
@@ -222,7 +222,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
 
     /**
-     * Return the set of {@link User}s defined in this user database.
+     * @return the set of {@link User}s defined in this user database.
      */
     @Override
     public Iterator<User> getUsers() {
@@ -485,6 +485,7 @@ public class MemoryUserDatabase implements UserDatabase {
     /**
      * Check for permissions to save this user database to persistent storage
      * location.
+     * @return <code>true</code> if the database is writable
      */
     public boolean isWriteable() {
 

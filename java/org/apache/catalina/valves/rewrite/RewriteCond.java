@@ -183,6 +183,8 @@ public class RewriteCond {
      *
      * @param rule corresponding matched rule
      * @param cond last matched condition
+     * @param resolver Property resolver
+     * @return <code>true</code> if the condition matches
      */
     public boolean evaluate(Matcher rule, Matcher cond, Resolver resolver) {
         String value = test.evaluate(rule, cond, resolver);

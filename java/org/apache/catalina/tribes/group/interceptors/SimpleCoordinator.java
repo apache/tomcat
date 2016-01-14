@@ -58,7 +58,7 @@ public class SimpleCoordinator extends ChannelInterceptorBase {
     /**
      * Override to receive view changes.
      *
-     * @param view
+     * @param view The members array
      */
     protected void viewChange(final Member[] view) {
     }

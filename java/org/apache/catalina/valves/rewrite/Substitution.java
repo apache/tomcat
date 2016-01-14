@@ -227,10 +227,11 @@ public class Substitution {
     }
 
     /**
-     * Evaluate the substitution based on the context
-     *
+     * Evaluate the substitution based on the context.
      * @param rule corresponding matched rule
      * @param cond last matched condition
+     * @param resolver The property resolver
+     * @return The substitution result
      */
     public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
         StringBuffer buf = new StringBuffer();

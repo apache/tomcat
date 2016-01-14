@@ -86,7 +86,7 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
      * @param destination Member[] - the destination for this message
      * @param msg ChannelMessage - the message to be sent
      * @param payload InterceptorPayload - the payload, carrying an error handler and future useful data, can be null
-     * @throws ChannelException
+     * @throws ChannelException if a serialization error happens.
      * @see ErrorHandler
      * @see InterceptorPayload
      */

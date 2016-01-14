@@ -42,6 +42,7 @@ public class IOTools {
      * @param reader the reader to read from.
      * @param writer the writer to write to.
      * @param buf the char array to use as a buffer
+     * @throws IOException IO error
      */
     public static void flow( Reader reader, Writer writer, char[] buf )
         throws IOException {
@@ -52,6 +53,12 @@ public class IOTools {
     }
 
     /**
+     * Read input from reader and write it to writer until there is no more
+     * input from reader.
+     *
+     * @param reader the reader to read from.
+     * @param writer the writer to write to.
+     * @throws IOException IO error
      * @see #flow( Reader, Writer, char[] )
      */
     public static void flow( Reader reader, Writer writer )
