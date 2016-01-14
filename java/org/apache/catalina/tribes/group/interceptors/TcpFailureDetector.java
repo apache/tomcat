@@ -335,7 +335,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
             socket.connect(addr, (int) conTimeout);
             if ( sendTest ) {
                 ChannelData data = new ChannelData(true);
-                data.setAddress(mbr);
+                data.setAddress(getLocalMember(false));
                 data.setMessage(new XByteBuffer(msgData,false));
                 data.setTimestamp(System.currentTimeMillis());
                 int options = optionFlag | Channel.SEND_OPTIONS_BYTE_MESSAGE;
