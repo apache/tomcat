@@ -292,10 +292,10 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     protected boolean alive(Member mbr) {
-        return memberAlive(mbr, COORD_ALIVE, waitForCoordMsgTimeout);
+        return memberAlive(mbr, waitForCoordMsgTimeout);
     }
 
-    protected boolean memberAlive(Member mbr, byte[] msgData,long conTimeout) {
+    protected boolean memberAlive(Member mbr, long conTimeout) {
         //could be a shutdown notification
         if ( Arrays.equals(mbr.getCommand(),Member.SHUTDOWN_PAYLOAD) ) return false;
 
