@@ -144,6 +144,8 @@ public abstract class AbstractProcessorLight implements Processor {
      * Uses currently include Servlet 3.0 Async and HTTP upgrade connections.
      * Further uses may be added in the future. These will typically start as
      * HTTP requests.
+     * @param status The event to process
+     * @return the socket state
      */
     protected abstract SocketState dispatch(SocketEvent status);
 

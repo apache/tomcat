@@ -55,9 +55,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     /**
      * Used by HTTP/2.
-     *
-     * @param coyoteRequest
-     * @param coyoteResponse
+     * @param coyoteRequest The request
+     * @param coyoteResponse The response
      */
     protected AbstractProcessor(Request coyoteRequest, Response coyoteResponse) {
         this(null, coyoteRequest, coyoteResponse);
@@ -83,6 +82,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     /**
      * Update the current error state to the new error state if the new error
      * state is more severe than the current error state.
+     * @param errorState The error status details
+     * @param t The error which occurred
      */
     protected void setErrorState(ErrorState errorState, Throwable t) {
         boolean blockIo = this.errorState.isIoAllowed() && !errorState.isIoAllowed();
@@ -135,6 +136,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     /**
      * Set the socket wrapper being used.
+     * @param socketWrapper The socket wrapper
      */
     protected final void setSocketWrapper(SocketWrapperBase<?> socketWrapper) {
         this.socketWrapper = socketWrapper;
@@ -142,7 +144,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Get the socket wrapper being used.
+     * @return the socket wrapper being used.
      */
     protected final SocketWrapperBase<?> getSocketWrapper() {
         return socketWrapper;
@@ -156,7 +158,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * Obtain the Executor used by the underlying endpoint.
+     * @return the Executor used by the underlying endpoint.
      */
     protected Executor getExecutor() {
         return endpoint.getExecutor();

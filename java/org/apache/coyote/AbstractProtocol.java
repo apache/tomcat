@@ -393,6 +393,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     /**
      * Concrete implementations need to provide access to their logger to be
      * used by the abstract classes.
+     * @return the logger
      */
     protected abstract Log getLog();
 
@@ -400,19 +401,22 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     /**
      * Obtain the prefix to be used when construction a name for this protocol
      * handler. The name will be prefix-address-port.
+     * @return the prefix
      */
     protected abstract String getNamePrefix();
 
 
     /**
      * Obtain the name of the protocol, (Http, Ajp, etc.). Used with JMX.
+     * @return the protocol name
      */
     protected abstract String getProtocolName();
 
 
     /**
+     * Find a suitable handler for the protocol negotiated
+     * at the network layer.
      * @param name The name of the requested negotiated protocol.
-     *
      * @return The instance where {@link UpgradeProtocol#getAlpnName()} matches
      *         the requested protocol
      */

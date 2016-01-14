@@ -527,7 +527,7 @@ public class Http11OutputBuffer implements OutputBuffer {
      * @param block     Should this method block until the buffer is empty
      * @return  <code>true</code> if data remains in the buffer (which can only
      *          happen in non-blocking mode) else <code>false</code>.
-     * @throws IOException
+     * @throws IOException Error writing data
      */
     protected boolean flushBuffer(boolean block) throws IOException  {
         return socketWrapper.flush(block);
@@ -536,6 +536,7 @@ public class Http11OutputBuffer implements OutputBuffer {
 
     /**
      * Is standard Servlet blocking IO being used for output?
+     * @return <code>true</code> if this is blocking IO
      */
     protected final boolean isBlocking() {
         return response.getWriteListener() == null;

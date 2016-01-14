@@ -932,8 +932,10 @@ public class AjpProcessor extends AbstractProcessor {
     /**
      * Get more request body data from the web server and store it in the
      * internal buffer.
-     *
-     * @return true if there is more data, false if not.
+     * @param block <code>true</code> if this is blocking IO
+     * @return <code>true</code> if there is more data,
+     *  <code>false</code> if not.
+     * @throws IOException An IO error occurred
      */
     protected boolean refillReadBuffer(boolean block) throws IOException {
         // When using replay (e.g. after FORM auth) all the data to read has
