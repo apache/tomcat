@@ -292,38 +292,17 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     protected boolean alive(Member mbr) {
-        return memberAlive(mbr, COORD_ALIVE, false, false,
-                waitForCoordMsgTimeout, waitForCoordMsgTimeout, getOptionFlag());
+        return memberAlive(mbr, COORD_ALIVE, waitForCoordMsgTimeout);
     }
 
-    protected boolean memberAlive(Member mbr, byte[] msgData,
-                                         boolean sendTest, boolean readTest,
-                                         long readTimeout, long conTimeout,
-                                         int optionFlag) {
+    protected boolean memberAlive(Member mbr, byte[] msgData,long conTimeout) {
         //could be a shutdown notification
         if ( Arrays.equals(mbr.getCommand(),Member.SHUTDOWN_PAYLOAD) ) return false;
 
         try (Socket socket = new Socket()) {
             InetAddress ia = InetAddress.getByAddress(mbr.getHost());
             InetSocketAddress addr = new InetSocketAddress(ia, mbr.getPort());
-            socket.setSoTimeout((int)readTimeout);
             socket.connect(addr, (int) conTimeout);
-            if ( sendTest ) {
-                ChannelData data = new ChannelData(true);
-                data.setAddress(mbr);
-                data.setMessage(new XByteBuffer(msgData,false));
-                data.setTimestamp(System.currentTimeMillis());
-                int options = optionFlag | Channel.SEND_OPTIONS_BYTE_MESSAGE;
-                if ( readTest ) options = (options | Channel.SEND_OPTIONS_USE_ACK);
-                else options = (options & (~Channel.SEND_OPTIONS_USE_ACK));
-                data.setOptions(options);
-                byte[] message = XByteBuffer.createDataPackage(data);
-                socket.getOutputStream().write(message);
-                if ( readTest ) {
-                    int length = socket.getInputStream().read(message);
-                    return length > 0;
-                }
-            }//end if
             return true;
         } catch (SocketTimeoutException sx) {
             //do nothing, we couldn't connect
