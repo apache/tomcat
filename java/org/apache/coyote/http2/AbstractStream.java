@@ -105,8 +105,10 @@ abstract class AbstractStream {
 
 
     /**
-     * @param increment
-     * @throws Http2Exception
+     * Increment window size.
+     * @param increment The amount of the incrementation
+     * @throws Http2Exception If the window size is now higher than
+     *  the maximum allowed
      */
     protected synchronized void incrementWindowSize(int increment) throws Http2Exception {
         // No need for overflow protection here.
