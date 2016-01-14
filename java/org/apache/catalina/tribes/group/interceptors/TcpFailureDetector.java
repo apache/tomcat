@@ -321,7 +321,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         return memberAlive(mbr,TCP_FAIL_DETECT,performSendTest,performReadTest,readTestTimeout,connectTimeout,getOptionFlag());
     }
 
-    protected static boolean memberAlive(Member mbr, byte[] msgData,
+    protected boolean memberAlive(Member mbr, byte[] msgData,
                                          boolean sendTest, boolean readTest,
                                          long readTimeout, long conTimeout,
                                          int optionFlag) {
