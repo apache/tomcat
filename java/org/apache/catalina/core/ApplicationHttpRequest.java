@@ -838,35 +838,28 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param values1 First set of values
      * @param values2 Second set of values
      */
-    protected String[] mergeValues(Object values1, Object values2) {
+    private String[] mergeValues(String[] values1, String[] values2) {
 
         ArrayList<Object> results = new ArrayList<>();
 
         if (values1 == null) {
             // Skip - nothing to merge
-        } else if (values1 instanceof String)
-            results.add(values1);
-        else if (values1 instanceof String[]) {
-            String values[] = (String[]) values1;
-            for (int i = 0; i < values.length; i++)
-                results.add(values[i]);
-        } else
-            results.add(values1.toString());
+        } else {
+            for (String value : values1) {
+                results.add(value);
+            }
+        }
 
         if (values2 == null) {
             // Skip - nothing to merge
-        } else if (values2 instanceof String)
-            results.add(values2);
-        else if (values2 instanceof String[]) {
-            String values[] = (String[]) values2;
-            for (int i = 0; i < values.length; i++)
-                results.add(values[i]);
-        } else
-            results.add(values2.toString());
+        } else {
+            for (String value : values2) {
+                results.add(value);
+            }
+        }
 
         String values[] = new String[results.size()];
         return results.toArray(values);
-
     }
 
 
