@@ -29,7 +29,7 @@ public interface ChannelReceiver extends Heartbeat {
 
     /**
      * Start listening for incoming messages on the host/port
-     * @throws java.io.IOException
+     * @throws java.io.IOException Listen failed
      */
     public void start() throws java.io.IOException;
 

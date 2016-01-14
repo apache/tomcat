@@ -96,7 +96,7 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 
 
     /**
-     * Return the locked state of this parameter map.
+     * @return the locked state of this parameter map.
      */
     public boolean isLocked() {
 

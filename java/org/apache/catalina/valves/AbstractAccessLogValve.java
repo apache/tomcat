@@ -475,7 +475,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * @return Returns the enabled.
+     * @return the enabled flag.
      */
     public boolean getEnabled() {
         return enabled;
@@ -490,7 +490,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * Return the format pattern.
+     * @return the format pattern.
      */
     public String getPattern() {
         return (this.pattern);
@@ -519,6 +519,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Return whether the attribute name to look for when
      * performing conditional logging. If null, every
      * request is logged.
+     * @return the attribute name
      */
     public String getCondition() {
         return condition;
@@ -540,6 +541,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Return whether the attribute name to look for when
      * performing conditional logging. If null, every
      * request is logged.
+     * @return the attribute name
      */
     public String getConditionUnless() {
         return getCondition();
@@ -560,6 +562,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * Return whether the attribute name to look for when
      * performing conditional logging. If null, every
      * request is logged.
+     * @return the attribute name
      */
     public String getConditionIf() {
         return conditionIf;
@@ -579,6 +582,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     /**
      * Return the locale used to format timestamps in log entries and in
      * log file name suffix.
+     * @return the locale
      */
     public String getLocale() {
         return localeName;
@@ -671,8 +675,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * second since a new Date was created, this method simply gives out the
      * same Date again so that the system doesn't spend time creating Date
      * objects unnecessarily.
-     *
-     * @return Date
+     * @param systime The time
+     * @return the date object
      */
     private static Date getDate(long systime) {
         Date date = localDate.get();
@@ -682,7 +686,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
 
     /**
-     * Find a locale by name
+     * Find a locale by name.
+     * @param name The locale name
+     * @param fallback Fallback locale if the name is not found
+     * @return the locale object
      */
     protected static Locale findLocale(String name, Locale fallback) {
         if (name == null || name.isEmpty()) {
@@ -1155,7 +1162,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         private final boolean conversion;
 
         /**
-         * if conversion is true, write '-' instead of 0 - %b
+         * @param conversion <code>true</code> to write '-' instead of 0 - %b.
          */
         public ByteSentElement(boolean conversion) {
             this.conversion = conversion;
@@ -1209,8 +1216,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         private final boolean millis;
 
         /**
-         * if millis is true, write time in millis - %D
-         * if millis is false, write time in seconds - %T
+         * @param millis <code>true</code>, write time in millis - %D,
+         * if <code>false</code>, write time in seconds - %T
          */
         public ElapsedTimeElement(boolean millis) {
             this.millis = millis;
@@ -1477,7 +1484,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
 
     /**
-     * parse pattern string and create the array of AccessLogElement
+     * Parse pattern string and create the array of AccessLogElement.
+     * @return the log elements array
      */
     protected AccessLogElement[] createLogElements() {
         List<AccessLogElement> list = new ArrayList<>();
@@ -1526,7 +1534,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * create an AccessLogElement implementation which needs an element name
+     * Create an AccessLogElement implementation which needs an element name.
+     * @param name Header name
+     * @param pattern char in the log pattern
+     * @return the log element
      */
     protected AccessLogElement createAccessLogElement(String name, char pattern) {
         switch (pattern) {
@@ -1550,7 +1561,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * create an AccessLogElement implementation
+     * Create an AccessLogElement implementation.
+     * @param pattern char in the log pattern
+     * @return the log element
      */
     protected AccessLogElement createAccessLogElement(char pattern) {
         switch (pattern) {

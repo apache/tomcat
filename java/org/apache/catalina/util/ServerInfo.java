@@ -85,7 +85,7 @@ public class ServerInfo {
 
 
     /**
-     * Return the server identification for this version of Tomcat.
+     * @return the server identification for this version of Tomcat.
      */
     public static String getServerInfo() {
 
@@ -94,7 +94,7 @@ public class ServerInfo {
     }
 
     /**
-     * Return the server built time for this version of Tomcat.
+     * @return the server built time for this version of Tomcat.
      */
     public static String getServerBuilt() {
 
@@ -103,7 +103,7 @@ public class ServerInfo {
     }
 
     /**
-     * Return the server's version number.
+     * @return the server's version number.
      */
     public static String getServerNumber() {
 

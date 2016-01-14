@@ -156,12 +156,14 @@ public abstract class AbstractReplicatedMap<K,V>
 //------------------------------------------------------------------------------
 
     /**
-     * Creates a new map
+     * Creates a new map.
+     * @param owner The map owner
      * @param channel The channel to use for communication
      * @param timeout long - timeout for RPC messags
      * @param mapContextName String - unique name for this map, to allow multiple maps per channel
      * @param initialCapacity int - the size of this map, see HashMap
      * @param loadFactor float - load factor, see HashMap
+     * @param channelSendOptions Send options
      * @param cls - a list of classloaders to be used for deserialization of objects.
      * @param terminate - Flag for whether to terminate this map that failed to start.
      */
@@ -248,7 +250,7 @@ public abstract class AbstractReplicatedMap<K,V>
      * Sends a ping out to all the members in the cluster, not just map members
      * that this map is alive.
      * @param timeout long
-     * @throws ChannelException
+     * @throws ChannelException Send error
      */
     protected void ping(long timeout) throws ChannelException {
         //send out a map membership message, only wait for the first reply
@@ -307,7 +309,7 @@ public abstract class AbstractReplicatedMap<K,V>
      * Helper method to broadcast a message to all members in a channel
      * @param msgtype int
      * @param rpc boolean
-     * @throws ChannelException
+     * @throws ChannelException Send error
      */
     protected void broadcast(int msgtype, boolean rpc) throws ChannelException {
         Member[] members = channel.getMembers();
@@ -400,6 +402,7 @@ public abstract class AbstractReplicatedMap<K,V>
     /**
      * Replicates any changes to the object since the last time
      * The object has to be primary, ie, if the object is a proxy or a backup, it will not be replicated<br>
+     * @param key The object to replicate
      * @param complete - if set to true, the object is replicated to its backup
      * if set to false, only objects that implement ReplicatedMapEntry and the isDirty() returns true will
      * be replicated
@@ -1301,8 +1304,8 @@ public abstract class AbstractReplicatedMap<K,V>
          * @param offset int
          * @param length int
          * @param diff boolean
-         * @throws IOException
-         * @throws ClassNotFoundException
+         * @throws IOException IO error
+         * @throws ClassNotFoundException Deserialization error
          */
         @SuppressWarnings("unchecked")
         public void apply(byte[] data, int offset, int length, boolean diff) throws IOException, ClassNotFoundException {

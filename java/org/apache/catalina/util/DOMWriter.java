@@ -52,7 +52,10 @@ public class DOMWriter {
     }
 
 
-    /** Prints the specified node, recursively. */
+    /**
+     * Prints the specified node, recursively.
+     * @param node The node to output
+     */
     public void print(Node node) {
 
         // is there anything to do?
@@ -161,7 +164,11 @@ public class DOMWriter {
     }
 
 
-    /** Returns a sorted list of attributes. */
+    /**
+     * Returns a sorted list of attributes.
+     * @param attrs The map to sort
+     * @return a sorted attribute array
+     */
     protected Attr[] sortAttributes(NamedNodeMap attrs) {
         if (attrs == null) {
             return new Attr[0];
@@ -195,7 +202,11 @@ public class DOMWriter {
 
     }
 
-    /** Normalizes the given string. */
+    /**
+     * Normalizes the given string.
+     * @param s The string to escape
+     * @return the escaped string
+     */
     protected String normalize(String s) {
         if (s == null) {
             return "";

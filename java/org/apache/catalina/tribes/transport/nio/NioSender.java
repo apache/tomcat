@@ -75,10 +75,11 @@ public class NioSender extends AbstractSender {
     }
 
     /**
-     * State machine to send data
-     * @param key SelectionKey
-     * @return boolean
-     * @throws IOException
+     * State machine to send data.
+     * @param key The key to use
+     * @param waitForAck Wait for an ack
+     * @return <code>true</code> if the processing was successful
+     * @throws IOException An IO error occurred
      */
     public boolean process(SelectionKey key, boolean waitForAck) throws IOException {
         int ops = key.readyOps();
