@@ -296,7 +296,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
                 waitForCoordMsgTimeout, waitForCoordMsgTimeout, getOptionFlag());
     }
 
-    protected static boolean memberAlive(Member mbr, byte[] msgData,
+    protected boolean memberAlive(Member mbr, byte[] msgData,
                                          boolean sendTest, boolean readTest,
                                          long readTimeout, long conTimeout,
                                          int optionFlag) {
