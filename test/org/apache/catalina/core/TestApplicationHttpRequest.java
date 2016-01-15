@@ -162,6 +162,19 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
         doQueryStringTest("a=b&c&a=e", "a", expected);
     }
 
+    @Test
+    public void testMergeQueryString05() throws Exception {
+        // https://ru.wikipedia.org/wiki/%D0%A2%D0%B5%D1%81%D1%82
+        // "Test" = "Test"
+        String test = "\u0422\u0435\u0441\u0442";
+        String query = test + "=%D0%A2%D0%B5%D1%81%D1%82";
+
+        Map<String, String[]> expected = new HashMap<String, String[]>();
+        expected.put("a", new String[] { "b" });
+        expected.put(test, new String[] { test });
+        doQueryStringTest("a=b", query, expected);
+    }
+
 
     private void doQueryStringTest(String originalQueryString, String forwardQueryString,
             Map<String,String[]> expected) throws Exception {
@@ -210,6 +223,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
+            req.setCharacterEncoding("UTF-8");
             req.getRequestDispatcher(target).forward(req, resp);
         }
     }
@@ -228,6 +242,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
+            req.setCharacterEncoding("UTF-8");
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
             PrintWriter w = resp.getWriter();
