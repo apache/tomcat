@@ -20,6 +20,7 @@ package org.apache.catalina.core;
 
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -39,6 +40,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.Parameters;
 
@@ -883,8 +885,20 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         Parameters paramParser = new Parameters();
         MessageBytes queryMB = MessageBytes.newInstance();
         queryMB.setString(queryParamString);
+
+        String encoding = getCharacterEncoding();
+        // No need to process null value, as ISO-8859-1 is the default encoding
+        // in MessageBytes.toBytes().
+        if (encoding != null) {
+            try {
+                queryMB.setCharset(B2CConverter.getCharset(encoding));
+            } catch (UnsupportedEncodingException ignored) {
+                // Fall-back to ISO-8859-1
+            }
+        }
+
         paramParser.setQuery(queryMB);
-        paramParser.setQueryStringEncoding(getCharacterEncoding());
+        paramParser.setQueryStringEncoding(encoding);
         paramParser.handleQueryParameters();
 
         // Copy the original parameters

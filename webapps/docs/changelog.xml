@@ -182,7 +182,7 @@
       <fix>
         <bug>58836</bug>: Correctly merge query string parameters when
         processing a forwarded request where the target includes a query string
-        that contains a parameter with no value. (markt)
+        that contains a parameter with no value. (markt/kkolinko)
       </fix>
     </changelog>
   </subsection>
