@@ -232,7 +232,9 @@ public class JspServletWrapper {
     }
 
     /**
-     * Compile (if needed) and load a tag file
+     * Compile (if needed) and load a tag file.
+     * @return the loaded class
+     * @throws JasperException Error compiling or loading tag file
      */
     public Class<?> loadTagFile() throws JasperException {
 
@@ -267,6 +269,8 @@ public class JspServletWrapper {
      * when compiling tag files with circular dependencies.  A prototype
      * (skeleton) with no dependencies on other other tag files is
      * generated and compiled.
+     * @return the loaded class
+     * @throws JasperException Error compiling or loading tag file
      */
     public Class<?> loadTagFilePrototype() throws JasperException {
 
@@ -280,6 +284,7 @@ public class JspServletWrapper {
 
     /**
      * Get a list of files that the current page has source dependency on.
+     * @return the map of dependent resources
      */
     public java.util.Map<String,Long> getDependants() {
         try {

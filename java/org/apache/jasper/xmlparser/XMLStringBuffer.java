@@ -51,7 +51,9 @@ public class XMLStringBuffer
     // Constants
     //
 
-    /** Default buffer size (32). */
+    /**
+     * Default buffer size (32).
+     */
     private static final int DEFAULT_SIZE = 32;
 
     //
@@ -59,16 +61,15 @@ public class XMLStringBuffer
     //
 
     /**
-     *
+     * Build a string buffer with the default size (32).
      */
     public XMLStringBuffer() {
         this(DEFAULT_SIZE);
     } // <init>()
 
     /**
-     *
-     *
-     * @param size
+     * Build a string buffer with the specified size.
+     * @param size The backing array size
      */
     public XMLStringBuffer(int size) {
         ch = new char[size];
@@ -78,7 +79,9 @@ public class XMLStringBuffer
     // Public methods
     //
 
-    /** Clears the string buffer. */
+    /**
+     * Clears the string buffer.
+     */
     @Override
     public void clear() {
         offset = 0;
@@ -86,9 +89,9 @@ public class XMLStringBuffer
     }
 
     /**
-     * append
+     * Append character.
      *
-     * @param c
+     * @param c The character to append
      */
     public void append(char c) {
         if (this.length + 1 > this.ch.length) {
@@ -104,9 +107,9 @@ public class XMLStringBuffer
     } // append(char)
 
     /**
-     * append
+     * Append string.
      *
-     * @param s
+     * @param s The string to append
      */
     public void append(String s) {
         int length = s.length();
@@ -123,11 +126,11 @@ public class XMLStringBuffer
     } // append(String)
 
     /**
-     * append
+     * Append characters.
      *
-     * @param ch
-     * @param offset
-     * @param length
+     * @param ch The character array
+     * @param offset The offset
+     * @param length The length
      */
     public void append(char[] ch, int offset, int length) {
         if (this.length + length > this.ch.length) {
@@ -140,9 +143,9 @@ public class XMLStringBuffer
     } // append(char[],int,int)
 
     /**
-     * append
+     * Append XML string
      *
-     * @param s
+     * @param s The string
      */
     public void append(XMLString s) {
         append(s.ch, s.offset, s.length);
