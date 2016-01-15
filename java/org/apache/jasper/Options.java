@@ -38,78 +38,85 @@ public interface Options {
      * Returns true if Jasper issues a compilation error instead of a runtime
      * Instantiation error if the class attribute specified in useBean action
      * is invalid.
+     * @return <code>true</code> to get an error
      */
     public boolean getErrorOnUseBeanInvalidClassAttribute();
 
     /**
-     * Are we keeping generated code around?
+     * @return <code>true</code> to keep the generated source
      */
     public boolean getKeepGenerated();
 
     /**
-     * Returns true if tag handler pooling is enabled, false otherwise.
+     * @return <code>true</code> if tag handler pooling is enabled,
+     *  <code>false</code> otherwise.
      */
     public boolean isPoolingEnabled();
 
     /**
-     * Are we supporting HTML mapped servlets?
+     * @return <code>true</code> if HTML mapped Servlets are supported.
      */
     public boolean getMappedFile();
 
     /**
-     * Should we include debug information in compiled class?
+     * @return <code>true</code> if debug information in included
+     *  in compiled classes.
      */
     public boolean getClassDebugInfo();
 
     /**
-     * Background compile thread check interval in seconds
+     * @return background compile thread check interval in seconds
      */
     public int getCheckInterval();
 
     /**
-     * Is Jasper being used in development mode?
+     * Main development flag, which enables detailed error reports with
+     *  sources, as well automatic recompilation of JSPs and tag files.
+     *  This setting should usually be <code>false</code> when running
+     *  in production.
+     * @return <code>true</code> if Jasper is in development mode
      */
     public boolean getDevelopment();
 
     /**
-     * Should we include a source fragment in exception messages, which could be displayed
-     * to the developer ?
+     * @return <code>true</code> to include a source fragment in exception
+     *  messages.
      */
     public boolean getDisplaySourceFragment();
 
     /**
-     * Is the generation of SMAP info for JSR45 debugging suppressed?
+     * @return <code>true</code> to suppress generation of SMAP info for
+     *  JSR45 debugging.
      */
     public boolean isSmapSuppressed();
 
     /**
-     * Indicates whether SMAP info for JSR45 debugging should be dumped to a
+     * This setting is ignored if suppressSmap() is <code>true</code>.
+     * @return <code>true</code> to write SMAP info for JSR45 debugging to a
      * file.
-     * Ignored if suppressSmap() is true.
      */
     public boolean isSmapDumped();
 
     /**
-     * Should white spaces between directives or actions be trimmed?
+     * @return <code>true</code> to trim white spaces between
+     *  directives or actions.
      */
     public boolean getTrimSpaces();
 
     /**
      * Gets the class-id value that is sent to Internet Explorer when using
      * &lt;jsp:plugin&gt; tags.
-     *
      * @return Class-id value
      */
     public String getIeClassId();
 
     /**
-     * What is my scratch dir?
+     * @return the work folder
      */
     public File getScratchDir();
 
     /**
-     * What classpath should I use while compiling the servlets
-     * generated from JSP files?
+     * @return the classpath used to compile generated Servlets
      */
     public String getClassPath();
 
@@ -122,21 +129,22 @@ public interface Options {
      * <code>javac</code> task from Apache Ant will be used to call an external
      * java compiler and the value of this option will be passed to it. See
      * Apache Ant documentation for the possible values.
+     * @return the compiler name
      */
     public String getCompiler();
 
     /**
-     * The compiler target VM, e.g. 1.8.
+     * @return the compiler target VM, e.g. 1.8.
      */
     public String getCompilerTargetVM();
 
     /**
-     * The compiler source VM, e.g. 1.8.
+     * @return the compiler source VM, e.g. 1.8.
      */
     public String getCompilerSourceVM();
 
     /**
-     * Jasper Java compiler class to use.
+     * @return Jasper Java compiler class to use.
      */
     public String getCompilerClassName();
 
@@ -148,13 +156,12 @@ public interface Options {
      * of a taglib deployed in a jar file (WEB-INF/lib).
      *
      * @return the instance of the TldLocationsCache
-     * for the web-application.
+     *  for the web-application.
      */
     public TldCache getTldCache();
 
     /**
-     * Java platform encoding to generate the JSP
-     * page servlet.
+     * @return Java platform encoding to generate the JSP page servlet.
      */
     public String getJavaEncoding();
 
@@ -164,21 +171,22 @@ public interface Options {
      * <p>
      * Is used only when Jasper uses an external java compiler (wrapped through
      * a <code>javac</code> Apache Ant task).
+     * @return <code>true</code> to fork a process during compilation
      */
     public boolean getFork();
 
     /**
-     * Obtain JSP configuration information specified in web.xml.
+     * @return JSP configuration information specified in web.xml.
      */
     public JspConfig getJspConfig();
 
     /**
-     * Is generation of X-Powered-By response header enabled/disabled?
+     * @return <code>true</code> to generate a X-Powered-By response header.
      */
     public boolean isXpoweredBy();
 
     /**
-     * Obtain a Tag Plugin Manager
+     * @return a Tag Plugin Manager
      */
     public TagPluginManager getTagPluginManager();
 
@@ -191,18 +199,19 @@ public interface Options {
     public boolean genStringAsCharArray();
 
     /**
-     * Modification test interval.
+     * @return modification test interval.
      */
     public int getModificationTestInterval();
 
 
     /**
-     * Re-compile on failure.
+     * @return <code>true</code> if re-compile will occur on a failure.
      */
     public boolean getRecompileOnFail();
 
     /**
-     * Is caching enabled (used for precompilation).
+     * @return <code>true</code> is caching is enabled
+     *  (used for precompilation).
      */
     public boolean isCaching();
 
@@ -223,11 +232,12 @@ public interface Options {
      * The maximum number of loaded jsps per web-application. If there are more
      * jsps loaded, they will be unloaded. If unset or less than 0, no jsps
      * are unloaded.
+     * @return The JSP count
      */
     public int getMaxLoadedJsps();
 
     /**
-     * The idle time in seconds after which a JSP is unloaded.
+     * @return the idle time in seconds after which a JSP is unloaded.
      * If unset or less or equal than 0, no jsps are unloaded.
      */
     public int getJspIdleTimeout();

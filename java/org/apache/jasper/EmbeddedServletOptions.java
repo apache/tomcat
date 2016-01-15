@@ -471,6 +471,8 @@ public final class EmbeddedServletOptions implements Options {
     /**
      * Create an EmbeddedServletOptions object using data available from
      * ServletConfig and ServletContext.
+     * @param config The Servlet config
+     * @param context The Servlet context
      */
     public EmbeddedServletOptions(ServletConfig config,
             ServletContext context) {

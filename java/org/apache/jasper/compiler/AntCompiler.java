@@ -312,6 +312,7 @@ public class AntCompiler extends Compiler {
 
         /**
          * Construct the handler to capture the output of the given steam.
+         * @param wrapped The wrapped stream
          */
         public SystemLogHandler(PrintStream wrapped) {
             super(wrapped);
@@ -356,6 +357,7 @@ public class AntCompiler extends Compiler {
 
         /**
          * Stop capturing thread's output and return captured data as a String.
+         * @return the captured output
          */
         public static String unsetThread() {
             ByteArrayOutputStream baos = data.get();
@@ -373,6 +375,7 @@ public class AntCompiler extends Compiler {
 
         /**
          * Find PrintStream to which the output must be written to.
+         * @return the current stream
          */
         protected PrintStream findStream() {
             PrintStream ps = streams.get();

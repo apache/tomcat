@@ -63,7 +63,9 @@ public class JspUtil {
     public static final int CHUNKSIZE = 1024;
 
     /**
-     * Takes a potential expression and converts it into XML form
+     * Takes a potential expression and converts it into XML form.
+     * @param expression The expression to convert
+     * @return XML view
      */
     public static String getExprInXml(String expression) {
         String returnString;
@@ -108,6 +110,11 @@ public class JspUtil {
      * present have valid names. Checks attributes specified as XML-style
      * attributes as well as attributes specified using the jsp:attribute
      * standard action.
+     * @param typeOfTag The tag type
+     * @param n The corresponding node
+     * @param validAttributes The array with the valid attributes
+     * @param err Dispatcher for errors
+     * @throws JasperException An error occurred
      */
     public static void checkAttributes(String typeOfTag, Node n,
             ValidAttribute[] validAttributes, ErrorDispatcher err)
@@ -206,6 +213,8 @@ public class JspUtil {
 
     /**
      * Escape the 5 entities defined by XML.
+     * @param s String to escape
+     * @return XML escaped string
      */
     public static String escapeXml(String s) {
         if (s == null) {
@@ -276,6 +285,10 @@ public class JspUtil {
      * name to the <tt>Class.forName()</tt> method, unless the given string
      * name represents a primitive type, in which case it is converted to a
      * <tt>Class</tt> object by appending ".class" to it (e.g., "int.class").
+     * @param type The class name, array or primitive type
+     * @param loader The class loader
+     * @return the loaded class
+     * @throws ClassNotFoundException Loading class failed
      */
     public static Class<?> toClass(String type, ClassLoader loader)
             throws ClassNotFoundException {
@@ -330,6 +343,8 @@ public class JspUtil {
     /**
      * Produces a String representing a call to the EL interpreter.
      *
+     * @param isTagFile <code>true</code> if the file is a tag file
+     *  rather than a JSP
      * @param expression
      *            a String containing zero or more "${}" expressions
      * @param expectedType
@@ -683,13 +698,13 @@ public class JspUtil {
      * Gets the fully-qualified class name of the tag handler corresponding to
      * the given tag file path.
      *
-     * @param path
-     *            Tag file path
-     * @param err
-     *            Error dispatcher
+     * @param path Tag file path
+     * @param urn The tag identifier
+     * @param err Error dispatcher
      *
      * @return Fully-qualified class name of the tag handler corresponding to
      *         the given tag file path
+     * @throws JasperException Failed to generate a class name for the tag
      */
     public static String getTagHandlerClassName(String path, String urn,
             ErrorDispatcher err) throws JasperException {
@@ -852,6 +867,8 @@ public class JspUtil {
 
     /**
      * Mangle the specified character to create a legal Java class name.
+     * @param ch The character
+     * @return the replacement charater as a string
      */
     public static final String mangleChar(char ch) {
         char[] result = new char[5];
@@ -864,7 +881,9 @@ public class JspUtil {
     }
 
     /**
-     * Test whether the argument is a Java keyword
+     * Test whether the argument is a Java keyword.
+     * @param key The name
+     * @return <code>true</code> if the name is a java identifier
      */
     public static boolean isJavaKeyword(String key) {
         int i = 0;
@@ -914,7 +933,8 @@ public class JspUtil {
      * 'java.lang.Object.class' 'int' -&gt; 'int.class' 'void' -&gt; 'Void.TYPE'
      * 'int[]' -&gt; 'int[].class'
      *
-     * @param type
+     * @param type The type from the TLD
+     * @return the Java type
      */
     public static String toJavaSourceTypeFromTld(String type) {
         if (type == null || "void".equals(type)) {
@@ -927,6 +947,8 @@ public class JspUtil {
      * Class.getName() return arrays in the form "[[[&lt;et&gt;", where et, the
      * element type can be one of ZBCDFIJS or L&lt;classname&gt;;. It is
      * converted into forms that can be understood by javac.
+     * @param type the type to convert
+     * @return the equivalent type in Java sources
      */
     public static String toJavaSourceType(String type) {
 

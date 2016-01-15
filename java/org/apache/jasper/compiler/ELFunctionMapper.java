@@ -49,6 +49,7 @@ public class ELFunctionMapper {
      * Creates the functions mappers for all EL expressions in the JSP page.
      *
      * @param page The current compilation unit.
+     * @throws JasperException EL error
      */
     public static void map(Node.Nodes page)
                 throws JasperException {

@@ -87,12 +87,17 @@ public class XMLEncodingDetector {
      *
      * Encoding autodetection is done according to the XML 1.0 specification,
      * Appendix F.1: Detection Without External Encoding Information.
-     *
+     * @param fname The file name
+     * @param jar The containing jar
+     * @param ctxt The compilation context
+     * @param err The error dispatcher
      * @return Two-element array, where the first element (of type
      * java.lang.String) contains the name of the (auto)detected encoding, and
      * the second element (of type java.lang.Boolean) specifies whether the
      * encoding was specified using the 'encoding' attribute of an XML prolog
      * (TRUE) or autodetected (FALSE).
+     * @throws IOException Error reading resource
+     * @throws JasperException Other error, usually a bad encoding
      */
     public static Object[] getEncoding(String fname, Jar jar,
                                        JspCompilationContext ctxt,
@@ -194,6 +199,8 @@ public class XMLEncodingDetector {
      *                      is bigEndian. null means unknown or not relevant.
      *
      * @return Returns a reader.
+     * @throws IOException Error reading resource
+     * @throws JasperException Other error, usually a bad encoding
      */
     private Reader createReader(InputStream inputStream, String encoding,
                                 Boolean isBigEndian)
@@ -359,7 +366,9 @@ public class XMLEncodingDetector {
 
     // Adapted from:
     // org.apache.xerces.impl.XMLEntityManager.EntityScanner.isExternal
-    /** Returns true if the current entity being scanned is external. */
+    /**
+     * @return <code>true</code> if the current entity being scanned is external.
+     */
     public boolean isExternal() {
         return true;
     }
@@ -370,7 +379,7 @@ public class XMLEncodingDetector {
      * Returns the next character on the input.
      * <p>
      * <strong>Note:</strong> The character is <em>not</em> consumed.
-     *
+     * @return the next char
      * @throws IOException  Thrown if i/o error occurs.
      * @throws EOFException Thrown on end of file.
      */
@@ -400,7 +409,7 @@ public class XMLEncodingDetector {
      * Returns the next character on the input.
      * <p>
      * <strong>Note:</strong> The character is consumed.
-     *
+     * @return the next char
      * @throws IOException  Thrown if i/o error occurs.
      * @throws EOFException Thrown on end of file.
      */
@@ -443,7 +452,7 @@ public class XMLEncodingDetector {
      * <p>
      * <strong>Note:</strong> The string returned must be a symbol. The
      * SymbolTable can be used for this purpose.
-     *
+     * @return the name
      * @throws IOException  Thrown if i/o error occurs.
      * @throws EOFException Thrown on end of file.
      *
@@ -650,7 +659,8 @@ public class XMLEncodingDetector {
      *                  data to be scanned.
      * @param buffer    The data structure to fill.
      *
-     * @return Returns true if there is more data to scan, false otherwise.
+     * @return <code>true</code> if there is more data to scan,
+     *  <code>false</code> otherwise.
      *
      * @throws IOException  Thrown if i/o error occurs.
      * @throws EOFException Thrown on end of file.
@@ -792,7 +802,7 @@ public class XMLEncodingDetector {
      *
      * @param c The character to skip.
      *
-     * @return Returns true if the character was skipped.
+     * @return <code>true</code> if the character was skipped.
      *
      * @throws IOException  Thrown if i/o error occurs.
      * @throws EOFException Thrown on end of file.
@@ -835,7 +845,7 @@ public class XMLEncodingDetector {
      * <strong>Note:</strong> The characters are consumed only if they are
      * space characters.
      *
-     * @return Returns true if at least one space character was skipped.
+     * @return <code>true</code> if at least one space character was skipped.
      *
      * @throws IOException  Thrown if i/o error occurs.
      * @throws EOFException Thrown on end of file.
@@ -904,7 +914,7 @@ public class XMLEncodingDetector {
      *
      * @param s The string to skip.
      *
-     * @return Returns true if the string was skipped.
+     * @return <code>true</code> if the string was skipped.
      *
      * @throws IOException  Thrown if i/o error occurs.
      * @throws EOFException Thrown on end of file.
@@ -951,8 +961,9 @@ public class XMLEncodingDetector {
      *                     boundary will be signaled by the return
      *                     value.
      *
-     * @return Returns true if the entity changed as a result of this
+     * @return <code>true</code> if the entity changed as a result of this
      *         load operation.
+     * @throws IOException Error reading data
      */
     final boolean load(int offset, boolean changeEntity)
         throws IOException {
@@ -1202,6 +1213,8 @@ public class XMLEncodingDetector {
      * @param scanningTextDecl True if a text declaration is to
      *                         be scanned instead of an XML
      *                         declaration.
+     * @throws IOException Error reading data
+     * @throws JasperException Other error
      */
     private void scanXMLDeclOrTextDecl(boolean scanningTextDecl)
         throws IOException, JasperException {
@@ -1235,6 +1248,8 @@ public class XMLEncodingDetector {
      * [77] TextDecl ::= '<?xml' VersionInfo? EncodingDecl S? '?>'
      * </pre>
      *
+     * <strong>Note:</strong> This method uses fString, anything in it
+     * at the time of calling is lost.
      * @param scanningTextDecl True if a text declaration is to
      *                         be scanned instead of an XML
      *                         declaration.
@@ -1242,8 +1257,8 @@ public class XMLEncodingDetector {
      *                         encoding and standalone pseudo attribute values
      *                         (in that order).
      *
-     * <strong>Note:</strong> This method uses fString, anything in it
-     * at the time of calling is lost.
+     * @throws IOException Error reading data
+     * @throws JasperException Other error
      */
     private void scanXMLDeclOrTextDecl(boolean scanningTextDecl,
                                        String[] pseudoAttributeValues)
@@ -1390,6 +1405,8 @@ public class XMLEncodingDetector {
     /**
      * Scans a pseudo attribute.
      *
+     * <strong>Note:</strong> This method uses fStringBuffer2, anything in it
+     * at the time of calling is lost.
      * @param scanningTextDecl True if scanning this pseudo-attribute for a
      *                         TextDecl; false if scanning XMLDecl. This
      *                         flag is needed to report the correct type of
@@ -1398,9 +1415,8 @@ public class XMLEncodingDetector {
      *                         value.
      *
      * @return The name of the attribute
-     *
-     * <strong>Note:</strong> This method uses fStringBuffer2, anything in it
-     * at the time of calling is lost.
+     * @throws IOException Error reading data
+     * @throws JasperException Other error
      */
     public String scanPseudoAttribute(boolean scanningTextDecl,
                                       XMLString value)
@@ -1475,6 +1491,8 @@ public class XMLEncodingDetector {
      *
      * @param target The PI target
      * @param data The string to fill in with the data
+     * @throws IOException Error reading data
+     * @throws JasperException Other error
      */
     private void scanPIData(String target, XMLString data)
         throws IOException, JasperException {
@@ -1531,7 +1549,9 @@ public class XMLEncodingDetector {
      * identified as a high surrogate.
      *
      * @param buf The StringBuffer to append the read surrogates to.
-     * @return True if it succeeded.
+     * @return <code>true</code> if it succeeded.
+     * @throws IOException Error reading data
+     * @throws JasperException Other error
      */
     private boolean scanSurrogates(XMLStringBuffer buf)
         throws IOException, JasperException {
@@ -1567,6 +1587,9 @@ public class XMLEncodingDetector {
     // org.apache.xerces.impl.XMLScanner.reportFatalError
     /**
      * Convenience function used in all XML scanners.
+     * @param msgId The message key
+     * @param arg The argument
+     * @throws JasperException The created exception
      */
     private void reportFatalError(String msgId, String arg)
                 throws JasperException {

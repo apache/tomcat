@@ -57,6 +57,7 @@ public class SmapGenerator {
     /**
      * Sets the filename (without path information) for the generated
      * source file.  E.g., "foo$jsp.java".
+     * @param x The file name
      */
     public synchronized void setOutputFileName(String x) {
         outputFileName = x;
