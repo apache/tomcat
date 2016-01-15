@@ -214,4 +214,9 @@ public class DummyProxySession implements Session {
             boolean notifySessionListeners, boolean notifyContainerListeners) {
         // NOOP
     }
+
+    @Override
+    public boolean isAttributeDistributable(String name, Object value) {
+        return false;
+    }
 }

@@ -370,4 +370,18 @@ public interface Manager {
      * a method that executes periodic tasks, such as expiring sessions etc.
      */
     public void backgroundProcess();
+
+
+    /**
+     * Would the Manager distribute the given session attribute? Manager
+     * implementations may provide additional configuration options to control
+     * which attributes are distributable.
+     *
+     * @param name  The attribute name
+     * @param value The attribute value
+     *
+     * @return {@code true} if the Manager would distribute the given attribute
+     *         otherwise {@code false}
+     */
+    public boolean willAttributeDistribute(String name, Object value);
 }
