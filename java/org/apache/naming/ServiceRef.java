@@ -134,6 +134,7 @@ public class ServiceRef extends Reference {
 
     /**
      * Add and Get Handlers classes.
+     * @return the handler
      */
     public HandlerRef getHandler() {
         return handlers.remove(0);
@@ -153,6 +154,7 @@ public class ServiceRef extends Reference {
     /**
      * Retrieves the class name of the factory of the object to which this
      * reference refers.
+     * @return the factory
      */
     @Override
     public String getFactoryClassName() {

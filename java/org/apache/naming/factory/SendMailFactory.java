@@ -41,7 +41,6 @@ import javax.naming.spi.ObjectFactory;
  * of your server.xml configuration file.
  * <p>
  * Example:
- * <p>
  * <pre>
  * &lt;Resource name="mail/send" auth="CONTAINER"
  *           type="javax.mail.internet.MimePartDataSource"/&gt;

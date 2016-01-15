@@ -941,7 +941,7 @@ public class NamingContext implements Context {
 
 
     /**
-     * Returns true if writing is allowed on this context.
+     * @return <code>true</code> if writing is allowed on this context.
      */
     protected boolean isWritable() {
         return ContextAccessController.isWritable(name);
@@ -950,6 +950,9 @@ public class NamingContext implements Context {
 
     /**
      * Throws a naming exception is Context is not writable.
+     * @return <code>true</code> if the Context is writable
+     * @throws NamingException if the Context is not writable and
+     *  <code>exceptionOnFailedWrite</code> is <code>true</code>
      */
     protected boolean checkWritable() throws NamingException {
         if (isWritable()) {

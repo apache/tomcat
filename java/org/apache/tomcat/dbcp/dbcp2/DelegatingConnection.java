@@ -174,6 +174,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace
      * This method is useful when you may have nested
      * {@code DelegatingConnection}s, and you want to make
      * sure to obtain a "genuine" {@link Connection}.
+     * @return the connection
      */
     public Connection getInnermostDelegate() {
         return getInnermostDelegateInternal();
@@ -184,6 +185,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace
      * Although this method is public, it is part of the internal API and should
      * not be used by clients. The signature of this method may change at any
      * time including in ways that break backwards compatibility.
+     * @return the connection
      */
     public final Connection getInnermostDelegateInternal() {
         Connection c = _conn;
@@ -196,7 +198,10 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace
         return c;
     }
 
-    /** Sets my delegate. */
+    /**
+     * Sets my delegate.
+     * @param c The connection
+     */
     public void setDelegate(C c) {
         _conn = c;
     }
@@ -210,6 +215,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace
      *     connection</li>
      * <li>Set _closed to <code>false</code></li>
      * </ol>
+     * @throws SQLException Error closing connection
      */
     @Override
     public void close() throws SQLException {
@@ -499,6 +505,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace
      * Obtain the default query timeout that will be used for {@link Statement}s
      * created from this connection. <code>null</code> means that the driver
      * default will be used.
+     * @return the timeout
      */
     public Integer getDefaultQueryTimeout() {
         return defaultQueryTimeout;
@@ -509,6 +516,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace
      * Set the default query timeout that will be used for {@link Statement}s
      * created from this connection. <code>null</code> means that the driver
      * default will be used.
+     * @param defaultQueryTimeout The timeout value
      */
     public void setDefaultQueryTimeout(Integer defaultQueryTimeout) {
         this.defaultQueryTimeout = defaultQueryTimeout;

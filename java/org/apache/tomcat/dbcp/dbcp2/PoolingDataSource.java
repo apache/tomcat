@@ -148,7 +148,7 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
 
     /**
      * Throws {@link UnsupportedOperationException}
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException This is unsupported
      */
     @Override
     public Connection getConnection(String uname, String passwd) throws SQLException {

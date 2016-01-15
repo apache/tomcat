@@ -81,14 +81,15 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
     // Properties
 
     /**
-     * Set {@link GenericKeyedObjectPool#getMaxTotal()} for this pool.
+     * @return {@link GenericKeyedObjectPool#getMaxTotal()} for this pool.
      */
     public int getMaxTotal() {
         return this.maxTotal;
     }
 
     /**
-     * Get {@link GenericKeyedObjectPool#getMaxTotal()} for this pool.
+     * Set {@link GenericKeyedObjectPool#getMaxTotal()} for this pool.
+     * @param maxTotal The max total value
      */
     public void setMaxTotal(int maxTotal) {
         assertInitializationAllowed();
@@ -100,14 +101,14 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
     // Instrumentation Methods
 
     /**
-     * Get the number of active connections in the pool.
+     * @return the number of active connections in the pool.
      */
     public int getNumActive() {
         return pool == null ? 0 : pool.getNumActive();
     }
 
     /**
-     * Get the number of idle connections in the pool.
+     * @return the number of idle connections in the pool.
      */
     public int getNumIdle() {
         return pool == null ? 0 : pool.getNumIdle();
@@ -151,7 +152,8 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
     }
 
     /**
-     * Returns a <code>SharedPoolDataSource</code> {@link Reference}.
+     * @return a <code>SharedPoolDataSource</code> {@link Reference}.
+     * @throws NamingException Should not occur
      */
     @Override
     public Reference getReference() throws NamingException {

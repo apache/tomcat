@@ -213,7 +213,7 @@ public abstract class InstanceKeyDataSource
     // Properties
 
     /**
-     * Gets the default value for
+     * @return the default value for
      * {@link GenericKeyedObjectPoolConfig#getBlockWhenExhausted()} for each per
      * user pool.
      */
@@ -225,6 +225,7 @@ public abstract class InstanceKeyDataSource
      * Sets the default value for
      * {@link GenericKeyedObjectPoolConfig#getBlockWhenExhausted()} for each per
      * user pool.
+     * @param blockWhenExhausted The new value
      */
     public void setDefaultBlockWhenExhausted(boolean blockWhenExhausted) {
         assertInitializationAllowed();
@@ -232,7 +233,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Gets the default value for
+     * @return the default value for
      * {@link GenericKeyedObjectPoolConfig#getEvictionPolicyClassName()} for
      * each per user pool.
      */
@@ -244,6 +245,7 @@ public abstract class InstanceKeyDataSource
      * Sets the default value for
      * {@link GenericKeyedObjectPoolConfig#getEvictionPolicyClassName()} for
      * each per user pool.
+     * @param evictionPolicyClassName The new value
      */
     public void setDefaultEvictionPolicyClassName(
             String evictionPolicyClassName) {
@@ -252,7 +254,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Gets the default value for
+     * @return the default value for
      * {@link GenericKeyedObjectPoolConfig#getLifo()} for each per user pool.
      */
     public boolean getDefaultLifo() {
@@ -262,6 +264,7 @@ public abstract class InstanceKeyDataSource
     /**
      * Sets the default value for
      * {@link GenericKeyedObjectPoolConfig#getLifo()} for each per user pool.
+     * @param lifo The new value
      */
     public void setDefaultLifo(boolean lifo) {
         assertInitializationAllowed();
@@ -269,7 +272,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Gets the default value for
+     * @return the default value for
      * {@link GenericKeyedObjectPoolConfig#getMaxIdlePerKey()} for each per user
      * pool.
      */
@@ -281,6 +284,7 @@ public abstract class InstanceKeyDataSource
      * Sets the default value for
      * {@link GenericKeyedObjectPoolConfig#getMaxIdlePerKey()} for each per user
      * pool.
+     * @param maxIdle The new value
      */
     public void setDefaultMaxIdle(int maxIdle) {
         assertInitializationAllowed();
@@ -288,7 +292,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Gets the default value for
+     * @return the default value for
      * {@link GenericKeyedObjectPoolConfig#getMaxTotalPerKey()} for each per
      * user pool.
      */
@@ -300,6 +304,7 @@ public abstract class InstanceKeyDataSource
      * Sets the default value for
      * {@link GenericKeyedObjectPoolConfig#getMaxTotalPerKey()} for each per
      * user pool.
+     * @param maxTotal The new value
      */
     public void setDefaultMaxTotal(int maxTotal) {
         assertInitializationAllowed();
@@ -307,7 +312,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Gets the default value for
+     * @return the default value for
      * {@link GenericKeyedObjectPoolConfig#getMaxWaitMillis()} for each per user
      * pool.
      */
@@ -319,6 +324,7 @@ public abstract class InstanceKeyDataSource
      * Sets the default value for
      * {@link GenericKeyedObjectPoolConfig#getMaxWaitMillis()} for each per user
      * pool.
+     * @param maxWaitMillis The new value
      */
     public void setDefaultMaxWaitMillis(long maxWaitMillis) {
         assertInitializationAllowed();
@@ -326,7 +332,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Gets the default value for
+     * @return the default value for
      * {@link GenericKeyedObjectPoolConfig#getMinEvictableIdleTimeMillis()} for
      * each per user pool.
      */
@@ -338,6 +344,7 @@ public abstract class InstanceKeyDataSource
      * Sets the default value for
      * {@link GenericKeyedObjectPoolConfig#getMinEvictableIdleTimeMillis()} for
      * each per user pool.
+     * @param minEvictableIdleTimeMillis The new value
      */
     public void setDefaultMinEvictableIdleTimeMillis(
             long minEvictableIdleTimeMillis) {
@@ -346,7 +353,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Gets the default value for
+     * @return the default value for
      * {@link GenericKeyedObjectPoolConfig#getMinIdlePerKey()} for each per user
      * pool.
      */
@@ -358,6 +365,7 @@ public abstract class InstanceKeyDataSource
      * Sets the default value for
      * {@link GenericKeyedObjectPoolConfig#getMinIdlePerKey()} for each per user
      * pool.
+     * @param minIdle The new value
      */
     public void setDefaultMinIdle(int minIdle) {
         assertInitializationAllowed();
@@ -365,7 +373,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Gets the default value for
+     * @return the default value for
      * {@link GenericKeyedObjectPoolConfig#getNumTestsPerEvictionRun()} for each
      * per user pool.
      */
@@ -377,6 +385,7 @@ public abstract class InstanceKeyDataSource
      * Sets the default value for
      * {@link GenericKeyedObjectPoolConfig#getNumTestsPerEvictionRun()} for each
      * per user pool.
+     * @param numTestsPerEvictionRun The new value
      */
     public void setDefaultNumTestsPerEvictionRun(int numTestsPerEvictionRun) {
         assertInitializationAllowed();
@@ -384,7 +393,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Gets the default value for
+     * @return the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getSoftMinEvictableIdleTimeMillis()} for each
      * per user pool.
      */
@@ -395,6 +404,7 @@ public abstract class InstanceKeyDataSource
     /**
      * Sets the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getSoftMinEvictableIdleTimeMillis()} for each per user pool.
+     * @param softMinEvictableIdleTimeMillis The new value
      */
     public void setDefaultSoftMinEvictableIdleTimeMillis(
             long softMinEvictableIdleTimeMillis) {
@@ -403,7 +413,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Gets the default value for
+     * @return the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getTestOnCreate()} for each per user pool.
      */
     public boolean getDefaultTestOnCreate() {
@@ -413,6 +423,7 @@ public abstract class InstanceKeyDataSource
     /**
      * Sets the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getTestOnCreate()} for each per user pool.
+     * @param testOnCreate The new value
      */
     public void setDefaultTestOnCreate(boolean testOnCreate) {
         assertInitializationAllowed();
@@ -420,7 +431,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Gets the default value for
+     * @return the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getTestOnBorrow()} for each per user pool.
      */
     public boolean getDefaultTestOnBorrow() {
@@ -430,6 +441,7 @@ public abstract class InstanceKeyDataSource
     /**
      * Sets the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getTestOnBorrow()} for each per user pool.
+     * @param testOnBorrow The new value
      */
     public void setDefaultTestOnBorrow(boolean testOnBorrow) {
         assertInitializationAllowed();
@@ -437,7 +449,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Gets the default value for
+     * @return the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getTestOnReturn()} for each per user pool.
      */
     public boolean getDefaultTestOnReturn() {
@@ -447,6 +459,7 @@ public abstract class InstanceKeyDataSource
     /**
      * Sets the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getTestOnReturn()} for each per user pool.
+     * @param testOnReturn The new value
      */
     public void setDefaultTestOnReturn(boolean testOnReturn) {
         assertInitializationAllowed();
@@ -454,7 +467,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Gets the default value for
+     * @return the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getTestWhileIdle()} for each per user pool.
      */
     public boolean getDefaultTestWhileIdle() {
@@ -464,6 +477,7 @@ public abstract class InstanceKeyDataSource
     /**
      * Sets the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getTestWhileIdle()} for each per user pool.
+     * @param testWhileIdle The new value
      */
     public void setDefaultTestWhileIdle(boolean testWhileIdle) {
         assertInitializationAllowed();
@@ -471,7 +485,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Gets the default value for
+     * @return the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getTimeBetweenEvictionRunsMillis ()} for each
      * per user pool.
      */
@@ -483,6 +497,7 @@ public abstract class InstanceKeyDataSource
      * Sets the default value for
      * {@link org.apache.tomcat.dbcp.pool2.impl.GenericObjectPool GenericObjectPool#getTimeBetweenEvictionRunsMillis ()} for each
      * per user pool.
+     * @param timeBetweenEvictionRunsMillis The new value
      */
     public void setDefaultTimeBetweenEvictionRunsMillis (
             long timeBetweenEvictionRunsMillis ) {
@@ -675,7 +690,7 @@ public abstract class InstanceKeyDataSource
      * Get the value of jndiEnvironment which is used when instantiating
      * a jndi InitialContext.  This InitialContext is used to locate the
      * backend ConnectionPoolDataSource.
-     *
+     * @param key The environment property name
      * @return value of jndiEnvironment.
      */
     public String getJndiEnvironment(String key) {
@@ -764,6 +779,7 @@ public abstract class InstanceKeyDataSource
      * <strong>MUST</strong> be an SQL SELECT statement that returns at least
      * one row. If not specified, {@link Connection#isValid(int)} will be used
      * to validate connections.
+     * @return the validation query
      */
     public String getValidationQuery() {
         return this.validationQuery;
@@ -775,6 +791,7 @@ public abstract class InstanceKeyDataSource
      * <strong>MUST</strong> be an SQL SELECT statement that returns at least
      * one row. If not specified, connections will be validated using
      * {@link Connection#isValid(int)}.
+     * @param validationQuery The validation query
      */
     public void setValidationQuery(String validationQuery) {
         assertInitializationAllowed();
@@ -782,7 +799,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Returns the timeout in seconds before the validation query fails.
+     * @return the timeout in seconds before the validation query fails.
      */
     public int getValidationQueryTimeout() {
         return validationQueryTimeout;
@@ -824,7 +841,7 @@ public abstract class InstanceKeyDataSource
     }
 
     /**
-     * Returns the maximum permitted lifetime of a connection in milliseconds. A
+     * @return the maximum permitted lifetime of a connection in milliseconds. A
      * value of zero or less indicates an infinite lifetime.
      */
     public long getMaxConnLifetimeMillis() {
@@ -839,6 +856,7 @@ public abstract class InstanceKeyDataSource
      * initialized.  The pool is initialized the first time one of the
      * following methods is invoked: <code>getConnection, setLogwriter,
      * setLoginTimeout, getLoginTimeout, getLogWriter.</code></p>
+     * @param maxConnLifetimeMillis The maximum connection lifetime
      */
     public void setMaxConnLifetimeMillis(long maxConnLifetimeMillis) {
         this.maxConnLifetimeMillis = maxConnLifetimeMillis;
@@ -852,6 +870,8 @@ public abstract class InstanceKeyDataSource
 
     /**
      * Attempt to establish a database connection.
+     * @return the connection
+     * @throws SQLException Connection failed
      */
     @Override
     public Connection getConnection() throws SQLException {
@@ -868,7 +888,10 @@ public abstract class InstanceKeyDataSource
      * means that the database password has been changed.  In this case, the <code>PooledConnectionAndInfo</code>
      * instance retrieved with the old password is destroyed and the <code>getPooledConnectionAndInfo</code> is
      * repeatedly invoked until a <code>PooledConnectionAndInfo</code> instance with the new password is returned.
-     *
+     * @param username The user name to use to connect
+     * @param password The password
+     * @return the connection
+     * @throws SQLException Connection failed
      */
     @Override
     public Connection getConnection(String username, String password)

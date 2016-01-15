@@ -133,6 +133,7 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
      * This method is useful when you may have nested
      * {@code DelegatingResultSet}s, and you want to make
      * sure to obtain a "genuine" {@link ResultSet}.
+     * @return the result set
      */
     public ResultSet getInnermostDelegate() {
         ResultSet r = _res;

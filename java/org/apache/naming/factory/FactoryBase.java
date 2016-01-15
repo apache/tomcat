@@ -133,6 +133,7 @@ public abstract class FactoryBase implements ObjectFactory {
      *
      * @return  The linked object or <code>null</code> if linked objects are
      *          not supported by or not configured for this reference object
+     * @throws NamingException Error accessing linked object
      */
     protected abstract Object getLinked(Reference ref) throws NamingException;
 }

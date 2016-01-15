@@ -331,6 +331,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
      * given properties.
      *
      * @param properties the datasource configuration properties
+     * @return the data source instance
      * @throws Exception if an error occurs creating the data source
      */
     public static BasicDataSource createDataSource(Properties properties) throws Exception {
