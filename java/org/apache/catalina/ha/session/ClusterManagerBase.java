@@ -138,13 +138,24 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
      *
      * @param name The attribute name
      * @return <code>true</code> if the attribute should be distributed
+     *
+     * @deprecated Use {@link #willAttributeDistribute(String, Object)}. Will be
+     *             removed in Tomcat 9.0.x
      */
+    @Deprecated
     public boolean willAttributeDistribute(String name) {
+        return willAttributeDistribute(name, null);
+    }
+
+
+    @Override
+    public boolean willAttributeDistribute(String name, Object value) {
         if (sessionAttributePattern == null) {
             return true;
         }
         return sessionAttributePattern.matcher(name).matches();
     }
+
 
     public static ClassLoader[] getClassLoaders(Context context) {
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
