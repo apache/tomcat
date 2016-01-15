@@ -853,25 +853,23 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         if (values1 == null) {
             // Skip - nothing to merge
-        } else if (values1 instanceof String)
-            results.add(values1);
-        else if (values1 instanceof String[]) {
-            String values[] = (String[]) values1;
-            for (int i = 0; i < values.length; i++)
-                results.add(values[i]);
-        } else
+        } else if (values1 instanceof String[]) {
+            for (String value : (String[]) values1) {
+                results.add(value);
+            }
+        } else { // String
             results.add(values1.toString());
+        }
 
         if (values2 == null) {
             // Skip - nothing to merge
-        } else if (values2 instanceof String)
-            results.add(values2);
-        else if (values2 instanceof String[]) {
-            String values[] = (String[]) values2;
-            for (int i = 0; i < values.length; i++)
-                results.add(values[i]);
-        } else
+        } else if (values2 instanceof String[]) {
+            for (String value : (String[]) values2) {
+                results.add(value);
+            }
+        } else { // String
             results.add(values2.toString());
+        }
 
         String values[] = new String[results.size()];
         return results.toArray(values);
