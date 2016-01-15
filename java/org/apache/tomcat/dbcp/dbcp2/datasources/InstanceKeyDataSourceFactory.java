@@ -72,6 +72,7 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
 
     /**
      * Close all pools associated with this class.
+     * @throws Exception Close exception
      */
     public static void closeAll() throws Exception {
         //Get iterator to loop over all instances of this datasource.
@@ -85,8 +86,8 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
 
 
     /**
-     * implements ObjectFactory to create an instance of SharedPoolDataSource
-     * or PerUserPoolDataSource
+     * Implements ObjectFactory to create an instance of SharedPoolDataSource
+     * or PerUserPoolDataSource.
      */
     @Override
     public Object getObjectInstance(Object refObj, Name name,
@@ -295,6 +296,7 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
 
 
     /**
+     * @param className The class name
      * @return true if and only if className is the value returned
      * from getClass().getName().toString()
      */
@@ -303,12 +305,20 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
     /**
      * Creates an instance of the subclass and sets any properties
      * contained in the Reference.
+     * @param ref The reference
+     * @return the data source
+     * @throws IOException IO error
+     * @throws ClassNotFoundException Couldn't load data source implementation
      */
     protected abstract InstanceKeyDataSource getNewInstance(Reference ref)
         throws IOException, ClassNotFoundException;
 
     /**
-     * used to set some properties saved within a Reference
+     * Used to set some properties saved within a Reference.
+     * @param data Object data
+     * @return the deserialized object
+     * @throws IOException Stream error
+     * @throws ClassNotFoundException Couldn't load object class
      */
     protected static final Object deserialize(byte[] data)
         throws IOException, ClassNotFoundException {

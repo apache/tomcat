@@ -47,7 +47,9 @@ import org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject;
 public class PoolingConnection extends DelegatingConnection<Connection>
         implements KeyedPooledObjectFactory<PStmtKey,DelegatingPreparedStatement> {
 
-    /** Pool of {@link PreparedStatement}s. and {@link CallableStatement}s */
+    /**
+     * Pool of {@link PreparedStatement}s. and {@link CallableStatement}s
+     */
     private KeyedObjectPool<PStmtKey,DelegatingPreparedStatement> _pstmtPool = null;
 
     /**
@@ -141,6 +143,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      * @param resultSetType result set type
      * @param resultSetConcurrency result set concurrency
      * @return a {@link PoolablePreparedStatement}
+     * @throws SQLException An error occurred
      */
     @Override
     public PreparedStatement prepareStatement(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
@@ -163,7 +166,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      * Create or obtain a {@link CallableStatement} from the pool.
      * @param sql the sql string used to define the CallableStatement
      * @return a {@link PoolableCallableStatement}
-     * @throws SQLException
+     * @throws SQLException An error occurred
      */
     @Override
     public CallableStatement prepareCall(String sql) throws SQLException {
@@ -184,7 +187,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      * @param resultSetType result set type
      * @param resultSetConcurrency result set concurrency
      * @return a {@link PoolableCallableStatement}
-     * @throws SQLException
+     * @throws SQLException An error occurred
      */
     @Override
     public CallableStatement prepareCall(String sql, int resultSetType, int resultSetConcurrency) throws SQLException {
@@ -236,6 +239,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      * @param sql the sql string used to define the statement
      * @param resultSetType result set type
      * @param resultSetConcurrency result set concurrency
+     * @return the key
      */
     protected PStmtKey createKey(String sql, int resultSetType, int resultSetConcurrency) {
         String catalog = null;
@@ -253,6 +257,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      * @param resultSetType result set type
      * @param resultSetConcurrency result set concurrency
      * @param stmtType statement type
+     * @return the key
      */
     protected PStmtKey createKey(String sql, int resultSetType, int resultSetConcurrency, StatementType stmtType) {
         String catalog = null;
@@ -267,6 +272,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
     /**
      * Create a PStmtKey for the given arguments.
      * @param sql the sql string used to define the statement
+     * @return the key
      */
     protected PStmtKey createKey(String sql) {
         String catalog = null;
@@ -282,6 +288,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      * Create a PStmtKey for the given arguments.
      * @param sql the SQL string used to define the statement
      * @param stmtType statement type
+     * @return the key
      */
     protected PStmtKey createKey(String sql, StatementType stmtType) {
         String catalog = null;
@@ -296,6 +303,8 @@ public class PoolingConnection extends DelegatingConnection<Connection>
     /**
      * Normalize the given SQL statement, producing a
      * canonical form that is semantically equivalent to the original.
+     * @param sql The SQL statement
+     * @return the trimmed SQL statement
      */
     protected String normalizeSQL(String sql) {
         return sql.trim();
@@ -308,6 +317,8 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      * a PoolablePreparedStatement or PoolableCallableStatement is created.
      *
      * @param key the key for the {@link PreparedStatement} to be created
+     * @return the object
+     * @throws Exception An error occurred
      * @see #createKey(String, int, int, StatementType)
      */
     @Override
@@ -350,6 +361,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *
      * @param key ignored
      * @param p the wrapped pooled statement to be destroyed.
+     * @throws Exception An error occurred
      */
     @Override
     public void destroyObject(PStmtKey key,
@@ -378,6 +390,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *
      * @param key ignored
      * @param p wrapped pooled statement to be activated
+     * @throws Exception An error occurred
      */
     @Override
     public void activateObject(PStmtKey key,
@@ -392,6 +405,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *
      * @param key ignored
      * @param p a wrapped {@link PreparedStatement}
+     * @throws Exception An error occurred
      */
     @Override
     public void passivateObject(PStmtKey key,

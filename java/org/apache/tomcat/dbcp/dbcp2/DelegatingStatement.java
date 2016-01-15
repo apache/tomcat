@@ -87,6 +87,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
      * {@code DelegatingStatement}s, and you want to make
      * sure to obtain a "genuine" {@link Statement}.
      * @see #getDelegate
+     * @return the statement
      */
     public Statement getInnermostDelegate() {
         Statement s = _stmt;
@@ -99,7 +100,10 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
         return s;
     }
 
-    /** Sets my delegate. */
+    /**
+     * Sets my delegate.
+     * @param s The statement
+     */
     public void setDelegate(Statement s) {
         _stmt = s;
     }

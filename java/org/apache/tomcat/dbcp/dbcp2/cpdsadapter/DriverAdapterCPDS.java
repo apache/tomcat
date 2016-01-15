@@ -492,6 +492,7 @@ public class DriverAdapterCPDS
      * Set the driver classname.  Setting the driver classname cause the
      * driver to be registered with the DriverManager.
      * @param v  Value to assign to driver.
+     * @throws ClassNotFoundException Driver class was not found
      * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      */
     public void setDriver(String v) throws ClassNotFoundException {
@@ -596,7 +597,7 @@ public class DriverAdapterCPDS
      * idle object evictor thread.
      * When non-positive, no idle object evictor thread will be
      * run.
-     * @param timeBetweenEvictionRunsMillis
+     * @param timeBetweenEvictionRunsMillis The time between runs
      * @see #getTimeBetweenEvictionRunsMillis()
      * @throws IllegalStateException if {@link #getPooledConnection()} has been called
      */
@@ -610,8 +611,9 @@ public class DriverAdapterCPDS
      * Returns the number of statements to examine during each run of the
      * idle object evictor thread (if any).
      *
-     * *see #setNumTestsPerEvictionRun
-     * *see #setTimeBetweenEvictionRunsMillis
+     * @see #setNumTestsPerEvictionRun(int)
+     * @see #setTimeBetweenEvictionRunsMillis(long)
+     * @return the number of statements
      */
     public int getNumTestsPerEvictionRun() {
         return _numTestsPerEvictionRun;
@@ -640,8 +642,9 @@ public class DriverAdapterCPDS
      * before it is eligible for eviction by the idle object evictor
      * (if any).
      *
-     * *see #setMinEvictableIdleTimeMillis
-     * *see #setTimeBetweenEvictionRunsMillis
+     * @see #setMinEvictableIdleTimeMillis(int)
+     * @see #setTimeBetweenEvictionRunsMillis(long)
+     * @return the amount of time
      */
     public int getMinEvictableIdleTimeMillis() {
         return _minEvictableIdleTimeMillis;
@@ -666,7 +669,8 @@ public class DriverAdapterCPDS
     /**
      * Returns the value of the accessToUnderlyingConnectionAllowed property.
      *
-     * @return true if access to the underlying is allowed, false otherwise.
+     * @return <code>true</code> if access to the underlying is allowed,
+     *  <code>false</code> otherwise.
      */
     public synchronized boolean isAccessToUnderlyingConnectionAllowed() {
         return this.accessToUnderlyingConnectionAllowed;

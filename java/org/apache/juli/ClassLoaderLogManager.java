@@ -386,6 +386,7 @@ public class ClassLoaderLogManager extends LogManager {
      *
      * @param classLoader The classloader for which we will retrieve or build the
      *                    configuration
+     * @return the log configuration
      */
     protected synchronized ClassLoaderLogInfo getClassLoaderInfo(ClassLoader classLoader) {
 
@@ -415,8 +416,8 @@ public class ClassLoaderLogManager extends LogManager {
     /**
      * Read configuration for the specified classloader.
      *
-     * @param classLoader
-     * @throws IOException Error
+     * @param classLoader The classloader
+     * @throws IOException Error reading configuration
      */
     protected synchronized void readConfiguration(ClassLoader classLoader)
         throws IOException {
@@ -584,8 +585,8 @@ public class ClassLoaderLogManager extends LogManager {
     /**
      * Set parent child relationship between the two specified loggers.
      *
-     * @param logger
-     * @param parent
+     * @param logger The logger
+     * @param parent The parent logger
      */
     protected static void doSetParentLogger(final Logger logger,
             final Logger parent) {
