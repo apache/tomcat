@@ -113,9 +113,6 @@ public class StandardManager extends ManagerBase {
 
     // ------------------------------------------------------------- Properties
 
-    /**
-     * Return the descriptive short name of this Manager implementation.
-     */
     @Override
     public String getName() {
         return name;
@@ -145,15 +142,6 @@ public class StandardManager extends ManagerBase {
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Load any currently active sessions that were previously unloaded
-     * to the appropriate persistence mechanism, if any.  If persistence is not
-     * supported, this method returns without doing anything.
-     *
-     * @exception ClassNotFoundException if a serialized class cannot be
-     *  found during the reload
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     public void load() throws ClassNotFoundException, IOException {
         if (SecurityUtil.isPackageProtectionEnabled()){
@@ -257,13 +245,6 @@ public class StandardManager extends ManagerBase {
     }
 
 
-    /**
-     * Save any currently active sessions in the appropriate persistence
-     * mechanism, if any.  If persistence is not supported, this method
-     * returns without doing anything.
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     public void unload() throws IOException {
         if (SecurityUtil.isPackageProtectionEnabled()) {

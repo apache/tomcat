@@ -72,9 +72,6 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
      */
     private boolean recordAllActions = false;
 
-    /*
-     * @see org.apache.catalina.ha.ClusterManager#getCluster()
-     */
     @Override
     public CatalinaCluster getCluster() {
         return cluster;
@@ -179,14 +176,6 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
         return getClassLoaders(getContext());
     }
 
-    /**
-     * Open Stream and use correct ClassLoader (Container) Switch
-     * ThreadClassLoader
-     *
-     * @param data The data
-     * @return The object input stream
-     * @throws IOException An error occurred
-     */
     @Override
     public ReplicationStream getReplicationStream(byte[] data) throws IOException {
         return getReplicationStream(data,0,data.length);
@@ -210,6 +199,10 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
         // NOOP
     }
 
+    /**
+     * {@link org.apache.catalina.Manager} implementations that also implement
+     * {@link ClusterManager} do not support local session persistence.
+     */
     @Override
     public void unload() {
         // NOOP
