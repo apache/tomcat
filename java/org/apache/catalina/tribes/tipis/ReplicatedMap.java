@@ -51,7 +51,8 @@ import org.apache.juli.logging.LogFactory;
  * TODO memberDisappeared, should do nothing except change map membership
  *       by default it relocates the primary objects
  *
- * @version 1.0
+ * @param <K> The type of Key
+ * @param <V> The type of Value
  */
 public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
 

@@ -47,8 +47,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- *
- * @version 1.0
+ * @param <K> The type of Key
+ * @param <V> The type of Value
  */
 public abstract class AbstractReplicatedMap<K,V>
         implements Map<K,V>, Serializable, RpcCallback, ChannelListener,
