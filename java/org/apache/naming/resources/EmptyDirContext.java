@@ -42,8 +42,6 @@ import javax.naming.directory.SearchResult;
  * embedded mode when the web application is configured entirely
  * programmatically and does not use any static resources from the file system.
  * EmptyDirContext is implemented as a read only context.
- *
- * @author Huxing Zhang (huxing.zhx@alibaba-inc.com)
  */
 public class EmptyDirContext implements DirContext {
 
@@ -52,7 +50,7 @@ public class EmptyDirContext implements DirContext {
      */
     private static final Attributes emptyAttributes = new BasicAttributes();
 
-    private static final NameNotFoundException nameNotFoundException = new NameNotFoundException();
+    private static final NameNotFoundException nameNotFoundException = new ImmutableNameNotFoundException();
 
     private static final Name emptyName = new CompositeName();
 

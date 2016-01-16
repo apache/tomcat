@@ -5377,13 +5377,15 @@ public class StandardContext extends ContainerBase
             if (log.isDebugEnabled())
                 log.debug("Configuring default Resources");
             try {
-                if (getDocBase() == null)
+                String docBase = getDocBase();
+                if (docBase == null) {
                     setResources(new EmptyDirContext());
-                else if ((getDocBase() != null) && (getDocBase().endsWith(".war")) &&
-                        (!(new File(getBasePath())).isDirectory()))
+                } else if (docBase.endsWith(".war")
+                        && !(new File(getBasePath())).isDirectory()) {
                     setResources(new WARDirContext());
-                else
+                } else {
                     setResources(new FileDirContext());
+                }
             } catch (IllegalArgumentException e) {
                 log.error(sm.getString("standardContext.resourcesInit"), e);
                 ok = false;
