@@ -60,7 +60,9 @@ import org.apache.juli.logging.LogFactory;
  * <br><br><b>REMBER TO CALL</b> <code>breakdown()</code> or <code>finalize()</code> when you are done with the map to
  * avoid memory leaks.<br><br>
  * TODO implement periodic sync/transfer thread
- * @version 1.0
+ *
+ * @param <K> The type of Key
+ * @param <V> The type of Value
  */
 public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
     private static final long serialVersionUID = 1L;

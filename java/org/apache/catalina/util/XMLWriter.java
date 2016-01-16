@@ -76,7 +76,9 @@ public class XMLWriter {
     /**
      * New XML writer utility that will store its data in an internal buffer
      * and can write it to the specified writer.
-     * @see sendData
+     * <p>
+     * See {@link #sendData()}
+     *
      * @param writer The writer to use
      */
     public XMLWriter(Writer writer) {

@@ -211,7 +211,7 @@ public class ExpressionParseTree {
      */
     private abstract class Node {
         /**
-         * Return true if the node evaluates to true.
+         * @return {@code true} if the node evaluates to true.
          */
         public abstract boolean evaluate();
     }
@@ -230,6 +230,8 @@ public class ExpressionParseTree {
 
         /**
          * Resolves any variable references and returns the value string.
+         *
+         * @return the value string
          */
         public String getValue() {
             if (resolved == null)
@@ -272,7 +274,7 @@ public class ExpressionParseTree {
 
 
         /**
-         * Returns a preference level suitable for comparison to other OppNode
+         * @return a precedence level suitable for comparison to other OppNode
          * preference levels.
          */
         public abstract int getPrecedence();
@@ -281,6 +283,8 @@ public class ExpressionParseTree {
         /**
          * Lets the node pop its own branch nodes off the front of the
          * specified list. The default pulls two.
+         *
+         * @param values The list from which to pop the values
          */
         public void popValues(List<Node> values) {
             right = values.remove(0);

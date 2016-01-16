@@ -52,6 +52,8 @@ import org.apache.tomcat.util.scan.JarFactory;
  * <p>
  * Provider classes will be loaded using the context's ClassLoader.
  *
+ * @param <T> The type of service to load
+ *
  * @see javax.servlet.ServletContainerInitializer
  * @see java.util.ServiceLoader
  */
