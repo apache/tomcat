@@ -586,29 +586,23 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void setProtocol(String protocol) {
 
-        if (AprLifecycleListener.isAprAvailable() && AprLifecycleListener.isAprPreferred()) {
-            if ("HTTP/1.1".equals(protocol)) {
-                setProtocolHandlerClassName
-                    ("org.apache.coyote.http11.Http11AprProtocol");
-            } else if ("AJP/1.3".equals(protocol)) {
-                setProtocolHandlerClassName
-                    ("org.apache.coyote.ajp.AjpAprProtocol");
-            } else if (protocol != null) {
-                setProtocolHandlerClassName(protocol);
+        boolean aprConnector = AprLifecycleListener.isAprAvailable()
+                && AprLifecycleListener.isAprPreferred();
+
+        if ("HTTP/1.1".equals(protocol) || protocol == null) {
+            if (aprConnector) {
+                setProtocolHandlerClassName("org.apache.coyote.http11.Http11AprProtocol");
             } else {
-                setProtocolHandlerClassName
-                    ("org.apache.coyote.http11.Http11AprProtocol");
+                setProtocolHandlerClassName("org.apache.coyote.http11.Http11NioProtocol");
+            }
+        } else if ("AJP/1.3".equals(protocol)) {
+            if (aprConnector) {
+                setProtocolHandlerClassName("org.apache.coyote.ajp.AjpAprProtocol");
+            } else {
+                setProtocolHandlerClassName("org.apache.coyote.ajp.AjpNioProtocol");
             }
         } else {
-            if ("HTTP/1.1".equals(protocol)) {
-                setProtocolHandlerClassName
-                    ("org.apache.coyote.http11.Http11NioProtocol");
-            } else if ("AJP/1.3".equals(protocol)) {
-                setProtocolHandlerClassName
-                    ("org.apache.coyote.ajp.AjpNioProtocol");
-            } else if (protocol != null) {
-                setProtocolHandlerClassName(protocol);
-            }
+            setProtocolHandlerClassName(protocol);
         }
 
     }
