@@ -419,11 +419,11 @@ public class Tomcat {
         if (connector != null) {
             return connector;
         }
-        // This will load Apr connector if available,
-        // default to nio. I'm having strange problems with apr
-        // XXX: jfclere weird... Don't add the AprLifecycleListener then.
-        // and for the use case the speed benefit wouldn't matter.
 
+        // The same as in standard Tomcat configuration.
+        // This creates an APR HTTP connector if AprLifecycleListener has been
+        // configured (created) and Tomcat Native library is available.
+        // Otherwise it creates a NIO HTTP connector.
         connector = new Connector("HTTP/1.1");
         connector.setPort(port);
         service.addConnector( connector );
