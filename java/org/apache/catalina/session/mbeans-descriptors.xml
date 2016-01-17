@@ -128,6 +128,10 @@
                  type="int"
             writeable="false"/>
 
+    <attribute   name="sessionAttributeNameFilter"
+          descritpion="The string pattern used for including session attributes in distribution. Null means all attributes are included."
+                 type="java.lang.String"/>
+
     <operation   name="backgroundProcess"
           description="Invalidate all sessions that have expired."
                impact="ACTION"
@@ -310,6 +314,10 @@
           description="Number of sessions we rejected due to maxActive beeing reached"
                  type="int"
             writeable="false"/>
+
+    <attribute   name="sessionAttributeNameFilter"
+          descritpion="The string pattern used for including session attributes in distribution. Null means all attributes are included."
+                 type="java.lang.String"/>
 
     <operation   name="backgroundProcess"
           description="Invalidate all sessions that have expired."

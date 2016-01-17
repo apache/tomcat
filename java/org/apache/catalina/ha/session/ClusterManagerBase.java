@@ -18,7 +18,6 @@ package org.apache.catalina.ha.session;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.regex.Pattern;
 
 import org.apache.catalina.Cluster;
 import org.apache.catalina.Context;
@@ -47,20 +46,6 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
      * Should listeners be notified?
      */
     private boolean notifyListenersOnReplication = true;
-
-    /**
-     * The pattern used for including session attributes to
-     *  replication, e.g. <code>^(userName|sessionHistory)$</code>.
-     *  If not set, all session attributes will be eligible for replication.
-     */
-    private String sessionAttributeFilter = null;
-
-    /**
-     * The compiled pattern used for including session attributes to
-     * replication, e.g. <code>^(userName|sessionHistory)$</code>.
-     * If not set, all session attributes will be eligible for replication.
-     */
-    private Pattern sessionAttributePattern = null;
 
     /**
      * cached replication valve cluster container!
@@ -96,9 +81,13 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
      * to replication.
      *
      * @return the sessionAttributeFilter
+     *
+     * @deprecated Use {@link #getSessionAttributeNameFilter()}. Will be removed
+     *             in Tomcat 9.0.x
      */
+    @Deprecated
     public String getSessionAttributeFilter() {
-        return sessionAttributeFilter;
+        return getSessionAttributeNameFilter();
     }
 
     /**
@@ -110,16 +99,13 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
      *
      * @param sessionAttributeFilter
      *            the filter name pattern to set
+     *
+     * @deprecated Use {@link #setSessionAttributeNameFilter(String)}. Will be
+     *             removed in Tomcat 9.0.x
      */
+    @Deprecated
     public void setSessionAttributeFilter(String sessionAttributeFilter) {
-        if (sessionAttributeFilter == null
-            || sessionAttributeFilter.trim().equals("")) {
-            this.sessionAttributeFilter = null;
-            sessionAttributePattern = null;
-        } else {
-            this.sessionAttributeFilter = sessionAttributeFilter;
-            sessionAttributePattern = Pattern.compile(sessionAttributeFilter);
-        }
+        setSessionAttributeNameFilter(sessionAttributeFilter);
     }
 
     public boolean isRecordAllActions() {
@@ -142,15 +128,6 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
     @Deprecated
     public boolean willAttributeDistribute(String name) {
         return willAttributeDistribute(name, null);
-    }
-
-
-    @Override
-    public boolean willAttributeDistribute(String name, Object value) {
-        if (sessionAttributePattern == null) {
-            return true;
-        }
-        return sessionAttributePattern.matcher(name).matches();
     }
 
 
