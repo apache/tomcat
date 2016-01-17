@@ -888,17 +888,15 @@ public class HostConfig
                 cn.getBaseName() + "/META-INF/context.xml");
 
         boolean xmlInWar = false;
-        JarEntry entry = null;
         try {
             jar = new JarFile(war);
-            entry = jar.getJarEntry(Constants.ApplicationContextXml);
+            JarEntry entry = jar.getJarEntry(Constants.ApplicationContextXml);
             if (entry != null) {
                 xmlInWar = true;
             }
         } catch (IOException e) {
             /* Ignore */
         } finally {
-            entry = null;
             if (jar != null) {
                 try {
                     jar.close();
@@ -920,10 +918,10 @@ public class HostConfig
                                 "hostConfig.deployDescriptor.error",
                                 war.getAbsolutePath()), e);
                     } finally {
+                        digester.reset();
                         if (context == null) {
                             context = new FailedContext();
                         }
-                        digester.reset();
                     }
                 }
                 context.setConfigFile(xml.toURI().toURL());
@@ -931,7 +929,7 @@ public class HostConfig
                 synchronized (digesterLock) {
                     try {
                         jar = new JarFile(war);
-                        entry =
+                        JarEntry entry =
                             jar.getJarEntry(Constants.ApplicationContextXml);
                         istream = jar.getInputStream(entry);
                         context = (Context) digester.parse(istream);
@@ -940,9 +938,6 @@ public class HostConfig
                                 "hostConfig.deployDescriptor.error",
                                 war.getAbsolutePath()), e);
                     } finally {
-                        if (context == null) {
-                            context = new FailedContext();
-                        }
                         if (istream != null) {
                             try {
                                 istream.close();
@@ -951,7 +946,6 @@ public class HostConfig
                             }
                             istream = null;
                         }
-                        entry = null;
                         if (jar != null) {
                             try {
                                 jar.close();
@@ -960,10 +954,13 @@ public class HostConfig
                             }
                             jar = null;
                         }
+                        digester.reset();
+                        if (context == null) {
+                            context = new FailedContext();
+                        }
                         context.setConfigFile(new URL("jar:" +
                                 war.toURI().toString() + "!/" +
                                 Constants.ApplicationContextXml));
-                        digester.reset();
                     }
                 }
             } else if (!deployXML && xmlInWar) {
@@ -999,10 +996,9 @@ public class HostConfig
             if (xmlInWar && copyThisXml) {
                 // Change location of XML file to config base
                 xml = new File(configBase(), cn.getBaseName() + ".xml");
-                entry = null;
                 try {
                     jar = new JarFile(war);
-                    entry =
+                    JarEntry entry =
                         jar.getJarEntry(Constants.ApplicationContextXml);
                     istream = jar.getInputStream(entry);
 
@@ -1205,10 +1201,10 @@ public class HostConfig
                                 xml), e);
                         context = new FailedContext();
                     } finally {
+                        digester.reset();
                         if (context == null) {
                             context = new FailedContext();
                         }
-                        digester.reset();
                     }
                 }
 
