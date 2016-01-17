@@ -184,6 +184,10 @@
         processing a forwarded request where the target includes a query string
         that contains a parameter with no value. (markt/kkolinko)
       </fix>
+      <fix>
+        Make sure that shared Digester is reset in an unlikely error case
+        in <code>HostConfig.deployWAR()</code>. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
