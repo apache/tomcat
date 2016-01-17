@@ -271,7 +271,8 @@ public class TestTomcat extends TomcatBaseTest {
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/examples/servlets/servlet/HelloWorldExample");
-        assertTrue(res.toString().indexOf("<h1>Hello World!</h1>") > 0);
+        String text = res.toString();
+        assertTrue(text, text.indexOf("<h1>Hello World!</h1>") > 0);
     }
 
     @Test
@@ -286,7 +287,8 @@ public class TestTomcat extends TomcatBaseTest {
 
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/examples/jsp/jsp2/el/basic-arithmetic.jsp");
-        assertTrue(res.toString().indexOf("<td>${(1==2) ? 3 : 4}</td>") > 0);
+        String text = res.toString();
+        assertTrue(text, text.indexOf("<td>${(1==2) ? 3 : 4}</td>") > 0);
     }
 
     @Test
