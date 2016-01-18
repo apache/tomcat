@@ -203,7 +203,9 @@
         filtered bases on attribute name to all session manager implementations.
         Note that configuration attribute name has changed from
         <code>sessionAttributeFilter</code> to
-        <code>sessionAttributeNameFilter</code>. (markt)
+        <code>sessionAttributeNameFilter</code>. Apply the filter on load as
+        well as unload to ensure that configuration changes made while the web
+        application is stopped are applied to any persisted data. (markt)
       </add>
     </changelog>
   </subsection>
