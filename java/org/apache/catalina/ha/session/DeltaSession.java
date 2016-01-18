@@ -751,6 +751,11 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
                 }
                 throw wae;
             }
+            // Handle the case where the filter configuration was changed while
+            // the web application was stopped.
+            if (exclude(name, value)) {
+                continue;
+            }
             attributes.put(name, value);
         }
         isValid = isValidSave;
