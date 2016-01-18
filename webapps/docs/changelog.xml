@@ -72,14 +72,14 @@
         during evaluation of EL expressions. (kkolinko)
       </fix>
       <fix>
-        <bug>58701</bug>: Reset the <code>instanceInitialized</code> field in
-        <code>StandardWrapper</code> when unloading a Servlet so that a new
-        instance may be correctly initialized. (markt)
-      </fix>
-      <fix>
         <bug>58692</bug>: Make <code>StandardJarScanner</code> more robust. Log
         a warning if a class path entry cannot be scanned rather than triggering
         the failure of the web application. (markt)
+      </fix>
+      <fix>
+        <bug>58701</bug>: Reset the <code>instanceInitialized</code> field in
+        <code>StandardWrapper</code> when unloading a Servlet so that a new
+        instance may be correctly initialized. (markt)
       </fix>
       <fix>
         <bug>58702</bug>: Ensure an access log entry is generated if the client
