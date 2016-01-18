@@ -225,11 +225,17 @@ public class StandardManager extends ManagerBase {
                         }
                         sessionCounter++;
                     }
-                } finally {
+
                     // Delete the persistent storage file
                     if (file.exists()) {
                         file.delete();
                     }
+                } catch (Throwable t) {
+                    // Clearing the partially loaded sessions here prevents the
+                    // stop() method overwriting the file where the session data
+                    // is stored.
+                    sessions.clear();
+                    throw t;
                 }
             }
         } catch (FileNotFoundException e) {
@@ -278,6 +284,8 @@ public class StandardManager extends ManagerBase {
             log.debug(sm.getString("standardManager.unloading.debug"));
 
         if (sessions.isEmpty()) {
+            // This is important in the case where the load fails since it
+            // prevents the overwriting of the data that failed to load.
             log.debug(sm.getString("standardManager.unloading.nosessions"));
             return; // nothing to do
         }
@@ -354,7 +362,7 @@ public class StandardManager extends ManagerBase {
             load();
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            log.error(sm.getString("standardManager.managerLoad"), t);
+            throw new LifecycleException(sm.getString("standardManager.managerLoad"), t);
         }
 
         setState(LifecycleState.STARTING);
