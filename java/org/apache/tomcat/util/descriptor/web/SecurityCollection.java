@@ -161,7 +161,7 @@ public class SecurityCollection implements Serializable {
 
     /**
      * Set if this constraint was defined in a deployment descriptor.
-     * @param isFromDescriptor <code>true</code> was declared in a descriptor 
+     * @param isFromDescriptor <code>true</code> was declared in a descriptor
      */
     public void setFromDescriptor(boolean isFromDescriptor) {
         this.isFromDescriptor = isFromDescriptor;
