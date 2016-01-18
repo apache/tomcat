@@ -73,6 +73,8 @@ public class ContextHandler extends ResourceBase {
 
     /**
      * Set a configured property.
+     * @param name The property name
+     * @param value The property value
      */
     public void setProperty(String name, String value) {
         this.setProperty(name, (Object) value);

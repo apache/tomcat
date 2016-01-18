@@ -118,6 +118,7 @@ public class WebRuleSet extends RuleSetBase {
     /**
      * Construct an instance of this <code>RuleSet</code> with the default
      * matching pattern prefix.
+     * @param fragment <code>true</code> if this is a web fragment
      */
     public WebRuleSet(boolean fragment) {
 
@@ -132,6 +133,7 @@ public class WebRuleSet extends RuleSetBase {
      *
      * @param prefix Prefix for matching pattern rules (including the
      *  trailing slash character)
+     * @param fragment <code>true</code> if this is a web fragment
      */
     public WebRuleSet(String prefix, boolean fragment) {
 
