@@ -117,7 +117,8 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
     }
 
     /**
-     * Check whether the given session attribute should be distributed
+     * Check whether the given session attribute should be distributed based on
+     * attribute name only.
      *
      * @param name The attribute name
      * @return <code>true</code> if the attribute should be distributed
