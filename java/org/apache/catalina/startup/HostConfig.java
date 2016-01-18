@@ -938,6 +938,7 @@ public class HostConfig
                                 "hostConfig.deployDescriptor.error",
                                 war.getAbsolutePath()), e);
                     } finally {
+                        digester.reset();
                         if (istream != null) {
                             try {
                                 istream.close();
@@ -954,7 +955,6 @@ public class HostConfig
                             }
                             jar = null;
                         }
-                        digester.reset();
                         if (context == null) {
                             context = new FailedContext();
                         }
