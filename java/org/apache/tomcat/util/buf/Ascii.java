@@ -56,14 +56,16 @@ public final class Ascii {
 
     /**
      * Returns the lower case equivalent of the specified ASCII character.
+     * @param c The char
+     * @return the lower case equivalent char
      */
-
     public static int toLower(int c) {
         return toLower[c & 0xff] & 0xff;
     }
 
     /**
-     * Returns true if the specified ASCII character is a digit.
+     * @return <code>true</code> if the specified ASCII character is a digit.
+     * @param c The char
      */
     private static boolean isDigit(int c) {
         return isDigit[c & 0xff];
@@ -74,6 +76,7 @@ public final class Ascii {
      * @param b the bytes to parse
      * @param off the start offset of the bytes
      * @param len the length of the bytes
+     * @return the long value
      * @exception NumberFormatException if the long format was invalid
      */
     public static long parseLong(byte[] b, int off, int len)

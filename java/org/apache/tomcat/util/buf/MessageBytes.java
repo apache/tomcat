@@ -73,7 +73,9 @@ public final class MessageBytes implements Cloneable, Serializable {
     private MessageBytes() {
     }
 
-    /** Construct a new MessageBytes instance
+    /**
+     * Construct a new MessageBytes instance.
+     * @return the instance
      */
     public static MessageBytes newInstance() {
         return factory.newInstance();
@@ -119,9 +121,9 @@ public final class MessageBytes implements Cloneable, Serializable {
     /**
      * Sets the content to be a char[]
      *
-     * @param c the bytes
-     * @param off the start offset of the bytes
-     * @param len the length of the bytes
+     * @param c the chars
+     * @param off the start offset of the chars
+     * @param len the length of the chars
      */
     public void setChars( char[] c, int off, int len ) {
         charC.setChars( c, off, len );
@@ -133,6 +135,7 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     /**
      * Set the content to be a string
+     * @param s The string
      */
     public void setString( String s ) {
         strValue=s;
@@ -149,7 +152,9 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     // -------------------- Conversion and getters --------------------
 
-    /** Compute the string value
+    /**
+     * Compute the string value.
+     * @return the string
      */
     @Override
     public String toString() {
@@ -171,8 +176,10 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     //----------------------------------------
-    /** Return the type of the original content. Can be
-     *  T_STR, T_BYTES, T_CHARS or T_NULL
+    /**
+     * Return the type of the original content. Can be
+     * T_STR, T_BYTES, T_CHARS or T_NULL
+     * @return the type
      */
     public int getType() {
         return type;
@@ -181,6 +188,7 @@ public final class MessageBytes implements Cloneable, Serializable {
     /**
      * Returns the byte chunk, representing the byte[] and offset/length.
      * Valid only if T_BYTES or after a conversion was made.
+     * @return the byte chunk
      */
     public ByteChunk getByteChunk() {
         return byteC;
@@ -189,6 +197,7 @@ public final class MessageBytes implements Cloneable, Serializable {
     /**
      * Returns the char chunk, representing the char[] and offset/length.
      * Valid only if T_CHARS or after a conversion was made.
+     * @return the char chunk
      */
     public CharChunk getCharChunk() {
         return charC;
@@ -197,13 +206,14 @@ public final class MessageBytes implements Cloneable, Serializable {
     /**
      * Returns the string value.
      * Valid only if T_STR or after a conversion was made.
+     * @return the string
      */
     public String getString() {
         return strValue;
     }
 
     /**
-     * Get the Charset used for string&lt;-&gt;byte conversions.
+     * @return the Charset used for string&lt;-&gt;byte conversions.
      */
     public Charset getCharset() {
         return byteC.getCharset();
@@ -211,12 +221,14 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     /**
      * Set the Charset used for string&lt;-&gt;byte conversions.
+     * @param charset The charset
      */
     public void setCharset(Charset charset) {
         byteC.setCharset(charset);
     }
 
-    /** Do a char-&gt;byte conversion.
+    /**
+     * Do a char-&gt;byte conversion.
      */
     public void toBytes() {
         if (!byteC.isNull()) {
@@ -230,8 +242,9 @@ public final class MessageBytes implements Cloneable, Serializable {
         byteC.setBytes(result.array(), result.arrayOffset(), result.limit());
     }
 
-    /** Convert to char[] and fill the CharChunk.
-     *  XXX Not optimized - it converts to String first.
+    /**
+     * Convert to char[] and fill the CharChunk.
+     * XXX Not optimized - it converts to String first.
      */
     public void toChars() {
         if( ! charC.isNull() ) {
@@ -250,6 +263,7 @@ public final class MessageBytes implements Cloneable, Serializable {
      * Returns the length of the original buffer.
      * Note that the length in bytes may be different from the length
      * in chars.
+     * @return the length
      */
     public int getLength() {
         if(type==T_BYTES) {
@@ -273,7 +287,7 @@ public final class MessageBytes implements Cloneable, Serializable {
     /**
      * Compares the message bytes to the specified String object.
      * @param s the String to compare
-     * @return true if the comparison succeeded, false otherwise
+     * @return <code>true</code> if the comparison succeeded, <code>false</code> otherwise
      */
     public boolean equals(String s) {
         switch (type) {
@@ -294,7 +308,7 @@ public final class MessageBytes implements Cloneable, Serializable {
     /**
      * Compares the message bytes to the specified String object.
      * @param s the String to compare
-     * @return true if the comparison succeeded, false otherwise
+     * @return <code>true</code> if the comparison succeeded, <code>false</code> otherwise
      */
     public boolean equalsIgnoreCase(String s) {
         switch (type) {
@@ -354,7 +368,7 @@ public final class MessageBytes implements Cloneable, Serializable {
 
 
     /**
-     * Returns true if the message bytes starts with the specified string.
+     * @return <code>true</code> if the message bytes starts with the specified string.
      * @param s the string
      * @param pos The start position
      */
@@ -438,8 +452,10 @@ public final class MessageBytes implements Cloneable, Serializable {
         return upper.indexOf( sU, starting );
     }
 
-    /** Copy the src into this MessageBytes, allocating more space if
-     *  needed
+    /**
+     * Copy the src into this MessageBytes, allocating more space if needed.
+     * @param src The source
+     * @throws IOException Writing overflow data to the output channel failed
      */
     public void duplicate( MessageBytes src ) throws IOException
     {
@@ -471,7 +487,9 @@ public final class MessageBytes implements Cloneable, Serializable {
     private long longValue;
     private boolean hasLongValue=false;
 
-    /** Set the buffer to the representation of an long
+    /**
+     * Set the buffer to the representation of an long.
+     * @param l The long
      */
     public void setLong(long l) {
         byteC.allocate(32, 64);
@@ -513,7 +531,9 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     // Used for headers conversion
-    /** Convert the buffer to an long, cache the value
+    /**
+     * Convert the buffer to an long, cache the value.
+     * @return the long value
      */
     public long getLong() {
         if( hasLongValue ) {
