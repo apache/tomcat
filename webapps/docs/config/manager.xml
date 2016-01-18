@@ -285,7 +285,7 @@
         <code>org.apache.catalina.session.StandardManager</code> class.
         </p>
       </attribute>
-      
+
       <attribute name="sessionAttributeNameFilter" required="false">
         <p>A regular expression used to filter which session attributes will be
         distributed. An attribute will only be distributed if its name matches
