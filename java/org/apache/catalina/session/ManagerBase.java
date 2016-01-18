@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -205,6 +206,16 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     // ------------------------------------------------------------- Properties
 
+    /**
+     * Obtain the regular expression used to filter session attribute based on
+     * attribute name. The regular expression is anchored so it must match the
+     * entire name
+     *
+     * @return The regular expression currently used to filter attribute names.
+     *         {@code null} means no filter is applied. If an empty string is
+     *         specified then no names will match the filter and all attributes
+     *         will be blocked.
+     */
     public String getSessionAttributeNameFilter() {
         if (sessionAttributeNamePattern == null) {
             return null;
@@ -213,7 +224,20 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    public void setSessionAttributeNameFilter(String sessionAttributeNameFilter) {
+    /**
+     * Set the regular expression to use to filter session attributes based on
+     * attribute name. The regular expression is anchored so it must match the
+     * entire name.
+     *
+     * @param sessionAttributeNameFilter The regular expression to use to filter
+     *        session attributes based on attribute name. Use {@code null} if no
+     *        filtering is required. If an empty string is specified then no
+     *        names will match the filter and all attributes will be blocked.
+     *
+     * @throws PatternSyntaxException If the expression is not valid
+     */
+    public void setSessionAttributeNameFilter(String sessionAttributeNameFilter)
+            throws PatternSyntaxException {
         if (sessionAttributeNameFilter == null || sessionAttributeNameFilter.length() == 0) {
             sessionAttributeNamePattern = null;
         }
@@ -221,6 +245,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
+    /**
+     * Provides {@link #getSessionAttributeNameFilter()} as a pre-compiled
+     * regular expression pattern.
+     *
+     * @return The pre-compiled pattern used to filter session attributes based
+     *         on attribute name. {@code null} means no filter is applied.
+     */
     protected Pattern getSessionAttributeNamePattern() {
         return sessionAttributeNamePattern;
     }
