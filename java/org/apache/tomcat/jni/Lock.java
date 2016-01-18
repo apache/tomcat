@@ -54,6 +54,7 @@ public class Lock {
      * </PRE>
      * @param pool the pool from which to allocate the mutex.
      * @return Newly created mutex.
+     * @throws Error An error occurred
      */
     public static native long create(String fname, int mech, long pool)
         throws Error;
@@ -68,6 +69,7 @@ public class Lock {
      *              same one that was passed to apr_proc_mutex_create().
      * @param pool The pool to operate on.
      * @return Newly opened mutex.
+     * @throws Error An error occurred
      */
     public static native long childInit(String fname, long pool)
         throws Error;
@@ -76,6 +78,7 @@ public class Lock {
      * Acquire the lock for the given mutex. If the mutex is already locked,
      * the current thread will be put to sleep until the lock becomes available.
      * @param mutex the mutex on which to acquire the lock.
+     * @return the operation status
      */
     public static native int lock(long mutex);
 
@@ -85,24 +88,29 @@ public class Lock {
      * is important that the APR_STATUS_IS_EBUSY(s) macro be used to determine
      * if the return value was APR_EBUSY, for portability reasons.
      * @param mutex the mutex on which to attempt the lock acquiring.
+     * @return the operation status
      */
     public static native int trylock(long mutex);
 
     /**
      * Release the lock for the given mutex.
      * @param mutex the mutex from which to release the lock.
+     * @return the operation status
      */
     public static native int unlock(long mutex);
 
     /**
      * Destroy the mutex and free the memory associated with the lock.
      * @param mutex the mutex to destroy.
+     * @return the operation status
      */
     public static native int destroy(long mutex);
 
     /**
      * Return the name of the lockfile for the mutex, or NULL
      * if the mutex doesn't use a lock file
+     * @param mutex the name of the mutex
+     * @return the name of the lock file
      */
     public static native String lockfile(long mutex);
 
@@ -110,11 +118,13 @@ public class Lock {
      * Display the name of the mutex, as it relates to the actual method used.
      * This matches the valid options for Apache's AcceptMutex directive
      * @param mutex the name of the mutex
+     * @return the name of the mutex
      */
     public static native String name(long mutex);
 
     /**
      * Display the name of the default mutex: APR_LOCK_DEFAULT
+     * @return the default name
      */
     public static native String defname();
 

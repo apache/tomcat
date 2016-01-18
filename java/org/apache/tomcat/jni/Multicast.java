@@ -31,6 +31,7 @@ public class Multicast {
      *              default multicast interface will be used. (OS Dependent)
      * @param source Source Address to accept transmissions from (non-NULL
      *               implies Source-Specific Multicast)
+     * @return the operation status
      */
     public static native int join(long sock, long join,
                                   long iface, long source);
@@ -44,6 +45,7 @@ public class Multicast {
      *              default multicast interface will be used. (OS Dependent)
      * @param source Source Address to accept transmissions from (non-NULL
      *               implies Source-Specific Multicast)
+     * @return the operation status
      */
     public static native int leave(long sock, long addr,
                                    long iface, long source);
@@ -55,6 +57,7 @@ public class Multicast {
      * <br><b>Remark :</b> If the TTL is 0, packets will only be seen
      * by sockets on the local machine,
      * and only when multicast loopback is enabled.
+     * @return the operation status
      */
     public static native int hops(long sock, int ttl);
 
@@ -62,6 +65,7 @@ public class Multicast {
      * Toggle IP Multicast Loopback
      * @param sock The socket to set multicast loopback
      * @param opt false=disable, true=enable
+     * @return the operation status
      */
     public static native int loopback(long sock, boolean opt);
 
@@ -70,6 +74,7 @@ public class Multicast {
      * Set the Interface to be used for outgoing Multicast Transmissions.
      * @param sock The socket to set the multicast interface on
      * @param iface Address of the interface to use for Multicast
+     * @return the operation status
      */
     public static native int ointerface(long sock, long iface);
 

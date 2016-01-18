@@ -144,6 +144,8 @@ public final class SSLContext {
      * was read but before the HTTP response is sent.
      * @param ctx Server or Client context to use.
      * @param ciphers An OpenSSL cipher specification.
+     * @return <code>true</code> if the operation was successful
+     * @throws Exception An error occurred
      */
     public static native boolean setCipherSuite(long ctx, String ciphers)
         throws Exception;
@@ -166,6 +168,8 @@ public final class SSLContext {
      * @param ctx Server or Client context to use.
      * @param file File of concatenated PEM-encoded CA CRLs for Client Auth.
      * @param path Directory of PEM-encoded CA Certificates for Client Auth.
+     * @return <code>true</code> if the operation was successful
+     * @throws Exception An error occurred
      */
     public static native boolean setCARevocation(long ctx, String file,
                                                  String path)
@@ -190,6 +194,7 @@ public final class SSLContext {
      * @param file File of PEM-encoded Server CA Certificates.
      * @param skipfirst Skip first certificate if chain file is inside
      *                  certificate file.
+     * @return <code>true</code> if the operation was successful
      */
     public static native boolean setCertificateChainFile(long ctx, String file,
                                                          boolean skipfirst);
@@ -215,6 +220,8 @@ public final class SSLContext {
      * @param password Certificate password. If null and certificate
      *                 is encrypted, password prompt will be displayed.
      * @param idx Certificate index SSL_AIDX_RSA or SSL_AIDX_DSA.
+     * @return <code>true</code> if the operation was successful
+     * @throws Exception An error occurred
      */
     public static native boolean setCertificate(long ctx, String cert,
                                                 String key, String password,
@@ -224,38 +231,53 @@ public final class SSLContext {
     /**
      * Set the size of the internal session cache.
      * http://www.openssl.org/docs/ssl/SSL_CTX_sess_set_cache_size.html
+     * @param ctx Server or Client context to use.
+     * @param size The cache size
+     * @return the value set
      */
     public static native long setSessionCacheSize(long ctx, long size);
 
     /**
      * Get the size of the internal session cache.
      * http://www.openssl.org/docs/ssl/SSL_CTX_sess_get_cache_size.html
+     * @param ctx Server or Client context to use.
+     * @return the size
      */
     public static native long getSessionCacheSize(long ctx);
 
     /**
      * Set the timeout for the internal session cache in seconds.
      * http://www.openssl.org/docs/ssl/SSL_CTX_set_timeout.html
+     * @param ctx Server or Client context to use.
+     * @param timeoutSeconds Timeout value
+     * @return the value set
      */
     public static native long setSessionCacheTimeout(long ctx, long timeoutSeconds);
 
     /**
      * Get the timeout for the internal session cache in seconds.
      * http://www.openssl.org/docs/ssl/SSL_CTX_set_timeout.html
+     * @param ctx Server or Client context to use.
+     * @return the timeout
      */
     public static native long getSessionCacheTimeout(long ctx);
 
     /**
      * Set the mode of the internal session cache and return the previous used mode.
+     * @param ctx Server or Client context to use.
+     * @param mode The mode to set
+     * @return the value set
      */
     public static native long setSessionCacheMode(long ctx, long mode);
 
     /**
      * Get the mode of the current used internal session cache.
+     * @param ctx Server or Client context to use.
+     * @return the value set
      */
     public static native long getSessionCacheMode(long ctx);
 
-    /**
+    /*
      * Session resumption statistics methods.
      * http://www.openssl.org/docs/ssl/SSL_CTX_sess_number.html
      */
@@ -274,6 +296,8 @@ public final class SSLContext {
 
     /**
      * Set TLS session keys. This allows us to share keys across TFEs.
+     * @param ctx Server or Client context to use.
+     * @param keys Some session keys
      */
     public static native void setSessionTicketKeys(long ctx, byte[] keys);
 
@@ -297,6 +321,8 @@ public final class SSLContext {
      * @param file File of concatenated PEM-encoded CA Certificates for
      *             Client Auth.
      * @param path Directory of PEM-encoded CA Certificates for Client Auth.
+     * @return <code>true</code> if the operation was successful
+     * @throws Exception An error occurred
      */
     public static native boolean setCACertificate(long ctx, String file,
                                                   String path)
@@ -382,7 +408,7 @@ public final class SSLContext {
         return sniCallBack.getSslContext(sniHostName);
     }
 
-    /*
+    /**
      * A map of default SSL Contexts to SNICallBack instances (in Tomcat these
      * are instances of AprEndpoint) that will be used to determine the SSL
      * Context to use bases on the SNI host name. It is structured this way
@@ -486,6 +512,7 @@ public final class SSLContext {
      * @param ctx Server context to use.
      * @param cert DH param file (can be generated from e.g. {@code openssl dhparam -rand - 2048 > dhparam.pem} -
      *             see the <a href="https://www.openssl.org/docs/apps/dhparam.html">OpenSSL documentation</a>).
+     * @throws Exception An error occurred
      */
     public static native void setTmpDH(long ctx, String cert)
             throws Exception;
@@ -495,6 +522,7 @@ public final class SSLContext {
      * @param ctx Server context to use.
      * @param curveName the name of the elliptic curve to use
      *             (available names can be obtained from {@code openssl ecparam -list_curves}).
+     * @throws Exception An error occurred
      */
     public static native void setTmpECDHByCurveName(long ctx, String curveName)
             throws Exception;
@@ -518,6 +546,7 @@ public final class SSLContext {
      * @param cert Byte array with the certificate in DER encoding.
      * @param key Byte array with the Private Key file in PEM format.
      * @param sslAidxRsa Certificate index SSL_AIDX_RSA or SSL_AIDX_DSA.
+     * @return {@code true} if success, {@code false} otherwise.
      */
     public static native boolean setCertificateRaw(long ctx, byte[] cert, byte[] key, int sslAidxRsa);
 }

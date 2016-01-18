@@ -282,6 +282,7 @@ public final class SSL {
      *        set, $HOME/.rnd otherwise.
      *        In case both files are unavailable builtin
      *        random seed generator is used.
+     * @return <code>true</code> if the operation was successful
      */
     public static native boolean randLoad(String filename);
 
@@ -290,6 +291,7 @@ public final class SSL {
      * file <code>filename</code> which can be used to initialize the PRNG
      * by calling randLoad in a later session.
      * @param filename Filename to save the data
+     * @return <code>true</code> if the operation was successful
      */
     public static native boolean randSave(String filename);
 
@@ -298,6 +300,7 @@ public final class SSL {
      * @param filename Filename to save the data
      * @param len The length of random sequence in bytes
      * @param base64 Output the data in Base64 encoded format
+     * @return <code>true</code> if the operation was successful
      */
     public static native boolean randMake(String filename, int len,
                                           boolean base64);
@@ -315,6 +318,7 @@ public final class SSL {
      * @param pool The pool to use.
      * @param callback BIOCallback to use
      * @return New BIO handle
+     * @throws Exception An error occurred
      */
      public static native long newBIO(long pool, BIOCallback callback)
             throws Exception;
@@ -340,6 +344,7 @@ public final class SSL {
 
     /**
      * Return last SSL error string
+     * @return the error string
      */
     public static native String getLastError();
 
@@ -359,6 +364,8 @@ public final class SSL {
 
     /**
      * Return the handshake completed count.
+     * @param ssl SSL pointer
+     * @return the count
      */
     public static native int getHandshakeCount(long ssl);
 
@@ -400,63 +407,71 @@ public final class SSL {
      * SSL_get_error
      * @param ssl SSL pointer (SSL *)
      * @param ret TLS/SSL I/O return value
+     * @return the error status
      */
     public static native int getError(long ssl, int ret);
 
     /**
      * BIO_ctrl_pending.
      * @param bio BIO pointer (BIO *)
+     * @return the pending bytes count
      */
     public static native int pendingWrittenBytesInBIO(long bio);
 
     /**
      * SSL_pending.
      * @param ssl SSL pointer (SSL *)
+     * @return the pending bytes count
      */
     public static native int pendingReadableBytesInSSL(long ssl);
 
     /**
      * BIO_write.
-     * @param bio
-     * @param wbuf
-     * @param wlen
+     * @param bio BIO pointer
+     * @param wbuf Buffer pointer
+     * @param wlen Write length
+     * @return the bytes count written
      */
     public static native int writeToBIO(long bio, long wbuf, int wlen);
 
     /**
      * BIO_read.
-     * @param bio
-     * @param rbuf
-     * @param rlen
+     * @param bio BIO pointer
+     * @param rbuf Buffer pointer
+     * @param rlen Read length
+     * @return the bytes count read
      */
     public static native int readFromBIO(long bio, long rbuf, int rlen);
 
     /**
      * SSL_write.
      * @param ssl the SSL instance (SSL *)
-     * @param wbuf
-     * @param wlen
+     * @param wbuf Buffer pointer
+     * @param wlen Write length
+     * @return the bytes count written
      */
     public static native int writeToSSL(long ssl, long wbuf, int wlen);
 
     /**
      * SSL_read
      * @param ssl the SSL instance (SSL *)
-     * @param rbuf
-     * @param rlen
+     * @param rbuf Buffer pointer
+     * @param rlen Read length
+     * @return the bytes count read
      */
     public static native int readFromSSL(long ssl, long rbuf, int rlen);
 
     /**
      * SSL_get_shutdown
      * @param ssl the SSL instance (SSL *)
+     * @return the operation status
      */
     public static native int getShutdown(long ssl);
 
     /**
      * SSL_set_shutdown
      * @param ssl the SSL instance (SSL *)
-     * @param mode
+     * @param mode Shutdown mode
      */
     public static native void setShutdown(long ssl, int mode);
 
@@ -481,55 +496,63 @@ public final class SSL {
 
     /**
      * BIO_free
-     * @param bio
+     * @param bio BIO pointer
      */
     public static native void freeBIO(long bio);
 
     /**
      * SSL_shutdown
      * @param ssl the SSL instance (SSL *)
+     * @return the operation status
      */
     public static native int shutdownSSL(long ssl);
 
     /**
      * Get the error number representing the last error OpenSSL encountered on
      * this thread.
+     * @return the last error number
      */
     public static native int getLastErrorNumber();
 
     /**
      * SSL_get_cipher.
      * @param ssl the SSL instance (SSL *)
+     * @return the cipher name
      */
     public static native String getCipherForSSL(long ssl);
 
     /**
      * SSL_get_version
      * @param ssl the SSL instance (SSL *)
+     * @return the SSL version in use
      */
     public static native String getVersion(long ssl);
 
     /**
      * SSL_do_handshake
      * @param ssl the SSL instance (SSL *)
+     * @return the handshake status
      */
     public static native int doHandshake(long ssl);
 
     /**
      * SSL_renegotiate
      * @param ssl the SSL instance (SSL *)
+     * @return the operation status
      */
     public static native int renegotiate(long ssl);
 
     /**
      * SSL_in_init.
-     * @param SSL
+     * @param ssl the SSL instance (SSL *)
+     * @return the status
      */
-    public static native int isInInit(long SSL);
+    public static native int isInInit(long ssl);
 
     /**
      * SSL_get0_next_proto_negotiated
      * @param ssl the SSL instance (SSL *)
+     * @return the NPN protocol negotiated
      */
     public static native String getNextProtoNegotiated(long ssl);
 
@@ -540,20 +563,28 @@ public final class SSL {
     /**
      * SSL_get0_alpn_selected
      * @param ssl the SSL instance (SSL *)
+     * @return the ALPN protocol negotiated
      */
     public static native String getAlpnSelected(long ssl);
 
     /**
      * Get the peer certificate chain or {@code null} if non was send.
+     * @param ssl the SSL instance (SSL *)
+     * @return the certificate chain bytes
      */
     public static native byte[][] getPeerCertChain(long ssl);
 
     /**
      * Get the peer certificate or {@code null} if non was send.
+     * @param ssl the SSL instance (SSL *)
+     * @return the certificate bytes
      */
     public static native byte[] getPeerCertificate(long ssl);
-    /*
+
+    /**
      * Get the error number representing for the given {@code errorNumber}.
+     * @param errorNumber The error code
+     * @return an error message
      */
     public static native String getErrorString(long errorNumber);
 
@@ -634,6 +665,8 @@ public final class SSL {
      * was read but before the HTTP response is sent.
      * @param ssl the SSL instance (SSL *)
      * @param ciphers an SSL cipher specification
+     * @return <code>true</code> if the operation was successful
+     * @throws Exception An error occurred
      */
     public static native boolean setCipherSuites(long ssl, String ciphers)
             throws Exception;
