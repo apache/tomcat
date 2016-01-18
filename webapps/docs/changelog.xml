@@ -180,6 +180,11 @@
         it is read-only. (kkolinko)
       </fix>
       <fix>
+        <bug>58766</bug>: Make skipping non-class files during annotation
+        scanning faster by checking the file name first. Improve debug logging.
+        (kkolinko)
+      </fix>
+      <fix>
         <bug>58836</bug>: Correctly merge query string parameters when
         processing a forwarded request where the target includes a query string
         that contains a parameter with no value. (markt/kkolinko)
