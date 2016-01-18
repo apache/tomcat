@@ -1693,9 +1693,9 @@ public class StandardSession implements HttpSession, Session, Serializable {
         ArrayList<Object> saveValues = new ArrayList<>();
         for (int i = 0; i < keys.length; i++) {
             Object value = attributes.get(keys[i]);
-            if (value == null)
+            if (value == null) {
                 continue;
-            else if (isAttributeDistributable(keys[i], value) && !exclude(keys[i], value)) {
+            } else if (isAttributeDistributable(keys[i], value) && !exclude(keys[i], value)) {
                 saveNames.add(keys[i]);
                 saveValues.add(value);
             } else {
