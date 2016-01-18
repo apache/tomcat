@@ -486,12 +486,6 @@ public final class SSL {
     public static native void freeBIO(long bio);
 
     /**
-     * BIO_flush
-     * @param bio
-     */
-    public static native void flushBIO(long bio);
-
-    /**
      * SSL_shutdown
      * @param ssl the SSL instance (SSL *)
      */
