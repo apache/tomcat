@@ -60,9 +60,11 @@ public class WebXml {
 
     private static final Log log = LogFactory.getLog(WebXml.class);
 
-    // Global defaults are overridable but Servlets and Servlet mappings need to
-    // be unique. Duplicates normally trigger an error. This flag indicates if
-    // newly added Servlet elements are marked as overridable.
+    /**
+     * Global defaults are overridable but Servlets and Servlet mappings need to
+     * be unique. Duplicates normally trigger an error. This flag indicates if
+     * newly added Servlet elements are marked as overridable.
+     */
     private boolean overridable = false;
     public boolean isOverridable() {
         return overridable;
@@ -71,8 +73,10 @@ public class WebXml {
         this.overridable = overridable;
     }
 
-    // web.xml only elements
-    // Absolute Ordering
+    /**
+     * web.xml only elements
+     * Absolute Ordering
+     */
     private Set<String> absoluteOrdering = null;
     public void createAbsoluteOrdering() {
         if (absoluteOrdering == null) {
@@ -91,8 +95,10 @@ public class WebXml {
         return absoluteOrdering;
     }
 
-    // web-fragment.xml only elements
-    // Relative ordering
+    /**
+     * web-fragment.xml only elements
+     * Relative ordering
+     */
     private final Set<String> after = new LinkedHashSet<>();
     public void addAfterOrdering(String fragmentName) {
         after.add(fragmentName);
@@ -339,6 +345,8 @@ public class WebXml {
     /**
      * When merging/parsing web.xml files into this web.xml should the current
      * set be completely replaced?
+     * @param replaceWelcomeFiles <code>true</code> to replace welcome files
+     *  rather than add to the list
      */
     public void setReplaceWelcomeFiles(boolean replaceWelcomeFiles) {
         this.replaceWelcomeFiles = replaceWelcomeFiles;
@@ -346,6 +354,7 @@ public class WebXml {
     /**
      * When merging from this web.xml, should the welcome files be added to the
      * target web.xml even if it already contains welcome file definitions.
+     * @param alwaysAddWelcomeFiles <code>true</code> to add welcome files
      */
     public void setAlwaysAddWelcomeFiles(boolean alwaysAddWelcomeFiles) {
         this.alwaysAddWelcomeFiles = alwaysAddWelcomeFiles;
