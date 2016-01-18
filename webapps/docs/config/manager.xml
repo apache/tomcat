@@ -543,6 +543,13 @@
     including the <code>&lt;distributable&gt;</code> element in your web
     application deployment descriptor (<code>/WEB-INF/web.xml</code>).</p>
 
+    <p>The persistence across restarts provided by the
+    <strong>StandardManager</strong> is a simpler implementation than that
+    provided by the <strong>PersistentManager</strong>. If robust, production
+    quality persistence across restarts is required then the
+    <strong>PersistentManager</strong> should be used with an appropriate
+    configuration.</p>
+
   </subsection>
 
   <subsection name="Disable Session Persistence">
