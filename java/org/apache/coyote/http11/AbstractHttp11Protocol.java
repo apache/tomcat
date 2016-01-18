@@ -16,7 +16,6 @@
  */
 package org.apache.coyote.http11;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -645,8 +644,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     @Override
     protected Processor createUpgradeProcessor(
             SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
-            UpgradeToken upgradeToken)
-            throws IOException {
+            UpgradeToken upgradeToken) {
         HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
         if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
             return new UpgradeProcessorInternal(socket, leftoverInput, upgradeToken);

@@ -16,7 +16,6 @@
  */
 package org.apache.coyote;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.Collections;
@@ -434,7 +433,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     protected abstract Processor createUpgradeProcessor(
             SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
-            UpgradeToken upgradeToken) throws IOException;
+            UpgradeToken upgradeToken);
 
 
     // ----------------------------------------------------- JMX related methods
