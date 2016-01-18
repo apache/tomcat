@@ -203,6 +203,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     private Pattern sessionAttributeNamePattern;
 
+    private Pattern sessionAttributeValueClassNamePattern;
+
+    private boolean warnOnSessionAttributeFilterFailure;
+
 
     // ------------------------------------------------------------- Properties
 
@@ -254,6 +258,86 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      */
     protected Pattern getSessionAttributeNamePattern() {
         return sessionAttributeNamePattern;
+    }
+
+
+    /**
+     * Obtain the regular expression used to filter session attribute based on
+     * the implementation class of the value. The regular expression is anchored
+     * and must match the fully qualified class name.
+     *
+     * @return The regular expression currently used to filter class names.
+     *         {@code null} means no filter is applied. If an empty string is
+     *         specified then no names will match the filter and all attributes
+     *         will be blocked.
+     */
+    public String getSessionAttributeValueClassNameFilter() {
+        if (sessionAttributeValueClassNamePattern == null) {
+            return null;
+        }
+        return sessionAttributeValueClassNamePattern.toString();
+    }
+
+
+    /**
+     * Provides {@link #getSessionAttributeValueClassNameFilter()} as a
+     * pre-compiled regular expression pattern.
+     *
+     * @return The pre-compiled pattern used to filter session attributes based
+     *         on the implementation class name of the value. {@code null} means
+     *         no filter is applied.
+     */
+    protected Pattern getSessionAttributeValueClassNamePattern() {
+        return sessionAttributeValueClassNamePattern;
+    }
+
+
+    /**
+     * Set the regular expression to use to filter classes used for session
+     * attributes. The regular expression is anchored and must match the fully
+     * qualified class name.
+     *
+     * @param sessionAttributeValueClassNameFilter The regular expression to use
+     *            to filter session attributes based on class name. Use {@code
+     *            null} if no filtering is required. If an empty string is
+     *           specified then no names will match the filter and all
+     *           attributes will be blocked.
+     *
+     * @throws PatternSyntaxException If the expression is not valid
+     */
+    public void setSessionAttributeValueClassNameFilter(String sessionAttributeValueClassNameFilter)
+            throws PatternSyntaxException {
+        if (sessionAttributeValueClassNameFilter == null ||
+                sessionAttributeValueClassNameFilter.length() == 0) {
+            sessionAttributeValueClassNamePattern = null;
+        }
+        sessionAttributeValueClassNamePattern =
+                Pattern.compile(sessionAttributeValueClassNameFilter);
+    }
+
+
+    /**
+     * Should a warn level log message be generated if a session attribute is
+     * not persisted / replicated / restored.
+     *
+     * @return {@code true} if a warn level log message should be generated
+     */
+    public boolean getWarnOnSessionAttributeFilterFailure() {
+        return warnOnSessionAttributeFilterFailure;
+    }
+
+
+    /**
+     * Configure whether or not a warn level log message should be generated if
+     * a session attribute is not persisted / replicated / restored.
+     *
+     * @param warnOnSessionAttributeFilterFailure {@code true} if the
+     *            warn level message should be generated
+     *
+     */
+    public void setWarnOnSessionAttributeFilterFailure(
+            boolean warnOnSessionAttributeFilterFailure) {
+        this.warnOnSessionAttributeFilterFailure = warnOnSessionAttributeFilterFailure;
     }
 
 
@@ -719,10 +803,39 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     @Override
     public boolean willAttributeDistribute(String name, Object value) {
         Pattern sessionAttributeNamePattern = getSessionAttributeNamePattern();
-        if (sessionAttributeNamePattern == null) {
-            return true;
+        if (sessionAttributeNamePattern != null) {
+            if (!sessionAttributeNamePattern.matcher(name).matches()) {
+                if (getWarnOnSessionAttributeFilterFailure() || log.isDebugEnabled()) {
+                    String msg = sm.getString("managerBase.sessionAttributeNameFilter",
+                            name, sessionAttributeNamePattern);
+                    if (getWarnOnSessionAttributeFilterFailure()) {
+                        log.warn(msg);
+                    } else {
+                        log.debug(msg);
+                    }
+                }
+                return false;
+            }
         }
-        return sessionAttributeNamePattern.matcher(name).matches();
+
+        Pattern sessionAttributeValueClassNamePattern = getSessionAttributeValueClassNamePattern();
+        if (value != null && sessionAttributeValueClassNamePattern != null) {
+            if (!sessionAttributeValueClassNamePattern.matcher(
+                    value.getClass().getName()).matches()) {
+                if (getWarnOnSessionAttributeFilterFailure() || log.isDebugEnabled()) {
+                    String msg = sm.getString("managerBase.sessionAttributeValueClassNameFilter",
+                            name, value.getClass().getName(), sessionAttributeNamePattern);
+                    if (getWarnOnSessionAttributeFilterFailure()) {
+                        log.warn(msg);
+                    } else {
+                        log.debug(msg);
+                    }
+                }
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
