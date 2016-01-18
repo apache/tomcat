@@ -194,21 +194,21 @@ public final class ByteChunk implements Cloneable, Serializable {
     }
 
     /**
-     * Returns the message bytes.
+     * @return the message bytes.
      */
     public byte[] getBytes() {
         return getBuffer();
     }
 
     /**
-     * Returns the message bytes.
+     * @return the message bytes.
      */
     public byte[] getBuffer() {
         return buff;
     }
 
     /**
-     * Returns the start offset of the bytes.
+     * @return the start offset of the bytes.
      * For output this is the end of the buffer.
      */
     public int getStart() {
@@ -227,19 +227,19 @@ public final class ByteChunk implements Cloneable, Serializable {
     }
 
     /**
-     * Returns the length of the bytes.
-     * XXX need to clean this up
+     * @return the length of the bytes.
      */
     public int getLength() {
         return end-start;
     }
 
-    /** Maximum amount of data in this buffer.
-     *
-     *  If -1 or not set, the buffer will grow indefinitely.
-     *  Can be smaller than the current buffer size ( which will not shrink ).
-     *  When the limit is reached, the buffer will be flushed ( if out is set )
-     *  or throw exception.
+    /**
+     * Maximum amount of data in this buffer.
+     * If -1 or not set, the buffer will grow indefinitely.
+     * Can be smaller than the current buffer size ( which will not shrink ).
+     * When the limit is reached, the buffer will be flushed ( if out is set )
+     * or throw exception.
+     * @param limit The new limit
      */
     public void setLimit(int limit) {
         this.limit=limit;
@@ -251,15 +251,17 @@ public final class ByteChunk implements Cloneable, Serializable {
 
     /**
      * When the buffer is empty, read the data from the input channel.
+     * @param in The input channel
      */
     public void setByteInputChannel(ByteInputChannel in) {
         this.in = in;
     }
 
-    /** When the buffer is full, write the data to the output channel.
-     *         Also used when large amount of data is appended.
-     *
-     *  If not set, the buffer will grow to the limit.
+    /**
+     * When the buffer is full, write the data to the output channel.
+     * Also used when large amount of data is appended.
+     * If not set, the buffer will grow to the limit.
+     * @param out The output channel
      */
     public void setByteOutputChannel(ByteOutputChannel out) {
         this.out=out;
@@ -292,11 +294,14 @@ public final class ByteChunk implements Cloneable, Serializable {
         append( src.getBytes(), src.getStart(), src.getLength());
     }
 
-    /** Add data to the buffer
+    /**
+     * Add data to the buffer.
+     * @param src Bytes array
+     * @param off Offset
+     * @param len Length
+     * @throws IOException Writing overflow data to the output channel failed
      */
-    public void append( byte src[], int off, int len )
-        throws IOException
-    {
+    public void append(byte src[], int off, int len) throws IOException {
         // will grow, up to limit
         makeSpace( len );
 
@@ -406,7 +411,7 @@ public final class ByteChunk implements Cloneable, Serializable {
      * Send the buffer to the sink. Called by append() when the limit is
      * reached. You can also call it explicitly to force the data to be written.
      *
-     * @throws IOException
+     * @throws IOException Writing overflow data to the output channel failed
      */
     public void flushBuffer()
         throws IOException
@@ -421,8 +426,9 @@ public final class ByteChunk implements Cloneable, Serializable {
     }
 
     /**
-     * Make space for len chars. If len is small, allocate a reserve space too.
+     * Make space for len bytes. If len is small, allocate a reserve space too.
      * Never grow bigger than limit.
+     * @param count The size
      */
     public void makeSpace(int count) {
         byte[] tmp = null;
@@ -608,6 +614,7 @@ public final class ByteChunk implements Cloneable, Serializable {
      * Returns true if the message bytes starts with the specified string.
      * @param s the string
      * @param pos The position
+     * @return <code>true</code> if the start matches
      */
     public boolean startsWithIgnoreCase(String s, int pos) {
         byte[] b = buff;

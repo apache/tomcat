@@ -450,7 +450,9 @@ public class StringCache {
 
     /**
      * Compare given byte chunk with byte array.
-     * Return -1, 0 or +1 if inferior, equal, or superior to the String.
+     * @param name The name to compare
+     * @param compareTo The compared to data
+     * @return -1, 0 or +1 if inferior, equal, or superior to the String.
      */
     protected static final int compare(ByteChunk name, byte[] compareTo) {
         int result = 0;
@@ -484,6 +486,8 @@ public class StringCache {
     /**
      * Find an entry given its name in the cache and return the associated
      * String.
+     * @param name The name to find
+     * @return the corresponding value
      */
     protected static final String find(ByteChunk name) {
         int pos = findClosest(name, bcCache, bcCache.length);
@@ -500,6 +504,10 @@ public class StringCache {
      * Find an entry given its name in a sorted array of map elements.
      * This will return the index for the closest inferior or equal item in the
      * given array.
+     * @param name The name to find
+     * @param array The array in which to look
+     * @param len The effective length of the array
+     * @return the position of the best match
      */
     protected static final int findClosest(ByteChunk name, ByteEntry[] array,
             int len) {
@@ -545,7 +553,9 @@ public class StringCache {
 
     /**
      * Compare given char chunk with char array.
-     * Return -1, 0 or +1 if inferior, equal, or superior to the String.
+     * @param name The name to compare
+     * @param compareTo The compared to data
+     * @return -1, 0 or +1 if inferior, equal, or superior to the String.
      */
     protected static final int compare(CharChunk name, char[] compareTo) {
         int result = 0;
@@ -579,6 +589,8 @@ public class StringCache {
     /**
      * Find an entry given its name in the cache and return the associated
      * String.
+     * @param name The name to find
+     * @return the corresponding value
      */
     protected static final String find(CharChunk name) {
         int pos = findClosest(name, ccCache, ccCache.length);
@@ -594,6 +606,10 @@ public class StringCache {
      * Find an entry given its name in a sorted array of map elements.
      * This will return the index for the closest inferior or equal item in the
      * given array.
+     * @param name The name to find
+     * @param array The array in which to look
+     * @param len The effective length of the array
+     * @return the position of the best match
      */
     protected static final int findClosest(CharChunk name, CharEntry[] array,
             int len) {

@@ -63,6 +63,7 @@ public final class C2BConverter {
      *
      * @param cc char input
      * @param bc byte output
+     * @throws IOException An encoding error occurred
      */
     public void convert(CharChunk cc, ByteChunk bc)
             throws IOException {

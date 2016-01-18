@@ -163,6 +163,7 @@ public class DigesterFactory {
      * @param xmlNamespaceAware turn on/off namespace validation
      * @param rule an instance of <code>RuleSet</code> used for parsing the xml.
      * @param blockExternal turn on/off the blocking of external resources
+     * @return a new digester
      */
     public static Digester newDigester(boolean xmlValidation,
                                        boolean xmlNamespaceAware,
