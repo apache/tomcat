@@ -214,7 +214,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     public void setSessionAttributeNameFilter(String sessionAttributeNameFilter) {
-        if (sessionAttributeNameFilter == null) {
+        if (sessionAttributeNameFilter == null || sessionAttributeNameFilter.length() == 0) {
             sessionAttributeNamePattern = null;
         }
         sessionAttributeNamePattern = Pattern.compile(sessionAttributeNameFilter);
