@@ -557,9 +557,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public Manager getManager() {
-
-        return (this.manager);
-
+        return this.manager;
     }
 
 
@@ -570,9 +568,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public void setManager(Manager manager) {
-
         this.manager = manager;
-
     }
 
 
