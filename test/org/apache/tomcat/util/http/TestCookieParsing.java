@@ -49,7 +49,6 @@ public class TestCookieParsing extends TomcatBaseTest {
 
     private static final String[] COOKIES_WITH_QUOTES = new String[] {
             "name=\"val\\\"ue\"" };
-    private static final String COOKIES_WITH_QUOTES_MODIFIED = "name=\"val\"uee\"";
 
     @Test
     public void testLegacyWithEquals() throws Exception {
@@ -181,26 +180,10 @@ public class TestCookieParsing extends TomcatBaseTest {
 
     @Test
     public void testLegacyPreserveHeader() throws Exception {
-        doTestLegacyPreserveHeader(true);
-    }
-
-
-    @Test
-    public void testLegacyNoPreserveHeader() throws Exception {
-        doTestLegacyPreserveHeader(false);
-    }
-
-
-    private void doTestLegacyPreserveHeader(boolean preserveHeader) throws Exception {
         LegacyCookieProcessor legacyCookieProcessor = new LegacyCookieProcessor();
-        legacyCookieProcessor.setPreserveCookieHeader(preserveHeader);
 
         String expected;
-        if (preserveHeader) {
-            expected = concat(COOKIES_WITH_QUOTES);
-        } else {
-            expected = COOKIES_WITH_QUOTES_MODIFIED;
-        }
+        expected = concat(COOKIES_WITH_QUOTES);
         TestCookieParsingClient client = new TestCookieParsingClient(
                 legacyCookieProcessor, true, COOKIES_WITH_QUOTES, expected);
         client.doRequest();

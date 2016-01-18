@@ -254,6 +254,10 @@ public class DigestAuthenticator extends AuthenticatorBase {
     /**
      * Removes the quotes on a string. RFC2617 states quotes are optional for
      * all parameters except realm.
+     *
+     * @param quotedString The quoted string
+     * @param quotesRequired <code>true</code> if quotes were required
+     * @return The unquoted string
      */
     protected static String removeQuotes(String quotedString,
                                          boolean quotesRequired) {
@@ -270,6 +274,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     /**
      * Removes the quotes on a string.
+     *
+     * @param quotedString The quoted string
+     * @return The unquoted string
      */
     protected static String removeQuotes(String quotedString) {
         return removeQuotes(quotedString, false);
@@ -281,6 +288,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
      * time-stamp ":" private-key ) ).
      *
      * @param request HTTP Servlet request
+     * @return The generated nonce
      */
     protected String generateNonce(Request request) {
 
@@ -334,6 +342,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
      * @param request HTTP Servlet request
      * @param response HTTP Servlet response
      * @param nonce nonce token
+     * @param isNonceStale <code>true</code> to add a stale parameter
      */
     protected void setAuthenticateHeader(HttpServletRequest request,
                                          HttpServletResponse response,

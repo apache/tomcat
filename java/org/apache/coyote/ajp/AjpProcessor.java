@@ -48,7 +48,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -493,13 +493,13 @@ public class AjpProcessor extends AbstractProcessor {
         case ASYNC_COMPLETE: {
             clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
-                socketWrapper.processSocket(SocketStatus.OPEN_READ, true);
+                socketWrapper.processSocket(SocketEvent.OPEN_READ, true);
             }
             break;
         }
         case ASYNC_DISPATCH: {
             if (asyncStateMachine.asyncDispatch()) {
-                socketWrapper.processSocket(SocketStatus.OPEN_READ, true);
+                socketWrapper.processSocket(SocketEvent.OPEN_READ, true);
             }
             break;
         }
@@ -932,8 +932,10 @@ public class AjpProcessor extends AbstractProcessor {
     /**
      * Get more request body data from the web server and store it in the
      * internal buffer.
-     *
-     * @return true if there is more data, false if not.
+     * @param block <code>true</code> if this is blocking IO
+     * @return <code>true</code> if there is more data,
+     *  <code>false</code> if not.
+     * @throws IOException An IO error occurred
      */
     protected boolean refillReadBuffer(boolean block) throws IOException {
         // When using replay (e.g. after FORM auth) all the data to read has

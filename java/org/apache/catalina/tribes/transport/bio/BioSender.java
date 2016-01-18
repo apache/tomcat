@@ -99,6 +99,9 @@ public class BioSender extends AbstractSender {
 
     /**
      * Send message.
+     * @param data The data to send
+     * @param waitForAck Wait for an ack
+     * @throws IOException An IO error occured sending the message
      */
     public  void sendMessage(byte[] data, boolean waitForAck) throws IOException {
         IOException exception = null;
@@ -129,9 +132,6 @@ public class BioSender extends AbstractSender {
     }
 
 
-    /**
-     * Name of this SockerSender
-     */
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder("DataSender[(");
@@ -143,8 +143,9 @@ public class BioSender extends AbstractSender {
     // --------------------------------------------------------- Protected Methods
 
     /**
-     * open real socket and set time out when waitForAck is enabled
-     * is socket open return directly
+     * Open real socket and set time out when waitForAck is enabled
+     * is socket open return directly.
+     * @throws IOException Error opening socket
      */
     protected void openSocket() throws IOException {
        if(isConnected()) return ;
@@ -215,8 +216,10 @@ public class BioSender extends AbstractSender {
      * @see #openSocket()
      * @see #sendMessage(byte[], boolean)
      *
-     * @param data
-     *            data to send
+     * @param data Data to send
+     * @param reconnect Do a reconnect (close socket then reopen)
+     * @param waitForAck Wait for an acknowledgement
+     * @throws IOException IO error writing data
      * @since 5.5.10
      */
 
@@ -234,8 +237,7 @@ public class BioSender extends AbstractSender {
     /**
      * Wait for Acknowledgement from other server.
      * FIXME Please, not wait only for three characters, better control that the wait ack message is correct.
-     * @throws java.io.IOException
-     * @throws java.net.SocketTimeoutException
+     * @throws IOException An IO error occurred
      */
     protected void waitForAck() throws java.io.IOException {
         try {

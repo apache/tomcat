@@ -77,7 +77,7 @@ public class MemoryRealm  extends RealmBase {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Return the pathname of our XML file containing user definitions.
+     * @return the pathname of our XML file containing user definitions.
      */
     public String getPathname() {
 
@@ -109,6 +109,7 @@ public class MemoryRealm  extends RealmBase {
      * @param username Username of the Principal to look up
      * @param credentials Password or other credentials to use in
      *  authenticating this username
+     * @return the associated principal, or <code>null</code> if there is none.
      */
     @Override
     public Principal authenticate(String username, String credentials) {
@@ -176,7 +177,7 @@ public class MemoryRealm  extends RealmBase {
 
 
     /**
-     * Return a configured <code>Digester</code> to use for processing
+     * @return a configured <code>Digester</code> to use for processing
      * the XML input file, creating a new one if necessary.
      */
     protected synchronized Digester getDigester() {
@@ -199,7 +200,7 @@ public class MemoryRealm  extends RealmBase {
 
 
     /**
-     * Return a short name for this Realm implementation.
+     * @return a short name for this Realm implementation.
      */
     @Override
     protected String getName() {
@@ -210,7 +211,7 @@ public class MemoryRealm  extends RealmBase {
 
 
     /**
-     * Return the password associated with the given principal's user name.
+     * @return the password associated with the given principal's user name.
      */
     @Override
     protected String getPassword(String username) {
@@ -226,7 +227,7 @@ public class MemoryRealm  extends RealmBase {
 
 
     /**
-     * Return the Principal associated with the given user name.
+     * @return the Principal associated with the given user name.
      */
     @Override
     protected Principal getPrincipal(String username) {

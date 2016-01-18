@@ -496,6 +496,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
      * Get the instance handle of the object against which we execute
      * all methods in this ModelMBean management interface.
      *
+     * @return the backend managed object
      * @exception InstanceNotFoundException if the managed resource object
      *  cannot be found
      * @exception InvalidTargetObjectTypeException if the managed resource
@@ -802,8 +803,6 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
 
         // Acquire the set of application notifications
         MBeanNotificationInfo current[] = getMBeanInfo().getNotifications();
-        if (current == null)
-            current = new MBeanNotificationInfo[0];
         MBeanNotificationInfo response[] =
             new MBeanNotificationInfo[current.length + 2];
  //       Descriptor descriptor = null;

@@ -733,11 +733,6 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public void addInstanceListener(String listener) {
-        // NO-OP
-    }
-
-    @Override
     public void addLocaleEncodingMappingParameter(String locale, String encoding) {
         // NO-OP
     }
@@ -830,11 +825,6 @@ public class TesterContext implements Context {
 
     @Override
     public FilterMap[] findFilterMaps() {
-        return null;
-    }
-
-    @Override
-    public String[] findInstanceListeners() {
         return null;
     }
 
@@ -945,11 +935,6 @@ public class TesterContext implements Context {
 
     @Override
     public void removeFilterMap(FilterMap filterMap) {
-        // NO-OP
-    }
-
-    @Override
-    public void removeInstanceListener(String listener) {
         // NO-OP
     }
 

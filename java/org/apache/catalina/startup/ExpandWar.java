@@ -241,6 +241,7 @@ public class ExpandWar {
      *
      * @param src File object representing the source
      * @param dest File object representing the destination
+     * @return <code>true</code> if the copy was successful
      */
     public static boolean copy(File src, File dest) {
 
@@ -281,6 +282,7 @@ public class ExpandWar {
      * sub-directories recursively. Any failure will be logged.
      *
      * @param dir File object representing the directory to be deleted
+     * @return <code>true</code> if the deletion was successful
      */
     public static boolean delete(File dir) {
         // Log failure by default
@@ -295,6 +297,7 @@ public class ExpandWar {
      * @param dir File object representing the directory to be deleted
      * @param logFailure <code>true</code> if failure to delete the resource
      *                   should be logged
+     * @return <code>true</code> if the deletion was successful
      */
     public static boolean delete(File dir, boolean logFailure) {
         boolean result;
@@ -320,6 +323,7 @@ public class ExpandWar {
      * sub-directories recursively. Any failure will be logged.
      *
      * @param dir File object representing the directory to be deleted
+     * @return <code>true</code> if the deletion was successful
      */
     public static boolean deleteDir(File dir) {
         return deleteDir(dir, true);
@@ -333,6 +337,7 @@ public class ExpandWar {
      * @param dir File object representing the directory to be deleted
      * @param logFailure <code>true</code> if failure to delete the resource
      *                   should be logged
+     * @return <code>true</code> if the deletion was successful
      */
     public static boolean deleteDir(File dir, boolean logFailure) {
 

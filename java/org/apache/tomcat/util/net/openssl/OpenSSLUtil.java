@@ -17,41 +17,60 @@
 package org.apache.tomcat.util.net.openssl;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
-import org.apache.tomcat.util.net.SSLUtil;
-import org.apache.tomcat.util.net.jsse.JSSESocketFactory;
+import org.apache.tomcat.util.net.SSLUtilBase;
+import org.apache.tomcat.util.net.jsse.JSSEUtil;
 
-public class OpenSSLUtil implements SSLUtil {
+public class OpenSSLUtil extends SSLUtilBase {
 
-    private final SSLHostConfig sslHostConfig;
-    private final SSLHostConfigCertificate certificate;
-    private final JSSESocketFactory jsseUtil;
+    private static final Log log = LogFactory.getLog(OpenSSLUtil.class);
 
-    private String[] enabledProtocols = null;
-    private String[] enabledCiphers = null;
+    private final JSSEUtil jsseUtil;
 
-    public OpenSSLUtil(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
-        this.sslHostConfig = sslHostConfig;
-        this.certificate = certificate;
+    public OpenSSLUtil(SSLHostConfigCertificate certificate) {
+        super(certificate);
+
         if (certificate.getCertificateFile() == null) {
             // Using JSSE configuration for keystore and truststore
-            jsseUtil = new JSSESocketFactory(sslHostConfig, certificate);
+            jsseUtil = new JSSEUtil(certificate);
         } else {
             // Use OpenSSL configuration for certificates
             jsseUtil = null;
         }
     }
 
+
+    @Override
+    protected Log getLog() {
+        return log;
+    }
+
+
+    @Override
+    protected Set<String> getImplementedProtocols() {
+        return OpenSSLEngine.IMPLEMENTED_PROTOCOLS_SET;
+    }
+
+
+    @Override
+    protected Set<String> getImplementedCiphers() {
+        return OpenSSLEngine.AVAILABLE_CIPHER_SUITES;
+    }
+
+
     @Override
     public SSLContext createSSLContext(List<String> negotiableProtocols) throws Exception {
-        return new OpenSSLContext(sslHostConfig, certificate, negotiableProtocols);
+        return new OpenSSLContext(certificate, negotiableProtocols);
     }
 
     @Override
@@ -81,22 +100,4 @@ public class OpenSSLUtil implements SSLUtil {
     public void configureSessionContext(SSLSessionContext sslSessionContext) {
         // do nothing. configuration is done in the init phase
     }
-
-    @Override
-    public String[] getEnableableCiphers(SSLContext context) {
-        if (enabledCiphers == null) {
-            List<String> enabledCiphersList = ((OpenSSLContext) context).getCiphers();
-            enabledCiphers = enabledCiphersList.toArray(new String[enabledCiphersList.size()]);
-        }
-        return enabledCiphers;
-    }
-
-    @Override
-    public String[] getEnableableProtocols(SSLContext context) {
-        if (enabledProtocols == null) {
-            enabledProtocols = new OpenSSLProtocols(((OpenSSLContext) context).getEnabledProtocol()).getProtocols();
-        }
-        return enabledProtocols;
-    }
-
 }

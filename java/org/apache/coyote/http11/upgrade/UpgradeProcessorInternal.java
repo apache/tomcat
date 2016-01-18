@@ -27,7 +27,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class UpgradeProcessorInternal extends UpgradeProcessorBase {
@@ -51,7 +51,7 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
 
 
     @Override
-    public SocketState dispatch(SocketStatus status) {
+    public SocketState dispatch(SocketEvent status) {
         return internalHttpUpgradeHandler.upgradeDispatch(status);
     }
 

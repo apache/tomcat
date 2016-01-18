@@ -25,8 +25,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.StringTokenizer;
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLEngine;
@@ -68,10 +67,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private final List<String> negotiableProtocols;
 
-    private List<String> ciphers = new ArrayList<>();
+    private List<String> jsseCipherNames = new ArrayList<>();
 
-    public List<String> getCiphers() {
-        return ciphers;
+    public List<String> getJsseCipherNames() {
+        return jsseCipherNames;
     }
 
     private String enabledProtocol;
@@ -85,12 +84,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     private final long aprPool;
+    private final AtomicInteger aprPoolDestroyed = new AtomicInteger(0);
+
     protected final long ctx;
 
-    @SuppressWarnings("unused")
-    private volatile int aprPoolDestroyed;
-    private static final AtomicIntegerFieldUpdater<OpenSSLContext> DESTROY_UPDATER
-            = AtomicIntegerFieldUpdater.newUpdater(OpenSSLContext.class, "aprPoolDestroyed");
     static final CertificateFactory X509_CERT_FACTORY;
 
     private static final String BEGIN_KEY = "-----BEGIN RSA PRIVATE KEY-----\n";
@@ -106,9 +103,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
-    public OpenSSLContext(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate, List<String> negotiableProtocols)
+    public OpenSSLContext(SSLHostConfigCertificate certificate, List<String> negotiableProtocols)
             throws SSLException {
-        this.sslHostConfig = sslHostConfig;
+        this.sslHostConfig = certificate.getSSLHostConfig();
         this.certificate = certificate;
         aprPool = Pool.create(0);
         boolean success = false;
@@ -123,7 +120,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (sslHostConfig.getProtocols().size() == 0) {
                 value = SSL.SSL_PROTOCOL_ALL;
             } else {
-                for (String protocol : sslHostConfig.getProtocols()) {
+                for (String protocol : sslHostConfig.getEnabledProtocols()) {
                     if (Constants.SSL_PROTO_SSLv2Hello.equalsIgnoreCase(protocol)) {
                         // NO-OP. OpenSSL always supports SSLv2Hello
                     } else if (Constants.SSL_PROTO_SSLv2.equalsIgnoreCase(protocol)) {
@@ -171,9 +168,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
+    @Override
     public synchronized void destroy() {
         // Guard against multiple destroyPools() calls triggered by construction exception and finalize() later
-        if (DESTROY_UPDATER.compareAndSet(this, 0, 1)) {
+        if (aprPoolDestroyed.compareAndSet(0, 1)) {
             if (ctx != 0) {
                 SSLContext.free(ctx);
             }
@@ -184,11 +182,12 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     /**
-     * Setup the SSL_CTX
+     * Setup the SSL_CTX.
      *
      * @param kms Must contain a KeyManager of the type
-     * {@code OpenSSLKeyManager}
-     * @param tms
+     *            {@code OpenSSLKeyManager}
+     * @param tms Must contain a TrustManager of the type
+     *            {@code X509TrustManager}
      * @param sr Is not used for this implementation.
      */
     @Override
@@ -297,21 +296,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
 
             // List the ciphers that the client is permitted to negotiate
-            String ciphers = sslHostConfig.getCiphers();
-            if (!("ALL".equals(ciphers)) && ciphers.indexOf(':') == -1) {
-                StringTokenizer tok = new StringTokenizer(ciphers, ",");
-                this.ciphers = new ArrayList<>();
-                while (tok.hasMoreTokens()) {
-                    String token = tok.nextToken().trim();
-                    if (!"".equals(token)) {
-                        this.ciphers.add(token);
-                    }
-                }
-                ciphers = CipherSuiteConverter.toOpenSsl(ciphers);
-            } else {
-                this.ciphers = OpenSSLCipherConfigurationParser.parseExpression(ciphers);
-            }
-            SSLContext.setCipherSuite(ctx, ciphers);
+            String opensslCipherConfig = sslHostConfig.getCiphers();
+            this.jsseCipherNames = OpenSSLCipherConfigurationParser.parseExpression(opensslCipherConfig);
+            SSLContext.setCipherSuite(ctx, opensslCipherConfig);
             // Load Server key and certificate
             if (certificate.getCertificateFile() != null) {
                 // Set certificate

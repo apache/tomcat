@@ -51,6 +51,7 @@ import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLUtil;
+import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -67,7 +68,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private static final SSLException ENGINE_CLOSED = new SSLException(sm.getString("engine.engineClosed"));
     private static final SSLException ENCRYPTED_PACKET_OVERSIZED = new SSLException(sm.getString("engine.oversizedPacket"));
 
-    private static final Set<String> AVAILABLE_CIPHER_SUITES;
+    protected static final Set<String> AVAILABLE_CIPHER_SUITES;
 
     static {
         final Set<String> availableCipherSuites = new LinkedHashSet<>(128);
@@ -84,7 +85,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                         if (c == null || c.length() == 0 || availableCipherSuites.contains(c)) {
                             continue;
                         }
-                        availableCipherSuites.add(CipherSuiteConverter.toJava(c, "ALL"));
+                        availableCipherSuites.add(OpenSSLCipherConfigurationParser.openSSLToJsse(c));
                     }
                 } finally {
                     SSL.freeSSL(ssl);
@@ -113,7 +114,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     // Protocols
     static final int VERIFY_DEPTH = 10;
 
-    private static final String[] SUPPORTED_PROTOCOLS = {
+    private static final String[] IMPLEMENTED_PROTOCOLS = {
         Constants.SSL_PROTO_SSLv2Hello,
         Constants.SSL_PROTO_SSLv2,
         Constants.SSL_PROTO_SSLv3,
@@ -121,8 +122,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         Constants.SSL_PROTO_TLSv1_1,
         Constants.SSL_PROTO_TLSv1_2
     };
-    private static final Set<String> SUPPORTED_PROTOCOLS_SET =
-            new HashSet<>(Arrays.asList(SUPPORTED_PROTOCOLS));
+    protected static final Set<String> IMPLEMENTED_PROTOCOLS_SET =
+            new HashSet<>(Arrays.asList(IMPLEMENTED_PROTOCOLS));
 
     // Header (5) + Data (2^14) + Compression (1024) + Encryption (1024) + MAC (20) + Padding (256)
     static final int MAX_ENCRYPTED_PACKET_LENGTH = MAX_CIPHERTEXT_LENGTH + 5 + 20 + 256;
@@ -699,7 +700,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return new String[0];
         } else {
             for (int i = 0; i < enabled.length; i++) {
-                String mapped = toJavaCipherSuite(enabled[i]);
+                String mapped = OpenSSLCipherConfigurationParser.openSSLToJsse(enabled[i]);
                 if (mapped != null) {
                     enabled[i] = mapped;
                 }
@@ -718,7 +719,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (cipherSuite == null) {
                 break;
             }
-            String converted = CipherSuiteConverter.toOpenSsl(cipherSuite);
+            String converted = OpenSSLCipherConfigurationParser.jsseToOpenSSL(cipherSuite);
             if (converted != null) {
                 cipherSuite = converted;
             }
@@ -745,7 +746,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public String[] getSupportedProtocols() {
-        return SUPPORTED_PROTOCOLS.clone();
+        return IMPLEMENTED_PROTOCOLS.clone();
     }
 
     @Override
@@ -789,7 +790,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         boolean tlsv1_1 = false;
         boolean tlsv1_2 = false;
         for (String p : protocols) {
-            if (!SUPPORTED_PROTOCOLS_SET.contains(p)) {
+            if (!IMPLEMENTED_PROTOCOLS_SET.contains(p)) {
                 throw new IllegalArgumentException(sm.getString("engine.unsupportedProtocol", p));
             }
             if (p.equals(Constants.SSL_PROTO_SSLv2)) {
@@ -906,7 +907,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         if (error != SSL.SSL_ERROR_NONE) {
             String err = SSL.getErrorString(error);
             if (logger.isDebugEnabled()) {
-                logger.debug(sm.getString("engine.openSSLError", error, err));
+                logger.debug(sm.getString("engine.openSSLError", Long.toString(error), err));
             }
             // Many errors can occur during handshake and need to be reported
             if (!handshakeFinished) {
@@ -976,40 +977,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
 
         return SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING;
-    }
-
-    /**
-     * Converts the specified OpenSSL cipher suite to the Java cipher suite.
-     */
-    private String toJavaCipherSuite(String openSslCipherSuite) {
-        if (openSslCipherSuite == null) {
-            return null;
-        }
-
-        String prefix = toJavaCipherSuitePrefix(SSL.getVersion(ssl));
-        return CipherSuiteConverter.toJava(openSslCipherSuite, prefix);
-    }
-
-    /**
-     * Converts the protocol version string returned by
-     * {@link SSL#getVersion(long)} to protocol family string.
-     */
-    private static String toJavaCipherSuitePrefix(String protocolVersion) {
-        final char c;
-        if (protocolVersion == null || protocolVersion.length() == 0) {
-            c = 0;
-        } else {
-            c = protocolVersion.charAt(0);
-        }
-
-        switch (c) {
-            case 'T':
-                return "TLS";
-            case 'S':
-                return "SSL";
-            default:
-                return "UNKNOWN";
-        }
     }
 
     @Override
@@ -1297,7 +1264,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return INVALID_CIPHER;
             }
             if (cipher == null) {
-                String c = toJavaCipherSuite(SSL.getCipherForSSL(ssl));
+                String c = OpenSSLCipherConfigurationParser.openSSLToJsse(SSL.getCipherForSSL(ssl));
                 if (c != null) {
                     cipher = c;
                 }

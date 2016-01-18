@@ -41,7 +41,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
  */
 public class ConnectorStoreAppender extends StoreAppender {
 
-    protected static HashMap<String, String> replacements = new HashMap<>();
+    protected static final HashMap<String, String> replacements = new HashMap<>();
     static {
         replacements.put("backlog", "acceptCount");
         replacements.put("soLinger", "connectionLinger");
@@ -57,21 +57,6 @@ public class ConnectorStoreAppender extends StoreAppender {
         replacements.put("protocols", "sslProtocols");
     }
 
-    /**
-     * Store the relevant attributes of the specified JavaBean.
-     *
-     * @param writer
-     *            PrintWriter to which we are storing
-     * @param include
-     *            Should we include a <code>className</code> attribute?
-     * @param bean
-     *            Bean whose properties are to be rendered as attributes,
-     * @param desc
-     *            RegistryDescrpitor from this bean
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
-     */
     @Override
     public void printAttributes(PrintWriter writer, int indent,
             boolean include, Object bean, StoreDescription desc)
@@ -118,11 +103,11 @@ public class ConnectorStoreAppender extends StoreAppender {
     }
 
     /**
-     * Get all properties from Connector and current ProtocolHandler
+     * Get all properties from Connector and current ProtocolHandler.
      *
-     * @param bean
-     * @return List of Connector Properties
-     * @throws IntrospectionException
+     * @param bean The connector
+     * @return List of Connector property names
+     * @throws IntrospectionException Error intropecting connector
      */
     protected List<String> getPropertyKeys(Connector bean)
             throws IntrospectionException {
@@ -177,13 +162,13 @@ public class ConnectorStoreAppender extends StoreAppender {
     }
 
     /**
-     * print Attributes
+     * Print Attributes for the connector
      *
-     * @param aWriter
-     * @param indent
-     * @param bean
-     * @param aDesc
-     * @throws Exception
+     * @param aWriter Current writer
+     * @param indent Indentation level
+     * @param bean The connector bean
+     * @param aDesc The connector description
+     * @throws Exception Store error occurred
      */
     protected void storeConnectorAttribtues(PrintWriter aWriter, int indent,
             Object bean, StoreDescription aDesc) throws Exception {
@@ -192,8 +177,8 @@ public class ConnectorStoreAppender extends StoreAppender {
         }
     }
 
-    /*
-     * Print the open tag for connector attributes (override)
+    /**
+     * Print the open tag for connector attributes (override).
      *
      * @see org.apache.catalina.storeconfig.StoreAppender#printOpenTag(java.io.PrintWriter,
      *      int, java.lang.Object,
@@ -209,7 +194,7 @@ public class ConnectorStoreAppender extends StoreAppender {
     }
 
     /**
-     * print a tag for connector attributes (override)
+     * Print a tag for connector attributes (override).
      *
      * @see org.apache.catalina.storeconfig.StoreAppender#printTag(java.io.PrintWriter,
      *      int, java.lang.Object,
@@ -225,11 +210,8 @@ public class ConnectorStoreAppender extends StoreAppender {
     }
 
     /**
-     * print a value but replace attribute name
+     * Print a value but replace certain attribute names.
      *
-     * @param writer
-     * @param name
-     * @param value
      * @see org.apache.catalina.storeconfig.StoreAppender#printValue(java.io.PrintWriter,
      *      int, java.lang.String, java.lang.Object)
      */
@@ -243,13 +225,13 @@ public class ConnectorStoreAppender extends StoreAppender {
         super.printValue(writer, indent, repl, value);
     }
 
-    /*
+    /**
      * Print Connector Values. <ul><li> Spezial handling to default jkHome.
      * </li><li> Don't save catalina.base path at server.xml</li><li></ul>
      *
-     * @see org.apache.catalina.config.StoreAppender#isPrintValue(java.lang.Object,
+     * @see org.apache.catalina.storeconfig.StoreAppender#isPrintValue(java.lang.Object,
      *      java.lang.Object, java.lang.String,
-     *      org.apache.catalina.config.StoreDescription)
+     *      org.apache.catalina.storeconfig.StoreDescription)
      */
     @Override
     public boolean isPrintValue(Object bean, Object bean2, String attrName,

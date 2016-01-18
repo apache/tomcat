@@ -49,7 +49,7 @@ public class StoreConfig implements IStoreConfig {
     private Server server;
 
     /**
-     * get server.xml location
+     * Get server.xml location
      *
      * @return The server file name
      */
@@ -58,30 +58,25 @@ public class StoreConfig implements IStoreConfig {
     }
 
     /**
-     * set new server.xml location
+     * Set new server.xml location.
      *
-     * @param string
+     * @param string The server.xml location
      */
     public void setServerFilename(String string) {
         serverFilename = string;
     }
 
-    /*
+    /**
      * Get the StoreRegistry with all factory to generate the
-     * server.xml/context.xml files
+     * server.xml/context.xml files.
      *
-     * @see org.apache.catalina.config.IStoreConfig#getRegistry()
+     * @see org.apache.catalina.storeconfig.IStoreConfig#getRegistry()
      */
     @Override
     public StoreRegistry getRegistry() {
         return registry;
     }
 
-    /*
-     * set StoreRegistry
-     *
-     * @see org.apache.catalina.config.IStoreConfig#setRegistry(org.apache.catalina.config.ConfigurationRegistry)
-     */
     @Override
     public void setServer(Server aServer) {
         server = aServer;
@@ -92,6 +87,11 @@ public class StoreConfig implements IStoreConfig {
         return server;
     }
 
+    /**
+     * set StoreRegistry
+     *
+     * @see org.apache.catalina.storeconfig.IStoreConfig#setRegistry(org.apache.catalina.storeconfig.StoreRegistry)
+     */
     @Override
     public void setRegistry(StoreRegistry aRegistry) {
         registry = aRegistry;
@@ -106,14 +106,15 @@ public class StoreConfig implements IStoreConfig {
     }
 
     /**
-     * Store Server from Object Name (Catalina:type=Server)
+     * Store Server from Object Name (Catalina:type=Server).
      *
-     * @param aServerName
-     *            Server ObjectName
-     * @param backup
-     * @param externalAllowed
-     *            s *
-     * @throws MalformedObjectNameException
+     * @param aServerName Server ObjectName
+     * @param backup <code>true</code> to backup existing configuration files
+     *  before rewriting them
+     * @param externalAllowed <code>true</code> to allow saving webapp
+     *  configuration for webapps that are not inside the host's app
+     *  directory
+     * @throws MalformedObjectNameException Bad MBean name
      */
     public synchronized void storeServer(String aServerName, boolean backup,
             boolean externalAllowed) throws MalformedObjectNameException {
@@ -157,13 +158,15 @@ public class StoreConfig implements IStoreConfig {
     }
 
     /**
-     * Store a Context from ObjectName
+     * Store a Context from ObjectName.
      *
-     * @param aContextName
-     *            MBean ObjectName
-     * @param backup
-     * @param externalAllowed
-     * @throws MalformedObjectNameException
+     * @param aContextName MBean ObjectName
+     * @param backup <code>true</code> to backup existing configuration files
+     *  before rewriting them
+     * @param externalAllowed <code>true</code> to allow saving webapp
+     *  configuration for webapps that are not inside the host's app
+     *  directory
+     * @throws MalformedObjectNameException Bad MBean name
      */
     public synchronized void storeContext(String aContextName, boolean backup,
             boolean externalAllowed) throws MalformedObjectNameException {
@@ -224,6 +227,8 @@ public class StoreConfig implements IStoreConfig {
      * Write the configuration information for this entire <code>Server</code>
      * out to the server.xml configuration file.
      *
+     * @param aServer Server instance
+     * @return <code>true</code> if the store operation was successful
      */
     @Override
     public synchronized boolean store(Server aServer) {
@@ -243,10 +248,8 @@ public class StoreConfig implements IStoreConfig {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.catalina.config.IStoreConfig#store(org.apache.catalina.Context)
+    /**
+     * @see org.apache.catalina.storeconfig.IStoreConfig#store(org.apache.catalina.Context)
      */
     @Override
     public synchronized boolean store(Context aContext) {
@@ -274,10 +277,8 @@ public class StoreConfig implements IStoreConfig {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.catalina.config.IStoreConfig#store(java.io.PrintWriter,
+    /**
+     * @see org.apache.catalina.storeconfig.IStoreConfig#store(java.io.PrintWriter,
      *      int, org.apache.catalina.Context)
      */
     @Override
@@ -296,10 +297,8 @@ public class StoreConfig implements IStoreConfig {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.catalina.config.IStoreConfig#store(java.io.PrintWriter,
+    /**
+     * @see org.apache.catalina.storeconfig.IStoreConfig#store(java.io.PrintWriter,
      *      int, org.apache.catalina.Host)
      */
     @Override
@@ -310,10 +309,8 @@ public class StoreConfig implements IStoreConfig {
         desc.getStoreFactory().store(aWriter, indent, aHost);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.apache.catalina.config.IStoreConfig#store(java.io.PrintWriter,
+    /**
+     * @see org.apache.catalina.storeconfig.IStoreConfig#store(java.io.PrintWriter,
      *      int, org.apache.catalina.Service)
      */
     @Override
@@ -325,12 +322,8 @@ public class StoreConfig implements IStoreConfig {
     }
 
     /**
-     * Store the state of this Server MBean (which will recursively store
-     * everything)
-     *
-     * @param writer
-     * @param indent
-     * @param aServer
+     * @see org.apache.catalina.storeconfig.IStoreConfig#store(java.io.PrintWriter,
+     *      int, org.apache.catalina.Server)
      */
     @Override
     public void store(PrintWriter writer, int indent,

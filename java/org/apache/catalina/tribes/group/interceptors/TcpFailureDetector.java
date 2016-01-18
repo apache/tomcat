@@ -160,7 +160,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
                 log.info(sm.getString("tcpFailureDetector.memberDisappeared.verify", member));
             synchronized (membership) {
                 if (!membership.contains(member)) {
-                    if(!shutdown && log.isInfoEnabled())
+                    if(log.isInfoEnabled())
                         log.info(sm.getString("tcpFailureDetector.already.disappeared", member));
                     return;
                 }
@@ -179,11 +179,11 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
                 }
             }
             if ( notify ) {
-                if(!shutdown && log.isInfoEnabled())
+                if(log.isInfoEnabled())
                     log.info(sm.getString("tcpFailureDetector.member.disappeared", member));
                 super.memberDisappeared(member);
             } else {
-                if(!shutdown && log.isInfoEnabled())
+                if(log.isInfoEnabled())
                     log.info(sm.getString("tcpFailureDetector.still.alive", member));
             }
         }
@@ -321,7 +321,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         return memberAlive(mbr,TCP_FAIL_DETECT,performSendTest,performReadTest,readTestTimeout,connectTimeout,getOptionFlag());
     }
 
-    protected static boolean memberAlive(Member mbr, byte[] msgData,
+    protected boolean memberAlive(Member mbr, byte[] msgData,
                                          boolean sendTest, boolean readTest,
                                          long readTimeout, long conTimeout,
                                          int optionFlag) {
@@ -335,7 +335,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
             socket.connect(addr, (int) conTimeout);
             if ( sendTest ) {
                 ChannelData data = new ChannelData(true);
-                data.setAddress(mbr);
+                data.setAddress(getLocalMember(false));
                 data.setMessage(new XByteBuffer(msgData,false));
                 data.setTimestamp(System.currentTimeMillis());
                 int options = optionFlag | Channel.SEND_OPTIONS_BYTE_MESSAGE;

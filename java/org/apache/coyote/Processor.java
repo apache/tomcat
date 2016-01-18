@@ -21,7 +21,7 @@ import java.nio.ByteBuffer;
 
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
@@ -44,7 +44,7 @@ public interface Processor {
      * @throws IOException If an I/O error occurs during the processing of the
      *         request
      */
-    SocketState process(SocketWrapperBase<?> socketWrapper, SocketStatus status) throws IOException;
+    SocketState process(SocketWrapperBase<?> socketWrapper, SocketEvent status) throws IOException;
 
     UpgradeToken getUpgradeToken();
 

@@ -45,11 +45,11 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.catalina.util.UriUtil;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.RequestUtil;
-import org.apache.tomcat.util.net.URL;
 
 public class RewriteValve extends ValveBase {
 
@@ -122,13 +122,11 @@ public class RewriteValve extends ValveBase {
             File file = new File(getConfigBase(), resourceName);
             try {
                 if (!file.exists()) {
-                    if (resourceName != null) {
-                        // Use getResource and getResourceAsStream
-                        is = getClass().getClassLoader()
-                            .getResourceAsStream(resourceName);
-                        if (is != null && container.getLogger().isDebugEnabled()) {
-                            container.getLogger().debug("Read configuration from CL at " + resourceName);
-                        }
+                    // Use getResource and getResourceAsStream
+                    is = getClass().getClassLoader()
+                        .getResourceAsStream(resourceName);
+                    if (is != null && container.getLogger().isDebugEnabled()) {
+                        container.getLogger().debug("Read configuration from CL at " + resourceName);
                     }
                 } else {
                     if (container.getLogger().isDebugEnabled()) {
@@ -344,7 +342,7 @@ public class RewriteValve extends ValveBase {
                     // 1. this valve is associated with a context
                     // 2. the url starts with a leading slash
                     // 3. the url isn't absolute
-                    if (context && urlString.charAt(0) == '/' && !URL.hasScheme(urlString)) {
+                    if (context && urlString.charAt(0) == '/' && !UriUtil.hasScheme(urlString)) {
                         urlString.insert(0, request.getContext().getEncodedPath());
                     }
                     response.sendRedirect(urlString.toString());
@@ -489,7 +487,7 @@ public class RewriteValve extends ValveBase {
 
 
     /**
-     * Get config base.
+     * @return config base.
      */
     protected File getConfigBase() {
         File configBase =
@@ -505,8 +503,8 @@ public class RewriteValve extends ValveBase {
     /**
      * Find the configuration path where the rewrite configuration file
      * will be stored.
-     *
-     * @param resourceName
+     * @param resourceName The rewrite configuration file name
+     * @return the full rewrite configuration path
      */
     protected String getHostConfigPath(String resourceName) {
         StringBuffer result = new StringBuffer();
@@ -538,7 +536,6 @@ public class RewriteValve extends ValveBase {
      *  RewriteCond %{REMOTE_HOST}  ^host1.*  [OR]
      *
      * @param line A line from the rewrite configuration
-     *
      * @return The condition, rule or map resulting from parsing the line
      */
     public static Object parse(String line) {
@@ -615,9 +612,9 @@ public class RewriteValve extends ValveBase {
 
     /**
      * Parser for RewriteCond flags.
-     *
-     * @param condition
-     * @param flag
+     * @param line The configuration line being parsed
+     * @param condition The current condition
+     * @param flag The flag
      */
     protected static void parseCondFlag(String line, RewriteCond condition, String flag) {
         if (flag.equals("NC") || flag.equals("nocase")) {
@@ -632,9 +629,9 @@ public class RewriteValve extends ValveBase {
 
     /**
      * Parser for ReweriteRule flags.
-     *
-     * @param rule
-     * @param flag
+     * @param line The configuration line being parsed
+     * @param rule The current rule
+     * @param flag The flag
      */
     protected static void parseRuleFlag(String line, RewriteRule rule, String flag) {
         if (flag.equals("chain") || flag.equals("C")) {

@@ -18,7 +18,6 @@ package org.apache.tomcat.util.net.jsse;
 
 import javax.net.ssl.SSLSession;
 
-import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -41,17 +40,12 @@ public class JSSEImplementation extends SSLImplementation {
     }
 
     @Override
-    public String getImplementationName(){
-        return "JSSE";
-    }
-
-    @Override
     public SSLSupport getSSLSupport(SSLSession session) {
         return new JSSESupport(session);
     }
 
     @Override
-    public SSLUtil getSSLUtil(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
-        return new JSSESocketFactory(sslHostConfig, certificate);
+    public SSLUtil getSSLUtil(SSLHostConfigCertificate certificate) {
+        return new JSSEUtil(certificate);
     }
 }

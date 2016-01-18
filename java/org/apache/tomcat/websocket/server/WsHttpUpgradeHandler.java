@@ -35,7 +35,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.Transformation;
@@ -141,7 +141,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
 
 
     @Override
-    public SocketState upgradeDispatch(SocketStatus status) {
+    public SocketState upgradeDispatch(SocketEvent status) {
         switch (status) {
             case OPEN_READ:
                 try {
@@ -174,15 +174,12 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                     close(cr);
                 }
                 break;
-            case DISCONNECT:
             case ERROR:
                 String msg = sm.getString("wsHttpUpgradeHandler.closeOnError");
                 wsSession.doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
                         new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
                 //$FALL-THROUGH$
-            case ASYNC_READ_ERROR:
-            case ASYNC_WRITE_ERROR:
-            case CLOSE_NOW:
+            case DISCONNECT:
             case TIMEOUT:
                 return SocketState.CLOSED;
 

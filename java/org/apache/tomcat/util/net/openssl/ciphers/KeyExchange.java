@@ -27,7 +27,7 @@ enum KeyExchange {
     FZA   /* SSL_kFZA   - Fortezza */  /* no such ciphersuite supported! */,
     KRB5  /* SSL_kKRB5  - Kerberos 5 key exchange */,
     ECDHr /* SSL_kECDHr - ECDH cert, RSA CA cert */,
-    ECDHe /* SSL_eECDHe - ECDH cert, ECDSA CA cert */,
+    ECDHe /* SSL_kECDHe - ECDH cert, ECDSA CA cert */,
     GOST  /* SSL_kGOST  - GOST key exchange */,
     SRP   /* SSL_kSRP   - SRP */,
     RSAPSK,

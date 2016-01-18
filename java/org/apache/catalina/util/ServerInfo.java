@@ -69,11 +69,11 @@ public class ServerInfo {
             ExceptionUtils.handleThrowable(t);
         }
         if (info == null)
-            info = "Apache Tomcat 8.0.x-dev";
+            info = "Apache Tomcat 9.0.x-dev";
         if (built == null)
             built = "unknown";
         if (number == null)
-            number = "8.0.x";
+            number = "9.0.x";
 
         serverInfo = info;
         serverBuilt = built;
@@ -85,7 +85,7 @@ public class ServerInfo {
 
 
     /**
-     * Return the server identification for this version of Tomcat.
+     * @return the server identification for this version of Tomcat.
      */
     public static String getServerInfo() {
 
@@ -94,7 +94,7 @@ public class ServerInfo {
     }
 
     /**
-     * Return the server built time for this version of Tomcat.
+     * @return the server built time for this version of Tomcat.
      */
     public static String getServerBuilt() {
 
@@ -103,7 +103,7 @@ public class ServerInfo {
     }
 
     /**
-     * Return the server's version number.
+     * @return the server's version number.
      */
     public static String getServerNumber() {
 

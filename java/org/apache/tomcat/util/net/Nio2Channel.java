@@ -33,7 +33,7 @@ import java.util.concurrent.TimeoutException;
  */
 public class Nio2Channel implements AsynchronousByteChannel {
 
-    protected static ByteBuffer emptyBuf = ByteBuffer.allocate(0);
+    protected static final ByteBuffer emptyBuf = ByteBuffer.allocate(0);
 
     protected AsynchronousSocketChannel sc = null;
     protected SocketWrapperBase<Nio2Channel> socket = null;
@@ -44,7 +44,10 @@ public class Nio2Channel implements AsynchronousByteChannel {
     }
 
     /**
-     * Reset the channel
+     * Reset the channel.
+     *
+     * @param channel The new async channel to associate with this NIO2 channel
+     * @param socket  The new socket to associate with this NIO2 channel
      *
      * @throws IOException If a problem was encountered resetting the channel
      */
@@ -123,7 +126,8 @@ public class Nio2Channel implements AsynchronousByteChannel {
      * implementation.
      *
      * @return Always returns zero
-     * @throws IOException
+     *
+     * @throws IOException Never for non-secure channel
      */
     public int handshake() throws IOException {
         return 0;

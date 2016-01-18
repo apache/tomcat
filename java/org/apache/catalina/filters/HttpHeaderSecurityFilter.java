@@ -57,6 +57,11 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     private static final String BLOCK_CONTENT_TYPE_SNIFFING_HEADER_VALUE = "nosniff";
     private boolean blockContentTypeSniffingEnabled = true;
 
+    // Cross-site scripting filter protection
+    private static final String XSS_PROTECTION_HEADER_NAME = "X-XSS-Protection";
+    private static final String XSS_PROTECTION_HEADER_VALUE = "1; mode=block";
+    private boolean xssProtectionEnabled = true;
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         super.init(filterConfig);
@@ -83,26 +88,35 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
 
-        if (response.isCommitted()) {
-            throw new ServletException(sm.getString("httpHeaderSecurityFilter.committed"));
+        if (response instanceof HttpServletResponse) {
+            HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+            if (response.isCommitted()) {
+                throw new ServletException(sm.getString("httpHeaderSecurityFilter.committed"));
+            }
+
+            // HSTS
+            if (hstsEnabled && request.isSecure()) {
+                httpResponse.setHeader(HSTS_HEADER_NAME, hstsHeaderValue);
+            }
+
+            // anti click-jacking
+            if (antiClickJackingEnabled) {
+                httpResponse.setHeader(ANTI_CLICK_JACKING_HEADER_NAME, antiClickJackingHeaderValue);
+            }
+
+            // Block content type sniffing
+            if (blockContentTypeSniffingEnabled) {
+                httpResponse.setHeader(BLOCK_CONTENT_TYPE_SNIFFING_HEADER_NAME,
+                        BLOCK_CONTENT_TYPE_SNIFFING_HEADER_VALUE);
+            }
+
+            // cross-site scripting filter protection
+            if (xssProtectionEnabled) {
+                httpResponse.setHeader(XSS_PROTECTION_HEADER_NAME, XSS_PROTECTION_HEADER_VALUE);
+            }
         }
 
-        // HSTS
-        if (hstsEnabled && request.isSecure() && response instanceof HttpServletResponse) {
-            ((HttpServletResponse) response).setHeader(HSTS_HEADER_NAME, hstsHeaderValue);
-        }
-
-        // anti click-jacking
-        if (antiClickJackingEnabled && response instanceof HttpServletResponse) {
-            ((HttpServletResponse) response).setHeader(
-                    ANTI_CLICK_JACKING_HEADER_NAME, antiClickJackingHeaderValue);
-        }
-
-        // Block content type sniffing
-        if (blockContentTypeSniffingEnabled && response instanceof HttpServletResponse) {
-            ((HttpServletResponse) response).setHeader(BLOCK_CONTENT_TYPE_SNIFFING_HEADER_NAME,
-                    BLOCK_CONTENT_TYPE_SNIFFING_HEADER_VALUE);
-        }
         chain.doFilter(request, response);
     }
 
@@ -212,6 +226,13 @@ public class HttpHeaderSecurityFilter extends FilterBase {
         this.antiClickJackingUri = uri;
     }
 
+    public boolean isXssProtectionEnabled() {
+        return xssProtectionEnabled;
+    }
+
+    public void setXssProtectionEnabled(boolean xssProtectionEnabled) {
+        this.xssProtectionEnabled = xssProtectionEnabled;
+    }
 
     private static enum XFrameOption {
         DENY("DENY"),

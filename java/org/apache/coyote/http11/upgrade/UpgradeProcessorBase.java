@@ -69,12 +69,6 @@ public abstract class UpgradeProcessorBase extends AbstractProcessorLight implem
 
 
     @Override
-    public void errorDispatch() {
-        // NO-OP
-    }
-
-
-    @Override
     public final SocketState asyncPostProcess() {
         return null;
     }

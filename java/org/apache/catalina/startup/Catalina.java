@@ -177,7 +177,7 @@ public class Catalina {
 
 
     /**
-     * Return true if naming is enabled.
+     * @return <code>true</code> if naming is enabled.
      */
     public boolean isUseNaming() {
         return (this.useNaming);
@@ -205,11 +205,10 @@ public class Catalina {
 
 
     /**
-     * Process the specified command line arguments, and return
-     * <code>true</code> if we should continue processing; otherwise
-     * return <code>false</code>.
+     * Process the specified command line arguments.
      *
      * @param args Command line arguments to process
+     * @return <code>true</code> if we should continue processing
      */
     protected boolean arguments(String args[]) {
 
@@ -249,6 +248,7 @@ public class Catalina {
 
     /**
      * Return a File object representing our configuration file.
+     * @return the main configuration file
      */
     protected File configFile() {
 
@@ -263,6 +263,7 @@ public class Catalina {
 
     /**
      * Create and configure the Digester we will be using for startup.
+     * @return the main digester to parse server.xml
      */
     protected Digester createStartDigester() {
         long t1=System.currentTimeMillis();
@@ -412,6 +413,7 @@ public class Catalina {
 
     /**
      * Create and configure the Digester we will be using for shutdown.
+     * @return the digester to process the stop operation
      */
     protected Digester createStopDigester() {
 

@@ -52,6 +52,8 @@ public abstract class OpenSSLSessionContext implements SSLSessionContext {
 
     /**
      * Sets the SSL session ticket keys of this context.
+     *
+     * @param keys The session ticket keys
      */
     public void setTicketKeys(byte[] keys) {
         if (keys == null) {
@@ -62,16 +64,19 @@ public abstract class OpenSSLSessionContext implements SSLSessionContext {
 
     /**
      * Enable or disable caching of SSL sessions.
+     *
+     * @param enabled {@code true} to enable caching, {@code false} to disable
      */
     public abstract void setSessionCacheEnabled(boolean enabled);
 
     /**
-     * Return {@code true} if caching of SSL sessions is enabled, {@code false} otherwise.
+     * @return {@code true} if caching of SSL sessions is enabled, {@code false}
+     *         otherwise.
      */
     public abstract boolean isSessionCacheEnabled();
 
     /**
-     * Returns the stats of this context.
+     * @return The statistics for this context.
      */
     public OpenSSLSessionStats stats() {
         return stats;

@@ -84,7 +84,8 @@ public class XByteBuffer {
     /**
      * Constructs a new XByteBuffer.<br>
      * TODO use a pool of byte[] for performance
-     * @param size - the initial size of the byte buffer
+     * @param size the initial size of the byte buffer
+     * @param discard Flag for discarding invalid packages
      */
     public XByteBuffer(int size, boolean discard) {
         buf = new byte[size];
@@ -128,7 +129,7 @@ public class XByteBuffer {
     }
 
     /**
-     * Returns the bytes in the buffer, in its exact length
+     * @return the bytes in the buffer, in its exact length
      */
     public byte[] getBytes() {
         byte[] b = new byte[bufSize];
@@ -392,7 +393,6 @@ public class XByteBuffer {
      * @param b - the byte array containing the four bytes
      * @param off - the offset
      * @return the integer value constructed from the four bytes
-     * @exception java.lang.ArrayIndexOutOfBoundsException
      */
     public static int toInt(byte[] b,int off){
         return ( ( b[off+3]) & 0xFF) +
@@ -406,7 +406,6 @@ public class XByteBuffer {
      * @param b - the byte array containing the four bytes
      * @param off - the offset
      * @return the long value constructed from the eight bytes
-     * @exception java.lang.ArrayIndexOutOfBoundsException
      */
     public static long toLong(byte[] b,int off){
         return ( ( (long) b[off+7]) & 0xFF) +
@@ -421,9 +420,11 @@ public class XByteBuffer {
 
 
     /**
-     * Converts a boolean to a 1-byte array
-     * @param bool - the integer
-     * @return - 1-byte array
+     * Converts a boolean and put it in a byte array.
+     * @param bool the integer
+     * @param data the byte buffer in which the boolean will be placed
+     * @param offset the offset in the byte array
+     * @return the byte array
      */
     public static byte[] toBytes(boolean bool, byte[] data, int offset) {
         data[offset] = (byte)(bool?1:0);
@@ -431,7 +432,7 @@ public class XByteBuffer {
     }
 
     /**
-     * Converts a byte array entry to boolean
+     * Converts a byte array entry to boolean.
      * @param b byte array
      * @param offset within byte array
      * @return true if byte array entry is non-zero, false otherwise
@@ -442,11 +443,13 @@ public class XByteBuffer {
 
 
     /**
-     * Converts an integer to four bytes
-     * @param n - the integer
-     * @return - four bytes in an array
+     * Converts an integer to four bytes.
+     * @param n the integer
+     * @param b the byte buffer in which the integer will be placed
+     * @param offset the offset in the byte array
+     * @return four bytes in an array
      */
-    public static byte[] toBytes(int n,byte[] b, int offset) {
+    public static byte[] toBytes(int n, byte[] b, int offset) {
         b[offset+3] = (byte) (n);
         n >>>= 8;
         b[offset+2] = (byte) (n);
@@ -458,9 +461,11 @@ public class XByteBuffer {
     }
 
     /**
-     * Converts an long to eight bytes
-     * @param n - the long
-     * @return - eight bytes in an array
+     * Converts an long to eight bytes.
+     * @param n the long
+     * @param b the byte buffer in which the integer will be placed
+     * @param offset the offset in the byte array
+     * @return eight bytes in an array
      */
     public static byte[] toBytes(long n, byte[] b, int offset) {
         b[offset+7] = (byte) (n);
@@ -482,7 +487,7 @@ public class XByteBuffer {
     }
 
     /**
-     * Similar to a String.IndexOf, but uses pure bytes
+     * Similar to a String.IndexOf, but uses pure bytes.
      * @param src - the source bytes to be searched
      * @param srcOff - offset on the source buffer
      * @param find - the string to be found within src
@@ -514,14 +519,16 @@ public class XByteBuffer {
                 return -1;
             //assume it does exist
             found = true;
-            for (int i = 1; ( (i < findlen) && found); i++)
-                found = found && (find[i] == src[pos + i]);
-            if (found)
+            for (int i = 1; ( (i < findlen) && found); i++) {
+                found = (find[i] == src[pos + i]);
+            }
+            if (found) {
                 result = pos;
-            else if ( (srclen - pos) < findlen)
+            } else if ( (srclen - pos) < findlen) {
                 return -1; //no more matches possible
-            else
+            } else {
                 pos++;
+            }
         }
         return result;
     }
@@ -565,7 +572,7 @@ public class XByteBuffer {
      * Serializes a message into cluster data
      * @param msg ClusterMessage
      * @return serialized content as byte[] array
-     * @throws IOException
+     * @throws IOException Serialization error
      */
     public static byte[] serialize(Serializable msg) throws IOException {
         ByteArrayOutputStream outs = new ByteArrayOutputStream();

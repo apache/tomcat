@@ -38,6 +38,8 @@ public class ContextMBean extends ContainerMBean {
 
      /**
      * Return the set of application parameters for this application.
+     * @return a string array with a representation of each parameter
+     * @throws MBeanException propagated from the managed resource access
      */
     public String[] findApplicationParameters() throws MBeanException {
 
@@ -65,6 +67,9 @@ public class ContextMBean extends ContainerMBean {
     /**
      * Return the security constraints for this web application.
      * If there are none, a zero-length array is returned.
+     * @return a string array with a representation of each
+     *  security constraint
+     * @throws MBeanException propagated from the managed resource access
      */
     public String[] findConstraints() throws MBeanException {
 
@@ -94,6 +99,8 @@ public class ContextMBean extends ContainerMBean {
      * if any; otherwise return <code>null</code>.
      *
      * @param errorCode Error code to look up
+     * @return a string representation of the error page
+     * @throws MBeanException propagated from the managed resource access
      */
     public String findErrorPage(int errorCode) throws MBeanException {
 
@@ -117,6 +124,8 @@ public class ContextMBean extends ContainerMBean {
      * if any; otherwise return <code>null</code>.
      *
      * @param exceptionType Exception type to look up
+     * @return a string representation of the error page
+     * @throws MBeanException propagated from the managed resource access
      */
     public String findErrorPage(String exceptionType) throws MBeanException {
 
@@ -138,6 +147,8 @@ public class ContextMBean extends ContainerMBean {
     /**
      * Return the set of defined error pages for all specified error codes
      * and exception types.
+     * @return a string array with a representation of each error page
+     * @throws MBeanException propagated from the managed resource access
      */
     public String[] findErrorPages() throws MBeanException {
 
@@ -167,6 +178,8 @@ public class ContextMBean extends ContainerMBean {
      * otherwise return <code>null</code>.
      *
      * @param name Filter name to look up
+     * @return a string representation of the filter definition
+     * @throws MBeanException propagated from the managed resource access
      */
     public String findFilterDef(String name) throws MBeanException {
 
@@ -188,6 +201,9 @@ public class ContextMBean extends ContainerMBean {
 
     /**
      * Return the set of defined filters for this Context.
+     * @return a string array with a representation of all
+     *  the filter definitions
+     * @throws MBeanException propagated from the managed resource access
      */
     public String[] findFilterDefs() throws MBeanException {
 
@@ -214,6 +230,8 @@ public class ContextMBean extends ContainerMBean {
 
     /**
      * Return the set of filter mappings for this Context.
+     * @return a string array with a representation of all the filter mappings
+     * @throws MBeanException propagated from the managed resource access
      */
     public String[] findFilterMaps() throws MBeanException {
 

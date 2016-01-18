@@ -37,7 +37,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
     public static final int DEFAULT_MAX_ACTIVE = 100;
 
-    protected static AtomicInteger poolCounter = new AtomicInteger(0);
+    protected static final AtomicInteger poolCounter = new AtomicInteger(0);
     private volatile Properties dbProperties = new Properties();
     private volatile String url = null;
     private volatile String driverClassName = null;

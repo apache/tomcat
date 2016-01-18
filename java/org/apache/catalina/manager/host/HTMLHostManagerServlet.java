@@ -155,7 +155,10 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
     /**
      * Add a host using the specified parameters.
      *
-     * @param name host name
+     * @param request The Servlet request
+     * @param name Host name
+     * @param smClient StringManager for the client's locale
+     * @return output
      */
     protected String add(HttpServletRequest request,String name,
             StringManager smClient) {
@@ -172,7 +175,9 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
     /**
      * Remove the specified host.
      *
-     * @param name host name
+     * @param name Host name
+     * @param smClient StringManager for the client's locale
+     * @return output
      */
     protected String remove(String name, StringManager smClient) {
 
@@ -189,6 +194,8 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
      * Start the host with the specified name.
      *
      * @param name Host name
+     * @param smClient StringManager for the client's locale
+     * @return output
      */
     protected String start(String name, StringManager smClient) {
 
@@ -205,6 +212,8 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
      * Stop the host with the specified name.
      *
      * @param name Host name
+     * @param smClient StringManager for the client's locale
+     * @return output
      */
     protected String stop(String name, StringManager smClient) {
 
@@ -224,6 +233,8 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
      * @param request The request
      * @param response The response
      * @param message a message to display
+     * @param smClient StringManager for the client's locale
+     * @throws IOException An IO error occurred
      */
     public void list(HttpServletRequest request,
                      HttpServletResponse response,

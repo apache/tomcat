@@ -67,6 +67,7 @@ public class SelectorContext implements Context {
 
     /**
      * Builds a Catalina selector context using the given environment.
+     * @param env The environment
      */
     public SelectorContext(Hashtable<String,Object> env) {
         this.env = env;
@@ -76,6 +77,9 @@ public class SelectorContext implements Context {
 
     /**
      * Builds a Catalina selector context using the given environment.
+     * @param env The environment
+     * @param initialContext <code>true</code> if this is the main
+     *  initial context
      */
     public SelectorContext(Hashtable<String,Object> env,
             boolean initialContext) {
@@ -703,6 +707,9 @@ public class SelectorContext implements Context {
 
     /**
      * Get the bound context.
+     * @return the Context bound with either the current thread or
+     *  the current classloader
+     * @throws NamingException Bindings exception
      */
     protected Context getBoundContext()
         throws NamingException {
@@ -735,7 +742,7 @@ public class SelectorContext implements Context {
 
     /**
      * Strips the URL header.
-     *
+     * @param name The name
      * @return the parsed name
      * @throws NamingException if there is no "java:" header or if no
      * naming context has been bound to this thread
@@ -759,7 +766,7 @@ public class SelectorContext implements Context {
 
     /**
      * Strips the URL header.
-     *
+     * @param name The name
      * @return the parsed name
      * @throws NamingException if there is no "java:" header or if no
      * naming context has been bound to this thread

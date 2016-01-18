@@ -42,7 +42,9 @@ public class MBeanDumper {
 
     /**
      * The following code to dump MBeans has been copied from JMXProxyServlet.
-     *
+     * @param mbeanServer the MBean server
+     * @param names a set of object names for which to dump the info
+     * @return a string representation of the MBeans
      */
     public static String dumpBeans(MBeanServer mbeanServer, Set<ObjectName> names)
     {

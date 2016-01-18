@@ -28,6 +28,9 @@ import org.apache.tomcat.util.res.StringManager;
  * to clone them in order to avoid modifications.  When first created, a
  * <code>ParmaeterMap</code> instance is not locked.
  *
+ * @param <K> The type of Key
+ * @param <V> The type of Value
+ *
  * @author Craig R. McClanahan
  */
 public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
@@ -96,7 +99,7 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 
 
     /**
-     * Return the locked state of this parameter map.
+     * @return the locked state of this parameter map.
      */
     public boolean isLocked() {
 

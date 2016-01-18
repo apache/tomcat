@@ -14,16 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.session;
-
 
 import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
-
 
 /**
  * Facade for the StandardSession object.
@@ -32,11 +28,12 @@ import javax.servlet.http.HttpSession;
  */
 public class StandardSessionFacade implements HttpSession {
 
-
     // ----------------------------------------------------------- Constructors
 
     /**
      * Construct a new session facade.
+     *
+     * @param session The session instance to wrap
      */
     public StandardSessionFacade(HttpSession session) {
         this.session = session;
@@ -45,7 +42,6 @@ public class StandardSessionFacade implements HttpSession {
 
     // ----------------------------------------------------- Instance Variables
 
-
     /**
      * Wrapped session object.
      */
@@ -53,7 +49,6 @@ public class StandardSessionFacade implements HttpSession {
 
 
     // ---------------------------------------------------- HttpSession Methods
-
 
     @Override
     public long getCreationTime() {
@@ -181,6 +176,4 @@ public class StandardSessionFacade implements HttpSession {
     public boolean isNew() {
         return session.isNew();
     }
-
-
 }

@@ -383,6 +383,8 @@ public class JspConfig {
     /**
      * To find out if an uri matches an url pattern in jsp config.  If so,
      * then the uri is a JSP page.  This is used primarily for jspc.
+     * @param uri The path to check
+     * @return <code>true</code> if the path denotes a JSP page
      */
     public boolean isJspPage(String uri) {
 

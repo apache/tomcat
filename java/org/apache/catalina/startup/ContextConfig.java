@@ -39,7 +39,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.security.auth.message.config.AuthConfigFactory;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
@@ -62,8 +61,6 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.authenticator.jaspic.JaspicAuthenticator;
-import org.apache.catalina.authenticator.jaspic.provider.TomcatAuthConfigProvider;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
@@ -388,15 +385,7 @@ public class ContextConfig implements LifecycleListener {
          */
         Valve authenticator = null;
         if (customAuthenticators != null) {
-            authenticator = (Valve)
-                customAuthenticators.get(loginConfig.getAuthMethod());
-        }
-
-        if (authenticator == null) {
-            String authMethod = loginConfig.getAuthMethod();
-            if (authMethod != null && authMethod.contains("JASPIC")) {
-                authenticator = new JaspicAuthenticator();
-            }
+            authenticator = (Valve) customAuthenticators.get(loginConfig.getAuthMethod());
         }
 
         if (authenticator == null) {
@@ -444,26 +433,9 @@ public class ContextConfig implements LifecycleListener {
 
 
     /**
-     * Configure and register default JASPIC modules
-     */
-    private void configureDefaultJaspicAuthModules() {
-        if (!(context.getAuthenticator() instanceof JaspicAuthenticator)) {
-            return;
-        }
-        // TODO currently we setup default provider if we have
-        // JaspicAuthenicator registred.
-        // we need to find a better way to decide, if we want embedded provider
-        // or not
-        JaspicAuthenticator authenticator = (JaspicAuthenticator) context.getAuthenticator();
-        AuthConfigFactory authConfigFactory = AuthConfigFactory.getFactory();
-        TomcatAuthConfigProvider provider = new TomcatAuthConfigProvider(context, authenticator.getAuthProperties());
-        authConfigFactory.registerConfigProvider(provider, JaspicAuthenticator.MESSAGE_LAYER,
-                authenticator.getAppContext(), "Apache Tomcat JASPIC");
-    }
-
-    /**
      * Create (if necessary) and return a Digester configured to process the
      * context configuration descriptor for an application.
+     * @return the digester for context.xml files
      */
     protected Digester createContextDigester() {
         Digester digester = new Digester();
@@ -484,6 +456,7 @@ public class ContextConfig implements LifecycleListener {
 
     /**
      * Process the default configuration file, if it exists.
+     * @param digester The digester that will be used for XML parsing
      */
     protected void contextConfig(Digester digester) {
 
@@ -534,6 +507,8 @@ public class ContextConfig implements LifecycleListener {
 
     /**
      * Process a context.xml.
+     * @param digester The digester that will be used for XML parsing
+     * @param contextXml The URL to the context.xml configuration
      */
     protected void processContextConfig(Digester digester, URL contextXml) {
 
@@ -602,6 +577,7 @@ public class ContextConfig implements LifecycleListener {
 
     /**
      * Adjust docBase.
+     * @throws IOException cannot access the context base path
      */
     protected void fixDocBase()
         throws IOException {
@@ -806,7 +782,6 @@ public class ContextConfig implements LifecycleListener {
         // Configure an authenticator if we need one
         if (ok) {
             authenticatorConfig();
-            configureDefaultJaspicAuthModules();
         }
 
         // Dump the contents of this pipeline if requested
@@ -1695,6 +1670,8 @@ public class ContextConfig implements LifecycleListener {
      * configure this application to see if they also contain static resources.
      * If static resources are found, add them to the context. Resources are
      * added in web-fragment.xml priority order.
+     * @param fragments The set of fragments that will be scanned for
+     *  static resources
      */
     protected void processResourceJARs(Set<WebXml> fragments) {
         for (WebXml fragment : fragments) {
@@ -1738,6 +1715,7 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Identify the default web.xml to be used and obtain an input source for
      * it.
+     * @return an input source to the default web.xml
      */
     protected InputSource getGlobalWebXmlSource() {
         // Is a default web.xml specified for the Context?
@@ -1760,6 +1738,7 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Identify the host web.xml to be used and obtain an input source for
      * it.
+     * @return an input source to the default per host web.xml
      */
     protected InputSource getHostWebXmlSource() {
         File hostConfigBase = getHostConfigBase();
@@ -1772,6 +1751,7 @@ public class ContextConfig implements LifecycleListener {
     /**
      * Identify the application web.xml to be used and obtain an input source
      * for it.
+     * @return an input source to the context web.xml
      */
     protected InputSource getContextWebXmlSource() {
         InputStream stream = null;
@@ -1829,10 +1809,11 @@ public class ContextConfig implements LifecycleListener {
     }
 
     /**
-     *
+     * Utility method to create an input source from the specified XML file.
      * @param filename  Name of the file (possibly with one or more leading path
      *                  segments) to read
      * @param path      Location that filename is relative to
+     * @return the input source
      */
     protected InputSource getWebXmlSource(String filename, String path) {
         File file = new File(filename);
@@ -1885,6 +1866,7 @@ public class ContextConfig implements LifecycleListener {
      * <code>null</code> will be used if no web-fragment.xml was found. Any JARs
      * known not contain fragments will be skipped.
      *
+     * @param application The main web.xml metadata
      * @return A map of JAR name to processed web fragment (if any)
      */
     protected Map<String,WebXml> processJarsForWebFragments(WebXml application) {
@@ -1945,8 +1927,15 @@ public class ContextConfig implements LifecycleListener {
             WebResource[] webResources =
                     webResource.getWebResourceRoot().listResources(
                             webResource.getWebappPath());
-            for (WebResource r : webResources) {
-                processAnnotationsWebResource(r, fragment, handlesTypesOnly);
+            if (webResources.length > 0) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString(
+                            "contextConfig.processAnnotationsWebDir.debug",
+                            webResource.getURL()));
+                }
+                for (WebResource r : webResources) {
+                    processAnnotationsWebResource(r, fragment, handlesTypesOnly);
+                }
             }
         } else if (webResource.isFile() &&
                 webResource.getName().endsWith(".class")) {
@@ -1989,6 +1978,11 @@ public class ContextConfig implements LifecycleListener {
             boolean handlesTypesOnly) {
 
         try (Jar jar = JarFactory.newInstance(url)) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString(
+                        "contextConfig.processAnnotationsJar.debug", url));
+            }
+
             jar.nextEntry();
             String entryName = jar.getEntryName();
             while (entryName != null) {
@@ -2020,12 +2014,16 @@ public class ContextConfig implements LifecycleListener {
             // Returns null if directory is not readable
             String[] dirs = file.list();
             if (dirs != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString(
+                            "contextConfig.processAnnotationsDir.debug", file));
+                }
                 for (String dir : dirs) {
                     processAnnotationsFile(
                             new File(file,dir), fragment, handlesTypesOnly);
                 }
             }
-        } else if (file.canRead() && file.getName().endsWith(".class")) {
+        } else if (file.getName().endsWith(".class") && file.canRead()) {
             try (FileInputStream fis = new FileInputStream(file)) {
                 processAnnotationsStream(fis, fragment, handlesTypesOnly);
             } catch (IOException e) {
@@ -2073,7 +2071,7 @@ public class ContextConfig implements LifecycleListener {
      * For classes packaged with the web application, the class and each
      * super class needs to be checked for a match with {@link HandlesTypes} or
      * for an annotation that matches {@link HandlesTypes}.
-     * @param javaClass
+     * @param javaClass the class to check
      */
     protected void checkHandlesTypes(JavaClass javaClass) {
 
@@ -2386,9 +2384,9 @@ public class ContextConfig implements LifecycleListener {
      * process filter annotation and merge with existing one!
      * FIXME: refactoring method too long and has redundant subroutines with
      *        processAnnotationWebServlet!
-     * @param className
-     * @param ae
-     * @param fragment
+     * @param className The filter class name
+     * @param ae The filter annotation
+     * @param fragment The corresponding fragment
      */
     protected void processAnnotationWebFilter(String className,
             AnnotationEntry ae, WebXml fragment) {

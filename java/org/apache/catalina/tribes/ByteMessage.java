@@ -77,7 +77,7 @@ public class ByteMessage implements Externalizable {
     /**
      * @see java.io.Externalizable#readExternal
      * @param in ObjectInput
-     * @throws IOException
+     * @throws IOException An IO error occurred
      */
     @Override
     public void readExternal(ObjectInput in ) throws IOException {
@@ -89,7 +89,7 @@ public class ByteMessage implements Externalizable {
     /**
      * @see java.io.Externalizable#writeExternal
      * @param out ObjectOutput
-     * @throws IOException
+     * @throws IOException An IO error occurred
      */
     @Override
     public void writeExternal(ObjectOutput out) throws IOException {

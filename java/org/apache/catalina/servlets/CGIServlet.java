@@ -21,13 +21,13 @@ package org.apache.catalina.servlets;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -173,8 +173,8 @@ import org.apache.catalina.util.IOTools;
  * and stderr (which should not be too hard).
  * <br>
  * If you find your cgi scripts are timing out receiving input, you can set
- * the init parameter <code></code> of your webapps' cgi-handling servlet
- * to be
+ * the init parameter <code>stderrTimeout</code> of your webapps' cgi-handling
+ * servlet.
  * </p>
  * <p>
  *
@@ -211,7 +211,6 @@ import org.apache.catalina.util.IOTools;
  * <a href="http://cgi-spec.golux.com">http://cgi-spec.golux.com</a>.
  *
  * </p>
- * <p>
  * <h3>TODO:</h3>
  * <ul>
  * <li> Support for setting headers (for example, Location headers don't work)
@@ -231,7 +230,6 @@ import org.apache.catalina.util.IOTools;
  *
  * @author Martin T Dengler [root@martindengler.com]
  * @author Amy Roh
- * @since Tomcat 4.0
  */
 public final class CGIServlet extends HttpServlet {
 
@@ -631,7 +629,7 @@ public final class CGIServlet extends HttpServlet {
     }
 
 
-    /*
+    /**
      * Behaviour depends on the status code and the value of debug.
      *
      * Status < 400  - Always calls setStatus. Returns false. CGI servlet will
@@ -657,11 +655,6 @@ public final class CGIServlet extends HttpServlet {
     /**
      * Encapsulates the CGI environment and rules to derive
      * that environment from the servlet container and request information.
-     *
-     * <p>
-     * </p>
-     *
-     * @since    Tomcat 4.0
      */
     protected class CGIEnvironment {
 
@@ -708,7 +701,7 @@ public final class CGIServlet extends HttpServlet {
          *                   the Servlet API
          * @param  context   ServletContext for information provided by the
          *                   Servlet API
-         *
+         * @throws IOException an IO error occurred
          */
         protected CGIEnvironment(HttpServletRequest req,
                                  ServletContext context) throws IOException {
@@ -744,7 +737,7 @@ public final class CGIServlet extends HttpServlet {
          *
          * @param  req   HttpServletRequest for information provided by
          *               the Servlet API
-         * @throws UnsupportedEncodingException
+         * @throws UnsupportedEncodingException Unknown encoding
          */
         protected void setupFromRequest(HttpServletRequest req)
                 throws UnsupportedEncodingException {
@@ -861,8 +854,6 @@ public final class CGIServlet extends HttpServlet {
          * <code>name</code> -    simple name (no directories) of the
          *                        cgi script, or null if no cgi was found
          * </ul>
-         *
-         * @since Tomcat 4.0
          */
         protected String[] findCGI(String pathInfo, String webAppRootDir,
                                    String contextPath, String servletPath,
@@ -870,7 +861,6 @@ public final class CGIServlet extends HttpServlet {
             String path = null;
             String name = null;
             String scriptname = null;
-            String cginame = "";
 
             if ((webAppRootDir != null)
                 && (webAppRootDir.lastIndexOf(File.separator) ==
@@ -895,14 +885,16 @@ public final class CGIServlet extends HttpServlet {
             if (debug >= 3) {
                 log("findCGI: currentLoc=" + currentLocation);
             }
+            StringBuilder cginameBuilder = new StringBuilder();
             while (!currentLocation.isFile() && dirWalker.hasMoreElements()) {
                 if (debug >= 3) {
                     log("findCGI: currentLoc=" + currentLocation);
                 }
                 String nextElement = (String) dirWalker.nextElement();
                 currentLocation = new File(currentLocation, nextElement);
-                cginame = cginame + "/" + nextElement;
+                cginameBuilder.append('/').append(nextElement);
             }
+            String cginame = cginameBuilder.toString();
             if (!currentLocation.isFile()) {
                 return new String[] { null, null, null, null };
             }
@@ -938,6 +930,7 @@ public final class CGIServlet extends HttpServlet {
          *
          * @return   true if environment was set OK, false if there
          *           was a problem and no environment was set
+         * @throws IOException an IO error occurred
          */
         protected boolean setCGIEnvironment(HttpServletRequest req) throws IOException {
 
@@ -1047,7 +1040,7 @@ public final class CGIServlet extends HttpServlet {
              * SHOULD NOT be defined.
              *
              */
-            if (sPathInfoCGI != null && !("".equals(sPathInfoCGI))) {
+            if (!("".equals(sPathInfoCGI))) {
                 sPathTranslatedCGI = context.getRealPath(sPathInfoCGI);
             }
             if (sPathTranslatedCGI == null || "".equals(sPathTranslatedCGI)) {
@@ -1165,9 +1158,7 @@ public final class CGIServlet extends HttpServlet {
             }
 
             // create directories
-            String dirPath = destPath.toString().substring(
-                    0,destPath.toString().lastIndexOf('/'));
-            File dir = new File(dirPath);
+            File dir = f.getParentFile();
             if (!dir.mkdirs() && !dir.isDirectory()) {
                 if (debug >= 2) {
                     log("expandCGIScript: failed to create directories for '" +
@@ -1187,19 +1178,13 @@ public final class CGIServlet extends HttpServlet {
                     if (!f.createNewFile()) {
                         return;
                     }
-                    FileOutputStream fos = new FileOutputStream(f);
 
                     try {
-                        // copy data
-                        IOTools.flow(is, fos);
+                        Files.copy(is, f.toPath());
                     } finally {
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            log("Could not close is.", e);
-                        }
-                        fos.close();
+                        is.close();
                     }
+
                     if (debug >= 2) {
                         log("expandCGIScript: expanded '" + srcPath + "' to '" + destPath + "'");
                     }

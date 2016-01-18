@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
@@ -36,6 +35,7 @@ import org.apache.tomcat.JarScanFilter;
 import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -225,6 +225,10 @@ public class StandardJarScanner implements JarScanner {
                             continue;
                         }
 
+                        // TODO: Java 9 support. Details are TBD. It will depend
+                        //       on the extent to which Java 8 supports the
+                        //       Java 9 file formats since this code MUST run on
+                        //       Java 8.
                         ClassPathEntry cpe = new ClassPathEntry(urls[i]);
 
                         // JARs are scanned unless the filter says not to.
@@ -332,10 +336,11 @@ public class StandardJarScanner implements JarScanner {
                                 }
                             }
                         }
-                    } catch (URISyntaxException e) {
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
                         // Wrap the exception and re-throw
                         IOException ioe = new IOException();
-                        ioe.initCause(e);
+                        ioe.initCause(t);
                         throw ioe;
                     }
                 }

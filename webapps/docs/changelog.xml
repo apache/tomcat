@@ -132,6 +132,81 @@
         NIO + OpenSSL if tomcat-native is available, rather than the APR
         connector. (remm)
       </update>
+      <fix>
+        Add path parameter handling to
+        <code>HttpServletRequest.getContextPath()</code>. This is a follow-up to
+        the fix for <bug>57215</bug>. (markt)
+      </fix>
+      <fix>
+        <bug>58692</bug>: Make <code>StandardJarScanner</code> more robust. Log
+        a warning if a class path entry cannot be scanned rather than triggering
+        the failure of the web application. Includes a test case written by
+         Derek Abdine. (markt)
+      </fix>
+      <fix>
+        <bug>58702</bug>: Ensure an access log entry is generated if the client
+        aborts the connection. (markt)
+      </fix>
+      <fix>
+        Fixed various issues reported by Findbugs. (violetagg)
+      </fix>
+      <fix>
+        <bug>58735</bug>: Add support for the <code>X-XSS-Protection</code>
+        header to the <code>HttpHeaderSecurityFilter</code>. Patch provided by
+        Jacopo Cappellato. (markt)
+      </fix>
+      <fix>
+        Add the <code>StatusManagerServlet</code> to the list of Servlets that
+        can only be loaded by privileged applications. (markt)
+      </fix>
+      <fix>
+        Simplify code and fix messages in
+        <code>org.apache.catalina.core.DefaultInstanceManager</code> class.
+        (kkolinko)
+      </fix>
+      <fix>
+        <bug>58751</bug>: Correctly handle the case where an
+        <code>AsyncListener</code> dispatches to a Servlet on an asynchronous
+        timeout and the Servlet uses <code>sendError()</code> to trigger an
+        error page. Includes a test case based on code provided by Andy
+        Wilkinson.(markt)
+      </fix>
+      <fix>
+        Ensure that the proper file encoding if specified will be used when
+        a readme file is served by DefaultServlet. (violetagg)
+      </fix>
+      <fix>
+        Fix declaration of <code>localPort</code> attribute of Connector MBean:
+        it is read-only. (kkolinko)
+      </fix>
+      <fix>
+        <bug>58766</bug>: Make skipping non-class files during annotation
+        scanning faster by checking the file name first. Improve debug logging.
+        (kkolinko)
+      </fix>
+      <fix>
+        <bug>58836</bug>: Correctly merge query string parameters when
+        processing a forwarded request where the target includes a query string
+        that contains a parameter with no value. (markt/kkolinko)
+      </fix>
+      <fix>
+        Make sure that shared Digester is reset in an unlikely error case
+        in <code>HostConfig.deployWAR()</code>. (kkolinko)
+      </fix>
+      <fix>
+        Ensure that persistent session data is not lost if an error occurs
+        during the loading of session data at application start. (markt)
+      </fix>
+      <add>
+        Extend the feature available in the cluster session manager
+        implementations that enables session attribute replication to be
+        filtered bases on attribute name to all session manager implementations.
+        Note that configuration attribute name has changed from
+        <code>sessionAttributeFilter</code> to
+        <code>sessionAttributeNameFilter</code>. Apply the filter on load as
+        well as unload to ensure that configuration changes made while the web
+        application is stopped are applied to any persisted data. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -164,6 +239,10 @@
       <fix>
         Fix NIO connector renegotiation. (remm)
       </fix>
+      <fix>
+        <bug>58659</bug>: Fix a potential deadlock during HTTP/2 processing when
+        the connection window size is limited. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -174,6 +253,10 @@
         for better compatibility with other implementations and older versions
         of Tomcat. Add command line option <code>-no-quoteAttributeEL</code> in
         JspC. (kkolinko)
+      </fix>
+      <fix>
+        Fix handling of missing messages in
+        <code>org.apache.el.util.MessageFactory</code>. (violetagg)
       </fix>
     </changelog>
   </subsection>
@@ -186,6 +269,13 @@
       <fix>
         Fix potential integer overflow in <code>DeltaSession</code>.
         Reported by coverity scan. (fschumacher)
+      </fix>
+      <fix>
+        In order to avoid that the heartbeat thread and the background thread to
+        run <code>Channel.heartbeat</code> simultaneously, if
+        <code>heartbeatBackgroundEnabled</code> of <code>SimpleTcpCluster</code>
+        set to <code>true</code>, ensure that the heartbeat thread does not
+        start. (kfujino)
       </fix>
     </changelog>
   </subsection>
@@ -219,6 +309,25 @@
         correct, new location for attributes related to individual certificates.
         (markt)
       </fix>
+      <fix>
+        Correct some typos in the JNDI resources How-To. (markt)
+      </fix>
+      <fix>
+        Don't create session unnecessarily in the Manager application. (markt)
+      </fix>
+      <fix>
+        Don't create session unnecessarily in the Host Manager application.
+        (markt)
+      </fix>
+      <fix>
+        <bug>58723</bug>: Clarify documentation and error messages for the text
+        interface of the manager to make clear that version must be used with
+        path when referencing contexts deployed using parallel deployment.
+        (markt)
+      </fix>
+      <add>
+        Document <code>test.threads</code> option in BUILDING.txt. (kkolinko)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">
@@ -233,12 +342,25 @@
         the membership service to the map members list in order to ensure that
         the map member is a static member. (kfujino)
       </fix>
+      <fix>
+        Add support for the startup notification of local members in the static
+        cluster. (kfujino)
+      </fix>
+      <fix>
+        Ignore the unnecessary member remove operation from different domain.
+        (kfujino)
+      </fix>
+      <fix>
+        Add support for the shutdown notification of local members in the static
+        cluster. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
-        Correct evaluation of system property <code>org.apache.tomcat.jdbc.pool.onlyAttemptCurrentClassLoader</code>.
+        Correct evaluation of system property
+        <code>org.apache.tomcat.jdbc.pool.onlyAttemptCurrentClassLoader</code>.
         It was basically ignored before. Reported by coverity scan. (fschumacher)
       </fix>
       <fix>
@@ -250,7 +372,16 @@
   <subsection name="Other">
     <changelog>
       <update>
-        Update optional Checkstyle library to 6.13. (kkolinko)
+        Update optional Checkstyle library to 6.14.1. (kkolinko)
+      </update>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.4 to
+        pick up the Windows binaries that are based on OpenSSL 1.0.2e and APR
+        1.5.1. (markt)
+      </update>
+      <update>
+        Update the NSIS Installer used to build the Windows Installers to
+        version 2.50. (markt/kkolinko)
       </update>
     </changelog>
   </subsection>

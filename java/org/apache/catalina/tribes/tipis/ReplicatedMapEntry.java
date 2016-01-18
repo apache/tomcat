@@ -64,18 +64,19 @@ public interface ReplicatedMapEntry extends Serializable {
 
     /**
      * Returns a diff and sets the dirty map to false
-     * @return byte[]
-     * @throws IOException
+     * @return Serialized diff data
+     * @throws IOException IO error serializing
      */
     public byte[] getDiff() throws IOException;
 
 
     /**
      * Applies a diff to an existing object.
-     * @param diff byte[]
-     * @param offset int
-     * @param length int
-     * @throws IOException
+     * @param diff Serialized diff data
+     * @param offset Array offset
+     * @param length Array length
+     * @throws IOException IO error deserializing
+     * @throws ClassNotFoundException Serialization error
      */
     public void applyDiff(byte[] diff, int offset, int length) throws IOException, ClassNotFoundException;
 
@@ -118,13 +119,13 @@ public interface ReplicatedMapEntry extends Serializable {
     public void setVersion(long version);
 
     /**
-     * Return the last replicate time.
+     * @return the last replicate time.
      */
     public long getLastTimeReplicated();
 
     /**
      * Set the last replicate time.
-     * @param lastTimeReplicated
+     * @param lastTimeReplicated New timestamp
      */
     public void setLastTimeReplicated(long lastTimeReplicated);
 

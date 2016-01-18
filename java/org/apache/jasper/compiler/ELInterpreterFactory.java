@@ -43,6 +43,9 @@ public class ELInterpreterFactory {
 
     /**
      * Obtain the correct EL Interpreter for the given web application.
+     * @param context The Servlet context
+     * @return the EL interpreter
+     * @throws Exception If an error occurs creating the interpreter
      */
     public static ELInterpreter getELInterpreter(ServletContext context)
             throws Exception {

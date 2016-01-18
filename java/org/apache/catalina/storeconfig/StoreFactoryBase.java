@@ -47,7 +47,7 @@ public class StoreFactoryBase implements IStoreFactory {
     private static final String info = "org.apache.catalina.config.StoreFactoryBase/1.0";
 
     /**
-     * Return descriptive information about this Facotry implementation and the
+     * @return descriptive information about this Facotry implementation and the
      * corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
@@ -74,10 +74,10 @@ public class StoreFactoryBase implements IStoreFactory {
         this.storeAppender = storeAppender;
     }
 
-    /*
-     * set Registry
+    /**
+     * Set Registry
      *
-     * @see org.apache.catalina.config.IStoreFactory#setRegistry(org.apache.catalina.config.ConfigurationRegistry)
+     * @see org.apache.catalina.storeconfig.IStoreFactory#setRegistry(org.apache.catalina.storeconfig.StoreRegistry)
      */
     @Override
     public void setRegistry(StoreRegistry aRegistry) {
@@ -85,10 +85,10 @@ public class StoreFactoryBase implements IStoreFactory {
 
     }
 
-    /*
+    /**
      * get Registry
      *
-     * @see org.apache.catalina.config.IStoreFactory#getRegistry()
+     * @see org.apache.catalina.storeconfig.IStoreFactory#getRegistry()
      */
     @Override
     public StoreRegistry getRegistry() {
@@ -104,7 +104,7 @@ public class StoreFactoryBase implements IStoreFactory {
         aWriter.println("\"?>");
     }
 
-    /*
+    /**
      * Store a server.xml element with attributes and children
      *
      * @see org.apache.catalina.storeconfig.IStoreFactory#store(java.io.PrintWriter,
@@ -138,12 +138,13 @@ public class StoreFactoryBase implements IStoreFactory {
     }
 
     /**
-     * Must Implement at subclass for sepzial store children handling
+     * Must Implement at subclass for custom store children handling.
      *
-     * @param aWriter
-     * @param indent
-     * @param aElement
-     * @param elementDesc
+     * @param aWriter Current output writer
+     * @param indent Indentation level
+     * @param aElement Current element
+     * @param elementDesc The element description
+     * @throws Exception Configuration storing error
      */
     public void storeChildren(PrintWriter aWriter, int indent, Object aElement,
             StoreDescription elementDesc) throws Exception {
@@ -153,10 +154,10 @@ public class StoreFactoryBase implements IStoreFactory {
      * Store only elements from storeChildren methods that are not a transient
      * child.
      *
-     * @param aWriter current output writer
-     * @param indent indentation level
-     * @param aTagElement current tomcat element
-     * @throws Exception
+     * @param aWriter Current output writer
+     * @param indent Indentation level
+     * @param aTagElement Current element
+     * @throws Exception Configuration storing error
      */
     protected void storeElement(PrintWriter aWriter, int indent,
             Object aTagElement) throws Exception {
@@ -176,11 +177,12 @@ public class StoreFactoryBase implements IStoreFactory {
         }
     }
 
-    /*
-     * Save a array of elements
-     * @param aWriter current output writer
-     * @param indent indentation level
-     * @param elements list of child elments to store!
+    /**
+     * Save a array of elements.
+     * @param aWriter Current output writer
+     * @param indent Indentation level
+     * @param elements Array of elements
+     * @throws Exception Configuration storing error
      */
     protected void storeElementArray(PrintWriter aWriter, int indent,
             Object[] elements) throws Exception {

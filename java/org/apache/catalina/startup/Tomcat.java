@@ -169,6 +169,9 @@ public class Tomcat {
      * (/tmp doesn't seem a good choice for security).
      *
      * TODO: disable work dir if not needed ( no jsp, etc ).
+     *
+     * @param basedir The Tomcat base folder on which all others
+     *  will be derived
      */
     public void setBaseDir(String basedir) {
         this.basedir = basedir;
@@ -177,6 +180,7 @@ public class Tomcat {
     /**
      * Set the port for the default connector. Must
      * be called before start().
+     * @param port The port number
      */
     public void setPort(int port) {
         this.port = port;
@@ -185,6 +189,7 @@ public class Tomcat {
     /**
      * The the hostname of the default host, default is
      * 'localhost'.
+     * @param s The default host name
      */
     public void setHostname(String s) {
         hostname = s;
@@ -198,7 +203,11 @@ public class Tomcat {
      * {@link javax.servlet.ServletContainerInitializer} processing will be
      * applied.
      *
-     * @throws ServletException
+     * @param contextPath The context mapping to use, "" for root context.
+     * @param docBase Base directory for the context, for static files.
+     *  Must exist, relative to the server home
+     * @return the deployed context
+     * @throws ServletException if a deployment error occurs
      */
     public Context addWebapp(String contextPath, String docBase) throws ServletException {
         return addWebapp(getHost(), contextPath, docBase);
@@ -236,9 +245,10 @@ public class Tomcat {
      *
      * TODO: add the rest
      *
-     *  @param contextPath "" for root context.
-     *  @param docBase base dir for the context, for static files. Must exist,
-     *  relative to the server home
+     * @param contextPath The context mapping to use, "" for root context.
+     * @param docBase Base directory for the context, for static files.
+     *  Must exist, relative to the server home
+     * @return the deployed context
      */
     public Context addContext(String contextPath, String docBase) {
         return addContext(getHost(), contextPath, docBase);
@@ -322,9 +332,9 @@ public class Tomcat {
 
 
     /**
-     * Initialise the server.
+     * Initialize the server.
      *
-     * @throws LifecycleException
+     * @throws LifecycleException Init error
      */
     public void init() throws LifecycleException {
         getServer();
@@ -336,7 +346,7 @@ public class Tomcat {
     /**
      * Start the server.
      *
-     * @throws LifecycleException
+     * @throws LifecycleException Start error
      */
     public void start() throws LifecycleException {
         getServer();
@@ -347,7 +357,7 @@ public class Tomcat {
     /**
      * Stop the server.
      *
-     * @throws LifecycleException
+     * @throws LifecycleException Stop error
      */
     public void stop() throws LifecycleException {
         getServer();
@@ -358,6 +368,8 @@ public class Tomcat {
     /**
      * Destroy the server. This object cannot be used once this method has been
      * called.
+     *
+     * @throws LifecycleException Destroy error
      */
     public void destroy() throws LifecycleException {
         getServer();
@@ -368,14 +380,18 @@ public class Tomcat {
     /**
      * Add a user for the in-memory realm. All created apps use this
      * by default, can be replaced using setRealm().
-     *
+     * @param user The user name
+     * @param pass The password
      */
     public void addUser(String user, String pass) {
         userPass.put(user, pass);
     }
 
     /**
+     * Add a role to a user.
      * @see #addUser(String, String)
+     * @param user The user name
+     * @param role The role name
      */
     public void addRole(String user, String role) {
         List<String> roles = userRoles.get(user);
@@ -403,11 +419,11 @@ public class Tomcat {
         if (connector != null) {
             return connector;
         }
-        // This will load Apr connector if available,
-        // default to nio. I'm having strange problems with apr
-        // XXX: jfclere weird... Don't add the AprLifecycleListener then.
-        // and for the use case the speed benefit wouldn't matter.
 
+        // The same as in standard Tomcat configuration.
+        // This creates an APR HTTP connector if AprLifecycleListener has been
+        // configured (created) and Tomcat Native library is available.
+        // Otherwise it creates a NIO HTTP connector.
         connector = new Connector("HTTP/1.1");
         connector.setPort(port);
         service.addConnector( connector );
@@ -421,6 +437,7 @@ public class Tomcat {
     /**
      * Get the service object. Can be used to add more
      * connectors and few other global settings.
+     * @return The service
      */
     public Service getService() {
         getServer();
@@ -432,7 +449,7 @@ public class Tomcat {
      * be added to this host. When tomcat starts, the
      * host will be the default host.
      *
-     * @param host
+     * @param host The current host
      */
     public void setHost(Host host) {
         this.host = host;
@@ -450,6 +467,7 @@ public class Tomcat {
 
     /**
      * Access to the engine, for further customization.
+     * @return The engine
      */
     public Engine getEngine() {
         if(engine == null ) {
@@ -466,6 +484,7 @@ public class Tomcat {
     /**
      * Get the server object. You can add listeners and few more
      * customizations. JNDI is disabled by default.
+     * @return The Server
      */
     public Server getServer() {
 
@@ -488,6 +507,11 @@ public class Tomcat {
     }
 
     /**
+     * @param host The host in which the context will be deployed
+     * @param contextPath The context mapping to use, "" for root context.
+     * @param dir Base directory for the context, for static files.
+     *  Must exist, relative to the server home
+     * @return the deployed context
      * @see #addContext(String, String)
      */
     public Context addContext(Host host, String contextPath, String dir) {
@@ -495,6 +519,12 @@ public class Tomcat {
     }
 
     /**
+     * @param host The host in which the context will be deployed
+     * @param contextPath The context mapping to use, "" for root context.
+     * @param contextName The context name
+     * @param dir Base directory for the context, for static files.
+     *  Must exist, relative to the server home
+     * @return the deployed context
      * @see #addContext(String, String)
      */
     public Context addContext(Host host, String contextPath, String contextName,
@@ -515,6 +545,11 @@ public class Tomcat {
     }
 
     /**
+     * @param host The host in which the context will be deployed
+     * @param contextPath The context mapping to use, "" for root context.
+     * @param docBase Base directory for the context, for static files.
+     *  Must exist, relative to the server home
+     * @return the deployed context
      * @see #addWebapp(String, String)
      */
     public Context addWebapp(Host host, String contextPath, String docBase) {
@@ -522,6 +557,12 @@ public class Tomcat {
     }
 
     /**
+     * @param host The host in which the context will be deployed
+     * @param contextPath The context mapping to use, "" for root context.
+     * @param docBase Base directory for the context, for static files.
+     *  Must exist, relative to the server home
+     * @param config Custom context configurator helper
+     * @return the deployed context
      * @see #addWebapp(String, String)
      */
     public Context addWebapp(Host host, String contextPath, String docBase, ContextConfig config) {
@@ -576,6 +617,7 @@ public class Tomcat {
      * one. The Realm created here will be added to the Engine by default and
      * may be replaced at the Engine level or over-ridden (as per normal Tomcat
      * behaviour) at the Host or Context level.
+     * @return a realm instance
      */
     protected Realm createDefaultRealm() {
         return new RealmBase() {

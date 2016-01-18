@@ -42,14 +42,18 @@ import org.xml.sax.SAXException;
  */
 public class ErrorDispatcher {
 
-    // Custom error handler
+    /**
+     * Custom error handler
+     */
     private final ErrorHandler errHandler;
 
-    // Indicates whether the compilation was initiated by JspServlet or JspC
+    /**
+     * Indicates whether the compilation was initiated by JspServlet or JspC
+     */
     private final boolean jspcMode;
 
 
-    /*
+    /**
      * Constructor.
      *
      * @param jspcMode true if compilation has been initiated by JspC, false
@@ -61,7 +65,7 @@ public class ErrorDispatcher {
         this.jspcMode = jspcMode;
     }
 
-    /*
+    /**
      * Dispatches the given JSP parse error to the configured error handler.
      *
      * The given error code is localized. If it is not found in the
@@ -70,12 +74,13 @@ public class ErrorDispatcher {
      *
      * @param errCode Error code
      * @param args Arguments for parametric replacement
+     * @throws JasperException An error occurred
      */
     public void jspError(String errCode, String... args) throws JasperException {
         dispatch(null, errCode, args, null);
     }
 
-    /*
+    /**
      * Dispatches the given JSP parse error to the configured error handler.
      *
      * The given error code is localized. If it is not found in the
@@ -85,13 +90,14 @@ public class ErrorDispatcher {
      * @param where Error location
      * @param errCode Error code
      * @param args Arguments for parametric replacement
+     * @throws JasperException An error occurred
      */
     public void jspError(Mark where, String errCode, String... args)
             throws JasperException {
         dispatch(where, errCode, args, null);
     }
 
-    /*
+    /**
      * Dispatches the given JSP parse error to the configured error handler.
      *
      * The given error code is localized. If it is not found in the
@@ -101,22 +107,24 @@ public class ErrorDispatcher {
      * @param n Node that caused the error
      * @param errCode Error code
      * @param args Arguments for parametric replacement
+     * @throws JasperException An error occurred
      */
     public void jspError(Node n, String errCode, String... args)
             throws JasperException {
         dispatch(n.getStart(), errCode, args, null);
     }
 
-    /*
+    /**
      * Dispatches the given parsing exception to the configured error handler.
      *
      * @param e Parsing exception
+     * @throws JasperException An error occurred
      */
     public void jspError(Exception e) throws JasperException {
         dispatch(null, null, null, e);
     }
 
-    /*
+    /**
      * Dispatches the given JSP parse error to the configured error handler.
      *
      * The given error code is localized. If it is not found in the
@@ -126,13 +134,14 @@ public class ErrorDispatcher {
      * @param errCode Error code
      * @param args Arguments for parametric replacement
      * @param e Parsing exception
+     * @throws JasperException An error occurred
      */
     public void jspError(Exception e, String errCode, String... args)
                 throws JasperException {
         dispatch(null, errCode, args, e);
     }
 
-    /*
+    /**
      * Dispatches the given JSP parse error to the configured error handler.
      *
      * The given error code is localized. If it is not found in the
@@ -140,16 +149,17 @@ public class ErrorDispatcher {
      * message.
      *
      * @param where Error location
+     * @param e Parsing exception
      * @param errCode Error code
      * @param args Arguments for parametric replacement
-     * @param e Parsing exception
+     * @throws JasperException An error occurred
      */
     public void jspError(Mark where, Exception e, String errCode, String... args)
                 throws JasperException {
         dispatch(where, errCode, args, e);
     }
 
-    /*
+    /**
      * Dispatches the given JSP parse error to the configured error handler.
      *
      * The given error code is localized. If it is not found in the
@@ -157,9 +167,10 @@ public class ErrorDispatcher {
      * message.
      *
      * @param n Node that caused the error
+     * @param e Parsing exception
      * @param errCode Error code
      * @param args Arguments for parametric replacement
-     * @param e Parsing exception
+     * @throws JasperException An error occurred
      */
     public void jspError(Node n, Exception e, String errCode, String... args)
                 throws JasperException {
@@ -177,6 +188,8 @@ public class ErrorDispatcher {
      *
      * @return Array of javac compilation errors, or null if the given error
      * message does not contain any compilation error line numbers
+     * @throws JasperException An error occurred
+     * @throws IOException IO error which usually should not occur
      */
     public static JavacErrorDetail[] parseJavacErrors(String errMsg,
                                                       String fname,
@@ -186,11 +199,12 @@ public class ErrorDispatcher {
         return parseJavacMessage(errMsg, fname, page);
     }
 
-    /*
+    /**
      * Dispatches the given javac compilation errors to the configured error
      * handler.
      *
      * @param javacErrors Array of javac compilation errors
+     * @throws JasperException An error occurred
      */
     public void javacError(JavacErrorDetail[] javacErrors)
             throws JasperException {
@@ -199,12 +213,13 @@ public class ErrorDispatcher {
     }
 
 
-    /*
+    /**
      * Dispatches the given compilation error report and exception to the
      * configured error handler.
      *
      * @param errorReport Compilation error report
      * @param e Compilation exception
+     * @throws JasperException An error occurred
      */
     public void javacError(String errorReport, Exception e)
                 throws JasperException {
@@ -216,7 +231,7 @@ public class ErrorDispatcher {
     //*********************************************************************
     // Private utility methods
 
-    /*
+    /**
      * Dispatches the given JSP parse error to the configured error handler.
      *
      * The given error code is localized. If it is not found in the
@@ -227,6 +242,7 @@ public class ErrorDispatcher {
      * @param errCode Error code
      * @param args Arguments for parametric replacement
      * @param e Parsing exception
+     * @throws JasperException An error occurred
      */
     private void dispatch(Mark where, String errCode, Object[] args,
                           Exception e) throws JasperException {
@@ -278,7 +294,7 @@ public class ErrorDispatcher {
         }
     }
 
-    /*
+    /**
      * Parses the given Java compilation error message, which may contain one
      * or more compilation errors, into an array of JavacErrorDetail instances.
      *
@@ -293,6 +309,8 @@ public class ErrorDispatcher {
      *
      * @return Array of JavacErrorDetail instances corresponding to the
      * compilation errors
+     * @throws JasperException An error occurred
+     * @throws IOException IO error which usually should not occur
      */
     private static JavacErrorDetail[] parseJavacMessage(
                                 String errMsg, String fname, Node.Nodes page)
@@ -363,12 +381,13 @@ public class ErrorDispatcher {
 
 
     /**
-     * @param fname
-     * @param page
-     * @param errMsgBuf
-     * @param lineNum
+     * Create a compilation error.
+     * @param fname The file name
+     * @param page The page nodes
+     * @param errMsgBuf The error message
+     * @param lineNum The source line number of the error
      * @return JavacErrorDetail The error details
-     * @throws JasperException
+     * @throws JasperException An error occurred
      */
     public static JavacErrorDetail createJavacError(String fname,
             Node.Nodes page, StringBuilder errMsgBuf, int lineNum)
@@ -378,13 +397,14 @@ public class ErrorDispatcher {
 
 
     /**
-     * @param fname
-     * @param page
-     * @param errMsgBuf
-     * @param lineNum
-     * @param ctxt
+     * Create a compilation error.
+     * @param fname The file name
+     * @param page The page nodes
+     * @param errMsgBuf The error message
+     * @param lineNum The source line number of the error
+     * @param ctxt The compilation context
      * @return JavacErrorDetail The error details
-     * @throws JasperException
+     * @throws JasperException An error occurred
      */
     public static JavacErrorDetail createJavacError(String fname,
             Node.Nodes page, StringBuilder errMsgBuf, int lineNum,
@@ -439,22 +459,24 @@ public class ErrorDispatcher {
     }
 
 
-    /*
+    /**
      * Visitor responsible for mapping a line number in the generated servlet
      * source code to the corresponding JSP node.
      */
     private static class ErrorVisitor extends Node.Visitor {
 
-        // Java source line number to be mapped
+        /**
+         * Java source line number to be mapped
+         */
         private final int lineNum;
 
-        /*
+        /**
          * JSP node whose Java source code range in the generated servlet
          * contains the Java source line number to be mapped
          */
         private Node found;
 
-        /*
+        /**
          * Constructor.
          *
          * @param lineNum Source line number in the generated servlet code
@@ -471,7 +493,7 @@ public class ErrorDispatcher {
             }
         }
 
-        /*
+        /**
          * Gets the JSP node to which the source line number in the generated
          * servlet code was mapped.
          *

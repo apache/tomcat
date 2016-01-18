@@ -51,7 +51,7 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -264,7 +264,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public SocketState upgradeDispatch(SocketStatus status) {
+    public SocketState upgradeDispatch(SocketEvent status) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.upgradeDispatch.entry", connectionId, status));
         }
@@ -319,20 +319,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 result = SocketState.UPGRADED;
                 break;
 
-            case ASYNC_READ_ERROR:
-            case ASYNC_WRITE_ERROR:
-            case CLOSE_NOW:
-                // This should never happen and will be fatal for this connection.
-                // Add the exception to trace how this point was reached.
-                log.error(sm.getString("upgradeHandler.unexpectedStatus", status),
-                        new IllegalStateException());
-                //$FALL-THROUGH$
             case DISCONNECT:
             case ERROR:
             case TIMEOUT:
             case STOP:
-                // For all of the above, including the unexpected values, close the
-                // connection.
                 close();
                 break;
             }
@@ -369,20 +359,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         if (connectionState.compareAndSet(ConnectionState.CONNECTED, ConnectionState.PAUSING)) {
             pausedNanoTime = System.nanoTime();
 
-            // Write a GOAWAY frame.
-            byte[] fixedPayload = new byte[8];
-            ByteUtil.set31Bits(fixedPayload, 0, (1 << 31) - 1);
-            ByteUtil.setFourBytes(fixedPayload, 4, Http2Error.NO_ERROR.getCode());
-            byte[] payloadLength = new byte[3];
-            ByteUtil.setThreeBytes(payloadLength, 0, 8);
-
             try {
-                synchronized (socketWrapper) {
-                    socketWrapper.write(true, payloadLength, 0, payloadLength.length);
-                    socketWrapper.write(true, GOAWAY, 0, GOAWAY.length);
-                    socketWrapper.write(true, fixedPayload, 0, 8);
-                    socketWrapper.flush(true);
-                }
+                writeGoAwayFrame((1 << 31) - 1, Http2Error.NO_ERROR.getCode(), null);
             } catch (IOException ioe) {
                 // This is fatal for the connection. Ignore it here. There will be
                 // further attempts at I/O in upgradeDispatch() and it can better
@@ -402,20 +380,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         if (connectionState.get() == ConnectionState.PAUSING) {
             if (pausedNanoTime + pingManager.getRoundTripTimeNano() < System.nanoTime()) {
                 connectionState.compareAndSet(ConnectionState.PAUSING, ConnectionState.PAUSED);
-
-                // Write a GOAWAY frame.
-                byte[] fixedPayload = new byte[8];
-                ByteUtil.set31Bits(fixedPayload, 0, maxProcessedStreamId);
-                ByteUtil.setFourBytes(fixedPayload, 4, Http2Error.NO_ERROR.getCode());
-                byte[] payloadLength = new byte[3];
-                ByteUtil.setThreeBytes(payloadLength, 0, 8);
-
-                synchronized (socketWrapper) {
-                    socketWrapper.write(true, payloadLength, 0, payloadLength.length);
-                    socketWrapper.write(true, GOAWAY, 0, GOAWAY.length);
-                    socketWrapper.write(true, fixedPayload, 0, 8);
-                    socketWrapper.flush(true);
-                }
+                writeGoAwayFrame(maxProcessedStreamId, Http2Error.NO_ERROR.getCode(), null);
             }
         }
     }
@@ -448,22 +413,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     void closeConnection(Http2Exception ce) {
-        // Write a GOAWAY frame.
-        byte[] fixedPayload = new byte[8];
-        ByteUtil.set31Bits(fixedPayload, 0, maxProcessedStreamId);
-        ByteUtil.setFourBytes(fixedPayload, 4, ce.getError().getCode());
-        byte[] debugMessage = ce.getMessage().getBytes(StandardCharsets.UTF_8);
-        byte[] payloadLength = new byte[3];
-        ByteUtil.setThreeBytes(payloadLength, 0, debugMessage.length + 8);
-
         try {
-            synchronized (socketWrapper) {
-                socketWrapper.write(true, payloadLength, 0, payloadLength.length);
-                socketWrapper.write(true, GOAWAY, 0, GOAWAY.length);
-                socketWrapper.write(true, fixedPayload, 0, 8);
-                socketWrapper.write(true, debugMessage, 0, debugMessage.length);
-                socketWrapper.flush(true);
-            }
+            writeGoAwayFrame(maxProcessedStreamId, ce.getError().getCode(),
+                    ce.getMessage().getBytes(StandardCharsets.UTF_8));
         } catch (IOException ioe) {
             // Ignore. GOAWAY is sent on a best efforts basis and the original
             // error has already been logged.
@@ -471,6 +423,29 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         close();
     }
 
+
+    private void writeGoAwayFrame(int maxStreamId, long errorCode, byte[] debugMsg)
+            throws IOException {
+        byte[] fixedPayload = new byte[8];
+        ByteUtil.set31Bits(fixedPayload, 0, maxStreamId);
+        ByteUtil.setFourBytes(fixedPayload, 4, errorCode);
+        int len = 8;
+        if (debugMsg != null) {
+            len += debugMsg.length;
+        }
+        byte[] payloadLength = new byte[3];
+        ByteUtil.setThreeBytes(payloadLength, 0, len);
+
+        synchronized (socketWrapper) {
+            socketWrapper.write(true, payloadLength, 0, payloadLength.length);
+            socketWrapper.write(true, GOAWAY, 0, GOAWAY.length);
+            socketWrapper.write(true, fixedPayload, 0, 8);
+            if (debugMsg != null) {
+                socketWrapper.write(true, debugMsg, 0, debugMsg.length);
+            }
+            socketWrapper.flush(true);
+        }
+    }
 
     void writeHeaders(Stream stream, Response coyoteResponse, int payloadSize)
             throws IOException {
@@ -743,24 +718,35 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
 
+    @SuppressWarnings("sync-override") // notifyAll() needs to be outside sync
+                                       // to avoid deadlock
     @Override
-    protected synchronized void incrementWindowSize(int increment) throws Http2Exception {
-        long windowSize = getWindowSize();
-        if (windowSize < 1 && windowSize + increment > 0) {
-            releaseBackLog((int) (windowSize +increment));
+    protected void incrementWindowSize(int increment) throws Http2Exception {
+        Set<AbstractStream> streamsToNotify = null;
+
+        synchronized (this) {
+            long windowSize = getWindowSize();
+            if (windowSize < 1 && windowSize + increment > 0) {
+                streamsToNotify = releaseBackLog((int) (windowSize +increment));
+            }
+            super.incrementWindowSize(increment);
         }
-        super.incrementWindowSize(increment);
-    }
 
-
-    private synchronized void releaseBackLog(int increment) {
-        if (backLogSize < increment) {
-            // Can clear the whole backlog
-            for (AbstractStream stream : backLogStreams.keySet()) {
+        if (streamsToNotify != null) {
+            for (AbstractStream stream : streamsToNotify) {
                 synchronized (stream) {
                     stream.notifyAll();
                 }
             }
+        }
+    }
+
+
+    private synchronized Set<AbstractStream> releaseBackLog(int increment) {
+        Set<AbstractStream> result = new HashSet<>();
+        if (backLogSize < increment) {
+            // Can clear the whole backlog
+            result.addAll(backLogStreams.keySet());
             backLogStreams.clear();
             backLogSize = 0;
         } else {
@@ -772,12 +758,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 int allocation = entry.getValue()[1];
                 if (allocation > 0) {
                     backLogSize -= allocation;
-                    synchronized (entry.getKey()) {
-                        entry.getKey().doNotifyAll();
-                    }
+                    result.add(entry.getKey());
                 }
             }
         }
+        return result;
     }
 
 

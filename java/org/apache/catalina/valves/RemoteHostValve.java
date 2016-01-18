@@ -50,6 +50,7 @@ public final class RemoteHostValve extends RequestFilterValve {
      * Get the flag deciding whether we add the server connector port to the
      * property compared in the filtering method. The port will be appended
      * using a ";" as a separator.
+     * @return <code>true</code> to add the connector port
      */
     public boolean getAddConnectorPort() {
         return addConnectorPort;

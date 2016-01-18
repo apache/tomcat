@@ -312,14 +312,9 @@ public abstract class PersistentManagerBase extends ManagerBase
     }
 
 
-    /**
-     * @return the descriptive short name of this Manager implementation.
-     */
     @Override
     public String getName() {
-
         return name;
-
     }
 
 
@@ -332,7 +327,6 @@ public abstract class PersistentManagerBase extends ManagerBase
     public void setStore(Store store) {
         this.store = store;
         store.setManager(this);
-
     }
 
 
@@ -342,9 +336,7 @@ public abstract class PersistentManagerBase extends ManagerBase
      */
     @Override
     public Store getStore() {
-
         return this.store;
-
     }
 
 
@@ -416,8 +408,9 @@ public abstract class PersistentManagerBase extends ManagerBase
 
 
     /**
-     * Implements the {@link org.apache.catalina.Manager Manager} interface,
-     * direct call to processExpires and processPersistenceChecks
+     * {@inheritDoc}
+     * <p>
+     * Direct call to processExpires and processPersistenceChecks
      */
     @Override
     public void processExpires() {
@@ -460,17 +453,10 @@ public abstract class PersistentManagerBase extends ManagerBase
 
 
     /**
-     * Return the active Session, associated with this Manager, with the
-     * specified session id (if any); otherwise return <code>null</code>.
+     * {@inheritDoc}
+     * <p>
      * This method checks the persistence store if persistence is enabled,
      * otherwise just uses the functionality from ManagerBase.
-     *
-     * @param id The session id for the session to be returned
-     *
-     * @exception IllegalStateException if a new session cannot be
-     *  instantiated for any reason
-     * @exception IOException if an input/output error occurs while
-     *  processing this request
      */
     @Override
     public Session findSession(String id) throws IOException {
@@ -499,7 +485,6 @@ public abstract class PersistentManagerBase extends ManagerBase
         // See if the Session is in the Store
         session = swapIn(id);
         return session;
-
     }
 
     /**
@@ -570,10 +555,9 @@ public abstract class PersistentManagerBase extends ManagerBase
 
 
     /**
-     * Remove this Session from the active Sessions for this Manager,
-     * and from the Store.
-     *
-     * @param session Session to be removed
+     * {@inheritDoc}
+     * <p>
+     * Remove this Session from the Store.
      */
     @Override
     public void remove(Session session, boolean update) {
@@ -686,7 +670,9 @@ public abstract class PersistentManagerBase extends ManagerBase
      * in, but will not be added to the active session list if it
      * is invalid or past its expiration.
      *
+     * @param id The id of the session that should be swapped in
      * @return restored session, or {@code null}, if none is found
+     * @throws IOException an IO error occurred
      */
     protected Session swapIn(String id) throws IOException {
 
@@ -787,7 +773,8 @@ public abstract class PersistentManagerBase extends ManagerBase
      * is past its expiration or invalid, this method does
      * nothing.
      *
-     * @param session The Session to write out.
+     * @param session The Session to write out
+     * @throws IOException an IO error occurred
      */
     protected void swapOut(Session session) throws IOException {
 
@@ -807,6 +794,8 @@ public abstract class PersistentManagerBase extends ManagerBase
      * Write the provided session to the Store without modifying
      * the copy in memory or triggering passivation events. Does
      * nothing if the session is invalid or past its expiration.
+     * @param session The session that should be written
+     * @throws IOException an IO error occurred
      */
     protected void writeSession(Session session) throws IOException {
 

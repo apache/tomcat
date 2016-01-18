@@ -27,7 +27,7 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 public class TestInterceptor extends JdbcInterceptor {
     public static boolean poolstarted = false;
     public static boolean poolclosed = false;
-    public static AtomicInteger instancecount = new AtomicInteger(0);
+    public static final AtomicInteger instancecount = new AtomicInteger(0);
 
     @Override
     public void poolClosed(ConnectionPool pool) {

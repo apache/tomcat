@@ -93,9 +93,8 @@ public class ObjectReader {
      * @param len length in buffer
      * @param count whether to return the count
      * @return number of messages that was sent to callback (or -1 if count == false)
-     * @throws java.io.IOException
      */
-    public int append(ByteBuffer data, int len, boolean count) throws java.io.IOException {
+    public int append(ByteBuffer data, int len, boolean count) {
        buffer.append(data,len);
        int pkgCnt = -1;
        if ( count ) pkgCnt = buffer.countPackages();
@@ -118,9 +117,8 @@ public class ObjectReader {
      * @see XByteBuffer#extractPackage(boolean)
      *
      * @return number of received packages/messages
-     * @throws java.io.IOException
      */
-    public ChannelMessage[] execute() throws java.io.IOException {
+    public ChannelMessage[] execute() {
         int pkgCnt = buffer.countPackages();
         ChannelMessage[] result = new ChannelMessage[pkgCnt];
         for (int i=0; i<pkgCnt; i++)  {

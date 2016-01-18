@@ -116,6 +116,8 @@ public final class Utils {
 
     /**
      * Obtain the correct i18n message for the given key.
+     * @param key The message key
+     * @return the message
      */
     public static String getMessage(String key) {
         return getMessage(key, (Object[]) null);
@@ -125,6 +127,9 @@ public final class Utils {
     /**
      * Obtain the correct i18n message for the given key with placeholders
      * replaced by the supplied arguments.
+     * @param key The message key
+     * @param args The arguments
+     * @return the message
      */
     public static String getMessage(String key, Object... args) {
         String msg =  messages.getString(key);

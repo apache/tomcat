@@ -176,6 +176,7 @@ public final class Extension {
      * <code>false</code>.
      *
      * @param required Extension of the required optional package
+     * @return <code>true</code> if the extension is satisfied
      */
     public boolean isCompatibleWith(Extension required) {
 
@@ -213,9 +214,6 @@ public final class Extension {
 
     }
 
-    /**
-     * Return a String representation of this object.
-     */
     @Override
     public String toString() {
 

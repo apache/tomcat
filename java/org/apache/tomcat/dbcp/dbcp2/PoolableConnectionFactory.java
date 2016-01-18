@@ -54,6 +54,7 @@ public class PoolableConnectionFactory
     /**
      * Create a new {@code PoolableConnectionFactory}.
      * @param connFactory the {@link ConnectionFactory} from which to obtain
+     * @param dataSourceJmxName The JMX name
      * base {@link Connection}s
      */
     public PoolableConnectionFactory(ConnectionFactory connFactory,
@@ -166,6 +167,7 @@ public class PoolableConnectionFactory
      * connection will always fail activation, passivation and validation. A
      * value of zero or less indicates an infinite lifetime. The default value
      * is -1.
+     * @param maxConnLifetimeMillis The maximum connection lifetime
      */
     public void setMaxConnLifetimeMillis(long maxConnLifetimeMillis) {
         this.maxConnLifetimeMillis = maxConnLifetimeMillis;
@@ -220,7 +222,7 @@ public class PoolableConnectionFactory
 
     /**
      * @see #getDisconnectionSqlCodes()
-     * @param disconnectionSqlCodes
+     * @param disconnectionSqlCodes The disconnection codes
      * @since 2.1
      */
     public void setDisconnectionSqlCodes(Collection<String> disconnectionSqlCodes) {

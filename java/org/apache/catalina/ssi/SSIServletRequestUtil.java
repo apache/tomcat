@@ -29,6 +29,7 @@ public class SSIServletRequestUtil {
      *
      * @param request
      *            The servlet request we are processing
+     * @return the relative path
      */
     public static String getRelativePath(HttpServletRequest request) {
         // Are we being processed by a RequestDispatcher.include()?

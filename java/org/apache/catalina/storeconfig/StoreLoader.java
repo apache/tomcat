@@ -78,7 +78,7 @@ public class StoreLoader {
     /**
      * The <code>Digester</code> instance used to parse registry descriptors.
      */
-    protected static Digester digester = createDigester();
+    protected static final Digester digester = createDigester();
 
     private StoreRegistry registry;
 
@@ -102,6 +102,7 @@ public class StoreLoader {
     /**
      * Create and configure the Digester we will be using for setup store
      * registry.
+     * @return the XML digester that will be used to parse the configuration
      */
     protected static Digester createDigester() {
         long t1 = System.currentTimeMillis();
@@ -139,9 +140,11 @@ public class StoreLoader {
     }
 
     /**
-     *
-     * @param aFile
-     * @return The server file
+     * Find main configuration file.
+     * @param aFile File name, absolute or relative
+     *  to <code>${catalina.base}/conf</code>, if not specified
+     *  <code>server-registry.xml</code> is used
+     * @return The file
      */
     protected File serverFile(String aFile) {
 
@@ -160,9 +163,9 @@ public class StoreLoader {
     }
 
     /**
-     * Load Description from external source
+     * Load main configuration file from external source.
      *
-     * @param aURL
+     * @param aURL URL to the configuration file
      */
     public void load(String aURL) {
         synchronized (digester) {
@@ -183,7 +186,7 @@ public class StoreLoader {
      * Load from defaults
      * <ul>
      * <li>System Property URL catalina.storeregistry</li>
-     * <li>File $catalina.base/conf/server-registry.xml</li>
+     * <li>File ${catalina.base}/conf/server-registry.xml</li>
      * <li>class resource org/apache/catalina/storeconfig/server-registry.xml
      * </li>
      * </ul>
@@ -252,7 +255,7 @@ public class StoreLoader {
     }
 
     /**
-     * Get the value of the catalina.home environment variable.
+     * @return the catalina.home environment variable.
      */
     private static String getCatalinaHome() {
         return System.getProperty("catalina.home", System
@@ -260,21 +263,21 @@ public class StoreLoader {
     }
 
     /**
-     * Get the value of the catalina.base environment variable.
+     * @return the catalina.base environment variable.
      */
     private static String getCatalinaBase() {
         return System.getProperty("catalina.base", getCatalinaHome());
     }
 
     /**
-     * Get the value of the configuration URL.
+     * @return the configuration URL.
      */
     private static String getConfigUrl() {
         return System.getProperty("catalina.storeconfig");
     }
 
     /**
-     * @return Returns the registryResource.
+     * @return the registryResource.
      */
     public URL getRegistryResource() {
         return registryResource;

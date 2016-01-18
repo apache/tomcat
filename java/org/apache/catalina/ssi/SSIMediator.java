@@ -201,6 +201,8 @@ public class SSIMediator {
     /**
      * Applies variable substitution to the specified String and returns the
      * new resolved string.
+     * @param val The value which should be checked
+     * @return the value after variable substitution
      */
     public String substituteVariables(String val) {
         // If it has no references or HTML entities then no work

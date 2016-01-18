@@ -21,7 +21,7 @@ import java.io.IOException;
 
 /**
  * A <b>Manager</b> manages the pool of Sessions that are associated with a
- * particular Container.  Different Manager implementations may support
+ * particular Context. Different Manager implementations may support
  * value-added features such as the persistent storage of session data,
  * as well as migrating sessions for distributable web applications.
  * <p>
@@ -370,4 +370,18 @@ public interface Manager {
      * a method that executes periodic tasks, such as expiring sessions etc.
      */
     public void backgroundProcess();
+
+
+    /**
+     * Would the Manager distribute the given session attribute? Manager
+     * implementations may provide additional configuration options to control
+     * which attributes are distributable.
+     *
+     * @param name  The attribute name
+     * @param value The attribute value
+     *
+     * @return {@code true} if the Manager would distribute the given attribute
+     *         otherwise {@code false}
+     */
+    public boolean willAttributeDistribute(String name, Object value);
 }

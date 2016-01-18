@@ -105,13 +105,11 @@ public class TestJdbcInterceptorConfigParsing {
         assertEquals(emptyParmValProps.get("parm1").getValue(), "");
     }
 
-    /**
+    /*
      * Some of these should probably be handled more cleanly by the parser, but a few known
      * exception scenarios are presented here just to document current behavior.  In many cases
      * failure in parsing will just be propagated to a definition that will fail later
      * when instantiated.  Should we be failing faster (and with more detail)?
-     *
-     * @throws Exception
      */
     @Test
     public void testExceptionOrNot() throws Exception {

@@ -305,6 +305,8 @@ public class ChunkedInputFilter implements InputFilter {
 
     /**
      * Read bytes from the previous buffer.
+     * @return The byte count which has been read
+     * @throws IOException Read error
      */
     protected int readBytes() throws IOException {
 
@@ -327,6 +329,9 @@ public class ChunkedInputFilter implements InputFilter {
      * The letters before CRLF or ';' (whatever comes first) must be valid hex
      * digits. We should not parse F23IAMGONNAMESSTHISUP34CRLF as a valid
      * header according to the spec.
+     * @return <code>true</code> if the chunk header has been
+     *  successfully parsed
+     * @throws IOException Read error
      */
     protected boolean parseChunkHeader() throws IOException {
 
@@ -397,6 +402,7 @@ public class ChunkedInputFilter implements InputFilter {
      * @param   tolerant    Should tolerant parsing (LF and CRLF) be used? This
      *                      is recommended (RFC2616, section 19.3) for message
      *                      headers.
+     * @throws IOException An error occurred parsing CRLF
      */
     protected void parseCRLF(boolean tolerant) throws IOException {
 
@@ -431,6 +437,7 @@ public class ChunkedInputFilter implements InputFilter {
 
     /**
      * Parse end chunk data.
+     * @throws IOException Error propagation
      */
     protected void parseEndChunk() throws IOException {
         // Handle optional trailer headers
@@ -584,7 +591,7 @@ public class ChunkedInputFilter implements InputFilter {
         String headerName = new String(trailingHeaders.getBytes(), startPos,
                 colonPos - startPos, StandardCharsets.ISO_8859_1);
 
-        if (allowedTrailerHeaders.contains(headerName.trim().toLowerCase(Locale.ENGLISH))) {
+        if (allowedTrailerHeaders.contains(headerName.toLowerCase(Locale.ENGLISH))) {
             MessageBytes headerValue = headers.addValue(headerName);
 
             // Set the header value

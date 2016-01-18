@@ -253,6 +253,7 @@ public interface Channel {
      * send a pure byte array
      * @param options int - sender options, see class documentation for each interceptor that is configured in order to trigger interceptors
      * @return a unique Id that identifies the message that is sent
+     * @throws ChannelException if a serialization error happens.
      * @see ByteMessage
      * @see #SEND_OPTIONS_USE_ACK
      * @see #SEND_OPTIONS_ASYNCHRONOUS

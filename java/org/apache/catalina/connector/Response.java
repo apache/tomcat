@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -48,6 +49,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.SessionConfig;
+import org.apache.catalina.util.UriUtil;
 import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.UEncoder;
@@ -55,7 +57,6 @@ import org.apache.tomcat.util.buf.UEncoder.SafeCharsSet;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.MediaTypeCache;
-import org.apache.tomcat.util.net.URL;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -142,7 +143,7 @@ public class Response
     }
 
     /**
-     * Get the Coyote response.
+     * @return the Coyote response.
      */
     public org.apache.coyote.Response getCoyoteResponse() {
         return this.coyoteResponse;
@@ -150,7 +151,7 @@ public class Response
 
 
     /**
-     * Return the Context within which this Request is being processed.
+     * @return the Context within which this Request is being processed.
      */
     public Context getContext() {
         return (request.getContext());
@@ -300,7 +301,7 @@ public class Response
     // ------------------------------------------------------- Response Methods
 
     /**
-     * Return the number of bytes the application has actually written to the
+     * @return the number of bytes the application has actually written to the
      * output stream. This excludes chunking, compression, etc. as well as
      * headers.
      */
@@ -310,8 +311,9 @@ public class Response
 
 
     /**
-     * Return the number of bytes the actually written to the socket. This
+     * @return the number of bytes the actually written to the socket. This
      * includes chunking, compression, etc. but excludes headers.
+     * @param flush if <code>true</code> will perform a buffer flush first
      */
     public long getBytesWritten(boolean flush) {
         if (flush) {
@@ -336,6 +338,8 @@ public class Response
 
     /**
      * Application commit flag accessor.
+     *
+     * @return <code>true</code> if the application has committed the response
      */
     public boolean isAppCommitted() {
         return (this.appCommitted || isCommitted() || isSuspended()
@@ -350,7 +354,7 @@ public class Response
     protected Request request = null;
 
     /**
-     * Return the Request with which this Response is associated.
+     * @return the Request with which this Response is associated.
      */
     public org.apache.catalina.connector.Request getRequest() {
         return (this.request);
@@ -372,7 +376,7 @@ public class Response
     protected ResponseFacade facade = null;
 
     /**
-     * Return the <code>ServletResponse</code> for which this object
+     * @return the <code>ServletResponse</code> for which this object
      * is the facade.
      */
     public HttpServletResponse getResponse() {
@@ -395,6 +399,8 @@ public class Response
 
     /**
      * Suspended flag accessor.
+     *
+     * @return <code>true</code> if the response is suspended
      */
     public boolean isSuspended() {
         return outputBuffer.isSuspended();
@@ -403,6 +409,8 @@ public class Response
 
     /**
      * Closed flag accessor.
+     *
+     * @return <code>true</code> if the response has been closed
      */
     public boolean isClosed() {
         return outputBuffer.isClosed();
@@ -411,6 +419,8 @@ public class Response
 
     /**
      * Set the error flag.
+     *
+     * @return <code>false</code> if the error flag was already set
      */
     public boolean setError() {
         boolean result = errorState.compareAndSet(0, 1);
@@ -426,6 +436,8 @@ public class Response
 
     /**
      * Error flag accessor.
+     *
+     * @return <code>true</code> if the response has encountered an error
      */
     public boolean isError() {
         return errorState.get() > 0;
@@ -455,7 +467,7 @@ public class Response
 
 
     /**
-     * Return the content length that was set or calculated for this Response.
+     * @return the content length that was set or calculated for this Response.
      */
     public int getContentLength() {
         return getCoyoteResponse().getContentLength();
@@ -463,7 +475,7 @@ public class Response
 
 
     /**
-     * Return the content type that was set or calculated for this response,
+     * @return the content type that was set or calculated for this response,
      * or <code>null</code> if no content type was set.
      */
     @Override
@@ -512,7 +524,7 @@ public class Response
 
 
     /**
-     * Return the actual buffer size used for this Response.
+     * @return the actual buffer size used for this Response.
      */
     @Override
     public int getBufferSize() {
@@ -521,7 +533,7 @@ public class Response
 
 
     /**
-     * Return the character encoding used for this Response.
+     * @return the character encoding used for this Response.
      */
     @Override
     public String getCharacterEncoding() {
@@ -530,7 +542,7 @@ public class Response
 
 
     /**
-     * Return the servlet output stream associated with this Response.
+     * @return the servlet output stream associated with this Response.
      *
      * @exception IllegalStateException if <code>getWriter</code> has
      *  already been called for this response
@@ -555,7 +567,7 @@ public class Response
 
 
     /**
-     * Return the Locale assigned to this response.
+     * @return the Locale assigned to this response.
      */
     @Override
     public Locale getLocale() {
@@ -564,7 +576,7 @@ public class Response
 
 
     /**
-     * Return the writer associated with this Response.
+     * @return the writer associated with this Response.
      *
      * @exception IllegalStateException if <code>getOutputStream</code> has
      *  already been called for this response
@@ -606,6 +618,8 @@ public class Response
 
     /**
      * Has the output of this response already been committed?
+     *
+     * @return <code>true</code> if the response has been committed
      */
     @Override
     public boolean isCommitted() {
@@ -765,7 +779,7 @@ public class Response
     }
 
 
-    /*
+    /**
      * Overrides the name of the character encoding used in the body
      * of the request. This method must be called prior to reading
      * request parameters or reading input using getReader().
@@ -869,7 +883,7 @@ public class Response
 
 
     /**
-     * Return the error message that was set with <code>sendError()</code>
+     * @return the error message that was set with <code>sendError()</code>
      * for this Response.
      */
     public String getMessage() {
@@ -1035,7 +1049,7 @@ public class Response
      * visible to {@link org.apache.coyote.Response}
      *
      * Called from set/addHeader.
-     * Return true if the header is special, no need to set the header.
+     * @return <code>true</code> if the header is special, no need to set the header.
      */
     private boolean checkSpecialHeader(String name, String value) {
         if (name.equalsIgnoreCase("Content-Type")) {
@@ -1077,6 +1091,7 @@ public class Response
      * Has the specified header been set already in this response?
      *
      * @param name Name of the header to check
+     * @return <code>true</code> if the header has been set
      */
     @Override
     public boolean containsHeader(String name) {
@@ -1103,6 +1118,7 @@ public class Response
      * into the specified redirect URL, if necessary.
      *
      * @param url URL to be encoded
+     * @return <code>true</code> if the URL was encoded
      */
     @Override
     public String encodeRedirectURL(String url) {
@@ -1121,6 +1137,7 @@ public class Response
      * into the specified redirect URL, if necessary.
      *
      * @param url URL to be encoded
+     * @return <code>true</code> if the URL was encoded
      *
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *  <code>encodeRedirectURL()</code> instead.
@@ -1137,6 +1154,7 @@ public class Response
      * into the specified URL, if necessary.
      *
      * @param url URL to be encoded
+     * @return <code>true</code> if the URL was encoded
      */
     @Override
     public String encodeURL(String url) {
@@ -1169,6 +1187,7 @@ public class Response
      * into the specified URL, if necessary.
      *
      * @param url URL to be encoded
+     * @return <code>true</code> if the URL was encoded
      *
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *  <code>encodeURL()</code> instead.
@@ -1272,6 +1291,10 @@ public class Response
      * Internal method that allows a redirect to be sent with a status other
      * than {@link HttpServletResponse#SC_FOUND} (302). No attempt is made to
      * validate the status code.
+     *
+     * @param location Location URL to redirect to
+     * @param status HTTP status code that will be sent
+     * @throws IOException an IO exception occurred
      */
     public void sendRedirect(String location, int status) throws IOException {
         if (isCommitted()) {
@@ -1459,6 +1482,7 @@ public class Response
      * </ul>
      *
      * @param location Absolute URL to be validated
+     * @return <code>true</code> if the URL should be encoded
      */
     protected boolean isEncodeable(final String location) {
 
@@ -1541,7 +1565,7 @@ public class Response
         String contextPath = getContext().getPath();
         if (contextPath != null) {
             String file = url.getFile();
-            if ((file == null) || !file.startsWith(contextPath)) {
+            if (!file.startsWith(contextPath)) {
                 return false;
             }
             String tok = ";" +
@@ -1564,6 +1588,7 @@ public class Response
      * already absolute, return it unchanged.
      *
      * @param location URL to be (possibly) converted and then returned
+     * @return the encoded URL
      *
      * @exception IllegalArgumentException if a MalformedURLException is
      *  thrown when converting the relative URL to an absolute one
@@ -1593,7 +1618,7 @@ public class Response
                 throw iae;
             }
 
-        } else if (leadingSlash || !URL.hasScheme(location)) {
+        } else if (leadingSlash || !UriUtil.hasScheme(location)) {
 
             redirectURLCC.recycle();
 
@@ -1659,9 +1684,11 @@ public class Response
 
     }
 
-    /*
+    /**
      * Removes /./ and /../ sequences from absolute URLs.
      * Code borrowed heavily from CoyoteAdapter.normalize()
+     *
+     * @param cc the char chunk containing the chars to normalize
      */
     private void normalize(CharChunk cc) {
         // Strip query string and/or fragment first as doing it this way makes
@@ -1754,7 +1781,10 @@ public class Response
 
 
     /**
-     * Determine if an absolute URL has a path component
+     * Determine if an absolute URL has a path component.
+     *
+     * @param uri the URL that will be checked
+     * @return <code>true</code> if the URL has a path
      */
     private boolean hasPath(String uri) {
         int pos = uri.indexOf("://");
@@ -1774,6 +1804,7 @@ public class Response
      *
      * @param url URL to be encoded with the session id
      * @param sessionId Session id to be included in the encoded URL
+     * @return the encoded URL
      */
     protected String toEncoded(String url, String sessionId) {
 

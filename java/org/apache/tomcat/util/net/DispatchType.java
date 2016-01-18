@@ -23,16 +23,16 @@ package org.apache.tomcat.util.net;
  */
 public enum DispatchType {
 
-    NON_BLOCKING_READ(SocketStatus.OPEN_READ),
-    NON_BLOCKING_WRITE(SocketStatus.OPEN_WRITE);
+    NON_BLOCKING_READ(SocketEvent.OPEN_READ),
+    NON_BLOCKING_WRITE(SocketEvent.OPEN_WRITE);
 
-    private final SocketStatus status;
+    private final SocketEvent status;
 
-    private DispatchType(SocketStatus status) {
+    private DispatchType(SocketEvent status) {
         this.status = status;
     }
 
-    public SocketStatus getSocketStatus() {
+    public SocketEvent getSocketStatus() {
         return status;
     }
 }

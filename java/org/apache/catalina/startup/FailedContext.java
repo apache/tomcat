@@ -530,13 +530,6 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void removeFilterMap(FilterMap filterMap) { /* NO-OP */ }
 
     @Override
-    public void addInstanceListener(String listener) { /* NO-OP */ }
-    @Override
-    public String[] findInstanceListeners() { return null; }
-    @Override
-    public void removeInstanceListener(String listener) { /* NO-OP */ }
-
-    @Override
     public void addLocaleEncodingMappingParameter(String locale, String encoding) { /* NO-OP */ }
 
     @Override

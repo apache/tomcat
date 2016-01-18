@@ -17,11 +17,11 @@
 package org.apache.catalina.manager.host;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
@@ -237,7 +237,8 @@ public class HostManagerServlet
      * @param writer The output writer
      * @param name The host name
      * @param htmlMode Flag value
-     */
+     * @param smClient StringManager for the client's locale
+    */
     protected void add(HttpServletRequest request, PrintWriter writer,
             String name, boolean htmlMode, StringManager smClient) {
         String aliases = request.getParameter("aliases");
@@ -260,10 +261,11 @@ public class HostManagerServlet
 
     /**
      * Extract boolean value from checkbox with default.
-     * @param request
-     * @param parameter
-     * @param theDefault
-     * @param htmlMode
+     * @param request The Servlet request
+     * @param parameter The parameter name
+     * @param theDefault Default value
+     * @param htmlMode Flag value
+     * @return the boolean value for the parameter
      */
     protected boolean booleanParameter(HttpServletRequest request,
             String parameter, boolean theDefault, boolean htmlMode) {
@@ -287,9 +289,6 @@ public class HostManagerServlet
     }
 
 
-    /**
-     * Initialize this servlet.
-     */
     @Override
     public void init() throws ServletException {
 
@@ -322,6 +321,12 @@ public class HostManagerServlet
      * @param aliases comma separated alias list
      * @param appBase application base for the host
      * @param manager should the manager webapp be deployed to the new host ?
+     * @param autoDeploy Flag value
+     * @param deployOnStartup Flag value
+     * @param deployXML Flag value
+     * @param unpackWARs Flag value
+     * @param copyXML Flag value
+     * @param smClient StringManager for the client's locale
      */
     protected synchronized void add
         (PrintWriter writer, String name, String aliases, String appBase,
@@ -382,20 +387,11 @@ public class HostManagerServlet
                         "hostManagerServlet.configBaseCreateFail", name));
                 return;
             }
-            try (InputStream is = getServletContext().getResourceAsStream("/manager.xml");
-                    OutputStream os = new FileOutputStream(
-                            new File(configBaseFile, "manager.xml"))) {
-                byte buffer[] = new byte[512];
-                int len = buffer.length;
-                while (true) {
-                    len = is.read(buffer);
-                    if (len == -1)
-                        break;
-                    os.write(buffer, 0, len);
-                }
+            try (InputStream is = getServletContext().getResourceAsStream("/manager.xml")) {
+                Path dest = (new File(configBaseFile, "manager.xml")).toPath();
+                Files.copy(is, dest);
             } catch (IOException e) {
-                writer.println(smClient.getString(
-                        "hostManagerServlet.managerXml"));
+                writer.println(smClient.getString("hostManagerServlet.managerXml"));
                 return;
             }
         }
@@ -445,6 +441,7 @@ public class HostManagerServlet
      *
      * @param writer Writer to render results to
      * @param name host name
+     * @param smClient StringManager for the client's locale
      */
     protected synchronized void remove(PrintWriter writer, String name,
             StringManager smClient) {
@@ -503,6 +500,7 @@ public class HostManagerServlet
      * Render a list of the currently active Contexts in our virtual host.
      *
      * @param writer Writer to render to
+     * @param smClient StringManager for the client's locale
      */
     protected void list(PrintWriter writer, StringManager smClient) {
 
@@ -535,6 +533,7 @@ public class HostManagerServlet
      *
      * @param writer Writer to render to
      * @param name Host name
+     * @param smClient StringManager for the client's locale
      */
     protected void start(PrintWriter writer, String name,
             StringManager smClient) {
@@ -596,6 +595,7 @@ public class HostManagerServlet
      *
      * @param writer Writer to render to
      * @param name Host name
+     * @param smClient StringManager for the client's locale
      */
     protected void stop(PrintWriter writer, String name,
             StringManager smClient) {
@@ -657,6 +657,8 @@ public class HostManagerServlet
 
     /**
      * Get config base.
+     * @param hostName The host name
+     * @return the config base for the host
      */
     protected File getConfigBase(String hostName) {
         File configBase = new File(context.getCatalinaBase(), "conf");

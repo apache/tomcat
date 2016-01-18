@@ -37,14 +37,6 @@
           description="The JNDI named JDBC DataSource for your database"
                  type="java.lang.String"/>
 
-    <attribute   name="digest"
-          description="Digest algorithm used in storing passwords in a non-plaintext format"
-                 type="java.lang.String"/>
-
-    <attribute   name="digestEncoding"
-          description="The digest encoding charset."
-                 type="java.lang.String"/>
-
     <attribute   name="localDataSource"
           description="Configures if the DataSource is local to the webapp"
                  type="boolean"/>
@@ -109,14 +101,6 @@
                  type="java.lang.String"
             writeable="false"/>
 
-    <attribute   name="digest"
-          description="Digest algorithm used in storing passwords in a non-plaintext format"
-                 type="java.lang.String"/>
-
-    <attribute   name="digestEncoding"
-          description="The digest encoding charset."
-                 type="java.lang.String"/>
-
     <attribute   name="roleClassNames"
           description="Comma-delimited list of javax.security.Principal classes that represent security roles"
                  type="java.lang.String"/>
@@ -176,14 +160,6 @@
 
     <attribute   name="connectionURL"
           description="The connection URL to use when trying to connect to the database"
-                 type="java.lang.String"/>
-
-    <attribute   name="digest"
-          description="Digest algorithm used in storing passwords in a non-plaintext format"
-                 type="java.lang.String"/>
-
-    <attribute   name="digestEncoding"
-          description="The digest encoding charset."
                  type="java.lang.String"/>
 
     <attribute   name="driverName"
@@ -279,14 +255,6 @@
 
     <attribute   name="contextFactory"
           description="The JNDI context factory for this Realm"
-                 type="java.lang.String"/>
-
-    <attribute   name="digest"
-          description="Digest algorithm used in storing passwords in a non-plaintext format"
-                 type="java.lang.String"/>
-
-    <attribute   name="digestEncoding"
-          description="The digest encoding charset."
                  type="java.lang.String"/>
 
     <attribute   name="protocol"
@@ -386,14 +354,6 @@
                  type="java.lang.String"
             writeable="false"/>
 
-    <attribute   name="digest"
-          description="Digest algorithm used in storing passwords in a non-plaintext format"
-                 type="java.lang.String"/>
-
-    <attribute   name="digestEncoding"
-          description="The digest encoding charset."
-                 type="java.lang.String"/>
-
     <attribute   name="pathname"
           description="The pathname of the XML file containing our database information"
                  type="java.lang.String"/>
@@ -433,14 +393,6 @@
                  type="java.lang.String"
             writeable="false"/>
 
-    <attribute   name="digest"
-          description="Digest algorithm used in storing passwords in a non-plaintext format"
-                 type="java.lang.String"/>
-
-    <attribute   name="digestEncoding"
-          description="The digest encoding charset."
-                 type="java.lang.String"/>
-
     <attribute   name="resourceName"
           description="The global JNDI name of the UserDatabase resource to use"
                  type="java.lang.String"/>
@@ -479,14 +431,6 @@
           description="Fully qualified class name of the managed object"
                  type="java.lang.String"
             writeable="false"/>
-
-    <attribute   name="digest"
-          description="Digest algorithm used in storing passwords in a non-plaintext format"
-                 type="java.lang.String"/>
-
-    <attribute   name="digestEncoding"
-          description="The digest encoding charset."
-                 type="java.lang.String"/>
 
     <attribute   name="realms"
           description="The set of realms that the combined realm is wrapping"
@@ -545,10 +489,6 @@
                  type="java.lang.String"
             writeable="false"/>
 
-    <attribute   name="digest"
-          description="Digest algorithm used in storing passwords in a non-plaintext format"
-                 type="java.lang.String"/>
-
     <attribute   name="failureCount"
           description="The number of times in a row a user has to fail authentication to be locked out. Defaults to 5."
                  type="int" />
@@ -556,10 +496,6 @@
     <attribute   name="lockOutTime"
           description="The time (in seconds) a user is locked out for after too many authentication failures. Defaults to 300 (5 minutes)."
                  type="int" />
-
-    <attribute   name="digestEncoding"
-          description="The digest encoding charset."
-                 type="java.lang.String"/>
 
     <attribute   name="realms"
           description="The set of realms that the lockout realm is wrapping"

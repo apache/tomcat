@@ -41,7 +41,9 @@ import org.apache.tomcat.dbcp.pool2.ObjectPool;
  * @since 2.0
  */
 public class PoolingDriver implements Driver {
-    /** Register myself with the {@link DriverManager}. */
+    /**
+     * Register myself with the {@link DriverManager}.
+     */
     static {
         try {
             DriverManager.registerDriver(new PoolingDriver());
@@ -49,11 +51,15 @@ public class PoolingDriver implements Driver {
         }
     }
 
-    /** The map of registered pools. */
+    /**
+     * The map of registered pools.
+     */
     protected static final HashMap<String,ObjectPool<? extends Connection>> pools =
             new HashMap<>();
 
-    /** Controls access to the underlying connection */
+    /**
+     * Controls access to the underlying connection
+     */
     private final boolean accessToUnderlyingConnectionAllowed;
 
     public PoolingDriver() {
@@ -62,6 +68,7 @@ public class PoolingDriver implements Driver {
 
     /**
      * For unit testing purposes.
+     * @param accessToUnderlyingConnectionAllowed The new flag
      */
     protected PoolingDriver(boolean accessToUnderlyingConnectionAllowed) {
         this.accessToUnderlyingConnectionAllowed = accessToUnderlyingConnectionAllowed;
@@ -71,7 +78,8 @@ public class PoolingDriver implements Driver {
     /**
      * Returns the value of the accessToUnderlyingConnectionAllowed property.
      *
-     * @return true if access to the underlying is allowed, false otherwise.
+     * @return <code>true</code> if access to the underlying is allowed,
+     *  <code>false</code> otherwise.
      */
     protected boolean isAccessToUnderlyingConnectionAllowed() {
         return accessToUnderlyingConnectionAllowed;

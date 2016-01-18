@@ -153,6 +153,7 @@ public final class SecurityClassLoad {
         final String basePackage = "org.apache.catalina.util.";
         loader.loadClass(basePackage + "ParameterMap");
         loader.loadClass(basePackage + "RequestUtil");
+        loader.loadClass(basePackage + "UriUtil");
     }
 
 
@@ -300,7 +301,6 @@ public final class SecurityClassLoad {
                 "util.net.NioBlockingSelector$BlockPoller$2");
         loader.loadClass(basePackage +
                 "util.net.NioBlockingSelector$BlockPoller$3");
-        loader.loadClass(basePackage + "util.net.URL");
         // security
         loader.loadClass(basePackage + "util.security.PrivilegedGetTccl");
         loader.loadClass(basePackage + "util.security.PrivilegedSetTccl");

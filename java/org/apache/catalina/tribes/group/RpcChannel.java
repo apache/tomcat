@@ -75,7 +75,7 @@ public class RpcChannel implements ChannelListener{
      * @param channelOptions channel sender options
      * @param timeout long - timeout in milliseconds, if no reply is received within this time null is returned
      * @return Response[] - an array of response objects.
-     * @throws ChannelException
+     * @throws ChannelException Error sending message
      */
     public Response[] send(Member[] destination,
                            Serializable message,

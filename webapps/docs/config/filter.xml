@@ -926,6 +926,14 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         default value of <code>true</code> will be used.</p>
       </attribute>
 
+      <attribute name="xssProtectionEnabled" required="false">
+        <p>Should the header that enables the browser's cross-site scripting
+        filter protection (<code>X-XSS-Protection: 1; mode=block</code>)
+        be set on every response. If already present, the header
+        will be replaced. If not specified, the default value of
+        <code>true</code> will be used.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>

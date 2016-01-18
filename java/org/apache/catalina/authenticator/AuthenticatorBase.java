@@ -770,6 +770,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * @param ssoId identifier of SingleSignOn session with which the
      *              caller is associated
      * @param request   the request that needs to be authenticated
+     * @return <code>true</code> if the reauthentication from SSL occurred
      */
     protected boolean reauthenticateFromSSO(String ssoId, Request request) {
 
@@ -945,7 +946,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * @param username  The user
      * @param password  The password
      * @return          The authenticated Principal
-     * @throws ServletException
+     * @throws ServletException No principal was authenticated with
+     *         the specified credentials
      */
     protected Principal doLogin(Request request, String username,
             String password) throws ServletException {

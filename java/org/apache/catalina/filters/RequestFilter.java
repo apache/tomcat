@@ -82,7 +82,7 @@ public abstract class RequestFilter extends FilterBase {
 
 
     /**
-     * Return the regular expression used to test for allowed requests for this
+     * @return the regular expression used to test for allowed requests for this
      * Filter, if any; otherwise, return <code>null</code>.
      */
     public String getAllow() {
@@ -109,7 +109,7 @@ public abstract class RequestFilter extends FilterBase {
 
 
     /**
-     * Return the regular expression used to test for denied requests for this
+     * @return the regular expression used to test for denied requests for this
      * Filter, if any; otherwise, return <code>null</code>.
      */
     public String getDeny() {
@@ -136,7 +136,7 @@ public abstract class RequestFilter extends FilterBase {
 
 
     /**
-     * Return response status code that is used to reject denied request.
+     * @return response status code that is used to reject denied request.
      */
     public int getDenyStatus() {
         return denyStatus;
@@ -145,6 +145,8 @@ public abstract class RequestFilter extends FilterBase {
 
     /**
      * Set response status code that is used to reject denied request.
+     *
+     * @param denyStatus The status code for deny
      */
     public void setDenyStatus(int denyStatus) {
         this.denyStatus = denyStatus;
@@ -189,6 +191,7 @@ public abstract class RequestFilter extends FilterBase {
      * @param property The request property on which to filter
      * @param request The servlet request to be processed
      * @param response The servlet response to be processed
+     * @param chain The filter chain
      *
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet error occurs

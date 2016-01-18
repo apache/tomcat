@@ -97,24 +97,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
 
     @Override
     public void fireOnComplete() {
-        List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
-        listenersCopy.addAll(listeners);
-
-        ClassLoader oldCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
-        try {
-            for (AsyncListenerWrapper listener : listenersCopy) {
-                try {
-                    listener.fireOnComplete(event);
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    log.warn("onComplete() failed for listener of type [" +
-                            listener.getClass().getName() + "]", t);
-                }
-            }
-        } finally {
-            clearServletRequestResponse();
-            context.unbind(Globals.IS_SECURITY_ENABLED, oldCL);
-        }
+        // Fire the listeners
+        doFireOnComplete();
 
         // The application doesn't know it has to stop read and/or writing until
         // it receives the complete event so the request and response have to be
@@ -133,6 +117,29 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             log.debug(sm.getString("asyncContextImpl.finishResponseError"), t);
         }
     }
+
+
+    private void doFireOnComplete() {
+        List<AsyncListenerWrapper> listenersCopy = new ArrayList<>();
+        listenersCopy.addAll(listeners);
+
+        ClassLoader oldCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
+        try {
+            for (AsyncListenerWrapper listener : listenersCopy) {
+                try {
+                    listener.fireOnComplete(event);
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    log.warn("onComplete() failed for listener of type [" +
+                            listener.getClass().getName() + "]", t);
+                }
+            }
+        } finally {
+            clearServletRequestResponse();
+            context.unbind(Globals.IS_SECURITY_ENABLED, oldCL);
+        }
+    }
+
 
     public boolean timeout() {
         AtomicBoolean result = new AtomicBoolean();
@@ -383,7 +390,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             dispatch = null;
             runnable.run();
             if (!request.isAsync()) {
-                fireOnComplete();
+                // Uses internal method since we don't want the request/response
+                // to be closed. That will be handled in the adapter.
+                doFireOnComplete();
             }
         } catch (RuntimeException x) {
             // doInternalComplete(true);

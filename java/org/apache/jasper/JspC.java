@@ -293,9 +293,8 @@ public class JspC extends Task implements Options {
 
     /**
      * Apply command-line arguments.
-     *
-     * @param arg
-     *            The arguments
+     * @param arg The arguments
+     * @throws JasperException JSPC error
      */
     public void setArgs(String[] arg) throws JasperException {
         args = arg;
@@ -437,6 +436,7 @@ public class JspC extends Task implements Options {
 
     /**
      * Sets the option to trim white spaces between directives or actions.
+     * @param ts New value
      */
     public void setTrimSpaces(boolean ts) {
         this.trimSpaces = ts;
@@ -452,6 +452,7 @@ public class JspC extends Task implements Options {
 
     /**
      * Sets the option to enable the tag handler pooling.
+     * @param poolingEnabled New value
      */
     public void setPoolingEnabled(boolean poolingEnabled) {
         this.poolingEnabled = poolingEnabled;
@@ -467,6 +468,7 @@ public class JspC extends Task implements Options {
 
     /**
      * Sets the option to enable generation of X-Powered-By response header.
+     * @param xpoweredBy New value
      */
     public void setXpoweredBy(boolean xpoweredBy) {
         this.xpoweredBy = xpoweredBy;
@@ -502,6 +504,7 @@ public class JspC extends Task implements Options {
     /**
      * Sets the option to issue a compilation error if the class attribute
      * specified in useBean action is invalid.
+     * @param b New value
      */
     public void setErrorOnUseBeanInvalidClassAttribute(boolean b) {
         errorOnUseBeanInvalidClassAttribute = b;
@@ -521,6 +524,7 @@ public class JspC extends Task implements Options {
 
     /**
      * Sets the option to include debug information in compiled class.
+     * @param b New value
      */
     public void setClassDebugInfo( boolean b ) {
         classDebugInfo=b;
@@ -545,6 +549,7 @@ public class JspC extends Task implements Options {
 
     /**
      * Sets the option to enable caching.
+     * @param caching New value
      *
      * @see Options#isCaching()
      */
@@ -608,6 +613,7 @@ public class JspC extends Task implements Options {
 
     /**
      * Sets smapSuppressed flag.
+     * @param smapSuppressed New value
      */
     public void setSmapSuppressed(boolean smapSuppressed) {
         this.smapSuppressed = smapSuppressed;
@@ -623,6 +629,7 @@ public class JspC extends Task implements Options {
 
     /**
      * Sets smapDumped flag.
+     * @param smapDumped New value
      *
      * @see Options#isSmapDumped()
      */
@@ -687,6 +694,7 @@ public class JspC extends Task implements Options {
 
     /**
      * Sets the option to determine what compiler to use.
+     * @param c New value
      *
      * @see Options#getCompiler()
      */
@@ -712,6 +720,7 @@ public class JspC extends Task implements Options {
 
     /**
      * Sets the compiler target VM.
+     * @param vm New value
      *
      * @see Options#getCompilerTargetVM()
      */
@@ -729,6 +738,7 @@ public class JspC extends Task implements Options {
 
      /**
       * Sets the compiler source VM.
+      * @param vm New value
       *
       * @see Options#getCompilerSourceVM()
       */
@@ -786,6 +796,7 @@ public class JspC extends Task implements Options {
     /**
      * Sets the classpath used while compiling the servlets generated from JSP
      * files
+      * @param s New value
      */
     public void setClassPath(String s) {
         classPath=s;
@@ -820,6 +831,7 @@ public class JspC extends Task implements Options {
     /**
      * Base dir for the webapp. Used to generate class names and resolve
      * includes.
+     * @param s New value
      */
     public void setUriroot( String s ) {
         if (s == null) {
@@ -933,6 +945,7 @@ public class JspC extends Task implements Options {
 
     /**
      * Sets the package name to be used for the generated servlet classes.
+     * @param p New value
      */
     public void setPackage( String p ) {
         targetPackage=p;
@@ -942,6 +955,7 @@ public class JspC extends Task implements Options {
      * Class name of the generated file ( without package ).
      * Can only be used if a single file is converted.
      * XXX Do we need this feature ?
+     * @param p New value
      */
     public void setClassName( String p ) {
         targetClassName=p;
@@ -949,6 +963,7 @@ public class JspC extends Task implements Options {
 
     /**
      * File where we generate a web.xml fragment with the class definitions.
+     * @param s New value
      */
     public void setWebXmlFragment( String s ) {
         webxmlFile=resolveFile(s).getAbsolutePath();
@@ -957,6 +972,7 @@ public class JspC extends Task implements Options {
 
     /**
      * File where we generate a complete web.xml with the class definitions.
+     * @param s New value
      */
     public void setWebXml( String s ) {
         webxmlFile=resolveFile(s).getAbsolutePath();
@@ -993,14 +1009,15 @@ public class JspC extends Task implements Options {
 
     /**
      * Sets the option that throws an exception in case of a compilation error.
+     * @param b New value
      */
     public void setFailOnError(final boolean b) {
         failOnError = b;
     }
 
     /**
-     * Returns true if an exception will be thrown in case of a compilation
-     * error.
+     * @return <code>true</code> if an exception will be thrown
+     *  in case of a compilation error.
      */
     public boolean getFailOnError() {
         return failOnError;
@@ -1031,6 +1048,7 @@ public class JspC extends Task implements Options {
      *            <code>/index.jsp</code>
      * @param clctxt
      *            Compilation context of the servlet
+     * @throws IOException An IO error occurred
      */
     public void generateWebMapping( String file, JspCompilationContext clctxt )
         throws IOException
@@ -1069,6 +1087,7 @@ public class JspC extends Task implements Options {
 
     /**
      * Include the generated web.xml inside the webapp's web.xml.
+     * @throws IOException An IO error occurred
      */
     protected void mergeIntoWebXml() throws IOException {
 
@@ -1285,6 +1304,7 @@ public class JspC extends Task implements Options {
     /**
      * Locate all jsp files in the webapp. Used if no explicit
      * jsps are specified.
+     * @param base Base path
      */
     public void scanFiles( File base ) {
         Stack<String> dirs = new Stack<>();
@@ -1372,7 +1392,7 @@ public class JspC extends Task implements Options {
 
             Iterator<String> iter = pages.iterator();
             while (iter.hasNext()) {
-                String nextjsp = iter.next().toString();
+                String nextjsp = iter.next();
                 File fjsp = new File(nextjsp);
                 if (!fjsp.isAbsolute()) {
                     fjsp = new File(uriRootF, nextjsp);
@@ -1532,7 +1552,7 @@ public class JspC extends Task implements Options {
     /**
      * Initializes the classloader as/if needed for the given
      * compilation context.
-     *
+     * @return the classloader that will be used
      * @throws IOException If an error occurs
      */
     protected ClassLoader initClassLoader() throws IOException {
@@ -1617,6 +1637,7 @@ public class JspC extends Task implements Options {
      * Find the WEB-INF dir by looking up in the directory tree.
      * This is used if no explicit docbase is set, but only files.
      * XXX Maybe we should require the docbase.
+     * @param f The path from which it will start looking
      */
     protected void locateUriRoot( File f ) {
         String tUriBase = uriBase;

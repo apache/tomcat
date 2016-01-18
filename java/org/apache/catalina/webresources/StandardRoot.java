@@ -560,7 +560,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         this.context = context;
     }
 
-    /*
+    /**
      * Class loader resources are handled by treating JARs in WEB-INF/lib as
      * resource JARs (without the internal META-INF/resources/ prefix) mounted
      * at WEB-INF/claasses (rather than the web app root). This enables reuse
@@ -583,7 +583,8 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     }
 
     /**
-     * For unit testing
+     * For unit testing.
+     * @param main The main resources
      */
     protected final void setMainResources(WebResourceSet main) {
         this.main = main;

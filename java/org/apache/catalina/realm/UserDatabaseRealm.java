@@ -75,7 +75,7 @@ public class UserDatabaseRealm
     // ------------------------------------------------------------- Properties
 
     /**
-     * Return the global JNDI name of the <code>UserDatabase</code> resource
+     * @return the global JNDI name of the <code>UserDatabase</code> resource
      * we will be using.
      */
     public String getResourceName() {

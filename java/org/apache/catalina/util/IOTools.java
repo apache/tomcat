@@ -42,6 +42,7 @@ public class IOTools {
      * @param reader the reader to read from.
      * @param writer the writer to write to.
      * @param buf the char array to use as a buffer
+     * @throws IOException IO error
      */
     public static void flow( Reader reader, Writer writer, char[] buf )
         throws IOException {
@@ -52,6 +53,12 @@ public class IOTools {
     }
 
     /**
+     * Read input from reader and write it to writer until there is no more
+     * input from reader.
+     *
+     * @param reader the reader to read from.
+     * @param writer the writer to write to.
+     * @throws IOException IO error
      * @see #flow( Reader, Writer, char[] )
      */
     public static void flow( Reader reader, Writer writer )
@@ -60,28 +67,22 @@ public class IOTools {
         flow( reader, writer, buf );
     }
 
+
     /**
-     * Read input from input stream and write it to output stream
-     * until there is no more input from input stream.
+     * Read input from input stream and write it to output stream until there is
+     * no more input from input stream using a new buffer of the default size
+     * (4kB).
      *
      * @param is input stream the input stream to read from.
      * @param os output stream the output stream to write to.
-     * @param buf the byte array to use as a buffer
+     *
+     * @throws IOException If an I/O error occurs during the copy
      */
-    public static void flow( InputStream is, OutputStream os, byte[] buf )
-        throws IOException {
+    public static void flow(InputStream is, OutputStream os) throws IOException {
+        byte[] buf = new byte[DEFAULT_BUFFER_SIZE];
         int numRead;
         while ( (numRead = is.read(buf) ) >= 0) {
             os.write(buf, 0, numRead);
         }
-    }
-
-    /**
-     * @see #flow( java.io.InputStream, java.io.OutputStream, byte[] )
-     */
-    public static void flow( InputStream is, OutputStream os )
-        throws IOException {
-        byte[] buf = new byte[DEFAULT_BUFFER_SIZE];
-        flow( is, os, buf );
     }
 }

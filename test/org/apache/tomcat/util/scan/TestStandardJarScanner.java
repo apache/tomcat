@@ -19,6 +19,7 @@ package org.apache.tomcat.util.scan;
 import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -38,6 +39,12 @@ public class TestStandardJarScanner {
         StandardJarScanner scanner = new StandardJarScanner();
 
         scanner.setScanClassPath(true);
+        // When running the test on Java 9, one or more URLs to jimage files may
+        // be returned. By setting the scanAllFiles option, a callback will be
+        // generated for these files which in turn will mean the number of URLs
+        // and the number of call backs will agree and this test will pass.
+        // There is a TODO in StandardJarScanner to add 'proper' Java 9 support.
+        scanner.setScanAllFiles(true);
 
         LoggingCallback callback = new LoggingCallback();
 
@@ -61,6 +68,31 @@ public class TestStandardJarScanner {
             Assert.fail("Unexpected class loader type: " + cl.getClass().getName());
         }
     }
+
+
+    /**
+     * Tomcat should ignore URLs which do not have a file part and do not use the file scheme.
+     */
+    @Test
+    public void skipsInvalidClasspathURLNoFilePartNoFileScheme() {
+        StandardJarScanner scanner = new StandardJarScanner();
+        LoggingCallback callback = new LoggingCallback();
+        TesterServletContext context = new TesterServletContext() {
+            @Override
+            public ClassLoader getClassLoader() {
+                URLClassLoader urlClassLoader;
+                try {
+                    urlClassLoader = new URLClassLoader(
+                            new URL[] { new URL("http://felix.extensions:9/") });
+                } catch (MalformedURLException e) {
+                    throw new RuntimeException(e);
+                }
+                return urlClassLoader;
+            }
+        };
+        scanner.scan(JarScanType.PLUGGABILITY, context, callback);
+    }
+
 
     private static class LoggingCallback implements JarScannerCallback {
 

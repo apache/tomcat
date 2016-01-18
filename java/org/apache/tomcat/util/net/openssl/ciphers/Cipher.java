@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -1290,7 +1291,7 @@ public enum Cipher {
             false,
             56,
             128,
-            new String[] {"SSL_RSA_EXPORT1024_WITH_RC2_CBC_56_MD"},
+            new String[] {"SSL_RSA_EXPORT1024_WITH_RC2_CBC_56_MD5"},
             null
     ),
     // Cipher 62
@@ -4323,6 +4324,119 @@ public enum Cipher {
             null,
             null
     ),
+    // Draft: https://tools.ietf.org/html/draft-ietf-tls-chacha20-poly1305-04
+    TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256(
+            0xCCA8,
+            "ECDHE-RSA-CHACHA20-POLY1305",
+            KeyExchange.EECDH,
+            Authentication.RSA,
+            Encryption.CHACHA20POLY1305,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256,
+            null,
+            null
+    ),
+    TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256(
+            0xCCA9,
+            "ECDHE-ECDSA-CHACHA20-POLY1305",
+            KeyExchange.EECDH,
+            Authentication.ECDSA,
+            Encryption.CHACHA20POLY1305,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256,
+            null,
+            null
+    ),
+    TLS_DHE_RSA_WITH_CHACHA20_POLY1305_SHA256(
+            0xCCAA,
+            "DHE-RSA-CHACHA20-POLY1305",
+            KeyExchange.EDH,
+            Authentication.RSA,
+            Encryption.CHACHA20POLY1305,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256,
+            null,
+            null
+    ),
+    TLS_PSK_WITH_CHACHA20_POLY1305_SHA256(
+            0xCCAB,
+            "PSK-CHACHA20-POLY1305",
+            KeyExchange.PSK,
+            Authentication.PSK,
+            Encryption.CHACHA20POLY1305,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256,
+            null,
+            null
+    ),
+    TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256(
+            0xCCAC,
+            "ECDHE-PSK-CHACHA20-POLY1305",
+            KeyExchange.ECDHEPSK,
+            Authentication.PSK,
+            Encryption.CHACHA20POLY1305,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256,
+            null,
+            null
+    ),
+    TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256(
+            0xCCAD,
+            "DHE-PSK-CHACHA20-POLY1305",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.CHACHA20POLY1305,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256,
+            null,
+            null
+    ),
+    TLS_RSA_PSK_WITH_CHACHA20_POLY1305_SHA256(
+            0xCCAE,
+            "RSA-PSK-CHACHA20-POLY1305",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.CHACHA20POLY1305,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256,
+            null,
+            null
+    ),
 
     // Cipher 0x010080 (SSLv2)
     // RC4_128_WITH_MD5
@@ -4539,7 +4653,7 @@ public enum Cipher {
         } else {
             this.openSSLAltNames = Collections.emptySet();
         }
-        Set<String> jsseNames = new HashSet<>();
+        Set<String> jsseNames = new LinkedHashSet<>();
         if (jsseAltNames != null && jsseAltNames.length != 0) {
             jsseNames.addAll(Arrays.asList(jsseAltNames));
         }

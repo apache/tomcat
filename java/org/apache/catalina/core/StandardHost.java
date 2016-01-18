@@ -331,7 +331,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Returns true if the Host will attempt to create directories for appBase and xmlBase
+     * @return <code>true</code> if the Host will attempt to create directories for appBase and xmlBase
      * unless they already exist.
      */
     @Override
@@ -340,8 +340,8 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
     /**
-     * Set to true if the Host should attempt to create directories for xmlBase and appBase upon startup
-     * @param createDirs
+     * Set to <code>true</code> if the Host should attempt to create directories for xmlBase and appBase upon startup
+     * @param createDirs the new flag value
      */
     @Override
     public void setCreateDirs(boolean createDirs) {
@@ -349,7 +349,7 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
     /**
-     * Return the value of the auto deploy flag.  If true, it indicates that
+     * @return the value of the auto deploy flag.  If true, it indicates that
      * this host's child webapps will be dynamically deployed.
      */
     @Override
@@ -377,7 +377,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Return the Java class name of the context configuration class
+     * @return the Java class name of the context configuration class
      * for new web applications.
      */
     @Override
@@ -406,7 +406,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Return the Java class name of the Context implementation class
+     * @return the Java class name of the Context implementation class
      * for new web applications.
      */
     public String getContextClass() {
@@ -433,7 +433,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Return the value of the deploy on startup flag.  If true, it indicates
+     * @return the value of the deploy on startup flag.  If <code>true</code>, it indicates
      * that this host's child webapps should be discovered and automatically
      * deployed at startup time.
      */
@@ -462,7 +462,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Deploy XML Context config files flag accessor.
+     * @return <code>true</code> if XML context descriptors should be deployed.
      */
     public boolean isDeployXML() {
 
@@ -473,6 +473,8 @@ public class StandardHost extends ContainerBase implements Host {
 
     /**
      * Deploy XML Context config files flag mutator.
+     *
+     * @param deployXML <code>true</code> if context descirptors should be deployed
      */
     public void setDeployXML(boolean deployXML) {
 
@@ -482,7 +484,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Return the copy XML config file flag for this component.
+     * @return the copy XML config file flag for this component.
      */
     public boolean isCopyXML() {
 
@@ -504,7 +506,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Return the Java class name of the error report valve class
+     * @return the Java class name of the error report valve class
      * for new web applications.
      */
     public String getErrorReportValveClass() {
@@ -532,7 +534,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Return the canonical, fully qualified, name of the virtual host
+     * @return the canonical, fully qualified, name of the virtual host
      * this Container represents.
      */
     @Override
@@ -568,7 +570,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Unpack WARs flag accessor.
+     * @return <code>true</code> if WARs should be unpacked on deployment.
      */
     public boolean isUnpackWARs() {
 
@@ -579,6 +581,8 @@ public class StandardHost extends ContainerBase implements Host {
 
     /**
      * Unpack WARs flag mutator.
+     *
+     * @param unpackWARs <code>true</code> to unpack WARs on deployement
      */
     public void setUnpackWARs(boolean unpackWARs) {
 
@@ -588,7 +592,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Host work directory base.
+     * @return host work directory base.
      */
     public String getWorkDir() {
 
@@ -597,7 +601,9 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Host work directory base.
+     * Set host work directory base.
+     *
+     * @param workDir the new base work folder for this host
      */
     public void setWorkDir(String workDir) {
 
@@ -606,7 +612,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Return the regular expression that defines the files and directories in
+     * @return the regular expression that defines the files and directories in
      * the host's {@link #getAppBase} that will be ignored by the automatic
      * deployment process.
      */
@@ -620,7 +626,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Return the compiled regular expression that defines the files and
+     * @return the compiled regular expression that defines the files and
      * directories in the host's {@link #getAppBase} that will be ignored by the
      * automatic deployment process.
      */
@@ -634,6 +640,8 @@ public class StandardHost extends ContainerBase implements Host {
      * Set the regular expression that defines the files and directories in
      * the host's {@link #getAppBase} that will be ignored by the automatic
      * deployment process.
+     *
+     * @param deployIgnore the regexp
      */
     @Override
     public void setDeployIgnore(String deployIgnore) {
@@ -654,11 +662,19 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
 
+    /**
+     * @return <code>true</code> if a webapp start should fail if a Servlet startup fails
+     */
     public boolean isFailCtxIfServletStartFails() {
         return failCtxIfServletStartFails;
     }
 
 
+    /**
+     * Change the behavior of Servlet startup errors on web application starts.
+     * @param failCtxIfServletStartFails <code>false</code> to ignore errors on Servlets which
+     *    are stated when the web application starts
+     */
     public void setFailCtxIfServletStartFails(
             boolean failCtxIfServletStartFails) {
         boolean oldFailCtxIfServletStartFails = this.failCtxIfServletStartFails;
@@ -743,6 +759,8 @@ public class StandardHost extends ContainerBase implements Host {
      * This is usually triggered on context reload. Note: This method attempts
      * to force a full garbage collection. This should be used with extreme
      * caution on a production system.
+     *
+     * @return a list of possibly leaking contexts
      */
     public String[] findReloadedContextMemoryLeaks() {
 
@@ -764,7 +782,7 @@ public class StandardHost extends ContainerBase implements Host {
     }
 
     /**
-     * Return the set of alias names for this Host.  If none are defined,
+     * @return the set of alias names for this Host.  If none are defined,
      * a zero length array is returned.
      */
     @Override
@@ -818,7 +836,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Return a String representation of this component.
+     * @return a String representation of this component.
      */
     @Override
     public String toString() {
@@ -875,11 +893,11 @@ public class StandardHost extends ContainerBase implements Host {
 
     // -------------------- JMX  --------------------
     /**
-      * Return the MBean Names of the Valves associated with this Host
+      * @return the MBean Names of the Valves associated with this Host
       *
       * @exception Exception if an MBean cannot be created or registered
       */
-     public String [] getValveNames() throws Exception {
+     public String[] getValveNames() throws Exception {
          Valve [] valves = this.getPipeline().getValves();
          String [] mbeanNames = new String[valves.length];
          for (int i = 0; i < valves.length; i++) {

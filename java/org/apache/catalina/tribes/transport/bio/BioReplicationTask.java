@@ -134,8 +134,9 @@ public class BioReplicationTask extends AbstractRxTask {
      * interest in OP_READ.  When this method completes it
      * re-enables OP_READ and calls wakeup() on the selector
      * so the selector will resume watching this channel.
+     * @throws Exception IO exception or execute exception
      */
-    protected void drainSocket () throws Exception {
+    protected void drainSocket() throws Exception {
         InputStream in = socket.getInputStream();
         // loop while data available, channel is non-blocking
         byte[] buf = new byte[1024];
@@ -149,8 +150,8 @@ public class BioReplicationTask extends AbstractRxTask {
 
 
     /**
-     * send a reply-acknowledgment (6,2,3)
-     * @param command
+     * Send a reply-acknowledgment (6,2,3)
+     * @param command The command to write
      */
     protected void sendAck(byte[] command) {
         try {

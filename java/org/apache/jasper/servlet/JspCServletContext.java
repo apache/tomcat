@@ -119,7 +119,7 @@ public class JspCServletContext implements ServletContext {
      * @param validate      Should a validating parser be used to parse web.xml?
      * @param blockExternal Should external entities be blocked when parsing
      *                      web.xml?
-     * @throws JasperException
+     * @throws JasperException An error occurred building the merged web.xml
      */
     public JspCServletContext(PrintWriter aLogWriter, URL aResourceBaseURL,
             ClassLoader classLoader, boolean validate, boolean blockExternal)

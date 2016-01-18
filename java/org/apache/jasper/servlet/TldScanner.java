@@ -153,6 +153,8 @@ public class TldScanner {
 
     /**
      * Scan for TLDs defined in &lt;jsp-config&gt;.
+     * @throws IOException Error reading resources
+     * @throws SAXException XML parsing error
      */
     protected void scanJspConfig() throws IOException, SAXException {
         JspConfigDescriptor jspConfigDescriptor = context.getJspConfigDescriptor();

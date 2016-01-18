@@ -67,6 +67,7 @@ public class LoaderSF extends StoreFactoryBase {
      *
      * @param loader
      *            Loader to be tested
+     * @return <code>true</code> if this is an instance of the default loader
      */
     protected boolean isDefaultLoader(Loader loader) {
 

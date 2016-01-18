@@ -18,7 +18,6 @@ package org.apache.tomcat.util.net.openssl;
 
 import javax.net.ssl.SSLSession;
 
-import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -27,21 +26,14 @@ import org.apache.tomcat.util.net.jsse.JSSESupport;
 
 public class OpenSSLImplementation extends SSLImplementation {
 
-    public static final String IMPLEMENTATION_NAME = "org.apache.tomcat.util.net.openssl.OpenSSLImplementation";
-
-    @Override
-    public String getImplementationName() {
-        return "OpenSSl";
-    }
-
     @Override
     public SSLSupport getSSLSupport(SSLSession session) {
         return new JSSESupport(session);
     }
 
     @Override
-    public SSLUtil getSSLUtil(SSLHostConfig sslHostConfig, SSLHostConfigCertificate certificate) {
-        return new OpenSSLUtil(sslHostConfig, certificate);
+    public SSLUtil getSSLUtil(SSLHostConfigCertificate certificate) {
+        return new OpenSSLUtil(certificate);
     }
 
 }

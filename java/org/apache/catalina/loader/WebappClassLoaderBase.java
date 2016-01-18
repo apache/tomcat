@@ -445,7 +445,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     // ------------------------------------------------------------- Properties
 
     /**
-     * Get associated resources.
+     * @return associated resources.
      */
     public WebResourceRoot getResources() {
         return this.resources;
@@ -454,6 +454,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     /**
      * Set associated resources.
+     * @param resources the resources from which the classloader will
+     *     load the classes
      */
     public void setResources(WebResourceRoot resources) {
         this.resources = resources;
@@ -461,7 +463,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
-     * Return the context name for this class loader.
+     * @return the context name for this class loader.
      */
     public String getContextName() {
         if (resources == null) {
@@ -474,6 +476,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     /**
      * Return the "delegate first" flag for this class loader.
+     * @return <code>true</code> if the class lookup will delegate to
+     *   the parent first. The default in Tomcat is <code>false</code>.
      */
     public boolean getDelegate() {
 
@@ -560,6 +564,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     /**
      * Return the clearReferencesStatic flag for this Context.
+     * @return <code>true</code> if the classloader should attempt to set to null
+     *    static final fields in loaded classes
      */
     public boolean getClearReferencesStatic() {
         return (this.clearReferencesStatic);
@@ -577,7 +583,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
-     * Return the clearReferencesStopThreads flag for this Context.
+     * @return the clearReferencesStopThreads flag for this Context.
      */
     public boolean getClearReferencesStopThreads() {
         return (this.clearReferencesStopThreads);
@@ -596,7 +602,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
-     * Return the clearReferencesStopTimerThreads flag for this Context.
+     * @return the clearReferencesStopTimerThreads flag for this Context.
      */
     public boolean getClearReferencesStopTimerThreads() {
         return (this.clearReferencesStopTimerThreads);
@@ -615,7 +621,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
-     * Return the clearReferencesLogFactoryRelease flag for this Context.
+     * @return the clearReferencesLogFactoryRelease flag for this Context.
      */
     public boolean getClearReferencesLogFactoryRelease() {
         return (this.clearReferencesLogFactoryRelease);
@@ -635,7 +641,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
-     * Return the clearReferencesHttpClientKeepAliveThread flag for this
+     * @return the clearReferencesHttpClientKeepAliveThread flag for this
      * Context.
      */
     public boolean getClearReferencesHttpClientKeepAliveThread() {
@@ -726,6 +732,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     /**
      * Have one or more classes or resources been modified so that a reload
      * is appropriate?
+     * @return <code>true</code> if there's been a modification
      */
     public boolean modified() {
 
@@ -782,9 +789,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
-    /**
-     * Render a String representation of this object.
-     */
     @Override
     public String toString() {
 
@@ -812,9 +816,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     // ---------------------------------------------------- ClassLoader Methods
 
 
-    /**
-     * Expose this method for use by the unit tests.
-     */
+    // Note: exposed for use by tests
     protected final Class<?> doDefineClass(String name, byte[] b, int off, int len,
             ProtectionDomain protectionDomain) {
         return super.defineClass(name, b, off, len, protectionDomain);
@@ -2544,6 +2546,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     /**
      * Find specified resource in local repositories.
      *
+     * @param name the resource name
+     * @param path the resource path
+     * @param manifestRequired will load an associated manifest
      * @return the loaded resource, or null if the resource isn't found
      */
     protected ResourceEntry findResourceInternal(final String name, final String path,
@@ -2679,6 +2684,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     /**
      * Returns true if the specified package name is sealed according to the
      * given manifest.
+     *
+     * @param name Path name to check
+     * @param man Associated manifest
+     * @return <code>true</code> if the manifest associated says it is sealed
      */
     protected boolean isPackageSealed(String name, Manifest man) {
 
@@ -2705,6 +2714,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * <code>null</code>.
      *
      * @param name Name of the resource to return
+     * @return a stream to the loaded resource
      */
     protected InputStream findLoadedResource(String name) {
 
@@ -2732,6 +2742,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * If this class has not been cached, return <code>null</code>.
      *
      * @param name The binary name of the resource to return
+     * @return a loaded class
      */
     protected Class<?> findLoadedClass0(String name) {
 
@@ -2768,7 +2779,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * Filter classes.
      *
      * @param name class name
-     * @return true if the class should be filtered
+     * @return <code>true</code> if the class should be filtered
      */
     protected synchronized boolean filter(String name) {
 

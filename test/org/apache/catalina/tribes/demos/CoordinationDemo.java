@@ -24,7 +24,7 @@ import java.util.StringTokenizer;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.GroupChannel;
-import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
+import org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor;
 import org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator;
 import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
 import org.apache.catalina.tribes.transport.ReceiverBase;
@@ -371,7 +371,7 @@ public class CoordinationDemo {
             };
             channel.addInterceptor(interceptor);
             channel.addInterceptor(new TcpFailureDetector());
-            channel.addInterceptor(new MessageDispatch15Interceptor());
+            channel.addInterceptor(new MessageDispatchInterceptor());
             return channel;
         }
     }

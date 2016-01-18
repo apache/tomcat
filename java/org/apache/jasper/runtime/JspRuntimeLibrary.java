@@ -94,6 +94,8 @@ public class JspRuntimeLibrary {
      * This method is called at the beginning of the generated servlet code
      * for a JSP error page, when the "exception" implicit scripting language
      * variable is initialized.
+     * @param request The Servlet request
+     * @return the throwable in the error attribute if any
      */
     public static Throwable getThrowable(ServletRequest request) {
         Throwable error = (Throwable) request.getAttribute(
@@ -424,6 +426,13 @@ public class JspRuntimeLibrary {
      * Create a typed array.
      * This is a special case where params are passed through
      * the request and the property is indexed.
+     * @param propertyName The property name
+     * @param bean The bean
+     * @param method The method
+     * @param values Array values
+     * @param t The class
+     * @param propertyEditorClass The editor for the property
+     * @throws JasperException An error occurred
      */
     public static void createTypedArray(String propertyName,
                                         Object bean,
@@ -542,23 +551,24 @@ public class JspRuntimeLibrary {
      * @param unescString The string to shell-escape
      * @return The escaped shell string.
      */
-
     public static String escapeQueryString(String unescString) {
-    if ( unescString == null )
-        return null;
+        if (unescString == null) {
+            return null;
+        }
 
-    String escString    = "";
-    String shellSpChars = "&;`'\"|*?~<>^()[]{}$\\\n";
+        StringBuilder escStringBuilder = new StringBuilder();
+        String shellSpChars = "&;`'\"|*?~<>^()[]{}$\\\n";
 
-    for(int index=0; index<unescString.length(); index++) {
-        char nextChar = unescString.charAt(index);
+        for (int index = 0; index < unescString.length(); index++) {
+            char nextChar = unescString.charAt(index);
 
-        if( shellSpChars.indexOf(nextChar) != -1 )
-        escString += "\\";
+            if (shellSpChars.indexOf(nextChar) != -1) {
+                escStringBuilder.append('\\');
+            }
 
-        escString += nextChar;
-    }
-    return escString;
+            escStringBuilder.append(nextChar);
+        }
+        return escStringBuilder.toString();
     }
 
     // __begin lookupReadMethodMethod
@@ -869,6 +879,7 @@ public class JspRuntimeLibrary {
      *
      * @param request The servlet request we are processing
      * @param relativePath The possibly relative resource path
+     * @return an absolute path
      */
     public static String getContextRelativePath(ServletRequest request,
                                                 String relativePath) {

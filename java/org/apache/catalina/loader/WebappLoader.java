@@ -222,7 +222,7 @@ public class WebappLoader extends LifecycleMBeanBase
 
 
     /**
-     * Return the ClassLoader class name.
+     * @return the ClassLoader class name.
      */
     public String getLoaderClass() {
         return (this.loaderClass);
@@ -650,7 +650,6 @@ public class WebappLoader extends LifecycleMBeanBase
             Method m=loader.getClass().getMethod("getClasspath", new Class[] {});
             if( log.isTraceEnabled())
                 log.trace("getClasspath " + m );
-            if( m==null ) return null;
             Object o=m.invoke( loader, new Object[] {} );
             if( log.isDebugEnabled() )
                 log.debug("gotClasspath " + o);

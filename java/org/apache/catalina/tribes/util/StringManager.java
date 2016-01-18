@@ -152,6 +152,8 @@ public class StringManager {
      *
      * @param key  The key for the required message
      * @param args The values to insert into the message
+     *
+     * @return The requested string formatted with the provided arguments
      */
     public String getString(final String key, final Object... args) {
         String value = getString(key);
@@ -167,6 +169,8 @@ public class StringManager {
 
     /**
      * Identify the Locale this StringManager is associated with
+     *
+     * @return The Locale associated with this instance
      */
     public Locale getLocale() {
         return locale;
@@ -182,12 +186,13 @@ public class StringManager {
 
 
     /**
-     * Get the StringManager for a given class. The StringManager will be
-     * returned for the package in which the class is located. If a manager for
-     * that package already exists, it will be reused, else a new
-     * StringManager will be created and returned.
+     * The StringManager will be returned for the package in which the class is
+     * located. If a manager for that package already exists, it will be reused,
+     * else a new StringManager will be created and returned.
      *
      * @param clazz The class for which to retrieve the StringManager
+     *
+     * @return The StringManager for the given class.
      */
     public static final StringManager getManager(Class<?> clazz) {
         return getManager(clazz.getPackage().getName());
@@ -195,11 +200,12 @@ public class StringManager {
 
 
     /**
-     * Get the StringManager for a particular package. If a manager for
-     * a package already exists, it will be reused, else a new
+     * If a manager for a package already exists, it will be reused, else a new
      * StringManager will be created and returned.
      *
      * @param packageName The package name
+     *
+     * @return The StringManager for the given package.
      */
     public static final StringManager getManager(String packageName) {
         return getManager(packageName, Locale.getDefault());
@@ -207,12 +213,13 @@ public class StringManager {
 
 
     /**
-     * Get the StringManager for a particular package and Locale. If a manager
-     * for a package/Locale combination already exists, it will be reused, else
-     * a new StringManager will be created and returned.
+     * If a manager for a package/Locale combination already exists, it will be
+     * reused, else a new StringManager will be created and returned.
      *
      * @param packageName The package name
      * @param locale      The Locale
+     *
+     * @return The StringManager for a particular package and Locale
      */
     public static final synchronized StringManager getManager(
             String packageName, Locale locale) {
@@ -254,6 +261,7 @@ public class StringManager {
      * Retrieve the StringManager for a list of Locales. The first StringManager
      * found will be returned.
      *
+     * @param packageName The package for which the StringManager is required
      * @param requestedLocales the list of Locales
      *
      * @return the found StringManager or the default StringManager

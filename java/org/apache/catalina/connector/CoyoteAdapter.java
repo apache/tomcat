@@ -50,7 +50,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.ServerCookie;
 import org.apache.tomcat.util.http.ServerCookies;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -127,7 +127,7 @@ public class CoyoteAdapter implements Adapter {
 
     @Override
     public boolean asyncDispatch(org.apache.coyote.Request req,
-            org.apache.coyote.Response res, SocketStatus status) throws Exception {
+            org.apache.coyote.Response res, SocketEvent status) throws Exception {
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
@@ -153,47 +153,28 @@ public class CoyoteAdapter implements Adapter {
                 response.setSuspended(false);
             }
 
-            if (status==SocketStatus.TIMEOUT) {
+            if (status==SocketEvent.TIMEOUT) {
                 if (!asyncConImpl.timeout()) {
                     asyncConImpl.setErrorState(null, false);
                 }
-            } else if (status==SocketStatus.ASYNC_READ_ERROR) {
-                // A async read error is an IO error which means the socket
-                // needs to be closed so set success to false to trigger a
-                // close
+            } else if (status==SocketEvent.ERROR) {
+                // An I/O error occurred on a non-container thread which means
+                // that the socket needs to be closed so set success to false to
+                // trigger a close
                 success = false;
-                Throwable t = (Throwable)req.getAttribute(
-                        RequestDispatcher.ERROR_EXCEPTION);
+                Throwable t = (Throwable)req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
                 req.getAttributes().remove(RequestDispatcher.ERROR_EXCEPTION);
-                ReadListener readListener = req.getReadListener();
-                if (readListener != null) {
-                    ClassLoader oldCL = null;
-                    try {
-                        oldCL = request.getContext().bind(false, null);
-                        readListener.onError(t);
-                    } finally {
-                        request.getContext().unbind(false, oldCL);
+                ClassLoader oldCL = null;
+                try {
+                    oldCL = request.getContext().bind(false, null);
+                    if (req.getReadListener() != null) {
+                        req.getReadListener().onError(t);
                     }
-                }
-                if (t != null) {
-                    asyncConImpl.setErrorState(t, true);
-                }
-            } else if (status==SocketStatus.ASYNC_WRITE_ERROR) {
-                // A async write error is an IO error which means the socket
-                // needs to be closed so set success to false to trigger a
-                // close
-                success = false;
-                Throwable t = (Throwable)req.getAttribute(
-                        RequestDispatcher.ERROR_EXCEPTION);
-                req.getAttributes().remove(RequestDispatcher.ERROR_EXCEPTION);
-                if (res.getWriteListener() != null) {
-                    ClassLoader oldCL = null;
-                    try {
-                        oldCL = request.getContext().bind(false, null);
+                    if (res.getWriteListener() != null) {
                         res.getWriteListener().onError(t);
-                    } finally {
-                        request.getContext().unbind(false, oldCL);
                     }
+                } finally {
+                    request.getContext().unbind(false, oldCL);
                 }
                 if (t != null) {
                     asyncConImpl.setErrorState(t, true);
@@ -204,7 +185,7 @@ public class CoyoteAdapter implements Adapter {
             if (!request.isAsyncDispatching() && request.isAsync()) {
                 WriteListener writeListener = res.getWriteListener();
                 ReadListener readListener = req.getReadListener();
-                if (writeListener != null && status == SocketStatus.OPEN_WRITE) {
+                if (writeListener != null && status == SocketEvent.OPEN_WRITE) {
                     ClassLoader oldCL = null;
                     try {
                         oldCL = request.getContext().bind(false, null);
@@ -220,7 +201,7 @@ public class CoyoteAdapter implements Adapter {
                     } finally {
                         request.getContext().unbind(false, oldCL);
                     }
-                } else if (readListener != null && status == SocketStatus.OPEN_READ) {
+                } else if (readListener != null && status == SocketEvent.OPEN_READ) {
                     ClassLoader oldCL = null;
                     try {
                         oldCL = request.getContext().bind(false, null);
@@ -265,15 +246,6 @@ public class CoyoteAdapter implements Adapter {
             if (!request.isAsync()) {
                 request.finishRequest();
                 response.finishResponse();
-                if (request.getMappingData().context != null) {
-                    request.getMappingData().context.logAccess(
-                            request, response,
-                            System.currentTimeMillis() - req.getStartTime(),
-                            false);
-                } else {
-                    // Should normally not happen
-                    log(req, res, System.currentTimeMillis() - req.getStartTime());
-                }
             }
 
             // Check to see if the processor is in an error state. If it is,
@@ -293,12 +265,21 @@ public class CoyoteAdapter implements Adapter {
         } finally {
             if (!success) {
                 res.setStatus(500);
+            }
+
+            // Access logging
+            if (!success || !request.isAsync()) {
                 long time = 0;
                 if (req.getStartTime() != -1) {
                     time = System.currentTimeMillis() - req.getStartTime();
                 }
-                log(req, res, time);
+                if (request.getMappingData().context != null) {
+                    request.getMappingData().context.logAccess(request, response, time, false);
+                } else {
+                    log(req, res, time);
+                }
             }
+
             req.getRequestProcessor().setWorkerThreadName(null);
             // Recycle the wrapper request and response
             if (!success || !request.isAsync()) {
@@ -308,6 +289,7 @@ public class CoyoteAdapter implements Adapter {
         }
         return success;
     }
+
 
     /**
      * Service method.
@@ -347,13 +329,13 @@ public class CoyoteAdapter implements Adapter {
         }
 
         boolean async = false;
+        boolean postParseSuccess = false;
 
         try {
-
             // Parse and set Catalina and configuration specific
             // request parameters
             req.getRequestProcessor().setWorkerThreadName(THREAD_NAME.get());
-            boolean postParseSuccess = postParseRequest(req, request, res, response);
+            postParseSuccess = postParseRequest(req, request, res, response);
             if (postParseSuccess) {
                 //check valves if we support async
                 request.setAsyncSupported(connector.getService().getContainer().getPipeline().isAsyncSupported());
@@ -380,6 +362,13 @@ public class CoyoteAdapter implements Adapter {
             } else {
                 request.finishRequest();
                 response.finishResponse();
+            }
+
+        } catch (IOException e) {
+            // Ignore
+        } finally {
+            // Access log
+            if (!async) {
                 if (postParseSuccess) {
                     // Log only if processing was invoked.
                     // If postParseRequest() failed, it has already logged it.
@@ -390,12 +379,10 @@ public class CoyoteAdapter implements Adapter {
                 }
             }
 
-        } catch (IOException e) {
-            // Ignore
-        } finally {
             req.getRequestProcessor().setWorkerThreadName(null);
             AtomicBoolean error = new AtomicBoolean(false);
             res.action(ActionCode.IS_ERROR, error);
+
             // Recycle the wrapper request and response
             if (!async || error.get()) {
                 request.recycle();
@@ -412,34 +399,6 @@ public class CoyoteAdapter implements Adapter {
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
         return postParseRequest(req, request, res, response);
-    }
-
-
-    @Override
-    public void errorDispatch(org.apache.coyote.Request req,
-            org.apache.coyote.Response res) {
-        Request request = (Request) req.getNote(ADAPTER_NOTES);
-        Response response = (Response) res.getNote(ADAPTER_NOTES);
-
-        if (request != null && request.getMappingData().context != null) {
-            request.getMappingData().context.logAccess(
-                    request, response,
-                    System.currentTimeMillis() - req.getStartTime(),
-                    false);
-        } else {
-            log(req, res, System.currentTimeMillis() - req.getStartTime());
-        }
-
-        if (request != null) {
-            request.recycle();
-        }
-
-        if (response != null) {
-            response.recycle();
-        }
-
-        req.recycle();
-        res.recycle();
     }
 
 
@@ -566,17 +525,17 @@ public class CoyoteAdapter implements Adapter {
     protected boolean postParseRequest(org.apache.coyote.Request req, Request request,
             org.apache.coyote.Response res, Response response) throws IOException, ServletException {
 
-        // If the processor has set the scheme (AJP will do this) use this to
-        // set the secure flag as well. If the processor hasn't set it, use the
-        // settings from the connector
-        if (! req.scheme().isNull()) {
-            // use processor specified scheme to determine secure state
-            request.setSecure(req.scheme().equals("https"));
-        } else {
-            // use connector scheme and secure configuration, (defaults to
+        // If the processor has set the scheme (AJP does this, HTTP does this if
+        // SSL is enabled) use this to set the secure flag as well. If the
+        // processor hasn't set it, use the settings from the connector
+        if (req.scheme().isNull()) {
+            // Use connector scheme and secure configuration, (defaults to
             // "http" and false respectively)
             req.scheme().setString(connector.getScheme());
             request.setSecure(connector.getSecure());
+        } else {
+            // Use processor specified scheme to determine secure state
+            request.setSecure(req.scheme().equals("https"));
         }
 
         // At this point the Host header has been processed.
@@ -760,8 +719,8 @@ public class CoyoteAdapter implements Adapter {
                                 // Recycle cookies and session info in case the
                                 // correct context is configured with different
                                 // settings
-                                req.getCookies().recycle();
                                 request.recycleSessionInfo();
+                                request.recycleCookieInfo(true);
                             }
                             break;
                         }
@@ -888,8 +847,8 @@ public class CoyoteAdapter implements Adapter {
      * interested in the session ID that will be in this form. Other parameters
      * can safely be ignored.
      *
-     * @param req
-     * @param request
+     * @param req The Coyote request object
+     * @param request The Servlet request object
      */
     protected void parsePathParameters(org.apache.coyote.Request req,
             Request request) {
@@ -988,6 +947,8 @@ public class CoyoteAdapter implements Adapter {
     /**
      * Look for SSL session ID if required. Only look for SSL Session ID if it
      * is the only tracking method enabled.
+     *
+     * @param request The Servlet request obejct
      */
     protected void parseSessionSslId(Request request) {
         if (request.getRequestedSessionId() == null &&
@@ -1003,6 +964,8 @@ public class CoyoteAdapter implements Adapter {
 
     /**
      * Parse session id in URL.
+     *
+     * @param request The Servlet request obejct
      */
     protected void parseSessionCookiesId(Request request) {
 
@@ -1057,6 +1020,10 @@ public class CoyoteAdapter implements Adapter {
 
     /**
      * Character conversion of the URI.
+     *
+     * @param uri MessageBytes object containing the URI
+     * @param request The Servlet request obejct
+     * @throws IOException if a IO exception occurs sending an error to the client
      */
     protected void convertURI(MessageBytes uri, Request request) throws IOException {
 
@@ -1076,7 +1043,7 @@ public class CoyoteAdapter implements Adapter {
                     conv.recycle();
                 }
             } catch (IOException e) {
-                log.error("Invalid URI encoding; using HTTP default");
+                log.error(sm.getString("coyoteAdapter.invalidEncoding"));
                 connector.setURIEncoding(null);
             }
             if (conv != null) {
@@ -1106,6 +1073,8 @@ public class CoyoteAdapter implements Adapter {
 
     /**
      * Character conversion of the a US-ASCII MessageBytes.
+     *
+     * @param mb The MessageBytes instance contaning the bytes that should be converted to chars
      */
     protected void convertMB(MessageBytes mb) {
 
@@ -1316,6 +1285,11 @@ public class CoyoteAdapter implements Adapter {
     /**
      * Copy an array of bytes to a different position. Used during
      * normalization.
+     *
+     * @param b The bytes that should be copied
+     * @param dest Destination offset
+     * @param src Source offset
+     * @param len Length
      */
     protected static void copyBytes(byte[] b, int dest, int src, int len) {
         for (int pos = 0; pos < len; pos++) {

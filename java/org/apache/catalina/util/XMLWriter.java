@@ -22,8 +22,6 @@ import java.io.Writer;
 
 /**
  * XMLWriter helper class.
- *
- * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  */
 public class XMLWriter {
 
@@ -68,7 +66,7 @@ public class XMLWriter {
 
 
     /**
-     * Constructor.
+     * New XML writer utility that will store its data in an internal buffer.
      */
     public XMLWriter() {
         this(null);
@@ -76,7 +74,12 @@ public class XMLWriter {
 
 
     /**
-     * Constructor.
+     * New XML writer utility that will store its data in an internal buffer
+     * and can write it to the specified writer.
+     * <p>
+     * See {@link #sendData()}
+     *
+     * @param writer The writer to use
      */
     public XMLWriter(Writer writer) {
         this.writer = writer;
@@ -204,7 +207,8 @@ public class XMLWriter {
 
 
     /**
-     * Send data and reinitializes buffer.
+     * Send data and reinitializes buffer, if a writer has been specified.
+     * @throws IOException Error writing XML data
      */
     public void sendData()
         throws IOException {

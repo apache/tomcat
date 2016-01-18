@@ -29,14 +29,6 @@ import org.apache.tomcat.util.net.SSLHostConfig;
  */
 public class ConnectorSF extends StoreFactoryBase {
 
-    /**
-     * Store Connector description
-     *
-     * @param aWriter
-     * @param indent
-     * @param aConnector
-     * @throws Exception
-     */
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aConnector,
             StoreDescription parentDesc) throws Exception {

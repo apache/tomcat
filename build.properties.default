@@ -27,7 +27,7 @@ version.major=9
 version.minor=0
 version.build=0
 version.patch=0
-version.suffix=.M1-dev
+version.suffix=.M2-dev
 
 # ----- Build control flags -----
 # Note enabling validation uses Checkstyle which is LGPL licensed
@@ -156,7 +156,7 @@ jdt.loc.1=http://archive.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj
 jdt.loc.2=http://download.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ecj-${jdt.version}.jar
 
 # ----- Tomcat native library -----
-tomcat-native.version=1.2.2
+tomcat-native.version=1.2.4
 tomcat-native.home=${base.path}/tomcat-native-${tomcat-native.version}
 tomcat-native.tar.gz=${tomcat-native.home}/tomcat-native.tar.gz
 tomcat-native.loc.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/source/tomcat-native-${tomcat-native.version}-src.tar.gz
@@ -165,12 +165,13 @@ tomcat-native.win.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-nativ
 tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-win32-bin.zip
 
 # ----- NSIS, version 2.0 or later -----
-nsis.home=${base.path}/nsis-2.46
+nsis.version=2.50
+nsis.home=${base.path}/nsis-${nsis.version}
 nsis.exe=${nsis.home}/makensis.exe
 nsis.installoptions.dll=${nsis.home}/Plugins/InstallOptions.dll
 nsis.nsexec.dll=${nsis.home}/Plugins/nsExec.dll
 nsis.nsisdl.dll=${nsis.home}/Plugins/NSISdl.dll
-nsis.loc=${base-sf.loc}/nsis/nsis-2.46.zip
+nsis.loc=${base-sf.loc}/nsis/nsis-${nsis.version}.zip
 
 # ----- Commons Daemon, version 1.0-Alpha or later -----
 commons-daemon.version=1.0.15
@@ -218,7 +219,7 @@ objenesis.loc=https://objenesis.googlecode.com/files/objenesis-${objenesis.versi
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 
 # ----- Checkstyle, version 6.0 or later -----
-checkstyle.version=6.13
+checkstyle.version=6.14.1
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle/${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar

@@ -38,6 +38,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Valve;
 import org.apache.catalina.ha.CatalinaCluster;
+import org.apache.catalina.ha.ClusterDeployer;
 import org.apache.catalina.ha.ClusterListener;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
@@ -51,7 +52,7 @@ import org.apache.catalina.tribes.ChannelListener;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.group.GroupChannel;
-import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
+import org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor;
 import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
@@ -136,7 +137,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     private final List<Valve> valves = new ArrayList<>();
 
-    private org.apache.catalina.ha.ClusterDeployer clusterDeployer;
+    private ClusterDeployer clusterDeployer;
     private ObjectName onameClusterDeployer;
 
     /**
@@ -268,6 +269,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     /**
      * Get the cluster listeners associated with this cluster. If this Array has
      * no listeners registered, a zero-length array is returned.
+     * @return the listener array
      */
     public ClusterListener[] findClusterListeners() {
         if (clusterListeners.size() > 0) {
@@ -282,6 +284,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     /**
      * Add cluster message listener and register cluster to this listener.
      *
+     * @param listener The new listener
      * @see org.apache.catalina.ha.CatalinaCluster#addClusterListener(org.apache.catalina.ha.ClusterListener)
      */
     @Override
@@ -295,6 +298,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     /**
      * Remove message listener and deregister Cluster from listener.
      *
+     * @param listener The listener to remove
      * @see org.apache.catalina.ha.CatalinaCluster#removeClusterListener(org.apache.catalina.ha.ClusterListener)
      */
     @Override
@@ -306,7 +310,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     }
 
     /**
-     * get current Deployer
+     * @return the current Deployer
      */
     @Override
     public org.apache.catalina.ha.ClusterDeployer getClusterDeployer() {
@@ -315,6 +319,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     /**
      * set a new Deployer, must be set before cluster started!
+     * @param clusterDeployer The associated deployer
      */
     @Override
     public void setClusterDeployer(
@@ -437,6 +442,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     /**
      * Remove an application from cluster replication bus.
      *
+     * @param manager The manager
      * @see org.apache.catalina.Cluster#removeManager(Manager)
      */
     @Override
@@ -452,11 +458,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         }
     }
 
-    /**
-     * @param name
-     * @param manager
-     * @return TODO
-     */
     @Override
     public String getManagerName(String name, Manager manager) {
         String clusterName = name ;
@@ -474,11 +475,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         return clusterName;
     }
 
-    /*
-     * Get Manager
-     *
-     * @see org.apache.catalina.ha.CatalinaCluster#getManager(java.lang.String)
-     */
     @Override
     public Manager getManager(String name) {
         return managers.get(name);
@@ -563,9 +559,10 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         if ( clusterDeployer != null ) clusterDeployer.setCluster(this);
         if ( channel == null ) channel = new GroupChannel();
         if ( channel instanceof GroupChannel && !((GroupChannel)channel).getInterceptors().hasNext()) {
-            channel.addInterceptor(new MessageDispatch15Interceptor());
+            channel.addInterceptor(new MessageDispatchInterceptor());
             channel.addInterceptor(new TcpFailureDetector());
         }
+        if (heartbeatBackgroundEnabled) channel.setHeartbeat(false);
     }
 
     /**

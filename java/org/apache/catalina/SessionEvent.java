@@ -68,7 +68,7 @@ public final class SessionEvent extends EventObject {
 
 
     /**
-     * Return the event data of this event.
+     * @return the event data of this event.
      */
     public Object getData() {
 
@@ -78,7 +78,7 @@ public final class SessionEvent extends EventObject {
 
 
     /**
-     * Return the Session on which this event occurred.
+     * @return the Session on which this event occurred.
      */
     public Session getSession() {
 
@@ -88,7 +88,7 @@ public final class SessionEvent extends EventObject {
 
 
     /**
-     * Return the event type of this event.
+     * @return the event type of this event.
      */
     public String getType() {
 
@@ -97,9 +97,6 @@ public final class SessionEvent extends EventObject {
     }
 
 
-    /**
-     * Return a string representation of this event.
-     */
     @Override
     public String toString() {
 

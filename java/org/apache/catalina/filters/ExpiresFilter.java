@@ -218,12 +218,12 @@ import org.apache.juli.logging.LogFactory;
  * {@code
  * <init-param>
  *    <param-name>ExpiresDefault</param-name>
- *    <param-value><base> [plus] {<num> <type>}*</param-value>
+ *    <param-value><base> [plus] (<num> <type>)*</param-value>
  * </init-param>
  *
  * <init-param>
  *    <param-name>ExpiresByType type/encoding</param-name>
- *    <param-value><base> [plus] {<num> <type>}*</param-value>
+ *    <param-value><base> [plus] (<num> <type>)*</param-value>
  * </init-param>
  * }
  * </pre>
@@ -426,7 +426,6 @@ import org.apache.juli.logging.LogFactory;
  * FINE: Request "/docs/config/manager.html" with response status "200" content-type "text/html", no expiration configured
  * </code>
  */
-@SuppressWarnings("javadoc")
 public class ExpiresFilter extends FilterBase {
 
     /**
@@ -1086,6 +1085,7 @@ public class ExpiresFilter extends FilterBase {
     /**
      * Convert a given comma delimited list of strings into an array of String
      *
+     * @param commaDelimitedStrings the string to be split
      * @return array of patterns (non {@code null})
      */
     protected static String[] commaDelimitedListToStringArray(
@@ -1095,8 +1095,10 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     * Return {@code true} if the given {@code str} contains the given
+     * @return {@code true} if the given {@code str} contains the given
      * {@code searchStr}.
+     * @param str String that will be searched
+     * @param searchStr The substring to search
      */
     protected static boolean contains(String str, String searchStr) {
         if (str == null || searchStr == null) {
@@ -1107,6 +1109,8 @@ public class ExpiresFilter extends FilterBase {
 
     /**
      * Convert an array of ints into a comma delimited string
+     * @param ints The int array
+     * @return a comma separated string
      */
     protected static String intsToCommaDelimitedString(int[] ints) {
         if (ints == null) {
@@ -1125,7 +1129,8 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     * Return {@code true} if the given {@code str} is
+     * @param str The String to check
+     * @return {@code true} if the given {@code str} is
      * {@code null} or has a zero characters length.
      */
     protected static boolean isEmpty(String str) {
@@ -1133,7 +1138,8 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     * Return {@code true} if the given {@code str} has at least one
+     * @param str The String to check
+     * @return {@code true} if the given {@code str} has at least one
      * character (can be a withespace).
      */
     protected static boolean isNotEmpty(String str) {
@@ -1141,7 +1147,7 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     * Return {@code true} if the given {@code string} starts with the
+     * @return {@code true} if the given {@code string} starts with the
      * given {@code prefix} ignoring case.
      *
      * @param string
@@ -1161,7 +1167,7 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     * Return the subset of the given {@code str} that is before the first
+     * @return the subset of the given {@code str} that is before the first
      * occurence of the given {@code separator}. Return {@code null}
      * if the given {@code str} or the given {@code separator} is
      * null. Return and empty string if the {@code separator} is empty.
@@ -1255,6 +1261,8 @@ public class ExpiresFilter extends FilterBase {
      * {@code protected} for extension.
      * </p>
      *
+     * @param response The Servlet response
+     * @return the expiration date
      * @see HttpServletResponse#getContentType()
      */
     protected Date getExpirationDate(XHttpServletResponse response) {
@@ -1331,6 +1339,9 @@ public class ExpiresFilter extends FilterBase {
      * <p>
      * {@code protected} for extension.
      * </p>
+     * @param configuration The parsed expires
+     * @param response The Servlet response
+     * @return the expiration date
      */
     protected Date getExpirationDate(ExpiresConfiguration configuration,
             XHttpServletResponse response) {
@@ -1411,10 +1422,12 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     *
      * <p>
      * {@code protected} for extension.
      * </p>
+     * @param request The Servlet request
+     * @param response The Servlet response
+     * @return <code>true</code> if an expire header may be added
      */
     protected boolean isEligibleToExpirationHeaderGeneration(
             HttpServletRequest request, XHttpServletResponse response) {
@@ -1463,6 +1476,8 @@ public class ExpiresFilter extends FilterBase {
      * {@link HttpServletResponse#getContentType()} costs {@code String}
      * objects instantiations (as of Tomcat 7).
      * </p>
+     * @param request The Servlet request
+     * @param response The Servlet response
      */
     public void onBeforeWriteResponseBody(HttpServletRequest request,
             XHttpServletResponse response) {
@@ -1504,7 +1519,8 @@ public class ExpiresFilter extends FilterBase {
      * '{@code access plus 1 month 15 days 2 hours}' or
      * '{@code modification 1 day 2 hours 5 seconds}'
      *
-     * @param inputLine
+     * @param inputLine the input
+     * @return the parsed expires
      */
     protected ExpiresConfiguration parseExpiresConfiguration(String inputLine) {
         String line = inputLine.trim();

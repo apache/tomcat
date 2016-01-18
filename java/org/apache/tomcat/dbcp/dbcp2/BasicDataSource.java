@@ -204,6 +204,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Obtain the default query timeout that will be used for {@link java.sql.Statement Statement}s
      * created from this connection. <code>null</code> means that the driver
      * default will be used.
+     * @return the timoeut
      */
     public Integer getDefaultQueryTimeout() {
         return defaultQueryTimeout;
@@ -214,6 +215,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Set the default query timeout that will be used for {@link java.sql.Statement Statement}s
      * created from this connection. <code>null</code> means that the driver
      * default will be used.
+     * @param defaultQueryTimeout The new default timeout
      */
     public void setDefaultQueryTimeout(Integer defaultQueryTimeout) {
         this.defaultQueryTimeout = defaultQueryTimeout;
@@ -306,7 +308,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * following methods is invoked: <code>getConnection, setLogwriter,
      * setLoginTimeout, getLoginTimeout, getLogWriter.</code></p>
      *
-     * @param driver
+     * @param driver The driver to use
      */
     public synchronized void setDriver(Driver driver) {
         this.driver = driver;
@@ -366,6 +368,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * {@link #setDriverClassLoader(ClassLoader)}. It does not return the class
      * loader of any driver that may have been set via
      * {@link #setDriver(Driver)}.
+     * @return the classloader
      */
     public synchronized ClassLoader getDriverClassLoader() {
         return this.driverClassLoader;
@@ -398,7 +401,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     /**
      * Returns the LIFO property.
      *
-     * @return true if connection pool behaves as a LIFO queue.
+     * @return <code>true</code> if connection pool behaves as a LIFO queue.
      */
     @Override
     public synchronized boolean getLifo() {
@@ -410,7 +413,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * false means FIFO.
      *
      * @param lifo the new value for the LIFO property
-     *
      */
     public synchronized void setLifo(boolean lifo) {
         this.lifo = lifo;
@@ -604,7 +606,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     /**
      * Returns true if we are pooling statements.
      *
-     * @return true if prepared and callable statements are pooled
+     * @return <code>true</code> if prepared and callable statements are pooled
      */
     @Override
     public synchronized boolean isPoolPreparedStatements() {
@@ -674,8 +676,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     /**
      * Returns the {@link #testOnCreate} property.
      *
-     * @return true if objects are validated immediately after they are created
-     * by the pool
+     * @return <code>true</code> if objects are validated immediately
+     *  after they are created by the pool
      *
      * @see #testOnCreate
      */
@@ -708,8 +710,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     /**
      * Returns the {@link #testOnBorrow} property.
      *
-     * @return true if objects are validated before being borrowed from the
-     * pool
+     * @return <code>true</code> if objects are validated before being
+     *  borrowed from the pool
      *
      * @see #testOnBorrow
      */
@@ -741,8 +743,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     /**
      * Returns the value of the {@link #testOnReturn} property.
      *
-     * @return true if objects are validated before being returned to the
-     * pool
+     * @return <code>true</code> if objects are validated before being
+     *  returned to the pool
      * @see #testOnReturn
      */
     public synchronized boolean getTestOnReturn() {
@@ -917,6 +919,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
 
     /**
      * Gets the EvictionPolicy implementation in use with this connection pool.
+     * @return the eviction policy
      */
     public synchronized String getEvictionPolicyClassName() {
         return evictionPolicyClassName;
@@ -946,8 +949,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     /**
      * Returns the value of the {@link #testWhileIdle} property.
      *
-     * @return true if objects examined by the idle object evictor are
-     * validated
+     * @return <code>true</code> if objects examined by
+     *  the idle object evictor are validated
      * @see #testWhileIdle
      */
     @Override
@@ -1295,6 +1298,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * initialized.  The pool is initialized the first time one of the
      * following methods is invoked: <code>getConnection, setLogwriter,
      * setLoginTimeout, getLoginTimeout, getLogWriter.</code></p>
+     * @param maxConnLifetimeMillis The maximum connection lifetime
      */
     public void setMaxConnLifetimeMillis(long maxConnLifetimeMillis) {
         this.maxConnLifetimeMillis = maxConnLifetimeMillis;
@@ -1305,6 +1309,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * this property determines whether or not log messages are generated when the
      * pool closes connections due to maximum lifetime exceeded.  Set this property
      * to false to suppress log messages when connections expire.
+     * @param logExpiredConnections <code>true</code> to log expired connections
      */
     public void setLogExpiredConnections(boolean logExpiredConnections) {
         this.logExpiredConnections = logExpiredConnections;
@@ -1313,7 +1318,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     private String jmxName = null;
 
     /**
-     * Returns the JMX name that has been requested for this DataSource. If the
+     * @return the JMX name that has been requested for this DataSource. If the
      * requested name is not valid, an alternative may be chosen.
      */
     public String getJmxName() {
@@ -1326,6 +1331,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * DataSource will attempt to register itself using this name. If another
      * component registers this DataSource with JMX and this name is valid this
      * name will be used in preference to any specified by the other component.
+     * @param jmxName The JMX name
      */
     public void setJmxName(String jmxName) {
         this.jmxName = jmxName;
@@ -1340,6 +1346,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * {@link Connection#setAutoCommit(boolean) Connection.setAutoCommit(true)}
      * if the auto commit setting is {@code false} when the connection
      * is returned. It is <code>true</code> by default.
+     * @return <code>true</code> to commit automatically
      */
     public boolean getEnableAutoCommitOnReturn() {
         return enableAutoCommitOnReturn;
@@ -1351,6 +1358,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * {@link Connection#setAutoCommit(boolean) Connection.setAutoCommit(true)}
      * if the auto commit setting is {@code false} when the connection
      * is returned. It is <code>true</code> by default.
+     * @param enableAutoCommitOnReturn The new value
      */
     public void setEnableAutoCommitOnReturn(boolean enableAutoCommitOnReturn) {
         this.enableAutoCommitOnReturn = enableAutoCommitOnReturn;
@@ -1362,6 +1370,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Gets the current value of the flag that controls if a connection will be
      * rolled back when it is returned to the pool if auto commit is not enabled
      * and the connection is not read only.
+     * @return <code>true</code> to rollback non committed connections
      */
     public boolean getRollbackOnReturn() {
         return rollbackOnReturn;
@@ -1371,6 +1380,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets the flag that controls if a connection will be rolled back when it
      * is returned to the pool if auto commit is not enabled and the connection
      * is not read only.
+     * @param rollbackOnReturn The new value
      */
     public void setRollbackOnReturn(boolean rollbackOnReturn) {
         this.rollbackOnReturn = rollbackOnReturn;
@@ -1395,6 +1405,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     /**
      * Provides the same data as {@link #getDisconnectionSqlCodes} but in an
      * array so it is accessible via JMX.
+     * @return fatal disconnection state codes
      * @since 2.1
      */
     @Override
@@ -1540,7 +1551,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      *   is being made
      * @param pass The database user's password
      *
-     * @throws UnsupportedOperationException
+     * @throws UnsupportedOperationException This is not supported
      * @throws SQLException if a database access error occurs
      * @return nothing - always throws UnsupportedOperationException
      */
@@ -1776,6 +1787,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     /**
      * Gets the log writer to be used by this configuration to log
      * information on abandoned objects.
+     * @return the log writer
      */
     public PrintWriter getAbandonedLogWriter() {
         if (abandonedConfig != null) {
@@ -1962,7 +1974,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     /**
      * Manually invalidates a connection, effectively requesting the pool to try
      * to close it, remove it from the pool and reclaim pool capacity.
-     *
+     * @param connection The connection to close
      * @throws IllegalStateException
      *             if invalidating the connection failed.
      * @since 2.1
@@ -2006,7 +2018,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     /**
      * <p>Create (if necessary) and return the internal data source we are
      * using to manage our connections.</p>
-     *
+     * @return the data source
      * @throws SQLException if the object pool cannot be created.
      */
     protected DataSource createDataSource()
@@ -2109,6 +2121,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * {@link DriverManager} using the specified {@link #url}.
      * </ol>
      * This method exists so subclasses can replace the implementation class.
+     * @return the connection factory
+     * @throws SQLException Error creating connection factory
      */
     protected ConnectionFactory createConnectionFactory() throws SQLException {
         // Load the JDBC driver class
@@ -2190,6 +2204,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * {@link #startPoolMaintenance()}, since setting timeBetweenEvictionRunsMillis
      * to a positive value causes {@link GenericObjectPool}'s eviction timer
      * to be started.
+     * @param factory The connection factory
      */
     protected void createConnectionPool(PoolableConnectionFactory factory) {
         // Create an object pool to contain our active connections
@@ -2249,7 +2264,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     /**
      * Creates the actual data source instance.  This method only exists so
      * that subclasses can replace the implementation class.
-     *
+     * @return the data source
      * @throws SQLException if unable to create a datasource instance
      */
     protected DataSource createDataSourceInstance() throws SQLException {
@@ -2263,6 +2278,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * so subclasses can replace the default implementation.
      *
      * @param driverConnectionFactory JDBC connection factory
+     * @return the connection factory
      * @throws SQLException if an error occurs creating the PoolableConnectionFactory
      */
     protected PoolableConnectionFactory createPoolableConnectionFactory(

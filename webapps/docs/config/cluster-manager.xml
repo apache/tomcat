@@ -77,14 +77,16 @@
         when session attributes are being replicated or removed across Tomcat
         nodes in the cluster.
       </attribute>
-      <attribute name="sessionAttributeFilter" required="false">
-        A regular expression used to filter, which session attributes will
-        be replicated. An attribute will only be replicated, if its name
-        matches this pattern. If the pattern is not set (default), all
-        attributes are eligible for replication. As an example, the value
-        <code>^(userName|sessionHistory)$</code> will only replicate the two
-        session attributes named <code>userName</code> and
-        <code>sessionHistory</code>.
+      <attribute name="sessionAttributeNameFilter" required="false">
+        A regular expression used to filter which session attributes will be
+        replicated. An attribute will only be replicated if its name matches
+        this pattern. If the pattern is zero length or <code>null</code>, all
+        attributes are eligible for replication. The pattern is anchored so the
+        session attribute name must fully match the pattern. As an example, the
+        value <code>(userName|sessionHistory)</code> will only replicate the
+        two session attributes named <code>userName</code> and
+        <code>sessionHistory</code>. If not specified, the default value of
+        <code>null</code> will be used.
       </attribute>
       <attribute name="maxInactiveInterval" required="false">
         <p>The initial maximum time interval, in seconds,

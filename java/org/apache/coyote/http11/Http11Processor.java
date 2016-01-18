@@ -61,7 +61,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SendfileDataBase;
-import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -540,9 +540,8 @@ public class Http11Processor extends AbstractProcessor {
             if(userAgentValueMB != null) {
                 String userAgentValue = userAgentValueMB.toString();
 
-                if (noCompressionUserAgents != null &&
-                        noCompressionUserAgents.matcher(userAgentValue).matches()) {
-                        return false;
+                if (noCompressionUserAgents.matcher(userAgentValue).matches()) {
+                    return false;
                 }
             }
         }
@@ -758,7 +757,7 @@ public class Http11Processor extends AbstractProcessor {
         case ASYNC_COMPLETE: {
             clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
-                socketWrapper.processSocket(SocketStatus.OPEN_READ, true);
+                socketWrapper.processSocket(SocketEvent.OPEN_READ, true);
             }
             break;
         }
@@ -772,7 +771,7 @@ public class Http11Processor extends AbstractProcessor {
         }
         case ASYNC_DISPATCH: {
             if (asyncStateMachine.asyncDispatch()) {
-                socketWrapper.processSocket(SocketStatus.OPEN_READ, true);
+                socketWrapper.processSocket(SocketEvent.OPEN_READ, true);
             }
             break;
         }

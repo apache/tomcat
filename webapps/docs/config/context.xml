@@ -365,7 +365,7 @@
         redirected (adding a trailing slash) if necessary by the Mapper rather
         than the default Servlet. This is more efficient but has the side effect
         of confirming that the context path exists. If not specified, the
-        default value of <code>false</code> is used.</p>
+        default value of <code>true</code> is used.</p>
       </attribute>
 
       <attribute name="mapperDirectoryRedirectEnabled" required="false">

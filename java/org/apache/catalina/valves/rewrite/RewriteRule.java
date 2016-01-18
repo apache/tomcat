@@ -76,8 +76,9 @@ public class RewriteRule {
 
     /**
      * Evaluate the rule based on the context
-     *
-     * @return null if no rewrite took place
+     * @param url The char sequence
+     * @param resolver Property resolver
+     * @return <code>null</code> if no rewrite took place
      */
     public CharSequence evaluate(CharSequence url, Resolver resolver) {
         Pattern pattern = this.pattern.get();

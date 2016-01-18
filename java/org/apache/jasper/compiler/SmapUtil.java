@@ -62,6 +62,7 @@ public class SmapUtil {
      * @param ctxt Current compilation context
      * @param pageNodes The current JSP page
      * @return a SMAP for the page
+     * @throws IOException Error writing SMAP
      */
     public static String[] generateSmap(
         JspCompilationContext ctxt,
@@ -224,9 +225,9 @@ public class SmapUtil {
             addSDE();
 
             // write result
-            FileOutputStream outStream = new FileOutputStream(outClassFile);
-            outStream.write(gen, 0, genPos);
-            outStream.close();
+            try (FileOutputStream outStream = new FileOutputStream(outClassFile);) {
+                outStream.write(gen, 0, genPos);
+            }
         }
 
         static byte[] readWhole(File input) throws IOException {

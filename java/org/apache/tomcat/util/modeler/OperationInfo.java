@@ -48,7 +48,7 @@ public class OperationInfo extends FeatureInfo {
 
     protected String impact = "UNKNOWN";
     protected String role = "operation";
-    protected ReadWriteLock parametersLock = new ReentrantReadWriteLock();
+    protected final ReadWriteLock parametersLock = new ReentrantReadWriteLock();
     protected ParameterInfo parameters[] = new ParameterInfo[0];
 
 

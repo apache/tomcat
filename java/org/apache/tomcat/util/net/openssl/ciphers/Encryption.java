@@ -28,6 +28,7 @@ enum Encryption {
     AES256GCM,
     CAMELLIA256,
     CAMELLIA128,
+    CHACHA20POLY1305,
     TRIPLE_DES,
     DES,
     IDEA,

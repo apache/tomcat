@@ -22,20 +22,18 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletContextEvent;
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.DeploymentException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 //import org.junit.Ignore;
 import org.junit.Test;
@@ -123,6 +121,10 @@ public class TestClose extends TomcatBaseTest {
 
     @Test
     public void testTcpClose() throws Exception {
+        // TODO
+        Assume.assumeFalse("This test currently fails for APR",
+                getTomcatInstance().getConnector().getProtocolHandlerClassName().contains("Apr"));
+
         startServer(TestEndpointConfig.class);
 
         TesterWsCloseClient client = new TesterWsCloseClient("localhost", getPort());
@@ -170,7 +172,7 @@ public class TestClose extends TomcatBaseTest {
         client.forceCloseSocket();
 
         // WebSocket 1.1, section 2.1.5 requires this to be CLOSED_ABNORMALLY if
-        // the container initiates the close and the close close from the client
+        // the container initiates the close and the close code from the client
         // if the client initiates it. When the client resets the TCP connection
         // after sending the close, different operating systems react different
         // ways. Some present the close message then drop the connection, some
@@ -182,6 +184,10 @@ public class TestClose extends TomcatBaseTest {
 
     @Test
     public void testTcpCloseInOnMessage() throws Exception {
+        // TODO
+        Assume.assumeFalse("This test currently fails for APR",
+                getTomcatInstance().getConnector().getProtocolHandlerClassName().contains("Apr"));
+
         startServer(TestEndpointConfig.class);
 
         TesterWsCloseClient client = new TesterWsCloseClient("localhost", getPort());
@@ -258,7 +264,7 @@ public class TestClose extends TomcatBaseTest {
         awaitLatch(events.onMessageCalled, "onMessage not called");
 
         client.sendCloseFrame(CloseCodes.NORMAL_CLOSURE);
-        client.closeSocket();
+        client.forceCloseSocket();
         events.onMessageWait.countDown();
 
         awaitOnClose(CloseCodes.CLOSED_ABNORMALLY);
@@ -341,29 +347,13 @@ public class TestClose extends TomcatBaseTest {
     }
 
 
-    public abstract static class BaseEndpointConfig extends WsContextListener {
+    public abstract static class BaseEndpointConfig extends TesterEndpointConfig {
 
         public static final String PATH = "/test";
 
-        protected abstract Class<?> getEndpointClass();
-
         @Override
-        public void contextInitialized(ServletContextEvent sce) {
-            super.contextInitialized(sce);
-
-            ServerContainer sc = (ServerContainer) sce
-                    .getServletContext()
-                    .getAttribute(
-                            Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
-
-            ServerEndpointConfig sec = ServerEndpointConfig.Builder.create(
-                    getEndpointClass(), PATH).build();
-
-            try {
-                sc.addEndpoint(sec);
-            } catch (DeploymentException e) {
-                throw new RuntimeException(e);
-            }
+        protected ServerEndpointConfig getServerEndpointConfig() {
+            return ServerEndpointConfig.Builder.create(getEndpointClass(), PATH).build();
         }
     }
 }

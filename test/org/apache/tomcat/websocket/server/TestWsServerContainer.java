@@ -21,12 +21,9 @@ import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletContextEvent;
 import javax.websocket.ContainerProvider;
-import javax.websocket.DeploymentException;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
-import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
@@ -97,24 +94,12 @@ public class TestWsServerContainer extends TomcatBaseTest {
     }
 
 
-    public static class Bug54807Config extends WsContextListener {
+    public static class Bug54807Config extends TesterEndpointConfig {
 
         @Override
-        public void contextInitialized(ServletContextEvent sce) {
-            super.contextInitialized(sce);
-
-            ServerContainer sc =
-                    (ServerContainer) sce.getServletContext().getAttribute(
-                            Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
-
-            ServerEndpointConfig sec = ServerEndpointConfig.Builder.create(
+        protected ServerEndpointConfig getServerEndpointConfig() {
+            return ServerEndpointConfig.Builder.create(
                     TesterEchoServer.Basic.class, "/{param}").build();
-
-            try {
-                sc.addEndpoint(sec);
-            } catch (DeploymentException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 

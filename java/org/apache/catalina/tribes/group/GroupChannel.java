@@ -38,7 +38,7 @@ import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.MembershipService;
 import org.apache.catalina.tribes.RemoteProcessException;
 import org.apache.catalina.tribes.UniqueId;
-import org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor;
+import org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor;
 import org.apache.catalina.tribes.io.BufferPool;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
@@ -367,19 +367,19 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     /**
      * Sets up the default implementation interceptor stack
      * if no interceptors have been added
-     * @throws ChannelException
+     * @throws ChannelException Cluster error
      */
     protected synchronized void setupDefaultStack() throws ChannelException {
         if (getFirstInterceptor() != null &&
                 ((getFirstInterceptor().getNext() instanceof ChannelCoordinator))) {
-            addInterceptor(new MessageDispatch15Interceptor());
+            addInterceptor(new MessageDispatchInterceptor());
         }
     }
 
     /**
      * Validates the option flags that each interceptor is using and reports
      * an error if two interceptor share the same flag.
-     * @throws ChannelException
+     * @throws ChannelException Error with option flag
      */
     protected void checkOptionFlags() throws ChannelException {
         StringBuilder conflicts = new StringBuilder();
@@ -412,9 +412,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     }
 
     /**
-     * Starts the channel
+     * Starts the channel.
      * @param svc int - what service to start
-     * @throws ChannelException
+     * @throws ChannelException Start error
      * @see org.apache.catalina.tribes.Channel#start(int)
      */
     @Override
@@ -429,9 +429,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     }
 
     /**
-     * Stops the channel
+     * Stops the channel.
      * @param svc int
-     * @throws ChannelException
+     * @throws ChannelException Stop error
      * @see org.apache.catalina.tribes.Channel#stop(int)
      */
     @Override

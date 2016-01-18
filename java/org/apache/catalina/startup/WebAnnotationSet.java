@@ -57,6 +57,7 @@ public class WebAnnotationSet {
 
     /**
      * Process the annotations on a context.
+     * @param context The context which will have its annotations processed
      */
     public static void loadApplicationAnnotations(Context context) {
 
@@ -73,6 +74,7 @@ public class WebAnnotationSet {
 
     /**
      * Process the annotations for the listeners.
+     * @param context The context which will have its annotations processed
      */
     protected static void loadApplicationListenerAnnotations(Context context) {
         String[] applicationListeners = context.findApplicationListeners();
@@ -91,6 +93,7 @@ public class WebAnnotationSet {
 
     /**
      * Process the annotations for the filters.
+     * @param context The context which will have its annotations processed
      */
     protected static void loadApplicationFilterAnnotations(Context context) {
         FilterDef[] filterDefs = context.findFilterDefs();
@@ -110,6 +113,7 @@ public class WebAnnotationSet {
 
     /**
      * Process the annotations for the servlets.
+     * @param context The context which will have its annotations processed
      */
     protected static void loadApplicationServletAnnotations(Context context) {
 
@@ -148,6 +152,8 @@ public class WebAnnotationSet {
 
     /**
      * Process the annotations on a context for a given className.
+     * @param context The context which will have its annotations processed
+     * @param classClass The class to examine for Servlet annotations
      */
     protected static void loadClassAnnotation(Context context,
             Class<?> classClass) {
@@ -296,6 +302,8 @@ public class WebAnnotationSet {
      * Ref JSR 250, equivalent to the resource-ref,
      * message-destination-ref, env-ref, resource-env-ref
      * or service-ref element in the deployment descriptor.
+     * @param context The context which will have its annotations processed
+     * @param annotation The annotation that was found
      */
     protected static void addResource(Context context, Resource annotation) {
         addResource(context, annotation, null, null);

@@ -41,6 +41,7 @@ import org.apache.catalina.startup.Constants;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.WebXml;
 
@@ -255,10 +256,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
 
             try (InputStream input = url.openStream();
                     OutputStream output = resp.getOutputStream()) {
-                byte[] buffer = new byte[4000];
-                for (int len; (len = input.read(buffer)) > 0;) {
-                    output.write(buffer, 0, len);
-                }
+                IOTools.flow(input, output);
             }
         }
     }

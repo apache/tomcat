@@ -65,6 +65,7 @@ public interface IStoreConfig {
      *
      * @param aServer
      *            Object to be stored
+     * @return <code>true</code> if the store operation was successful
      */
     boolean store(Server aServer);
 
@@ -77,6 +78,7 @@ public interface IStoreConfig {
      *            Number of spaces to indent this element
      * @param aServer
      *            Object to be stored
+     * @throws Exception Store error occurred
      */
     void store(PrintWriter aWriter, int indent, Server aServer) throws Exception;
 
@@ -89,6 +91,7 @@ public interface IStoreConfig {
      *            Number of spaces to indent this element
      * @param aService
      *            Object to be stored
+     * @throws Exception Store error occurred
      */
     void store(PrintWriter aWriter, int indent, Service aService) throws Exception;
 
@@ -101,6 +104,7 @@ public interface IStoreConfig {
      *            Number of spaces to indent this element
      * @param aHost
      *            Object to be stored
+     * @throws Exception Store error occurred
      */
     void store(PrintWriter aWriter, int indent, Host aHost) throws Exception;
 
@@ -109,6 +113,7 @@ public interface IStoreConfig {
      *
      * @param aContext
      *            Object to be stored
+     * @return <code>true</code> if the store operation was successful
      */
     boolean store(Context aContext);
 
@@ -121,6 +126,7 @@ public interface IStoreConfig {
      *            Number of spaces to indent this element
      * @param aContext
      *            Object to be stored
+     * @throws Exception Store error occurred
      */
     void store(PrintWriter aWriter, int indent, Context aContext) throws Exception;
 }

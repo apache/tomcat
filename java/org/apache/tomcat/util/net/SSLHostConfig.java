@@ -70,10 +70,12 @@ public class SSLHostConfig {
 
     // Configuration properties
 
+    // Internal
+    private String[] enabledCiphers;
+    private String[] enabledProtocols;
     // Nested
     private SSLHostConfigCertificate defaultCertificate = null;
     private Set<SSLHostConfigCertificate> certificates = new HashSet<>(4);
-
     // Common
     private String certificateRevocationListFile;
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
@@ -157,6 +159,38 @@ public class SSLHostConfig {
                         name, getHostName(), configType, this.configType));
             }
         }
+    }
+
+
+    // ----------------------------------------------------- Internal properties
+
+    /**
+     * @see SSLUtil#getEnabledProtocols()
+     *
+     * @return The protocols enabled for this TLS virtual host
+     */
+    public String[] getEnabledProtocols() {
+        return enabledProtocols;
+    }
+
+
+    void setEnabledProtocols(String[] enabledProtocols) {
+        this.enabledProtocols = enabledProtocols;
+    }
+
+
+    /**
+     * @see SSLUtil#getEnabledCiphers()
+     *
+     * @return The ciphers enabled for this TLS virtual host
+     */
+    public String[] getEnabledCiphers() {
+        return enabledCiphers;
+    }
+
+
+    void setEnabledCiphers(String[] enabledCiphers) {
+        this.enabledCiphers = enabledCiphers;
     }
 
 
@@ -244,6 +278,12 @@ public class SSLHostConfig {
     }
 
 
+    /**
+     * Set the new cipher configuration. Note: Regardless of the format used to
+     * set the configuration, it is always stored in OpenSSL format.
+     *
+     * @param ciphersList The new cipher configuration in OpenSSL or JSSE format
+     */
     public void setCiphers(String ciphersList) {
         // Ciphers is stored in OpenSSL format. Convert the provided value if
         // necessary.
@@ -272,10 +312,12 @@ public class SSLHostConfig {
         }
         this.cipherList = null;
         this.jsseCipherNames = null;
-
     }
 
 
+    /**
+     * @return An OpenSSL cipher string for the current configuration.
+     */
     public String getCiphers() {
         return ciphers;
     }
@@ -289,6 +331,13 @@ public class SSLHostConfig {
     }
 
 
+    /**
+     * Obtain the list of JSSE cipher names for the current configuration.
+     * Ciphers included in the configuration but not supported by JSSE will be
+     * excluded from this list.
+     *
+     * @return A list of the JSSE cipher names
+     */
     public List<String> getJsseCipherNames() {
         if (jsseCipherNames == null) {
             jsseCipherNames = OpenSSLCipherConfigurationParser.convertForJSSE(getCipherList());

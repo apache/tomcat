@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.util;
 
 import java.io.IOException;
@@ -31,9 +30,7 @@ import java.lang.reflect.Proxy;
  * @author Craig R. McClanahan
  * @author Bip Thelin
  */
-public final class CustomObjectInputStream
-    extends ObjectInputStream {
-
+public final class CustomObjectInputStream extends ObjectInputStream {
 
     /**
      * The class loader we will use to resolve classes.
@@ -49,10 +46,7 @@ public final class CustomObjectInputStream
      *
      * @exception IOException if an input/output error occurs
      */
-    public CustomObjectInputStream(InputStream stream,
-                                   ClassLoader classLoader)
-        throws IOException {
-
+    public CustomObjectInputStream(InputStream stream, ClassLoader classLoader) throws IOException {
         super(stream);
         this.classLoader = classLoader;
     }
@@ -92,11 +86,12 @@ public final class CustomObjectInputStream
      */
     @Override
     protected Class<?> resolveProxyClass(String[] interfaces)
-        throws IOException, ClassNotFoundException {
+            throws IOException, ClassNotFoundException {
 
         Class<?>[] cinterfaces = new Class[interfaces.length];
-        for (int i = 0; i < interfaces.length; i++)
+        for (int i = 0; i < interfaces.length; i++) {
             cinterfaces[i] = classLoader.loadClass(interfaces[i]);
+        }
 
         try {
             return Proxy.getProxyClass(classLoader, cinterfaces);
@@ -104,5 +99,4 @@ public final class CustomObjectInputStream
             throw new ClassNotFoundException(null, e);
         }
     }
-
 }

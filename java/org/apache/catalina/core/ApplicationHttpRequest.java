@@ -20,12 +20,12 @@ package org.apache.catalina.core;
 
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 
 import javax.servlet.DispatcherType;
@@ -40,7 +40,9 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
-import org.apache.catalina.util.RequestUtil;
+import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.Parameters;
 
 
 /**
@@ -87,6 +89,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * Construct a new wrapped request around the specified servlet request.
      *
      * @param request The servlet request being wrapped
+     * @param context The target context for the wrapped request
+     * @param crossContext {@code true} if the wrapped request will be a
+     *                     cross-context request, otherwise {@code false}
      */
     public ApplicationHttpRequest(HttpServletRequest request, Context context,
                                   boolean crossContext) {
@@ -835,35 +840,28 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * @param values1 First set of values
      * @param values2 Second set of values
      */
-    protected String[] mergeValues(Object values1, Object values2) {
+    private String[] mergeValues(String[] values1, String[] values2) {
 
         ArrayList<Object> results = new ArrayList<>();
 
         if (values1 == null) {
             // Skip - nothing to merge
-        } else if (values1 instanceof String)
-            results.add(values1);
-        else if (values1 instanceof String[]) {
-            String values[] = (String[]) values1;
-            for (int i = 0; i < values.length; i++)
-                results.add(values[i]);
-        } else
-            results.add(values1.toString());
+        } else {
+            for (String value : values1) {
+                results.add(value);
+            }
+        }
 
         if (values2 == null) {
             // Skip - nothing to merge
-        } else if (values2 instanceof String)
-            results.add(values2);
-        else if (values2 instanceof String[]) {
-            String values[] = (String[]) values2;
-            for (int i = 0; i < values.length; i++)
-                results.add(values[i]);
-        } else
-            results.add(values2.toString());
+        } else {
+            for (String value : values2) {
+                results.add(value);
+            }
+        }
 
         String values[] = new String[results.size()];
         return results.toArray(values);
-
     }
 
 
@@ -882,24 +880,44 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             return;
 
         HashMap<String, String[]> queryParameters = new HashMap<>();
+
+        // Parse the query string from the dispatch target
+        Parameters paramParser = new Parameters();
+        MessageBytes queryMB = MessageBytes.newInstance();
+        queryMB.setString(queryParamString);
+
         String encoding = getCharacterEncoding();
-        if (encoding == null)
-            encoding = "ISO-8859-1";
-        RequestUtil.parseParameters(queryParameters, queryParamString,
-                encoding);
-        for (Entry<String, String[]> entry : parameters.entrySet()) {
-            String entryKey = entry.getKey();
-            String[] entryValue = entry.getValue();
-            Object value = queryParameters.get(entryKey);
-            if (value == null) {
-                queryParameters.put(entryKey, entryValue);
+        // No need to process null value, as ISO-8859-1 is the default encoding
+        // in MessageBytes.toBytes().
+        if (encoding != null) {
+            try {
+                queryMB.setCharset(B2CConverter.getCharset(encoding));
+            } catch (UnsupportedEncodingException ignored) {
+                // Fall-back to ISO-8859-1
+            }
+        }
+
+        paramParser.setQuery(queryMB);
+        paramParser.setQueryStringEncoding(encoding);
+        paramParser.handleQueryParameters();
+
+        // Copy the original parameters
+        queryParameters.putAll(parameters);
+
+        // Insert the additional parameters from the dispatch target
+        Enumeration<String> dispParamNames = paramParser.getParameterNames();
+        while (dispParamNames.hasMoreElements()) {
+            String dispParamName = dispParamNames.nextElement();
+            String[] dispParamValues = paramParser.getParameterValues(dispParamName);
+            String[] originalValues = queryParameters.get(dispParamName);
+            if (originalValues == null) {
+                queryParameters.put(dispParamName, dispParamValues);
                 continue;
             }
-            queryParameters.put
-                (entryKey, mergeValues(value, entryValue));
+            queryParameters.put(dispParamName, mergeValues(dispParamValues, originalValues));
         }
-        parameters = queryParameters;
 
+        parameters = queryParameters;
     }
 
 

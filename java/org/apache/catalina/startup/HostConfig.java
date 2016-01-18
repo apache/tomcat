@@ -22,8 +22,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,7 +56,6 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.util.ContextName;
-import org.apache.catalina.util.IOTools;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -158,7 +157,7 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * Return the Context implementation class name.
+     * @return the Context implementation class name.
      */
     public String getContextClass() {
 
@@ -186,7 +185,7 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * Return the deploy XML config file flag for this component.
+     * @return the deploy XML config file flag for this component.
      */
     public boolean isDeployXML() {
 
@@ -208,7 +207,7 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * Return the copy XML config file flag for this component.
+     * @return the copy XML config file flag for this component.
      */
     public boolean isCopyXML() {
 
@@ -230,7 +229,7 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * Return the unpack WARs flag.
+     * @return the unpack WARs flag.
      */
     public boolean isUnpackWARs() {
 
@@ -289,6 +288,7 @@ public class HostConfig implements LifecycleListener {
 
     /**
      * Add a serviced application to the list.
+     * @param name the context name
      */
     public synchronized void addServiced(String name) {
         serviced.add(name);
@@ -297,6 +297,7 @@ public class HostConfig implements LifecycleListener {
 
     /**
      * Is application serviced ?
+     * @param name the context name
      * @return state of the application
      */
     public synchronized boolean isServiced(String name) {
@@ -306,6 +307,7 @@ public class HostConfig implements LifecycleListener {
 
     /**
      * Removed a serviced application from the list.
+     * @param name the context name
      */
     public synchronized void removeServiced(String name) {
         serviced.remove(name);
@@ -314,8 +316,9 @@ public class HostConfig implements LifecycleListener {
 
     /**
      * Get the instant where an application was deployed.
+     * @param name the context name
      * @return 0L if no application with that name is deployed, or the instant
-     * on which the application was deployed
+     *  on which the application was deployed
      */
     public long getDeploymentTime(String name) {
         DeployedApplication app = deployed.get(name);
@@ -330,9 +333,10 @@ public class HostConfig implements LifecycleListener {
     /**
      * Has the specified application been deployed? Note applications defined
      * in server.xml will not have been deployed.
+     * @param name the context name
      * @return <code>true</code> if the application has been deployed and
-     * <code>false</code> if the application has not been deployed or does not
-     * exist
+     *  <code>false</code> if the application has not been deployed or does not
+     *  exist
      */
     public boolean isDeployed(String name) {
         DeployedApplication app = deployed.get(name);
@@ -349,6 +353,9 @@ public class HostConfig implements LifecycleListener {
 
     /**
      * Create the digester which will be used to parse context config files.
+     * @param contextClassName The class which will be used to create the
+     *  context instance
+     * @return the digester
      */
     protected static Digester createDigester(String contextClassName) {
         Digester digester = new Digester();
@@ -376,6 +383,7 @@ public class HostConfig implements LifecycleListener {
     /**
      * Get the name of the configBase.
      * For use with JMX management.
+     * @return the config base
      */
     public String getConfigBaseName() {
         return host.getConfigBaseFile().getAbsolutePath();
@@ -438,6 +446,7 @@ public class HostConfig implements LifecycleListener {
     /**
      * Deploy applications for any directories or WAR files that are found
      * in our "application root" directory.
+     * @param name The context name which should be deployed
      */
     protected void deployApps(String name) {
 
@@ -471,6 +480,8 @@ public class HostConfig implements LifecycleListener {
 
     /**
      * Deploy XML context descriptors.
+     * @param configBase The config base
+     * @param files The XML descriptors which should be deployed
      */
     protected void deployDescriptors(File configBase, String[] files) {
 
@@ -506,8 +517,9 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * @param cn
-     * @param contextXml
+     * Deploy specified context descriptor.
+     * @param cn The context name
+     * @param contextXml The descriptor
      */
     @SuppressWarnings("null") // context is not null
     protected void deployDescriptor(ContextName cn, File contextXml) {
@@ -537,10 +549,10 @@ public class HostConfig implements LifecycleListener {
                             "hostConfig.deployDescriptor.error",
                             contextXml.getAbsolutePath()), e);
                 } finally {
+                    digester.reset();
                     if (context == null) {
                         context = new FailedContext();
                     }
-                    digester.reset();
                 }
             }
 
@@ -662,6 +674,8 @@ public class HostConfig implements LifecycleListener {
 
     /**
      * Deploy WAR files.
+     * @param appBase The base path for applications
+     * @param files The WARs to deploy
      */
     protected void deployWARs(File appBase, String[] files) {
 
@@ -771,8 +785,9 @@ public class HostConfig implements LifecycleListener {
     }
 
     /**
-     * @param cn
-     * @param war
+     * Deploy packed WAR.
+     * @param cn The context name
+     * @param war The WAR file
      */
     protected void deployWAR(ContextName cn, File war) {
 
@@ -783,16 +798,13 @@ public class HostConfig implements LifecycleListener {
                 cn.getBaseName() + "/" + Constants.WarTracker);
 
         boolean xmlInWar = false;
-        JarEntry entry = null;
         try (JarFile jar = new JarFile(war)) {
-            entry = jar.getJarEntry(Constants.ApplicationContextXml);
+            JarEntry entry = jar.getJarEntry(Constants.ApplicationContextXml);
             if (entry != null) {
                 xmlInWar = true;
             }
         } catch (IOException e) {
             /* Ignore */
-        } finally {
-            entry = null;
         }
 
         // If there is an expanded directory then any xml in that directory
@@ -817,17 +829,17 @@ public class HostConfig implements LifecycleListener {
                                 "hostConfig.deployDescriptor.error",
                                 war.getAbsolutePath()), e);
                     } finally {
+                        digester.reset();
                         if (context == null) {
                             context = new FailedContext();
                         }
-                        digester.reset();
                     }
                 }
                 context.setConfigFile(xml.toURI().toURL());
             } else if (deployXML && xmlInWar) {
                 synchronized (digesterLock) {
                     try (JarFile jar = new JarFile(war)) {
-                        entry = jar.getJarEntry(Constants.ApplicationContextXml);
+                        JarEntry entry = jar.getJarEntry(Constants.ApplicationContextXml);
                         try (InputStream istream = jar.getInputStream(entry)) {
                             context = (Context) digester.parse(istream);
                         }
@@ -836,14 +848,13 @@ public class HostConfig implements LifecycleListener {
                                 "hostConfig.deployDescriptor.error",
                                 war.getAbsolutePath()), e);
                     } finally {
+                        digester.reset();
                         if (context == null) {
                             context = new FailedContext();
                         }
                         context.setConfigFile(new URL("jar:" +
                                 war.toURI().toString() + "!/" +
                                 Constants.ApplicationContextXml));
-                        entry = null;
-                        digester.reset();
                     }
                 }
             } else if (!deployXML && xmlInWar) {
@@ -880,9 +891,8 @@ public class HostConfig implements LifecycleListener {
                 // Change location of XML file to config base
                 xml = new File(host.getConfigBaseFile(),
                         cn.getBaseName() + ".xml");
-                entry = null;
                 try (JarFile jar = new JarFile(war)) {
-                    entry = jar.getJarEntry(Constants.ApplicationContextXml);
+                    JarEntry entry = jar.getJarEntry(Constants.ApplicationContextXml);
                     try (InputStream istream = jar.getInputStream(entry);
                             FileOutputStream fos = new FileOutputStream(xml);
                             BufferedOutputStream ostream = new BufferedOutputStream(fos, 1024)) {
@@ -980,7 +990,9 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * Deploy directories.
+     * Deploy exploded webapps.
+     * @param appBase The base path for applications
+     * @param files The exploded webapps that should be deployed
      */
     protected void deployDirectories(File appBase, String[] files) {
 
@@ -1019,8 +1031,9 @@ public class HostConfig implements LifecycleListener {
 
 
     /**
-     * @param cn
-     * @param dir
+     * Deploy exploded webapp.
+     * @param cn The context name
+     * @param dir The path to the root folder of the weapp
      */
     protected void deployDirectory(ContextName cn, File dir) {
 
@@ -1053,10 +1066,10 @@ public class HostConfig implements LifecycleListener {
                                 xml), e);
                         context = new FailedContext();
                     } finally {
+                        digester.reset();
                         if (context == null) {
                             context = new FailedContext();
                         }
-                        digester.reset();
                     }
                 }
 
@@ -1066,11 +1079,7 @@ public class HostConfig implements LifecycleListener {
                 }
 
                 if (copyThisXml) {
-                    try (InputStream is = new FileInputStream(xml);
-                            OutputStream os = new FileOutputStream(xmlCopy)) {
-                        IOTools.flow(is, os);
-                        // Don't catch IOE - let the outer try/catch handle it
-                    }
+                    Files.copy(xml.toPath(), xmlCopy.toPath());
                     context.setConfigFile(xmlCopy.toURI().toURL());
                 } else {
                     context.setConfigFile(xml.toURI().toURL());
@@ -1155,6 +1164,7 @@ public class HostConfig implements LifecycleListener {
      * Check if a webapp is already deployed in this host.
      *
      * @param contextName of the context which will be checked
+     * @return <code>true</code> if the specified deployment exists
      */
     protected boolean deploymentExists(String contextName) {
         return (deployed.containsKey(contextName) ||
@@ -1633,6 +1643,7 @@ public class HostConfig implements LifecycleListener {
     /**
      * Add a new Context to be managed by us.
      * Entry point for the admin webapp, and other JMX Context controllers.
+     * @param context The context instance
      */
     public void manageApp(Context context)  {
 
@@ -1678,6 +1689,7 @@ public class HostConfig implements LifecycleListener {
     /**
      * Remove a webapp from our control.
      * Entry point for the admin webapp, and other JMX Context controllers.
+     * @param contextName The context name
      */
     public void unmanageApp(String contextName) {
         if(isServiced(contextName)) {
@@ -1832,7 +1844,7 @@ public class HostConfig implements LifecycleListener {
 
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
-            if (event.getType() == Lifecycle.AFTER_STOP_EVENT) {
+            if (Lifecycle.AFTER_STOP_EVENT.equals(event.getType())) {
                 // The context has stopped.
                 Context context = (Context) event.getLifecycle();
 

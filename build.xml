@@ -2042,11 +2042,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <link href="http://docs.oracle.com/javase/7/docs/api/"/>
       <link href="http://commons.apache.org/proper/commons-io/javadocs/api-release/"/>
       <link href="http://docs.oracle.com/javaee/7/api/"/>
-      <sourcepath>
-        <path location="${tomcat.dist}/src/java"/>
-        <!--jdbc-pool src files for javadoc-->
-        <path location="${tomcat.dist}/src/modules/jdbc-pool/src/main/java"/>
-      </sourcepath>
+      <packageset dir="${tomcat.dist}/src/java/">
+        <include name="org/**"/>
+        <exclude name="org/apache/el/parser/**"/>
+      </packageset>
+      <!--jdbc-pool src files for javadoc-->
+      <packageset dir="${tomcat.dist}/src/modules/jdbc-pool/src/main/java"/>
     </javadoc>
   </target>
 
@@ -3030,7 +3031,7 @@ skip.installer property in build.properties" />
     <copy file="${tomcat.home}/res/ide-support/eclipse/org.eclipse.jdt.core.prefs.properties" tofile="${tomcat.home}/.settings/org.eclipse.jdt.core.prefs"/>
 
     <echo>Eclipse project files created.
-Read the Building page on the Apache Tomcat documentation site for details on how to configure your Eclipse workplace.</echo>
+Read the Building page on the Apache Tomcat documentation site for details on how to configure your Eclipse workspace.</echo>
   </target>
 
   <!-- ============================ NetBeans =============================== -->

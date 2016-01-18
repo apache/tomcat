@@ -24,7 +24,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.DispatchType;
-import org.apache.tomcat.util.net.SocketStatus;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
@@ -38,19 +38,16 @@ public abstract class AbstractProcessorLight implements Processor {
 
 
     @Override
-    public SocketState process(SocketWrapperBase<?> socketWrapper, SocketStatus status)
+    public SocketState process(SocketWrapperBase<?> socketWrapper, SocketEvent status)
             throws IOException {
 
         SocketState state = SocketState.CLOSED;
         Iterator<DispatchType> dispatches = null;
         do {
-            if (status == SocketStatus.CLOSE_NOW) {
-                errorDispatch();
-                state = SocketState.CLOSED;
-            } else if (dispatches != null) {
+            if (dispatches != null) {
                 DispatchType nextDispatch = dispatches.next();
                 state = dispatch(nextDispatch.getSocketStatus());
-            } else if (status == SocketStatus.DISCONNECT && !isUpgrade()) {
+            } else if (status == SocketEvent.DISCONNECT) {
                 // Do nothing here, just wait for it to get recycled
             } else if (isAsync() || isUpgrade() || state == SocketState.ASYNC_END) {
                 state = dispatch(status);
@@ -62,7 +59,7 @@ public abstract class AbstractProcessorLight implements Processor {
                     // process it now.
                     state = service(socketWrapper);
                 }
-            } else if (status == SocketStatus.OPEN_WRITE) {
+            } else if (status == SocketEvent.OPEN_WRITE) {
                 // Extra write event likely after async, ignore
                 state = SocketState.LONG;
             } else {
@@ -130,7 +127,7 @@ public abstract class AbstractProcessorLight implements Processor {
      * or HTTP headers. Once the headers have been fully read this method is not
      * called again until there is a new HTTP request to process. Note that the
      * request type may change during processing which may result in one or more
-     * calls to {@link #dispatch(SocketStatus)}. Requests may be pipe-lined.
+     * calls to {@link #dispatch(SocketEvent)}. Requests may be pipe-lined.
      *
      * @param socketWrapper The connection to process
      *
@@ -147,12 +144,12 @@ public abstract class AbstractProcessorLight implements Processor {
      * Uses currently include Servlet 3.0 Async and HTTP upgrade connections.
      * Further uses may be added in the future. These will typically start as
      * HTTP requests.
+     * @param status The event to process
+     * @return the socket state
      */
-    protected abstract SocketState dispatch(SocketStatus status);
+    protected abstract SocketState dispatch(SocketEvent status);
 
     protected abstract SocketState asyncPostProcess();
-
-    protected abstract void errorDispatch();
 
     protected abstract Log getLog();
 }

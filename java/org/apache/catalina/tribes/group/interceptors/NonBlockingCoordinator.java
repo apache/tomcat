@@ -16,6 +16,11 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
+import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.catalina.tribes.Channel;
@@ -287,13 +292,26 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
     }
 
     protected boolean alive(Member mbr) {
-        return TcpFailureDetector.memberAlive(mbr,
-                                              COORD_ALIVE,
-                                              false,
-                                              false,
-                                              waitForCoordMsgTimeout,
-                                              waitForCoordMsgTimeout,
-                                              getOptionFlag());
+        return memberAlive(mbr, waitForCoordMsgTimeout);
+    }
+
+    protected boolean memberAlive(Member mbr, long conTimeout) {
+        //could be a shutdown notification
+        if ( Arrays.equals(mbr.getCommand(),Member.SHUTDOWN_PAYLOAD) ) return false;
+
+        try (Socket socket = new Socket()) {
+            InetAddress ia = InetAddress.getByAddress(mbr.getHost());
+            InetSocketAddress addr = new InetSocketAddress(ia, mbr.getPort());
+            socket.connect(addr, (int) conTimeout);
+            return true;
+        } catch (SocketTimeoutException sx) {
+            //do nothing, we couldn't connect
+        } catch (ConnectException cx) {
+            //do nothing, we couldn't connect
+        } catch (Exception x) {
+            log.error(sm.getString("nonBlockingCoordinator.memberAlive.failed"),x);
+        }
+        return false;
     }
 
     protected Membership mergeOnArrive(CoordinationMessage msg) {

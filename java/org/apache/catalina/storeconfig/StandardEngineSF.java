@@ -60,16 +60,14 @@ public class StandardEngineSF extends StoreFactoryBase {
 
             // Store nested <Realm> element
             Realm realm = engine.getRealm();
-            if (realm != null) {
-                Realm parentRealm = null;
-                // TODO is this case possible? (see it a old Server 5.0 impl)
-                if (engine.getParent() != null) {
-                    parentRealm = engine.getParent().getRealm();
-                }
-                if (realm != parentRealm) {
-                    storeElement(aWriter, indent, realm);
+            Realm parentRealm = null;
+            // TODO is this case possible? (see it a old Server 5.0 impl)
+            if (engine.getParent() != null) {
+                parentRealm = engine.getParent().getRealm();
+            }
+            if (realm != parentRealm) {
+                storeElement(aWriter, indent, realm);
 
-                }
             }
 
             // Store nested <Valve> elements

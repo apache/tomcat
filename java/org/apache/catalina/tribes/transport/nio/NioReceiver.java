@@ -236,10 +236,9 @@ public class NioReceiver extends ReceiverBase implements Runnable {
 
 
     /**
-     * get data from channel and store in byte array
+     * Get data from channel and store in byte array
      * send it to cluster
-     * @throws IOException
-     * @throws java.nio.channels.ClosedChannelException
+     * @throws IOException IO error
      */
     protected void listen() throws Exception {
         if (doListen()) {
@@ -397,6 +396,11 @@ public class NioReceiver extends ReceiverBase implements Runnable {
     /**
      * Register the given channel with the given selector for
      * the given operations of interest
+     * @param selector The selector to use
+     * @param channel The channel
+     * @param ops The operations to register
+     * @param attach Attachment object
+     * @throws Exception IO error with channel
      */
     protected void registerChannel(Selector selector,
                                    SelectableChannel channel,
@@ -433,6 +437,7 @@ public class NioReceiver extends ReceiverBase implements Runnable {
      *  channel returns an EOF condition, it is closed here, which
      *  automatically invalidates the associated key.  The selector
      *  will then de-register the channel on the next select call.
+     * @throws Exception IO error with channel
      */
     protected void readDataFromSocket(SelectionKey key) throws Exception {
         NioReplicationTask task = (NioReplicationTask) getTaskPool().getRxTask();

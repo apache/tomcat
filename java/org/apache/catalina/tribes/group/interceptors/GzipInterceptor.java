@@ -80,7 +80,7 @@ public class GzipInterceptor extends ChannelInterceptorBase {
     /**
      * @param data  Data to decompress
      * @return      Decompressed data
-     * @throws IOException
+     * @throws IOException Compression error
      */
     public static byte[] decompress(byte[] data) throws IOException {
         ByteArrayOutputStream bout =

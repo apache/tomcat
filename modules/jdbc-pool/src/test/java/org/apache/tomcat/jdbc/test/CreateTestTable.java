@@ -118,7 +118,7 @@ public class CreateTestTable extends DefaultTestCase {
         con.close();
     }
 
-    public static Random random = new Random(System.currentTimeMillis());
+    public static final Random random = new Random(System.currentTimeMillis());
     public static String getRandom() {
         StringBuilder s = new StringBuilder(256);
         for (int i=0;i<254; i++) {
