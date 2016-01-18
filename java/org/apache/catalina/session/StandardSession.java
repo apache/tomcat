@@ -1739,7 +1739,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
     /**
      * Should the given session attribute be excluded? This implementation
-     * checks:</p>
+     * checks:
      * <ul>
      * <li>{@link Constants#excludedAttributeNames}</li>
      * <li>{@link Manager#willAttributeDistribute(String, Object)}</li>
@@ -1753,7 +1753,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      * @param value The attribute value
      *
      * @return {@code true} if the attribute should be excluded from
-     *         distribution, otherwise {@false}
+     *         distribution, otherwise {@code false}
      */
     protected boolean exclude(String name, Object value) {
         if (Constants.excludedAttributeNames.contains(name)) {
