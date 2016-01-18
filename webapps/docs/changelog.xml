@@ -66,6 +66,11 @@
         session IDs may be rejected if validation is enabled. (markt)
       </fix>
       <fix>
+        <bug>56785</bug>: Avoid <code>NullPointerException</code> if directory
+        exists on the class path that is not readable by the Tomcat user.
+        (kkolinko)
+      </fix>
+      <fix>
         <bug>57906</bug>: Suppress WebappClassLoader log messages when running
         with a security manager on Java 6, caused by
         <code>java.beans.Introspector.findExplicitBeanInfo()</code> calls
@@ -122,6 +127,11 @@
       <fix>
         Fix declaration of <code>localPort</code> attribute of Connector MBean:
         it is read-only. (kkolinko)
+      </fix>
+      <fix>
+        <bug>58766</bug>: Make skipping non-class files during annotation
+        scanning faster by checking the file name first. Improve debug logging.
+        (kkolinko)
       </fix>
       <fix>
         <bug>58836</bug>: Correctly merge query string parameters when

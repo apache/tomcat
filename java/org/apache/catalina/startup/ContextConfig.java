@@ -1970,6 +1970,11 @@ public class ContextConfig implements LifecycleListener {
         try {
             jar = JarFactory.newInstance(url);
 
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString(
+                        "contextConfig.processAnnotationsJar.debug", url));
+            }
+
             jar.nextEntry();
             String entryName = jar.getEntryName();
             while (entryName != null) {
@@ -2026,6 +2031,13 @@ public class ContextConfig implements LifecycleListener {
             if (ResourceAttributes.COLLECTION_TYPE.equals(type)) {
                 // Collection
                 Enumeration<String> dirs = dcUrlConn.list();
+
+                if (log.isDebugEnabled() && dirs.hasMoreElements()) {
+                    log.debug(sm.getString(
+                            "contextConfig.processAnnotationsWebDir.debug",
+                            url));
+                }
+
                 while (dirs.hasMoreElements()) {
                     String dir = dirs.nextElement();
                     URL dirUrl = new URL(url.toString() + '/' + dir);
@@ -2067,12 +2079,19 @@ public class ContextConfig implements LifecycleListener {
             boolean handlesTypesOnly) {
 
         if (file.isDirectory()) {
+            // Returns null if directory is not readable
             String[] dirs = file.list();
-            for (String dir : dirs) {
-                processAnnotationsFile(
-                        new File(file,dir), fragment, handlesTypesOnly);
+            if (dirs != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString(
+                            "contextConfig.processAnnotationsDir.debug", file));
+                }
+                for (String dir : dirs) {
+                    processAnnotationsFile(
+                            new File(file,dir), fragment, handlesTypesOnly);
+                }
             }
-        } else if (file.canRead() && file.getName().endsWith(".class")) {
+        } else if (file.getName().endsWith(".class") && file.canRead()) {
             FileInputStream fis = null;
             try {
                 fis = new FileInputStream(file);
