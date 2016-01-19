@@ -65,22 +65,6 @@
         If not specified, the standard value (defined below) will be used.</p>
       </attribute>
 
-      <attribute name="distributable" required="false">
-        <p><strong>Deprecated</strong>: This should be configured via the
-        Context.</p>
-        <p>Set to <code>true</code> to ask the session manager to enforce
-        the restrictions described in the Servlet Specification on
-        distributable applications (primarily, this would mean that all
-        session attributes must implement <code>java.io.Serializable</code>).
-        Set to <code>false</code> (the default) to not enforce these
-        restrictions.</p>
-
-        <p><strong>NOTE</strong> - The value for this property is inherited
-        automatically based on the presence or absence of the
-        <code>&lt;distributable&gt;</code> element in the web application
-        deployment descriptor (<code>/WEB-INF/web.xml</code>).</p>
-      </attribute>
-
       <attribute name="maxActiveSessions" required="false">
         <p>The maximum number of active sessions that will be created by
         this Manager, or <code>-1</code> (the default) for no limit.</p>
@@ -88,20 +72,6 @@
         <p>When the limit is reached, any attempt to create a new session
         (e.g. with <code>HttpServletRequest.getSession()</code> call)
         will fail with an <code>IllegalStateException</code>.</p>
-      </attribute>
-
-      <attribute name="maxInactiveInterval" required="false">
-        <p><strong>Deprecated</strong>: This should be configured via the
-        Context.</p>
-        <p>The initial maximum time interval, in seconds,
-        between client requests before a session is invalidated. A negative value
-        will result in sessions never timing out. If the attribute is not provided,
-        a default of 1800 seconds (30 minutes) is used.</p>
-
-        <p>This attribute provides the initial value whenever a
-        new session is created, but the interval may be dynamically
-        varied by a servlet via the
-        <code>setMaxInactiveInterval</code> method of the <code>HttpSession</code> object.</p>
       </attribute>
     </attributes>
 

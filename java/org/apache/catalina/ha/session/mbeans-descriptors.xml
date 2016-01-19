@@ -170,10 +170,6 @@
       type="long"
       writeable="false"/>
     <attribute
-      name="distributable"
-      description="The distributable flag for Sessions created by this Manager"
-      type="boolean"/>
-    <attribute
       name="duplicates"
       description="Number of duplicated session ids generated"
       type="int"/>
@@ -198,10 +194,6 @@
     <attribute
       name="maxActiveSessions"
       description="The maximum number of active Sessions allowed, or -1 for no limit"
-      type="int"/>
-    <attribute
-      name="maxInactiveInterval"
-      description="The default maximum inactive interval for Sessions created by this Manager"
       type="int"/>
     <attribute
       name="name"
@@ -440,10 +432,6 @@
       type="java.lang.String"
       writeable="false"/>
     <attribute
-      name="distributable"
-      description="The distributable flag for Sessions created by this Manager"
-      type="boolean"/>
-    <attribute
       name="duplicates"
       description="Number of duplicated session ids generated"
       type="int"/>
@@ -472,10 +460,6 @@
     <attribute
       name="maxActiveSessions"
       description="The maximum number of active Sessions allowed, or -1 for no limit"
-      type="int"/>
-    <attribute
-      name="maxInactiveInterval"
-      description="The default maximum inactive interval for Sessions created by this Manager"
       type="int"/>
     <attribute
       name="name"
