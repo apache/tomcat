@@ -17,7 +17,8 @@
 
 Notes of things to consider for the next major Tomcat release (9.0.x)
 
- 1. Fix Java 8 Javadoc warnings. Currently ~1300.
+ 1. DONE.
+    Fix Java 8 Javadoc warnings.
 
  2. DONE.
     Remove BIO AJP and HTTP connector.
@@ -53,3 +54,6 @@ Notes of things to consider for the next major Tomcat release (9.0.x)
 
 12. Consider wrapping the SocketWrapper with a facade to detect / prevent
     components retaining references longer than they should.
+
+13. Asynchronous NIO2 styled alternate HTTP/2 implementation. Frame parsing logic
+    would be in completion handlers.
