@@ -426,8 +426,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             log.warn(sm.getString("simpleTcpCluster.clustermanager.notImplement", manager));
             return;
         }
-        ClusterManager cmanager = (ClusterManager) manager ;
-        cmanager.setDistributable(true);
+        ClusterManager cmanager = (ClusterManager) manager;
         // Notify our interested LifecycleListeners
         fireLifecycleEvent(BEFORE_MANAGERREGISTER_EVENT, manager);
         String clusterName = getManagerName(cmanager.getName(), manager);
