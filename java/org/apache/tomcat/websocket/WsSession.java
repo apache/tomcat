@@ -614,6 +614,8 @@ public class WsSession implements Session {
 
     /**
      * Use protected so unit tests can access this method directly.
+     * @param msg The message
+     * @param reason The reason
      */
     protected static void appendCloseReasonWithTruncation(ByteBuffer msg,
             String reason) {
@@ -648,6 +650,7 @@ public class WsSession implements Session {
      * Make the session aware of a {@link FutureToSendHandler} that will need to
      * be forcibly closed if the session closes before the
      * {@link FutureToSendHandler} completes.
+     * @param f2sh The handler
      */
     protected void registerFuture(FutureToSendHandler f2sh) {
         boolean fail = false;
@@ -673,6 +676,7 @@ public class WsSession implements Session {
 
     /**
      * Remove a {@link FutureToSendHandler} from the set of tracked instances.
+     * @param f2sh The handler
      */
     protected void unregisterFuture(FutureToSendHandler f2sh) {
         futures.remove(f2sh);

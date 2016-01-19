@@ -354,6 +354,7 @@ public class JSSEUtil extends SSLUtilBase {
      * @param crlf The path to the CRL file.
      * @param trustStore The configured TrustStore.
      * @return The parameters including the CRLs and TrustStore.
+     * @throws Exception An error occurred
      */
     protected CertPathParameters getParameters(String algorithm, String crlf,
             KeyStore trustStore) throws Exception {
@@ -376,7 +377,11 @@ public class JSSEUtil extends SSLUtilBase {
 
     /**
      * Load the collection of CRLs.
-     *
+     * @param crlf The path to the CRL file.
+     * @return the CRLs collection
+     * @throws IOException Error reading CRL file
+     * @throws CRLException CRL error
+     * @throws CertificateException Error processing certificate
      */
     protected Collection<? extends CRL> getCRLs(String crlf)
         throws IOException, CRLException, CertificateException {

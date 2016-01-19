@@ -818,6 +818,7 @@ public abstract class AbstractEndpoint<S> {
 
     /**
      * Hook to allow Endpoints to provide a specific Acceptor implementation.
+     * @return the acceptor
      */
     protected abstract Acceptor createAcceptor();
 

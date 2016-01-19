@@ -708,6 +708,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
     /**
      * Process the specified connection.
+     * @param socketWrapper The socket wrapper
+     * @return <code>true</code> if the socket was correctly configured
+     *  and processing may continue, <code>false</code> if the socket needs to be
+     *  close immediately
      */
     protected boolean setSocketOptions(SocketWrapperBase<Long> socketWrapper) {
         long socket = socketWrapper.getSocket().longValue();
@@ -764,6 +768,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
     /**
      * Allocate a new poller of the specified size.
+     * @param size The size
+     * @param pool The pool from which the poller will be allocated
+     * @param timeout The timeout
+     * @return the poller pointer
      */
     protected long allocatePoller(int size, long pool, int timeout) {
         try {
@@ -782,6 +790,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     /**
      * Process given socket. This is called when the socket has been
      * accepted.
+     * @param socket The socket
+     * @return <code>true</code> if the socket was correctly configured
+     *  and processing may continue, <code>false</code> if the socket needs to be
+     *  close immediately
      */
     protected boolean processSocketWithOptions(long socket) {
         try {

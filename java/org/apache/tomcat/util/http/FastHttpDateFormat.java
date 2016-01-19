@@ -91,6 +91,7 @@ public final class FastHttpDateFormat {
 
     /**
      * Get the current date in HTTP format.
+     * @return the HTTP date
      */
     public static final String getCurrentDate() {
 
@@ -110,6 +111,9 @@ public final class FastHttpDateFormat {
 
     /**
      * Get the HTTP format of the specified date.
+     * @param value The date
+     * @param threadLocalformat Local format to avoid synchronization
+     * @return the HTTP date
      */
     public static final String formatDate
         (long value, DateFormat threadLocalformat) {
@@ -137,6 +141,9 @@ public final class FastHttpDateFormat {
 
     /**
      * Try to parse the given date as a HTTP date.
+     * @param value The HTTP date
+     * @param threadLocalformats Local format to avoid synchronization
+     * @return the date as a long
      */
     public static final long parseDate(String value,
                                        DateFormat[] threadLocalformats) {

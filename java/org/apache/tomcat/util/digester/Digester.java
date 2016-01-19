@@ -297,6 +297,7 @@ public class Digester extends DefaultHandler2 {
      * go dynamically as the document is parsed.
      *
      * @param prefix Prefix to look up
+     * @return the namespace URI
      */
     public String findNamespaceURI(String prefix) {
 
@@ -322,6 +323,7 @@ public class Digester extends DefaultHandler2 {
      *     <code>useContextClassLoader</code> property is set to true</li>
      * <li>The class loader used to load the Digester class itself.
      * </ul>
+     * @return the classloader
      */
     public ClassLoader getClassLoader() {
 
@@ -355,7 +357,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the current depth of the element stack.
+     * @return the current depth of the element stack.
      */
     public int getCount() {
 
@@ -365,7 +367,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the name of the XML element that is currently being processed.
+     * @return the name of the XML element that is currently being processed.
      */
     public String getCurrentElementName() {
 
@@ -380,7 +382,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the error handler for this Digester.
+     * @return the error handler for this Digester.
      */
     public ErrorHandler getErrorHandler() {
 
@@ -402,10 +404,11 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the SAXParserFactory we will use, creating one if necessary.
-     * @throws ParserConfigurationException
-     * @throws SAXNotSupportedException
-     * @throws SAXNotRecognizedException
+     * SAX parser factory method.
+     * @return the SAXParserFactory we will use, creating one if necessary.
+     * @throws ParserConfigurationException Error creating parser
+     * @throws SAXNotSupportedException Error creating parser
+     * @throws SAXNotRecognizedException Error creating parser
      */
     public SAXParserFactory getFactory()
     throws SAXNotRecognizedException, SAXNotSupportedException,
@@ -469,7 +472,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the current Logger associated with this instance of the Digester
+     * @return the current Logger associated with this instance of the Digester
      */
     public Log getLogger() {
 
@@ -480,6 +483,7 @@ public class Digester extends DefaultHandler2 {
 
     /**
      * Set the current logger for this Digester.
+     * @param log The logger that will be used
      */
     public void setLogger(Log log) {
 
@@ -492,6 +496,7 @@ public class Digester extends DefaultHandler2 {
      * <strong>Note</strong> the output is finely grained.
      *
      * @since 1.6
+     * @return the SAX logger
      */
     public Log getSAXLogger() {
 
@@ -512,7 +517,7 @@ public class Digester extends DefaultHandler2 {
     }
 
     /**
-     * Return the current rule match path
+     * @return the current rule match path
      */
     public String getMatch() {
 
@@ -522,7 +527,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the "namespace aware" flag for parsers we create.
+     * @return the "namespace aware" flag for parsers we create.
      */
     public boolean getNamespaceAware() {
 
@@ -553,7 +558,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the public identifier of the DTD we are currently
+     * @return the public identifier of the DTD we are currently
      * parsing under, if any.
      */
     public String getPublicId() {
@@ -564,7 +569,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the namespace URI that will be applied to all subsequently
+     * @return the namespace URI that will be applied to all subsequently
      * added <code>Rule</code> objects.
      */
     public String getRuleNamespaceURI() {
@@ -590,7 +595,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the SAXParser we will use to parse the input stream.  If there
+     * @return the SAXParser we will use to parse the input stream.  If there
      * is a problem creating the parser, return <code>null</code>.
      */
     public SAXParser getParser() {
@@ -621,7 +626,7 @@ public class Digester extends DefaultHandler2 {
      * for information about the standard SAX2 properties.
      *
      * @param property Property name to be retrieved
-     *
+     * @return the property value
      * @exception SAXNotRecognizedException if the property name is
      *  not recognized
      * @exception SAXNotSupportedException if the property name is
@@ -639,6 +644,7 @@ public class Digester extends DefaultHandler2 {
      * Return the <code>Rules</code> implementation object containing our
      * rules collection and associated matching policy.  If none has been
      * established, a default implementation will be created and returned.
+     * @return the rules
      */
     public Rules getRules() {
 
@@ -666,7 +672,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the boolean as to whether the context classloader should be used.
+     * @return the boolean as to whether the context classloader should be used.
      */
     public boolean getUseContextClassLoader() {
 
@@ -692,7 +698,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the validating parser flag.
+     * @return the validating parser flag.
      */
     public boolean getValidating() {
 
@@ -715,7 +721,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the rules validation flag.
+     * @return the rules validation flag.
      */
     public boolean getRulesValidation() {
 
@@ -738,7 +744,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Return the fake attributes list.
+     * @return the fake attributes list.
      */
     public Map<Class<?>, List<String>> getFakeAttributes() {
 
@@ -749,6 +755,9 @@ public class Digester extends DefaultHandler2 {
 
     /**
      * Determine if an attribute is a fake attribute.
+     * @param object The object
+     * @param name The attribute name
+     * @return <code>true</code> if this is a fake attribute
      */
     public boolean isFakeAttribute(Object object, String name) {
 
@@ -785,6 +794,7 @@ public class Digester extends DefaultHandler2 {
      *
      * FIX ME: there is a bug in JAXP/XERCES that prevent the use of a
      * parser that contains a schema with a DTD.
+     * @return the XML reader
      * @exception SAXException if no XMLReader can be instantiated
      */
     public XMLReader getXMLReader() throws SAXException {
@@ -1423,7 +1433,7 @@ public class Digester extends DefaultHandler2 {
      * the root element from the object stack (if any).
      *
      * @param file File containing the XML data to be parsed
-     *
+     * @return the root object
      * @exception IOException if an input/output error occurs
      * @exception SAXException if a parsing exception occurs
      */
@@ -1441,7 +1451,7 @@ public class Digester extends DefaultHandler2 {
      * Returns the root element from the object stack (if any).
      *
      * @param input Input source containing the XML data to be parsed
-     *
+     * @return the root object
      * @exception IOException if an input/output error occurs
      * @exception SAXException if a parsing exception occurs
      */
@@ -1459,7 +1469,7 @@ public class Digester extends DefaultHandler2 {
      * Returns the root element from the object stack (if any).
      *
      * @param input Input stream containing the XML data to be parsed
-     *
+     * @return the root object
      * @exception IOException if an input/output error occurs
      * @exception SAXException if a parsing exception occurs
      */
@@ -1716,6 +1726,7 @@ public class Digester extends DefaultHandler2 {
     /**
      * Return the top object on the stack without removing it.  If there are
      * no objects on the stack, return <code>null</code>.
+     * @return the top object
      */
     public Object peek() {
 
@@ -1736,6 +1747,7 @@ public class Digester extends DefaultHandler2 {
      *
      * @param n Index of the desired element, where 0 is the top of the stack,
      *  1 is the next element down, and so on.
+     * @return the specified object
      */
     public Object peek(int n) {
 
@@ -1752,6 +1764,7 @@ public class Digester extends DefaultHandler2 {
     /**
      * Pop the top object off of the stack, and return it.  If there are
      * no objects on the stack, return <code>null</code>.
+     * @return the top object
      */
     public Object pop() {
 
@@ -1830,6 +1843,7 @@ public class Digester extends DefaultHandler2 {
      *
      * <p>The parameters stack is used to store <code>CallMethodRule</code> parameters.
      * See {@link #params}.</p>
+     * @return the top object on the parameters stack
      */
     public Object peekParams() {
 
@@ -1849,6 +1863,7 @@ public class Digester extends DefaultHandler2 {
      *
      * <p>The parameters stack is used to store <code>CallMethodRule</code> parameters.
      * See {@link #params}.</p>
+     * @return the top object on the parameters stack
      */
     public Object popParams() {
 
@@ -1884,7 +1899,8 @@ public class Digester extends DefaultHandler2 {
     /**
      * Create a SAX exception which also understands about the location in
      * the digester file where the exception occurs
-     *
+     * @param message The error message
+     * @param e The root cause
      * @return the new exception
      */
     public SAXException createSAXException(String message, Exception e) {
@@ -1921,7 +1937,7 @@ public class Digester extends DefaultHandler2 {
     /**
      * Create a SAX exception which also understands about the location in
      * the digester file where the exception occurs
-     *
+     * @param e The root cause
      * @return the new exception
      */
     public SAXException createSAXException(Exception e) {
@@ -1943,7 +1959,7 @@ public class Digester extends DefaultHandler2 {
     /**
      * Create a SAX exception which also understands about the location in
      * the digester file where the exception occurs
-     *
+     * @param message The error message
      * @return the new exception
      */
     public SAXException createSAXException(String message) {

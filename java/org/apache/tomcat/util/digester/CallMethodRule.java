@@ -218,6 +218,7 @@ public class CallMethodRule extends Rule {
     /**
      * Should <code>MethodUtils.invokeExactMethod</code>
      * be used for the reflection.
+     * @return <code>true</code> if invokeExactMethod is used
      */
     public boolean getUseExactMatch() {
         return useExactMatch;
@@ -226,6 +227,7 @@ public class CallMethodRule extends Rule {
     /**
      * Set whether <code>MethodUtils.invokeExactMethod</code>
      * should be used for the reflection.
+     * @param useExactMatch The flag value
      */
     public void setUseExactMatch(boolean useExactMatch)
     {

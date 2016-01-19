@@ -225,6 +225,7 @@ public class NioChannel implements ByteChannel {
      * socket is removed from the poller without the socket being selected. This
      * results in a connection limit leak for NIO as the endpoint expects the
      * socket to be selected even in error conditions.
+     * @throws IOException If the current thread was interrupted
      */
     protected void checkInterruptStatus() throws IOException {
         if (Thread.interrupted()) {
