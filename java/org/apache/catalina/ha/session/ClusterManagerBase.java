@@ -192,7 +192,6 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
         copy.setMaxInactiveInterval(getMaxInactiveInterval());
         copy.setProcessExpiresFrequency(getProcessExpiresFrequency());
         copy.setNotifyListenersOnReplication(isNotifyListenersOnReplication());
-        copy.setSessionAttributeFilter(getSessionAttributeFilter());
         copy.setSessionAttributeNameFilter(getSessionAttributeNameFilter());
         copy.setSessionAttributeValueClassNameFilter(getSessionAttributeValueClassNameFilter());
         copy.setWarnOnSessionAttributeFilterFailure(getWarnOnSessionAttributeFilterFailure());
