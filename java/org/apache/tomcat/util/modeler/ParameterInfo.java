@@ -43,6 +43,7 @@ public class ParameterInfo extends FeatureInfo {
     /**
      * Create and return a <code>MBeanParameterInfo</code> object that
      * corresponds to the parameter described by this instance.
+     * @return a parameter info
      */
     public MBeanParameterInfo createParameterInfo() {
 

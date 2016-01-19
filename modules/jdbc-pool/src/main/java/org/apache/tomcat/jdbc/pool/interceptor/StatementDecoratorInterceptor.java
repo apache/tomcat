@@ -65,7 +65,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
      * @param clazz
      *            - the interface that the proxy will implement
      * @return - returns a constructor used to create new instances
-     * @throws NoSuchMethodException
+     * @throws NoSuchMethodException Constructor not found
      */
     protected Constructor<?> getConstructor(int idx, Class<?> clazz) throws NoSuchMethodException {
         if (constructors[idx] == null) {
@@ -139,6 +139,9 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
      * @param sql           The sql of of the statement
      *
      * @return  A new proxy for the Statement
+     * @throws InstantiationException Couldn't instantiate object
+     * @throws IllegalAccessException Inaccessible constructor
+     * @throws InvocationTargetException Exception thrown from constructor
      */
     protected Object createDecorator(Object proxy, Method method, Object[] args,
                                      Object statement, Constructor<?> constructor, String sql)

@@ -81,6 +81,7 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
      * @param method the method that was called. It will be one of the methods defined in {@link #STATEMENT_TYPES}
      * @param args the arguments to the method
      * @param statement the statement that the underlying connection created
+     * @param time Elapsed time
      * @return a {@link java.sql.Statement} object
      */
     public abstract Object createStatement(Object proxy, Method method, Object[] args, Object statement, long time);

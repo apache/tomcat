@@ -47,7 +47,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
 
     /**
      * Constructs a DataSource object wrapping a connection
-     * @param poolProperties
+     * @param poolProperties The pool properties
      */
     public DataSource(PoolConfiguration poolProperties) {
         super(poolProperties);
@@ -111,7 +111,7 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
      * Creates the ObjectName for the ConnectionPoolMBean object to be registered
      * @param original the ObjectName for the DataSource
      * @return the ObjectName for the ConnectionPoolMBean
-     * @throws MalformedObjectNameException
+     * @throws MalformedObjectNameException Invalid object name
      */
     public ObjectName createObjectName(ObjectName original) throws MalformedObjectNameException {
         String domain = ConnectionPool.POOL_JMX_DOMAIN;

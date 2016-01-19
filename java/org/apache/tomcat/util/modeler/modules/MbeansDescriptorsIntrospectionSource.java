@@ -49,9 +49,10 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
         this.registry=reg;
     }
 
-    /** Used if a single component is loaded
+    /**
+     * Used if a single component is loaded
      *
-     * @param type
+     * @param type The type
      */
     public void setType( String type ) {
        this.type=type;

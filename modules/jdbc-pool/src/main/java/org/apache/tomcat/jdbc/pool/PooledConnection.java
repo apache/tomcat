@@ -136,7 +136,10 @@ public class PooledConnection {
 
     /**
      * @deprecated use {@link #shouldForceReconnect(String, String)}
-     * method kept since it was public, to avoid changing interface. name was pooo
+     * method kept since it was public, to avoid changing interface.
+     * @param username The user name
+     * @param password The password
+     * @return <code>true</code>if the pool does not need to reconnect
      */
     @Deprecated
     public boolean checkUser(String username, String password) {
@@ -405,9 +408,9 @@ public class PooledConnection {
     }
 
     /**
-     * Returns true if the connection pool is configured
+     * Returns <code>true</code> if the connection pool is configured
      * to do validation for a certain action.
-     * @param action
+     * @param action The validation action
      */
     private boolean doValidate(int action) {
         if (action == PooledConnection.VALIDATE_BORROW &&
@@ -429,9 +432,12 @@ public class PooledConnection {
             return false;
     }
 
-    /**Returns true if the object is still valid. if not
+    /**
+     * Returns <code>true</code> if the object is still valid. if not
      * the pool will call the getExpiredAction() and follow up with one
      * of the four expired methods
+     * @param validateAction The value
+     * @return <code>true</code> if the connection is valid
      */
     public boolean validate(int validateAction) {
         return validate(validateAction,null);
@@ -604,7 +610,7 @@ public class PooledConnection {
     /**
      * Sets the pool configuration for this connection and connection pool.
      * Object is shared with the {@link ConnectionPool}
-     * @param poolProperties
+     * @param poolProperties The pool properties
      */
     public void setPoolProperties(PoolConfiguration poolProperties) {
         this.poolProperties = poolProperties;

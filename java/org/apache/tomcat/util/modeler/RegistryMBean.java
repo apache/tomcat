@@ -40,18 +40,20 @@ import javax.management.ObjectName;
  */
 public interface RegistryMBean {
 
-    /** Invoke an operation on a set of mbeans.
+    /**
+     * Invoke an operation on a set of mbeans.
      *
      * @param mbeans List of ObjectNames
      * @param operation Operation to perform. Typically "init" "start" "stop" or "destroy"
      * @param failFirst Behavior in case of exceptions - if false we'll ignore
      *      errors
-     * @throws Exception
+     * @throws Exception Error invoking operation
      */
-    public void invoke( List<ObjectName> mbeans, String operation, boolean failFirst )
+    public void invoke(List<ObjectName> mbeans, String operation, boolean failFirst)
             throws Exception;
 
-    /** Register a bean by creating a modeler mbean and adding it to the
+    /**
+     * Register a bean by creating a modeler mbean and adding it to the
      * MBeanServer.
      *
      * If metadata is not loaded, we'll look up and read a file named
@@ -77,23 +79,26 @@ public interface RegistryMBean {
      * @param type The type of the mbean, as declared in mbeans-descriptors. If
      * null, the name of the class will be used. This can be used as a hint or
      * by subclasses.
+     * @throws Exception Error registering MBean
      *
      * @since 1.1
      */
     public void registerComponent(Object bean, String oname, String type)
            throws Exception;
 
-    /** Unregister a component. We'll first check if it is registered,
+    /**
+     * Unregister a component. We'll first check if it is registered,
      * and mask all errors. This is mostly a helper.
      *
-     * @param oname
+     * @param oname The name used by the bean
      *
      * @since 1.1
      */
-    public void unregisterComponent( String oname );
+    public void unregisterComponent(String oname);
 
 
-     /** Return an int ID for faster access. Will be used for notifications
+     /**
+      * Return an int ID for faster access. Will be used for notifications
       * and for other operations we want to optimize.
       *
       * @param domain Namespace
@@ -101,10 +106,11 @@ public interface RegistryMBean {
       * @return  An unique id for the domain:name combination
       * @since 1.1
       */
-    public int getId( String domain, String name);
+    public int getId(String domain, String name);
 
 
-    /** Reset all metadata cached by this registry. Should be called
+    /**
+     * Reset all metadata cached by this registry. Should be called
      * to support reloading. Existing mbeans will not be affected or modified.
      *
      * It will be called automatically if the Registry is unregistered.
