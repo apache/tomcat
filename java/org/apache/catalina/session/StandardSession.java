@@ -1462,7 +1462,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
             throw new IllegalStateException(sm.getString(
                     "standardSession.setAttribute.ise", getIdInternal()));
         }
-        if ((manager != null) && manager.getDistributable() &&
+        if ((manager != null) && manager.getContext().getDistributable() &&
                 !isAttributeDistributable(name, value) && !exclude(name, value)) {
             throw new IllegalArgumentException(sm.getString(
                     "standardSession.setAttribute.iae", name));
