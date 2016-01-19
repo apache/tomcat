@@ -106,6 +106,7 @@ public class TestPersistentManager extends TomcatBaseTest {
 
         // No file system docBase required
         StandardContext ctx = (StandardContext) tomcat.addContext("", null);
+        ctx.setDistributable(true);
 
         Tomcat.addServlet(ctx, "DummyServlet", new DummyServlet());
         ctx.addServletMapping("/dummy", "DummyServlet");
@@ -115,7 +116,6 @@ public class TestPersistentManager extends TomcatBaseTest {
 
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
-        manager.setDistributable(true);
         ctx.setManager(manager);
         ctx.addValve(new PersistentValve());
         tomcat.start();
@@ -138,6 +138,7 @@ public class TestPersistentManager extends TomcatBaseTest {
 
         // No file system docBase required
         StandardContext ctx = (StandardContext) tomcat.addContext("", null);
+        ctx.setDistributable(true);
 
         Tomcat.addServlet(ctx, "DummyServlet", new DummyServlet());
         ctx.addServletMapping("/dummy", "DummyServlet");
@@ -147,7 +148,6 @@ public class TestPersistentManager extends TomcatBaseTest {
 
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
-        manager.setDistributable(true);
         ctx.setManager(manager);
         ctx.addValve(new PersistentValve());
         tomcat.start();
@@ -170,6 +170,7 @@ public class TestPersistentManager extends TomcatBaseTest {
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
+        ctx.setDistributable(true);
 
         Tomcat.addServlet(ctx, "DummyServlet", new DummyServlet());
         ctx.addServletMapping("/dummy", "DummyServlet");
@@ -179,7 +180,6 @@ public class TestPersistentManager extends TomcatBaseTest {
 
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
-        manager.setDistributable(true);
         ctx.setManager(manager);
         tomcat.start();
         String sessionId = getUrl("http://localhost:" + getPort() + "/dummy")

@@ -17,7 +17,6 @@
 package org.apache.catalina.session;
 
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
@@ -59,8 +58,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
-public abstract class ManagerBase extends LifecycleMBeanBase
-        implements Manager, PropertyChangeListener {
+public abstract class ManagerBase extends LifecycleMBeanBase implements Manager {
 
     private final Log log = LogFactory.getLog(ManagerBase.class); // must not be static
 
@@ -76,7 +74,11 @@ public abstract class ManagerBase extends LifecycleMBeanBase
      * The distributable flag for Sessions created by this Manager.  If this
      * flag is set to <code>true</code>, any user attributes added to a
      * session controlled by this Manager must be Serializable.
+     *
+     * @deprecated Ignored. {@link Context#getDistributable()} always takes
+     *             precedence. Will be removed in Tomcat 9.0.x.
      */
+    @Deprecated
     protected boolean distributable;
 
 
@@ -89,7 +91,11 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     /**
      * The default maximum inactive interval for Sessions created by
      * this Manager.
+     *
+     * @deprecated Ignored. {@link Context#getSessionTimeout()} always takes
+     *             precedence. Will be removed in Tomcat 9.0.x.
      */
+    @Deprecated
     protected int maxInactiveInterval = 30 * 60;
 
     /**
@@ -371,43 +377,39 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
+    @Deprecated
     @Override
     public boolean getDistributable() {
-        return this.distributable;
+        Context context = getContext();
+        if (context == null) {
+            return false;
+        }
+        return context.getDistributable();
     }
 
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Session attributes do not need to implement {@link java.io.Serializable}
-     * if they are excluded from distribution by
-     * {@link #willAttributeDistribute(String, Object)}.
-     */
+    @Deprecated
     @Override
     public void setDistributable(boolean distributable) {
-
-        boolean oldDistributable = this.distributable;
-        this.distributable = distributable;
-        support.firePropertyChange("distributable",
-                                   Boolean.valueOf(oldDistributable),
-                                   Boolean.valueOf(this.distributable));
+        // NO-OP
     }
 
 
+    @Deprecated
     @Override
     public int getMaxInactiveInterval() {
-        return this.maxInactiveInterval;
+        Context context = getContext();
+        if (context == null) {
+            return -1;
+        }
+        return context.getSessionTimeout() * 60;
     }
 
 
+    @Deprecated
     @Override
     public void setMaxInactiveInterval(int interval) {
-        int oldMaxInactiveInterval = this.maxInactiveInterval;
-        this.maxInactiveInterval = interval;
-        support.firePropertyChange("maxInactiveInterval",
-                                   Integer.valueOf(oldMaxInactiveInterval),
-                                   Integer.valueOf(this.maxInactiveInterval));
+        // NO-OP
     }
 
 
@@ -600,22 +602,16 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     }
 
+
     @Override
     protected void initInternal() throws LifecycleException {
-
         super.initInternal();
 
         if (context == null) {
             throw new LifecycleException(sm.getString("managerBase.contextNull"));
         }
-
-        // Copy current values from Context
-        setMaxInactiveInterval(this.context.getSessionTimeout() * 60);
-        setDistributable(getContext().getDistributable());
-
-        // Track any further changes in those values
-        this.context.addPropertyChangeListener(this);
     }
+
 
     @Override
     protected void startInternal() throws LifecycleException {
@@ -656,22 +652,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         }
     }
 
+
     @Override
     protected void stopInternal() throws LifecycleException {
         if (sessionIdGenerator instanceof Lifecycle) {
             ((Lifecycle) sessionIdGenerator).stop();
         }
-    }
-
-
-    @Override
-    protected void destroyInternal() throws LifecycleException {
-        // De-register from the old Context (if any)
-        if (this.context != null) {
-            this.context.removePropertyChangeListener(this);
-        }
-
-        super.destroyInternal();
     }
 
 
@@ -1322,30 +1308,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     @Override
     public String getDomainInternal() {
         return context.getDomain();
-    }
-
-
-    // ----------------------------------------- PropertyChangeListener Methods
-
-    @Override
-    public void propertyChange(PropertyChangeEvent event) {
-
-        // Validate the source of this event
-        if (!(event.getSource() instanceof Context))
-            return;
-
-        // Process a relevant property change
-        if (event.getPropertyName().equals("sessionTimeout")) {
-            try {
-                setMaxInactiveInterval(
-                        ((Integer) event.getNewValue()).intValue() * 60);
-            } catch (NumberFormatException e) {
-                log.error(sm.getString("managerBase.sessionTimeout",
-                        event.getNewValue()));
-            }
-        } else if (event.getPropertyName().equals("distributable")) {
-            setDistributable(((Boolean) event.getNewValue()).booleanValue());
-        }
     }
 
 
