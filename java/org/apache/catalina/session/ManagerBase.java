@@ -71,32 +71,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
 
     /**
-     * The distributable flag for Sessions created by this Manager.  If this
-     * flag is set to <code>true</code>, any user attributes added to a
-     * session controlled by this Manager must be Serializable.
-     *
-     * @deprecated Ignored. {@link Context#getDistributable()} always takes
-     *             precedence. Will be removed in Tomcat 9.0.x.
-     */
-    @Deprecated
-    protected boolean distributable;
-
-
-    /**
      * The descriptive name of this Manager implementation (for logging).
      */
     private static final String name = "ManagerBase";
 
-
-    /**
-     * The default maximum inactive interval for Sessions created by
-     * this Manager.
-     *
-     * @deprecated Ignored. {@link Context#getSessionTimeout()} always takes
-     *             precedence. Will be removed in Tomcat 9.0.x.
-     */
-    @Deprecated
-    protected int maxInactiveInterval = 30 * 60;
 
     /**
      * The Java class name of the secure random number generator class to be
@@ -374,42 +352,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      */
     public String getClassName() {
         return this.getClass().getName();
-    }
-
-
-    @Deprecated
-    @Override
-    public boolean getDistributable() {
-        Context context = getContext();
-        if (context == null) {
-            return false;
-        }
-        return context.getDistributable();
-    }
-
-
-    @Deprecated
-    @Override
-    public void setDistributable(boolean distributable) {
-        // NO-OP
-    }
-
-
-    @Deprecated
-    @Override
-    public int getMaxInactiveInterval() {
-        Context context = getContext();
-        if (context == null) {
-            return -1;
-        }
-        return context.getSessionTimeout() * 60;
-    }
-
-
-    @Deprecated
-    @Override
-    public void setMaxInactiveInterval(int interval) {
-        // NO-OP
     }
 
 
@@ -699,7 +641,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         session.setNew(true);
         session.setValid(true);
         session.setCreationTime(System.currentTimeMillis());
-        session.setMaxInactiveInterval(this.maxInactiveInterval);
+        session.setMaxInactiveInterval(getContext().getSessionTimeout() * 60);
         String id = sessionId;
         if (id == null) {
             id = generateSessionId();
