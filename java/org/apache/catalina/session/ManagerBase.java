@@ -40,6 +40,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.SessionIdGenerator;
@@ -349,20 +350,16 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     @Override
     public void setContext(Context context) {
-        // De-register from the old Context (if any)
-        if (this.context != null) {
-            this.context.removePropertyChangeListener(this);
+        if (this.context == context) {
+            // NO-OP
+            return;
         }
-
+        if (!getState().equals(LifecycleState.NEW)) {
+            throw new IllegalStateException(sm.getString("managerBase.setContextNotNew"));
+        }
         Context oldContext = this.context;
         this.context = context;
         support.firePropertyChange("context", oldContext, this.context);
-
-        // Register with the new Context (if any)
-        if (this.context != null) {
-            setMaxInactiveInterval(this.context.getSessionTimeout() * 60);
-            this.context.addPropertyChangeListener(this);
-        }
     }
 
 
@@ -608,7 +605,16 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
         super.initInternal();
 
+        if (context == null) {
+            throw new LifecycleException(sm.getString("managerBase.contextNull"));
+        }
+
+        // Copy current values from Context
+        setMaxInactiveInterval(this.context.getSessionTimeout() * 60);
         setDistributable(getContext().getDistributable());
+
+        // Track any further changes in those values
+        this.context.addPropertyChangeListener(this);
     }
 
     @Override
@@ -655,6 +661,17 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         if (sessionIdGenerator instanceof Lifecycle) {
             ((Lifecycle) sessionIdGenerator).stop();
         }
+    }
+
+
+    @Override
+    protected void destroyInternal() throws LifecycleException {
+        // De-register from the old Context (if any)
+        if (this.context != null) {
+            this.context.removePropertyChangeListener(this);
+        }
+
+        super.destroyInternal();
     }
 
 
@@ -1326,6 +1343,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
                 log.error(sm.getString("managerBase.sessionTimeout",
                         event.getNewValue()));
             }
+        } else if (event.getPropertyName().equals("distributable")) {
+            setDistributable(((Boolean) event.getNewValue()).booleanValue());
         }
     }
 

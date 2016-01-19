@@ -1700,16 +1700,6 @@ public class StandardContext extends ContainerBase
         support.firePropertyChange("distributable",
                                    oldDistributable,
                                    this.distributable);
-
-        // Bugzilla 32866
-        Manager manager = getManager();
-        if(manager != null) {
-            if(log.isDebugEnabled()) {
-                log.debug("Propagating distributable=" + distributable
-                          + " to manager");
-            }
-            manager.setDistributable(distributable);
-        }
     }
 
 
@@ -1835,20 +1825,20 @@ public class StandardContext extends ContainerBase
             this.manager = manager;
 
             // Stop the old component if necessary
-            if (getState().isAvailable() && (oldManager != null) &&
-                (oldManager instanceof Lifecycle)) {
+            if (oldManager instanceof Lifecycle) {
                 try {
                     ((Lifecycle) oldManager).stop();
+                    ((Lifecycle) oldManager).destroy();
                 } catch (LifecycleException e) {
-                    log.error("StandardContext.setManager: stop: ", e);
+                    log.error("StandardContext.setManager: stop-destroy: ", e);
                 }
             }
 
             // Start the new component if necessary
-            if (manager != null)
+            if (manager != null) {
                 manager.setContext(this);
-            if (getState().isAvailable() && (manager != null) &&
-                (manager instanceof Lifecycle)) {
+            }
+            if (getState().isAvailable() && manager instanceof Lifecycle) {
                 try {
                     ((Lifecycle) manager).start();
                 } catch (LifecycleException e) {

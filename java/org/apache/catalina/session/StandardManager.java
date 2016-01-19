@@ -194,9 +194,7 @@ public class StandardManager extends ManagerBase {
         try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
                 BufferedInputStream bis = new BufferedInputStream(fis);) {
             Context c = getContext();
-            if (c != null) {
-                loader = c.getLoader();
-            }
+            loader = c.getLoader();
             if (loader != null) {
                 classLoader = loader.getClassLoader();
             }
@@ -415,17 +413,16 @@ public class StandardManager extends ManagerBase {
      * @return the file
      */
     protected File file() {
-        if ((pathname == null) || (pathname.length() == 0))
-            return (null);
+        if (pathname == null || pathname.length() == 0) {
+            return null;
+        }
         File file = new File(pathname);
         if (!file.isAbsolute()) {
             Context context = getContext();
-            if (context != null) {
-                ServletContext servletContext = context.getServletContext();
-                File tempdir = (File)
-                    servletContext.getAttribute(ServletContext.TEMPDIR);
-                if (tempdir != null)
-                    file = new File(tempdir, pathname);
+            ServletContext servletContext = context.getServletContext();
+            File tempdir = (File) servletContext.getAttribute(ServletContext.TEMPDIR);
+            if (tempdir != null) {
+                file = new File(tempdir, pathname);
             }
         }
         return file;
