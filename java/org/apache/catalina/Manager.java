@@ -50,7 +50,11 @@ public interface Manager {
 
 
     /**
-     * Set the Container with which this Manager is associated.
+     * Set the Context with which this Manager is associated. The Context must
+     * be set to a non-null value before the Manager is first used. Multiple
+     * calls to this method before first use are permitted. Once the Manager has
+     * been used, this method may not be used to change the Context (including
+     * setting a {@code null} value) that the Manager is associated with.
      *
      * @param context The newly associated Context
      */
