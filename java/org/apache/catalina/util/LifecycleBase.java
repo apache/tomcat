@@ -154,11 +154,6 @@ public abstract class LifecycleBase implements Lifecycle {
             ExceptionUtils.handleThrowable(t);
             setStateInternal(LifecycleState.FAILED, null, false);
             throw new LifecycleException(sm.getString("lifecycleBase.startFail", toString()), t);
-        } finally {
-            if (state.equals(LifecycleState.FAILED)) {
-                stop();
-                return;
-            }
         }
 
         // Shouldn't be necessary but acts as a check that sub-classes are
