@@ -277,11 +277,12 @@ public abstract class LifecycleBase implements Lifecycle {
 
             if (log.isDebugEnabled()) {
                 Exception e = new LifecycleException();
-                log.debug(sm.getString("lifecycleBase.alreadyDestroyed",
-                        toString()), e);
-            } else if (log.isInfoEnabled()) {
-                log.info(sm.getString("lifecycleBase.alreadyDestroyed",
-                        toString()));
+                log.debug(sm.getString("lifecycleBase.alreadyDestroyed", toString()), e);
+            } else if (log.isInfoEnabled() && !(this instanceof Lifecycle.SingleUse)) {
+                // Rather than have every component that might need to call
+                // destroy() check for SingleUse, don't log an info message if
+                // multiple calls are made to destroy()
+                log.info(sm.getString("lifecycleBase.alreadyDestroyed", toString()));
             }
 
             return;
