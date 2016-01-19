@@ -100,6 +100,7 @@ public class BaseAttributeFilter implements NotificationFilter {
      * Return the set of names that are accepted by this filter.  If this
      * filter accepts all attribute names, a zero length array will be
      * returned.
+     * @return the array of names
      */
     public String[] getNames() {
 

@@ -71,7 +71,7 @@ public class NotificationInfo extends FeatureInfo {
 
 
     /**
-     * The set of notification types for this MBean.
+     * @return the set of notification types for this MBean.
      */
     public String[] getNotifTypes() {
         Lock readLock = notifTypesLock.readLock();
@@ -112,6 +112,7 @@ public class NotificationInfo extends FeatureInfo {
     /**
      * Create and return a <code>ModelMBeanNotificationInfo</code> object that
      * corresponds to the attribute described by this instance.
+     * @return the notification info
      */
     public MBeanNotificationInfo createNotificationInfo() {
 

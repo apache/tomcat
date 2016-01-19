@@ -148,7 +148,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * @param idx - the index of the constructor
      * @param clazz - the interface that the proxy will implement
      * @return - returns a constructor used to create new instances
-     * @throws NoSuchMethodException
+     * @throws NoSuchMethodException Constructor not found
      */
     protected Constructor<?> getConstructor(int idx, Class<?> clazz) throws NoSuchMethodException {
         if (constructors[idx]==null) {

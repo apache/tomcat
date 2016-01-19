@@ -90,7 +90,7 @@ public class ManagedBean implements java.io.Serializable {
 
 
     /**
-     * The collection of attributes for this MBean.
+     * @return the collection of attributes for this MBean.
      */
     public AttributeInfo[] getAttributes() {
         AttributeInfo result[] = new AttributeInfo[attributes.size()];
@@ -104,6 +104,7 @@ public class ManagedBean implements java.io.Serializable {
      * described by this descriptor.  If not specified, the standard JMX
      * class (<code>javax.management.modelmbean.RequiredModeLMBean</code>)
      * will be utilized.
+     * @return the class name
      */
     public String getClassName() {
         return this.className;
@@ -121,7 +122,7 @@ public class ManagedBean implements java.io.Serializable {
 
 
     /**
-     * The human-readable description of this MBean.
+     * @return the human-readable description of this MBean.
      */
     public String getDescription() {
         return this.description;
@@ -139,8 +140,8 @@ public class ManagedBean implements java.io.Serializable {
 
 
     /**
-     * The (optional) <code>ObjectName</code> domain in which this MBean
-     * should be registered in the MBeanServer.
+     * @return the (optional) <code>ObjectName</code> domain in which
+     *  this MBean should be registered in the MBeanServer.
      */
     public String getDomain() {
         return this.domain;
@@ -152,7 +153,7 @@ public class ManagedBean implements java.io.Serializable {
 
 
     /**
-     * The (optional) group to which this MBean belongs.
+     * @return the (optional) group to which this MBean belongs.
      */
     public String getGroup() {
         return this.group;
@@ -164,8 +165,8 @@ public class ManagedBean implements java.io.Serializable {
 
 
     /**
-     * The name of this managed bean, which must be unique among all
-     * MBeans managed by a particular MBeans server.
+     * @return the name of this managed bean, which must be unique
+     *  among all MBeans managed by a particular MBeans server.
      */
     public String getName() {
         return this.name;
@@ -183,7 +184,7 @@ public class ManagedBean implements java.io.Serializable {
 
 
     /**
-     * The collection of notifications for this MBean.
+     * @return the collection of notifications for this MBean.
      */
     public NotificationInfo[] getNotifications() {
         return this.notifications;
@@ -191,7 +192,7 @@ public class ManagedBean implements java.io.Serializable {
 
 
     /**
-     * The collection of operations for this MBean.
+     * @return the collection of operations for this MBean.
      */
     public OperationInfo[] getOperations() {
         OperationInfo[] result = new OperationInfo[operations.size()];
@@ -201,7 +202,7 @@ public class ManagedBean implements java.io.Serializable {
 
 
     /**
-     * The fully qualified name of the Java class of the resource
+     * @return the fully qualified name of the Java class of the resource
      * implementation class described by the managed bean described
      * by this descriptor.
      */
@@ -274,7 +275,7 @@ public class ManagedBean implements java.io.Serializable {
      *
      * @param instance Instanced of the managed object, or <code>null</code>
      *  for no associated instance
-     *
+     * @return the MBean
      * @exception InstanceNotFoundException if the managed resource
      *  object cannot be found
      * @exception MBeanException if a problem occurs instantiating the
@@ -342,6 +343,7 @@ public class ManagedBean implements java.io.Serializable {
     /**
      * Create and return a <code>ModelMBeanInfo</code> object that
      * describes this entire managed bean.
+     * @return the MBean info
      */
     MBeanInfo getMBeanInfo() {
 

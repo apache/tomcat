@@ -96,8 +96,8 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 
     /**
      * Return true if the notification was sent successfully, false otherwise.
-     * @param type
-     * @param message
+     * @param type The notification type
+     * @param message The message
      * @return true if the notification succeeded
      */
     public boolean notify(final String type, String message) {

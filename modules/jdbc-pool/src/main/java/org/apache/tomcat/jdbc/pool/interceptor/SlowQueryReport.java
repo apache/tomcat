@@ -215,7 +215,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
 
     /**
      * Sort QueryStats by last invocation time
-     * @param queries
+     * @param queries The queries map
      */
     protected void removeOldest(ConcurrentHashMap<String,QueryStats> queries) {
         ArrayList<QueryStats> list = new ArrayList<>(queries.values());

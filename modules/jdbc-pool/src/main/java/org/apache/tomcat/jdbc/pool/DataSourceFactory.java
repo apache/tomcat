@@ -536,6 +536,7 @@ public class DataSourceFactory implements ObjectFactory {
      * given properties.
      *
      * @param properties the datasource configuration properties
+     * @return the datasource
      * @throws Exception if an error occurs creating the data source
      */
     public DataSource createDataSource(Properties properties) throws Exception {
@@ -580,9 +581,9 @@ public class DataSourceFactory implements ObjectFactory {
     }
 
     /**
-     * <p>Parse properties from the string. Format of the string must be [propertyName=property;]*<p>
-     * @param propText
-     * @return Properties
+     * Parse properties from the string. Format of the string must be [propertyName=property;]*.
+     * @param propText The properties string
+     * @return the properties
      */
     protected static Properties getProperties(String propText) {
         return PoolProperties.getProperties(propText,null);

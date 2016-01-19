@@ -42,7 +42,7 @@ public class AttributeInfo extends FeatureInfo {
     // ------------------------------------------------------------- Properties
 
     /**
-     * The display name of this attribute.
+     * @return the display name of this attribute.
      */
     public String getDisplayName() {
         return (this.displayName);
@@ -53,7 +53,7 @@ public class AttributeInfo extends FeatureInfo {
     }
 
     /**
-     * The name of the property getter method, if non-standard.
+     * @return the name of the property getter method, if non-standard.
      */
     public String getGetMethod() {
         if(getMethod == null)
@@ -67,6 +67,8 @@ public class AttributeInfo extends FeatureInfo {
 
     /**
      * Is this a boolean attribute with an "is" getter?
+     * @return <code>true</code> if this is a boolean attribute
+     *  with an "is" getter
      */
     public boolean isIs() {
         return (this.is);
@@ -79,6 +81,7 @@ public class AttributeInfo extends FeatureInfo {
 
     /**
      * Is this attribute readable by management applications?
+     * @return <code>true</code> if readable
      */
     public boolean isReadable() {
         return (this.readable);
@@ -90,7 +93,7 @@ public class AttributeInfo extends FeatureInfo {
 
 
     /**
-     * The name of the property setter method, if non-standard.
+     * @return the name of the property setter method, if non-standard.
      */
     public String getSetMethod() {
         if( setMethod == null )
@@ -104,6 +107,7 @@ public class AttributeInfo extends FeatureInfo {
 
     /**
      * Is this attribute writable by management applications?
+     * @return <code>true</code> if writable
      */
     public boolean isWriteable() {
         return (this.writeable);
@@ -119,6 +123,7 @@ public class AttributeInfo extends FeatureInfo {
     /**
      * Create and return a <code>ModelMBeanAttributeInfo</code> object that
      * corresponds to the attribute described by this instance.
+     * @return the attribute info
      */
     MBeanAttributeInfo createAttributeInfo() {
         // Return our cached information (if any)
@@ -139,6 +144,7 @@ public class AttributeInfo extends FeatureInfo {
      * @param name Name of the property itself
      * @param getter Do we want a get method (versus a set method)?
      * @param is If returning a getter, do we want the "is" form?
+     * @return the method name
      */
     private String getMethodName(String name, boolean getter, boolean is) {
 
