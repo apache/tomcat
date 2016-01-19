@@ -121,6 +121,7 @@ public class SystemLogHandler extends PrintStream {
 
     /**
      * Find PrintStream to which the output must be written to.
+     * @return the print stream
      */
     protected PrintStream findStream() {
         Stack<CaptureLog> stack = logs.get();

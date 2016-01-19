@@ -680,6 +680,7 @@ public abstract class SocketWrapperBase<E> {
      * @param check for the IO operation completion
      * @param handler to call when the IO is complete
      * @param dsts buffers
+     * @param <A> The attachment type
      * @return the completion state (done, done inline, or still pending)
      */
     public <A> CompletionState read(boolean block, long timeout, TimeUnit unit, A attachment,
@@ -714,6 +715,7 @@ public abstract class SocketWrapperBase<E> {
      *        used when calling the completion handler
      * @param check for the IO operation completion
      * @param handler to call when the IO is complete
+     * @param <A> The attachment type
      * @return the completion state (done, done inline, or still pending)
      */
     public abstract <A> CompletionState read(ByteBuffer[] dsts, int offset, int length,
@@ -742,6 +744,7 @@ public abstract class SocketWrapperBase<E> {
      * @param check for the IO operation completion
      * @param handler to call when the IO is complete
      * @param srcs buffers
+     * @param <A> The attachment type
      * @return the completion state (done, done inline, or still pending)
      */
     public <A> CompletionState write(boolean block, long timeout, TimeUnit unit, A attachment,
@@ -777,6 +780,7 @@ public abstract class SocketWrapperBase<E> {
      *        used when calling the completion handler
      * @param check for the IO operation completion
      * @param handler to call when the IO is complete
+     * @param <A> The attachment type
      * @return the completion state (done, done inline, or still pending)
      */
     public abstract <A> CompletionState write(ByteBuffer[] srcs, int offset, int length,

@@ -253,6 +253,7 @@ public class RulesBase implements Rules {
      * @param namespaceURI Namespace URI to match, or <code>null</code> to
      *  select matching rules regardless of namespace URI
      * @param pattern Pattern to be matched
+     * @return a rules list
      */
     protected List<Rule> lookup(String namespaceURI, String pattern) {
 

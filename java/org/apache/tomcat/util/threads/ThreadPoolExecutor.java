@@ -151,6 +151,8 @@ public class ThreadPoolExecutor extends java.util.concurrent.ThreadPoolExecutor 
      * full after that.
      *
      * @param command the runnable task
+     * @param timeout A timeout for the completion of the task
+     * @param unit The timeout time unit
      * @throws RejectedExecutionException if this task cannot be
      * accepted for execution - the queue is full
      * @throws NullPointerException if command or unit is null
