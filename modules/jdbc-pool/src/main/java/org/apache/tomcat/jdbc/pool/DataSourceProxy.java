@@ -582,7 +582,7 @@ public class DataSourceProxy implements PoolConfiguration {
     /**
      * no-op
      * {@link javax.sql.DataSource#getParentLogger}
-     * @return no reaturn value
+     * @return no return value
      * @throws SQLFeatureNotSupportedException Unsupported
      */
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
@@ -595,7 +595,6 @@ public class DataSourceProxy implements PoolConfiguration {
      * @return null
      * @throws SQLException No exception
      */
-    @SuppressWarnings("unused") // Has to match signature in DataSource
     public PrintWriter getLogWriter() throws SQLException {
         return null;
     }
@@ -607,7 +606,6 @@ public class DataSourceProxy implements PoolConfiguration {
      * @param out Ignored
      * @throws SQLException No exception
      */
-    @SuppressWarnings("unused") // Has to match signature in DataSource
     public void setLogWriter(PrintWriter out) throws SQLException {
         // NOOP
     }

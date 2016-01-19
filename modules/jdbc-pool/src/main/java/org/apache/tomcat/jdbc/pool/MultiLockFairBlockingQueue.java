@@ -41,6 +41,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * <br>
  * Not all of the methods of the {@link java.util.concurrent.BlockingQueue} are implemented.
  *
+ * @param <E> Type of element in the queue
  */
 
 public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
