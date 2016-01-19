@@ -66,7 +66,11 @@ public interface Manager {
      *
      * @return {@code true} if this manager is marked as distributable otherwise
      *         {@code false}
+     *
+     * @deprecated Ignored. {@link Context#getDistributable()} always takes
+     *             precedence. Will be removed in Tomcat 9.0.x.
      */
+    @Deprecated
     public boolean getDistributable();
 
 
@@ -76,7 +80,11 @@ public interface Manager {
      * manager must implement Serializable.
      *
      * @param distributable The new distributable flag
+     *
+     * @deprecated Ignored. {@link Context#getDistributable()} always takes
+     *             precedence. Will be removed in Tomcat 9.0.x.
      */
+    @Deprecated
     public void setDistributable(boolean distributable);
 
 
@@ -85,7 +93,11 @@ public interface Manager {
      * will be considered inactive.
      *
      * @return The default maximum inactive interval in seconds
+     *
+     * @deprecated Ignored. {@link Context#getSessionTimeout()} always takes
+     *             precedence. Will be removed in Tomcat 9.0.x.
      */
+    @Deprecated
     public int getMaxInactiveInterval();
 
 
@@ -94,7 +106,11 @@ public interface Manager {
      * for Sessions created by this Manager.
      *
      * @param interval The new default value
+     *
+     * @deprecated Ignored. {@link Context#getSessionTimeout()} always takes
+     *             precedence. Will be removed in Tomcat 9.0.x.
      */
+    @Deprecated
     public void setMaxInactiveInterval(int interval);
 
 
