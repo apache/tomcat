@@ -563,7 +563,7 @@ public final class PoolUtils {
      * instances reaches the configured minIdle. Note that this is not the same
      * as the pool's minIdle setting.
      */
-    private static class ObjectPoolMinIdleTimerTask<T> extends TimerTask {
+    private static final class ObjectPoolMinIdleTimerTask<T> extends TimerTask {
 
         /** Minimum number of idle instances. Not the same as pool.getMinIdle(). */
         private final int minIdle;
@@ -632,7 +632,7 @@ public final class PoolUtils {
      * instances for the given key reaches the configured minIdle. Note that
      * this is not the same as the pool's minIdle setting.
      */
-    private static class KeyedObjectPoolMinIdleTimerTask<K, V> extends
+    private static final class KeyedObjectPoolMinIdleTimerTask<K, V> extends
             TimerTask {
         /** Minimum number of idle instances. Not the same as pool.getMinIdle(). */
         private final int minIdle;
@@ -716,7 +716,7 @@ public final class PoolUtils {
      * deadlock.
      * </p>
      */
-    private static class SynchronizedObjectPool<T> implements ObjectPool<T> {
+    private static final class SynchronizedObjectPool<T> implements ObjectPool<T> {
 
         /**
          * Object whose monitor is used to synchronize methods on the wrapped
@@ -889,7 +889,7 @@ public final class PoolUtils {
      * deadlock.
      * </p>
      */
-    private static class SynchronizedKeyedObjectPool<K, V> implements
+    private static final class SynchronizedKeyedObjectPool<K, V> implements
             KeyedObjectPool<K, V> {
 
         /**
@@ -1104,7 +1104,7 @@ public final class PoolUtils {
      * Pool library.
      * </p>
      */
-    private static class SynchronizedPooledObjectFactory<T> implements
+    private static final class SynchronizedPooledObjectFactory<T> implements
             PooledObjectFactory<T> {
         /** Synchronization lock */
         private final WriteLock writeLock = new ReentrantReadWriteLock().writeLock();
@@ -1217,7 +1217,7 @@ public final class PoolUtils {
      * Pool library.
      * </p>
      */
-    private static class SynchronizedKeyedPooledObjectFactory<K, V>
+    private static final class SynchronizedKeyedPooledObjectFactory<K, V>
             implements KeyedPooledObjectFactory<K, V> {
         /** Synchronization lock */
         private final WriteLock writeLock = new ReentrantReadWriteLock().writeLock();
@@ -1332,7 +1332,7 @@ public final class PoolUtils {
      * to previously established high water mark), erosion occurs more
      * frequently.
      */
-    private static class ErodingFactor {
+    private static final class ErodingFactor {
         /** Determines frequency of "erosion" events */
         private final float factor;
 
@@ -1751,7 +1751,7 @@ public final class PoolUtils {
      * per-key basis. Timing of erosion events is tracked separately for
      * separate keyed pools.
      */
-    private static class ErodingPerKeyKeyedObjectPool<K, V> extends
+    private static final class ErodingPerKeyKeyedObjectPool<K, V> extends
             ErodingKeyedObjectPool<K, V> {
         /** Erosion factor - same for all pools */
         private final float factor;

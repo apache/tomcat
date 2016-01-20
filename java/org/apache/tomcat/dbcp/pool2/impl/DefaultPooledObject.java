@@ -76,9 +76,8 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
 
         if (rTime > bTime) {
             return rTime - bTime;
-        } else {
-            return System.currentTimeMillis() - bTime;
         }
+        return System.currentTimeMillis() - bTime;
     }
 
     @Override
@@ -122,9 +121,8 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     public long getLastUsedTime() {
         if (object instanceof TrackedUse) {
             return Math.max(((TrackedUse) object).getLastUsed(), lastUseTime);
-        } else {
-            return lastUseTime;
         }
+        return lastUseTime;
     }
 
     @Override

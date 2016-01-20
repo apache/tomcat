@@ -121,14 +121,13 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
             if (idleReferences.isEmpty()) {
                 if (null == factory) {
                     throw new NoSuchElementException();
-                } else {
-                    newlyCreated = true;
-                    obj = factory.makeObject().getObject();
-                    createCount++;
-                    // Do not register with the queue
-                    ref = new PooledSoftReference<>(new SoftReference<>(obj));
-                    allReferences.add(ref);
                 }
+                newlyCreated = true;
+                obj = factory.makeObject().getObject();
+                createCount++;
+                // Do not register with the queue
+                ref = new PooledSoftReference<>(new SoftReference<>(obj));
+                allReferences.add(ref);
             } else {
                 ref = idleReferences.pollFirst();
                 obj = ref.getObject();
@@ -428,5 +427,24 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
                 iterator.remove();
             }
         }
+    }
+
+    @Override
+    protected void toStringAppendFields(StringBuilder builder) {
+        super.toStringAppendFields(builder);
+        builder.append(", factory=");
+        builder.append(factory);
+        builder.append(", refQueue=");
+        builder.append(refQueue);
+        builder.append(", numActive=");
+        builder.append(numActive);
+        builder.append(", destroyCount=");
+        builder.append(destroyCount);
+        builder.append(", createCount=");
+        builder.append(createCount);
+        builder.append(", idleReferences=");
+        builder.append(idleReferences);
+        builder.append(", allReferences=");
+        builder.append(allReferences);
     }
 }

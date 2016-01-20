@@ -222,9 +222,8 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
         int maxIdlePerKeySave = getMaxIdlePerKey();
         if (this.minIdlePerKey > maxIdlePerKeySave) {
             return maxIdlePerKeySave;
-        } else {
-            return minIdlePerKey;
         }
+        return minIdlePerKey;
     }
 
     /**
@@ -481,9 +480,8 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
             if (state != PooledObjectState.ALLOCATED) {
                 throw new IllegalStateException(
                         "Object has already been returned to this pool or is invalid");
-            } else {
-                p.markReturning(); // Keep from being marked abandoned (once GKOP does this)
             }
+            p.markReturning(); // Keep from being marked abandoned (once GKOP does this)
         }
 
         long activeTime = p.getActiveTimeMillis();
@@ -686,9 +684,8 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
         if (objectDeque != null) {
             return objectDeque.getAllObjects().size() -
                     objectDeque.getIdleObjects().size();
-        } else {
-            return 0;
         }
+        return 0;
     }
 
 
@@ -1015,9 +1012,8 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
                 numTotal.decrementAndGet();
                 if (getNumIdle() == 0) {
                     return null;
-                } else {
-                    clearOldest();
                 }
+                clearOldest();
             } else {
                 loop = false;
             }
@@ -1079,9 +1075,8 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
                     numTotal.decrementAndGet();
                 }
                 return true;
-            } else {
-                return false;
             }
+            return false;
         } finally {
             deregister(key);
         }
@@ -1496,6 +1491,21 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
             return allObjects;
         }
 
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("ObjectDeque [idleObjects=");
+            builder.append(idleObjects);
+            builder.append(", createCount=");
+            builder.append(createCount);
+            builder.append(", allObjects=");
+            builder.append(allObjects);
+            builder.append(", numInterested=");
+            builder.append(numInterested);
+            builder.append("]");
+            return builder.toString();
+        }
+
     }
 
     //--- configuration attributes ---------------------------------------------
@@ -1539,4 +1549,31 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
     // JMX specific attributes
     private static final String ONAME_BASE =
         "org.apache.tomcat.dbcp.pool2:type=GenericKeyedObjectPool,name=";
+
+    @Override
+    protected void toStringAppendFields(StringBuilder builder) {
+        super.toStringAppendFields(builder);
+        builder.append(", maxIdlePerKey=");
+        builder.append(maxIdlePerKey);
+        builder.append(", minIdlePerKey=");
+        builder.append(minIdlePerKey);
+        builder.append(", maxTotalPerKey=");
+        builder.append(maxTotalPerKey);
+        builder.append(", factory=");
+        builder.append(factory);
+        builder.append(", fairness=");
+        builder.append(fairness);
+        builder.append(", poolMap=");
+        builder.append(poolMap);
+        builder.append(", poolKeyList=");
+        builder.append(poolKeyList);
+        builder.append(", keyLock=");
+        builder.append(keyLock);
+        builder.append(", numTotal=");
+        builder.append(numTotal);
+        builder.append(", evictionKeyIterator=");
+        builder.append(evictionKeyIterator);
+        builder.append(", evictionKey=");
+        builder.append(evictionKey);
+    }
 }

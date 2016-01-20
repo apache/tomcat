@@ -30,7 +30,7 @@ package org.apache.tomcat.dbcp.pool2;
  *
  * @since 2.0
  */
-public abstract class BasePooledObjectFactory<T> implements PooledObjectFactory<T> {
+public abstract class BasePooledObjectFactory<T> extends BaseObject implements PooledObjectFactory<T> {
     /**
      * Creates an object instance, to be wrapped in a {@link PooledObject}.
      * <p>This method <strong>must</strong> support concurrent, multi-threaded

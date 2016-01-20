@@ -179,4 +179,17 @@ public class GenericKeyedObjectPoolConfig extends BaseObjectPoolConfig {
             throw new AssertionError(); // Can't happen
         }
     }
+
+    @Override
+    protected void toStringAppendFields(StringBuilder builder) {
+        super.toStringAppendFields(builder);
+        builder.append(", minIdlePerKey=");
+        builder.append(minIdlePerKey);
+        builder.append(", maxIdlePerKey=");
+        builder.append(maxIdlePerKey);
+        builder.append(", maxTotalPerKey=");
+        builder.append(maxTotalPerKey);
+        builder.append(", maxTotal=");
+        builder.append(maxTotal);
+    }
 }

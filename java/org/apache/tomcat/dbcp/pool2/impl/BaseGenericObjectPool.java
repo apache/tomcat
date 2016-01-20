@@ -21,6 +21,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.management.ManagementFactory;
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.TimerTask;
@@ -34,6 +35,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
+import org.apache.tomcat.dbcp.pool2.BaseObject;
 import org.apache.tomcat.dbcp.pool2.PooledObject;
 import org.apache.tomcat.dbcp.pool2.SwallowedExceptionListener;
 
@@ -48,7 +50,7 @@ import org.apache.tomcat.dbcp.pool2.SwallowedExceptionListener;
  *
  * @since 2.0
  */
-public abstract class BaseGenericObjectPool<T> {
+public abstract class BaseGenericObjectPool<T> extends BaseObject {
 
     // Constants
     /**
@@ -1107,6 +1109,19 @@ public abstract class BaseGenericObjectPool<T> {
             }
             return (long) result;
         }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("StatsStore [values=");
+            builder.append(Arrays.toString(values));
+            builder.append(", size=");
+            builder.append(size);
+            builder.append(", index=");
+            builder.append(index);
+            builder.append("]");
+            return builder.toString();
+        }
     }
 
     /**
@@ -1198,6 +1213,85 @@ public abstract class BaseGenericObjectPool<T> {
         public T getObject() {
             return instance;
         }
+
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder();
+            builder.append("IdentityWrapper [instance=");
+            builder.append(instance);
+            builder.append("]");
+            return builder.toString();
+        }
+    }
+
+    @Override
+    protected void toStringAppendFields(StringBuilder builder) {
+        builder.append("maxTotal=");
+        builder.append(maxTotal);
+        builder.append(", blockWhenExhausted=");
+        builder.append(blockWhenExhausted);
+        builder.append(", maxWaitMillis=");
+        builder.append(maxWaitMillis);
+        builder.append(", lifo=");
+        builder.append(lifo);
+        builder.append(", fairness=");
+        builder.append(fairness);
+        builder.append(", testOnCreate=");
+        builder.append(testOnCreate);
+        builder.append(", testOnBorrow=");
+        builder.append(testOnBorrow);
+        builder.append(", testOnReturn=");
+        builder.append(testOnReturn);
+        builder.append(", testWhileIdle=");
+        builder.append(testWhileIdle);
+        builder.append(", timeBetweenEvictionRunsMillis=");
+        builder.append(timeBetweenEvictionRunsMillis);
+        builder.append(", numTestsPerEvictionRun=");
+        builder.append(numTestsPerEvictionRun);
+        builder.append(", minEvictableIdleTimeMillis=");
+        builder.append(minEvictableIdleTimeMillis);
+        builder.append(", softMinEvictableIdleTimeMillis=");
+        builder.append(softMinEvictableIdleTimeMillis);
+        builder.append(", evictionPolicy=");
+        builder.append(evictionPolicy);
+        builder.append(", closeLock=");
+        builder.append(closeLock);
+        builder.append(", closed=");
+        builder.append(closed);
+        builder.append(", evictionLock=");
+        builder.append(evictionLock);
+        builder.append(", evictor=");
+        builder.append(evictor);
+        builder.append(", evictionIterator=");
+        builder.append(evictionIterator);
+        builder.append(", factoryClassLoader=");
+        builder.append(factoryClassLoader);
+        builder.append(", oname=");
+        builder.append(oname);
+        builder.append(", creationStackTrace=");
+        builder.append(creationStackTrace);
+        builder.append(", borrowedCount=");
+        builder.append(borrowedCount);
+        builder.append(", returnedCount=");
+        builder.append(returnedCount);
+        builder.append(", createdCount=");
+        builder.append(createdCount);
+        builder.append(", destroyedCount=");
+        builder.append(destroyedCount);
+        builder.append(", destroyedByEvictorCount=");
+        builder.append(destroyedByEvictorCount);
+        builder.append(", destroyedByBorrowValidationCount=");
+        builder.append(destroyedByBorrowValidationCount);
+        builder.append(", activeTimes=");
+        builder.append(activeTimes);
+        builder.append(", idleTimes=");
+        builder.append(idleTimes);
+        builder.append(", waitTimes=");
+        builder.append(waitTimes);
+        builder.append(", maxBorrowWaitTimeMillis=");
+        builder.append(maxBorrowWaitTimeMillis);
+        builder.append(", swallowedExceptionListener=");
+        builder.append(swallowedExceptionListener);
     }
 
 }
