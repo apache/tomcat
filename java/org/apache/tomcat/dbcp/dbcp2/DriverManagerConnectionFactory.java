@@ -45,6 +45,17 @@ public class DriverManagerConnectionFactory implements ConnectionFactory {
      * Constructor for DriverManagerConnectionFactory.
      * @param connectUri a database url of the form
      * <code> jdbc:<em>subprotocol</em>:<em>subname</em></code>
+     * @since 2.2
+     */
+    public DriverManagerConnectionFactory(String connectUri) {
+        _connectUri = connectUri;
+        _props = new Properties();
+    }
+
+    /**
+     * Constructor for DriverManagerConnectionFactory.
+     * @param connectUri a database url of the form
+     * <code> jdbc:<em>subprotocol</em>:<em>subname</em></code>
      * @param props a list of arbitrary string tag/value pairs as
      * connection arguments; normally at least a "user" and "password"
      * property should be included.

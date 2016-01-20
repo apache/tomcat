@@ -177,7 +177,8 @@ public class BasicDataSourceFactory implements ObjectFactory {
         PROP_ENABLE_AUTOCOMMIT_ON_RETURN,
         PROP_DEFAULT_QUERYTIMEOUT,
         PROP_FASTFAIL_VALIDATION,
-        PROP_DISCONNECTION_SQL_CODES
+        PROP_DISCONNECTION_SQL_CODES,
+        PROP_JMX_NAME
     };
 
     /**

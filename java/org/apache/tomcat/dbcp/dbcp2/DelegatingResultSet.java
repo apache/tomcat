@@ -226,7 +226,7 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
     public double getDouble(int columnIndex) throws SQLException
     { try { return _res.getDouble(columnIndex); } catch (SQLException e) { handleException(e); return 0; } }
 
-    /** @deprecated */
+    /** @deprecated Use {@link #getBigDecimal(int)} */
     @Deprecated
     @Override
     public BigDecimal getBigDecimal(int columnIndex, int scale) throws SQLException
@@ -252,7 +252,7 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
     public InputStream getAsciiStream(int columnIndex) throws SQLException
     { try { return _res.getAsciiStream(columnIndex); } catch (SQLException e) { handleException(e); return null; } }
 
-    /** @deprecated */
+    /** @deprecated Use {@link #getCharacterStream(int)} */
     @Deprecated
     @Override
     public InputStream getUnicodeStream(int columnIndex) throws SQLException
@@ -294,7 +294,7 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
     public double getDouble(String columnName) throws SQLException
     { try { return _res.getDouble(columnName); } catch (SQLException e) { handleException(e); return 0; } }
 
-    /** @deprecated */
+    /** @deprecated Use {@link #getBigDecimal(String)} */
     @Deprecated
     @Override
     public BigDecimal getBigDecimal(String columnName, int scale) throws SQLException
@@ -320,7 +320,7 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
     public InputStream getAsciiStream(String columnName) throws SQLException
     { try { return _res.getAsciiStream(columnName); } catch (SQLException e) { handleException(e); return null; } }
 
-    /** @deprecated */
+    /** @deprecated Use {@link #getCharacterStream(String)} */
     @Deprecated
     @Override
     public InputStream getUnicodeStream(String columnName) throws SQLException
