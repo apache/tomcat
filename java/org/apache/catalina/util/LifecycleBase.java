@@ -151,18 +151,24 @@ public abstract class LifecycleBase implements Lifecycle {
         try {
             startInternal();
         } catch (Throwable t) {
+            // This is an 'uncontrolled' failure so put the component into the
+            // FAILED state and throw an exception.
             ExceptionUtils.handleThrowable(t);
             setStateInternal(LifecycleState.FAILED, null, false);
             throw new LifecycleException(sm.getString("lifecycleBase.startFail", toString()), t);
         }
 
-        // Shouldn't be necessary but acts as a check that sub-classes are
-        // doing what they are supposed to.
-        if (!state.equals(LifecycleState.STARTING)) {
+        if (state.equals(LifecycleState.FAILED)) {
+            // This is a 'controlled' failure. The component put itself into the
+            // FAILED state so call stop() to complete the clean-up.
+            stop();
+        } else if (!state.equals(LifecycleState.STARTING)) {
+            // Shouldn't be necessary but acts as a check that sub-classes are
+            // doing what they are supposed to.
             invalidTransition(Lifecycle.AFTER_START_EVENT);
+        } else {
+            setStateInternal(LifecycleState.STARTED, null, false);
         }
-
-        setStateInternal(LifecycleState.STARTED, null, false);
     }
 
 
