@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.dbcp.pool2.impl;
 
+import org.apache.tomcat.dbcp.pool2.BaseObject;
+
 /**
  * Provides the implementation for the common attributes shared by the
  * sub-classes. New instances of this class will be created using the defaults
@@ -25,7 +27,7 @@ package org.apache.tomcat.dbcp.pool2.impl;
  *
  * @since 2.0
  */
-public abstract class BaseObjectPoolConfig implements Cloneable {
+public abstract class BaseObjectPoolConfig extends BaseObject implements Cloneable {
 
     /**
      * The default value for the {@code lifo} configuration attribute.
@@ -634,5 +636,41 @@ public abstract class BaseObjectPoolConfig implements Cloneable {
      */
     public void setJmxNamePrefix(String jmxNamePrefix) {
         this.jmxNamePrefix = jmxNamePrefix;
+    }
+
+    @Override
+    protected void toStringAppendFields(StringBuilder builder) {
+        builder.append("lifo=");
+        builder.append(lifo);
+        builder.append(", fairness=");
+        builder.append(fairness);
+        builder.append(", maxWaitMillis=");
+        builder.append(maxWaitMillis);
+        builder.append(", minEvictableIdleTimeMillis=");
+        builder.append(minEvictableIdleTimeMillis);
+        builder.append(", softMinEvictableIdleTimeMillis=");
+        builder.append(softMinEvictableIdleTimeMillis);
+        builder.append(", numTestsPerEvictionRun=");
+        builder.append(numTestsPerEvictionRun);
+        builder.append(", evictionPolicyClassName=");
+        builder.append(evictionPolicyClassName);
+        builder.append(", testOnCreate=");
+        builder.append(testOnCreate);
+        builder.append(", testOnBorrow=");
+        builder.append(testOnBorrow);
+        builder.append(", testOnReturn=");
+        builder.append(testOnReturn);
+        builder.append(", testWhileIdle=");
+        builder.append(testWhileIdle);
+        builder.append(", timeBetweenEvictionRunsMillis=");
+        builder.append(timeBetweenEvictionRunsMillis);
+        builder.append(", blockWhenExhausted=");
+        builder.append(blockWhenExhausted);
+        builder.append(", jmxEnabled=");
+        builder.append(jmxEnabled);
+        builder.append(", jmxNamePrefix=");
+        builder.append(jmxNamePrefix);
+        builder.append(", jmxNameBase=");
+        builder.append(jmxNameBase);
     }
 }

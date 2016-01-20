@@ -30,7 +30,7 @@ package org.apache.tomcat.dbcp.pool2;
  *
  * @since 2.0
  */
-public abstract class BaseKeyedPooledObjectFactory<K,V>
+public abstract class BaseKeyedPooledObjectFactory<K,V> extends BaseObject
         implements KeyedPooledObjectFactory<K,V> {
 
     /**

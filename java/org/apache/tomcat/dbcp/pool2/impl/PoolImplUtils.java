@@ -113,14 +113,13 @@ class PoolImplUtils {
     private static Object getTypeParameter(Class<?> clazz, Type argType) {
         if (argType instanceof Class<?>) {
             return argType;
-        } else {
-            TypeVariable<?>[] tvs = clazz.getTypeParameters();
-            for (int i = 0; i < tvs.length; i++) {
-                if (tvs[i].equals(argType)) {
-                    return Integer.valueOf(i);
-                }
-            }
-            return null;
         }
+        TypeVariable<?>[] tvs = clazz.getTypeParameters();
+        for (int i = 0; i < tvs.length; i++) {
+            if (tvs[i].equals(argType)) {
+                return Integer.valueOf(i);
+            }
+        }
+        return null;
     }
 }

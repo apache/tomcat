@@ -30,7 +30,7 @@ package org.apache.tomcat.dbcp.pool2;
 public interface UsageTracking<T> {
 
     /**
-     * This method is called every time a pooled object to enable the pool to
+     * This method is called every time a pooled object is used to enable the pool to
      * better track borrowed objects.
      *
      * @param pooledObject  The object that is being used

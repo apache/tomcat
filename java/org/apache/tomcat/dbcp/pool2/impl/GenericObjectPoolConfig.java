@@ -141,4 +141,15 @@ public class GenericObjectPoolConfig extends BaseObjectPoolConfig {
             throw new AssertionError(); // Can't happen
         }
     }
+
+    @Override
+    protected void toStringAppendFields(StringBuilder builder) {
+        super.toStringAppendFields(builder);
+        builder.append(", maxTotal=");
+        builder.append(maxTotal);
+        builder.append(", maxIdle=");
+        builder.append(maxIdle);
+        builder.append(", minIdle=");
+        builder.append(minIdle);
+    }
 }

@@ -31,7 +31,6 @@ public class EvictionConfig {
     private final long idleSoftEvictTime;
     private final int minIdle;
 
-
     /**
      * Create a new eviction configuration with the specified parameters.
      * Instances are immutable.
@@ -95,5 +94,21 @@ public class EvictionConfig {
      */
     public int getMinIdle() {
         return minIdle;
+    }
+
+    /**
+     * @since 2.4
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("EvictionConfig [idleEvictTime=");
+        builder.append(idleEvictTime);
+        builder.append(", idleSoftEvictTime=");
+        builder.append(idleSoftEvictTime);
+        builder.append(", minIdle=");
+        builder.append(minIdle);
+        builder.append("]");
+        return builder.toString();
     }
 }
