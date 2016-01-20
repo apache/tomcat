@@ -105,9 +105,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         return sw.toString();
     }
 
-    /**
-     * Constructor.
-     */
+
     public TagLibraryInfoImpl(JspCompilationContext ctxt, ParserController pc,
             PageInfo pi, String prefix, String uriIn,
             TldResourcePath tldResourcePath, ErrorDispatcher err)

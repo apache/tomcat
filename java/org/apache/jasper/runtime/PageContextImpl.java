@@ -925,6 +925,7 @@ public class PageContextImpl extends PageContext {
      * @param functionMap
      *            Maps prefix and name to Method
      * @return The result of the evaluation
+     * @throws ELException If an error occurs during the evaluation
      */
     public static Object proprietaryEvaluate(final String expression,
             final Class<?> expectedType, final PageContext pageContext,
