@@ -20,14 +20,12 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInput;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
+import org.apache.tomcat.util.bcel.Const;
 
 /**
- * This class is derived from the abstract
- * <A HREF="org.apache.tomcat.util.bcel.classfile.Constant.html">Constant</A> class
+ * This class is derived from the abstract {@link Constant}
  * and represents a reference to an int object.
  *
- * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Constant
  */
 public final class ConstantInteger extends Constant {
@@ -42,7 +40,7 @@ public final class ConstantInteger extends Constant {
      * @throws IOException
      */
     ConstantInteger(DataInput file) throws IOException {
-        super(Constants.CONSTANT_Integer);
+        super(Const.CONSTANT_Integer);
         this.bytes = file.readInt();
     }
 

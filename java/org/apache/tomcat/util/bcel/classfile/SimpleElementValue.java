@@ -17,7 +17,7 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import org.apache.tomcat.util.bcel.Constants;
+import org.apache.tomcat.util.bcel.Const;
 
 public class SimpleElementValue extends ElementValue
 {
@@ -41,51 +41,51 @@ public class SimpleElementValue extends ElementValue
     @Override
     public String stringifyValue()
     {
-        switch (type)
+        ConstantPool cpool = super.getConstantPool();
+        final int _type = super.getType();
+        switch (_type)
         {
         case PRIMITIVE_INT:
             ConstantInteger c = (ConstantInteger) cpool.getConstant(getIndex(),
-                    Constants.CONSTANT_Integer);
+                    Const.CONSTANT_Integer);
             return Integer.toString(c.getBytes());
         case PRIMITIVE_LONG:
             ConstantLong j = (ConstantLong) cpool.getConstant(getIndex(),
-                    Constants.CONSTANT_Long);
+                    Const.CONSTANT_Long);
             return Long.toString(j.getBytes());
         case PRIMITIVE_DOUBLE:
             ConstantDouble d = (ConstantDouble) cpool.getConstant(getIndex(),
-                    Constants.CONSTANT_Double);
+                    Const.CONSTANT_Double);
             return Double.toString(d.getBytes());
         case PRIMITIVE_FLOAT:
             ConstantFloat f = (ConstantFloat) cpool.getConstant(getIndex(),
-                    Constants.CONSTANT_Float);
+                    Const.CONSTANT_Float);
             return Float.toString(f.getBytes());
         case PRIMITIVE_SHORT:
             ConstantInteger s = (ConstantInteger) cpool.getConstant(getIndex(),
-                    Constants.CONSTANT_Integer);
+                    Const.CONSTANT_Integer);
             return Integer.toString(s.getBytes());
         case PRIMITIVE_BYTE:
             ConstantInteger b = (ConstantInteger) cpool.getConstant(getIndex(),
-                    Constants.CONSTANT_Integer);
+                    Const.CONSTANT_Integer);
             return Integer.toString(b.getBytes());
         case PRIMITIVE_CHAR:
             ConstantInteger ch = (ConstantInteger) cpool.getConstant(
-                    getIndex(), Constants.CONSTANT_Integer);
+                    getIndex(), Const.CONSTANT_Integer);
             return String.valueOf((char)ch.getBytes());
         case PRIMITIVE_BOOLEAN:
             ConstantInteger bo = (ConstantInteger) cpool.getConstant(
-                    getIndex(), Constants.CONSTANT_Integer);
+                    getIndex(), Const.CONSTANT_Integer);
             if (bo.getBytes() == 0) {
                 return "false";
             }
             return "true";
         case STRING:
             ConstantUtf8 cu8 = (ConstantUtf8) cpool.getConstant(getIndex(),
-                    Constants.CONSTANT_Utf8);
+                    Const.CONSTANT_Utf8);
             return cu8.getBytes();
         default:
-            throw new RuntimeException(
-                    "SimpleElementValue class does not know how to stringify type "
-                            + type);
+            throw new RuntimeException("SimpleElementValue class does not know how to stringify type " + _type);
         }
     }
 }

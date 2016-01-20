@@ -20,12 +20,10 @@ import java.io.DataInput;
 import java.io.EOFException;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
+import org.apache.tomcat.util.bcel.Const;
 
 /**
  * Utility functions that do not really belong to any class in particular.
- *
- * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 final class Utility {
 
@@ -47,11 +45,11 @@ final class Utility {
     }
 
     static String getClassName(ConstantPool constant_pool, int index) {
-        Constant c = constant_pool.getConstant(index, Constants.CONSTANT_Class);
+        Constant c = constant_pool.getConstant(index, Const.CONSTANT_Class);
         int i = ((ConstantClass) c).getNameIndex();
 
         // Finally get the string from the constant pool
-        c = constant_pool.getConstant(i, Constants.CONSTANT_Utf8);
+        c = constant_pool.getConstant(i, Const.CONSTANT_Utf8);
         String name = ((ConstantUtf8) c).getBytes();
 
         return compactClassName(name);

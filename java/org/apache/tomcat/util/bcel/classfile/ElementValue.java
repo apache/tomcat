@@ -19,15 +19,11 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInput;
 import java.io.IOException;
 
-/**
- * @author <A HREF="mailto:dbrosius@qis.net">D. Brosius</A>
- * @since 6.0
- */
 public abstract class ElementValue
 {
-    protected final int type;
+    private final int type;
 
-    protected final ConstantPool cpool;
+    private final ConstantPool cpool;
 
 
     ElementValue(int type, ConstantPool cpool) {
@@ -91,5 +87,13 @@ public abstract class ElementValue
                 throw new ClassFormatException(
                         "Unexpected element value kind in annotation: " + type);
         }
+    }
+
+    final ConstantPool getConstantPool() {
+        return cpool;
+    }
+
+    final int getType() {
+        return type;
     }
 }

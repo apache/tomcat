@@ -29,7 +29,7 @@ to assist committers in keeping them up to date.
 
 BCEL
 org.apache.tomcat.util.bcel is copied from:
-/commons/proper/bcel/trunk/src/main/java/org/apache/bcel
+/commons/proper/bcel/trunk/src/main/java/org/apache/commons/bcel6
 
 DBCP
 org.apache.tomcat.dbcp.dbcp2 is copied from:
