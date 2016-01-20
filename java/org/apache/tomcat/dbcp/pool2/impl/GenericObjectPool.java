@@ -324,7 +324,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      *
      * @see AbandonedConfig
      */
-    public void setAbandonedConfig(AbandonedConfig abandonedConfig) throws IllegalArgumentException {
+    public void setAbandonedConfig(AbandonedConfig abandonedConfig) {
         if (abandonedConfig == null) {
             this.abandonedConfig = null;
         } else {
