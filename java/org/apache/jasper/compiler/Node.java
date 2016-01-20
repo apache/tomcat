@@ -2368,6 +2368,8 @@ abstract class Node implements TagConstants {
          *
          * @param v
          *            The visitor used
+         *
+         * @throws JasperException if an error occurs while visiting a node
          */
         public void visit(Visitor v) throws JasperException {
             Iterator<Node> iter = list.iterator();

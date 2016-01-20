@@ -38,10 +38,6 @@ abstract class ELNode {
 
     public abstract void accept(Visitor v) throws JasperException;
 
-    /**
-     * Child classes
-     */
-
 
     /**
      * Represents an EL expression: anything in ${ and }.
@@ -204,8 +200,11 @@ abstract class ELNode {
         }
 
         /**
-         * Visit the nodes in the list with the supplied visitor
+         * Visit the nodes in the list with the supplied visitor.
+         *
          * @param v The visitor used
+         *
+         * @throws JasperException if an error occurs while visiting a node
          */
         public void visit(Visitor v) throws JasperException {
             Iterator<ELNode> iter = list.iterator();

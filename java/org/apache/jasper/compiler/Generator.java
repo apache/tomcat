@@ -931,9 +931,7 @@ class Generator {
 
         private HashMap<String,String> textMap;
 
-        /**
-         * Constructor.
-         */
+
         public GenerateVisitor(boolean isTagFile, ServletWriter out,
                 ArrayList<GenBuffer> methodsBuffered,
                 FragmentHelperClass fragmentHelperClass) {
@@ -3387,7 +3385,11 @@ class Generator {
          * Generate the code required to obtain the runtime value of the given
          * named attribute.
          *
+         * @param n The named attribute node whose value is required
+         *
          * @return The name of the temporary variable the result is stored in.
+         *
+         * @throws JasperException If an error
          */
         public String generateNamedAttributeValue(Node.NamedAttribute n)
                 throws JasperException {
