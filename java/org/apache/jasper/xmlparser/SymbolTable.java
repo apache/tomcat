@@ -162,10 +162,6 @@ public class SymbolTable {
      */
     private static final class Entry {
 
-        //
-        // Data
-        //
-
         /**
          * Symbol.
          */
@@ -182,11 +178,7 @@ public class SymbolTable {
          */
         private final Entry next;
 
-        //
-        // Constructors
-        //
-
-        /**
+        /*
          * Constructs a new entry from the specified symbol information and
          * next entry reference.
          */
@@ -196,7 +188,5 @@ public class SymbolTable {
             symbol = new String(characters).intern();
             this.next = next;
         }
-
-    } // class Entry
-
-} // class SymbolTable
+    }
+}
