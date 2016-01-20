@@ -89,6 +89,23 @@ Eclipse IDE is documented here:
  4.2: http://help.eclipse.org/juno/topic/org.eclipse.jdt.doc.user/tasks/task-suppress_warnings.htm
 
 
+# Java -> Compiler -> Javadoc
+=============================
+
+Enable 'Process Javadoc comments'
+  - Malformed Javadoc comments          - W
+    - Only consider members visible as  - Public
+    [X] Validate tag arguments
+        [ ] Report non-visible references
+        [X] Report deprecated references
+    - Missing tag descriptions          - Validate all standard tags
+  - Missing Javadoc tags                - W
+    - Only consider members visible as  - Public
+    [X] - Ignore in overriding and implementing methods
+    [ ] - Ignore method type parameters
+  - Missing Javadoc comments            - I
+
+
 # Java -> Code Style -> Organize Imports
 ==========================================
 
