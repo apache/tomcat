@@ -417,8 +417,9 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      *
      * @param e element to link
      *
-     * @throws NullPointerException
-     * @throws InterruptedException
+     * @throws NullPointerException if e is null
+     * @throws InterruptedException if the thread is interrupted whilst waiting
+     *         for space
      */
     public void putFirst(E e) throws InterruptedException {
         if (e == null) {
@@ -440,8 +441,9 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      *
      * @param e element to link
      *
-     * @throws NullPointerException
-     * @throws InterruptedException
+     * @throws NullPointerException if e is null
+     * @throws InterruptedException if the thread is interrupted whilst waiting
+     *         for space
      */
     public void putLast(E e) throws InterruptedException {
         if (e == null) {
@@ -467,8 +469,9 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      *
      * @return {@code true} if successful, otherwise {@code false}
      *
-     * @throws NullPointerException
-     * @throws InterruptedException
+     * @throws NullPointerException if e is null
+     * @throws InterruptedException if the thread is interrupted whilst waiting
+     *         for space
      */
     public boolean offerFirst(E e, long timeout, TimeUnit unit)
         throws InterruptedException {
@@ -500,8 +503,9 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      *
      * @return {@code true} if successful, otherwise {@code false}
      *
-     * @throws NullPointerException
-     * @throws InterruptedException
+     * @throws NullPointerException if e is null
+     * @throws InterruptedException if the thread is interrupted whist waiting
+     *         for space
      */
     public boolean offerLast(E e, long timeout, TimeUnit unit)
         throws InterruptedException {
@@ -772,8 +776,9 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      *
      * @param e element to link
      *
-     * @throws NullPointerException
-     * @throws InterruptedException
+     * @throws NullPointerException if e is null
+     * @throws InterruptedException if the thread is interrupted whilst waiting
+     *         for space
      */
     public void put(E e) throws InterruptedException {
         putLast(e);
@@ -791,8 +796,9 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      *
      * @return {@code true} if successful, otherwise {@code false}
      *
-     * @throws NullPointerException
-     * @throws InterruptedException
+     * @throws NullPointerException if e is null
+     * @throws InterruptedException if the thread is interrupted whilst waiting
+     *         for space
      */
     public boolean offer(E e, long timeout, TimeUnit unit)
         throws InterruptedException {
@@ -897,10 +903,13 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      *
      * @return number of elements added to the collection
      *
-     * @throws UnsupportedOperationException
-     * @throws ClassCastException
-     * @throws NullPointerException
-     * @throws IllegalArgumentException
+     * @throws UnsupportedOperationException if the add operation is not
+     *         supported by the specified collection
+     * @throws ClassCastException if the class of the elements held by this
+     *         collection prevents them from being added to the specified
+     *         collection
+     * @throws NullPointerException if c is null
+     * @throws IllegalArgumentException if c is this instance
      */
     public int drainTo(Collection<? super E> c) {
         return drainTo(c, Integer.MAX_VALUE);
@@ -914,10 +923,13 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
      * @param maxElements maximum number of elements to remove from the queue
      *
      * @return number of elements added to the collection
-     * @throws UnsupportedOperationException
-     * @throws ClassCastException
-     * @throws NullPointerException
-     * @throws IllegalArgumentException
+     * @throws UnsupportedOperationException if the add operation is not
+     *         supported by the specified collection
+     * @throws ClassCastException if the class of the elements held by this
+     *         collection prevents them from being added to the specified
+     *         collection
+     * @throws NullPointerException if c is null
+     * @throws IllegalArgumentException if c is this instance
      */
     public int drainTo(Collection<? super E> c, int maxElements) {
         if (c == null) {
