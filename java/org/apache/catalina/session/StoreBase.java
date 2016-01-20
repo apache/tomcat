@@ -19,12 +19,16 @@ package org.apache.catalina.session;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Store;
+import org.apache.catalina.util.CustomObjectInputStream;
 import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -193,7 +197,27 @@ public abstract class StoreBase extends LifecycleBase implements Store {
         }
     }
 
+
     // --------------------------------------------------------- Protected Methods
+
+    /**
+     * Create the object input stream to use to read a session from the store.
+     * Sub-classes <b>must</b> have set the thread context class loader before
+     * calling this method.
+     *
+     * @param is The input stream provided by the sub-class that will provide
+     *           the data for a session
+     *
+     * @return An appropriately configured ObjectInputStream from which the
+     *         session can be read.
+     *
+     * @throws IOException if a problem occurs creating the ObjectInputStream
+     */
+    protected ObjectInputStream getObjectInputStream(InputStream is) throws IOException {
+        BufferedInputStream bis = new BufferedInputStream(is);
+        return new CustomObjectInputStream(bis, Thread.currentThread().getContextClassLoader());
+    }
+
 
     @Override
     protected void initInternal() {

@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.session;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,9 +29,8 @@ import java.util.ArrayList;
 import javax.servlet.ServletContext;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Loader;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Session;
-import org.apache.catalina.util.CustomObjectInputStream;
 import org.apache.juli.logging.Log;
 
 /**
@@ -226,22 +224,10 @@ public final class FileStore extends StoreBase {
             contextLog.debug(sm.getString(getStoreName()+".loading", id, file.getAbsolutePath()));
         }
 
-        ObjectInputStream ois = null;
-        Loader loader = null;
-        ClassLoader classLoader = null;
-        ClassLoader oldThreadContextCL = Thread.currentThread().getContextClassLoader();
+        ClassLoader oldThreadContextCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
+
         try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
-                BufferedInputStream bis = new BufferedInputStream(fis)) {
-            loader = context.getLoader();
-            if (loader != null) {
-                classLoader = loader.getClassLoader();
-            }
-            if (classLoader == null) {
-                classLoader = getClass().getClassLoader();
-            } else {
-                Thread.currentThread().setContextClassLoader(classLoader);
-            }
-            ois = new CustomObjectInputStream(bis, classLoader);
+                ObjectInputStream ois = getObjectInputStream(fis)) {
 
             StandardSession session = (StandardSession) manager.createEmptySession();
             session.readObjectData(ois);
@@ -253,15 +239,7 @@ public final class FileStore extends StoreBase {
             }
             return null;
         } finally {
-            if (ois != null) {
-                // Close the input stream
-                try {
-                    ois.close();
-                } catch (IOException f) {
-                    // Ignore
-                }
-            }
-            Thread.currentThread().setContextClassLoader(oldThreadContextCL);
+            context.unbind(Globals.IS_SECURITY_ENABLED, oldThreadContextCL);
         }
     }
 
