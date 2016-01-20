@@ -21,7 +21,11 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
+import org.apache.catalina.Globals;
+import org.apache.catalina.Host;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.Store;
@@ -42,6 +46,14 @@ import org.apache.catalina.connector.Response;
  */
 public class PersistentValve extends ValveBase {
 
+    // Saves a couple of calls to getClassLoader() on every request. Under high
+    // load these calls took just long enough to appear as a hot spot (although
+    // a very minor one) in a profiler.
+    private static final ClassLoader MY_CLASSLOADER = PersistentValve.class.getClassLoader();
+
+    private volatile boolean clBindRequired;
+
+
     //------------------------------------------------------ Constructor
 
     public PersistentValve() {
@@ -50,6 +62,17 @@ public class PersistentValve extends ValveBase {
 
 
     // --------------------------------------------------------- Public Methods
+
+    @Override
+    public void setContainer(Container container) {
+        super.setContainer(container);
+        if (container instanceof Engine || container instanceof Host) {
+            clBindRequired = true;
+        } else {
+            clBindRequired = false;
+        }
+    }
+
 
     /**
      * Select the appropriate child Context to process this request,
@@ -85,6 +108,7 @@ public class PersistentValve extends ValveBase {
                     session = store.load(sessionId);
                 } catch (Exception e) {
                     container.getLogger().error("deserializeError");
+                } finally {
                 }
                 if (session != null) {
                     if (!session.isValid() ||
@@ -131,31 +155,38 @@ public class PersistentValve extends ValveBase {
                 container.getLogger().debug("newsessionId: " + newsessionId);
             }
             if (newsessionId!=null) {
-                /* store the session and remove it from the manager */
-                if (manager instanceof StoreManager) {
-                    Session session = manager.findSession(newsessionId);
-                    Store store = ((StoreManager) manager).getStore();
-                    if (store != null && session != null && session.isValid() &&
-                            !isSessionStale(session, System.currentTimeMillis())) {
-                        store.save(session);
-                        ((StoreManager) manager).removeSuper(session);
-                        session.recycle();
+                try {
+                    bind(context);
+
+                    /* store the session and remove it from the manager */
+                    if (manager instanceof StoreManager) {
+                        Session session = manager.findSession(newsessionId);
+                        Store store = ((StoreManager) manager).getStore();
+                        if (store != null && session != null && session.isValid() &&
+                                !isSessionStale(session, System.currentTimeMillis())) {
+                            store.save(session);
+                            ((StoreManager) manager).removeSuper(session);
+                            session.recycle();
+                        } else {
+                            if (container.getLogger().isDebugEnabled()) {
+                                container.getLogger().debug("newsessionId store: " +
+                                        store + " session: " + session +
+                                        " valid: " +
+                                        (session == null ? "N/A" : Boolean.toString(
+                                                session.isValid())) +
+                                        " stale: " + isSessionStale(session,
+                                                System.currentTimeMillis()));
+                            }
+
+                        }
                     } else {
                         if (container.getLogger().isDebugEnabled()) {
-                            container.getLogger().debug("newsessionId store: " +
-                                    store + " session: " + session +
-                                    " valid: " +
-                                    (session == null ? "N/A" : Boolean.toString(
-                                            session.isValid())) +
-                                    " stale: " + isSessionStale(session,
-                                            System.currentTimeMillis()));
+                            container.getLogger().debug("newsessionId Manager: " +
+                                    manager);
                         }
                     }
-                } else {
-                    if (container.getLogger().isDebugEnabled()) {
-                        container.getLogger().debug("newsessionId Manager: " +
-                                manager);
-                    }
+                } finally {
+                    unbind(context);
                 }
             }
         }
@@ -185,5 +216,19 @@ public class PersistentValve extends ValveBase {
         }
 
         return false;
+    }
+
+
+    private void bind(Context context) {
+        if (clBindRequired) {
+            context.bind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
+        }
+    }
+
+
+    private void unbind(Context context) {
+        if (clBindRequired) {
+            context.unbind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
+        }
     }
 }
