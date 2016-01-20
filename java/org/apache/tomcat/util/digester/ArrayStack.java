@@ -38,6 +38,8 @@ import java.util.EmptyStackException;
  * <p>Unlike <code>Stack</code>, <code>ArrayStack</code> accepts null entries.
  * </p>
  *
+ * @param <E> Type of object in this stack
+ *
  * @see java.util.Stack
  * @since Digester 1.6 (from Commons Collections 1.0)
  */
