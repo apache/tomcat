@@ -605,8 +605,7 @@ public class ContextConfig implements LifecycleListener {
         file = new File(docBase);
         String origDocBase = docBase;
 
-        ContextName cn = new ContextName(context.getPath(),
-                context.getWebappVersion());
+        ContextName cn = new ContextName(context.getPath(), context.getWebappVersion());
         String pathName = cn.getBaseName();
 
         boolean unpackWARs = true;
@@ -631,10 +630,21 @@ public class ContextConfig implements LifecycleListener {
             }
         } else {
             File docDir = new File(docBase);
-            if (!docDir.exists()) {
-                File warFile = new File(docBase + ".war");
-                if (warFile.exists()) {
-                    URL war = new URL("jar:" + warFile.toURI().toURL() + "!/");
+            File warFile = new File(docBase + ".war");
+            URL war = null;
+            if (warFile.exists()) {
+                war = new URL("jar:" + warFile.toURI().toURL() + "!/");
+            }
+            if (docDir.exists()) {
+                if (war != null && unpackWARs) {
+                    // Check if WAR needs to be re-expanded (e.g. if it has
+                    // changed). Note: HostConfig.deployWar() takes care of
+                    // ensuring that the correct XML file is used.
+                    // This will be a NO-OP if the WAR is unchanged.
+                    ExpandWar.expand(host, war, pathName);
+                }
+            } else {
+                if (war != null) {
                     if (unpackWARs) {
                         docBase = ExpandWar.expand(host, war, pathName);
                         file = new File(docBase);
