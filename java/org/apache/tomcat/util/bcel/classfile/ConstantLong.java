@@ -20,14 +20,12 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInput;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
+import org.apache.tomcat.util.bcel.Const;
 
 /**
- * This class is derived from the abstract
- * <A HREF="org.apache.tomcat.util.bcel.classfile.Constant.html">Constant</A> class
+ * This class is derived from the abstract {@link Constant}
  * and represents a reference to a long object.
  *
- * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Constant
  */
 public final class ConstantLong extends Constant {
@@ -42,7 +40,7 @@ public final class ConstantLong extends Constant {
      * @throws IOException
      */
     ConstantLong(DataInput input) throws IOException {
-        super(Constants.CONSTANT_Long);
+        super(Const.CONSTANT_Long);
         this.bytes = input.readLong();
     }
 

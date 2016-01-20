@@ -22,22 +22,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.tomcat.util.bcel.Constants;
+import org.apache.tomcat.util.bcel.Const;
 
 /**
  * represents one annotation in the annotation table
- *
- * @author  <A HREF="mailto:dbrosius@mebigfatguy.com">D. Brosius</A>
- * @since 6.0
  */
-public class AnnotationEntry implements Constants {
+public class AnnotationEntry {
 
     private final int type_index;
     private final ConstantPool constant_pool;
 
     private final List<ElementValuePair> element_value_pairs;
 
-    /**
+    /*
      * Creates an AnnotationEntry from a DataInputStream
      *
      * @param input
@@ -61,7 +58,7 @@ public class AnnotationEntry implements Constants {
      * @return the annotation type name
      */
     public String getAnnotationType() {
-        final ConstantUtf8 c = (ConstantUtf8) constant_pool.getConstant(type_index, CONSTANT_Utf8);
+        final ConstantUtf8 c = (ConstantUtf8) constant_pool.getConstant(type_index, Const.CONSTANT_Utf8);
         return c.getBytes();
     }
 

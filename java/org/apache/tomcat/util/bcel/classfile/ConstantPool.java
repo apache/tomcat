@@ -20,7 +20,7 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInput;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
+import org.apache.tomcat.util.bcel.Const;
 
 /**
  * This class represents the constant pool, i.e., a table of constants, of
@@ -31,7 +31,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * ConstantPoolGen</a>.
 
  * @see     Constant
- * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public class ConstantPool {
 
@@ -62,7 +61,7 @@ public class ConstantPool {
              */
             if (constant_pool[i] != null) {
                 byte tag = constant_pool[i].getTag();
-                if ((tag == Constants.CONSTANT_Double) || (tag == Constants.CONSTANT_Long)) {
+                if ((tag == Const.CONSTANT_Double) || (tag == Const.CONSTANT_Long)) {
                     i++;
                 }
             }
@@ -103,7 +102,7 @@ public class ConstantPool {
             throw new ClassFormatException("Constant pool at index " + index + " is null.");
         }
         if (c.getTag() != tag) {
-            throw new ClassFormatException("Expected class `" + Constants.CONSTANT_NAMES[tag]
+            throw new ClassFormatException("Expected class `" + Const.getConstantName(tag)
                     + "' at index " + index + " and got " + c);
         }
         return c;

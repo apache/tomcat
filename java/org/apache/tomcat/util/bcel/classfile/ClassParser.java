@@ -23,7 +23,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.tomcat.util.bcel.Constants;
+import org.apache.tomcat.util.bcel.Const;
 
 /**
  * Wrapper class that parses a given Java .class file. The method <A
@@ -36,8 +36,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * exactly with the <A href="http://docs.oracle.com/javase/specs/">
  * JVM specification 1.0</a>. See this paper for
  * further details about the structure of a bytecode file.
- *
- * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public final class ClassParser {
 
@@ -117,7 +115,7 @@ public final class ClassParser {
             // Get class name from constant pool via `name_index' indirection
             name_index = dataInputStream.readUnsignedShort();
             c = (ConstantUtf8) constant_pool.getConstant(name_index,
-                    Constants.CONSTANT_Utf8);
+                    Const.CONSTANT_Utf8);
             name = c.getBytes();
             // Length of data in bytes
             length = dataInputStream.readInt();
@@ -146,11 +144,11 @@ public final class ClassParser {
         /* Interfaces are implicitely abstract, the flag should be set
          * according to the JVM specification.
          */
-        if ((access_flags & Constants.ACC_INTERFACE) != 0) {
-            access_flags |= Constants.ACC_ABSTRACT;
+        if ((access_flags & Const.ACC_INTERFACE) != 0) {
+            access_flags |= Const.ACC_ABSTRACT;
         }
-        if (((access_flags & Constants.ACC_ABSTRACT) != 0)
-                && ((access_flags & Constants.ACC_FINAL) != 0)) {
+        if (((access_flags & Const.ACC_ABSTRACT) != 0)
+                && ((access_flags & Const.ACC_FINAL) != 0)) {
             throw new ClassFormatException("Class can't be both final and abstract");
         }
 

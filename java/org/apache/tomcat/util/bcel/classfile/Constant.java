@@ -20,7 +20,7 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInput;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
+import org.apache.tomcat.util.bcel.Const;
 
 /**
  * Abstract superclass for classes to represent the different constant types
@@ -67,30 +67,30 @@ public abstract class Constant {
         byte b = input.readByte(); // Read tag byte
         int skipSize;
         switch (b) {
-            case Constants.CONSTANT_Class:
+            case Const.CONSTANT_Class:
                 return new ConstantClass(input);
-            case Constants.CONSTANT_Integer:
+            case Const.CONSTANT_Integer:
                 return new ConstantInteger(input);
-            case Constants.CONSTANT_Float:
+            case Const.CONSTANT_Float:
                 return new ConstantFloat(input);
-            case Constants.CONSTANT_Long:
+            case Const.CONSTANT_Long:
                 return new ConstantLong(input);
-            case Constants.CONSTANT_Double:
+            case Const.CONSTANT_Double:
                 return new ConstantDouble(input);
-            case Constants.CONSTANT_Utf8:
+            case Const.CONSTANT_Utf8:
                 return ConstantUtf8.getInstance(input);
-            case Constants.CONSTANT_String:
-            case Constants.CONSTANT_MethodType:
+            case Const.CONSTANT_String:
+            case Const.CONSTANT_MethodType:
                 skipSize = 2; // unsigned short
                 break;
-            case Constants.CONSTANT_MethodHandle:
+            case Const.CONSTANT_MethodHandle:
                 skipSize = 3; // unsigned byte, unsigned short
                 break;
-            case Constants.CONSTANT_Fieldref:
-            case Constants.CONSTANT_Methodref:
-            case Constants.CONSTANT_InterfaceMethodref:
-            case Constants.CONSTANT_NameAndType:
-            case Constants.CONSTANT_InvokeDynamic:
+            case Const.CONSTANT_Fieldref:
+            case Const.CONSTANT_Methodref:
+            case Const.CONSTANT_InterfaceMethodref:
+            case Const.CONSTANT_NameAndType:
+            case Const.CONSTANT_InvokeDynamic:
                 skipSize = 4; // unsigned short, unsigned short
                 break;
             default:
