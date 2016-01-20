@@ -1887,4 +1887,84 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     public static class TesterContext extends StandardContext {
         // No functional change
     }
+
+
+    @Test
+    public void testUpdateWarOfflineNoContextFF() throws Exception {
+        doTestUpdateWarOffline(WAR_SOURCE, false, false);
+    }
+
+
+    @Test
+    public void testUpdateWarOfflineNoContextTF() throws Exception {
+        doTestUpdateWarOffline(WAR_SOURCE, true, false);
+    }
+
+
+    @Test
+    public void testUpdateWarOfflineNoContextFT() throws Exception {
+        doTestUpdateWarOffline(WAR_SOURCE, false, true);
+    }
+
+
+    @Test
+    public void testUpdateWarOfflineNoContextTT() throws Exception {
+        doTestUpdateWarOffline(WAR_SOURCE, true, true);
+    }
+
+
+    @Test
+    public void testUpdateWarOfflineContextFF() throws Exception {
+        doTestUpdateWarOffline(WAR_XML_SOURCE, false, false);
+    }
+
+
+    @Test
+    public void testUpdateWarOfflineContextTF() throws Exception {
+        doTestUpdateWarOffline(WAR_XML_SOURCE, true, false);
+    }
+
+
+    @Test
+    public void testUpdateWarOfflineContextFT() throws Exception {
+        doTestUpdateWarOffline(WAR_XML_SOURCE, false, true);
+    }
+
+
+    @Test
+    public void testUpdateWarOfflineContextTT() throws Exception {
+        doTestUpdateWarOffline(WAR_XML_SOURCE, true, true);
+    }
+
+
+    private void doTestUpdateWarOffline(File srcWar, boolean deployOnStartUp, boolean autoDeploy)
+            throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+        host.setDeployOnStartup(deployOnStartUp);
+
+        File war = createWar(srcWar, true);
+        // Make the WAR appear to have been created earlier
+        war.setLastModified(war.lastModified() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
+
+        tomcat.addWebapp(APP_NAME.getPath(), war.getAbsolutePath());
+        tomcat.start();
+
+        // Get the last modified timestamp for the expanded dir
+        File dir = new File(host.getAppBase(), APP_NAME.getBaseName());
+        // Make the DIR appear to have been created earlier
+        long lastModified = war.lastModified() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS;
+        dir.setLastModified(lastModified);
+
+        host.stop();
+        war.setLastModified(System.currentTimeMillis());
+        host.start();
+        if (autoDeploy) {
+            host.backgroundProcess();
+        }
+
+        long newLastModified = dir.lastModified();
+
+        Assert.assertNotEquals("Timestamp hasn't changed", lastModified,  newLastModified);
+    }
 }

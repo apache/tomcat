@@ -220,6 +220,11 @@
         used. The equivalent attributes from the <code>Context</code> always
         take precedence. (markt)
       </scode>
+      <fix>
+        <bug>58867</bug>: Improve checking on Host start for WAR files that have
+        been modified while Tomcat has stopped and re-expand them if
+        <code>unpackWARs</code> is <code>true</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
