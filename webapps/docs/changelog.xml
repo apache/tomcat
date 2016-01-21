@@ -142,6 +142,9 @@
         Make sure that shared Digester is reset in an unlikely error case
         in <code>HostConfig.deployWAR()</code>. (kkolinko)
       </fix>
+      <fix>
+        Fix a potential JDBC resource leak in DataSourceRealm. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

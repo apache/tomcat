@@ -287,12 +287,15 @@ public class DataSourceRealm
             return null;
         }
         
-        // Acquire a Principal object for this user
-        Principal principal = authenticate(dbConnection, username, credentials);
-            
-        close(dbConnection);
-
-        return principal;
+        try
+        {
+            // Acquire a Principal object for this user
+            return authenticate(dbConnection, username, credentials);
+        }
+        finally
+        {
+            close(dbConnection);
+        }
     }
 
 
