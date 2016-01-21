@@ -227,7 +227,7 @@
         <code>unpackWARs</code> is <code>true</code>. (markt)
       </fix>
       <fix>
-        <bug>58900</bug>: Correctly undeply symlinked resources and prevent an
+        <bug>58900</bug>: Correctly undeploy symlinked resources and prevent an
         infinite cycle of deploy / undeploy. (markt)
       </fix>
     </changelog>
