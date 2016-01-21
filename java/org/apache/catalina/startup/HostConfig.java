@@ -1599,10 +1599,8 @@ public class HostConfig implements LifecycleListener {
             if (current.getPath().equals(previous.getPath())) {
                 // Current and previous are same path - current will always
                 // be a later version
-                Context previousContext =
-                        (Context) host.findChild(previous.getName());
-                Context currentContext =
-                        (Context) host.findChild(current.getName());
+                Context previousContext = (Context) host.findChild(previous.getName());
+                Context currentContext = (Context) host.findChild(current.getName());
                 if (previousContext != null && currentContext != null &&
                         currentContext.getState().isAvailable() &&
                         !isServiced(previous.getName())) {
@@ -1610,28 +1608,22 @@ public class HostConfig implements LifecycleListener {
                     if (manager != null) {
                         int sessionCount;
                         if (manager instanceof DistributedManager) {
-                            sessionCount = ((DistributedManager)
-                                    manager).getActiveSessionsFull();
+                            sessionCount = ((DistributedManager) manager).getActiveSessionsFull();
                         } else {
                             sessionCount = manager.getActiveSessions();
                         }
                         if (sessionCount == 0) {
                             if (log.isInfoEnabled()) {
                                 log.info(sm.getString(
-                                        "hostConfig.undeployVersion",
-                                        previous.getName()));
+                                        "hostConfig.undeployVersion", previous.getName()));
                             }
-                            DeployedApplication app =
-                                    deployed.get(previous.getName());
-                            String[] resources =
-                                    app.redeployResources.keySet().toArray(
-                                            new String[0]);
+                            DeployedApplication app = deployed.get(previous.getName());
+                            String[] resources = app.redeployResources.keySet().toArray(new String[0]);
                             // Version is unused - undeploy it completely
                             // The -1 is a 'trick' to ensure all redeploy
                             // resources are removed
                             undeploy(app);
-                            deleteRedeployResources(app, resources, -1,
-                                    true);
+                            deleteRedeployResources(app, resources, -1, true);
                         }
                     }
                 }
