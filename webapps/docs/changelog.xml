@@ -212,7 +212,8 @@
         based on the implementation class of the value and optional
         <code>WARN</code> level logging if an attribute is filtered. These
         options are avaialble for all of the Manager implementations that ship
-        with Tomcat. (markt)
+        with Tomcat. When a <code>SecurityManager</code> is used filtering will
+        be enabled by default. (markt)
       </add>
       <scode>
         Remove <code>distributable</code> and <code>maxInactiveInterval</code>
