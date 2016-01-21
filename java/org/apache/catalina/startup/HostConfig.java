@@ -1406,70 +1406,105 @@ public class HostConfig implements LifecycleListener {
     }
 
 
-    private void deleteRedeployResources(DeployedApplication app,
-            String[] resources, int i, boolean deleteReloadResources) {
+    private void deleteRedeployResources(DeployedApplication app, String[] resources, int i,
+            boolean deleteReloadResources) {
 
         // Delete other redeploy resources
         for (int j = i + 1; j < resources.length; j++) {
-            try {
-                File current = new File(resources[j]);
-                current = current.getCanonicalFile();
-                // Never delete per host context.xml defaults
-                if (Constants.HostContextXml.equals(
-                        current.getName())) {
-                    continue;
+            File current = new File(resources[j]);
+            // Never delete per host context.xml defaults
+            if (Constants.HostContextXml.equals(current.getName())) {
+                continue;
+            }
+            // Only delete resources in the appBase or the
+            // host's configBase
+            if (isDeletableResource(app, current)) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Delete " + current);
                 }
-                // Only delete resources in the appBase or the
-                // host's configBase
-                if (isDeletableResource(current)) {
-                    if (log.isDebugEnabled())
-                        log.debug("Delete " + current);
-                    ExpandWar.delete(current);
-                }
-            } catch (IOException e) {
-                log.warn(sm.getString
-                        ("hostConfig.canonicalizing", app.name), e);
+                ExpandWar.delete(current);
             }
         }
 
         // Delete reload resources (to remove any remaining .xml descriptor)
         if (deleteReloadResources) {
-            String[] resources2 =
-                    app.reloadResources.keySet().toArray(new String[0]);
+            String[] resources2 = app.reloadResources.keySet().toArray(new String[0]);
             for (int j = 0; j < resources2.length; j++) {
-                try {
-                    File current = new File(resources2[j]);
-                    current = current.getCanonicalFile();
-                    // Never delete per host context.xml defaults
-                    if (Constants.HostContextXml.equals(
-                            current.getName())) {
-                        continue;
+                File current = new File(resources2[j]);
+                // Never delete per host context.xml defaults
+                if (Constants.HostContextXml.equals(current.getName())) {
+                    continue;
+                }
+                // Only delete resources in the appBase or the host's
+                // configBase
+                if (isDeletableResource(app, current)) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Delete " + current);
                     }
-                    // Only delete resources in the appBase or the host's
-                    // configBase
-                    if (isDeletableResource(current)) {
-                        if (log.isDebugEnabled())
-                            log.debug("Delete " + current);
-                        ExpandWar.delete(current);
-                    }
-                } catch (IOException e) {
-                    log.warn(sm.getString
-                            ("hostConfig.canonicalizing", app.name), e);
+                    ExpandWar.delete(current);
                 }
             }
-
         }
     }
 
 
-    private boolean isDeletableResource(File resource) {
-        if ((resource.getAbsolutePath().startsWith(
-                host.getAppBaseFile().getAbsolutePath() + File.separator))
-            || ((resource.getAbsolutePath().startsWith(
-                    host.getConfigBaseFile().getAbsolutePath())
-                 && (resource.getAbsolutePath().endsWith(".xml"))))) {
+    /*
+     * Delete any resource that would trigger the automatic deployment code to
+     * re-deploy the application. This means deleting:
+     * - any resource located in the appBase
+     * - any deployment descriptor located under the configBase
+     * - symlinks in the appBase or configBase for either of the above
+     */
+    private boolean isDeletableResource(DeployedApplication app, File resource) {
+        // The resource may be a file, a directory or a symlink to a file or
+        // directory.
+
+        // Check that the resource is absolute. This should always be the case.
+        if (!resource.isAbsolute()) {
+            log.warn(sm.getString("hostConfig.resourceNotAbsolute", app.name, resource));
+            return false;
+        }
+
+        // Determine where the resource is located
+        String canonicalLocation;
+        try {
+            canonicalLocation = resource.getParentFile().getCanonicalPath();
+        } catch (IOException e) {
+            log.warn(sm.getString(
+                    "hostConfig.canonicalizing", resource.getParentFile(), app.name), e);
+            return false;
+        }
+
+        String canonicalAppBase;
+        try {
+            canonicalAppBase = host.getAppBaseFile().getCanonicalPath();
+        } catch (IOException e) {
+            log.warn(sm.getString(
+                    "hostConfig.canonicalizing", host.getAppBaseFile(), app.name), e);
+            return false;
+        }
+
+        if (canonicalLocation.equals(canonicalAppBase)) {
+            // Resource is located in the appBase so it may be deleted
             return true;
         }
+
+        String canonicalConfigBase;
+        try {
+            canonicalConfigBase = host.getConfigBaseFile().getCanonicalPath();
+        } catch (IOException e) {
+            log.warn(sm.getString(
+                    "hostConfig.canonicalizing", host.getConfigBaseFile(), app.name), e);
+            return false;
+        }
+
+        if (canonicalLocation.equals(canonicalConfigBase) &&
+                resource.getName().endsWith(".xml")) {
+            // Resource is an xml file in the configBase so it may be deleted
+            return true;
+        }
+
+        // All other resources should not be deleted
         return false;
     }
 
