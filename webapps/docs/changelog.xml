@@ -146,7 +146,7 @@
         Fix a potential JDBC resource leak in DataSourceRealm. (schultz)
       </fix>
       <fix>
-        <bug>58900</bug>: Correctly undeply symlinked resources and prevent an
+        <bug>58900</bug>: Correctly undeploy symlinked resources and prevent an
         infinite cycle of deploy / undeploy. (markt)
       </fix>
     </changelog>
