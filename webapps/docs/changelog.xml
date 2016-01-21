@@ -149,6 +149,10 @@
         <bug>58900</bug>: Correctly undeploy symlinked resources and prevent an
         infinite cycle of deploy / undeploy. (markt)
       </fix>
+      <fix>
+        Protect initialization of <code>ResourceLinkFactory</code> when
+        running with a SecurityManager. (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
