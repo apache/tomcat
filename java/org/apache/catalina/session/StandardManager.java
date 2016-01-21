@@ -191,10 +191,12 @@ public class StandardManager extends ManagerBase {
         }
         Loader loader = null;
         ClassLoader classLoader = null;
+        Log logger = null;
         try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
-                BufferedInputStream bis = new BufferedInputStream(fis);) {
+                BufferedInputStream bis = new BufferedInputStream(fis)) {
             Context c = getContext();
             loader = c.getLoader();
+            logger = c.getLogger();
             if (loader != null) {
                 classLoader = loader.getClassLoader();
             }
@@ -204,7 +206,9 @@ public class StandardManager extends ManagerBase {
 
             // Load the previously unloaded active sessions
             synchronized (sessions) {
-                try (ObjectInputStream ois = new CustomObjectInputStream(bis, classLoader)) {
+                try (ObjectInputStream ois = new CustomObjectInputStream(bis, classLoader, logger,
+                        getSessionAttributeValueClassNamePattern(),
+                        getWarnOnSessionAttributeFilterFailure())) {
                     Integer count = (Integer) ois.readObject();
                     int n = count.intValue();
                     if (log.isDebugEnabled())
