@@ -203,10 +203,6 @@
         Make sure that shared Digester is reset in an unlikely error case
         in <code>HostConfig.deployWAR()</code>. (kkolinko)
       </fix>
-      <fix>
-        Ensure that persistent session data is not lost if an error occurs
-        during the loading of session data at application start. (markt)
-      </fix>
       <add>
         Extend the feature available in the cluster session manager
         implementations that enables session attribute replication to be
