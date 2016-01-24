@@ -363,7 +363,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     // Native fallback used if protocols=""
                     value = SSL.SSL_PROTOCOL_ALL;
                 } else {
-                    for (String protocol : sslHostConfig.getEnabledProtocols()) {
+                    for (String protocol : sslHostConfig.getProtocols()) {
                         if (Constants.SSL_PROTO_SSLv2Hello.equalsIgnoreCase(protocol)) {
                             // NO-OP. OpenSSL always supports SSLv2Hello
                         } else if (Constants.SSL_PROTO_SSLv2.equalsIgnoreCase(protocol)) {
