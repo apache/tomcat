@@ -354,11 +354,11 @@ For example:
 (7.3) Running a set of tests
 
 It is possible to run a set of JUnit test classes by adding the "test.name"
-property to the build.properties file. The property specifies an ant
+property to the build.properties file. The property specifies an Ant
 includes pattern for the fileset of test class files to run.
 
-The default value is "**/Tester*.java", so all test classes are being
-executed.
+The default value is "**/Test*.java", so all test classes are being
+executed (with few exceptions - see build.xml for several exclude patterns).
 
 You can include multiple patterns by concatenating them with a comma (",")
 as the separator.
