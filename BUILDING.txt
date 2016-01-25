@@ -351,7 +351,24 @@ For example:
     test.entry.methods=testMultiply01,testMultiply02
 
 
-(7.3) Other configuration options
+(7.3) Running a set of tests
+
+It is possible to run a set of JUnit test classes by adding the "test.name"
+property to the build.properties file. The property specifies an ant
+includes pattern for the fileset of test class files to run.
+
+The default value is "**/Tester*.java", so all test classes are being
+executed.
+
+You can include multiple patterns by concatenating them with a comma (",")
+as the separator.
+
+For example:
+
+    test.name=**/TestSsl.java,**/TestWebSocketFrameClientSSL.java
+
+
+(7.4) Other configuration options
 
  1. It is possible to configure the directory where JUnit reports are
  written to. It is configured by "test.reports" property. The default

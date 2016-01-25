@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M3" rtext="In development">
+  <subsection name="General">
+    <changelog>
+      <add>
+        Allow to configure multiple JUnit test class patterns with the build
+        property <code>test.name</code> and document the property in
+        BUILDING.txt. (rjung)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Catalina">
     <changelog>
       <fix>
