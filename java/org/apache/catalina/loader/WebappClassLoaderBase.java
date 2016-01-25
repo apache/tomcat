@@ -195,11 +195,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * from a webapp class loader without delegating first.
      */
     protected final Matcher packageTriggersDeny = Pattern.compile(
-            "^javax(\\.|/)el(\\.|/)|" +
-            "^javax(\\.|/)security(\\.|/)auth(\\.|/)message(\\.|/)|" +
-            "^javax(\\.|/)servlet(\\.|/)|" +
-            "^javax(\\.|/)websocket(\\.|/)|" +
-            "^org(\\.|/)apache(\\.|/)(catalina|coyote|el|jasper|juli|naming|tomcat)(\\.|/)"
+            "^(?:javax[./](?:el|security[./]auth[./]message|servlet|websocket)|" +
+            "org[./]apache[./](?:catalina|coyote|el|jasper|juli|naming|tomcat))[./]"
             ).matcher("");
 
 
@@ -209,8 +206,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * {@link #packageTriggersDeny}.
      */
     protected final Matcher packageTriggersPermit =
-            Pattern.compile("^javax(\\.|/)servlet(\\.|/)jsp(\\.|/)jstl(\\.|/)|" +
-                    "^org(\\.|/)apache(\\.|/)tomcat(\\.|/)jdbc(\\.|/)").matcher("");
+            Pattern.compile("^(?:javax[./]servlet[./]jsp[./]jstl|" +
+                    "org[./]apache[./]tomcat[./]jdbc)[./]").matcher("");
 
 
     /**
