@@ -2786,21 +2786,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (name == null)
             return false;
 
-        // Looking up the package
-        String packageName = null;
-        int pos = name.lastIndexOf('.');
-        if (pos != -1)
-            // Package names in the filters include the last '.'
-            packageName = name.substring(0, pos + 1);
-        else
-            return false;
-
-        packageTriggersPermit.reset(packageName);
+        packageTriggersPermit.reset(name);
         if (packageTriggersPermit.lookingAt()) {
             return false;
         }
 
-        packageTriggersDeny.reset(packageName);
+        packageTriggersDeny.reset(name);
         if (packageTriggersDeny.lookingAt()) {
             return true;
         }

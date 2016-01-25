@@ -64,6 +64,10 @@
         Correct a thread safety issue in the filtering of session attributes
         based on the implementing class name of the value object. (markt)
       </fix>
+      <fix>
+        Fix class loader decision on the delegation for class loading and
+        resource lookup and make it faster too. (rjung)
+      </fix>
     </changelog>
   </subsection>
 </section>
