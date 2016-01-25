@@ -62,8 +62,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.Attributes;
 import java.util.jar.Attributes.Name;
 import java.util.jar.Manifest;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Globals;
@@ -265,53 +263,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     // ----------------------------------------------------- Instance Variables
-
-    /**
-     * Synchronization object for access to packageTriggersDeny
-     * and packageTriggersPermit; Matchers are not thread-safe.
-     */
-    private final Object packageTriggerLock = new Object();
-
-
-    /**
-     * Regular expression of package names which are not allowed to be loaded
-     * from a webapp class loader as classes without delegating first.
-     */
-    private final Matcher classPackageTriggersDeny = Pattern.compile(
-            "^(?:javax\\.(?:el|security\\.auth\\.message|servlet|websocket)|" +
-            "org\\.apache\\.(?:catalina|coyote|el|jasper|juli|naming|tomcat))\\."
-            ).matcher("");
-
-
-    /**
-     * Regular expression of package names which are not allowed to be loaded
-     * from a webapp class loader as resources without delegating first.
-     */
-    private final Matcher resourcePackageTriggersDeny = Pattern.compile(
-            "^(?:javax/(?:el|security/auth/message|servlet|websocket)|" +
-            "org/apache/(?:catalina|coyote|el|jasper|juli|naming|tomcat))/"
-            ).matcher("");
-
-
-    /**
-     * Regular expression of package names which are allowed to be loaded from a
-     * webapp class loader as classes without delegating first.
-     * These take precedence over those set via {@link #classPackageTriggersDeny}.
-     */
-    private final Matcher classPackageTriggersPermit =
-            Pattern.compile("^(?:javax\\.servlet\\.jsp\\.jstl|" +
-                    "org\\.apache\\.tomcat\\.jdbc)\\.").matcher("");
-
-
-    /**
-     * Regular expression of package names which are allowed to be loaded from a
-     * webapp class loader as resources without delegating first.
-     * These take precedence over those set via {@link #resourcePackageTriggersDeny}.
-     */
-    private final Matcher resourcePackageTriggersPermit =
-            Pattern.compile("^(?:javax/servlet/jsp/jstl|" +
-                    "org/apache/tomcat/jdbc)/").matcher("");
-
 
     /**
      * Associated web resources for this webapp.
@@ -2812,24 +2763,69 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (name == null)
             return false;
 
-        synchronized(packageTriggerLock) {
-            if (isClassName) {
-                classPackageTriggersPermit.reset(name);
-                if (classPackageTriggersPermit.lookingAt()) {
+        char ch;
+        if (name.startsWith("javax")) {
+            /* 5 == length("javax") */
+            ch = name.charAt(5);
+            if (isClassName && ch == '.') {
+                /* 6 == length("javax.") */
+                if (name.startsWith("servlet.jsp.jstl.", 6)) {
                     return false;
                 }
-                classPackageTriggersDeny.reset(name);
-                if (classPackageTriggersDeny.lookingAt()) {
+                if (name.startsWith("el.", 6) ||
+                    name.startsWith("servlet.", 6) ||
+                    name.startsWith("websocket.", 6) ||
+                    name.startsWith("security.auth.message.", 6)) {
                     return true;
                 }
-            } else {
-                resourcePackageTriggersPermit.reset(name);
-                if (resourcePackageTriggersPermit.lookingAt()) {
+            } else if (!isClassName && ch == '/') {
+                /* 6 == length("javax/") */
+                if (name.startsWith("servlet/jsp/jstl/", 6)) {
                     return false;
                 }
-                resourcePackageTriggersDeny.reset(name);
-                if (resourcePackageTriggersDeny.lookingAt()) {
+                if (name.startsWith("el/", 6) ||
+                    name.startsWith("servlet/", 6) ||
+                    name.startsWith("websocket/", 6) ||
+                    name.startsWith("security/auth/message/", 6)) {
                     return true;
+                }
+            }
+        } else if (name.startsWith("org")) {
+            /* 3 == length("org") */
+            ch = name.charAt(3);
+            if (isClassName && ch == '.') {
+                /* 4 == length("org.") */
+                if (name.startsWith("apache.", 4)) {
+                    /* 11 == length("org.apache.") */
+                    if (name.startsWith("tomcat.jdbc.", 11)) {
+                        return false;
+                    }
+                    if (name.startsWith("el.", 11) ||
+                        name.startsWith("catalina.", 11) ||
+                        name.startsWith("jasper.", 11) ||
+                        name.startsWith("juli.", 11) ||
+                        name.startsWith("tomcat.", 11) ||
+                        name.startsWith("naming.", 11) ||
+                        name.startsWith("coyote.", 11)) {
+                        return true;
+                    }
+                }
+            } else if (!isClassName && ch == '/') {
+                /* 4 == length("org/") */
+                if (name.startsWith("apache/", 4)) {
+                    /* 11 == length("org/apache/") */
+                    if (name.startsWith("tomcat/jdbc/", 11)) {
+                        return false;
+                    }
+                    if (name.startsWith("el/", 11) ||
+                        name.startsWith("catalina/", 11) ||
+                        name.startsWith("jasper/", 11) ||
+                        name.startsWith("juli/", 11) ||
+                        name.startsWith("tomcat/", 11) ||
+                        name.startsWith("naming/", 11) ||
+                        name.startsWith("coyote/", 11)) {
+                        return true;
+                    }
                 }
             }
         }
