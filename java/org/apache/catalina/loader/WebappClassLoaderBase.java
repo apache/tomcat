@@ -191,26 +191,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     // ------------------------------------------------------- Static Variables
 
     /**
-     * Regular expression of package names which are not allowed to be loaded
-     * from a webapp class loader without delegating first.
-     */
-    protected final Matcher packageTriggersDeny = Pattern.compile(
-            "^(?:javax[./](?:el|security[./]auth[./]message|servlet|websocket)|" +
-            "org[./]apache[./](?:catalina|coyote|el|jasper|juli|naming|tomcat))[./]"
-            ).matcher("");
-
-
-    /**
-     * Regular expression of package names which are allowed to be loaded from a
-     * webapp class loader without delegating first and override any set by
-     * {@link #packageTriggersDeny}.
-     */
-    protected final Matcher packageTriggersPermit =
-            Pattern.compile("^(?:javax[./]servlet[./]jsp[./]jstl|" +
-                    "org[./]apache[./]tomcat[./]jdbc)[./]").matcher("");
-
-
-    /**
      * The string manager for this package.
      */
     protected static final StringManager sm =
@@ -285,6 +265,33 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     // ----------------------------------------------------- Instance Variables
+
+    /**
+     * Synchronization object for access to packageTriggersDeny
+     * and packageTriggersPermit; Matchers are not thread-safe.
+     */
+    private final Object packageTriggerLock = new Object();
+
+
+    /**
+     * Regular expression of package names which are not allowed to be loaded
+     * from a webapp class loader without delegating first.
+     */
+    private final Matcher packageTriggersDeny = Pattern.compile(
+            "^(?:javax[./](?:el|security[./]auth[./]message|servlet|websocket)|" +
+            "org[./]apache[./](?:catalina|coyote|el|jasper|juli|naming|tomcat))[./]"
+            ).matcher("");
+
+
+    /**
+     * Regular expression of package names which are allowed to be loaded from a
+     * webapp class loader without delegating first and override any set by
+     * {@link #packageTriggersDeny}.
+     */
+    private final Matcher packageTriggersPermit =
+            Pattern.compile("^(?:javax[./]servlet[./]jsp[./]jstl|" +
+                    "org[./]apache[./]tomcat[./]jdbc)[./]").matcher("");
+
 
     /**
      * Associated web resources for this webapp.
@@ -2778,19 +2785,20 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * @param name class name
      * @return <code>true</code> if the class should be filtered
      */
-    protected synchronized boolean filter(String name) {
+    protected boolean filter(String name) {
 
         if (name == null)
             return false;
 
-        packageTriggersPermit.reset(name);
-        if (packageTriggersPermit.lookingAt()) {
-            return false;
-        }
-
-        packageTriggersDeny.reset(name);
-        if (packageTriggersDeny.lookingAt()) {
-            return true;
+        synchronized(packageTriggerLock) {
+            packageTriggersPermit.reset(name);
+            if (packageTriggersPermit.lookingAt()) {
+                return false;
+            }
+            packageTriggersDeny.reset(name);
+            if (packageTriggersDeny.lookingAt()) {
+                return true;
+            }
         }
 
         return false;
