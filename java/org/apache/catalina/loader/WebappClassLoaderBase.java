@@ -275,22 +275,42 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     /**
      * Regular expression of package names which are not allowed to be loaded
-     * from a webapp class loader without delegating first.
+     * from a webapp class loader as classes without delegating first.
      */
-    private final Matcher packageTriggersDeny = Pattern.compile(
-            "^(?:javax[./](?:el|security[./]auth[./]message|servlet|websocket)|" +
-            "org[./]apache[./](?:catalina|coyote|el|jasper|juli|naming|tomcat))[./]"
+    private final Matcher classPackageTriggersDeny = Pattern.compile(
+            "^(?:javax\\.(?:el|security\\.auth\\.message|servlet|websocket)|" +
+            "org\\.apache\\.(?:catalina|coyote|el|jasper|juli|naming|tomcat))\\."
+            ).matcher("");
+
+
+    /**
+     * Regular expression of package names which are not allowed to be loaded
+     * from a webapp class loader as resources without delegating first.
+     */
+    private final Matcher resourcePackageTriggersDeny = Pattern.compile(
+            "^(?:javax/(?:el|security/auth/message|servlet|websocket)|" +
+            "org/apache/(?:catalina|coyote|el|jasper|juli|naming|tomcat))/"
             ).matcher("");
 
 
     /**
      * Regular expression of package names which are allowed to be loaded from a
-     * webapp class loader without delegating first and override any set by
-     * {@link #packageTriggersDeny}.
+     * webapp class loader as classes without delegating first.
+     * These take precedence over those set via {@link #classPackageTriggersDeny}.
      */
-    private final Matcher packageTriggersPermit =
-            Pattern.compile("^(?:javax[./]servlet[./]jsp[./]jstl|" +
-                    "org[./]apache[./]tomcat[./]jdbc)[./]").matcher("");
+    private final Matcher classPackageTriggersPermit =
+            Pattern.compile("^(?:javax\\.servlet\\.jsp\\.jstl|" +
+                    "org\\.apache\\.tomcat\\.jdbc)\\.").matcher("");
+
+
+    /**
+     * Regular expression of package names which are allowed to be loaded from a
+     * webapp class loader as resources without delegating first.
+     * These take precedence over those set via {@link #resourcePackageTriggersDeny}.
+     */
+    private final Matcher resourcePackageTriggersPermit =
+            Pattern.compile("^(?:javax/servlet/jsp/jstl|" +
+                    "org/apache/tomcat/jdbc)/").matcher("");
 
 
     /**
@@ -1038,7 +1058,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         URL url = null;
 
-        boolean delegateFirst = delegate || filter(name);
+        boolean delegateFirst = delegate || filter(name, false);
 
         // (1) Delegate to parent if requested
         if (delegateFirst) {
@@ -1105,7 +1125,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             return (stream);
         }
 
-        boolean delegateFirst = delegate || filter(name);
+        boolean delegateFirst = delegate || filter(name, false);
 
         // (1) Delegate to parent if requested
         if (delegateFirst) {
@@ -1283,7 +1303,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 }
             }
 
-            boolean delegateLoad = delegate || filter(name);
+            boolean delegateLoad = delegate || filter(name, true);
 
             // (1) Delegate to our parent if requested
             if (delegateLoad) {
@@ -2783,25 +2803,50 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * Filter classes.
      *
      * @param name class name
+     * @param isClassName <code>true</code> if name is a class name,
+     *                <code>false</code> if name is a resource name
      * @return <code>true</code> if the class should be filtered
      */
-    protected boolean filter(String name) {
+    protected boolean filter(String name, boolean isClassName) {
 
         if (name == null)
             return false;
 
         synchronized(packageTriggerLock) {
-            packageTriggersPermit.reset(name);
-            if (packageTriggersPermit.lookingAt()) {
-                return false;
-            }
-            packageTriggersDeny.reset(name);
-            if (packageTriggersDeny.lookingAt()) {
-                return true;
+            if (isClassName) {
+                classPackageTriggersPermit.reset(name);
+                if (classPackageTriggersPermit.lookingAt()) {
+                    return false;
+                }
+                classPackageTriggersDeny.reset(name);
+                if (classPackageTriggersDeny.lookingAt()) {
+                    return true;
+                }
+            } else {
+                resourcePackageTriggersPermit.reset(name);
+                if (resourcePackageTriggersPermit.lookingAt()) {
+                    return false;
+                }
+                resourcePackageTriggersDeny.reset(name);
+                if (resourcePackageTriggersDeny.lookingAt()) {
+                    return true;
+                }
             }
         }
-
         return false;
+    }
+
+
+    /**
+     * Filter classes.
+     *
+     * @param name class name
+     * @return <code>true</code> if the class should be filtered
+     * @deprecated Use {@link #filter(String, boolean)}
+     */
+    @Deprecated
+    protected boolean filter(String name) {
+        return filter(name, true) || filter(name, false);
     }
 
 
