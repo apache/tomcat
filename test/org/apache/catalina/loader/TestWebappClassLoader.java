@@ -59,4 +59,94 @@ public class TestWebappClassLoader extends TomcatBaseTest {
             Assert.assertArrayEquals(expected, actual);
         }
     }
+
+    @Test
+    public void testFilter() {
+
+        String[] classSuffixes = new String[]{
+            "some.package.Example"
+        };
+
+        String[] resourceSuffixes = new String[]{
+            "some/path/test.properties",
+            "some/path/test"
+        };
+
+        String[] prefixesPermit = new String[]{
+            "",
+            "resources",
+            "WEB-INF",
+            "WEB-INF.classes",
+            "WEB-INF.lib",
+            "org",
+            "org.apache",
+            "org.apache.tomcat.jdbc",
+            "javax",
+            "javax.jsp.jstl",
+            "com.mycorp"
+        };
+
+        String[] prefixesDeny = new String[]{
+            "org.apache.catalina",
+            "org.apache.coyote",
+            "org.apache.el",
+            "org.apache.jasper",
+            "org.apache.juli",
+            "org.apache.naming",
+            "org.apache.tomcat",
+            "javax.el",
+            "javax.servlet",
+            "javax.websocket",
+            "javax.security.auth.message"
+        };
+
+        WebappClassLoader loader = new WebappClassLoader();
+        String name;
+
+        for (String prefix : prefixesPermit) {
+            for (String suffix : classSuffixes) {
+                name = prefix + "." + suffix;
+                Assert.assertTrue("Class '" + name + "' failed permit filter",
+                           !loader.filter(name, true));
+                if (prefix.equals("")) {
+                    name = suffix;
+                    Assert.assertTrue("Class '" + name + "' failed permit filter",
+                               !loader.filter(name, true));
+                }
+            }
+            prefix = prefix.replace('.', '/');
+            for (String suffix : resourceSuffixes) {
+                name = prefix + "/" + suffix;
+                Assert.assertTrue("Resource '" + name + "' failed permit filter",
+                           !loader.filter(name, false));
+                if (prefix.equals("")) {
+                    name = suffix;
+                    Assert.assertTrue("Resource '" + name + "' failed permit filter",
+                               !loader.filter(name, false));
+                }
+            }
+        }
+
+        for (String prefix : prefixesDeny) {
+            for (String suffix : classSuffixes) {
+                if (prefix.equals("")) {
+                    name = suffix;
+                } else {
+                    name = prefix + "." + suffix;
+                }
+                Assert.assertTrue("Class '" + name + "' failed deny filter",
+                           loader.filter(name, true));
+            }
+            prefix = prefix.replace('.', '/');
+            for (String suffix : resourceSuffixes) {
+                if (prefix.equals("")) {
+                    name = suffix;
+                } else {
+                    name = prefix + "/" + suffix;
+                }
+                Assert.assertTrue("Resource '" + name + "' failed deny filter",
+                           loader.filter(name, false));
+            }
+        }
+    }
 }
