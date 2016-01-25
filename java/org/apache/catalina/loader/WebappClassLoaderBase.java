@@ -110,8 +110,7 @@ import org.apache.tomcat.util.res.StringManager;
  * class is contained inside a JAR.
  * <p>
  * <strong>IMPLEMENTATION NOTE</strong> - Local repositories are searched in
- * the order they are added via the initial constructor and/or any subsequent
- * calls to <code>addRepository()</code> or <code>addJar()</code>.
+ * the order they are added via the initial constructor.
  * <p>
  * <strong>IMPLEMENTATION NOTE</strong> - No check for sealing violations or
  * security is made unless a security manager is present.

@@ -53,10 +53,9 @@ import org.apache.tomcat.util.res.StringManager;
  * This class loader supports detection of modified
  * Java classes, which can be used to implement auto-reload support.
  * <p>
- * This class loader is configured by adding the pathnames of directories,
- * JAR files, and ZIP files with the <code>addRepository()</code> method,
+ * This class loader is configured via the Resources children of its Context
  * prior to calling <code>start()</code>.  When a new class is required,
- * these repositories will be consulted first to locate the class.  If it
+ * these Resources will be consulted first to locate the class.  If it
  * is not present, the system class loader will be used instead.
  *
  * @author Craig R. McClanahan
