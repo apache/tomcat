@@ -243,8 +243,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
             throws PatternSyntaxException {
         if (sessionAttributeNameFilter == null || sessionAttributeNameFilter.length() == 0) {
             sessionAttributeNamePattern = null;
+        } else {
+            sessionAttributeNamePattern = Pattern.compile(sessionAttributeNameFilter);
         }
-        sessionAttributeNamePattern = Pattern.compile(sessionAttributeNameFilter);
     }
 
 
@@ -309,9 +310,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         if (sessionAttributeValueClassNameFilter == null ||
                 sessionAttributeValueClassNameFilter.length() == 0) {
             sessionAttributeValueClassNamePattern = null;
+        } else {
+            sessionAttributeValueClassNamePattern =
+                    Pattern.compile(sessionAttributeValueClassNameFilter);
         }
-        sessionAttributeValueClassNamePattern =
-                Pattern.compile(sessionAttributeValueClassNameFilter);
     }
 
 
