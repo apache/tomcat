@@ -1455,9 +1455,8 @@
               if="test.entry.methods"
            />
         <batchtest todir="${test.reports}" unless="test.entry">
-          <fileset dir="test" >
-            <!-- Include all by default -->
-            <include name="${test.name}" />
+          <!-- Include all by default -->
+          <fileset dir="test" includes="${test.name}">
             <!-- Exclude helper classes -->
             <exclude name="**/Tester*.java" />
             <!-- Exclude the tests known to fail -->
