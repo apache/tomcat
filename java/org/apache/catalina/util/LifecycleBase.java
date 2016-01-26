@@ -119,17 +119,14 @@ public abstract class LifecycleBase implements Lifecycle {
     @Override
     public final synchronized void start() throws LifecycleException {
         
-        if (LifecycleState.STARTING_PREP.equals(state) ||
-                LifecycleState.STARTING.equals(state) ||
+        if (LifecycleState.STARTING_PREP.equals(state) || LifecycleState.STARTING.equals(state) ||
                 LifecycleState.STARTED.equals(state)) {
             
             if (log.isDebugEnabled()) {
                 Exception e = new LifecycleException();
-                log.debug(sm.getString("lifecycleBase.alreadyStarted",
-                        toString()), e);
+                log.debug(sm.getString("lifecycleBase.alreadyStarted", toString()), e);
             } else if (log.isInfoEnabled()) {
-                log.info(sm.getString("lifecycleBase.alreadyStarted",
-                        toString()));
+                log.info(sm.getString("lifecycleBase.alreadyStarted", toString()));
             }
             
             return;
@@ -137,7 +134,7 @@ public abstract class LifecycleBase implements Lifecycle {
         
         if (state.equals(LifecycleState.NEW)) {
             init();
-        } else if (state.equals(LifecycleState.FAILED)){
+        } else if (state.equals(LifecycleState.FAILED)) {
             stop();
         } else if (!state.equals(LifecycleState.INITIALIZED) &&
                 !state.equals(LifecycleState.STOPPED)) {
@@ -149,22 +146,22 @@ public abstract class LifecycleBase implements Lifecycle {
         try {
             startInternal();
         } catch (Throwable t) {
+            // This is an 'uncontrolled' failure so put the component into the
+            // FAILED state and throw an exception.
             ExceptionUtils.handleThrowable(t);
             setStateInternal(LifecycleState.FAILED, null, false);
-            throw new LifecycleException(
-                    sm.getString("lifecycleBase.startFail",toString()), t);
+            throw new LifecycleException(sm.getString("lifecycleBase.startFail", toString()), t);
         }
 
-        if (state.equals(LifecycleState.FAILED) ||
-                state.equals(LifecycleState.MUST_STOP)) {
+        if (state.equals(LifecycleState.FAILED)) {
+            // This is a 'controlled' failure. The component put itself into the
+            // FAILED state so call stop() to complete the clean-up.
             stop();
-        } else {
+        } else if (!state.equals(LifecycleState.STARTING)) {
             // Shouldn't be necessary but acts as a check that sub-classes are
             // doing what they are supposed to.
-            if (!state.equals(LifecycleState.STARTING)) {
-                invalidTransition(Lifecycle.AFTER_START_EVENT);
-            }
-            
+            invalidTransition(Lifecycle.AFTER_START_EVENT);
+        } else {
             setStateInternal(LifecycleState.STARTED, null, false);
         }
     }
@@ -192,17 +189,14 @@ public abstract class LifecycleBase implements Lifecycle {
     @Override
     public final synchronized void stop() throws LifecycleException {
 
-        if (LifecycleState.STOPPING_PREP.equals(state) ||
-                LifecycleState.STOPPING.equals(state) ||
+        if (LifecycleState.STOPPING_PREP.equals(state) || LifecycleState.STOPPING.equals(state) ||
                 LifecycleState.STOPPED.equals(state)) {
 
             if (log.isDebugEnabled()) {
                 Exception e = new LifecycleException();
-                log.debug(sm.getString("lifecycleBase.alreadyStopped",
-                        toString()), e);
+                log.debug(sm.getString("lifecycleBase.alreadyStopped", toString()), e);
             } else if (log.isInfoEnabled()) {
-                log.info(sm.getString("lifecycleBase.alreadyStopped",
-                        toString()));
+                log.info(sm.getString("lifecycleBase.alreadyStopped", toString()));
             }
             
             return;
@@ -213,9 +207,7 @@ public abstract class LifecycleBase implements Lifecycle {
             return;
         }
 
-        if (!state.equals(LifecycleState.STARTED) &&
-                !state.equals(LifecycleState.FAILED) &&
-                !state.equals(LifecycleState.MUST_STOP)) {
+        if (!state.equals(LifecycleState.STARTED) && !state.equals(LifecycleState.FAILED)) {
             invalidTransition(Lifecycle.BEFORE_STOP_EVENT);
         }
         
@@ -233,24 +225,23 @@ public abstract class LifecycleBase implements Lifecycle {
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             setStateInternal(LifecycleState.FAILED, null, false);
-            throw new LifecycleException(
-                    sm.getString("lifecycleBase.stopFail",toString()), t);
-        }
-
-        if (state.equals(LifecycleState.MUST_DESTROY)) {
-            // Complete stop process first
-            setStateInternal(LifecycleState.STOPPED, null, false);
-
-            destroy();
-        } else if (!state.equals(LifecycleState.FAILED)){
-            // Shouldn't be necessary but acts as a check that sub-classes are
-            // doing what they are supposed to.
-            if (!state.equals(LifecycleState.STOPPING)) {
-                invalidTransition(Lifecycle.AFTER_STOP_EVENT);
+            throw new LifecycleException(sm.getString("lifecycleBase.stopFail",toString()), t);
+        } finally {
+            if (this instanceof Lifecycle.SingleUse) {
+                // Complete stop process first
+                setStateInternal(LifecycleState.STOPPED, null, false);
+                destroy();
+                return;
             }
-
-            setStateInternal(LifecycleState.STOPPED, null, false);
         }
+
+        // Shouldn't be necessary but acts as a check that sub-classes are
+        // doing what they are supposed to.
+        if (!state.equals(LifecycleState.STOPPING) && !state.equals(LifecycleState.FAILED)) {
+            invalidTransition(Lifecycle.AFTER_STOP_EVENT);
+        }
+
+        setStateInternal(LifecycleState.STOPPED, null, false);
     }
 
 
@@ -282,11 +273,12 @@ public abstract class LifecycleBase implements Lifecycle {
 
             if (log.isDebugEnabled()) {
                 Exception e = new LifecycleException();
-                log.debug(sm.getString("lifecycleBase.alreadyDestroyed",
-                        toString()), e);
-            } else if (log.isInfoEnabled()) {
-                log.info(sm.getString("lifecycleBase.alreadyDestroyed",
-                        toString()));
+                log.debug(sm.getString("lifecycleBase.alreadyDestroyed", toString()), e);
+            } else if (log.isInfoEnabled() && !(this instanceof Lifecycle.SingleUse)) {
+                // Rather than have every component that might need to call
+                // destroy() check for SingleUse, don't log an info message if
+                // multiple calls are made to destroy()
+                log.info(sm.getString("lifecycleBase.alreadyDestroyed", toString()));
             }
             
             return;

@@ -34,7 +34,23 @@ public enum LifecycleState {
     DESTROYING(false, Lifecycle.BEFORE_DESTROY_EVENT),
     DESTROYED(false, Lifecycle.AFTER_DESTROY_EVENT),
     FAILED(false, null),
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 9.0.x. The state transition
+     *             checking in {@link org.apache.catalina.util.LifecycleBase}
+     *             makes it impossible to use this state. The intended behaviour
+     *             can be obtained by setting the state to
+     *             {@link LifecycleState#FAILED} in
+     *             <code>LifecycleBase.startInternal()</code>
+     */
+    @Deprecated
     MUST_STOP(true, null),
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 9.0.x. The state transition
+     *             checking in {@link org.apache.catalina.util.LifecycleBase}
+     *             makes it impossible to use this state. The intended behaviour
+     *             can be obtained by implementing {@link Lifecycle.SingleUse}.
+     */
+    @Deprecated
     MUST_DESTROY(false, null);
 
     private final boolean available;
