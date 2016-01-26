@@ -172,6 +172,13 @@
         well as unload to ensure that configuration changes made while the web
         application is stopped are applied to any persisted data. (markt)
       </add>
+      <add>
+        Extend the session attribute filtering options to include filtering
+        based on the implementation class of the value and optional
+        <code>WARN</code> level logging if an attribute is filtered. These
+        options are avaialble for all of the Manager implementations that ship
+        with Tomcat. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

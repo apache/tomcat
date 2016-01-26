@@ -345,6 +345,14 @@
       name="sessionAttributeNameFilter"
       descritpion="The string pattern used for including session attributes in replication. Null means all attributes are included."
       type="java.lang.String"/>
+    <attribute
+      name="sessionAttributeValueClassNameFilter"
+      description="The regular expression used to filter session attributes based on the implementation class of the value. The regular expression is anchored and must match the fully qualified class name."
+      type="java.lang.String"/>
+    <attribute
+      name="warnOnSessionAttributeFilterFailure"
+      description="Should a WARN level log message be generated if a session attribute fails to match sessionAttributeNameFilter or sessionAttributeClassNameFilter?"
+      type="boolean"/>
     <operation
       name="expireSession"
       description="Expired the given session"
@@ -576,6 +584,14 @@
       name="sessionAttributeNameFilter"
       descritpion="The string pattern used for including session attributes in replication. Null means all attributes are included."
       type="java.lang.String"/>
+    <attribute
+      name="sessionAttributeValueClassNameFilter"
+      description="The regular expression used to filter session attributes based on the implementation class of the value. The regular expression is anchored and must match the fully qualified class name."
+      type="java.lang.String"/>
+    <attribute
+      name="warnOnSessionAttributeFilterFailure"
+      description="Should a WARN level log message be generated if a session attribute fails to match sessionAttributeNameFilter or sessionAttributeClassNameFilter?"
+      type="boolean"/>
     <operation
       name="expireSession"
       description="Expired the given session"
