@@ -341,6 +341,10 @@
       is="true"
       description="Flag whether send all actions for session across Tomcat cluster nodes."
       type="boolean"/>
+    <attribute
+      name="sessionAttributeNameFilter"
+      descritpion="The string pattern used for including session attributes in replication. Null means all attributes are included."
+      type="java.lang.String"/>
     <operation
       name="expireSession"
       description="Expired the given session"
@@ -568,6 +572,10 @@
       is="true"
       description="Flag whether send all actions for session across Tomcat cluster nodes."
       type="boolean"/>
+    <attribute
+      name="sessionAttributeNameFilter"
+      descritpion="The string pattern used for including session attributes in replication. Null means all attributes are included."
+      type="java.lang.String"/>
     <operation
       name="expireSession"
       description="Expired the given session"
