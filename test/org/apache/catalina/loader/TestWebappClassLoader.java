@@ -17,6 +17,7 @@
 package org.apache.catalina.loader;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
@@ -61,7 +62,7 @@ public class TestWebappClassLoader extends TomcatBaseTest {
     }
 
     @Test
-    public void testFilter() {
+    public void testFilter() throws IOException {
 
         String[] classSuffixes = new String[]{
             "some.package.Example"
@@ -100,52 +101,53 @@ public class TestWebappClassLoader extends TomcatBaseTest {
             "javax.security.auth.message"
         };
 
-        WebappClassLoader loader = new WebappClassLoader();
-        String name;
+        try (WebappClassLoader loader = new WebappClassLoader()) {
+            String name;
 
-        for (String prefix : prefixesPermit) {
-            for (String suffix : classSuffixes) {
-                name = prefix + "." + suffix;
-                Assert.assertTrue("Class '" + name + "' failed permit filter",
-                           !loader.filter(name, true));
-                if (prefix.equals("")) {
-                    name = suffix;
+            for (String prefix : prefixesPermit) {
+                for (String suffix : classSuffixes) {
+                    name = prefix + "." + suffix;
                     Assert.assertTrue("Class '" + name + "' failed permit filter",
                                !loader.filter(name, true));
+                    if (prefix.equals("")) {
+                        name = suffix;
+                        Assert.assertTrue("Class '" + name + "' failed permit filter",
+                                   !loader.filter(name, true));
+                    }
                 }
-            }
-            prefix = prefix.replace('.', '/');
-            for (String suffix : resourceSuffixes) {
-                name = prefix + "/" + suffix;
-                Assert.assertTrue("Resource '" + name + "' failed permit filter",
-                           !loader.filter(name, false));
-                if (prefix.equals("")) {
-                    name = suffix;
+                prefix = prefix.replace('.', '/');
+                for (String suffix : resourceSuffixes) {
+                    name = prefix + "/" + suffix;
                     Assert.assertTrue("Resource '" + name + "' failed permit filter",
                                !loader.filter(name, false));
+                    if (prefix.equals("")) {
+                        name = suffix;
+                        Assert.assertTrue("Resource '" + name + "' failed permit filter",
+                                   !loader.filter(name, false));
+                    }
                 }
             }
-        }
 
-        for (String prefix : prefixesDeny) {
-            for (String suffix : classSuffixes) {
-                if (prefix.equals("")) {
-                    name = suffix;
-                } else {
-                    name = prefix + "." + suffix;
+            for (String prefix : prefixesDeny) {
+                for (String suffix : classSuffixes) {
+                    if (prefix.equals("")) {
+                        name = suffix;
+                    } else {
+                        name = prefix + "." + suffix;
+                    }
+                    Assert.assertTrue("Class '" + name + "' failed deny filter",
+                               loader.filter(name, true));
                 }
-                Assert.assertTrue("Class '" + name + "' failed deny filter",
-                           loader.filter(name, true));
-            }
-            prefix = prefix.replace('.', '/');
-            for (String suffix : resourceSuffixes) {
-                if (prefix.equals("")) {
-                    name = suffix;
-                } else {
-                    name = prefix + "/" + suffix;
+                prefix = prefix.replace('.', '/');
+                for (String suffix : resourceSuffixes) {
+                    if (prefix.equals("")) {
+                        name = suffix;
+                    } else {
+                        name = prefix + "/" + suffix;
+                    }
+                    Assert.assertTrue("Resource '" + name + "' failed deny filter",
+                               loader.filter(name, false));
                 }
-                Assert.assertTrue("Resource '" + name + "' failed deny filter",
-                           loader.filter(name, false));
             }
         }
     }
