@@ -267,25 +267,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /**
-     * Return the distributable flag for the sessions supported by
-     * this Manager.
-     */
     @Override
     public boolean getDistributable() {
-
-        return (this.distributable);
-
+        return this.distributable;
     }
 
 
-    /**
-     * Set the distributable flag for the sessions supported by this
-     * Manager.  If this flag is set, all user data objects added to
-     * sessions associated with this manager must implement Serializable.
-     *
-     * @param distributable The new distributable flag
-     */
     @Override
     public void setDistributable(boolean distributable) {
 
@@ -297,46 +284,25 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /**
-     * Return descriptive information about this Manager implementation and
-     * the corresponding version number, in the format
-     * <code>&lt;description&gt;/&lt;version&gt;</code>.
-     */
     @Override
     public String getInfo() {
-
-        return (info);
-
+        return info;
     }
 
 
-    /**
-     * Return the default maximum inactive interval (in seconds)
-     * for Sessions created by this Manager.
-     */
     @Override
     public int getMaxInactiveInterval() {
-
-        return (this.maxInactiveInterval);
-
+        return this.maxInactiveInterval;
     }
 
 
-    /**
-     * Set the default maximum inactive interval (in seconds)
-     * for Sessions created by this Manager.
-     *
-     * @param interval The new default value
-     */
     @Override
     public void setMaxInactiveInterval(int interval) {
-
         int oldMaxInactiveInterval = this.maxInactiveInterval;
         this.maxInactiveInterval = interval;
         support.firePropertyChange("maxInactiveInterval",
                                    Integer.valueOf(oldMaxInactiveInterval),
                                    Integer.valueOf(this.maxInactiveInterval));
-
     }
 
 
@@ -402,11 +368,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /**
-     * Sets the session id generator
-     *
-     * @param sessionIdGenerator The session id generator
-     */
     public void setSessionIdGenerator(SessionIdGenerator sessionIdGenerator) {
         this.sessionIdGenerator = sessionIdGenerator;
         sessionIdGeneratorClass = sessionIdGenerator.getClass();
@@ -486,32 +447,18 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /**
-     * Number of session creations that failed due to maxActiveSessions
-     * 
-     * @return The count
-     */
     @Override
     public int getRejectedSessions() {
         return rejectedSessions;
     }
 
-    /**
-     * Gets the number of sessions that have expired.
-     *
-     * @return Number of sessions that have expired
-     */
+
     @Override
     public long getExpiredSessions() {
         return expiredSessions.get();
     }
 
 
-    /**
-     * Sets the number of sessions that have expired.
-     *
-     * @param expiredSessions Number of sessions that have expired
-     */
     @Override
     public void setExpiredSessions(long expiredSessions) {
         this.expiredSessions.set(expiredSessions);
@@ -557,7 +504,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
 
     /**
-     * Implements the Manager interface, direct call to processExpires
+     * {@inheritDoc}
+     * <p>
+     * Direct call to {@link #processExpires()}
      */
     @Override
     public void backgroundProcess() {
@@ -647,14 +596,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /**
-     * Add this Session to the set of active Sessions for this Manager.
-     *
-     * @param session Session to be added
-     */
     @Override
     public void add(Session session) {
-
         sessions.put(session.getIdInternal(), session);
         int size = getActiveSessions();
         if( size > maxActive ) {
@@ -667,32 +610,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /**
-     * Add a property change listener to this component.
-     *
-     * @param listener The listener to add
-     */
     @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-
         support.addPropertyChangeListener(listener);
-
     }
 
 
-    /**
-     * Construct and return a new session object, based on the default
-     * settings specified by this Manager's properties.  The session
-     * id specified will be used as the session id.  
-     * If a new session cannot be created for any reason, return 
-     * <code>null</code>.
-     * 
-     * @param sessionId The session id which should be used to create the
-     *  new session; if <code>null</code>, a new session id will be
-     *  generated
-     * @exception IllegalStateException if a new session cannot be
-     *  instantiated for any reason
-     */
     @Override
     public Session createSession(String sessionId) {
         
@@ -729,69 +652,35 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
     
     
-    /**
-     * Get a session from the recycled ones or create a new empty one.
-     * The PersistentManager manager does not need to create session data
-     * because it reads it from the Store.
-     */
     @Override
     public Session createEmptySession() {
         return (getNewSession());
     }
 
 
-    /**
-     * Return the active Session, associated with this Manager, with the
-     * specified session id (if any); otherwise return <code>null</code>.
-     *
-     * @param id The session id for the session to be returned
-     *
-     * @exception IllegalStateException if a new session cannot be
-     *  instantiated for any reason
-     * @exception IOException if an input/output error occurs while
-     *  processing this request
-     */
     @Override
     public Session findSession(String id) throws IOException {
-
-        if (id == null)
-            return (null);
+        if (id == null) {
+            return null;
+        }
         return sessions.get(id);
-
     }
 
 
-    /**
-     * Return the set of active Sessions associated with this Manager.
-     * If this Manager has no active Sessions, a zero-length array is returned.
-     */
     @Override
     public Session[] findSessions() {
-
         return sessions.values().toArray(new Session[0]);
-
     }
 
 
-    /**
-     * Remove this Session from the active Sessions for this Manager.
-     *
-     * @param session Session to be removed
-     */
     @Override
     public void remove(Session session) {
         remove(session, false);
     }
     
-    /**
-     * Remove this Session from the active Sessions for this Manager.
-     *
-     * @param session   Session to be removed
-     * @param update    Should the expiration statistics be updated
-     */
+
     @Override
     public void remove(Session session, boolean update) {
-        
         // If the session has expired - as opposed to just being removed from
         // the manager because it is being persisted - update the expired stats
         if (update) {
@@ -813,25 +702,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /**
-     * Remove a property change listener from this component.
-     *
-     * @param listener The listener to remove
-     */
     @Override
     public void removePropertyChangeListener(PropertyChangeListener listener) {
-
         support.removePropertyChangeListener(listener);
-
     }
 
 
-    /**
-     * Change the session ID of the current session to a new randomly generated
-     * session ID.
-     * 
-     * @param session   The session to change the session ID for
-     */
     @Override
     public void changeSessionId(Session session) {
         String oldId = session.getIdInternal();
@@ -925,11 +801,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /** 
-     * Total sessions created by this manager.
-     *
-     * @return sessions created
-     */
     @Override
     public long getSessionCounter() {
         return sessionCounter;
@@ -952,22 +823,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /** 
-     * Returns the number of active sessions
-     *
-     * @return number of sessions active
-     */
     @Override
     public int getActiveSessions() {
         return sessions.size();
     }
 
 
-    /**
-     * Max number of concurrent active sessions
-     *
-     * @return The highest number of concurrent active sessions
-     */
     @Override
     public int getMaxActive() {
         return maxActive;
@@ -1010,26 +871,12 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
 
-    /**
-     * Gets the longest time (in seconds) that an expired session had been
-     * alive.
-     *
-     * @return Longest time (in seconds) that an expired session had been
-     * alive.
-     */
     @Override
     public int getSessionMaxAliveTime() {
         return sessionMaxAliveTime;
     }
 
 
-    /**
-     * Sets the longest time (in seconds) that an expired session had been
-     * alive. Typically used for resetting the current value.
-     *
-     * @param sessionMaxAliveTime Longest time (in seconds) that an expired
-     * session had been alive.
-     */
     @Override
     public void setSessionMaxAliveTime(int sessionMaxAliveTime) {
         synchronized (sessionMaxAliveTimeUpdateLock) {
@@ -1056,12 +903,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
     /**
-     * Gets the average time (in seconds) that expired sessions had been
-     * alive based on the last 100 sessions to expire. If less than
-     * 100 sessions have expired then all available data is used.
-     * 
-     * @return Average time (in seconds) that expired sessions had been
-     * alive.
+     * {@inheritDoc}
+     * <p>
+     * Based on the last 100 sessions to expire. If less than 100 sessions have
+     * expired then all available data is used.
      */
     @Override
     public int getSessionAverageAliveTime() {
@@ -1092,11 +937,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase
 
     
     /**
-     * Gets the current rate of session creation (in session per minute) based
-     * on the creation time of the previous 100 sessions created. If less than
-     * 100 sessions have been created then all available data is used.
-     * 
-     * @return  The current rate (in sessions per minute) of session creation
+     * {@inheritDoc}<p>
+     * Based on the creation time of the previous 100 sessions created. If less
+     * than 100 sessions have been created then all available data is used.
      */
     @Override
     public int getSessionCreateRate() {
@@ -1135,9 +978,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     
 
     /**
-     * Gets the current rate of session expiration (in session per minute) based
-     * on the expiry time of the previous 100 sessions expired. If less than
-     * 100 sessions have expired then all available data is used.
+     * {@inheritDoc}
+     * <p>
+     * Based on the expiry time of the previous 100 sessions expired. If less
+     * than 100 sessions have expired then all available data is used.
      * 
      * @return  The current rate (in sessions per minute) of session expiration
      */
@@ -1313,9 +1157,6 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
 
     
-    /**
-     * Return a String rendering of this object.
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(this.getClass().getName());
@@ -1361,14 +1202,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         return MBeanUtils.getDomain(container);
     }
 
+
     // ----------------------------------------- PropertyChangeListener Methods
 
-    /**
-     * Process property change events from our associated Context.
-     * 
-     * @param event
-     *            The property change event that has occurred
-     */
     @Override
     public void propertyChange(PropertyChangeEvent event) {
 
@@ -1388,6 +1224,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
         }
     }
     
+
     // ----------------------------------------------------------- Inner classes
     
     protected static final class SessionTiming {

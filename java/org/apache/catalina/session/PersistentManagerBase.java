@@ -336,14 +336,9 @@ public abstract class PersistentManagerBase extends ManagerBase
     }
 
 
-    /**
-     * @return the descriptive short name of this Manager implementation.
-     */
     @Override
     public String getName() {
-
         return name;
-
     }
 
 
@@ -356,7 +351,6 @@ public abstract class PersistentManagerBase extends ManagerBase
     public void setStore(Store store) {
         this.store = store;
         store.setManager(this);
-
     }
 
 
@@ -365,9 +359,7 @@ public abstract class PersistentManagerBase extends ManagerBase
      * storage for this Manager.
      */
     public Store getStore() {
-
         return this.store;
-
     }
 
 
@@ -439,8 +431,9 @@ public abstract class PersistentManagerBase extends ManagerBase
 
 
     /**
-     * Implements the {@link org.apache.catalina.Manager Manager} interface,
-     * direct call to processExpires and processPersistenceChecks
+     * {@inheritDoc}
+     * <p>
+     * Direct call to processExpires and processPersistenceChecks
      */
     @Override
     public void processExpires() {
@@ -483,17 +476,10 @@ public abstract class PersistentManagerBase extends ManagerBase
 
 
     /**
-     * Return the active Session, associated with this Manager, with the
-     * specified session id (if any); otherwise return <code>null</code>.
+     * {@inheritDoc}
+     * <p>
      * This method checks the persistence store if persistence is enabled,
      * otherwise just uses the functionality from ManagerBase.
-     *
-     * @param id The session id for the session to be returned
-     *
-     * @exception IllegalStateException if a new session cannot be
-     *  instantiated for any reason
-     * @exception IOException if an input/output error occurs while
-     *  processing this request
      */
     @Override
     public Session findSession(String id) throws IOException {
@@ -522,7 +508,6 @@ public abstract class PersistentManagerBase extends ManagerBase
         // See if the Session is in the Store
         session = swapIn(id);
         return session;
-
     }
 
     /**
@@ -592,10 +577,9 @@ public abstract class PersistentManagerBase extends ManagerBase
 
 
     /**
-     * Remove this Session from the active Sessions for this Manager,
-     * and from the Store.
-     *
-     * @param session Session to be removed
+     * {@inheritDoc}
+     * <p>
+     * Remove this Session from the Store.
      */
     @Override
     public void remove(Session session, boolean update) {
