@@ -659,13 +659,13 @@ public class JDBCStore extends StoreBase {
                         if (loader != null) {
                             classLoader = loader.getClassLoader();
                         }
-                        if (classLoader != null) {
-                            Thread.currentThread().setContextClassLoader(classLoader);
-                            ois = new CustomObjectInputStream(bis,
-                                    classLoader);
+                        if (classLoader == null) {
+                            classLoader = getClass().getClassLoader();
                         } else {
-                            ois = new ObjectInputStream(bis);
+                            Thread.currentThread().setContextClassLoader(classLoader);
                         }
+
+                        ois = new CustomObjectInputStream(bis, classLoader);
 
                         if (manager.getContainer().getLogger().isDebugEnabled()) {
                             manager.getContainer().getLogger().debug(sm.getString(getStoreName() + ".loading",
