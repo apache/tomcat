@@ -43,6 +43,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
 import org.apache.catalina.util.CustomObjectInputStream;
+import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 
 /**
@@ -628,6 +629,7 @@ public class JDBCStore extends StoreBase {
         ObjectInputStream ois = null;
         BufferedInputStream bis = null;
         Container container = manager.getContainer();
+        Log containerLog = container.getLogger();
  
         synchronized (this) {
             int numberOfTries = 2;
@@ -652,10 +654,7 @@ public class JDBCStore extends StoreBase {
                     rst = preparedLoadSql.executeQuery();
                     if (rst.next()) {
                         bis = new BufferedInputStream(rst.getBinaryStream(2));
-
-                        if (container != null) {
-                            loader = container.getLoader();
-                        }
+                        loader = container.getLoader();
                         if (loader != null) {
                             classLoader = loader.getClassLoader();
                         }
@@ -667,21 +666,21 @@ public class JDBCStore extends StoreBase {
 
                         ois = new CustomObjectInputStream(bis, classLoader);
 
-                        if (manager.getContainer().getLogger().isDebugEnabled()) {
-                            manager.getContainer().getLogger().debug(sm.getString(getStoreName() + ".loading",
-                                    id, sessionTable));
-                        }
+                        if (containerLog.isDebugEnabled()) {
+                            containerLog.debug(
+                                    sm.getString(getStoreName() + ".loading", id, sessionTable));
 
-                        _session = (StandardSession) manager.createEmptySession();
-                        _session.readObjectData(ois);
-                        _session.setManager(manager);
-                      } else if (manager.getContainer().getLogger().isDebugEnabled()) {
-                        manager.getContainer().getLogger().debug(getStoreName() + ": No persisted data object found");
+                            _session = (StandardSession) manager.createEmptySession();
+                            _session.readObjectData(ois);
+                            _session.setManager(manager);
+                        } else if (containerLog.isDebugEnabled()) {
+                            containerLog.debug(getStoreName() + ": No persisted data object found");
+                        }
                     }
                     // Break out after the finally block
                     numberOfTries = 0;
                 } catch (SQLException e) {
-                    manager.getContainer().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
+                    containerLog.error(sm.getString(getStoreName() + ".SQLException", e));
                     if (dbConnection != null)
                         close(dbConnection);
                 } finally {
