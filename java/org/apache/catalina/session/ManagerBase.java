@@ -211,8 +211,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(ManagerBase.class);
 
     /**
      * The property change support for this component.
@@ -843,6 +842,17 @@ public abstract class ManagerBase extends LifecycleMBeanBase
     }
     
     
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This implementation always returns {@code true}
+     */
+    @Override
+    public boolean willAttributeDistribute(String name, Object value) {
+        return true;
+    }
+
+
     // ------------------------------------------------------ Protected Methods
 
 

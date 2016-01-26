@@ -203,4 +203,9 @@ public class DummyProxySession implements Session {
     public void setValid(boolean isValid) {
         // NOOP
     }
+
+    @Override
+    public boolean isAttributeDistributable(String name, Object value) {
+        return false;
+    }
 }

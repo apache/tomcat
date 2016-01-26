@@ -143,8 +143,18 @@ public abstract class ClusterManagerBase extends ManagerBase
      * Check whether the given session attribute should be distributed
      *
      * @return true if the attribute should be distributed
+     *
+     * @deprecated Use {@link #willAttributeDistribute(String, Object)}. Will be
+     *             removed in Tomcat 9.0.x
      */
+    @Deprecated
     public boolean willAttributeDistribute(String name) {
+        return willAttributeDistribute(name, null);
+    }
+
+
+    @Override
+    public boolean willAttributeDistribute(String name, Object value) {
         if (sessionAttributePattern == null) {
             return true;
         }

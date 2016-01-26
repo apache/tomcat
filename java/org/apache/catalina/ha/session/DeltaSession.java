@@ -624,41 +624,10 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         return deltaRequest;
     }
 
+
     // ------------------------------------------------- HttpSession Properties
 
     // ----------------------------------------------HttpSession Public Methods
-
-
-    /**
-     * Check whether the Object can be distributed.
-     * The object is always distributable, if the cluster manager
-     * decides to never distribute it.
-     * @param name The name of the attribute to check
-     * @param value The value of the attribute to check
-     * @return true if the attribute is distributable, false otherwise
-     */
-    @Override
-    protected boolean isAttributeDistributable(String name, Object value) {
-        if (manager instanceof ClusterManagerBase &&
-            !((ClusterManagerBase)manager).willAttributeDistribute(name))
-            return true;
-        return super.isAttributeDistributable(name, value);
-    }
-
-    /**
-     * Exclude attributes from replication.
-     * @param name the attribute's name
-     * @return true if attribute should not be replicated
-     */
-    @Override
-    protected boolean exclude(String name) {
-
-        if (super.exclude(name))
-            return true;
-        if (manager instanceof ClusterManagerBase)
-            return !((ClusterManagerBase)manager).willAttributeDistribute(name);
-        return false;
-    }
 
     /**
      * Remove the object bound with the specified name from this session. If the
@@ -727,7 +696,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         try {
             lock();
             super.setAttribute(name,value, notify);
-            if (addDeltaRequest && deltaRequest != null && !exclude(name)) {
+            if (addDeltaRequest && deltaRequest != null && !exclude(name, value)) {
                 deltaRequest.setAttribute(name, value);
             }
         } finally {
@@ -877,9 +846,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         for (int i = 0; i < keys.length; i++) {
             Object value = null;
             value = attributes.get(keys[i]);
-            if (value == null || exclude(keys[i]))
-                continue;
-            else if (value instanceof Serializable) {
+            if (value != null && !exclude(keys[i], value) &&
+                    isAttributeDistributable(keys[i], value)) {
                 saveNames.add(keys[i]);
                 saveValues.add(value);
             }
@@ -930,7 +898,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
             if (value == null) return;
 
             super.removeAttributeInternal(name,notify);
-            if (addDeltaRequest && deltaRequest != null && !exclude(name)) {
+            if (addDeltaRequest && deltaRequest != null && !exclude(name, null)) {
                 deltaRequest.removeAttribute(name);
             }
 
