@@ -563,8 +563,6 @@ public class StandardManager extends ManagerBase {
                     file = new File(tempdir, pathname);
             }
         }
-//        if (!file.isAbsolute())
-//            return (null);
         return file;
     }
 }
