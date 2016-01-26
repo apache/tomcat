@@ -116,7 +116,8 @@ public class JDBCStore extends StoreBase {
      */
     protected DataSource dataSource = null;
     
-    // ------------------------------------------------------------- Table & cols
+
+    // ------------------------------------------------------------ Table & cols
 
     /**
      * Table to use.
@@ -153,7 +154,8 @@ public class JDBCStore extends StoreBase {
      */
     protected String sessionLastAccessedCol = "lastaccess";
 
-    // ------------------------------------------------------------- SQL Variables
+
+    // ----------------------------------------------------------- SQL Variables
 
     /**
      * Variable to hold the <code>getSize()</code> prepared statement.
@@ -180,7 +182,8 @@ public class JDBCStore extends StoreBase {
      */
     protected PreparedStatement preparedLoadSql = null;
 
-    // ------------------------------------------------------------- Properties
+
+    // -------------------------------------------------------------- Properties
 
     /**
      * @return the info for this Store.
@@ -248,7 +251,7 @@ public class JDBCStore extends StoreBase {
      * @return the driver for this Store.
      */
     public String getDriverName() {
-        return this.driverName;
+        return driverName;
     }
 
     /**
@@ -300,7 +303,7 @@ public class JDBCStore extends StoreBase {
      * @return the Connection URL for this Store.
      */
     public String getConnectionURL() {
-        return this.connectionURL;
+        return connectionURL;
     }
 
     /**
@@ -320,7 +323,7 @@ public class JDBCStore extends StoreBase {
      * @return the table for this Store.
      */
     public String getSessionTable() {
-        return this.sessionTable;
+        return sessionTable;
     }
 
     /**
@@ -463,6 +466,7 @@ public class JDBCStore extends StoreBase {
     public String getDataSourceName() {
         return this.dataSourceName;
     }
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -892,6 +896,7 @@ public class JDBCStore extends StoreBase {
                     session.getIdInternal(), sessionTable));
         }
     }
+
 
     // --------------------------------------------------------- Protected Methods
 
