@@ -377,25 +377,17 @@ public final class FileStore extends StoreBase {
         }
         File file = new File(this.directory);
         if (!file.isAbsolute()) {
-            Container container = manager.getContainer();
-            if (container instanceof Context) {
-                ServletContext servletContext =
-                    ((Context) container).getServletContext();
-                File work = (File)
-                    servletContext.getAttribute(ServletContext.TEMPDIR);
-                file = new File(work, this.directory);
-            } else {
-                throw new IllegalArgumentException("Parent Container is not a Context");
-            }
+            Context context = (Context) manager.getContainer();
+            ServletContext servletContext = context.getServletContext();
+            File work = (File) servletContext.getAttribute(ServletContext.TEMPDIR);
+            file = new File(work, this.directory);
         }
         if (!file.exists() || !file.isDirectory()) {
             if (!file.delete() && file.exists()) {
-                throw new IOException(
-                        sm.getString("fileStore.deleteFailed", file));
+                throw new IOException(sm.getString("fileStore.deleteFailed", file));
             }
             if (!file.mkdirs() && !file.isDirectory()) {
-                throw new IOException(
-                        sm.getString("fileStore.createFailed", file));
+                throw new IOException(sm.getString("fileStore.createFailed", file));
             }
         }
         this.directoryFile = file;

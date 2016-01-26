@@ -487,20 +487,19 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         this.manager = manager;
 
         // Stop the old component if necessary
-        if (getState().isAvailable() && (oldManager != null) &&
-            (oldManager instanceof Lifecycle)) {
+        if (oldManager instanceof Lifecycle) {
             try {
                 ((Lifecycle) oldManager).stop();
+                ((Lifecycle) oldManager).destroy();
             } catch (LifecycleException e) {
-                log.error("ContainerBase.setManager: stop: ", e);
+                log.error("ContainerBase.setManager: stop-destroy: ", e);
             }
         }
 
         // Start the new component if necessary
         if (manager != null)
             manager.setContainer(this);
-        if (getState().isAvailable() && (manager != null) &&
-            (manager instanceof Lifecycle)) {
+        if (getState().isAvailable() && manager instanceof Lifecycle) {
             try {
                 ((Lifecycle) manager).start();
             } catch (LifecycleException e) {
@@ -510,7 +509,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         // Report this property change to interested listeners
         support.firePropertyChange("manager", oldManager, this.manager);
-
     }
 
 

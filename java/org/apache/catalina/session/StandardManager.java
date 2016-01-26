@@ -33,6 +33,7 @@ import java.util.Iterator;
 
 import javax.servlet.ServletContext;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
@@ -211,9 +212,7 @@ public class StandardManager extends ManagerBase {
         try {
             fis = new FileInputStream(file.getAbsolutePath());
             bis = new BufferedInputStream(fis);
-            if (container != null) {
-                loader = container.getLoader();
-            }
+            loader = container.getLoader();
             if (loader != null) {
                 classLoader = loader.getClassLoader();
             }
@@ -523,17 +522,15 @@ public class StandardManager extends ManagerBase {
      * persistence file, if any.
      */
     protected File file() {
-        if ((pathname == null) || (pathname.length() == 0))
-            return (null);
+        if (pathname == null || pathname.length() == 0) {
+            return null;
+        }
         File file = new File(pathname);
         if (!file.isAbsolute()) {
-            if (container instanceof Context) {
-                ServletContext servletContext =
-                    ((Context) container).getServletContext();
-                File tempdir = (File)
-                    servletContext.getAttribute(ServletContext.TEMPDIR);
-                if (tempdir != null)
-                    file = new File(tempdir, pathname);
+            ServletContext servletContext = ((Context) container).getServletContext();
+            File tempdir = (File) servletContext.getAttribute(ServletContext.TEMPDIR);
+            if (tempdir != null) {
+                file = new File(tempdir, pathname);
             }
         }
         return file;

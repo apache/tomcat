@@ -2000,15 +2000,6 @@ public class StandardContext extends ContainerBase
         support.firePropertyChange("distributable",
                                    oldDistributable,
                                    this.distributable);
-
-        // Bugzilla 32866
-        if(getManager() != null) {
-            if(log.isDebugEnabled()) {
-                log.debug("Propagating distributable=" + distributable
-                          + " to manager");
-            }
-            getManager().setDistributable(distributable);
-        }
     }
 
 

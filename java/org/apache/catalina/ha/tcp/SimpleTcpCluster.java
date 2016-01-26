@@ -593,15 +593,13 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     @Override
     public String getManagerName(String name, Manager manager) {
         String clusterName = name ;
-        if ( clusterName == null ) clusterName = manager.getContainer().getName();
-        if(getContainer() instanceof Engine) {
-            Container context = manager.getContainer() ;
-            if(context != null && context instanceof Context) {
-                Container host = ((Context)context).getParent();
-                if(host != null && host instanceof Host && clusterName!=null && 
-                        !(clusterName.startsWith(host.getName() +"#"))) {
-                    clusterName = host.getName() +"#" + clusterName ;
-                }
+        if (clusterName == null) clusterName = manager.getContainer().getName();
+        if (getContainer() instanceof Engine) {
+            Context context = (Context) manager.getContainer() ;
+            Container host = context.getParent();
+            if (host instanceof Host && clusterName != null && 
+                    !(clusterName.startsWith(host.getName() +"#"))) {
+                clusterName = host.getName() +"#" + clusterName ;
             }
         }
         return clusterName;
