@@ -517,14 +517,11 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 args[8] = RequestUtil.filter(response.encodeURL(request
                         .getContextPath() + "/html/expire?" + pathVersion));
                 args[9] = appsExpire;
-                args[10] = smClient.getString(
-                        "htmlManagerServlet.expire.explain");
+                args[10] = smClient.getString("htmlManagerServlet.expire.explain");
                 if (manager == null) {
-                    args[11] = smClient.getString(
-                            "htmlManagerServlet.noManager");
+                    args[11] = smClient.getString("htmlManagerServlet.noManager");
                 } else {
-                    args[11] = Integer.valueOf(
-                            ctxt.getManager().getMaxInactiveInterval()/60);
+                    args[11] = Integer.valueOf(ctxt.getSessionTimeout());
                 }
                 args[12] = smClient.getString("htmlManagerServlet.expire.unit");
                 args[13] = highlightColor;

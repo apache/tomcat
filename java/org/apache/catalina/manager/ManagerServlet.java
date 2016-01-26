@@ -1179,7 +1179,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             }
             int maxCount = 60;
             int histoInterval = 1;
-            int maxInactiveInterval = manager.getMaxInactiveInterval()/60;
+            int maxInactiveInterval = context.getSessionTimeout();
             if (maxInactiveInterval > 0) {
                 histoInterval = maxInactiveInterval / maxCount;
                 if (histoInterval * maxCount < maxInactiveInterval)

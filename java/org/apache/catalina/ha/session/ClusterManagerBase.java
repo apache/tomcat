@@ -190,7 +190,6 @@ public abstract class ClusterManagerBase extends ManagerBase
     protected void clone(ClusterManagerBase copy) {
         copy.setName("Clone-from-" + getName());
         copy.setMaxActiveSessions(getMaxActiveSessions());
-        copy.setMaxInactiveInterval(getMaxInactiveInterval());
         copy.setProcessExpiresFrequency(getProcessExpiresFrequency());
         copy.setNotifyListenersOnReplication(isNotifyListenersOnReplication());
         copy.setSessionAttributeNameFilter(getSessionAttributeNameFilter());

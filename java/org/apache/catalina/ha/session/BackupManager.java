@@ -215,11 +215,6 @@ public class BackupManager extends ClusterManagerBase
     }
 
     @Override
-    public void setDistributable(boolean dist) {
-        this.distributable = dist;
-    }
-
-    @Override
     public void setName(String name) {
         this.name = name;
     }

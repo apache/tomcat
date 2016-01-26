@@ -107,6 +107,7 @@ public class TestPersistentManager extends TomcatBaseTest {
 
         File appDir = new File("test/webapp-3.0-fragments-empty-absolute-ordering");
         StandardContext ctx = (StandardContext) tomcat.addContext("", appDir.getAbsolutePath());
+        ctx.setDistributable(true);
 
         Tomcat.addServlet(ctx, "DummyServlet", new DummyServlet());
         ctx.addServletMapping("/dummy", "DummyServlet");
@@ -116,7 +117,6 @@ public class TestPersistentManager extends TomcatBaseTest {
 
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
-        manager.setDistributable(true);
         ctx.setManager(manager);
         ctx.addValve(new PersistentValve());
         tomcat.start();
@@ -139,6 +139,7 @@ public class TestPersistentManager extends TomcatBaseTest {
 
         File appDir = new File("test/webapp-3.0-fragments-empty-absolute-ordering");
         StandardContext ctx = (StandardContext) tomcat.addContext("", appDir.getAbsolutePath());
+        ctx.setDistributable(true);
 
         Tomcat.addServlet(ctx, "DummyServlet", new DummyServlet());
         ctx.addServletMapping("/dummy", "DummyServlet");
@@ -148,7 +149,6 @@ public class TestPersistentManager extends TomcatBaseTest {
 
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
-        manager.setDistributable(true);
         ctx.setManager(manager);
         ctx.addValve(new PersistentValve());
         tomcat.start();
@@ -170,6 +170,7 @@ public class TestPersistentManager extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
+        ctx.setDistributable(true);
 
         Tomcat.addServlet(ctx, "DummyServlet", new DummyServlet());
         ctx.addServletMapping("/dummy", "DummyServlet");
@@ -179,7 +180,6 @@ public class TestPersistentManager extends TomcatBaseTest {
 
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
-        manager.setDistributable(true);
         ctx.setManager(manager);
         tomcat.start();
         String sessionId = getUrl("http://localhost:" + getPort() + "/dummy")
