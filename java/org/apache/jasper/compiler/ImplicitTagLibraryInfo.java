@@ -63,9 +63,7 @@ class ImplicitTagLibraryInfo extends TagLibraryInfo {
     private final PageInfo pi;
     private final Vector<TagFileInfo> vec;
 
-    /**
-     * Constructor.
-     */
+
     public ImplicitTagLibraryInfo(JspCompilationContext ctxt,
             ParserController pc,
             PageInfo pi,
