@@ -639,7 +639,7 @@ public class JDBCStore extends StoreBase {
                     if (dbConnection != null)
                         close(dbConnection);
                 } finally {
-                    Thread.currentThread().setContextClassLoader(oldThreadContextCL);
+                    context.unbind(Globals.IS_SECURITY_ENABLED, oldThreadContextCL);
                     release(_conn);
                 }
                 numberOfTries--;
