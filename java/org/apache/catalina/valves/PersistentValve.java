@@ -176,8 +176,8 @@ public class PersistentValve extends ValveBase {
                 container.getLogger().debug("newsessionId: " + newsessionId);
             }
             if (newsessionId!=null) {
-            try {
-                bind(context);
+                try {
+                    bind(context);
                     /* store the session and remove it from the manager */
                     if (manager instanceof PersistentManager) {
                         Session session = manager.findSession(newsessionId);
