@@ -92,10 +92,10 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
      * it is not important, that the packets get streamed up to
      * the client, do not use explicit flush.
      */
-    protected boolean useAJPFlush = true;
-    public boolean getAjpFlush() { return useAJPFlush; }
-    public void setAjpFlush(boolean useAJPFlush) {
-        this.useAJPFlush = useAJPFlush;
+    protected boolean ajpFlush = true;
+    public boolean getAjpFlush() { return ajpFlush; }
+    public void setAjpFlush(boolean ajpFlush) {
+        this.ajpFlush = ajpFlush;
     }
 
 
