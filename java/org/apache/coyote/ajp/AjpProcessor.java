@@ -282,6 +282,20 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     /**
+     * Ignore explicit flush?
+     * An explicit flush will send a zero byte AJP13 SEND_BODY_CHUNK
+     * package. AJP does flush at the and of the response, so if
+     * it is not important, that the packets get streamed up to
+     * the client, do not use explicit flush.
+     */
+    protected boolean ajpFlush = true;
+    public boolean getAjpFlush() { return ajpFlush; }
+    public void setAjpFlush(boolean ajpFlush) {
+        this.ajpFlush = ajpFlush;
+    }
+
+
+    /**
      * The number of milliseconds Tomcat will wait for a subsequent request
      * before closing the connection. The default is -1 which is an infinite
      * timeout.
@@ -1380,8 +1394,10 @@ public class AjpProcessor extends AbstractProcessor {
         // non-blocking writes.
         // TODO Validate the assertion above
         if (!finished) {
-            // Send the flush message
-            socketWrapper.write(true, flushMessageArray, 0, flushMessageArray.length);
+            if (ajpFlush) {
+                // Send the flush message
+                socketWrapper.write(true, flushMessageArray, 0, flushMessageArray.length);
+            }
             socketWrapper.flush(true);
         }
     }
