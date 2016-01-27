@@ -40,6 +40,10 @@
           description="The IP address on which to bind"
                  type="java.lang.String"/>
 
+    <attribute   name="ajpFlush"
+          description="Send AJP flush package for each explicit flush"
+                 type="boolean"/>
+
     <attribute   name="allowTrace"
           description="Allow disabling TRACE method"
                  type="boolean"/>

@@ -86,6 +86,20 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     // ------------------------------------------ managed in the ProtocolHandler
 
     /**
+     * Ignore explicit flush?
+     * An explicit flush will send a zero byte AJP13 SEND_BODY_CHUNK
+     * package. AJP does flush at the and of the response, so if
+     * it is not important, that the packets get streamed up to
+     * the client, do not use explicit flush.
+     */
+    protected boolean useAJPFlush = true;
+    public boolean getAjpFlush() { return useAJPFlush; }
+    public void setAjpFlush(boolean useAJPFlush) {
+        this.useAJPFlush = useAJPFlush;
+    }
+
+
+    /**
      * Should authentication be done in the native web server layer,
      * or in the Servlet container ?
      */
@@ -160,6 +174,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     protected Processor createProcessor() {
         AjpProcessor processor = new AjpProcessor(getPacketSize(), getEndpoint());
         processor.setAdapter(getAdapter());
+        processor.setAjpFlush(getAjpFlush());
         processor.setTomcatAuthentication(getTomcatAuthentication());
         processor.setTomcatAuthorization(getTomcatAuthorization());
         processor.setRequiredSecret(requiredSecret);
