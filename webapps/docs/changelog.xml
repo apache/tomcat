@@ -176,7 +176,7 @@
         Extend the session attribute filtering options to include filtering
         based on the implementation class of the value and optional
         <code>WARN</code> level logging if an attribute is filtered. These
-        options are avaialble for all of the Manager implementations that ship
+        options are available for all of the Manager implementations that ship
         with Tomcat. When a <code>SecurityManager</code> is used filtering will
         be enabled by default. (markt)
       </add>
