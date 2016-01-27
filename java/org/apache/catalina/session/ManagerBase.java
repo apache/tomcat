@@ -39,6 +39,7 @@ import java.util.regex.PatternSyntaxException;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
@@ -234,8 +235,31 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     private boolean warnOnSessionAttributeFilterFailure;
 
 
-    // ------------------------------------------------------------- Properties
+    // ------------------------------------------------------------ Constructors
 
+    public ManagerBase() {
+        if (Globals.IS_SECURITY_ENABLED) {
+            // Minimum set required for default distribution/persistence to work
+            // plus String
+            setSessionAttributeValueClassNameFilter(
+                    "java\\.lang\\.(?:Boolean|Integer|Long|Number|String)");
+            setWarnOnSessionAttributeFilterFailure(true);
+        }
+    }
+
+
+    // -------------------------------------------------------------- Properties
+
+    /**
+     * Obtain the regular expression used to filter session attribute based on
+     * attribute name. The regular expression is anchored so it must match the
+     * entire name
+     *
+     * @return The regular expression currently used to filter attribute names.
+     *         {@code null} means no filter is applied. If an empty string is
+     *         specified then no names will match the filter and all attributes
+     *         will be blocked.
+     */
     public String getSessionAttributeNameFilter() {
         if (sessionAttributeNamePattern == null) {
             return null;

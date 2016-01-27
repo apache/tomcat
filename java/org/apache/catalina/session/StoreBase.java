@@ -228,7 +228,20 @@ public abstract class StoreBase extends LifecycleBase implements Store {
      */
     protected ObjectInputStream getObjectInputStream(InputStream is) throws IOException {
         BufferedInputStream bis = new BufferedInputStream(is);
-        return new CustomObjectInputStream(bis, Thread.currentThread().getContextClassLoader());
+
+        CustomObjectInputStream ois;
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+        if (manager instanceof ManagerBase) {
+            ManagerBase managerBase = (ManagerBase) manager;
+            ois = new CustomObjectInputStream(bis, classLoader, manager.getContainer().getLogger(),
+                    managerBase.getSessionAttributeValueClassNamePattern(),
+                    managerBase.getWarnOnSessionAttributeFilterFailure());
+        } else {
+            ois = new CustomObjectInputStream(bis, classLoader);
+        }
+
+        return ois;
     }
 
 
