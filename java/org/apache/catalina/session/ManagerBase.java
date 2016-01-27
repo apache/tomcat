@@ -42,6 +42,7 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
 import org.apache.catalina.SessionIdGenerator;
@@ -375,7 +376,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
             // NO-OP
             return;
         }
-
+        if (!getState().equals(LifecycleState.NEW)) {
+            throw new IllegalStateException(sm.getString("managerBase.setContextNotNew"));
+        }
         Container oldContainer = this.container;
         this.container = container;
         // TODO - delete the line below in Tomcat 9 onwards
