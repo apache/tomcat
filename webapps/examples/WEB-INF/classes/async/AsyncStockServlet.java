@@ -30,6 +30,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 import async.Stockticker.Stock;
 import async.Stockticker.TickListener;
 
@@ -37,13 +40,15 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
 
     private static final long serialVersionUID = 1L;
 
+    private static final Log log = LogFactory.getLog(AsyncStockServlet.class);
+
     private static final ConcurrentLinkedQueue<AsyncContext> clients =
             new ConcurrentLinkedQueue<>();
     private static final AtomicInteger clientcount = new AtomicInteger(0);
     private static final Stockticker ticker = new Stockticker();
 
     public AsyncStockServlet() {
-        System.out.println("AsyncStockServlet created");
+        log.info("AsyncStockServlet created");
     }
 
 
