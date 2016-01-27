@@ -127,12 +127,9 @@ public class PersistentValve extends ValveBase {
             if (store != null) {
                 Session session = null;
                 try {
-                    bind(context);
                     session = store.load(sessionId);
                 } catch (Exception e) {
                     container.getLogger().error("deserializeError");
-                } finally {
-                    unbind();
                 }
                 if (session != null) {
                     if (!session.isValid() ||

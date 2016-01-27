@@ -42,7 +42,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
 import org.apache.catalina.Session;
-import org.apache.catalina.util.CustomObjectInputStream;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 
@@ -624,12 +623,14 @@ public class JDBCStore extends StoreBase {
             throws ClassNotFoundException, IOException {
         ResultSet rst = null;
         StandardSession _session = null;
-        Loader loader = null;
         ClassLoader classLoader = null;
         ObjectInputStream ois = null;
-        BufferedInputStream bis = null;
-        Container container = manager.getContainer();
-        Log containerLog = container.getLogger();
+        org.apache.catalina.Context context = (org.apache.catalina.Context) manager.getContainer();
+        Log containerLog = context.getLogger();
+        Loader loader = context.getLoader();
+        if (loader != null) {
+            classLoader = loader.getClassLoader();
+        }
  
         synchronized (this) {
             int numberOfTries = 2;
@@ -653,29 +654,21 @@ public class JDBCStore extends StoreBase {
                     preparedLoadSql.setString(2, getName());
                     rst = preparedLoadSql.executeQuery();
                     if (rst.next()) {
-                        bis = new BufferedInputStream(rst.getBinaryStream(2));
-                        loader = container.getLoader();
-                        if (loader != null) {
-                            classLoader = loader.getClassLoader();
-                        }
-                        if (classLoader == null) {
-                            classLoader = getClass().getClassLoader();
-                        } else {
+                        if (classLoader != null) {
                             Thread.currentThread().setContextClassLoader(classLoader);
                         }
-
-                        ois = new CustomObjectInputStream(bis, classLoader);
+                        ois = getObjectInputStream(rst.getBinaryStream(2));
 
                         if (containerLog.isDebugEnabled()) {
                             containerLog.debug(
                                     sm.getString(getStoreName() + ".loading", id, sessionTable));
-
-                            _session = (StandardSession) manager.createEmptySession();
-                            _session.readObjectData(ois);
-                            _session.setManager(manager);
-                        } else if (containerLog.isDebugEnabled()) {
-                            containerLog.debug(getStoreName() + ": No persisted data object found");
                         }
+
+                        _session = (StandardSession) manager.createEmptySession();
+                        _session.readObjectData(ois);
+                        _session.setManager(manager);
+                    } else if (containerLog.isDebugEnabled()) {
+                        containerLog.debug(getStoreName() + ": No persisted data object found");
                     }
                     // Break out after the finally block
                     numberOfTries = 0;
