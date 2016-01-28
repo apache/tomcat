@@ -88,9 +88,14 @@ class ParserController implements TagConstants {
      * Parses a JSP page or tag file. This is invoked by the compiler.
      *
      * @param inFileName The path to the JSP page or tag file to be parsed.
+     *
+     * @return The parsed nodes
+     *
+     * @throws JasperException If an error occurs during parsing
+     * @throws IOException If an I/O error occurs such as the file not being
+     *         found
      */
-    public Node.Nodes parse(String inFileName)
-    throws FileNotFoundException, JasperException, IOException {
+    public Node.Nodes parse(String inFileName) throws JasperException, IOException {
         // If we're parsing a packaged tag file or a resource included by it
         // (using an include directive), ctxt.getTagFileJar() returns the
         // JAR file from which to read the tag file or included resource,
@@ -105,9 +110,14 @@ class ParserController implements TagConstants {
      * compiler.
      *
      * @param inFileName The path to the JSP page or tag file to be parsed.
+     *
+     * @return The parsed directive nodes
+     *
+     * @throws JasperException If an error occurs during parsing
+     * @throws IOException If an I/O error occurs such as the file not being
+     *         found
      */
-    public Node.Nodes parseDirectives(String inFileName)
-    throws FileNotFoundException, JasperException, IOException {
+    public Node.Nodes parseDirectives(String inFileName) throws JasperException, IOException {
         // If we're parsing a packaged tag file or a resource included by it
         // (using an include directive), ctxt.getTagFileJar() returns the
         // JAR file from which to read the tag file or included resource,
@@ -125,9 +135,15 @@ class ParserController implements TagConstants {
      * @param parent The parent node of the include directive.
      * @param jar The JAR file from which to read the included resource,
      * or null of the included resource is to be read from the filesystem
+     *
+     * @return The parsed nodes
+     *
+     * @throws JasperException If an error occurs during parsing
+     * @throws IOException If an I/O error occurs such as the file not being
+     *         found
      */
     public Node.Nodes parse(String inFileName, Node parent, Jar jar)
-    throws FileNotFoundException, JasperException, IOException {
+            throws JasperException, IOException {
         // For files that are statically included, isTagfile and directiveOnly
         // remain unchanged.
         return doParse(inFileName, parent, jar);
@@ -140,9 +156,15 @@ class ParserController implements TagConstants {
      *
      * @param inFileName    The name of the tag file to be parsed.
      * @param jar The location of the tag file.
+     *
+     * @return The parsed tage file nodes
+     *
+     * @throws JasperException If an error occurs during parsing
+     * @throws IOException If an I/O error occurs such as the file not being
+     *         found
      */
     public Node.Nodes parseTagFileDirectives(String inFileName, Jar jar)
-            throws FileNotFoundException, JasperException, IOException {
+            throws JasperException, IOException {
         boolean isTagFileSave = isTagFile;
         boolean directiveOnlySave = directiveOnly;
         isTagFile = true;

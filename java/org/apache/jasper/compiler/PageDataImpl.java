@@ -58,9 +58,10 @@ class PageDataImpl extends PageData implements TagConstants {
     private final StringBuilder buf;
 
     /**
-     * Constructor.
-     *
      * @param page the page nodes from which to generate the XML view
+     * @param compiler The compiler for this page
+     *
+     * @throws JasperException If an error occurs
      */
     public PageDataImpl(Node.Nodes page, Compiler compiler)
                 throws JasperException {

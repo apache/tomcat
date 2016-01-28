@@ -17,7 +17,6 @@
 
 package org.apache.jasper.compiler;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -497,8 +496,6 @@ class TagFileProcessor {
         Node.Nodes page = null;
         try {
             page = pc.parseTagFileDirectives(path, jar);
-        } catch (FileNotFoundException e) {
-            err.jspError("jsp.error.file.not.found", path);
         } catch (IOException e) {
             err.jspError("jsp.error.file.not.found", path);
         }

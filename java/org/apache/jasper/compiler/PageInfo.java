@@ -126,8 +126,11 @@ class PageInfo {
     }
 
     /**
-     * Check if the plugin ID has been previously declared.  Make a not
+     * Check if the plugin ID has been previously declared.  Make a note
      * that this Id is now declared.
+     *
+     * @param id The plugin ID to check
+     *
      * @return true if Id has been declared.
      */
     public boolean isPluginDeclared(String id) {

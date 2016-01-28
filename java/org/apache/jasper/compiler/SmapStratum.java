@@ -44,18 +44,12 @@ public class SmapStratum {
         private int outputLineIncrement = 1;
         private boolean lineFileIDSet = false;
 
-        /**
-         * Sets InputStartLine.
-         */
         public void setInputStartLine(int inputStartLine) {
             if (inputStartLine < 0)
                 throw new IllegalArgumentException("" + inputStartLine);
             this.inputStartLine = inputStartLine;
         }
 
-        /**
-         * Sets OutputStartLine.
-         */
         public void setOutputStartLine(int outputStartLine) {
             if (outputStartLine < 0)
                 throw new IllegalArgumentException("" + outputStartLine);
@@ -67,6 +61,8 @@ public class SmapStratum {
          * that of prior LineInfo object (in any given context) or 0
          * if the current LineInfo has no (logical) predecessor.
          * <tt>LineInfo</tt> will print this file number no matter what.
+         *
+         * @param lineFileID The new line file ID
          */
         public void setLineFileID(int lineFileID) {
             if (lineFileID < 0)
@@ -75,18 +71,12 @@ public class SmapStratum {
             this.lineFileIDSet = true;
         }
 
-        /**
-         * Sets InputLineCount.
-         */
         public void setInputLineCount(int inputLineCount) {
             if (inputLineCount < 0)
                 throw new IllegalArgumentException("" + inputLineCount);
             this.inputLineCount = inputLineCount;
         }
 
-        /**
-         * Sets OutputLineIncrement.
-         */
         public void setOutputLineIncrement(int outputLineIncrement) {
             if (outputLineIncrement < 0)
                 throw new IllegalArgumentException("" + outputLineIncrement);
@@ -94,9 +84,9 @@ public class SmapStratum {
         }
 
         /**
-         * Retrieves the current LineInfo as a String, print all values
-         * only when appropriate (but LineInfoID if and only if it's been
-         * specified, as its necessity is sensitive to context).
+         * @return the current LineInfo as a String, print all values only when
+         *         appropriate (but LineInfoID if and only if it's been
+         *         specified, as its necessity is sensitive to context).
          */
         public String getString() {
             if (inputStartLine == -1 || outputStartLine == -1)
