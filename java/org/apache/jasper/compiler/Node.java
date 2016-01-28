@@ -230,6 +230,10 @@ abstract class Node implements TagConstants {
     /**
      * Get the attribute that is non request time expression, either from the
      * attribute of the node, or from a jsp:attrbute
+     *
+     * @param name The name of the attribute
+     *
+     * @return The attribute value
      */
     public String getTextAttribute(String name) {
 
@@ -247,12 +251,15 @@ abstract class Node implements TagConstants {
     }
 
     /**
-     * Searches all subnodes of this node for jsp:attribute standard actions
-     * with the given name, and returns the NamedAttribute node of the matching
-     * named attribute, nor null if no such node is found.
+     * Searches all sub-nodes of this node for jsp:attribute standard actions
+     * with the given name.
      * <p>
      * This should always be called and only be called for nodes that accept
      * dynamic runtime attribute expressions.
+     *
+     * @param name The name of the attribute
+     * @return the NamedAttribute node of the matching named attribute, nor null
+     *         if no such node is found.
      */
     public NamedAttribute getNamedAttributeNode(String name) {
         NamedAttribute result = null;
@@ -518,6 +525,8 @@ abstract class Node implements TagConstants {
 
         /**
          * Generates a new temporary variable name.
+         *
+         * @return The name to use for the temporary variable
          */
         public String nextTemporaryVariableName() {
             if (parentRoot == null) {
@@ -1701,6 +1710,10 @@ abstract class Node implements TagConstants {
         /**
          * Checks to see if the attribute of the given name is of type
          * JspFragment.
+         *
+         * @param name The attribute to check
+         *
+         * @return {@code true} if it is a JspFragment
          */
         public boolean checkIfAttributeIsJspFragment(String name) {
             boolean result = false;
@@ -1775,12 +1788,12 @@ abstract class Node implements TagConstants {
         }
 
         /**
-         * Returns true if this custom action has an empty body, and false
-         * otherwise.
-         *
          * A custom action is considered to have an empty body if the following
          * holds true: - getBody() returns null, or - all immediate children are
          * jsp:attribute actions, or - the action's jsp:body is empty.
+         *
+         * @return {@code true} if this custom action has an empty body, and
+         *         {@code false} otherwise.
          */
         public boolean hasEmptyBody() {
             boolean hasEmptyBody = true;
@@ -2054,7 +2067,7 @@ abstract class Node implements TagConstants {
         }
 
         /**
-         * Returns true if this template text contains whitespace only.
+         * @return true if this template text contains whitespace only.
          */
         public boolean isAllSpace() {
             boolean isAllSpace = true;
@@ -2139,11 +2152,12 @@ abstract class Node implements TagConstants {
         }
 
         /**
-         * Allow node to validate itself
+         * Allow node to validate itself.
          *
-         * @param ef
-         * @param ctx
-         * @throws ELException
+         * @param ef The expression factory to use to evaluate any EL
+         * @param ctx The context to use to evaluate any EL
+         *
+         * @throws ELException If validation fails
          */
         public void validateEL(ExpressionFactory ef, ELContext ctx)
                 throws ELException {
@@ -2307,7 +2321,7 @@ abstract class Node implements TagConstants {
         }
 
         /**
-         * <code>true</code> if the attribute is a "dynamic" attribute of a
+         * @return {@code true} if the attribute is a "dynamic" attribute of a
          * custom tag that implements DynamicAttributes interface. That is,
          * a random extra attribute that is not declared by the tag.
          */
