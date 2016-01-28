@@ -22,7 +22,8 @@ import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
@@ -34,7 +35,6 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharChunk;
-import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -55,8 +55,7 @@ public class OutputBuffer extends Writer
     /**
      * Encoder cache.
      */
-    private static final ConcurrentHashMap<Charset, SynchronizedStack<C2BConverter>> encoders =
-            new ConcurrentHashMap<>();
+    private final Map<Charset, C2BConverter> encoders = new HashMap<>();
 
 
     // ----------------------------------------------------- Instance Variables
@@ -233,7 +232,6 @@ public class OutputBuffer extends Writer
 
         if (conv != null) {
             conv.recycle();
-            encoders.get(conv.getCharset()).push(conv);
             conv = null;
         }
 
@@ -560,16 +558,11 @@ public class OutputBuffer extends Writer
         }
 
         final Charset charset = getCharset(enc);
-        SynchronizedStack<C2BConverter> stack = encoders.get(charset);
-        if (stack == null) {
-            stack = new SynchronizedStack<>();
-            encoders.putIfAbsent(charset, stack);
-            stack = encoders.get(charset);
-        }
-        conv = stack.pop();
+        conv = encoders.get(charset);
 
         if (conv == null) {
             conv = createConverter(charset);
+            encoders.put(charset, conv);
         }
     }
 
@@ -659,7 +652,6 @@ public class OutputBuffer extends Writer
         if (resetWriterStreamFlags) {
             if (conv != null) {
                 conv.recycle();
-                encoders.get(conv.getCharset()).push(conv);
             }
             conv = null;
             enc = null;
