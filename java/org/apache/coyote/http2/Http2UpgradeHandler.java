@@ -456,12 +456,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         prepareHeaders(coyoteResponse);
 
+        byte[] header = new byte[9];
+        ByteBuffer target = ByteBuffer.allocate(payloadSize);
+        boolean first = true;
+        State state = null;
         // This ensures the Stream processing thread has control of the socket.
         synchronized (socketWrapper) {
-            byte[] header = new byte[9];
-            ByteBuffer target = ByteBuffer.allocate(payloadSize);
-            boolean first = true;
-            State state = null;
             while (state != State.COMPLETE) {
                 state = getHpackEncoder().encode(coyoteResponse.getMimeHeaders(), target);
                 target.flip();
@@ -573,18 +573,18 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             log.debug(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdentifier(),
                     Integer.toString(len)));
         }
-        synchronized (socketWrapper) {
-            byte[] header = new byte[9];
-            ByteUtil.setThreeBytes(header, 0, len);
-            header[3] = FrameType.DATA.getIdByte();
-            if (finished) {
-                header[4] = FLAG_END_OF_STREAM;
-                stream.sentEndOfStream();
-                if (!stream.isActive()) {
-                    activeRemoteStreamCount.decrementAndGet();
-                }
+        byte[] header = new byte[9];
+        ByteUtil.setThreeBytes(header, 0, len);
+        header[3] = FrameType.DATA.getIdByte();
+        if (finished) {
+            header[4] = FLAG_END_OF_STREAM;
+            stream.sentEndOfStream();
+            if (!stream.isActive()) {
+                activeRemoteStreamCount.decrementAndGet();
             }
-            ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
+        }
+        ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
+        synchronized (socketWrapper) {
             try {
                 socketWrapper.write(true, header, 0, header.length);
                 socketWrapper.write(true, data.array(), data.arrayOffset() + data.position(),
