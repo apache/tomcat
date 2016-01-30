@@ -52,6 +52,10 @@
         property <code>test.name</code> and document the property in
         BUILDING.txt. (rjung)
       </add>
+      <fix>
+        <bug>58768</bug>: Log a warning if a redirect fails because of an
+        invalid location. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
