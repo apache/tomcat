@@ -24,7 +24,9 @@ import java.nio.channels.CompletionHandler;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
@@ -54,6 +56,7 @@ import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLHostConfig.Type;
+import org.apache.tomcat.util.net.openssl.OpenSSLEngine;
 
 
 /**
@@ -346,13 +349,32 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         if (isSSLEnabled()) {
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
 
-                for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
+                Set<SSLHostConfigCertificate> certificates = sslHostConfig.getCertificates(true);
+                boolean firstCertificate = true;
+                for (SSLHostConfigCertificate certificate : certificates) {
                     if (SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()) == null) {
                         // This is required
                         throw new Exception(sm.getString("endpoint.apr.noSslCertFile"));
                     }
+                    if (firstCertificate) {
+                        // TODO: Duplicates code in SSLUtilBase. Consider
+                        //       refactoring to reduce duplication
+                        firstCertificate = false;
+                        // Configure the enabled protocols
+                        List<String> enabledProtocols = SSLUtilBase.getEnabled("protocols", log,
+                                true, sslHostConfig.getProtocols(),
+                                OpenSSLEngine.IMPLEMENTED_PROTOCOLS_SET);
+                        sslHostConfig.setEnabledProtocols(
+                                enabledProtocols.toArray(new String[enabledProtocols.size()]));
+                        // Configure the enabled ciphers
+                        List<String> enabledCiphers = SSLUtilBase.getEnabled("ciphers", log,
+                                false, sslHostConfig.getJsseCipherNames(),
+                                OpenSSLEngine.AVAILABLE_CIPHER_SUITES);
+                        sslHostConfig.setEnabledCiphers(
+                                enabledCiphers.toArray(new String[enabledCiphers.size()]));
+                    }
                 }
-                if (sslHostConfig.getCertificates().size() > 2) {
+                if (certificates.size() > 2) {
                     // TODO: Can this limitation be removed?
                     throw new Exception(sm.getString("endpoint.apr.tooManyCertFiles"));
                 }
@@ -363,7 +385,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     // Native fallback used if protocols=""
                     value = SSL.SSL_PROTOCOL_ALL;
                 } else {
-                    for (String protocol : sslHostConfig.getProtocols()) {
+                    for (String protocol : sslHostConfig.getEnabledProtocols()) {
                         if (Constants.SSL_PROTO_SSLv2Hello.equalsIgnoreCase(protocol)) {
                             // NO-OP. OpenSSL always supports SSLv2Hello
                         } else if (Constants.SSL_PROTO_SSLv2.equalsIgnoreCase(protocol)) {

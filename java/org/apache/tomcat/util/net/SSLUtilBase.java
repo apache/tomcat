@@ -45,19 +45,19 @@ public abstract class SSLUtilBase implements SSLUtil {
         Set<String> configuredProtocols = sslHostConfig.getProtocols();
         Set<String> implementedProtocols = getImplementedProtocols();
         List<String> enabledProtocols =
-                getEnabled("protocols", true, configuredProtocols, implementedProtocols);
+                getEnabled("protocols", getLog(), true, configuredProtocols, implementedProtocols);
         this.enabledProtocols = enabledProtocols.toArray(new String[enabledProtocols.size()]);
 
         // Calculate the enabled ciphers
         List<String> configuredCiphers = sslHostConfig.getJsseCipherNames();
         Set<String> implementedCiphers = getImplementedCiphers();
         List<String> enabledCiphers =
-                getEnabled("ciphers", false, configuredCiphers, implementedCiphers);
+                getEnabled("ciphers", getLog(), false, configuredCiphers, implementedCiphers);
         this.enabledCiphers = enabledCiphers.toArray(new String[enabledCiphers.size()]);
     }
 
 
-    private <T> List<T> getEnabled(String name, boolean warnOnSkip, Collection<T> configured,
+    static <T> List<T> getEnabled(String name, Log log, boolean warnOnSkip, Collection<T> configured,
             Collection<T> implemented) {
 
         List<T> enabled = new ArrayList<>();
@@ -80,19 +80,19 @@ public abstract class SSLUtilBase implements SSLUtil {
                 throw new IllegalArgumentException(
                         sm.getString("sslUtilBase.noneSupported", name, configured));
             }
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("sslUtilBase.active", name, enabled));
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("sslUtilBase.active", name, enabled));
             }
-            if (getLog().isDebugEnabled() || warnOnSkip) {
+            if (log.isDebugEnabled() || warnOnSkip) {
                 if (enabled.size() != configured.size()) {
                     List<T> skipped = new ArrayList<>();
                     skipped.addAll(configured);
                     skipped.removeAll(enabled);
                     String msg = sm.getString("sslUtilBase.skipped", name, skipped);
                     if (warnOnSkip) {
-                        getLog().warn(msg);
+                        log.warn(msg);
                     } else {
-                        getLog().debug(msg);
+                        log.debug(msg);
                     }
                 }
             }
