@@ -1738,8 +1738,17 @@ public class StandardSession implements HttpSession, Session, Serializable {
         if (Constants.excludedAttributeNames.contains(name)) {
             return true;
         }
+
+        // Manager is required for remaining check
+        Manager manager = getManager();
+        if (manager == null) {
+            // Manager may be null during replication of new sessions in a
+            // cluster. Avoid the NPE.
+            return false;
+        }
+
         // Last check so use a short-cut
-        return !getManager().willAttributeDistribute(name, value);
+        return !manager.willAttributeDistribute(name, value);
     }
 
 
