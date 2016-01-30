@@ -68,7 +68,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private static final SSLException ENGINE_CLOSED = new SSLException(sm.getString("engine.engineClosed"));
     private static final SSLException ENCRYPTED_PACKET_OVERSIZED = new SSLException(sm.getString("engine.oversizedPacket"));
 
-    protected static final Set<String> AVAILABLE_CIPHER_SUITES;
+    public static final Set<String> AVAILABLE_CIPHER_SUITES;
 
     static {
         final Set<String> availableCipherSuites = new LinkedHashSet<>(128);
@@ -122,8 +122,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         Constants.SSL_PROTO_TLSv1_1,
         Constants.SSL_PROTO_TLSv1_2
     };
-    protected static final Set<String> IMPLEMENTED_PROTOCOLS_SET =
-            new HashSet<>(Arrays.asList(IMPLEMENTED_PROTOCOLS));
+    public static final Set<String> IMPLEMENTED_PROTOCOLS_SET =
+            Collections.unmodifiableSet(new HashSet<>(Arrays.asList(IMPLEMENTED_PROTOCOLS)));
 
     // Header (5) + Data (2^14) + Compression (1024) + Encryption (1024) + MAC (20) + Padding (256)
     static final int MAX_ENCRYPTED_PACKET_LENGTH = MAX_CIPHERTEXT_LENGTH + 5 + 20 + 256;
