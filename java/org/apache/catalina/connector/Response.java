@@ -51,6 +51,8 @@ import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.catalina.util.UriUtil;
 import org.apache.coyote.ActionCode;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.buf.UEncoder.SafeCharsSet;
@@ -65,14 +67,12 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Remy Maucherat
  * @author Craig R. McClanahan
  */
-public class Response
-    implements HttpServletResponse {
+public class Response implements HttpServletResponse {
 
+    private static final Log log = LogFactory.getLog(Response.class);
+    protected static final StringManager sm = StringManager.getManager(Response.class);
 
-    // ----------------------------------------------------------- Constructors
-
-    private static final MediaTypeCache MEDIA_TYPE_CACHE =
-            new MediaTypeCache(100);
+    private static final MediaTypeCache MEDIA_TYPE_CACHE = new MediaTypeCache(100);
 
     /**
      * Compliance with SRV.15.2.22.1. A call to Response.getWriter() if no
@@ -87,17 +87,6 @@ public class Response
                 System.getProperty("org.apache.catalina.connector.Response.ENFORCE_ENCODING_IN_GET_WRITER",
                         "true"));
     }
-
-    public Response() {
-    }
-
-
-    // ----------------------------------------------------- Class Variables
-
-    /**
-     * The string manager for this package.
-     */
-    protected static final StringManager sm = StringManager.getManager(Response.class);
 
 
     // ----------------------------------------------------- Instance Variables
@@ -1328,6 +1317,7 @@ public class Response
                 flushBuffer();
             }
         } catch (IllegalArgumentException e) {
+            log.warn(sm.getString("response.sendRedirectFail", location), e);
             setStatus(SC_NOT_FOUND);
         }
 
