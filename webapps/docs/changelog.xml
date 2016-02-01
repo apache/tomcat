@@ -72,6 +72,10 @@
         <bug>58768</bug>: Log a warning if a redirect fails because of an
         invalid location. (markt)
       </fix>
+      <fix>
+        <bug>58946</bug>: Ensure that the request parameter map remains
+        immutable when processing via a RequestDispatcher. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
