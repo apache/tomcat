@@ -558,18 +558,33 @@ public class SecureNioChannel extends NioChannel  {
                 if (unwrap.getStatus() == Status.BUFFER_UNDERFLOW) {
                     break;
                 }
-            } else if (unwrap.getStatus() == Status.BUFFER_OVERFLOW && read > 0) {
-                //buffer overflow can happen, if we have read data, then
-                //empty out the dst buffer before we do another read
-                break;
+            } else if (unwrap.getStatus() == Status.BUFFER_OVERFLOW) {
+                if (read > 0) {
+                    // Buffer overflow can happen if we have read data. Return
+                    // so the destination buffer can be emptied before another
+                    // read is attempted
+                    break;
+                } else {
+                    // The SSL session has increased the required buffer size
+                    // since the buffer was created.
+                    if (dst == socket.getSocketBufferHandler().getReadBuffer()) {
+                        // This is the normal case for this code
+                        socket.getSocketBufferHandler().expand(
+                                sslEngine.getSession().getApplicationBufferSize());
+                        dst = socket.getSocketBufferHandler().getReadBuffer();
+                    } else {
+                        // Can't expand the buffer as there is no way to signal
+                        // to the caller that the buffer has been replaced.
+                        throw new IOException(
+                                sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
+                    }
+                }
             } else {
-                //here we should trap BUFFER_OVERFLOW and call expand on the buffer
-                //for now, throw an exception, as we initialized the buffers
-                //in the constructor
+                // Something else went wrong
                 throw new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
             }
-        } while ( (netInBuffer.position() != 0)); //continue to unwrapping as long as the input buffer has stuff
-        return (read);
+        } while (netInBuffer.position() != 0); //continue to unwrapping as long as the input buffer has stuff
+        return read;
     }
 
     /**
