@@ -299,12 +299,6 @@
                description="Time (in milliseconds) it took to start this context"
                type="long"/>
 
-    <attribute name="stateManageable"
-               description="Deprecated. State management support for this managed object"
-               is="true"
-               type="boolean"
-               writeable="false" />
-
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
@@ -1613,12 +1607,6 @@
                type="boolean"
                is="true"
                writeable="false" />
-
-    <attribute name="stateManageable"
-               description="State management support for this managed object"
-               is="true"
-               type="boolean"
-               writeable="false"/>
 
     <attribute name="stateName"
                description="The name of the LifecycleState that this component is currently in"

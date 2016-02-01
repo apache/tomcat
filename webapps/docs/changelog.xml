@@ -72,6 +72,9 @@
         <bug>58768</bug>: Log a warning if a redirect fails because of an
         invalid location. (markt)
       </fix>
+      <scode>
+        <bug>58827</bug>: Remove remains of JSR-77 implementaion. (markt)
+      </scode>
       <fix>
         <bug>58946</bug>: Ensure that the request parameter map remains
         immutable when processing via a RequestDispatcher. (markt)
