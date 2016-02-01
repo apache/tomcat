@@ -51,6 +51,7 @@ import org.apache.catalina.Service;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.authenticator.NonLoginAuthenticator;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.NamingContextListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardEngine;
@@ -529,7 +530,7 @@ public class Tomcat {
      */
     public Context addContext(Host host, String contextPath, String contextName,
             String dir) {
-        silence(host, contextPath);
+        silence(host, contextName);
         Context ctx = createContext(host, contextPath);
         ctx.setName(contextName);
         ctx.setPath(contextPath);
@@ -698,6 +699,8 @@ public class Tomcat {
         "org.apache.catalina.core.AprLifecycleListener"
     };
 
+    private boolean silent = false;
+
     /**
      * Controls if the loggers will be silenced or not.
      * @param silent    <code>true</code> sets the log level to WARN for the
@@ -707,6 +710,7 @@ public class Tomcat {
      *                  level of INFO.
      */
     public void setSilent(boolean silent) {
+        this.silent = silent;
         for (String s : silences) {
             Logger logger = Logger.getLogger(s);
             pinnedLoggers.put(s, logger);
@@ -718,24 +722,44 @@ public class Tomcat {
         }
     }
 
-    private void silence(Host host, String ctx) {
-        String loggerName = getLoggerName(host, ctx);
+    private void silence(Host host, String contextPath) {
+        String loggerName = getLoggerName(host, contextPath);
         Logger logger = Logger.getLogger(loggerName);
         pinnedLoggers.put(loggerName, logger);
-        logger.setLevel(Level.WARNING);
+        if (silent) {
+            logger.setLevel(Level.WARNING);
+        } else {
+            logger.setLevel(Level.INFO);
+        }
     }
 
-    private String getLoggerName(Host host, String ctx) {
-        String loggerName = "org.apache.catalina.core.ContainerBase.[default].[";
+
+    /*
+     * Uses essentially the same logic as {@link ContainerBase#logName()}.
+     */
+    private String getLoggerName(Host host, String contextName) {
         if (host == null) {
-            loggerName += getHost().getName();
-        } else {
-            loggerName += host.getName();
+            host = getHost();
         }
-        loggerName += "].[";
-        loggerName += ctx;
-        loggerName += "]";
-        return loggerName;
+        StringBuilder loggerName = new StringBuilder();
+        loggerName.append(ContainerBase.class.getName());
+        loggerName.append(".[");
+        // Engine name
+        loggerName.append(host.getParent().getName());
+        loggerName.append("].[");
+        // Host name
+        loggerName.append(host.getName());
+        loggerName.append("].[");
+        // Context name
+        if (contextName == null || contextName.equals("")) {
+            loggerName.append("/");
+        } else if (contextName.startsWith("##")) {
+            loggerName.append("/");
+            loggerName.append(contextName);
+        }
+        loggerName.append(']');
+
+        return loggerName.toString();
     }
 
     /**
@@ -1151,30 +1175,30 @@ public class Tomcat {
         "zip", "application/zip"
     };
 
-    protected URL getWebappConfigFile(String path, String url) {
+    protected URL getWebappConfigFile(String path, String contextName) {
         File docBase = new File(path);
         if (docBase.isDirectory()) {
-            return getWebappConfigFileFromDirectory(docBase, url);
+            return getWebappConfigFileFromDirectory(docBase, contextName);
         } else {
-            return getWebappConfigFileFromJar(docBase, url);
+            return getWebappConfigFileFromJar(docBase, contextName);
         }
     }
 
-    private URL getWebappConfigFileFromDirectory(File docBase, String url) {
+    private URL getWebappConfigFileFromDirectory(File docBase, String contextName) {
         URL result = null;
         File webAppContextXml = new File(docBase, Constants.ApplicationContextXml);
         if (webAppContextXml.exists()) {
             try {
                 result = webAppContextXml.toURI().toURL();
             } catch (MalformedURLException e) {
-                Logger.getLogger(getLoggerName(getHost(), url)).log(Level.WARNING,
+                Logger.getLogger(getLoggerName(getHost(), contextName)).log(Level.WARNING,
                         "Unable to determine web application context.xml " + docBase, e);
             }
         }
         return result;
     }
 
-    private URL getWebappConfigFileFromJar(File docBase, String url) {
+    private URL getWebappConfigFileFromJar(File docBase, String contextName) {
         URL result = null;
         try (JarFile jar = new JarFile(docBase)) {
             JarEntry entry = jar.getJarEntry(Constants.ApplicationContextXml);
@@ -1183,7 +1207,7 @@ public class Tomcat {
                         + Constants.ApplicationContextXml);
             }
         } catch (IOException e) {
-            Logger.getLogger(getLoggerName(getHost(), url)).log(Level.WARNING,
+            Logger.getLogger(getLoggerName(getHost(), contextName)).log(Level.WARNING,
                     "Unable to determine web application context.xml " + docBase, e);
         }
         return result;
