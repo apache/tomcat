@@ -99,6 +99,10 @@
         New configuration option <code>ajpFlush</code> for the AJP connectors
         to disable the sending of AJP flush packets. (rjung)
       </add>
+      <fix>
+        Handle the case in the NIO connector where the required TLS buffer sizes
+        increase after the connection has been initiated. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
