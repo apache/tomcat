@@ -77,7 +77,7 @@ public class SecureNioChannel extends NioChannel  {
             netOutBuffer = ByteBuffer.allocateDirect(DEFAULT_NET_BUFFER_SIZE);
         } else {
             netInBuffer = ByteBuffer.allocate(DEFAULT_NET_BUFFER_SIZE);
-            netOutBuffer = ByteBuffer.allocateDirect(DEFAULT_NET_BUFFER_SIZE);
+            netOutBuffer = ByteBuffer.allocate(DEFAULT_NET_BUFFER_SIZE);
         }
 
         // selector pool for blocking operations
