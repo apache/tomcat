@@ -63,8 +63,6 @@ public class SocketBufferHandler {
                     readBuffer.clear();
                 } else {
                     readBuffer.compact();
-                    readBuffer.position(remaining);
-                    readBuffer.limit(readBuffer.capacity());
                 }
             } else {
                 // Switching to read
