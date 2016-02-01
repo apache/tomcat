@@ -270,7 +270,7 @@
                type="java.lang.String"/>
 
     <attribute name="servlets"
-               description="JSR77 list of servlets"
+               description="Deprecated. JSR77 list of servlets"
                type="[Ljava.lang.String;"
                writeable="false"/>
 
@@ -300,7 +300,7 @@
                type="long"/>
 
     <attribute name="stateManageable"
-               description="State management support for this managed object"
+               description="Deprecated. State management support for this managed object"
                is="true"
                type="boolean"
                writeable="false" />

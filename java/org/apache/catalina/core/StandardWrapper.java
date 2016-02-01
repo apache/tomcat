@@ -1787,7 +1787,11 @@ public class StandardWrapper extends ContainerBase
 
     /**
      * @return JSR 77. Always return <code>false</code>.
+     *
+     * @deprecated The JSR-77 implementation is incomplete and will be removed
+     *             in 9.0.x
      */
+    @Deprecated
     public boolean isStateManageable() {
         return false;
     }
