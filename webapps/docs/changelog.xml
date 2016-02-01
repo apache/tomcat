@@ -52,18 +52,6 @@
         property <code>test.name</code> and document the property in
         BUILDING.txt. (rjung)
       </add>
-      <fix>
-        <bug>58768</bug>: Log a warning if a redirect fails because of an
-        invalid location. (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Coyote">
-    <changelog>
-      <add>
-        New configuration option <code>ajpFlush</code> for the AJP connectors
-        to disable the sending of AJP flush packets. (rjung)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Catalina">
@@ -80,6 +68,10 @@
         Fix class loader decision on the delegation for class loading and
         resource lookup and make it faster too. (rjung)
       </fix>
+      <fix>
+        <bug>58768</bug>: Log a warning if a redirect fails because of an
+        invalid location. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -92,6 +84,10 @@
         Correct an NPE when listing the enabled ciphers (e.g. via the Manager
         web application) for a TLS enabled APR/native connector. (markt)
       </fix>
+      <add>
+        New configuration option <code>ajpFlush</code> for the AJP connectors
+        to disable the sending of AJP flush packets. (rjung)
+      </add>
     </changelog>
   </subsection>
 </section>
