@@ -16,11 +16,9 @@
  */
 package org.apache.catalina.core;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.AccessController;
@@ -6198,67 +6196,6 @@ public class StandardContext extends ContainerBase
 
     // ------------------------------------------------------------- Operations
 
-
-    /**
-     * JSR77 deploymentDescriptor attribute
-     *
-     * @return string deployment descriptor
-     *
-     * @deprecated The JSR-77 implementation is incomplete and will be removed
-     *             in 9.0.x
-     */
-    @Deprecated
-    public String getDeploymentDescriptor() {
-
-        InputStream stream = null;
-        ServletContext servletContext = getServletContext();
-        if (servletContext != null) {
-            stream = servletContext.getResourceAsStream(
-                org.apache.catalina.startup.Constants.ApplicationWebXml);
-        }
-        if (stream == null) {
-            return "";
-        }
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
-            String strRead = "";
-            while (strRead != null) {
-                sb.append(strRead);
-                strRead = br.readLine();
-            }
-        } catch (IOException e) {
-            return "";
-        }
-
-        return sb.toString();
-    }
-
-
-    /**
-     * JSR77 servlets attribute
-     *
-     * @return list of all servlets ( we know about )
-     *
-     * @deprecated The JSR-77 implementation is incomplete and will be removed
-     *             in 9.0.x
-     */
-    @Deprecated
-    public String[] getServlets() {
-
-        String[] result = null;
-
-        Container[] children = findChildren();
-        if (children != null) {
-            result = new String[children.length];
-            for( int i=0; i< children.length; i++ ) {
-                result[i] = children[i].getObjectName().toString();
-            }
-        }
-
-        return result;
-    }
-
-
     @Override
     protected String getObjectNameKeyProperties() {
 
@@ -6453,17 +6390,6 @@ public class StandardContext extends ContainerBase
         return tldValidation;
     }
 
-
-    /**
-     * @return support for "stateManageable" JSR77
-     *
-     * @deprecated The JSR-77 implementation is incomplete and will be removed
-     *             in 9.0.x
-     */
-    @Deprecated
-    public boolean isStateManageable() {
-        return true;
-    }
 
     /**
      * The J2EE Server ObjectName this module is deployed on.
