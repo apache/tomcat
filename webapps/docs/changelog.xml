@@ -184,6 +184,10 @@
         with Tomcat. When a <code>SecurityManager</code> is used filtering will
         be enabled by default. (markt)
       </add>
+      <fix>
+        <bug>58946</bug>: Ensure that the request parameter map remains
+        immutable when processing via a RequestDispatcher. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

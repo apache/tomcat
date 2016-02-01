@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestApplicationHttpRequest extends TomcatBaseTest {
@@ -210,6 +211,32 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testParameterImmutability() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        Tomcat.addServlet(ctx, "forward", new ForwardServlet("/modify"));
+        ctx.addServletMapping("/forward", "forward");
+
+        Tomcat.addServlet(ctx, "modify", new ModifyParameterServlet());
+        ctx.addServletMapping("/modify", "modify");
+
+        tomcat.start();
+
+        ByteChunk response = new ByteChunk();
+        StringBuilder target = new StringBuilder("http://localhost:");
+        target.append(getPort());
+        target.append("/forward");
+        int rc = getUrl(target.toString(), response, null);
+
+        Assert.assertEquals(200, rc);
+        Assert.assertEquals("OK", response.toString());
+    }
+
+
     private static class ForwardServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -291,6 +318,39 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
                     w.print(value);
                     w.print(')');
                 }
+            }
+        }
+    }
+
+
+    private static class ModifyParameterServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        // Suppress warnings generated because the code is trying to put the
+        // wrong type of values into the Map
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            Map map = req.getParameterMap();
+
+            boolean insertWorks;
+            try {
+                map.put("test", new Integer[] { Integer.valueOf(0) });
+                insertWorks = true;
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                insertWorks = false;
+            }
+
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+            PrintWriter pw = resp.getWriter();
+            if (insertWorks) {
+                pw.print("FAIL");
+            } else {
+                pw.print("OK");
             }
         }
     }
