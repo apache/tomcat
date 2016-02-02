@@ -224,7 +224,11 @@
         WebSocket connection is closed even if the sending of the close message
         fails. Includes test cases by Barry Coughlan. (markt)
       </fix>
-    </changelog>
+      <fix>
+        Fix a timing issue on session close that could result in an exception
+        being thrown for an incomplete message even through the message was
+        completed. (markt)
+      </fix>
   </subsection>
   <subsection name="Web Applications">
     <changelog>
