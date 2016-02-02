@@ -576,7 +576,7 @@ public class SecureNioChannel extends NioChannel  {
                         // Can't expand the buffer as there is no way to signal
                         // to the caller that the buffer has been replaced.
                         throw new IOException(
-                                sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
+                                sm.getString("channel.nio.ssl.unwrapFailResize", unwrap.getStatus()));
                     }
                 }
             } else {
