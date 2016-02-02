@@ -185,6 +185,10 @@
         be enabled by default. (markt)
       </add>
       <fix>
+        <bug>58905</bug>: Ensure that <code>Tomcat.silence()</code> silences the
+        correct logger and respects the current setting. (markt)
+      </fix>
+      <fix>
         <bug>58946</bug>: Ensure that the request parameter map remains
         immutable when processing via a RequestDispatcher. (markt)
       </fix>
