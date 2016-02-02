@@ -45,6 +45,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M4" rtext="In development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Handle the case in the NIO2 connector where the required TLS buffer
+        sizes increase after the connection has been initiated. (markt/remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>

@@ -573,7 +573,7 @@ public class SecureNio2Channel extends Nio2Channel  {
     }
 
     private class FutureRead implements Future<Integer> {
-        private final ByteBuffer dst;
+        private ByteBuffer dst;
         private Future<Integer> integer;
         private FutureRead(ByteBuffer dst) {
             this.dst = dst;
@@ -652,17 +652,31 @@ public class SecureNio2Channel extends Nio2Channel  {
                             break;
                         }
                     }
-                } else if (unwrap.getStatus() == Status.BUFFER_OVERFLOW && read > 0) {
-                    //buffer overflow can happen, if we have read data, then
-                    //empty out the dst buffer before we do another read
-                    break;
+                } else if (unwrap.getStatus() == Status.BUFFER_OVERFLOW) {
+                    if (read > 0) {
+                        // Buffer overflow can happen if we have read data. Return
+                        // so the destination buffer can be emptied before another
+                        // read is attempted
+                        break;
+                    } else {
+                        // The SSL session has increased the required buffer size
+                        // since the buffer was created.
+                        if (dst == socket.getSocketBufferHandler().getReadBuffer()) {
+                            // This is the normal case for this code
+                            socket.getSocketBufferHandler().expand(
+                                    sslEngine.getSession().getApplicationBufferSize());
+                            dst = socket.getSocketBufferHandler().getReadBuffer();
+                        } else {
+                            // Can't expand the buffer as there is no way to signal
+                            // to the caller that the buffer has been replaced.
+                            throw new ExecutionException(new IOException(sm.getString("channel.nio.ssl.unwrapFailResize", unwrap.getStatus())));
+                        }
+                    }
                 } else {
-                    //here we should trap BUFFER_OVERFLOW and call expand on the buffer
-                    //for now, throw an exception, as we initialized the buffers
-                    //in the constructor
+                    // Something else went wrong
                     throw new ExecutionException(new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus())));
                 }
-            } while ((netInBuffer.position() != 0)); //continue to unwrapping as long as the input buffer has stuff
+            } while (netInBuffer.position() != 0); //continue to unwrapping as long as the input buffer has stuff
             if (!dst.hasRemaining()) {
                 unwrapBeforeRead = true;
             } else {
@@ -796,6 +810,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                     failed(new EOFException(), attach);
                 } else {
                     try {
+                        ByteBuffer dst2 = dst;
                         //the data read
                         int read = 0;
                         //the SSL engine result
@@ -804,7 +819,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                             //prepare the buffer
                             netInBuffer.flip();
                             //unwrap the data
-                            unwrap = sslEngine.unwrap(netInBuffer, dst);
+                            unwrap = sslEngine.unwrap(netInBuffer, dst2);
                             //compact the buffer
                             netInBuffer.compact();
                             if (unwrap.getStatus() == Status.OK || unwrap.getStatus() == Status.BUFFER_UNDERFLOW) {
@@ -822,19 +837,34 @@ public class SecureNio2Channel extends Nio2Channel  {
                                         break;
                                     }
                                 }
-                            } else if (unwrap.getStatus() == Status.BUFFER_OVERFLOW && read > 0) {
-                                //buffer overflow can happen, if we have read data, then
-                                //empty out the dst buffer before we do another read
-                                break;
+                            } else if (unwrap.getStatus() == Status.BUFFER_OVERFLOW) {
+                                if (read > 0) {
+                                    // Buffer overflow can happen if we have read data. Return
+                                    // so the destination buffer can be emptied before another
+                                    // read is attempted
+                                    break;
+                                } else {
+                                    // The SSL session has increased the required buffer size
+                                    // since the buffer was created.
+                                    if (dst2 == socket.getSocketBufferHandler().getReadBuffer()) {
+                                        // This is the normal case for this code
+                                        socket.getSocketBufferHandler().expand(
+                                                sslEngine.getSession().getApplicationBufferSize());
+                                        dst2 = socket.getSocketBufferHandler().getReadBuffer();
+                                    } else {
+                                        // Can't expand the buffer as there is no way to signal
+                                        // to the caller that the buffer has been replaced.
+                                        throw new IOException(
+                                                sm.getString("channel.nio.ssl.unwrapFailResize", unwrap.getStatus()));
+                                    }
+                                }
                             } else {
-                                //here we should trap BUFFER_OVERFLOW and call expand on the buffer
-                                //for now, throw an exception, as we initialized the buffers
-                                //in the constructor
+                                // Something else went wrong
                                 throw new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
                             }
                         // continue to unwrap as long as the input buffer has stuff
                         } while (netInBuffer.position() != 0);
-                        if (!dst.hasRemaining()) {
+                        if (!dst2.hasRemaining()) {
                             unwrapBeforeRead = true;
                         } else {
                             unwrapBeforeRead = false;
@@ -915,7 +945,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 //in the constructor
                                 throw new IOException(sm.getString("channel.nio.ssl.unwrapFail", unwrap.getStatus()));
                             }
-                        } while ((netInBuffer.position() != 0)); //continue to unwrapping as long as the input buffer has stuff
+                        } while (netInBuffer.position() != 0); //continue to unwrapping as long as the input buffer has stuff
                         int capacity = 0;
                         final int endOffset = offset + length;
                         for (int i = offset; i < endOffset; i++) {
