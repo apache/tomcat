@@ -229,6 +229,7 @@
         being thrown for an incomplete message even through the message was
         completed. (markt)
       </fix>
+    </changelog>
   </subsection>
   <subsection name="Web Applications">
     <changelog>
