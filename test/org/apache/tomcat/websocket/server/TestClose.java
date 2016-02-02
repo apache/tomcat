@@ -79,7 +79,7 @@ public class TestClose extends TomcatBaseTest {
 
     private static void awaitLatch(CountDownLatch latch, String failMessage) {
         try {
-            if (!latch.await(10000, TimeUnit.MILLISECONDS)) {
+            if (!latch.await(5000, TimeUnit.MILLISECONDS)) {
                 Assert.fail(failMessage);
             }
         } catch (InterruptedException e) {
@@ -107,7 +107,8 @@ public class TestClose extends TomcatBaseTest {
 
     public static void awaitOnError(Class<? extends Throwable> exceptionClazz) {
         awaitLatch(events.onErrorCalled, "onError not called");
-        Assert.assertEquals(exceptionClazz, events.onErrorThrowable.getClass());
+        Assert.assertTrue(exceptionClazz.getName(),
+                events.onErrorThrowable.getClass().isAssignableFrom(exceptionClazz));
     }
 
 
