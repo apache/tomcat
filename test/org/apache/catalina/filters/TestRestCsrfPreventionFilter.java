@@ -28,7 +28,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionContext;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -375,7 +374,8 @@ public class TestRestCsrfPreventionFilter {
         }
 
         @Override
-        public HttpSessionContext getSessionContext() {
+        @Deprecated
+        public javax.servlet.http.HttpSessionContext getSessionContext() {
             return null;
         }
 

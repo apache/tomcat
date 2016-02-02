@@ -65,6 +65,6 @@ public class SocketSend {
         out.flush();
         System.out.println("Complete, sleeping 5 seconds");
         Thread.sleep(5000);
-
+        socket.close();
     }
 }

@@ -70,7 +70,6 @@ public class SocketReceive {
                 printStats(start, mb, count, df, total);
             }
         }
-
     }
 
     private static void printStats(long start, double mb, int count, DecimalFormat df, BigDecimal total) {

@@ -69,11 +69,11 @@ public class TestMapper extends LoggingBaseTest {
         welcomes[1] = "bobou";
 
         mapper.addContextVersion("iowejoiejfoiew", "blah7", "",
-                "0", "context0", new String[0], null, null);
+                "0", "context0", new String[0], null, null, false, false);
         mapper.addContextVersion("iowejoiejfoiew", "blah7", "/foo",
-                "0", "context1", new String[0], null, null);
+                "0", "context1", new String[0], null, null, false, false);
         mapper.addContextVersion("iowejoiejfoiew", "blah7", "/foo/bar",
-                "0", "context2", welcomes, null, null);
+                "0", "context2", welcomes, null, null, false, false);
 
         Collection<WrapperMappingInfo> wrappersForContext1 = Arrays
                 .asList(new WrapperMappingInfo[] { new WrapperMappingInfo("/",
@@ -121,7 +121,9 @@ public class TestMapper extends LoggingBaseTest {
                 new String[0],
                 null,
                 Arrays.asList(new WrapperMappingInfo[] { new WrapperMappingInfo(
-                        "/bobou/*", "wrapper7", false, false) }));
+                        "/bobou/*", "wrapper7", false, false) }),
+                false,
+                false);
     }
 
     @Test
@@ -174,7 +176,7 @@ public class TestMapper extends LoggingBaseTest {
 
         assertEquals(16, mapper.hosts.length);
         mapper.addContextVersion("zzzz", hostZ, "/", "", contextZ, null, null,
-                null);
+                null, false, false);
         assertEquals(17, mapper.hosts.length);
 
         mapper.addHost("zzzz", new String[] { "zzzz_alias1", "zzzz_alias2" },
@@ -317,7 +319,9 @@ public class TestMapper extends LoggingBaseTest {
                 null,
                 null,
                 Arrays.asList(new WrapperMappingInfo[] { new WrapperMappingInfo(
-                        "/", "newContext-default", false, false) }));
+                        "/", "newContext-default", false, false) }),
+                false,
+                false);
 
         assertEquals(2, mappedContext.versions.length);
         assertEquals("0", mappedContext.versions[0].name);
@@ -357,7 +361,9 @@ public class TestMapper extends LoggingBaseTest {
                 null,
                 null,
                 Arrays.asList(new WrapperMappingInfo[] { new WrapperMappingInfo(
-                        "/", "newContext-defaultWrapper2", false, false) }));
+                        "/", "newContext-defaultWrapper2", false, false) }),
+                false,
+                false);
         mappedContext = mappedHost.contextList.contexts[contextPos];
 
         assertEquals(contextPath, mappedContext.name);
@@ -427,7 +433,9 @@ public class TestMapper extends LoggingBaseTest {
                 null,
                 null,
                 Arrays.asList(new WrapperMappingInfo[] { new WrapperMappingInfo(
-                        "/", "newDefaultWrapper", false, false) }));
+                        "/", "newDefaultWrapper", false, false) }),
+                false,
+                false);
 
         mappedContext = mappedHost.contextList.contexts[contextPos];
         assertEquals(contextPath, mappedContext.name);
@@ -454,15 +462,15 @@ public class TestMapper extends LoggingBaseTest {
         mapper.setDefaultHostName("localhost");
 
         mapper.addContextVersion("localhost", host, "", "0", contextRoot,
-                new String[0], null, null);
+                new String[0], null, null, false, false);
         mapper.addContextVersion("localhost", host, "/foo", "0", context1,
-                new String[0], null, null);
+                new String[0], null, null, false, false);
         mapper.addContextVersion("localhost", host, "/foo/bar", "0", context2,
-                new String[0], null, null);
+                new String[0], null, null, false, false);
         mapper.addContextVersion("localhost", host, "/foo/bar/bla", "0",
-                context3, new String[0], null, null);
+                context3, new String[0], null, null, false, false);
         mapper.addContextVersion("localhost", host, "/foo/bar/bla/baz", "0",
-                context4, new String[0], null, null);
+                context4, new String[0], null, null, false, false);
 
         final AtomicBoolean running = new AtomicBoolean(true);
         Thread t = new Thread() {
@@ -473,7 +481,7 @@ public class TestMapper extends LoggingBaseTest {
                             "/foo/bar/bla/baz", "0");
                     mapper.addContextVersion("localhost", host,
                             "/foo/bar/bla/baz", "0", context4, new String[0],
-                            null, null);
+                            null, null, false, false);
                 }
                 running.set(false);
             }
