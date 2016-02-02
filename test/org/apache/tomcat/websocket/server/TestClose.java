@@ -244,7 +244,8 @@ public class TestClose extends TomcatBaseTest {
         client.closeSocket();
         events.onMessageWait.countDown();
 
-        awaitOnClose(CloseCodes.CLOSED_ABNORMALLY);
+        // BIO will see close from client before it sees the TCP close
+        awaitOnClose(CloseCodes.CLOSED_ABNORMALLY, CloseCodes.NORMAL_CLOSURE);
     }
 
 
@@ -260,7 +261,7 @@ public class TestClose extends TomcatBaseTest {
         awaitLatch(events.onMessageCalled, "onMessage not called");
 
         client.sendCloseFrame(CloseCodes.NORMAL_CLOSURE);
-        client.closeSocket();
+        client.forceCloseSocket();
         events.onMessageWait.countDown();
 
         awaitOnClose(CloseCodes.CLOSED_ABNORMALLY);
@@ -291,7 +292,7 @@ public class TestClose extends TomcatBaseTest {
 
         @OnError
         public void onError(Throwable t) {
-            log.info("onError: " + t.getMessage());
+            log.info("onError", t);
             events.onErrorThrowable = t;
             events.onErrorCalled.countDown();
         }
