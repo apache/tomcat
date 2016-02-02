@@ -660,6 +660,10 @@ public class WsSession implements Session {
             // needs to be set here.
             if (state == State.OPEN) {
                 futures.put(f2sh, f2sh);
+            } else if (f2sh.isDone()) {
+                // NO-OP. The future completed before the session closed to no
+                // need to register in case the session closes before it
+                // completes.
             } else {
                 // Construct the exception outside of the sync block
                 fail = true;
