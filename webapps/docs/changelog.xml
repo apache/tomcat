@@ -46,11 +46,13 @@
 -->
 <section name="Tomcat 9.0.0.M4" rtext="In development">
   <subsection name="WebSocket">
-    <fix>
-      Fix a timing issue on session close that could result in an exception
-      being thrown for an incomplete message even through the message was
-      completed. (markt)
-    </fix>
+    <changelog>
+      <fix>
+        Fix a timing issue on session close that could result in an exception
+        being thrown for an incomplete message even through the message was
+        completed. (markt)
+      </fix>
+    </changelog>
   </subsection>
 </section>
 <section name="Tomcat 9.0.0.M3" rtext="Voting in progress">
