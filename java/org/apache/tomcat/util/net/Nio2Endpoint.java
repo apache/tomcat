@@ -1107,6 +1107,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 } else {
                     throw new ReadPendingException();
                 }
+                if (block && state.state == CompletionState.PENDING && readPending.tryAcquire(timeout, unit)) {
+                    readPending.release();
+                }
             } catch (InterruptedException e) {
                 handler.failed(e, attachment);
             }
@@ -1335,6 +1338,32 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             synchronized (readCompletionHandler) {
                 return readPending.availablePermits() == 0;
             }
+        }
+
+
+        @Override
+        public boolean awaitReadComplete(long timeout, TimeUnit unit) {
+            try {
+                if (readPending.tryAcquire(timeout, unit)) {
+                    readPending.release();
+                }
+            } catch (InterruptedException e) {
+                return false;
+            }
+            return true;
+        }
+
+
+        @Override
+        public boolean awaitWriteComplete(long timeout, TimeUnit unit) {
+            try {
+                if (writePending.tryAcquire(timeout, unit)) {
+                    writePending.release();
+                }
+            } catch (InterruptedException e) {
+                return false;
+            }
+            return true;
         }
 
         /*
