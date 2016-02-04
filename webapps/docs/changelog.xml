@@ -70,6 +70,10 @@
         present, the directory will always be deleted and recreated by expanding
         the WAR if <code>unpackWARs</code> is <code>true</code>. (markt)
       </fix>
+      <fix>
+        <bug>58935</bug>: Remove incorrect references in the documentation to
+        using <code>jar:file:</code> URLs with the Manager application. (markt) 
+      </fix>
     </changelog>
   </subsection>
 </section>
