@@ -253,6 +253,12 @@
         path when referencing contexts deployed using parallel deployment.
         (markt)
       </fix>
+      <fix>
+        Correct an error in the documentation of the expected behaviour for
+        automatic deployment. If a WAR is updated and an expanded directory is
+        present, the directory will always be deleted and recreated by expanding
+        the WAR if <code>unpackWARs</code> is <code>true</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
