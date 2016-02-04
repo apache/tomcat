@@ -62,6 +62,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Correct an error in the documentation of the expected behaviour for
+        automatic deployment. If a WAR is updated and an expanded directory is
+        present, the directory will always be deleted and recreated by expanding
+        the WAR if <code>unpackWARs</code> is <code>true</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M3" rtext="Voting in progress">
   <subsection name="General">
