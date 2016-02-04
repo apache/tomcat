@@ -278,10 +278,6 @@ the host and port appropriately for your installation.</p>
         path of a web application archive (WAR) file.  This is valid
         <strong>only</strong> for the <code>/deploy</code> command, and is
         the only acceptable format to that command.</li>
-    <li><strong>jar:file:/absolute/path/to/a/warfile.war!/</strong> - The
-        URL to a local web application archive (WAR) file.  You can use any
-        syntax that is valid for the <code>JarURLConnection</code> class
-        for reference to an entire JAR file.</li>
     <li><strong>file:/absolute/path/to/a/context.xml</strong> - The
         absolute path of a web application Context configuration ".xml"
         file which contains the Context configuration element.</li>
@@ -405,7 +401,7 @@ Tomcat server is deployed as the web application context named
 <code>/bar</code>. Notice that there is no <code>path</code> parameter
 so the context path defaults to the name of the web application archive
 file without the ".war" extension.</p>
-<source>http://localhost:8080/manager/text/deploy?war=jar:file:/path/to/bar.war!/</source>
+<source>http://localhost:8080/manager/text/deploy?war=file:/path/to/bar.war</source>
 
 </subsection>
 
@@ -458,7 +454,7 @@ configuration ".xml" file.</p>
 configuration ".xml" file and a web application ".war" file located
 on the server.</p>
 <source>http://localhost:8080/manager/text/deploy
- ?config=file:/path/context.xml&amp;war=jar:file:/path/bar.war!/</source>
+ ?config=file:/path/context.xml&amp;war=file:/path/bar.war</source>
 
 </subsection>
 
