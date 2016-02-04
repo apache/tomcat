@@ -380,8 +380,9 @@
         before the change and isn't present after it either. '-' rather than 'N'
         is used to focus attention on what changes.</li>
     <li>'M' means that the artifact has been modified.</li>
-    <li>'R' means that the directory is re-created by expanding the WAR file.
-        This will only happen if <em>unpackWARs</em> is <code>true</code>.</li>
+    <li>'R' means that the directory is deleted and re-created by expanding the
+        WAR file. This will only happen if <em>unpackWARs</em> is
+        <code>true</code>.</li>
   </ul>
 
   <table class="detail-table">
@@ -447,7 +448,7 @@
     <tr>
       <td>Y</td><td>Y</td><td>Y</td>
       <td>WAR</td>
-      <td>Y</td><td>M</td><td>Y</td><td>Reload</td>
+      <td>Y</td><td>M</td><td>R</td><td>Reload</td>
     </tr>
     <tr>
       <td>Y</td><td>Y</td><td>Y</td>
