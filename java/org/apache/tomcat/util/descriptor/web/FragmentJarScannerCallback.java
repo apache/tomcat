@@ -111,6 +111,11 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
     @Override
     public void scan(File file, String webappPath, boolean isWebapp) throws IOException {
 
+        // Fragments unpacked in WEB-INF/classes are not handled
+        if ("/WEB-INF/classes".equals(webappPath)) {
+            return;
+        }
+
         WebXml fragment = new WebXml();
         fragment.setWebappJar(isWebapp);
         fragment.setDelegate(delegate);

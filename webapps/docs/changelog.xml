@@ -45,6 +45,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M4" rtext="In development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Ensure that <code>/WEB-INF/classes</code> is never processed as a web
+        fragment. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
