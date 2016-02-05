@@ -562,20 +562,18 @@ public class Connector extends LifecycleMBeanBase  {
      * @return the Coyote protocol handler in use.
      */
     public String getProtocol() {
-
-        if (("org.apache.coyote.http11.Http11NioProtocol".equals
-            (getProtocolHandlerClassName()) && (!AprLifecycleListener.isAprAvailable() || !AprLifecycleListener.isAprPreferred()))
-            || "org.apache.coyote.http11.Http11AprProtocol".equals
-            (getProtocolHandlerClassName())) {
+        if (("org.apache.coyote.http11.Http11NioProtocol".equals(getProtocolHandlerClassName()) &&
+                    (!AprLifecycleListener.isAprAvailable() || !AprLifecycleListener.isAprPreferred())) ||
+                "org.apache.coyote.http11.Http11AprProtocol".equals(getProtocolHandlerClassName()) &&
+                    AprLifecycleListener.isAprPreferred()) {
             return "HTTP/1.1";
-        } else if (("org.apache.coyote.ajp.AjpNioProtocol".equals
-                   (getProtocolHandlerClassName()) && (!AprLifecycleListener.isAprAvailable() || !AprLifecycleListener.isAprPreferred()))
-                   || "org.apache.coyote.ajp.AjpAprProtocol".equals
-                   (getProtocolHandlerClassName())) {
+        } else if (("org.apache.coyote.ajp.AjpNioProtocol".equals(getProtocolHandlerClassName()) &&
+                    (!AprLifecycleListener.isAprAvailable() || !AprLifecycleListener.isAprPreferred())) ||
+                "org.apache.coyote.ajp.AjpAprProtocol".equals(getProtocolHandlerClassName()) &&
+                    AprLifecycleListener.isAprPreferred()) {
             return "AJP/1.3";
         }
         return getProtocolHandlerClassName();
-
     }
 
 
@@ -586,8 +584,8 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void setProtocol(String protocol) {
 
-        boolean aprConnector = AprLifecycleListener.isAprAvailable()
-                && AprLifecycleListener.isAprPreferred();
+        boolean aprConnector = AprLifecycleListener.isAprAvailable() &&
+                AprLifecycleListener.isAprPreferred();
 
         if ("HTTP/1.1".equals(protocol) || protocol == null) {
             if (aprConnector) {
@@ -997,9 +995,10 @@ public class Connector extends LifecycleMBeanBase  {
                     sm.getString("coyoteConnector.protocolHandlerNoApr",
                             getProtocolHandlerClassName()));
         }
-        if (AprLifecycleListener.isAprAvailable() && !AprLifecycleListener.isAprPreferred()
-                && protocolHandler instanceof AbstractHttp11JsseProtocol) {
-            AbstractHttp11JsseProtocol<?> jsseProtocolHandler = (AbstractHttp11JsseProtocol<?>) protocolHandler;
+        if (AprLifecycleListener.isAprAvailable() &&
+                protocolHandler instanceof AbstractHttp11JsseProtocol) {
+            AbstractHttp11JsseProtocol<?> jsseProtocolHandler =
+                    (AbstractHttp11JsseProtocol<?>) protocolHandler;
             if (jsseProtocolHandler.getSslImplementationName() == null) {
                 // OpenSSL is compatible with the JSSE configuration, so use it if APR is available
                 jsseProtocolHandler.setSslImplementationName(OpenSSLImplementation.class.getName());
@@ -1009,9 +1008,8 @@ public class Connector extends LifecycleMBeanBase  {
         try {
             protocolHandler.init();
         } catch (Exception e) {
-            throw new LifecycleException
-                (sm.getString
-                 ("coyoteConnector.protocolHandlerInitializationFailed"), e);
+            throw new LifecycleException(
+                    sm.getString("coyoteConnector.protocolHandlerInitializationFailed"), e);
         }
     }
 
