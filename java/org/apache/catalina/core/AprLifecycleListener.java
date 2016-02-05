@@ -78,7 +78,7 @@ public class AprLifecycleListener
     protected static boolean sslInitialized = false;
     protected static boolean aprInitialized = false;
     protected static boolean aprAvailable = false;
-    protected static boolean aprPreferred = true;
+    protected static boolean aprPreferred = false;
     protected static boolean fipsModeActive = false;
 
     /**

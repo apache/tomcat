@@ -51,6 +51,11 @@
         Ensure that <code>/WEB-INF/classes</code> is never processed as a web
         fragment. (markt)
       </fix>
+      <update>
+        Switch default connector when native is installed. Unless configured
+        otherwise, the NIO endpoint will be used by default. If SSL is
+        configured, OpenSSL will be used rather than JSSE. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
