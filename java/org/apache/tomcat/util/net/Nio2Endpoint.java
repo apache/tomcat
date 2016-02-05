@@ -1606,7 +1606,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     sslChannel.rehandshake();
                     ((JSSESupport) sslSupport).setSession(engine.getSession());
                 } catch (IOException ioe) {
-                    log.warn(sm.getString("http11processor.socket.sslreneg"), ioe);
+                    log.warn(sm.getString("socket.sslreneg"), ioe);
                 }
             }
         }

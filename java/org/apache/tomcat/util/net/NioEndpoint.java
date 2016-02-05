@@ -1419,7 +1419,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     sslChannel.rehandshake(getEndpoint().getSoTimeout());
                     ((JSSESupport) sslSupport).setSession(engine.getSession());
                 } catch (IOException ioe) {
-                    log.warn(sm.getString("http11processor.socket.sslreneg",ioe));
+                    log.warn(sm.getString("socket.sslreneg",ioe));
                 }
             }
         }
