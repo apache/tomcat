@@ -21,7 +21,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.tomcat.util.digester.Digester;
 import org.xml.sax.SAXException;
@@ -88,7 +90,7 @@ final class PersistentProviderRegistrations {
         private String layer;
         private String appContext;
         private String description;
-        private final List<Property> properties = new ArrayList<>();
+        private final Map<String,String> properties = new HashMap<>();
 
 
         public String getClassName() {
@@ -124,9 +126,9 @@ final class PersistentProviderRegistrations {
 
 
         public void addProperty(Property property) {
-            properties.add(property);
+            properties.put(property.getName(), property.getValue());
         }
-        public List<Property> getProperties() {
+        public Map<String,String> getProperties() {
             return properties;
         }
     }

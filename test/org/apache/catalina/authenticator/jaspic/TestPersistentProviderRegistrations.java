@@ -21,7 +21,6 @@ import java.io.File;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.apache.catalina.authenticator.jaspic.PersistentProviderRegistrations.Property;
 import org.apache.catalina.authenticator.jaspic.PersistentProviderRegistrations.Provider;
 import org.apache.catalina.authenticator.jaspic.PersistentProviderRegistrations.Providers;
 
@@ -47,12 +46,7 @@ public class TestPersistentProviderRegistrations {
         Assert.assertEquals("d", p.getDescription());
 
         Assert.assertEquals(2,  p.getProperties().size());
-        Property prop1 = p.getProperties().get(0);
-        Assert.assertEquals("e", prop1.getName());
-        Assert.assertEquals("f", prop1.getValue());
-        Property prop2 = p.getProperties().get(1);
-        Assert.assertEquals("g", prop2.getName());
-        Assert.assertEquals("h", prop2.getValue());
+        Assert.assertEquals("f", p.getProperties().get("e"));
+        Assert.assertEquals("h", p.getProperties().get("g"));
     }
-
 }
