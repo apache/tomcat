@@ -172,15 +172,16 @@ public class StandardJarScanner implements JarScanner {
         }
 
         // Scan WEB-INF/classes
-        if (isScanAllDirectories()) {
-            try {
-                URL url = context.getResource("/WEB-INF/classes/META-INF");
+        URL webInfURL = null;
+        try {
+            webInfURL = context.getResource(Constants.WEB_INF_CLASSES);
+            if (isScanAllDirectories()) {
+                URL url = context.getResource(Constants.WEB_INF_CLASSES + "/META-INF");
                 if (url != null) {
                     // Class path scanning will look at WEB-INF/classes since
                     // that is the URL that Tomcat's web application class
                     // loader returns. Therefore, it is this URL that needs to
                     // be added to the set of processed URLs.
-                    URL webInfURL = context.getResource("/WEB-INF/classes");
                     if (webInfURL != null) {
                         processedURLs.add(webInfURL);
                     }
@@ -190,9 +191,9 @@ public class StandardJarScanner implements JarScanner {
                         log.warn(sm.getString("jarScan.webinfclassesFail"), e);
                     }
                 }
-            } catch (MalformedURLException e) {
-                // Ignore
             }
+        } catch (MalformedURLException e) {
+            // Ignore. Won't happen. URLs are of the correct form.
         }
 
         // Scan the classpath
@@ -244,8 +245,12 @@ public class StandardJarScanner implements JarScanner {
                                 log.debug(sm.getString(
                                         "jarScan.classloaderJarScan", urls[i]));
                             }
+                            String webappPath = null;
+                            if (urls[i].equals(webInfURL)) {
+                                webappPath = Constants.WEB_INF_CLASSES;
+                            }
                             try {
-                                process(scanType, callback, urls[i], null, isWebapp);
+                                process(scanType, callback, urls[i], webappPath, isWebapp);
                             } catch (IOException ioe) {
                                 log.warn(sm.getString(
                                         "jarScan.classloaderFail", urls[i]),

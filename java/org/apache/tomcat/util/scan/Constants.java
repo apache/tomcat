@@ -33,6 +33,7 @@ public final class Constants {
     /* Commons strings */
     public static final String JAR_EXT = ".jar";
     public static final String WEB_INF_LIB = "/WEB-INF/lib/";
+    public static final String WEB_INF_CLASSES = "/WEB-INF/classes";
 
     /* Context attributes - used to pass short-cuts to Jasper */
     public static final String MERGED_WEB_XML =
