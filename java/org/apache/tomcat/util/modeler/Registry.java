@@ -418,11 +418,11 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      */
     public void unregisterComponent( ObjectName oname ) {
         try {
-            if( getMBeanServer().isRegistered(oname)) {
+            if (oname != null && getMBeanServer().isRegistered(oname)) {
                 getMBeanServer().unregisterMBean(oname);
             }
-        } catch( Throwable t ) {
-            log.error( "Error unregistering mbean ", t);
+        } catch (Throwable t) {
+            log.error("Error unregistering mbean", t);
         }
     }
 
