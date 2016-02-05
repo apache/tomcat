@@ -96,7 +96,7 @@ public class TesterServletContext implements ServletContext {
 
     @Override
     public URL getResource(String path) throws MalformedURLException {
-        throw new RuntimeException("Not implemented");
+        return null;
     }
 
     @Override
