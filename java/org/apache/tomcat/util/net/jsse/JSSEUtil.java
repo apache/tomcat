@@ -96,12 +96,15 @@ public class JSSEUtil extends SSLUtilBase {
         implementedProtocols = new HashSet<>();
         try (SSLServerSocket socket = (SSLServerSocket) ssf.createServerSocket()) {
             // Filter out all the SSL protocols (SSLv2 and SSLv3) from the
-            // defaults
-            // since they are no longer considered secure
+            // defaults since they are no longer considered secure but allow
+            // SSLv2Hello
             for (String protocol : socket.getEnabledProtocols()) {
-                if (protocol.toUpperCase(Locale.ENGLISH).contains("SSL")) {
-                    log.debug(sm.getString("jsse.excludeDefaultProtocol", protocol));
-                    continue;
+                String protocolUpper = protocol.toUpperCase(Locale.ENGLISH);
+                if (!"SSLV2HELLO".equals(protocolUpper)) {
+                    if (protocolUpper.contains("SSL")) {
+                        log.debug(sm.getString("jsse.excludeDefaultProtocol", protocol));
+                        continue;
+                    }
                 }
                 implementedProtocols.add(protocol);
             }
