@@ -1227,7 +1227,7 @@ public class JspC extends Task implements Options {
                 if (temp == null) {
                     temp = "";
                 }
-                scratchDir = new File(new File(temp).getAbsolutePath());
+                scratchDir = new File(temp).getAbsoluteFile();
             }
 
             String jspUri=file.replace('\\','/');
