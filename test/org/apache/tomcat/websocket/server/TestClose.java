@@ -111,7 +111,7 @@ public class TestClose extends TomcatBaseTest {
     public static void awaitOnError(Class<? extends Throwable> exceptionClazz) {
         awaitLatch(events.onErrorCalled, "onError not called");
         Assert.assertTrue(exceptionClazz.getName(),
-                events.onErrorThrowable.getClass().isAssignableFrom(exceptionClazz));
+                exceptionClazz.isAssignableFrom(events.onErrorThrowable.getClass()));
     }
 
 
