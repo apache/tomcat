@@ -182,19 +182,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Authenticate the user making this request, based on the specified
-     * login configuration.  Return <code>true</code> if any specified
-     * constraint has been satisfied, or <code>false</code> if we have
-     * created a response challenge already.
-     *
-     * @param request Request we are processing
-     * @param response Response we are creating
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
-    public boolean authenticate(Request request, HttpServletResponse response)
+    protected boolean doAuthenticate(Request request, HttpServletResponse response)
             throws IOException {
 
         // NOTE: We don't try to reauthenticate using any existing SSO session,
