@@ -304,7 +304,7 @@
       <add>
         Extend the feature available in the cluster session manager
         implementations that enables session attribute replication to be
-        filtered bases on attribute name to all session manager implementations.
+        filtered based on attribute name to all session manager implementations.
         Note that configuration attribute name has changed from
         <code>sessionAttributeFilter</code> to
         <code>sessionAttributeNameFilter</code>. Apply the filter on load as
