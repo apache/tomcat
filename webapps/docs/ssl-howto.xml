@@ -269,11 +269,12 @@ Certificate that can be used by your server.</p>
 
 <subsection name="Edit the Tomcat Configuration File">
 <p>
-Tomcat can use two different implementations of SSL:
+Tomcat can use three different implementations of SSL:
 </p>
 <ul>
-<li>the JSSE implementation provided as part of the Java runtime (since 1.4)</li>
-<li>the APR implementation, which uses the OpenSSL engine by default.</li>
+<li>JSSE implementation provided as part of the Java runtime</li>
+<li>JSSE implementation that uses OpenSSL</li>
+<li>APR implementation, which uses the OpenSSL engine by default</li>
 </ul>
 <p>
 The exact configuration details depend on which implementation is being used.
@@ -281,29 +282,30 @@ If you configured Connector by specifying generic
 <code>protocol="HTTP/1.1"</code> then the implementation used by Tomcat is
 chosen automatically. If the installation uses <a href="apr.html">APR</a>
 - i.e. you have installed the Tomcat native library -
-then it will use the APR SSL implementation, otherwise it will use the Java
+then it will use the JSSE OpenSSL implementation, otherwise it will use the Java
 JSSE implementation.
 </p>
 
 <p>
-As configuration attributes for SSL support significantly differ between
-APR vs. JSSE implementations, it is <strong>recommended</strong> to
-avoid auto-selection of implementation. It is done by specifying a classname
+Auto-selection of implementation can be avoided if needed. It is done by specifying a classname
 in the <b>protocol</b> attribute of the <a href="config/http.html">Connector</a>.</p>
 
 <p>To define a Java (JSSE) connector, regardless of whether the APR library is
 loaded or not, use one of the following:</p>
 <source><![CDATA[<!-- Define a HTTP/1.1 Connector on port 8443, JSSE NIO implementation -->
 <Connector protocol="org.apache.coyote.http11.Http11NioProtocol"
+           sslImplementationName="org.apache.tomcat.util.net.jsse.JSSEImplementation"
            port="8443" .../>
 
 <!-- Define a HTTP/1.1 Connector on port 8443, JSSE NIO2 implementation -->
 <Connector protocol="org.apache.coyote.http11.Http11Nio2Protocol"
+           sslImplementationName="org.apache.tomcat.util.net.jsse.JSSEImplementation"
            port="8443" .../>]]></source>
 
-<p>Tomcat also provides a SSL engine that directly uses OpenSSL. If the APR library
+<p>The OpenSSL JSSE implementation can also be configured explicitly if needed. If the APR library
 is installed (as for using the APR connector), using the sslImplementationName attribute
-allows enabling it. In that case, the configuration can use either the JSSE attributes or
+allows enabling it. When using the OpenSSL JSSE implementation, the configuration can use
+either the JSSE attributes or
 the OpenSSL attributes (as used for the APR connector), but must not mix attributes from
 both types in the same SSLHostConfig or Connector element.</p>
 <source><![CDATA[<!-- Define a HTTP/1.1 Connector on port 8443, JSSE NIO implementation and OpenSSL -->
@@ -316,15 +318,20 @@ both types in the same SSLHostConfig or Connector element.</p>
 <Connector protocol="org.apache.coyote.http11.Http11AprProtocol"
            port="8443" .../>]]></source>
 
-<p>If you are using APR, you have the option of configuring an alternative engine to OpenSSL.</p>
+<p>If you are using APR or JSSE OpenSSL, you have the option of configuring an alternative engine to OpenSSL.</p>
 <source><![CDATA[<Listener className="org.apache.catalina.core.AprLifecycleListener"
           SSLEngine="someengine" SSLRandomSeed="somedevice" />]]></source>
 <p>The default value is</p>
 <source><![CDATA[<Listener className="org.apache.catalina.core.AprLifecycleListener"
           SSLEngine="on" SSLRandomSeed="builtin" />]]></source>
+<p>Also the <code>useAprConnector</code> attribute may be used to have Tomcat default to
+using the APR connector rather than the NIO connector:</p>
+<source><![CDATA[<Listener className="org.apache.catalina.core.AprLifecycleListener"
+          useAprConnector="true" SSLEngine="on" SSLRandomSeed="builtin" />]]></source>
 <p>
-So to use SSL under APR, make sure the SSLEngine attribute is set to something other than <code>off</code>.
-The default value is <code>on</code> and if you specify another value, it has to be a valid engine name.
+So to enable OpenSSL, make sure the SSLEngine attribute is set to something other than <code>off</code>.
+The default value is <code>on</code> and if you specify another value,
+it has to be a valid OpenSSL engine name.
 </p>
 
 <p>
@@ -338,7 +345,7 @@ sources like "/dev/urandom" that will allow quicker starts of Tomcat.
 <code>$CATALINA_BASE</code> represents the base directory for the
 Tomcat instance.  An example <code>&lt;Connector&gt;</code> element
 for an SSL connector is included in the default <code>server.xml</code>
-file installed with Tomcat.  To configure an SSL connector that uses JSSE, you
+file installed with Tomcat. To configure an SSL connector that uses JSSE, you
 will need to remove the comments and edit it so it looks something like
 this:</p>
 <source><![CDATA[<!-- Define a SSL Coyote HTTP/1.1 Connector on port 8443 -->
@@ -348,6 +355,10 @@ this:</p>
            scheme="https" secure="true" SSLEnabled="true"
            keystoreFile="${user.home}/.keystore" keystorePass="changeit"
            clientAuth="false" sslProtocol="TLS"/>]]></source>
+<p>
+  Note: If tomcat-native is installed, the configuration will use JSSE with
+  an OpenSSL implementation, which supports either this configuration or the APR
+  configuration example given below.</p>
 <p>
   The APR connector uses different attributes for many SSL settings,
   particularly keys and certificates. An example of an APR configuration is:</p>
@@ -365,8 +376,9 @@ this:</p>
 are mandatory, are documented in the SSL Support section of the
 <a href="config/http.html#SSL_Support">HTTP connector</a> configuration
 reference. Make sure that you use the correct attributes for the connector you
-are using. The NIO and NIO2 connectors use JSSE whereas the APR/native connector
-uses APR.</p>
+are using. The NIO and NIO2 connectors use JSSE unless the JSSE OpenSSL implementation is
+installed (in which case it supports either the JSSE or OpenSSL configuration styles),
+whereas the APR/native connector uses APR.</p>
 
 <p>The <code>port</code> attribute is the TCP/IP
 port number on which Tomcat will listen for secure connections.  You can
@@ -500,7 +512,7 @@ SSL communications, and what to do about them.</p>
     "java.security.InvalidAlgorithmParameterException: Prime size must be multiple
     of 64, and can only range from 512 to 1024 (inclusive)"
 
-    <p>If you are using the APR/native connector,
+    <p>If you are using the APR/native connector or the JSSE OpenSSL implementation,
     it will determine the strength of ephemeral DH keys from the key size of
     your RSA certificate. For example a 2048 bit RSA key will result in
     using a 2048 bit prime for the DH keys. Unfortunately Java 6 only supports
