@@ -70,6 +70,10 @@
         WAR into the <code>appBase</code> and using the newly created expanded
         directory as the <code>docBase</code>. (markt)
       </fix>
+      <add>
+        <bug>58988</bug>: Special characters in the substitutions for the RewriteValve
+        can now be quoted with a backslash. (fschumacher)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
