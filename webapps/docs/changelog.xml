@@ -62,6 +62,14 @@
         <code>authenticate()</code> to ensure compatibility with future
         improvements to <code>AuthenticatorBase</code>. (markt)
       </scode>
+      <fix>
+        Correct a regression in the fix for <bug>58867</bug>. When configuring a
+        Context to use an external directory for the <code>docBase</code>, and
+        that directory happens to be located along side the original WAR, use
+        the directory as the <code>docBase</code> rather than expanding the
+        WAR into the <code>appBase</code> and using the newly created expanded
+        directory as the <code>docBase</code>. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
