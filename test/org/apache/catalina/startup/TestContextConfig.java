@@ -34,6 +34,7 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.core.StandardHost;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestContextConfig extends TomcatBaseTest {
@@ -200,5 +201,25 @@ public class TestContextConfig extends TomcatBaseTest {
             String result = res.toString();
             Assert.assertTrue(result, result.indexOf(expectedBody) > -1);
         }
+    }
+
+
+    @Test
+    public void testUser01() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        StandardHost host = (StandardHost) tomcat.getHost();
+        host.setUnpackWARs(true);
+        host.setAutoDeploy(true);
+        tomcat.start();
+
+
+        StandardContext ctx = new StandardContext();
+        ctx.setDocBase("D://test1");
+        ctx.setPath("/test1");
+        ctx.addLifecycleListener(new ContextConfig());
+
+        host.addChild(ctx);
+
+        System.out.println("done");
     }
 }

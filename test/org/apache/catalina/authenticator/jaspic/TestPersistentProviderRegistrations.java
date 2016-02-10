@@ -29,7 +29,7 @@ public class TestPersistentProviderRegistrations {
     @Test
     public void testLoadEmpty() {
         File f = new File("test/conf/jaspic-test-01.xml");
-        Providers result = PersistentProviderRegistrations.getProviders(f);
+        Providers result = PersistentProviderRegistrations.loadProviders(f);
         Assert.assertEquals(0,  result.getProviders().size());
     }
 
@@ -37,9 +37,14 @@ public class TestPersistentProviderRegistrations {
     @Test
     public void testLoadSimple() {
         File f = new File("test/conf/jaspic-test-02.xml");
-        Providers result = PersistentProviderRegistrations.getProviders(f);
-        Assert.assertEquals(1,  result.getProviders().size());
-        Provider p = result.getProviders().get(0);
+        Providers result = PersistentProviderRegistrations.loadProviders(f);
+        validateSimple(result);
+    }
+
+
+    private void validateSimple(Providers providers) {
+        Assert.assertEquals(1,  providers.getProviders().size());
+        Provider p = providers.getProviders().get(0);
         Assert.assertEquals("a", p.getClassName());
         Assert.assertEquals("b", p.getLayer());
         Assert.assertEquals("c", p.getAppContext());
@@ -48,5 +53,35 @@ public class TestPersistentProviderRegistrations {
         Assert.assertEquals(2,  p.getProperties().size());
         Assert.assertEquals("f", p.getProperties().get("e"));
         Assert.assertEquals("h", p.getProperties().get("g"));
+    }
+
+
+    @Test
+    public void testSaveSimple() {
+        File f = new File("test/conf/jaspic-test-03.xml");
+        if (f.exists()) {
+            Assert.assertTrue(f.delete());
+        }
+
+        // Create a config and write it out
+        Providers start = new Providers();
+        Provider p = new Provider();
+        p.setClassName("a");
+        p.setLayer("b");
+        p.setAppContext("c");
+        p.setDescription("d");
+        p.addProperty("e", "f");
+        p.addProperty("g", "h");
+        start.addProvider(p);
+        PersistentProviderRegistrations.writeProviders(start, f);
+
+        // Read it back
+        Providers end = PersistentProviderRegistrations.loadProviders(f);
+
+        validateSimple(end);
+
+        if (f.exists()) {
+            f.delete();
+        }
     }
 }
