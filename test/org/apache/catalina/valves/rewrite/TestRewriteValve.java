@@ -33,6 +33,11 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
     @Test
+    public void testBackslashPercentSign() throws Exception {
+        doTestRewrite("RewriteRule ^(.*) /a/\\%5A", "/", "/a/%255A");
+    }
+
+    @Test
     public void testNoopRewrite() throws Exception {
         doTestRewrite("RewriteRule ^(.*) $1", "/a/%255A", "/a/%255A");
     }

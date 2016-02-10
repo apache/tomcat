@@ -520,6 +520,10 @@ cannot use <code>$N</code> in the substitution string!
       or it is explicitly terminated by a
       <code><strong>L</strong></code> flag.</p>
 
+      <p>The special characters <code>$</code> and <code>%</code> can
+      be quoted by prepending them with a backslash character
+      <code>\</code>.</p>
+
       <p>There is a special substitution string named
       '<code>-</code>' which means: <strong>NO
       substitution</strong>! This is useful in providing
