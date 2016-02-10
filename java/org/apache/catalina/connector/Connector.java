@@ -563,14 +563,14 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public String getProtocol() {
         if (("org.apache.coyote.http11.Http11NioProtocol".equals(getProtocolHandlerClassName()) &&
-                    (!AprLifecycleListener.isAprAvailable() || !AprLifecycleListener.isAprPreferred())) ||
+                    (!AprLifecycleListener.isAprAvailable() || !AprLifecycleListener.getUseAprConnector())) ||
                 "org.apache.coyote.http11.Http11AprProtocol".equals(getProtocolHandlerClassName()) &&
-                    AprLifecycleListener.isAprPreferred()) {
+                    AprLifecycleListener.getUseAprConnector()) {
             return "HTTP/1.1";
         } else if (("org.apache.coyote.ajp.AjpNioProtocol".equals(getProtocolHandlerClassName()) &&
-                    (!AprLifecycleListener.isAprAvailable() || !AprLifecycleListener.isAprPreferred())) ||
+                    (!AprLifecycleListener.isAprAvailable() || !AprLifecycleListener.getUseAprConnector())) ||
                 "org.apache.coyote.ajp.AjpAprProtocol".equals(getProtocolHandlerClassName()) &&
-                    AprLifecycleListener.isAprPreferred()) {
+                    AprLifecycleListener.getUseAprConnector()) {
             return "AJP/1.3";
         }
         return getProtocolHandlerClassName();
@@ -585,7 +585,7 @@ public class Connector extends LifecycleMBeanBase  {
     public void setProtocol(String protocol) {
 
         boolean aprConnector = AprLifecycleListener.isAprAvailable() &&
-                AprLifecycleListener.isAprPreferred();
+                AprLifecycleListener.getUseAprConnector();
 
         if ("HTTP/1.1".equals(protocol) || protocol == null) {
             if (aprConnector) {

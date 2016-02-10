@@ -78,7 +78,7 @@ public class AprLifecycleListener
     protected static boolean sslInitialized = false;
     protected static boolean aprInitialized = false;
     protected static boolean aprAvailable = false;
-    protected static boolean aprPreferred = false;
+    protected static boolean useAprConnector = false;
     protected static boolean fipsModeActive = false;
 
     /**
@@ -395,14 +395,14 @@ public class AprLifecycleListener
         return fipsModeActive;
     }
 
-    public void setAprPreferred(boolean aprPreferred) {
-        if (aprPreferred != AprLifecycleListener.aprPreferred) {
-            AprLifecycleListener.aprPreferred = aprPreferred;
+    public void setUseAprConnector(boolean useAprConnector) {
+        if (useAprConnector != AprLifecycleListener.useAprConnector) {
+            AprLifecycleListener.useAprConnector = useAprConnector;
         }
     }
 
-    public static boolean isAprPreferred() {
-        return aprPreferred;
+    public static boolean getUseAprConnector() {
+        return useAprConnector;
     }
 
 }
