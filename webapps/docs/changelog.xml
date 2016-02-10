@@ -68,7 +68,7 @@
         that directory happens to be located along side the original WAR, use
         the directory as the <code>docBase</code> rather than expanding the
         WAR into the <code>appBase</code> and using the newly created expanded
-        directory as the <code>docBase</code>. (markt) 
+        directory as the <code>docBase</code>. (markt)
       </fix>
     </changelog>
   </subsection>
