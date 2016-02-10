@@ -18,32 +18,50 @@ package org.apache.catalina.authenticator.jaspic;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.digester.Digester;
+import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.SAXException;
 
+/**
+ * Utility class for the loading and saving of JASPIC persistent provider
+ * registrations.
+ */
 final class PersistentProviderRegistrations {
+
+    private static final Log log = LogFactory.getLog(PersistentProviderRegistrations.class);
+    private static final StringManager sm =
+            StringManager.getManager(PersistentProviderRegistrations.class);
+
 
     private PersistentProviderRegistrations() {
         // Utility class. Hide default constructor
     }
 
 
-    static Providers getProviders(File configFile) {
+    static Providers loadProviders(File configFile) {
         try (InputStream is = new FileInputStream(configFile)) {
             // Construct a digester to read the XML input file
             Digester digester = new Digester();
 
             try {
                 digester.setFeature("http://apache.org/xml/features/allow-java-encodings", true);
-                // TODO: Configure the digester to validate the input against
-                //       the XSD
+                digester.setValidating(true);
+                digester.setNamespaceAware(true);
             } catch (Exception e) {
                 throw new SecurityException(e);
             }
@@ -68,6 +86,85 @@ final class PersistentProviderRegistrations {
             return result;
         } catch (IOException | SAXException e) {
             throw new SecurityException(e);
+        }
+    }
+
+
+    static void writeProviders(Providers providers, File configFile) {
+        File configFileOld = new File(configFile.getAbsolutePath() + ".old");
+        File configFileNew = new File(configFile.getAbsolutePath() + ".new");
+
+        // Remove left over temporary files if present
+        if (configFileOld.exists()) {
+            if (configFileOld.delete()) {
+                throw new SecurityException(sm.getString(
+                        "persistentProviderRegistrations.existsDeleteFail",
+                        configFileOld.getAbsolutePath()));
+            }
+        }
+        if (configFileNew.exists()) {
+            if (configFileNew.delete()) {
+                throw new SecurityException(sm.getString(
+                        "persistentProviderRegistrations.existsDeleteFail",
+                        configFileNew.getAbsolutePath()));
+            }
+        }
+
+        // Write out the providers to the temporary new file
+        try (OutputStream fos = new FileOutputStream(configFileNew);
+                Writer writer = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
+            writer.write(
+                    "<?xml version='1.0' encoding='utf-8'?>\n" +
+                    "<jaspic-providers\n" +
+                    "    xmlns=\"http://tomcat.apache.org/xml\"\n" +
+                    "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                    "    xsi:schemaLocation=\"http://tomcat.apache.org/xml jaspic-providers.xsd\"\n" +
+                    "    version=\"1.0\">\n");
+            for (Provider provider : providers.providers) {
+                writer.write("  <provider className=\"");
+                writer.write(provider.getClassName());
+                writer.write("\" layer=\"");
+                writer.write(provider.getLayer());
+                writer.write("\" appContext=\"");
+                writer.write(provider.getAppContext());
+                if (provider.getDescription() != null) {
+                    writer.write("\" description=\"");
+                    writer.write(provider.getDescription());
+                }
+                writer.write("\">\n");
+                for (Entry<String,String> entry : provider.getProperties().entrySet()) {
+                    writer.write("    <property name=\"");
+                    writer.write(entry.getKey());
+                    writer.write("\" value=\"");
+                    writer.write(entry.getValue());
+                    writer.write("\"/>\n");
+                }
+                writer.write("  </provider>\n");
+            }
+            writer.write("</jaspic-providers>\n");
+        } catch (IOException e) {
+            configFileNew.delete();
+            throw new SecurityException(e);
+        }
+
+        // Move the current file out of the way
+        if (configFile.isFile()) {
+            if (!configFile.renameTo(configFileOld)) {
+                throw new SecurityException(sm.getString("persistentProviderRegistrations.moveFail",
+                        configFile.getAbsolutePath(), configFileOld.getAbsolutePath()));
+            }
+        }
+
+        // Move the new file into place
+        if (!configFileNew.renameTo(configFile)) {
+            throw new SecurityException(sm.getString("persistentProviderRegistrations.moveFail",
+                    configFileNew.getAbsolutePath(), configFile.getAbsolutePath()));
+        }
+
+        // Remove the old file
+        if (configFileOld.exists() && !configFileOld.delete()) {
+            log.warn(sm.getString("persistentProviderRegistrations.deleteFail",
+                    configFileOld.getAbsolutePath()));
         }
     }
 
@@ -127,6 +224,9 @@ final class PersistentProviderRegistrations {
 
         public void addProperty(Property property) {
             properties.put(property.getName(), property.getValue());
+        }
+        void addProperty(String name, String value) {
+            properties.put(name, value);
         }
         public Map<String,String> getProperties() {
             return properties;
