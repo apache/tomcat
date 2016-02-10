@@ -90,7 +90,7 @@
     </p>
     <ul>
       <li>APR 1.2+ development headers (libapr1-dev package)</li>
-      <li>OpenSSL 0.9.7+ development headers (libssl-dev package)</li>
+      <li>OpenSSL 1.0.2+ development headers (libssl-dev package)</li>
       <li>JNI headers from Java compatible JDK 1.4+</li>
       <li>GNU development environment (gcc, make)</li>
     </ul>
@@ -132,6 +132,14 @@
   <section name="APR Lifecycle Listener Configuration">
     <subsection name="AprLifecycleListener">
     <attributes>
+    <attribute name="FIPSMode" required="false">
+    <p>
+      Allows using OpenSSL FIPS mode. If set to <code>on</code>, Tomcat will enter FIPS mode if needed.
+      If set to <code>require</code>, Tomcat will fail to start if FIPS mode was not active. If set
+      to <code>enter</code>, Tomcat will enter FIPS mode and will cause an error if FIPS mode was active.
+      If unset or set to <code>off</code>, Tomcat will not check FIPS status.
+    </p>
+    </attribute>
     <attribute name="SSLEngine" required="false">
     <p>
       Name of the SSLEngine to use. off: Do not use SSL, on: Use SSL but no specific ENGINE.
@@ -143,6 +151,17 @@
 
     <p>See the <a href="http://www.openssl.org">Official OpenSSL
        website</a> for more details on SSL hardware engines and manufacturers.
+    </p>
+    </attribute>
+    <attribute name="SSLRandomSeed" required="false">
+    <p>
+      If specified, this sets a random source that will be used by OpenSSL.
+    </p>
+    </attribute>
+    <attribute name="useAprConnector" required="false">
+    <p>
+      Set to <code>true</code> to use the APR connector by default. The default value is
+      <code>false</code>, which will use the NIO connector with the JSSE OpenSSL implementation instead.
     </p>
     </attribute>
     </attributes>

@@ -172,10 +172,12 @@
         either a Java NIO based connector or an APR/native based connector.
         If the <code>PATH</code> (Windows) or <code>LD_LIBRARY_PATH</code> (on
         most unix systems) environment variables contain the Tomcat native
-        library, the APR/native connector will be used. If the native library
-        cannot be found, the Java NIO based connector will be used. Note
-        that the APR/native connector has different settings for HTTPS than the
-        Java connectors.<br/>
+        library, and the <code>AprLifecycleListener</code> that is used to
+        initialize APR has its <code>useAprConnector</code> attribute set to
+        <code>true</code>, the APR/native connector will be used. If the native library
+        cannot be found or the attribute is not configured, the Java NIO based
+        connector will be used. Note that the APR/native connector has different
+        settings for HTTPS than the Java connectors.<br/>
         To use an explicit protocol rather than rely on the auto-switching
         mechanism described above, the following values may be used:<br/>
         <code>org.apache.coyote.http11.Http11NioProtocol</code> -
@@ -987,12 +989,14 @@
   attributes to the values <code>https</code> and <code>true</code>
   respectively, to pass correct information to the servlets.</p>
 
-  <p>The NIO and NIO2 connectors use the JSSE SSL implementation whereas the
-  APR/native connector uses OpenSSL. Prior to Tomcat 9, different configuration
+  <p>The NIO and NIO2 connectors use either the JSSE Java SSL implementation or
+  an OpenSSL implementation, whereas the
+  APR/native connector uses OpenSSL only. Prior to Tomcat 9, different configuration
   attributes were used for JSSE and OpenSSL. From Tomcat 9 onwards, and as far
   as possible, common configuration attributes are used for both JSSE and
-  OpenSSL. This is to aid simpler switching between connector implementations
-  for SSL connectors.</p>
+  OpenSSL. Also if using the JSSE OpenSSL implementation, configuration can be set using
+  either the JSSE or APR attributes (note: but not both types within the same configuration).
+  This is to aid simpler switching between connector implementations for SSL connectors.</p>
 
   <p>Each secure connector must define at least one
   <strong>SSLHostConfig</strong>. The names of the
@@ -1357,6 +1361,10 @@
 
   <subsection name="SSL Support - Connector - NIO and NIO2">
 
+  <p>When APR/native is enabled, the connectors will default to using OpenSSL through JSSE,
+  which may be more optimized than the JSSE Java implementation depending on the processor being used,
+  and can be complemented with many commercial accelerator components.</p>
+
   <p>The following NIO and NIO2 SSL configuration attributes are not specific to
   a virtual host and, therefore, must be configured on the connector.</p>
 
@@ -1367,7 +1375,7 @@
       message received on a new TLS connection (the client hello) to extract the
       requested server name. The message needs to be buffered so it can then be
       passed to the JSSE implementation for normal TLS processing. In theory,
-      this first message could be very large although in practise it is
+      this first message could be very large although in practice it is
       typically a few hundred bytes. This attribute sets the maximum message
       size that Tomcat will buffer. If a message exceeds this size, the
       connection will be configured as if no server name was indicated by the
@@ -1376,13 +1384,15 @@
     </attribute>
 
     <attribute name="sslImplementationName" required="false">
-      <p>The class name of the SSL implementation to use. If not specified, the
+      <p>The class name of the SSL implementation to use. If not specified and
+      the tomcat-native library is not installed, the
       default of <code>org.apache.tomcat.util.net.jsse.JSSEImplementation</code>
       will be used which wraps JVM&apos;s default JSSE provider. Note that the
       JVM can be configured to use a different JSSE provider as the default.
       Tomcat also bundles a special SSL implementation for JSSE that is backed
       by OpenSSL. To enable it, the native library should be enabled as if
-      intending to use the APR connector, the value of this attribute should be
+      intending to use the APR connector, and Tomcat will automatically enable it
+      and the default value of this attribute becomes
       <code>org.apache.tomcat.util.net.openssl.OpenSSLImplementation</code>.
       In that case, the attributes from either from either JSSE and OpenSSL
       configuration styles can be used, as long as the two types are not mixed
@@ -1397,7 +1407,7 @@
   <subsection name="SSL Support - Connector - NIO and NIO2 (deprecated)">
 
   <p>The following NIO and NIO2 SSL configuration attributes have been
-  deprecated in favour of the default
+  deprecated in favor of the default
   <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.
   </p>
 
@@ -1715,8 +1725,8 @@
       </tr>
       <tr>
         <th style="text-align: left;">SSL Support</th>
-        <td>Java SSL</td>
-        <td>Java SSL</td>
+        <td>Java SSL or OpenSSL</td>
+        <td>Java SSL or OpenSSL</td>
         <td>OpenSSL</td>
       </tr>
       <tr>
