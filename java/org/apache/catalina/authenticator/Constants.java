@@ -55,7 +55,11 @@ public class Constants {
      * request is associated.
      */
     public static final String REQ_SSOID_NOTE =
-      "org.apache.catalina.request.SSOID";
+            "org.apache.catalina.request.SSOID";
+
+
+    public static final String REQ_JASPIC_SUBJECT_NOTE =
+            "org.apache.catalina.authenticator.jaspic.SUBJECT";
 
 
     // ---------------------------------------------------------- Session Notes
