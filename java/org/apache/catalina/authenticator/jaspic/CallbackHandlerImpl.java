@@ -29,7 +29,6 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.message.callback.CallerPrincipalCallback;
 import javax.security.auth.message.callback.GroupPrincipalCallback;
 
-import org.apache.catalina.connector.Request;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -40,16 +39,10 @@ public class CallbackHandlerImpl implements CallbackHandler {
     private static final Log log = LogFactory.getLog(CallbackHandlerImpl.class);
     private static final StringManager sm = StringManager.getManager(CallbackHandlerImpl.class);
 
-    private Request request;
     private String name;
     private Principal principal;
     private Subject subject;
     private String[] groups;
-
-
-    public CallbackHandlerImpl(Request request) {
-        this.request = request;
-    }
 
 
     @Override
@@ -74,19 +67,19 @@ public class CallbackHandlerImpl implements CallbackHandler {
             }
 
             // Create the GenericPrincipal
-            GenericPrincipal gp = getGenericPrincipal();
-            if (gp != null) {
-                request.setUserPrincipal(gp);
-
-                if (subject != null) {
-                    subject.getPrivateCredentials().add(gp);
-                }
+            Principal gp = getPrincipal();
+            if (subject != null && gp != null) {
+                subject.getPrivateCredentials().add(gp);
             }
         }
     }
 
 
-    public GenericPrincipal getGenericPrincipal() {
+    private Principal getPrincipal() {
+        // If the Principal is cached in the session JASPIC may simply return it
+        if (principal instanceof GenericPrincipal) {
+            return principal;
+        }
         String name = this.name;
         if (name == null && principal != null) {
             name = principal.getName();

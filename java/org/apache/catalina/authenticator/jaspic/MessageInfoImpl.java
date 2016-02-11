@@ -20,9 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.security.auth.message.MessageInfo;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.connector.Request;
 import org.apache.tomcat.util.res.StringManager;
 
 public class MessageInfoImpl implements MessageInfo {
@@ -31,13 +31,13 @@ public class MessageInfoImpl implements MessageInfo {
     public static final String IS_MANDATORY = "javax.security.auth.message.MessagePolicy.isMandatory";
 
     private final Map<String, Object> map = new HashMap<>();
-    private Request request;
+    private HttpServletRequest request;
     private HttpServletResponse response;
 
     public MessageInfoImpl() {
     }
 
-    public MessageInfoImpl(Request request, HttpServletResponse response, boolean authMandatory) {
+    public MessageInfoImpl(HttpServletRequest request, HttpServletResponse response, boolean authMandatory) {
         this.request = request;
         this.response = response;
         map.put(IS_MANDATORY, Boolean.toString(authMandatory));
@@ -62,11 +62,11 @@ public class MessageInfoImpl implements MessageInfo {
 
     @Override
     public void setRequestMessage(Object request) {
-        if (!(request instanceof Request)) {
+        if (!(request instanceof HttpServletRequest)) {
             throw new IllegalArgumentException(sm.getString("authenticator.jaspic.badRequestType",
                     request.getClass().getName()));
         }
-        this.request = (Request) request;
+        this.request = (HttpServletRequest) request;
     }
 
     @Override
