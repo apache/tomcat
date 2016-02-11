@@ -56,12 +56,6 @@
         otherwise, the NIO endpoint will be used by default. If SSL is
         configured, OpenSSL will be used rather than JSSE. (remm)
       </update>
-      <scode>
-        Refactor <code>AuthenticatorBase</code>. Sub-classes should now
-        implement <code>doAuthenticate()</code> rather than
-        <code>authenticate()</code> to ensure compatibility with future
-        improvements to <code>AuthenticatorBase</code>. (markt)
-      </scode>
       <fix>
         Correct a regression in the fix for <bug>58867</bug>. When configuring a
         Context to use an external directory for the <code>docBase</code>, and
