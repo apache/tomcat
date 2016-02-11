@@ -59,6 +59,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
@@ -412,6 +413,8 @@ public class Request implements HttpServletRequest {
 
     protected Boolean asyncSupported = null;
 
+    private HttpServletRequest applicationRequest = null;
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -480,6 +483,7 @@ public class Request implements HttpServletRequest {
 
         mappingData.recycle();
 
+        applicationRequest = null;
         if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
             if (facade != null) {
                 facade.clear();
@@ -630,6 +634,7 @@ public class Request implements HttpServletRequest {
      */
     protected RequestFacade facade = null;
 
+
     /**
      * @return the <code>ServletRequest</code> for which this object
      * is the facade.  This method must be implemented by a subclass.
@@ -638,7 +643,31 @@ public class Request implements HttpServletRequest {
         if (facade == null) {
             facade = new RequestFacade(this);
         }
-        return facade;
+        if (applicationRequest == null) {
+            applicationRequest = facade;
+        }
+        return applicationRequest;
+    }
+
+
+    /**
+     * Set a wrapped HttpServletRequest to pass to the application. Components
+     * wishing to wrap the request should obtain the request via
+     * {@link #getRequest()}, wrap it and then call this method with the
+     * wrapped request.
+     *
+     * @param applicationRequest The wrapped request to pass to the application
+     */
+    public void setRequest(HttpServletRequest applicationRequest) {
+        // Check the wrapper wraps this request
+        ServletRequest r = applicationRequest;
+        while (r instanceof HttpServletRequestWrapper) {
+            r = ((HttpServletRequestWrapper) r).getRequest();
+        }
+        if (r != facade) {
+            throw new IllegalArgumentException(sm.getString("request.illegalWrap"));
+        }
+        this.applicationRequest = applicationRequest;
     }
 
 
