@@ -77,8 +77,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     /**
      * "Expires" header always set to Date(1), so generate once only
      */
-    private static final String DATE_ONE = (new SimpleDateFormat(FastHttpDateFormat.RFC1123_DATE, Locale.US))
-            .format(new Date(1));
+    private static final String DATE_ONE =
+            (new SimpleDateFormat(FastHttpDateFormat.RFC1123_DATE, Locale.US)).format(new Date(1));
 
     /**
      * The string manager for this package.
@@ -406,7 +406,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     public void invoke(Request request, Response response) throws IOException, ServletException {
 
         if (log.isDebugEnabled()) {
-            log.debug("Security checking request " + request.getMethod() + " " + request.getRequestURI());
+            log.debug("Security checking request " + request.getMethod() + " " +
+                    request.getRequestURI());
         }
 
         // Have we got a cached authenticated Principal to record?
@@ -418,8 +419,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                     principal = session.getPrincipal();
                     if (principal != null) {
                         if (log.isDebugEnabled()) {
-                            log.debug("We have cached auth type " + session.getAuthType() + " for principal "
-                                    + session.getPrincipal());
+                            log.debug("We have cached auth type " + session.getAuthType() +
+                                    " for principal " + session.getPrincipal());
                         }
                         request.setAuthType(session.getAuthType());
                         request.setUserPrincipal(principal);
@@ -433,7 +434,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         // to which it submits) might be outside the secured area
         String contextPath = this.context.getPath();
         String decodedRequestURI = request.getDecodedRequestURI();
-        if (decodedRequestURI.startsWith(contextPath) && decodedRequestURI.endsWith(Constants.FORM_ACTION)) {
+        if (decodedRequestURI.startsWith(contextPath) &&
+                decodedRequestURI.endsWith(Constants.FORM_ACTION)) {
             if (!authenticate(request, response)) {
                 if (log.isDebugEnabled()) {
                     log.debug(" Failed authenticate() test ??" + decodedRequestURI);
@@ -451,8 +453,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         Session session = request.getSessionInternal(false);
         if (session != null) {
             SavedRequest savedRequest = (SavedRequest) session.getNote(Constants.FORM_REQUEST_NOTE);
-            if (savedRequest != null && decodedRequestURI.equals(savedRequest.getDecodedRequestURI())
-                    && !authenticate(request, response)) {
+            if (savedRequest != null &&
+                    decodedRequestURI.equals(savedRequest.getDecodedRequestURI()) &&
+                    !authenticate(request, response)) {
                 if (log.isDebugEnabled()) {
                     log.debug(" Failed authenticate() test");
                 }
@@ -485,7 +488,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         // Make sure that constrained resources are not cached by web proxies
         // or browsers as caching can provide a security hole
-        if (constraints != null && disableProxyCaching && !"POST".equalsIgnoreCase(request.getMethod())) {
+        if (constraints != null && disableProxyCaching &&
+                !"POST".equalsIgnoreCase(request.getMethod())) {
             if (securePagesWithPragma) {
                 // Note: These can cause problems with downloading files with IE
                 response.setHeader("Pragma", "No-cache");
@@ -525,7 +529,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 if (!constraints[i].getAuthConstraint()) {
                     authRequired = false;
                     break;
-                } else if (!constraints[i].getAllRoles() && !constraints[i].getAuthenticatedUsers()) {
+                } else if (!constraints[i].getAllRoles() &&
+                        !constraints[i].getAuthenticatedUsers()) {
                     String[] roles = constraints[i].findAuthRoles();
                     if (roles == null || roles.length == 0) {
                         authRequired = false;
@@ -536,7 +541,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         }
 
         if (!authRequired && context.getPreemptiveAuthentication()) {
-            authRequired = request.getCoyoteRequest().getMimeHeaders().getValue("authorization") != null;
+            authRequired =
+                    request.getCoyoteRequest().getMimeHeaders().getValue("authorization") != null;
         }
 
         if (!authRequired && context.getPreemptiveAuthentication()
@@ -598,9 +604,11 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      *
      * @return The X509 certificate chain if found, <code>null</code> otherwise.
      */
-    protected X509Certificate[] getRequestCertificates(final Request request) throws IllegalStateException {
+    protected X509Certificate[] getRequestCertificates(final Request request)
+            throws IllegalStateException {
 
-        X509Certificate certs[] = (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
+        X509Certificate certs[] =
+                (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
 
         if ((certs == null) || (certs.length < 1)) {
             try {
@@ -632,24 +640,6 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         sso.associate(ssoId, session);
 
     }
-
-    /**
-     * Authenticate the user making this request, based on the login
-     * configuration of the {@link Context} with which this Authenticator is
-     * associated. Return <code>true</code> if any specified constraint has been
-     * satisfied, or <code>false</code> if we have created a response challenge
-     * already.
-     *
-     * @param request
-     *            Request we are processing
-     * @param response
-     *            Response we are populating
-     *
-     * @exception IOException
-     *                if an input/output error occurs
-     */
-    @Override
-    public abstract boolean authenticate(Request request, HttpServletResponse response) throws IOException;
 
     /**
      * Check to see if the user has already been authenticated earlier in the
@@ -762,8 +752,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             associate(ssoId, request.getSessionInternal(true));
 
             if (log.isDebugEnabled()) {
-                log.debug(" Reauthenticated cached principal '" + request.getUserPrincipal().getName()
-                        + "' with auth type '" + request.getAuthType() + "'");
+                log.debug(" Reauthenticated cached principal '" +
+                        request.getUserPrincipal().getName() +
+                        "' with auth type '" + request.getAuthType() + "'");
             }
         }
 
@@ -789,8 +780,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * @param password
      *            Password used to authenticate (if any)
      */
-    public void register(Request request, HttpServletResponse response, Principal principal, String authType,
-            String username, String password) {
+    public void register(Request request, HttpServletResponse response, Principal principal,
+            String authType, String username, String password) {
 
         if (log.isDebugEnabled()) {
             String name = (principal == null) ? "none" : principal.getName();
@@ -813,7 +804,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 manager.changeSessionId(session);
                 request.changeSessionId(session.getId());
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("authenticator.changeSessionId", oldId, session.getId()));
+                    log.debug(sm.getString("authenticator.changeSessionId",
+                            oldId, session.getId()));
                 }
             }
         } else if (alwaysUseSession) {
@@ -922,7 +914,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * @throws ServletException
      *             No principal was authenticated with the specified credentials
      */
-    protected Principal doLogin(Request request, String username, String password) throws ServletException {
+    protected Principal doLogin(Request request, String username, String password)
+            throws ServletException {
         Principal p = context.getRealm().authenticate(username, password);
         if (p == null) {
             throw new ServletException(sm.getString("authenticator.loginFail"));
