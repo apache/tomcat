@@ -134,7 +134,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
 
     @Override
-    protected boolean doAuthenticate(Request request, HttpServletResponse response)
+    public boolean authenticate(Request request, HttpServletResponse response)
             throws IOException {
 
         if (checkForCachedAuthentication(request, response, true)) {
