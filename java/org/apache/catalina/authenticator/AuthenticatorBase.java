@@ -669,12 +669,6 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     }
 
 
-    @Override
-    public boolean authenticate(Request request, HttpServletResponse response) throws IOException {
-        return doAuthenticate(request, response);
-    }
-
-
     /**
      * Authenticate the user making this request, based on the login
      * configuration of the {@link Context} with which this Authenticator is
@@ -687,11 +681,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      *
      * @exception IOException if an input/output error occurs
      */
-    protected boolean doAuthenticate(Request request, HttpServletResponse response)
-            throws IOException {
-        // Defaults to false in case sub-class doesn't implement this method.
-        return false;
-    }
+    @Override
+    public abstract boolean authenticate(Request request,
+            HttpServletResponse response) throws IOException;
 
 
     /**

@@ -14,7 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+
 package org.apache.catalina.authenticator;
+
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +33,8 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.codec.binary.Base64;
 
+
+
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP BASIC
  * Authentication, as outlined in RFC 2617:  "HTTP Authentication: Basic
@@ -38,14 +43,24 @@ import org.apache.tomcat.util.codec.binary.Base64;
  * @author Craig R. McClanahan
  */
 public class BasicAuthenticator extends AuthenticatorBase {
-
     private static final Log log = LogFactory.getLog(BasicAuthenticator.class);
 
 
     // --------------------------------------------------------- Public Methods
 
+    /**
+     * Authenticate the user making this request, based on the specified
+     * login configuration.  Return <code>true</code> if any specified
+     * constraint has been satisfied, or <code>false</code> if we have
+     * created a response challenge already.
+     *
+     * @param request Request we are processing
+     * @param response Response we are creating
+     *
+     * @exception IOException if an input/output error occurs
+     */
     @Override
-    protected boolean doAuthenticate(Request request, HttpServletResponse response)
+    public boolean authenticate(Request request, HttpServletResponse response)
             throws IOException {
 
         if (checkForCachedAuthentication(request, response, true)) {
