@@ -38,9 +38,11 @@ import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletResponse;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
@@ -244,8 +246,10 @@ public class Response implements HttpServletResponse {
      */
     private final List<Cookie> cookies = new ArrayList<>();
 
-    // --------------------------------------------------------- Public Methods
+    private HttpServletResponse applicationResponse = this;
 
+
+    // --------------------------------------------------------- Public Methods
 
     /**
      * Release all object references, and initialize instance variables, in
@@ -262,6 +266,7 @@ public class Response implements HttpServletResponse {
         errorState.set(0);
         isCharacterEncodingSet = false;
 
+        applicationResponse = null;
         if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
             if (facade != null) {
                 facade.clear();
@@ -364,6 +369,7 @@ public class Response implements HttpServletResponse {
      */
     protected ResponseFacade facade = null;
 
+
     /**
      * @return the <code>ServletResponse</code> for which this object
      * is the facade.
@@ -372,7 +378,32 @@ public class Response implements HttpServletResponse {
         if (facade == null) {
             facade = new ResponseFacade(this);
         }
-        return (facade);
+        if (applicationResponse == null) {
+            applicationResponse = facade;
+        }
+        return applicationResponse;
+    }
+
+
+    /**
+     * Set a wrapped HttpServletResponse to pass to the application. Components
+     * wishing to wrap the response should obtain the response via
+     * {@link #getResponse()}, wrap it and then call this method with the
+     * wrapped response.
+     *
+     * @param applicationResponse The wrapped response to pass to the
+     *        application
+     */
+    public void setResponse(HttpServletResponse applicationResponse) {
+        // Check the wrapper wraps this request
+        ServletResponse r = applicationResponse;
+        while (r instanceof HttpServletResponseWrapper) {
+            r = ((HttpServletResponseWrapper) r).getResponse();
+        }
+        if (r != facade) {
+            throw new IllegalArgumentException(sm.getString("response.illegalWrap"));
+        }
+        this.applicationResponse = applicationResponse;
     }
 
 
