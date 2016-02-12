@@ -22,11 +22,12 @@
   - *.html files in documentation are generated from XML sources
   - *.md5 files are generated and cannot contain license
   - *.manifest JAR manifest files cannot contain license
+  - *.bmp image files cannot contain license
   - package-list files in API documentation (javadoc) are generated
   - bug52121-part1, bug52121-part2 files in tests are test data for a hard
-  to reproduce testcase and should be used as is.
+    to reproduce testcase and should be used as is.
   - other trivial test files, such as textual files containing only "OK' string,
-  are also excluded.
+    are also excluded.
 
 output/build/webapps/docs/*.html
 output/build/webapps/docs/appdev/*.html
@@ -35,6 +36,7 @@ output/build/webapps/docs/config/*.html
 output/build/webapps/docs/funcspecs/*.html
 output/build/webapps/docs/tribes/*.html
 output/deployer/deployer-howto.html
+output/dist/side_left.bmp
 output/dist/webapps/docs/*.html
 output/dist/webapps/docs/appdev/*.html
 output/dist/webapps/docs/architecture/*.html
