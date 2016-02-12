@@ -797,7 +797,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     // In the middle of processing a request/response. Keep the
                     // socket associated with the processor. Exact requirements
                     // depend on type of long poll
-                    connections.put(socket, processor);
                     longPoll(wrapper, processor);
                     if (processor.isAsync()) {
                         getProtocol().addWaitingProcessor(processor);
