@@ -411,11 +411,18 @@ public class AsyncStateMachine {
 
 
     public synchronized void recycle() {
+        // Use lastAsyncStart to determine if this instance has been used since
+        // it was last recycled. If it hasn't there is no need to recycle again
+        // which saves the relatively expensive call to notifyAll()
+        if (lastAsyncStart == 0) {
+            return;
+        }
         // Ensure in case of error that any non-container threads that have been
         // paused are unpaused.
         notifyAll();
         asyncCtxt = null;
         state = AsyncState.DISPATCHED;
+        lastAsyncStart = 0;
     }
 
 
