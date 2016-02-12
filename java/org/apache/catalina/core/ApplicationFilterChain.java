@@ -173,9 +173,8 @@ final class ApplicationFilterChain implements FilterChain {
         // Call the next filter if there is one
         if (pos < n) {
             ApplicationFilterConfig filterConfig = filters[pos++];
-            Filter filter = null;
             try {
-                filter = filterConfig.getFilter();
+                Filter filter = filterConfig.getFilter();
 
                 if (request.isAsyncSupported() && "false".equalsIgnoreCase(
                         filterConfig.getFilterDef().getAsyncSupported())) {
@@ -215,42 +214,33 @@ final class ApplicationFilterChain implements FilterChain {
             }
             // Use potentially wrapped request from this point
             if ((request instanceof HttpServletRequest) &&
-                (response instanceof HttpServletResponse)) {
-
-                if( Globals.IS_SECURITY_ENABLED ) {
-                    final ServletRequest req = request;
-                    final ServletResponse res = response;
-                    Principal principal =
-                        ((HttpServletRequest) req).getUserPrincipal();
-                    Object[] args = new Object[]{req, res};
-                    SecurityUtil.doAsPrivilege("service",
-                                               servlet,
-                                               classTypeUsedInService,
-                                               args,
-                                               principal);
-                } else {
-                    servlet.service(request, response);
-                }
+                    (response instanceof HttpServletResponse) &&
+                    Globals.IS_SECURITY_ENABLED ) {
+                final ServletRequest req = request;
+                final ServletResponse res = response;
+                Principal principal =
+                    ((HttpServletRequest) req).getUserPrincipal();
+                Object[] args = new Object[]{req, res};
+                SecurityUtil.doAsPrivilege("service",
+                                           servlet,
+                                           classTypeUsedInService,
+                                           args,
+                                           principal);
             } else {
                 servlet.service(request, response);
             }
-        } catch (IOException e) {
-            throw e;
-        } catch (ServletException e) {
-            throw e;
-        } catch (RuntimeException e) {
+        } catch (IOException | ServletException | RuntimeException e) {
             throw e;
         } catch (Throwable e) {
+            e = ExceptionUtils.unwrapInvocationTargetException(e);
             ExceptionUtils.handleThrowable(e);
-            throw new ServletException
-              (sm.getString("filterChain.servlet"), e);
+            throw new ServletException(sm.getString("filterChain.servlet"), e);
         } finally {
             if (ApplicationDispatcher.WRAP_SAME_OBJECT) {
                 lastServicedRequest.set(null);
                 lastServicedResponse.set(null);
             }
         }
-
     }
 
 
