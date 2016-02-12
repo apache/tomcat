@@ -47,6 +47,8 @@
 
   - files used simply to ensure directories are not empty
 
+  - *.bmp files
+
 output/build/webapps/docs/*.html
 output/build/webapps/docs/appdev/*.html
 output/build/webapps/docs/architecture/*.html
@@ -183,3 +185,5 @@ output/dist/src/res/checkstyle/header-al2.txt
 res/checkstyle/header-al2.txt
 
 output/dist/temp/safeToDelete.tmp
+
+output/dist/side_left.bmp
