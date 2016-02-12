@@ -368,15 +368,11 @@ public class CoyoteAdapter implements Adapter {
             // Ignore
         } finally {
             // Access log
-            if (!async) {
-                if (postParseSuccess) {
-                    // Log only if processing was invoked.
-                    // If postParseRequest() failed, it has already logged it.
-                    request.getMappingData().context.logAccess(
-                            request, response,
-                            System.currentTimeMillis() - req.getStartTime(),
-                            false);
-                }
+            if (!async && postParseSuccess) {
+                // Log only if processing was invoked.
+                // If postParseRequest() failed, it has already logged it.
+                request.getMappingData().context.logAccess(request, response,
+                        System.currentTimeMillis() - req.getStartTime(), false);
             }
 
             req.getRequestProcessor().setWorkerThreadName(null);
