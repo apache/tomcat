@@ -65,10 +65,12 @@ public class TestWebappClassLoader extends TomcatBaseTest {
     public void testFilter() throws IOException {
 
         String[] classSuffixes = new String[]{
+            "",
             "some.package.Example"
         };
 
         String[] resourceSuffixes = new String[]{
+            "",
             "some/path/test.properties",
             "some/path/test"
         };
@@ -83,7 +85,7 @@ public class TestWebappClassLoader extends TomcatBaseTest {
             "org.apache",
             "org.apache.tomcat.jdbc",
             "javax",
-            "javax.jsp.jstl",
+            "javax.servlet.jsp.jstl",
             "com.mycorp"
         };
 
@@ -131,20 +133,13 @@ public class TestWebappClassLoader extends TomcatBaseTest {
             for (String prefix : prefixesDeny) {
                 for (String suffix : classSuffixes) {
                     if (prefix.equals("")) {
-                        name = suffix;
-                    } else {
-                        name = prefix + "." + suffix;
-                    }
+                    name = prefix + "." + suffix;
                     Assert.assertTrue("Class '" + name + "' failed deny filter",
                                loader.filter(name, true));
                 }
                 prefix = prefix.replace('.', '/');
                 for (String suffix : resourceSuffixes) {
-                    if (prefix.equals("")) {
-                        name = suffix;
-                    } else {
-                        name = prefix + "/" + suffix;
-                    }
+                    name = prefix + "/" + suffix;
                     Assert.assertTrue("Resource '" + name + "' failed deny filter",
                                loader.filter(name, false));
                 }
