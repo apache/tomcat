@@ -515,7 +515,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         // Add date header unless the application has already set one
         if (headers.getValue("date") == null) {
-            headers.setValue("date").setString(FastHttpDateFormat.getCurrentDate());
+            headers.addValue("date").setString(FastHttpDateFormat.getCurrentDate());
         }
     }
 
