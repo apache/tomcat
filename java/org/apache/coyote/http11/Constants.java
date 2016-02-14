@@ -163,22 +163,4 @@ public final class Constants {
      */
     public static final String HTTP_11 = "HTTP/1.1";
     public static final byte[] HTTP_11_BYTES = ByteChunk.convertToBytes(HTTP_11);
-
-
-    /**
-     * GET.
-     */
-    public static final String GET = "GET";
-
-
-    /**
-     * HEAD.
-     */
-    public static final String HEAD = "HEAD";
-
-
-    /**
-     * POST.
-     */
-    public static final String POST = "POST";
 }
