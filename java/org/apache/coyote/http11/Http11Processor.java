@@ -1338,24 +1338,23 @@ public class Http11Processor extends AbstractProcessor {
         InputFilter[] inputFilters = inputBuffer.getFilters();
 
         // Parse transfer-encoding header
-        MessageBytes transferEncodingValueMB = null;
         if (http11) {
-            transferEncodingValueMB = headers.getValue("transfer-encoding");
-        }
-        if (transferEncodingValueMB != null) {
-            String transferEncodingValue = transferEncodingValueMB.toString();
-            // Parse the comma separated list. "identity" codings are ignored
-            int startPos = 0;
-            int commaPos = transferEncodingValue.indexOf(',');
-            String encodingName = null;
-            while (commaPos != -1) {
-                encodingName = transferEncodingValue.substring(startPos, commaPos);
+            MessageBytes transferEncodingValueMB = headers.getValue("transfer-encoding");
+            if (transferEncodingValueMB != null) {
+                String transferEncodingValue = transferEncodingValueMB.toString();
+                // Parse the comma separated list. "identity" codings are ignored
+                int startPos = 0;
+                int commaPos = transferEncodingValue.indexOf(',');
+                String encodingName = null;
+                while (commaPos != -1) {
+                    encodingName = transferEncodingValue.substring(startPos, commaPos);
+                    addInputFilter(inputFilters, encodingName);
+                    startPos = commaPos + 1;
+                    commaPos = transferEncodingValue.indexOf(',', startPos);
+                }
+                encodingName = transferEncodingValue.substring(startPos);
                 addInputFilter(inputFilters, encodingName);
-                startPos = commaPos + 1;
-                commaPos = transferEncodingValue.indexOf(',', startPos);
             }
-            encodingName = transferEncodingValue.substring(startPos);
-            addInputFilter(inputFilters, encodingName);
         }
 
         // Parse content-length header
