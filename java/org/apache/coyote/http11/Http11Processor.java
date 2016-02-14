@@ -1522,7 +1522,7 @@ public class Http11Processor extends AbstractProcessor {
         // Add date header unless application has already set one (e.g. in a
         // Caching Filter)
         if (headers.getValue("Date") == null) {
-            headers.setValue("Date").setString(
+            headers.addValue("Date").setString(
                     FastHttpDateFormat.getCurrentDate());
         }
 
