@@ -1705,7 +1705,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                                 }
                             }
                         } else if (state == SocketState.UPGRADING) {
-                            socket.setKeptAlive(true);
                             launch = true;
                         }
                     } else if (handshake == -1 ) {
