@@ -1279,17 +1279,16 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
 
-        MessageBytes expectMB = null;
         if (http11) {
-            expectMB = headers.getValue("expect");
-        }
-        if (expectMB != null) {
-            if (expectMB.indexOfIgnoreCase("100-continue", 0) != -1) {
-                inputBuffer.setSwallowInput(false);
-                request.setExpectation(true);
-            } else {
-                response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
-                setErrorState(ErrorState.CLOSE_CLEAN, null);
+            MessageBytes expectMB = headers.getValue("expect");
+            if (expectMB != null) {
+                if (expectMB.indexOfIgnoreCase("100-continue", 0) != -1) {
+                    inputBuffer.setSwallowInput(false);
+                    request.setExpectation(true);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_EXPECTATION_FAILED);
+                    setErrorState(ErrorState.CLOSE_CLEAN, null);
+                }
             }
         }
 
