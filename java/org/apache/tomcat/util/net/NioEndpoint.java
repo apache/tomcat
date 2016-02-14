@@ -824,22 +824,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
                 boolean hasEvents = false;
 
-                // Time to terminate?
-                if (close) {
-                    events();
-                    timeout(0, false);
-                    try {
-                        selector.close();
-                    } catch (IOException ioe) {
-                        log.error(sm.getString(
-                                "endpoint.nio.selectorCloseFail"), ioe);
-                    }
-                    break;
-                } else {
-                    hasEvents = events();
-                }
                 try {
-                    if ( !close ) {
+                    if (!close) {
+                        hasEvents = events();
                         if (wakeupCounter.getAndSet(-1) > 0) {
                             //if we are here, means we have other stuff to do
                             //do a non blocking select
@@ -855,8 +842,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         try {
                             selector.close();
                         } catch (IOException ioe) {
-                            log.error(sm.getString(
-                                    "endpoint.nio.selectorCloseFail"), ioe);
+                            log.error(sm.getString("endpoint.nio.selectorCloseFail"), ioe);
                         }
                         break;
                     }
