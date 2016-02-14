@@ -42,7 +42,6 @@ public abstract class SocketWrapperBase<E> {
     private volatile long writeTimeout = -1;
 
     private volatile int keepAliveLeft = 100;
-    private boolean keptAlive = false;
     private volatile boolean upgraded = false;
     private boolean secure = false;
     private String negotiatedProtocol = null;
@@ -148,8 +147,6 @@ public abstract class SocketWrapperBase<E> {
 
     public void setKeepAliveLeft(int keepAliveLeft) { this.keepAliveLeft = keepAliveLeft;}
     public int decrementKeepAlive() { return (--keepAliveLeft);}
-    public boolean isKeptAlive() {return keptAlive;}
-    public void setKeptAlive(boolean keptAlive) {this.keptAlive = keptAlive;}
 
     public String getRemoteHost() {
         if (remoteHost == null) {
