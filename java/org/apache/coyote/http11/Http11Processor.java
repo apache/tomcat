@@ -1265,13 +1265,6 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
 
-        MessageBytes methodMB = request.method();
-        if (methodMB.equals(Constants.GET)) {
-            methodMB.setString(Constants.GET);
-        } else if (methodMB.equals(Constants.POST)) {
-            methodMB.setString(Constants.POST);
-        }
-
         MimeHeaders headers = request.getMimeHeaders();
 
         // Check connection header
