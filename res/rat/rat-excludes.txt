@@ -186,4 +186,4 @@ res/checkstyle/header-al2.txt
 
 output/dist/temp/safeToDelete.tmp
 
-output/dist/side_left.bmp
+**/*.bmp
