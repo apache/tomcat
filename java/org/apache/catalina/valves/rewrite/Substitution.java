@@ -149,7 +149,7 @@ public class Substitution {
                     newElement.n = Character.digit(sub.charAt(dollarPos + 1), 10);
                     pos = dollarPos + 2;
                     elements.add(newElement);
-                } else {
+                } else if (sub.charAt(dollarPos + 1) == '{') {
                     // $: map lookup as ${mapname:key|default}
                     MapElement newElement = new MapElement();
                     int open = sub.indexOf('{', dollarPos);
@@ -177,6 +177,8 @@ public class Substitution {
                     }
                     pos = close + 1;
                     elements.add(newElement);
+                } else {
+                    throw new IllegalArgumentException(sub + ": missing digit or curly brace.");
                 }
             } else {
                 // %: back reference to condition or server variable
@@ -196,7 +198,7 @@ public class Substitution {
                     newElement.n = Character.digit(sub.charAt(percentPos + 1), 10);
                     pos = percentPos + 2;
                     elements.add(newElement);
-                } else {
+                } else if (sub.charAt(percentPos + 1) == '{') {
                     // %: server variable as %{variable}
                     SubstitutionElement newElement = null;
                     int open = sub.indexOf('{', percentPos);
@@ -205,10 +207,7 @@ public class Substitution {
                     if (!(-1 < open && open < close)) {
                         throw new IllegalArgumentException(sub);
                     }
-                    if (colon > -1) {
-                        if (!(open < colon && colon < close)) {
-                            throw new IllegalArgumentException(sub);
-                        }
+                    if (colon > -1 && open < colon && colon < close) {
                         String type = sub.substring(open + 1, colon);
                         if (type.equals("ENV")) {
                             newElement = new ServerVariableEnvElement();
@@ -228,6 +227,8 @@ public class Substitution {
                     }
                     pos = close + 1;
                     elements.add(newElement);
+                } else {
+                    throw new IllegalArgumentException(sub + ": missing digit or curly brace.");
                 }
             }
         }

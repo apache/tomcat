@@ -65,6 +65,43 @@ public class TestRewriteValve extends TomcatBaseTest {
                 "RewriteRule /b/(.*).html$ /c/${mapa:$1|dd}", "/b/x.html", "/c/dd");
     }
 
+    @Test
+    public void testRewriteServerVar() throws Exception {
+        doTestRewrite("RewriteRule /b/(.*).html$ /c%{SERVLET_PATH}", "/b/x.html", "/c/b/x.html");
+    }
+
+    @Test
+    public void testRewriteEnvVarAndServerVar() throws Exception {
+        System.setProperty("some_variable", "something");
+        doTestRewrite("RewriteRule /b/(.*).html$ /c/%{ENV:some_variable}%{SERVLET_PATH}", "/b/x.html", "/c/something/b/x.html");
+    }
+
+    @Test
+    public void testRewriteServerVarAndEnvVar() throws Exception {
+        System.setProperty("some_variable", "something");
+        doTestRewrite("RewriteRule /b/(.*).html$ /c%{SERVLET_PATH}/%{ENV:some_variable}", "/b/x.html", "/c/b/x.html/something");
+    }
+
+    @Test
+    public void testRewriteMissingCurlyBraceOnVar() throws Exception {
+        try {
+            doTestRewrite("RewriteRule /b/(.*).html$ /c%_{SERVLET_PATH}", "/b/x.html", "/c");
+            Assert.fail("IAE expected.");
+        } catch (java.lang.IllegalArgumentException e) {
+            // excpected as %_{ is invalid
+        }
+    }
+
+    @Test
+    public void testRewriteMissingCurlyBraceOnMapper() throws Exception {
+        try {
+            doTestRewrite("RewriteRule /b/(.*).html$ /c$_{SERVLET_PATH}", "/b/x.html", "/c");
+            Assert.fail("IAE expected.");
+        } catch (java.lang.IllegalArgumentException e) {
+            // excpected as $_{ is invalid
+        }
+    }
+
     private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
