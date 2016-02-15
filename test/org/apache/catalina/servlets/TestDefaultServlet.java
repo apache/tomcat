@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -40,6 +41,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.not;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
@@ -118,7 +121,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
         tomcat.start();
 
-        TestGzipClient gzipClient = new TestGzipClient(getPort());
+        TestCompressedClient gzipClient = new TestCompressedClient(getPort());
 
         gzipClient.reset();
         gzipClient.setRequest(new String[] {
@@ -130,7 +133,9 @@ public class TestDefaultServlet extends TomcatBaseTest {
         gzipClient.processRequest();
         assertTrue(gzipClient.isResponse200());
         List<String> responseHeaders = gzipClient.getResponseHeaders();
+        assertTrue(responseHeaders.contains("Content-Encoding: gzip"));
         assertTrue(responseHeaders.contains("Content-Length: " + gzipSize));
+        assertTrue(responseHeaders.contains("Vary: accept-encoding"));
 
         gzipClient.reset();
         gzipClient.setRequest(new String[] {
@@ -144,6 +149,65 @@ public class TestDefaultServlet extends TomcatBaseTest {
         assertTrue(responseHeaders.contains("Content-Type: text/html"));
         assertFalse(responseHeaders.contains("Content-Encoding: gzip"));
         assertTrue(responseHeaders.contains("Content-Length: " + indexSize));
+        assertTrue(responseHeaders.contains("Vary: accept-encoding"));
+    }
+
+    /*
+     * Verify serving of brotli compressed resources from context root.
+     */
+    @Test
+    public void testBrotliCompressedFile() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+
+        File brIndex = new File(appDir, "index.html.br");
+        long brSize = brIndex.length();
+
+        File index = new File(appDir, "index.html");
+        long indexSize = index.length();
+
+        // app dir is relative to server home
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
+                "org.apache.catalina.servlets.DefaultServlet");
+        defaultServlet.addInitParameter("precompressed", "true");
+        ctxt.addServletMapping("/", "default");
+
+        ctxt.addMimeMapping("html", "text/html");
+
+        tomcat.start();
+
+        TestCompressedClient brClient = new TestCompressedClient(getPort());
+
+        brClient.reset();
+        brClient.setRequest(new String[] {
+                "GET /index.html HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Connection: Close" + CRLF +
+                        "Accept-Encoding: br, gzip" + CRLF + CRLF });
+        brClient.connect();
+        brClient.processRequest();
+        assertTrue(brClient.isResponse200());
+        List<String> responseHeaders = brClient.getResponseHeaders();
+        assertThat(responseHeaders, hasItem("Content-Encoding: br"));
+        assertThat(responseHeaders, hasItem("Content-Length: " + brSize));
+        assertThat(responseHeaders, hasItem("Vary: accept-encoding"));
+
+        brClient.reset();
+        brClient.setRequest(new String[] {
+                "GET /index.html HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Connection: Close" + CRLF+ CRLF });
+        brClient.connect();
+        brClient.processRequest();
+        assertTrue(brClient.isResponse200());
+        responseHeaders = brClient.getResponseHeaders();
+        assertThat(responseHeaders, hasItem("Content-Type: text/html"));
+        assertThat(responseHeaders, not(hasItem("Content-Encoding: br")));
+        assertThat(responseHeaders, hasItem("Content-Length: " + indexSize));
+        assertThat(responseHeaders, hasItem("Vary: accept-encoding"));
     }
 
     /*
@@ -387,9 +451,9 @@ public class TestDefaultServlet extends TomcatBaseTest {
         }
     }
 
-    private static class TestGzipClient extends SimpleHttpClient {
+    private static class TestCompressedClient extends SimpleHttpClient {
 
-        public TestGzipClient(int port) {
+        public TestCompressedClient(int port) {
             setPort(port);
         }
 

@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
@@ -193,9 +194,17 @@ public class DefaultServlet extends HttpServlet {
     protected boolean readOnly = true;
 
     /**
-     * Should be serve gzip versions of files. By default, it's set to false.
+     * Should be serve precompressed versions of files (gzip, brotli etc). By default, it's set to false.
      */
-    protected boolean gzip = false;
+    protected boolean precompressed = false;
+
+    /**
+     * List of compression formats to serve and their preference order.
+     */
+    protected CompressionFormat[] compressionFormats = new CompressionFormat[] {
+            new CompressionFormat(".br", "br"),
+            new CompressionFormat(".gz", "gzip")
+    };
 
     /**
      * The output buffer size to use when serving resources.
@@ -280,8 +289,14 @@ public class DefaultServlet extends HttpServlet {
         if (getServletConfig().getInitParameter("readonly") != null)
             readOnly = Boolean.parseBoolean(getServletConfig().getInitParameter("readonly"));
 
-        if (getServletConfig().getInitParameter("gzip") != null)
-            gzip = Boolean.parseBoolean(getServletConfig().getInitParameter("gzip"));
+        if (getServletConfig().getInitParameter("precompressed") != null)
+            precompressed = Boolean.parseBoolean(getServletConfig().getInitParameter("precompressed"));
+        else if (getServletConfig().getInitParameter("gzip") != null) {
+            precompressed = Boolean.parseBoolean(getServletConfig().getInitParameter("gzip"));
+            if (precompressed) {
+                compressionFormats = new CompressionFormat[] {new CompressionFormat(".gz", "gzip")};
+            }
+        }
 
         if (getServletConfig().getInitParameter("sendfileSize") != null)
             sendfileSize =
@@ -790,7 +805,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         // These need to reflect the original resource, not the potentially
-        // gzip'd version of the resource so get them now if they are going to
+        // precompressed version of the resource so get them now if they are going to
         // be needed later
         String eTag = null;
         String lastModifiedHttp = null;
@@ -800,11 +815,11 @@ public class DefaultServlet extends HttpServlet {
         }
 
 
-        // Serve a gzipped version of the file if present
-        boolean usingGzippedVersion = false;
-        if (gzip && !included && resource.isFile() && !path.endsWith(".gz")) {
-            WebResource gzipResource = resources.getResource(path + ".gz");
-            if (gzipResource.exists() && gzipResource.isFile()) {
+        // Serve a precompressed version of the file if present
+        boolean usingPrecompressedVersion = false;
+        if (precompressed && !included && resource.isFile() && !pathEndsWithCompressedExtension(path)) {
+            List<PrecompressedResource> precompressedResources = getAvailablePrecompressedResources(path);
+            if (!precompressedResources.isEmpty()) {
                 Collection<String> varyHeaders = response.getHeaders("Vary");
                 boolean addRequired = true;
                 for (String varyHeader : varyHeaders) {
@@ -817,10 +832,11 @@ public class DefaultServlet extends HttpServlet {
                 if (addRequired) {
                     response.addHeader("Vary", "accept-encoding");
                 }
-                if (checkIfGzip(request)) {
-                    response.addHeader("Content-Encoding", "gzip");
-                    resource = gzipResource;
-                    usingGzippedVersion = true;
+                PrecompressedResource bestResource = getBestPrecompressedResource(request, precompressedResources);
+                if (bestResource != null) {
+                    response.addHeader("Content-Encoding", bestResource.format.encoding);
+                    resource = bestResource.resource;
+                    usingPrecompressedVersion = true;
                 }
             }
         }
@@ -878,7 +894,7 @@ public class DefaultServlet extends HttpServlet {
             } catch (IllegalStateException e) {
                 // If it fails, we try to get a Writer instead if we're
                 // trying to serve a text file
-                if (!usingGzippedVersion &&
+                if (!usingPrecompressedVersion &&
                         ((contentType == null) ||
                                 (contentType.startsWith("text")) ||
                                 (contentType.endsWith("xml")) ||
@@ -1037,6 +1053,46 @@ public class DefaultServlet extends HttpServlet {
                 }
             }
         }
+    }
+
+    private boolean pathEndsWithCompressedExtension(String path) {
+        for (CompressionFormat format : compressionFormats) {
+            if (path.endsWith(format.extension)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private List<PrecompressedResource> getAvailablePrecompressedResources(String path) {
+        List<PrecompressedResource> ret = new ArrayList<>(compressionFormats.length);
+        for (CompressionFormat format : compressionFormats) {
+            WebResource precompressedResource = resources.getResource(path + format.extension);
+            if (precompressedResource.exists() && precompressedResource.isFile()) {
+                ret.add(new PrecompressedResource(precompressedResource, format));
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Check if the user agent supports any of the available precompressed resources encoding.
+     *
+     * @param request   The servlet request we are processing
+     * @param precompressedResources   List of available precompressed resources.
+     * @return The best matching precompressed resource or null if no match was found.
+     */
+    private PrecompressedResource getBestPrecompressedResource(HttpServletRequest request, List<PrecompressedResource> precompressedResources) {
+        Enumeration<String> headers = request.getHeaders("Accept-Encoding");
+        while (headers.hasMoreElements()) {
+            String header = headers.nextElement();
+            for (PrecompressedResource resource : precompressedResources) {
+                if (header.indexOf(resource.format.encoding) != -1) {
+                    return resource;
+                }
+            }
+        }
+        return null;
     }
 
     private void doDirectoryRedirect(HttpServletRequest request, HttpServletResponse response)
@@ -1945,25 +2001,6 @@ public class DefaultServlet extends HttpServlet {
     }
 
     /**
-     * Check if the user agent supports gzip encoding.
-     *
-     * @param request   The servlet request we are processing
-     * @return <code>true</code> if the user agent supports gzip encoding,
-     * and <code>false</code> if the user agent does not support gzip encoding.
-     */
-    protected boolean checkIfGzip(HttpServletRequest request) {
-        Enumeration<String> headers = request.getHeaders("Accept-Encoding");
-        while (headers.hasMoreElements()) {
-            String header = headers.nextElement();
-            if (header.indexOf("gzip") != -1) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    /**
      * Check if the if-unmodified-since condition is satisfied.
      *
      * @param request   The servlet request we are processing
@@ -2290,6 +2327,25 @@ public class DefaultServlet extends HttpServlet {
         }
     }
 
+    protected static class CompressionFormat {
+        public final String extension;
+        public final String encoding;
+
+        public CompressionFormat(String extension, String encoding) {
+            this.extension = extension;
+            this.encoding = encoding;
+        }
+    }
+
+    private static class PrecompressedResource {
+        public final WebResource resource;
+        public final CompressionFormat format;
+
+        private PrecompressedResource(WebResource resource, CompressionFormat format) {
+            this.resource = resource;
+            this.format = format;
+        }
+    }
 
     /**
      * This is secure in the sense that any attempt to use an external entity
