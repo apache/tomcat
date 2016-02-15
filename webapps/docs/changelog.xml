@@ -84,6 +84,9 @@
         Handle the case in the NIO2 connector where the required TLS buffer
         sizes increase after the connection has been initiated. (markt/remm)
       </fix>
+      <fix>
+        Bad processing of handshake errors in NIO2. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
