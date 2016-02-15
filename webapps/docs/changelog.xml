@@ -73,6 +73,9 @@
         It throws a StringIndexOutOfBoundsException if the name is exactly
         "org" or "javax". (rjung)
       </fix>
+      <add>
+        Add JASPIC (JSR-196) support. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
