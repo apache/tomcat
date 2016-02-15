@@ -76,6 +76,10 @@
       <add>
         Add JASPIC (JSR-196) support. (markt)
       </add>
+      <add>
+        Make checking for var and map replacement in RewriteValve a bit stricter and
+        correct detection of colon in var replacement. (fschumacher)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
