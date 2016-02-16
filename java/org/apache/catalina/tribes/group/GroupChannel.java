@@ -93,12 +93,12 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     /**
      * A list of membership listeners that subscribe to membership announcements
      */
-    protected final List<Object> membershipListeners = new CopyOnWriteArrayList<>();
+    protected final List<MembershipListener> membershipListeners = new CopyOnWriteArrayList<>();
 
     /**
      * A list of channel listeners that subscribe to incoming messages
      */
-    protected final List<Object> channelListeners = new CopyOnWriteArrayList<>();
+    protected final List<ChannelListener> channelListeners = new CopyOnWriteArrayList<>();
 
     /**
      * If set to true, the GroupChannel will check to make sure that
@@ -154,15 +154,15 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     @Override
     public void heartbeat() {
         super.heartbeat();
-        Iterator<Object> i = membershipListeners.iterator();
-        while ( i.hasNext() ) {
-            Object o = i.next();
-            if ( o instanceof Heartbeat ) ((Heartbeat)o).heartbeat();
+        Iterator<MembershipListener> membershipListenerIterator = membershipListeners.iterator();
+        while ( membershipListenerIterator.hasNext() ) {
+            MembershipListener listener = membershipListenerIterator.next();
+            if ( listener instanceof Heartbeat ) ((Heartbeat)listener).heartbeat();
         }
-        i = channelListeners.iterator();
-        while ( i.hasNext() ) {
-            Object o = i.next();
-            if ( o instanceof Heartbeat ) ((Heartbeat)o).heartbeat();
+        Iterator<ChannelListener> channelListenerIterator = channelListeners.iterator();
+        while ( channelListenerIterator.hasNext() ) {
+            ChannelListener listener = channelListenerIterator.next();
+            if ( listener instanceof Heartbeat ) ((Heartbeat)listener).heartbeat();
         }
 
     }
@@ -290,7 +290,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             boolean rx = false;
             boolean delivered = false;
             for ( int i=0; i<channelListeners.size(); i++ ) {
-                ChannelListener channelListener = (ChannelListener)channelListeners.get(i);
+                ChannelListener channelListener = channelListeners.get(i);
                 if (channelListener != null && channelListener.accept(fwd, source)) {
                     channelListener.messageReceived(fwd, source);
                     delivered = true;
@@ -345,7 +345,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     public void memberAdded(Member member) {
         //notify upwards
         for (int i=0; i<membershipListeners.size(); i++ ) {
-            MembershipListener membershipListener = (MembershipListener)membershipListeners.get(i);
+            MembershipListener membershipListener = membershipListeners.get(i);
             if (membershipListener != null) membershipListener.memberAdded(member);
         }
     }
@@ -359,7 +359,7 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
     public void memberDisappeared(Member member) {
         //notify upwards
         for (int i=0; i<membershipListeners.size(); i++ ) {
-            MembershipListener membershipListener = (MembershipListener)membershipListeners.get(i);
+            MembershipListener membershipListener = membershipListeners.get(i);
             if (membershipListener != null) membershipListener.memberDisappeared(member);
         }
     }
