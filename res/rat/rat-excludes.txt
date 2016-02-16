@@ -47,7 +47,6 @@
 
   - files used simply to ensure directories are not empty
 
-  - *.mdl are Rational Rose data files and cannot contain comments
   - *.bmp, *.dia files are binary
     (*.git, *.jpg are also binary, but are automatically detected by RAT as
     ones, so no explicit configuration is needed)
@@ -157,6 +156,5 @@ res/checkstyle/header-al2.txt
 
 output/dist/temp/safeToDelete.tmp
 
-**/*.mdl
 **/*.bmp
 **/*.dia
