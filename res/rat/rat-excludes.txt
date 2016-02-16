@@ -50,7 +50,7 @@
   - *.mdl are Rational Rose data files and cannot contain comments
   - *.bmp, *.dia files are binary
 
-output/build/logs/*
+output/build/logs/*.txt
 
 output/build/webapps/docs/**/*.html
 output/dist/webapps/docs/**/*.html
