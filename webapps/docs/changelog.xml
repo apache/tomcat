@@ -146,7 +146,7 @@
         invalid location. (markt)
       </fix>
       <scode>
-        <bug>58827</bug>: Remove remains of JSR-77 implementaion. (markt)
+        <bug>58827</bug>: Remove remains of JSR-77 implementation. (markt)
       </scode>
       <fix>
         <bug>58946</bug>: Ensure that the request parameter map remains
