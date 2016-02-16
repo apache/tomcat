@@ -104,7 +104,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         try {
             clazz = Class.forName(className);
             Constructor<?> constructor = clazz.getConstructor(Map.class, AuthConfigFactory.class);
-            provider = (AuthConfigProvider) constructor.newInstance(properties, this);
+            provider = (AuthConfigProvider) constructor.newInstance(properties, null);
         } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException |
                 IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new SecurityException(e);
