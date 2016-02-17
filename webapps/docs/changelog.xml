@@ -58,6 +58,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.69 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix the type of <code>InstanceManager</code> attribute of mbean
+        definition of <code>StandardContext</code>. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.68 (violetagg)" rtext="released 2016-02-16">
   <subsection name="General">
