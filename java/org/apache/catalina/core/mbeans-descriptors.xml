@@ -151,7 +151,7 @@
 
     <attribute name="instanceManager"
                description="Object that creates and destroys servlets, filters, and listeners. Include dependency injection and postConstruct/preDestory handling"
-               type="org.apache.catalina.instanceManagement.InstanceManager" />
+               type="org.apache.tomcat.InstanceManager" />
 
     <attribute name="javaVMs"
                description="The Java virtual machines on which this module is running"
