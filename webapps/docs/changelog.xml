@@ -80,6 +80,10 @@
         Make checking for var and map replacement in RewriteValve a bit stricter and
         correct detection of colon in var replacement. (fschumacher)
       </add>
+      <fix>
+        Refactor the web application class loader to reduce the impact of JAR
+        scanning on the memory footprint of the web application. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
