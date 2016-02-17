@@ -37,6 +37,7 @@ import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.unittest.TesterContext;
+import org.apache.tomcat.unittest.TesterServletContext;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
@@ -63,7 +64,9 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
     @Test
     public void bug54521() throws LifecycleException {
         DigestAuthenticator digestAuthenticator = new DigestAuthenticator();
-        digestAuthenticator.setContainer(new TesterContext());
+        TesterContext context = new TesterContext();
+        context.setServletContext(new TesterServletContext());
+        digestAuthenticator.setContainer(context);
         digestAuthenticator.start();
         Request request = new TesterRequest();
         final int count = 1000;
