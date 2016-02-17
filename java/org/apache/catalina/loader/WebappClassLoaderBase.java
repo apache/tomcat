@@ -41,6 +41,7 @@ import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
+import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -140,8 +141,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     private static final String CLASS_FILE_SUFFIX = ".class";
     private static final String SERVICES_PREFIX = "/META-INF/services/";
 
-    private static final Manifest MANIFEST_UNKNOWN = new Manifest();
-
     static {
         ClassLoader.registerAsParallelCapable();
         JVM_THREAD_GROUP_NAMES.add(JVM_THREAD_GROUP_SYSTEM);
@@ -153,19 +152,16 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         protected final String name;
         protected final String path;
-        protected final boolean manifestRequired;
 
-        PrivilegedFindResourceByName(String name, String path, boolean manifestRequired) {
+        PrivilegedFindResourceByName(String name, String path) {
             this.name = name;
             this.path = path;
-            this.manifestRequired = manifestRequired;
         }
 
         @Override
         public ResourceEntry run() {
-            return findResourceInternal(name, path, manifestRequired);
+            return findResourceInternal(name, path);
         }
-
     }
 
 
@@ -911,14 +907,15 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (entry == null) {
             if (securityManager != null) {
                 PrivilegedAction<ResourceEntry> dp =
-                    new PrivilegedFindResourceByName(name, path, false);
+                    new PrivilegedFindResourceByName(name, path);
                 entry = AccessController.doPrivileged(dp);
             } else {
-                entry = findResourceInternal(name, path, false);
+                entry = findResourceInternal(name, path);
             }
         }
         if (entry != null) {
             url = entry.source;
+            entry.webResource = null;
         }
 
         if ((url == null) && hasExternalRepositories) {
@@ -931,7 +928,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             else
                 log.debug("    --> Resource not found, returning null");
         }
-        return (url);
+        return url;
 
     }
 
@@ -2399,10 +2396,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         if (securityManager != null) {
             PrivilegedAction<ResourceEntry> dp =
-                new PrivilegedFindResourceByName(name, path, true);
+                new PrivilegedFindResourceByName(name, path);
             entry = AccessController.doPrivileged(dp);
         } else {
-            entry = findResourceInternal(name, path, true);
+            entry = findResourceInternal(name, path);
         }
 
         if (entry == null) {
@@ -2418,8 +2415,41 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (clazz != null)
                 return clazz;
 
-            if (entry.binaryContent == null) {
+            WebResource webResource = entry.webResource;
+            if (webResource == null) {
+                webResource = resources.getResource(path);
+            } else {
+                entry.webResource = null;
+            }
+
+            if (webResource == null) {
                 return null;
+            }
+
+            Manifest manifest = webResource.getManifest();
+            URL codeBase = webResource.getCodeBase();
+            Certificate[] certificates = webResource.getCertificates();
+            byte[] binaryContent = webResource.getContent();
+
+            if (transformers.size() > 0) {
+                // If the resource is a class just being loaded, decorate it
+                // with any attached transformers
+                String className = name.endsWith(CLASS_FILE_SUFFIX) ?
+                        name.substring(0, name.length() - CLASS_FILE_SUFFIX.length()) : name;
+                String internalName = className.replace(".", "/");
+
+                for (ClassFileTransformer transformer : this.transformers) {
+                    try {
+                        byte[] transformed = transformer.transform(
+                                this, internalName, null, null, binaryContent);
+                        if (transformed != null) {
+                            binaryContent = transformed;
+                        }
+                    } catch (IllegalClassFormatException e) {
+                        log.error(sm.getString("webappClassLoader.transformError", name), e);
+                        return null;
+                    }
+                }
             }
 
             // Looking up the package
@@ -2435,12 +2465,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 // Define the package (if null)
                 if (pkg == null) {
                     try {
-                        if (entry.manifest == null) {
-                            definePackage(packageName, null, null, null, null,
-                                    null, null, null);
+                        if (manifest == null) {
+                            definePackage(packageName, null, null, null, null, null, null, null);
                         } else {
-                            definePackage(packageName, entry.manifest,
-                                    entry.codeBase);
+                            definePackage(packageName, manifest, codeBase);
                         }
                     } catch (IllegalArgumentException e) {
                         // Ignore: normal error due to dual definition of package
@@ -2455,10 +2483,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 if (pkg != null) {
                     boolean sealCheck = true;
                     if (pkg.isSealed()) {
-                        sealCheck = pkg.isSealed(entry.codeBase);
+                        sealCheck = pkg.isSealed(codeBase);
                     } else {
-                        sealCheck = (entry.manifest == null)
-                            || !isPackageSealed(packageName, entry.manifest);
+                        sealCheck = (manifest == null) || !isPackageSealed(packageName, manifest);
                     }
                     if (!sealCheck)
                         throw new SecurityException
@@ -2469,9 +2496,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             try {
-                clazz = defineClass(name, entry.binaryContent, 0,
-                        entry.binaryContent.length,
-                        new CodeSource(entry.codeBase, entry.certificates));
+                clazz = defineClass(name, binaryContent, 0,
+                        binaryContent.length, new CodeSource(codeBase, certificates));
             } catch (UnsupportedClassVersionError ucve) {
                 throw new UnsupportedClassVersionError(
                         ucve.getLocalizedMessage() + " " +
@@ -2481,10 +2507,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             // Now the class has been defined, clear the elements of the local
             // resource cache that are no longer required.
             entry.loadedClass = clazz;
-            entry.binaryContent = null;
-            entry.codeBase = null;
-            entry.manifest = null;
-            entry.certificates = null;
             // Retain entry.source in case of a getResourceAsStream() call on
             // the class file after the class has been defined.
         }
@@ -2522,11 +2544,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      *
      * @param name the resource name
      * @param path the resource path
-     * @param manifestRequired will load an associated manifest
      * @return the loaded resource, or null if the resource isn't found
      */
-    protected ResourceEntry findResourceInternal(final String name, final String path,
-            boolean manifestRequired) {
+    protected ResourceEntry findResourceInternal(final String name, final String path) {
 
         checkStateForResourceLoading(name);
 
@@ -2538,24 +2558,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         ResourceEntry entry = resourceEntries.get(path);
         if (entry != null) {
-            if (manifestRequired && entry.manifest == MANIFEST_UNKNOWN) {
-                // This resource was added to the cache when a request was made
-                // for the resource that did not need the manifest. Now the
-                // manifest is required, the cache entry needs to be updated.
-                resource = resources.getClassLoaderResource(path);
-                entry.manifest = resource.getManifest();
-            }
             return entry;
         }
-
-        boolean isClassResource = path.endsWith(CLASS_FILE_SUFFIX);
-        boolean isCacheable = isClassResource;
-        if (!isCacheable) {
-             isCacheable = path.startsWith(SERVICES_PREFIX);
-        }
-
-
-        boolean fileNeedConvert = false;
 
         resource = resources.getClassLoaderResource(path);
 
@@ -2565,29 +2569,27 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         entry = new ResourceEntry();
         entry.source = resource.getURL();
-        entry.codeBase = resource.getCodeBase();
         entry.lastModified = resource.getLastModified();
+        entry.webResource = resource;
 
+        boolean fileNeedConvert = false;
         if (needConvert && path.endsWith(".properties")) {
             fileNeedConvert = true;
         }
 
         /* Only cache the binary content if there is some content
          * available and one of the following is true:
-         * a) It is a class file since the binary content is only cached
-         *    until the class has been loaded
-         *    or
-         * b) The file needs conversion to address encoding issues (see
+         * a) The file needs conversion to address encoding issues (see
          *    below)
          *    or
-         * c) The resource is a service provider configuration file located
+         * b) The resource is a service provider configuration file located
          *    under META-INF/services
          *
          * In all other cases do not cache the content to prevent
          * excessive memory usage if large resources are present (see
          * https://bz.apache.org/bugzilla/show_bug.cgi?id=53081).
          */
-        if (isCacheable || fileNeedConvert) {
+        if (path.startsWith(SERVICES_PREFIX) || fileNeedConvert) {
             byte[] binaryContent = resource.getContent();
             if (binaryContent != null) {
                  if (fileNeedConvert) {
@@ -2603,38 +2605,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     }
                 }
                 entry.binaryContent = binaryContent;
-                // The certificates and manifest are made available as a side
-                // effect of reading the binary content
-                entry.certificates = resource.getCertificates();
-            }
-        }
-
-        if (manifestRequired) {
-            entry.manifest = resource.getManifest();
-        } else {
-            entry.manifest = MANIFEST_UNKNOWN;
-        }
-
-        if (isClassResource && entry.binaryContent != null &&
-                this.transformers.size() > 0) {
-            // If the resource is a class just being loaded, decorate it
-            // with any attached transformers
-            String className = name.endsWith(CLASS_FILE_SUFFIX) ?
-                    name.substring(0, name.length() - CLASS_FILE_SUFFIX.length()) : name;
-            String internalName = className.replace(".", "/");
-
-            for (ClassFileTransformer transformer : this.transformers) {
-                try {
-                    byte[] transformed = transformer.transform(
-                            this, internalName, null, null, entry.binaryContent
-                    );
-                    if (transformed != null) {
-                        entry.binaryContent = transformed;
-                    }
-                } catch (IllegalClassFormatException e) {
-                    log.error(sm.getString("webappClassLoader.transformError", name), e);
-                    return null;
-                }
             }
         }
 

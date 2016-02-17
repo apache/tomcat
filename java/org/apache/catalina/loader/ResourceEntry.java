@@ -14,13 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.loader;
 
 import java.net.URL;
-import java.security.cert.Certificate;
-import java.util.jar.Manifest;
+
+import org.apache.catalina.WebResource;
 
 /**
  * Resource entry.
@@ -55,23 +53,6 @@ public class ResourceEntry {
     public URL source = null;
 
 
-    /**
-     * URL of the codebase from where the object was loaded.
-     */
-    public URL codeBase = null;
-
-
-    /**
-     * Manifest (if the resource was loaded from a JAR).
-     */
-    public Manifest manifest = null;
-
-
-    /**
-     * Certificates (if the resource was loaded from a JAR).
-     */
-    public Certificate[] certificates = null;
-
-
+    public WebResource webResource = null;
 }
 
