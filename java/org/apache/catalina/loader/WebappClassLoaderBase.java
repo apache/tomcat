@@ -2573,7 +2573,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
 
         /* Only cache the binary content if there is some content
-         * available one of the following is true:
+         * available and one of the following is true:
          * a) It is a class file since the binary content is only cached
          *    until the class has been loaded
          *    or
@@ -2581,7 +2581,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
          *    below)
          *    or
          * c) The resource is a service provider configuration file located
-         *    under META=INF/services
+         *    under META-INF/services
          *
          * In all other cases do not cache the content to prevent
          * excessive memory usage if large resources are present (see
