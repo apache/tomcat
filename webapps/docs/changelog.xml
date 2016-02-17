@@ -82,7 +82,7 @@
       </add>
       <fix>
         Refactor the web application class loader to reduce the impact of JAR
-        scanning on the memory footprint of the web application. (markt) 
+        scanning on the memory footprint of the web application. (markt)
       </fix>
     </changelog>
   </subsection>
