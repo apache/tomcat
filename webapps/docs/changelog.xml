@@ -84,6 +84,10 @@
         Refactor the web application class loader to reduce the impact of JAR
         scanning on the memory footprint of the web application. (markt)
       </fix>
+      <fix>
+        Fix some resource leaks in the error handling for accessing files from
+        JARs and WARs. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

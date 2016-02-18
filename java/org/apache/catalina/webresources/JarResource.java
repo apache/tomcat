@@ -39,8 +39,9 @@ public class JarResource extends AbstractArchiveResource {
 
     @Override
     protected JarInputStreamWrapper getJarInputStreamWrapper() {
+        JarFile jarFile = null;
         try {
-            JarFile jarFile = getArchiveResourceSet().openJarFile();
+            jarFile = getArchiveResourceSet().openJarFile();
             // Need to create a new JarEntry so the certificates can be read
             JarEntry jarEntry = jarFile.getJarEntry(getResource().getName());
             InputStream is = jarFile.getInputStream(jarEntry);
@@ -49,6 +50,9 @@ public class JarResource extends AbstractArchiveResource {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("jarResource.getInputStreamFail",
                         getResource().getName(), getBaseUrl()), e);
+            }
+            if (jarFile != null) {
+                getArchiveResourceSet().closeJarFile();
             }
             return null;
         }
