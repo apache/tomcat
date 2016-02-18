@@ -88,6 +88,10 @@
         Fix some resource leaks in the error handling for accessing files from
         JARs and WARs. (markt)
       </fix>
+      <fix>
+        Refactor the JAR and JAR-in-WAR resource handling to reduce the memory
+        footprint of the web application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

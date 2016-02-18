@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.util.HashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
@@ -84,6 +85,67 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
         return new JarWarResource(this, webAppPath, getBaseUrlString(), jarEntry, archivePath);
     }
 
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * JarWar can't optimise for a single resource so the Map is always
+     * returned.
+     */
+    @Override
+    protected HashMap<String,JarEntry> getArchiveEntries(boolean single) {
+        synchronized (archiveLock) {
+            if (archiveEntries == null) {
+                JarFile warFile = null;
+                InputStream jarFileIs = null;
+                archiveEntries = new HashMap<>();
+                try {
+                    warFile = openJarFile();
+                    JarEntry jarFileInWar = warFile.getJarEntry(archivePath);
+                    jarFileIs = warFile.getInputStream(jarFileInWar);
+
+                    try (JarInputStream jarIs = new JarInputStream(jarFileIs)) {
+                        JarEntry entry = jarIs.getNextJarEntry();
+                        while (entry != null) {
+                            archiveEntries.put(entry.getName(), entry);
+                            entry = jarIs.getNextJarEntry();
+                        }
+                        setManifest(jarIs.getManifest());
+                    }
+                } catch (IOException ioe) {
+                    // Should never happen
+                    archiveEntries = null;
+                    throw new IllegalStateException(ioe);
+                } finally {
+                    if (warFile != null) {
+                        closeJarFile();
+                    }
+                    if (jarFileIs != null) {
+                        try {
+                            jarFileIs.close();
+                        } catch (IOException e) {
+                            // Ignore
+                        }
+                    }
+                }
+            }
+            return archiveEntries;
+        }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Should never be called since {@link #getArchiveEntries(boolean)} always
+     * returns a Map.
+     */
+    @Override
+    protected JarEntry getArchiveEntry(String pathInArchive) {
+        throw new IllegalStateException("Coding error");
+    }
+
+
     //-------------------------------------------------------- Lifecycle methods
     @Override
     protected void initInternal() throws LifecycleException {
@@ -93,11 +155,6 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
             InputStream jarFileIs = warFile.getInputStream(jarFileInWar);
 
             try (JarInputStream jarIs = new JarInputStream(jarFileIs)) {
-                JarEntry entry = jarIs.getNextJarEntry();
-                while (entry != null) {
-                    getJarFileEntries().put(entry.getName(), entry);
-                    entry = jarIs.getNextJarEntry();
-                }
                 setManifest(jarIs.getManifest());
             }
         } catch (IOException ioe) {
