@@ -23,6 +23,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -34,12 +35,12 @@ import org.apache.catalina.util.ResourceSet;
 
 public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
-    private final HashMap<String,JarEntry> jarFileEntries = new HashMap<>();
     private URL baseUrl;
     private String baseUrlString;
 
     private JarFile archive = null;
-    private final Object archiveLock = new Object();
+    protected HashMap<String,JarEntry> archiveEntries = null;
+    protected final Object archiveLock = new Object();
     private long archiveUseCount = 0;
 
 
@@ -61,10 +62,6 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         return baseUrlString;
     }
 
-    protected final HashMap<String,JarEntry> getJarFileEntries() {
-        return jarFileEntries;
-    }
-
 
     @Override
     public final String[] list(String path) {
@@ -79,7 +76,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
             if (pathInJar.length() > 0 && pathInJar.charAt(0) == '/') {
                 pathInJar = pathInJar.substring(1);
             }
-            Iterator<String> entries = jarFileEntries.keySet().iterator();
+            Iterator<String> entries = getArchiveEntries(false).keySet().iterator();
             while (entries.hasNext()) {
                 String name = entries.next();
                 if (name.length() > pathInJar.length() &&
@@ -138,7 +135,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 }
             }
 
-            Iterator<String> entries = jarFileEntries.keySet().iterator();
+            Iterator<String> entries = getArchiveEntries(false).keySet().iterator();
             while (entries.hasNext()) {
                 String name = entries.next();
                 if (name.length() > pathInJar.length() &&
@@ -168,6 +165,34 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         result.setLocked(true);
         return result;
     }
+
+
+    /**
+     * Obtain the map of entries in the archive. May return null in which case
+     * {@link #getArchiveEntry(String)} should be used.
+     *
+     * @param single Is this request being make to support a single lookup? If
+     *               false, a map will always be returned. If true,
+     *               implementations may use this as a hint in determining the
+     *               optimum way to respond.
+     *
+     * @return The archives entries mapped to their names or null if
+     *         {@link #getArchiveEntry(String)} should be used.
+     */
+    protected abstract HashMap<String,JarEntry> getArchiveEntries(boolean single);
+
+
+    /**
+     * Obtain a single entry from the archive. For performance reasons,
+     * {@link #getArchiveEntries(boolean)} should always be called first and the
+     * archive entry looked up in the map if one is returned. Only if that call
+     * returns null should this method be used.
+     *
+     * @param pathInArchive The path in the archive of the entry required
+     *
+     * @return The specified archive entry or null if it does not exist
+     */
+    protected abstract JarEntry getArchiveEntry(String pathInArchive);
 
     @Override
     public final boolean mkdir(String path) {
@@ -228,15 +253,24 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 return new JarResourceRoot(root, new File(getBase()),
                         baseUrlString, path);
             } else {
+                Map<String,JarEntry> jarEntries = getArchiveEntries(true);
                 JarEntry jarEntry = null;
                 if (!(pathInJar.charAt(pathInJar.length() - 1) == '/')) {
-                    jarEntry = jarFileEntries.get(pathInJar + '/');
+                    if (jarEntries == null) {
+                        jarEntry = getArchiveEntry(pathInJar + '/');
+                    } else {
+                        jarEntry = jarEntries.get(pathInJar + '/');
+                    }
                     if (jarEntry != null) {
                         path = path + '/';
                     }
                 }
                 if (jarEntry == null) {
-                    jarEntry = jarFileEntries.get(pathInJar);
+                    if (jarEntries == null) {
+                        jarEntry = getArchiveEntry(pathInJar);
+                    } else {
+                        jarEntry = jarEntries.get(pathInJar);
+                    }
                 }
                 if (jarEntry == null) {
                     return new EmptyResource(root, path);
@@ -294,6 +328,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                     // Log at least WARN
                 }
                 archive = null;
+                archiveEntries = null;
             }
         }
     }

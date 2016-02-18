@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -81,16 +82,57 @@ public class JarResourceSet extends AbstractArchiveResourceSet {
         return new JarResource(this, webAppPath, getBaseUrlString(), jarEntry);
     }
 
+
+    @Override
+    protected HashMap<String,JarEntry> getArchiveEntries(boolean single) {
+        synchronized (archiveLock) {
+            if (archiveEntries == null && !single) {
+                JarFile jarFile = null;
+                archiveEntries = new HashMap<>();
+                try {
+                    jarFile = openJarFile();
+                    Enumeration<JarEntry> entries = jarFile.entries();
+                    while (entries.hasMoreElements()) {
+                        JarEntry entry = entries.nextElement();
+                        archiveEntries.put(entry.getName(), entry);
+                    }
+                } catch (IOException ioe) {
+                    // Should never happen
+                    archiveEntries = null;
+                    throw new IllegalStateException(ioe);
+                } finally {
+                    if (jarFile != null) {
+                        closeJarFile();
+                    }
+                }
+            }
+            return archiveEntries;
+        }
+    }
+
+
+    @Override
+    protected JarEntry getArchiveEntry(String pathInArchive) {
+        JarFile jarFile = null;
+        try {
+            jarFile = openJarFile();
+            return jarFile.getJarEntry(pathInArchive);
+        } catch (IOException ioe) {
+            // Should never happen
+            throw new IllegalStateException(ioe);
+        } finally {
+            if (jarFile != null) {
+                closeJarFile();
+            }
+        }
+    }
+
+
     //-------------------------------------------------------- Lifecycle methods
     @Override
     protected void initInternal() throws LifecycleException {
 
         try (JarFile jarFile = new JarFile(getBase())) {
-            Enumeration<JarEntry> entries = jarFile.entries();
-            while (entries.hasMoreElements()) {
-                JarEntry entry = entries.nextElement();
-                getJarFileEntries().put(entry.getName(), entry);
-            }
             setManifest(jarFile.getManifest());
         } catch (IOException ioe) {
             throw new IllegalArgumentException(ioe);
