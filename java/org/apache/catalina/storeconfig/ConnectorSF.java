@@ -51,11 +51,11 @@ public class ConnectorSF extends StoreFactoryBase {
             StoreDescription aDesc) throws Exception {
         aWriter.print("<");
         aWriter.print(aDesc.getTag());
-        storeConnectorAttribtues(aWriter, indent, bean, aDesc);
+        storeConnectorAttributes(aWriter, indent, bean, aDesc);
         aWriter.println(">");
     }
 
-    protected void storeConnectorAttribtues(PrintWriter aWriter, int indent,
+    protected void storeConnectorAttributes(PrintWriter aWriter, int indent,
             Object bean, StoreDescription aDesc) throws Exception {
         if (aDesc.isAttributes()) {
             getStoreAppender().printAttributes(aWriter, indent, false, bean,
@@ -67,7 +67,7 @@ public class ConnectorSF extends StoreFactoryBase {
             StoreDescription aDesc) throws Exception {
         aWriter.print("<");
         aWriter.print(aDesc.getTag());
-        storeConnectorAttribtues(aWriter, indent, bean, aDesc);
+        storeConnectorAttributes(aWriter, indent, bean, aDesc);
         aWriter.println("/>");
     }
 
