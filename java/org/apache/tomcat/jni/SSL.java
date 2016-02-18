@@ -228,10 +228,10 @@ public final class SSL {
      * Add certificate chain number to that flag (0 ... verify depth)
      */
     public static final int SSL_INFO_CLIENT_CERT_CHAIN         = 0x0400;
-    /* Return OpenSSL version number */
+    /* Return OpenSSL version number (compile time version, if version < 1.1.0) */
     public static native int version();
 
-    /* Return OpenSSL version string */
+    /* Return OpenSSL version string (run time version) */
     public static native String versionString();
 
     /**
