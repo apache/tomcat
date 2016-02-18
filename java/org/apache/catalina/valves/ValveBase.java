@@ -37,7 +37,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class ValveBase extends LifecycleMBeanBase implements Contained, Valve {
 
-    protected static StringManager sm = StringManager.getManager(ValveBase.class);
+    protected static final StringManager sm = StringManager.getManager(ValveBase.class);
 
 
     //------------------------------------------------------ Constructor
