@@ -44,29 +44,22 @@ public class JarWarResource extends AbstractArchiveResource {
 
     @Override
     protected JarInputStreamWrapper getJarInputStreamWrapper() {
+        JarFile warFile = null;
+        JarInputStream jarIs = null;
+        JarEntry entry = null;
         try {
-            JarFile warFile = getArchiveResourceSet().openJarFile();
+            warFile = getArchiveResourceSet().openJarFile();
             JarEntry jarFileInWar = warFile.getJarEntry(archivePath);
             InputStream isInWar = warFile.getInputStream(jarFileInWar);
 
-            JarInputStream jarIs = new JarInputStream(isInWar);
-            JarEntry entry = jarIs.getNextJarEntry();
+            jarIs = new JarInputStream(isInWar);
+            entry = jarIs.getNextJarEntry();
             while (entry != null &&
                     !entry.getName().equals(getResource().getName())) {
                 entry = jarIs.getNextJarEntry();
             }
 
             if (entry == null) {
-                try {
-                    jarIs.close();
-                } catch (IOException ioe) {
-                    // Ignore
-                }
-                try {
-                    warFile.close();
-                } catch (IOException ioe) {
-                    // Ignore
-                }
                 return null;
             }
 
@@ -77,6 +70,19 @@ public class JarWarResource extends AbstractArchiveResource {
                         getResource().getName(), getBaseUrl()), e);
             }
             return null;
+        } finally {
+            if (entry == null) {
+                if (jarIs != null) {
+                    try {
+                        jarIs.close();
+                    } catch (IOException ioe) {
+                        // Ignore
+                    }
+                }
+                if (warFile != null) {
+                    getArchiveResourceSet().closeJarFile();
+                }
+            }
         }
     }
 
