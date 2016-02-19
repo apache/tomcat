@@ -1319,17 +1319,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             return result;
         }
 
-        /**
-         * @deprecated Replaced by processSendfile(sk, attachment, event)
-         */
-        @Deprecated
-        public boolean processSendfile(SelectionKey sk,
-                KeyAttachment attachment,
-                @SuppressWarnings("unused") boolean reg, boolean event) {
-            return processSendfile(sk, attachment, event);
-        }
-
-        public boolean processSendfile(SelectionKey sk, KeyAttachment attachment, boolean event) {
+        public SendfileState processSendfile(SelectionKey sk, KeyAttachment attachment,
+                boolean calledByProcessor) {
             NioChannel sc = null;
             try {
                 unreg(sk, attachment, sk.readyOps());
@@ -1344,7 +1335,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     File f = new File(sd.fileName);
                     if ( !f.exists() ) {
                         cancelledKey(sk,SocketStatus.ERROR,false);
-                        return false;
+                        return SendfileState.ERROR;
                     }
                     @SuppressWarnings("resource") // Closed when channel is closed
                     FileInputStream fis = new FileInputStream(f);
@@ -1388,7 +1379,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     // For calls from outside the Poller, the caller is
                     // responsible for registering the socket for the
                     // appropriate event(s) if sendfile completes.
-                    if (!event) {
+                    if (!calledByProcessor) {
                         if ( sd.keepAlive ) {
                                 if (log.isDebugEnabled()) {
                                     log.debug("Connection is keep alive, registering back for OP_READ");
@@ -1399,29 +1390,29 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                                 log.debug("Send file connection is being closed");
                             }
                             cancelledKey(sk,SocketStatus.STOP,false);
-                            return false;
                         }
                     }
+                    return SendfileState.DONE;
                 } else {
                     if (log.isDebugEnabled()) {
                         log.debug("OP_WRITE for sendfile: " + sd.fileName);
                     }
-                    if (event) {
+                    if (calledByProcessor) {
                         add(attachment.getChannel(),SelectionKey.OP_WRITE);
                     } else {
                         reg(sk,attachment,SelectionKey.OP_WRITE);
                     }
+                    return SendfileState.PENDING;
                 }
             }catch ( IOException x ) {
                 if ( log.isDebugEnabled() ) log.debug("Unable to complete sendfile request:", x);
                 cancelledKey(sk,SocketStatus.ERROR,false);
-                return false;
+                return SendfileState.ERROR;
             }catch ( Throwable t ) {
                 log.error("",t);
                 cancelledKey(sk, SocketStatus.ERROR, false);
-                return false;
+                return SendfileState.ERROR;
             }
-            return true;
         }
 
         protected void unreg(SelectionKey sk, KeyAttachment attachment, int readyOps) {
