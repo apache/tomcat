@@ -103,6 +103,11 @@
         Switch to the web application class loader to the
         <code>ParallelWebappClassLoader</code> by default. (markt)
       </update>
+      <fix>
+        <bug>57809</bug>: Remove the custom context attribute that held the
+        effective web.xml. Components needing access to configuration
+        information may access it via the Servlet API. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

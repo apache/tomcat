@@ -1191,16 +1191,8 @@ public class ContextConfig implements LifecycleListener {
             configureContext(webXml);
         }
 
-        // Step 9a. Make the merged web.xml available to other
-        // components, specifically Jasper, to save those components
-        // from having to re-generate it.
-        // TODO Use a ServletContainerInitializer for Jasper
-        String mergedWebXml = webXml.toXml();
-        sContext.setAttribute(
-               org.apache.tomcat.util.scan.Constants.MERGED_WEB_XML,
-               mergedWebXml);
         if (context.getLogEffectiveWebXml()) {
-            log.info("web.xml:\n" + mergedWebXml);
+            log.info("web.xml:\n" + webXml.toXml());
         }
 
         // Always need to look for static resources
