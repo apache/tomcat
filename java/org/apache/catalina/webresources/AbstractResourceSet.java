@@ -37,8 +37,7 @@ public abstract class AbstractResourceSet extends LifecycleBase
     private Manifest manifest;
 
 
-    protected static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(AbstractResourceSet.class);
 
 
     protected final void checkPath(String path) {
