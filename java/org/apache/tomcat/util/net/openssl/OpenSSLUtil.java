@@ -98,6 +98,8 @@ public class OpenSSLUtil extends SSLUtilBase {
 
     @Override
     public void configureSessionContext(SSLSessionContext sslSessionContext) {
-        // do nothing. configuration is done in the init phase
+        if (jsseUtil != null) {
+            jsseUtil.configureSessionContext(sslSessionContext);
+        }
     }
 }

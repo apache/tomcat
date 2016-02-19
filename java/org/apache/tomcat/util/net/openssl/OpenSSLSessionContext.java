@@ -22,18 +22,19 @@ import java.util.NoSuchElementException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSessionContext;
 
+import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
  * OpenSSL specific {@link SSLSessionContext} implementation.
  */
-public abstract class OpenSSLSessionContext implements SSLSessionContext {
+public class OpenSSLSessionContext implements SSLSessionContext {
     private static final StringManager sm = StringManager.getManager(OpenSSLSessionContext.class);
     private static final Enumeration<byte[]> EMPTY = new EmptyEnumeration();
 
     private final OpenSSLSessionStats stats;
-    final long context;
+    private final long context;
 
     OpenSSLSessionContext(long context) {
         this.context = context;
@@ -67,19 +68,63 @@ public abstract class OpenSSLSessionContext implements SSLSessionContext {
      *
      * @param enabled {@code true} to enable caching, {@code false} to disable
      */
-    public abstract void setSessionCacheEnabled(boolean enabled);
+    public void setSessionCacheEnabled(boolean enabled) {
+        long mode = enabled ? SSL.SSL_SESS_CACHE_SERVER : SSL.SSL_SESS_CACHE_OFF;
+        SSLContext.setSessionCacheMode(context, mode);
+    }
 
     /**
      * @return {@code true} if caching of SSL sessions is enabled, {@code false}
      *         otherwise.
      */
-    public abstract boolean isSessionCacheEnabled();
+    public boolean isSessionCacheEnabled() {
+        return SSLContext.getSessionCacheMode(context) == SSL.SSL_SESS_CACHE_SERVER;
+    }
 
     /**
      * @return The statistics for this context.
      */
     public OpenSSLSessionStats stats() {
         return stats;
+    }
+
+    @Override
+    public void setSessionTimeout(int seconds) {
+        if (seconds < 0) {
+            throw new IllegalArgumentException();
+        }
+        SSLContext.setSessionCacheTimeout(context, seconds);
+    }
+
+    @Override
+    public int getSessionTimeout() {
+        return (int) SSLContext.getSessionCacheTimeout(context);
+    }
+
+    @Override
+    public void setSessionCacheSize(int size) {
+        if (size < 0) {
+            throw new IllegalArgumentException();
+        }
+        SSLContext.setSessionCacheSize(context, size);
+    }
+
+    @Override
+    public int getSessionCacheSize() {
+        return (int) SSLContext.getSessionCacheSize(context);
+    }
+
+    /**
+     * Set the context within which session be reused (server side only)
+     * See <a href="http://www.openssl.org/docs/ssl/SSL_CTX_set_session_id_context.html">
+     *     man SSL_CTX_set_session_id_context</a>
+     *
+     * @param sidCtx can be any kind of binary data, it is therefore possible to use e.g. the name
+     *               of the application and/or the hostname and/or service name
+     * @return {@code true} if success, {@code false} otherwise.
+     */
+    public boolean setSessionIdContext(byte[] sidCtx) {
+        return SSLContext.setSessionIdContext(context, sidCtx);
     }
 
     private static final class EmptyEnumeration implements Enumeration<byte[]> {
