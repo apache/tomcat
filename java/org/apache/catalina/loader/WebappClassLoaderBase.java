@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.loader;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FilePermission;
 import java.io.IOException;
@@ -32,7 +31,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 import java.security.AccessControlException;
 import java.security.AccessController;
 import java.security.CodeSource;
@@ -139,7 +137,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     private static final String JVM_THREAD_GROUP_SYSTEM = "system";
 
     private static final String CLASS_FILE_SUFFIX = ".class";
-    private static final String SERVICES_PREFIX = "/META-INF/services/";
 
     static {
         ClassLoader.registerAsParallelCapable();
@@ -147,20 +144,18 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         JVM_THREAD_GROUP_NAMES.add("RMI Runtime");
     }
 
-    protected class PrivilegedFindResourceByName
-        implements PrivilegedAction<ResourceEntry> {
+    protected class PrivilegedFindClassByName
+        implements PrivilegedAction<Class<?>> {
 
         protected final String name;
-        protected final String path;
 
-        PrivilegedFindResourceByName(String name, String path) {
+        PrivilegedFindClassByName(String name) {
             this.name = name;
-            this.path = path;
         }
 
         @Override
-        public ResourceEntry run() {
-            return findResourceInternal(name, path);
+        public Class<?> run() {
+            return findClassInternal(name);
         }
     }
 
@@ -324,12 +319,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * the system class loader and the last non-null result used.
      */
     private ClassLoader javaseClassLoader;
-
-
-    /**
-     * need conversion for properties files
-     */
-    protected boolean needConvert = false;
 
 
     /**
@@ -688,7 +677,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         base.resources = this.resources;
         base.delegate = this.delegate;
         base.state = LifecycleState.NEW;
-        base.needConvert = this.needConvert;
         base.clearReferencesStatic = this.clearReferencesStatic;
         base.clearReferencesStopThreads = this.clearReferencesStopThreads;
         base.clearReferencesStopTimerThreads = this.clearReferencesStopTimerThreads;
@@ -831,7 +819,13 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (log.isTraceEnabled())
                 log.trace("      findClassInternal(" + name + ")");
             try {
-                clazz = findClassInternal(name);
+                if (securityManager != null) {
+                    PrivilegedAction<Class<?>> dp =
+                        new PrivilegedFindClassByName(name);
+                    clazz = AccessController.doPrivileged(dp);
+                } else {
+                    clazz = findClassInternal(name);
+                }
             } catch(AccessControlException ace) {
                 log.warn("WebappClassLoader.findClassInternal(" + name
                         + ") security exception: " + ace.getMessage(), ace);
@@ -903,19 +897,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         String path = nameToPath(name);
 
-        ResourceEntry entry = resourceEntries.get(path);
-        if (entry == null) {
-            if (securityManager != null) {
-                PrivilegedAction<ResourceEntry> dp =
-                    new PrivilegedFindResourceByName(name, path);
-                entry = AccessController.doPrivileged(dp);
-            } else {
-                entry = findResourceInternal(name, path);
-            }
-        }
-        if (entry != null) {
-            url = entry.source;
-            entry.webResource = null;
+        WebResource resource = resources.getClassLoaderResource(path);
+        if (resource.exists()) {
+            url = resource.getURL();
+            trackLastModified(path, resource);
         }
 
         if ((url == null) && hasExternalRepositories) {
@@ -929,7 +914,18 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 log.debug("    --> Resource not found, returning null");
         }
         return url;
+    }
 
+
+    private void trackLastModified(String path, WebResource resource) {
+        if (resourceEntries.containsKey(path)) {
+            return;
+        }
+        ResourceEntry entry = new ResourceEntry();
+        entry.lastModified = resource.getLastModified();
+        synchronized(resourceEntries) {
+            resourceEntries.putIfAbsent(path, entry);
+        }
     }
 
 
@@ -1064,14 +1060,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         InputStream stream = null;
 
-        // (0) Check for a cached copy of this resource
-        stream = findLoadedResource(name);
-        if (stream != null) {
-            if (log.isDebugEnabled())
-                log.debug("  --> Returning stream from cache");
-            return (stream);
-        }
-
         boolean delegateFirst = delegate || filter(name, false);
 
         // (1) Delegate to parent if requested
@@ -1080,30 +1068,33 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 log.debug("  Delegating to parent classloader " + parent);
             stream = parent.getResourceAsStream(name);
             if (stream != null) {
-                // FIXME - cache???
                 if (log.isDebugEnabled())
                     log.debug("  --> Returning stream from parent");
-                return (stream);
+                return stream;
             }
         }
 
         // (2) Search local repositories
         if (log.isDebugEnabled())
             log.debug("  Searching local repositories");
-        URL url = findResource(name);
-        if (url != null) {
-            // FIXME - cache???
+        String path = nameToPath(name);
+        WebResource resource = resources.getClassLoaderResource(path);
+        if (resource.exists()) {
+            stream = resource.getInputStream();
+            trackLastModified(path, resource);
+        }
+        try {
+            if (hasExternalRepositories && stream == null) {
+                URL url = super.findResource(name);
+                stream = url.openStream();
+            }
+        } catch (IOException e) {
+            // Ignore
+        }
+        if (stream != null) {
             if (log.isDebugEnabled())
                 log.debug("  --> Returning stream from local");
-            stream = findLoadedResource(name);
-            try {
-                if (hasExternalRepositories && (stream == null))
-                    stream = url.openStream();
-            } catch (IOException e) {
-                // Ignore
-            }
-            if (stream != null)
-                return (stream);
+            return stream;
         }
 
         // (3) Delegate to parent unconditionally
@@ -1112,18 +1103,16 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 log.debug("  Delegating to parent classloader unconditionally " + parent);
             stream = parent.getResourceAsStream(name);
             if (stream != null) {
-                // FIXME - cache???
                 if (log.isDebugEnabled())
                     log.debug("  --> Returning stream from parent");
-                return (stream);
+                return stream;
             }
         }
 
         // (4) Resource was not found
         if (log.isDebugEnabled())
             log.debug("  --> Resource not found, returning null");
-        return (null);
-
+        return null;
     }
 
 
@@ -1463,17 +1452,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 jarModificationTimes.put(
                         jar.getName(), Long.valueOf(jar.getLastModified()));
             }
-        }
-
-        state = LifecycleState.STARTING;
-
-        try {
-            String encoding = System.getProperty("file.encoding");
-            if (encoding.indexOf("EBCDIC") != -1) {
-                needConvert = true;
-            }
-        } catch (SecurityException e) {
-            // Ignore
         }
 
         state = LifecycleState.STARTED;
@@ -2389,20 +2367,39 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      */
     protected Class<?> findClassInternal(String name) {
 
+        checkStateForResourceLoading(name);
+
         String path = binaryNameToPath(name, true);
 
-        ResourceEntry entry = null;
-
-        if (securityManager != null) {
-            PrivilegedAction<ResourceEntry> dp =
-                new PrivilegedFindResourceByName(name, path);
-            entry = AccessController.doPrivileged(dp);
-        } else {
-            entry = findResourceInternal(name, path);
+        if (name == null || path == null) {
+            return null;
         }
 
+        ResourceEntry entry = resourceEntries.get(path);
+        WebResource resource = null;
+
         if (entry == null) {
-            return null;
+            resource = resources.getClassLoaderResource(path);
+
+            if (!resource.exists()) {
+                return null;
+            }
+
+            entry = new ResourceEntry();
+            entry.lastModified = resource.getLastModified();
+
+            // Add the entry in the local resource repository
+            synchronized (resourceEntries) {
+                // Ensures that all the threads which may be in a race to load
+                // a particular class all end up with the same ResourceEntry
+                // instance
+                ResourceEntry entry2 = resourceEntries.get(path);
+                if (entry2 == null) {
+                    resourceEntries.put(path, entry);
+                } else {
+                    entry = entry2;
+                }
+            }
         }
 
         Class<?> clazz = entry.loadedClass;
@@ -2414,21 +2411,18 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (clazz != null)
                 return clazz;
 
-            WebResource webResource = entry.webResource;
-            if (webResource == null) {
-                webResource = resources.getClassLoaderResource(path);
-            } else {
-                entry.webResource = null;
+            if (resource == null) {
+                resource = resources.getClassLoaderResource(path);
             }
 
-            if (!webResource.exists()) {
+            if (!resource.exists()) {
                 return null;
             }
 
-            byte[] binaryContent = webResource.getContent();
-            Manifest manifest = webResource.getManifest();
-            URL codeBase = webResource.getCodeBase();
-            Certificate[] certificates = webResource.getCertificates();
+            byte[] binaryContent = resource.getContent();
+            Manifest manifest = resource.getManifest();
+            URL codeBase = resource.getCodeBase();
+            Certificate[] certificates = resource.getCertificates();
 
             if (transformers.size() > 0) {
                 // If the resource is a class just being loaded, decorate it
@@ -2503,11 +2497,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         sm.getString("webappClassLoader.wrongVersion",
                                 name));
             }
-            // Now the class has been defined, clear the elements of the local
-            // resource cache that are no longer required.
             entry.loadedClass = clazz;
-            // Retain entry.source in case of a getResourceAsStream() call on
-            // the class file after the class has been defined.
         }
 
         return clazz;
@@ -2539,90 +2529,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
-     * Find specified resource in local repositories.
-     *
-     * @param name the resource name
-     * @param path the resource path
-     * @return the loaded resource, or null if the resource isn't found
-     */
-    protected ResourceEntry findResourceInternal(final String name, final String path) {
-
-        checkStateForResourceLoading(name);
-
-        if (name == null || path == null) {
-            return null;
-        }
-
-        ResourceEntry entry = resourceEntries.get(path);
-        if (entry != null) {
-            return entry;
-        }
-
-        WebResource resource = resources.getClassLoaderResource(path);
-
-        if (!resource.exists()) {
-            return null;
-        }
-
-        entry = new ResourceEntry();
-        entry.source = resource.getURL();
-        entry.lastModified = resource.getLastModified();
-        entry.webResource = resource;
-
-        boolean fileNeedConvert = false;
-        if (needConvert && path.endsWith(".properties")) {
-            fileNeedConvert = true;
-        }
-
-        /* Only cache the binary content if there is some content
-         * available and one of the following is true:
-         * a) The file needs conversion to address encoding issues (see
-         *    below)
-         *    or
-         * b) The resource is a service provider configuration file located
-         *    under META-INF/services
-         *
-         * In all other cases do not cache the content to prevent
-         * excessive memory usage if large resources are present (see
-         * https://bz.apache.org/bugzilla/show_bug.cgi?id=53081).
-         */
-        if (path.startsWith(SERVICES_PREFIX) || fileNeedConvert) {
-            byte[] binaryContent = resource.getContent();
-            if (binaryContent != null) {
-                 if (fileNeedConvert) {
-                    // Workaround for certain files on platforms that use
-                    // EBCDIC encoding, when they are read through FileInputStream.
-                    // See commit message of rev.303915 for details
-                    // http://svn.apache.org/viewvc?view=revision&revision=303915
-                    String str = new String(binaryContent);
-                    try {
-                        binaryContent = str.getBytes(StandardCharsets.UTF_8);
-                    } catch (Exception e) {
-                        return null;
-                    }
-                }
-                entry.binaryContent = binaryContent;
-            }
-        }
-
-        // Add the entry in the local resource repository
-        synchronized (resourceEntries) {
-            // Ensures that all the threads which may be in a race to load
-            // a particular class all end up with the same ResourceEntry
-            // instance
-            ResourceEntry entry2 = resourceEntries.get(path);
-            if (entry2 == null) {
-                resourceEntries.put(path, entry);
-            } else {
-                entry = entry2;
-            }
-        }
-
-        return entry;
-    }
-
-
-    /**
      * Returns true if the specified package name is sealed according to the
      * given manifest.
      *
@@ -2645,35 +2551,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
         return "true".equalsIgnoreCase(sealed);
 
-    }
-
-
-    /**
-     * Finds the resource with the given name if it has previously been
-     * loaded and cached by this class loader, and return an input stream
-     * to the resource data.  If this resource has not been cached, return
-     * <code>null</code>.
-     *
-     * @param name Name of the resource to return
-     * @return a stream to the loaded resource
-     */
-    protected InputStream findLoadedResource(String name) {
-
-        String path = nameToPath(name);
-
-        ResourceEntry entry = resourceEntries.get(path);
-        if (entry != null) {
-            if (entry.binaryContent != null)
-                return new ByteArrayInputStream(entry.binaryContent);
-            else {
-                try {
-                    return entry.source.openStream();
-                } catch (IOException ioe) {
-                    // Ignore
-                }
-            }
-        }
-        return null;
     }
 
 
