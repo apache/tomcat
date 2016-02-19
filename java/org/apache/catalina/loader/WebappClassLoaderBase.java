@@ -1467,14 +1467,13 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         state = LifecycleState.STARTING;
 
-        String encoding = null;
         try {
-            encoding = System.getProperty("file.encoding");
+            String encoding = System.getProperty("file.encoding");
+            if (encoding.indexOf("EBCDIC") != -1) {
+                needConvert = true;
+            }
         } catch (SecurityException e) {
-            return;
-        }
-        if (encoding.indexOf("EBCDIC")!=-1) {
-            needConvert = true;
+            // Ignore
         }
 
         state = LifecycleState.STARTED;
