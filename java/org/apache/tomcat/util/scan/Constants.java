@@ -35,7 +35,10 @@ public final class Constants {
     public static final String WEB_INF_LIB = "/WEB-INF/lib/";
     public static final String WEB_INF_CLASSES = "/WEB-INF/classes";
 
-    /* Context attributes - used to pass short-cuts to Jasper */
+    /* Context attributes */
+    @Deprecated // Third party components should use standard Servlet API
+                // mechanisms such as a ServletContainerInitializer to access
+                // configuration information
     public static final String MERGED_WEB_XML =
         "org.apache.tomcat.util.scan.MergedWebXml";
 }
