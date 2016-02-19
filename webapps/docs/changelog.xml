@@ -92,6 +92,13 @@
         Refactor the JAR and JAR-in-WAR resource handling to reduce the memory
         footprint of the web application. (markt)
       </fix>
+      <fix>
+        Refactor the web.xml parsing so a new parser is created every time the
+        web application starts rather than creating and caching the parser when
+        the Context is created. This enables the parser to take account of
+        modified Context configuration parameters and reduces (slightly) the
+        memory footprint of a running Tomcat instance. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
