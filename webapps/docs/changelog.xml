@@ -99,6 +99,10 @@
         modified Context configuration parameters and reduces (slightly) the
         memory footprint of a running Tomcat instance. (markt)
       </fix>
+      <update>
+        Switch to the web application class loader to the
+        <code>ParallelWebappClassLoader</code> by default. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
