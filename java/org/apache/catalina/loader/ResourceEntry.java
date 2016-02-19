@@ -16,10 +16,6 @@
  */
 package org.apache.catalina.loader;
 
-import java.net.URL;
-
-import org.apache.catalina.WebResource;
-
 /**
  * Resource entry.
  *
@@ -27,32 +23,16 @@ import org.apache.catalina.WebResource;
  */
 public class ResourceEntry {
 
-
     /**
-     * The "last modified" time of the origin file at the time this class
+     * The "last modified" time of the origin file at the time this resource
      * was loaded, in milliseconds since the epoch.
      */
     public long lastModified = -1;
 
 
     /**
-     * Binary content of the resource.
-     */
-    public byte[] binaryContent = null;
-
-
-    /**
      * Loaded class.
      */
     public volatile Class<?> loadedClass = null;
-
-
-    /**
-     * URL source from where the object was loaded.
-     */
-    public URL source = null;
-
-
-    public WebResource webResource = null;
 }
 
