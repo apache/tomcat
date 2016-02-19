@@ -108,6 +108,9 @@
         effective web.xml. Components needing access to configuration
         information may access it via the Servlet API. (markt)
       </fix>
+      <fix>
+        Refactor JAR scanning to reduce memory footprint. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
