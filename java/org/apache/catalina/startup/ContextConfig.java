@@ -241,8 +241,6 @@ public class ContextConfig implements LifecycleListener {
      */
     protected boolean handlesTypesNonAnnotations = false;
 
-    private WebXmlParser webXmlParser;
-
 
     // ------------------------------------------------------------- Properties
 
@@ -741,9 +739,6 @@ public class ContextConfig implements LifecycleListener {
         ok = true;
 
         contextConfig(contextDigester);
-
-        webXmlParser = new WebXmlParser(context.getXmlNamespaceAware(),
-                context.getXmlValidation(), context.getXmlBlockExternal());
     }
 
 
@@ -1109,8 +1104,11 @@ public class ContextConfig implements LifecycleListener {
          *   those in JARs excluded from an absolute ordering) need to be
          *   scanned to check if they match.
          */
+        WebXmlParser webXmlParser = new WebXmlParser(context.getXmlNamespaceAware(),
+                context.getXmlValidation(), context.getXmlBlockExternal());
+
         Set<WebXml> defaults = new HashSet<>();
-        defaults.add(getDefaultWebXmlFragment());
+        defaults.add(getDefaultWebXmlFragment(webXmlParser));
 
         WebXml webXml = createWebXml();
 
@@ -1128,7 +1126,7 @@ public class ContextConfig implements LifecycleListener {
         // provided by the container. If any of the application JARs have a
         // web-fragment.xml it will be parsed at this point. web-fragment.xml
         // files are ignored for container provided JARs.
-        Map<String,WebXml> fragments = processJarsForWebFragments(webXml);
+        Map<String,WebXml> fragments = processJarsForWebFragments(webXml, webXmlParser);
 
         // Step 2. Order the fragments.
         Set<WebXml> orderedFragments = null;
@@ -1456,7 +1454,7 @@ public class ContextConfig implements LifecycleListener {
     }
 
 
-    private WebXml getDefaultWebXmlFragment() {
+    private WebXml getDefaultWebXmlFragment(WebXmlParser webXmlParser) {
 
         // Host should never be null
         Host host = (Host) context.getParent();
@@ -1877,9 +1875,11 @@ public class ContextConfig implements LifecycleListener {
      * known not contain fragments will be skipped.
      *
      * @param application The main web.xml metadata
+     * @param webXmlParser The parser to use to process the web.xml file
      * @return A map of JAR name to processed web fragment (if any)
      */
-    protected Map<String,WebXml> processJarsForWebFragments(WebXml application) {
+    protected Map<String,WebXml> processJarsForWebFragments(WebXml application,
+            WebXmlParser webXmlParser) {
 
         JarScanner jarScanner = context.getJarScanner();
         boolean delegate = false;
