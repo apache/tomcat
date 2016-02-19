@@ -63,7 +63,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
-    private OpenSSLServerSessionContext sessionContext;
+    private OpenSSLSessionContext sessionContext;
 
     private final List<String> negotiableProtocols;
 
@@ -373,7 +373,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 SSLContext.setNpnProtos(ctx, protocolsArray, SSL.SSL_SELECTOR_FAILURE_NO_ADVERTISE);
             }
 
-            sessionContext = new OpenSSLServerSessionContext(ctx);
+            sessionContext = new OpenSSLSessionContext(ctx);
             sslHostConfig.setOpenSslContext(Long.valueOf(ctx));
             initialized = true;
         } catch (Exception e) {

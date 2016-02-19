@@ -110,6 +110,9 @@
       <fix>
         Bad processing of handshake errors in NIO2. (remm)
       </fix>
+      <fix>
+        Use JSSE session configuration options with OpenSSL. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
