@@ -114,7 +114,7 @@ public class WebappLoader extends LifecycleMBeanBase
      * This class should extend WebappClassLoaderBase, otherwise, a different
      * loader implementation must be used.
      */
-    private String loaderClass = WebappClassLoader.class.getName();
+    private String loaderClass = ParallelWebappClassLoader.class.getName();
 
 
     /**
