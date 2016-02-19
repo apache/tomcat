@@ -117,7 +117,7 @@ public class TestRegistration extends TomcatBaseTest {
                     ",name=NonLoginAuthenticator",
             "Tomcat:type=Valve,host=" + host + ",context=" + context +
                     ",name=StandardContextValve",
-            "Tomcat:type=WebappClassLoader,host=" + host + ",context=" + context,
+            "Tomcat:type=ParallelWebappClassLoader,host=" + host + ",context=" + context,
             "Tomcat:type=WebResourceRoot,host=" + host + ",context=" + context,
             "Tomcat:type=WebResourceRoot,host=" + host + ",context=" + context +
                     ",name=Cache",
