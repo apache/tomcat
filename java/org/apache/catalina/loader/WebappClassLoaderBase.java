@@ -2553,14 +2553,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             return null;
         }
 
-        WebResource resource = null;
-
         ResourceEntry entry = resourceEntries.get(path);
         if (entry != null) {
             return entry;
         }
 
-        resource = resources.getClassLoaderResource(path);
+        WebResource resource = resources.getClassLoaderResource(path);
 
         if (!resource.exists()) {
             return null;
