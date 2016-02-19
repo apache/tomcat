@@ -31,8 +31,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class Cache {
 
     private static final Log log = LogFactory.getLog(Cache.class);
-    protected static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Cache.class);
 
     private static final long TARGET_FREE_PERCENT_GET = 5;
     private static final long TARGET_FREE_PERCENT_BACKGROUND = 10;
