@@ -330,6 +330,29 @@ public class TesterOpenSSL {
             unimplemented.add(Cipher.TLS_DH_RSA_WITH_CAMELLIA_128_CBC_SHA);
             unimplemented.add(Cipher.TLS_DH_RSA_WITH_CAMELLIA_256_CBC_SHA);
             unimplemented.add(Cipher.TLS_DH_RSA_WITH_SEED_CBC_SHA);
+            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_NULL_SHA);
+            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_RC4_128_SHA);
+            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_RC4_128_SHA);
+            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA);
+            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA);
+            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_NULL_SHA);
+            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_RC4_128_SHA);
+            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_128_CBC_SHA);
+            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_256_CBC_SHA);
+            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256);
+            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384);
+            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256);
+            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384);
+            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256);
+            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384);
+            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256);
+            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384);
+            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_CAMELLIA_128_CBC_SHA256);
+            unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_CAMELLIA_256_CBC_SHA384);
+            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_CAMELLIA_128_CBC_SHA256);
+            unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_CAMELLIA_256_CBC_SHA384);
         }
         OPENSSL_UNIMPLEMENTED_CIPHERS = Collections.unmodifiableSet(unimplemented);
     }
