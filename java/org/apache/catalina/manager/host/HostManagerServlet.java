@@ -20,10 +20,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.StringTokenizer;
 
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServlet;
@@ -41,7 +45,6 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.HostConfig;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
-
 
 /**
  * Servlet that enables remote management of the virtual hosts installed
@@ -218,6 +221,8 @@ public class HostManagerServlet
             start(writer, name, smClient);
         } else if (command.equals("/stop")) {
             stop(writer, name, smClient);
+        } else if (command.equals("/persist")) {
+            persist(writer, smClient);
         } else {
             writer.println(sm.getString("hostManagerServlet.unknownCommand",
                                         command));
@@ -228,7 +233,6 @@ public class HostManagerServlet
         writer.close();
 
     }
-
 
     /**
      * Add host with the given parameters.
@@ -652,8 +656,39 @@ public class HostManagerServlet
     }
 
 
-    // -------------------------------------------------------- Support Methods
+    /**
+     * Persist the current configuration to server.xml.
+     *
+     * @param writer Writer to render to
+     * @param smClient i18n resources localized for the client
+     */
+    protected void persist(PrintWriter writer, StringManager smClient) {
 
+        if (debug >= 1) {
+            log(sm.getString("hostManagerServlet.persist"));
+        }
+
+        try {
+            MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
+            ObjectName oname = new ObjectName(engine.getDomain() + ":type=StoreConfig");
+            platformMBeanServer.invoke(oname, "storeConfig", null, null);
+            writer.println(smClient.getString("hostManagerServlet.persisted"));
+        } catch (Exception e) {
+            getServletContext().log(sm.getString("hostManagerServlet.persistFailed"), e);
+            writer.println(smClient.getString("hostManagerServlet.persistFailed"));
+            // catch InstanceNotFoundException when StoreConfig is not enabled instead of printing
+            // the failure message
+            if (e instanceof InstanceNotFoundException) {
+                writer.println("Please enable StoreConfig to use this feature.");
+            } else {
+                writer.println(smClient.getString("hostManagerServlet.exception", e.toString()));
+            }
+            return;
+        }
+    }
+
+
+    // -------------------------------------------------------- Support Methods
 
     /**
      * Get config base.

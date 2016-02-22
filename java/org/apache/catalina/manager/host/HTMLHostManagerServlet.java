@@ -94,7 +94,8 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         } else if (command.equals("/list")) {
             // Nothing to do - always generate list
         } else if (command.equals("/add") || command.equals("/remove") ||
-                command.equals("/start") || command.equals("/stop")) {
+                command.equals("/start") || command.equals("/stop") ||
+                command.equals("/persist")) {
             message = smClient.getString(
                     "hostManagerServlet.postCommand", command);
         } else {
@@ -143,6 +144,8 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
             message = start(name, smClient);
         } else if (command.equals("/stop")) {
             message = stop(name, smClient);
+        } else if (command.equals("/persist")) {
+            message = persist(smClient);
         } else {
             //Try GET
             doGet(request, response);
@@ -221,6 +224,22 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         PrintWriter printWriter = new PrintWriter(stringWriter);
 
         super.stop(printWriter, name, smClient);
+
+        return stringWriter.toString();
+    }
+
+
+    /**
+     * Persist the current configuration to server.xml.
+     *
+     * @param smClient i18n resources localized for the client
+     */
+    protected String persist(StringManager smClient) {
+
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+
+        super.persist(printWriter, smClient);
 
         return stringWriter.toString();
     }
@@ -341,7 +360,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                 writer.print
                     (MessageFormat.format(HOSTS_ROW_DETAILS_SECTION, args));
 
-                args = new Object[4];
+                args = new Object[6];
                 if (host.getState().isAvailable()) {
                     args[0] = response.encodeURL
                     (request.getContextPath() +
@@ -362,10 +381,10 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                 args[3] = hostsRemove;
                 if (host == this.installedHost) {
                     writer.print(MessageFormat.format(
-                        MANAGER_HOST_ROW_BUTTON_SECTION, args));
+                            MANAGER_HOST_ROW_BUTTON_SECTION, args));
                 } else {
                     writer.print(MessageFormat.format(
-                        HOSTS_ROW_BUTTON_SECTION, args));
+                            HOSTS_ROW_BUTTON_SECTION, args));
                 }
             }
         }
@@ -412,6 +431,14 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         args = new Object[1];
         args[0] = smClient.getString("htmlHostManagerServlet.addButton");
         writer.print(MessageFormat.format(ADD_SECTION_END, args));
+
+        // Persist Configuration Section
+        args = new Object[4];
+        args[0] = smClient.getString("htmlHostManagerServlet.persistTitle");
+        args[1] = response.encodeURL(request.getContextPath() + "/html/persist");
+        args[2] = smClient.getString("htmlHostManagerServlet.persistAllButton");
+        args[3] = smClient.getString("htmlHostManagerServlet.persistAll");
+        writer.print(MessageFormat.format(PERSIST_SECTION, args));
 
         // Server Header Section
         args = new Object[7];
@@ -483,6 +510,9 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         "  <form class=\"inline\" method=\"POST\" action=\"{2}\">" +
         "   <small><input type=\"submit\" value=\"{3}\"></small>" +
         "  </form>\n" +
+        "  <form class=\"inline\" method=\"POST\" action=\"{4}\">" +
+        "   <small><input type=\"submit\" value=\"{5}\"></small>" +
+        "  </form>\n" +
         " </td>\n" +
         "</tr>\n";
 
@@ -551,5 +581,21 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         "</table>\n" +
         "<br>\n" +
         "\n";
+
+        private static final String PERSIST_SECTION =
+                "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+                "<tr>\n" +
+                " <td class=\"title\">{0}</td>\n" +
+                "</tr>\n" +
+                "<tr>\n" +
+                " <td class=\"row-left\">\n" +
+                "  <form class=\"inline\" method=\"POST\" action=\"{1}\">" +
+                "   <small><input type=\"submit\" value=\"{2}\"></small>" +
+                "  </form> {3}\n" +
+                " </td>\n" +
+                "</tr>\n" +
+                "</table>\n" +
+                "<br>\n" +
+                "\n";
 
 }

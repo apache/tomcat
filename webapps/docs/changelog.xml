@@ -145,6 +145,11 @@
         the WAR if <code>unpackWARs</code> is <code>true</code>. (markt)
       </fix>
       <fix>
+        <bug>48674</bug>: Implement an option within the Host Manager web
+        application to persist the current configuration. Based on a patch by
+        Coty Sutherland. (markt)
+      </fix>
+      <fix>
         <bug>58935</bug>: Remove incorrect references in the documentation to
         using <code>jar:file:</code> URLs with the Manager application. (markt)
       </fix>
