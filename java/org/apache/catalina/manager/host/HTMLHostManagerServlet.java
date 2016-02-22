@@ -360,7 +360,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                 writer.print
                     (MessageFormat.format(HOSTS_ROW_DETAILS_SECTION, args));
 
-                args = new Object[6];
+                args = new Object[4];
                 if (host.getState().isAvailable()) {
                     args[0] = response.encodeURL
                     (request.getContextPath() +
