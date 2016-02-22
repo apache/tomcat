@@ -462,6 +462,13 @@
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description
+        tag="CookieProcessor"
+        standard="true"
+        default="false"
+        tagClass="org.apache.tomcat.util.http.Rfc6265CookieProcessor"
+        storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
+     </Description>
+     <Description
         tag="SessionIdGenerator"
         standard="true"
         default="false"
