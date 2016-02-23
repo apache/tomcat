@@ -858,12 +858,8 @@ public class ApplicationContextFacade implements ServletContext {
                    InvocationTargetException {
 
         if (SecurityUtil.isPackageProtectionEnabled()){
-           return AccessController.doPrivileged(new PrivilegedExceptionAction<Object>(){
-                @Override
-                public Object run() throws IllegalAccessException, InvocationTargetException{
-                    return method.invoke(context,  params);
-                }
-            });
+           return AccessController.doPrivileged(
+                   new PrivilegedExecuteMethod(method, context,  params));
         } else {
             return method.invoke(context, params);
         }
@@ -894,5 +890,24 @@ public class ApplicationContextFacade implements ServletContext {
         }
 
         throw realException;
+    }
+
+
+    private static class PrivilegedExecuteMethod implements PrivilegedExceptionAction<Object> {
+
+        private final Method method;
+        private final ApplicationContext context;
+        private final Object[] params;
+
+        public PrivilegedExecuteMethod(Method method, ApplicationContext context, Object[] params) {
+            this.method = method;
+            this.context = context;
+            this.params = params;
+        }
+
+        @Override
+        public Object run() throws Exception {
+            return method.invoke(context, params);
+        }
     }
 }
