@@ -147,8 +147,8 @@ ${tomcat.source}.
     directory outside of the source tree, so that you do not waste your
     time re-downloading the libraries.
 
-* NOTE: The default value of base.path property makes the build script
-  to download libraries required to build Tomcat to the
+* NOTE: The default value of the base.path property configures the build script
+  to download the libraries required to build Tomcat to the
   ${user.home}/tomcat-build-libs directory.
 
 * NOTE: Users accessing the Internet through a proxy must use the properties

@@ -119,9 +119,9 @@ available, which will be used to actually perform the build.
 </p>
 
 <p>
-  By default the build is configured to download dependencies into directory
-  <code>${user.home}/tomcat-build-libs</code>. You can change this (see below)
-  but it must be an absolute path.
+  By default the build is configured to download the dependencies into the
+  <code>${user.home}/tomcat-build-libs</code> directory. You can change this
+  (see below) but it must be an absolute path.
 </p>
 
 <p>
