@@ -221,20 +221,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                     (AsyncDispatcher) requestDispatcher;
             final ServletRequest servletRequest = getRequest();
             final ServletResponse servletResponse = getResponse();
-            Runnable run = new Runnable() {
-                @Override
-                public void run() {
-                    request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCHED, null);
-                    try {
-                        applicationDispatcher.dispatch(servletRequest, servletResponse);
-                    }catch (Exception x) {
-                        //log.error("Async.dispatch",x);
-                        throw new RuntimeException(x);
-                    }
-                }
-            };
-
-            this.dispatch = run;
+            this.dispatch = new AsyncRunnable(
+                    request, applicationDispatcher, servletRequest, servletResponse);
             this.request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, null);
             clearServletRequestResponse();
         }
@@ -578,5 +566,34 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             // executed.
             coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
         }
+    }
+
+
+    private static class AsyncRunnable implements Runnable {
+
+        private final AsyncDispatcher applicationDispatcher;
+        private final Request request;
+        private final ServletRequest servletRequest;
+        private final ServletResponse servletResponse;
+
+        public AsyncRunnable(Request request, AsyncDispatcher applicationDispatcher,
+                ServletRequest servletRequest, ServletResponse servletResponse) {
+            this.request = request;
+            this.applicationDispatcher = applicationDispatcher;
+            this.servletRequest = servletRequest;
+            this.servletResponse = servletResponse;
+        }
+
+        @Override
+        public void run() {
+            request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCHED, null);
+            try {
+                applicationDispatcher.dispatch(servletRequest, servletResponse);
+            }catch (Exception x) {
+                //log.error("Async.dispatch",x);
+                throw new RuntimeException(x);
+            }
+        }
+
     }
 }
