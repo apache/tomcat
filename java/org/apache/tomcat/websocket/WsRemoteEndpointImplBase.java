@@ -271,7 +271,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         // trigger a session close and depending on timing the client
         // session may close before we can read the timeout.
         long timeout = getBlockingSendTimeout();
-        FutureToSendHandler f2sh = new FutureToSendHandler(wsSession);
+        FutureToSendHandler f2sh =
+                new FutureToSendHandler(wsSession, opCode == Constants.OPCODE_CLOSE);
         startMessage(opCode, payload, last, f2sh);
         try {
             if (timeout == -1) {

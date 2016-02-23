@@ -32,10 +32,22 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
 
     private final CountDownLatch latch = new CountDownLatch(1);
     private final WsSession wsSession;
+    private final boolean closeMessage;
     private volatile SendResult result = null;
 
     public FutureToSendHandler(WsSession wsSession) {
+        this(wsSession, false);
+    }
+
+
+    public FutureToSendHandler(WsSession wsSession, boolean closeMessage) {
         this.wsSession = wsSession;
+        this.closeMessage = closeMessage;
+    }
+
+
+    public boolean isCloseMessage() {
+        return closeMessage;
     }
 
 
