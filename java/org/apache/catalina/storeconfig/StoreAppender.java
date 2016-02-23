@@ -41,6 +41,8 @@ public class StoreAppender {
             Float.class, Float.TYPE, Long.class, Long.TYPE, Short.class,
             Short.TYPE, InetAddress.class };
 
+    private static int pos = 0;
+
     /**
      * Print the closing tag.
      *
@@ -167,6 +169,7 @@ public class StoreAppender {
         for (int i = 0; i < indent; i++) {
             aWriter.print(' ');
         }
+        pos = indent;
     }
 
     /**
@@ -340,11 +343,17 @@ public class StoreAppender {
         if (!(value instanceof String)) {
             value = value.toString();
         }
-        writer.println();
-        printIndent(writer, indent + 4);
+        String strValue = convertStr((String) value);
+        pos = pos + name.length() + strValue.length();
+        System.out.println(pos + "[" + name + strValue);
+        if (pos > 60) {
+            writer.println();
+            printIndent(writer, indent + 4);
+        } else {
+            writer.print(' ');
+        }
         writer.print(name);
         writer.print("=\"");
-        String strValue = convertStr((String) value);
         writer.print(strValue);
         writer.print("\"");
     }
