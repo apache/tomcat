@@ -2032,7 +2032,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                             }
                         }
 
-                        if (reset) {
+                        if (reset && pollerRunning) {
                             // Reallocate the current poller
                             int count = Poll.pollset(pollers[i], desc);
                             long newPoller = allocatePoller(actualPollerSize, pool, -1);
