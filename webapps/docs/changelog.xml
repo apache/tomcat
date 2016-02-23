@@ -65,6 +65,10 @@
         directory as the <code>docBase</code>. (markt)
       </fix>
       <add>
+        <bug>58351</bug>: Make the server build date and server version number
+        accessible via JMX. Patch provided by  Huxing Zhang. (markt)
+      </add>
+      <add>
         <bug>58988</bug>: Special characters in the substitutions for the RewriteValve
         can now be quoted with a backslash. (fschumacher)
       </add>
