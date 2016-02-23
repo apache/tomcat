@@ -661,7 +661,7 @@ public class WsSession implements Session {
             if (state == State.OPEN) {
                 futures.put(f2sh, f2sh);
             } else if (f2sh.isDone()) {
-                // NO-OP. The future completed before the session closed to no
+                // NO-OP. The future completed before the session closed so no
                 // need to register in case the session closes before it
                 // completes.
             } else {
