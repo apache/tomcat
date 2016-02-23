@@ -120,11 +120,8 @@ available, which will be used to actually perform the build.
 
 <p>
   By default the build is configured to download dependencies into directory
-  <code>/usr/share/java</code>. On a typical Linux or MacOX system, an ordinary
-  user will not have access to write to this directory, and, even if you do,
-  it is likely not appropriate for you to write there. On Windows this usually
-  corresponds to the <code>C:\usr\share\java</code> directory, unless Cygwin is
-  used.
+  <code>${user.home}/tomcat-build-libs</code>. You can change this (see below)
+  but it must be an absolute path.
 </p>
 
 <p>
