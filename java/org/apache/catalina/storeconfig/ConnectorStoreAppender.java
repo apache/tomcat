@@ -31,6 +31,7 @@ import java.util.List;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.net.SocketProperties;
 
 /**
  * Store the Connector attributes. Connector has really special design. A
@@ -78,7 +79,6 @@ public class ConnectorStoreAppender extends StoreAppender {
         while (propertyIterator.hasNext()) {
             String key = propertyIterator.next();
             Object value = IntrospectionUtils.getProperty(bean, key);
-
             if (desc.isTransientAttribute(key)) {
                 continue; // Skip the specified exceptions
             }
@@ -120,20 +120,20 @@ public class ConnectorStoreAppender extends StoreAppender {
         if (descriptors == null) {
             descriptors = new PropertyDescriptor[0];
         }
-        for (int i = 0; i < descriptors.length; i++) {
-            if (descriptors[i] instanceof IndexedPropertyDescriptor) {
+        for (PropertyDescriptor descriptor : descriptors) {
+            if (descriptor instanceof IndexedPropertyDescriptor) {
                 continue; // Indexed properties are not persisted
             }
-            if (!isPersistable(descriptors[i].getPropertyType())
-                    || (descriptors[i].getReadMethod() == null)
-                    || (descriptors[i].getWriteMethod() == null)) {
+            if (!isPersistable(descriptor.getPropertyType())
+                    || (descriptor.getReadMethod() == null)
+                    || (descriptor.getWriteMethod() == null)) {
                 continue; // Must be a read-write primitive or String
             }
-            if ("protocol".equals(descriptors[i].getName())
-                    || "protocolHandlerClassName".equals(descriptors[i]
+            if ("protocol".equals(descriptor.getName())
+                    || "protocolHandlerClassName".equals(descriptor
                             .getName()))
                 continue;
-            propertyKeys.add(descriptors[i].getName());
+            propertyKeys.add(descriptor.getName());
         }
         // Add the properties of the protocol handler
         descriptors = Introspector.getBeanInfo(
@@ -141,21 +141,47 @@ public class ConnectorStoreAppender extends StoreAppender {
         if (descriptors == null) {
             descriptors = new PropertyDescriptor[0];
         }
-        for (int i = 0; i < descriptors.length; i++) {
-            if (descriptors[i] instanceof IndexedPropertyDescriptor) {
+        for (PropertyDescriptor descriptor : descriptors) {
+            if (descriptor instanceof IndexedPropertyDescriptor) {
                 continue; // Indexed properties are not persisted
             }
-            if (!isPersistable(descriptors[i].getPropertyType())
-                    || (descriptors[i].getReadMethod() == null)
-                    || (descriptors[i].getWriteMethod() == null)) {
+            if (!isPersistable(descriptor.getPropertyType())
+                    || (descriptor.getReadMethod() == null)
+                    || (descriptor.getWriteMethod() == null)) {
                 continue; // Must be a read-write primitive or String
             }
-            String key = descriptors[i].getName();
+            String key = descriptor.getName();
             if (replacements.get(key) != null) {
                 key = replacements.get(key);
             }
             if (!propertyKeys.contains(key)) {
                 propertyKeys.add(key);
+            }
+        }
+        // Add the properties for the socket
+        final String socketName = "socket.";
+        descriptors = Introspector.getBeanInfo(
+                SocketProperties.class).getPropertyDescriptors();
+        if (descriptors == null) {
+            descriptors = new PropertyDescriptor[0];
+        }
+        for (PropertyDescriptor descriptor : descriptors) {
+            if (descriptor instanceof IndexedPropertyDescriptor) {
+                continue; // Indexed properties are not persisted
+            }
+            if (!isPersistable(descriptor.getPropertyType())
+                    || (descriptor.getReadMethod() == null)
+                    || (descriptor.getWriteMethod() == null)) {
+                continue; // Must be a read-write primitive or String
+            }
+            String key = descriptor.getName();
+            if (replacements.get(key) != null) {
+                key = replacements.get(key);
+            }
+            if (!propertyKeys.contains(key)) {
+                // Add socket.[original name] if this is not a property
+                // that could be set elsewhere
+                propertyKeys.add(socketName + descriptor.getName());
             }
         }
         return propertyKeys;
