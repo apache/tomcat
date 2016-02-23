@@ -130,14 +130,9 @@ ${tomcat.source}.
     directory outside of the source tree, so that you do not waste your
     time re-downloading the libraries.
 
-* WARNING: The default value of base.path property makes the build script
-  to download libraries required to build Tomcat to the /usr/share/java
-  directory. On a typical Linux or MacOX system an ordinary user will not
-  have access to write to this directory. Even if you do have access to
-  that directory, it is likely not appropriate for you to write there.
-
-  On Windows this usually corresponds to the "C:\usr\share\java"
-  directory, unless Cygwin is used.
+* NOTE: The default value of base.path property makes the build script
+  to download libraries required to build Tomcat to the
+  ${user.home}/tomcat-build-libs directory.
 
 * NOTE: Users accessing the Internet through a proxy must use the properties
   file to indicate to Ant the proxy configuration.
