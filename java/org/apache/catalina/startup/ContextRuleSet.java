@@ -243,7 +243,7 @@ public class ContextRuleSet extends RuleSetBase {
                             "org.apache.tomcat.JarScanFilter");
 
         digester.addObjectCreate(prefix + "Context/CookieProcessor",
-                                 "org.apache.tomcat.util.http.LegacyCookieProcessor",
+                                 "org.apache.tomcat.util.http.Rfc6265CookieProcessor",
                                  "className");
         digester.addSetProperties(prefix + "Context/CookieProcessor");
         digester.addSetNext(prefix + "Context/CookieProcessor",
