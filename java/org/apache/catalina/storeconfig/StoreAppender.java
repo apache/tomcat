@@ -345,7 +345,6 @@ public class StoreAppender {
         }
         String strValue = convertStr((String) value);
         pos = pos + name.length() + strValue.length();
-        System.out.println(pos + "[" + name + strValue);
         if (pos > 60) {
             writer.println();
             printIndent(writer, indent + 4);
