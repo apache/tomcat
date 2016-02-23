@@ -598,7 +598,15 @@ public abstract class AbstractEndpoint<S> {
         }
     }
     public String getProperty(String name) {
-        return (String) getAttribute(name);
+        String value = (String) getAttribute(name);
+        final String socketName = "socket.";
+        if (value == null && name.startsWith(socketName)) {
+            Object result = IntrospectionUtils.getProperty(socketProperties, name.substring(socketName.length()));
+            if (result != null) {
+                value = result.toString();
+            }
+        }
+        return value;
     }
 
     /**

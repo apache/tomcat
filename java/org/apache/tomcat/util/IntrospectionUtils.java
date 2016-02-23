@@ -220,6 +220,10 @@ public final class IntrospectionUtils {
             log.warn("IntrospectionUtils: IllegalAccessException for " +
                     o.getClass() + " " + name + ")", iae);
         } catch (InvocationTargetException ie) {
+            if (ie.getCause() instanceof NullPointerException) {
+                // Assume the underlying object uses a storage to represent an unset property
+                return null;
+            }
             ExceptionUtils.handleThrowable(ie.getCause());
             log.warn("IntrospectionUtils: InvocationTargetException for " +
                     o.getClass() + " " + name + ")", ie);
