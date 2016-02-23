@@ -117,6 +117,9 @@
         does not trigger an error when the Valve registers itself in the
         session. (markt)
       </fix>
+      <fix>
+        Add socket properties support to storeconfig. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
