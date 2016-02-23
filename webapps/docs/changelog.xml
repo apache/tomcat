@@ -169,6 +169,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>58283</bug>: Change the default download location for libraries
+        during the build process from <code>/usr/share/java</code> to
+        <code>${user.home}/temp</code>. Patch provided by Ahmed Hosni. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M3" rtext="2016-02-05">
   <subsection name="General">
