@@ -134,6 +134,11 @@
       <fix>
         Use JSSE session configuration options with OpenSSL. (remm)
       </fix>
+      <fix>
+        <bug>59015</bug>: Fix potential cause of endless APR Poller loop during
+        shutdown if the Poller experiences an error during the shutdown process.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
