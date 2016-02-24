@@ -724,7 +724,8 @@ public class SecurityConstraint implements Serializable {
             // pattern is fully covered.
             omittedMethods.removeAll(methods);
 
-            handleOmittedMethods(omittedMethods, pattern, denyUncoveredHttpMethods, newConstraints, log);
+            handleOmittedMethods(omittedMethods, pattern, denyUncoveredHttpMethods,
+                    newConstraints, log);
         }
         for (Map.Entry<String, Set<String>> entry :
                 urlOmittedMethodMap.entrySet()) {
