@@ -1016,37 +1016,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      */
     @Override
     public int getSessionCreateRate() {
-        long now = System.currentTimeMillis();
         // Copy current stats
         List<SessionTiming> copy = new ArrayList<>();
         synchronized (sessionCreationTiming) {
             copy.addAll(sessionCreationTiming);
         }
 
-        // Init
-        long oldest = now;
-        int counter = 0;
-        int result = 0;
-        Iterator<SessionTiming> iter = copy.iterator();
-
-        // Calculate rate
-        while (iter.hasNext()) {
-            SessionTiming timing = iter.next();
-            if (timing != null) {
-                counter++;
-                if (timing.getTimestamp() < oldest) {
-                    oldest = timing.getTimestamp();
-                }
-            }
-        }
-        if (counter > 0) {
-            if (oldest < now) {
-                result = (1000*60*counter)/(int) (now - oldest);
-            } else {
-                result = Integer.MAX_VALUE;
-            }
-        }
-        return result;
+        return calculateRate(copy);
     }
 
 
@@ -1060,18 +1036,23 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      */
     @Override
     public int getSessionExpireRate() {
-        long now = System.currentTimeMillis();
         // Copy current stats
         List<SessionTiming> copy = new ArrayList<>();
         synchronized (sessionExpirationTiming) {
             copy.addAll(sessionExpirationTiming);
         }
 
+        return calculateRate(copy);
+    }
+
+
+    private static int calculateRate(List<SessionTiming> sessionTiming) {
         // Init
+        long now = System.currentTimeMillis();
         long oldest = now;
         int counter = 0;
         int result = 0;
-        Iterator<SessionTiming> iter = copy.iterator();
+        Iterator<SessionTiming> iter = sessionTiming.iterator();
 
         // Calculate rate
         while (iter.hasNext()) {
