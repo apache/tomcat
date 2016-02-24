@@ -360,42 +360,21 @@ public final class ByteChunk implements Cloneable, Serializable {
     // -------------------- Removing data from the buffer --------------------
 
     public int substract() throws IOException {
-        if ((end - start) == 0) {
-            if (in == null) {
-                return -1;
-            }
-            int n = in.realReadBytes();
-            if (n < 0) {
-                return -1;
-            }
-        }
-        return (buff[start++] & 0xFF);
+        return substractB() & 0xFF;
     }
 
 
     public byte substractB() throws IOException {
-        if ((end - start) == 0) {
-            if (in == null) {
-                return -1;
-            }
-            int n = in.realReadBytes();
-            if (n < 0) {
-                return -1;
-            }
+        if (checkEof()) {
+            return -1;
         }
         return buff[start++];
     }
 
 
     public int substract(byte dest[], int off, int len ) throws IOException {
-        if ((end - start) == 0) {
-            if (in == null) {
-                return -1;
-            }
-            int n = in.realReadBytes();
-            if (n < 0) {
-                return -1;
-            }
+        if (checkEof()) {
+            return -1;
         }
         int n = len;
         if (len > getLength()) {
@@ -404,6 +383,20 @@ public final class ByteChunk implements Cloneable, Serializable {
         System.arraycopy(buff, start, dest, off, n);
         start += n;
         return n;
+    }
+
+
+    private boolean checkEof() throws IOException {
+        if ((end - start) == 0) {
+            if (in == null) {
+                return true;
+            }
+            int n = in.realReadBytes();
+            if (n < 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
