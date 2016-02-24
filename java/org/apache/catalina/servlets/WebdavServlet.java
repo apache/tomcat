@@ -1946,13 +1946,6 @@ public class WebdavServlet
             return;
         }
 
-        generatedXML.writeElement("D", "response", XMLWriter.OPENING);
-        String status = "HTTP/1.1 " + WebdavStatus.SC_OK + " " +
-                WebdavStatus.getStatusText(WebdavStatus.SC_OK);
-
-        // Generating href element
-        generatedXML.writeElement("D", "href", XMLWriter.OPENING);
-
         String href = req.getContextPath() + req.getServletPath();
         if ((href.endsWith("/")) && (path.startsWith("/")))
             href += path.substring(1);
@@ -1961,245 +1954,12 @@ public class WebdavServlet
         if (resource.isDirectory() && (!href.endsWith("/")))
             href += "/";
 
-        generatedXML.writeText(rewriteUrl(href));
+        String rewrittenUrl = rewriteUrl(href);
 
-        generatedXML.writeElement("D", "href", XMLWriter.CLOSING);
-
-        String resourceName = path;
-        int lastSlash = path.lastIndexOf('/');
-        if (lastSlash != -1)
-            resourceName = resourceName.substring(lastSlash + 1);
-
-        switch (type) {
-
-        case FIND_ALL_PROP :
-
-            generatedXML.writeElement("D", "propstat", XMLWriter.OPENING);
-            generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
-
-            generatedXML.writeProperty("D", "creationdate",
-                    getISOCreationDate(resource.getCreation()));
-            generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
-            generatedXML.writeData(resourceName);
-            generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
-            if (resource.isFile()) {
-                generatedXML.writeProperty
-                    ("D", "getlastmodified", FastHttpDateFormat.formatDate
-                           (resource.getLastModified(), null));
-                generatedXML.writeProperty
-                    ("D", "getcontentlength",
-                     String.valueOf(resource.getContentLength()));
-                String contentType = getServletContext().getMimeType(
-                        resource.getName());
-                if (contentType != null) {
-                    generatedXML.writeProperty("D", "getcontenttype",
-                            contentType);
-                }
-                generatedXML.writeProperty("D", "getetag",resource.getETag());
-                generatedXML.writeElement("D", "resourcetype",
-                        XMLWriter.NO_CONTENT);
-            } else {
-                generatedXML.writeElement("D", "resourcetype",
-                        XMLWriter.OPENING);
-                generatedXML.writeElement("D", "collection",
-                        XMLWriter.NO_CONTENT);
-                generatedXML.writeElement("D", "resourcetype",
-                        XMLWriter.CLOSING);
-            }
-
-            generatedXML.writeProperty("D", "source", "");
-
-            String supportedLocks = "<D:lockentry>"
-                + "<D:lockscope><D:exclusive/></D:lockscope>"
-                + "<D:locktype><D:write/></D:locktype>"
-                + "</D:lockentry>" + "<D:lockentry>"
-                + "<D:lockscope><D:shared/></D:lockscope>"
-                + "<D:locktype><D:write/></D:locktype>"
-                + "</D:lockentry>";
-            generatedXML.writeElement("D", "supportedlock", XMLWriter.OPENING);
-            generatedXML.writeText(supportedLocks);
-            generatedXML.writeElement("D", "supportedlock", XMLWriter.CLOSING);
-
-            generateLockDiscovery(path, generatedXML);
-
-            generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
-            generatedXML.writeElement("D", "status", XMLWriter.OPENING);
-            generatedXML.writeText(status);
-            generatedXML.writeElement("D", "status", XMLWriter.CLOSING);
-            generatedXML.writeElement("D", "propstat", XMLWriter.CLOSING);
-
-            break;
-
-        case FIND_PROPERTY_NAMES :
-
-            generatedXML.writeElement("D", "propstat", XMLWriter.OPENING);
-            generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
-
-            generatedXML.writeElement("D", "creationdate",
-                                      XMLWriter.NO_CONTENT);
-            generatedXML.writeElement("D", "displayname", XMLWriter.NO_CONTENT);
-            if (resource.isFile()) {
-                generatedXML.writeElement("D", "getcontentlanguage",
-                        XMLWriter.NO_CONTENT);
-                generatedXML.writeElement("D", "getcontentlength",
-                        XMLWriter.NO_CONTENT);
-                generatedXML.writeElement("D", "getcontenttype",
-                        XMLWriter.NO_CONTENT);
-                generatedXML.writeElement("D", "getetag", XMLWriter.NO_CONTENT);
-                generatedXML.writeElement("D", "getlastmodified",
-                        XMLWriter.NO_CONTENT);
-            }
-            generatedXML.writeElement("D", "resourcetype",
-                                      XMLWriter.NO_CONTENT);
-            generatedXML.writeElement("D", "source", XMLWriter.NO_CONTENT);
-            generatedXML.writeElement("D", "lockdiscovery",
-                                      XMLWriter.NO_CONTENT);
-
-            generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
-            generatedXML.writeElement("D", "status", XMLWriter.OPENING);
-            generatedXML.writeText(status);
-            generatedXML.writeElement("D", "status", XMLWriter.CLOSING);
-            generatedXML.writeElement("D", "propstat", XMLWriter.CLOSING);
-
-            break;
-
-        case FIND_BY_PROPERTY :
-
-            Vector<String> propertiesNotFound = new Vector<>();
-
-            // Parse the list of properties
-
-            generatedXML.writeElement("D", "propstat", XMLWriter.OPENING);
-            generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
-
-            Enumeration<String> properties = propertiesVector.elements();
-
-            while (properties.hasMoreElements()) {
-
-                String property = properties.nextElement();
-
-                if (property.equals("creationdate")) {
-                    generatedXML.writeProperty
-                        ("D", "creationdate",
-                         getISOCreationDate(resource.getCreation()));
-                } else if (property.equals("displayname")) {
-                    generatedXML.writeElement
-                        ("D", "displayname", XMLWriter.OPENING);
-                    generatedXML.writeData(resourceName);
-                    generatedXML.writeElement
-                        ("D", "displayname", XMLWriter.CLOSING);
-                } else if (property.equals("getcontentlanguage")) {
-                    if (resource.isDirectory()) {
-                        propertiesNotFound.addElement(property);
-                    } else {
-                        generatedXML.writeElement("D", "getcontentlanguage",
-                                                  XMLWriter.NO_CONTENT);
-                    }
-                } else if (property.equals("getcontentlength")) {
-                    if (resource.isDirectory()) {
-                        propertiesNotFound.addElement(property);
-                    } else {
-                        generatedXML.writeProperty
-                            ("D", "getcontentlength",
-                             (String.valueOf(resource.getContentLength())));
-                    }
-                } else if (property.equals("getcontenttype")) {
-                    if (resource.isDirectory()) {
-                        propertiesNotFound.addElement(property);
-                    } else {
-                        generatedXML.writeProperty
-                            ("D", "getcontenttype",
-                             getServletContext().getMimeType
-                             (resource.getName()));
-                    }
-                } else if (property.equals("getetag")) {
-                    if (resource.isDirectory()) {
-                        propertiesNotFound.addElement(property);
-                    } else {
-                        generatedXML.writeProperty
-                            ("D", "getetag", resource.getETag());
-                    }
-                } else if (property.equals("getlastmodified")) {
-                    if (resource.isDirectory()) {
-                        propertiesNotFound.addElement(property);
-                    } else {
-                        generatedXML.writeProperty
-                            ("D", "getlastmodified", FastHttpDateFormat.formatDate
-                                    (resource.getLastModified(), null));
-                    }
-                } else if (property.equals("resourcetype")) {
-                    if (resource.isDirectory()) {
-                        generatedXML.writeElement("D", "resourcetype",
-                                XMLWriter.OPENING);
-                        generatedXML.writeElement("D", "collection",
-                                XMLWriter.NO_CONTENT);
-                        generatedXML.writeElement("D", "resourcetype",
-                                XMLWriter.CLOSING);
-                    } else {
-                        generatedXML.writeElement("D", "resourcetype",
-                                XMLWriter.NO_CONTENT);
-                    }
-                } else if (property.equals("source")) {
-                    generatedXML.writeProperty("D", "source", "");
-                } else if (property.equals("supportedlock")) {
-                    supportedLocks = "<D:lockentry>"
-                        + "<D:lockscope><D:exclusive/></D:lockscope>"
-                        + "<D:locktype><D:write/></D:locktype>"
-                        + "</D:lockentry>" + "<D:lockentry>"
-                        + "<D:lockscope><D:shared/></D:lockscope>"
-                        + "<D:locktype><D:write/></D:locktype>"
-                        + "</D:lockentry>";
-                    generatedXML.writeElement("D", "supportedlock",
-                            XMLWriter.OPENING);
-                    generatedXML.writeText(supportedLocks);
-                    generatedXML.writeElement("D", "supportedlock",
-                            XMLWriter.CLOSING);
-                } else if (property.equals("lockdiscovery")) {
-                    if (!generateLockDiscovery(path, generatedXML))
-                        propertiesNotFound.addElement(property);
-                } else {
-                    propertiesNotFound.addElement(property);
-                }
-
-            }
-
-            generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
-            generatedXML.writeElement("D", "status", XMLWriter.OPENING);
-            generatedXML.writeText(status);
-            generatedXML.writeElement("D", "status", XMLWriter.CLOSING);
-            generatedXML.writeElement("D", "propstat", XMLWriter.CLOSING);
-
-            Enumeration<String> propertiesNotFoundList =
-                propertiesNotFound.elements();
-
-            if (propertiesNotFoundList.hasMoreElements()) {
-
-                status = "HTTP/1.1 " + WebdavStatus.SC_NOT_FOUND + " " +
-                        WebdavStatus.getStatusText(WebdavStatus.SC_NOT_FOUND);
-
-                generatedXML.writeElement("D", "propstat", XMLWriter.OPENING);
-                generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
-
-                while (propertiesNotFoundList.hasMoreElements()) {
-                    generatedXML.writeElement
-                        ("D", propertiesNotFoundList.nextElement(),
-                         XMLWriter.NO_CONTENT);
-                }
-
-                generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
-                generatedXML.writeElement("D", "status", XMLWriter.OPENING);
-                generatedXML.writeText(status);
-                generatedXML.writeElement("D", "status", XMLWriter.CLOSING);
-                generatedXML.writeElement("D", "propstat", XMLWriter.CLOSING);
-
-            }
-
-            break;
-
-        }
-
-        generatedXML.writeElement("D", "response", XMLWriter.CLOSING);
-
+        generatePropFindResponse(generatedXML, rewrittenUrl, path, type, propertiesVector,
+                resource.isFile(), false, resource.getCreation(), resource.getLastModified(),
+                resource.getContentLength(), getServletContext().getMimeType(resource.getName()),
+                resource.getETag());
     }
 
 
@@ -2228,22 +1988,33 @@ public class WebdavServlet
         if (lock == null)
             return;
 
-        generatedXML.writeElement("D", "response", XMLWriter.OPENING);
-        String status = "HTTP/1.1 " + WebdavStatus.SC_OK + " " +
-                WebdavStatus.getStatusText(WebdavStatus.SC_OK);
-
-        // Generating href element
-        generatedXML.writeElement("D", "href", XMLWriter.OPENING);
-
         String absoluteUri = req.getRequestURI();
         String relativePath = getRelativePath(req);
         String toAppend = path.substring(relativePath.length());
         if (!toAppend.startsWith("/"))
             toAppend = "/" + toAppend;
 
-        generatedXML.writeText(rewriteUrl(RequestUtil.normalize(
-                absoluteUri + toAppend)));
+        String rewrittenUrl = rewriteUrl(RequestUtil.normalize(
+                absoluteUri + toAppend));
 
+        generatePropFindResponse(generatedXML, rewrittenUrl, path, type, propertiesVector,
+                true, true, lock.creationDate.getTime(), lock.creationDate.getTime(),
+                0, "", "");
+    }
+
+
+    private void generatePropFindResponse(XMLWriter generatedXML, String rewrittenUrl,
+            String path, int propFindType, Vector<String> propertiesVector, boolean isFile,
+            boolean isLockNull, long created, long lastModified, long contentLength,
+            String contentType, String eTag) {
+
+        generatedXML.writeElement("D", "response", XMLWriter.OPENING);
+        String status = "HTTP/1.1 " + WebdavStatus.SC_OK + " " +
+                WebdavStatus.getStatusText(WebdavStatus.SC_OK);
+
+        // Generating href element
+        generatedXML.writeElement("D", "href", XMLWriter.OPENING);
+        generatedXML.writeText(rewrittenUrl);
         generatedXML.writeElement("D", "href", XMLWriter.CLOSING);
 
         String resourceName = path;
@@ -2251,28 +2022,37 @@ public class WebdavServlet
         if (lastSlash != -1)
             resourceName = resourceName.substring(lastSlash + 1);
 
-        switch (type) {
+        switch (propFindType) {
 
         case FIND_ALL_PROP :
 
             generatedXML.writeElement("D", "propstat", XMLWriter.OPENING);
             generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
 
-            generatedXML.writeProperty("D", "creationdate",
-                    getISOCreationDate(lock.creationDate.getTime()));
+            generatedXML.writeProperty("D", "creationdate", getISOCreationDate(created));
             generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
             generatedXML.writeData(resourceName);
             generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
-            generatedXML.writeProperty("D", "getlastmodified",
-                                       FastHttpDateFormat.formatDate
-                                       (lock.creationDate.getTime(), null));
-            generatedXML.writeProperty("D", "getcontentlength",
-                    String.valueOf(0));
-            generatedXML.writeProperty("D", "getcontenttype", "");
-            generatedXML.writeProperty("D", "getetag", "");
-            generatedXML.writeElement("D", "resourcetype", XMLWriter.OPENING);
-            generatedXML.writeElement("D", "lock-null", XMLWriter.NO_CONTENT);
-            generatedXML.writeElement("D", "resourcetype", XMLWriter.CLOSING);
+            if (isFile) {
+                generatedXML.writeProperty("D", "getlastmodified",
+                        FastHttpDateFormat.formatDate(lastModified, null));
+                generatedXML.writeProperty("D", "getcontentlength", Long.toString(contentLength));
+                if (contentType != null) {
+                    generatedXML.writeProperty("D", "getcontenttype", contentType);
+                }
+                generatedXML.writeProperty("D", "getetag", eTag);
+                if (isLockNull) {
+                    generatedXML.writeElement("D", "resourcetype", XMLWriter.OPENING);
+                    generatedXML.writeElement("D", "lock-null", XMLWriter.NO_CONTENT);
+                    generatedXML.writeElement("D", "resourcetype", XMLWriter.CLOSING);
+                } else {
+                    generatedXML.writeElement("D", "resourcetype", XMLWriter.NO_CONTENT);
+                }
+            } else {
+                generatedXML.writeElement("D", "resourcetype", XMLWriter.OPENING);
+                generatedXML.writeElement("D", "collection", XMLWriter.NO_CONTENT);
+                generatedXML.writeElement("D", "resourcetype", XMLWriter.CLOSING);
+            }
 
             generatedXML.writeProperty("D", "source", "");
 
@@ -2302,23 +2082,18 @@ public class WebdavServlet
             generatedXML.writeElement("D", "propstat", XMLWriter.OPENING);
             generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
 
-            generatedXML.writeElement("D", "creationdate",
-                                      XMLWriter.NO_CONTENT);
+            generatedXML.writeElement("D", "creationdate", XMLWriter.NO_CONTENT);
             generatedXML.writeElement("D", "displayname", XMLWriter.NO_CONTENT);
-            generatedXML.writeElement("D", "getcontentlanguage",
-                                      XMLWriter.NO_CONTENT);
-            generatedXML.writeElement("D", "getcontentlength",
-                                      XMLWriter.NO_CONTENT);
-            generatedXML.writeElement("D", "getcontenttype",
-                                      XMLWriter.NO_CONTENT);
-            generatedXML.writeElement("D", "getetag", XMLWriter.NO_CONTENT);
-            generatedXML.writeElement("D", "getlastmodified",
-                                      XMLWriter.NO_CONTENT);
-            generatedXML.writeElement("D", "resourcetype",
-                                      XMLWriter.NO_CONTENT);
+            if (isFile) {
+                generatedXML.writeElement("D", "getcontentlanguage", XMLWriter.NO_CONTENT);
+                generatedXML.writeElement("D", "getcontentlength", XMLWriter.NO_CONTENT);
+                generatedXML.writeElement("D", "getcontenttype", XMLWriter.NO_CONTENT);
+                generatedXML.writeElement("D", "getetag", XMLWriter.NO_CONTENT);
+                generatedXML.writeElement("D", "getlastmodified", XMLWriter.NO_CONTENT);
+            }
+            generatedXML.writeElement("D", "resourcetype", XMLWriter.NO_CONTENT);
             generatedXML.writeElement("D", "source", XMLWriter.NO_CONTENT);
-            generatedXML.writeElement("D", "lockdiscovery",
-                                      XMLWriter.NO_CONTENT);
+            generatedXML.writeElement("D", "lockdiscovery", XMLWriter.NO_CONTENT);
 
             generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
             generatedXML.writeElement("D", "status", XMLWriter.OPENING);
@@ -2344,36 +2119,58 @@ public class WebdavServlet
                 String property = properties.nextElement();
 
                 if (property.equals("creationdate")) {
-                    generatedXML.writeProperty("D", "creationdate",
-                            getISOCreationDate(lock.creationDate.getTime()));
+                    generatedXML.writeProperty ("D", "creationdate", getISOCreationDate(created));
                 } else if (property.equals("displayname")) {
-                    generatedXML.writeElement("D", "displayname",
-                            XMLWriter.OPENING);
+                    generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
                     generatedXML.writeData(resourceName);
-                    generatedXML.writeElement("D", "displayname",
-                            XMLWriter.CLOSING);
+                    generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
                 } else if (property.equals("getcontentlanguage")) {
-                    generatedXML.writeElement("D", "getcontentlanguage",
-                            XMLWriter.NO_CONTENT);
+                    if (isFile) {
+                        generatedXML.writeElement("D", "getcontentlanguage",
+                                XMLWriter.NO_CONTENT);
+                    } else {
+                        propertiesNotFound.addElement(property);
+                    }
                 } else if (property.equals("getcontentlength")) {
-                    generatedXML.writeProperty("D", "getcontentlength",
-                            (String.valueOf(0)));
+                    if (isFile) {
+                        generatedXML.writeProperty("D", "getcontentlength",
+                                Long.toString(contentLength));
+                    } else {
+                        propertiesNotFound.addElement(property);
+                    }
                 } else if (property.equals("getcontenttype")) {
-                    generatedXML.writeProperty("D", "getcontenttype", "");
+                    if (isFile) {
+                        generatedXML.writeProperty("D", "getcontenttype", contentType);
+                    } else {
+                        propertiesNotFound.addElement(property);
+                    }
                 } else if (property.equals("getetag")) {
-                    generatedXML.writeProperty("D", "getetag", "");
+                    if (isFile) {
+                        generatedXML.writeProperty("D", "getetag", eTag);
+                    } else {
+                        propertiesNotFound.addElement(property);
+                    }
                 } else if (property.equals("getlastmodified")) {
-                    generatedXML.writeProperty
-                        ("D", "getlastmodified",
-                          FastHttpDateFormat.formatDate
-                         (lock.creationDate.getTime(), null));
+                    if (isFile) {
+                        generatedXML.writeProperty("D", "getlastmodified",
+                                FastHttpDateFormat.formatDate(lastModified, null));
+                    } else {
+                        propertiesNotFound.addElement(property);
+                    }
                 } else if (property.equals("resourcetype")) {
-                    generatedXML.writeElement("D", "resourcetype",
-                            XMLWriter.OPENING);
-                    generatedXML.writeElement("D", "lock-null",
-                            XMLWriter.NO_CONTENT);
-                    generatedXML.writeElement("D", "resourcetype",
-                            XMLWriter.CLOSING);
+                    if (isFile) {
+                        if(isLockNull) {
+                            generatedXML.writeElement("D", "resourcetype", XMLWriter.OPENING);
+                            generatedXML.writeElement("D", "lock-null", XMLWriter.NO_CONTENT);
+                            generatedXML.writeElement("D", "resourcetype", XMLWriter.CLOSING);
+                        } else {
+                            generatedXML.writeElement("D", "resourcetype", XMLWriter.NO_CONTENT);
+                        }
+                    } else {
+                        generatedXML.writeElement("D", "resourcetype", XMLWriter.OPENING);
+                        generatedXML.writeElement("D", "collection", XMLWriter.NO_CONTENT);
+                        generatedXML.writeElement("D", "resourcetype",XMLWriter.CLOSING);
+                    }
                 } else if (property.equals("source")) {
                     generatedXML.writeProperty("D", "source", "");
                 } else if (property.equals("supportedlock")) {
@@ -2384,11 +2181,9 @@ public class WebdavServlet
                         + "<D:lockscope><D:shared/></D:lockscope>"
                         + "<D:locktype><D:write/></D:locktype>"
                         + "</D:lockentry>";
-                    generatedXML.writeElement("D", "supportedlock",
-                            XMLWriter.OPENING);
+                    generatedXML.writeElement("D", "supportedlock", XMLWriter.OPENING);
                     generatedXML.writeText(supportedLocks);
-                    generatedXML.writeElement("D", "supportedlock",
-                            XMLWriter.CLOSING);
+                    generatedXML.writeElement("D", "supportedlock", XMLWriter.CLOSING);
                 } else if (property.equals("lockdiscovery")) {
                     if (!generateLockDiscovery(path, generatedXML))
                         propertiesNotFound.addElement(property);
@@ -2415,9 +2210,8 @@ public class WebdavServlet
                 generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
 
                 while (propertiesNotFoundList.hasMoreElements()) {
-                    generatedXML.writeElement
-                        ("D", propertiesNotFoundList.nextElement(),
-                         XMLWriter.NO_CONTENT);
+                    generatedXML.writeElement("D", propertiesNotFoundList.nextElement(),
+                            XMLWriter.NO_CONTENT);
                 }
 
                 generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
@@ -2433,7 +2227,6 @@ public class WebdavServlet
         }
 
         generatedXML.writeElement("D", "response", XMLWriter.CLOSING);
-
     }
 
 
