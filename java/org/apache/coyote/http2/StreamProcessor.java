@@ -345,6 +345,13 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
 
+        // Servlet 3.1 HTTP Upgrade
+        case UPGRADE: {
+            // Unsupported / illegal under HTTP/2
+            throw new UnsupportedOperationException(
+                    sm.getString("streamProcessor.httpupgrade.notsupported"));
+        }
+
         // Servlet 4.0 Push requests
         case PUSH_REQUEST: {
             try {
@@ -355,11 +362,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             }
             break;
         }
-
-        // Unsupported / illegal under HTTP/2
-        case UPGRADE:
-            throw new UnsupportedOperationException(
-                    sm.getString("streamProcessor.httpupgrade.notsupported"));
         }
     }
 
