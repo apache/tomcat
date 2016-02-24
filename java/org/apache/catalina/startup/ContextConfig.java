@@ -2068,6 +2068,7 @@ public class ContextConfig implements LifecycleListener {
      * super class needs to be checked for a match with {@link HandlesTypes} or
      * for an annotation that matches {@link HandlesTypes}.
      * @param javaClass the class to check
+     * @param javaClassCache a class cache
      */
     protected void checkHandlesTypes(JavaClass javaClass,
             Map<String,JavaClassCacheEntry> javaClassCache) {

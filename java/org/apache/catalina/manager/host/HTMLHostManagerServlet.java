@@ -233,6 +233,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
      * Persist the current configuration to server.xml.
      *
      * @param smClient i18n resources localized for the client
+     * @return output
      */
     protected String persist(StringManager smClient) {
 
