@@ -23,38 +23,6 @@ public class Constants {
 
     public static final String Package = "org.apache.catalina.manager.host";
 
-    public static final String BODY_HEADER_SECTION =
-        "<title>{0}</title>\n" +
-        "</head>\n" +
-        "\n" +
-        "<body bgcolor=\"#FFFFFF\">\n" +
-        "\n" +
-        "<table cellspacing=\"4\" border=\"0\">\n" +
-        " <tr>\n" +
-        "  <td colspan=\"2\">\n" +
-        "   <a href=\"http://www.apache.org/\">\n" +
-        "    <img border=\"0\" alt=\"The Apache Software Foundation\" align=\"left\"\n" +
-        "         src=\"{0}/images/asf-logo.gif\">\n" +
-        "   </a>\n" +
-        "   <a href=\"http://tomcat.apache.org/\">\n" +
-        "    <img border=\"0\" alt=\"The Tomcat Servlet/JSP Container\"\n" +
-        "         align=\"right\" src=\"{0}/images/tomcat.gif\">\n" +
-        "   </a>\n" +
-        "  </td>\n" +
-        " </tr>\n" +
-        "</table>\n" +
-        "<hr size=\"1\" noshade=\"noshade\">\n" +
-        "<table cellspacing=\"4\" border=\"0\">\n" +
-        " <tr>\n" +
-        "  <td class=\"page-title\" bordercolor=\"#000000\" " +
-        "align=\"left\" nowrap>\n" +
-        "   <font size=\"+2\">{1}</font>\n" +
-        "  </td>\n" +
-        " </tr>\n" +
-        "</table>\n" +
-        "<br>\n" +
-        "\n";
-
     public static final String MESSAGE_SECTION =
         "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
         " <tr>\n" +
