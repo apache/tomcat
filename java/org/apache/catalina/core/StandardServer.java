@@ -246,9 +246,27 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      * @return Tomcat release identifier
      */
     public String getServerInfo() {
-
         return ServerInfo.getServerInfo();
     }
+
+
+    /**
+     * Return the current server built timestamp
+     * @return server built timestamp.
+     */
+    public String getServerBuilt() {
+        return ServerInfo.getServerBuilt();
+    }
+
+
+    /**
+     * Return the current server's version number.
+     * @return server's version number.
+     */
+    public String getServerNumber() {
+        return ServerInfo.getServerNumber();
+    }
+
 
     /**
      * Return the port number we listen to for shutdown commands.

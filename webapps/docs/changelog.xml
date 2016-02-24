@@ -64,6 +64,10 @@
         Fix the type of <code>InstanceManager</code> attribute of mbean
         definition of <code>StandardContext</code>. (kfujino)
       </fix>
+      <add>
+        <bug>58351</bug>: Make the server build date and server version number
+        accessible via JMX. Patch provided by  Huxing Zhang. (markt)
+      </add>
       <fix>
         <bug>59054</bug>: Ensure that using the
         <code>CrawlerSessionManagerValve</code> in a distributed environment

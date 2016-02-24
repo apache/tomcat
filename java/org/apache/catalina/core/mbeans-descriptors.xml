@@ -1417,6 +1417,16 @@
                type="java.lang.String"
                writeable="false"/>
                
+    <attribute name="serverBuilt"
+               description="Tomcat server built timestamp"
+               type="java.lang.String"
+               writeable="false"/>
+
+    <attribute name="serverNumber"
+               description="Tomcat server's version number"
+               type="java.lang.String"
+               writeable="false"/>
+
     <attribute name="serviceNames"
                description="Object names of all services we know about"
                type="[Ljavax.management.ObjectName;"
