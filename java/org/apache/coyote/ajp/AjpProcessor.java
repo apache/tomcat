@@ -390,8 +390,40 @@ public class AjpProcessor extends AbstractProcessor {
             }
             break;
         }
+        case AVAILABLE: {
+            if (available()) {
+                request.setAvailable(1);
+            } else {
+                request.setAvailable(0);
+            }
+            break;
+        }
+        case REQ_SET_BODY_REPLAY: {
+            // Set the given bytes as the content
+            ByteChunk bc = (ByteChunk) param;
+            int length = bc.getLength();
+            bodyBytes.setBytes(bc.getBytes(), bc.getStart(), length);
+            request.setContentLength(length);
+            first = false;
+            empty = false;
+            replay = true;
+            endOfStream = false;
+            break;
+        }
+        case RESET: {
+            // NO-OP
+            break;
+        }
+
+        // Error handling
         case IS_ERROR: {
             ((AtomicBoolean) param).set(getErrorState().isError());
+            break;
+        }
+        case CLOSE_NOW: {
+            // Prevent further writes to the response
+            swallowResponse = true;
+            setErrorState(ErrorState.CLOSE_NOW, null);
             break;
         }
         case DISABLE_SWALLOW_INPUT: {
@@ -400,10 +432,55 @@ public class AjpProcessor extends AbstractProcessor {
             setErrorState(ErrorState.CLOSE_CLEAN, null);
             break;
         }
-        case RESET: {
-            // NO-OP
+        case END_REQUEST: {
+            // NO-OP for AJP
             break;
         }
+
+        // Request attribute support
+        case REQ_HOST_ADDR_ATTRIBUTE: {
+            // NO-OP
+            // Automatically populated during prepareRequest()
+            break;
+        }
+        case REQ_HOST_ATTRIBUTE: {
+            // Get remote host name using a DNS resolution
+            if (request.remoteHost().isNull()) {
+                try {
+                    request.remoteHost().setString(InetAddress.getByName
+                            (request.remoteAddr().toString()).getHostName());
+                } catch (IOException iex) {
+                    // Ignore
+                }
+            }
+            break;
+        }
+        case REQ_LOCALPORT_ATTRIBUTE: {
+            // NO-OP
+            // Automatically populated during prepareRequest()
+            break;
+        }
+        case REQ_LOCAL_ADDR_ATTRIBUTE: {
+            // Automatically populated during prepareRequest() when using
+            // modern AJP forwarder, otherwise copy from local name
+            if (request.localAddr().isNull()) {
+                request.localAddr().setString(request.localName().toString());
+            }
+            break;
+        }
+        case REQ_LOCAL_NAME_ATTRIBUTE: {
+            // NO-OP
+            // Automatically populated during prepareRequest()
+            break;
+        }
+        case REQ_REMOTEPORT_ATTRIBUTE: {
+            // NO-OP
+            // Automatically populated during prepareRequest() when using
+            // modern AJP forwarder, otherwise not available
+            break;
+        }
+
+        // SSL request attribute support
         case REQ_SSL_ATTRIBUTE: {
             if (!certificates.isNull()) {
                 ByteChunk certData = certificates.getByteChunk();
@@ -451,59 +528,8 @@ public class AjpProcessor extends AbstractProcessor {
             // AJP as the reverse proxy controls that connection.
             break;
         }
-        case REQ_HOST_ATTRIBUTE: {
-            // Get remote host name using a DNS resolution
-            if (request.remoteHost().isNull()) {
-                try {
-                    request.remoteHost().setString(InetAddress.getByName
-                            (request.remoteAddr().toString()).getHostName());
-                } catch (IOException iex) {
-                    // Ignore
-                }
-            }
-            break;
-        }
-        case REQ_HOST_ADDR_ATTRIBUTE: {
-            // NO-OP
-            // Automatically populated during prepareRequest()
-            break;
-        }
-        case REQ_LOCAL_NAME_ATTRIBUTE: {
-            // NO-OP
-            // Automatically populated during prepareRequest()
-            break;
-        }
-        case REQ_LOCAL_ADDR_ATTRIBUTE: {
-            // Automatically populated during prepareRequest() when using
-            // modern AJP forwarder, otherwise copy from local name
-            if (request.localAddr().isNull()) {
-                request.localAddr().setString(request.localName().toString());
-            }
-            break;
-        }
-        case REQ_REMOTEPORT_ATTRIBUTE: {
-            // NO-OP
-            // Automatically populated during prepareRequest() when using
-            // modern AJP forwarder, otherwise not available
-            break;
-        }
-        case REQ_LOCALPORT_ATTRIBUTE: {
-            // NO-OP
-            // Automatically populated during prepareRequest()
-            break;
-        }
-        case REQ_SET_BODY_REPLAY: {
-            // Set the given bytes as the content
-            ByteChunk bc = (ByteChunk) param;
-            int length = bc.getLength();
-            bodyBytes.setBytes(bc.getBytes(), bc.getStart(), length);
-            request.setContentLength(length);
-            first = false;
-            empty = false;
-            replay = true;
-            endOfStream = false;
-            break;
-        }
+
+        // Servlet 3.0 asynchronous support
         case ASYNC_START: {
             asyncStateMachine.asyncStart((AsyncContextCallback) param);
             break;
@@ -525,6 +551,38 @@ public class AjpProcessor extends AbstractProcessor {
             asyncStateMachine.asyncDispatched();
             break;
         }
+        case ASYNC_ERROR: {
+            asyncStateMachine.asyncError();
+            break;
+        }
+        case ASYNC_IS_ASYNC: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsync());
+            break;
+        }
+        case ASYNC_IS_COMPLETING: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isCompleting());
+            break;
+        }
+        case ASYNC_IS_DISPATCHING: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncDispatching());
+            break;
+        }
+        case ASYNC_IS_ERROR: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
+            break;
+        }
+        case ASYNC_IS_STARTED: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarted());
+            break;
+        }
+        case ASYNC_IS_TIMINGOUT: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
+            break;
+        }
+        case ASYNC_RUN: {
+            asyncStateMachine.asyncRun((Runnable) param);
+            break;
+        }
         case ASYNC_SETTIMEOUT: {
             if (param == null) {
                 return;
@@ -538,49 +596,11 @@ public class AjpProcessor extends AbstractProcessor {
             result.set(asyncStateMachine.asyncTimeout());
             break;
         }
-        case ASYNC_RUN: {
-            asyncStateMachine.asyncRun((Runnable) param);
-            break;
-        }
-        case ASYNC_ERROR: {
-            asyncStateMachine.asyncError();
-            break;
-        }
-        case ASYNC_IS_STARTED: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarted());
-            break;
-        }
-        case ASYNC_IS_COMPLETING: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isCompleting());
-            break;
-        }
-        case ASYNC_IS_DISPATCHING: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncDispatching());
-            break;
-        }
-        case ASYNC_IS_ASYNC: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsync());
-            break;
-        }
-        case ASYNC_IS_TIMINGOUT: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
-            break;
-        }
-        case ASYNC_IS_ERROR: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
-            break;
-        }
-        case UPGRADE: {
-            // HTTP connections only. Unsupported for AJP.
-            throw new UnsupportedOperationException(
-                    sm.getString("ajpprocessor.httpupgrade.notsupported"));
-        }
-        case AVAILABLE: {
-            if (available()) {
-                request.setAvailable(1);
-            } else {
-                request.setAvailable(0);
-            }
+
+        // Servlet 3.1 non-blocking I/O
+        case REQUEST_BODY_FULLY_READ: {
+            AtomicBoolean result = (AtomicBoolean) param;
+            result.set(endOfStream);
             break;
         }
         case NB_READ_INTEREST: {
@@ -595,11 +615,6 @@ public class AjpProcessor extends AbstractProcessor {
             isReady.set(result);
             break;
         }
-        case REQUEST_BODY_FULLY_READ: {
-            AtomicBoolean result = (AtomicBoolean) param;
-            result.set(endOfStream);
-            break;
-        }
         case DISPATCH_READ: {
             addDispatch(DispatchType.NON_BLOCKING_READ);
             break;
@@ -612,15 +627,12 @@ public class AjpProcessor extends AbstractProcessor {
             socketWrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
             break;
         }
-        case CLOSE_NOW: {
-            // Prevent further writes to the response
-            swallowResponse = true;
-            setErrorState(ErrorState.CLOSE_NOW, null);
-            break;
-        }
-        case END_REQUEST: {
-            // NO-OP for AJP
-            break;
+
+        // Servlet 3.1 HTTP Upgrade
+        case UPGRADE: {
+            // HTTP connections only. Unsupported for AJP.
+            throw new UnsupportedOperationException(
+                    sm.getString("ajpprocessor.httpupgrade.notsupported"));
         }
 
         // Servlet 4.0 Push requests
