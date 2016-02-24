@@ -360,7 +360,10 @@ public final class ByteChunk implements Cloneable, Serializable {
     // -------------------- Removing data from the buffer --------------------
 
     public int substract() throws IOException {
-        return substractB() & 0xFF;
+        if (checkEof()) {
+            return -1;
+        }
+        return buff[start++] & 0xFF;
     }
 
 
