@@ -1122,6 +1122,12 @@ Section Uninstall
   SetShellVarContext current
   RMDir /r "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName"
 
+  ; Before files are removed using recursive deletes, remove any symbolic
+  ; links in the installation directory and the directory structure below it
+  ; to ensure the recursive deletes don't result in any nasty surprises.
+  Push "$INSTDIR"
+  Call un.RemoveSymlinks
+
   Delete "$INSTDIR\tomcat.ico"
   Delete "$INSTDIR\LICENSE"
   Delete "$INSTDIR\NOTICE"
@@ -1160,7 +1166,7 @@ SectionEnd
 ; =================
 ; uninstall init function
 ;
-; Read the command line paramater and set up the service name variables so the
+; Read the command line parameter and set up the service name variables so the
 ; uninstaller knows which service it is working with
 ; =================
 Function un.onInit
@@ -1169,5 +1175,47 @@ Function un.onInit
   StrCpy $TomcatServiceName $R1
   StrCpy $TomcatServiceFileName $R1.exe
   StrCpy $TomcatServiceManagerFileName $R1w.exe
+FunctionEnd
+
+; =================
+; Removes symbolic links from the path found on top of the stack.
+; The path is removed from the stack as a result of calling this function.
+; =================
+Function un.RemoveSymlinks
+  Pop $0
+  ${GetFileAttributes} "$0" "REPARSE_POINT" $3
+  ; DetailPrint "Processing directory [$0] [$3]"
+  FindFirst $1 $2 $0\*.*
+  ; DetailPrint "Search [$1] found [$2]"
+  StrCmp $3 "1" RemoveSymlinks-delete
+RemoveSymlinks-loop:
+  ; DetailPrint "Search [$1] processing [$0\$2]"
+  StrCmp $2 "" RemoveSymlinks-exit
+  StrCmp $2 "." RemoveSymlinks-skip
+  StrCmp $2 ".." RemoveSymlinks-skip
+  IfFileExists $0\$2\*.* RemoveSymlinks-directory
+RemoveSymlinks-skip:
+  ; DetailPrint "Search [$1] ignoring file [$0\$2]"
+  FindNext $1 $2
+  StrCmp $2 "" RemoveSymlinks-exit
+  goto RemoveSymlinks-loop
+RemoveSymlinks-directory:
+  ; DetailPrint "Search [$1] found directory [$0\$2]"
+  Push $0
+  Push $1
+  Push $0\$2
+  Call un.RemoveSymlinks
+  Pop $1
+  Pop $0
+  ; DetailPrint "Search [$1] restored for [$0]"
+  FindNext $1 $2
+  goto RemoveSymlinks-loop
+RemoveSymlinks-delete:
+  ; DetailPrint "Deleting symlink [$0]"
+  SetFileAttributes "$0" "NORMAL"
+  System::Call "kernel32::RemoveDirectoryW(w `$0`) i.n"
+RemoveSymlinks-exit:
+  ; DetailPrint "Search [$1] closed"
+ FindClose $1
 FunctionEnd
 ;eof

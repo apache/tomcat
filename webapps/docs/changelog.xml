@@ -105,6 +105,11 @@
         during the build process from <code>/usr/share/java</code> to
         <code>${user.home}/temp</code>. Patch provided by Ahmed Hosni. (markt)
       </fix>
+      <fix>
+        <bug>59031</bug>: When using the Windows uninstaller, do not remove the
+        contents of any directories that have been symlinked into the Tomcat
+        directory structure. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
