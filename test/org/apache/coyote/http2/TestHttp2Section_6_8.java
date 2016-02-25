@@ -30,7 +30,11 @@ import org.apache.catalina.connector.Connector;
  */
 public class TestHttp2Section_6_8 extends Http2TestBase {
 
+    private static final boolean RELAX_TIMING = Boolean.getBoolean("tomcat.test.relaxTiming");
+
     private static final long PNG_ACK_DELAY_MS = 2000;
+    // On slow systems (Gump) may need to be higher
+    private static final long TIMING_MARGIN_MS = RELAX_TIMING ? 1000 : 200;
 
     @Test
     public void testGoawayIgnoreNewStreams() throws Exception {
@@ -51,7 +55,7 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
         sendClientPreface();
         validateHttp2InitialResponse();
 
-        Thread.sleep(PNG_ACK_DELAY_MS + 500);
+        Thread.sleep(PNG_ACK_DELAY_MS + TIMING_MARGIN_MS);
 
         getTomcatInstance().getConnector().pause();
 
@@ -65,7 +69,7 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
         // Should be processed
         sendSimpleGetRequest(3);
 
-        Thread.sleep(PNG_ACK_DELAY_MS + 500);
+        Thread.sleep(PNG_ACK_DELAY_MS + TIMING_MARGIN_MS);
 
         // Should be ignored
         sendSimpleGetRequest(5);
