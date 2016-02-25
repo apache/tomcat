@@ -2258,7 +2258,7 @@ skip.installer property in build.properties" />
     </signcode>
   </target>
 
-  <target name="-installer" description="Builds Windows installer"
+  <target name="-installer" description="Builds the installer executable"
       unless="skip.installer" depends="-installer-sign-uninstaller">
     <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
       <arg value="/DNSISDIR=${nsis.home}" />
@@ -2275,7 +2275,8 @@ skip.installer property in build.properties" />
     <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe" />
   </target>
 
-  <target name="installer-sign" depends="-installer" if="${do.codesigning}" >
+  <target name="installer-sign" description="Builds and signs the Windows installer"
+      depends="-installer" if="${do.codesigning}" >
     <taskdef name="signcode"
         classname="org.apache.tomcat.buildutil.SignCode"
         classpath="${tomcat.classes}" />
