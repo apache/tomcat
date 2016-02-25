@@ -51,7 +51,7 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
         sendClientPreface();
         validateHttp2InitialResponse();
 
-        Thread.sleep(PNG_ACK_DELAY_MS + 200);
+        Thread.sleep(PNG_ACK_DELAY_MS + 500);
 
         getTomcatInstance().getConnector().pause();
 
@@ -65,7 +65,7 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
         // Should be processed
         sendSimpleGetRequest(3);
 
-        Thread.sleep(PNG_ACK_DELAY_MS + 200);
+        Thread.sleep(PNG_ACK_DELAY_MS + 500);
 
         // Should be ignored
         sendSimpleGetRequest(5);
