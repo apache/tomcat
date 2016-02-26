@@ -116,6 +116,11 @@
         Refactor JAR scanning to reduce memory footprint. (markt)
       </fix>
       <fix>
+        <bug>59043</bug>: Avoid warning while expiring sessions associated with
+        a single sign on if <code>HttpServletRequest.logout()</code> is used.
+        (markt)
+      </fix>
+      <fix>
         <bug>59054</bug>: Ensure that using the
         <code>CrawlerSessionManagerValve</code> in a distributed environment
         does not trigger an error when the Valve registers itself in the
