@@ -194,17 +194,9 @@ public class DefaultServlet extends HttpServlet {
     protected boolean readOnly = true;
 
     /**
-     * Should be serve precompressed versions of files (gzip, brotli etc). By default, it's set to false.
-     */
-    protected boolean precompressed = false;
-
-    /**
      * List of compression formats to serve and their preference order.
      */
-    protected CompressionFormat[] compressionFormats = new CompressionFormat[] {
-            new CompressionFormat(".br", "br"),
-            new CompressionFormat(".gz", "gzip")
-    };
+    protected CompressionFormat[] compressionFormats;
 
     /**
      * The output buffer size to use when serving resources.
@@ -289,14 +281,8 @@ public class DefaultServlet extends HttpServlet {
         if (getServletConfig().getInitParameter("readonly") != null)
             readOnly = Boolean.parseBoolean(getServletConfig().getInitParameter("readonly"));
 
-        if (getServletConfig().getInitParameter("precompressed") != null)
-            precompressed = Boolean.parseBoolean(getServletConfig().getInitParameter("precompressed"));
-        else if (getServletConfig().getInitParameter("gzip") != null) {
-            precompressed = Boolean.parseBoolean(getServletConfig().getInitParameter("gzip"));
-            if (precompressed) {
-                compressionFormats = new CompressionFormat[] {new CompressionFormat(".gz", "gzip")};
-            }
-        }
+        compressionFormats = parseCompressionFormats(getServletConfig().getInitParameter("precompressed"),
+                getServletConfig().getInitParameter("gzip"));
 
         if (getServletConfig().getInitParameter("sendfileSize") != null)
             sendfileSize =
@@ -334,6 +320,27 @@ public class DefaultServlet extends HttpServlet {
         if (getServletConfig().getInitParameter("showServerInfo") != null) {
             showServerInfo = Boolean.parseBoolean(getServletConfig().getInitParameter("showServerInfo"));
         }
+    }
+
+    private CompressionFormat[] parseCompressionFormats(String precompressed, String gzip) {
+        List<CompressionFormat> ret = new ArrayList<>();
+        if (precompressed != null && precompressed.indexOf('=') > 0) {
+            for (String pair : precompressed.split(",")) {
+                String[] setting = pair.split("=");
+                String encoding = setting[0];
+                String extension = setting[1];
+                ret.add(new CompressionFormat(extension, encoding));
+            }
+        } else if (precompressed != null) {
+            if (Boolean.parseBoolean(precompressed)) {
+                ret.add(new CompressionFormat(".br", "br"));
+                ret.add(new CompressionFormat(".gz", "gzip"));
+            }
+        } else if (Boolean.parseBoolean(gzip)) {
+            // gzip handling is for backwards compatibility with Tomcat 8.x
+            ret.add(new CompressionFormat(".gz", "gzip"));
+        }
+        return ret.toArray(new CompressionFormat[ret.size()]);
     }
 
 
@@ -817,7 +824,7 @@ public class DefaultServlet extends HttpServlet {
 
         // Serve a precompressed version of the file if present
         boolean usingPrecompressedVersion = false;
-        if (precompressed && !included && resource.isFile() && !pathEndsWithCompressedExtension(path)) {
+        if (compressionFormats.length > 0 && !included && resource.isFile() && !pathEndsWithCompressedExtension(path)) {
             List<PrecompressedResource> precompressedResources = getAvailablePrecompressedResources(path);
             if (!precompressedResources.isEmpty()) {
                 Collection<String> varyHeaders = response.getHeaders("Vary");
@@ -1076,7 +1083,7 @@ public class DefaultServlet extends HttpServlet {
     }
 
     /**
-     * Check if the user agent supports any of the available precompressed resources encoding.
+     * Match the client preferred encoding formts to the available precompressed resources.
      *
      * @param request   The servlet request we are processing
      * @param precompressedResources   List of available precompressed resources.
@@ -1084,15 +1091,50 @@ public class DefaultServlet extends HttpServlet {
      */
     private PrecompressedResource getBestPrecompressedResource(HttpServletRequest request, List<PrecompressedResource> precompressedResources) {
         Enumeration<String> headers = request.getHeaders("Accept-Encoding");
+        PrecompressedResource bestResource = null;
+        double bestResourceQuality = 0;
         while (headers.hasMoreElements()) {
             String header = headers.nextElement();
-            for (PrecompressedResource resource : precompressedResources) {
-                if (header.indexOf(resource.format.encoding) != -1) {
-                    return resource;
+            for (String preference : header.split(",")) {
+                if (bestResourceQuality >= 1) {
+                    return bestResource;
+                }
+                double quality = 1;
+                int qualityIdx = preference.indexOf(';');
+                if (qualityIdx > 0) {
+                    int equalsIdx = preference.indexOf('=', qualityIdx + 1);
+                    if (equalsIdx == -1) {
+                        continue;
+                    }
+                    quality = Double.parseDouble(preference.substring(equalsIdx + 1).trim());
+                }
+                if (quality > bestResourceQuality) {
+                    String encoding = preference;
+                    if (qualityIdx > 0) {
+                        encoding = encoding.substring(0, qualityIdx);
+                    }
+                    encoding = encoding.trim();
+                    if ("identity".equals(encoding)) {
+                        bestResource = null;
+                        bestResourceQuality = quality;
+                        continue;
+                    }
+                    if ("*".equals(encoding)) {
+                        bestResource = precompressedResources.get(0);
+                        bestResourceQuality = quality;
+                        continue;
+                    }
+                    for (PrecompressedResource resource : precompressedResources) {
+                        if (encoding.equals(resource.format.encoding)) {
+                            bestResource = resource;
+                            bestResourceQuality = quality;
+                            break;
+                        }
+                    }
                 }
             }
         }
-        return null;
+        return bestResource;
     }
 
     private void doDirectoryRedirect(HttpServletRequest request, HttpServletResponse response)

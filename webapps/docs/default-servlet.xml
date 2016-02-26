@@ -105,6 +105,11 @@ directory listings are disabled and debugging is turned off.
         extension will be accessible if requested directly so if the original
         resource is protected with a security constraint, the precompressed
         versions must be similarly protected.
+        <br />
+        It is also possible to configure the list of precompressed formats.
+        The syntax is comma separated list of
+        <code>[content-encoding]=[file-extension]</code> pairs. For example:
+        <code>br=.br,gzip=.gz,bzip2=.bz2</code>.
   </property>
   <property name="readmeFile">
         If a directory listing is presented, a readme file may also
