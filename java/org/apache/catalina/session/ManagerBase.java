@@ -423,7 +423,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     public int getMaxInactiveInterval() {
         Container container = getContainer();
         if (container instanceof Context) {
-            return ((Context) container).getSessionTimeout();
+            // This method returns seconds, the Context uses minutes
+            return ((Context) container).getSessionTimeout() * 60;
         }
         return -1;
     }
