@@ -111,6 +111,10 @@
         <bug>59014</bug>: Ensure that a WebSocket close message can be sent
         after a close message has been received. (markt)
       </fix>
+      <fix>
+        Correctly handle compression of partial messages when the final message
+        fragment has a zero length payload. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
