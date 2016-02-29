@@ -321,7 +321,8 @@ public class PerMessageDeflate implements Transformation {
                 // Control messages can appear in the middle of other messages
                 // and must not be compressed. Pass it straight through
                 allCompressedParts.add(uncompressedPart);
-            } else if (uncompressedPart.getPayload().limit() == 0) {
+            } else if (uncompressedPart.getPayload().limit() == 0 && uncompressedPart.isFin() &&
+                    deflater.getBytesRead() == 0) {
                 // Zero length messages can't be compressed so pass them
                 // straight through.
                 allCompressedParts.add(uncompressedPart);
