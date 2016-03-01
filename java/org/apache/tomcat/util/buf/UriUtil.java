@@ -71,7 +71,7 @@ public final class UriUtil {
 
 
     public static URL buildJarUrl(File jarFile, String entryPath) throws MalformedURLException {
-        return buildJarUrl(jarFile.toURI().toURL().toString(), entryPath);
+        return buildJarUrl(jarFile.toURI().toString(), entryPath);
     }
 
 
@@ -94,7 +94,7 @@ public final class UriUtil {
 
 
     public static URL buildJarSafeUrl(File file) throws MalformedURLException {
-        String safe = makeSafeForJarUrl(file.toURI().toURL().toString());
+        String safe = makeSafeForJarUrl(file.toURI().toString());
         return new URL(safe);
     }
 
