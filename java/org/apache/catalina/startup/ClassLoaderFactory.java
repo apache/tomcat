@@ -280,7 +280,7 @@ public final class ClassLoaderFactory {
      * org.apache.tomcat.util.buf.UriUtil but that class is not visible until
      * after the class loaders have been constructed.
      */
-    public static URL buildClassLoaderUrl(String urlString) throws MalformedURLException {
+    private static URL buildClassLoaderUrl(String urlString) throws MalformedURLException {
         // URLs passed to class loaders may point to directories that contain
         // JARs. If these URLs are used to construct URLs for resources in a JAR
         // the URL will be used as is. It is therefore necessary to ensure that
@@ -290,9 +290,9 @@ public final class ClassLoaderFactory {
     }
 
 
-    public static URL buildClassLoaderUrl(File file) throws MalformedURLException {
+    private static URL buildClassLoaderUrl(File file) throws MalformedURLException {
         // Could be a directory or a file
-        String fileUrlString = file.toURI().toURL().toString();
+        String fileUrlString = file.toURI().toString();
         fileUrlString = fileUrlString.replaceAll("!/", "%21/");
         return new URL(fileUrlString);
     }
