@@ -106,6 +106,9 @@ public final class UriUtil {
     private static String makeSafeForJarUrl(String input) {
         // Since "!/" has a special meaning in a JAR URL, make sure that the
         // sequence is properly escaped if present.
-        return input.replaceAll("!/", "%21/");
+        String tmp = input.replaceAll("!/", "%21/");
+        // Tomcat's custom jar:war: URL handling treats */ and ^/ as special
+        tmp = tmp.replaceAll("^/", "%5e/");
+        return tmp.replaceAll("\\*/", "%2a/");
     }
 }
