@@ -45,10 +45,10 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.URLEncoder;
-import org.apache.catalina.util.UriUtil;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.http.RequestUtil;
 
 public class RewriteValve extends ValveBase {
