@@ -107,6 +107,10 @@
         <bug>59001</bug>: Correctly handle the case when Tomcat is installed on
         a path where one of the segments ends in an exclamation mark. (markt)
       </fix>
+      <fix>
+        Expand the fix for <bug>59001</bug> to cover the special sequences used
+        in Tomcat&apos;s custom jar:war: URLs. (markt)
+      </fix>
       <update>
         Switch to the web application class loader to the
         <code>ParallelWebappClassLoader</code> by default. (markt)
