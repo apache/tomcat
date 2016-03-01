@@ -115,6 +115,12 @@
         Correctly handle compression of partial messages when the final message
         fragment has a zero length payload. (markt)
       </fix>
+      <add>
+        Extend the WebSocket programmatic echo endpoint provided in the examples
+        to handle binary messages and also partial messages. This aligns the
+        code with Tomcat 8 and makes it easier to run the Autobahn testsuite
+        against the WebSocket implementation. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
