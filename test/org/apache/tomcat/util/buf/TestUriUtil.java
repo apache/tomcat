@@ -18,6 +18,7 @@ package org.apache.tomcat.util.buf;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -57,5 +58,30 @@ public class TestUriUtil {
 
         index = result.indexOf("^/");
         Assert.assertEquals(result, -1, index);
+    }
+
+
+    // @Test /* Uncomment to test performance for different implementations. */
+    public void performanceTestBuildJarUrl() throws MalformedURLException {
+        File jarFile = new File("/patha/pathb^/pathc");
+
+        URL url = null;
+
+        int count = 1000000;
+
+        // Warm up
+        for (int i = 0; i < count / 10; i++) {
+            url = UriUtil.buildJarUrl(jarFile);
+        }
+
+        // Test
+        long start = System.nanoTime();
+        for (int i = 0; i < count / 10; i++) {
+            url = UriUtil.buildJarUrl(jarFile);
+        }
+        long duration = System.nanoTime() - start;
+
+        System.out.println("[" + count + "] iterations took [" +
+                duration + "] ns for [" + url + "]");
     }
 }

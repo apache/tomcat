@@ -19,11 +19,16 @@ package org.apache.tomcat.util.buf;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.regex.Pattern;
 
 /**
  * Utility class for working with URIs and URLs.
  */
 public final class UriUtil {
+
+    private static Pattern PATTERN_EXCLAMATION_MARK = Pattern.compile("!/");
+    private static Pattern PATTERN_CARET = Pattern.compile("\\^/");
+    private static Pattern PATTERN_ASTERISK = Pattern.compile("\\*/");
 
     private UriUtil() {
         // Utility class. Hide default constructor
@@ -100,15 +105,27 @@ public final class UriUtil {
 
 
     /*
+     * When testing on markt's desktop each iteration was taking ~1420ns when
+     * using String.replaceAll().
+     *
+     * Switching the implementation to use pre-compiled patterns and
+     * Pattern.matcher(input).replaceAll(replacement) reduced this by ~10%.
+     *
+     * Note: Given the very small absolute time of a single iteration, even for
+     *       a web application with 1000 JARs this is only going to add ~3ms.
+     *       It is therefore unlikely that further optimisation will be
+     *       necessary.
+     */
+    /*
      * Pulled out into a separate method in case we need to handle other unusual
      * sequences in the future.
      */
     private static String makeSafeForJarUrl(String input) {
         // Since "!/" has a special meaning in a JAR URL, make sure that the
         // sequence is properly escaped if present.
-        String tmp = input.replaceAll("!/", "%21/");
+        String tmp = PATTERN_EXCLAMATION_MARK.matcher(input).replaceAll("%21/");
         // Tomcat's custom jar:war: URL handling treats */ and ^/ as special
-        tmp = tmp.replaceAll("^/", "%5e/");
-        return tmp.replaceAll("\\*/", "%2a/");
+        tmp = PATTERN_CARET.matcher(tmp).replaceAll("%5e/");
+        return PATTERN_ASTERISK.matcher(tmp).replaceAll("%2a/");
     }
 }
