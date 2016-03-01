@@ -28,6 +28,7 @@ import java.util.jar.Manifest;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
+import org.apache.tomcat.util.buf.UriUtil;
 
 /**
  * Represents a {@link org.apache.catalina.WebResourceSet} based on a JAR file.
@@ -139,7 +140,7 @@ public class JarResourceSet extends AbstractArchiveResourceSet {
         }
 
         try {
-            setBaseUrl((new File(getBase())).toURI().toURL());
+            setBaseUrl(UriUtil.buildJarSafeUrl(new File(getBase())));
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(e);
         }

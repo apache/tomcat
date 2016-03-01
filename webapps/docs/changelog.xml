@@ -103,6 +103,10 @@
         modified Context configuration parameters and reduces (slightly) the
         memory footprint of a running Tomcat instance. (markt)
       </fix>
+      <fix>
+        <bug>59001</bug>: Correctly handle the case when Tomcat is installed on
+        a path where one of the segments ends in an exclamation mark. (markt)
+      </fix>
       <update>
         Switch to the web application class loader to the
         <code>ParallelWebappClassLoader</code> by default. (markt)
