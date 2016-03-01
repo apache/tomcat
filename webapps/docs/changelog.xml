@@ -129,6 +129,9 @@
       <fix>
         Add socket properties support to storeconfig. (remm)
       </fix>
+      <fix>
+        Fix incorrect parsing of the NE and NC flags in rewrite rules. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
