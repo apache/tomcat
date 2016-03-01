@@ -82,6 +82,7 @@ import org.apache.naming.resources.ResourceAttributes;
 import org.apache.tomcat.InstrumentableClassLoader;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.compat.JreVendor;
 import org.apache.tomcat.util.res.StringManager;
@@ -1501,8 +1502,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     if (jarEntry != null) {
                         try {
                             String jarFakeUrl = getURI(jarRealFiles[i]).toString();
-                            jarFakeUrl = "jar:" + jarFakeUrl + "!/" + name;
-                            result.add(new URL(jarFakeUrl));
+                            result.add(UriUtil.buildJarUrl(jarFakeUrl));
                         } catch (MalformedURLException e) {
                             // Ignore
                         }
@@ -3314,9 +3314,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         entry = new ResourceEntry();
                         try {
                             entry.codeBase = getURI(jarRealFiles[i]);
-                            String jarFakeUrl = entry.codeBase.toString();
-                            jarFakeUrl = "jar:" + jarFakeUrl + "!/" + path;
-                            entry.source = new URL(jarFakeUrl);
+                            entry.source = UriUtil.buildJarUrl(entry.codeBase.toString());
                             entry.lastModified = jarRealFiles[i].lastModified();
                         } catch (MalformedURLException e) {
                             return null;

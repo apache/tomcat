@@ -69,6 +69,14 @@
         accessible via JMX. Patch provided by  Huxing Zhang. (markt)
       </add>
       <fix>
+        <bug>59001</bug>: Correctly handle the case when Tomcat is installed on
+        a path where one of the segments ends in an exclamation mark. (markt)
+      </fix>
+      <fix>
+        Expand the fix for <bug>59001</bug> to cover the special sequences used
+        in Tomcat&apos;s custom jar:war: URLs. (markt)
+      </fix>
+      <fix>
         <bug>59043</bug>: Avoid warning while expiring sessions associated with
         a single sign on if <code>HttpServletRequest.logout()</code> is used.
         (markt)

@@ -35,6 +35,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.file.Matcher;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -254,7 +255,7 @@ public class StandardJarScanner implements JarScanner {
             if (urlStr.startsWith("file:") || urlStr.startsWith("jndi:") ||
                     urlStr.startsWith("http:") || urlStr.startsWith("https:")) {
                 if (urlStr.endsWith(Constants.JAR_EXT)) {
-                    URL jarURL = new URL("jar:" + urlStr + "!/");
+                    URL jarURL = UriUtil.buildJarUrl(urlStr);
                     callback.scan((JarURLConnection) jarURL.openConnection());
                 } else {
                     File f;
@@ -262,7 +263,7 @@ public class StandardJarScanner implements JarScanner {
                         f = new File(url.toURI());
                         if (f.isFile() && scanAllFiles) {
                             // Treat this file as a JAR
-                            URL jarURL = new URL("jar:" + urlStr + "!/");
+                            URL jarURL = UriUtil.buildJarUrl(f);
                             callback.scan((JarURLConnection) jarURL.openConnection());
                         } else if (f.isDirectory() && scanAllDirectories) {
                             File metainf = new File(f.getAbsoluteFile() +

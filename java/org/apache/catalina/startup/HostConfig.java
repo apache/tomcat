@@ -23,7 +23,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,6 +61,7 @@ import org.apache.catalina.util.IOTools;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
@@ -958,9 +958,8 @@ public class HostConfig
                         if (context == null) {
                             context = new FailedContext();
                         }
-                        context.setConfigFile(new URL("jar:" +
-                                war.toURI().toString() + "!/" +
-                                Constants.ApplicationContextXml));
+                        context.setConfigFile(
+                                UriUtil.buildJarUrl(war, Constants.ApplicationContextXml));
                     }
                 }
             } else if (!deployXML && xmlInWar) {
