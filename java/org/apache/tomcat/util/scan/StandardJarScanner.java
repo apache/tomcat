@@ -36,6 +36,7 @@ import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -317,7 +318,7 @@ public class StandardJarScanner implements JarScanner {
             String urlStr = url.toString();
             if (urlStr.startsWith("file:") || urlStr.startsWith("http:") || urlStr.startsWith("https:")) {
                 if (urlStr.endsWith(Constants.JAR_EXT)) {
-                    URL jarURL = new URL("jar:" + urlStr + "!/");
+                    URL jarURL = UriUtil.buildJarUrl(urlStr);
                     callback.scan((JarURLConnection) jarURL.openConnection(),
                             webappPath, isWebapp);
                 } else {
@@ -326,7 +327,7 @@ public class StandardJarScanner implements JarScanner {
                         f = new File(url.toURI());
                         if (f.isFile() && isScanAllFiles()) {
                             // Treat this file as a JAR
-                            URL jarURL = new URL("jar:" + urlStr + "!/");
+                            URL jarURL = UriUtil.buildJarUrl(f);
                             callback.scan(
                                     (JarURLConnection) jarURL.openConnection(),
                                     webappPath, isWebapp);

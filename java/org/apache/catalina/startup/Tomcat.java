@@ -61,6 +61,7 @@ import org.apache.catalina.core.StandardService;
 import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
+import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 
 // TODO: lazy init for the temp dir - only when a JSP is compiled or
@@ -1203,8 +1204,7 @@ public class Tomcat {
         try (JarFile jar = new JarFile(docBase)) {
             JarEntry entry = jar.getJarEntry(Constants.ApplicationContextXml);
             if (entry != null) {
-                result = new URL("jar:" + docBase.toURI().toString() + "!/"
-                        + Constants.ApplicationContextXml);
+                result = UriUtil.buildJarUrl(docBase, Constants.ApplicationContextXml);
             }
         } catch (IOException e) {
             Logger.getLogger(getLoggerName(getHost(), contextName)).log(Level.WARNING,

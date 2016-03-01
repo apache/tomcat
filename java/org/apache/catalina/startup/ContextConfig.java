@@ -78,6 +78,7 @@ import org.apache.tomcat.util.bcel.classfile.ClassParser;
 import org.apache.tomcat.util.bcel.classfile.ElementValue;
 import org.apache.tomcat.util.bcel.classfile.ElementValuePair;
 import org.apache.tomcat.util.bcel.classfile.JavaClass;
+import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.descriptor.XmlErrorHandler;
 import org.apache.tomcat.util.descriptor.web.ContextEjb;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
@@ -608,7 +609,7 @@ public class ContextConfig implements LifecycleListener {
         boolean docBaseInAppBase = docBase.startsWith(appBase.getPath() + File.separatorChar);
 
         if (docBase.toLowerCase(Locale.ENGLISH).endsWith(".war") && !file.isDirectory()) {
-            URL war = new URL("jar:" + (new File(docBase)).toURI().toURL() + "!/");
+            URL war = UriUtil.buildJarUrl(new File(docBase));
             if (unpackWARs) {
                 docBase = ExpandWar.expand(host, war, pathName);
                 file = new File(docBase);
@@ -624,7 +625,7 @@ public class ContextConfig implements LifecycleListener {
             File warFile = new File(docBase + ".war");
             URL war = null;
             if (warFile.exists() && docBaseInAppBase) {
-                war = new URL("jar:" + warFile.toURI().toURL() + "!/");
+                war = UriUtil.buildJarUrl(warFile);
             }
             if (docDir.exists()) {
                 if (war != null && unpackWARs) {

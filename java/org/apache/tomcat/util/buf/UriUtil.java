@@ -16,6 +16,10 @@
  */
 package org.apache.tomcat.util.buf;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
  * Utility class for working with URIs and URLs.
  */
@@ -58,5 +62,50 @@ public final class UriUtil {
             }
         }
         return false;
+    }
+
+
+    public static URL buildJarUrl(File jarFile) throws MalformedURLException {
+        return buildJarUrl(jarFile, null);
+    }
+
+
+    public static URL buildJarUrl(File jarFile, String entryPath) throws MalformedURLException {
+        return buildJarUrl(jarFile.toURI().toURL().toString(), entryPath);
+    }
+
+
+    public static URL buildJarUrl(String fileUrlString) throws MalformedURLException {
+        return buildJarUrl(fileUrlString, null);
+    }
+
+
+    public static URL buildJarUrl(String fileUrlString, String entryPath) throws MalformedURLException {
+        String safeString = makeSafeForJarUrl(fileUrlString);
+        StringBuilder sb = new StringBuilder();
+        sb.append("jar:");
+        sb.append(safeString);
+        sb.append("!/");
+        if (entryPath != null) {
+            sb.append(makeSafeForJarUrl(entryPath));
+        }
+        return new URL(sb.toString());
+    }
+
+
+    public static URL buildJarSafeUrl(File file) throws MalformedURLException {
+        String safe = makeSafeForJarUrl(file.toURI().toURL().toString());
+        return new URL(safe);
+    }
+
+
+    /*
+     * Pulled out into a separate method in case we need to handle other unusual
+     * sequences in the future.
+     */
+    private static String makeSafeForJarUrl(String input) {
+        // Since "!/" has a special meaning in a JAR URL, make sure that the
+        // sequence is properly escaped if present.
+        return input.replaceAll("!/", "%21/");
     }
 }
