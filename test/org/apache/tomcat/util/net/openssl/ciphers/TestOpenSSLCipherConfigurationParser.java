@@ -26,29 +26,22 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testDEFAULT() throws Exception {
-        // EXPORT was removed from DEFAULT in 1.1.0 but we prefer the old
-        // behaviour
-        // DES, RC2 and RC4 were removed from default in 1.1.0-dev
+        // RC4 was removed from default in 1.1.0-dev
         if (TesterOpenSSL.VERSION < 10100) {
-            testSpecification("DEFAULT:!EXPORT:!DES:!RC2:!RC4");
+            testSpecification("DEFAULT:!RC4");
         } else {
-            testSpecification("DEFAULT:!EXPORT");
+            testSpecification("DEFAULT");
         }
     }
 
 
     @Test
     public void testCOMPLEMENTOFDEFAULT() throws Exception {
-        // EXPORT was removed from DEFAULT in 1.1.0 but we prefer the old
-        // behaviour
-        // DES, RC2 and RC4 were removed from default in 1.1.0-dev
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 excludes aNULL unless explicitly enabled
-            testSpecification("COMPLEMENTOFDEFAULT:EXPORT:aNULL:DES:RC2:RC4");
-        } else if (TesterOpenSSL.VERSION < 10100) {
-            testSpecification("COMPLEMENTOFDEFAULT:EXPORT:aNULL:DES:RC2:RC4");
+        // NULL and RC4 were removed from default in 1.1.0-dev
+        if (TesterOpenSSL.VERSION < 10100) {
+            testSpecification("COMPLEMENTOFDEFAULT:RC4:aNULL");
         } else {
-            testSpecification("COMPLEMENTOFDEFAULT:EXPORT");
+            testSpecification("COMPLEMENTOFDEFAULT");
         }
     }
 
