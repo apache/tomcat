@@ -29,11 +29,7 @@ public class TestOpenSSLCipherConfigurationParser {
         // EXPORT was removed from DEFAULT in 1.1.0 but we prefer the old
         // behaviour
         // DES, RC2 and RC4 were removed from default in 1.1.0-dev
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 excludes EC ciphers unless explicitly enabled
-            // (using aRSA:!SSLv2:!eNULL as an EC alias isn't available)
-            testSpecification("DEFAULT:!EXPORT:aRSA:!SSLv2:!eNULL:!DES:!RC2:!RC4");
-        } else if (TesterOpenSSL.VERSION < 10100) {
+        if (TesterOpenSSL.VERSION < 10100) {
             testSpecification("DEFAULT:!EXPORT:!DES:!RC2:!RC4");
         } else {
             testSpecification("DEFAULT:!EXPORT");
@@ -59,29 +55,13 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testALL() throws Exception {
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 excludes aNULL unless explicitly enabled whereas
-            // later versions include it.
-            // OpenSSL 0.9.8 excludes EC ciphers unless explicitly enabled
-            // (using aRSA:kECDHr as an EC alias isn't available)
-            testSpecification("ALL:aNULL:aRSA:kECDHr");
-        } else {
-            testSpecification("ALL");
-        }
+        testSpecification("ALL");
     }
 
 
     @Test
     public void testCOMPLEMENTOFALL() throws Exception {
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 excludes aNULL unless explicitly enabled whereas
-            // later versions include it.
-            // OpenSSL 0.9.8 excludes EC ciphers unless explicitly enabled
-            // (using aRSA:kECDHr as an EC alias isn't available)
-            testSpecification("COMPLEMENTOFALL:!aNULL:!aRSA:!kECDHr");
-        } else {
-            testSpecification("COMPLEMENTOFALL");
-        }
+        testSpecification("COMPLEMENTOFALL");
     }
 
 
@@ -93,56 +73,19 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testeNULL() throws Exception {
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 excludes aNULL unless explicitly enabled
-            // OpenSSL 0.9.8 excludes EC ciphers unless explicitly enabled
-            // (using aRSA as an EC alias isn't available)
-            testSpecification("eNULL:eNULL+aNULL:eNULL+aRSA");
-        } else {
-            testSpecification("eNULL");
-        }
+        testSpecification("eNULL");
     }
 
 
     @Test
     public void testHIGH() throws Exception {
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 excludes aNULL unless explicitly enabled
-            // OpenSSL 0.9.8 describes the following ciphers as HIGH whereas
-            // later versions use MEDIUM
-            //   TLS_ECDH_anon_WITH_RC4_128_SHA (AECDH-RC4-SHA)
-            //   TLS_ECDHE_RSA_WITH_RC4_128_SHA (ECDHE-RSA-RC4-SHA)
-            //   TLS_ECDH_RSA_WITH_RC4_128_SHA  (ECDH-RSA-RC4-SHA)
-            //   TLS_ECDHE_RSA_WITH_NULL_SHA    (ECDHE-RSA-NULL-SHA)
-            //   TLS_ECDH_RSA_WITH_NULL_SHA     (ECDH-RSA-NULL-SHA)
-            //
-            // OpenSSL 0.9.8 describes TLS_ECDH_anon_WITH_NULL_SHA
-            // (AECDH-NULL-SHA) as HIGH whereas later versions use STRONG_NONE
-            // OpenSSL 0.9.8 excludes EC ciphers unless explicitly enabled
-            // (using aRSA as an EC alias isn't available)
-            testSpecification("HIGH:HIGH+aNULL:HIGH+aRSA:" +
-                    "!AECDH-RC4-SHA:!ECDHE-RSA-RC4-SHA:!ECDH-RSA-RC4-SHA:!ECDHE-RSA-NULL-SHA:!ECDH-RSA-NULL-SHA:" +
-                    "!AECDH-NULL-SHA");
-        } else {
-            testSpecification("HIGH");
-        }
+        testSpecification("HIGH");
     }
 
 
     @Test
     public void testMEDIUM() throws Exception {
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 describes the following ciphers as HIGH whereas
-            // later versions use MEDIUM
-            //   TLS_ECDH_anon_WITH_RC4_128_SHA (AECDH-RC4-SHA)
-            //   TLS_ECDHE_RSA_WITH_RC4_128_SHA (ECDHE-RSA-RC4-SHA)
-            //   TLS_ECDH_RSA_WITH_RC4_128_SHA  (ECDH-RSA-RC4-SHA)
-            //   TLS_ECDHE_RSA_WITH_NULL_SHA    (ECDHE-RSA-NULL-SHA)
-            //   TLS_ECDH_RSA_WITH_NULL_SHA     (ECDH-RSA-NULL-SHA)
-            testSpecification("MEDIUM:AECDH-RC4-SHA:ECDHE-RSA-RC4-SHA:ECDH-RSA-RC4-SHA:ECDHE-RSA-NULL-SHA:ECDH-RSA-NULL-SHA");
-        } else {
-            testSpecification("MEDIUM");
-        }
+        testSpecification("MEDIUM");
     }
 
 
@@ -172,12 +115,7 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testaRSA() throws Exception {
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 treats kECDHr as aRSA
-            testSpecification("aRSA:kECDHr");
-        } else {
-            testSpecification("aRSA");
-        }
+        testSpecification("aRSA");
     }
 
 
@@ -204,10 +142,7 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testEDH() throws Exception {
-        // This alias was introduced in 1.0.0
-        if (TesterOpenSSL.VERSION >= 10000) {
-            testSpecification("EDH");
-        }
+        testSpecification("EDH");
     }
 
 
@@ -240,10 +175,7 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testkECDHr() throws Exception {
-        // This alias was introduced in 1.0.0
-        if (TesterOpenSSL.VERSION >= 10000) {
-            testSpecification("kECDHr");
-        }
+        testSpecification("kECDHr");
     }
 
 
@@ -255,28 +187,19 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testkECDH() throws Exception {
-        // This alias was introduced in 1.0.0
-        if (TesterOpenSSL.VERSION >= 10000) {
-            testSpecification("kECDH");
-        }
+        testSpecification("kECDH");
     }
 
 
     @Test
     public void testkEECDH() throws Exception {
-     // This alias was introduced in 1.0.0
-        if (TesterOpenSSL.VERSION >= 10000) {
-            testSpecification("kEECDH");
-        }
+        testSpecification("kEECDH");
     }
 
 
     @Test
     public void testECDH() throws Exception {
-        // This alias was introduced in 1.0.0
-        if (TesterOpenSSL.VERSION >= 10000) {
-            testSpecification("ECDH");
-        }
+        testSpecification("ECDH");
     }
 
 
@@ -301,10 +224,7 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testAECDH() throws Exception {
-        // This alias was introduced in 1.0.0
-        if (TesterOpenSSL.VERSION >= 10000) {
-            testSpecification("AECDH");
-        }
+        testSpecification("AECDH");
     }
 
 
@@ -322,10 +242,7 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testaECDH() throws Exception {
-        // This alias was introduced in 1.0.0
-        if (TesterOpenSSL.VERSION >= 10000) {
-            testSpecification("aECDH");
-        }
+        testSpecification("aECDH");
     }
 
 
@@ -373,14 +290,7 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testTLSv1() throws Exception {
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 excludes aNULL unless explicitly enabled
-            // OpenSSL 0.9.8 excludes EC ciphers unless explicitly enabled
-            // (using aRSA as an EC alias isn't available)
-            testSpecification("TLSv1:TLSv1+aNULL:TLSv1+aRSA");
-        } else {
-            testSpecification("TLSv1");
-        }
+        testSpecification("TLSv1");
     }
 
 
@@ -392,14 +302,7 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testSSLv3() throws Exception {
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 excludes aNULL unless explicitly enabled
-            // OpenSSL 0.9.8 excludes EC ciphers unless explicitly enabled
-            // (using aRSA as an EC alias isn't available)
-            testSpecification("SSLv3:SSLv3+aNULL:SSLv3+aRSA");
-        } else {
-            testSpecification("SSLv3");
-        }
+        testSpecification("SSLv3");
     }
 
 
@@ -417,32 +320,19 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testAES128() throws Exception {
-        // This alias was introduced in 1.0.0
-        if (TesterOpenSSL.VERSION >= 10000) {
-            testSpecification("AES128");
-        }
+        testSpecification("AES128");
     }
 
 
     @Test
     public void testAES256() throws Exception {
-        // This alias was introduced in 1.0.0
-        if (TesterOpenSSL.VERSION >= 10000) {
-            testSpecification("AES256");
-        }
+        testSpecification("AES256");
     }
 
 
     @Test
     public void testAES() throws Exception {
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 excludes aNULL unless explicitly enabled
-            // OpenSSL 0.9.8 excludes EC ciphers unless explicitly enabled
-            // (using aRSA as an EC alias isn't available)
-            testSpecification("AES:AES+aNULL:AES+aRSA");
-        } else {
-            testSpecification("AES");
-        }
+        testSpecification("AES");
     }
 
 
@@ -472,14 +362,7 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void test3DES() throws Exception {
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 excludes aNULL unless explicitly enabled
-            // OpenSSL 0.9.8 excludes EC ciphers unless explicitly enabled
-            // (using aRSA as an EC alias isn't available)
-            testSpecification("3DES:3DES+aNULL:3DES+aRSA");
-        } else {
-            testSpecification("3DES");
-        }
+        testSpecification("3DES");
     }
 
 
@@ -491,12 +374,7 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testRC4() throws Exception {
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 excludes aNULL unless explicitly enabled
-            testSpecification("RC4:RC4+aNULL:RC4+aRSA");
-        } else {
-            testSpecification("RC4");
-        }
+        testSpecification("RC4");
     }
 
 
@@ -526,27 +404,13 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testSHA1() throws Exception {
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 excludes aNULL unless explicitly enabled
-            // OpenSSL 0.9.8 excludes EC ciphers unless explicitly enabled
-            // (using aRSA as an EC alias isn't available)
-            testSpecification("SHA1:SHA1+aNULL:SHA1+aRSA");
-        } else {
-            testSpecification("SHA1");
-        }
+        testSpecification("SHA1");
     }
 
 
     @Test
     public void testSHA() throws Exception {
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 excludes aNULL unless explicitly enabled
-            // OpenSSL 0.9.8 excludes EC ciphers unless explicitly enabled
-            // (using aRSA as an EC alias isn't available)
-            testSpecification("SHA:SHA+aNULL:SHA+aRSA");
-        } else {
-            testSpecification("SHA");
-        }
+        testSpecification("SHA");
     }
 
 
@@ -617,25 +481,14 @@ public class TestOpenSSLCipherConfigurationParser {
         // Tomcat 8 default as of 2014-08-04
         // This gets an A- from https://www.ssllabs.com/ssltest with no FS for
         // a number of the reference browsers
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 excludes EC ciphers unless explicitly enabled
-            // (using aRSA:kECDHr as an EC alias isn't available)
-            testSpecification("HIGH:aRSA:kECDHr:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
-        } else {
-            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
-        }
+        testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
     }
 
 
     @Test
     public void testSpecification02() throws Exception {
         // Suggestion from dev list (s/ECDHE/kEECDH/, s/DHE/EDH/
-        if (TesterOpenSSL.VERSION < 10000) {
-            // OpenSSL 0.9.8 excludes EC ciphers unless explicitly enabled
-            // (using aRSA:kECDHr as an EC alias isn't available)
-        } else {
-            testSpecification("!aNULL:!eNULL:!EXPORT:!DSS:!DES:!SSLv2:kEECDH:ECDH:EDH:AES256-GCM-SHA384:AES128-GCM-SHA256:+RC4:HIGH:aRSA:kECDHr:MEDIUM");
-        }
+        testSpecification("!aNULL:!eNULL:!EXPORT:!DSS:!DES:!SSLv2:kEECDH:ECDH:EDH:AES256-GCM-SHA384:AES128-GCM-SHA256:+RC4:HIGH:aRSA:kECDHr:MEDIUM");
     }
 
 
@@ -643,9 +496,7 @@ public class TestOpenSSLCipherConfigurationParser {
     public void testSpecification03() throws Exception {
         // Reported as failing during 8.0.11 release vote by Ognjen Blagojevic
         // EDH was introduced in 1.0.0
-        if (TesterOpenSSL.VERSION >= 10000) {
-            testSpecification("EECDH+aRSA+SHA384:EECDH:EDH+aRSA:RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS");
-        }
+        testSpecification("EECDH+aRSA+SHA384:EECDH:EDH+aRSA:RC4:!aNULL:!eNULL:!LOW:!3DES:!MD5:!EXP:!PSK:!SRP:!DSS");
     }
 
     private void testSpecification(String specification) throws Exception {
