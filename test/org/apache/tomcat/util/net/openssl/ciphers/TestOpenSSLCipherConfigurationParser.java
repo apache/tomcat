@@ -660,9 +660,9 @@ public class TestOpenSSLCipherConfigurationParser {
 
         TesterOpenSSL.removeUnimplementedCiphersJsse(jsseCipherListFromParser);
 
-        // First check the lists have the same entries
-        Assert.assertEquals(jsseCipherListFromOpenSSL.size(), jsseCipherListFromParser.size());
-        Assert.assertTrue(jsseCipherListFromOpenSSL.containsAll(jsseCipherListFromParser));
+        // Check the lists have the same entries in the same order
+        Assert.assertEquals(jsseCipherListFromOpenSSL.toString(),
+                jsseCipherListFromParser.toString());
 
         // OpenSSL treats many ciphers as having equal preference. The order
         // returned depends on the order they are requested. The following code
