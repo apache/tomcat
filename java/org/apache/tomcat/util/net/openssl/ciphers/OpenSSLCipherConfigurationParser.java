@@ -565,10 +565,11 @@ public class OpenSSLCipherConfigurationParser {
         /* Everything else being equal, prefer ephemeral ECDH over other key exchange mechanisms */
         result.addAll(filterByKeyExchange(ciphers, Collections.singleton(KeyExchange.EECDH)));
         /* AES is our preferred symmetric cipher */
-        moveToStart(result, filterByEncryption(result, new HashSet<>(Arrays.asList(Encryption.AES128, Encryption.AES128GCM,
-                Encryption.AES256, Encryption.AES256GCM))));
-        result.addAll(filterByEncryption(ciphers, new HashSet<>(Arrays.asList(Encryption.AES128, Encryption.AES128GCM,
-                Encryption.AES256, Encryption.AES256GCM))));
+        Set<Encryption> aes = new HashSet<>(Arrays.asList(Encryption.AES128, Encryption.AES128CCM,
+                Encryption.AES128CCM8, Encryption.AES128GCM, Encryption.AES256,
+                Encryption.AES256CCM, Encryption.AES256CCM8, Encryption.AES256GCM));
+        moveToStart(result, filterByEncryption(result, aes));
+        result.addAll(filterByEncryption(ciphers, aes));
         /* Temporarily enable everything else for sorting */
         result.addAll(ciphers);
 
