@@ -140,6 +140,11 @@
       <fix>
         Fix incorrect parsing of the NE and NC flags in rewrite rules. (remm)
       </fix>
+      <fix>
+        <bug>59065</bug>: Correct the timing of the check for colons in paths
+        on non-Windows systems implemented in <code>catalina.sh</code> so it
+        works correctly with Cygwin. Patch provided by Ed Randall. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
