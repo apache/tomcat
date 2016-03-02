@@ -281,14 +281,12 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
-    @Ignore("Contrary to the docs, OpenSSL does not recognise kECDHE")
     public void testkECDHE() throws Exception {
         testSpecification("kECDHE");
     }
 
 
     @Test
-    @Ignore("Contrary to the docs, OpenSSL does not recognise ECDHE")
     public void testECDHE() throws Exception {
         testSpecification("ECDHE");
     }
