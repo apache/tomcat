@@ -76,4 +76,21 @@ public class TestOpenSSLCipherConfigurationParserOnly {
 
         Assert.assertEquals(expected, result);
     }
+
+    @Test
+    public void testCustomOrdering() throws Exception {
+        // https://bz.apache.org/bugzilla/show_bug.cgi?id=59081
+        LinkedHashSet<Cipher> result = OpenSSLCipherConfigurationParser.parse(
+                "ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-RSA-DES-CBC3-SHA:" +
+                "DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:DES-CBC3-SHA");
+        LinkedHashSet<Cipher> expected = new LinkedHashSet<>();
+        expected.add(Cipher.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384);
+        expected.add(Cipher.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA);
+        expected.add(Cipher.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA);
+        expected.add(Cipher.TLS_DHE_RSA_WITH_AES_256_CBC_SHA);
+        expected.add(Cipher.TLS_DHE_RSA_WITH_AES_128_CBC_SHA);
+        expected.add(Cipher.TLS_RSA_WITH_3DES_EDE_CBC_SHA);
+
+        Assert.assertEquals(expected.toString(), result.toString());
+    }
 }

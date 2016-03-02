@@ -70,8 +70,8 @@ public abstract class SSLUtilBase implements SSLUtil {
             // can be done at this point.
             enabled.addAll(configured);
         } else {
-            enabled.addAll(implemented);
-            enabled.retainAll(configured);
+            enabled.addAll(configured);
+            enabled.retainAll(implemented);
 
             if (enabled.isEmpty()) {
                 // Don't use the defaults in this case. They may be less secure

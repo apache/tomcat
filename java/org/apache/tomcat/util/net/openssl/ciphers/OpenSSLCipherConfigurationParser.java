@@ -695,7 +695,7 @@ public class OpenSSLCipherConfigurationParser {
             }
         }
         ciphers.removeAll(removedCiphers);
-        return defaultSort(ciphers);
+        return ciphers;
     }
 
     public static List<String> convertForJSSE(Collection<Cipher> ciphers) {

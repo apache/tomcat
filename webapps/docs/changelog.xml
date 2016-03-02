@@ -168,6 +168,10 @@
         Align cipher aliases for <code>kECDHE</code> and <code>ECDHE</code> with
         the current OpenSSL implementation. (markt)
       </fix>
+      <fix>
+        <bug>59081</bug>: Retain the user defined cipher order when defining
+        ciphers. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
