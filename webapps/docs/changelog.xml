@@ -164,6 +164,10 @@
         shutdown if the Poller experiences an error during the shutdown process.
         (markt)
       </fix>
+      <fix>
+        Align cipher aliases for <code>kECDHE</code> and <code>ECDHE</code> with
+        the current OpenSSL implementation. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
