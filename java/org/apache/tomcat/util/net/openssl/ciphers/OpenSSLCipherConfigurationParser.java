@@ -564,7 +564,7 @@ public class OpenSSLCipherConfigurationParser {
         final LinkedHashSet<Cipher> ecdh = new LinkedHashSet<>(ciphers.size());
 
         /* Everything else being equal, prefer ephemeral ECDH over other key exchange mechanisms */
-        ecdh.addAll(filterByKeyExchange(ciphers, new HashSet<>(Arrays.asList(KeyExchange.EECDH, KeyExchange.ECDHEPSK))));
+        ecdh.addAll(filterByKeyExchange(ciphers, Collections.singleton(KeyExchange.EECDH)));
 
         /* AES is our preferred symmetric cipher */
         Set<Encryption> aes = new HashSet<>(Arrays.asList(Encryption.AES128, Encryption.AES128CCM,
