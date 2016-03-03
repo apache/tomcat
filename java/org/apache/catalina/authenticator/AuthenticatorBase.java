@@ -459,7 +459,7 @@ public abstract class AuthenticatorBase extends ValveBase
                 String authContextID = serverAuthConfig.getAuthContextID(messageInfo);
                 serverAuthContext = serverAuthConfig.getAuthContext(authContextID, null, null);
             } catch (AuthException e) {
-                // TODO: i18n log this
+                log.warn(sm.getString("authenticator.jaspicServerAuthContextFail"), e);
                 response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 return;
             }
@@ -637,7 +637,7 @@ public abstract class AuthenticatorBase extends ValveBase
                 request.setRequest((HttpServletRequest) messageInfo.getRequestMessage());
                 response.setResponse((HttpServletResponse) messageInfo.getResponseMessage());
             } catch (AuthException e) {
-                // TODO Log this. Change the status code?
+                log.warn(sm.getString("authenticator.jaspicSecureResponseFail"), e);
             }
         }
     }
