@@ -1078,8 +1078,6 @@ public abstract class AuthenticatorBase extends ValveBase
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
-
-        // TODO: Handle JASPIC and parallel deployment
         ServletContext servletContext = context.getServletContext();
         jaspicAppContextID = servletContext.getVirtualServerName() + " " +
                 servletContext.getContextPath();

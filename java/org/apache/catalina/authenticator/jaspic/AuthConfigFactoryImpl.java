@@ -55,8 +55,6 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
     private final Map<String,RegistrationContextImpl> registrations = new ConcurrentHashMap<>();
 
 
-    // TODO: Handle parallel deployment. Can this be done if web application is
-    //       not aware it is being deployed in parallel?
     public AuthConfigFactoryImpl() {
         loadPersistentRegistrations();
     }

@@ -130,6 +130,20 @@
 
 </section>
 
+<section name="Dynamic configuration">
+
+  <p>JASPIC modules and configuration can be packaged within a WAR file with the
+  web application. The web application can then register the required JASPIC
+  configuration when it starts using the standard JASPIC APIs.</p>
+
+  <p>If parallel deployment is being used then dynamic configuration should not
+  be used. The JASPIC API assumes that a context path is unique for any given
+  host which is not the case when using parallel deployment. When using parallel
+  deployment, static JASPIC configuration should be used. This will require that
+  all versions of the application use the same JASPIC configuration.</p>
+
+</section>
+
 <section name="3rd party modules">
 
   <p>This is not an exhaustive list. The Tomcat community welcomes contributions
