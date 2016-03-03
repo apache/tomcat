@@ -491,7 +491,7 @@ public class OpenSSLCipherConfigurationParser {
         // Despite what the OpenSSL docs say, DEFAULT also excludes SSLv2
         addListAlias(DEFAULT, parse("ALL:!EXPORT:!eNULL:!aNULL:!SSLv2:!DES:!RC2:!RC4"));
         // COMPLEMENTOFDEFAULT is also not exactly as defined by the docs
-        Set<Cipher> complementOfDefault = filterByKeyExchange(all, new HashSet<>(Arrays.asList(KeyExchange.EDH,KeyExchange.EECDH)));
+        LinkedHashSet<Cipher> complementOfDefault = filterByKeyExchange(all, new HashSet<>(Arrays.asList(KeyExchange.EDH,KeyExchange.EECDH)));
         complementOfDefault = filterByAuthentication(complementOfDefault, Collections.singleton(Authentication.aNULL));
         complementOfDefault.removeAll(aliases.get(eNULL));
         complementOfDefault.addAll(aliases.get(Constants.SSL_PROTO_SSLv2));
@@ -499,6 +499,7 @@ public class OpenSSLCipherConfigurationParser {
         complementOfDefault.addAll(aliases.get(DES));
         complementOfDefault.addAll(aliases.get(RC2));
         complementOfDefault.addAll(aliases.get(RC4));
+        defaultSort(complementOfDefault);
         addListAlias(COMPLEMENTOFDEFAULT, complementOfDefault);
     }
 
@@ -610,11 +611,11 @@ public class OpenSSLCipherConfigurationParser {
         return filter(ciphers, protocol, null, null, null, null, null);
     }
 
-    static Set<Cipher> filterByKeyExchange(Set<Cipher> ciphers, Set<KeyExchange> kx) {
+    static LinkedHashSet<Cipher> filterByKeyExchange(Set<Cipher> ciphers, Set<KeyExchange> kx) {
         return filter(ciphers, null, kx, null, null, null, null);
     }
 
-    static Set<Cipher> filterByAuthentication(Set<Cipher> ciphers, Set<Authentication> au) {
+    static LinkedHashSet<Cipher> filterByAuthentication(Set<Cipher> ciphers, Set<Authentication> au) {
         return filter(ciphers, null, null, au, null, null, null);
     }
 
@@ -630,9 +631,9 @@ public class OpenSSLCipherConfigurationParser {
         return filter(ciphers, null, null, null, null, null, mac);
     }
 
-    static Set<Cipher> filter(Set<Cipher> ciphers, Set<Protocol> protocol, Set<KeyExchange> kx,
+    static LinkedHashSet<Cipher> filter(Set<Cipher> ciphers, Set<Protocol> protocol, Set<KeyExchange> kx,
             Set<Authentication> au, Set<Encryption> enc, Set<EncryptionLevel> level, Set<MessageDigest> mac) {
-        Set<Cipher> result = new LinkedHashSet<>(ciphers.size());
+        LinkedHashSet<Cipher> result = new LinkedHashSet<>(ciphers.size());
         for (Cipher cipher : ciphers) {
             if (protocol != null && protocol.contains(cipher.getProtocol())) {
                 result.add(cipher);
