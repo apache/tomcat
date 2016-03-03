@@ -560,17 +560,22 @@ public class OpenSSLCipherConfigurationParser {
      */
     static LinkedHashSet<Cipher> defaultSort(final LinkedHashSet<Cipher> ciphers) {
         final LinkedHashSet<Cipher> result = new LinkedHashSet<>(ciphers.size());
-        /* Now arrange all ciphers by preference: */
+        final LinkedHashSet<Cipher> ecdh = new LinkedHashSet<>(ciphers.size());
 
         /* Everything else being equal, prefer ephemeral ECDH over other key exchange mechanisms */
-        result.addAll(filterByKeyExchange(ciphers, Collections.singleton(KeyExchange.EECDH)));
+        ecdh.addAll(filterByKeyExchange(ciphers, Collections.singleton(KeyExchange.EECDH)));
+
         /* AES is our preferred symmetric cipher */
         Set<Encryption> aes = new HashSet<>(Arrays.asList(Encryption.AES128, Encryption.AES128CCM,
                 Encryption.AES128CCM8, Encryption.AES128GCM, Encryption.AES256,
                 Encryption.AES256CCM, Encryption.AES256CCM8, Encryption.AES256GCM));
-        moveToStart(result, filterByEncryption(result, aes));
+
+        /* Now arrange all ciphers by preference: */
+        result.addAll(filterByEncryption(ecdh, aes));
         result.addAll(filterByEncryption(ciphers, aes));
-        /* Temporarily enable everything else for sorting */
+
+        /* Add everything else */
+        result.addAll(ecdh);
         result.addAll(ciphers);
 
         /* Low priority for MD5 */
