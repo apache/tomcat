@@ -478,4 +478,67 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         }
 
     }
+
+
+    /**
+     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=59089
+     */
+    @Test
+    public void testBug59089() {
+
+        Bug59089Client client = new Bug59089Client();
+
+        client.doRequest();
+        assertTrue(client.isResponse200());
+        assertTrue(client.isResponseBodyOK());
+    }
+
+
+    /**
+     * Bug 59089 test client.
+     */
+    private class Bug59089Client extends SimpleHttpClient {
+
+        private Exception doRequest() {
+
+            Tomcat tomcat = getTomcatInstance();
+
+            Context root = tomcat.addContext("", TEMP_DIR);
+            Tomcat.addServlet(root, "Bug59089", new TesterServlet());
+            root.addServletMapping("/test", "Bug59089");
+
+            try {
+                tomcat.start();
+                setPort(tomcat.getConnector().getLocalPort());
+
+                // Open connection
+                connect();
+
+                String[] request = new String[1];
+                request[0] = "GET http://localhost:8080/test HTTP/1.1" + CRLF +
+                        "X-Header: Ignore" + CRLF +
+                        "X-Header" + (char) 130 + ": Broken" + CRLF + CRLF;
+
+                setRequest(request);
+                processRequest(); // blocks until response has been read
+
+                // Close the connection
+                disconnect();
+            } catch (Exception e) {
+                return e;
+            }
+            return null;
+        }
+
+        @Override
+        public boolean isResponseBodyOK() {
+            if (getResponseBody() == null) {
+                return false;
+            }
+            if (!getResponseBody().contains("OK")) {
+                return false;
+            }
+            return true;
+        }
+    }
 }
