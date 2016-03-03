@@ -84,44 +84,6 @@ public class TestOpenSSLCipherConfigurationParserOnly {
     }
 
     @Test
-    public void testDefaultSort04() throws Exception {
-        // Reproducing a failure observed on Gump with OpenSSL 1.1.x
-        // Note: Failure seems to depend on the order ciphers are added to the
-        //       input list.
-
-        LinkedHashSet<Cipher> input = new LinkedHashSet<>();
-        input.add(Cipher.TLS_DH_anon_WITH_3DES_EDE_CBC_SHA);
-        input.add(Cipher.TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA);
-        input.add(Cipher.TLS_PSK_WITH_RC4_128_SHA);
-        input.add(Cipher.TLS_RSA_WITH_RC4_128_MD5);
-        input.add(Cipher.TLS_RSA_WITH_RC4_128_SHA);
-        input.add(Cipher.TLS_DH_anon_WITH_RC4_128_MD5);
-        input.add(Cipher.TLS_ECDH_anon_WITH_RC4_128_SHA);
-        input.add(Cipher.TLS_DHE_PSK_WITH_RC4_128_SHA);
-        input.add(Cipher.TLS_RSA_PSK_WITH_RC4_128_SHA);
-        input.add(Cipher.TLS_ECDHE_PSK_WITH_RC4_128_SHA);
-        input.add(Cipher.TLS_ECDHE_ECDSA_WITH_RC4_128_SHA);
-        input.add(Cipher.TLS_ECDHE_RSA_WITH_RC4_128_SHA);
-        LinkedHashSet<Cipher> result = OpenSSLCipherConfigurationParser.defaultSort(input);
-
-        LinkedHashSet<Cipher> expected = new LinkedHashSet<>();
-        expected.add(Cipher.TLS_ECDHE_RSA_WITH_RC4_128_SHA);
-        expected.add(Cipher.TLS_ECDHE_ECDSA_WITH_RC4_128_SHA);
-        expected.add(Cipher.TLS_ECDHE_PSK_WITH_RC4_128_SHA);
-        expected.add(Cipher.TLS_RSA_PSK_WITH_RC4_128_SHA);
-        expected.add(Cipher.TLS_DHE_PSK_WITH_RC4_128_SHA);
-        expected.add(Cipher.TLS_ECDH_anon_WITH_RC4_128_SHA);
-        expected.add(Cipher.TLS_DH_anon_WITH_RC4_128_MD5);
-        expected.add(Cipher.TLS_RSA_WITH_RC4_128_SHA);
-        expected.add(Cipher.TLS_RSA_WITH_RC4_128_MD5);
-        expected.add(Cipher.TLS_PSK_WITH_RC4_128_SHA);
-        expected.add(Cipher.TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA);
-        expected.add(Cipher.TLS_DH_anon_WITH_3DES_EDE_CBC_SHA);
-
-        Assert.assertEquals(expected.toString(), result.toString());
-    }
-
-    @Test
     public void testRename01() throws Exception {
         // EDH -> DHE
         LinkedHashSet<Cipher> result =
