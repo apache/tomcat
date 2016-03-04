@@ -150,6 +150,12 @@
         the appBase before trying to expand an external WAR file into it.
         (markt)
       </fix>
+      <fix>
+       <bug>59115</bug>: When using the Servlet 3.0 file upload, the submitted
+       file name may be provided as a token or a quoted-string. If a
+       quoted-string, unquote the string before returning it to the user.
+       (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
