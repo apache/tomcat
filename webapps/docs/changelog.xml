@@ -97,6 +97,11 @@
         <code>Manager.getMaxInactiveInterval()</code> method returned the
         current default session timeout in minutes rather than seconds. (markt)
       </fix>
+      <fix>
+        When a Host is configured with an appBase that does not exist, create
+        the appBase before trying to expand an external WAR file into it.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
