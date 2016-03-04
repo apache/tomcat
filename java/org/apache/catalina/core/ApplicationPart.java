@@ -155,7 +155,11 @@ public class ApplicationPart implements Part {
                 if (params.containsKey("filename")) {
                     fileName = params.get("filename");
                     if (fileName != null) {
-                        fileName = fileName.trim();
+                        // This is a token or a quoted-string. If it is a token,
+                        // there won't be any '\' characters. If it is a
+                        // quoted-string it can be dequoted by removing the '\'
+                        // characters.
+                        fileName = fileName.trim().replaceAll("\\", "");
                     } else {
                         // Even if there is no value, the parameter is present,
                         // so we return an empty file name rather than no file
