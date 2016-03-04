@@ -145,6 +145,11 @@
         on non-Windows systems implemented in <code>catalina.sh</code> so it
         works correctly with Cygwin. Patch provided by Ed Randall. (markt)
       </fix>
+      <fix>
+        When a Host is configured with an appBase that does not exist, create
+        the appBase before trying to expand an external WAR file into it.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
