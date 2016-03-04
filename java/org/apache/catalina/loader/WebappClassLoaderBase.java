@@ -1502,7 +1502,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     if (jarEntry != null) {
                         try {
                             String jarFakeUrl = getURI(jarRealFiles[i]).toString();
-                            result.add(UriUtil.buildJarUrl(jarFakeUrl));
+                            result.add(UriUtil.buildJarUrl(jarFakeUrl, name));
                         } catch (MalformedURLException e) {
                             // Ignore
                         }
@@ -3314,7 +3314,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         entry = new ResourceEntry();
                         try {
                             entry.codeBase = getURI(jarRealFiles[i]);
-                            entry.source = UriUtil.buildJarUrl(entry.codeBase.toString());
+                            entry.source = UriUtil.buildJarUrl(entry.codeBase.toString(), path);
                             entry.lastModified = jarRealFiles[i].lastModified();
                         } catch (MalformedURLException e) {
                             return null;
