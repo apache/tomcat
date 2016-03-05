@@ -229,12 +229,24 @@ public class HttpParser {
     }
 
     public static String unquote(String input) {
-        if (input == null || input.length() < 2 || input.charAt(0) != '"') {
+        if (input == null || input.length() < 2) {
             return input;
         }
 
+        int start;
+        int end;
+
+        // Skip surrounding quotes if there are any
+        if (input.charAt(0) == '"') {
+            start = 1;
+            end = input.length() - 1;
+        } else {
+            start = 0;
+            end = input.length();
+        }
+
         StringBuilder result = new StringBuilder();
-        for (int i = 1 ; i < (input.length() - 1); i++) {
+        for (int i = start ; i < end; i++) {
             char c = input.charAt(i);
             if (input.charAt(i) == '\\') {
                 i++;
