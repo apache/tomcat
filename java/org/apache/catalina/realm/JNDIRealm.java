@@ -655,7 +655,7 @@ public class JNDIRealm extends RealmBase {
     /**
      * How do we handle PartialResultExceptions?
      * True: ignore all PartialResultExceptions.
-     * @param adCompat <code>true</code> to ignore patial results
+     * @param adCompat <code>true</code> to ignore partial results
      */
     public void setAdCompat (boolean adCompat) {
         this.adCompat = adCompat;
