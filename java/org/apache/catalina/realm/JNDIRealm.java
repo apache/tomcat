@@ -1697,10 +1697,10 @@ public class JNDIRealm extends RealmBase {
                 else
                     return null;
             }
-    
+
             // Get result for the first entry found
             SearchResult result = results.next();
-    
+
             // Check no further entries were found
             try {
                 if (results.hasMore()) {
@@ -1712,32 +1712,32 @@ public class JNDIRealm extends RealmBase {
                 if (!adCompat)
                     throw ex;
             }
-    
+
             String dn = getDistinguishedName(context, userBase, result);
-    
+
             if (containerLog.isTraceEnabled())
                 containerLog.trace("  entry found for " + username + " with dn " + dn);
-    
+
             // Get the entry's attributes
             Attributes attrs = result.getAttributes();
             if (attrs == null)
                 return null;
-    
+
             // Retrieve value of userPassword
             String password = null;
             if (userPassword != null)
                 password = getAttributeValue(userPassword, attrs);
-    
+
             String userRoleAttrValue = null;
             if (userRoleAttribute != null) {
                 userRoleAttrValue = getAttributeValue(userRoleAttribute, attrs);
             }
-    
+
             // Retrieve values of userRoleName attribute
             ArrayList<String> roles = null;
             if (userRoleName != null)
                 roles = addAttributeValues(userRoleName, attrs, roles);
-    
+
             return new User(username, dn, password, roles, userRoleAttrValue);
         } finally {
             if (results != null) {
