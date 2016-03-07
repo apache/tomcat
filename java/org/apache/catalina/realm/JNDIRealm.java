@@ -1685,60 +1685,65 @@ public class JNDIRealm extends RealmBase {
         NamingEnumeration<SearchResult> results =
             context.search(userBase, filter, constraints);
 
-
-        // Fail if no entries found
         try {
-            if (results == null || !results.hasMore()) {
-                return null;
+            // Fail if no entries found
+            try {
+                if (results == null || !results.hasMore()) {
+                    return null;
+                }
+            } catch (PartialResultException ex) {
+                if (!adCompat)
+                    throw ex;
+                else
+                    return null;
             }
-        } catch (PartialResultException ex) {
-            if (!adCompat)
-                throw ex;
-            else
-                return null;
-        }
-
-        // Get result for the first entry found
-        SearchResult result = results.next();
-
-        // Check no further entries were found
-        try {
-            if (results.hasMore()) {
-                if(containerLog.isInfoEnabled())
-                    containerLog.info("username " + username + " has multiple entries");
-                return null;
+    
+            // Get result for the first entry found
+            SearchResult result = results.next();
+    
+            // Check no further entries were found
+            try {
+                if (results.hasMore()) {
+                    if(containerLog.isInfoEnabled())
+                        containerLog.info("username " + username + " has multiple entries");
+                    return null;
+                }
+            } catch (PartialResultException ex) {
+                if (!adCompat)
+                    throw ex;
             }
-        } catch (PartialResultException ex) {
-            if (!adCompat)
-                throw ex;
+    
+            String dn = getDistinguishedName(context, userBase, result);
+    
+            if (containerLog.isTraceEnabled())
+                containerLog.trace("  entry found for " + username + " with dn " + dn);
+    
+            // Get the entry's attributes
+            Attributes attrs = result.getAttributes();
+            if (attrs == null)
+                return null;
+    
+            // Retrieve value of userPassword
+            String password = null;
+            if (userPassword != null)
+                password = getAttributeValue(userPassword, attrs);
+    
+            String userRoleAttrValue = null;
+            if (userRoleAttribute != null) {
+                userRoleAttrValue = getAttributeValue(userRoleAttribute, attrs);
+            }
+    
+            // Retrieve values of userRoleName attribute
+            ArrayList<String> roles = null;
+            if (userRoleName != null)
+                roles = addAttributeValues(userRoleName, attrs, roles);
+    
+            return new User(username, dn, password, roles, userRoleAttrValue);
+        } finally {
+            if (results != null) {
+                results.close();
+            }
         }
-
-        String dn = getDistinguishedName(context, userBase, result);
-
-        if (containerLog.isTraceEnabled())
-            containerLog.trace("  entry found for " + username + " with dn " + dn);
-
-        // Get the entry's attributes
-        Attributes attrs = result.getAttributes();
-        if (attrs == null)
-            return null;
-
-        // Retrieve value of userPassword
-        String password = null;
-        if (userPassword != null)
-            password = getAttributeValue(userPassword, attrs);
-
-        String userRoleAttrValue = null;
-        if (userRoleAttribute != null) {
-            userRoleAttrValue = getAttributeValue(userRoleAttribute, attrs);
-        }
-
-        // Retrieve values of userRoleName attribute
-        ArrayList<String> roles = null;
-        if (userRoleName != null)
-            roles = addAttributeValues(userRoleName, attrs, roles);
-
-        return new User(username, dn, password, roles, userRoleAttrValue);
     }
 
 
@@ -2003,6 +2008,8 @@ public class JNDIRealm extends RealmBase {
         } catch (PartialResultException ex) {
             if (!adCompat)
                 throw ex;
+        } finally {
+            results.close();
         }
 
         if (containerLog.isTraceEnabled()) {
@@ -2054,6 +2061,8 @@ public class JNDIRealm extends RealmBase {
                     } catch (PartialResultException ex) {
                         if (!adCompat)
                             throw ex;
+                    } finally {
+                        results.close();
                     }
                 }
 
@@ -2131,6 +2140,8 @@ public class JNDIRealm extends RealmBase {
         } catch (PartialResultException ex) {
             if (!adCompat)
                 throw ex;
+        } finally {
+            e.close();
         }
         return values;
     }
