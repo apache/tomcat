@@ -216,6 +216,10 @@
         <bug>59119</bug>: Correct read logic for WebSocket client when using
         secure connections. (markt)
       </fix>
+      <fix>
+        <bug>59134</bug>: Correct client connect logic for secure connections
+        made through a proxy. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

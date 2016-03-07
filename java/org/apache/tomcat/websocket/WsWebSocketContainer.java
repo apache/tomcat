@@ -202,6 +202,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             proxyPath = URI.create("http" + path.toString().substring(2));
         } else if ("wss".equalsIgnoreCase(scheme)) {
             proxyPath = URI.create("https" + path.toString().substring(3));
+            secure = true;
         } else {
             throw new DeploymentException(sm.getString(
                     "wsWebSocketContainer.pathWrongScheme", scheme));
@@ -243,12 +244,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 } else {
                     // Must be wss due to scheme validation above
                     sa = new InetSocketAddress(host, 443);
-                    secure = true;
                 }
             } else {
-                if ("wss".equalsIgnoreCase(scheme)) {
-                    secure = true;
-                }
                 sa = new InetSocketAddress(host, port);
             }
         } else {
