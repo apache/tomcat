@@ -108,6 +108,11 @@
        quoted-string, unquote the string before returning it to the user.
        (markt)
       </fix>
+      <fix>
+        <bug>59123</bug>: Close <code>NamingEnumeration</code> objects used by
+        the <code>JNDIRealm</code> once they are no longer required.
+        (fschumacher/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
