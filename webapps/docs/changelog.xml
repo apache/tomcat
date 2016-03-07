@@ -140,6 +140,10 @@
         code with Tomcat 8 and makes it easier to run the Autobahn testsuite
         against the WebSocket implementation. (markt)
       </add>
+      <fix>
+        <bug>59119</bug>: Correct read logic for WebSocket client when using
+        secure connections. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
