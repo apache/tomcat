@@ -263,8 +263,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                     socketReadBuffer.compact();
 
                     if (forceRead) {
-                        Future<Integer> f =
-                                socketChannel.read(socketReadBuffer);
+                        forceRead = false;
+                        Future<Integer> f = socketChannel.read(socketReadBuffer);
                         Integer socketRead = f.get();
                         if (socketRead.intValue() == -1) {
                             throw new EOFException(sm.getString(
