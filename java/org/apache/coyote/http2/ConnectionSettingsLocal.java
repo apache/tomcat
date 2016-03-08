@@ -19,7 +19,7 @@ package org.apache.coyote.http2;
 import java.util.Map;
 
 /**
- * Represents the local connection settingsL i.e. the settings the client is
+ * Represents the local connection settings i.e. the settings the client is
  * expected to use when communicating with the server. There will be a delay
  * between calling a setter and the setting taking effect at the client. When a
  * setter is called, the new value is added to the set of pending settings. Once
