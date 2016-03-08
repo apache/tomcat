@@ -262,6 +262,11 @@
         pick up the Windows binaries that are based on OpenSSL 1.0.2g and APR
         1.5.1. (markt)
       </update>
+      <update>
+        Modify the default <code>tomcat-users.xml</code> file to make it harder
+        for users to configure the entries intended for use with the examples
+        web application for the Manager application. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
