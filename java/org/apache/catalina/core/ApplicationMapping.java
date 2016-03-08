@@ -21,30 +21,81 @@ import javax.servlet.http.MappingMatch;
 
 import org.apache.catalina.mapper.MappingData;
 
-public class ApplicationMapping implements Mapping {
+public class ApplicationMapping {
 
-    private final String matchValue;
-    private final String pattern;
-    private final MappingMatch mappingMatch;
+    private final MappingData mappingData;
+
+    private volatile Mapping mapping = null;
 
     public ApplicationMapping(MappingData mappingData) {
-        matchValue = mappingData.matchValue;
-        pattern = mappingData.matchPattern;
-        mappingMatch = mappingData.matchType;
+        this.mappingData = mappingData;
     }
 
-    @Override
-    public String getMatchValue() {
-        return matchValue;
+    public Mapping getMapping() {
+        if (mapping == null) {
+            switch (mappingData.matchType) {
+                case CONTEXT_ROOT:
+                    mapping = new MappingImpl("", "", mappingData.matchType);
+                    break;
+                case DEFAULT:
+                    mapping = new MappingImpl("/", "/", mappingData.matchType);
+                    break;
+                case EXACT:
+                    mapping = new MappingImpl(mappingData.wrapperPath.toString(),
+                            mappingData.wrapperPath.toString(), mappingData.matchType);
+                    break;
+                case EXTENSION:
+                    String path = mappingData.wrapperPath.toString();
+                    int extIndex = path.lastIndexOf('.');
+                    mapping = new MappingImpl(path.substring(0, extIndex),
+                            "*" + path.substring(extIndex), mappingData.matchType);
+                    break;
+                case PATH:
+                    mapping = new MappingImpl(mappingData.pathInfo.toString(),
+                            mappingData.wrapperPath.toString() + "/*",
+                            mappingData.matchType);
+                    break;
+                case IMPLICIT:
+                    // Treat IMPLICIT as UNKNOWN since Tomcat doesn't use
+                    // implicit mappings
+                case UNKNOWN:
+                    mapping = new MappingImpl("", "", mappingData.matchType);
+                    break;
+            }
+        }
+
+        return mapping;
     }
 
-    @Override
-    public String getPattern() {
-        return pattern;
+    public void recycle() {
+        mapping = null;
     }
 
-    @Override
-    public MappingMatch getMatchType() {
-        return mappingMatch;
+    private static class MappingImpl implements Mapping {
+
+        private final String matchValue;
+        private final String pattern;
+        private final MappingMatch mappingType;
+
+        public MappingImpl(String matchValue, String pattern, MappingMatch mappingType) {
+            this.matchValue = matchValue;
+            this.pattern = pattern;
+            this.mappingType = mappingType;
+        }
+
+        @Override
+        public String getMatchValue() {
+            return matchValue;
+        }
+
+        @Override
+        public String getPattern() {
+            return pattern;
+        }
+
+        @Override
+        public MappingMatch getMatchType() {
+            return mappingType;
+        }
     }
 }

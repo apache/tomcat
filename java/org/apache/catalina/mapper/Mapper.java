@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.servlet.http.MappingMatch;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
 import org.apache.catalina.WebResource;
@@ -992,6 +994,7 @@ public final class Mapper {
                     (path.getBuffer(), path.getStart(), path.getLength());
                 mappingData.wrapperPath.setChars
                     (path.getBuffer(), path.getStart(), path.getLength());
+                mappingData.matchType = MappingMatch.DEFAULT;
             }
             // Redirection to a folder
             char[] buf = path.getBuffer();
@@ -1040,8 +1043,10 @@ public final class Mapper {
                 mappingData.wrapperPath.setString("");
                 // This seems wrong but it is what the spec says...
                 mappingData.contextPath.setString("");
+                mappingData.matchType = MappingMatch.CONTEXT_ROOT;
             } else {
                 mappingData.wrapperPath.setString(wrapper.name);
+                mappingData.matchType = MappingMatch.EXACT;
             }
         }
     }
@@ -1093,6 +1098,7 @@ public final class Mapper {
                     (path.getBuffer(), path.getOffset(), path.getLength());
                 mappingData.wrapper = wrappers[pos].object;
                 mappingData.jspWildCard = wrappers[pos].jspWildCard;
+                mappingData.matchType = MappingMatch.PATH;
             }
         }
     }
@@ -1137,6 +1143,7 @@ public final class Mapper {
                     mappingData.requestPath.setChars(buf, servletPath, pathEnd
                             - servletPath);
                     mappingData.wrapper = wrapper.object;
+                    mappingData.matchType = MappingMatch.EXTENSION;
                 }
                 path.setOffset(servletPath);
                 path.setEnd(pathEnd);
