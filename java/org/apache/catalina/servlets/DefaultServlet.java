@@ -281,7 +281,8 @@ public class DefaultServlet extends HttpServlet {
         if (getServletConfig().getInitParameter("readonly") != null)
             readOnly = Boolean.parseBoolean(getServletConfig().getInitParameter("readonly"));
 
-        compressionFormats = parseCompressionFormats(getServletConfig().getInitParameter("precompressed"),
+        compressionFormats = parseCompressionFormats(
+                getServletConfig().getInitParameter("precompressed"),
                 getServletConfig().getInitParameter("gzip"));
 
         if (getServletConfig().getInitParameter("sendfileSize") != null)
@@ -824,8 +825,10 @@ public class DefaultServlet extends HttpServlet {
 
         // Serve a precompressed version of the file if present
         boolean usingPrecompressedVersion = false;
-        if (compressionFormats.length > 0 && !included && resource.isFile() && !pathEndsWithCompressedExtension(path)) {
-            List<PrecompressedResource> precompressedResources = getAvailablePrecompressedResources(path);
+        if (compressionFormats.length > 0 && !included && resource.isFile() &&
+                !pathEndsWithCompressedExtension(path)) {
+            List<PrecompressedResource> precompressedResources =
+                    getAvailablePrecompressedResources(path);
             if (!precompressedResources.isEmpty()) {
                 Collection<String> varyHeaders = response.getHeaders("Vary");
                 boolean addRequired = true;
@@ -839,7 +842,8 @@ public class DefaultServlet extends HttpServlet {
                 if (addRequired) {
                     response.addHeader("Vary", "accept-encoding");
                 }
-                PrecompressedResource bestResource = getBestPrecompressedResource(request, precompressedResources);
+                PrecompressedResource bestResource =
+                        getBestPrecompressedResource(request, precompressedResources);
                 if (bestResource != null) {
                     response.addHeader("Content-Encoding", bestResource.format.encoding);
                     resource = bestResource.resource;
@@ -1089,7 +1093,8 @@ public class DefaultServlet extends HttpServlet {
      * @param precompressedResources   List of available precompressed resources.
      * @return The best matching precompressed resource or null if no match was found.
      */
-    private PrecompressedResource getBestPrecompressedResource(HttpServletRequest request, List<PrecompressedResource> precompressedResources) {
+    private PrecompressedResource getBestPrecompressedResource(HttpServletRequest request,
+            List<PrecompressedResource> precompressedResources) {
         Enumeration<String> headers = request.getHeaders("Accept-Encoding");
         PrecompressedResource bestResource = null;
         double bestResourceQuality = 0;
