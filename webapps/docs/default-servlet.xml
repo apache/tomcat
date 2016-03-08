@@ -94,15 +94,22 @@ directory listings are disabled and debugging is turned off.
         expensive. Multiple requests for large directory listings can consume
         significant proportions of server resources.
   </property>
-  <property name="gzip">
-        If a gzipped version of a file exists (a file with <code>.gz</code>
-        appended to the file name located alongside the original file), Tomcat
-        will serve the gzipped file if the user agent supports gzip and this
+  <property name="precompressed">
+        If a precompressed version of a file exists (a file with <code>.br</code>
+        or <code>.gz</code> appended to the file name located alongside the
+        original file), Tomcat will serve the precompressed file if the user
+        agent supports the matching content encoding (br or gzip) and this
         option is enabled. [false]
         <br />
-        The file with the <code>.gz</code> extension will be accessible if
-        requested directly so if the original resource is protected with a
-        security constraint, the gzipped version must be similarly protected.
+        The precompressed file with the with <code>.br</code> or <code>.gz</code>
+        extension will be accessible if requested directly so if the original
+        resource is protected with a security constraint, the precompressed
+        versions must be similarly protected.
+        <br />
+        It is also possible to configure the list of precompressed formats.
+        The syntax is comma separated list of
+        <code>[content-encoding]=[file-extension]</code> pairs. For example:
+        <code>br=.br,gzip=.gz,bzip2=.bz2</code>.
   </property>
   <property name="readmeFile">
         If a directory listing is presented, a readme file may also
