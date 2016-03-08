@@ -2179,7 +2179,7 @@ public class Request implements HttpServletRequest {
 
     @Override
     public Mapping getMapping() {
-        return new ApplicationMapping();
+        return new ApplicationMapping(mappingData);
     }
 
 
