@@ -2699,11 +2699,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 for (int j =0; j < table.length; j++) {
                     Object obj = table[j];
                     if (obj != null) {
-                        boolean potentialLeak = false;
+                        boolean keyLoadedByWebapp = false;
+                        boolean valueLoadedByWebapp = false;
                         // Check the key
                         Object key = ((Reference<?>) obj).get();
                         if (this.equals(key) || loadedByThisOrChild(key)) {
-                            potentialLeak = true;
+                            keyLoadedByWebapp = true;
                         }
                         // Check the value
                         Field valueField =
@@ -2711,9 +2712,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         valueField.setAccessible(true);
                         Object value = valueField.get(obj);
                         if (this.equals(value) || loadedByThisOrChild(value)) {
-                            potentialLeak = true;
+                            valueLoadedByWebapp = true;
                         }
-                        if (potentialLeak) {
+                        if (keyLoadedByWebapp || valueLoadedByWebapp) {
                             Object[] args = new Object[5];
                             args[0] = contextName;
                             if (key != null) {
@@ -2740,16 +2741,22 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                                     "webappClassLoader.checkThreadLocalsForLeaks.unknown");
                                 }
                             }
-                            if (value == null) {
-                                if (log.isDebugEnabled()) {
-                                    log.debug(sm.getString(
-                                            "webappClassLoader.checkThreadLocalsForLeaksDebug",
-                                            args));
-                                }
-                            } else {
+                            if (valueLoadedByWebapp) {
                                 log.error(sm.getString(
                                         "webappClassLoader.checkThreadLocalsForLeaks",
                                         args));
+                            } else if (value == null) {
+                                if (log.isDebugEnabled()) {
+                                    log.debug(sm.getString(
+                                            "webappClassLoader.checkThreadLocalsForLeaksNull",
+                                            args));
+                                }
+                            } else {
+                                if (log.isDebugEnabled()) {
+                                    log.debug(sm.getString(
+                                            "webappClassLoader.checkThreadLocalsForLeaksNone",
+                                            args));
+                                }
                             }
                         }
                     }

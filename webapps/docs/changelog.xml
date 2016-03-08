@@ -113,6 +113,11 @@
         the <code>JNDIRealm</code> once they are no longer required.
         (fschumacher/markt)
       </fix>
+      <fix>
+        <bug>59138</bug>: Correct a false positive warning for ThreadLocal
+        related memory leaks when the key class but not the value class has been
+        loaded by the web application class loader. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
