@@ -46,8 +46,6 @@ public class MappingData {
     public final MessageBytes redirectPath = MessageBytes.newInstance();
 
     // Fields used by ApplicationMapping to implement javax.servlet.http.Mapping
-    public String matchValue = "";
-    public String matchPattern = "";
     public MappingMatch matchType = MappingMatch.UNKNOWN;
 
     public void recycle() {
@@ -62,8 +60,6 @@ public class MappingData {
         wrapperPath.recycle();
         pathInfo.recycle();
         redirectPath.recycle();
-        matchValue = "";
-        matchPattern= "";
         matchType = MappingMatch.UNKNOWN;
     }
 }

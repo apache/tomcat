@@ -161,6 +161,10 @@
         the <code>JNDIRealm</code> once they are no longer required.
         (fschumacher/markt)
       </fix>
+      <add>
+        Implement the proposed Servlet 4.0 API to provide mapping type
+        information for the current request. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -484,6 +484,7 @@ public class Request implements HttpServletRequest {
         }
 
         mappingData.recycle();
+        applicationMapping.recycle();
 
         applicationRequest = null;
         if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
@@ -622,6 +623,7 @@ public class Request implements HttpServletRequest {
      * Mapping data.
      */
     protected final MappingData mappingData = new MappingData();
+    private final ApplicationMapping applicationMapping = new ApplicationMapping(mappingData);
 
     /**
      * @return mapping data.
@@ -2179,7 +2181,7 @@ public class Request implements HttpServletRequest {
 
     @Override
     public Mapping getMapping() {
-        return new ApplicationMapping(mappingData);
+        return applicationMapping.getMapping();
     }
 
 
