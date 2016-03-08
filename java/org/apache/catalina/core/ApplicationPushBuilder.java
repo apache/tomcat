@@ -38,6 +38,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.PushToken;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
@@ -322,7 +323,7 @@ public class ApplicationPushBuilder implements PushBuilder {
 
 
     @Override
-    public void push() {
+    public boolean push() {
         if (path == null) {
             throw new IllegalStateException(sm.getString("pushBuilder.noPath"));
         }
@@ -392,7 +393,8 @@ public class ApplicationPushBuilder implements PushBuilder {
         setHeader("cookie", generateCookieHeader(cookies,
                 catalinaRequest.getContext().getCookieProcessor()));
 
-        coyoteRequest.action(ActionCode.PUSH_REQUEST, pushTarget);
+        PushToken pushToken = new PushToken(pushTarget);
+        coyoteRequest.action(ActionCode.PUSH_REQUEST, pushToken);
 
         // Reset for next call to this method
         pushTarget = null;
@@ -401,6 +403,8 @@ public class ApplicationPushBuilder implements PushBuilder {
         lastModified = null;
         headers.remove("if-none-match");
         headers.remove("if-modified-since");
+
+        return pushToken.getResult();
     }
 
 

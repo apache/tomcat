@@ -159,7 +159,8 @@ public interface PushBuilder {
     PushBuilder lastModified(String lastModified);
 
     /**
-     * Generates the push request. After calling this method the following
+     * Generates the push request and sends it to the client unless pushes are
+     * not available for some reason. After calling this method the following
      * fields are set to {@code null}:
      * <ul>
      * <li>{@code path}</li>
@@ -167,11 +168,14 @@ public interface PushBuilder {
      * <li>{@code lastModified}</li>
      * </ul>
      *
+     * @return {@code true} if the push request was sent to the client,
+     *         otherwise {@code false}
+     *
      * @throws IllegalStateException If this method is called when {@code path}
      *         is {@code null}
      * @throws IllegalArgumentException If the request to push requires a body
      */
-    void push();
+    boolean push();
 
     /**
      * Obtain the name of the HTTP method that will be used for push requests

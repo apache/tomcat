@@ -26,7 +26,7 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.ErrorState;
-import org.apache.coyote.Request;
+import org.apache.coyote.PushToken;
 import org.apache.coyote.UpgradeToken;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -355,7 +355,8 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         // Servlet 4.0 Push requests
         case PUSH_REQUEST: {
             try {
-                stream.push((Request) param);
+                PushToken pushToken = (PushToken) param;
+                pushToken.setResult(stream.push(pushToken.getPushTarget()));
             } catch (IOException ioe) {
                 response.setErrorException(ioe);
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);

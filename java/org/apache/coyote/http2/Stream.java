@@ -382,7 +382,10 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    void push(Request request) throws IOException {
+    boolean push(Request request) throws IOException {
+        if (!handler.getRemoteSettings().getEnablePush()) {
+            return false;
+        }
         // Set the special HTTP/2 headers
         request.getMimeHeaders().addValue(":method").duplicate(request.method());
         request.getMimeHeaders().addValue(":scheme").duplicate(request.scheme());
@@ -404,6 +407,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         }
 
         push(handler, request, this);
+
+        return true;
     }
 
 
