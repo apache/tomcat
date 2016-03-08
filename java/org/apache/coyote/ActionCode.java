@@ -239,6 +239,11 @@ public enum ActionCode {
     END_REQUEST,
 
     /**
+     * Is server push supported and allowed for the current request?
+     */
+    IS_PUSH_SUPPORTED,
+
+    /**
      * Push a request on behalf of the client of the current request.
      */
     PUSH_REQUEST

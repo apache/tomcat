@@ -353,6 +353,11 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         }
 
         // Servlet 4.0 Push requests
+        case IS_PUSH_SUPPORTED: {
+            AtomicBoolean result = (AtomicBoolean) param;
+            result.set(stream.isPushSupported());
+            break;
+        }
         case PUSH_REQUEST: {
             try {
                 PushToken pushToken = (PushToken) param;
