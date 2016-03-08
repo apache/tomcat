@@ -19,24 +19,32 @@ package org.apache.catalina.core;
 import javax.servlet.http.Mapping;
 import javax.servlet.http.MappingMatch;
 
+import org.apache.catalina.mapper.MappingData;
+
 public class ApplicationMapping implements Mapping {
+
+    private final String matchValue;
+    private final String pattern;
+    private final MappingMatch mappingMatch;
+
+    public ApplicationMapping(MappingData mappingData) {
+        matchValue = mappingData.matchValue;
+        pattern = mappingData.matchPattern;
+        mappingMatch = mappingData.matchType;
+    }
 
     @Override
     public String getMatchValue() {
-        // TODO Auto-generated method stub
-        return "";
+        return matchValue;
     }
 
     @Override
     public String getPattern() {
-        // TODO Auto-generated method stub
-        return "";
+        return pattern;
     }
 
     @Override
     public MappingMatch getMatchType() {
-        // TODO Auto-generated method stub
-        return MappingMatch.UNKNOWN;
+        return mappingMatch;
     }
-
 }
