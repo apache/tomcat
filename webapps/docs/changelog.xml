@@ -170,6 +170,11 @@
         related memory leaks when the key class but not the value class has been
         loaded by the web application class loader. (markt)
       </fix>
+      <add>
+        <bug>59017</bug>: Make the pre-compressed file support in the Default
+        Servlet generic so any compression may be used rather than just gzip.
+        Patch provided by Mikko Tiihonen. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
