@@ -170,6 +170,26 @@ public interface HttpServletRequest extends ServletRequest {
      */
     public int getIntHeader(String name);
 
+    public default Mapping getMapping() {
+        return new Mapping() {
+
+            @Override
+            public String getMatchValue() {
+                return "";
+            }
+
+            @Override
+            public String getPattern() {
+                return "";
+            }
+
+            @Override
+            public MappingMatch getMatchType() {
+                return MappingMatch.UNKNOWN;
+            }
+        };
+    }
+
     /**
      * Returns the name of the HTTP method with which this request was made, for
      * example, GET, POST, or PUT. Same as the value of the CGI variable
