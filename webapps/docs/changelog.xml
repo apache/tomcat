@@ -167,6 +167,11 @@
         contents of any directories that have been symlinked into the Tomcat
         directory structure. (markt)
       </fix>
+      <update>
+        Modify the default <code>tomcat-users.xml</code> file to make it harder
+        for users to configure the entries intended for use with the examples
+        web application for the Manager application. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
