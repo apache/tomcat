@@ -115,6 +115,15 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
+     * The default behavior of this method is to return getMapping() on the
+     * wrapped request object.
+     */
+    @Override
+    public Mapping getMapping() {
+        return this._getHttpServletRequest().getMapping();
+    }
+
+    /**
      * The default behavior of this method is to return getMethod() on the
      * wrapped request object.
      */

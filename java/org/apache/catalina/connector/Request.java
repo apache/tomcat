@@ -63,6 +63,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.http.Mapping;
 import javax.servlet.http.Part;
 import javax.servlet.http.PushBuilder;
 
@@ -75,6 +76,7 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.TomcatPrincipal;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.core.ApplicationMapping;
 import org.apache.catalina.core.ApplicationPart;
 import org.apache.catalina.core.ApplicationPushBuilder;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
@@ -2172,6 +2174,12 @@ public class Request implements HttpServletRequest {
         }
 
         return Integer.parseInt(value);
+    }
+
+
+    @Override
+    public Mapping getMapping() {
+        return new ApplicationMapping();
     }
 
 

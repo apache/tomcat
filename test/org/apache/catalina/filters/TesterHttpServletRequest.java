@@ -42,6 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.http.Mapping;
 import javax.servlet.http.Part;
 import javax.servlet.http.PushBuilder;
 
@@ -260,6 +261,11 @@ public class TesterHttpServletRequest implements HttpServletRequest {
 
     @Override
     public int getIntHeader(String name) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public Mapping getMapping() {
         throw new RuntimeException("Not implemented");
     }
 
