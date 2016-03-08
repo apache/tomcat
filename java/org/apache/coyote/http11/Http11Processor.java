@@ -942,6 +942,12 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         // Servlet 4.0 Push requests
+        case IS_PUSH_SUPPORTED: {
+            // HTTP2 connections only. Unsupported for HTTP/1.x
+            AtomicBoolean result = (AtomicBoolean) param;
+            result.set(false);
+            break;
+        }
         case PUSH_REQUEST: {
             // HTTP2 connections only. Unsupported for AJP.
             throw new UnsupportedOperationException(

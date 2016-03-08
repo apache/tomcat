@@ -374,4 +374,17 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
             Class<T> httpUpgradeHandlerClass) throws IOException, ServletException {
         return this._getHttpServletRequest().upgrade(httpUpgradeHandlerClass);
     }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The default behavior of this method is to return
+     * {@link HttpServletRequest#isPushSupported()} on the wrapped request object.
+     *
+     * @since Servlet 4.0
+     */
+    @Override
+    public boolean isPushSupported() {
+        return this._getHttpServletRequest().isPushSupported();
+    }
 }

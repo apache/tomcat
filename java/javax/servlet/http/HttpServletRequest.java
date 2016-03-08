@@ -215,6 +215,18 @@ public interface HttpServletRequest extends ServletRequest {
     public String getPathTranslated();
 
     /**
+     * Does the current request allow push requests. This will return {@code
+     * true} only if the underlying protocol supports server push and if pushes
+     * are permitted from the current request.
+     *
+     * @return {@code true} if server push is supported for the current request
+     *         otherwise {@code false}
+     */
+    public default boolean isPushSupported() {
+        return false;
+    }
+
+    /**
      * Obtain a builder for generating push requests. {@link PushBuilder}
      * documents how this request will be used as the basis for a push request.
      * Each call to this method will return a new instance, independent of any
