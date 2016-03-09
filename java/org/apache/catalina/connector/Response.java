@@ -19,7 +19,6 @@ package org.apache.catalina.connector;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.security.AccessController;
@@ -1335,7 +1334,7 @@ public class Response implements HttpServletResponse {
             // Relative redirects require HTTP/1.1
             if (getRequest().getCoyoteRequest().getSupportsRelativeRedirects() &&
                     getContext().getUseRelativeRedirects()) {
-                locationUri = URI.create(location).toASCIIString();
+                locationUri = location;
             } else {
                 locationUri = toAbsolute(location);
             }
