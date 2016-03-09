@@ -222,6 +222,12 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
+    public void testDSS() throws Exception {
+        testSpecification("DSS");
+    }
+
+
+    @Test
     public void testaDSS() throws Exception {
         testSpecification("aDSS");
     }
@@ -336,6 +342,18 @@ public class TestOpenSSLCipherConfigurationParser {
 
 
     @Test
+    public void testAESCCM() throws Exception {
+        testSpecification("AESCCM");
+    }
+
+
+    @Test
+    public void testAESCCM8() throws Exception {
+        testSpecification("AESCCM8");
+    }
+
+
+    @Test
     public void testCAMELLIA128() throws Exception {
         testSpecification("CAMELLIA128");
     }
@@ -350,6 +368,12 @@ public class TestOpenSSLCipherConfigurationParser {
     @Test
     public void testCAMELLIA() throws Exception {
         testSpecification("CAMELLIA");
+    }
+
+
+    @Test
+    public void testCHACHA20() throws Exception {
+        testSpecification("CHACHA20");
     }
 
 
@@ -458,6 +482,36 @@ public class TestOpenSSLCipherConfigurationParser {
     @Test
     public void testGOST89MAC() throws Exception {
         testSpecification("GOST89MAC");
+    }
+
+
+    @Test
+    public void testaPSK() throws Exception {
+        testSpecification("aPSK");
+    }
+
+
+    @Test
+    public void testkPSK() throws Exception {
+        testSpecification("kPSK");
+    }
+
+
+    @Test
+    public void testkRSAPSK() throws Exception {
+        testSpecification("kRSAPSK");
+    }
+
+
+    @Test
+    public void testkECDHEPSK() throws Exception {
+        testSpecification("kECDHEPSK");
+    }
+
+
+    @Test
+    public void testkDHEPSK() throws Exception {
+        testSpecification("kDHEPSK");
     }
 
 
