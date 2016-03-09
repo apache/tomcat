@@ -160,6 +160,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <fix>
+        Correct the description of the
+        <code>ServletRequest.getServerPort()</code> in Proxy How-To.
+        Issue reported via comments.apache.org. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>

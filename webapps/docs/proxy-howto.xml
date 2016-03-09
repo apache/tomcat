@@ -44,7 +44,7 @@ which the <strong>Connector</strong> is listening.  The servlet API
 calls of interest, for this purpose, are:</p>
 <ul>
 <li><code>ServletRequest.getServerName()</code>: Returns the host name of the server to which the request was sent.</li>
-<li><code>ServletRequest.getServerPort()</code>: Returns the host name of the server to which the request was sent.</li>
+<li><code>ServletRequest.getServerPort()</code>: Returns the port number of the server to which the request was sent.</li>
 <li><code>ServletRequest.getLocalName()</code>: Returns the host name of the Internet Protocol (IP) interface on which the request was received.</li>
 <li><code>ServletRequest.getLocalPort()</code>:  Returns the Internet Protocol (IP) port number of the interface on which the request was received.</li>
 </ul>
