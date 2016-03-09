@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -41,9 +40,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.not;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
@@ -189,9 +185,9 @@ public class TestDefaultServlet extends TomcatBaseTest {
         client.processRequest();
         assertTrue(client.isResponse200());
         List<String> responseHeaders = client.getResponseHeaders();
-        assertThat(responseHeaders, hasItem("Content-Encoding: br"));
-        assertThat(responseHeaders, hasItem("Content-Length: " + brSize));
-        assertThat(responseHeaders, hasItem("Vary: accept-encoding"));
+        assertTrue(responseHeaders.contains("Content-Encoding: br"));
+        assertTrue(responseHeaders.contains("Content-Length: " + brSize));
+        assertTrue(responseHeaders.contains("Vary: accept-encoding"));
 
         client.reset();
         client.setRequest(new String[] {
@@ -202,10 +198,10 @@ public class TestDefaultServlet extends TomcatBaseTest {
         client.processRequest();
         assertTrue(client.isResponse200());
         responseHeaders = client.getResponseHeaders();
-        assertThat(responseHeaders, hasItem("Content-Type: text/html"));
-        assertThat(responseHeaders, not(hasItem(containsString("Content-Encoding"))));
-        assertThat(responseHeaders, hasItem("Content-Length: " + indexSize));
-        assertThat(responseHeaders, hasItem("Vary: accept-encoding"));
+        assertTrue(responseHeaders.contains("Content-Type: text/html"));
+        assertFalse(responseHeaders.contains("Content-Encoding"));
+        assertTrue(responseHeaders.contains("Content-Length: " + indexSize));
+        assertTrue(responseHeaders.contains("Vary: accept-encoding"));
     }
 
     /*
@@ -244,9 +240,9 @@ public class TestDefaultServlet extends TomcatBaseTest {
         client.processRequest();
         assertTrue(client.isResponse200());
         List<String> responseHeaders = client.getResponseHeaders();
-        assertThat(responseHeaders, hasItem("Content-Encoding: custom"));
-        assertThat(responseHeaders, hasItem("Content-Length: " + brSize));
-        assertThat(responseHeaders, hasItem("Vary: accept-encoding"));
+        assertTrue(responseHeaders.contains("Content-Encoding: custom"));
+        assertTrue(responseHeaders.contains("Content-Length: " + brSize));
+        assertTrue(responseHeaders.contains("Vary: accept-encoding"));
 
         client.reset();
         client.setRequest(new String[] {
@@ -258,9 +254,9 @@ public class TestDefaultServlet extends TomcatBaseTest {
         client.processRequest();
         assertTrue(client.isResponse200());
         responseHeaders = client.getResponseHeaders();
-        assertThat(responseHeaders, hasItem("Content-Encoding: gzip"));
-        assertThat(responseHeaders, hasItem("Content-Length: " + gzSize));
-        assertThat(responseHeaders, hasItem("Vary: accept-encoding"));
+        assertTrue(responseHeaders.contains("Content-Encoding: gzip"));
+        assertTrue(responseHeaders.contains("Content-Length: " + gzSize));
+        assertTrue(responseHeaders.contains("Vary: accept-encoding"));
     }
 
     /*
@@ -299,9 +295,9 @@ public class TestDefaultServlet extends TomcatBaseTest {
         client.processRequest();
         assertTrue(client.isResponse200());
         List<String> responseHeaders = client.getResponseHeaders();
-        assertThat(responseHeaders, hasItem("Content-Encoding: br"));
-        assertThat(responseHeaders, hasItem("Content-Length: " + brSize));
-        assertThat(responseHeaders, hasItem("Vary: accept-encoding"));
+        assertTrue(responseHeaders.contains("Content-Encoding: br"));
+        assertTrue(responseHeaders.contains("Content-Length: " + brSize));
+        assertTrue(responseHeaders.contains("Vary: accept-encoding"));
 
         client.reset();
         client.setRequest(new String[] {
@@ -313,9 +309,9 @@ public class TestDefaultServlet extends TomcatBaseTest {
         client.processRequest();
         assertTrue(client.isResponse200());
         responseHeaders = client.getResponseHeaders();
-        assertThat(responseHeaders, not(hasItem(containsString("Content-Encoding"))));
-        assertThat(responseHeaders, hasItem("Content-Length: " + indexSize));
-        assertThat(responseHeaders, hasItem("Vary: accept-encoding"));
+        assertFalse(responseHeaders.contains("Content-Encoding"));
+        assertTrue(responseHeaders.contains("Content-Length: " + indexSize));
+        assertTrue(responseHeaders.contains("Vary: accept-encoding"));
     }
 
     /*
