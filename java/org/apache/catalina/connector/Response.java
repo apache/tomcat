@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
@@ -1381,7 +1380,7 @@ public class Response implements HttpServletResponse {
             // Relative redirects require HTTP/1.1
             if (getRequest().getCoyoteRequest().getSupportsRelativeRedirects() &&
                     getContext().getUseRelativeRedirects()) {
-                locationUri = URI.create(location).toASCIIString();
+                locationUri = location;
             } else {
                 locationUri = toAbsolute(location);
             }

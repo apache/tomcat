@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -574,6 +575,45 @@ public class TestResponse extends TomcatBaseTest {
     public void testEncodeRedirectURL16() throws Exception {
         doTestEncodeURL("./..#/../..", "./..;jsessionid=1234#/../..");
     }    @Test
+    public void testSendRedirect01() throws Exception {
+        doTestSendRedirect("../foo", "../foo");
+    }
+
+
+    @Test
+    public void testSendRedirect02() throws Exception {
+        doTestSendRedirect("../foo bar", "../foo bar");
+    }
+
+
+    @Test
+    public void testSendRedirect03() throws Exception {
+        doTestSendRedirect("../foo%20bar", "../foo%20bar");
+    }
+
+
+    private void doTestSendRedirect(String input, String expectedLocation) throws Exception {
+        // Set-up.
+        // Note: Not sufficient for testing relative -> absolute
+        Connector connector = new Connector();
+        org.apache.coyote.Response cResponse = new org.apache.coyote.Response();
+        Response response = new Response();
+        response.setConnector(connector);
+        response.setCoyoteResponse(cResponse);
+        Request request = new Request();
+        org.apache.coyote.Request cRequest = new org.apache.coyote.Request();
+        request.setCoyoteRequest(cRequest);
+        Context context = new TesterContext();
+        request.getMappingData().context = context;
+        response.setRequest(request);
+        // Do test
+        response.sendRedirect(input);
+        String location = response.getHeader("Location");
+        Assert.assertEquals(expectedLocation,  location);
+    }
+
+
+    @Test
     public void testBug53469a() throws Exception {
         Request req = new TesterRequest();
         Response resp = new Response();

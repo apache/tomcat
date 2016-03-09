@@ -118,6 +118,11 @@
         related memory leaks when the key class but not the value class has been
         loaded by the web application class loader. (markt)
       </fix>
+      <fix>
+        <bug>59151</bug>: Fix a regression in the fix for <bug>56917</bug> that
+        added additional (and arguably unnecessary) validation to the provided
+        redirect location. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
