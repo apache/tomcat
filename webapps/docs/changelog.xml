@@ -263,6 +263,10 @@
         <code>ServletRequest.getServerPort()</code> in Proxy How-To.
         Issue reported via comments.apache.org. (violetagg)
       </fix>
+      <add>
+        The Manager and Host Manager applications are now only accessible via
+        <code>localhost</code> by default. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
