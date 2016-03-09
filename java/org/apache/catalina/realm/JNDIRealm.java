@@ -1266,8 +1266,9 @@ public class JNDIRealm extends RealmBase {
                 // Authenticate the specified username if possible
                 principal = authenticate(context, username, credentials);
 
-            } catch (NullPointerException e) {
-                /* BZ 42449 - Kludge Sun's LDAP provider
+            } catch (NullPointerException | CommunicationException
+                    | ServiceUnavailableException e) {
+                /* BZ 42449 - Catch NPE - Kludge Sun's LDAP provider
                    with broken SSL
                 */
                 // log the exception so we know it's there.
@@ -1282,37 +1283,6 @@ public class JNDIRealm extends RealmBase {
 
                 // Try the authentication again.
                 principal = authenticate(context, username, credentials);
-
-            } catch (CommunicationException e) {
-
-                // log the exception so we know it's there.
-                containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
-
-                // close the connection so we know it will be reopened.
-                if (context != null)
-                    close(context);
-
-                // open a new directory context.
-                context = open();
-
-                // Try the authentication again.
-                principal = authenticate(context, username, credentials);
-
-            } catch (ServiceUnavailableException e) {
-
-                // log the exception so we know it's there.
-                containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
-
-                // close the connection so we know it will be reopened.
-                if (context != null)
-                    close(context);
-
-                // open a new directory context.
-                context = open();
-
-                // Try the authentication again.
-                principal = authenticate(context, username, credentials);
-
             }
 
 
@@ -2246,22 +2216,7 @@ public class JNDIRealm extends RealmBase {
                 // Authenticate the specified username if possible
                 principal = getPrincipal(context, username, gssCredential);
 
-            } catch (CommunicationException e) {
-
-                // log the exception so we know it's there.
-                containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
-
-                // close the connection so we know it will be reopened.
-                if (context != null)
-                    close(context);
-
-                // open a new directory context.
-                context = open();
-
-                // Try the authentication again.
-                principal = getPrincipal(context, username, gssCredential);
-
-            } catch (ServiceUnavailableException e) {
+            } catch (CommunicationException | ServiceUnavailableException e) {
 
                 // log the exception so we know it's there.
                 containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
