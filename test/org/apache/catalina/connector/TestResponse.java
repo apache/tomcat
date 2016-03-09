@@ -573,7 +573,10 @@ public class TestResponse extends TomcatBaseTest {
     @Test
     public void testEncodeRedirectURL16() throws Exception {
         doTestEncodeURL("./..#/../..", "./..;jsessionid=1234#/../..");
-    }    @Test
+    }
+
+
+    @Test
     public void testBug53469a() throws Exception {
         Request req = new TesterRequest();
         Response resp = new Response();
