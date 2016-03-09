@@ -265,6 +265,16 @@ public class TesterOpenSSL {
             unimplemented.add(Cipher.TLS_ECDH_ECDSA_WITH_CAMELLIA_256_CBC_SHA384);
             unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_CAMELLIA_128_CBC_SHA256);
             unimplemented.add(Cipher.TLS_ECDH_RSA_WITH_CAMELLIA_256_CBC_SHA384);
+            unimplemented.add(Cipher.TLS_RSA_WITH_RC4_128_MD5);
+            unimplemented.add(Cipher.TLS_DH_anon_WITH_RC4_128_MD5);
+            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_RC4_128_SHA);
+            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_RC4_128_SHA);
+            unimplemented.add(Cipher.TLS_ECDHE_RSA_WITH_RC4_128_SHA);
+            unimplemented.add(Cipher.TLS_RSA_WITH_RC4_128_SHA);
+            unimplemented.add(Cipher.TLS_PSK_WITH_RC4_128_SHA);
+            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_RC4_128_SHA);
+            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_RC4_128_SHA);
+            unimplemented.add(Cipher.TLS_ECDH_anon_WITH_RC4_128_SHA);
         }
         OPENSSL_UNIMPLEMENTED_CIPHERS = Collections.unmodifiableSet(unimplemented);
     }
