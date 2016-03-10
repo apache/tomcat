@@ -463,9 +463,9 @@ public class TestELInJsp extends TomcatBaseTest {
         String result = res.toString();
         // javax.servlet
         assertEcho(result, "00-" + DispatcherType.ASYNC);
-        // No obvious status fields for javax.servlet.http
+        // No obvious static fields for javax.servlet.http
         // Could hack something with HttpUtils...
-        // No obvious status fields for javax.servlet.jsp
+        // No obvious static fields for javax.servlet.jsp
         // Wild card (package) import
         assertEcho(result, "01-" + BigDecimal.ROUND_UP);
         // Class import
