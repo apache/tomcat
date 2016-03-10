@@ -222,6 +222,12 @@
       <update>
         Update to the Eclipse JDT Compiler 4.5.1. (markt)
       </update>
+      <fix>
+        <bug>57583</bug>: Improve the performance of
+        <code>javax.servlet.jsp.el.ScopedAttributeELResolver</code> when
+        resolving attributes that do not exist. This improvement only works when
+        Jasper is used with with Tomcat's EL implementation. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
