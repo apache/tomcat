@@ -273,6 +273,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        If promoting a proxy node to a primary node when getting a session,
+        notify the change of the new primary node to the original backup node.
+        (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
