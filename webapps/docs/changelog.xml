@@ -180,6 +180,10 @@
         added additional (and arguably unnecessary) validation to the provided
         redirect location. (markt)
       </fix>
+      <fix>
+        <bug>59150</bug>: Add an additional flag on APR listener to allow
+        disabling automatic use of OpenSSL. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

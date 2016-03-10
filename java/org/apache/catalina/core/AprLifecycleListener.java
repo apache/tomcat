@@ -79,6 +79,7 @@ public class AprLifecycleListener
     protected static boolean aprInitialized = false;
     protected static boolean aprAvailable = false;
     protected static boolean useAprConnector = false;
+    protected static boolean useOpenSSL = true;
     protected static boolean fipsModeActive = false;
 
     /**
@@ -403,6 +404,16 @@ public class AprLifecycleListener
 
     public static boolean getUseAprConnector() {
         return useAprConnector;
+    }
+
+    public void setUseOpenSSL(boolean useOpenSSL) {
+        if (useOpenSSL != AprLifecycleListener.useOpenSSL) {
+            AprLifecycleListener.useOpenSSL = useOpenSSL;
+        }
+    }
+
+    public static boolean getUseOpenSSL() {
+        return useOpenSSL;
     }
 
 }
