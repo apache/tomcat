@@ -188,6 +188,11 @@
         added additional (and arguably unnecessary) validation to the provided
         redirect location. (markt)
       </fix>
+      <fix>
+        <bug>59154</bug>: Fix a <code>NullPointerException</code> in the
+        <code>JASSMemoryLoginModue</code> resulting from the introduction of the
+        <code>CredentialHandler</code> to <code>Realm</code>s. (schultz/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

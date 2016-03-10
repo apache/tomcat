@@ -18,6 +18,7 @@ package org.apache.catalina.realm;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.Map;
 
@@ -41,8 +42,7 @@ import org.apache.tomcat.util.digester.Digester;
  * <p>Implementation of the JAAS <strong>LoginModule</strong> interface,
  * primarily for use in testing <code>JAASRealm</code>.  It utilizes an
  * XML-format data file of username/password/role information identical to
- * that supported by <code>org.apache.catalina.realm.MemoryRealm</code>
- * (except that digested passwords are not supported).</p>
+ * that supported by <code>org.apache.catalina.realm.MemoryRealm</code>.</p>
  *
  * <p>This class recognizes the following string-valued options, which are
  * specified in the configuration file and passed to {@link
@@ -54,6 +54,14 @@ import org.apache.tomcat.util.digester.Digester;
  *     XML file containing our user information, in the format supported by
  *     {@link MemoryRealm}.  The default value matches the MemoryRealm
  *     default.</li>
+ * <li><strong>digest</strong> - Digest used to protect credentials in the XML
+ *     file. If not specified, the passwords will be assumed to be in clear
+ *     text.</li>
+ * <li><strong>iterations</strong> - The number of iterations of the associated
+ *     algorithm that will be used when creating a new stored credential for a
+ *     given input credential.</li>
+ * <li><strong>saltLength</strong> - The salt length that will be used when
+ *     creating a new stored credential for a given input credential.</li>
  * </ul>
  *
  * <p><strong>IMPLEMENTATION NOTE</strong> - This class implements
@@ -223,8 +231,23 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         this.options = options;
 
         // Perform instance-specific initialization
+        MessageDigestCredentialHandler credentialHandler = new MessageDigestCredentialHandler();
+        setCredentialHandler(credentialHandler);
         if (options.get("pathname") != null) {
             this.pathname = (String) options.get("pathname");
+        }
+        if (options.get("digest") != null) {
+            try {
+                credentialHandler.setAlgorithm((String) options.get("digest"));
+            } catch (NoSuchAlgorithmException e) {
+                log.warn("Invalid digest algorithm for JAASMemoryLoginModule", e);
+            }
+        }
+        if (options.get("iterations") != null) {
+            credentialHandler.setIterations(Integer.parseInt((String) options.get("iterations")));
+        }
+        if (options.get("saltLength") != null) {
+            credentialHandler.setIterations(Integer.parseInt((String) options.get("saltLength")));
         }
 
         // Load our defined Principals
