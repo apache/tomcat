@@ -84,6 +84,8 @@
         this value to <code>true</code>. Default value is <code>false</code>.
       </attribute>
       <attribute name="maxInactiveInterval" required="false">
+        <p><strong>Deprecated</strong>: This should be configured via the
+        Context.</p>
         <p>The initial maximum time interval, in seconds,
         between client requests before a session is invalidated. A negative value
         will result in sessions never timing out. If the attribute is not provided,
