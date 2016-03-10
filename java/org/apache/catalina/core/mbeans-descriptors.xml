@@ -123,11 +123,6 @@
                description=""
                type="boolean"/>
 
-    <attribute name="deploymentDescriptor"
-               description="String deployment descriptor "
-               type="java.lang.String"
-               writeable="false" />
-
     <attribute name="displayName"
                description="The display name of this web application"
                type="java.lang.String"/>
