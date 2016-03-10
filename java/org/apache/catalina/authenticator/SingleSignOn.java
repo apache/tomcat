@@ -360,7 +360,16 @@ public class SingleSignOn extends ValveBase {
                 containerLog.debug(sm.getString("singleSignOn.debug.sessionLogout",
                         ssoId, session));
             }
-            deregister(ssoId);
+            // First remove the session that we know has expired / been logged
+            // out since it has already been removed from its Manager and, if
+            // we don't remove it first, deregister() will log a warning that it
+            // can't be found
+            removeSession(ssoId, session);
+            // If the SSO session was only associated with one web app the call
+            // above will have removed the SSO session from the cache
+            if (cache.containsKey(ssoId)) {
+                deregister(ssoId);
+            }
         }
     }
 
