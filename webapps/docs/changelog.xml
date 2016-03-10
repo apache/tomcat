@@ -176,6 +176,10 @@
         Patch provided by Mikko Tiihonen. (markt)
       </add>
       <fix>
+        <bug>59145</bug>: Don't log an invalid warning when a user logs out of
+        a session associated with SSO. (markt)
+      </fix>
+      <fix>
         <bug>59151</bug>: Fix a regression in the fix for <bug>56917</bug> that
         added additional (and arguably unnecessary) validation to the provided
         redirect location. (markt)
