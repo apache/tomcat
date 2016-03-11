@@ -18,9 +18,9 @@ package org.apache.catalina.realm;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -34,8 +34,10 @@ import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.catalina.CredentialHandler;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.Digester;
 
 /**
@@ -54,14 +56,14 @@ import org.apache.tomcat.util.digester.Digester;
  *     XML file containing our user information, in the format supported by
  *     {@link MemoryRealm}.  The default value matches the MemoryRealm
  *     default.</li>
- * <li><strong>digest</strong> - Digest used to protect credentials in the XML
- *     file. If not specified, the passwords will be assumed to be in clear
- *     text.</li>
- * <li><strong>iterations</strong> - The number of iterations of the associated
- *     algorithm that will be used when creating a new stored credential for a
- *     given input credential.</li>
- * <li><strong>saltLength</strong> - The salt length that will be used when
- *     creating a new stored credential for a given input credential.</li>
+ * <li><strong>credentialHandlerClassName</strong> - The fully qualified class
+ *     name of the CredentialHandler to use. If not specified, {@link
+ *     MessageDigestCredentialHandler} will be used.</li>
+ * <li>Any additional options will be used to identify and call setters on the
+ *     {@link CredentialHandler}. For example, <code>algorithm=SHA256</code>
+ *     would result in a call to {@link
+ *     MessageDigestCredentialHandler#setAlgorithm(String)} with a parameter of
+ *     <code>"SHA256"</code></li>
  * </ul>
  *
  * <p><strong>IMPLEMENTATION NOTE</strong> - This class implements
@@ -231,24 +233,40 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         this.options = options;
 
         // Perform instance-specific initialization
-        MessageDigestCredentialHandler credentialHandler = new MessageDigestCredentialHandler();
-        setCredentialHandler(credentialHandler);
-        if (options.get("pathname") != null) {
-            this.pathname = (String) options.get("pathname");
+        Object option = options.get("pathname");
+        if (option instanceof String) {
+            this.pathname = (String) option;
         }
-        if (options.get("digest") != null) {
+
+        CredentialHandler credentialHandler = null;
+        option = options.get("credentialHandlerClassName");
+        if (option instanceof String) {
             try {
-                credentialHandler.setAlgorithm((String) options.get("digest"));
-            } catch (NoSuchAlgorithmException e) {
-                log.warn("Invalid digest algorithm for JAASMemoryLoginModule", e);
+                Class<?> clazz = Class.forName((String) option);
+                credentialHandler = (CredentialHandler) clazz.newInstance();
+            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+                throw new IllegalArgumentException(e);
             }
         }
-        if (options.get("iterations") != null) {
-            credentialHandler.setIterations(Integer.parseInt((String) options.get("iterations")));
+        if (credentialHandler == null) {
+            credentialHandler = new MessageDigestCredentialHandler();
         }
-        if (options.get("saltLength") != null) {
-            credentialHandler.setIterations(Integer.parseInt((String) options.get("saltLength")));
+
+        for (Entry<String,?> entry : options.entrySet()) {
+            if ("pathname".equals(entry.getKey())) {
+                continue;
+            }
+            if ("credentialHandlerClassName".equals(entry.getKey())) {
+                continue;
+            }
+            // Skip any non-String values since any value we are interested in
+            // will be a String.
+            if (entry.getValue() instanceof String) {
+                IntrospectionUtils.setProperty(credentialHandler, entry.getKey(),
+                        (String) entry.getValue());
+            }
         }
+        setCredentialHandler(credentialHandler);
 
         // Load our defined Principals
         load();
