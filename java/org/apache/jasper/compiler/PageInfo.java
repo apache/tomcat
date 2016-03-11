@@ -49,7 +49,7 @@ class PageInfo {
     private final HashMap<String, LinkedList<String>> xmlPrefixMapper;
     private final HashMap<String, Mark> nonCustomTagPrefixMap;
     private final String jspFile;
-    private final String defaultLanguage = "java";
+    private static final String defaultLanguage = "java";
     private String language;
     private final String defaultExtends = Constants.JSP_SERVLET_BASE;
     private String xtends;

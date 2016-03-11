@@ -68,7 +68,7 @@ public class JDBCStore extends StoreBase {
     /**
      * Name to register for the background thread.
      */
-    protected final String threadName = "JDBCStore";
+    protected static final String threadName = "JDBCStore";
 
     /**
      * The connection username to use when trying to connect to the database.
