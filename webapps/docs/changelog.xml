@@ -176,6 +176,10 @@
         <code>ServletRequest.getServerPort()</code> in Proxy How-To.
         Issue reported via comments.apache.org. (violetagg)
       </fix>
+      <fix>
+        Fix a potenital indefinite wait in the Comet Chat servlet in the
+        examples web application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">

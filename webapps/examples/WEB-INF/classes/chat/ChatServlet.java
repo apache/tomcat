@@ -225,7 +225,7 @@ public class ChatServlet
                 String[] pendingMessages;
                 synchronized (messages) {
                     try {
-                        if (messages.size() == 0) {
+                        if (running && messages.size() == 0) {
                             messages.wait();
                         }
                     } catch (InterruptedException e) {
