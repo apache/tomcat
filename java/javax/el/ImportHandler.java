@@ -191,7 +191,7 @@ public class ImportHandler {
     private Class<?> findClass(String name, boolean throwException) {
         Class<?> clazz;
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        String path = name.replace(".", "/");
+        String path = name.replace(".", "/") + ".class";
         try {
             /* Given that findClass() has to be called for every imported
              * package and that getResource() is a lot faster then loadClass()
