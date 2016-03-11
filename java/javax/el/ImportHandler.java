@@ -191,8 +191,23 @@ public class ImportHandler {
     private Class<?> findClass(String name, boolean throwException) {
         Class<?> clazz;
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        String path = name.replace(".", "/");
         try {
-             clazz = cl.loadClass(name);
+            /* Given that findClass() has to be called for every imported
+             * package and that getResource() is a lot faster then loadClass()
+             * for resources that don't exist, the overhead of the getResource()
+             * for the case where the class does exist is a lot less than the
+             * overhead we save by not calling loadClass().
+             */
+            if (cl.getResource(path) == null) {
+                return null;
+            }
+        } catch (ClassCircularityError cce) {
+            // May happen under a security manager. Ignore it and try loading
+            // the class normally.
+        }
+        try {
+            clazz = cl.loadClass(name);
         } catch (ClassNotFoundException e) {
             return null;
         }
