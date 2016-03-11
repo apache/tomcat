@@ -361,7 +361,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     }
 
     // TODO: Should the createWebResourceSet() methods be removed to some
-    //       utility class for fiel system based resource sets?
+    //       utility class for file system based resource sets?
 
     @Override
     public void createWebResourceSet(ResourceSetType type, String webAppMount,
