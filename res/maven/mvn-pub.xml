@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 9.0 Maven Deployment" default="" basedir="."
+<project name="Tomcat 8.5 Maven Deployment" default="" basedir="."
          xmlns:artifact="urn:maven-artifact-ant">
   <!--
     Built for using Maven Ant Tasks (version 2.1.0 is known to work)
@@ -395,7 +395,7 @@
       <param name="maven.repo.repositoryId"
              value="${maven.snapshot.repo.repositoryId}"/>
       <param name="maven.repo.url" value="${maven.snapshot.repo.url}"/>
-      <param name="maven.deploy.version" value="9.0-SNAPSHOT"/>
+      <param name="maven.deploy.version" value="8.5-SNAPSHOT"/>
       <param name="maven.deploy.binary.version"
              value="${maven.asf.release.deploy.version}-dev"/>
     </antcall>
