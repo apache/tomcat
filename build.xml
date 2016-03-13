@@ -82,8 +82,8 @@
   <property name="tomcat.pool"           value="${tomcat.output}/jdbc-pool"/>
 
   <!-- Servlet 4.0 spec requires 1.8+ -->
-  <property name="compile.source" value="1.8"/>
-  <property name="compile.target" value="1.8"/>
+  <property name="compile.source" value="1.7"/>
+  <property name="compile.target" value="1.7"/>
 
   <!-- Locations to create the JAR artifacts -->
   <!-- Standard JARs -->
