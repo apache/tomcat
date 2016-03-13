@@ -937,8 +937,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         public ReadBodyServlet(boolean callAvailable) {
             this.callAvailable = callAvailable;
-            this.availableList = callAvailable ? new ArrayList<>() : null;
-            this.readList = callAvailable ? new ArrayList<>() : null;
+            this.availableList = callAvailable ? new ArrayList<Integer>() : null;
+            this.readList = callAvailable ? new ArrayList<Integer>() : null;
         }
 
         @Override
