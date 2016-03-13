@@ -76,37 +76,6 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
         this.notifyListenersOnReplication = notifyListenersOnReplication;
     }
 
-    /**
-     * Return the string pattern used for including session attributes
-     * to replication.
-     *
-     * @return the sessionAttributeFilter
-     *
-     * @deprecated Use {@link #getSessionAttributeNameFilter()}. Will be removed
-     *             in Tomcat 9.0.x
-     */
-    @Deprecated
-    public String getSessionAttributeFilter() {
-        return getSessionAttributeNameFilter();
-    }
-
-    /**
-     * Set the pattern used for including session attributes to replication.
-     * If not set, all session attributes will be eligible for replication.
-     * <p>
-     * E.g. <code>^(userName|sessionHistory)$</code>
-     * </p>
-     *
-     * @param sessionAttributeFilter
-     *            the filter name pattern to set
-     *
-     * @deprecated Use {@link #setSessionAttributeNameFilter(String)}. Will be
-     *             removed in Tomcat 9.0.x
-     */
-    @Deprecated
-    public void setSessionAttributeFilter(String sessionAttributeFilter) {
-        setSessionAttributeNameFilter(sessionAttributeFilter);
-    }
 
     public boolean isRecordAllActions() {
         return recordAllActions;
@@ -114,21 +83,6 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
 
     public void setRecordAllActions(boolean recordAllActions) {
         this.recordAllActions = recordAllActions;
-    }
-
-    /**
-     * Check whether the given session attribute should be distributed based on
-     * attribute name only.
-     *
-     * @param name The attribute name
-     * @return <code>true</code> if the attribute should be distributed
-     *
-     * @deprecated Use {@link #willAttributeDistribute(String, Object)}. Will be
-     *             removed in Tomcat 9.0.x
-     */
-    @Deprecated
-    public boolean willAttributeDistribute(String name) {
-        return willAttributeDistribute(name, null);
     }
 
 
