@@ -371,11 +371,11 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
             return path;
         }
     }
-    
+
     private interface Predicate<T> {
         boolean test(T x);
     }
-    
+
     private static boolean nonNull(Object o) {
         return o != null;
     }
@@ -393,7 +393,7 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
             }
         };
     }
-    
+
     /**
      * @return a Predicate to check for non emptiness of a List of Strings
      */
