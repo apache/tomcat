@@ -924,7 +924,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         ResourceEntry entry = new ResourceEntry();
         entry.lastModified = resource.getLastModified();
         synchronized(resourceEntries) {
-            resourceEntries.putIfAbsent(path, entry);
+            if (!resourceEntries.containsKey(path)) {
+                resourceEntries.put(path, entry);
+            }
         }
     }
 
