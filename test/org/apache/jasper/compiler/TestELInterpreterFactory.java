@@ -93,5 +93,10 @@ public class TestELInterpreterFactory extends TomcatBaseTest {
             sce.getServletContext().setInitParameter(ELInterpreter.class.getName(),
                     SimpleELInterpreter.class.getName());
         }
+
+        @Override
+        public void contextDestroyed(ServletContextEvent sce) {
+            // NO-OP
+        }
     }
 }

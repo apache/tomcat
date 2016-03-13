@@ -23,8 +23,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.GenericFilter;
+import javax.servlet.FilterConfig;
 import javax.servlet.HttpConstraintElement;
 import javax.servlet.HttpMethodConstraintElement;
 import javax.servlet.MultipartConfigElement;
@@ -160,9 +161,12 @@ public class TestStandardContext extends TomcatBaseTest {
         }
     }
 
-    public static final class Bug46243Filter extends GenericFilter {
+    public static final class Bug46243Filter implements Filter {
 
-        private static final long serialVersionUID = 1L;
+        @Override
+        public void destroy() {
+            // NOOP
+        }
 
         @Override
         public void doFilter(ServletRequest request, ServletResponse response,
@@ -173,10 +177,11 @@ public class TestStandardContext extends TomcatBaseTest {
         }
 
         @Override
-        public void init() throws ServletException {
-            boolean fail = getInitParameter("fail").equals("true");
+        public void init(FilterConfig filterConfig) throws ServletException {
+            boolean fail = filterConfig.getInitParameter("fail").equals("true");
             if (fail) {
-                throw new ServletException("Init fail (test)", new ClassNotFoundException());
+                throw new ServletException("Init fail (test)",
+                        new ClassNotFoundException());
             }
         }
     }
@@ -330,9 +335,12 @@ public class TestStandardContext extends TomcatBaseTest {
     }
 
 
-    public static final class Bug49922Filter extends GenericFilter {
+    public static final class Bug49922Filter implements Filter {
 
-        private static final long serialVersionUID = 1L;
+        @Override
+        public void destroy() {
+            // NOOP
+        }
 
         @Override
         public void doFilter(ServletRequest request, ServletResponse response,
@@ -340,6 +348,11 @@ public class TestStandardContext extends TomcatBaseTest {
             response.setContentType("text/plain");
             response.getWriter().print("Filter");
             chain.doFilter(request, response);
+        }
+
+        @Override
+        public void init(FilterConfig filterConfig) throws ServletException {
+            // NOOP
         }
     }
 

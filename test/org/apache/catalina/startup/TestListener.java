@@ -88,6 +88,11 @@ public class TestListener extends TomcatBaseTest {
         public void contextInitialized(ServletContextEvent sce) {
             initialized = true;
         }
+
+        @Override
+        public void contextDestroyed(ServletContextEvent sce) {
+            // NOOP
+        }
     }
 
     public static class SCL2 implements ServletContextListener {
@@ -96,6 +101,11 @@ public class TestListener extends TomcatBaseTest {
         public void contextInitialized(ServletContextEvent sce) {
             ServletContext sc = sce.getServletContext();
             sc.addListener(SCL3.class.getName());
+        }
+
+        @Override
+        public void contextDestroyed(ServletContextEvent sce) {
+            // NOOP
         }
     }
 
@@ -106,6 +116,11 @@ public class TestListener extends TomcatBaseTest {
         @Override
         public void contextInitialized(ServletContextEvent sce) {
             initialized = true;
+        }
+
+        @Override
+        public void contextDestroyed(ServletContextEvent sce) {
+            // NOOP
         }
     }
 }

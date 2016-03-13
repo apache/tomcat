@@ -27,8 +27,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.GenericFilter;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -41,8 +42,8 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * <p>
- * A {@link javax.servlet.Filter} that enable client-side cross-origin requests
- * by implementing W3C's CORS (<b>C</b>ross-<b>O</b>rigin <b>R</b>esource
+ * A {@link Filter} that enable client-side cross-origin requests by
+ * implementing W3C's CORS (<b>C</b>ross-<b>O</b>rigin <b>R</b>esource
  * <b>S</b>haring) specification for resources. Each {@link HttpServletRequest}
  * request is inspected as per specification, and appropriate response headers
  * are added to {@link HttpServletResponse}.
@@ -75,9 +76,8 @@ import org.apache.tomcat.util.res.StringManager;
  * @see <a href="http://www.w3.org/TR/cors/">CORS specification</a>
  *
  */
-public final class CorsFilter extends GenericFilter {
+public final class CorsFilter implements Filter {
 
-    private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(CorsFilter.class);
     private static final StringManager sm = StringManager.getManager(CorsFilter.class);
 
@@ -132,11 +132,6 @@ public final class CorsFilter extends GenericFilter {
 
 
     @Override
-    public void destroy() {
-        // NOOP
-    }
-
-    @Override
     public void doFilter(final ServletRequest servletRequest,
             final ServletResponse servletResponse, final FilterChain filterChain)
             throws IOException, ServletException {
@@ -182,25 +177,34 @@ public final class CorsFilter extends GenericFilter {
 
 
     @Override
-    public void init() throws ServletException {
+    public void init(final FilterConfig filterConfig) throws ServletException {
         // Initialize defaults
         parseAndStore(DEFAULT_ALLOWED_ORIGINS, DEFAULT_ALLOWED_HTTP_METHODS,
                 DEFAULT_ALLOWED_HTTP_HEADERS, DEFAULT_EXPOSED_HEADERS,
                 DEFAULT_SUPPORTS_CREDENTIALS, DEFAULT_PREFLIGHT_MAXAGE,
                 DEFAULT_DECORATE_REQUEST);
 
-        String configAllowedOrigins = getInitParameter(PARAM_CORS_ALLOWED_ORIGINS);
-        String configAllowedHttpMethods = getInitParameter(PARAM_CORS_ALLOWED_METHODS);
-        String configAllowedHttpHeaders = getInitParameter(PARAM_CORS_ALLOWED_HEADERS);
-        String configExposedHeaders = getInitParameter(PARAM_CORS_EXPOSED_HEADERS);
-        String configSupportsCredentials = getInitParameter(PARAM_CORS_SUPPORT_CREDENTIALS);
-        String configPreflightMaxAge = getInitParameter(PARAM_CORS_PREFLIGHT_MAXAGE);
-        String configDecorateRequest = getInitParameter(PARAM_CORS_REQUEST_DECORATE);
+        if (filterConfig != null) {
+            String configAllowedOrigins = filterConfig
+                    .getInitParameter(PARAM_CORS_ALLOWED_ORIGINS);
+            String configAllowedHttpMethods = filterConfig
+                    .getInitParameter(PARAM_CORS_ALLOWED_METHODS);
+            String configAllowedHttpHeaders = filterConfig
+                    .getInitParameter(PARAM_CORS_ALLOWED_HEADERS);
+            String configExposedHeaders = filterConfig
+                    .getInitParameter(PARAM_CORS_EXPOSED_HEADERS);
+            String configSupportsCredentials = filterConfig
+                    .getInitParameter(PARAM_CORS_SUPPORT_CREDENTIALS);
+            String configPreflightMaxAge = filterConfig
+                    .getInitParameter(PARAM_CORS_PREFLIGHT_MAXAGE);
+            String configDecorateRequest = filterConfig
+                    .getInitParameter(PARAM_CORS_REQUEST_DECORATE);
 
         parseAndStore(configAllowedOrigins, configAllowedHttpMethods,
                 configAllowedHttpHeaders, configExposedHeaders,
                 configSupportsCredentials, configPreflightMaxAge,
                 configDecorateRequest);
+    }
     }
 
 
@@ -447,6 +451,12 @@ public final class CorsFilter extends GenericFilter {
             }
             log.debug(message.toString());
         }
+    }
+
+
+    @Override
+    public void destroy() {
+        // NOOP
     }
 
 

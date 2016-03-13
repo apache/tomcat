@@ -23,8 +23,9 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.GenericFilter;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -38,9 +39,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Amy Roh
  * @author Dmitri Valdin
  */
-public class CompressionFilter extends GenericFilter {
-
-    private static final long serialVersionUID = 1L;
+public class CompressionFilter implements Filter {
 
     /**
      * Minimal reasonable threshold.
@@ -72,14 +71,21 @@ public class CompressionFilter extends GenericFilter {
      */
     private int debug = 0;
 
+    /**
+     * Place this filter into service.
+     *
+     * @param filterConfig The filter configuration object
+     */
     @Override
-    public void init() {
-        String str = getInitParameter("debug");
-        if (str != null) {
-            debug = Integer.parseInt(str);
+    public void init(FilterConfig filterConfig) {
+
+        if (filterConfig != null) {
+            String value = filterConfig.getInitParameter("debug");
+            if (value!=null) {
+                debug = Integer.parseInt(value);
         }
 
-        str = getInitParameter("compressionThreshold");
+            String str = filterConfig.getInitParameter("compressionThreshold");
         if (str != null) {
             compressionThreshold = Integer.parseInt(str);
             if (compressionThreshold != 0 && compressionThreshold < minThreshold) {
@@ -91,7 +97,7 @@ public class CompressionFilter extends GenericFilter {
             }
         }
 
-        str = getInitParameter("compressionBuffer");
+            str = filterConfig.getInitParameter("compressionBuffer");
         if (str != null) {
             compressionBuffer = Integer.parseInt(str);
             if (compressionBuffer < minBuffer) {
@@ -103,7 +109,7 @@ public class CompressionFilter extends GenericFilter {
             }
         }
 
-        str = getInitParameter("compressionMimeTypes");
+            str = filterConfig.getInitParameter("compressionMimeTypes");
         if (str != null) {
             List<String> values = new ArrayList<>();
             StringTokenizer st = new StringTokenizer(str, ",");
@@ -127,6 +133,15 @@ public class CompressionFilter extends GenericFilter {
                         Arrays.toString(compressionMimeTypes));
             }
         }
+    }
+
+    }
+
+    /**
+    * Take this filter out of service.
+    */
+    @Override
+    public void destroy() {
     }
 
     /**

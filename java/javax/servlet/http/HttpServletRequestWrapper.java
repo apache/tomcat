@@ -115,15 +115,6 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     }
 
     /**
-     * The default behavior of this method is to return getMapping() on the
-     * wrapped request object.
-     */
-    @Override
-    public Mapping getMapping() {
-        return this._getHttpServletRequest().getMapping();
-    }
-
-    /**
      * The default behavior of this method is to return getMethod() on the
      * wrapped request object.
      */
@@ -292,7 +283,8 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
      * @deprecated As of Version 3.0 of the Java Servlet API
      */
     @Override
-    @Deprecated
+    @SuppressWarnings("dep-ann")
+    // Spec API does not use @Deprecated
     public boolean isRequestedSessionIdFromUrl() {
         return this._getHttpServletRequest().isRequestedSessionIdFromUrl();
     }
@@ -382,18 +374,5 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     public <T extends HttpUpgradeHandler> T upgrade(
             Class<T> httpUpgradeHandlerClass) throws IOException, ServletException {
         return this._getHttpServletRequest().upgrade(httpUpgradeHandlerClass);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The default behavior of this method is to return
-     * {@link HttpServletRequest#isPushSupported()} on the wrapped request object.
-     *
-     * @since Servlet 4.0
-     */
-    @Override
-    public boolean isPushSupported() {
-        return this._getHttpServletRequest().isPushSupported();
     }
 }

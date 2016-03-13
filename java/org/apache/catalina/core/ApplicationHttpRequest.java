@@ -33,7 +33,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.PushBuilder;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
@@ -615,8 +614,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     }
 
 
-    @Override
-    public PushBuilder getPushBuilder() {
+    public ApplicationPushBuilder getPushBuilder() {
         return new ApplicationPushBuilder(this);
     }
 

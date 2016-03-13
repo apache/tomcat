@@ -170,26 +170,6 @@ public interface HttpServletRequest extends ServletRequest {
      */
     public int getIntHeader(String name);
 
-    public default Mapping getMapping() {
-        return new Mapping() {
-
-            @Override
-            public String getMatchValue() {
-                return "";
-            }
-
-            @Override
-            public String getPattern() {
-                return "";
-            }
-
-            @Override
-            public MappingMatch getMatchType() {
-                return MappingMatch.UNKNOWN;
-            }
-        };
-    }
-
     /**
      * Returns the name of the HTTP method with which this request was made, for
      * example, GET, POST, or PUT. Same as the value of the CGI variable
@@ -233,33 +213,6 @@ public interface HttpServletRequest extends ServletRequest {
      *         information
      */
     public String getPathTranslated();
-
-    /**
-     * Does the current request allow push requests. This will return {@code
-     * true} only if the underlying protocol supports server push and if pushes
-     * are permitted from the current request.
-     *
-     * @return {@code true} if server push is supported for the current request
-     *         otherwise {@code false}
-     */
-    public default boolean isPushSupported() {
-        return false;
-    }
-
-    /**
-     * Obtain a builder for generating push requests. {@link PushBuilder}
-     * documents how this request will be used as the basis for a push request.
-     * Each call to this method will return a new instance, independent of any
-     * previous instance obtained.
-     *
-     * @return A builder that can be used to generate push requests based on
-     *         this request.
-     *
-     * @since Servlet 4.0
-     */
-    public default PushBuilder getPushBuilder() {
-        return null;
-    }
 
     /**
      * Returns the portion of the request URI that indicates the context of the
@@ -474,7 +427,8 @@ public interface HttpServletRequest extends ServletRequest {
      * @deprecated As of Version 2.1 of the Java Servlet API, use
      *             {@link #isRequestedSessionIdFromURL} instead.
      */
-    @Deprecated
+    @SuppressWarnings("dep-ann")
+    // Spec API does not use @Deprecated
     public boolean isRequestedSessionIdFromUrl();
 
     /**

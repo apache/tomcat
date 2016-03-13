@@ -712,6 +712,21 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
+        public boolean fill(boolean block, byte[] data) throws IOException {
+            return fill(block, data, 0, data.length);        }
+
+
+        @Override
+        public boolean fill(boolean block, ByteBuffer data, int len) throws IOException {
+            boolean result = fill(block, data.array(), data.arrayOffset(), len);
+            if (result) {
+                data.position(data.position() + len);
+            }
+            return result;
+        }
+
+
+        @Override
         public boolean fill(boolean block, byte[] data, int offset, int length) throws IOException {
             // Note: Block is ignored for this test class. Reads always block.
             int off = offset;

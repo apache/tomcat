@@ -38,11 +38,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.Mapping;
 import javax.servlet.http.Part;
-import javax.servlet.http.PushBuilder;
 
 import org.apache.catalina.Globals;
+import org.apache.catalina.core.ApplicationPushBuilder;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -738,18 +737,6 @@ public class RequestFacade implements HttpServletRequest {
 
 
     @Override
-    public Mapping getMapping() {
-
-        if (request == null) {
-            throw new IllegalStateException(
-                            sm.getString("requestFacade.nullRequest"));
-        }
-
-        return request.getMapping();
-    }
-
-
-    @Override
     public String getMethod() {
 
         if (request == null) {
@@ -1129,12 +1116,12 @@ public class RequestFacade implements HttpServletRequest {
 
 
     /**
-     * {@inheritDoc}
+     * Pulled forward from Servlet 4.0. The method signature may be modified,
+     * removed or replaced at any time until Servlet 4.0 becomes final.
      *
-     * @since Servlet 4.0
+     * @return A builder to use to construct the push request
      */
-    @Override
-    public PushBuilder getPushBuilder() {
+    public ApplicationPushBuilder getPushBuilder() {
         return request.getPushBuilder();
     }
 }

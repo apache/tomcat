@@ -92,19 +92,19 @@ public interface ServletContext {
 
     /**
      * Returns the major version of the Java Servlet API that this servlet
-     * container supports. All implementations that comply with Version 4.0 must
-     * have this method return the integer 4.
+     * container supports. All implementations that comply with Version 3.1 must
+     * have this method return the integer 3.
      *
-     * @return 4
+     * @return 3
      */
     public int getMajorVersion();
 
     /**
      * Returns the minor version of the Servlet API that this servlet container
-     * supports. All implementations that comply with Version 4.0 must have this
-     * method return the integer 0.
+     * supports. All implementations that comply with Version 3.1 must have this
+     * method return the integer 1.
      *
-     * @return 0
+     * @return 1
      */
     public int getMinorVersion();
 
@@ -310,7 +310,8 @@ public interface ServletContext {
      *
      * @deprecated As of Java Servlet API 2.1, with no direct replacement.
      */
-    @Deprecated
+    @SuppressWarnings("dep-ann")
+    // Spec API does not use @Deprecated
     public Servlet getServlet(String name) throws ServletException;
 
     /**
@@ -324,7 +325,8 @@ public interface ServletContext {
      *
      * @deprecated As of Java Servlet API 2.0, with no replacement.
      */
-    @Deprecated
+    @SuppressWarnings("dep-ann")
+    // Spec API does not use @Deprecated
     public Enumeration<Servlet> getServlets();
 
     /**
@@ -339,7 +341,8 @@ public interface ServletContext {
      *
      * @deprecated As of Java Servlet API 2.1, with no replacement.
      */
-    @Deprecated
+    @SuppressWarnings("dep-ann")
+    // Spec API does not use @Deprecated
     public Enumeration<String> getServletNames();
 
     /**
@@ -364,7 +367,8 @@ public interface ServletContext {
      *             stack trace and an explanatory error message to the servlet
      *             log file.
      */
-    @Deprecated
+    @SuppressWarnings("dep-ann")
+    // Spec API does not use @Deprecated
     public void log(Exception exception, String msg);
 
     /**
@@ -433,8 +437,6 @@ public interface ServletContext {
      *            whose value is requested
      * @return a <code>String</code> containing the value of the initialization
      *         parameter
-     * @throws NullPointerException If the provided parameter name is
-     *         <code>null</code>
      * @see ServletConfig#getInitParameter
      */
     public String getInitParameter(String name);
@@ -467,8 +469,6 @@ public interface ServletContext {
      *    {@link javax.servlet.annotation.WebListener}. For example, a
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
-     * @throws NullPointerException If the provided parameter name is
-     *         <code>null</code>
      * @since Servlet 3.0
      */
     public boolean setInitParameter(String name, String value);
@@ -490,8 +490,6 @@ public interface ServletContext {
      *            a <code>String</code> specifying the name of the attribute
      * @return an <code>Object</code> containing the value of the attribute, or
      *         <code>null</code> if no attribute exists matching the given name
-     * @throws NullPointerException If the provided attribute name is
-     *         <code>null</code>
      * @see ServletContext#getAttributeNames
      */
     public Object getAttribute(String name);
@@ -525,8 +523,6 @@ public interface ServletContext {
      *            a <code>String</code> specifying the name of the attribute
      * @param object
      *            an <code>Object</code> representing the attribute to be bound
-     * @throws NullPointerException If the provided attribute name is
-     *         <code>null</code>
      */
     public void setAttribute(String name, Object object);
 

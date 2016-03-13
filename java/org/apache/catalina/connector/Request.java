@@ -63,9 +63,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.Mapping;
 import javax.servlet.http.Part;
-import javax.servlet.http.PushBuilder;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -76,7 +74,6 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.TomcatPrincipal;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.core.ApplicationMapping;
 import org.apache.catalina.core.ApplicationPart;
 import org.apache.catalina.core.ApplicationPushBuilder;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
@@ -484,7 +481,6 @@ public class Request implements HttpServletRequest {
         }
 
         mappingData.recycle();
-        applicationMapping.recycle();
 
         applicationRequest = null;
         if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
@@ -623,7 +619,6 @@ public class Request implements HttpServletRequest {
      * Mapping data.
      */
     protected final MappingData mappingData = new MappingData();
-    private final ApplicationMapping applicationMapping = new ApplicationMapping(mappingData);
 
     /**
      * @return mapping data.
@@ -1895,11 +1890,11 @@ public class Request implements HttpServletRequest {
     // --------------------------------------------- HttpServletRequest Methods
 
     /**
-     * {@inheritDoc}
+     * Pulled forward from Servlet 4.0. The method signature may be modified,
+     * removed or replaced at any time until Servlet 4.0 becomes final.
      *
-     * @since Servlet 4.0
+     * @return {@code true} If this request supports server push
      */
-    @Override
     public boolean isPushSupported() {
         AtomicBoolean result = new AtomicBoolean();
         coyoteRequest.action(ActionCode.IS_PUSH_SUPPORTED, result);
@@ -1908,12 +1903,12 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * {@inheritDoc}
+     * Pulled forward from Servlet 4.0. The method signature may be modified,
+     * removed or replaced at any time until Servlet 4.0 becomes final.
      *
-     * @since Servlet 4.0
+     * @return A builder to use to construct the push request
      */
-    @Override
-    public PushBuilder getPushBuilder() {
+    public ApplicationPushBuilder getPushBuilder() {
         return new ApplicationPushBuilder(this);
     }
 
@@ -2176,12 +2171,6 @@ public class Request implements HttpServletRequest {
         }
 
         return Integer.parseInt(value);
-    }
-
-
-    @Override
-    public Mapping getMapping() {
-        return applicationMapping.getMapping();
     }
 
 

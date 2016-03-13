@@ -32,7 +32,6 @@ import javax.servlet.SessionTrackingMode;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.PushBuilder;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
@@ -45,7 +44,7 @@ import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.http.CookieProcessor;
 import org.apache.tomcat.util.res.StringManager;
 
-public class ApplicationPushBuilder implements PushBuilder {
+public class ApplicationPushBuilder {
 
     private static final StringManager sm = StringManager.getManager(ApplicationPushBuilder.class);
 
@@ -168,8 +167,7 @@ public class ApplicationPushBuilder implements PushBuilder {
     }
 
 
-    @Override
-    public PushBuilder path(String path) {
+    public ApplicationPushBuilder path(String path) {
         if (path.startsWith("/")) {
             this.path = path;
         } else {
@@ -185,92 +183,78 @@ public class ApplicationPushBuilder implements PushBuilder {
     }
 
 
-    @Override
     public String getPath() {
         return path;
     }
 
 
-    @Override
-    public PushBuilder method(String method) {
+    public ApplicationPushBuilder method(String method) {
         this.method = method;
         return this;
     }
 
 
-    @Override
     public String getMethod() {
         return method;
     }
 
 
-    @Override
-    public PushBuilder etag(String etag) {
+    public ApplicationPushBuilder etag(String etag) {
         this.etag = etag;
         return this;
     }
 
 
-    @Override
     public String getEtag() {
         return etag;
     }
 
 
-    @Override
-    public PushBuilder lastModified(String lastModified) {
+    public ApplicationPushBuilder lastModified(String lastModified) {
         this.lastModified = lastModified;
         return this;
     }
 
 
-    @Override
     public String getLastModified() {
         return lastModified;
     }
 
 
-    @Override
-    public PushBuilder queryString(String queryString) {
+    public ApplicationPushBuilder queryString(String queryString) {
         this.queryString = queryString;
         return this;
     }
 
 
-    @Override
     public String getQueryString() {
         return queryString;
     }
 
 
-    @Override
-    public PushBuilder sessionId(String sessionId) {
+    public ApplicationPushBuilder sessionId(String sessionId) {
         this.sessionId = sessionId;
         return this;
     }
 
 
-    @Override
     public String getSessionId() {
         return sessionId;
     }
 
 
-    @Override
-    public PushBuilder conditional(boolean conditional) {
+    public ApplicationPushBuilder conditional(boolean conditional) {
         this.conditional = conditional;
         return this;
     }
 
 
-    @Override
     public boolean isConditional() {
         return conditional;
     }
 
 
-    @Override
-    public PushBuilder addHeader(String name, String value) {
+    public ApplicationPushBuilder addHeader(String name, String value) {
         List<String> values = headers.get(name);
         if (values == null) {
             values = new ArrayList<>();
@@ -282,8 +266,7 @@ public class ApplicationPushBuilder implements PushBuilder {
     }
 
 
-    @Override
-    public PushBuilder setHeader(String name, String value) {
+    public ApplicationPushBuilder setHeader(String name, String value) {
         List<String> values = headers.get(name);
         if (values == null) {
             values = new ArrayList<>();
@@ -297,21 +280,18 @@ public class ApplicationPushBuilder implements PushBuilder {
     }
 
 
-    @Override
-    public PushBuilder removeHeader(String name) {
+    public ApplicationPushBuilder removeHeader(String name) {
         headers.remove(name);
 
         return this;
     }
 
 
-    @Override
     public Set<String> getHeaderNames() {
         return Collections.unmodifiableSet(headers.keySet());
     }
 
 
-    @Override
     public String getHeader(String name) {
         List<String> values = headers.get(name);
         if (values == null) {
@@ -322,7 +302,6 @@ public class ApplicationPushBuilder implements PushBuilder {
     }
 
 
-    @Override
     public boolean push() {
         if (path == null) {
             throw new IllegalStateException(sm.getString("pushBuilder.noPath"));

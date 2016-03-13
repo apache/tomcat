@@ -100,7 +100,8 @@ public interface HttpServletResponse extends ServletResponse {
      *         otherwise.
      * @deprecated As of version 2.1, use encodeURL(String url) instead
      */
-    @Deprecated
+    @SuppressWarnings("dep-ann")
+    // Spec API does not use @Deprecated
     public String encodeUrl(String url);
 
     /**
@@ -110,7 +111,8 @@ public interface HttpServletResponse extends ServletResponse {
      *         otherwise.
      * @deprecated As of version 2.1, use encodeRedirectURL(String url) instead
      */
-    @Deprecated
+    @SuppressWarnings("dep-ann")
+    // Spec API does not use @Deprecated
     public String encodeRedirectUrl(String url);
 
     /**
@@ -289,7 +291,8 @@ public interface HttpServletResponse extends ServletResponse {
      *             <code>setStatus(int)</code>, to send an error with a
      *             description use <code>sendError(int, String)</code>.
      */
-    @Deprecated
+    @SuppressWarnings("dep-ann")
+    // Spec API does not use @Deprecated
     public void setStatus(int sc, String sm);
 
     /**

@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ImportHandler {
 
     private List<String> packageNames = new ArrayList<>();
-    private Map<String,String> classNames = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String,String> classNames = new ConcurrentHashMap<>();
     private Map<String,Class<?>> clazzes = new ConcurrentHashMap<>();
     private Map<String,Class<?>> statics = new ConcurrentHashMap<>();
 

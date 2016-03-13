@@ -20,8 +20,9 @@ package filters;
 
 import java.io.IOException;
 
+import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.GenericFilter;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -42,16 +43,38 @@ import javax.servlet.ServletResponse;
  *
  * @author Craig McClanahan
  */
-public final class ExampleFilter extends GenericFilter {
+public final class ExampleFilter implements Filter {
 
 
-    private static final long serialVersionUID = 1L;
+    // ----------------------------------------------------- Instance Variables
 
 
     /**
      * The request attribute name under which we store a reference to ourself.
      */
     private String attribute = null;
+
+
+    /**
+     * The filter configuration object we are associated with.  If this value
+     * is null, this filter instance is not currently configured.
+     */
+    private FilterConfig filterConfig = null;
+
+
+    // --------------------------------------------------------- Public Methods
+
+
+    /**
+     * Take this filter out of service.
+     */
+    @Override
+    public void destroy() {
+
+        this.attribute = null;
+        this.filterConfig = null;
+
+    }
 
 
     /**
@@ -66,7 +89,8 @@ public final class ExampleFilter extends GenericFilter {
      * @exception ServletException if a servlet error occurs
      */
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+    public void doFilter(ServletRequest request, ServletResponse response,
+                         FilterChain chain)
             throws IOException, ServletException {
 
         // Store ourselves as a request attribute (if requested)
@@ -77,14 +101,22 @@ public final class ExampleFilter extends GenericFilter {
         long startTime = System.currentTimeMillis();
         chain.doFilter(request, response);
         long stopTime = System.currentTimeMillis();
-        getServletContext().log(this.toString() + ": " + (stopTime - startTime) +
+        filterConfig.getServletContext().log
+            (this.toString() + ": " + (stopTime - startTime) +
              " milliseconds");
     }
 
 
+    /**
+     * Place this filter into service.
+     *
+     * @param fConfig The filter configuration object
+     */
     @Override
-    public void init() throws ServletException {
-        this.attribute = getInitParameter("attribute");
+    public void init(FilterConfig fConfig) throws ServletException {
+
+        this.filterConfig = fConfig;
+        this.attribute = fConfig.getInitParameter("attribute");
     }
 
 
@@ -93,8 +125,11 @@ public final class ExampleFilter extends GenericFilter {
      */
     @Override
     public String toString() {
+
+        if (filterConfig == null)
+            return ("TimingFilter()");
         StringBuilder sb = new StringBuilder("TimingFilter(");
-        sb.append(getFilterConfig());
+        sb.append(filterConfig);
         sb.append(")");
         return (sb.toString());
     }
