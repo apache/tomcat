@@ -567,7 +567,7 @@ public class OutputBuffer extends Writer
     }
 
 
-    private static Charset getCharset(String encoding) throws IOException {
+    private static Charset getCharset(final String encoding) throws IOException {
         if (Globals.IS_SECURITY_ENABLED) {
             try {
                 return AccessController.doPrivileged(
@@ -591,7 +591,7 @@ public class OutputBuffer extends Writer
     }
 
 
-    private static C2BConverter createConverter(Charset charset) throws IOException {
+    private static C2BConverter createConverter(final Charset charset) throws IOException {
         if (Globals.IS_SECURITY_ENABLED){
             try {
                 return AccessController.doPrivileged(

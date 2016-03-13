@@ -661,7 +661,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             }
         };
 
-        public Nio2SocketWrapper(Nio2Channel channel, Nio2Endpoint endpoint) {
+        public Nio2SocketWrapper(Nio2Channel channel, final Nio2Endpoint endpoint) {
             super(channel, endpoint);
             socketBufferHandler = channel.getBufHandler();
 
@@ -1102,7 +1102,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             try {
                 if ((!block && readPending.tryAcquire()) || (block && readPending.tryAcquire(timeout, unit))) {
                     Nio2Endpoint.startInline();
-                    getSocket().read(dsts, offset, length, timeout, unit, state, new ScatterReadCompletionHandler<>());
+                    getSocket().read(dsts, offset, length, timeout, unit, state, new ScatterReadCompletionHandler<A>());
                     Nio2Endpoint.endInline();
                 } else {
                     throw new ReadPendingException();
@@ -1131,7 +1131,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             try {
                 if ((!block && writePending.tryAcquire()) || (block && writePending.tryAcquire(timeout, unit))) {
                     Nio2Endpoint.startInline();
-                    getSocket().write(srcs, offset, length, timeout, unit, state, new GatherWriteCompletionHandler<>());
+                    getSocket().write(srcs, offset, length, timeout, unit, state, new GatherWriteCompletionHandler<A>());
                     Nio2Endpoint.endInline();
                 } else {
                     throw new WritePendingException();

@@ -19,6 +19,7 @@ package org.apache.catalina.filters;
 import java.io.IOException;
 
 import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.GenericFilter;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -73,6 +74,16 @@ public class WebdavFixFilter extends GenericFilter {
     /* XP 64-bit SP2 */
     private static final String UA_MINIDIR_5_2_3790 =
         "Microsoft-WebDAV-MiniRedir/5.2.3790";
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        // NOOP
+    }
+
+    @Override
+    public void destroy() {
+        // NOOP
+    }
 
     /**
      * Check for the broken MS WebDAV client and if detected issue a re-direct

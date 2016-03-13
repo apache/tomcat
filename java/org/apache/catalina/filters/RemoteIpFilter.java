@@ -764,6 +764,11 @@ public class RemoteIpFilter extends GenericFilter {
      */
     private Pattern trustedProxies = null;
 
+    @Override
+    public void destroy() {
+        // NOOP
+    }
+
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
         if (internalProxies != null &&

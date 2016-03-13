@@ -558,7 +558,7 @@ public class InputBuffer extends Reader
     }
 
 
-    private static B2CConverter createConverter(Charset charset) throws IOException {
+    private static B2CConverter createConverter(final Charset charset) throws IOException {
         if (SecurityUtil.isPackageProtectionEnabled()){
             try {
                 return AccessController.doPrivileged(

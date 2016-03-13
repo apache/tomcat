@@ -112,7 +112,7 @@ public final class CustomObjectInputStream extends ObjectInputStream {
             reportedClasses = reportedClassCache.get(classLoader);
         }
         if (reportedClasses == null) {
-            reportedClasses = Collections.newSetFromMap(new ConcurrentHashMap<>());
+            reportedClasses = Collections.newSetFromMap(new ConcurrentHashMap<String,Boolean>());
             Set<String> original;
             synchronized (reportedClassCache) {
                 original = reportedClassCache.putIfAbsent(classLoader, reportedClasses);

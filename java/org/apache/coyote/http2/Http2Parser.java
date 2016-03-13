@@ -556,17 +556,9 @@ class Http2Parser {
          */
         boolean fill(boolean block, byte[] data, int offset, int length) throws IOException;
 
-        default boolean fill(boolean block, byte[] data) throws IOException {
-            return fill(block, data, 0, data.length);
-        }
+        boolean fill(boolean block, byte[] data) throws IOException;
 
-        default boolean fill(boolean block, ByteBuffer data, int len) throws IOException {
-            boolean result = fill(block, data.array(), data.arrayOffset(), len);
-            if (result) {
-                data.position(data.position() + len);
-            }
-            return result;
-        }
+        boolean fill(boolean block, ByteBuffer data, int len) throws IOException;
 
         int getMaxFrameSize();
     }

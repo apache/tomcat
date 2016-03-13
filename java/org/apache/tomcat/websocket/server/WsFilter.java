@@ -78,4 +78,11 @@ public class WsFilter extends GenericFilter {
         UpgradeUtil.doUpgrade(sc, req, resp, mappingResult.getConfig(),
                 mappingResult.getPathParams());
     }
+
+    @Override
+    public void destroy() {
+        // NO-OP
+    }
+
+
 }

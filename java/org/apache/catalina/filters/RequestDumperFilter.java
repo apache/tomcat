@@ -70,6 +70,11 @@ public class RequestDumperFilter extends GenericFilter {
     private static final Log log = LogFactory.getLog(RequestDumperFilter.class);
 
 
+    @Override
+    public void destroy() {
+        // NOOP
+    }
+
     /**
      * Log the interesting request parameters, invoke the next Filter in the
      * sequence, and log the interesting response parameters.

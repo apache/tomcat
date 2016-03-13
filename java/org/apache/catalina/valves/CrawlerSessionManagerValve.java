@@ -206,6 +206,12 @@ public class CrawlerSessionManagerValve extends ValveBase
 
 
     @Override
+    public void valueBound(HttpSessionBindingEvent event) {
+        // NOOP
+    }
+
+
+    @Override
     public void valueUnbound(HttpSessionBindingEvent event) {
         String clientIp = sessionIdClientIp.remove(event.getSession().getId());
         if (clientIp != null) {

@@ -132,6 +132,11 @@ public final class CorsFilter extends GenericFilter {
 
 
     @Override
+    public void destroy() {
+        // NOOP
+    }
+
+    @Override
     public void doFilter(final ServletRequest servletRequest,
             final ServletResponse servletResponse, final FilterChain filterChain)
             throws IOException, ServletException {
