@@ -81,7 +81,7 @@
   <!-- build output directory for jdbc-pool -->
   <property name="tomcat.pool"           value="${tomcat.output}/jdbc-pool"/>
 
-  <!-- Servlet 4.0 spec requires 1.8+ -->
+  <!-- Servlet 3.1 spec requires 1.7+ -->
   <property name="compile.source" value="1.7"/>
   <property name="compile.target" value="1.7"/>
 
