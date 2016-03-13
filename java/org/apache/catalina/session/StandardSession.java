@@ -161,19 +161,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
 
 
     /**
-     * Set of attribute names which are not allowed to be persisted.
-     *
-     * @deprecated Use {@link Constants#excludedAttributeNames} instead. Will be
-     *             removed in Tomcat 9.
-     */
-    @Deprecated
-    protected static final String[] excludedAttributes = {
-        Globals.SUBJECT_ATTR,
-        Globals.GSS_CREDENTIAL_ATTR
-    };
-
-
-    /**
      * We are currently processing a session expiration, so bypass
      * certain IllegalStateException tests.  NOTE:  This value is not
      * included in the serialized version of this object.
@@ -1715,21 +1702,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
             }
         }
 
-    }
-
-
-    /**
-     * Exclude standard attributes that cannot be serialized.
-     * @param name the attribute's name
-     * @return <code>true</code> if the specified attribute should be
-     *    excluded from serialization
-     *
-     * @deprecated Use {@link #exclude(String, Object)}. Will be removed in
-     *             Tomcat 9.0.x.
-     */
-    @Deprecated
-    protected boolean exclude(String name){
-        return exclude(name, null);
     }
 
 
