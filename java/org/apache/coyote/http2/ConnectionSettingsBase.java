@@ -138,7 +138,7 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
         if (pendingValue == null) {
             return currentValue;
         } else {
-            return Long.min(pendingValue.longValue(), currentValue);
+            return Math.min(pendingValue.longValue(), currentValue);
         }
     }
 
@@ -159,7 +159,7 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
         if (pendingValue == null) {
             return currentValue;
         } else {
-            return Long.max(pendingValue.longValue(), currentValue);
+            return Math.max(pendingValue.longValue(), currentValue);
         }
     }
 
