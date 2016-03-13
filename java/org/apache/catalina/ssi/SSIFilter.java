@@ -169,9 +169,4 @@ public class SSIFilter extends GenericFilter {
             out.write(bytes);
         }
     }
-
-    @Override
-    public void destroy() {
-        // NOOP
-    }
 }
