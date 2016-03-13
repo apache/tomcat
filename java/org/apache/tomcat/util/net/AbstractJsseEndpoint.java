@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -146,7 +148,20 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         engine.setEnabledProtocols(sslHostConfig.getEnabledProtocols());
 
         SSLParameters sslParameters = engine.getSSLParameters();
-        sslParameters.setUseCipherSuitesOrder(sslHostConfig.getHonorCipherOrder());
+        if (sslHostConfig.getHonorCipherOrder()) {
+            // SSLParameters#setUseCipherSuiteOrder is java 8 and upwards
+            try {
+                Method m = SSLParameters.class.getMethod(
+                        "setUseCipherSuitesOrder", Boolean.TYPE);
+                m.invoke(sslParameters, Boolean.TRUE);
+            } catch (NoSuchMethodException | SecurityException
+                    | IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException e) {
+                throw new UnsupportedOperationException(
+                        sm.getString("endpoint.jsse.cannotHonorServerCipherOrder"),
+                        e);
+            }
+        }
         // In case the getter returns a defensive copy
         engine.setSSLParameters(sslParameters);
 
