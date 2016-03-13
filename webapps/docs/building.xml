@@ -43,10 +43,10 @@ The following is a quick step by step guide.
 
 </section>
 
-<section name="Download a Java Development Kit (JDK) version 8">
+<section name="Download a Java Development Kit (JDK) version 7">
 
 <p>
-Building Apache Tomcat requires a JDK (version 8) to be installed. You can download one from<br />
+Building Apache Tomcat requires a JDK (version 7) to be installed. You can download one from<br />
 <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">http://www.oracle.com/technetwork/java/javase/downloads/index.html</a><br/>
 <a href="http://openjdk.java.net/install/index.html">http://openjdk.java.net/install/index.html</a><br/>
 or another JDK vendor.
@@ -87,7 +87,7 @@ available, which will be used to actually perform the build.
 
   <p>
   Tomcat SVN repository URL:
-  <a href="http://svn.apache.org/repos/asf/tomcat/trunk/">http://svn.apache.org/repos/asf/tomcat/trunk/</a>
+  <a href="http://svn.apache.org/repos/asf/tomcat/tc8.5.x/trunk/">http://svn.apache.org/repos/asf/tomcat/tc8.0.x/trunk/</a>
   </p>
   <p>
   Tomcat source packages:
