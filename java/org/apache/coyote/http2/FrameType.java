@@ -16,23 +16,21 @@
  */
 package org.apache.coyote.http2;
 
-import java.util.function.IntPredicate;
-
 import org.apache.tomcat.util.res.StringManager;
 
 public enum FrameType {
 
-    DATA          (0,   false,  true, null,              false),
-    HEADERS       (1,   false,  true, null,               true),
-    PRIORITY      (2,   false,  true, (x) -> x == 5,     false),
-    RST           (3,   false,  true, (x) -> x == 4,     false),
-    SETTINGS      (4,    true, false, (x) -> x % 6 == 0,  true),
-    PUSH_PROMISE  (5,   false,  true, (x) -> x >= 4,      true),
-    PING          (6,    true, false, (x) -> x == 8,     false),
-    GOAWAY        (7,    true, false, (x) -> x >= 8,     false),
-    WINDOW_UPDATE (8,    true,  true, (x) -> x == 4,      true),
-    CONTINUATION  (9,   false,  true, null,               true),
-    UNKNOWN       (256,  true,  true, null,              false);
+    DATA          (0,   false,  true, null,               false),
+    HEADERS       (1,   false,  true, null,                true),
+    PRIORITY      (2,   false,  true, equals(5),          false),
+    RST           (3,   false,  true, equals(4),          false),
+    SETTINGS      (4,    true, false, dividableBy(6),      true),
+    PUSH_PROMISE  (5,   false,  true, greaterOrEquals(4),  true),
+    PING          (6,    true, false, equals(8),          false),
+    GOAWAY        (7,    true, false, greaterOrEquals(8), false),
+    WINDOW_UPDATE (8,    true,  true, equals(4),           true),
+    CONTINUATION  (9,   false,  true, null,                true),
+    UNKNOWN       (256,  true,  true, null,               false);
 
     private static final StringManager sm = StringManager.getManager(FrameType.class);
 
@@ -105,5 +103,36 @@ public enum FrameType {
         default:
             return UNKNOWN;
         }
+    }
+
+    private interface IntPredicate {
+        boolean test(int x);
+    }
+
+    private static IntPredicate greaterOrEquals(final int y) {
+        return new IntPredicate() {
+            @Override
+            public boolean test(int x) {
+                return x >= y;
+            }
+        };
+    }
+
+    private static IntPredicate equals(final int y) {
+        return new IntPredicate() {
+            @Override
+            public boolean test(int x) {
+                return x == y;
+            }
+        };
+    }
+
+    private static IntPredicate dividableBy(final int y) {
+        return new IntPredicate() {
+            @Override
+            public boolean test(int x) {
+                return x % y == 0;
+            }
+        };
     }
 }
