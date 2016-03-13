@@ -23,7 +23,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -43,6 +42,7 @@ import org.apache.tomcat.jni.CertificateVerifier;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLContext;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLHostConfig;
@@ -52,6 +52,8 @@ import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationPars
 import org.apache.tomcat.util.res.StringManager;
 
 public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
+
+    private static final Base64 BASE64_ENCODER = new Base64(64, new byte[] {'\n'});
 
     private static final Log log = LogFactory.getLog(OpenSSLContext.class);
 
@@ -325,7 +327,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 X509Certificate certificate = keyManager.getCertificateChain(alias)[0];
                 PrivateKey key = keyManager.getPrivateKey(alias);
                 StringBuilder sb = new StringBuilder(BEGIN_KEY);
-                sb.append(Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(key.getEncoded()));
+                sb.append(BASE64_ENCODER.encodeToString(key.getEncoded()));
                 sb.append(END_KEY);
                 SSLContext.setCertificateRaw(ctx, certificate.getEncoded(), sb.toString().getBytes(StandardCharsets.US_ASCII), SSL.SSL_AIDX_RSA);
             }
