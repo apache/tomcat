@@ -38,7 +38,7 @@ CONTENTS:
 ===================
 Dependency Changes:
 ===================
-Tomcat @VERSION_MAJOR_MINOR@ is designed to run on Java SE 8 and later.
+Tomcat @VERSION_MAJOR_MINOR@ is designed to run on Java SE 7 and later.
 
 
 ==============
@@ -77,7 +77,7 @@ for use by web applications (by placing them in "lib"):
 * jasper.jar (Jasper 2 Compiler and Runtime)
 * jasper-el.jar (Jasper 2 EL implementation)
 * jsp-api.jar (JSP 2.3 API)
-* servlet-api.jar (Servlet 4.0 API)
+* servlet-api.jar (Servlet 3.1 API)
 * tomcat-api.jar (Interfaces shared by Catalina and Jasper)
 * tomcat-coyote.jar (Tomcat connectors and utility classes)
 * tomcat-dbcp.jar (package renamed database connection pool based on Commons DBCP)
