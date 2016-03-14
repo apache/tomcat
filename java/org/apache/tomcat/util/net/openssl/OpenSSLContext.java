@@ -327,7 +327,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 X509Certificate certificate = keyManager.getCertificateChain(alias)[0];
                 PrivateKey key = keyManager.getPrivateKey(alias);
                 StringBuilder sb = new StringBuilder(BEGIN_KEY);
-                sb.append(BASE64_ENCODER.encodeToString(key.getEncoded()));
+                String encoded = BASE64_ENCODER.encodeToString(key.getEncoded());
+                if (encoded.endsWith("\n")) {
+                    encoded = encoded.substring(0, encoded.length() - 1);
+                }
+                sb.append(encoded);
                 sb.append(END_KEY);
                 SSLContext.setCertificateRaw(ctx, certificate.getEncoded(), sb.toString().getBytes(StandardCharsets.US_ASCII), SSL.SSL_AIDX_RSA);
             }
