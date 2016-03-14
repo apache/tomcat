@@ -197,9 +197,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
         session = new OpenSSLSession();
+        destroyed = 1;
         ssl = SSL.newSSL(sslCtx, !clientMode);
         networkBIO = SSL.makeNetworkBIO(ssl);
-        DESTROYED_UPDATER.compareAndSet(this, 0, 1);
+        destroyed = 0;
         this.fallbackApplicationProtocol = fallbackApplicationProtocol;
         this.clientMode = clientMode;
         this.sessionContext = sessionContext;
@@ -215,7 +216,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Destroys this engine.
      */
     public synchronized void shutdown() {
-        if (DESTROYED_UPDATER.compareAndSet(this, 1, 2)) {
+        if (DESTROYED_UPDATER.compareAndSet(this, 0, 1)) {
             SSL.freeSSL(ssl);
             SSL.freeBIO(networkBIO);
             ssl = networkBIO = 0;
