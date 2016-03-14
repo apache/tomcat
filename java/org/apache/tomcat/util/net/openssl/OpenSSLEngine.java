@@ -199,6 +199,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         session = new OpenSSLSession();
         ssl = SSL.newSSL(sslCtx, !clientMode);
         networkBIO = SSL.makeNetworkBIO(ssl);
+        DESTROYED_UPDATER.compareAndSet(this, 0, 1);
         this.fallbackApplicationProtocol = fallbackApplicationProtocol;
         this.clientMode = clientMode;
         this.sessionContext = sessionContext;
@@ -214,7 +215,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Destroys this engine.
      */
     public synchronized void shutdown() {
-        if (DESTROYED_UPDATER.compareAndSet(this, 0, 1)) {
+        if (DESTROYED_UPDATER.compareAndSet(this, 1, 2)) {
             SSL.freeSSL(ssl);
             SSL.freeBIO(networkBIO);
             ssl = networkBIO = 0;
