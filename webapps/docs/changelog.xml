@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M5" rtext="In development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>48922</bug>: Apply a very small performance improvement to the
+        date formatting in Tomcat's internal request object. Based on a patch
+        provided by Ondrej Medek. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>

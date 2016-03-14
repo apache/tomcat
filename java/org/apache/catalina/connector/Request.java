@@ -127,11 +127,10 @@ public class Request implements HttpServletRequest {
 
 
     public Request() {
-
-        formats[0].setTimeZone(GMT_ZONE);
-        formats[1].setTimeZone(GMT_ZONE);
-        formats[2].setTimeZone(GMT_ZONE);
-
+        formats = new SimpleDateFormat[formatsTemplate.length];
+        for(int i = 0; i < formats.length; i++) {
+            formats[i] = (SimpleDateFormat) formatsTemplate[i].clone();
+        }
     }
 
 
@@ -187,7 +186,9 @@ public class Request implements HttpServletRequest {
      * Notice that because SimpleDateFormat is not thread-safe, we can't
      * declare formats[] as a static variable.
      */
-    protected final SimpleDateFormat formats[] = {
+    protected final SimpleDateFormat formats[];
+
+    private static final SimpleDateFormat formatsTemplate[] = {
         new SimpleDateFormat(FastHttpDateFormat.RFC1123_DATE, Locale.US),
         new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
         new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
@@ -3489,5 +3490,9 @@ public class Request implements HttpServletRequest {
                         // NO-OP
                     }
                 });
+
+        for (SimpleDateFormat sdf : formatsTemplate) {
+            sdf.setTimeZone(GMT_ZONE);
+        }
     }
 }
