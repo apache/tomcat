@@ -34,7 +34,7 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
     private static final boolean RELAX_TIMING = Boolean.getBoolean("tomcat.test.relaxTiming");
 
     // Timing tests need an error margin to prevent failures.
-    private static final long ERROR_MARGIN = RELAX_TIMING ? 1000 : 100;
+    private static final long ERROR_MARGIN = RELAX_TIMING ? 2000 : 100;
 
     private final Queue<Entry> entries = new ConcurrentLinkedQueue<>();
 
