@@ -29,7 +29,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
@@ -65,8 +64,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private static final StringManager sm = StringManager.getManager(OpenSSLEngine.class);
 
     private static final Certificate[] EMPTY_CERTIFICATES = new Certificate[0];
-    private static final SSLException ENGINE_CLOSED = new SSLException(sm.getString("engine.engineClosed"));
-    private static final SSLException ENCRYPTED_PACKET_OVERSIZED = new SSLException(sm.getString("engine.oversizedPacket"));
 
     public static final Set<String> AVAILABLE_CIPHER_SUITES;
 
@@ -101,12 +98,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         AVAILABLE_CIPHER_SUITES = Collections.unmodifiableSet(availableCipherSuites);
     }
 
-    static {
-        ENGINE_CLOSED.setStackTrace(new StackTraceElement[0]);
-        ENCRYPTED_PACKET_OVERSIZED.setStackTrace(new StackTraceElement[0]);
-        DESTROYED_UPDATER = AtomicIntegerFieldUpdater.newUpdater(OpenSSLEngine.class, "destroyed");
-    }
-
     private static final int MAX_PLAINTEXT_LENGTH = 16 * 1024; // 2^14
     private static final int MAX_COMPRESSED_LENGTH = MAX_PLAINTEXT_LENGTH + 1024;
     private static final int MAX_CIPHERTEXT_LENGTH = MAX_COMPRESSED_LENGTH + 1024;
@@ -136,8 +127,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         REQUIRE,
     }
 
-    private static final AtomicIntegerFieldUpdater<OpenSSLEngine> DESTROYED_UPDATER;
-
     private static final String INVALID_CIPHER = "SSL_NULL_WITH_NULL_NULL";
 
     private static final long EMPTY_ADDR = Buffer.address(ByteBuffer.allocate(0));
@@ -154,7 +143,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private boolean handshakeFinished;
     private int currentHandshake;
     private boolean receivedShutdown;
-    private volatile int destroyed;
+    private volatile boolean destroyed;
 
     // Use an invalid cipherSuite until the handshake is completed
     // See http://docs.oracle.com/javase/7/docs/api/javax/net/ssl/SSLEngine.html#getSession()
@@ -197,10 +186,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
         session = new OpenSSLSession();
-        destroyed = 1;
+        destroyed = true;
         ssl = SSL.newSSL(sslCtx, !clientMode);
         networkBIO = SSL.makeNetworkBIO(ssl);
-        destroyed = 0;
+        destroyed = false;
         this.fallbackApplicationProtocol = fallbackApplicationProtocol;
         this.clientMode = clientMode;
         this.sessionContext = sessionContext;
@@ -216,9 +205,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Destroys this engine.
      */
     public synchronized void shutdown() {
-        if (DESTROYED_UPDATER.compareAndSet(this, 0, 1)) {
-            SSL.freeSSL(ssl);
+        if (!destroyed) {
+            destroyed = true;
             SSL.freeBIO(networkBIO);
+            SSL.freeSSL(ssl);
             ssl = networkBIO = 0;
 
             // internal errors can cause shutdown without marking the engine closed
@@ -384,7 +374,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     public synchronized SSLEngineResult wrap(final ByteBuffer[] srcs, final int offset, final int length, final ByteBuffer dst) throws SSLException {
 
         // Check to make sure the engine has not been closed
-        if (destroyed != 0) {
+        if (destroyed) {
             return new SSLEngineResult(SSLEngineResult.Status.CLOSED, SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING, 0, 0);
         }
 
@@ -492,7 +482,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     @Override
     public synchronized SSLEngineResult unwrap(final ByteBuffer src, final ByteBuffer[] dsts, final int offset, final int length) throws SSLException {
         // Check to make sure the engine has not been closed
-        if (destroyed != 0) {
+        if (destroyed) {
             return new SSLEngineResult(SSLEngineResult.Status.CLOSED, SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING, 0, 0);
         }
 
@@ -542,7 +532,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             isOutboundDone = true;
             engineClosed = true;
             shutdown();
-            throw ENCRYPTED_PACKET_OVERSIZED;
+            throw new SSLException(sm.getString("engine.oversizedPacket"));
         }
 
         // Write encrypted data to network BIO
@@ -673,7 +663,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         isOutboundDone = true;
         engineClosed = true;
 
-        if (accepted != 0 && destroyed == 0) {
+        if (accepted != 0 && !destroyed) {
             int mode = SSL.getShutdown(ssl);
             if ((mode & SSL.SSL_SENT_SHUTDOWN) != SSL.SSL_SENT_SHUTDOWN) {
                 SSL.shutdownSSL(ssl);
@@ -834,8 +824,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public synchronized void beginHandshake() throws SSLException {
-        if (engineClosed || destroyed != 0) {
-            throw ENGINE_CLOSED;
+        if (engineClosed || destroyed) {
+            throw new SSLException(sm.getString("engine.engineClosed"));
         }
         switch (accepted) {
             case 0:
@@ -860,14 +850,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private void beginHandshakeImplicitly() throws SSLException {
-        if (engineClosed || destroyed != 0) {
-            throw ENGINE_CLOSED;
-        }
-
-        if (accepted == 0) {
-            handshake();
-            accepted = 1;
-        }
+        handshake();
+        accepted = 1;
     }
 
     private void handshake() throws SSLException {
@@ -930,7 +914,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public synchronized SSLEngineResult.HandshakeStatus getHandshakeStatus() {
-        if (accepted == 0 || destroyed != 0) {
+        if (accepted == 0 || destroyed) {
             return SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING;
         }
 

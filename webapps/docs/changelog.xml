@@ -60,6 +60,9 @@
         Improves OpenSSL engine robustness when SSL allocation fails for
         some reason. (remm)
       </fix>
+      <fix>
+        OpenSSL engine code cleanups. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
