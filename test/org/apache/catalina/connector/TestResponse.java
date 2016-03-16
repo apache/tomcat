@@ -604,7 +604,7 @@ public class TestResponse extends TomcatBaseTest {
         org.apache.coyote.Request cRequest = new org.apache.coyote.Request();
         request.setCoyoteRequest(cRequest);
         Context context = new TesterContext();
-        request.getMappingData().context = context;
+        request.setContext(context);
         response.setRequest(request);
         // Do test
         response.sendRedirect(input);
