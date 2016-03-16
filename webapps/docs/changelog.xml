@@ -45,6 +45,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.0">
+  <subsection name="Other">
+    <changelog>
+      <add>
+        The Tomcat 8.5.x branch was created from the Tomcat 9.0.0.M4 tag.
+        Changes were applied to restore Java 7 compatibility and to align the
+        specification APIs with Servlet 3.1, JSP 2.3, EL 3.0, WebSocket 1.1 and
+        JASPIC 1.1.
+      </add>
+    </changelog>
+  </subsection>
 </section>
 </body>
 </document>
