@@ -772,7 +772,10 @@ public class WsSession implements Session {
         }
 
         if (System.currentTimeMillis() - lastActive > timeout) {
-            String msg = sm.getString("wsSession.timeout");
+            String msg = sm.getString("wsSession.timeout", getId());
+            if (log.isDebugEnabled()) {
+                log.debug(msg);
+            }
             doClose(new CloseReason(CloseCodes.GOING_AWAY, msg),
                     new CloseReason(CloseCodes.CLOSED_ABNORMALLY, msg));
         }
