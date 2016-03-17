@@ -44,7 +44,7 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 8.5.0">
+<section name="Tomcat 8.5.0" rext="In development">
   <subsection name="Other">
     <changelog>
       <add>
