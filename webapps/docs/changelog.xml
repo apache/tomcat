@@ -44,7 +44,19 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 8.5.0" rext="In development">
+<section name="Tomcat 8.5.1" rtext="In development">
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>59189</bug>: Explicitly release the native memory held by the
+        <code>Inflater</code> and <code>Deflater</code> when using
+        PerMessageDeflate and the WebSocket session ends. Based on a patch by
+        Henrik Olsson. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 8.5.0" rtext="Release in progress">
   <subsection name="Other">
     <changelog>
       <add>
