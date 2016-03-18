@@ -704,6 +704,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         for (EncoderEntry entry : encoderEntries) {
             entry.getEncoder().destroy();
         }
+        // The transformation handles both input and output. It only needs to be
+        // closed once so it is closed here on the output side.
+        transformation.close();
         doClose();
     }
 

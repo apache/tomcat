@@ -65,6 +65,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>59189</bug>: Explicitly release the native memory held by the
+        <code>Inflater</code> and <code>Deflater</code> when using
+        PerMessageDeflate and the WebSocket session ends. Based on a patch by
+        Henrik Olsson. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M4" rtext="2016-03-16">
   <subsection name="Catalina">

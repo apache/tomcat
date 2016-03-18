@@ -460,4 +460,13 @@ public class PerMessageDeflate implements Transformation {
         }
         return result;
     }
+
+
+    @Override
+    public void close() {
+        // There will always be a next transformation
+        next.close();
+        inflater.end();
+        deflater.end();
+    }
 }
