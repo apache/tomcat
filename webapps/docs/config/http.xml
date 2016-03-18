@@ -923,16 +923,16 @@
 
 <section name="Nested Components">
 
-  <p>Starting with Tomcat 9, Tomcat supports Server Name Indication (SNI). This
-  allows multiple SSL configurations to be associated with a single secure
-  connector with the configuration used for any given connection determined by
-  the host name requested by the client. To facilitate this, Tomcat 9 added the
-  <strong>SSLHostConfig</strong> element which can be used to define one of
-  these configurations. Any number of <strong>SSLHostConfig</strong> may be
-  nested in a <strong>Connector</strong>. Tomcat 9 also adds support for
-  multiple certificates to be associated with a single
-  <strong>SSLHostConfig</strong>. Each SSL certificate is therefore configured
-  in a <strong>Certificate</strong> element with in an
+  <p>First implemented in Tomcat 9 and back-ported to 8.5, Tomcat now supports
+  Server Name Indication (SNI). This allows multiple SSL configurations to be
+  associated with a single secure connector with the configuration used for any
+  given connection determined by the host name requested by the client. To
+  facilitate this, the <strong>SSLHostConfig</strong> element was added which
+  can be used to define one of these configurations. Any number of
+  <strong>SSLHostConfig</strong> may be nested in a <strong>Connector</strong>.
+  At the same time, support was added for multiple certificates to be associated
+  with a single <strong>SSLHostConfig</strong>. Each SSL certificate is
+  therefore configured in a <strong>Certificate</strong> element with in an
   <strong>SSLHostConfig</strong>. For further information, see the SSL Support
   section below.</p>
 
