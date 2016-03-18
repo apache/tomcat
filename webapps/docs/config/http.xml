@@ -1009,7 +1009,7 @@
   <strong>Certificate</strong>. The types of the <strong>Certificate</strong>s
   must be unique.</p>
 
-  <p>As of Tomcat 9, the majority of the SSL configuration attributes in the
+  <p>As of Tomcat 8.5, the majority of the SSL configuration attributes in the
   <strong>Connector</strong> are deprecated. If specified, they will be used to
   configure a <strong>SSLHostConfig</strong> and <strong>Certificate</strong>
   for the <code>sslDefaultHost</code>. Note that if an explicit
