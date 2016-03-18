@@ -47,7 +47,7 @@ API Stability:
 
 The public interfaces for the following classes are fixed and will not be
 changed at all during the remaining lifetime of the @VERSION_MAJOR@.x series:
-- All classes in the javax namespace
+- None
 
 The public interfaces for the following classes may be added to in order to
 resolve bugs and/or add new features. No existing interface method will be
