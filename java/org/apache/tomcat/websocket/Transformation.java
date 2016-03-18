@@ -94,4 +94,9 @@ public interface Transformation {
      *          may be bigger or smaller than the size of the input list
      */
     List<MessagePart> sendMessagePart(List<MessagePart> messageParts);
+
+    /**
+     * Clean-up any resources that were used by the transformation.
+     */
+    void close();
 }

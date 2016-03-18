@@ -737,6 +737,11 @@ public abstract class WsFrameBase {
         public boolean validateRsv(int rsv, byte opCode) {
             return rsv == 0;
         }
+
+        @Override
+        public void close() {
+            // NO-OP for the terminal transformations
+        }
     }
 
 

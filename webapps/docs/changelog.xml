@@ -167,6 +167,12 @@
         <bug>59134</bug>: Correct client connect logic for secure connections
         made through a proxy. (markt)
       </fix>
+      <fix>
+        <bug>59189</bug>: Explicitly release the native memory held by the
+        <code>Inflater</code> and <code>Deflater</code> when using
+        PerMessageDeflate and the WebSocket session ends. Based on a patch by
+        Henrik Olsson. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Applications">
