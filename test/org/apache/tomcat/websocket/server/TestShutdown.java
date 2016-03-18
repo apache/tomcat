@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.websocket.ClientEndpointConfig;
 import javax.websocket.ContainerProvider;
@@ -68,6 +69,14 @@ public class TestShutdown extends TomcatBaseTest {
         wsSession.addMessageHandler(handler);
         wsSession.getBasicRemote().sendText("Hello");
 
+        int count = 0;
+        while (count < 10 && EchoBufferedEndpoint.messageCount.get() == 0) {
+            Thread.sleep(200);
+            count++;
+        }
+        Assert.assertNotEquals("Message not received by server",
+                EchoBufferedEndpoint.messageCount.get(), 0);
+
         tomcat.stop();
 
         Assert.assertTrue("Latch expired waiting for message", latch.await(10, TimeUnit.SECONDS));
@@ -85,6 +94,8 @@ public class TestShutdown extends TomcatBaseTest {
     @ServerEndpoint("/test")
     public static class EchoBufferedEndpoint {
 
+        private static AtomicLong messageCount = new AtomicLong(0);
+
         @OnOpen
         public void onOpen(Session session, @SuppressWarnings("unused") EndpointConfig  epc)
                 throws IOException {
@@ -93,6 +104,7 @@ public class TestShutdown extends TomcatBaseTest {
 
         @OnMessage
         public void onMessage(Session session, String msg) throws IOException {
+            messageCount.incrementAndGet();
             session.getBasicRemote().sendText(msg);
         }
     }
