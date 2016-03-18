@@ -40,13 +40,11 @@ import javax.websocket.MessageHandler;
 import javax.websocket.OnMessage;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
-import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -767,76 +765,6 @@ public class TestWsWebSocketContainer extends TomcatBaseTest {
         Assert.assertEquals(0, getOpenCount(setA));
     }
 
-    @Ignore
-    @Test
-    public void testSessionMaxIdleTimeout() throws Exception {
-
-        Tomcat tomcat = getTomcatInstance();
-        // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
-        ctx.addApplicationListener(Config.class.getName());
-        Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMapping("/", "default");
-
-        tomcat.start();
-
-        // Need access to implementation methods for configuring unit tests
-        WsWebSocketContainer wsContainer = (WsWebSocketContainer)
-                ContainerProvider.getWebSocketContainer();
-        wsContainer.setProcessPeriod(1);
-
-        long timeout = 2000;
-        try (Session session = connectToEchoServer(wsContainer, new EndpointA(),
-                Config.PATH_MAX_IDLE_TIMEOUT + "/" + (2 * timeout))) {
-            session.addMessageHandler(new MessageHandler.Whole<String>() {
-                @Override
-                public void onMessage(String message) {
-                    System.out.println(message);
-                }
-            });
-            session.setMaxIdleTimeout(timeout);
-            session.getBasicRemote().sendText("timeout");
-            Thread.sleep(2 * timeout);
-        }
-
-    }
-
-    public static class Config extends WsContextListener {
-
-        public static final String PATH_MAX_IDLE_TIMEOUT = "/MaxIdleTimeout";
-
-        @Override
-        public void contextInitialized(ServletContextEvent sce) {
-            super.contextInitialized(sce);
-            ServerContainer sc =
-                    (ServerContainer) sce.getServletContext().getAttribute(
-                            Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
-            try {
-                sc.addEndpoint(MaxIdleTimeout.class);
-            } catch (DeploymentException e) {
-                throw new IllegalStateException(e);
-            }
-        }
-
-        @ServerEndpoint("/MaxIdleTimeout/{timeout}")
-        public static class MaxIdleTimeout {
-
-            @OnMessage
-            public void echoTextMessage(@PathParam("timeout") long timeout, Session session, String msg) {
-                try {
-                    session.getBasicRemote().sendText(msg + "=" + timeout);
-                    Thread.sleep(timeout);
-                    session.getBasicRemote().sendText("After sleep...");
-                } catch (Exception e) {
-                    try {
-                        session.close();
-                    } catch (IOException e1) {
-                        // Ignore
-                    }
-                }
-            }
-        }
-    }
 
     private int getOpenCount(Set<Session> sessions) {
         int result = 0;
