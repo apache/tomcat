@@ -52,10 +52,15 @@ changed at all during the remaining lifetime of the @VERSION_MAJOR@.x series:
 The public interfaces for the following classes may be added to in order to
 resolve bugs and/or add new features. No existing interface method will be
 removed or changed although it may be deprecated.
-- None
+- org.apache.catalina.* (excluding sub-packages)
 
 Note: As Tomcat @VERSION_MAJOR@ matures, the above list will be added to. The list is not
       considered complete at this time.
+
+Note: A large number of deprecated methods, fields and configuration options
+      were removed in the transition from 8.0.x to 8.5.x. If any of those
+      removals triggers significant problems for the user community that the
+      deletion may be reverted in a later point release.
 
 The remaining classes are considered part of the Tomcat internals and may change
 without notice between point releases.
