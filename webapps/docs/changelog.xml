@@ -65,6 +65,16 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>59210</bug>: Server push example has to use
+        <code>o.a.catalina.connector.RequestFacade</code> when obtaining
+        <code>o.a.catalina.core.ApplicationPushBuilder</code>. Patch is
+        provided by Huxing Zhang. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
