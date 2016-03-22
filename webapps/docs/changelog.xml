@@ -195,6 +195,9 @@
         notify the change of the new primary node to the original backup node.
         (kfujino)
       </fix>
+      <fix>
+        Avoid NPE when a proxy node failed to retrieve a backup entry. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
