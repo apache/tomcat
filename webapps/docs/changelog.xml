@@ -127,6 +127,11 @@
         added additional (and arguably unnecessary) validation to the provided
         redirect location. (markt)
       </fix>
+      <fix>
+        <bug>59206</bug>: Ensure NPE will not be thrown by
+        <code>o.a.tomcat.util.file.ConfigFileLoader</code> when
+        <code>catalina.base</code> is not specified. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
