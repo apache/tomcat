@@ -220,6 +220,10 @@
         for users to configure the entries intended for use with the examples
         web application for the Manager application. (markt)
       </update>
+      <fix>
+        <bug>59211</bug>: Add hamcrest to Eclipse classpath. Patch is provided
+        by Huxing Zhang. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>
