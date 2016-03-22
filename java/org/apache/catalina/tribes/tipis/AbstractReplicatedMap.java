@@ -593,6 +593,10 @@ public abstract class AbstractReplicatedMap<K,V>
                 mapMemberAdded(mapmsg.getPrimary());
             } else if (mapmsg.getMsgType() == MapMessage.MSG_INIT) {
                 memberAlive(mapmsg.getPrimary());
+            } else {
+                // other messages are ignored.
+                if (log.isInfoEnabled())
+                    log.info("Message[" + mapmsg.getTypeDesc() + "] is ignored.");
             }
         } catch (IOException x ) {
             log.error("Unable to deserialize MapMessage.",x);

@@ -198,6 +198,9 @@
       <fix>
         Avoid NPE when a proxy node failed to retrieve a backup entry. (kfujino)
       </fix>
+      <add>
+        Add log of when received an unexpected messages. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
