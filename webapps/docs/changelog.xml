@@ -52,6 +52,11 @@
         date formatting in Tomcat's internal request object. Based on a patch
         provided by Ondrej Medek. (markt)
       </fix>
+      <fix>
+        <bug>59206</bug>: Ensure NPE will not be thrown by
+        <code>o.a.tomcat.util.file.ConfigFileLoader</code> when
+        <code>catalina.base</code> is not specified. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
