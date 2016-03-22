@@ -517,7 +517,6 @@ public abstract class AbstractReplicatedMap<K,V>
     }
 
     /**
-     * TODO implement state transfer
      * @param msg Serializable
      * @return Serializable - null if no reply should be sent
      */
