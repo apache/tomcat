@@ -68,12 +68,16 @@
   <subsection name="Other">
     <changelog>
       <fix>
-        <bug>59209<bug>: Remove <code>honorCipherOrder=false</code> attribute
+        <bug>59209</bug>: Remove <code>honorCipherOrder=false</code> attribute
         from the connector example in server.xml. When the block is uncommented
         the connector will use the default value for this attribute which is
         <code>false</code>. If one needs to enable it, one can add it
         explicitly to the connector definition. Use of this feature requires
         Java 8 or later. Patch is provided by Huxing Zhang. (violetagg)
+      </fix>
+      <fix>
+        <bug>59211</bug>: Add hamcrest to Eclipse classpath. Patch is provided
+        by Huxing Zhang. (violetagg)
       </fix>
     </changelog>
   </subsection>
