@@ -98,7 +98,7 @@
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11AprProtocol"
                maxThreads="150" SSLEnabled="true" >
         <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" />
-        <SSLHostConfig honorCipherOrder="false" >
+        <SSLHostConfig>
             <Certificate certificateKeyFile="conf/localhost-rsa-key.pem"
                          certificateFile="conf/localhost-rsa-cert.pem"
                          certificateChainFile="conf/localhost-rsa-chain.pem"
