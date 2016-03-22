@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * This class is used to obtain {@link InputStream}s for configuration files
  * from a given location String. This allows greater flexibility than these
@@ -31,12 +33,21 @@ import java.net.URL;
  */
 public class ConfigFileLoader {
 
+    private static final StringManager sm = StringManager.getManager(ConfigFileLoader.class
+            .getPackage().getName());
+
     private static final File CATALINA_BASE_FILE;
     private static final URI CATALINA_BASE_URI;
 
     static {
-        CATALINA_BASE_FILE = new File(System.getProperty("catalina.base"));
-        CATALINA_BASE_URI = CATALINA_BASE_FILE.toURI();
+        String catalinaBase = System.getProperty("catalina.base");
+        if (catalinaBase != null) {
+            CATALINA_BASE_FILE = new File(catalinaBase);
+            CATALINA_BASE_URI = CATALINA_BASE_FILE.toURI();
+        } else {
+            CATALINA_BASE_FILE = null;
+            CATALINA_BASE_URI = null;
+        }
     }
 
     private ConfigFileLoader() {
@@ -72,10 +83,19 @@ public class ConfigFileLoader {
         // File didn't work so try URI.
         // Using resolve() enables the code to handle relative paths that did
         // not point to a file
-        URI uri = CATALINA_BASE_URI.resolve(location);
+        URI uri;
+        if (CATALINA_BASE_URI != null) {
+            uri = CATALINA_BASE_URI.resolve(location);
+        } else {
+            uri = URI.create(location);
+        }
 
         // Obtain the input stream we need
-        URL url = uri.toURL();
-        return url.openConnection().getInputStream();
+        try {
+            URL url = uri.toURL();
+            return url.openConnection().getInputStream();
+        } catch (IllegalArgumentException e) {
+            throw new IOException(sm.getString("configFileLoader.cannotObtainURL", location), e);
+        }
     }
 }
