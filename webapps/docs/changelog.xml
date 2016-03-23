@@ -57,6 +57,11 @@
         <code>o.a.tomcat.util.file.ConfigFileLoader</code> when
         <code>catalina.base</code> is not specified. (violetagg)
       </fix>
+      <fix>
+        <bug>59217</bug>: Remove duplication in the recycling of the path in
+        <code>o.a.tomcat.util.http.ServerCookie</code>. Patch is provided by
+        Kyohei Nakamura. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
