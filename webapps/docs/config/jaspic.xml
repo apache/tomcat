@@ -94,7 +94,7 @@
 
     <p>The the 3rd party implementation only provides an
     <code>ServerAuthModule</code> then it will be necessary to provide a number
-    os supporting classes. These may be a custom implementation or,
+    of supporting classes. These may be a custom implementation or,
     alternatively, Tomcat provides a simple wrapper implementation for
     <code>ServerAuthModule</code>s.
     </p>
