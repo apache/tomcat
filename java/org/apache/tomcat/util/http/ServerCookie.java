@@ -86,7 +86,6 @@ public class ServerCookie implements Serializable {
     }
 
     public void recycle() {
-        path.recycle();
         name.recycle();
         value.recycle();
         comment.recycle();
