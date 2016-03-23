@@ -193,7 +193,7 @@
         Issue reported via comments.apache.org. (violetagg)
       </fix>
       <fix>
-        Fix a potenital indefinite wait in the Comet Chat servlet in the
+        Fix a potential indefinite wait in the Comet Chat servlet in the
         examples web application. (markt)
       </fix>
     </changelog>
