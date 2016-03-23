@@ -87,6 +87,10 @@
         <code>o.a.catalina.core.ApplicationPushBuilder</code>. Patch is
         provided by Huxing Zhang. (violetagg)
       </fix>
+      <fix>
+        <bug>59218</bug>: Correct the path to <code>jaspic-providers.xml</code>
+        in Jaspic How-To. Patch is provided by Tatsuya Bessho. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
