@@ -69,16 +69,6 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="Tribes">
-    <changelog>
-      <fix>
-        Avoid NPE when a proxy node failed to retrieve a backup entry. (kfujino)
-      </fix>
-      <add>
-        Add log of when received an unexpected messages. (kfujino)
-      </add>
-    </changelog>
-  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
@@ -91,6 +81,16 @@
         <bug>59218</bug>: Correct the path to <code>jaspic-providers.xml</code>
         in Jaspic How-To. Patch is provided by Tatsuya Bessho. (violetagg)
       </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Avoid NPE when a proxy node failed to retrieve a backup entry. (kfujino)
+      </fix>
+      <add>
+        Add log of when received an unexpected messages. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
