@@ -40,7 +40,7 @@
   JASPIC authentication implementations with Tomcat.</p>
 
   <p>JASPIC may be configured dynamically by an application or statically via
-  the <code>$CATALINA_BASE/jaspic-providers.xml</code> configuration file.
+  the <code>$CATALINA_BASE/conf/jaspic-providers.xml</code> configuration file.
   If present, a JASPIC configuration will over-ride any
   <code>&lt;login-config&gt;</code> present in <code>web.xml</code>.</p>
 
@@ -54,7 +54,7 @@
     <code>AuthConfigProvider</code> then a web application can be configured to
     use it by nesting the following inside the
     <code>&lt;jaspic-providers&gt;</code> element in
-    <code>$CATALINA_BASE/jaspic-providers.xml</code>.</p>
+    <code>$CATALINA_BASE/conf/jaspic-providers.xml</code>.</p>
 <source><![CDATA[<provider name="any"
           className="fully.qualified.implementation.class.Name"
           layer="HttpServlet"
@@ -102,7 +102,7 @@
     <p>Tomcat&apos;s wrapper for <code>ServerAuthModule</code> can be configured
     by nesting the following inside the
     <code>&lt;jaspic-providers&gt;</code> element in
-    <code>$CATALINA_BASE/jaspic-providers.xml</code>.</p>
+    <code>$CATALINA_BASE/conf/jaspic-providers.xml</code>.</p>
 <source><![CDATA[<provider name="any"
           className="org.apache.catalina.authenticator.jaspic.AuthConfigProviderImpl"
           layer="HttpServlet"
