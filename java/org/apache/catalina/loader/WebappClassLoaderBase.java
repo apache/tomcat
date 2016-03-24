@@ -1088,7 +1088,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         try {
             if (hasExternalRepositories && stream == null) {
                 URL url = super.findResource(name);
-                stream = url.openStream();
+                if (url != null) {
+                    stream = url.openStream();
+                }
             }
         } catch (IOException e) {
             // Ignore

@@ -57,6 +57,11 @@
         <code>o.a.tomcat.util.http.ServerCookie</code>. Patch is provided by
         Kyohei Nakamura. (violetagg)
       </fix>
+      <fix>
+        Fixed possible NPE in
+        <code>o.a.catalina.loader.WebappClassLoaderBase.getResourceAsStream</code>
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
