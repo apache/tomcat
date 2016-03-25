@@ -191,7 +191,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     @Override
     public void dispatch(String path) {
         check();
-        dispatch(request.getServletContext(),path);
+        dispatch(getRequest().getServletContext(), path);
     }
 
     @Override
