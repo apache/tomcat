@@ -67,6 +67,10 @@
         <code>o.a.catalina.loader.WebappClassLoaderBase.getResourceAsStream</code>
         (violetagg)
       </fix>
+      <fix>
+        <bug>59213</bug>: Async dispatches should be based off a wrapped request.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
