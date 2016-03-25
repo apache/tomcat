@@ -52,11 +52,15 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
+import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
+import org.easymock.EasyMock;
 
 public class TestAsyncContextImpl extends TomcatBaseTest {
 
@@ -2357,5 +2361,50 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             }
         }
 
+    }
+
+
+    @Test
+    public void testAsyncListenerSupplyRequestResponse() {
+        final ServletRequest servletRequest = EasyMock.createMock(ServletRequest.class);
+        final ServletResponse servletResponse = EasyMock.createMock(ServletResponse.class);
+        final AsyncListener listener = new AsyncListener() {
+
+            @Override
+            public void onTimeout(AsyncEvent event) throws IOException {
+                checkRequestResponse(event);
+            }
+
+            @Override
+            public void onStartAsync(AsyncEvent event) throws IOException {
+                checkRequestResponse(event);
+            }
+
+            @Override
+            public void onError(AsyncEvent event) throws IOException {
+                checkRequestResponse(event);
+            }
+
+            @Override
+            public void onComplete(AsyncEvent event) throws IOException {
+                checkRequestResponse(event);
+            }
+
+            private void checkRequestResponse(AsyncEvent event) {
+                assertEquals(servletRequest, event.getSuppliedRequest());
+                assertEquals(servletResponse, event.getSuppliedResponse());
+            }
+        };
+        final Context context = new TesterContext();
+        final Response response = new Response();
+        final Request request = new Request();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        request.getMappingData().context = context;
+        final AsyncContextImpl ac = new AsyncContextImpl(request);
+        ac.addListener(listener, servletRequest, servletResponse);
+        ac.setStarted(context, request, response, true);
+        ac.addListener(listener, servletRequest, servletResponse);
+        ac.setErrorState(new Exception(), true);
+        ac.fireOnComplete();
     }
 }
