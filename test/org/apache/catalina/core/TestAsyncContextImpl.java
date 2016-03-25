@@ -51,12 +51,16 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Loader;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.ErrorPage;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.easymock.EasyMock;
 
 public class TestAsyncContextImpl extends TomcatBaseTest {
 
@@ -2211,5 +2215,59 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             }
         }
 
+    }
+
+
+    @Test
+    public void testAsyncListenerSupplyRequestResponse() {
+        final ServletRequest servletRequest = EasyMock.createMock(ServletRequest.class);
+        final ServletResponse servletResponse = EasyMock.createMock(ServletResponse.class);
+        final AsyncListener listener = new AsyncListener() {
+
+            @Override
+            public void onTimeout(AsyncEvent event) throws IOException {
+                checkRequestResponse(event);
+            }
+
+            @Override
+            public void onStartAsync(AsyncEvent event) throws IOException {
+                checkRequestResponse(event);
+            }
+
+            @Override
+            public void onError(AsyncEvent event) throws IOException {
+                checkRequestResponse(event);
+            }
+
+            @Override
+            public void onComplete(AsyncEvent event) throws IOException {
+                checkRequestResponse(event);
+            }
+
+            private void checkRequestResponse(AsyncEvent event) {
+                assertEquals(servletRequest, event.getSuppliedRequest());
+                assertEquals(servletResponse, event.getSuppliedResponse());
+            }
+        };
+        final Context context = EasyMock.createMock(Context.class);
+        final Loader loader = EasyMock.createMock(Loader.class);
+        final Response response = new Response();
+        final Request request = new Request();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        request.setContext(context);
+        final AsyncContextImpl ac = new AsyncContextImpl(request);
+        EasyMock.expect(context.getApplicationEventListeners()).andReturn(null);
+        EasyMock.expect(context.getLoader()).andReturn(loader);
+        EasyMock.expect(loader.getClassLoader()).andReturn(null);
+
+        EasyMock.replay(context, loader);
+
+        ac.addListener(listener, servletRequest, servletResponse);
+        ac.setStarted(context, request, response, true);
+        ac.addListener(listener, servletRequest, servletResponse);
+        ac.setErrorState(new Exception(), true);
+        ac.fireOnComplete();
+
+        EasyMock.verify(context, loader);
     }
 }

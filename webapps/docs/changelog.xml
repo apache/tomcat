@@ -141,6 +141,14 @@
         <bug>59213</bug>: Async dispatches should be based off a wrapped request.
         (remm)
       </fix>
+      <fix>
+        Ensure that <code>javax.servlet.ServletRequest</code> and
+        <code>javax.servlet.ServletResponse</code> provided during
+        <code>javax.servlet.AsyncListener</code> registration are made
+        available via <code>javax.servlet.AsyncEvent.getSuppliedRequest</code>
+        and <code>javax.servlet.AsyncEvent.getSuppliedResponse</code>
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
