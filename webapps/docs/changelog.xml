@@ -137,6 +137,10 @@
         <code>o.a.tomcat.util.http.ServerCookie</code>. Patch is provided by
         Kyohei Nakamura. (violetagg)
       </fix>
+      <fix>
+        <bug>59213</bug>: Async dispatches should be based off a wrapped request.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
