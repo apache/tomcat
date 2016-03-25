@@ -272,6 +272,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         check();
         AsyncListenerWrapper wrapper = new AsyncListenerWrapper();
         wrapper.setListener(listener);
+        wrapper.setServletRequest(servletRequest);
+        wrapper.setServletResponse(servletResponse);
         listeners.add(wrapper);
     }
 
