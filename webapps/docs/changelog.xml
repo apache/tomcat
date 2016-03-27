@@ -84,6 +84,11 @@
         PerMessageDeflate and the WebSocket session ends. Based on a patch by
         Henrik Olsson. (markt)
       </fix>
+      <fix>
+        Return back a container specific extension to the WsServerContainer
+        to allow frameworks to more easily dispatch requests to WebSocket
+        endpoints. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
