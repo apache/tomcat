@@ -90,6 +90,9 @@
       <fix>
         OpenSSL engine code cleanups. (remm)
       </fix>
+      <fix>
+        Align cipher configuration parsing with current OpenSSL master. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
