@@ -100,6 +100,10 @@
         PerMessageDeflate and the WebSocket session ends. Based on a patch by
         Henrik Olsson. (markt)
       </fix>
+      <fix>
+        Restore the <code>WsServerContainer.doUpgrade()</code> method which was
+        accidentally removed since it is not used by Tomcat. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
