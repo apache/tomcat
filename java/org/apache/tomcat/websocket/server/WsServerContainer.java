@@ -325,6 +325,24 @@ public class WsServerContainer extends WsWebSocketContainer
     }
 
 
+    /**
+     * Until the WebSocket specification provides such a mechanism, this Tomcat
+     * proprietary method is provided to enable applications to programmatically
+     * determine whether or not to upgrade an individual request to WebSocket.
+     * <p>
+     * Note: This method is not used by Tomcat but is used directly by
+     *       third-party code and must not be removed.
+     *
+     * @param request The request object to be upgraded
+     * @param response The response object to be populated with the result of
+     *                 the upgrade
+     * @param sec The server endpoint to use to process the upgrade request
+     * @param pathParams The path parameters associated with the upgrade request
+     *
+     * @throws ServletException If a configuration error prevents the upgrade
+     *         from taking place
+     * @throws IOException If an I/O error occurs during the upgrade process
+     */
     public void doUpgrade(HttpServletRequest request,
             HttpServletResponse response, ServerEndpointConfig sec,
             Map<String,String> pathParams)
