@@ -759,9 +759,9 @@
     <table class="defaultTable" style="text-align: center;">
       <tr>
         <th />
-        <th>Java Nio Connector<br />NIO</th>
-        <th>Java Nio2 Connector<br />NIO2</th>
-        <th>APR/native Connector<br />APR</th>
+        <th style="text-align: center;">Java Nio Connector<br />NIO</th>
+        <th style="text-align: center;">Java Nio2 Connector<br />NIO2</th>
+        <th style="text-align: center;">APR/native Connector<br />APR</th>
       </tr>
       <tr>
         <th>Classname</th>
@@ -800,7 +800,7 @@
         <td>Blocking</td>
       </tr>
       <tr>
-        <th>Write Response</th>
+        <th>Write Response Headers and Body</th>
         <td>Blocking</td>
         <td>Blocking</td>
         <td>Blocking</td>
