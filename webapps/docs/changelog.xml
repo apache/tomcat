@@ -208,6 +208,11 @@
         Fix a potential indefinite wait in the Comet Chat servlet in the
         examples web application. (markt)
       </fix>
+      <fix>
+        <bug>59229</bug>: Fix error in HTTP docs and make clear the the HTTP NIO
+        connector uses non-blocking I/O to read the HTTP request headers.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
