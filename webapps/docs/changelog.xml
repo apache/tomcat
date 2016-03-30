@@ -99,6 +99,12 @@
         longer necessary for this to be <code>true</code> for a reasonably
         secure configuration. (markt)
       </update>
+      <add>
+        Add a new environment variable <code>JSSE_OPTS</code> that is intended
+        to be used to pass JVM wide configuration to the JSSE implementation.
+        The default value is <code>-Djdk.tls.ephemeralDHKeySize=2048</code>
+        which protects against weak Diffie-Hellman keys. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
