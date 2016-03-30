@@ -511,9 +511,6 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         "  <form class=\"inline\" method=\"POST\" action=\"{2}\">" +
         "   <small><input type=\"submit\" value=\"{3}\"></small>" +
         "  </form>\n" +
-        "  <form class=\"inline\" method=\"POST\" action=\"{4}\">" +
-        "   <small><input type=\"submit\" value=\"{5}\"></small>" +
-        "  </form>\n" +
         " </td>\n" +
         "</tr>\n";
 
