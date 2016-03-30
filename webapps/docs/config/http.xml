@@ -1111,7 +1111,7 @@
     <attribute name="honorCipherOrder" required="false">
       <p>Set to <code>true</code> to enforce the server's cipher order
       (from the <code>ciphers</code> setting) instead of allowing
-      the client to choose the cipher. The default is <code>true</code>.</p>
+      the client to choose the cipher. The default is <code>false</code>.</p>
     </attribute>
 
     <attribute name="hostName" required="false">

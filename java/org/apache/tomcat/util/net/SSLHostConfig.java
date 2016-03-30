@@ -83,7 +83,7 @@ public class SSLHostConfig {
     private String ciphers = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
     private LinkedHashSet<Cipher> cipherList = null;
     private List<String> jsseCipherNames = null;
-    private boolean honorCipherOrder = true;
+    private boolean honorCipherOrder = false;
     private Set<String> protocols = new HashSet<>();
     // JSSE
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();

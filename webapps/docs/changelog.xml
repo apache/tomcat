@@ -93,6 +93,12 @@
       <fix>
         Align cipher configuration parsing with current OpenSSL master. (markt)
       </fix>
+      <update>
+        Change the default for <code>honorCipherOrder</code> to
+        <code>false</code>. With the current default TLS configuration, it is no
+        longer necessary for this to be <code>true</code> for a reasonably
+        secure configuration. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
