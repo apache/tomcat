@@ -17,6 +17,7 @@
 package org.apache.coyote.http11;
 
 import org.apache.tomcat.util.net.AbstractJsseEndpoint;
+import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 
 public abstract class AbstractHttp11JsseProtocol<S>
         extends AbstractHttp11Protocol<S> {
@@ -32,6 +33,13 @@ public abstract class AbstractHttp11JsseProtocol<S>
         return (AbstractJsseEndpoint<S>) super.getEndpoint();
     }
 
+
+    protected String getSslImplemenationShortName() {
+        if (OpenSSLImplementation.class.getName().equals(getSslImplementationName())) {
+            return "openssl";
+        }
+        return "jsse";
+    }
 
     public String getSslImplementationName() { return getEndpoint().getSslImplementationName(); }
     public void setSslImplementationName(String s) { getEndpoint().setSslImplementationName(s); }
