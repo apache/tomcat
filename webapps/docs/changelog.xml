@@ -79,6 +79,11 @@
         and <code>javax.servlet.AsyncEvent.getSuppliedResponse</code>
         (violetagg)
       </fix>
+      <fix>
+        <bug>59247</bug>: Add loader package access permission to JULI.
+        Based on a patch submitted by Coty Sutherland.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
