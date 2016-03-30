@@ -251,6 +251,11 @@
         <bug>59211</bug>: Add hamcrest to Eclipse classpath. Patch is provided
         by Huxing Zhang. (violetagg)
       </fix>
+      <fix>
+        <bug>59247</bug>: Add loader package access permission to JULI.
+        Based on a patch submitted by Coty Sutherland.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>

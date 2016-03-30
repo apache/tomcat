@@ -77,6 +77,7 @@ grant codeBase "file:${catalina.home}/bin/tomcat-juli.jar" {
         permission java.lang.RuntimePermission "shutdownHooks";
         permission java.lang.RuntimePermission "getClassLoader";
         permission java.lang.RuntimePermission "setContextClassLoader";
+        permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.loader";
 
         permission java.util.logging.LoggingPermission "control";
 
