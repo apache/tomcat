@@ -180,7 +180,7 @@
         <code>PATH</code> (Windows) or <code>LD_LIBRARY_PATH</code> (on most unix
         systems) environment variables contain the Tomcat native library, the
         native/APR connector will be used. If the native library cannot be
-        found, the Java based connector will be used.<br/>
+        found, the Java BIO based connector will be used.<br/>
         To use an explicit protocol rather than rely on the auto-switching
         mechanism described above, the following values may be used:<br/>
         <code>org.apache.coyote.ajp.AjpProtocol</code>
