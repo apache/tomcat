@@ -253,6 +253,11 @@ public class AprLifecycleListener
                 Boolean.valueOf(Library.APR_HAS_SENDFILE),
                 Boolean.valueOf(Library.APR_HAS_SO_ACCEPTFILTER),
                 Boolean.valueOf(Library.APR_HAS_RANDOM)));
+
+        initInfoLogMessages.add(sm.getString("aprListener.config",
+                Boolean.valueOf(useAprConnector),
+                Boolean.valueOf(useOpenSSL)));
+
         aprAvailable = true;
     }
 
