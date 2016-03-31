@@ -77,6 +77,10 @@ rem
 rem                   -agentlib:jdwp=transport=%JPDA_TRANSPORT%,
 rem                       address=%JPDA_ADDRESS%,server=y,suspend=%JPDA_SUSPEND%
 rem
+rem   JSSE_OPTS       (Optional) Java runtime options used to control the TLS
+rem                   implementation when JSSE is used. Default is:
+rem                   "-Djdk.tls.ephemeralDHKeySize=2048"
+rem
 rem   LOGGING_CONFIG  (Optional) Override Tomcat's logging config file
 rem                   Example (all one line)
 rem                   set LOGGING_CONFIG="-Djava.util.logging.config.file=%CATALINA_BASE%\conf\logging.properties"
@@ -170,6 +174,11 @@ goto juliClasspathDone
 :juliClasspathHome
 set "CLASSPATH=%CLASSPATH%;%CATALINA_HOME%\bin\tomcat-juli.jar"
 :juliClasspathDone
+
+if not "%JSSE_OPTS%" == "" goto gotJsseOpts
+set JSSE_OPTS="-Djdk.tls.ephemeralDHKeySize=2048"
+:gotJsseOpts
+set "JAVA_OPTS=%JAVA_OPTS% %JSSE_OPTS%"
 
 if not "%LOGGING_CONFIG%" == "" goto noJuliConfig
 set LOGGING_CONFIG=-Dnop

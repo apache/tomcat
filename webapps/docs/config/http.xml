@@ -987,12 +987,12 @@
       <p>The comma separated list of encryption ciphers to support for HTTPS
       connections. If specified, only the ciphers that are listed and supported
       by the SSL implementation will be used. By default, the default ciphers
-      for the JVM will be used. Note that this usually means that the weak
-      export grade ciphers will be included in the list of available ciphers.
-      The ciphers are specified using the JSSE cipher naming convention. The
-      special value of <code>ALL</code> will enable all supported ciphers. This
-      will include many that are not secure. <code>ALL</code> is intended for
-      testing purposes only.</p>
+      for the JVM will be used less those considered to be insecure. Note that
+      with older JVMs this will result in a very limited set of ciphers being
+      available by default. The ciphers are specified using the JSSE cipher
+      naming convention. The special value of <code>ALL</code> will enable all
+      supported ciphers. This will include many that are not secure.
+      <code>ALL</code> is intended for testing purposes only.</p>
     </attribute>
 
     <attribute name="clientAuth" required="false">

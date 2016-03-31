@@ -82,6 +82,10 @@
 #                   -agentlib:jdwp=transport=$JPDA_TRANSPORT,
 #                       address=$JPDA_ADDRESS,server=y,suspend=$JPDA_SUSPEND
 #
+#   JSSE_OPTS       (Optional) Java runtime options used to control the TLS
+#                   implementation when JSSE is used. Default is:
+#                   "-Djdk.tls.ephemeralDHKeySize=2048"
+#
 #   CATALINA_PID    (Optional) Path of the file which should contains the pid
 #                   of the catalina startup java process, when start (fork) is
 #                   used
@@ -214,6 +218,11 @@ if $cygwin; then
   CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
   JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
 fi
+
+if [ -z "$JSSE_OPTS" ] ; then
+  JSSE_OPTS="-Djdk.tls.ephemeralDHKeySize=2048"
+fi
+JAVA_OPTS="$JAVA_OPTS $JSSE_OPTS"
 
 # Set juli LogManager config file if it is present and an override has not been issued
 if [ -z "$LOGGING_CONFIG" ]; then
