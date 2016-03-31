@@ -112,11 +112,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         aprPool = Pool.create(0);
         boolean success = false;
         try {
-            if (SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()) == null) {
-                // This is required
-                // throw new Exception(netSm.getString("endpoint.apr.noSslCertFile"));
-            }
-
             // SSL protocol
             int value = SSL.SSL_PROTOCOL_NONE;
             if (sslHostConfig.getProtocols().size() == 0) {
