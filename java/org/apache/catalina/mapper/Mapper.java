@@ -877,7 +877,7 @@ public final class Mapper {
         }
 
         if(mappingData.wrapper == null && noServletPath &&
-                mappingData.context.getMapperContextRootRedirectEnabled()) {
+                contextVersion.object.getMapperContextRootRedirectEnabled()) {
             // The path is empty, redirect to "/"
             path.append('/');
             pathEnd = path.getEnd();
@@ -1005,7 +1005,7 @@ public final class Mapper {
                     file = contextVersion.resources.getResource(pathStr);
                 }
                 if (file != null && file.isDirectory() &&
-                        mappingData.context.getMapperDirectoryRedirectEnabled()) {
+                        contextVersion.object.getMapperDirectoryRedirectEnabled()) {
                     // Note: this mutates the path: do not do any processing
                     // after this (since we set the redirectPath, there
                     // shouldn't be any)
