@@ -93,6 +93,11 @@
         The default value is <code>-Djdk.tls.ephemeralDHKeySize=2048</code>
         which protects against weak Diffie-Hellman keys. (markt)
       </add>
+      <fix>
+        When running on Java 7, exclude DHE ciphers from the default cipher list
+        for JSSE connectors since they use weak 768 bit DH keys and cannot be
+        configured to use more secure keys. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

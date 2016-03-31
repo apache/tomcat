@@ -30,6 +30,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
@@ -41,6 +42,8 @@ public class SSLHostConfig {
 
     private static final Log log = LogFactory.getLog(SSLHostConfig.class);
     private static final StringManager sm = StringManager.getManager(SSLHostConfig.class);
+
+    private static final String DEFAULT_CIPHERS = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
 
     protected static final String DEFAULT_SSL_HOST_NAME = "_default_";
     protected static final Set<String> SSL_PROTO_ALL = new HashSet<>();
@@ -81,7 +84,7 @@ public class SSLHostConfig {
     private String certificateRevocationListFile;
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
     private int certificateVerificationDepth = 10;
-    private String ciphers = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
+    private String ciphers;
     private LinkedHashSet<Cipher> cipherList = null;
     private List<String> jsseCipherNames = null;
     private boolean honorCipherOrder = false;
@@ -320,13 +323,21 @@ public class SSLHostConfig {
      * @return An OpenSSL cipher string for the current configuration.
      */
     public String getCiphers() {
+        if (ciphers == null) {
+            if (!JreCompat.isJre8Available() && Type.JSSE.equals(configType)) {
+                ciphers = DEFAULT_CIPHERS + ":!DHE";
+            } else {
+                ciphers = DEFAULT_CIPHERS;
+            }
+
+        }
         return ciphers;
     }
 
 
     public LinkedHashSet<Cipher> getCipherList() {
         if (cipherList == null) {
-            cipherList = OpenSSLCipherConfigurationParser.parse(ciphers);
+            cipherList = OpenSSLCipherConfigurationParser.parse(getCiphers());
         }
         return cipherList;
     }
