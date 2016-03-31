@@ -164,8 +164,8 @@
         (markt)
       </fix>
       <fix>
-        Limit the default TLS ciphers to those currently considered secure.
-        (markt) 
+        Limit the default TLS ciphers for JSSE (BIO, NIO) and OpenSSL (APR) to
+        those currently considered secure. (markt) 
       </fix>
       <add>
         Add a new environment variable <code>JSSE_OPTS</code> that is intended

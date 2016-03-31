@@ -1259,9 +1259,8 @@
 
     <attribute name="SSLCipherSuite" required="false">
       <p>Ciphers which may be used for communicating with clients. The default
-      is "ALL", with other acceptable values being a list of ciphers, with ":"
-      used as the delimiter (see OpenSSL documentation for the list of ciphers
-      supported).</p>
+      is "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA". See the OpenSSL
+      documentation for details of the cipher configuration options.</p>
     </attribute>
 
     <attribute name="SSLDisableCompression" required="false">
