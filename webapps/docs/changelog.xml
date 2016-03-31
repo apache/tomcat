@@ -75,7 +75,7 @@
         (violetagg)
       </fix>
       <fix>
-        <bug>59255</bug>: Fix posible NPE in mapper. (kkolinko/remm)
+        <bug>59255</bug>: Fix possible NPE in mapper. (kkolinko/remm)
       </fix>
     </changelog>
   </subsection>
