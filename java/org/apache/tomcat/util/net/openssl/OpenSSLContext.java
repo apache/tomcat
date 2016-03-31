@@ -324,7 +324,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             } else {
                 X509KeyManager keyManager = chooseKeyManager(kms);
                 String alias = certificate.getCertificateKeyAlias();
-                X509Certificate certificate = keyManager.getCertificateChain(alias)[0];
+                X509Certificate[] chain = keyManager.getCertificateChain(alias);
                 PrivateKey key = keyManager.getPrivateKey(alias);
                 StringBuilder sb = new StringBuilder(BEGIN_KEY);
                 String encoded = BASE64_ENCODER.encodeToString(key.getEncoded());
@@ -333,7 +333,15 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
                 sb.append(encoded);
                 sb.append(END_KEY);
-                SSLContext.setCertificateRaw(ctx, certificate.getEncoded(), sb.toString().getBytes(StandardCharsets.US_ASCII), SSL.SSL_AIDX_RSA);
+                SSLContext.setCertificateRaw(ctx, chain[0].getEncoded(), sb.toString().getBytes(StandardCharsets.US_ASCII), SSL.SSL_AIDX_RSA);
+                /*
+                 * Uncomment the code block below once there has been a tc-native
+                 * release with this method and the minimum tc-native version
+                 * has been incremented.
+                for (int i = 1; i < chain.length; i++) {
+                    SSLContext.addChainCertificateRaw(ctx, chain[i].getEncoded());
+                }
+                */
             }
             // Client certificate verification
             int value = 0;
