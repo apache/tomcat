@@ -77,6 +77,10 @@
       <fix>
         <bug>59255</bug>: Fix possible NPE in mapper. (kkolinko/remm)
       </fix>
+      <fix>
+        <bug>59256</bug>: <code>slf4j-taglib*.jar</code> should not be excluded
+        from the standard JAR scanning by default. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
