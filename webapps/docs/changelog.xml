@@ -154,6 +154,10 @@
         Remove button that has accidentally been added to the host manager.
         Submitted by Coty Sutherland. (remm)
       </fix>
+      <fix>
+        Update in the documentation the link to the maven repository where
+        Tomcat snapshot artifacts are deployed. (markt/violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
