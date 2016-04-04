@@ -417,83 +417,32 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                             sm.getString("endpoint.apr.failSslContextMake"), e);
                 }
 
-                boolean legacyRenegSupported = false;
-                try {
-                    legacyRenegSupported = SSL.hasOp(SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
-                    if (legacyRenegSupported)
-                        if (sslHostConfig.getInsecureRenegotiation()) {
-                            SSLContext.setOptions(ctx, SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
-                        } else {
-                            SSLContext.clearOptions(ctx, SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
-                        }
-                } catch (UnsatisfiedLinkError e) {
-                    // Ignore
-                }
-                if (!legacyRenegSupported) {
-                    // OpenSSL does not support unsafe legacy renegotiation.
-                    log.warn(sm.getString("endpoint.warn.noInsecureReneg",
-                                          SSL.versionString()));
+                if (sslHostConfig.getInsecureRenegotiation()) {
+                    SSLContext.setOptions(ctx, SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
+                } else {
+                    SSLContext.clearOptions(ctx, SSL.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION);
                 }
 
                 // Use server's preference order for ciphers (rather than
                 // client's)
-                boolean orderCiphersSupported = false;
-                try {
-                    orderCiphersSupported = SSL.hasOp(SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
-                    if (orderCiphersSupported) {
-                        if (sslHostConfig.getHonorCipherOrder()) {
-                            SSLContext.setOptions(ctx, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
-                        } else {
-                            SSLContext.clearOptions(ctx, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
-                        }
-                    }
-                } catch (UnsatisfiedLinkError e) {
-                    // Ignore
-                }
-                if (!orderCiphersSupported) {
-                    // OpenSSL does not support ciphers ordering.
-                    log.warn(sm.getString("endpoint.warn.noHonorCipherOrder",
-                                          SSL.versionString()));
+                if (sslHostConfig.getHonorCipherOrder()) {
+                    SSLContext.setOptions(ctx, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
+                } else {
+                    SSLContext.clearOptions(ctx, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
                 }
 
                 // Disable compression if requested
-                boolean disableCompressionSupported = false;
-                try {
-                    disableCompressionSupported = SSL.hasOp(SSL.SSL_OP_NO_COMPRESSION);
-                    if (disableCompressionSupported) {
-                        if (sslHostConfig.getDisableCompression()) {
-                            SSLContext.setOptions(ctx, SSL.SSL_OP_NO_COMPRESSION);
-                        } else {
-                            SSLContext.clearOptions(ctx, SSL.SSL_OP_NO_COMPRESSION);
-                        }
-                    }
-                } catch (UnsatisfiedLinkError e) {
-                    // Ignore
-                }
-                if (!disableCompressionSupported) {
-                    // OpenSSL does not support ciphers ordering.
-                    log.warn(sm.getString("endpoint.warn.noDisableCompression",
-                                          SSL.versionString()));
+                if (sslHostConfig.getDisableCompression()) {
+                    SSLContext.setOptions(ctx, SSL.SSL_OP_NO_COMPRESSION);
+                } else {
+                    SSLContext.clearOptions(ctx, SSL.SSL_OP_NO_COMPRESSION);
                 }
 
                 // Disable TLS Session Tickets (RFC4507) to protect perfect forward secrecy
-                boolean disableSessionTicketsSupported = false;
-                try {
-                    disableSessionTicketsSupported = SSL.hasOp(SSL.SSL_OP_NO_TICKET);
-                    if (disableSessionTicketsSupported) {
-                        if (sslHostConfig.getDisableSessionTickets()) {
-                            SSLContext.setOptions(ctx, SSL.SSL_OP_NO_TICKET);
-                        } else {
-                            SSLContext.clearOptions(ctx, SSL.SSL_OP_NO_TICKET);
-                        }
-                    }
-                } catch (UnsatisfiedLinkError e) {
-                    // Ignore
-                }
-                if (!disableSessionTicketsSupported) {
-                    // OpenSSL is too old to support TLS Session Tickets.
-                    log.warn(sm.getString("endpoint.warn.noDisableSessionTickets",
-                                          SSL.versionString()));
+                if (sslHostConfig.getDisableSessionTickets()) {
+                    SSLContext.setOptions(ctx, SSL.SSL_OP_NO_TICKET);
+                } else {
+                    SSLContext.clearOptions(ctx, SSL.SSL_OP_NO_TICKET);
                 }
 
                 // List the ciphers that the client is permitted to negotiate
