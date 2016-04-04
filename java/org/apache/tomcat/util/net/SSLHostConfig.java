@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLParameters;
 import javax.net.ssl.TrustManagerFactory;
 
 import org.apache.juli.logging.Log;
@@ -359,11 +358,6 @@ public class SSLHostConfig {
 
 
     public void setHonorCipherOrder(boolean honorCipherOrder) {
-        try {
-            SSLParameters.class.getMethod("setUseCipherSuitesOrder", Boolean.TYPE);
-        } catch (NoSuchMethodException | SecurityException e) {
-            throw new UnsupportedOperationException(sm.getString("endpoint.jsse.cannotHonorServerCipherOrder"), e);
-        }
         this.honorCipherOrder = honorCipherOrder;
     }
 
