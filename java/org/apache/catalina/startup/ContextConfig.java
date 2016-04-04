@@ -2317,7 +2317,7 @@ public class ContextConfig implements LifecycleListener {
             if ("value".equals(name) || "urlPatterns".equals(name)) {
                 if (urlPatternsSet) {
                     throw new IllegalArgumentException(sm.getString(
-                            "contextConfig.urlPatternValue", className));
+                            "contextConfig.urlPatternValue", "WebServlet", className));
                 }
                 urlPatternsSet = true;
                 urlPatterns = processAnnotationsStringArray(evp.getValue());
@@ -2429,7 +2429,7 @@ public class ContextConfig implements LifecycleListener {
             if ("value".equals(name) || "urlPatterns".equals(name)) {
                 if (urlPatternsSet) {
                     throw new IllegalArgumentException(sm.getString(
-                            "contextConfig.urlPatternValue", className));
+                            "contextConfig.urlPatternValue", "WebFilter", className));
                 }
                 urlPatterns = processAnnotationsStringArray(evp.getValue());
                 urlPatternsSet = urlPatterns.length > 0;
