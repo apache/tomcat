@@ -81,6 +81,11 @@
         <bug>59256</bug>: <code>slf4j-taglib*.jar</code> should not be excluded
         from the standard JAR scanning by default. (violetagg)
       </fix>
+      <fix>
+        Clarify in the log message that specifying both urlPatterns and value
+        attributes in WebServlet and WebFilter annotations is not allowed.
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
