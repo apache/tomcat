@@ -96,6 +96,12 @@
         attributes in WebServlet and WebFilter annotations is not allowed.
         (violetagg)
       </fix>
+      <fix>
+        Ensure the exceptions caused by Valves will be available in the log
+        files so that they can be evaluated when
+        <code>o.a.catalina.valves.ErrorReportValve.showReport</code> is
+        disabled. Patch is provided by Svetlin Zarev. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
