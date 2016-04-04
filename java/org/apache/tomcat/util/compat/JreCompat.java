@@ -17,7 +17,6 @@
 package org.apache.tomcat.util.compat;
 
 import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLServerSocket;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -57,13 +56,6 @@ public class JreCompat {
 
     public static boolean isJre8Available() {
         return jre8Available;
-    }
-
-
-    @SuppressWarnings("unused")
-    public void setUseServerCipherSuitesOrder(SSLServerSocket socket,
-            boolean useCipherSuitesOrder) {
-        throw new UnsupportedOperationException(sm.getString("jreCompat.noServerCipherSuiteOrder"));
     }
 
 

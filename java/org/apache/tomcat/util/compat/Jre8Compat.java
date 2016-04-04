@@ -21,25 +21,18 @@ import java.lang.reflect.Method;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
-import javax.net.ssl.SSLServerSocket;
 
 class Jre8Compat extends JreCompat {
 
-    private static final Method getSSLParametersMethod;
     private static final Method setUseCipherSuitesOrderMethod;
-    private static final Method setSSLParametersMethod;
 
 
     static {
         Method m1 = null;
-        Method m2 = null;
-        Method m3 = null;
         try {
             // Get this class first since it is Java 8+ only
-            Class<?> c2 = Class.forName("javax.net.ssl.SSLParameters");
-            m1 = SSLServerSocket.class.getMethod("getSSLParameters");
-            m2 = c2.getMethod("setUseCipherSuitesOrder", boolean.class);
-            m3 = SSLServerSocket.class.getMethod("setSSLParameters", c2);
+            Class<?> c1 = Class.forName("javax.net.ssl.SSLParameters");
+            m1 = c1.getMethod("setUseCipherSuitesOrder", boolean.class);
         } catch (SecurityException e) {
             // Should never happen
         } catch (NoSuchMethodException e) {
@@ -47,33 +40,12 @@ class Jre8Compat extends JreCompat {
         } catch (ClassNotFoundException e) {
             // Should never happen
         }
-        getSSLParametersMethod = m1;
-        setUseCipherSuitesOrderMethod = m2;
-        setSSLParametersMethod = m3;
+        setUseCipherSuitesOrderMethod = m1;
     }
 
 
     static boolean isSupported() {
         return setUseCipherSuitesOrderMethod != null;
-    }
-
-
-    @Override
-    public void setUseServerCipherSuitesOrder(SSLServerSocket socket,
-            boolean useCipherSuitesOrder) {
-        try {
-            Object sslParameters = getSSLParametersMethod.invoke(socket);
-            setUseCipherSuitesOrderMethod.invoke(
-                    sslParameters, Boolean.valueOf(useCipherSuitesOrder));
-            setSSLParametersMethod.invoke(socket, sslParameters);
-            return;
-        } catch (IllegalArgumentException e) {
-            throw new UnsupportedOperationException(e);
-        } catch (IllegalAccessException e) {
-            throw new UnsupportedOperationException(e);
-        } catch (InvocationTargetException e) {
-            throw new UnsupportedOperationException(e);
-        }
     }
 
 
