@@ -176,13 +176,10 @@ final class StandardHostValve extends ValveBase {
                 }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
+                container.getLogger().error("Exception Processing " + request.getRequestURI(), t);
                 // If a new error occurred while trying to report a previous
-                // error simply log the new error and allow the original error
-                // to be reported.
-                if (response.isErrorReportRequired()) {
-                    container.getLogger().error("Exception Processing " +
-                            request.getRequestURI(), t);
-                } else {
+                // error allow the original error to be reported.
+                if (!response.isErrorReportRequired()) {
                     request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
                     throwable(request, response, t);
                 }
