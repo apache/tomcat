@@ -92,8 +92,8 @@
         from the standard JAR scanning by default. (violetagg)
       </fix>
       <fix>
-        Clarify in the log message that specifying both urlPatterns and value
-        attributes in WebServlet and WebFilter annotations is not allowed.
+        Clarify the log message that specifying both urlPatterns and value
+        attributes in @WebServlet and @WebFilter annotations is not allowed.
         (violetagg)
       </fix>
       <fix>
@@ -239,7 +239,7 @@
         memory footprint of a running Tomcat instance. (markt)
       </fix>
       <update>
-        Switch to the web application class loader to the
+        Switch the web application class loader to the
         <code>ParallelWebappClassLoader</code> by default. (markt)
       </update>
       <fix>
@@ -325,7 +325,7 @@
       </fix>
       <fix>
         <bug>59154</bug>: Fix a <code>NullPointerException</code> in the
-        <code>JASSMemoryLoginModue</code> resulting from the introduction of the
+        <code>JAASMemoryLoginModule</code> resulting from the introduction of the
         <code>CredentialHandler</code> to <code>Realm</code>s. (schultz/markt)
       </fix>
     </changelog>
