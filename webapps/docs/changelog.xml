@@ -165,6 +165,9 @@
       <fix>
         Avoid NPE when a proxy node failed to retrieve a backup entry. (kfujino)
       </fix>
+      <add>
+        Add the flag indicating that member is a localMember. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">

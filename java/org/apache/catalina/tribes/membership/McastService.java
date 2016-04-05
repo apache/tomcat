@@ -156,6 +156,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
                 localMember.setUniqueId(UUIDGenerator.randomUUID(true));
                 localMember.setPayload(getPayload());
                 localMember.setDomain(getDomain());
+                localMember.setLocal(true);
             }
             localMember.setSecurePort(securePort);
             localMember.setUdpPort(udpPort);
@@ -306,6 +307,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
         if ( localMember == null ) {
             localMember = new MemberImpl(host, port, 100);
             localMember.setUniqueId(UUIDGenerator.randomUUID(true));
+            localMember.setLocal(true);
         } else {
             localMember.setHostname(host);
             localMember.setPort(port);

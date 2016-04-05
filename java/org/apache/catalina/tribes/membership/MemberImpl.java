@@ -109,6 +109,11 @@ public class MemberImpl implements Member, java.io.Externalizable {
     protected volatile byte[] domain = new byte[0];
 
     /**
+     * The flag indicating that this member is a local member.
+     */
+    protected volatile boolean local = false;
+
+    /**
      * Empty constructor for serialization
      */
     public MemberImpl() {
@@ -651,6 +656,14 @@ public class MemberImpl implements Member, java.io.Externalizable {
     public synchronized void setUdpPort(int port) {
         this.udpPort = port;
         this.dataPkg = null;
+    }
+
+    public boolean isLocal() {
+        return local;
+    }
+
+    public void setLocal(boolean local) {
+        this.local = local;
     }
 
     @Override
