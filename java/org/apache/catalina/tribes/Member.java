@@ -148,4 +148,11 @@ public interface Member {
      * @return the data length
      */
     public int getDataLength();
+
+    /**
+     * @return boolean - true if the member is local member
+     */
+    public boolean isLocal();
+
+    public void setLocal(boolean local);
 }

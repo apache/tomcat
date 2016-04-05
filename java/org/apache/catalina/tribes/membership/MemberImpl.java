@@ -658,10 +658,12 @@ public class MemberImpl implements Member, java.io.Externalizable {
         this.dataPkg = null;
     }
 
+    @Override
     public boolean isLocal() {
         return local;
     }
 
+    @Override
     public void setLocal(boolean local) {
         this.local = local;
     }
