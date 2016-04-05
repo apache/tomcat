@@ -176,6 +176,9 @@
         <bug>59211</bug>: Add hamcrest to Eclipse classpath. Patch is provided
         by Huxing Zhang. (violetagg)
       </fix>
+      <update>
+        Update optional Checkstyle library to 6.15. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
