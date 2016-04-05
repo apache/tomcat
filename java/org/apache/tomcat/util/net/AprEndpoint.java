@@ -425,10 +425,14 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
                 // Use server's preference order for ciphers (rather than
                 // client's)
-                if (sslHostConfig.getHonorCipherOrder()) {
-                    SSLContext.setOptions(ctx, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
-                } else {
-                    SSLContext.clearOptions(ctx, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
+                String honorCipherOrderStr = sslHostConfig.getHonorCipherOrder();
+                if (honorCipherOrderStr != null) {
+                    boolean honorCipherOrder = Boolean.valueOf(honorCipherOrderStr).booleanValue();
+                    if (honorCipherOrder) {
+                        SSLContext.setOptions(ctx, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
+                    } else {
+                        SSLContext.clearOptions(ctx, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
+                    }
                 }
 
                 // Disable compression if requested

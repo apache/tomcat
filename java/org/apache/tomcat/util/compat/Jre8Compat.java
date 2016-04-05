@@ -54,7 +54,8 @@ class Jre8Compat extends JreCompat {
             boolean useCipherSuitesOrder) {
         SSLParameters sslParameters = engine.getSSLParameters();
         try {
-            setUseCipherSuitesOrderMethod.invoke(sslParameters, Boolean.valueOf(useCipherSuitesOrder));
+            setUseCipherSuitesOrderMethod.invoke(sslParameters,
+                    Boolean.valueOf(useCipherSuitesOrder));
             engine.setSSLParameters(sslParameters);
         } catch (IllegalArgumentException e) {
             throw new UnsupportedOperationException(e);

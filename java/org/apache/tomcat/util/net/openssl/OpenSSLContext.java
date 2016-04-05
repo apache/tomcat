@@ -202,10 +202,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
             // Use server's preference order for ciphers (rather than
             // client's)
-            if (sslHostConfig.getHonorCipherOrder()) {
-                SSLContext.setOptions(ctx, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
-            } else {
-                SSLContext.clearOptions(ctx, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
+            String honorCipherOrderStr = sslHostConfig.getHonorCipherOrder();
+            if (honorCipherOrderStr != null) {
+                if (Boolean.parseBoolean(honorCipherOrderStr)) {
+                    SSLContext.setOptions(ctx, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
+                } else {
+                    SSLContext.clearOptions(ctx, SSL.SSL_OP_CIPHER_SERVER_PREFERENCE);
+                }
             }
 
             // Disable compression if requested

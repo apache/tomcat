@@ -145,9 +145,11 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         engine.setEnabledCipherSuites(sslHostConfig.getEnabledCiphers());
         engine.setEnabledProtocols(sslHostConfig.getEnabledProtocols());
 
-        JreCompat.getInstance().setUseServerCipherSuitesOrder(engine,
-                sslHostConfig.getHonorCipherOrder());
-
+        String honorCipherOrderStr = sslHostConfig.getHonorCipherOrder();
+        if (honorCipherOrderStr != null) {
+            boolean honorCipherOrder = Boolean.parseBoolean(honorCipherOrderStr);
+            JreCompat.getInstance().setUseServerCipherSuitesOrder(engine, honorCipherOrder);
+        }
         return engine;
     }
 
@@ -163,7 +165,7 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         LinkedHashSet<Cipher> serverCiphers = sslHostConfig.getCipherList();
 
         List<Cipher> candidateCiphers = new ArrayList<>();
-        if (sslHostConfig.getHonorCipherOrder()) {
+        if (Boolean.parseBoolean(sslHostConfig.getHonorCipherOrder())) {
             candidateCiphers.addAll(serverCiphers);
             candidateCiphers.retainAll(clientCiphers);
         } else {

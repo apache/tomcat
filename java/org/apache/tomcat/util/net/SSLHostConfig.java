@@ -86,7 +86,7 @@ public class SSLHostConfig {
     private String ciphers;
     private LinkedHashSet<Cipher> cipherList = null;
     private List<String> jsseCipherNames = null;
-    private boolean honorCipherOrder = false;
+    private String honorCipherOrder = null;
     private Set<String> protocols = new HashSet<>();
     // JSSE
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
@@ -357,12 +357,12 @@ public class SSLHostConfig {
     }
 
 
-    public void setHonorCipherOrder(boolean honorCipherOrder) {
+    public void setHonorCipherOrder(String honorCipherOrder) {
         this.honorCipherOrder = honorCipherOrder;
     }
 
 
-    public boolean getHonorCipherOrder() {
+    public String getHonorCipherOrder() {
         return honorCipherOrder;
     }
 

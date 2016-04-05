@@ -475,11 +475,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    public void setUseServerCipherSuitesOrder(boolean honorCipherOrder) {
+    public void setUseServerCipherSuitesOrder(String honorCipherOrder) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setHonorCipherOrder(honorCipherOrder);
     }
-    public void setSSLHonorCipherOrder(boolean honorCipherOrder) {
+    public void setSSLHonorCipherOrder(String honorCipherOrder) {
         registerDefaultSSLHostConfig();
         defaultSSLHostConfig.setHonorCipherOrder(honorCipherOrder);
     }
