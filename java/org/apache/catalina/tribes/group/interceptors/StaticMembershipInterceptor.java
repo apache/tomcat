@@ -28,6 +28,7 @@ import org.apache.catalina.tribes.group.AbsoluteOrder;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
+import org.apache.catalina.tribes.membership.StaticMember;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -67,6 +68,7 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
 
     public void setLocalMember(Member member) {
         this.localMember = member;
+        ((StaticMember)localMember).setLocal(true);
     }
 
     @Override
