@@ -179,6 +179,10 @@
       <update>
         Update optional Checkstyle library to 6.15. (kkolinko)
       </update>
+      <update>
+        Update the NSIS Installer used to build the Windows Installers to
+        version 2.51. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
