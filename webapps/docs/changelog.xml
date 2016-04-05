@@ -253,6 +253,9 @@
       <add>
         Add log of when received an unexpected messages. (kfujino)
       </add>
+      <add>
+        Add the flag indicating that member is a localMember. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">

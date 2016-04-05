@@ -65,6 +65,7 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
 
     public void setLocalMember(Member member) {
         this.localMember = member;
+        ((StaticMember)localMember).setLocal(true);
     }
 
     @Override
