@@ -62,7 +62,8 @@ public class JreCompat {
     @SuppressWarnings("unused")
     public void setUseServerCipherSuitesOrder(SSLEngine engine,
             boolean useCipherSuitesOrder) {
-        throw new UnsupportedOperationException(sm.getString("jreCompat.noServerCipherSuiteOrder"));
+        // FIXME: Diasabled for now as it i always called during SSL init, which makes it fail on Java 7
+        //throw new UnsupportedOperationException(sm.getString("jreCompat.noServerCipherSuiteOrder"));
     }
 
 }
