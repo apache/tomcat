@@ -1427,7 +1427,7 @@
     </attribute>
 
     <attribute name="clientAuth" required="false">
-      <p>This is an alias for the <code>certificateValidation</code> attribute
+      <p>This is an alias for the <code>certificateVerification</code> attribute
       of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
       element.</p>
     </attribute>
@@ -1645,7 +1645,7 @@
     </attribute>
 
     <attribute name="SSLVerifyClient" required="false">
-      <p>This is an alias for the <code>certificateValidation</code> attribute
+      <p>This is an alias for the <code>certificateVerification</code> attribute
       of the default <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a>
       element.</p>
     </attribute>
