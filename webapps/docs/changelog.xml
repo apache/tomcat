@@ -203,6 +203,10 @@
         Based on a patch submitted by Coty Sutherland.
         (remm)
       </fix>
+      <update>
+        <bug>59280</bug>: Update the NSIS Installer used to build the
+        Windows Installers to version 2.51. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
