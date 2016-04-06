@@ -16,14 +16,8 @@
  */
 package org.apache.catalina.session;
 
-import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletException;
@@ -39,15 +33,13 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
-import org.apache.catalina.Store;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.PersistentValve;
 
-public class TestPersistentManager extends TomcatBaseTest {
+public class TestPersistentManagerIntegration extends TomcatBaseTest {
 
     private final String ACTIVITY_CHECK = "org.apache.catalina.session.StandardSession.ACTIVITY_CHECK";
 
@@ -105,15 +97,15 @@ public class TestPersistentManager extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-fragments-empty-absolute-ordering");
-        StandardContext ctx = (StandardContext) tomcat.addContext("", appDir.getAbsolutePath());
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
         ctx.setDistributable(true);
 
         Tomcat.addServlet(ctx, "DummyServlet", new DummyServlet());
         ctx.addServletMapping("/dummy", "DummyServlet");
 
         PersistentManager manager = new PersistentManager();
-        DummyStore store = new DummyStore();
+        TesterStore store = new TesterStore();
 
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
@@ -137,15 +129,15 @@ public class TestPersistentManager extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        File appDir = new File("test/webapp-3.0-fragments-empty-absolute-ordering");
-        StandardContext ctx = (StandardContext) tomcat.addContext("", appDir.getAbsolutePath());
+        // No file system docBase required
+        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
         ctx.setDistributable(true);
 
         Tomcat.addServlet(ctx, "DummyServlet", new DummyServlet());
         ctx.addServletMapping("/dummy", "DummyServlet");
 
         PersistentManager manager = new PersistentManager();
-        DummyStore store = new DummyStore();
+        TesterStore store = new TesterStore();
 
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
@@ -168,6 +160,7 @@ public class TestPersistentManager extends TomcatBaseTest {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
+
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
         ctx.setDistributable(true);
@@ -176,7 +169,7 @@ public class TestPersistentManager extends TomcatBaseTest {
         ctx.addServletMapping("/dummy", "DummyServlet");
 
         PersistentManager manager = new PersistentManager();
-        DummyStore store = new DummyStore();
+        TesterStore store = new TesterStore();
 
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
@@ -244,70 +237,5 @@ public class TestPersistentManager extends TomcatBaseTest {
             }
         }
 
-    }
-
-    private static class DummyStore implements Store {
-
-        private Manager manager;
-        private Map<String, Session> sessions = new HashMap<String, Session>();
-        private List<String> savedIds = new ArrayList<String>();
-
-        List<String> getSavedIds() {
-            return savedIds;
-        }
-
-        @Override
-        public Manager getManager() {
-            return this.manager;
-        }
-
-        @Override
-        public void setManager(Manager manager) {
-            this.manager = manager;
-        }
-
-        @Override
-        public int getSize() throws IOException {
-            return 0;
-        }
-
-        @Override
-        public void addPropertyChangeListener(PropertyChangeListener listener) {
-        }
-
-        @Override
-        public String[] keys() throws IOException {
-            return new ArrayList<String>(sessions.keySet()).toArray(new String[] {});
-        }
-
-        @Override
-        public Session load(String id) throws ClassNotFoundException,
-                IOException {
-            return sessions.get(id);
-        }
-
-        @Override
-        public void remove(String id) throws IOException {
-            sessions.remove(id);
-        }
-
-        @Override
-        public void clear() throws IOException {
-        }
-
-        @Override
-        public void removePropertyChangeListener(PropertyChangeListener listener) {
-        }
-
-        @Override
-        public void save(Session session) throws IOException {
-            sessions.put(session.getId(), session);
-            savedIds.add(session.getId());
-        }
-
-        @Override
-        public String getInfo() {
-            return null;
-        }
     }
 }
