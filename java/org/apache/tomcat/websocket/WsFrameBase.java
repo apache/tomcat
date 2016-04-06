@@ -377,7 +377,7 @@ public abstract class WsFrameBase {
 
 
     @SuppressWarnings("unchecked")
-    private void sendMessageText(boolean last) throws WsIOException {
+    protected void sendMessageText(boolean last) throws WsIOException {
         if (textMsgHandler instanceof WrappedMessageHandler) {
             long maxMessageSize =
                     ((WrappedMessageHandler) textMsgHandler).getMaxMessageSize();
@@ -572,7 +572,7 @@ public abstract class WsFrameBase {
 
 
     @SuppressWarnings("unchecked")
-    private void sendMessageBinary(ByteBuffer msg, boolean last)
+    protected void sendMessageBinary(ByteBuffer msg, boolean last)
             throws WsIOException {
         if (binaryMsgHandler instanceof WrappedMessageHandler) {
             long maxMessageSize =
