@@ -172,16 +172,18 @@ public abstract class PersistentManagerBase extends ManagerBase
 
 
     /**
-     * Minimum time a session must be idle before it is swapped to disk.
-     * This overrides maxActiveSessions, to prevent thrashing if there are lots
-     * of active sessions. Setting to {@code -1} means it's ignored.
+     * The minimum time in seconds a session must be idle before it is eligible
+     * to be swapped to disk to keep the active session count below
+     * maxActiveSessions. Setting to {@code -1} means sessions will not be
+     * swapped out to keep the active session count down.
      */
     protected int minIdleSwap = -1;
 
+
     /**
-     * The maximum time a session may be idle before it should be swapped
-     * to file just on general principle. Setting this to {@code -1} means sessions
-     * should not be forced out.
+     * The maximum time in seconds a session may be idle before it is eligible
+     * to be swapped to disk due to inactivity. Setting this to {@code -1} means
+     * sessions should not be swapped out just because of inactivity.
      */
     protected int maxIdleSwap = -1;
 
@@ -244,19 +246,20 @@ public abstract class PersistentManagerBase extends ManagerBase
 
 
     /**
-     * @return The time in seconds after which a session should be swapped out of
-     * memory to disk.
+     * @return The maximum time in seconds a session may be idle before it is
+     * eligible to be swapped to disk due to inactivity. A value of {@code -1}
+     * means sessions should not be swapped out just because of inactivity.
      */
     public int getMaxIdleSwap() {
-
         return maxIdleSwap;
-
     }
 
 
     /**
-     * Sets the time in seconds after which a session should be swapped out of
-     * memory to disk.
+     * Sets the maximum time in seconds a session may be idle before it is
+     * eligible to be swapped to disk due to inactivity. Setting this to
+     * {@code -1} means sessions should not be swapped out just because of
+     * inactivity.
      *
      * @param max time in seconds to wait for possible swap out
      */
@@ -269,26 +272,25 @@ public abstract class PersistentManagerBase extends ManagerBase
         support.firePropertyChange("maxIdleSwap",
                                    Integer.valueOf(oldMaxIdleSwap),
                                    Integer.valueOf(this.maxIdleSwap));
-
     }
 
 
     /**
-     * @return The minimum time in seconds that a session must be idle before
-     * it can be swapped out of memory, or {@code -1} if it can be swapped out
-     * at any time.
+     * @return The minimum time in seconds a session must be idle before it is
+     * eligible to be swapped to disk to keep the active session count below
+     * maxActiveSessions. A value of {@code -1} means sessions will not be
+     * swapped out to keep the active session count down.
      */
     public int getMinIdleSwap() {
-
         return minIdleSwap;
-
     }
 
 
     /**
-     * Sets the minimum time in seconds that a session must be idle before
-     * it can be swapped out of memory due to maxActiveSession. Set it to {@code -1}
-     * if it can be swapped out at any time.
+     * Sets the minimum time in seconds a session must be idle before it is
+     * eligible to be swapped to disk to keep the active session count below
+     * maxActiveSessions. Setting to {@code -1} means sessions will not be
+     * swapped out to keep the active session count down.
      *
      * @param min time in seconds before a possible swap out
      */
@@ -963,7 +965,9 @@ public abstract class PersistentManagerBase extends ManagerBase
         Session sessions[] = findSessions();
 
         // FIXME: Smarter algorithm (LRU)
-        if (getMaxActiveSessions() >= sessions.length)
+        int limit = (int) (getMaxActiveSessions() * 0.9);
+
+        if (limit >= sessions.length)
             return;
 
         if(log.isDebugEnabled())
@@ -971,7 +975,7 @@ public abstract class PersistentManagerBase extends ManagerBase
                 ("persistentManager.tooManyActive",
                  Integer.valueOf(sessions.length)));
 
-        int toswap = sessions.length - getMaxActiveSessions();
+        int toswap = sessions.length - limit;
         long timeNow = System.currentTimeMillis();
 
         for (int i = 0; i < sessions.length && toswap > 0; i++) {

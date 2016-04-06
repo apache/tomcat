@@ -254,21 +254,21 @@
       </attribute>
 
       <attribute name="maxIdleSwap" required="false">
-        <p>The time interval (in seconds) since the last access to a session
-        before it should be persisted to the session store, and
-        passivated out of the server's memory, or <code>-1</code> to disable
-        this feature.  If this feature is enabled, the time interval specified
-        here should be equal to or longer than the value specified for
-        <code>maxIdleBackup</code>.  By default, this feature is disabled.</p>
+        <p>The maximum time a session may be idle before it is eligible to be
+        swapped to disk due to inactivity. Setting this to <code>-1</code> means
+        sessions should not be swapped out just because of inactivity. If this
+        feature is enabled, the time interval specified here should be equal to
+        or longer than the value specified for <code>maxIdleBackup</code>. By
+        default, this feature is disabled.</p>
       </attribute>
 
       <attribute name="minIdleSwap" required="false">
-        <p>The time interval (in seconds) since the last access to a session
-        before it will be eligible to be persisted to the session store, and
-        passivated out of the server's memory, or <code>-1</code> for this
-        swapping to be available at any time.  If specified, this value should
-        be less than that specified by <code>maxIdleSwap</code>.  By default,
-        this value is set to <code>-1</code>.</p>
+        <p>The minimum time in seconds a session must be idle before it is
+        eligible to be swapped to disk to keep the active session count below
+        maxActiveSessions. Setting to <code>-1</code> means sessions will not be
+        swapped out to keep the active session count down. If specified, this
+        value should be less than that specified by <code>maxIdleSwap</code>.
+        By default, this value is set to <code>-1</code>.</p>
       </attribute>
 
       <attribute name="processExpiresFrequency" required="false">
