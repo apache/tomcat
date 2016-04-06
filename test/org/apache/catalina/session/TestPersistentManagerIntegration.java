@@ -46,7 +46,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.PersistentValve;
 
-public class TestPersistentManager extends TomcatBaseTest {
+public class TestPersistentManagerIntegration extends TomcatBaseTest {
 
     private final String ACTIVITY_CHECK = "org.apache.catalina.session.StandardSession.ACTIVITY_CHECK";
 
@@ -268,7 +268,7 @@ public class TestPersistentManager extends TomcatBaseTest {
 
         @Override
         public int getSize() throws IOException {
-            return 0;
+            return savedIds.size();
         }
 
         @Override
