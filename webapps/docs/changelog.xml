@@ -198,11 +198,6 @@
         <bug>59211</bug>: Add hamcrest to Eclipse classpath. Patch is provided
         by Huxing Zhang. (violetagg)
       </fix>
-      <fix>
-        <bug>59247</bug>: Add loader package access permission to JULI.
-        Based on a patch submitted by Coty Sutherland.
-        (remm)
-      </fix>
       <update>
         <bug>59280</bug>: Update the NSIS Installer used to build the
         Windows Installers to version 2.51. (kkolinko)
