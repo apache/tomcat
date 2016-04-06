@@ -163,6 +163,12 @@
         Update in the documentation the link to the maven repository where
         Tomcat snapshot artifacts are deployed. (markt/violetagg)
       </fix>
+      <fix>
+        Clarify in the documentation that calls to
+        <code>ServletContext.log(String, Throwable)</code> or
+        <code>GenericServlet.log(String, Throwable)</code> are logged at the
+        SEVERE level. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
