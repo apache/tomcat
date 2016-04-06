@@ -107,6 +107,12 @@
         and <code>host</code> attributes define as
         <code>TransientAttribute</code>. (kfujino)
       </fix>
+      <fix>
+        <bug>59269</bug>: Correct the implementation of
+        <code>PersistentManagerBase</code> so that <code>minIdleSwap</code>
+        functions as designed and sessions are swapped out to keep the active
+        session count below <code>maxActiveSessions</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
