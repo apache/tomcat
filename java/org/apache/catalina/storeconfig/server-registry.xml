@@ -144,7 +144,6 @@
         children="true"
         tagClass="org.apache.catalina.Manager"
         storeFactoryClass="org.apache.catalina.storeconfig.ManagerSF">
-        <TransientAttribute>distributable</TransientAttribute>
         <TransientAttribute>domain</TransientAttribute>
     </Description>
     <Description
@@ -154,7 +153,6 @@
         children="true"
         tagClass="org.apache.catalina.session.PersistentManager"
         storeFactoryClass="org.apache.catalina.storeconfig.PersistentManagerSF">
-        <TransientAttribute>distributable</TransientAttribute>
      </Description>
      <Description
         tag="Store"
