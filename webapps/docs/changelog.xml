@@ -97,6 +97,11 @@
         <code>TransientAttribute</code> of <code>Manager</code> in StoreConfig.
         (kfujino)
       </fix>
+      <fix>
+        Fix handling of Cluster Receiver in StoreConfig. The <code>bind</code>
+        and <code>host</code> attributes define as
+        <code>TransientAttribute</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
