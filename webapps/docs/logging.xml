@@ -139,7 +139,7 @@
       or <code>GenericServlet.log(String)</code> are logged at the INFO level.
       The calls to <code>ServletContext.log(String, Throwable)</code> or
       <code>GenericServlet.log(String, Throwable)</code>
-      are logged at the ERROR level.
+      are logged at the SEVERE level.
     </p>
 
     </subsection>
