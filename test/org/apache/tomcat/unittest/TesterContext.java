@@ -155,24 +155,26 @@ public class TesterContext implements Context {
         // NO-OP
     }
 
+    private String name = "/test";
     @Override
     public String getName() {
-        return null;
+        return name;
     }
 
     @Override
     public void setName(String name) {
-        // NO-OP
+        this.name = name;
     }
 
+    private Container parent = null;
     @Override
     public Container getParent() {
-        return null;
+        return parent;
     }
 
     @Override
     public void setParent(Container container) {
-        // NO-OP
+        this.parent = container;
     }
 
     @Override
