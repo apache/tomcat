@@ -80,11 +80,6 @@
         (violetagg)
       </fix>
       <fix>
-        <bug>59247</bug>: Add loader package access permission to JULI.
-        Based on a patch submitted by Coty Sutherland.
-        (remm)
-      </fix>
-      <fix>
         <bug>59255</bug>: Fix possible NPE in mapper. (kkolinko/remm)
       </fix>
       <fix>
