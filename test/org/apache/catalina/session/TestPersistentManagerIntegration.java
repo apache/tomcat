@@ -16,13 +16,8 @@
  */
 package org.apache.catalina.session;
 
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletException;
@@ -38,9 +33,7 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
-import org.apache.catalina.Store;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -112,7 +105,7 @@ public class TestPersistentManagerIntegration extends TomcatBaseTest {
         ctx.addServletMapping("/dummy", "DummyServlet");
 
         PersistentManager manager = new PersistentManager();
-        DummyStore store = new DummyStore();
+        TesterStore store = new TesterStore();
 
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
@@ -144,7 +137,7 @@ public class TestPersistentManagerIntegration extends TomcatBaseTest {
         ctx.addServletMapping("/dummy", "DummyServlet");
 
         PersistentManager manager = new PersistentManager();
-        DummyStore store = new DummyStore();
+        TesterStore store = new TesterStore();
 
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
@@ -176,7 +169,7 @@ public class TestPersistentManagerIntegration extends TomcatBaseTest {
         ctx.addServletMapping("/dummy", "DummyServlet");
 
         PersistentManager manager = new PersistentManager();
-        DummyStore store = new DummyStore();
+        TesterStore store = new TesterStore();
 
         manager.setStore(store);
         manager.setMaxIdleBackup(0);
@@ -242,67 +235,6 @@ public class TestPersistentManagerIntegration extends TomcatBaseTest {
                 String id = session.getId();
                 resp.getWriter().print(id);
             }
-        }
-
-    }
-
-    private static class DummyStore implements Store {
-
-        private Manager manager;
-        private Map<String, Session> sessions = new HashMap<>();
-        private List<String> savedIds = new ArrayList<>();
-
-        List<String> getSavedIds() {
-            return savedIds;
-        }
-
-        @Override
-        public Manager getManager() {
-            return this.manager;
-        }
-
-        @Override
-        public void setManager(Manager manager) {
-            this.manager = manager;
-        }
-
-        @Override
-        public int getSize() throws IOException {
-            return savedIds.size();
-        }
-
-        @Override
-        public void addPropertyChangeListener(PropertyChangeListener listener) {
-        }
-
-        @Override
-        public String[] keys() throws IOException {
-            return new ArrayList<>(sessions.keySet()).toArray(new String[] {});
-        }
-
-        @Override
-        public Session load(String id) throws ClassNotFoundException,
-                IOException {
-            return sessions.get(id);
-        }
-
-        @Override
-        public void remove(String id) throws IOException {
-            sessions.remove(id);
-        }
-
-        @Override
-        public void clear() throws IOException {
-        }
-
-        @Override
-        public void removePropertyChangeListener(PropertyChangeListener listener) {
-        }
-
-        @Override
-        public void save(Session session) throws IOException {
-            sessions.put(session.getId(), session);
-            savedIds.add(session.getId());
         }
 
     }
