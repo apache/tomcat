@@ -177,7 +177,8 @@
         by Huxing Zhang. (violetagg)
       </fix>
       <update>
-        Update optional Checkstyle library to 6.15. (kkolinko)
+        <bug>59276</bug>: Update optional Checkstyle library to 6.17.
+        (kkolinko)
       </update>
       <update>
         Update the NSIS Installer used to build the Windows Installers to
