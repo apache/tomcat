@@ -136,7 +136,7 @@ public class CoyoteAdapter implements Adapter {
                     "Dispatch may only happen on an existing request.");
         }
         boolean success = true;
-        AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
+        AsyncContextImpl asyncConImpl = request.getAsyncContextInternal();
         req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
         try {
             if (!request.isAsync()) {

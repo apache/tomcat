@@ -108,6 +108,12 @@
         <code>TransientAttribute</code>. (kfujino)
       </fix>
       <fix>
+        <bug>59261</bug>: <code>ServletRequest.getAsyncContext()</code> now
+        throws an <code>IllegalStateException</code> as required by the Servlet
+        specification if the request is not in asynchronous mode when called.
+        (markt)
+      </fix>
+      <fix>
         <bug>59269</bug>: Correct the implementation of
         <code>PersistentManagerBase</code> so that <code>minIdleSwap</code>
         functions as designed and sessions are swapped out to keep the active
