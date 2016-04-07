@@ -1169,6 +1169,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
     @Test
     public void testErrorHandling() throws Exception {
+        resetTracker();
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
