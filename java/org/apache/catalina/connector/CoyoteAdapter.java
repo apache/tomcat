@@ -457,8 +457,7 @@ public class CoyoteAdapter implements Adapter {
                 }
 
             }
-            AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
-            if (asyncConImpl != null) {
+            if (request.isAsync()) {
                 async = true;
             } else if (!comet) {
                 try {
