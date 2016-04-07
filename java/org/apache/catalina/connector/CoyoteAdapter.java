@@ -342,8 +342,7 @@ public class CoyoteAdapter implements Adapter {
                 // Calling the container
                 connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
             }
-            AsyncContextImpl asyncConImpl = (AsyncContextImpl)request.getAsyncContext();
-            if (asyncConImpl != null) {
+            if (request.isAsync()) {
                 async = true;
                 ReadListener readListener = req.getReadListener();
                 if (readListener != null && request.isFinished()) {
