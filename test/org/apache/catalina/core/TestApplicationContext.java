@@ -248,6 +248,11 @@ public class TestApplicationContext extends TomcatBaseTest {
     }
 
 
+    /*
+     * The expectation is that you can set a context attribute on
+     * ServletContextB from ServletContextA and then access that attribute via
+     * a cross-context dispatch to ServletContextB.
+     */
     @Test
     public void testCrossContextSetAttribute() throws Exception {
         // Setup Tomcat instance
