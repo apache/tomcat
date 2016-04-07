@@ -55,13 +55,13 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * |-----------------»--------------|
  * |                               \|/
  * |   |----------«---------------ERROR---------------------------«-------------------------------|
- * |   |      complete()         /|\   \                                                          |
- * |   |                          |     \---------------|                                         |
- * |   |                          |                     |dispatch()                               |
- * |   |                          |                    \|/                                        |
- * |   |                   error()|                     |                                         |
- * |   |                          |     |--|timeout()   |                                         |
- * |   |              post()      |     | \|/           |     post()                              |
+ * |   |      complete()               \                                                          |
+ * |   |                                \---------------|                                         |
+ * |   |                                                |dispatch()                               |
+ * |   |                                               \|/                                        |
+ * |   |                                                |                                         |
+ * |   |                                |--|timeout()   |                                         |
+ * |   |              post()            | \|/           |     post()                              |
  * |   |         |---------------»DISPATCHED«---------- | --------------COMPLETING«-----|         |
  * |   |         |               /|\  |                 |                 | /|\         |         |
  * |   |         |    |---»-------|   |                 |                 |--|          |         |
@@ -117,7 +117,7 @@ public class AsyncStateMachine {
         MUST_DISPATCH(true,  true,  false, true,  true),
         DISPATCHING  (true,  false, false, true,  false),
         READ_WRITE_OP(true,  true,  false, false, true),
-        ERROR        (true,  false, false, false, false);
+        ERROR        (true,  true,  false, false, false);
 
         private final boolean isAsync;
         private final boolean isStarted;
