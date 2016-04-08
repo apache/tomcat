@@ -145,6 +145,10 @@
         The default value is <code>-Djdk.tls.ephemeralDHKeySize=2048</code>
         which protects against weak Diffie-Hellman keys. (markt)
       </add>
+      <fix>
+        <bug>59289</bug>: Do not recycle upgrade processors in unexpected clsoe
+        situations. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
