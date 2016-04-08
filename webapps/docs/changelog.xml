@@ -133,13 +133,13 @@
         <code>catalina.base</code> is not specified. (violetagg)
       </fix>
       <fix>
+        <bug>59213</bug>: Async dispatches should be based off a wrapped request.
+        (remm)
+      </fix>
+      <fix>
         <bug>59217</bug>: Remove duplication in the recycling of the path in
         <code>o.a.tomcat.util.http.ServerCookie</code>. Patch is provided by
         Kyohei Nakamura. (violetagg)
-      </fix>
-      <fix>
-        <bug>59213</bug>: Async dispatches should be based off a wrapped request.
-        (remm)
       </fix>
       <fix>
         Ensure that <code>javax.servlet.ServletRequest</code> and
@@ -150,7 +150,7 @@
         (violetagg)
       </fix>
       <fix>
-        Clarify in the log message that specifying both urlPatterns and value
+        Clarify the log message that specifying both urlPatterns and value
         attributes in WebServlet and WebFilter annotations is not allowed.
         (violetagg)
       </fix>
@@ -161,14 +161,14 @@
         disabled. Patch is provided by Svetlin Zarev. (violetagg)
       </fix>
       <fix>
+        <bug>59247</bug>: Preload ResourceEntry as a workaround for security
+        manager issues on some JVMs. (kkolinko/remm)
+      </fix>
+      <fix>
         <bug>59269</bug>: Correct the implementation of
         <code>PersistentManagerBase</code> so that <code>minIdleSwap</code>
         functions as designed and sessions are swapped out to keep the active
         session count below <code>maxActiveSessions</code>. (markt)
-      </fix>
-      <fix>
-        <bug>59247</bug>: Preload ResourceEntry as a workaround for security
-        manager issues on some JVMs. (kkolinko/remm)
       </fix>
     </changelog>
   </subsection>
@@ -279,7 +279,8 @@
       <fix>
         <bug>58283</bug>: Change the default download location for libraries
         during the build process from <code>/usr/share/java</code> to
-        <code>${user.home}/temp</code>. Patch provided by Ahmed Hosni. (markt)
+        <code>${user.home}/tomcat-build-libs</code>. Patch provided by
+        Ahmed Hosni. (markt)
       </fix>
       <fix>
         <bug>59031</bug>: When using the Windows uninstaller, do not remove the
