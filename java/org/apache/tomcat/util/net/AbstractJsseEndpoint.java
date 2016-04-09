@@ -62,6 +62,7 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
     }
 
 
+
     @Override
     protected Type getSslConfigType() {
         if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
@@ -186,6 +187,28 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         // No matches. Just return the first certificate. The handshake will
         // then fail due to no matching ciphers.
         return certificates.iterator().next();
+    }
+
+
+    @Override
+    public void init() throws Exception {
+        testServerCipherSuitesOrderSupport();
+        super.init();
+    }
+
+
+    private void testServerCipherSuitesOrderSupport() {
+        // Only need to test for this if running on Java < 8 and not using the
+        // OpenSSL SSLImplementation
+        if(!JreCompat.isJre8Available() &&
+                !OpenSSLImplementation.class.getName().equals(getSslImplementationName())) {
+            for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
+                if (!"".equals(sslHostConfig.getHonorCipherOrder().trim())) {
+                    throw new UnsupportedOperationException(
+                            sm.getString("endpoint.jsse.cannotHonorServerCipherOrder"));
+                }
+            }
+        }
     }
 
 

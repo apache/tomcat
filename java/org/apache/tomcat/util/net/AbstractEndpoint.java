@@ -793,12 +793,13 @@ public abstract class AbstractEndpoint<S> {
     public abstract void startInternal() throws Exception;
     public abstract void stopInternal() throws Exception;
 
-    public final void init() throws Exception {
+    public void init() throws Exception {
         if (bindOnInit) {
             bind();
             bindState = BindState.BOUND_ON_INIT;
         }
     }
+
 
     public final void start() throws Exception {
         if (bindState == BindState.UNBOUND) {
