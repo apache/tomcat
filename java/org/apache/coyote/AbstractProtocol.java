@@ -766,7 +766,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                         // Retrieve leftover input
                         ByteBuffer leftoverInput = processor.getLeftoverInput();
                         // Release the Http11 processor to be re-used
-                        release(wrapper, processor, false);
+                        release(processor);
                         // Create the upgrade processor
                         processor = getProtocol().createUpgradeProcessor(
                                 wrapper, leftoverInput, upgradeToken);
@@ -805,13 +805,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     // In keep-alive but between requests. OK to recycle
                     // processor. Continue to poll for the next request.
                     connections.remove(socket);
-                    release(wrapper, processor, true);
+                    release(processor);
+                    wrapper.registerReadInterest();
                 } else if (state == SocketState.SENDFILE) {
                     // Sendfile in progress. If it fails, the socket will be
                     // closed. If it works, the socket will be re-added to the
                     // poller
                     connections.remove(socket);
-                    release(wrapper, processor, false);
+                    release(processor);
                 } else if (state == SocketState.UPGRADED) {
                     // Don't add sockets back to the poller if this was a
                     // non-blocking write otherwise the poller may trigger
@@ -841,7 +842,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                             }
                         }
                     } else {
-                        release(wrapper, processor, false);
+                        release(processor);
                     }
                 }
                 return state;
@@ -875,10 +876,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             // Make sure socket/processor is removed from the list of current
             // connections
             connections.remove(socket);
-            // Don't try to add upgrade processors back into the pool
-            if (processor !=null && !processor.isUpgrade()) {
-                release(wrapper, processor, false);
-            }
+            release(processor);
             return SocketState.CLOSED;
         }
 
@@ -905,18 +903,20 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
          * Expected to be used by the handler once the processor is no longer
          * required.
          *
-         * @param socket    Socket being released (that was associated with the
-         *                  processor)
          * @param processor Processor being released (that was associated with
          *                  the socket)
-         * @param addToPoller Should the socket be added to the poller for
-         *                    reading
          */
-        public void release(SocketWrapperBase<S> socket, Processor processor, boolean addToPoller) {
-            processor.recycle();
-            recycledProcessors.push(processor);
-            if (addToPoller) {
-                socket.registerReadInterest();
+        private void release(Processor processor) {
+            if (processor != null) {
+                processor.recycle();
+                // After recycling, only instances of UpgradeProcessorBase will
+                // return true for isUpgrade().
+                // Instances of UpgradeProcessorBase should not be added to
+                // recycledProcessors since that pool is only for AJP or HTTP
+                // processors
+                if (!processor.isUpgrade()) {
+                    recycledProcessors.push(processor);
+                }
             }
         }
 
@@ -930,12 +930,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             S socket = socketWrapper.getSocket();
             if (socket != null) {
                 Processor processor = connections.remove(socket);
-                if (processor != null) {
-                    processor.recycle();
-                    if (!socketWrapper.isUpgraded()) {
-                        recycledProcessors.push(processor);
-                    }
-                }
+                release(processor);
             }
         }
 
