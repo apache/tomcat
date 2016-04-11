@@ -154,6 +154,11 @@
         <bug>59289</bug>: Do not recycle upgrade processors in unexpected clsoe
         situations. (remm)
       </fix>
+      <fix>
+        <bug>59295</bug>: Use <code>Locale.toLangaugeTag()</code> to construct
+        the <code>Content-Langauge</code> HTTP header to ensure the locale is
+        correctly represented. Patch provided by zikfat. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

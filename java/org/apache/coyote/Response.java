@@ -379,17 +379,7 @@ public final class Response {
         this.locale = locale;
 
         // Set the contentLanguage for header output
-        contentLanguage = locale.getLanguage();
-        if ((contentLanguage != null) && (contentLanguage.length() > 0)) {
-            String country = locale.getCountry();
-            StringBuilder value = new StringBuilder(contentLanguage);
-            if ((country != null) && (country.length() > 0)) {
-                value.append('-');
-                value.append(country);
-            }
-            contentLanguage = value.toString();
-        }
-
+        contentLanguage = locale.toLanguageTag();
     }
 
     /**
