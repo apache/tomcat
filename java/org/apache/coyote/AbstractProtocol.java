@@ -876,10 +876,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             // Make sure socket/processor is removed from the list of current
             // connections
             connections.remove(socket);
-            // Don't try to add upgrade processors back into the pool
-            if (processor !=null && !processor.isUpgrade()) {
-                release(processor);
-            }
+            release(processor);
             return SocketState.CLOSED;
         }
 
@@ -910,8 +907,17 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
          *                  the socket)
          */
         private void release(Processor processor) {
-            processor.recycle();
-            recycledProcessors.push(processor);
+            if (processor != null) {
+                processor.recycle();
+                // After recycling, only instances of UpgradeProcessorBase will
+                // return true for isUpgrade().
+                // Instances of UpgradeProcessorBase should not be added to
+                // recycledProcessors since that pool is only for AJP or HTTP
+                // processors
+                if (!processor.isUpgrade()) {
+                    recycledProcessors.push(processor);
+                }
+            }
         }
 
 
