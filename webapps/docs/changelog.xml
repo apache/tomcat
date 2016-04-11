@@ -68,8 +68,8 @@
         (violetagg)
       </fix>
       <fix>
-        <bug>59213</bug>: Async dispatches should be based off a wrapped request.
-        (remm)
+        <bug>59213</bug>: Async dispatches should be based off a wrapped
+        request. (remm)
       </fix>
       <fix>
         Ensure that <code>javax.servlet.ServletRequest</code> and
@@ -244,20 +244,20 @@
         accessible via JMX. Patch provided by  Huxing Zhang. (markt)
       </add>
       <add>
-        <bug>58988</bug>: Special characters in the substitutions for the RewriteValve
-        can now be quoted with a backslash. (fschumacher)
+        <bug>58988</bug>: Special characters in the substitutions for the
+        RewriteValve can now be quoted with a backslash. (fschumacher)
       </add>
       <fix>
-        <bug>58999</bug>: Fix class and resource name filtering in WebappClassLoader.
-        It throws a StringIndexOutOfBoundsException if the name is exactly
-        "org" or "javax". (rjung)
+        <bug>58999</bug>: Fix class and resource name filtering in
+        WebappClassLoader. It throws a StringIndexOutOfBoundsException if the
+        name is exactly "org" or "javax". (rjung)
       </fix>
       <add>
         Add JASPIC (JSR-196) support. (markt)
       </add>
       <add>
-        Make checking for var and map replacement in RewriteValve a bit stricter and
-        correct detection of colon in var replacement. (fschumacher)
+        Make checking for var and map replacement in RewriteValve a bit stricter
+        and correct detection of colon in var replacement. (fschumacher)
       </add>
       <fix>
         Refactor the web application class loader to reduce the impact of JAR
@@ -365,8 +365,9 @@
       </fix>
       <fix>
         <bug>59154</bug>: Fix a <code>NullPointerException</code> in the
-        <code>JAASMemoryLoginModule</code> resulting from the introduction of the
-        <code>CredentialHandler</code> to <code>Realm</code>s. (schultz/markt)
+        <code>JAASMemoryLoginModule</code> resulting from the introduction of
+        the <code>CredentialHandler</code> to <code>Realm</code>s.
+        (schultz/markt)
       </fix>
     </changelog>
   </subsection>
