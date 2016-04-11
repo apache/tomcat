@@ -35,31 +35,33 @@ public class ApplicationMapping {
         if (mapping == null) {
             switch (mappingData.matchType) {
                 case CONTEXT_ROOT:
-                    mapping = new MappingImpl("", "", mappingData.matchType);
+                    mapping = new MappingImpl("", "", mappingData.matchType,
+                            mappingData.wrapper.getName());
                     break;
                 case DEFAULT:
-                    mapping = new MappingImpl("/", "/", mappingData.matchType);
+                    mapping = new MappingImpl("/", "/", mappingData.matchType,
+                            mappingData.wrapper.getName());
                     break;
                 case EXACT:
                     mapping = new MappingImpl(mappingData.wrapperPath.toString(),
-                            mappingData.wrapperPath.toString(), mappingData.matchType);
+                            mappingData.wrapperPath.toString(), mappingData.matchType,
+                            mappingData.wrapper.getName());
                     break;
                 case EXTENSION:
                     String path = mappingData.wrapperPath.toString();
                     int extIndex = path.lastIndexOf('.');
                     mapping = new MappingImpl(path.substring(0, extIndex),
-                            "*" + path.substring(extIndex), mappingData.matchType);
+                            "*" + path.substring(extIndex), mappingData.matchType,
+                            mappingData.wrapper.getName());
                     break;
                 case PATH:
                     mapping = new MappingImpl(mappingData.pathInfo.toString(),
                             mappingData.wrapperPath.toString() + "/*",
-                            mappingData.matchType);
+                            mappingData.matchType, mappingData.wrapper.getName());
                     break;
-                case IMPLICIT:
-                    // Treat IMPLICIT as UNKNOWN since Tomcat doesn't use
-                    // implicit mappings
                 case UNKNOWN:
-                    mapping = new MappingImpl("", "", mappingData.matchType);
+                    mapping = new MappingImpl("", "", mappingData.matchType,
+                            mappingData.wrapper.getName());
                     break;
             }
         }
@@ -76,11 +78,14 @@ public class ApplicationMapping {
         private final String matchValue;
         private final String pattern;
         private final MappingMatch mappingType;
+        private final String servletName;
 
-        public MappingImpl(String matchValue, String pattern, MappingMatch mappingType) {
+        public MappingImpl(String matchValue, String pattern, MappingMatch mappingType,
+                String servletName) {
             this.matchValue = matchValue;
             this.pattern = pattern;
             this.mappingType = mappingType;
+            this.servletName = servletName;
         }
 
         @Override
@@ -94,8 +99,13 @@ public class ApplicationMapping {
         }
 
         @Override
-        public MappingMatch getMatchType() {
+        public MappingMatch getMappingMatch() {
             return mappingType;
+        }
+
+        @Override
+        public String getServletName() {
+            return servletName;
         }
     }
 }

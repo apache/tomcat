@@ -119,6 +119,11 @@
         functions as designed and sessions are swapped out to keep the active
         session count below <code>maxActiveSessions</code>. (markt)
       </fix>
+      <update>
+        Update the implementation of the the proposed Servlet 4.0 API to provide
+        mapping type information for the current request to reflect discussions
+        within the EG. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

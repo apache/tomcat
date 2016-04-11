@@ -184,8 +184,13 @@ public interface HttpServletRequest extends ServletRequest {
             }
 
             @Override
-            public MappingMatch getMatchType() {
+            public MappingMatch getMappingMatch() {
                 return MappingMatch.UNKNOWN;
+            }
+
+            @Override
+            public String getServletName() {
+                return "";
             }
         };
     }

@@ -52,6 +52,7 @@ import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionIdListener;
 import javax.servlet.http.HttpSessionListener;
+import javax.servlet.http.Mapping;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -375,7 +376,7 @@ public class ApplicationContext
         if (wrapper == null)
             return (null);
 
-        return new ApplicationDispatcher(wrapper, null, null, null, null, name);
+        return new ApplicationDispatcher(wrapper, null, null, null, null, null, name);
 
     }
 
@@ -460,13 +461,14 @@ public class ApplicationContext
         Wrapper wrapper = mappingData.wrapper;
         String wrapperPath = mappingData.wrapperPath.toString();
         String pathInfo = mappingData.pathInfo.toString();
+        Mapping mapping = (new ApplicationMapping(mappingData)).getMapping();
 
         mappingData.recycle();
 
         // Construct a RequestDispatcher to process this request
         return new ApplicationDispatcher
             (wrapper, uriCC.toString(), wrapperPath, pathInfo,
-             queryString, null);
+             queryString, mapping, null);
 
     }
 

@@ -33,6 +33,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Mapping;
 import javax.servlet.http.PushBuilder;
 
 import org.apache.catalina.Context;
@@ -75,11 +76,13 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
       RequestDispatcher.INCLUDE_SERVLET_PATH,
       RequestDispatcher.INCLUDE_PATH_INFO,
       RequestDispatcher.INCLUDE_QUERY_STRING,
+      RequestDispatcher.INCLUDE_MAPPING,
       RequestDispatcher.FORWARD_REQUEST_URI,
       RequestDispatcher.FORWARD_CONTEXT_PATH,
       RequestDispatcher.FORWARD_SERVLET_PATH,
       RequestDispatcher.FORWARD_PATH_INFO,
-      RequestDispatcher.FORWARD_QUERY_STRING };
+      RequestDispatcher.FORWARD_QUERY_STRING,
+      RequestDispatcher.FORWARD_MAPPING};
 
 
     // ----------------------------------------------------------- Constructors
@@ -179,6 +182,12 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * The servlet path for this request.
      */
     protected String servletPath = null;
+
+
+    /**
+     * The mapping for this request.
+     */
+    private Mapping mapping = null;
 
 
     /**
@@ -510,6 +519,12 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     }
 
 
+    @Override
+    public Mapping getMapping() {
+        return mapping;
+    }
+
+
     /**
      * Return the session associated with this Request, creating one
      * if necessary.
@@ -689,7 +704,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         queryString = request.getQueryString();
         requestURI = request.getRequestURI();
         servletPath = request.getServletPath();
-
+        mapping = request.getMapping();
     }
 
 
@@ -746,6 +761,12 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     void setQueryParams(String queryString) {
         this.queryParamString = queryString;
     }
+
+
+    void setMapping(Mapping mapping) {
+        this.mapping = mapping;
+    }
+
 
     // ------------------------------------------------------ Protected Methods
 
