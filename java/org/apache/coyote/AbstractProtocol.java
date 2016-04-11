@@ -905,18 +905,19 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
          * Expected to be used by the handler once the processor is no longer
          * required.
          *
-         * @param socket    Socket being released (that was associated with the
-         *                  processor)
+         * @param socketWrapper Socket being released (that was associated with
+         *                      the processor)
          * @param processor Processor being released (that was associated with
          *                  the socket)
          * @param addToPoller Should the socket be added to the poller for
          *                    reading
          */
-        public void release(SocketWrapperBase<S> socket, Processor processor, boolean addToPoller) {
+        public void release(SocketWrapperBase<S> socketWrapper, Processor processor,
+                boolean addToPoller) {
             processor.recycle();
             recycledProcessors.push(processor);
             if (addToPoller) {
-                socket.registerReadInterest();
+                socketWrapper.registerReadInterest();
             }
         }
 
