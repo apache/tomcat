@@ -264,7 +264,8 @@ public class TestClose extends TomcatBaseTest {
         client.forceCloseSocket();
         events.onMessageWait.countDown();
 
-        awaitOnClose(CloseCodes.CLOSED_ABNORMALLY);
+        // APR will see close from client before it sees the TCP reset
+        awaitOnClose(CloseCodes.CLOSED_ABNORMALLY, CloseCodes.NORMAL_CLOSURE);
     }
 
 
