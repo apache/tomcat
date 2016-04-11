@@ -138,6 +138,10 @@
         for JSSE connectors since they use weak 768 bit DH keys and cannot be
         configured to use more secure keys. (markt)
       </fix>
+      <fix>
+        <bug>59289</bug>: Do not recycle upgrade processors in unexpected close
+        situations. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

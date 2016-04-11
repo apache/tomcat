@@ -932,7 +932,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 Processor processor = connections.remove(socket);
                 if (processor != null) {
                     processor.recycle();
-                    recycledProcessors.push(processor);
+                    if (!socketWrapper.isUpgraded()) {
+                        recycledProcessors.push(processor);
+                    }
                 }
             }
         }
