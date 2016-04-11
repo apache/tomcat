@@ -94,7 +94,13 @@ public class TestApplicationMapping extends TomcatBaseTest {
         doTestMappingInclude(contextPath, mapping, requestPath, matchValue, matchType);
         tearDown();
         setUp();
+        doTestMappingNamedInclude(contextPath, mapping, requestPath, matchValue, matchType);
+        tearDown();
+        setUp();
         doTestMappingForward(contextPath, mapping, requestPath, matchValue, matchType);
+        tearDown();
+        setUp();
+        doTestMappingNamedForward(contextPath, mapping, requestPath, matchValue, matchType);
     }
 
     private void doTestMappingDirect(String contextPath, String mapping, String requestPath,
@@ -146,6 +152,29 @@ public class TestApplicationMapping extends TomcatBaseTest {
         Assert.assertTrue(body, body.contains("IncludeServletName=[Mapping]"));
     }
 
+    private void doTestMappingNamedInclude(String contextPath, String mapping, String requestPath,
+            String matchValue, String matchType) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext(contextPath, null);
+
+        Tomcat.addServlet(ctx, "Include", new NamedIncludeServlet());
+        ctx.addServletMapping(mapping, "Include");
+        Tomcat.addServlet(ctx, "Mapping", new MappingServlet());
+        ctx.addServletMapping("/mapping", "Mapping");
+
+        tomcat.start();
+
+        ByteChunk bc = getUrl("http://localhost:" + getPort() + contextPath + requestPath);
+        String body = bc.toString();
+
+        Assert.assertTrue(body, body.contains("MatchValue=[" + matchValue + "]"));
+        Assert.assertTrue(body, body.contains("Pattern=[" + mapping + "]"));
+        Assert.assertTrue(body, body.contains("MatchType=[" + matchType + "]"));
+        Assert.assertTrue(body, body.contains("ServletName=[Include]"));
+    }
+
     private void doTestMappingForward(String contextPath, String mapping, String requestPath,
             String matchValue, String matchType) throws Exception {
         Tomcat tomcat = getTomcatInstance();
@@ -174,6 +203,29 @@ public class TestApplicationMapping extends TomcatBaseTest {
         Assert.assertTrue(body, body.contains("ForwardServletName=[Forward]"));
     }
 
+    private void doTestMappingNamedForward(String contextPath, String mapping, String requestPath,
+            String matchValue, String matchType) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext(contextPath, null);
+
+        Tomcat.addServlet(ctx, "Forward", new NamedForwardServlet());
+        ctx.addServletMapping(mapping, "Forward");
+        Tomcat.addServlet(ctx, "Mapping", new MappingServlet());
+        ctx.addServletMapping("/mapping", "Mapping");
+
+        tomcat.start();
+
+        ByteChunk bc = getUrl("http://localhost:" + getPort() + contextPath + requestPath);
+        String body = bc.toString();
+
+        Assert.assertTrue(body, body.contains("MatchValue=[" + matchValue + "]"));
+        Assert.assertTrue(body, body.contains("Pattern=[" + mapping + "]"));
+        Assert.assertTrue(body, body.contains("MatchType=[" + matchType + "]"));
+        Assert.assertTrue(body, body.contains("ServletName=[Forward]"));
+    }
+
 
     private static class IncludeServlet extends HttpServlet {
         private static final long serialVersionUID = 1L;
@@ -183,6 +235,30 @@ public class TestApplicationMapping extends TomcatBaseTest {
                 throws ServletException, IOException {
             RequestDispatcher rd = req.getRequestDispatcher("/mapping");
             rd.include(req, resp);
+        }
+    }
+
+
+    private static class NamedIncludeServlet extends HttpServlet {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            RequestDispatcher rd = req.getServletContext().getNamedDispatcher("Mapping");
+            rd.include(req, resp);
+        }
+    }
+
+
+    private static class NamedForwardServlet extends HttpServlet {
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            RequestDispatcher rd = req.getServletContext().getNamedDispatcher("Mapping");
+            rd.forward(req, resp);
         }
     }
 
