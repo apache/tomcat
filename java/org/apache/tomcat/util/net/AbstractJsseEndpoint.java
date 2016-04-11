@@ -203,7 +203,7 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
         if(!JreCompat.isJre8Available() &&
                 !OpenSSLImplementation.class.getName().equals(getSslImplementationName())) {
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
-                if (!"".equals(sslHostConfig.getHonorCipherOrder().trim())) {
+                if (sslHostConfig.getHonorCipherOrder() != null) {
                     throw new UnsupportedOperationException(
                             sm.getString("endpoint.jsse.cannotHonorServerCipherOrder"));
                 }
