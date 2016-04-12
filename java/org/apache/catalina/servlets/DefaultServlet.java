@@ -1098,12 +1098,10 @@ public class DefaultServlet extends HttpServlet {
         Enumeration<String> headers = request.getHeaders("Accept-Encoding");
         PrecompressedResource bestResource = null;
         double bestResourceQuality = 0;
+        int bestResourcePreference = Integer.MAX_VALUE;
         while (headers.hasMoreElements()) {
             String header = headers.nextElement();
             for (String preference : header.split(",")) {
-                if (bestResourceQuality >= 1) {
-                    return bestResource;
-                }
                 double quality = 1;
                 int qualityIdx = preference.indexOf(';');
                 if (qualityIdx > 0) {
@@ -1113,7 +1111,7 @@ public class DefaultServlet extends HttpServlet {
                     }
                     quality = Double.parseDouble(preference.substring(equalsIdx + 1).trim());
                 }
-                if (quality > bestResourceQuality) {
+                if (quality >= bestResourceQuality) {
                     String encoding = preference;
                     if (qualityIdx > 0) {
                         encoding = encoding.substring(0, qualityIdx);
@@ -1122,17 +1120,23 @@ public class DefaultServlet extends HttpServlet {
                     if ("identity".equals(encoding)) {
                         bestResource = null;
                         bestResourceQuality = quality;
+                        bestResourcePreference = Integer.MAX_VALUE;
                         continue;
                     }
                     if ("*".equals(encoding)) {
                         bestResource = precompressedResources.get(0);
                         bestResourceQuality = quality;
+                        bestResourcePreference = 0;
                         continue;
                     }
-                    for (PrecompressedResource resource : precompressedResources) {
+                    for (int i = 0; i < precompressedResources.size(); ++i) {
+                        PrecompressedResource resource = precompressedResources.get(i);
                         if (encoding.equals(resource.format.encoding)) {
-                            bestResource = resource;
-                            bestResourceQuality = quality;
+                            if (quality > bestResourceQuality || i < bestResourcePreference) {
+                                bestResource = resource;
+                                bestResourceQuality = quality;
+                                bestResourcePreference = i;
+                            }
                             break;
                         }
                     }

@@ -109,7 +109,10 @@ directory listings are disabled and debugging is turned off.
         It is also possible to configure the list of precompressed formats.
         The syntax is comma separated list of
         <code>[content-encoding]=[file-extension]</code> pairs. For example:
-        <code>br=.br,gzip=.gz,bzip2=.bz2</code>.
+        <code>br=.br,gzip=.gz,bzip2=.bz2</code>. If multiple formats are
+        specified, the client supports more than one and the client does not
+        express a preference, the order of the list of formats will be treated
+        as the server preference order and used to select the format returned.
   </property>
   <property name="readmeFile">
         If a directory listing is presented, a readme file may also
