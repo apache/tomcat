@@ -176,7 +176,7 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
 
     /**
      * Set the channel that is related to this interceptor
-     * @param channel
+     * @param channel The channel
      */
     public void setChannel(Channel channel);
 
