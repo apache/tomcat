@@ -296,7 +296,9 @@ public class TestClose extends TomcatBaseTest {
                     session.getBasicRemote().sendText("Test reply");
                         Thread.sleep(500);
                     }
-                } catch (IOException | InterruptedException e) {
+                } catch (IOException e) {
+                    // Expected to fail
+                } catch (InterruptedException e) {
                     // Expected to fail
                 }
             }
