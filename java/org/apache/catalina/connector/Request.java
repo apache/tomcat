@@ -74,11 +74,14 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.TomcatPrincipal;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.core.ApplicationMapping;
 import org.apache.catalina.core.ApplicationPart;
 import org.apache.catalina.core.ApplicationPushBuilder;
 import org.apache.catalina.core.ApplicationSessionCookieConfig;
 import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.mapper.MappingData;
+import org.apache.catalina.servlet4preview.http.Mapping;
+import org.apache.catalina.servlet4preview.http.PushBuilder;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.UpgradeToken;
@@ -116,7 +119,7 @@ import org.ietf.jgss.GSSException;
  * @author Remy Maucherat
  * @author Craig R. McClanahan
  */
-public class Request implements HttpServletRequest {
+public class Request implements org.apache.catalina.servlet4preview.http.HttpServletRequest {
 
     private static final Log log = LogFactory.getLog(Request.class);
 
@@ -481,6 +484,7 @@ public class Request implements HttpServletRequest {
         }
 
         mappingData.recycle();
+        applicationMapping.recycle();
 
         applicationRequest = null;
         if (Globals.IS_SECURITY_ENABLED || Connector.RECYCLE_FACADES) {
@@ -619,6 +623,7 @@ public class Request implements HttpServletRequest {
      * Mapping data.
      */
     protected final MappingData mappingData = new MappingData();
+    private final ApplicationMapping applicationMapping = new ApplicationMapping(mappingData);
 
     /**
      * @return mapping data.
@@ -1902,6 +1907,7 @@ public class Request implements HttpServletRequest {
      *
      * @return {@code true} If this request supports server push
      */
+    @Override
     public boolean isPushSupported() {
         AtomicBoolean result = new AtomicBoolean();
         coyoteRequest.action(ActionCode.IS_PUSH_SUPPORTED, result);
@@ -1915,7 +1921,8 @@ public class Request implements HttpServletRequest {
      *
      * @return A builder to use to construct the push request
      */
-    public ApplicationPushBuilder getPushBuilder() {
+    @Override
+    public PushBuilder getPushBuilder() {
         return new ApplicationPushBuilder(this);
     }
 
@@ -2178,6 +2185,12 @@ public class Request implements HttpServletRequest {
         }
 
         return Integer.parseInt(value);
+    }
+
+
+    @Override
+    public Mapping getMapping() {
+        return applicationMapping.getMapping();
     }
 
 

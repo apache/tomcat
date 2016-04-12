@@ -63,6 +63,7 @@ import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.mapper.MappingData;
+import org.apache.catalina.servlet4preview.http.Mapping;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.CharChunk;
@@ -375,7 +376,7 @@ public class ApplicationContext
         if (wrapper == null)
             return (null);
 
-        return new ApplicationDispatcher(wrapper, null, null, null, null, name);
+        return new ApplicationDispatcher(wrapper, null, null, null, null, null, name);
 
     }
 
@@ -460,13 +461,14 @@ public class ApplicationContext
         Wrapper wrapper = mappingData.wrapper;
         String wrapperPath = mappingData.wrapperPath.toString();
         String pathInfo = mappingData.pathInfo.toString();
+        Mapping mapping = (new ApplicationMapping(mappingData)).getMapping();
 
         mappingData.recycle();
 
         // Construct a RequestDispatcher to process this request
         return new ApplicationDispatcher
             (wrapper, uriCC.toString(), wrapperPath, pathInfo,
-             queryString, null);
+             queryString, mapping, null);
 
     }
 

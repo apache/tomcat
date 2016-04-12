@@ -189,6 +189,10 @@ grant {
     // Applications using WebSocket need to be able to access these packages
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.tomcat.websocket";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.tomcat.websocket.server";
+
+    // Applications need to access these packages to use the Servlet 4.0 Preview
+    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.servlet4preview";
+    permission java.lang.RuntimePermission "accessClassInPackage.org.apache.catalina.servlet4preview.http";
 };
 
 

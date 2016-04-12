@@ -24,8 +24,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.connector.RequestFacade;
-import org.apache.catalina.core.ApplicationPushBuilder;
+import org.apache.catalina.servlet4preview.http.PushBuilder;
 
 public class SimpleImagePush extends HttpServlet {
 
@@ -35,7 +34,8 @@ public class SimpleImagePush extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        ApplicationPushBuilder pb = ((RequestFacade) req).getPushBuilder().path("servlets/images/code.gif");
+        PushBuilder pb = ((org.apache.catalina.servlet4preview.http.HttpServletRequest)
+                req).getPushBuilder().path("servlets/images/code.gif");
         pb.push();
 
         resp.setCharacterEncoding("UTF-8");

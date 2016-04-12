@@ -31,13 +31,14 @@ import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
+import org.apache.catalina.servlet4preview.http.Mapping;
+import org.apache.catalina.servlet4preview.http.PushBuilder;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -59,7 +60,8 @@ import org.apache.tomcat.util.http.Parameters;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-class ApplicationHttpRequest extends HttpServletRequestWrapper {
+class ApplicationHttpRequest
+        extends org.apache.catalina.servlet4preview.http.HttpServletRequestWrapper {
 
 
     // ------------------------------------------------------- Static Variables
@@ -74,11 +76,13 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
       RequestDispatcher.INCLUDE_SERVLET_PATH,
       RequestDispatcher.INCLUDE_PATH_INFO,
       RequestDispatcher.INCLUDE_QUERY_STRING,
+      org.apache.catalina.servlet4preview.RequestDispatcher.INCLUDE_MAPPING,
       RequestDispatcher.FORWARD_REQUEST_URI,
       RequestDispatcher.FORWARD_CONTEXT_PATH,
       RequestDispatcher.FORWARD_SERVLET_PATH,
       RequestDispatcher.FORWARD_PATH_INFO,
-      RequestDispatcher.FORWARD_QUERY_STRING };
+      RequestDispatcher.FORWARD_QUERY_STRING,
+      org.apache.catalina.servlet4preview.RequestDispatcher.FORWARD_MAPPING};
 
 
     // ----------------------------------------------------------- Constructors
@@ -178,6 +182,12 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      * The servlet path for this request.
      */
     protected String servletPath = null;
+
+
+    /**
+     * The mapping for this request.
+     */
+    private Mapping mapping = null;
 
 
     /**
@@ -509,6 +519,12 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     }
 
 
+    @Override
+    public Mapping getMapping() {
+        return mapping;
+    }
+
+
     /**
      * Return the session associated with this Request, creating one
      * if necessary.
@@ -614,7 +630,8 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     }
 
 
-    public ApplicationPushBuilder getPushBuilder() {
+    @Override
+    public PushBuilder getPushBuilder() {
         return new ApplicationPushBuilder(this);
     }
 
@@ -678,8 +695,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         // Initialize the attributes for this request
         dispatcherType = (DispatcherType)request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);
-        requestDispatcherPath =
-            request.getAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR);
+        requestDispatcherPath = request.getAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR);
 
         // Initialize the path elements for this request
         contextPath = request.getContextPath();
@@ -687,7 +703,11 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         queryString = request.getQueryString();
         requestURI = request.getRequestURI();
         servletPath = request.getServletPath();
-
+        if (request instanceof org.apache.catalina.servlet4preview.http.HttpServletRequest) {
+            mapping = ((org.apache.catalina.servlet4preview.http.HttpServletRequest) request).getMapping();
+        } else {
+            mapping = (new ApplicationMapping(null)).getMapping();
+        }
     }
 
 
@@ -744,6 +764,12 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     void setQueryParams(String queryString) {
         this.queryParamString = queryString;
     }
+
+
+    void setMapping(Mapping mapping) {
+        this.mapping = mapping;
+    }
+
 
     // ------------------------------------------------------ Protected Methods
 

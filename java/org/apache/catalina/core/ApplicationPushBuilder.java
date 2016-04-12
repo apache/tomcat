@@ -35,6 +35,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
+import org.apache.catalina.servlet4preview.http.PushBuilder;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.PushToken;
@@ -44,7 +45,7 @@ import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.http.CookieProcessor;
 import org.apache.tomcat.util.res.StringManager;
 
-public class ApplicationPushBuilder {
+public class ApplicationPushBuilder implements PushBuilder {
 
     private static final StringManager sm = StringManager.getManager(ApplicationPushBuilder.class);
 
@@ -167,6 +168,7 @@ public class ApplicationPushBuilder {
     }
 
 
+    @Override
     public ApplicationPushBuilder path(String path) {
         if (path.startsWith("/")) {
             this.path = path;
@@ -183,77 +185,91 @@ public class ApplicationPushBuilder {
     }
 
 
+    @Override
     public String getPath() {
         return path;
     }
 
 
+    @Override
     public ApplicationPushBuilder method(String method) {
         this.method = method;
         return this;
     }
 
 
+    @Override
     public String getMethod() {
         return method;
     }
 
 
+    @Override
     public ApplicationPushBuilder etag(String etag) {
         this.etag = etag;
         return this;
     }
 
 
+    @Override
     public String getEtag() {
         return etag;
     }
 
 
+    @Override
     public ApplicationPushBuilder lastModified(String lastModified) {
         this.lastModified = lastModified;
         return this;
     }
 
 
+    @Override
     public String getLastModified() {
         return lastModified;
     }
 
 
+    @Override
     public ApplicationPushBuilder queryString(String queryString) {
         this.queryString = queryString;
         return this;
     }
 
 
+    @Override
     public String getQueryString() {
         return queryString;
     }
 
 
+    @Override
     public ApplicationPushBuilder sessionId(String sessionId) {
         this.sessionId = sessionId;
         return this;
     }
 
 
+    @Override
     public String getSessionId() {
         return sessionId;
     }
 
 
+    @Override
     public ApplicationPushBuilder conditional(boolean conditional) {
         this.conditional = conditional;
         return this;
     }
 
 
+    @Override
     public boolean isConditional() {
         return conditional;
     }
 
 
+    @Override
     public ApplicationPushBuilder addHeader(String name, String value) {
         List<String> values = headers.get(name);
         if (values == null) {
@@ -266,6 +282,7 @@ public class ApplicationPushBuilder {
     }
 
 
+    @Override
     public ApplicationPushBuilder setHeader(String name, String value) {
         List<String> values = headers.get(name);
         if (values == null) {
@@ -280,6 +297,7 @@ public class ApplicationPushBuilder {
     }
 
 
+    @Override
     public ApplicationPushBuilder removeHeader(String name) {
         headers.remove(name);
 
@@ -287,11 +305,13 @@ public class ApplicationPushBuilder {
     }
 
 
+    @Override
     public Set<String> getHeaderNames() {
         return Collections.unmodifiableSet(headers.keySet());
     }
 
 
+    @Override
     public String getHeader(String name) {
         List<String> values = headers.get(name);
         if (values == null) {
@@ -302,6 +322,7 @@ public class ApplicationPushBuilder {
     }
 
 
+    @Override
     public boolean push() {
         if (path == null) {
             throw new IllegalStateException(sm.getString("pushBuilder.noPath"));

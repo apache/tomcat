@@ -114,6 +114,11 @@
         functions as designed and sessions are swapped out to keep the active
         session count below <code>maxActiveSessions</code>. (markt)
       </fix>
+      <add>
+        Add the <code>org.apache.catalina.servlet4preview</code> package that
+        can be used to gain early access to Servlet 4.0 features. Note that this
+        package will <strong>not</strong> be present in Tomcat 9. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

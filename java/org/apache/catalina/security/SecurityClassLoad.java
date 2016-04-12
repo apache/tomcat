@@ -166,6 +166,7 @@ public final class SecurityClassLoad {
     private static final void loadCoyotePackage(ClassLoader loader)
             throws Exception {
         final String basePackage = "org.apache.coyote.";
+        loader.loadClass(basePackage + "PushToken");
         loader.loadClass(basePackage + "http11.Constants");
         // Make sure system property is read at this point
         Class<?> clazz = loader.loadClass(basePackage + "Constants");
@@ -277,7 +278,9 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "util.buf.StringCache$CharEntry");
         loader.loadClass(basePackage + "util.buf.UriUtil");
         // collections
-        loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap");
+        Class<?> clazz = loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap");
+        // Ensure StringManager is configured
+        clazz.newInstance();
         loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap$EntryImpl");
         loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap$EntryIterator");
         loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap$EntrySet");
@@ -286,7 +289,7 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "util.http.CookieProcessor");
         loader.loadClass(basePackage + "util.http.NamesEnumerator");
         // Make sure system property is read at this point
-        Class<?> clazz = loader.loadClass(basePackage + "util.http.FastHttpDateFormat");
+        clazz = loader.loadClass(basePackage + "util.http.FastHttpDateFormat");
         clazz.newInstance();
         loader.loadClass(basePackage + "util.http.parser.HttpParser");
         loader.loadClass(basePackage + "util.http.parser.MediaType");
