@@ -168,6 +168,18 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
 
     public void fireInterceptorEvent(InterceptorEvent event);
 
+    /**
+     * Return the channel that is related to this interceptor
+     * @return Channel
+     */
+    public Channel getChannel();
+
+    /**
+     * Set the channel that is related to this interceptor
+     * @param channel
+     */
+    public void setChannel(Channel channel);
+
     interface InterceptorEvent {
         int getEventType();
         String getEventTypeDesc();
