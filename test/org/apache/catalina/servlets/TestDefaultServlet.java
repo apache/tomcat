@@ -315,6 +315,62 @@ public class TestDefaultServlet extends TomcatBaseTest {
     }
 
     /*
+     * Verify preferring of brotli in default configuration for actual Firefox and Chrome requests.
+     */
+    @Test
+    public void testBrotliPreference() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+
+        long brSize = new File(appDir, "index.html.br").length();
+
+        // app dir is relative to server home
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
+                DefaultServlet.class.getName());
+        defaultServlet.addInitParameter("precompressed", "true");
+
+        ctxt.addServletMapping("/", "default");
+        ctxt.addMimeMapping("html", "text/html");
+
+        tomcat.start();
+
+        TestCompressedClient client = new TestCompressedClient(getPort());
+
+        // Firefox 45 Accept-Encoding
+        client.reset();
+        client.setRequest(new String[] {
+                "GET /index.html HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Connection: Close" + CRLF +
+                        "Accept-Encoding: gzip, deflate, br" + CRLF + CRLF });
+        client.connect();
+        client.processRequest();
+        assertTrue(client.isResponse200());
+        List<String> responseHeaders = client.getResponseHeaders();
+        assertTrue(responseHeaders.contains("Content-Encoding: br"));
+        assertTrue(responseHeaders.contains("Content-Length: " + brSize));
+        assertTrue(responseHeaders.contains("Vary: accept-encoding"));
+
+        // Chrome 50 Accept-Encoding
+        client.reset();
+        client.setRequest(new String[] {
+                "GET /index.html HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Connection: Close" + CRLF +
+                        "Accept-Encoding: gzip, deflate, sdch, br" + CRLF + CRLF });
+        client.connect();
+        client.processRequest();
+        assertTrue(client.isResponse200());
+        responseHeaders = client.getResponseHeaders();
+        assertTrue(responseHeaders.contains("Content-Encoding: br"));
+        assertTrue(responseHeaders.contains("Content-Length: " + brSize));
+        assertTrue(responseHeaders.contains("Vary: accept-encoding"));
+    }
+
+    /*
      * Test https://bz.apache.org/bugzilla/show_bug.cgi?id=50026
      * Verify serving of resources from context root with subpath mapping.
      */

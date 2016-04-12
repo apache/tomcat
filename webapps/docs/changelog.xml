@@ -123,6 +123,11 @@
         Correctly configure the base path for a resources directory provided by
         an expanded JAR file. Patch provided by hengyunabc. (markt)
       </fix>
+      <add>
+        When multiple compressed formats are available and the client does not
+        express a preference, use the server order to determine the preferred
+        format. Based on a patch by gmokki. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
