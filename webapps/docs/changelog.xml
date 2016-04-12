@@ -212,6 +212,10 @@
         Fix potential NPE that depends on the setting order of attributes of
         static member when using the static cluster. (kfujino)
       </fix>
+      <add>
+        Add get/set method for the channel that is related to
+        <code>ChannelInterceptor</code>. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
