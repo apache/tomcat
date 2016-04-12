@@ -67,9 +67,6 @@
    so they will have the same level of notification mechanism as the members that are automatically discovered.</p>
    <source><![CDATA[     <Interceptor className="org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor">
        <LocalMember className="org.apache.catalina.tribes.membership.StaticMember"
-                  port="4000"
-                  securePort="-1"
-                  host="tomcat01.mydomain.com"
                   domain="staging-cluster"
                   uniqueId="{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,1}"/>
        <Member className="org.apache.catalina.tribes.membership.StaticMember"
@@ -187,45 +184,74 @@
 
 <section name="Nested Components">
 
-  <p><b>LocalMember:</b> <br/>
+  <subsection name="StaticMember Attributes">
+    <p><b>LocalMember:</b> <br/>
     Static member that is the local member of the static cluster group.
-  </p>
-  <p><b>Member:</b> <br/>
-    Static member that add to the static cluster group.
-  </p>
+    </p>
+    <attributes>
+      <attribute name="className" required="true">
+        Only one implementation available:<code>org.apache.catalina.tribes.membership.StaticMember</code>
+      </attribute>
+      <attribute name="port" required="false">
+        There is no need to set.
+        The value of this attribute inherits from the cluster receiver setting.
+      </attribute>
+      <attribute name="securePort" required="false">
+        There is no need to set.
+        The value of this attribute inherits from the cluster receiver setting.
+      </attribute>
+      <attribute name="host" required="false">
+        There is no need to set.
+        The value of this attribute inherits from the cluster receiver setting.
+      </attribute>
+      <attribute name="domain" required="false">
+        The logical cluster domain for that this static member listens for cluster messages.
+        Two different type of values are possible:<br/>
+        1. Regular string values like &quot;staging-domain&quot; or &quot;tomcat-cluster&quot; will be converted into bytes
+        using ISO-8859-1 encoding.
+        2. byte array in string form, for example {216,123,12,3}<br/>
+      </attribute>
+      <attribute name="uniqueId" required="true">
+        A universally uniqueId for this static member.
+        The values must be 16 bytes in the following form:<br/>
+        1. byte array in string form, for example {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}<br/>
+      </attribute>
+    </attributes>
 
-  <subsection name="Nested element StaticMember Attributes">
-   <attributes>
-     <attribute name="className" required="true">
-       Only one implementation available:<code>org.apache.catalina.tribes.membership.StaticMember</code>
-     </attribute>
-     <attribute name="port" required="true">
-       The port that this static member listens to for cluster messages
-     </attribute>
-     <attribute name="securePort" required="false">
-       The secure port this static member listens to for encrypted cluster messages
-       default value is <code>-1</code>, this value means the member is not listening on a secure port
-     </attribute>
-     <attribute name="host" required="true">
-       The host (or network interface) that this static member listens for cluster messages.
-       Three different type of values are possible:<br/>
-       1. IP address in the form of &quot;216.123.1.23&quot;<br/>
-       2. Hostnames like &quot;tomcat01.mydomain.com&quot; or &quot;tomcat01&quot; as long as they resolve correctly<br/>
-       3. byte array in string form, for example {216,123,12,3}<br/>
-     </attribute>
-     <attribute name="domain" required="false">
-       The logical cluster domain for that this static member listens for cluster messages.
-       Two different type of values are possible:<br/>
-       1. Regular string values like &quot;staging-domain&quot; or &quot;tomcat-cluster&quot; will be converted into bytes
-       using ISO-8859-1 encoding.
-       2. byte array in string form, for example {216,123,12,3}<br/>
-     </attribute>
-     <attribute name="uniqueId" required="true">
-       A universally uniqueId for this static member.
-       The values must be 16 bytes in the following form:<br/>
-       1. byte array in string form, for example {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}<br/>
-     </attribute>
-   </attributes>
+    <p><b>Member:</b> <br/>
+    Static member that add to the static cluster group.
+    </p>
+    <attributes>
+      <attribute name="className" required="true">
+        Only one implementation available:<code>org.apache.catalina.tribes.membership.StaticMember</code>
+      </attribute>
+      <attribute name="port" required="true">
+        The port that this static member listens to for cluster messages
+      </attribute>
+      <attribute name="securePort" required="false">
+        The secure port this static member listens to for encrypted cluster messages
+        default value is <code>-1</code>, this value means the member is not listening on a secure port
+      </attribute>
+      <attribute name="host" required="true">
+        The host (or network interface) that this static member listens for cluster messages.
+        Three different type of values are possible:<br/>
+        1. IP address in the form of &quot;216.123.1.23&quot;<br/>
+        2. Hostnames like &quot;tomcat01.mydomain.com&quot; or &quot;tomcat01&quot; as long as they resolve correctly<br/>
+        3. byte array in string form, for example {216,123,12,3}<br/>
+      </attribute>
+      <attribute name="domain" required="false">
+        The logical cluster domain for that this static member listens for cluster messages.
+        Two different type of values are possible:<br/>
+        1. Regular string values like &quot;staging-domain&quot; or &quot;tomcat-cluster&quot; will be converted into bytes
+        using ISO-8859-1 encoding.
+        2. byte array in string form, for example {216,123,12,3}<br/>
+      </attribute>
+      <attribute name="uniqueId" required="true">
+        A universally uniqueId for this static member.
+        The values must be 16 bytes in the following form:<br/>
+        1. byte array in string form, for example {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}<br/>
+      </attribute>
+    </attributes>
   </subsection>
   <!--TODO Document all the interceptors-->
 
