@@ -189,7 +189,7 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
 
     /**
      * Set the channel that is related to this interceptor
-     * @param channel
+     * @param channel The channel
      */
     @Override
     public void setChannel(Channel channel) {
