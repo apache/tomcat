@@ -63,7 +63,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
     /**
      * The listen host for this member
      */
-    protected byte[] host;
+    protected byte[] host = new byte[0];
     protected transient String hostname;
     /**
      * The tcp listen port for this member

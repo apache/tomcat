@@ -66,6 +66,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Fix potential NPE that depends on the setting order of attributes of
+        static member when using the static cluster. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.69 (violetagg)">
   <subsection name="Catalina">
