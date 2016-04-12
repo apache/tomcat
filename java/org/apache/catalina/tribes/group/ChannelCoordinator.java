@@ -26,6 +26,7 @@ import org.apache.catalina.tribes.MembershipService;
 import org.apache.catalina.tribes.MessageListener;
 import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.membership.McastService;
+import org.apache.catalina.tribes.membership.StaticMember;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
 import org.apache.catalina.tribes.transport.SenderState;
 import org.apache.catalina.tribes.transport.nio.NioReceiver;
@@ -152,10 +153,21 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 clusterReceiver.setMessageListener(this);
                 clusterReceiver.start();
                 //synchronize, big time FIXME
-                membershipService.setLocalMemberProperties(getClusterReceiver().getHost(),
-                                                           getClusterReceiver().getPort(),
-                                                           getClusterReceiver().getSecurePort(),
-                                                           getClusterReceiver().getUdpPort());
+                Member localMember = getChannel().getLocalMember(false);
+                if (localMember instanceof StaticMember) {
+                    // static member
+                    StaticMember staticMember = (StaticMember)localMember;
+                    staticMember.setHost(getClusterReceiver().getHost());
+                    staticMember.setPort(getClusterReceiver().getPort());
+                    staticMember.setSecurePort(getClusterReceiver().getSecurePort());
+                } else {
+                    // multicast member
+                    membershipService.setLocalMemberProperties(getClusterReceiver().getHost(),
+                            getClusterReceiver().getPort(),
+                            getClusterReceiver().getSecurePort(),
+                            getClusterReceiver().getUdpPort());
+                   
+                }
                 valid = true;
             }
             if ( Channel.SND_TX_SEQ==(svc & Channel.SND_TX_SEQ) ) {

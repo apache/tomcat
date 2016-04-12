@@ -216,6 +216,11 @@
         Add get/set method for the channel that is related to
         <code>ChannelInterceptor</code>. (kfujino)
       </add>
+      <fix>
+        As with the multicast cluster environment, in the static cluster
+        environment, the local member inherits properties from the cluster
+        receiver. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
