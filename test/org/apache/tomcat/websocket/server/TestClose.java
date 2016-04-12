@@ -51,7 +51,6 @@ import org.apache.juli.logging.LogFactory;
 /**
  * Test the behavior of closing websockets under various conditions.
  */
-//@Ignore // Only because they don't pass at the moment.
 public class TestClose extends TomcatBaseTest {
 
     private static Log log = LogFactory.getLog(TestClose.class);
@@ -284,8 +283,20 @@ public class TestClose extends TomcatBaseTest {
 
             if (events.onMessageSends) {
                 try {
+                    int count = 0;
+                    // The latches above are meant to ensure the correct
+                    // sequence of events but in some cases, particularly with
+                    // APR, there is a short delay between the client closing /
+                    // resetting the connection and the server recognising that
+                    // fact. This loop tries to ensure that it lasts much longer
+                    // than that delay so any close / reset from the client
+                    // triggers an error here.
+                    while (count < 10) {
+                        count++;
                     session.getBasicRemote().sendText("Test reply");
-                } catch (IOException e) {
+                        Thread.sleep(500);
+                    }
+                } catch (IOException | InterruptedException e) {
                     // Expected to fail
                 }
             }
