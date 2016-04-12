@@ -208,6 +208,10 @@
       <add>
         Add the flag indicating that member is a localMember. (kfujino)
       </add>
+      <fix>
+        Fix potential NPE that depends on the setting order of attributes of
+        static member when using the static cluster. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
