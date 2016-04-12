@@ -119,6 +119,10 @@
         can be used to gain early access to Servlet 4.0 features. Note that this
         package will <strong>not</strong> be present in Tomcat 9. (markt)
       </add>
+      <fix>
+        Correctly configure the base path for a resources directory provided by
+        an expanded JAR file. Patch provided by hengyunabc. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
