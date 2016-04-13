@@ -186,7 +186,8 @@ public class SecureNioChannel extends NioChannel  {
                 }
                 case FINISHED: {
                     if (endpoint.hasNegotiableProtocols() && sslEngine instanceof SSLUtil.ProtocolInfo) {
-                        socketWrapper.setNegotiatedProtocol(((SSLUtil.ProtocolInfo) sslEngine).getNegotiatedProtocol());
+                        socketWrapper.setNegotiatedProtocol(
+                                ((SSLUtil.ProtocolInfo) sslEngine).getNegotiatedProtocol());
                     }
                     //we are complete if we have delivered the last package
                     handshakeComplete = !netOutBuffer.hasRemaining();
