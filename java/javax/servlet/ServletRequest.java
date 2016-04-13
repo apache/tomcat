@@ -465,9 +465,14 @@ public interface ServletRequest {
     public boolean isAsyncSupported();
 
     /**
-     * @return TODO
+     * Get the current AsyncContext.
+     *
+     * @return The current AsyncContext
+     *
      * @throws IllegalStateException if the request is not in asynchronous mode
-     * @since Servlet 3.0 TODO SERVLET3 - Add comments
+     *         (i.e. @link #isAsyncStarted() is {@code false})
+     *
+     * @since Servlet 3.0
      */
     public AsyncContext getAsyncContext();
 

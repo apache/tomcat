@@ -410,7 +410,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
             processRequest(request,response,state);
         }
 
-        if (request.getAsyncContext() != null) {
+        if (request.isAsyncStarted()) {
             // An async request was started during the forward, don't close the
             // response as it may be written to during the async handling
             return;
