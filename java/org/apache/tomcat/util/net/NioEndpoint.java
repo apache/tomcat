@@ -615,12 +615,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
         @Override
         public void run() {
-            if ( interestOps == OP_REGISTER ) {
+            if (interestOps == OP_REGISTER) {
                 try {
                     socket.getIOChannel().register(socket.getPoller().getSelector(),
                             SelectionKey.OP_READ, socketWrapper);
                 } catch (Exception x) {
-                    log.error("", x);
+                    log.error(sm.getString("endpoint.nio.registerFail"), x);
                 }
             } else {
                 final SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
@@ -628,7 +628,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     boolean cancel = false;
                     if (key != null) {
                         final NioSocketWrapper socketWrapper = (NioSocketWrapper) key.attachment();
-                        if ( socketWrapper!=null ) {
+                        if (socketWrapper != null) {
                             //we are registering the key to start with, reset the fairness counter.
                             int ops = key.interestOps() | interestOps;
                             socketWrapper.interestOps(ops);
@@ -639,14 +639,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     } else {
                         cancel = true;
                     }
-                    if ( cancel ) socket.getPoller().cancelledKey(key);
-                }catch (CancelledKeyException ckx) {
+                    if (cancel) socket.getPoller().cancelledKey(key);
+                } catch (CancelledKeyException ckx) {
                     try {
                         socket.getPoller().cancelledKey(key);
-                    }catch (Exception ignore) {}
+                    } catch (Exception ignore) {}
                 }
-            }//end if
-        }//run
+            }
+        }
 
         @Override
         public String toString() {
