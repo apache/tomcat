@@ -625,8 +625,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             } else {
                 final SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
                 try {
-                    boolean cancel = false;
-                    if (key != null) {
+                    if (key == null) {
+                        // The key was cancelled (e.g. due to socket closure)
+                        // and removed from the selector while it was being
+                        // processed. Count down the connections at this point
+                        // since it won't have been counted down when the socket
+                        // closed.
+                        socket.socketWrapper.getEndpoint().countDownConnection();
+                    } else {
                         final NioSocketWrapper socketWrapper = (NioSocketWrapper) key.attachment();
                         if (socketWrapper != null) {
                             //we are registering the key to start with, reset the fairness counter.
@@ -634,12 +640,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                             socketWrapper.interestOps(ops);
                             key.interestOps(ops);
                         } else {
-                            cancel = true;
+                            socket.getPoller().cancelledKey(key);
                         }
-                    } else {
-                        cancel = true;
                     }
-                    if (cancel) socket.getPoller().cancelledKey(key);
                 } catch (CancelledKeyException ckx) {
                     try {
                         socket.getPoller().cancelledKey(key);
