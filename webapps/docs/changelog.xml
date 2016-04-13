@@ -61,6 +61,11 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        <bug>58970</bug>: Fix a connection counting bug in the NIO connector
+        that meant some dropped connections were not removed from the current
+        connection count. (markt)
+      </fix>
+      <fix>
         <bug>59289</bug>: Do not recycle upgrade processors in unexpected close
         situations. (remm)
       </fix>
