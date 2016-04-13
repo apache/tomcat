@@ -606,7 +606,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         public void reset(NioChannel ch, NioSocketWrapper w, int intOps) {
             socket = ch;
             interestOps = intOps;
-            this.socketWrapper = w;
+            socketWrapper = w;
         }
 
         public void reset() {
@@ -617,8 +617,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         public void run() {
             if (interestOps == OP_REGISTER) {
                 try {
-                    socket.getIOChannel().register(socket.getPoller().getSelector(),
-                            SelectionKey.OP_READ, socketWrapper);
+                    socket.getIOChannel().register(
+                            socket.getPoller().getSelector(), SelectionKey.OP_READ, socketWrapper);
                 } catch (Exception x) {
                     log.error(sm.getString("endpoint.nio.registerFail"), x);
                 }
