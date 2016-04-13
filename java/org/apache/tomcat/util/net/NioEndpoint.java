@@ -649,7 +649,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
         @Override
         public String toString() {
-            return super.toString()+"[intOps="+this.interestOps+"]";
+            return "Poller event: socket [" + socket + "], key [" + key +
+                    "], interstOps [" + interestOps + "]";
         }
     }
 
