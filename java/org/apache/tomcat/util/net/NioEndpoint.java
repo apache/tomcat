@@ -597,16 +597,16 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
         private NioChannel socket;
         private int interestOps;
-        private NioSocketWrapper key;
+        private NioSocketWrapper socketWrapper;
 
-        public PollerEvent(NioChannel ch, NioSocketWrapper k, int intOps) {
-            reset(ch, k, intOps);
+        public PollerEvent(NioChannel ch, NioSocketWrapper w, int intOps) {
+            reset(ch, w, intOps);
         }
 
-        public void reset(NioChannel ch, NioSocketWrapper k, int intOps) {
+        public void reset(NioChannel ch, NioSocketWrapper w, int intOps) {
             socket = ch;
             interestOps = intOps;
-            key = k;
+            socketWrapper = w;
         }
 
         public void reset() {
@@ -615,22 +615,23 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
         @Override
         public void run() {
-            if ( interestOps == OP_REGISTER ) {
+            if (interestOps == OP_REGISTER) {
                 try {
-                    socket.getIOChannel().register(socket.getPoller().getSelector(), SelectionKey.OP_READ, key);
+                    socket.getIOChannel().register(
+                            socket.getPoller().getSelector(), SelectionKey.OP_READ, socketWrapper);
                 } catch (Exception x) {
-                    log.error("", x);
+                    log.error(sm.getString("endpoint.nio.registerFail"), x);
                 }
             } else {
                 final SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
                 try {
                     boolean cancel = false;
                     if (key != null) {
-                        final NioSocketWrapper att = (NioSocketWrapper) key.attachment();
-                        if ( att!=null ) {
+                        final NioSocketWrapper socketWrapper = (NioSocketWrapper) key.attachment();
+                        if (socketWrapper != null) {
                             //we are registering the key to start with, reset the fairness counter.
                             int ops = key.interestOps() | interestOps;
-                            att.interestOps(ops);
+                            socketWrapper.interestOps(ops);
                             key.interestOps(ops);
                         } else {
                             cancel = true;
@@ -638,18 +639,19 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     } else {
                         cancel = true;
                     }
-                    if ( cancel ) socket.getPoller().cancelledKey(key);
-                }catch (CancelledKeyException ckx) {
+                    if (cancel) socket.getPoller().cancelledKey(key);
+                } catch (CancelledKeyException ckx) {
                     try {
                         socket.getPoller().cancelledKey(key);
-                    }catch (Exception ignore) {}
+                    } catch (Exception ignore) {}
                 }
-            }//end if
-        }//run
+            }
+        }
 
         @Override
         public String toString() {
-            return super.toString()+"[intOps="+this.interestOps+"]";
+            return "Poller event: socket [" + socket + "], socketWrapper [" + socketWrapper +
+                    "], interstOps [" + interestOps + "]";
         }
     }
 

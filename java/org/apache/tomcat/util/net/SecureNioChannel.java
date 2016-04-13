@@ -186,7 +186,8 @@ public class SecureNioChannel extends NioChannel  {
                 }
                 case FINISHED: {
                     if (endpoint.hasNegotiableProtocols() && sslEngine instanceof SSLUtil.ProtocolInfo) {
-                        socket.setNegotiatedProtocol(((SSLUtil.ProtocolInfo) sslEngine).getNegotiatedProtocol());
+                        socketWrapper.setNegotiatedProtocol(
+                                ((SSLUtil.ProtocolInfo) sslEngine).getNegotiatedProtocol());
                     }
                     //we are complete if we have delivered the last package
                     handshakeComplete = !netOutBuffer.hasRemaining();
@@ -567,11 +568,11 @@ public class SecureNioChannel extends NioChannel  {
                 } else {
                     // The SSL session has increased the required buffer size
                     // since the buffer was created.
-                    if (dst == socket.getSocketBufferHandler().getReadBuffer()) {
+                    if (dst == socketWrapper.getSocketBufferHandler().getReadBuffer()) {
                         // This is the normal case for this code
-                        socket.getSocketBufferHandler().expand(
+                        socketWrapper.getSocketBufferHandler().expand(
                                 sslEngine.getSession().getApplicationBufferSize());
-                        dst = socket.getSocketBufferHandler().getReadBuffer();
+                        dst = socketWrapper.getSocketBufferHandler().getReadBuffer();
                     } else {
                         // Can't expand the buffer as there is no way to signal
                         // to the caller that the buffer has been replaced.
