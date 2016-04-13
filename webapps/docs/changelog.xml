@@ -48,11 +48,6 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        <bug>58970</bug>: Fix a connection counting bug in the NIO connector
-        that meant some dropped connections were not removed from the current
-        connection count. (markt)
-      </fix>
-      <fix>
         <bug>59206</bug>: Ensure NPE will not be thrown by
         <code>o.a.tomcat.util.file.ConfigFileLoader</code> when
         <code>catalina.base</code> is not specified. (violetagg)
@@ -156,6 +151,11 @@
         When running on Java 7, exclude DHE ciphers from the default cipher list
         for JSSE connectors since they use weak 768 bit DH keys and cannot be
         configured to use more secure keys. (markt)
+      </fix>
+      <fix>
+        <bug>58970</bug>: Fix a connection counting bug in the NIO connector
+        that meant some dropped connections were not removed from the current
+        connection count. (markt)
       </fix>
       <fix>
         <bug>59289</bug>: Do not recycle upgrade processors in unexpected close
