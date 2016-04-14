@@ -19,6 +19,7 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.channels.WritePendingException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Collections;
@@ -556,28 +557,34 @@ public class WsSession implements Session {
         }
         msg.flip();
         try {
-            wsRemoteEndpoint.startMessageBlock(
-                    Constants.OPCODE_CLOSE, msg, true);
+            wsRemoteEndpoint.startMessageBlock(Constants.OPCODE_CLOSE, msg, true);
         } catch (IOException ioe) {
-            // Failed to send close message. Close the socket and let the caller
-            // deal with the Exception
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("wsSession.sendCloseFail", id), ioe);
-            }
-            wsRemoteEndpoint.close();
-            // Failure to send a close message is not unexpected in the case of
-            // an abnormal closure (usually triggered by a failure to read/write
-            // from/to the client. In this case do not trigger the endpoint's
-            // error handling
-            if (closeCode != CloseCodes.CLOSED_ABNORMALLY) {
-                localEndpoint.onError(this, ioe);
-            }
+            handleCloseException(ioe, closeCode);
+        } catch (WritePendingException wpe) {
+            handleCloseException(wpe, closeCode);
         } finally {
             webSocketContainer.unregisterSession(localEndpoint, this);
         }
     }
 
 
+    private void handleCloseException(Exception e, CloseCode closeCode) {
+        // Failed to send close message. Close the socket and let the caller
+        // deal with the Exception
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("wsSession.sendCloseFail", id), e);
+        }
+        wsRemoteEndpoint.close();
+        // Failure to send a close message is not unexpected in the case of
+        // an abnormal closure (usually triggered by a failure to read/write
+        // from/to the client. In this case do not trigger the endpoint's
+        // error handling
+        if (closeCode != CloseCodes.CLOSED_ABNORMALLY) {
+            localEndpoint.onError(this, e);
+        }
+    }
+    
+    
     /**
      * Use protected so unit tests can access this method directly.
      */

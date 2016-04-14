@@ -1578,6 +1578,10 @@
         <bug>57788</bug>: Avoid NPE when looking up a class hierarchy without
         finding anything. (remm)
       </fix>
+      <add>
+        Make WebSocket client more robust when handling errors during the close
+        of a WebSocket session. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
