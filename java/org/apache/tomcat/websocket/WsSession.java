@@ -19,6 +19,7 @@ package org.apache.tomcat.websocket;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.channels.WritePendingException;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.util.Collections;
@@ -590,13 +591,12 @@ public class WsSession implements Session {
         }
         msg.flip();
         try {
-            wsRemoteEndpoint.sendMessageBlock(
-                    Constants.OPCODE_CLOSE, msg, true);
-        } catch (IOException ioe) {
+            wsRemoteEndpoint.sendMessageBlock(Constants.OPCODE_CLOSE, msg, true);
+        } catch (IOException | WritePendingException e) {
             // Failed to send close message. Close the socket and let the caller
             // deal with the Exception
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("wsSession.sendCloseFail", id), ioe);
+                log.debug(sm.getString("wsSession.sendCloseFail", id), e);
             }
             wsRemoteEndpoint.close();
             // Failure to send a close message is not unexpected in the case of
@@ -604,7 +604,7 @@ public class WsSession implements Session {
             // from/to the client. In this case do not trigger the endpoint's
             // error handling
             if (closeCode != CloseCodes.CLOSED_ABNORMALLY) {
-                localEndpoint.onError(this, ioe);
+                localEndpoint.onError(this, e);
             }
         } finally {
             webSocketContainer.unregisterSession(localEndpoint, this);
