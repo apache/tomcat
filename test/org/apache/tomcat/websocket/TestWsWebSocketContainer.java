@@ -359,6 +359,10 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
         long timeout = System.currentTimeMillis() - lastSend;
 
 
+        // Close the client session, primarily to allow the
+        // BackgroundProcessManager to shut down.
+        wsSession.close();
+
         String msg = "Time out was [" + timeout + "] ms";
 
         // Check correct time passed
