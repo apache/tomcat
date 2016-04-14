@@ -128,6 +128,13 @@
         express a preference, use the server order to determine the preferred
         format. Based on a patch by gmokki. (markt)
       </add>
+      <fix>
+        <bug>59284</bug>: Allow the Tomcat provided JASPIC
+        <code>SimpleServerAuthConfig</code> to pick up module confiuration
+        properties from either the property set passed to its constructor or
+        from the properties passed in the call to <code>getAuthContext</code>.
+        Based on a patch by Thomas Maslen. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
