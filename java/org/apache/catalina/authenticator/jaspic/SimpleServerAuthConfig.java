@@ -102,16 +102,14 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                     if (this.properties != null) {
                         mergedProperties.putAll(this.properties);
                     }
-                    if (properties == null) {
-                        throw new AuthException(sm.getString("simpleServerAuthConfig.noModules"));
-                    } else {
+                    if (properties != null) {
                         mergedProperties.putAll(properties);
                     }
 
                     List<ServerAuthModule> modules = new ArrayList<>();
                     int moduleIndex = 1;
                     String key = SERVER_AUTH_MODULE_KEY_PREFIX + moduleIndex;
-                    String moduleClassName = (String) properties.get(key);
+                    String moduleClassName = mergedProperties.get(key);
                     while (moduleClassName != null) {
                         try {
                             Class<?> clazz = Class.forName(moduleClassName);
@@ -127,7 +125,7 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                         // Look for the next module
                         moduleIndex++;
                         key = SERVER_AUTH_MODULE_KEY_PREFIX + moduleIndex;
-                        moduleClassName = (String) properties.get(key);
+                        moduleClassName = mergedProperties.get(key);
                     }
 
                     if (modules.size() == 0) {
