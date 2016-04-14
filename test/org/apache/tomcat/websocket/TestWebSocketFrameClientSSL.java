@@ -33,13 +33,12 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.SleepingText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
-public class TestWebSocketFrameClientSSL extends TomcatBaseTest {
+public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
 
     @Test
     public void testConnectToServerEndpoint() throws Exception {
@@ -150,20 +149,5 @@ public class TestWebSocketFrameClientSSL extends TomcatBaseTest {
 
         // Close the client session.
         wsSession.close();
-
-        // Make sure the background process has stopped (else in some test
-        // environments it will continue to run and break other tests that check
-        // it has stopped.
-        count = 0;
-        while (count < 50) {
-            if (BackgroundProcessManager.getInstance().getProcessCount() == 0) {
-                break;
-            }
-            Thread.sleep(100);
-            count++;
-        }
-
-        Assert.assertEquals(0, BackgroundProcessManager.getInstance().getProcessCount());
-
     }
 }
