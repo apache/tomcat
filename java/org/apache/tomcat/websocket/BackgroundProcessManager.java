@@ -98,6 +98,16 @@ public class BackgroundProcessManager {
     }
 
 
+    /*
+     * For unit testing.
+     */
+    int getProcessCount() {
+        synchronized (processesLock) {
+            return processes.size();
+        }
+    }
+
+
     private static class WsBackgroundThread extends Thread {
 
         private final BackgroundProcessManager manager;

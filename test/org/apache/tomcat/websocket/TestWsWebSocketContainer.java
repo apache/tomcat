@@ -53,7 +53,6 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.coyote.http11.Http11Protocol;
 import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicBinary;
@@ -64,7 +63,7 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEn
 import org.apache.tomcat.websocket.server.Constants;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
-public class TestWsWebSocketContainer extends TomcatBaseTest {
+public class TestWsWebSocketContainer extends WebSocketBaseTest {
 
     private static final String MESSAGE_EMPTY = "";
     private static final String MESSAGE_STRING_1 = "qwerty";

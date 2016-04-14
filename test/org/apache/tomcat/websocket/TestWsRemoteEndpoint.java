@@ -37,7 +37,6 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.websocket.TesterMessageCountClient.AsyncBinary;
 import org.apache.tomcat.websocket.TesterMessageCountClient.AsyncHandler;
@@ -46,7 +45,7 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.TesterAnnotatedEndpo
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterEndpoint;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
-public class TestWsRemoteEndpoint extends TomcatBaseTest {
+public class TestWsRemoteEndpoint extends WebSocketBaseTest {
 
     private static final String SEQUENCE = "ABCDE";
     private static final int S_LEN = SEQUENCE.length();

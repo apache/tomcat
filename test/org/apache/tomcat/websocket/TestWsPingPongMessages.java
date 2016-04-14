@@ -33,12 +33,11 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterEndpoint;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
 
-public class TestWsPingPongMessages extends TomcatBaseTest {
+public class TestWsPingPongMessages extends WebSocketBaseTest {
 
     ByteBuffer applicationData = ByteBuffer.wrap(new String("mydata")
             .getBytes());
