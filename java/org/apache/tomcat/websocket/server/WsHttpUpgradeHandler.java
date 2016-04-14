@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.websocket.server;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -205,10 +204,6 @@ public class WsHttpUpgradeHandler implements HttpUpgradeHandler {
                 wsFrame.onDataAvailable();
             } catch (WsIOException ws) {
                 wsProtocolHandler.close(ws.getCloseReason());
-            } catch (EOFException eof) {
-                CloseReason cr = new CloseReason(
-                        CloseCodes.CLOSED_ABNORMALLY, eof.getMessage());
-                wsProtocolHandler.close(cr);
             } catch (IOException ioe) {
                 onError(ioe);
                 CloseReason cr = new CloseReason(
