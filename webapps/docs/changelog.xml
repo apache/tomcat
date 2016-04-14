@@ -196,6 +196,10 @@
         Ensure that a client disconnection triggers the error handling for the
         associated WebSocket end point. (markt)
       </fix>
+      <add>
+        Make WebSocket client more robist when handling errors during the close
+        of a WebSocket session. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
