@@ -361,6 +361,10 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
         // server to shutdown cleanly
         BlockingPojo.clearBlock();
 
+        // Close the client session, primarily to allow the
+        // BackgroundProcessManager to shut down.
+        wsSession.close();
+
         String msg = "Time out was [" + timeout + "] ms";
 
         // Check correct time passed
