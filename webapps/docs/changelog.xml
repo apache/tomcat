@@ -197,7 +197,7 @@
         associated WebSocket end point. (markt)
       </fix>
       <add>
-        Make WebSocket client more robist when handling errors during the close
+        Make WebSocket client more robust when handling errors during the close
         of a WebSocket session. (markt)
       </add>
     </changelog>
