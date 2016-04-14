@@ -192,6 +192,10 @@
         thread context class loader is set to the to the web application
         classloder when processing WebSocket messages on the server. (markt)
       </fix>
+      <fix>
+        Ensure that a client disconnection triggers the error handling for the
+        associated WebSocket end point. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
