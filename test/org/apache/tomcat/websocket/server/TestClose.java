@@ -293,7 +293,7 @@ public class TestClose extends TomcatBaseTest {
                     // triggers an error here.
                     while (count < 10) {
                         count++;
-                    session.getBasicRemote().sendText("Test reply");
+                        session.getBasicRemote().sendText("Test reply");
                         Thread.sleep(500);
                     }
                 } catch (IOException e) {
