@@ -32,11 +32,10 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
-public class TestWebSocketFrameClient extends TomcatBaseTest {
+public class TestWebSocketFrameClient extends WebSocketBaseTest {
 
     @Test
     public void testConnectToServerEndpoint() throws Exception {

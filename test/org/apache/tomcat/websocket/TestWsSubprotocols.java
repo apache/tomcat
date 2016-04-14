@@ -36,11 +36,10 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 import org.apache.tomcat.websocket.server.TesterEndpointConfig;
 
-public class TestWsSubprotocols extends TomcatBaseTest {
+public class TestWsSubprotocols extends WebSocketBaseTest {
 
     @Test
     public void testWsSubprotocols() throws Exception {
