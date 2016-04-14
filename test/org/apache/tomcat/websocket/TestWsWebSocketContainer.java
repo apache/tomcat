@@ -427,6 +427,10 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
             loops++;
         }
 
+        // Close the client session, primarily to allow the
+        // BackgroundProcessManager to shut down.
+        wsSession.close();
+
         // Check the right exception was thrown
         Assert.assertNotNull(ConstantTxEndpoint.getException());
         Assert.assertEquals(ExecutionException.class,
