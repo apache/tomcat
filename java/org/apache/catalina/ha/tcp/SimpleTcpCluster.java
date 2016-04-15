@@ -348,7 +348,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
      * get current Deployer
      */
     @Override
-    public org.apache.catalina.ha.ClusterDeployer getClusterDeployer() {
+    public ClusterDeployer getClusterDeployer() {
         return clusterDeployer;
     }
 
@@ -356,8 +356,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
      * set a new Deployer, must be set before cluster started!
      */
     @Override
-    public void setClusterDeployer(
-            org.apache.catalina.ha.ClusterDeployer clusterDeployer) {
+    public void setClusterDeployer(ClusterDeployer clusterDeployer) {
         this.clusterDeployer = clusterDeployer;
     }
 
