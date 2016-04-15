@@ -533,10 +533,15 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
                 session.getAsyncRemote().setSendTimeout(TIMEOUT_MS);
             }
 
-            long lastSend = 0;
+            // The close message is written with a blocking write. This is going
+            // to fail so reduce the timeout from the default so the test
+            // completes faster
+            session.getUserProperties().put(
+                    WsRemoteEndpointImplBase.BLOCKING_SEND_TIMEOUT_PROPERTY, Long.valueOf(5000));
 
             // Should send quickly until the network buffers fill up and then
             // block until the timeout kicks in
+            long lastSend = 0;
             try {
                 while (true) {
                     lastSend = System.currentTimeMillis();
