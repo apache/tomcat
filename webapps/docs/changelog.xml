@@ -106,6 +106,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.5 to
+        pick up the Windows binaries that are based on OpenSSL 1.0.2g and APR
+        1.5.1. (violetagg)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.69 (violetagg)" rtext="released 2016-04-15">
   <subsection name="Catalina">
