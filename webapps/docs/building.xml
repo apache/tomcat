@@ -87,7 +87,7 @@ available, which will be used to actually perform the build.
 
   <p>
   Tomcat SVN repository URL:
-  <a href="http://svn.apache.org/repos/asf/tomcat/tc8.5.x/trunk/">http://svn.apache.org/repos/asf/tomcat/tc8.0.x/trunk/</a>
+  <a href="http://svn.apache.org/repos/asf/tomcat/tc8.5.x/trunk/">http://svn.apache.org/repos/asf/tomcat/tc8.5.x/trunk/</a>
   </p>
   <p>
   Tomcat source packages:
