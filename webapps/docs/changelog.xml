@@ -113,6 +113,10 @@
         pick up the Windows binaries that are based on OpenSSL 1.0.2g and APR
         1.5.1. (violetagg)
       </update>
+      <update>
+        Remove native code (Windows Service Wrapper, APR/native connector)
+        support for Windows Itanium. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
