@@ -641,6 +641,13 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
         Assert.assertEquals(2, setB.size());
         Assert.assertTrue(setB.remove(s1b));
         Assert.assertTrue(setB.remove(s2b));
+
+        // Close sessions explicitly as Gump reports a session remains open at
+        // the end of this test
+        s2a.close();
+        s3a.close();
+        s1b.close();
+        s2b.close();
     }
 
 
