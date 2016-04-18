@@ -98,9 +98,13 @@ public class ErrorReportValve extends ValveBase {
         Throwable throwable = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 
         // If an async request is in progress and is not going to end once this
-        // container thread finishes, do not trigger error page handling - it
-        // will be triggered later if required.
+        // container thread finishes, do not process the error page here but
+        // trigger an error dispatch so the additional async processing such as
+        // firing onError() occurs.
         if (request.isAsync() && !request.isAsyncCompleting()) {
+            if (throwable != null) {
+                request.getAsyncContextInternal().setErrorState(throwable, true);
+            }
             return;
         }
 
