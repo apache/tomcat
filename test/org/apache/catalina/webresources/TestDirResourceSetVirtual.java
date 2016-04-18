@@ -89,4 +89,19 @@ public class TestDirResourceSetVirtual extends AbstractTestResourceSet {
     public void testNoArgConstructor() {
         // NO-OP. Tested in TestDirResource
     }
+
+    @Override
+    protected String getNewDirName() {
+        return "test-dir-05";
+    }
+
+    @Override
+    protected String getNewFileNameNull() {
+        return "test-null-05";
+    }
+
+    @Override
+    protected String getNewFileName() {
+        return "test-file-05";
+    }
 }

@@ -54,4 +54,19 @@ public class TestFileResourceSetReadOnly extends AbstractTestFileResourceSet {
     protected String getDir1() {
         return dir1.getAbsolutePath();
     }
+
+    @Override
+    protected String getNewDirName() {
+        return "test-dir-07";
+    }
+
+    @Override
+    protected String getNewFileNameNull() {
+        return "test-null-07";
+    }
+
+    @Override
+    protected String getNewFileName() {
+        return "test-file-07";
+    }
 }

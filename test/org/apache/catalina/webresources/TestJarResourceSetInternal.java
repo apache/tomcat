@@ -51,4 +51,19 @@ public class TestJarResourceSetInternal extends AbstractTestResourceSet {
         @SuppressWarnings("unused")
         Object obj = new JarResourceSet();
     }
+
+    @Override
+    protected String getNewDirName() {
+        return "test-dir-09";
+    }
+
+    @Override
+    protected String getNewFileNameNull() {
+        return "test-null-09";
+    }
+
+    @Override
+    protected String getNewFileName() {
+        return "test-file-09";
+    }
 }

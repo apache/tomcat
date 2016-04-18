@@ -59,4 +59,19 @@ public class TestFileResourceSetVirtual extends TestFileResourceSet {
     protected String getDir1() {
         return dir1.getAbsolutePath();
     }
+
+    @Override
+    protected String getNewDirName() {
+        return "test-dir-11";
+    }
+
+    @Override
+    protected String getNewFileNameNull() {
+        return "test-null-11";
+    }
+
+    @Override
+    protected String getNewFileName() {
+        return "test-file-11";
+    }
 }

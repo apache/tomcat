@@ -382,16 +382,19 @@ public abstract class AbstractTestResourceSet {
 
     @Test
     public final void testMkdirNew() {
+        String newDirName = getNewDirName();
         if (isWriteable()) {
-            Assert.assertTrue(resourceRoot.mkdir(getMount() + "/new-test"));
+            Assert.assertTrue(resourceRoot.mkdir(getMount() + "/" + newDirName));
 
-            File file = new File(getBaseDir(), "new-test");
+            File file = new File(getBaseDir(), newDirName);
             Assert.assertTrue(file.isDirectory());
             Assert.assertTrue(file.delete());
         } else {
-            Assert.assertFalse(resourceRoot.mkdir(getMount() + "/new-test"));
+            Assert.assertFalse(resourceRoot.mkdir(getMount() + "/" + newDirName));
         }
     }
+
+    protected abstract String getNewDirName();
 
     //------------------------------------------------------------------ write()
 
@@ -449,24 +452,29 @@ public abstract class AbstractTestResourceSet {
     }
 
     @Test(expected = NullPointerException.class)
-    public final void testWriteNew() {
-        resourceRoot.write(getMount() + "/new-test", null, false);
+    public final void testWriteNull() {
+        resourceRoot.write(getMount() + "/" + getNewFileNameNull(), null, false);
     }
+
+    protected abstract String getNewFileNameNull();
 
     @Test
     public final void testWrite() {
+        String newFileName = getNewFileName();
         InputStream is = new ByteArrayInputStream("test".getBytes());
         if (isWriteable()) {
             Assert.assertTrue(resourceRoot.write(
-                    getMount() + "/new-test", is, false));
-            File file = new File(getBaseDir(), "new-test");
+                    getMount() + "/" + newFileName, is, false));
+            File file = new File(getBaseDir(), newFileName);
             Assert.assertTrue(file.exists());
             Assert.assertTrue(file.delete());
         } else {
             Assert.assertFalse(resourceRoot.write(
-                    getMount() + "/new-test", is, false));
+                    getMount() + "/" + newFileName, is, false));
         }
     }
+
+    protected abstract String getNewFileName();
 
     // ------------------------------------------------------ getCanonicalPath()
 
