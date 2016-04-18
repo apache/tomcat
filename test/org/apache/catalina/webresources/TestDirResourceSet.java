@@ -75,4 +75,19 @@ public class TestDirResourceSet extends AbstractTestResourceSet {
         @SuppressWarnings("unused")
         Object obj = new DirResourceSet();
     }
+
+    @Override
+    protected String getNewDirName() {
+        return "test-dir-01";
+    }
+
+    @Override
+    protected String getNewFileNameNull() {
+        return "test-null-01";
+    }
+
+    @Override
+    protected String getNewFileName() {
+        return "test-file-01";
+    }
 }

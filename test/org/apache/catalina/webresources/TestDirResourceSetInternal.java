@@ -71,4 +71,19 @@ public class TestDirResourceSetInternal extends AbstractTestResourceSet {
     public void testNoArgConstructor() {
         // NO-OP. Tested in TestDirResource
     }
+
+    @Override
+    protected String getNewDirName() {
+        return "test-dir-02";
+    }
+
+    @Override
+    protected String getNewFileNameNull() {
+        return "test-null-02";
+    }
+
+    @Override
+    protected String getNewFileName() {
+        return "test-file-02";
+    }
 }

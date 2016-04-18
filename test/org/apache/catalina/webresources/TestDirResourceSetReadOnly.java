@@ -47,4 +47,19 @@ public class TestDirResourceSetReadOnly extends AbstractTestResourceSet {
     public void testNoArgConstructor() {
         // NO-OP. Tested in TestDirResource
     }
+
+    @Override
+    protected String getNewDirName() {
+        return "test-dir-04";
+    }
+
+    @Override
+    protected String getNewFileNameNull() {
+        return "test-null-04";
+    }
+
+    @Override
+    protected String getNewFileName() {
+        return "test-file-04";
+    }
 }

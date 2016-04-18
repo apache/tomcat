@@ -67,4 +67,19 @@ public class TestDirResourceSetMount extends AbstractTestResourceSetMount {
     public File getBaseDir() {
         return dir1;
     }
+
+    @Override
+    protected String getNewDirName() {
+        return "test-dir-03";
+    }
+
+    @Override
+    protected String getNewFileNameNull() {
+        return "test-null-03";
+    }
+
+    @Override
+    protected String getNewFileName() {
+        return "test-file-03";
+    }
 }
