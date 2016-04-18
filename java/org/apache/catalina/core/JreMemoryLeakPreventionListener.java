@@ -26,7 +26,6 @@ import java.net.URLConnection;
 import java.sql.DriverManager;
 import java.util.StringTokenizer;
 
-import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -62,20 +61,6 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
         LogFactory.getLog(JreMemoryLeakPreventionListener.class);
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
-
-    /**
-     * Protect against the memory leak caused when the first call to
-     * <code>sun.awt.AppContext.getAppContext()</code> is triggered by a web
-     * application. Defaults to <code>false</code> since
-     * {@link java.beans.Introspector#flushCaches()} no longer uses AppContext
-     * from 1.7.0_02 onwards. Also, from 1.7.0_25 onwards, calling this method
-     * requires a graphical environment and starts an AWT thread.
-     */
-    private boolean appContextProtection = false;
-    public boolean isAppContextProtection() { return appContextProtection; }
-    public void setAppContextProtection(boolean appContextProtection) {
-        this.appContextProtection = appContextProtection;
-    }
 
     /**
      * Protect against the memory leak caused when the first call to
@@ -247,32 +232,6 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                  */
                 if (driverManagerProtection) {
                     DriverManager.getDrivers();
-                }
-
-                /*
-                 * Several components end up calling:
-                 * sun.awt.AppContext.getAppContext()
-                 *
-                 * Those libraries / components known to trigger memory leaks
-                 * due to eventual calls to getAppContext() are:
-                 * - Google Web Toolkit via its use of javax.imageio
-                 * - Tomcat via its use of java.beans.Introspector.flushCaches()
-                 *   in 1.7.0 to 1.7.0_01. From 1.7.0_02 onwards use of
-                 *   AppContext by Introspector.flushCaches() was replaced with
-                 *   ThreadGroupContext
-                 * - others TBD
-                 *
-                 * From 1.7.0_25 onwards, a call to
-                 * sun.awt.AppContext.getAppContext() results in a thread being
-                 * started named AWT-AppKit that requires a graphic environment
-                 * to be available.
-                 */
-
-                // Trigger a call to sun.awt.AppContext.getAppContext(). This
-                // will pin the system class loader in memory but that shouldn't
-                // be an issue.
-                if (appContextProtection) {
-                    ImageIO.getCacheDirectory();
                 }
 
                 // Trigger the creation of the AWT (AWT-Windows, AWT-XAWT,
