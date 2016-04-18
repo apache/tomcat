@@ -801,4 +801,48 @@ public class TestHttp11Processor extends TomcatBaseTest {
             return true;
         }
     }
+
+
+    @Test
+    public void testBug59310() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        Tomcat.addServlet(ctx, "Bug59310", new Bug59310Servlet());
+        ctx.addServletMapping("/test", "Bug59310");
+
+        tomcat.start();
+
+        ByteChunk responseBody = new ByteChunk();
+        Map<String,List<String>> responseHeaders = new HashMap<>();
+
+        int rc = headUrl("http://localhost:" + getPort() + "/test", responseBody,
+                responseHeaders);
+
+        assertEquals(HttpServletResponse.SC_OK, rc);
+        assertEquals(0, responseBody.getLength());
+        assertFalse(responseHeaders.containsKey("Content-Length"));
+    }
+
+
+    private class Bug59310Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            // TODO Auto-generated method stub
+            super.doGet(req, resp);
+        }
+
+        @Override
+        protected void doHead(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            //resp.setContentLengthLong(-1);
+            //resp.flushBuffer();
+        }
+    }
 }
