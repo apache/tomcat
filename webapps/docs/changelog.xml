@@ -61,6 +61,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>59219</bug>: Ensure <code>AsyncListener.onError()</code> is called
+        if an <code>Exception</code> is thrown during async processing. (markt)
+      </fix>
+      <fix>
         <bug>59261</bug>: <code>ServletRequest.getAsyncContext()</code> now
         throws an <code>IllegalStateException</code> as required by the Servlet
         specification if the request is not in asynchronous mode when called.

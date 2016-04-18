@@ -53,23 +53,26 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  *                 available.
  * ERROR         - Something went wrong.
  *
- * |----------------->--------------|
- * |                               \|/
- * |   |----------<---------------ERROR
- * |   |      complete()             | \                                                          
- * |   |                             |  \---------------|                                         
- * |   |                             |                  |dispatch()                               
- * |   |                             |postProcess()    \|/                                        
- * |   |                             |                  |                                         
- * |   |                             |  |--|timeout()   |                                         
- * |   |           postProcess()    \|/ | \|/           |         auto                            
- * |   |         |--------------->DISPATCHED<---------- | --------------COMPLETING<-----|         
- * |   |         |               /|\  |                 |                 | /|\         |         
- * |   |         |    |--->-------|   |                 |                 |--|          |         
- * |   |         ^    |               |startAsync()     |               timeout()       |         
- * |   |         |    |               |                 |                               |         
- * |  \|/        |    |  complete()  \|/  postProcess() |                               |         
- * | MUST_COMPLETE-<- | ----<------STARTING-->--------- | ------------|                 ^         
+ * |----------------->------|
+ * |                       \|/
+ * |   |----------<-------ERROR
+ * |   |      complete() /|\/|\\
+ * |   |                  |  |  \
+ * |   |    |----->-------|  |   \----------->----------|
+ * |   |    |                |                          |dispatch()
+ * |   |    |                |                         \|/
+ * |   |    |                |          |--|timeout()   |
+ * |   |    |  postProcess() |          | \|/           |         auto
+ * |   |    |    |---------- | -->DISPATCHED<---------- | --------------COMPLETING<-----|
+ * |   |    |    |           |   /|\  |                 |                 | /|\         |
+ * |   |    |    |    |--->- | ---|   |                 |                 |--|          |
+ * |   |    ^    ^    |      |        |startAsync()     |               timeout()       |
+ * |   |    |    |    |       \       |                 |                               |
+ * |   |    |    |    |        \      |                 |                               |
+ * |   |    |    |    |         \     |                 |                               |
+ * |   |    |    |    |          \    |                 |                               |
+ * |  \|/   |    |    |           \  \|/  postProcess() |                               |
+ * | MUST_COMPLETE-<- | ----<------STARTING-->--------- | ------------|                 ^
  * |         /|\      |               |                 |             |      complete() |         
  * |          |       |               |                 |             |     /-----------|         
  * |          |       ^               |dispatch()       |             |    /                      
@@ -318,8 +321,10 @@ public class AsyncStateMachine<S> {
     
     public synchronized boolean asyncError() {
         boolean doDispatch = false;
-        if (state == AsyncState.DISPATCHED ||
-                state == AsyncState.TIMING_OUT) {
+        if (state == AsyncState.STARTING ||
+                state == AsyncState.DISPATCHED ||
+                state == AsyncState.TIMING_OUT ||
+                state == AsyncState.MUST_COMPLETE) {
             state = AsyncState.ERROR;
         } else {
             throw new IllegalStateException(
