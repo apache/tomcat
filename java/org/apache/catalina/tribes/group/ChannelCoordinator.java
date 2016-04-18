@@ -151,6 +151,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             //listens to with the local membership settings
             if ( Channel.SND_RX_SEQ==(svc & Channel.SND_RX_SEQ) ) {
                 clusterReceiver.setMessageListener(this);
+                clusterReceiver.setChannel(getChannel());
                 clusterReceiver.start();
                 //synchronize, big time FIXME
                 Member localMember = getChannel().getLocalMember(false);
@@ -167,27 +168,26 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                             getClusterReceiver().getSecurePort(),
                             getClusterReceiver().getUdpPort());
                 }
-                clusterReceiver.setChannel(getChannel());
                 valid = true;
             }
             if ( Channel.SND_TX_SEQ==(svc & Channel.SND_TX_SEQ) ) {
-                clusterSender.start();
                 clusterSender.setChannel(getChannel());
+                clusterSender.start();
                 valid = true;
             }
 
             if ( Channel.MBR_RX_SEQ==(svc & Channel.MBR_RX_SEQ) ) {
                 membershipService.setMembershipListener(this);
+                membershipService.setChannel(getChannel());
                 if (membershipService instanceof McastService) {
                     ((McastService)membershipService).setMessageListener(this);
                 }
                 membershipService.start(MembershipService.MBR_RX);
-                membershipService.setChannel(getChannel());
                 valid = true;
             }
             if ( Channel.MBR_TX_SEQ==(svc & Channel.MBR_TX_SEQ) ) {
-                membershipService.start(MembershipService.MBR_TX);
                 membershipService.setChannel(getChannel());
+                membershipService.start(MembershipService.MBR_TX);
                 valid = true;
             }
 
