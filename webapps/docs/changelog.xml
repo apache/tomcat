@@ -140,6 +140,11 @@
         from the properties passed in the call to <code>getAuthContext</code>.
         Based on a patch by Thomas Maslen. (markt)
       </fix>
+      <fix>
+        <bug>59310</bug>: Do not add a <code>Content-Length: 0</code> header for
+        custom responses to <code>HEAD</code> requests that do not set a
+        <code>Content-Length</code> value. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
