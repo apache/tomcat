@@ -104,6 +104,10 @@
         environment, the local member inherits properties from the cluster
         receiver. (kfujino)
       </fix>
+      <add>
+        Add get/set method for the channel that is related to each Channel
+        services. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">

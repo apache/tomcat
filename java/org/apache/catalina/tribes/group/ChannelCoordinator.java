@@ -27,6 +27,7 @@ import org.apache.catalina.tribes.MessageListener;
 import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.membership.McastService;
 import org.apache.catalina.tribes.membership.StaticMember;
+import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
 import org.apache.catalina.tribes.transport.SenderState;
 import org.apache.catalina.tribes.transport.nio.NioReceiver;
@@ -159,10 +160,16 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                             getClusterReceiver().getUdpPort());
                    
                 }
+                if (clusterReceiver instanceof ReceiverBase) {
+                    ((ReceiverBase)clusterReceiver).setChannel(getChannel());
+                }
                 valid = true;
             }
             if ( Channel.SND_TX_SEQ==(svc & Channel.SND_TX_SEQ) ) {
                 clusterSender.start();
+                if (clusterSender instanceof ReplicationTransmitter) {
+                    ((ReplicationTransmitter)clusterSender).setChannel(getChannel());
+                }
                 valid = true;
             }
             
@@ -172,10 +179,16 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                     ((McastService)membershipService).setMessageListener(this);
                 }
                 membershipService.start(MembershipService.MBR_RX);
+                if (membershipService instanceof McastService) {
+                    ((McastService)membershipService).setChannel(getChannel());
+                }
                 valid = true;
             }
             if ( Channel.MBR_TX_SEQ==(svc & Channel.MBR_TX_SEQ) ) {
                 membershipService.start(MembershipService.MBR_TX);
+                if (membershipService instanceof McastService) {
+                    ((McastService)membershipService).setChannel(getChannel());
+                }
                 valid = true;
             }
             

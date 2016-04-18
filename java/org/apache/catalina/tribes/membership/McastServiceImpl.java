@@ -149,6 +149,8 @@ public class McastServiceImpl
      * disable/enable local loopback message
      */
     protected boolean localLoopbackDisabled = false;
+
+    private Channel channel;
     
     /**
      * Create a new mcast service impl
@@ -518,6 +520,14 @@ public class McastServiceImpl
 
     public long getRecoverySleepTime() {
         return recoverySleepTime;
+    }
+
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
     }
 
     public class ReceiverThread extends Thread {
