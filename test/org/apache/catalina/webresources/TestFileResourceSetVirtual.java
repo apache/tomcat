@@ -30,18 +30,18 @@ import org.apache.catalina.startup.TomcatBaseTest;
 
 /**
  * Mounts file resources in sub directories that do not exist in the main
- * resoucres.
+ * resources.
  */
 public class TestFileResourceSetVirtual extends TestFileResourceSet {
 
     private static Path tempDir;
-    private static File dir1;
+    private static File dir2;
 
     @BeforeClass
     public static void before() throws IOException {
         tempDir = Files.createTempDirectory("test", new FileAttribute[0]);
-        dir1 = new File(tempDir.toFile(), "dir1");
-        TomcatBaseTest.recursiveCopy(new File("test/webresources/dir1").toPath(), dir1.toPath());
+        dir2 = new File(tempDir.toFile(), "dir2");
+        TomcatBaseTest.recursiveCopy(new File("test/webresources/dir2").toPath(), dir2.toPath());
     }
 
     @AfterClass
@@ -56,8 +56,8 @@ public class TestFileResourceSetVirtual extends TestFileResourceSet {
     }
 
     @Override
-    protected String getDir1() {
-        return dir1.getAbsolutePath();
+    protected File getDir2() {
+        return dir2;
     }
 
     @Override

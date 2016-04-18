@@ -31,13 +31,13 @@ import org.apache.catalina.startup.TomcatBaseTest;
 public class TestFileResourceSetReadOnly extends AbstractTestFileResourceSet {
 
     private static Path tempDir;
-    private static File dir1;
+    private static File dir2;
 
     @BeforeClass
     public static void before() throws IOException {
         tempDir = Files.createTempDirectory("test", new FileAttribute[0]);
-        dir1 = new File(tempDir.toFile(), "dir1");
-        TomcatBaseTest.recursiveCopy(new File("test/webresources/dir1").toPath(), dir1.toPath());
+        dir2 = new File(tempDir.toFile(), "dir2");
+        TomcatBaseTest.recursiveCopy(new File("test/webresources/dir2").toPath(), dir2.toPath());
     }
 
     @AfterClass
@@ -51,8 +51,8 @@ public class TestFileResourceSetReadOnly extends AbstractTestFileResourceSet {
     }
 
     @Override
-    protected String getDir1() {
-        return dir1.getAbsolutePath();
+    protected File getDir2() {
+        return dir2;
     }
 
     @Override
