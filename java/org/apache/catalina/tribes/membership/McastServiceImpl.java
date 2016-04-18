@@ -155,6 +155,8 @@ public class McastServiceImpl {
      */
     protected final boolean localLoopbackDisabled;
 
+    private Channel channel;
+
     /**
      * Create a new mcast service instance.
      * @param member - the local member
@@ -529,6 +531,14 @@ public class McastServiceImpl {
 
     public long getRecoverySleepTime() {
         return recoverySleepTime;
+    }
+
+    public Channel getChannel() {
+        return channel;
+    }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
     }
 
     public class ReceiverThread extends Thread {

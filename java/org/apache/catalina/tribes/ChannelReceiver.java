@@ -78,4 +78,16 @@ public interface ChannelReceiver extends Heartbeat {
      */
     public MessageListener getMessageListener();
 
+    /**
+     * Return the channel that is related to this ChannelReceiver
+     * @return Channel
+     */
+    public Channel getChannel();
+
+    /**
+     * Set the channel that is related to this ChannelReceiver
+     * @param channel The channel
+     */
+    public void setChannel(Channel channel);
+
 }
