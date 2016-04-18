@@ -52,24 +52,27 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * DISPATCHING   - The dispatch is being processed.
  * ERROR         - Something went wrong.
  *
- * |-----------------»--------------|
- * |                               \|/
- * |   |----------«---------------ERROR---------------------------«-------------------------------|
- * |   |      complete()               \                                                          |
- * |   |                                \---------------|                                         |
- * |   |                                                |dispatch()                               |
- * |   |                                               \|/                                        |
- * |   |                                                |                                         |
- * |   |                                |--|timeout()   |                                         |
- * |   |              post()            | \|/           |     post()                              |
- * |   |         |---------------»DISPATCHED«---------- | --------------COMPLETING«-----|         |
- * |   |         |               /|\  |                 |                 | /|\         |         |
- * |   |         |    |---»-------|   |                 |                 |--|          |         |
- * |   |         ^    |               |startAsync()     |               timeout()       |         |
- * |   |         |    |               |                 |                               |         |
- * |  \|/        |    |  complete()  \|/     post()     |                               |         |
+ * |-----------------»------|
+ * |                       \|/
+ * |   |----------«-------ERROR-----------------------------------«-------------------------------|
+ * |   |      complete() /|\/|\\                                                                  |
+ * |   |                  |  |  \                                                                 |
+ * |   |    |-----»-------|  |   \-----------»----------|                                         |
+ * |   |    |                |                          |dispatch()                               |
+ * |   |    |                |                         \|/                                        |
+ * |   |    |                |          |--|timeout()   |                                         |
+ * |   |    |     post()     |          | \|/           |     post()                              |
+ * |   |    |    |---------- | --»DISPATCHED«---------- | --------------COMPLETING«-----|         |
+ * |   |    |    |           |   /|\  |                 |                 | /|\         |         |
+ * |   |    |    |    |---»- | ---|   |                 |                 |--|          |         |
+ * |   |    ^    ^    |      |        |startAsync()     |               timeout()       |         |
+ * |   |    |    |    |       \       |                 |                               |         |
+ * |   |    |    |    |        \      |                 |                               |         |
+ * |   |    |    |    |         \     |                 |                               |         |
+ * |   |    |    |    |          \    |                 |                               |         |
+ * |  \|/   |    |    |           \  \|/     post()     |                               |         |
  * | MUST_COMPLETE-«- | ----«------STARTING--»--------- | -------------|                ^         |
- * |  /|\    /|\      |               |                 |              |     complete() |         |
+ * |  /|\    /|\      |  complete()   |                 |              |     complete() |         |
  * |   |      |       |               |                 |    post()    |     /----------|         |
  * |   |      |       ^               |dispatch()       |    |-----|   |    /                     |
  * |   |      |       |               |                 |    |     |   |   /                      |
@@ -357,8 +360,10 @@ public class AsyncStateMachine {
 
 
     public synchronized void asyncError() {
-        if (state == AsyncState.DISPATCHED ||
+        if (state == AsyncState.STARTING ||
+                state == AsyncState.DISPATCHED ||
                 state == AsyncState.TIMING_OUT ||
+                state == AsyncState.MUST_COMPLETE ||
                 state == AsyncState.READ_WRITE_OP) {
             clearNonBlockingListeners();
             state = AsyncState.ERROR;

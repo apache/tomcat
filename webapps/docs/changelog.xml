@@ -75,6 +75,10 @@
         (violetagg)
       </fix>
       <fix>
+        <bug>59219</bug>: Ensure <code>AsyncListener.onError()</code> is called
+        if an <code>Exception</code> is thrown during async processing. (markt)
+      </fix>
+      <fix>
         <bug>59255</bug>: Fix possible NPE in mapper. (kkolinko/remm)
       </fix>
       <fix>
