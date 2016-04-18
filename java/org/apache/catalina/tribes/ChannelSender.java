@@ -68,4 +68,17 @@ public interface ChannelSender extends Heartbeat
      * @see ChannelException#addFaultyMember(Member,java.lang.Exception)
      */
     public void sendMessage(ChannelMessage message, Member[] destination) throws ChannelException;
+
+    /**
+     * Return the channel that is related to this ChannelSender
+     * @return Channel
+     */
+    public Channel getChannel();
+
+    /**
+     * Set the channel that is related to this ChannelSender
+     * @param channel The channel
+     */
+    public void setChannel(Channel channel);
+
 }

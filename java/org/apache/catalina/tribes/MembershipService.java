@@ -144,4 +144,16 @@ public interface MembershipService {
      */
     public void broadcast(ChannelMessage message) throws ChannelException;
 
+    /**
+     * Return the channel that is related to this MembershipService
+     * @return Channel
+     */
+    public Channel getChannel();
+
+    /**
+     * Set the channel that is related to this MembershipService
+     * @param channel The channel
+     */
+    public void setChannel(Channel channel);
+
 }

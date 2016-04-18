@@ -167,10 +167,12 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                             getClusterReceiver().getSecurePort(),
                             getClusterReceiver().getUdpPort());
                 }
+                clusterReceiver.setChannel(getChannel());
                 valid = true;
             }
             if ( Channel.SND_TX_SEQ==(svc & Channel.SND_TX_SEQ) ) {
                 clusterSender.start();
+                clusterSender.setChannel(getChannel());
                 valid = true;
             }
 
@@ -180,10 +182,12 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                     ((McastService)membershipService).setMessageListener(this);
                 }
                 membershipService.start(MembershipService.MBR_RX);
+                membershipService.setChannel(getChannel());
                 valid = true;
             }
             if ( Channel.MBR_TX_SEQ==(svc & Channel.MBR_TX_SEQ) ) {
                 membershipService.start(MembershipService.MBR_TX);
+                membershipService.setChannel(getChannel());
                 valid = true;
             }
 
