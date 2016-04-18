@@ -915,7 +915,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk responseBody = new ByteChunk();
-        Map<String,List<String>> responseHeaders = new HashMap<>();
+        Map<String,List<String>> responseHeaders = new HashMap<String,List<String>>();
 
         int rc = headUrl("http://localhost:" + getPort() + "/test", responseBody,
                 responseHeaders);
