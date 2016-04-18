@@ -52,25 +52,25 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * DISPATCHING   - The dispatch is being processed.
  * ERROR         - Something went wrong.
  *
- * |-----------------»--------|
- * |                         \|/
- * |   |----------«---------ERROR---------------------------------«-------------------------------|
- * |   |      complete()    /|\  \                                                                |
- * |   |                     |    \---------------------|                                         |
- * |   |                     |                          |dispatch()                               |
- * |   |                     |                         \|/                                        |
- * |   |                     |                          |                                         |
- * |   |                     |          |--|timeout()   |                                         |
- * |   |          post()     |          | \|/           |     post()                              |
- * |   |         |---------- | --»DISPATCHED«---------- | --------------COMPLETING«-----|         |
- * |   |         |           |   /|\  |                 |                 | /|\         |         |
- * |   |         |    |---»- | ---|   |                 |                 |--|          |         |
- * |   |         ^    |      |        |startAsync()     |               timeout()       |         |
- * |   |         |    |       \       |                 |                               |         |
- * |   |         |    |        \      |                 |                               |         |
- * |   |         |    |         \     |                 |                               |         |
- * |   |         |    |          \    |                 |                               |         |
- * |  \|/        |    |           \  \|/     post()     |                               |         |
+ * |-----------------»------|
+ * |                       \|/
+ * |   |----------«-------ERROR-----------------------------------«-------------------------------|
+ * |   |      complete() /|\/|\\                                                                  |
+ * |   |                  |  |  \                                                                 |
+ * |   |    |-----»-------|  |   \-----------»----------|                                         |
+ * |   |    |                |                          |dispatch()                               |
+ * |   |    |                |                         \|/                                        |
+ * |   |    |                |          |--|timeout()   |                                         |
+ * |   |    |     post()     |          | \|/           |     post()                              |
+ * |   |    |    |---------- | --»DISPATCHED«---------- | --------------COMPLETING«-----|         |
+ * |   |    |    |           |   /|\  |                 |                 | /|\         |         |
+ * |   |    |    |    |---»- | ---|   |                 |                 |--|          |         |
+ * |   |    ^    ^    |      |        |startAsync()     |               timeout()       |         |
+ * |   |    |    |    |       \       |                 |                               |         |
+ * |   |    |    |    |        \      |                 |                               |         |
+ * |   |    |    |    |         \     |                 |                               |         |
+ * |   |    |    |    |          \    |                 |                               |         |
+ * |  \|/   |    |    |           \  \|/     post()     |                               |         |
  * | MUST_COMPLETE-«- | ----«------STARTING--»--------- | -------------|                ^         |
  * |  /|\    /|\      |  complete()   |                 |              |     complete() |         |
  * |   |      |       |               |                 |    post()    |     /----------|         |
@@ -363,6 +363,7 @@ public class AsyncStateMachine {
         if (state == AsyncState.STARTING ||
                 state == AsyncState.DISPATCHED ||
                 state == AsyncState.TIMING_OUT ||
+                state == AsyncState.MUST_COMPLETE ||
                 state == AsyncState.READ_WRITE_OP) {
             clearNonBlockingListeners();
             state = AsyncState.ERROR;
