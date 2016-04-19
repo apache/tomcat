@@ -265,6 +265,11 @@
         Add get/set method for the channel that is related to each Channel
         services. (kfujino)
       </add>
+      <add>
+        Add name to channel in order to identify channels. In tomcat cluster
+        environment, it is set the cluster name + "-Channel" as default value.
+        (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">

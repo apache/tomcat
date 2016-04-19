@@ -533,6 +533,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
             registerClusterValve();
             channel.addMembershipListener(this);
             channel.addChannelListener(this);
+            channel.setName(getClusterName() + "-Channel");
             channel.start(channelStartOptions);
             if (clusterDeployer != null) clusterDeployer.start();
             registerMember(channel.getLocalMember(false));
