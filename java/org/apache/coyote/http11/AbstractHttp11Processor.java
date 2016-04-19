@@ -890,6 +890,10 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             getOutputBuffer().finished = true;
             break;
         }
+        case ASYNC_POST_PROCESS: {
+            asyncStateMachine.asyncPostProcess();
+            break;
+        }
         case UPGRADE: {
             httpUpgradeHandler = (HttpUpgradeHandler) param;
             // Stop further HTTP output

@@ -517,6 +517,10 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
             break;
         }
+        case ASYNC_POST_PROCESS: {
+            asyncStateMachine.asyncPostProcess();
+            break;
+        }
         case UPGRADE_TOMCAT: {
             // HTTP connections only. Unsupported for AJP.
             // NOOP

@@ -220,6 +220,12 @@ public enum ActionCode {
      * Callback to trigger Tomcat's proprietary HTTP upgrade process.
      */
     UPGRADE_TOMCAT,
+
+    /**
+     * Callback to trigger post processing. Typically only used during error
+     * handling to trigger essential processing that otherwise would be skipped.
+     */
+    ASYNC_POST_PROCESS,
     
     /**
      * Callback to trigger the Servlet 3.1 based HTTP upgrade process.
