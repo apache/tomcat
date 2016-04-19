@@ -357,5 +357,16 @@ public interface Channel {
      */
     public Member getMember(Member mbr);
 
+    /**
+     * Return the name of this channel.
+     * @return channel name
+     */
+    public String getName();
+
+    /**
+     * Set the name of this channel
+     * @param name
+     */
+    public void setName(String name);
 
 }
