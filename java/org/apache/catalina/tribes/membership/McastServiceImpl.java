@@ -545,7 +545,9 @@ public class McastServiceImpl {
         int errorCounter = 0;
         public ReceiverThread() {
             super();
-            setName("Tribes-MembershipReceiver");
+            String channelName = "";
+            if (channel.getName() != null) channelName = "[" + channel.getName() + "]";
+            setName("Tribes-MembershipReceiver" + channelName);
         }
         @Override
         public void run() {
@@ -578,7 +580,9 @@ public class McastServiceImpl {
         int errorCounter=0;
         public SenderThread(long time) {
             this.time = time;
-            setName("Tribes-MembershipSender");
+            String channelName = "";
+            if (channel.getName() != null) channelName = "[" + channel.getName() + "]";
+            setName("Tribes-MembershipSender" + channelName);
 
         }
         @Override
@@ -615,8 +619,9 @@ public class McastServiceImpl {
             }
 
             Thread t = new RecoveryThread(parent);
-
-            t.setName("Tribes-MembershipRecovery");
+            String channelName = "";
+            if (parent.getChannel().getName() != null) channelName = "[" + parent.getChannel().getName() + "]";
+            t.setName("Tribes-MembershipRecovery" + channelName);
             t.setDaemon(true);
             t.start();
         }

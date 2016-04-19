@@ -270,6 +270,10 @@
         environment, it is set the cluster name + "-Channel" as default value.
         (kfujino)
       </add>
+      <add>
+        Add the channel name to the thread which is invoked by channel services
+        in order to identify the associated channel. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
