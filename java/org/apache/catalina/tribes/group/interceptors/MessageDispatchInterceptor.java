@@ -23,6 +23,7 @@ import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.UniqueId;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
+import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.transport.bio.util.FastQueue;
 import org.apache.catalina.tribes.transport.bio.util.LinkObject;
@@ -88,7 +89,11 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
     
     public void startQueue() {
         msgDispatchThread = new Thread(this);
-        msgDispatchThread.setName("MessageDispatchInterceptor.MessageDispatchThread");
+        String channelName = "";
+        if (getChannel() instanceof GroupChannel && ((GroupChannel)getChannel()).getName() != null) {
+            channelName = "[" + ((GroupChannel)getChannel()).getName() + "]";
+        }
+        msgDispatchThread.setName("MessageDispatchInterceptor.MessageDispatchThread" + channelName);
         msgDispatchThread.setDaemon(true);
         msgDispatchThread.setPriority(Thread.MAX_PRIORITY);
         queue.setEnabled(true);

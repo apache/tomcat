@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.InterceptorPayload;
 import org.apache.catalina.tribes.transport.bio.util.LinkObject;
 import org.apache.catalina.tribes.util.ExecutorFactory;
@@ -82,9 +83,13 @@ public class MessageDispatch15Interceptor extends MessageDispatchInterceptor {
     @Override
     public void startQueue() {
         if ( run ) return;
+        String channelName = "";
+        if (getChannel() instanceof GroupChannel && ((GroupChannel)getChannel()).getName() != null) {
+            channelName = "[" + ((GroupChannel)getChannel()).getName() + "]";
+        }
         executor = ExecutorFactory.newThreadPool(maxSpareThreads, maxThreads,
                 keepAliveTime, TimeUnit.MILLISECONDS,
-                new TcclThreadFactory("MessageDispatch15Interceptor.MessageDispatchThread"));
+                new TcclThreadFactory("MessageDispatch15Interceptor.MessageDispatchThread" + channelName));
         run = true;
     }
 

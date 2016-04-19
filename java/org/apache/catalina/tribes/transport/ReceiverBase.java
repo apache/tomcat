@@ -30,6 +30,7 @@ import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.ChannelReceiver;
 import org.apache.catalina.tribes.MessageListener;
+import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.io.ListenCallback;
 import org.apache.catalina.tribes.util.ExecutorFactory;
 import org.apache.juli.logging.Log;
@@ -97,7 +98,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     public void start() throws IOException {
         if ( executor == null ) {
             //executor = new ThreadPoolExecutor(minThreads,maxThreads,60,TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>());
-            TaskThreadFactory tf = new TaskThreadFactory("Tribes-Task-Receiver-");
+            String channelName = "";
+            if (channel instanceof GroupChannel && ((GroupChannel)channel).getName() != null) {
+                channelName = "[" + ((GroupChannel)channel).getName() + "]";
+            }
+            TaskThreadFactory tf = new TaskThreadFactory("Tribes-Task-Receiver" + channelName + "-");
             executor = ExecutorFactory.newThreadPool(minThreads, maxThreads, maxIdleTime, TimeUnit.MILLISECONDS, tf);
         }
     }

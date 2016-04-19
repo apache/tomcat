@@ -688,7 +688,9 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
         public HeartbeatThread(GroupChannel channel, long sleepTime) {
             super();
             this.setPriority(MIN_PRIORITY);
-            setName("GroupChannel-Heartbeat-"+inc());
+            String channelName = "";
+            if (channel.getName() != null) channelName = "[" + channel.getName() + "]";
+            setName("GroupChannel-Heartbeat" + channelName + "-" +inc());
             setDaemon(true);
             this.channel = channel;
             this.sleepTime = sleepTime;

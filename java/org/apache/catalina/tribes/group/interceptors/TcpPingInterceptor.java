@@ -26,6 +26,7 @@ import org.apache.catalina.tribes.ChannelInterceptor;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.group.ChannelInterceptorBase;
+import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
 import org.apache.juli.logging.Log;
@@ -68,7 +69,12 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
         if ( thread == null && useThread) {
             thread = new PingThread();
             thread.setDaemon(true);
-            thread.setName("TcpPingInterceptor.PingThread-"+cnt.addAndGet(1));
+            String channelName = "";
+            if (getChannel() instanceof GroupChannel
+                    && ((GroupChannel)getChannel()).getName() != null) {
+                channelName = "[" + ((GroupChannel)getChannel()).getName() + "]";
+            }
+            thread.setName("TcpPingInterceptor.PingThread" + channelName +"-"+cnt.addAndGet(1));
             thread.start();
         }
         

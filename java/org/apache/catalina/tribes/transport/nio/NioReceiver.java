@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.AbstractRxTask;
 import org.apache.catalina.tribes.transport.Constants;
@@ -108,7 +109,12 @@ public class NioReceiver extends ReceiverBase implements Runnable {
         try {
             getBind();
             bind();
-            Thread t = new Thread(this, "NioReceiver");
+            String channelName = "";
+            if (getChannel() instanceof GroupChannel
+                    && ((GroupChannel)getChannel()).getName() != null) {
+                channelName = "[" + ((GroupChannel)getChannel()).getName() + "]";
+            }
+            Thread t = new Thread(this, "NioReceiver" + channelName);
             t.setDaemon(true);
             t.start();
         } catch (Exception x) {

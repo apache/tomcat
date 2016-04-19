@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.io.ObjectReader;
 import org.apache.catalina.tribes.transport.AbstractRxTask;
 import org.apache.catalina.tribes.transport.ReceiverBase;
@@ -54,7 +55,12 @@ public class BioReceiver extends ReceiverBase implements Runnable {
         try {
             getBind();
             bind();
-            Thread t = new Thread(this, "BioReceiver");
+            String channelName = "";
+            if (getChannel() instanceof GroupChannel
+                    && ((GroupChannel)getChannel()).getName() != null) {
+                channelName = "[" + ((GroupChannel)getChannel()).getName() + "]";
+            }
+            Thread t = new Thread(this, "BioReceiver" + channelName);
             t.setDaemon(true);
             t.start();
         } catch (Exception x) {
