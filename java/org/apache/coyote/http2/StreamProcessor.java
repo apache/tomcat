@@ -316,6 +316,10 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             result.set(asyncStateMachine.asyncTimeout());
             break;
         }
+        case ASYNC_POST_PROCESS: {
+            asyncStateMachine.asyncPostProcess();
+            break;
+        }
 
         // Servlet 3.1 non-blocking I/O
         case REQUEST_BODY_FULLY_READ: {

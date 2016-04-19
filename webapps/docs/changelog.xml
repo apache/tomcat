@@ -79,6 +79,11 @@
         if an <code>Exception</code> is thrown during async processing. (markt)
       </fix>
       <fix>
+        <bug>59220</bug>: Ensure that <code>AsyncListener.onComplete()</code> is
+        called if the async request times out and the response is already
+        committed. (markt)
+      </fix>
+      <fix>
         <bug>59255</bug>: Fix possible NPE in mapper. (kkolinko/remm)
       </fix>
       <fix>
