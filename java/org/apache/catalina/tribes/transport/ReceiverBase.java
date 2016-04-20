@@ -88,7 +88,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private long maxIdleTime = 60000;
     
     private ExecutorService executor;
-    private Channel channel;
+    protected Channel channel;
 
 
     public ReceiverBase() {

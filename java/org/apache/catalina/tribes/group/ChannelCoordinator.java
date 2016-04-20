@@ -144,11 +144,11 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             if ( Channel.SND_RX_SEQ==(svc & Channel.SND_RX_SEQ) ) {
                 clusterReceiver.setMessageListener(this);
                 if (clusterReceiver instanceof ReceiverBase) {
-                    ((ReceiverBase)clusterReceiver).setChannel(getChannel());
+                    ((ReceiverBase)clusterReceiver).setChannel(channel);
                 }
                 clusterReceiver.start();
                 //synchronize, big time FIXME
-                Member localMember = getChannel().getLocalMember(false);
+                Member localMember = channel.getLocalMember(false);
                 if (localMember instanceof StaticMember) {
                     // static member
                     StaticMember staticMember = (StaticMember)localMember;
@@ -167,7 +167,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             }
             if ( Channel.SND_TX_SEQ==(svc & Channel.SND_TX_SEQ) ) {
                 if (clusterSender instanceof ReplicationTransmitter) {
-                    ((ReplicationTransmitter)clusterSender).setChannel(getChannel());
+                    ((ReplicationTransmitter)clusterSender).setChannel(channel);
                 }
                 valid = true;
                 clusterSender.start();
@@ -177,14 +177,14 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 membershipService.setMembershipListener(this);
                 if (membershipService instanceof McastService) {
                     ((McastService)membershipService).setMessageListener(this);
-                    ((McastService)membershipService).setChannel(getChannel());
+                    ((McastService)membershipService).setChannel(channel);
                 }
                 membershipService.start(MembershipService.MBR_RX);
                 valid = true;
             }
             if ( Channel.MBR_TX_SEQ==(svc & Channel.MBR_TX_SEQ) ) {
                 if (membershipService instanceof McastService) {
-                    ((McastService)membershipService).setChannel(getChannel());
+                    ((McastService)membershipService).setChannel(channel);
                 }
                 membershipService.start(MembershipService.MBR_TX);
                 valid = true;
