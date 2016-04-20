@@ -151,10 +151,10 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             //listens to with the local membership settings
             if ( Channel.SND_RX_SEQ==(svc & Channel.SND_RX_SEQ) ) {
                 clusterReceiver.setMessageListener(this);
-                clusterReceiver.setChannel(getChannel());
+                clusterReceiver.setChannel(channel);
                 clusterReceiver.start();
                 //synchronize, big time FIXME
-                Member localMember = getChannel().getLocalMember(false);
+                Member localMember = channel.getLocalMember(false);
                 if (localMember instanceof StaticMember) {
                     // static member
                     StaticMember staticMember = (StaticMember)localMember;
@@ -171,14 +171,14 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 valid = true;
             }
             if ( Channel.SND_TX_SEQ==(svc & Channel.SND_TX_SEQ) ) {
-                clusterSender.setChannel(getChannel());
+                clusterSender.setChannel(channel);
                 clusterSender.start();
                 valid = true;
             }
 
             if ( Channel.MBR_RX_SEQ==(svc & Channel.MBR_RX_SEQ) ) {
                 membershipService.setMembershipListener(this);
-                membershipService.setChannel(getChannel());
+                membershipService.setChannel(channel);
                 if (membershipService instanceof McastService) {
                     ((McastService)membershipService).setMessageListener(this);
                 }
@@ -186,7 +186,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 valid = true;
             }
             if ( Channel.MBR_TX_SEQ==(svc & Channel.MBR_TX_SEQ) ) {
-                membershipService.setChannel(getChannel());
+                membershipService.setChannel(channel);
                 membershipService.start(MembershipService.MBR_TX);
                 valid = true;
             }
