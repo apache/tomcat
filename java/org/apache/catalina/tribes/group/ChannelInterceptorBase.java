@@ -29,7 +29,7 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
 
     private ChannelInterceptor next;
     private ChannelInterceptor previous;
-    private Channel channel;
+    protected Channel channel;
     //default value, always process
     protected int optionFlag = 0;
 

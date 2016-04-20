@@ -155,7 +155,7 @@ public class McastServiceImpl {
      */
     protected final boolean localLoopbackDisabled;
 
-    private Channel channel;
+    protected Channel channel;
 
     /**
      * Create a new mcast service instance.
@@ -620,7 +620,7 @@ public class McastServiceImpl {
 
             Thread t = new RecoveryThread(parent);
             String channelName = "";
-            if (parent.getChannel().getName() != null) channelName = "[" + parent.getChannel().getName() + "]";
+            if (parent.channel.getName() != null) channelName = "[" + parent.channel.getName() + "]";
             t.setName("Tribes-MembershipRecovery" + channelName);
             t.setDaemon(true);
             t.start();

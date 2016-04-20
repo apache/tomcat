@@ -54,7 +54,7 @@ public class BioReceiver extends ReceiverBase implements Runnable {
             getBind();
             bind();
             String channelName = "";
-            if (getChannel().getName() != null) channelName = "[" + getChannel().getName() + "]";
+            if (channel.getName() != null) channelName = "[" + channel.getName() + "]";
             Thread t = new Thread(this, "BioReceiver" + channelName);
             t.setDaemon(true);
             t.start();
