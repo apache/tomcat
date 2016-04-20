@@ -67,6 +67,12 @@ public class RequestUtil {
         if (!normalized.startsWith("/"))
             normalized = "/" + normalized;
 
+        boolean addedTrailingSlash = false;
+        if (normalized.endsWith("/.") || normalized.endsWith("/..")) {
+            normalized = normalized + "/";
+            addedTrailingSlash = true;
+        }
+
         // Resolve occurrences of "//" in the normalized path
         while (true) {
             int index = normalized.indexOf("//");
@@ -98,12 +104,10 @@ public class RequestUtil {
             normalized = normalized.substring(0, index2) + normalized.substring(index + 3);
         }
 
-        if (normalized.equals("/.")) {
-            return "/";
-        }
-
-        if (normalized.equals("/..")) {
-            return null;  // Trying to go outside our context
+        if (normalized.length() > 1 && addedTrailingSlash) {
+            // Remove the trailing '/' we added to that input and output are
+            // consistent w.r.t. to the presence of the trailing '/'.
+            normalized = normalized.substring(0, normalized.length() - 1);
         }
 
         // Return the normalized path that we have completed
