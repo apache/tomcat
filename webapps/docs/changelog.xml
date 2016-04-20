@@ -154,6 +154,12 @@
         custom responses to <code>HEAD</code> requests that do not set a
         <code>Content-Length</code> value. (markt)
       </fix>
+      <fix>
+        When normalizing paths, improve the handling when paths end with
+        <code>/.</code> or <code>/..</code> and ensure that input and output are
+        consistent with respect to whether or not they end with <code>/</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
