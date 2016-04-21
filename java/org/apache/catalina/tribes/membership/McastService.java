@@ -374,7 +374,11 @@ public class McastService implements MembershipService,MembershipListener,Messag
     @Override
     public void stop(int svc) {
         try  {
-            if ( impl != null && impl.stop(svc) ) impl = null;
+            if ( impl != null && impl.stop(svc) ) {
+                impl.setChannel(null);
+                impl = null;
+                channel = null;
+            }
         } catch ( Exception x)  {
             log.error(sm.getString(
                     "McastService.stopFail", Integer.valueOf(svc)), x);
