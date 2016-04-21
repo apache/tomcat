@@ -134,13 +134,11 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
      */
     @Override
     public void addInterceptor(ChannelInterceptor interceptor) {
-        interceptor.setChannel(this);
         if ( interceptors == null ) {
             interceptors = interceptor;
             interceptors.setNext(coordinator);
             interceptors.setPrevious(null);
             coordinator.setPrevious(interceptors);
-            coordinator.setChannel(this);
         } else {
             ChannelInterceptor last = interceptors;
             while ( last.getNext() != coordinator ) {
@@ -381,6 +379,12 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
                 ((getFirstInterceptor().getNext() instanceof ChannelCoordinator))) {
             addInterceptor(new MessageDispatchInterceptor());
         }
+        Iterator<ChannelInterceptor> interceptors = getInterceptors();
+        while (interceptors.hasNext()) {
+            ChannelInterceptor channelInterceptor = interceptors.next();
+            channelInterceptor.setChannel(this);
+        }
+        coordinator.setChannel(this);
     }
 
     /**
