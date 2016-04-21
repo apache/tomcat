@@ -107,7 +107,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * getMessageListener
      *
      * @return MessageListener
-     * TODO Implement this org.apache.catalina.tribes.ChannelReceiver method
      */
     @Override
     public MessageListener getMessageListener() {
@@ -117,7 +116,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     /**
      *
      * @return The port
-     * TODO Implement this org.apache.catalina.tribes.ChannelReceiver method
      */
     @Override
     public int getPort() {
@@ -136,7 +134,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
      * setMessageListener
      *
      * @param listener MessageListener
-     * TODO Implement this org.apache.catalina.tribes.ChannelReceiver method
      */
     @Override
     public void setMessageListener(MessageListener listener) {
