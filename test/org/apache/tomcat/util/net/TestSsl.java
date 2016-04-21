@@ -61,7 +61,7 @@ public class TestSsl extends TomcatBaseTest {
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
             "/examples/servlets/servlet/HelloWorldExample");
-        assertTrue(res.toString().indexOf("<h1>Hello World!</h1>") > 0);
+        assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
     }
 
     @Test
@@ -79,7 +79,7 @@ public class TestSsl extends TomcatBaseTest {
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
             "/examples/servlets/servlet/HelloWorldExample");
-        assertTrue(res.toString().indexOf("<h1>Hello World!</h1>") > 0);
+        assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
     }
 
 
