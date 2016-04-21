@@ -84,8 +84,9 @@ public class MessageDispatch15Interceptor extends MessageDispatchInterceptor {
     public void startQueue() {
         if ( run ) return;
         String channelName = "";
-        if (channel instanceof GroupChannel && ((GroupChannel)channel).getName() != null) {
-            channelName = "[" + ((GroupChannel)channel).getName() + "]";
+        if (getChannel() instanceof GroupChannel
+                && ((GroupChannel)getChannel()).getName() != null) {
+            channelName = "[" + ((GroupChannel)getChannel()).getName() + "]";
         }
         executor = ExecutorFactory.newThreadPool(maxSpareThreads, maxThreads,
                 keepAliveTime, TimeUnit.MILLISECONDS,

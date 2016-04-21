@@ -110,8 +110,9 @@ public class NioReceiver extends ReceiverBase implements Runnable {
             getBind();
             bind();
             String channelName = "";
-            if (channel instanceof GroupChannel && ((GroupChannel)channel).getName() != null) {
-                channelName = "[" + ((GroupChannel)channel).getName() + "]";
+            if (getChannel() instanceof GroupChannel
+                    && ((GroupChannel)getChannel()).getName() != null) {
+                channelName = "[" + ((GroupChannel)getChannel()).getName() + "]";
             }
             Thread t = new Thread(this, "NioReceiver" + channelName);
             t.setDaemon(true);

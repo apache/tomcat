@@ -90,8 +90,9 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
     public void startQueue() {
         msgDispatchThread = new Thread(this);
         String channelName = "";
-        if (channel instanceof GroupChannel && ((GroupChannel)channel).getName() != null) {
-            channelName = "[" + ((GroupChannel)channel).getName() + "]";
+        if (getChannel() instanceof GroupChannel
+                && ((GroupChannel)getChannel()).getName() != null) {
+            channelName = "[" + ((GroupChannel)getChannel()).getName() + "]";
         }
         msgDispatchThread.setName("MessageDispatchInterceptor.MessageDispatchThread" + channelName);
         msgDispatchThread.setDaemon(true);

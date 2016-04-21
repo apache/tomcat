@@ -56,8 +56,9 @@ public class BioReceiver extends ReceiverBase implements Runnable {
             getBind();
             bind();
             String channelName = "";
-            if (channel instanceof GroupChannel && ((GroupChannel)channel).getName() != null) {
-                channelName = "[" + ((GroupChannel)channel).getName() + "]";
+            if (getChannel() instanceof GroupChannel
+                    && ((GroupChannel)getChannel()).getName() != null) {
+                channelName = "[" + ((GroupChannel)getChannel()).getName() + "]";
             }
             Thread t = new Thread(this, "BioReceiver" + channelName);
             t.setDaemon(true);

@@ -34,7 +34,7 @@ import org.apache.catalina.tribes.util.StringManager;
  */
 public class ReplicationTransmitter implements ChannelSender {
 
-    protected Channel channel;
+    private Channel channel;
 
     /**
      * The descriptive information about this implementation.

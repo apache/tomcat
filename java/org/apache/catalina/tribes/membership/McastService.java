@@ -84,7 +84,7 @@ public class McastService implements MembershipService,MembershipListener,Messag
 
     protected byte[] domain;
 
-    protected Channel channel;
+    private Channel channel;
 
     /**
      * Create a membership service.
