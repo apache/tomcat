@@ -100,6 +100,7 @@ public class ReplicationTransmitter implements ChannelSender {
     @Override
     public synchronized void stop() {
         getTransport().disconnect();
+        channel = null;
     }
 
     /**

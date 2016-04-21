@@ -111,6 +111,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     public void stop() {
         if ( executor != null ) executor.shutdownNow();//ignore left overs
         executor = null;
+        channel = null;
     }
 
     /**

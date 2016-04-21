@@ -137,6 +137,10 @@
         Add the channel name to the thread which is invoked by channel services
         in order to identify the associated channel. (kfujino)
       </add>
+      <fix>
+        Ensure that clear the channel instance from channel services when
+        stopping channel. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

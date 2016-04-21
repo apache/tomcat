@@ -176,6 +176,7 @@ public abstract class ChannelInterceptorBase implements ChannelInterceptor {
     @Override
     public void stop(int svc) throws ChannelException {
         if (getNext() != null) getNext().stop(svc);
+        channel = null;
     }
     
     @Override
