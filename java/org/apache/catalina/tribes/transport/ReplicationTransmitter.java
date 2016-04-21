@@ -30,7 +30,7 @@ import org.apache.catalina.tribes.transport.nio.PooledParallelSender;
  */
 public class ReplicationTransmitter implements ChannelSender {
 
-    protected Channel channel;
+    private Channel channel;
 
     public ReplicationTransmitter() {
     }

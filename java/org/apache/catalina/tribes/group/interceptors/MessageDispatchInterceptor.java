@@ -111,7 +111,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase {
             return;
         }
         String channelName = "";
-        if (channel.getName() != null) channelName = "[" + channel.getName() + "]";
+        if (getChannel().getName() != null) channelName = "[" + getChannel().getName() + "]";
         executor = ExecutorFactory.newThreadPool(maxSpareThreads, maxThreads, keepAliveTime,
                 TimeUnit.MILLISECONDS,
                 new TcclThreadFactory("MessageDispatchInterceptor.MessageDispatchThread" + channelName));

@@ -155,7 +155,7 @@ public class McastServiceImpl {
      */
     protected final boolean localLoopbackDisabled;
 
-    protected Channel channel;
+    private Channel channel;
 
     /**
      * Create a new mcast service instance.
