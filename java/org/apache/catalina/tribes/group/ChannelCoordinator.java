@@ -151,10 +151,10 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             //listens to with the local membership settings
             if ( Channel.SND_RX_SEQ==(svc & Channel.SND_RX_SEQ) ) {
                 clusterReceiver.setMessageListener(this);
-                clusterReceiver.setChannel(channel);
+                clusterReceiver.setChannel(getChannel());
                 clusterReceiver.start();
                 //synchronize, big time FIXME
-                Member localMember = channel.getLocalMember(false);
+                Member localMember = getChannel().getLocalMember(false);
                 if (localMember instanceof StaticMember) {
                     // static member
                     StaticMember staticMember = (StaticMember)localMember;
@@ -171,14 +171,14 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 valid = true;
             }
             if ( Channel.SND_TX_SEQ==(svc & Channel.SND_TX_SEQ) ) {
-                clusterSender.setChannel(channel);
+                clusterSender.setChannel(getChannel());
                 clusterSender.start();
                 valid = true;
             }
 
             if ( Channel.MBR_RX_SEQ==(svc & Channel.MBR_RX_SEQ) ) {
                 membershipService.setMembershipListener(this);
-                membershipService.setChannel(channel);
+                membershipService.setChannel(getChannel());
                 if (membershipService instanceof McastService) {
                     ((McastService)membershipService).setMessageListener(this);
                 }
@@ -186,7 +186,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 valid = true;
             }
             if ( Channel.MBR_TX_SEQ==(svc & Channel.MBR_TX_SEQ) ) {
-                membershipService.setChannel(channel);
+                membershipService.setChannel(getChannel());
                 membershipService.start(MembershipService.MBR_TX);
                 valid = true;
             }
@@ -247,7 +247,7 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             }
 
             startLevel = (startLevel & (~svc));
-            channel = null;
+            setChannel(null);
         } catch (Exception x) {
             throw new ChannelException(x);
         }
