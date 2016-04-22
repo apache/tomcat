@@ -104,7 +104,7 @@ public class ErrorReportValve extends ValveBase {
             // CoyoteAdapter will trigger the necessary processing. It is only
             // necessary to trigger it here if async is starting (i.e. this is
             // the post-processing of the service() method)
-            if (throwable != null && request.isAsyncDispatching()) {
+            if (throwable != null && request.isAsyncStarting()) {
                 request.getAsyncContextInternal().setErrorState(throwable, true);
             }
             return;
