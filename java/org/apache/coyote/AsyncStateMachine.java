@@ -172,6 +172,10 @@ public class AsyncStateMachine<S> {
         return state.isDispatching();
     }
 
+    public boolean isAsyncStarting() {
+        return state == AsyncState.STARTING;
+    }
+
     public boolean isAsyncStarted() {
         return state.isStarted();
     }

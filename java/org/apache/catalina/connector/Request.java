@@ -1678,6 +1678,16 @@ public class Request
         return asyncContext;
     }
 
+    public boolean isAsyncStarting() {
+        if (asyncContext == null) {
+            return false;
+        }
+
+        AtomicBoolean result = new AtomicBoolean(false);
+        coyoteRequest.action(ActionCode.ASYNC_IS_STARTING, result);
+        return result.get();
+    }
+
     @Override
     public boolean isAsyncStarted() {
         if (asyncContext == null) {
