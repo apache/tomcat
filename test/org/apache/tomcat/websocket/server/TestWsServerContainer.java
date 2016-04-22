@@ -36,14 +36,14 @@ import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.unittest.TesterServletContext;
 import org.apache.tomcat.websocket.TesterEchoServer;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
+import org.apache.tomcat.websocket.WebSocketBaseTest;
 import org.apache.tomcat.websocket.pojo.TesterUtil.SimpleClient;
 
 
-public class TestWsServerContainer extends TomcatBaseTest {
+public class TestWsServerContainer extends WebSocketBaseTest {
 
     @Test
     public void testBug54807() throws Exception {

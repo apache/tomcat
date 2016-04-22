@@ -37,9 +37,9 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.websocket.WebSocketBaseTest;
 
-public class TestCloseBug58264 extends TomcatBaseTest {
+public class TestCloseBug58264 extends WebSocketBaseTest {
 
     @Test
     public void testOnErrorNotCalledWhenClosingConnection() throws Throwable {

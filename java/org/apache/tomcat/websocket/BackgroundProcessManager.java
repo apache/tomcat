@@ -108,6 +108,17 @@ public class BackgroundProcessManager {
     }
 
 
+    void shutdown() {
+        synchronized (processesLock) {
+            processes.clear();
+            if (wsBackgroundThread != null) {
+                wsBackgroundThread.halt();
+                wsBackgroundThread = null;
+            }
+        }
+    }
+
+
     private static class WsBackgroundThread extends Thread {
 
         private final BackgroundProcessManager manager;
