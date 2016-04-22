@@ -365,7 +365,7 @@ public interface Channel {
 
     /**
      * Set the name of this channel
-     * @param name
+     * @param name The new channel name
      */
     public void setName(String name);
 
