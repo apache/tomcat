@@ -41,5 +41,8 @@ public abstract class WebSocketBaseTest extends TomcatBaseTest {
         }
 
         Assert.assertEquals(0, BackgroundProcessManager.getInstance().getProcessCount());
+
+        // Ensure the next test is not affected
+        BackgroundProcessManager.getInstance().shutdown();
     }
 }

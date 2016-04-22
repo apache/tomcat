@@ -42,14 +42,14 @@ import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.websocket.WebSocketBaseTest;
 
 /**
  * Test the behavior of closing websockets under various conditions.
  */
-public class TestClose extends TomcatBaseTest {
+public class TestClose extends WebSocketBaseTest {
 
     private static Log log = LogFactory.getLog(TestClose.class);
 
