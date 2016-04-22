@@ -35,12 +35,12 @@ import org.apache.catalina.Context;
 import org.apache.catalina.loader.WebappClassLoaderBase;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.websocket.WebSocketBaseTest;
 
 /**
  * Tests endpoint methods are called with the correct class loader.
  */
-public class TestClassLoader extends TomcatBaseTest {
+public class TestClassLoader extends WebSocketBaseTest {
 
     private static final String PASS = "PASS";
     private static final String FAIL = "FAIL";

@@ -37,15 +37,15 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
+import org.apache.tomcat.websocket.WebSocketBaseTest;
 
 /**
  * Tests inspired by https://bz.apache.org/bugzilla/show_bug.cgi?id=58835 to
  * check that WebSocket connections are closed gracefully on Tomcat shutdown.
  */
-public class TestShutdown extends TomcatBaseTest {
+public class TestShutdown extends WebSocketBaseTest {
 
     @Test
     public void testShutdownBufferedMessages() throws Exception {
