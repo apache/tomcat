@@ -105,7 +105,7 @@ public class TestMapperWebapps extends TomcatBaseTest{
         res = getUrl("http://localhost:" + getPort()
                 + "/examples/servlets/servlet/HelloWorldExample");
         text = res.toString();
-        Assert.assertTrue(text, text.contains("<h1>Hello World!</h1>"));
+        Assert.assertTrue(text, text.contains("<a href=\"../helloworld.html\">"));
 
         res = getUrl("http://localhost:" + getPort()
                 + "/examples/jsp/jsp2/el/basic-arithmetic.jsp");
@@ -139,7 +139,7 @@ public class TestMapperWebapps extends TomcatBaseTest{
         res = getUrl("http://localhost:" + getPort()
                 + "/examples/servlets/servlet/HelloWorldExample");
         text = res.toString();
-        Assert.assertTrue(text, text.contains("<h1>Hello World!</h1>"));
+        Assert.assertTrue(text, text.contains("<a href=\"../helloworld.html\">"));
 
         res = getUrl("http://localhost:" + getPort()
                 + "/examples/jsp/jsp2/el/basic-arithmetic.jsp");

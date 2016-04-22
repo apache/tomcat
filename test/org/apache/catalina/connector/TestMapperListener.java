@@ -55,7 +55,7 @@ public class TestMapperListener extends TomcatBaseTest {
         res = getUrl("http://localhost:" + getPort()
                 + "/examples/servlets/servlet/HelloWorldExample");
         text = res.toString();
-        Assert.assertTrue(text, text.contains("<h1>Hello World!</h1>"));
+        Assert.assertTrue(text, text.contains("<a href=\"../helloworld.html\">"));
 
         List<ListenersInfo> listenersFirst = new ArrayList<ListenersInfo>();
         populateListenersInfo(listenersFirst, tomcat.getEngine());
@@ -66,7 +66,7 @@ public class TestMapperListener extends TomcatBaseTest {
         res = getUrl("http://localhost:" + getPort()
                 + "/examples/servlets/servlet/HelloWorldExample");
         text = res.toString();
-        Assert.assertTrue(text, text.contains("<h1>Hello World!</h1>"));
+        Assert.assertTrue(text, text.contains("<a href=\"../helloworld.html\">"));
 
         List<ListenersInfo> listenersSecond = new ArrayList<ListenersInfo>();
         populateListenersInfo(listenersSecond, tomcat.getEngine());

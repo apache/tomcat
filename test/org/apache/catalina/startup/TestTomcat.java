@@ -273,7 +273,7 @@ public class TestTomcat extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/examples/servlets/servlet/HelloWorldExample");
         String text = res.toString();
-        assertTrue(text, text.indexOf("<h1>Hello World!</h1>") > 0);
+        assertTrue(text, text.indexOf("<a href=\"../helloworld.html\">") > 0);
     }
 
     @Test
