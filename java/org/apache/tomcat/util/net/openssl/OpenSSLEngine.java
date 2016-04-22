@@ -217,7 +217,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     /**
-     * Write plaintext data to the OpenSSL internal BIO
+     * Write plain text data to the OpenSSL internal BIO
      *
      * Calling this function with src.remaining == 0 is undefined.
      */
@@ -298,7 +298,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     /**
-     * Read plaintext data from the OpenSSL internal BIO
+     * Read plain text data from the OpenSSL internal BIO
      */
     private int readPlaintextData(final ByteBuffer dst) {
         if (dst.isDirect()) {
@@ -379,19 +379,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
 
         // Throw required runtime exceptions
-        if (srcs == null) {
+        if (srcs == null || dst == null) {
             throw new IllegalArgumentException(sm.getString("engine.nullBuffer"));
         }
-        if (dst == null) {
-            throw new IllegalArgumentException(sm.getString("engine.nullBuffer"));
-        }
-
         if (offset >= srcs.length || offset + length > srcs.length) {
             throw new IndexOutOfBoundsException(sm.getString("engine.invalidBufferArray",
                     Integer.toString(offset), Integer.toString(length),
                     Integer.toString(srcs.length)));
         }
-
         if (dst.isReadOnly()) {
             throw new ReadOnlyBufferException();
         }
@@ -415,7 +410,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         // Check for pending data in the network BIO
         pendingNet = SSL.pendingWrittenBytesInBIO(networkBIO);
         if (pendingNet > 0) {
-            // Do we have enough room in dst to write encrypted data?
+            // Do we have enough room in destination to write encrypted data?
             int capacity = dst.remaining();
             if (capacity < pendingNet) {
                 return new SSLEngineResult(SSLEngineResult.Status.BUFFER_OVERFLOW, handshakeStatus, 0, 0);
@@ -448,7 +443,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
             while (src.hasRemaining()) {
 
-                // Write plaintext application data to the SSL engine
+                // Write plain text application data to the SSL engine
                 try {
                     bytesConsumed += writePlaintextData(src);
                 } catch (Exception e) {
@@ -486,11 +481,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return new SSLEngineResult(SSLEngineResult.Status.CLOSED, SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING, 0, 0);
         }
 
-        // Throw requried runtime exceptions
-        if (src == null) {
-            throw new IllegalArgumentException(sm.getString("engine.nullBuffer"));
-        }
-        if (dsts == null) {
+        // Throw required runtime exceptions
+        if (src == null || dsts == null) {
             throw new IllegalArgumentException(sm.getString("engine.nullBuffer"));
         }
         if (offset >= dsts.length || offset + length > dsts.length) {
@@ -498,7 +490,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     Integer.toString(offset), Integer.toString(length),
                     Integer.toString(dsts.length)));
         }
-
         int capacity = 0;
         final int endOffset = offset + length;
         for (int i = offset; i < endOffset; i++) {
@@ -744,7 +735,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     @Override
     public String[] getEnabledProtocols() {
         List<String> enabled = new ArrayList<>();
-        // Seems like there is no way to explict disable SSLv2Hello in openssl so it is always enabled
+        // Seems like there is no way to explicitly disable SSLv2Hello in OpenSSL so it is always enabled
         enabled.add(Constants.SSL_PROTO_SSLv2Hello);
         int opts = SSL.getOptions(ssl);
         if ((opts & SSL.SSL_OP_NO_TLSv1) == 0) {
@@ -1066,7 +1057,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         @Override
         public long getCreationTime() {
-            // We need ot multiple by 1000 as openssl uses seconds and we need milli-seconds.
+            // We need to multiply by 1000 as OpenSSL uses seconds and we need milliseconds.
             return SSL.getTime(ssl) * 1000L;
         }
 
