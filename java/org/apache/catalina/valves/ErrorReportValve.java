@@ -124,13 +124,6 @@ public class ErrorReportValve extends ValveBase {
         // If an async request is in progress and is not going to end once this
         // container thread finishes, do not process any error page here.
         if (request.isAsync() && !request.isAsyncCompleting()) {
-            // If an async dispatch is in progress the error handling in the
-            // CoyoteAdapter will trigger the necessary processing. It is only
-            // necessary to trigger it here if async is starting (i.e. this is
-            // the post-processing of the service() method)
-            if (throwable != null && request.isAsyncStarting()) {
-                request.getAsyncContextInternal().setErrorState(throwable, true);
-            }
             return;
         }
 

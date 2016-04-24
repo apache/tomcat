@@ -192,11 +192,6 @@ public enum ActionCode {
     ASYNC_IS_ASYNC,
     
     /**
-     * Callback to determine if async processing is starting.
-     */
-    ASYNC_IS_STARTING,
-
-    /**
      * Callback to determine if async dispatch is in progress.
      */
     ASYNC_IS_STARTED,
