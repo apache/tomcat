@@ -876,10 +876,6 @@ public class Http11Processor extends AbstractProcessor {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
             break;
         }
-        case ASYNC_IS_STARTING: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarting());
-            break;
-        }
         case ASYNC_IS_STARTED: {
             ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarted());
             break;

@@ -364,6 +364,16 @@ public class CoyoteAdapter implements Adapter {
                         request.getContext().unbind(false, oldCL);
                     }
                 }
+
+                Throwable throwable =
+                        (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+
+                // If an async request was started, is not going to end once
+                // this container thread finishes and an error occurred, trigger
+                // the async error process
+                if (!request.isAsyncCompleting() && throwable != null) {
+                    request.getAsyncContextInternal().setErrorState(throwable, true);
+                }
             } else {
                 request.finishRequest();
                 response.finishResponse();

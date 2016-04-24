@@ -1821,6 +1821,76 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         }
     }
 
+
+    @Test
+    public void testBug59219a() throws Exception{
+        doTestBug59219("", "doGet-onError-onComplete-");
+    }
+
+
+    @Test
+    public void testBug59219b() throws Exception{
+        doTestBug59219("?loops=3", "doGet-doGet-onStartAsync-doGet-onStartAsync-onError-onComplete-");
+    }
+
+
+    private void doTestBug59219(String queryString, String expectedTrack) throws Exception {
+        resetTracker();
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctx = tomcat.addContext("", null);
+        Wrapper w = tomcat.addServlet("", "async", new Bug59219Servlet());
+        w.setAsyncSupported(true);
+        ctx.addServletMapping("/async", "async");
+
+        tomcat.start();
+
+        getUrl("http://localhost:" + getPort() + "/async" + queryString);
+
+        // Wait up to 5s for the response
+        int count = 0;
+        while(!expectedTrack.equals(getTrack()) && count < 100) {
+            Thread.sleep(50);
+            count++;
+        }
+
+        Assert.assertEquals(expectedTrack, getTrack());
+    }
+
+
+    private static class Bug59219Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            track("doGet-");
+            AsyncContext ctx = req.startAsync();
+            ctx.setTimeout(3000);
+            ctx.addListener(new TrackingListener(true, false, "/async"));
+
+            String loopsParam = req.getParameter("loops");
+            Integer loopsAttr = (Integer) req.getAttribute("loops");
+
+            int loops = 0;
+            if (loopsAttr != null) {
+                loops = loopsAttr.intValue();
+            } else if (loopsParam != null) {
+                loops = Integer.parseInt(loopsParam);
+            }
+
+            if (loops > 1) {
+                loops--;
+                req.setAttribute("loops", Integer.valueOf(loops));
+                ctx.dispatch();
+            } else
+                throw new ServletException();
+        }
+
+    }
+
     @Test
     public void testForbiddenDispatching() throws Exception {
         resetTracker();
