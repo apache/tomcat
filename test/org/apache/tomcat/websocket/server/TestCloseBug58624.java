@@ -17,6 +17,7 @@
 package org.apache.tomcat.websocket.server;
 
 import java.net.URI;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletContextEvent;
 import javax.websocket.ClientEndpoint;
@@ -32,6 +33,7 @@ import javax.websocket.WebSocketContainer;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -59,6 +61,17 @@ public class TestCloseBug58624 extends WebSocketBaseTest {
 
         Session session = wsContainer.connectToServer(client, uri);
         session.close();
+
+        // Wait for session to close on the server
+        int count = 0;
+        while (count < 50 && Bug58624ServerEndpoint.getOpenSessionCount() > 0) {
+            count++;
+            Thread.sleep(100);
+        }
+        Assert.assertEquals(0,  Bug58624ServerEndpoint.getOpenSessionCount());
+
+        // Ensure no errors were reported on the server
+        Assert.assertEquals(0,  Bug58624ServerEndpoint.getErrorCount());
 
         if (client.getError() != null) {
             throw client.getError();
@@ -107,9 +120,20 @@ public class TestCloseBug58624 extends WebSocketBaseTest {
 
     public static class Bug58624ServerEndpoint {
 
+        private static AtomicInteger openSessionCount = new AtomicInteger(0);
+        private static AtomicInteger errorCount = new AtomicInteger(0);
+
+        public static int getOpenSessionCount() {
+            return openSessionCount.get();
+        }
+
+        public static int getErrorCount() {
+            return errorCount.get();
+        }
+
         @OnOpen
         public void onOpen() {
-            System.out.println("Session opened");
+            openSessionCount.incrementAndGet();
         }
 
 
@@ -121,14 +145,14 @@ public class TestCloseBug58624 extends WebSocketBaseTest {
 
         @OnError
         public void onError(Throwable t) {
-            System.out.println("HERE");
+            errorCount.incrementAndGet();
             t.printStackTrace();
         }
 
 
         @OnClose
-        public void onClose(CloseReason cr) {
-            System.out.println("Session closed: " + cr);
+        public void onClose(@SuppressWarnings("unused") CloseReason cr) {
+            openSessionCount.decrementAndGet();
         }
     }
 }
