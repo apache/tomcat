@@ -32,7 +32,8 @@ public abstract class WebSocketBaseTest extends TomcatBaseTest {
         // environments it will continue to run and break other tests that check
         // it has stopped.
         int count = 0;
-        while (count < 50) {
+        // 5s should be plenty here but Gump can be a lot slower so allow 60s.
+        while (count < 600) {
             if (BackgroundProcessManager.getInstance().getProcessCount() == 0) {
                 break;
             }
