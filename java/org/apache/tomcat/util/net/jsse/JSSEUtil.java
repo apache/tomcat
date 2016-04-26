@@ -287,10 +287,9 @@ public class JSSEUtil extends SSLUtilBase {
             ks = KeyStore.getInstance("JKS");
             ks.load(null, null);
 
-            if (certificate.getCertificateKeyFile() == null) {
-                throw new IllegalStateException(sm.getString("jsse.noPrivateKey"));
-            }
-            PEMFile privateKeyFile = new PEMFile(SSLHostConfig.adjustRelativePath(certificate.getCertificateKeyFile()), keyPass);
+            PEMFile privateKeyFile = new PEMFile(SSLHostConfig.adjustRelativePath
+                    (certificate.getCertificateKeyFile() != null ? certificate.getCertificateKeyFile() : certificate.getCertificateFile()),
+                    keyPass);
             PEMFile certificateFile = new PEMFile(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()));
 
             Collection<Certificate> chain = new ArrayList<>();
