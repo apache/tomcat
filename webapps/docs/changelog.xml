@@ -202,6 +202,11 @@
         <bug>59295</bug>: Add support for using pem encoded certificates with
         JSSE SSL. Submitted by Emmanuel Bourg with additional tweaks. (remm)
       </update>
+      <fix>
+        Make the TLS certificate chain available to clients when using
+        JSSE+OpenSSL with the certificate chain stored in a Java KeyStore.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
