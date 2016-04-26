@@ -239,6 +239,8 @@ public class SSLHostConfigCertificate {
         }
     }
 
-    private static enum StoreType { KEYSTORE, PEM };
-
+    private static enum StoreType {
+        KEYSTORE,
+        PEM
+    }
 }
