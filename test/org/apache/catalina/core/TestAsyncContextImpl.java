@@ -18,6 +18,8 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -60,6 +62,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.easymock.EasyMock;
 
 public class TestAsyncContextImpl extends TomcatBaseTest {
@@ -2219,6 +2222,47 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testAsyncRequestURI() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        Servlet servlet = new AsyncRequestUriServlet();
+        Wrapper wrapper1 = Tomcat.addServlet(ctx, "bug57559", servlet);
+        wrapper1.setAsyncSupported(true);
+        ctx.addServletMapping("/", "bug57559");
+
+        tomcat.start();
+
+        String uri = "/foo/%24/bar";
+
+        ByteChunk body = getUrl("http://localhost:" + getPort()+ uri);
+
+        Assert.assertEquals(uri, body.toString());
+    }
+
+    private static class AsyncRequestUriServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            if (DispatcherType.ASYNC.equals(req.getDispatcherType())) {
+                resp.setContentType("text/plain");
+                resp.setCharacterEncoding("UTF-8");
+                resp.getWriter().write(req.getRequestURI());
+            } else {
+                req.startAsync().dispatch();
+            }
+        }
+    }
+
+
     /*
      * See https://bz.apache.org/bugzilla/show_bug.cgi?id=58751 comment 1
      */
@@ -2340,5 +2384,118 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         ac.fireOnComplete();
 
         EasyMock.verify(context, loader);
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=59317
+     */
+    @Test
+    public void testAsyncDispatchUrlWithSpaces() throws Exception {
+        doTestDispatchWithSpaces(true);
+    }
+
+
+    @Test
+    public void testForwardDispatchUrlWithSpaces() throws Exception {
+        doTestDispatchWithSpaces(false);
+    }
+
+
+    private void doTestDispatchWithSpaces(boolean async) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context context = tomcat.addContext("", null);
+        if (async) {
+            Servlet s = new AsyncDispatchUrlWithSpacesServlet();
+            Wrapper w = Tomcat.addServlet(context, "space", s);
+            w.setAsyncSupported(true);
+        } else {
+            Tomcat.addServlet(context, "space", new ForwardDispatchUrlWithSpacesServlet());
+        }
+        context.addServletMapping("/space/*", "space");
+        tomcat.start();
+
+        ByteChunk responseBody = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/sp%61ce/foo%20bar", responseBody, null);
+
+        Assert.assertEquals(200, rc);
+    }
+
+
+    private static class AsyncDispatchUrlWithSpacesServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            Integer countObj = (Integer) req.getAttribute("count");
+            int count = 0;
+            if (countObj != null) {
+                count = countObj.intValue();
+            }
+            count++;
+            req.setAttribute("count", Integer.valueOf(count));
+
+            String encodedUri = req.getRequestURI();
+            UDecoder uDecoder = new UDecoder();
+            String decodedUri = uDecoder.convert(encodedUri, false);
+
+            try {
+                // Just here to trigger the error
+                @SuppressWarnings("unused")
+                URI u = new URI(encodedUri);
+            } catch (URISyntaxException e) {
+                throw new ServletException(e);
+            }
+
+            if (count > 3) {
+                resp.setContentType("text/plain");
+                resp.getWriter().print("OK");
+            } else {
+                AsyncContext ac = req.startAsync();
+                ac.dispatch(decodedUri);
+            }
+        }
+    }
+
+
+    private static class ForwardDispatchUrlWithSpacesServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            Integer countObj = (Integer) req.getAttribute("count");
+            int count = 0;
+            if (countObj != null) {
+                count = countObj.intValue();
+            }
+            count++;
+            req.setAttribute("count", Integer.valueOf(count));
+
+            String encodedUri = req.getRequestURI();
+            UDecoder uDecoder = new UDecoder();
+            String decodedUri = uDecoder.convert(encodedUri, false);
+
+            try {
+                // Just here to trigger the error
+                @SuppressWarnings("unused")
+                URI u = new URI(req.getRequestURI());
+            } catch (URISyntaxException e) {
+                throw new ServletException(e);
+            }
+
+            if (count > 3) {
+                resp.setContentType("text/plain");
+                resp.getWriter().print("OK");
+            } else {
+                RequestDispatcher rd = req.getRequestDispatcher(decodedUri);
+                rd.forward(req, resp);
+            }
+        }
     }
 }
