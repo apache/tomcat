@@ -314,6 +314,11 @@
         <bug>59280</bug>: Update the NSIS Installer used to build the
         Windows Installers to version 2.51. (kkolinko)
       </update>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.6 to
+        pick up the Windows binaries that are based on OpenSSL 1.0.2g and APR
+        1.5.2. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
