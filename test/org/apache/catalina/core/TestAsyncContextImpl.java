@@ -18,6 +18,8 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,6 +50,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -2477,5 +2480,60 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         ac.addListener(listener, servletRequest, servletResponse);
         ac.setErrorState(new Exception(), true);
         ac.fireOnComplete();
+    }
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=59317
+     */
+    @Ignore // Currently fails. Disabled while investigations continue.
+    @Test
+    public void testAsyncDistachUrlWithSpaces() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context context = tomcat.addContext("", null);
+        Servlet s = new AsyncDispatchUrlWithSpacesServlet();
+        Wrapper w = Tomcat.addServlet(context, "space", s);
+        w.setAsyncSupported(true);
+        context.addServletMapping("/space/*", "space");
+        tomcat.start();
+
+        ByteChunk responseBody = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/sp%61ce/foo%20bar", responseBody, null);
+
+        Assert.assertEquals(200, rc);
+    }
+
+
+    private static class AsyncDispatchUrlWithSpacesServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            Integer countObj = (Integer) req.getAttribute("count");
+            int count = 0;
+            if (countObj != null) {
+                count = countObj.intValue();
+            }
+            count++;
+            req.setAttribute("count", Integer.valueOf(count));
+
+            try {
+                // Just here to trigger the error
+                @SuppressWarnings("unused")
+                URI u = new URI(req.getRequestURI());
+            } catch (URISyntaxException e) {
+                throw new ServletException(e);
+            }
+
+            if (count > 3) {
+                resp.setContentType("text/plain");
+                resp.getWriter().print("OK");
+            } else {
+                AsyncContext ac = req.startAsync();
+                ac.dispatch("/sp%61ce/foo%20bar");
+            }
+        }
     }
 }
