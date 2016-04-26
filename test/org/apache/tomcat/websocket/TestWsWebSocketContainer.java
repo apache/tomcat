@@ -73,6 +73,9 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
     private static final long TIMEOUT_MS = 5 * 1000;
     private static final long MARGIN = 500;
 
+    // 5s should be plenty but Gump can be a lot slower
+    private static final long START_STOP_WAIT = 60 * 1000;
+
     static {
         StringBuilder sb = new StringBuilder(4096);
         for (int i = 0; i < 4096; i++) {
@@ -347,9 +350,9 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
         Exception exception = null;
         try {
             while (true) {
+                lastSend = System.currentTimeMillis();
                 Future<Void> f = wsSession.getAsyncRemote().sendBinary(
                         ByteBuffer.wrap(MESSAGE_BINARY_4K));
-                lastSend = System.currentTimeMillis();
                 f.get();
             }
         } catch (Exception e) {
@@ -358,6 +361,9 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
 
         long timeout = System.currentTimeMillis() - lastSend;
 
+        // Clear the server side block and prevent further blocks to allow the
+        // server to shutdown cleanly
+        BlockingPojo.clearBlock();
 
         // Close the client session, primarily to allow the
         // BackgroundProcessManager to shut down.
@@ -387,7 +393,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
     }
 
 
-    private static volatile boolean timoutOnContainer = false;
+    private static volatile boolean timeoutOnContainer = false;
 
     private void doTestWriteTimeoutServer(boolean setTimeoutOnContainer)
             throws Exception {
@@ -402,7 +408,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
          *       because the API uses classes and the tests really need access
          *       to the instances which simply isn't possible.
          */
-        timoutOnContainer = setTimeoutOnContainer;
+        timeoutOnContainer = setTimeoutOnContainer;
 
         Tomcat tomcat = getTomcatInstance();
 
@@ -465,6 +471,8 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
                     (ServerContainer) sce.getServletContext().getAttribute(
                             Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
             try {
+                // Reset blocking state
+                BlockingPojo.resetBlock();
                 sc.addEndpoint(BlockingPojo.class);
             } catch (DeploymentException e) {
                 throw new IllegalStateException(e);
@@ -475,11 +483,35 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
 
     @ServerEndpoint("/block")
     public static class BlockingPojo {
+
+        private static Object monitor = new Object();
+        // Enable blockign by default
+        private static boolean block = true;
+
+        /**
+         * Clear any current block.
+         */
+        public static void clearBlock() {
+            synchronized (monitor) {
+                BlockingPojo.block = false;
+                monitor.notifyAll();
+            }
+        }
+
+        public static void resetBlock() {
+            synchronized (monitor) {
+                block = true;
+            }
+        }
         @SuppressWarnings("unused")
         @OnMessage
         public void echoTextMessage(Session session, String msg, boolean last) {
             try {
-                Thread.sleep(60000);
+                synchronized (monitor) {
+                    while (block) {
+                        monitor.wait();
+                    }
+                }
             } catch (InterruptedException e) {
                 // Ignore
             }
@@ -491,7 +523,11 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
         public void echoBinaryMessage(Session session, ByteBuffer msg,
                 boolean last) {
             try {
-                Thread.sleep(TIMEOUT_MS * 10);
+                synchronized (monitor) {
+                    while (block) {
+                        monitor.wait();
+                    }
+                }
             } catch (InterruptedException e) {
                 // Ignore
             }
@@ -529,7 +565,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
             exception = null;
             running = true;
 
-            if (!TestWsWebSocketContainer.timoutOnContainer) {
+            if (!TestWsWebSocketContainer.timeoutOnContainer) {
                 session.getAsyncRemote().setSendTimeout(TIMEOUT_MS);
             }
 
@@ -585,7 +621,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
             try {
                 sc.addEndpoint(ServerEndpointConfig.Builder.create(
                         ConstantTxEndpoint.class, PATH).build());
-                if (TestWsWebSocketContainer.timoutOnContainer) {
+                if (TestWsWebSocketContainer.timeoutOnContainer) {
                     sc.setAsyncSendTimeout(TIMEOUT_MS);
                 }
             } catch (DeploymentException e) {
@@ -748,9 +784,9 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
             Assert.assertEquals(expected, getOpenCount(setA));
 
             int count = 0;
-            while (getOpenCount(setA) == expected && count < 5) {
+            while (getOpenCount(setA) == expected && count < 50) {
                 count ++;
-                Thread.sleep(1000);
+                Thread.sleep(100);
             }
 
             expected--;
@@ -898,6 +934,9 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
 
         Session s = connectToEchoServer(wsContainer, new EndpointA(), path);
 
+        // One for the client, one for the server
+        validateBackgroundProcessCount(2);
+
         StringBuilder msg = new StringBuilder();
         for (long i = 0; i < size; i++) {
             msg.append('x');
@@ -905,7 +944,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
 
         s.getBasicRemote().sendText(msg.toString());
 
-        // Wait for up to 5 seconds for session to close
+        // Wait for up to 5 seconds for the client session to open
         boolean open = s.isOpen();
         int count = 0;
         while (open != expectOpen && count < 50) {
@@ -916,8 +955,29 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
 
         Assert.assertEquals(Boolean.valueOf(expectOpen),
                 Boolean.valueOf(s.isOpen()));
+
+        // Close the session if it is expected to be open
+        if (expectOpen) {
+            s.close();
+        }
+
+        // Ensure both server and client have shutdown
+        validateBackgroundProcessCount(0);
     }
 
+
+    private void validateBackgroundProcessCount(int expected) throws Exception {
+        int count = 0;
+        while (count < (START_STOP_WAIT / 100)) {
+            if (BackgroundProcessManager.getInstance().getProcessCount() == expected) {
+                break;
+            }
+            Thread.sleep(100);
+            count++;
+    }
+        Assert.assertEquals(expected, BackgroundProcessManager.getInstance().getProcessCount());
+
+    }
 
     @Test
     public void testPerMessageDefalteClient01() throws Exception {
