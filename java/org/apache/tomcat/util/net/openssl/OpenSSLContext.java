@@ -273,14 +273,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 sb.append(Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(key.getEncoded()));
                 sb.append(END_KEY);
                 SSLContext.setCertificateRaw(ctx, chain[0].getEncoded(), sb.toString().getBytes(StandardCharsets.US_ASCII), SSL.SSL_AIDX_RSA);
-                /*
-                 * Uncomment the code block below once there has been a tc-native
-                 * release with this method and the minimum tc-native version
-                 * has been incremented.
                 for (int i = 1; i < chain.length; i++) {
                     SSLContext.addChainCertificateRaw(ctx, chain[i].getEncoded());
                 }
-                */
             }
             // Client certificate verification
             int value = 0;
