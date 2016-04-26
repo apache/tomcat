@@ -1256,7 +1256,6 @@
   <attributes>
 
     <attribute name="certificateFile" required="true">
-      <p>OpenSSL only.</p>
       <p>Name of the file that contains the server certificate. The format is
       PEM-encoded. Relative paths will be resolved against
       <code>$CATALINA_BASE</code>.</p>
@@ -1268,7 +1267,6 @@
     </attribute>
 
     <attribute name="certificateChainFile" required="false">
-      <p>OpenSSL only.</p>
       <p>Name of the file that contains the certificate chain associated with
       the server certificate used. The format is
       PEM-encoded. Relative paths will be resolved against
@@ -1291,7 +1289,6 @@
     </attribute>
 
     <attribute name="certificateKeyFile" required="false">
-      <p>OpenSSL only.</p>
       <p>Name of the file that contains the server private key. The format is
       PEM-encoded. The default value is the value of
       <strong>certificateFile</strong> and in this case both certificate and

@@ -28,11 +28,13 @@ import java.security.cert.CRLException;
 import java.security.cert.CertPathParameters;
 import java.security.cert.CertStore;
 import java.security.cert.CertStoreParameters;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.X509CertSelector;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -275,7 +277,31 @@ public class JSSEUtil extends SSLUtilBase {
 
         KeyManager[] kms = null;
 
-        KeyStore ks = getStore(keystoreType, keystoreProvider, keystoreFile, keystorePass);
+        KeyStore ks;
+
+        if (certificate.getCertificateFile() == null) {
+            ks = getStore(keystoreType, keystoreProvider, keystoreFile, keystorePass);
+        } else {
+            // create an in-memory keystore and import the private key
+            // and the certificate chain from the PEM files
+            ks = KeyStore.getInstance("JKS");
+            ks.load(null, null);
+
+            PEMFile privateKeyFile = new PEMFile(SSLHostConfig.adjustRelativePath
+                    (certificate.getCertificateKeyFile() != null ? certificate.getCertificateKeyFile() : certificate.getCertificateFile()),
+                    keyPass);
+            PEMFile certificateFile = new PEMFile(SSLHostConfig.adjustRelativePath(certificate.getCertificateFile()));
+
+            Collection<Certificate> chain = new ArrayList<>();
+            chain.addAll(certificateFile.getCertificates());
+            if (certificate.getCertificateChainFile() != null) {
+                PEMFile certificateChainFile = new PEMFile(SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()));
+                chain.addAll(certificateChainFile.getCertificates());
+            }
+
+            ks.setKeyEntry(keyAlias, privateKeyFile.getPrivateKey(), keyPass.toCharArray(), chain.toArray(new Certificate[chain.size()]));
+        }
+
         if (keyAlias != null && !ks.isKeyEntry(keyAlias)) {
             throw new IOException(sm.getString("jsse.alias_no_key_entry", keyAlias));
         }
