@@ -50,7 +50,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -62,6 +61,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.TesterAccessLogValve;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.easymock.EasyMock;
 
@@ -2240,11 +2240,10 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         tomcat.start();
 
         String uri = "/foo/%24/bar";
-        String uriDecoded = "/foo/$/bar";
 
         ByteChunk body = getUrl("http://localhost:" + getPort()+ uri);
 
-        Assert.assertEquals(uriDecoded, body.toString());
+        Assert.assertEquals(uri, body.toString());
     }
 
     private static class AsyncRequestUriServlet extends HttpServlet {
@@ -2482,17 +2481,32 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         ac.fireOnComplete();
     }
 
+
     /*
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=59317
      */
-    @Ignore // Currently fails. Disabled while investigations continue.
     @Test
-    public void testAsyncDistachUrlWithSpaces() throws Exception {
+    public void testAsyncDispatchUrlWithSpaces() throws Exception {
+        doTestDispatchWithSpaces(true);
+    }
+
+
+    @Test
+    public void testForwardDispatchUrlWithSpaces() throws Exception {
+        doTestDispatchWithSpaces(false);
+    }
+
+
+    private void doTestDispatchWithSpaces(boolean async) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         Context context = tomcat.addContext("", null);
-        Servlet s = new AsyncDispatchUrlWithSpacesServlet();
-        Wrapper w = Tomcat.addServlet(context, "space", s);
-        w.setAsyncSupported(true);
+        if (async) {
+            Servlet s = new AsyncDispatchUrlWithSpacesServlet();
+            Wrapper w = Tomcat.addServlet(context, "space", s);
+            w.setAsyncSupported(true);
+        } else {
+            Tomcat.addServlet(context, "space", new ForwardDispatchUrlWithSpacesServlet());
+        }
         context.addServletMapping("/space/*", "space");
         tomcat.start();
 
@@ -2519,6 +2533,47 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             count++;
             req.setAttribute("count", Integer.valueOf(count));
 
+            String encodedUri = req.getRequestURI();
+            String decodedUri = UDecoder.URLDecode(encodedUri);
+
+            try {
+                // Just here to trigger the error
+                @SuppressWarnings("unused")
+                URI u = new URI(encodedUri);
+            } catch (URISyntaxException e) {
+                throw new ServletException(e);
+            }
+
+            if (count > 3) {
+                resp.setContentType("text/plain");
+                resp.getWriter().print("OK");
+            } else {
+                AsyncContext ac = req.startAsync();
+                ac.dispatch(decodedUri);
+            }
+        }
+    }
+
+
+    private static class ForwardDispatchUrlWithSpacesServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            Integer countObj = (Integer) req.getAttribute("count");
+            int count = 0;
+            if (countObj != null) {
+                count = countObj.intValue();
+            }
+            count++;
+            req.setAttribute("count", Integer.valueOf(count));
+
+            String encodedUri = req.getRequestURI();
+            String decodedUri = UDecoder.URLDecode(encodedUri);
+
             try {
                 // Just here to trigger the error
                 @SuppressWarnings("unused")
@@ -2531,8 +2586,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 resp.setContentType("text/plain");
                 resp.getWriter().print("OK");
             } else {
-                AsyncContext ac = req.startAsync();
-                ac.dispatch("/sp%61ce/foo%20bar");
+                RequestDispatcher rd = req.getRequestDispatcher(decodedUri);
+                rd.forward(req, resp);
             }
         }
     }

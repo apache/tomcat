@@ -160,6 +160,11 @@
         consistent with respect to whether or not they end with <code>/</code>.
         (markt)
       </fix>
+      <fix>
+        <bug>59317</bug>: Ensure that
+        <code>HttpServletRequest.getRequestURI()</code> returns an encoded URI
+        rather than a decoded URI after a dispatch. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -65,6 +65,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.mapper.MappingData;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -465,11 +466,11 @@ public class ApplicationContext
 
         mappingData.recycle();
 
-        // Construct a RequestDispatcher to process this request
-        return new ApplicationDispatcher
-            (wrapper, uriCC.toString(), wrapperPath, pathInfo,
-             queryString, mapping, null);
+        String encodedUri = URLEncoder.DEFAULT.encode(uriCC.toString());
 
+        // Construct a RequestDispatcher to process this request
+        return new ApplicationDispatcher(wrapper, encodedUri, wrapperPath, pathInfo,
+                queryString, mapping, null);
     }
 
 
