@@ -31,7 +31,6 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -80,8 +79,7 @@ class Util {
 
 
     private static final CacheValue nullTcclFactory = new CacheValue();
-    private static final ConcurrentMap<CacheKey, CacheValue> factoryCache =
-            new ConcurrentHashMap<>();
+    private static final Map<CacheKey, CacheValue> factoryCache = new ConcurrentHashMap<>();
 
     /**
      * Provides a per class loader cache of ExpressionFactory instances without
