@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.lang.reflect.Method;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.el.FunctionMapper;
 
@@ -37,7 +37,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
 
     private static final long serialVersionUID = 1L;
 
-    protected Map<String, Function> functions = new ConcurrentHashMap<>();
+    protected ConcurrentMap<String, Function> functions = new ConcurrentHashMap<>();
 
     /*
      * (non-Javadoc)
@@ -84,7 +84,7 @@ public class FunctionMapperImpl extends FunctionMapper implements
     @Override
     public void readExternal(ObjectInput in) throws IOException,
             ClassNotFoundException {
-        this.functions = (Map<String, Function>) in.readObject();
+        this.functions = (ConcurrentMap<String, Function>) in.readObject();
     }
 
     public static class Function implements Externalizable {
