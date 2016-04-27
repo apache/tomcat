@@ -144,7 +144,7 @@
       </add>
       <fix>
         <bug>59284</bug>: Allow the Tomcat provided JASPIC
-        <code>SimpleServerAuthConfig</code> to pick up module confiuration
+        <code>SimpleServerAuthConfig</code> to pick up module configuration
         properties from either the property set passed to its constructor or
         from the properties passed in the call to <code>getAuthContext</code>.
         Based on a patch by Thomas Maslen. (markt)
@@ -197,12 +197,12 @@
         connection count. (markt)
       </fix>
       <fix>
-        <bug>59289</bug>: Do not recycle upgrade processors in unexpected clsoe
+        <bug>59289</bug>: Do not recycle upgrade processors in unexpected close
         situations. (remm)
       </fix>
       <fix>
-        <bug>59295</bug>: Use <code>Locale.toLangaugeTag()</code> to construct
-        the <code>Content-Langauge</code> HTTP header to ensure the locale is
+        <bug>59295</bug>: Use <code>Locale.toLanguageTag()</code> to construct
+        the <code>Content-Language</code> HTTP header to ensure the locale is
         correctly represented. Patch provided by zikfat. (markt)
       </fix>
       <update>
@@ -212,7 +212,7 @@
       <fix>
         Make the TLS certificate chain available to clients when using
         JSSE+OpenSSL with the certificate chain stored in a Java KeyStore.
-        (markt) 
+        (markt)
       </fix>
     </changelog>
   </subsection>
@@ -231,7 +231,7 @@
       <fix>
         Fix a regression caused by the connector refactoring and ensure that the
         thread context class loader is set to the to the web application
-        classloder when processing WebSocket messages on the server. (markt)
+        classloader when processing WebSocket messages on the server. (markt)
       </fix>
       <fix>
         Ensure that a client disconnection triggers the error handling for the
