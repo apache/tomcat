@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.security.Principal;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -45,19 +46,19 @@ public class SingleSignOnEntry implements Serializable {
 
     // ------------------------------------------------------  Instance Fields
 
-    protected String authType = null;
+    private String authType = null;
 
-    protected String password = null;
+    private String password = null;
 
     // Marked as transient so special handling can be applied to serialization
-    protected transient Principal principal = null;
+    private transient Principal principal = null;
 
-    protected ConcurrentHashMap<SingleSignOnSessionKey,SingleSignOnSessionKey> sessionKeys =
+    private final ConcurrentMap<SingleSignOnSessionKey,SingleSignOnSessionKey> sessionKeys =
             new ConcurrentHashMap<>();
 
-    protected String username = null;
+    private String username = null;
 
-    protected boolean canReauthenticate = false;
+    private boolean canReauthenticate = false;
 
     // ---------------------------------------------------------  Constructors
 
