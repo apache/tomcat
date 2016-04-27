@@ -79,7 +79,7 @@ public class JspCServletContext implements ServletContext {
     /**
      * Servlet context initialization parameters.
      */
-    private final ConcurrentHashMap<String,String> myParameters;
+    private final Map<String,String> myParameters = new ConcurrentHashMap<>();
 
 
     /**
@@ -126,7 +126,6 @@ public class JspCServletContext implements ServletContext {
             throws JasperException {
 
         myAttributes = new HashMap<>();
-        myParameters = new ConcurrentHashMap<>();
         myParameters.put(Constants.XML_BLOCK_EXTERNAL_INIT_PARAM,
                 String.valueOf(blockExternal));
         myLogWriter = aLogWriter;
@@ -249,7 +248,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public Enumeration<String> getInitParameterNames() {
-        return myParameters.keys();
+        return Collections.enumeration(myParameters.keySet());
     }
 
 
