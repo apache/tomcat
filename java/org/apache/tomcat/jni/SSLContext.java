@@ -415,7 +415,7 @@ public final class SSLContext {
      * since a Tomcat instance may have several TLS enabled endpoints that each
      * have different SSL Context mappings for the same host name.
      */
-    private static Map<Long,SNICallBack> sniCallBacks = new ConcurrentHashMap<>();
+    private static final Map<Long,SNICallBack> sniCallBacks = new ConcurrentHashMap<>();
 
     /**
      * Register an OpenSSL SSLContext that will be used to initiate TLS
