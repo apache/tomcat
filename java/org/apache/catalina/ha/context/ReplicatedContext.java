@@ -132,8 +132,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
 
 
     protected static class ReplApplContext extends ApplicationContext {
-        protected final ConcurrentHashMap<String, Object> tomcatAttributes =
-            new ConcurrentHashMap<>();
+        protected final Map<String, Object> tomcatAttributes = new ConcurrentHashMap<>();
 
         public ReplApplContext(ReplicatedContext context) {
             super(context);
