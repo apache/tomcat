@@ -534,7 +534,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         protected RequestGroupInfo global = new RequestGroupInfo();
         protected AtomicLong registerCount = new AtomicLong(0);
 
-        protected Map<S,Processor<S>> connections = new ConcurrentHashMap<S,Processor<S>>();
+        protected final Map<S,Processor<S>> connections = new ConcurrentHashMap<S,Processor<S>>();
 
         protected RecycledProcessors<P,S> recycledProcessors =
             new RecycledProcessors<P,S>(this);
