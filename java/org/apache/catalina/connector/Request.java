@@ -203,7 +203,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
     /**
      * The attributes associated with this Request, keyed by attribute name.
      */
-    protected final ConcurrentHashMap<String, Object> attributes = new ConcurrentHashMap<>();
+    private final Map<String, Object> attributes = new ConcurrentHashMap<>();
 
 
     /**

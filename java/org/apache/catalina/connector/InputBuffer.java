@@ -23,6 +23,7 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.ReadListener;
 
@@ -65,7 +66,7 @@ public class InputBuffer extends Reader
     /**
      * Encoder cache.
      */
-    private static final ConcurrentHashMap<Charset,SynchronizedStack<B2CConverter>> encoders =
+    private static final ConcurrentMap<Charset,SynchronizedStack<B2CConverter>> encoders =
             new ConcurrentHashMap<>();
 
 
