@@ -42,6 +42,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.ListenerNotFoundException;
@@ -507,7 +509,7 @@ public class StandardContext extends ContainerBase
      * The context initialization parameters for this web application,
      * keyed by name.
      */
-    private HashMap<String, String> parameters = new HashMap<String, String>();
+    private final ConcurrentMap<String, String> parameters = new ConcurrentHashMap<String, String>();
 
 
     /**
