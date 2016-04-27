@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterRegistration;
@@ -79,7 +80,7 @@ public class JspCServletContext implements ServletContext {
     /**
      * Servlet context initialization parameters.
      */
-    private final ConcurrentHashMap<String,String> myParameters;
+    private final ConcurrentMap<String,String> myParameters = new ConcurrentHashMap<>();
 
 
     /**
@@ -126,7 +127,6 @@ public class JspCServletContext implements ServletContext {
             throws JasperException {
 
         myAttributes = new HashMap<>();
-        myParameters = new ConcurrentHashMap<>();
         myParameters.put(Constants.XML_BLOCK_EXTERNAL_INIT_PARAM,
                 String.valueOf(blockExternal));
         myLogWriter = aLogWriter;
@@ -249,7 +249,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public Enumeration<String> getInitParameterNames() {
-        return myParameters.keys();
+        return Collections.enumeration(myParameters.keySet());
     }
 
 
