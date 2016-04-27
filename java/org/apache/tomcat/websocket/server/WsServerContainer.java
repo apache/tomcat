@@ -83,13 +83,12 @@ public class WsServerContainer extends WsWebSocketContainer
     private final ServletContext servletContext;
     private final Map<String,ServerEndpointConfig> configExactMatchMap =
             new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Integer,SortedSet<TemplatePathMatch>>
-            configTemplateMatchMap = new ConcurrentHashMap<>();
+    private final Map<Integer,SortedSet<TemplatePathMatch>> configTemplateMatchMap =
+            new ConcurrentHashMap<>();
     private volatile boolean enforceNoAddAfterHandshake =
             org.apache.tomcat.websocket.Constants.STRICT_SPEC_COMPLIANCE;
     private volatile boolean addAllowed = true;
-    private final ConcurrentHashMap<String,Set<WsSession>> authenticatedSessions =
-            new ConcurrentHashMap<>();
+    private final Map<String,Set<WsSession>> authenticatedSessions = new ConcurrentHashMap<>();
     private final ExecutorService executorService;
     private final ThreadGroup threadGroup;
     private volatile boolean endpointsRegistered = false;
