@@ -154,7 +154,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     private int channelStartOptions = Channel.DEFAULT;
 
-    private Map<Member,ObjectName> memberOnameMap = new ConcurrentHashMap<>();
+    private final Map<Member,ObjectName> memberOnameMap = new ConcurrentHashMap<>();
 
     // ------------------------------------------------------------- Properties
 
