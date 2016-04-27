@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -79,11 +80,8 @@ public class StuckThreadDetectionValve extends ValveBase {
      * That way, Threads can be GC'ed, eventhough the Valve still thinks they
      * are stuck (caused by a long monitor interval)
      */
-    private final ConcurrentHashMap<Long, MonitoredThread> activeThreads =
-            new ConcurrentHashMap<>();
-    /**
-     *
-     */
+    private final Map<Long, MonitoredThread> activeThreads = new ConcurrentHashMap<>();
+
     private final Queue<CompletedStuckThread> completedStuckThreadsQueue =
             new ConcurrentLinkedQueue<>();
 
