@@ -21,6 +21,7 @@ import java.io.Reader;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.catalina.security.SecurityUtil;
@@ -106,8 +107,7 @@ public class InputBuffer extends Reader
     /**
      * List of encoders.
      */
-    protected final ConcurrentHashMap<String,B2CConverter> encoders =
-            new ConcurrentHashMap<String, B2CConverter>();
+    private final Map<String,B2CConverter> encoders = new ConcurrentHashMap<String, B2CConverter>();
 
 
     /**
