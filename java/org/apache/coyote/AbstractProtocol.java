@@ -733,10 +733,27 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                             // Explicitly negotiated the default protocol.
                             // Obtain a processor below.
                         } else {
+                            // TODO:
+                            // OpenSSL 1.0.2's ALPN callback doesn't support
+                            // failing the handshake with an error if no
+                            // protocol can be negotiated. Therefore, we need to
+                            // fail the connection here. Once this is fixed,
+                            // replace the code below with the commented out
+                            // block.
+                            if (getLog().isDebugEnabled()) {
+                                getLog().debug(sm.getString(
+                                    "abstractConnectionHandler.negotiatedProcessor.fail",
+                                    negotiatedProtocol));
+                            }
+                            return SocketState.CLOSED;
+                            /*
+                             * To replace the code above once OpenSSL 1.1.0 is
+                             * used.
                             // Failed to create processor. This is a bug.
                             throw new IllegalStateException(sm.getString(
                                     "abstractConnectionHandler.negotiatedProcessor.fail",
                                     negotiatedProtocol));
+                            */
                         }
                     }
                 }
