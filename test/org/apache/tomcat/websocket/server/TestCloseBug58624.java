@@ -60,10 +60,20 @@ public class TestCloseBug58624 extends WebSocketBaseTest {
         URI uri = new URI("ws://localhost:" + getPort() + Bug58624ServerConfig.PATH);
 
         Session session = wsContainer.connectToServer(client, uri);
+
+        // Wait for session to open on the server
+        int count = 0;
+        while (count < 50 && Bug58624ServerEndpoint.getOpenSessionCount() == 0) {
+            count++;
+            Thread.sleep(100);
+        }
+        Assert.assertNotEquals(0,  Bug58624ServerEndpoint.getOpenSessionCount());
+
+        // Now close the session
         session.close();
 
         // Wait for session to close on the server
-        int count = 0;
+        count = 0;
         while (count < 50 && Bug58624ServerEndpoint.getOpenSessionCount() > 0) {
             count++;
             Thread.sleep(100);
