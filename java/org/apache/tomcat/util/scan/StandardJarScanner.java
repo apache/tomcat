@@ -243,8 +243,7 @@ public class StandardJarScanner implements JarScanner {
                                         getJarScanFilter().check(scanType,
                                                 cpe.getName())) {
                             if (log.isDebugEnabled()) {
-                                log.debug(sm.getString(
-                                        "jarScan.classloaderJarScan", urls[i]));
+                                log.debug(sm.getString("jarScan.classloaderJarScan", urls[i]));
                             }
                             String webappPath = null;
                             if (urls[i].equals(webInfURL)) {
@@ -253,16 +252,12 @@ public class StandardJarScanner implements JarScanner {
                             try {
                                 process(scanType, callback, urls[i], webappPath, isWebapp);
                             } catch (IOException ioe) {
-                                log.warn(sm.getString(
-                                        "jarScan.classloaderFail", urls[i]),
-                                                ioe);
+                                log.warn(sm.getString("jarScan.classloaderFail", urls[i]), ioe);
                             }
                         } else {
                             // JAR / directory has been skipped
                             if (log.isTraceEnabled()) {
-                                log.trace(sm.getString(
-                                        "jarScan.classloaderJarNoScan",
-                                        urls[i]));
+                                log.trace(sm.getString("jarScan.classloaderJarNoScan", urls[i]));
                             }
                         }
                     }
