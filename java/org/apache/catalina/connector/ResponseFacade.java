@@ -219,28 +219,21 @@ public class ResponseFacade
 
     @Override
     public void setContentLength(int len) {
-
         if (isCommitted()) {
             return;
         }
-
         response.setContentLength(len);
-
     }
 
 
-    /**
-     * TODO SERVLET 3.1
-     */
     @Override
     public void setContentLengthLong(long length) {
         if (isCommitted()) {
             return;
         }
-
         response.setContentLengthLong(length);
-
     }
+
 
     @Override
     public void setContentType(String type) {

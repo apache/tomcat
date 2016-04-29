@@ -40,7 +40,6 @@ public class DirectByteArrayOutputStream extends OutputStream {
      * @throws IOException if an I/O error occurs. In particular, an
      *   <code>IOException</code> may be thrown if the output stream has
      *   been closed.
-     * TODO Implement this java.io.OutputStream method
      */
     @Override
     public void write(int b) throws IOException {

@@ -1088,7 +1088,6 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 }
             };
         }
-        //TODO: complete this to TTL, etc.
         return comparator;
     }
 
