@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -60,8 +61,21 @@ public class StandardJarScanner implements JarScanner {
     /**
      * The string resources for this package.
      */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(Constants.Package);
+
+    private static final Set<ClassLoader> CLASSLOADER_HIERARCHY;
+
+    static {
+        Set<ClassLoader> cls = new HashSet<>();
+
+        ClassLoader cl = StandardJarScanner.class.getClassLoader();
+        while (cl != null) {
+            cls.add(cl);
+            cl = cl.getParent();
+        }
+
+        CLASSLOADER_HIERARCHY = Collections.unmodifiableSet(cls);
+    }
 
     /**
      * Controls the classpath scanning extension.
@@ -282,16 +296,8 @@ public class StandardJarScanner implements JarScanner {
      *   the system class loader is not an application class loader
      *   the bootstrap class loader is not an application class loader
      */
-    private boolean isWebappClassLoader(ClassLoader classLoader) {
-        ClassLoader nonWebappLoader = StandardJarScanner.class.getClassLoader();
-
-        while (nonWebappLoader != null) {
-            if (nonWebappLoader == classLoader) {
-                return false;
-            }
-            nonWebappLoader = nonWebappLoader.getParent();
-        }
-        return true;
+    private static boolean isWebappClassLoader(ClassLoader classLoader) {
+        return !CLASSLOADER_HIERARCHY.contains(classLoader);
     }
 
 
