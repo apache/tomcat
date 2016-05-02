@@ -41,7 +41,7 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
 
     public UpgradeProcessorExternal(SocketWrapperBase<?> wrapper,
             UpgradeToken upgradeToken) {
-        super(wrapper, upgradeToken);
+        super(upgradeToken);
         this.upgradeServletInputStream = new UpgradeServletInputStream(this, wrapper);
         this.upgradeServletOutputStream = new UpgradeServletOutputStream(this, wrapper);
 

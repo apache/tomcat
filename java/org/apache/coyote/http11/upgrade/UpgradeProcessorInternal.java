@@ -37,7 +37,7 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
 
     public UpgradeProcessorInternal(SocketWrapperBase<?> wrapper,
             UpgradeToken upgradeToken) {
-        super(wrapper, upgradeToken);
+        super(upgradeToken);
         this.internalHttpUpgradeHandler = (InternalHttpUpgradeHandler) upgradeToken.getHttpUpgradeHandler();
         /*
          * Leave timeouts in the hands of the upgraded protocol.

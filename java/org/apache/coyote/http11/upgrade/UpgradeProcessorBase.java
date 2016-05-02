@@ -33,8 +33,7 @@ public abstract class UpgradeProcessorBase extends AbstractProcessorLight implem
 
     private final UpgradeToken upgradeToken;
 
-    public UpgradeProcessorBase(SocketWrapperBase<?> wrapper,
-            UpgradeToken upgradeToken) {
+    public UpgradeProcessorBase(UpgradeToken upgradeToken) {
         this.upgradeToken = upgradeToken;
     }
 
