@@ -424,6 +424,16 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
 
     /**
+     * Find a suitable handler for the protocol upgraded name specified. This
+     * is used for direct connection protocol selection.
+     * @param name The name of the requested negotiated protocol.
+     * @return The instance where {@link UpgradeProtocol#getAlpnName()} matches
+     *         the requested protocol
+     */
+    protected abstract UpgradeProtocol getUpgradeProtocol(String name);
+
+
+    /**
      * Create and configure a new Processor instance for the current protocol
      * implementation.
      *
@@ -433,7 +443,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
 
     protected abstract Processor createUpgradeProcessor(
-            SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
+            SocketWrapperBase<?> socket,
             UpgradeToken upgradeToken);
 
 
@@ -780,32 +790,44 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     if (state == SocketState.UPGRADING) {
                         // Get the HTTP upgrade handler
                         UpgradeToken upgradeToken = processor.getUpgradeToken();
-                        HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
                         // Retrieve leftover input
-                        ByteBuffer leftoverInput = processor.getLeftoverInput();
-                        // Release the Http11 processor to be re-used
-                        release(processor);
-                        // Create the upgrade processor
-                        processor = getProtocol().createUpgradeProcessor(
-                                wrapper, leftoverInput, upgradeToken);
-                        // Mark the connection as upgraded
-                        wrapper.setUpgraded(true);
-                        // Associate with the processor with the connection
-                        connections.put(socket, processor);
-                        // Initialise the upgrade handler (which may trigger
-                        // some IO using the new protocol which is why the lines
-                        // above are necessary)
-                        // This cast should be safe. If it fails the error
-                        // handling for the surrounding try/catch will deal with
-                        // it.
-                        if (upgradeToken.getInstanceManager() == null) {
-                            httpUpgradeHandler.init((WebConnection) processor);
+                        ByteBuffer leftOverInput = processor.getLeftoverInput();
+                        if (upgradeToken == null) {
+                            // Assume direct HTTP/2 connection
+                            UpgradeProtocol upgradeProtocol = getProtocol().getUpgradeProtocol("h2c");
+                            if (upgradeProtocol != null) {
+                                processor = upgradeProtocol.getProcessor(
+                                        wrapper, getProtocol().getAdapter());
+                                wrapper.unRead(leftOverInput);
+                                // Associate with the processor with the connection
+                                connections.put(socket, processor);
+                            }
                         } else {
-                            ClassLoader oldCL = upgradeToken.getContextBind().bind(false, null);
-                            try {
+                            HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
+                            // Release the Http11 processor to be re-used
+                            release(processor);
+                            // Create the upgrade processor
+                            processor = getProtocol().createUpgradeProcessor(wrapper, upgradeToken);
+                            wrapper.unRead(leftOverInput);
+                            // Mark the connection as upgraded
+                            wrapper.setUpgraded(true);
+                            // Associate with the processor with the connection
+                            connections.put(socket, processor);
+                            // Initialise the upgrade handler (which may trigger
+                            // some IO using the new protocol which is why the lines
+                            // above are necessary)
+                            // This cast should be safe. If it fails the error
+                            // handling for the surrounding try/catch will deal with
+                            // it.
+                            if (upgradeToken.getInstanceManager() == null) {
                                 httpUpgradeHandler.init((WebConnection) processor);
-                            } finally {
-                                upgradeToken.getContextBind().unbind(false, oldCL);
+                            } else {
+                                ClassLoader oldCL = upgradeToken.getContextBind().bind(false, null);
+                                try {
+                                    httpUpgradeHandler.init((WebConnection) processor);
+                                } finally {
+                                    upgradeToken.getContextBind().unbind(false, oldCL);
+                                }
                             }
                         }
                     }

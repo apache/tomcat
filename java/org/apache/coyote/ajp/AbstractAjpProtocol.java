@@ -16,8 +16,6 @@
  */
 package org.apache.coyote.ajp;
 
-import java.nio.ByteBuffer;
-
 import org.apache.coyote.AbstractProtocol;
 import org.apache.coyote.Processor;
 import org.apache.coyote.UpgradeProtocol;
@@ -81,6 +79,16 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         return null;
     }
 
+
+    /**
+     * {@inheritDoc}
+     *
+     * AJP does not support protocol upgrade so this always returns null.
+     */
+    @Override
+    protected UpgradeProtocol getUpgradeProtocol(String name) {
+        return null;
+    }
 
     // ------------------------------------------------- AJP specific properties
     // ------------------------------------------ managed in the ProtocolHandler
@@ -190,7 +198,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
 
     @Override
     protected Processor createUpgradeProcessor(SocketWrapperBase<?> socket,
-            ByteBuffer leftoverInput, UpgradeToken upgradeToken) {
+            UpgradeToken upgradeToken) {
         throw new IllegalStateException(sm.getString("ajpprotocol.noUpgradeHandler",
                 upgradeToken.getHttpUpgradeHandler().getClass().getName()));
     }

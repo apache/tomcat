@@ -97,6 +97,9 @@ public class Http11InputBuffer implements InputBuffer {
     }
 
 
+    private static final byte[] CLIENT_PREFACE_START =
+            "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n".getBytes(StandardCharsets.ISO_8859_1);
+
     /**
      * Associated Coyote request.
      */
@@ -406,6 +409,25 @@ public class Http11InputBuffer implements InputBuffer {
                     // At least one byte of the request has been received.
                     // Switch to the socket timeout.
                     wrapper.setReadTimeout(wrapper.getEndpoint().getSoTimeout());
+                }
+                if (!keptAlive) {
+                    for (int i = 0; i < CLIENT_PREFACE_START.length; i++) {
+                        if (i == lastValid) {
+                            // Need more data to know if this is HTTP/2
+                            if (!fill(false)) {
+                                // A read is pending, so no longer in initial state
+                                parsingRequestLinePhase = 1;
+                                return false;
+                            }
+                        }
+                        if (CLIENT_PREFACE_START[i] != buf[i]) {
+                            break;
+                        } else if (i == CLIENT_PREFACE_START.length - 1) {
+                            // HTTP/2 preface matched
+                            parsingRequestLinePhase = -1;
+                            return false;
+                        }
+                    }
                 }
                 // Set the start time once we start reading data (even if it is
                 // just skipping blank lines)

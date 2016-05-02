@@ -16,7 +16,6 @@
  */
 package org.apache.coyote.http11;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -351,6 +350,10 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public UpgradeProtocol getNegotiatedProtocol(String negotiatedName) {
         return negotiatedProtocols.get(negotiatedName);
     }
+    @Override
+    public UpgradeProtocol getUpgradeProtocol(String upgradedName) {
+        return httpUpgradeProtocols.get(upgradedName);
+    }
 
 
     // ------------------------------------------------ HTTP specific properties
@@ -643,13 +646,13 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     @Override
     protected Processor createUpgradeProcessor(
-            SocketWrapperBase<?> socket, ByteBuffer leftoverInput,
+            SocketWrapperBase<?> socket,
             UpgradeToken upgradeToken) {
         HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
         if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
-            return new UpgradeProcessorInternal(socket, leftoverInput, upgradeToken);
+            return new UpgradeProcessorInternal(socket, upgradeToken);
         } else {
-            return new UpgradeProcessorExternal(socket, leftoverInput, upgradeToken);
+            return new UpgradeProcessorExternal(socket, upgradeToken);
         }
     }
 }
