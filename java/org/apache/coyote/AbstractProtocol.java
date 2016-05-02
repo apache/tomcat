@@ -801,6 +801,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                                 wrapper.unRead(leftOverInput);
                                 // Associate with the processor with the connection
                                 connections.put(socket, processor);
+                            } else {
+                                if (getLog().isDebugEnabled()) {
+                                    getLog().debug(sm.getString(
+                                        "abstractConnectionHandler.negotiatedProcessor.fail",
+                                        "h2c"));
+                                }
+                                return SocketState.CLOSED;
                             }
                         } else {
                             HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
