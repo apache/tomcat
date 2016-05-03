@@ -261,6 +261,11 @@ public class StandardJarScanner implements JarScanner {
                             }
                             String webappPath = null;
                             if (urls[i].equals(webInfURL)) {
+                                if (scanType == JarScanType.PLUGGABILITY) {
+                                    // WEB-INF/classes should not be scanned for
+                                    // web fragments.
+                                    continue;
+                                }
                                 webappPath = Constants.WEB_INF_CLASSES;
                             }
                             try {
