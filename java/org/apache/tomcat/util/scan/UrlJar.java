@@ -45,6 +45,7 @@ public class UrlJar implements Jar {
 
     @Override
     public boolean entryExists(String name) throws IOException {
+        reset();
         JarEntry entry = jarInputStream.getNextJarEntry();
         while (entry != null) {
             if (name.equals(entry.getName())) {
@@ -58,6 +59,7 @@ public class UrlJar implements Jar {
 
     @Override
     public InputStream getInputStream(String name) throws IOException {
+        reset();
         JarEntry entry = jarInputStream.getNextJarEntry();
         while (entry != null) {
             if (name.equals(entry.getName())) {
@@ -75,6 +77,7 @@ public class UrlJar implements Jar {
 
     @Override
     public long getLastModified(String name) throws IOException {
+        reset();
         JarEntry entry = jarInputStream.getNextJarEntry();
         while (entry != null) {
             if (name.equals(entry.getName())) {
