@@ -27,8 +27,8 @@ import java.net.JarURLConnection;
 public interface JarScannerCallback {
 
     /**
-     * A JAR was found (probably packaged in a WAR) and may be accessed for
-     * further processing via the provided URL connection.
+     * A JAR was found and may be accessed for further processing via the
+     * provided URL connection.
      *
      * @param urlConn    The connection to the identified JAR
      * @param webappPath The path, if any, to the JAR within the web application
@@ -42,11 +42,10 @@ public interface JarScannerCallback {
             throws IOException;
 
     /**
-     * A JAR was found (probably in an unpacked WAR or possibly elsewhere on the
-     * class path) and may be accessed for further processing via the provided
-     * file.
+     * A directory was found that is to be treated as an unpacked JAR. The
+     * directory may be accessed for further processing via the provided file.
      *
-     * @param file       The file for the identified JAR.
+     * @param file       The directory containing the unpacked JAR.
      * @param webappPath The path, if any, to the file within the web
      *                       application
      * @param isWebapp   Indicates if the JAR was found within a web
