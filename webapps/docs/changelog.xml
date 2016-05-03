@@ -235,6 +235,15 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        When scanning JARs for TLDs, correctly handle the (rare) case where a
+        JAR has been exploded into <code>WEB-INF/classes</code> and the web
+        application is deployed as a packed WAR. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
