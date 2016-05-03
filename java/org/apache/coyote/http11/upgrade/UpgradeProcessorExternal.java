@@ -17,7 +17,6 @@
 package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
@@ -40,13 +39,12 @@ public class UpgradeProcessorExternal extends UpgradeProcessorBase {
     private final UpgradeServletOutputStream upgradeServletOutputStream;
 
 
-    public UpgradeProcessorExternal(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput,
+    public UpgradeProcessorExternal(SocketWrapperBase<?> wrapper,
             UpgradeToken upgradeToken) {
-        super(wrapper, leftOverInput, upgradeToken);
+        super(upgradeToken);
         this.upgradeServletInputStream = new UpgradeServletInputStream(this, wrapper);
         this.upgradeServletOutputStream = new UpgradeServletOutputStream(this, wrapper);
 
-        wrapper.unRead(leftOverInput);
         /*
          * Leave timeouts in the hands of the upgraded protocol.
          */

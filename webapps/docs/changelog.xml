@@ -212,6 +212,9 @@
         known issue in OpenSSL</a> that does not permit the TLS handshake to be
         failed if the ALPN negotiation fails. (markt)
       </fix>
+      <update>
+        <bug>59421</bug>: Add direct HTTP/2 connection support. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

@@ -17,7 +17,6 @@
 package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
@@ -36,9 +35,9 @@ public class UpgradeProcessorInternal extends UpgradeProcessorBase {
 
     private final InternalHttpUpgradeHandler internalHttpUpgradeHandler;
 
-    public UpgradeProcessorInternal(SocketWrapperBase<?> wrapper, ByteBuffer leftOverInput,
+    public UpgradeProcessorInternal(SocketWrapperBase<?> wrapper,
             UpgradeToken upgradeToken) {
-        super(wrapper, leftOverInput, upgradeToken);
+        super(upgradeToken);
         this.internalHttpUpgradeHandler = (InternalHttpUpgradeHandler) upgradeToken.getHttpUpgradeHandler();
         /*
          * Leave timeouts in the hands of the upgraded protocol.
