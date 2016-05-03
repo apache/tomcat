@@ -187,23 +187,22 @@ public class StandardJarScanner implements JarScanner {
         }
 
         // Scan WEB-INF/classes
-        URL webInfURL = null;
         try {
-            webInfURL = context.getResource(Constants.WEB_INF_CLASSES);
-            if (isScanAllDirectories()) {
-                URL url = context.getResource(Constants.WEB_INF_CLASSES + "/META-INF");
-                if (url != null) {
-                    // Class path scanning will look at WEB-INF/classes since
-                    // that is the URL that Tomcat's web application class
-                    // loader returns. Therefore, it is this URL that needs to
-                    // be added to the set of processed URLs.
-                    if (webInfURL != null) {
-                        processedURLs.add(webInfURL);
-                    }
-                    try {
-                        callback.scanWebInfClasses();
-                    } catch (IOException e) {
-                        log.warn(sm.getString("jarScan.webinfclassesFail"), e);
+            URL webInfURL = context.getResource(Constants.WEB_INF_CLASSES);
+            if (webInfURL != null) {
+                // WEB-INF/classes will also be included in the URLs returned
+                // by the web application class loader so ensure the class path
+                // scanning below does not re-scan this location.
+                processedURLs.add(webInfURL);
+
+                if (isScanAllDirectories()) {
+                    URL url = context.getResource(Constants.WEB_INF_CLASSES + "/META-INF");
+                    if (url != null) {
+                        try {
+                            callback.scanWebInfClasses();
+                        } catch (IOException e) {
+                            log.warn(sm.getString("jarScan.webinfclassesFail"), e);
+                        }
                     }
                 }
             }
@@ -259,17 +258,8 @@ public class StandardJarScanner implements JarScanner {
                             if (log.isDebugEnabled()) {
                                 log.debug(sm.getString("jarScan.classloaderJarScan", urls[i]));
                             }
-                            String webappPath = null;
-                            if (urls[i].equals(webInfURL)) {
-                                if (scanType == JarScanType.PLUGGABILITY) {
-                                    // WEB-INF/classes should not be scanned for
-                                    // web fragments.
-                                    continue;
-                                }
-                                webappPath = Constants.WEB_INF_CLASSES;
-                            }
                             try {
-                                process(scanType, callback, urls[i], webappPath, isWebapp);
+                                process(scanType, callback, urls[i], null, isWebapp);
                             } catch (IOException ioe) {
                                 log.warn(sm.getString("jarScan.classloaderFail", urls[i]), ioe);
                             }
