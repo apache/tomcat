@@ -18,7 +18,6 @@ package org.apache.jasper.servlet;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -110,9 +109,7 @@ public class TestTldScanner extends TomcatBaseTest {
             throws Exception {
         String fullPath = new File(webapp, path).toURI().toString();
         URL jarUrl = new URL("jar:" + fullPath + "!/");
-        JarURLConnection connection = (JarURLConnection) jarUrl.openConnection();
-        callback.scan(connection, path, true);
+        callback.scan(jarUrl, path, true);
     }
-
 }
 
