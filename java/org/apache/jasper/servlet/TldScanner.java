@@ -398,9 +398,8 @@ public class TldScanner {
 
             for (String path : paths) {
                 if (path.endsWith(TLD_EXT)) {
-                    String webappPath = WEB_INF + "classes/META-INF" + path;
                     try {
-                        parseTld(webappPath);
+                        parseTld(path);
                     } catch (SAXException e) {
                         throw new IOException(e);
                     }
