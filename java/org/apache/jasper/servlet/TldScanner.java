@@ -394,13 +394,18 @@ public class TldScanner {
             // JARs have been unpacked into WEB-INF/classes as happens with some
             // IDEs.
 
-            // We know that WEB-INF/classes/META-INF must be a directory on disk
-            String webappPath = WEB_INF + "classes";
-            String realPath = context.getRealPath(webappPath);
+            Set<String> paths = context.getResourcePaths(WEB_INF + "classes/META-INF");
 
-            File webInfClasses = new File(realPath);
-
-            scan(webInfClasses, webappPath, true);
+            for (String path : paths) {
+                if (path.endsWith(TLD_EXT)) {
+                    String webappPath = WEB_INF + "classes/META-INF" + path;
+                    try {
+                        parseTld(webappPath);
+                    } catch (SAXException e) {
+                        throw new IOException(e);
+                    }
+                }
+            }
         }
 
 
