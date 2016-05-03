@@ -268,6 +268,10 @@
         <code>GenericServlet.log(String, Throwable)</code> are logged at the
         SEVERE level. (violetagg)
       </fix>
+      <fix>
+        Correct a typo in SSL/TLS Configuration How-To.
+        Issue reported via comments.apache.org. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
