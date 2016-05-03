@@ -18,11 +18,9 @@ package org.apache.tomcat.util.scan;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLConnection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -103,7 +101,7 @@ public class StandardJarScanner implements JarScanner {
      * Controls the testing all directories to see of they are exploded JAR
      * files extension.
      */
-    private boolean scanAllDirectories = false;
+    private boolean scanAllDirectories = true;
     public boolean isScanAllDirectories() {
         return scanAllDirectories;
     }
@@ -307,48 +305,35 @@ public class StandardJarScanner implements JarScanner {
             log.trace(sm.getString("jarScan.jarUrlStart", url));
         }
 
-        URLConnection conn = url.openConnection();
-        if (conn instanceof JarURLConnection) {
-            callback.scan((JarURLConnection) conn, webappPath, isWebapp);
-        } else {
-            String urlStr = url.toString();
-            if (urlStr.startsWith("file:") || urlStr.startsWith("http:") || urlStr.startsWith("https:")) {
-                if (urlStr.endsWith(Constants.JAR_EXT)) {
-                    URL jarURL = UriUtil.buildJarUrl(urlStr);
-                    callback.scan((JarURLConnection) jarURL.openConnection(),
-                            webappPath, isWebapp);
-                } else {
-                    File f;
-                    try {
-                        f = new File(url.toURI());
-                        if (f.isFile() && isScanAllFiles()) {
-                            // Treat this file as a JAR
-                            URL jarURL = UriUtil.buildJarUrl(f);
-                            callback.scan(
-                                    (JarURLConnection) jarURL.openConnection(),
-                                    webappPath, isWebapp);
-                        } else if (f.isDirectory()) {
-                            if (scanType == JarScanType.PLUGGABILITY) {
-                                callback.scan(f, webappPath, isWebapp);
-                            } else {
-                                File metainf = new File(f.getAbsoluteFile() +
-                                        File.separator + "META-INF");
-                                if (metainf.isDirectory()) {
-                                    callback.scan(f, webappPath, isWebapp);
-                                }
-                            }
+        String urlStr = url.toString();
+        if (urlStr.startsWith("jar:") || urlStr.endsWith(Constants.JAR_EXT)) {
+            callback.scan(url, webappPath, isWebapp);
+        } else if (urlStr.startsWith("file:")) {
+            File f;
+            try {
+                f = new File(url.toURI());
+                if (f.isFile() && isScanAllFiles()) {
+                    // Treat this file as a JAR
+                    URL jarURL = UriUtil.buildJarUrl(f);
+                    callback.scan(jarURL, webappPath, isWebapp);
+                } else if (f.isDirectory()) {
+                    if (scanType == JarScanType.PLUGGABILITY) {
+                        callback.scan(f, webappPath, isWebapp);
+                    } else {
+                        File metainf = new File(f.getAbsoluteFile() + File.separator + "META-INF");
+                        if (metainf.isDirectory()) {
+                            callback.scan(f, webappPath, isWebapp);
                         }
-                    } catch (Throwable t) {
-                        ExceptionUtils.handleThrowable(t);
-                        // Wrap the exception and re-throw
-                        IOException ioe = new IOException();
-                        ioe.initCause(t);
-                        throw ioe;
                     }
                 }
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                // Wrap the exception and re-throw
+                IOException ioe = new IOException();
+                ioe.initCause(t);
+                throw ioe;
             }
         }
-
     }
 
 
