@@ -305,10 +305,9 @@ public class StandardJarScanner implements JarScanner {
             log.trace(sm.getString("jarScan.jarUrlStart", url));
         }
 
-        String urlStr = url.toString();
-        if (urlStr.startsWith("jar:") || urlStr.endsWith(Constants.JAR_EXT)) {
+        if ("jar".equals(url.getProtocol()) || url.getPath().endsWith(Constants.JAR_EXT)) {
             callback.scan(url, webappPath, isWebapp);
-        } else if (urlStr.startsWith("file:")) {
+        } else if ("file".equals(url.getProtocol())) {
             File f;
             try {
                 f = new File(url.toURI());
