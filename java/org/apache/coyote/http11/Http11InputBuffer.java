@@ -410,23 +410,17 @@ public class Http11InputBuffer implements InputBuffer {
                     // Switch to the socket timeout.
                     wrapper.setReadTimeout(wrapper.getEndpoint().getSoTimeout());
                 }
-                if (!keptAlive) {
+                if (!keptAlive && pos == 0 && lastValid >= CLIENT_PREFACE_START.length - 1) {
+                    boolean prefaceMatch = true;
                     for (int i = 0; i < CLIENT_PREFACE_START.length; i++) {
-                        if (i == lastValid) {
-                            // Need more data to know if this is HTTP/2
-                            if (!fill(false)) {
-                                // A read is pending, so no longer in initial state
-                                parsingRequestLinePhase = 1;
-                                return false;
-                            }
-                        }
                         if (CLIENT_PREFACE_START[i] != buf[i]) {
-                            break;
-                        } else if (i == CLIENT_PREFACE_START.length - 1) {
-                            // HTTP/2 preface matched
-                            parsingRequestLinePhase = -1;
-                            return false;
+                            prefaceMatch = false;
                         }
+                    }
+                    if (prefaceMatch) {
+                        // HTTP/2 preface matched
+                        parsingRequestLinePhase = -1;
+                        return false;
                     }
                 }
                 // Set the start time once we start reading data (even if it is
