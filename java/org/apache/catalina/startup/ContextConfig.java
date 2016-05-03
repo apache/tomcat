@@ -1672,7 +1672,7 @@ public class ContextConfig implements LifecycleListener {
         for (WebXml fragment : fragments) {
             URL url = fragment.getURL();
             try {
-                if ("jar".equals(url.getProtocol())) {
+                if ("jar".equals(url.getProtocol()) || url.toString().endsWith(".jar")) {
                     try (Jar jar = JarFactory.newInstance(url)) {
                         jar.nextEntry();
                         String entryName = jar.getEntryName();
