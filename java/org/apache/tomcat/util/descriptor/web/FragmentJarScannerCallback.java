@@ -55,7 +55,6 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
             throws IOException {
 
         URL url = jarConn.getURL();
-        URL resourceURL = jarConn.getJarFileURL();
         Jar jar = null;
         InputStream is = null;
         WebXml fragment = new WebXml();
@@ -77,8 +76,9 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
                 // distributable
                 fragment.setDistributable(true);
             } else {
-                InputSource source = new InputSource(
-                        "jar:" + resourceURL.toString() + "!/" + FRAGMENT_LOCATION);
+                @SuppressWarnings("null") // Cannot be null here
+                String fragmentUrl = jar.getURL(FRAGMENT_LOCATION);
+                InputSource source = new InputSource(fragmentUrl);
                 source.setByteStream(is);
                 if (!webXmlParser.parseWebXml(source, fragment, true)) {
                     ok = false;

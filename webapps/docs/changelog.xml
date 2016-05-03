@@ -161,6 +161,11 @@
         rather than a decoded URI after a dispatch. (markt)
       </fix>
       <fix>
+        Use the correct URL for the fragment when reporting errors processing
+        a <code>web-fragment.xml</code> file from a JAR located in an unpacked
+        WAR. (markt)
+      </fix>
+      <fix>
         Ensure that <code>JarScanner</code> only uses the explicit call-back to
         process <code>WEB-INF/classes</code> and only when configured to treat
         the contents of <code>WEB-INF/classes</code> as a possible exploded JAR.
