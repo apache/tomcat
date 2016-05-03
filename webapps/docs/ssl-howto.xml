@@ -473,7 +473,7 @@ SSL communications, and what to do about them.</p>
     be named <code>.keystore</code> in the user home directory under which
     Tomcat is running (which may or may not be the same as yours :-).  If
     the keystore file is anywhere else, you will need to add a
-    <code>keystoreFile</code> attribute to the <code>&lt;Factory&gt;</code>
+    <code>keystoreFile</code> attribute to the <code>&lt;Connector&gt;</code>
     element in the <a href="#Edit_the_Tomcat_Configuration_File">Tomcat
     configuration file</a>.</p>
     </li>
