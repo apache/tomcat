@@ -53,8 +53,13 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
     @Override
     public void scan(JarURLConnection jarConn, String webappPath, boolean isWebapp)
             throws IOException {
+        scan(jarConn.getURL(), webappPath, isWebapp);
+    }
 
-        URL url = jarConn.getURL();
+
+    @Override
+    public void scan(URL jarUrl, String webappPath, boolean isWebapp) throws IOException {
+
         Jar jar = null;
         InputStream is = null;
         WebXml fragment = new WebXml();
@@ -67,7 +72,7 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
             // web-fragment.xml files don't need to be parsed if they are never
             // going to be used.
             if (isWebapp && parseRequired) {
-                jar = JarFactory.newInstance(url);
+                jar = JarFactory.newInstance(jarUrl);
                 is = jar.getInputStream(FRAGMENT_LOCATION);
             }
 
@@ -88,14 +93,15 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
             if (jar != null) {
                 jar.close();
             }
-            fragment.setURL(url);
+            fragment.setURL(jarUrl);
             if (fragment.getName() == null) {
                 fragment.setName(fragment.getURL().toString());
             }
-            fragment.setJarName(extractJarFileName(url));
+            fragment.setJarName(extractJarFileName(jarUrl));
             fragments.put(fragment.getName(), fragment);
         }
     }
+
 
     private String extractJarFileName(URL input) {
         String url = input.toString();

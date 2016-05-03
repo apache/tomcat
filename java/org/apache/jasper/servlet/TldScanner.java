@@ -296,12 +296,18 @@ public class TldScanner {
         private boolean foundFileWithoutTld = false;
 
         @Override
-        public void scan(JarURLConnection urlConn, String webappPath,
-                boolean isWebapp) throws IOException {
+        public void scan(JarURLConnection jarConn, String webappPath, boolean isWebapp)
+                throws IOException {
+            scan(jarConn.getURL(), webappPath, isWebapp);
+        }
+
+
+        @Override
+        public void scan(URL jarUrl, String webappPath, boolean isWebapp) throws IOException {
             boolean found = false;
-            URL jarURL;
-            try (Jar jar = JarFactory.newInstance(urlConn.getURL())) {
-                jarURL = jar.getJarFileURL();
+            URL jarFileUrl;
+            try (Jar jar = JarFactory.newInstance(jarUrl)) {
+                jarFileUrl = jar.getJarFileURL();
                 jar.nextEntry();
                 for (String entryName = jar.getEntryName();
                     entryName != null;
@@ -312,7 +318,7 @@ public class TldScanner {
                     }
                     found = true;
                     TldResourcePath tldResourcePath =
-                            new TldResourcePath(jarURL, webappPath, entryName);
+                            new TldResourcePath(jarFileUrl, webappPath, entryName);
                     try {
                         parseTld(tldResourcePath);
                     } catch (SAXException e) {
@@ -322,12 +328,13 @@ public class TldScanner {
             }
             if (found) {
                 if (log.isDebugEnabled()) {
-                    log.debug(Localizer.getMessage("jsp.tldCache.tldInJar", jarURL.toString()));
+                    log.debug(Localizer.getMessage("jsp.tldCache.tldInJar", jarFileUrl.toString()));
                 }
             } else {
                 foundJarWithoutTld = true;
                 if (log.isDebugEnabled()) {
-                    log.debug(Localizer.getMessage("jsp.tldCache.noTldInJar", jarURL.toString()));
+                    log.debug(Localizer.getMessage(
+                            "jsp.tldCache.noTldInJar", jarFileUrl.toString()));
                 }
             }
         }
