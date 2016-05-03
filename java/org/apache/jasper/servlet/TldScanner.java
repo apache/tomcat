@@ -18,7 +18,6 @@ package org.apache.jasper.servlet;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -294,12 +293,6 @@ public class TldScanner {
     class TldScannerCallback implements JarScannerCallback {
         private boolean foundJarWithoutTld = false;
         private boolean foundFileWithoutTld = false;
-
-        @Override
-        public void scan(JarURLConnection jarConn, String webappPath, boolean isWebapp)
-                throws IOException {
-            scan(jarConn.getURL(), webappPath, isWebapp);
-        }
 
 
         @Override

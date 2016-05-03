@@ -18,7 +18,6 @@ package org.apache.tomcat;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.JarURLConnection;
 import java.net.URL;
 
 /**
@@ -26,28 +25,6 @@ import java.net.URL;
  * them to receive notification of a discovered JAR.
  */
 public interface JarScannerCallback {
-
-    /**
-     * A JAR was found and may be accessed for further processing via the
-     * provided URL connection.
-     *
-     * @param urlConn    The connection to the identified JAR
-     * @param webappPath The path, if any, to the JAR within the web application
-     * @param isWebapp   Indicates if the JAR was found within a web
-     *                       application. If <code>false</code> the JAR should
-     *                       be treated as being provided by the container
-     *
-     * @throws IOException if an I/O error occurs while scanning the JAR
-     *
-     * @deprecated Use {@link #scan(URL, String, boolean)} instead. Because the
-     *             urlConn parameter could refer directly to a JAR or to a JAR
-     *             as an entry in a WAR, it required further processing that
-     *             included obtaining the original URL. It is simpler to provide
-     *             the URL to start with..
-     */
-    @Deprecated
-    public void scan(JarURLConnection urlConn, String webappPath, boolean isWebapp)
-            throws IOException;
 
     /**
      * A JAR was found and may be accessed for further processing via the

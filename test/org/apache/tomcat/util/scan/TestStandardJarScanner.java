@@ -18,7 +18,6 @@ package org.apache.tomcat.util.scan;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -102,12 +101,6 @@ public class TestStandardJarScanner {
         public void scan(URL jarUrl, String webappPath,
                 boolean isWebapp) throws IOException {
             callbacks.add(jarUrl.toString() + "::" + webappPath + "::" + isWebapp);
-        }
-
-        @Override
-        public void scan(JarURLConnection urlConn, String webappPath,
-                boolean isWebapp) throws IOException {
-            callbacks.add(urlConn.toString() + "::" + webappPath + "::" + isWebapp);
         }
 
         @Override
