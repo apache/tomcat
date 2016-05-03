@@ -124,12 +124,21 @@ public class UrlJar implements Jar {
 
     @Override
     public void nextEntry() {
+        if (jarInputStream == null) {
+            try {
+                jarInputStream = createJarInputStream();
+            } catch (IOException e) {
+                entry = null;
+                return;
+            }
+        }
         try {
             entry = jarInputStream.getNextJarEntry();
         } catch (IOException ioe) {
             entry = null;
         }
     }
+
 
     @Override
     public String getEntryName() {
@@ -140,10 +149,15 @@ public class UrlJar implements Jar {
         }
     }
 
+
     @Override
     public InputStream getEntryInputStream() throws IOException {
+        if (jarInputStream == null) {
+            jarInputStream = createJarInputStream();
+        }
         return jarInputStream;
     }
+
 
     @Override
     public void reset() throws IOException {
