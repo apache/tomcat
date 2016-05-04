@@ -21,16 +21,16 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.jar.Manifest;
 
-import org.apache.tomcat.util.scan.JarFactory;
-
 /**
  * Provides an abstraction for use by the various classes that need to scan
- * JARs. The classes provided by the JRE for accessing JARs ({@link java.util.jar.JarFile} and
- * {@link java.util.jar.JarInputStream}) have significantly different performance
- * characteristics depending on the form of the URL used to access the JAR.
- * For file based JAR {@link java.net.URL}s, {@link java.util.jar.JarFile} is faster but for non-file
- * based {@link java.net.URL}s, {@link java.util.jar.JarFile} creates a copy of the JAR in the
- * temporary directory so {@link java.util.jar.JarInputStream} is faster.
+ * JARs. The classes provided by the JRE for accessing JARs
+ * ({@link java.util.jar.JarFile} and {@link java.util.jar.JarInputStream}) have
+ * significantly different performance characteristics depending on the form of
+ * the URL used to access the JAR. For file based JAR {@link java.net.URL}s,
+ * {@link java.util.jar.JarFile} is faster but for non-file based
+ * {@link java.net.URL}s, {@link java.util.jar.JarFile} creates a copy of the
+ * JAR in the temporary directory so {@link java.util.jar.JarInputStream} is
+ * faster.
  */
 public interface Jar extends AutoCloseable {
 
@@ -109,7 +109,8 @@ public interface Jar extends AutoCloseable {
      * be used, rather the jar:jar:file:... form (that the JRE does not
      * understand will be used). Note that this means that any code using these
      * URLs will need to understand the jar:jar:file:... form and use the
-     * {@link JarFactory} to ensure resources are accessed correctly.
+     * {@link org.apache.tomcat.util.scan.JarFactory} to ensure resources are
+     * accessed correctly.
      *
      * @param entry The entry to generate the URL for
      *
