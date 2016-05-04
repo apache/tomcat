@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Objects;
 
-import org.apache.tomcat.util.scan.Jar;
+import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.scan.JarFactory;
 
 /**

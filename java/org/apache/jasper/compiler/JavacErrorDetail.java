@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.jasper.JspCompilationContext;
-import org.apache.tomcat.util.scan.Jar;
+import org.apache.tomcat.Jar;
 
 /**
  * Class providing details about a javac compilation error.

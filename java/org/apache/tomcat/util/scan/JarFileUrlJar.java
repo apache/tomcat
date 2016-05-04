@@ -25,7 +25,10 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
+
+import org.apache.tomcat.Jar;
 
 /**
  * Implementation of {@link Jar} that is optimised for file based JAR URLs that
@@ -142,6 +145,12 @@ public class JarFileUrlJar implements Jar {
             return jarFile.getInputStream(entry);
         }
     }
+
+    @Override
+    public Manifest getManifest() throws IOException {
+        return jarFile.getManifest();
+    }
+
 
     @Override
     public void reset() throws IOException {

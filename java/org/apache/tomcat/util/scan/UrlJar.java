@@ -17,134 +17,33 @@
 package org.apache.tomcat.util.scan;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.jar.JarEntry;
 
 /**
- * Implementation of {@link Jar} that is optimised for non-file based JAR URLs
- * (e.g. JNDI based URLs of the form jar:jndi:...).
+ * Implementation of {@link org.apache.tomcat.Jar} that is optimised for
+ * non-file based JAR URLs (e.g. JNDI based URLs of the form jar:jndi:...).
  */
-public class UrlJar implements Jar {
+public class UrlJar extends AbstractInputStreamJar {
 
-    private NonClosingJarInputStream jarInputStream = null;
-    private final URL url;
-    private JarEntry entry = null;
-
-    public UrlJar(URL url) throws IOException {
-        this.url = url;
-        this.jarInputStream = createJarInputStream();
+    public UrlJar(URL jarFileURL) {
+        super(jarFileURL);
     }
 
-    @Override
-    public URL getJarFileURL() {
-        return url;
-    }
-
-    @Override
-    public boolean entryExists(String name) throws IOException {
-        JarEntry entry = jarInputStream.getNextJarEntry();
-        while (entry != null) {
-            if (name.equals(entry.getName())) {
-                break;
-            }
-            entry = jarInputStream.getNextJarEntry();
-        }
-
-        return entry != null;
-    }
-
-    @Override
-    public InputStream getInputStream(String name) throws IOException {
-        JarEntry entry = jarInputStream.getNextJarEntry();
-        while (entry != null) {
-            if (name.equals(entry.getName())) {
-                break;
-            }
-            entry = jarInputStream.getNextJarEntry();
-        }
-
-        if (entry == null) {
-            return null;
-        } else {
-            return jarInputStream;
-        }
-    }
-
-    @Override
-    public long getLastModified(String name) throws IOException {
-        JarEntry entry = jarInputStream.getNextJarEntry();
-        while (entry != null) {
-            if (name.equals(entry.getName())) {
-                break;
-            }
-            entry = jarInputStream.getNextJarEntry();
-        }
-
-        if (entry == null) {
-            return -1;
-        } else {
-            return entry.getTime();
-        }
-    }
-
-    @Override
-    public String getURL(String entry) {
-        StringBuilder result = new StringBuilder("jar:");
-        result.append(getJarFileURL().toExternalForm());
-        result.append("!/");
-        result.append(entry);
-
-        return result.toString();
-    }
 
     @Override
     public void close() {
-        if (jarInputStream != null) {
-            try {
-                jarInputStream.reallyClose();
-            } catch (IOException ioe) {
-                // Ignore
-            }
-        }
+        closeStream();
     }
 
-    private NonClosingJarInputStream createJarInputStream() throws IOException {
-        JarURLConnection jarConn = (JarURLConnection) url.openConnection();
+
+    @Override
+    protected NonClosingJarInputStream createJarInputStream() throws IOException {
+        JarURLConnection jarConn = (JarURLConnection) getJarFileURL().openConnection();
         URL resourceURL = jarConn.getJarFileURL();
         URLConnection resourceConn = resourceURL.openConnection();
         resourceConn.setUseCaches(false);
         return new NonClosingJarInputStream(resourceConn.getInputStream());
-    }
-
-    @Override
-    public void nextEntry() {
-        try {
-            entry = jarInputStream.getNextJarEntry();
-        } catch (IOException ioe) {
-            entry = null;
-        }
-    }
-
-    @Override
-    public String getEntryName() {
-        if (entry == null) {
-            return null;
-        } else {
-            return entry.getName();
-        }
-    }
-
-    @Override
-    public InputStream getEntryInputStream() throws IOException {
-        return jarInputStream;
-    }
-
-    @Override
-    public void reset() throws IOException {
-        close();
-        jarInputStream = createJarInputStream();
     }
 }

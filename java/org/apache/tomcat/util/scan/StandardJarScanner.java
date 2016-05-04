@@ -30,6 +30,7 @@ import javax.servlet.ServletContext;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.Jar;
 import org.apache.tomcat.JarScanFilter;
 import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScanner;
@@ -305,17 +306,20 @@ public class StandardJarScanner implements JarScanner {
             log.trace(sm.getString("jarScan.jarUrlStart", url));
         }
 
-        String urlStr = url.toString();
-        if (urlStr.startsWith("jar:") || urlStr.endsWith(Constants.JAR_EXT)) {
-            callback.scan(url, webappPath, isWebapp);
-        } else if (urlStr.startsWith("file:")) {
+        if ("jar".equals(url.getProtocol()) || url.getPath().endsWith(Constants.JAR_EXT)) {
+            try (Jar jar = JarFactory.newInstance(url)) {
+                callback.scan(jar, webappPath, isWebapp);
+            }
+        } else if ("file".equals(url.getProtocol())) {
             File f;
             try {
                 f = new File(url.toURI());
                 if (f.isFile() && isScanAllFiles()) {
                     // Treat this file as a JAR
                     URL jarURL = UriUtil.buildJarUrl(f);
-                    callback.scan(jarURL, webappPath, isWebapp);
+                    try (Jar jar = JarFactory.newInstance(jarURL)) {
+                        callback.scan(jar, webappPath, isWebapp);
+                    }
                 } else if (f.isDirectory()) {
                     if (scanType == JarScanType.PLUGGABILITY) {
                         callback.scan(f, webappPath, isWebapp);

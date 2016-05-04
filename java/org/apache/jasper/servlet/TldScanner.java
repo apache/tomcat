@@ -40,14 +40,13 @@ import org.apache.jasper.compiler.JarScannerFactory;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.Jar;
 import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.descriptor.tld.TaglibXml;
 import org.apache.tomcat.util.descriptor.tld.TldParser;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
-import org.apache.tomcat.util.scan.Jar;
-import org.apache.tomcat.util.scan.JarFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -296,27 +295,24 @@ public class TldScanner {
 
 
         @Override
-        public void scan(URL jarUrl, String webappPath, boolean isWebapp) throws IOException {
+        public void scan(Jar jar, String webappPath, boolean isWebapp) throws IOException {
             boolean found = false;
-            URL jarFileUrl;
-            try (Jar jar = JarFactory.newInstance(jarUrl)) {
-                jarFileUrl = jar.getJarFileURL();
-                jar.nextEntry();
-                for (String entryName = jar.getEntryName();
-                    entryName != null;
-                    jar.nextEntry(), entryName = jar.getEntryName()) {
-                    if (!(entryName.startsWith("META-INF/") &&
-                            entryName.endsWith(TLD_EXT))) {
-                        continue;
-                    }
-                    found = true;
-                    TldResourcePath tldResourcePath =
-                            new TldResourcePath(jarFileUrl, webappPath, entryName);
-                    try {
-                        parseTld(tldResourcePath);
-                    } catch (SAXException e) {
-                        throw new IOException(e);
-                    }
+            URL jarFileUrl = jar.getJarFileURL();
+            jar.nextEntry();
+            for (String entryName = jar.getEntryName();
+                entryName != null;
+                jar.nextEntry(), entryName = jar.getEntryName()) {
+                if (!(entryName.startsWith("META-INF/") &&
+                        entryName.endsWith(TLD_EXT))) {
+                    continue;
+                }
+                found = true;
+                TldResourcePath tldResourcePath =
+                        new TldResourcePath(jarFileUrl, webappPath, entryName);
+                try {
+                    parseTld(tldResourcePath);
+                } catch (SAXException e) {
+                    throw new IOException(e);
                 }
             }
             if (found) {

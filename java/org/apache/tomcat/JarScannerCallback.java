@@ -18,7 +18,6 @@ package org.apache.tomcat;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * This interface is implemented by clients of the {@link JarScanner} to enable
@@ -28,9 +27,9 @@ public interface JarScannerCallback {
 
     /**
      * A JAR was found and may be accessed for further processing via the
-     * provided URL connection.
+     * provided URL connection. The caller is responsible for closing the JAR.
      *
-     * @param jarURL     The URL for the identified JAR
+     * @param jar        The JAR to process
      * @param webappPath The path, if any, to the JAR within the web application
      * @param isWebapp   Indicates if the JAR was found within a web
      *                       application. If <code>false</code> the JAR should
@@ -38,7 +37,7 @@ public interface JarScannerCallback {
      *
      * @throws IOException if an I/O error occurs while scanning the JAR
      */
-    public void scan(URL jarURL, String webappPath, boolean isWebapp)
+    public void scan(Jar jar, String webappPath, boolean isWebapp)
             throws IOException;
 
     /**

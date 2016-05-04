@@ -36,8 +36,8 @@ import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.runtime.JspSourceDependent;
 import org.apache.jasper.servlet.JspServletWrapper;
+import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
-import org.apache.tomcat.util.scan.Jar;
 
 /**
  * 1. Processes and extracts the directive info in a tag file. 2. Compiles and

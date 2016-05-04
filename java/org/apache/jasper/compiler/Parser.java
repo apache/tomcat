@@ -29,8 +29,8 @@ import javax.servlet.jsp.tagext.TagLibraryInfo;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.util.UniqueAttributesImpl;
+import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
-import org.apache.tomcat.util.scan.Jar;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 

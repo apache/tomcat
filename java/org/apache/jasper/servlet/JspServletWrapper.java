@@ -47,7 +47,7 @@ import org.apache.jasper.util.FastRemovalDequeue;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
-import org.apache.tomcat.util.scan.Jar;
+import org.apache.tomcat.Jar;
 
 /**
  * The JSP engine (a.k.a Jasper).

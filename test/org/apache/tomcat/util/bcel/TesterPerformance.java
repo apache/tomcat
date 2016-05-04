@@ -27,8 +27,8 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.bcel.classfile.ClassParser;
-import org.apache.tomcat.util.scan.Jar;
 import org.apache.tomcat.util.scan.JarFactory;
 
 public class TesterPerformance {
