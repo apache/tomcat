@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.jar.JarEntry;
+import java.util.jar.Manifest;
 
 import org.apache.tomcat.Jar;
 
@@ -116,6 +117,13 @@ public abstract class AbstractInputStreamJar implements Jar {
         result.append(entry);
 
         return result.toString();
+    }
+
+
+    @Override
+    public Manifest getManifest() throws IOException {
+        reset();
+        return jarInputStream.getManifest();
     }
 
 

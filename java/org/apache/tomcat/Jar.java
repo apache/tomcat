@@ -19,6 +19,7 @@ package org.apache.tomcat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.jar.Manifest;
 
 import org.apache.tomcat.util.scan.JarFactory;
 
@@ -115,6 +116,15 @@ public interface Jar extends AutoCloseable {
      * @return a URL for the specified entry in the JAR
      */
     String getURL(String entry);
+
+    /**
+     * Obtain the manifest for the JAR file.
+     *
+     * @return The manifest for this JAR file.
+     *
+     * @throws IOException If an I/O error occurs trying to obtain the manifest
+     */
+    Manifest getManifest() throws IOException;
 
     /**
      * Resets the internal pointer used to track JAR entries to the beginning of
