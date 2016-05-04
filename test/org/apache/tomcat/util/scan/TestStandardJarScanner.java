@@ -26,7 +26,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-
+import org.apache.tomcat.Jar;
 import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.unittest.TesterServletContext;
@@ -98,9 +98,9 @@ public class TestStandardJarScanner {
         List<String> callbacks = new ArrayList<>();
 
         @Override
-        public void scan(URL jarUrl, String webappPath,
+        public void scan(Jar jar, String webappPath,
                 boolean isWebapp) throws IOException {
-            callbacks.add(jarUrl.toString() + "::" + webappPath + "::" + isWebapp);
+            callbacks.add(jar.getJarFileURL().toString() + "::" + webappPath + "::" + isWebapp);
         }
 
         @Override

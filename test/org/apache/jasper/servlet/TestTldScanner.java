@@ -29,7 +29,9 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.scan.JarFactory;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.easymock.EasyMock;
 
@@ -109,7 +111,9 @@ public class TestTldScanner extends TomcatBaseTest {
             throws Exception {
         String fullPath = new File(webapp, path).toURI().toString();
         URL jarUrl = new URL("jar:" + fullPath + "!/");
-        callback.scan(jarUrl, path, true);
+        try (Jar jar = JarFactory.newInstance(jarUrl)) {
+            callback.scan(jar, path, true);
+        }
     }
 }
 
