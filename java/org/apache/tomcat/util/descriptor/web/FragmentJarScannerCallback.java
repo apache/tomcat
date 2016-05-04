@@ -24,8 +24,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.tomcat.Jar;
 import org.apache.tomcat.JarScannerCallback;
-import org.apache.tomcat.util.scan.Jar;
 import org.apache.tomcat.util.scan.JarFactory;
 import org.xml.sax.InputSource;
 

@@ -36,7 +36,7 @@ import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.compiler.ErrorDispatcher;
 import org.apache.jasper.compiler.JspUtil;
 import org.apache.jasper.compiler.Localizer;
-import org.apache.tomcat.util.scan.Jar;
+import org.apache.tomcat.Jar;
 
 public class XMLEncodingDetector {
 

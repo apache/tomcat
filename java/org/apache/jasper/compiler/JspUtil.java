@@ -26,7 +26,7 @@ import java.util.Vector;
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
-import org.apache.tomcat.util.scan.Jar;
+import org.apache.tomcat.Jar;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 

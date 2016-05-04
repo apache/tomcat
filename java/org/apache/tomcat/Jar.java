@@ -14,11 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.util.scan;
+package org.apache.tomcat;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+
+import org.apache.tomcat.util.scan.JarFactory;
 
 /**
  * Provides an abstraction for use by the various classes that need to scan

@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.jar.JarEntry;
 
+import org.apache.tomcat.Jar;
+
 /**
  * Base implementation of Jar for implementations that use a JarInputStream to
  * access the JAR file.

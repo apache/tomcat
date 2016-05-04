@@ -24,7 +24,7 @@ import java.util.Stack;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.xmlparser.XMLEncodingDetector;
-import org.apache.tomcat.util.scan.Jar;
+import org.apache.tomcat.Jar;
 import org.xml.sax.Attributes;
 
 /**

@@ -22,8 +22,8 @@ import java.net.URL;
 import java.net.URLConnection;
 
 /**
- * Implementation of {@link Jar} that is optimised for non-file based JAR URLs
- * (e.g. JNDI based URLs of the form jar:jndi:...).
+ * Implementation of {@link org.apache.tomcat.Jar} that is optimised for
+ * non-file based JAR URLs (e.g. JNDI based URLs of the form jar:jndi:...).
  */
 public class UrlJar extends AbstractInputStreamJar {
 

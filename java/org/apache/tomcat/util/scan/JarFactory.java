@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.tomcat.Jar;
+
 /**
  * Provide a mechanism to obtain objects that implement {@link Jar}.
  */
