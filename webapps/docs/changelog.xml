@@ -84,6 +84,11 @@
         committed. (markt)
       </fix>
       <fix>
+        <bug>59226</bug>: Process the <code>Class-Path</code> attribute from
+        JAR manifests for JARs on the class path excluding JARs packaged in
+        <code>WEB-INF/lib</code>. (markt)
+      </fix>
+      <fix>
         <bug>59255</bug>: Fix possible NPE in mapper. (kkolinko/remm)
       </fix>
       <fix>
