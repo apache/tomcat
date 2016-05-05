@@ -229,6 +229,9 @@
         <code>sun.java2d.Disposer</code> class by a web application does not
         result in a memory leak.
         Defaults to <code>false</code> because a thread is launched.</p>
+        <p>Note: The underlying leak has been fixed in Java 1.6.0 update 21
+        onwards and Java 7 onwards. This option is unnecessary if running on a
+        fixed version of Java.</p>
       </attribute>
 
       <attribute name="ldapPoolProtection" required="false">
