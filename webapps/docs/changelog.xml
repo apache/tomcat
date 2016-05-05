@@ -176,6 +176,12 @@
         the contents of <code>WEB-INF/classes</code> as a possible exploded JAR.
         (markt)
       </fix>
+      <scode>
+        Remove the <code>java2DDisposerProtection</code> option from the
+        <code>JreMemoryLeakPreventionListener</code>. The leak is fixed in Java
+        7 onwards and Tomcat 9 requires Java 8 so the option is unnecessary.
+        (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
