@@ -69,6 +69,7 @@
   <property name="tomcat.release"        value="${tomcat.output}/release"/>
   <property name="tomcat.src.jars"       value="${tomcat.output}/src-jars"/>
   <property name="test.classes"          value="${tomcat.output}/testclasses"/>
+  <property name="test.run.classes"      value="${tomcat.output}/classes"/>
   <property name="test.temp"             value="${tomcat.output}/test-tmp"/>
   <property name="test.reports"          value="${tomcat.build}/logs"/>
   <property name="test.apr.loc"          value="${tomcat.build}/bin/native"/>
@@ -170,6 +171,7 @@
   <!-- Tests To Run -->
   <property name="test.name" value="**/Test*.java"/>
   <property name="test.formatter" value="-Dorg.apache.juli.formatter=java.util.logging.SimpleFormatter"/>
+  <property name="test.relaxTiming" value="false"/>
   
   <!-- Cobertura code coverage settings -->
   <property name="cobertura.out" value="${tomcat.output}/coverage"/>
@@ -1440,6 +1442,7 @@
         <sysproperty key="tomcat.test.protocol" value="@{protocol}" />
         <sysproperty key="tomcat.test.accesslog" value="${test.accesslog}" />
         <sysproperty key="tomcat.test.reports" value="${test.reports}" />
+        <sysproperty key="tomcat.test.relaxTiming" value="${test.relaxTiming}" />
         <!-- File for Cobertura to write coverage results to -->
         <sysproperty key="net.sourceforge.cobertura.datafile" file="${cobertura.datafile}" />
 

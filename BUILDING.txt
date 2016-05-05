@@ -415,20 +415,27 @@ For example:
 
         junit.formatter.usefile=false
 
- 5. Optional support is provided for the Cobertura code coverage tool. It
- can be enabled using the following property:
+ 5. Optional support is provided for the Cobertura code coverage tool.
 
+* NOTE: Cobertura is licensed under GPL v2 with parts of it being under
+  Apache License v1.1. See http://cobertura.sf.net for details. Using it
+  during Tomcat build is optional and is off by default.
+
+ Cobertura can be enabled using the following property:
+ 
         test.cobertura=true
 
  The report files by default are written to
 
         output/coverage
 
-* NOTE: Cobertura is licensed under GPL v2 with parts of it being under
-  Apache License v1.1. See http://cobertura.sf.net for details. Using it
-  during Tomcat build is optional and is off by default.
+ 6. Some tests include checks that the access log valve entries are as expected.
+    These checks include timings. On slower / loaded systems these checks will
+    often fail. The checks may be relaxed by using the following property:
 
- 6. It is known that some platforms (e.g. OSX El Capitan) require IPv4 to
+        test.relaxTiming=true
+
+ 7. It is known that some platforms (e.g. OSX El Capitan) require IPv4 to
     be the default for the multicast tests to work. This is configured by
     the following property:
 
