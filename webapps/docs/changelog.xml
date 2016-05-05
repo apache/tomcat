@@ -179,7 +179,7 @@
       <scode>
         Remove the <code>java2DDisposerProtection</code> option from the
         <code>JreMemoryLeakPreventionListener</code>. The leak is fixed in Java
-        7 onwards and Tomcat 9 requires Java 8 so the option is unnecessary.
+        7 onwards and Tomcat 8 requires Java 7 so the option is unnecessary.
         (markt)
       </scode>
     </changelog>
