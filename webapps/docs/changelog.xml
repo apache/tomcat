@@ -231,6 +231,10 @@
       <update>
         <bug>59421</bug>: Add direct HTTP/2 connection support. (remm)
       </update>
+      <fix>
+        Correctly handle a call to <code>AsyncContext.complete()</code> from a
+        non-container thread when non-blocking I/O is being used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
