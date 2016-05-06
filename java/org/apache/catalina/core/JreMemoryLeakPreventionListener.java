@@ -87,21 +87,6 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
         this.gcDaemonProtection = gcDaemonProtection;
     }
 
-    /**
-     * Protects against the memory leak caused when the first call to
-     * <code>javax.security.auth.login.Configuration</code> is triggered by a
-     * web application. This first call populate a static variable with a
-     * reference to the context class loader. Defaults to <code>true</code>.
-     */
-    private boolean securityLoginConfigurationProtection = true;
-    public boolean isSecurityLoginConfigurationProtection() {
-        return securityLoginConfigurationProtection;
-    }
-    public void setSecurityLoginConfigurationProtection(
-            boolean securityLoginConfigurationProtection) {
-        this.securityLoginConfigurationProtection = securityLoginConfigurationProtection;
-    }
-
      /**
      * Protect against the memory leak, when the initialization of the
      * Java Cryptography Architecture is triggered by initializing
@@ -257,18 +242,6 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                         ExceptionUtils.handleThrowable(e.getCause());
                         log.error(sm.getString("jreLeakListener.gcDaemonFail"),
                                 e);
-                    }
-                }
-
-                /*
-                 * Initializing javax.security.auth.login.Configuration retains a static reference to the context
-                 * class loader.
-                 */
-                if (securityLoginConfigurationProtection) {
-                    try {
-                        Class.forName("javax.security.auth.login.Configuration", true, ClassLoader.getSystemClassLoader());
-                    } catch(ClassNotFoundException e) {
-                        // Ignore
                     }
                 }
 
