@@ -87,20 +87,6 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
         this.gcDaemonProtection = gcDaemonProtection;
     }
 
-     /**
-      * Protect against the memory leak caused when the first call to
-      * <code>javax.security.auth.Policy</code> is triggered by a web
-      * application. This first call populate a static variable with a reference
-      * to the context class loader. Defaults to <code>true</code>.
-      */
-     private boolean securityPolicyProtection = true;
-     public boolean isSecurityPolicyProtection() {
-         return securityPolicyProtection;
-     }
-     public void setSecurityPolicyProtection(boolean securityPolicyProtection) {
-         this.securityPolicyProtection = securityPolicyProtection;
-     }
-
     /**
      * Protects against the memory leak caused when the first call to
      * <code>javax.security.auth.login.Configuration</code> is triggered by a
@@ -273,39 +259,6 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                                 e);
                     }
                 }
-
-                /*
-                 * Calling getPolicy retains a static reference to the context
-                 * class loader.
-                 */
-                if (securityPolicyProtection) {
-                    try {
-                        // Policy.getPolicy();
-                        Class<?> policyClass = Class
-                                .forName("javax.security.auth.Policy");
-                        Method method = policyClass.getMethod("getPolicy");
-                        method.invoke(null);
-                    } catch(ClassNotFoundException e) {
-                        // Ignore. The class is deprecated.
-                    } catch(SecurityException e) {
-                        // Ignore. Don't need call to getPolicy() to be
-                        // successful, just need to trigger static initializer.
-                    } catch (NoSuchMethodException e) {
-                        log.warn(sm.getString("jreLeakListener.authPolicyFail"),
-                                e);
-                    } catch (IllegalArgumentException e) {
-                        log.warn(sm.getString("jreLeakListener.authPolicyFail"),
-                                e);
-                    } catch (IllegalAccessException e) {
-                        log.warn(sm.getString("jreLeakListener.authPolicyFail"),
-                                e);
-                    } catch (InvocationTargetException e) {
-                        ExceptionUtils.handleThrowable(e.getCause());
-                        log.warn(sm.getString("jreLeakListener.authPolicyFail"),
-                                e);
-                    }
-                }
-
 
                 /*
                  * Initializing javax.security.auth.login.Configuration retains a static reference to the context

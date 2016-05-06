@@ -187,6 +187,12 @@
         7 onwards and Tomcat 9 requires Java 8 so the option is unnecessary.
         (markt)
       </scode>
+      <scode>
+        Remove the <code>securityPolicyProtection</code> option from the
+        <code>JreMemoryLeakPreventionListener</code>. The leak is fixed in Java
+        8 onwards and Tomcat 9 requires Java 8 so the option is unnecessary.
+        (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

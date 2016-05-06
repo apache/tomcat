@@ -236,16 +236,6 @@
         triggered by a web application. Defaults to <code>true</code>.</p>
       </attribute>
 
-      <attribute name="securityPolicyProtection" required="false">
-        <p>Enables protection so that usage of the deprecated
-        <code>javax.security.auth.Policy</code> class by a web application does not
-        result in a memory leak. The first access of this class will trigger the
-        static initializer that will retain a static reference to the context
-        class loader. The protection calls the <code>getPolicy()</code> method
-        of this class to ensure that the static initializer is not triggered by
-        a web application. Defaults to <code>true</code>.</p>
-      </attribute>
-
       <attribute name="tokenPollerProtection" required="false">
         <p>Enables protection so that any token poller thread initialized by
         <code>sun.security.pkcs11.SunPKCS11.initToken()</code> does not
