@@ -72,13 +72,23 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testHIGH() throws Exception {
-        testSpecification("HIGH");
+        // 3DES has been moved to medium in 1.1.0-dev
+        if (TesterOpenSSL.VERSION < 10100) {
+            testSpecification("HIGH:!3DES");
+        } else {
+            testSpecification("HIGH");
+        }
     }
 
 
     @Test
     public void testMEDIUM() throws Exception {
-        testSpecification("MEDIUM");
+        // 3DES has been moved to medium in 1.1.0-dev
+        if (TesterOpenSSL.VERSION < 10100) {
+             testSpecification("MEDIUM:3DES");
+        } else {
+            testSpecification("MEDIUM");
+        }
     }
 
 
@@ -289,7 +299,11 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testTLSv1() throws Exception {
-        testSpecification("TLSv1");
+        // In OpenSSL 1.1.0-dev, TLSv1 refers to those ciphers that require
+        // TLSv1 rather than being an alias for SSLv3
+        if (TesterOpenSSL.VERSION >= 10100) {
+            testSpecification("TLSv1");
+        }
     }
 
 
@@ -528,7 +542,12 @@ public class TestOpenSSLCipherConfigurationParser {
         // Tomcat 8 default as of 2014-08-04
         // This gets an A- from https://www.ssllabs.com/ssltest with no FS for
         // a number of the reference browsers
-        testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
+        // 3DES has been moved to medium in 1.1.0-dev
+        if (TesterOpenSSL.VERSION < 10100) {
+            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!3DES:!DES:!RC4:!MD5");
+        } else {
+            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
+        }
     }
 
 
