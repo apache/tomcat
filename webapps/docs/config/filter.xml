@@ -914,7 +914,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       </attribute>
 
       <attribute name="antiClickJackingUri" required="false">
-        <p>IF ALLOW-FROM is used for <strong>antiClickJackingOption</strong>,
+        <p>If ALLOW-FROM is used for <strong>antiClickJackingOption</strong>,
         what URI should be allowed? If not specified, the default value of an
         empty string will be used.</p>
       </attribute>
