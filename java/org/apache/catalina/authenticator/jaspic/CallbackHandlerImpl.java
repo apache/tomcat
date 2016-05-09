@@ -34,19 +34,40 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
+/**
+ * Implemented as a singleton since the class is stateless.
+ */
 public class CallbackHandlerImpl implements CallbackHandler {
 
     private static final Log log = LogFactory.getLog(CallbackHandlerImpl.class);
     private static final StringManager sm = StringManager.getManager(CallbackHandlerImpl.class);
 
-    private String name;
-    private Principal principal;
-    private Subject subject;
-    private String[] groups;
+    private static CallbackHandler instance;
+
+
+    static {
+        instance = new CallbackHandlerImpl();
+    }
+
+
+    public static CallbackHandler getInstance() {
+        return instance;
+    }
+
+
+    private  CallbackHandlerImpl() {
+        // Hide default constructor
+    }
 
 
     @Override
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
+
+        String name = null;
+        Principal principal = null;
+        Subject subject = null;
+        String[] groups = null;
+
         if (callbacks != null) {
             // Need to combine data from multiple callbacks so use this to hold
             // the data
@@ -67,7 +88,7 @@ public class CallbackHandlerImpl implements CallbackHandler {
             }
 
             // Create the GenericPrincipal
-            Principal gp = getPrincipal();
+            Principal gp = getPrincipal(principal, name, groups);
             if (subject != null && gp != null) {
                 subject.getPrivateCredentials().add(gp);
             }
@@ -75,12 +96,11 @@ public class CallbackHandlerImpl implements CallbackHandler {
     }
 
 
-    private Principal getPrincipal() {
+    private Principal getPrincipal(Principal principal, String name, String[] groups) {
         // If the Principal is cached in the session JASPIC may simply return it
         if (principal instanceof GenericPrincipal) {
             return principal;
         }
-        String name = this.name;
         if (name == null && principal != null) {
             name = principal.getName();
         }

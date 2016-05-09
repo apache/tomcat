@@ -196,6 +196,10 @@
         Do not trigger unnecessary session ID changes when using JASPIC and the
         user is authenticated using cached credentials. (markt)
       </fix>
+      <fix>
+        <bug>59437</bug>: Ensure that the JASPIC <code>CallbackHandler</code> is
+        thread-safe. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
