@@ -144,6 +144,11 @@ public abstract class AbstractReplicatedMap<K,V>
      */
     protected transient String mapname = "";
 
+    /**
+     * State of this map
+     */
+    private volatile transient State state = State.NEW;
+
 //------------------------------------------------------------------------------
 //              map owner interface
 //------------------------------------------------------------------------------
@@ -225,7 +230,6 @@ public abstract class AbstractReplicatedMap<K,V>
         //listen for membership notifications
         this.channel.addMembershipListener(this);
 
-
         try {
             //broadcast our map, this just notifies other members of our existence
             broadcast(MapMessage.MSG_INIT, true);
@@ -240,6 +244,7 @@ public abstract class AbstractReplicatedMap<K,V>
                 throw new RuntimeException(sm.getString("abstractReplicatedMap.unableStart"),x);
             }
         }
+        this.state = State.INITIALIZED;
         long complete = System.currentTimeMillis() - start;
         if (log.isInfoEnabled())
             log.info(sm.getString("abstractReplicatedMap.init.completed",
@@ -336,6 +341,7 @@ public abstract class AbstractReplicatedMap<K,V>
     }
 
     public void breakdown() {
+        this.state = State.DESTROYED;
         if (this.rpcChannel != null) {
             this.rpcChannel.breakdown();
         }
@@ -888,7 +894,7 @@ public abstract class AbstractReplicatedMap<K,V>
     @Override
     public void heartbeat() {
         try {
-            ping(accessTimeout);
+            if (this.state.isAvailable()) ping(accessTimeout);
         }catch ( Exception x ) {
             log.error(sm.getString("abstractReplicatedMap.heartbeat.failed"),x);
         }
@@ -1587,4 +1593,19 @@ public abstract class AbstractReplicatedMap<K,V>
         this.accessTimeout = accessTimeout;
     }
 
+    private static enum State {
+        NEW(false),
+        INITIALIZED(true),
+        DESTROYED(false);
+
+        private final boolean available;
+
+        private State(boolean available) {
+            this.available = available;
+        }
+
+        public boolean isAvailable() {
+            return available;
+        }
+    }
 }
