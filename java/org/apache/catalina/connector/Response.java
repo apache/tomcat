@@ -245,7 +245,7 @@ public class Response implements HttpServletResponse {
      */
     private final List<Cookie> cookies = new ArrayList<>();
 
-    private HttpServletResponse applicationResponse = this;
+    private HttpServletResponse applicationResponse = null;
 
 
     // --------------------------------------------------------- Public Methods

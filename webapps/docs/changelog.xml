@@ -204,6 +204,11 @@
         constructed correctly according to the specification when
         <code>ALLOW-FROM</code> option is used. (violetagg)
       </fix>
+      <fix>
+        Fix an <code>IllegalArgumentException</code> if the first use of an
+        internal <code>Response</code> object requires JASPIC authentication.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
