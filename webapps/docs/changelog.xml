@@ -255,6 +255,9 @@
         JAR has been exploded into <code>WEB-INF/classes</code> and the web
         application is deployed as a packed WAR. (markt)
       </fix>
+      <fix>
+        NPEs with not found TLDs. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
