@@ -171,9 +171,9 @@
   <subsection name="Other">
     <changelog>
       <update>
-        Update the packaged version of the Tomcat Native Library to 1.2.5 to
-        pick up the Windows binaries that are based on OpenSSL 1.0.2g and APR
-        1.5.1. (violetagg)
+        Update the packaged version of the Tomcat Native Library to 1.2.7 to
+        pick up the Windows binaries that are based on OpenSSL 1.0.2h and APR
+        1.5.2. (violetagg/markt)
       </update>
       <update>
         Remove native code (Windows Service Wrapper, APR/native connector)
