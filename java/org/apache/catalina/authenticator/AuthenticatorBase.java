@@ -455,7 +455,7 @@ public abstract class AuthenticatorBase extends ValveBase
             messageInfo = new MessageInfoImpl(request.getRequest(), response.getResponse(), true);
             try {
                 ServerAuthConfig serverAuthConfig = jaspicProvider.getServerAuthConfig(
-                        "HttpServlet", jaspicAppContextID, new CallbackHandlerImpl());
+                        "HttpServlet", jaspicAppContextID, CallbackHandlerImpl.getInstance());
                 String authContextID = serverAuthConfig.getAuthContextID(messageInfo);
                 serverAuthContext = serverAuthConfig.getAuthContext(authContextID, null, null);
             } catch (AuthException e) {
@@ -1058,7 +1058,7 @@ public abstract class AuthenticatorBase extends ValveBase
             ServerAuthContext serverAuthContext;
             try {
                 ServerAuthConfig serverAuthConfig = provider.getServerAuthConfig("HttpServlet",
-                        jaspicAppContextID, new CallbackHandlerImpl());
+                        jaspicAppContextID, CallbackHandlerImpl.getInstance());
                 String authContextID = serverAuthConfig.getAuthContextID(messageInfo);
                 serverAuthContext = serverAuthConfig.getAuthContext(authContextID, null, null);
                 serverAuthContext.cleanSubject(messageInfo, client);
