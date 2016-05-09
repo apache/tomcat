@@ -91,6 +91,11 @@
         <code>HttpServletRequest.getRequestURI()</code> returns an encoded URI
         rather than a decoded URI after a dispatch. (markt)
       </fix>
+      <fix>
+        Ensure that the value for the header <code>X-Frame-Options</code> is
+        constructed correctly according to the specification when
+        <code>ALLOW-FROM</code> option is used. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
