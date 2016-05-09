@@ -93,6 +93,9 @@ public class TldCache {
 
     public TaglibXml getTaglibXml(TldResourcePath tldResourcePath) throws JasperException {
         TaglibXmlCacheEntry cacheEntry = tldResourcePathTaglibXmlMap.get(tldResourcePath);
+        if (cacheEntry == null) {
+            return null;
+        }
         long lastModified[] = getLastModified(tldResourcePath);
         if (lastModified[0] != cacheEntry.getWebAppPathLastModified() ||
                 lastModified[1] != cacheEntry.getEntryLastModified()) {
