@@ -92,7 +92,7 @@
 
   <subsection name="ServerAuthModule">
 
-    <p>The the 3rd party implementation only provides an
+    <p>If the 3rd party implementation only provides an
     <code>ServerAuthModule</code> then it will be necessary to provide a number
     of supporting classes. These may be a custom implementation or,
     alternatively, Tomcat provides a simple wrapper implementation for
@@ -104,7 +104,7 @@
     <code>&lt;jaspic-providers&gt;</code> element in
     <code>$CATALINA_BASE/conf/jaspic-providers.xml</code>.</p>
 <source><![CDATA[<provider name="any"
-          className="org.apache.catalina.authenticator.jaspic.AuthConfigProviderImpl"
+          className="org.apache.catalina.authenticator.jaspic.SimpleAuthConfigProvider"
           layer="HttpServlet"
           appContext="Catalina/localhost /contextPath"
           description="any">
@@ -118,7 +118,7 @@
     the previous section but with some key differences.</p>
 
     <p>The <code>className</code> attribute must be
-    <code>org.apache.catalina.authenticator.jaspic.AuthConfigProviderImpl</code>.</p>
+    <code>org.apache.catalina.authenticator.jaspic.SimpleAuthConfigProvider</code>.</p>
 
     <p>The <code>ServerAuthModule</code>(s) are specified via properties. The
     property name must be
@@ -163,7 +163,7 @@
                   xsi:schemaLocation="http://tomcat.apache.org/xml jaspic-providers.xsd"
                   version="1.0">
   <provider name="google-oauth"
-            className="org.apache.catalina.authenticator.jaspic.AuthConfigProviderImpl"
+            className="org.apache.catalina.authenticator.jaspic.SimpleAuthConfigProvider"
             layer="HttpServlet"
             appContext="Catalina/localhost /contextPath"
             description="Google OAuth test">
