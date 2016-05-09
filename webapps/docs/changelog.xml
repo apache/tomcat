@@ -192,6 +192,10 @@
         internal <code>Response</code> object requires JASPIC authentication.
         (markt)
       </fix>
+      <fix>
+        Do not trigger unnecessary session ID changes when using JASPIC and the
+        user is authenticated using cached credentials. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
