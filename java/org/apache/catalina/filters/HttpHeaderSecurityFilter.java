@@ -77,7 +77,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
         // Anti click-jacking
         StringBuilder cjValue = new StringBuilder(antiClickJackingOption.headerValue);
         if (antiClickJackingOption == XFrameOption.ALLOW_FROM) {
-            cjValue.append(':');
+            cjValue.append(' ');
             cjValue.append(antiClickJackingUri);
         }
         antiClickJackingHeaderValue = cjValue.toString();

@@ -182,6 +182,11 @@
         7 onwards and Tomcat 8 requires Java 7 so the option is unnecessary.
         (markt)
       </scode>
+      <fix>
+        Ensure that the value for the header <code>X-Frame-Options</code> is
+        constructed correctly according to the specification when
+        <code>ALLOW-FROM</code> option is used. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
