@@ -353,6 +353,13 @@
         Ensure that clear the channel instance from channel services when
         stopping channel. (kfujino)
       </fix>
+      <add>
+        Implement map state in the replication map. (kfujino)
+      </add>
+      <fix>
+        Ensure that the ping is not executed during the start/stop of the
+        replication map. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
