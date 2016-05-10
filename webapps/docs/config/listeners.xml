@@ -257,6 +257,7 @@
         and Java 8 onwards. This option is unnecessary if running on a fixed
         version of Java.</p>
       </attribute>
+
       <attribute name="tokenPollerProtection" required="false">
         <p>Enables protection so that any token poller thread initialized by
         <code>sun.security.pkcs11.SunPKCS11.initToken()</code> does not
