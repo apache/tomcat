@@ -278,6 +278,10 @@
         Correctly handle a call to <code>AsyncContext.complete()</code> from a
         non-container thread when non-blocking I/O is being used. (markt)
       </fix>
+      <fix>
+        <bug>59451</bug>: Correct Javadoc for <code>MessageBytes</code>. Patch
+        provided by Kyohei Nakamura. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
