@@ -179,9 +179,9 @@ public final class LegacyCookieProcessor implements CookieProcessor {
             }
         }
         if (getForwardSlashIsSeparator() && !allowHttpSepsInV0) {
-            allowedWithoutQuotes.set('/');
-        } else {
             allowedWithoutQuotes.clear('/');
+        } else {
+            allowedWithoutQuotes.set('/');
         }
     }
 
@@ -198,9 +198,9 @@ public final class LegacyCookieProcessor implements CookieProcessor {
             httpSeparatorFlags.clear('/');
         }
         if (forwardSlashIsSeparator && !getAllowHttpSepsInV0()) {
-            allowedWithoutQuotes.set('/');
-        } else {
             allowedWithoutQuotes.clear('/');
+        } else {
+            allowedWithoutQuotes.set('/');
         }
     }
 
