@@ -96,6 +96,11 @@
         constructed correctly according to the specification when
         <code>ALLOW-FROM</code> option is used. (violetagg)
       </fix>
+      <fix>
+        <bug>59449</bug>: In <code>ContainerBase</code>, ensure that the process
+        to remove a child container is the reverse of the process to add one.
+        Patch provided by Huxing Zhang. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -1961,24 +1966,6 @@
         <code>PropertyEditor</code> has been registered for the type correctly
         coerce the empty string to <code>null</code> if the
         <code>PropertyEditor</code> throws an exception. (kkolinko/markt)
-      </fix>
-      <fix>
-        Simplify code in <code>ProtectedFunctionMapper</code> class of
-        Jasper runtime. (kkolinko)
-      </fix>
-      <update>
-        <bug>57123</bug>: Update all references to the ECJ compiler to version
-        4.4.1. With thanks to Ralph Schaer for uploading the 4.4.1 JAR to Maven
-        Central. (markt)
-      </update>
-      <update>
-        <bug>57662</bug>: Update all references to the ECJ compiler to version
-        4.4.2. (violetagg)
-      </update>
-      <fix>
-        <bug>57643</bug>: Fix JspC when the path to the web application to
-        compile contains a character that must be encoded when used in a URL
-        such as space. (mark)
       </fix>
     </changelog>
   </subsection>
