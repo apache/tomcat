@@ -200,6 +200,11 @@
         <bug>59437</bug>: Ensure that the JASPIC <code>CallbackHandler</code> is
         thread-safe. (markt)
       </fix>
+      <fix>
+        <bug>59449</bug>: In <code>ContainerBase</code>, ensure that the process
+        to remove a child container is the reverse of the process to add one.
+        Patch provided by Huxing Zhang. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
