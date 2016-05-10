@@ -44,10 +44,10 @@ public final class MessageBytes implements Cloneable, Serializable {
     /** getType() is T_STR if the the object used to create the MessageBytes
         was a String */
     public static final int T_STR  = 1;
-    /** getType() is T_STR if the the object used to create the MessageBytes
+    /** getType() is T_BYTES if the the object used to create the MessageBytes
         was a byte[] */
     public static final int T_BYTES = 2;
-    /** getType() is T_STR if the the object used to create the MessageBytes
+    /** getType() is T_CHARS if the the object used to create the MessageBytes
         was a char[] */
     public static final int T_CHARS = 3;
 

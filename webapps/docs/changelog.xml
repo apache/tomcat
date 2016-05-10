@@ -3112,6 +3112,10 @@
         The complete fix is only available with a recent AJP forwarder like
         the forthcoming mod_jk 1.2.41. (rjung)
       </fix>
+      <fix>
+        <bug>59451</bug>: Correct Javadoc for <code>MessageBytes</code>. Patch
+        provided by Kyohei Nakamura. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
