@@ -810,12 +810,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             return;
         }
 
-        synchronized(children) {
-            if (children.get(child.getName()) == null)
-                return;
-            children.remove(child.getName());
-        }
-
         try {
             if (child.getState().isAvailable()) {
                 child.stop();
@@ -823,8 +817,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         } catch (LifecycleException e) {
             log.error("ContainerBase.removeChild: stop: ", e);
         }
-
-        fireContainerEvent(REMOVE_CHILD_EVENT, child);
 
         try {
             // child.destroy() may have already been called which would have
@@ -837,6 +829,13 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             log.error("ContainerBase.removeChild: destroy: ", e);
         }
 
+        synchronized(children) {
+            if (children.get(child.getName()) == null)
+                return;
+            children.remove(child.getName());
+        }
+
+        fireContainerEvent(REMOVE_CHILD_EVENT, child);
     }
 
 
