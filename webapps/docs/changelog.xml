@@ -287,6 +287,13 @@
         <bug>59451</bug>: Correct Javadoc for <code>MessageBytes</code>. Patch
         provided by Kyohei Nakamura. (markt)
       </fix>
+      <fix>
+        <bug>59450</bug>: Correctly handle the case where the
+        <code>LegacyCookieProcessor</code> is configured with
+        <code>allowHttpSepsInV0</code> set to <code>false</code> and
+        <code>forwardSlashIsSeparator</code> set to <code>true</code>. Patch
+        provided by Kyohei Nakamura. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

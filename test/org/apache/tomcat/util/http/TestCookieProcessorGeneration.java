@@ -69,8 +69,9 @@ public class TestCookieProcessorGeneration {
 
     @Test
     public void v0ValueContainsNonV0Separator() {
-        doTest(new Cookie("foo", "a()<>@:\\\"/[]?={}b"),
-                "foo=\"a()<>@:\\\\\\\"/[]?={}b\"; Version=1", null);
+        Cookie cookie = new Cookie("foo", "a()<>@:\\\"/[]?={}b");
+        doTestDefaults(cookie,"foo=\"a()<>@:\\\\\\\"/[]?={}b\"; Version=1", null);
+        doTestAllowSeparators(cookie,"foo=a()<>@:\\\"/[]?={}b", null);
     }
 
     @Test
