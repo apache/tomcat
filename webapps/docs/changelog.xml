@@ -45,6 +45,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M6" rtext="In development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Ensure that annotated web components packed in web fragments will be
+        processed when <code>unpackWARs</code> is enabled. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M5" rtext="Release in progress">
   <subsection name="Catalina">
