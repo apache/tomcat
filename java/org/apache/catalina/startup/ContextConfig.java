@@ -1955,7 +1955,7 @@ public class ContextConfig implements LifecycleListener {
         if (url == null) {
             // Nothing to do.
             return;
-        } else if ("jar".equals(url.getProtocol())) {
+        } else if ("jar".equals(url.getProtocol()) || url.toString().endsWith(".jar")) {
             processAnnotationsJar(url, fragment, handlesTypesOnly, javaClassCache);
         } else if ("file".equals(url.getProtocol())) {
             try {
