@@ -73,11 +73,11 @@ public final class Utils {
      *
      * @param rset a ResultSet, may be {@code null}
      */
-    public static void closeQuietly(ResultSet rset) {
+    public static void closeQuietly(final ResultSet rset) {
         if (rset != null) {
             try {
                 rset.close();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // ignored
             }
         }
@@ -88,11 +88,11 @@ public final class Utils {
      *
      * @param conn a Connection, may be {@code null}
      */
-    public static void closeQuietly(Connection conn) {
+    public static void closeQuietly(final Connection conn) {
         if (conn != null) {
             try {
                 conn.close();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // ignored
             }
         }
@@ -103,11 +103,11 @@ public final class Utils {
      *
      * @param stmt a Statement, may be {@code null}
      */
-    public static void closeQuietly(Statement stmt) {
+    public static void closeQuietly(final Statement stmt) {
         if (stmt != null) {
             try {
                 stmt.close();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // ignored
             }
         }
@@ -119,7 +119,7 @@ public final class Utils {
      * @param key The message key
      * @return the message
      */
-    public static String getMessage(String key) {
+    public static String getMessage(final String key) {
         return getMessage(key, (Object[]) null);
     }
 
@@ -131,12 +131,12 @@ public final class Utils {
      * @param args The arguments
      * @return the message
      */
-    public static String getMessage(String key, Object... args) {
-        String msg =  messages.getString(key);
+    public static String getMessage(final String key, final Object... args) {
+        final String msg =  messages.getString(key);
         if (args == null || args.length == 0) {
             return msg;
         }
-        MessageFormat mf = new MessageFormat(msg);
+        final MessageFormat mf = new MessageFormat(msg);
         return mf.format(args, new StringBuffer(), null).toString();
     }
 }

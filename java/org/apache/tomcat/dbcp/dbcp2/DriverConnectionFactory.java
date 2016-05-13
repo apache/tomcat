@@ -27,7 +27,7 @@ import java.util.Properties;
  * @since 2.0
  */
 public class DriverConnectionFactory implements ConnectionFactory {
-    public DriverConnectionFactory(Driver driver, String connectUri, Properties props) {
+    public DriverConnectionFactory(final Driver driver, final String connectUri, final Properties props) {
         _driver = driver;
         _connectUri = connectUri;
         _props = props;

@@ -41,8 +41,8 @@ import org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject;
  * @author John D. McNally
  * @since 2.0
  */
-class PooledConnectionImpl implements PooledConnection,
-        KeyedPooledObjectFactory<PStmtKeyCPDS,PoolablePreparedStatement<PStmtKeyCPDS>> {
+class PooledConnectionImpl
+        implements PooledConnection, KeyedPooledObjectFactory<PStmtKeyCPDS, PoolablePreparedStatement<PStmtKeyCPDS>> {
 
     private static final String CLOSED
             = "Attempted to use PooledConnection after closed() was called.";
@@ -90,7 +90,7 @@ class PooledConnectionImpl implements PooledConnection,
      * Wrap the real connection.
      * @param connection the connection to be wrapped
      */
-    PooledConnectionImpl(Connection connection) {
+    PooledConnectionImpl(final Connection connection) {
         this.connection = connection;
         if (connection instanceof DelegatingConnection) {
             this.delegatingConnection = (DelegatingConnection<?>) connection;
@@ -102,7 +102,7 @@ class PooledConnectionImpl implements PooledConnection,
     }
 
     public void setStatementPool(
-            KeyedObjectPool<PStmtKeyCPDS, PoolablePreparedStatement<PStmtKeyCPDS>> statementPool) {
+            final KeyedObjectPool<PStmtKeyCPDS, PoolablePreparedStatement<PStmtKeyCPDS>> statementPool) {
         pstmtPool = statementPool;
     }
 
@@ -110,7 +110,7 @@ class PooledConnectionImpl implements PooledConnection,
      * {@inheritDoc}
      */
     @Override
-    public void addConnectionEventListener(ConnectionEventListener listener) {
+    public void addConnectionEventListener(final ConnectionEventListener listener) {
         if (!eventListeners.contains(listener)) {
             eventListeners.add(listener);
         }
@@ -118,7 +118,7 @@ class PooledConnectionImpl implements PooledConnection,
 
     /* JDBC_4_ANT_KEY_BEGIN */
     @Override
-    public void addStatementEventListener(StatementEventListener listener) {
+    public void addStatementEventListener(final StatementEventListener listener) {
         if (!statementEventListeners.contains(listener)) {
             statementEventListeners.add(listener);
         }
@@ -144,9 +144,9 @@ class PooledConnectionImpl implements PooledConnection,
                     pstmtPool = null;
                 }
             }
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new SQLException("Cannot close connection (return to pool failed)", e);
         } finally {
             try {
@@ -194,13 +194,13 @@ class PooledConnectionImpl implements PooledConnection,
      */
     @Override
     public void removeConnectionEventListener(
-            ConnectionEventListener listener) {
+            final ConnectionEventListener listener) {
         eventListeners.remove(listener);
     }
 
     /* JDBC_4_ANT_KEY_BEGIN */
     @Override
-    public void removeStatementEventListener(StatementEventListener listener) {
+    public void removeStatementEventListener(final StatementEventListener listener) {
         statementEventListeners.remove(listener);
     }
     /* JDBC_4_ANT_KEY_END */
@@ -215,7 +215,7 @@ class PooledConnectionImpl implements PooledConnection,
         // an error will occur.
         try {
             connection.close();
-        } catch (Exception ignored) {
+        } catch (final Exception ignored) {
         }
 
         // make sure the last connection is marked as closed
@@ -229,9 +229,9 @@ class PooledConnectionImpl implements PooledConnection,
      * sends a connectionClosed event.
      */
     void notifyListeners() {
-        ConnectionEvent event = new ConnectionEvent(this);
-        Object[] listeners = eventListeners.toArray();
-        for (Object listener : listeners) {
+        final ConnectionEvent event = new ConnectionEvent(this);
+        final Object[] listeners = eventListeners.toArray();
+        for (final Object listener : listeners) {
             ((ConnectionEventListener) listener).connectionClosed(event);
         }
     }
@@ -244,15 +244,15 @@ class PooledConnectionImpl implements PooledConnection,
      * @param sql the SQL statement
      * @return a {@link PoolablePreparedStatement}
      */
-    PreparedStatement prepareStatement(String sql) throws SQLException {
+    PreparedStatement prepareStatement(final String sql) throws SQLException {
         if (pstmtPool == null) {
             return connection.prepareStatement(sql);
         }
         try {
             return pstmtPool.borrowObject(createKey(sql));
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new SQLException("Borrow prepareStatement from pool failed", e);
         }
     }
@@ -273,8 +273,8 @@ class PooledConnectionImpl implements PooledConnection,
      * @return a {@link PoolablePreparedStatement}
      * @see Connection#prepareStatement(String, int, int)
      */
-    PreparedStatement prepareStatement(String sql, int resultSetType,
-                                       int resultSetConcurrency)
+    PreparedStatement prepareStatement(final String sql, final int resultSetType,
+                                       final int resultSetConcurrency)
             throws SQLException {
         if (pstmtPool == null) {
             return connection.prepareStatement(sql, resultSetType, resultSetConcurrency);
@@ -282,9 +282,9 @@ class PooledConnectionImpl implements PooledConnection,
         try {
             return pstmtPool.borrowObject(
                     createKey(sql,resultSetType,resultSetConcurrency));
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new SQLException("Borrow prepareStatement from pool failed", e);
         }
     }
@@ -300,22 +300,22 @@ class PooledConnectionImpl implements PooledConnection,
      * @return a {@link PoolablePreparedStatement}
      * @see Connection#prepareStatement(String, int)
      */
-    PreparedStatement prepareStatement(String sql, int autoGeneratedKeys)
+    PreparedStatement prepareStatement(final String sql, final int autoGeneratedKeys)
             throws SQLException {
         if (pstmtPool == null) {
             return connection.prepareStatement(sql, autoGeneratedKeys);
         }
         try {
             return pstmtPool.borrowObject(createKey(sql,autoGeneratedKeys));
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new SQLException("Borrow prepareStatement from pool failed", e);
         }
     }
 
-    PreparedStatement prepareStatement(String sql, int resultSetType,
-            int resultSetConcurrency, int resultSetHoldability)
+    PreparedStatement prepareStatement(final String sql, final int resultSetType,
+            final int resultSetConcurrency, final int resultSetHoldability)
     throws SQLException {
         if (pstmtPool == null) {
             return connection.prepareStatement(sql, resultSetType,
@@ -324,37 +324,37 @@ class PooledConnectionImpl implements PooledConnection,
         try {
             return pstmtPool.borrowObject(createKey(sql, resultSetType,
                     resultSetConcurrency, resultSetHoldability));
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new SQLException("Borrow prepareStatement from pool failed", e);
         }
     }
 
-    PreparedStatement prepareStatement(String sql, int columnIndexes[])
+    PreparedStatement prepareStatement(final String sql, final int columnIndexes[])
     throws SQLException {
         if (pstmtPool == null) {
             return connection.prepareStatement(sql, columnIndexes);
         }
         try {
             return pstmtPool.borrowObject(createKey(sql, columnIndexes));
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new SQLException("Borrow prepareStatement from pool failed", e);
         }
     }
 
-    PreparedStatement prepareStatement(String sql, String columnNames[])
+    PreparedStatement prepareStatement(final String sql, final String columnNames[])
     throws SQLException {
         if (pstmtPool == null) {
             return connection.prepareStatement(sql, columnNames);
         }
         try {
             return pstmtPool.borrowObject(createKey(sql, columnNames));
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new SQLException("Borrow prepareStatement from pool failed", e);
         }
     }
@@ -362,15 +362,15 @@ class PooledConnectionImpl implements PooledConnection,
     /**
      * Create a {@link PooledConnectionImpl.PStmtKey} for the given arguments.
      */
-    protected PStmtKeyCPDS createKey(String sql, int autoGeneratedKeys) {
+    protected PStmtKeyCPDS createKey(final String sql, final int autoGeneratedKeys) {
         return new PStmtKeyCPDS(normalizeSQL(sql), autoGeneratedKeys);
     }
 
     /**
      * Create a {@link PooledConnectionImpl.PStmtKey} for the given arguments.
      */
-    protected PStmtKeyCPDS createKey(String sql, int resultSetType,
-            int resultSetConcurrency, int resultSetHoldability) {
+    protected PStmtKeyCPDS createKey(final String sql, final int resultSetType,
+            final int resultSetConcurrency, final int resultSetHoldability) {
         return new PStmtKeyCPDS(normalizeSQL(sql), resultSetType,
                 resultSetConcurrency, resultSetHoldability);
     }
@@ -378,22 +378,22 @@ class PooledConnectionImpl implements PooledConnection,
     /**
      * Create a {@link PooledConnectionImpl.PStmtKey} for the given arguments.
      */
-    protected PStmtKeyCPDS createKey(String sql, int columnIndexes[]) {
+    protected PStmtKeyCPDS createKey(final String sql, final int columnIndexes[]) {
         return new PStmtKeyCPDS(normalizeSQL(sql), columnIndexes);
     }
 
     /**
      * Create a {@link PooledConnectionImpl.PStmtKey} for the given arguments.
      */
-    protected PStmtKeyCPDS createKey(String sql, String columnNames[]) {
+    protected PStmtKeyCPDS createKey(final String sql, final String columnNames[]) {
         return new PStmtKeyCPDS(normalizeSQL(sql), columnNames);
     }
 
     /**
      * Create a {@link PooledConnectionImpl.PStmtKey} for the given arguments.
      */
-    protected PStmtKeyCPDS createKey(String sql, int resultSetType,
-                               int resultSetConcurrency) {
+    protected PStmtKeyCPDS createKey(final String sql, final int resultSetType,
+                               final int resultSetConcurrency) {
         return new PStmtKeyCPDS(normalizeSQL(sql), resultSetType,
                             resultSetConcurrency);
     }
@@ -401,7 +401,7 @@ class PooledConnectionImpl implements PooledConnection,
     /**
      * Create a {@link PooledConnectionImpl.PStmtKey} for the given arguments.
      */
-    protected PStmtKeyCPDS createKey(String sql) {
+    protected PStmtKeyCPDS createKey(final String sql) {
         return new PStmtKeyCPDS(normalizeSQL(sql));
     }
 
@@ -409,7 +409,7 @@ class PooledConnectionImpl implements PooledConnection,
      * Normalize the given SQL statement, producing a
      * canonical form that is semantically equivalent to the original.
      */
-    protected String normalizeSQL(String sql) {
+    protected String normalizeSQL(final String sql) {
         return sql.trim();
     }
 
@@ -419,7 +419,7 @@ class PooledConnectionImpl implements PooledConnection,
      * @param key the key for the {@link PreparedStatement} to be created
      */
     @Override
-    public PooledObject<PoolablePreparedStatement<PStmtKeyCPDS>> makeObject(PStmtKeyCPDS key) throws Exception {
+    public PooledObject<PoolablePreparedStatement<PStmtKeyCPDS>> makeObject(final PStmtKeyCPDS key) throws Exception {
         if (null == key) {
             throw new IllegalArgumentException();
         }
@@ -450,8 +450,8 @@ class PooledConnectionImpl implements PooledConnection,
      * @param p the wrapped {@link PreparedStatement} to be destroyed.
      */
     @Override
-    public void destroyObject(PStmtKeyCPDS key,
-            PooledObject<PoolablePreparedStatement<PStmtKeyCPDS>> p)
+    public void destroyObject(final PStmtKeyCPDS key,
+            final PooledObject<PoolablePreparedStatement<PStmtKeyCPDS>> p)
             throws Exception {
         p.getObject().getInnermostDelegate().close();
     }
@@ -464,8 +464,8 @@ class PooledConnectionImpl implements PooledConnection,
      * @return {@code true}
      */
     @Override
-    public boolean validateObject(PStmtKeyCPDS key,
-            PooledObject<PoolablePreparedStatement<PStmtKeyCPDS>> p) {
+    public boolean validateObject(final PStmtKeyCPDS key,
+            final PooledObject<PoolablePreparedStatement<PStmtKeyCPDS>> p) {
         return true;
     }
 
@@ -476,8 +476,8 @@ class PooledConnectionImpl implements PooledConnection,
      * @param p ignored
      */
     @Override
-    public void activateObject(PStmtKeyCPDS key,
-            PooledObject<PoolablePreparedStatement<PStmtKeyCPDS>> p)
+    public void activateObject(final PStmtKeyCPDS key,
+            final PooledObject<PoolablePreparedStatement<PStmtKeyCPDS>> p)
             throws Exception {
         p.getObject().activate();
     }
@@ -489,10 +489,10 @@ class PooledConnectionImpl implements PooledConnection,
      * @param p a wrapped {@link PreparedStatement}
      */
     @Override
-    public void passivateObject(PStmtKeyCPDS key,
-            PooledObject<PoolablePreparedStatement<PStmtKeyCPDS>> p)
+    public void passivateObject(final PStmtKeyCPDS key,
+            final PooledObject<PoolablePreparedStatement<PStmtKeyCPDS>> p)
             throws Exception {
-        PoolablePreparedStatement<PStmtKeyCPDS> ppss = p.getObject();
+        final PoolablePreparedStatement<PStmtKeyCPDS> ppss = p.getObject();
         ppss.clearParameters();
         ppss.passivate();
     }
@@ -513,7 +513,7 @@ class PooledConnectionImpl implements PooledConnection,
      *
      * @param allow Access to the underlying connection is granted when true.
      */
-    public synchronized void setAccessToUnderlyingConnectionAllowed(boolean allow) {
+    public synchronized void setAccessToUnderlyingConnectionAllowed(final boolean allow) {
         this.accessToUnderlyingConnectionAllowed = allow;
     }
 }

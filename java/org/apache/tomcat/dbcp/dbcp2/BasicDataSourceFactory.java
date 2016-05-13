@@ -239,7 +239,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
      * @exception Exception if an exception occurs creating the instance
      */
     @Override
-    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?,?> environment)
+    public Object getObjectInstance(final Object obj, final Name name, final Context nameCtx, final Hashtable<?,?> environment)
         throws Exception {
 
         // We only know how to deal with <code>javax.naming.Reference</code>s
@@ -247,7 +247,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
         if (obj == null || !(obj instanceof Reference)) {
             return null;
         }
-        Reference ref = (Reference) obj;
+        final Reference ref = (Reference) obj;
         if (!"javax.sql.DataSource".equals(ref.getClassName())) {
             return null;
         }
@@ -256,18 +256,18 @@ public class BasicDataSourceFactory implements ObjectFactory {
         final List<String> warnings = new ArrayList<>();
         final List<String> infoMessages = new ArrayList<>();
         validatePropertyNames(ref, name, warnings, infoMessages);
-        for (String warning : warnings) {
+        for (final String warning : warnings) {
             log.warn(warning);
         }
-        for (String infoMessage : infoMessages) {
+        for (final String infoMessage : infoMessages) {
             log.info(infoMessage);
         }
 
-        Properties properties = new Properties();
-        for (String propertyName : ALL_PROPERTIES) {
-            RefAddr ra = ref.get(propertyName);
+        final Properties properties = new Properties();
+        for (final String propertyName : ALL_PROPERTIES) {
+            final RefAddr ra = ref.get(propertyName);
             if (ra != null) {
-                String propertyValue = ra.getContent().toString();
+                final String propertyValue = ra.getContent().toString();
                 properties.setProperty(propertyName, propertyValue);
             }
         }
@@ -284,12 +284,12 @@ public class BasicDataSourceFactory implements ObjectFactory {
      * @param warnings container for warning messages
      * @param infoMessages container for info messages
      */
-    private void validatePropertyNames(Reference ref, Name name, List<String> warnings,
-                                      List<String> infoMessages) {
+    private void validatePropertyNames(final Reference ref, final Name name, final List<String> warnings,
+                                      final List<String> infoMessages) {
         final List<String> allPropsAsList = Arrays.asList(ALL_PROPERTIES);
         final String nameString = name != null ? "Name = " + name.toString() + " " : "";
         if (NUPROP_WARNTEXT!=null && !NUPROP_WARNTEXT.keySet().isEmpty()) {
-            for (String propertyName : NUPROP_WARNTEXT.keySet()) {
+            for (final String propertyName : NUPROP_WARNTEXT.keySet()) {
                 final RefAddr ra = ref.get(propertyName);
                 if (ra != null && !allPropsAsList.contains(ra.getType())) {
                     final StringBuilder stringBuilder = new StringBuilder(nameString);
@@ -335,8 +335,8 @@ public class BasicDataSourceFactory implements ObjectFactory {
      * @return the data source instance
      * @throws Exception if an error occurs creating the data source
      */
-    public static BasicDataSource createDataSource(Properties properties) throws Exception {
-        BasicDataSource dataSource = new BasicDataSource();
+    public static BasicDataSource createDataSource(final Properties properties) throws Exception {
+        final BasicDataSource dataSource = new BasicDataSource();
         String value = null;
 
         value = properties.getProperty(PROP_DEFAULTAUTOCOMMIT);
@@ -370,7 +370,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
             else {
                 try {
                     level = Integer.parseInt(value);
-                } catch (NumberFormatException e) {
+                } catch (final NumberFormatException e) {
                     System.err.println("Could not parse defaultTransactionIsolation: " + value);
                     System.err.println("WARNING: defaultTransactionIsolation not set");
                     System.err.println("using default value of database driver");
@@ -542,10 +542,10 @@ public class BasicDataSourceFactory implements ObjectFactory {
 
         value = properties.getProperty(PROP_CONNECTIONPROPERTIES);
         if (value != null) {
-          Properties p = getProperties(value);
-          Enumeration<?> e = p.propertyNames();
+          final Properties p = getProperties(value);
+          final Enumeration<?> e = p.propertyNames();
           while (e.hasMoreElements()) {
-            String propertyName = (String) e.nextElement();
+            final String propertyName = (String) e.nextElement();
             dataSource.addConnectionProperty(propertyName, p.getProperty(propertyName));
           }
         }
@@ -606,8 +606,8 @@ public class BasicDataSourceFactory implements ObjectFactory {
      * @return Properties
      * @throws Exception
      */
-    private static Properties getProperties(String propText) throws Exception {
-      Properties p = new Properties();
+    private static Properties getProperties(final String propText) throws Exception {
+      final Properties p = new Properties();
       if (propText != null) {
         p.load(new ByteArrayInputStream(
                 propText.replace(';', '\n').getBytes(StandardCharsets.ISO_8859_1)));
@@ -621,9 +621,9 @@ public class BasicDataSourceFactory implements ObjectFactory {
      * @param delimiter character used to separate values in the list
      * @return String Collection of values
      */
-    private static Collection<String> parseList(String value, char delimiter) {
-        StringTokenizer tokenizer = new StringTokenizer(value, Character.toString(delimiter));
-        Collection<String> tokens = new ArrayList<>(tokenizer.countTokens());
+    private static Collection<String> parseList(final String value, final char delimiter) {
+        final StringTokenizer tokenizer = new StringTokenizer(value, Character.toString(delimiter));
+        final Collection<String> tokens = new ArrayList<>(tokenizer.countTokens());
         while (tokenizer.hasMoreTokens()) {
             tokens.add(tokenizer.nextToken());
         }
