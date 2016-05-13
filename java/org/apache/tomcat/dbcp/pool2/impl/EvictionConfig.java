@@ -43,8 +43,8 @@ public class EvictionConfig {
      *        {@link GenericObjectPool#getMinIdle()} or
      *        {@link GenericKeyedObjectPool#getMinIdlePerKey()}
      */
-    public EvictionConfig(long poolIdleEvictTime, long poolIdleSoftEvictTime,
-            int minIdle) {
+    public EvictionConfig(final long poolIdleEvictTime, final long poolIdleSoftEvictTime,
+            final int minIdle) {
         if (poolIdleEvictTime > 0) {
             idleEvictTime = poolIdleEvictTime;
         } else {
@@ -101,7 +101,7 @@ public class EvictionConfig {
      */
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         builder.append("EvictionConfig [idleEvictTime=");
         builder.append(idleEvictTime);
         builder.append(", idleSoftEvictTime=");

@@ -58,11 +58,11 @@ class EvictionTimer {
      * @param delay     Delay in milliseconds before task is executed
      * @param period    Time in milliseconds between executions
      */
-    static synchronized void schedule(TimerTask task, long delay, long period) {
+    static synchronized void schedule(final TimerTask task, final long delay, final long period) {
         if (null == _timer) {
             // Force the new Timer thread to be created with a context class
             // loader set to the class loader that loaded this library
-            ClassLoader ccl = AccessController.doPrivileged(
+            final ClassLoader ccl = AccessController.doPrivileged(
                     new PrivilegedGetTccl());
             try {
                 AccessController.doPrivileged(new PrivilegedSetTccl(
@@ -80,7 +80,7 @@ class EvictionTimer {
      * Remove the specified eviction task from the timer.
      * @param task      Task to be scheduled
      */
-    static synchronized void cancel(TimerTask task) {
+    static synchronized void cancel(final TimerTask task) {
         task.cancel();
         _usageCount--;
         if (_usageCount == 0) {
@@ -115,7 +115,7 @@ class EvictionTimer {
          * Create a new PrivilegedSetTccl using the given classloader
          * @param classLoader ClassLoader to use
          */
-        PrivilegedSetTccl(ClassLoader cl) {
+        PrivilegedSetTccl(final ClassLoader cl) {
             this.classLoader = cl;
         }
 
@@ -130,7 +130,7 @@ class EvictionTimer {
 
         @Override
         public String toString() {
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
             builder.append("PrivilegedSetTccl [classLoader=");
             builder.append(classLoader);
             builder.append("]");
@@ -162,7 +162,7 @@ class EvictionTimer {
      */
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         builder.append("EvictionTimer []");
         return builder.toString();
     }

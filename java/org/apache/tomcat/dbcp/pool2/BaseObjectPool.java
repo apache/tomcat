@@ -118,7 +118,7 @@ public abstract class BaseObjectPool<T> extends BaseObject implements ObjectPool
     private volatile boolean closed = false;
 
     @Override
-    protected void toStringAppendFields(StringBuilder builder) {
+    protected void toStringAppendFields(final StringBuilder builder) {
         builder.append("closed=");
         builder.append(closed);
     }

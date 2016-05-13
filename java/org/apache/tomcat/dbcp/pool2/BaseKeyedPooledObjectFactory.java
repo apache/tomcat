@@ -56,7 +56,7 @@ public abstract class BaseKeyedPooledObjectFactory<K,V> extends BaseObject
     public abstract PooledObject<V> wrap(V value);
 
     @Override
-    public PooledObject<V> makeObject(K key) throws Exception {
+    public PooledObject<V> makeObject(final K key) throws Exception {
         return wrap(create(key));
     }
 
@@ -69,7 +69,7 @@ public abstract class BaseKeyedPooledObjectFactory<K,V> extends BaseObject
      * @param p a {@code PooledObject} wrapping the the instance to be destroyed
      */
     @Override
-    public void destroyObject(K key, PooledObject<V> p)
+    public void destroyObject(final K key, final PooledObject<V> p)
         throws Exception {
     }
 
@@ -83,7 +83,7 @@ public abstract class BaseKeyedPooledObjectFactory<K,V> extends BaseObject
      * @return always <code>true</code> in the default implementation
      */
     @Override
-    public boolean validateObject(K key, PooledObject<V> p) {
+    public boolean validateObject(final K key, final PooledObject<V> p) {
         return true;
     }
 
@@ -96,7 +96,7 @@ public abstract class BaseKeyedPooledObjectFactory<K,V> extends BaseObject
      * @param p a {@code PooledObject} wrapping the the instance to be activated
      */
     @Override
-    public void activateObject(K key, PooledObject<V> p)
+    public void activateObject(final K key, final PooledObject<V> p)
         throws Exception {
     }
 
@@ -109,7 +109,7 @@ public abstract class BaseKeyedPooledObjectFactory<K,V> extends BaseObject
      * @param p a {@code PooledObject} wrapping the the instance to be passivated
      */
     @Override
-    public void passivateObject(K key, PooledObject<V> p)
+    public void passivateObject(final K key, final PooledObject<V> p)
         throws Exception {
     }
 }
