@@ -478,4 +478,61 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
         }
 
     }
+
+
+    @Test
+    public void testInvalidMethod() {
+
+        InvalidMethodClient client = new InvalidMethodClient();
+
+        client.doRequest();
+        assertTrue(client.getResponseLine(), client.isResponse400());
+        assertTrue(client.isResponseBodyOK());
+    }
+
+
+    /**
+     * Bug 48839 test client.
+     */
+    private class InvalidMethodClient extends SimpleHttpClient {
+
+        private Exception doRequest() {
+
+            Tomcat tomcat = getTomcatInstance();
+
+            tomcat.addContext("", TEMP_DIR);
+
+            try {
+                tomcat.start();
+                setPort(tomcat.getConnector().getLocalPort());
+
+                // Open connection
+                connect();
+
+                String[] request = new String[1];
+                request[0] =
+                    "GET" + (char) 0 + " /test HTTP/1.1" + CRLF +
+                    "Host: localhost:8080" + CRLF +
+                    "Connection: close" + CRLF +
+                    CRLF;
+
+                setRequest(request);
+                processRequest(); // blocks until response has been read
+
+                // Close the connection
+                disconnect();
+            } catch (Exception e) {
+                return e;
+            }
+            return null;
+        }
+
+        @Override
+        public boolean isResponseBodyOK() {
+            if (getResponseBody() == null) {
+                return false;
+            }
+            return true;
+        }
+    }
 }

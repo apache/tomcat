@@ -114,6 +114,10 @@
         <bug>59289</bug>: Do not recycle upgrade processors in unexpected close
         situations. (remm)
       </fix>
+      <fix>
+        Ensure that requests with HTTP method names that are not tokens (as
+        required by RFC 7231) are rejected with a 400 response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

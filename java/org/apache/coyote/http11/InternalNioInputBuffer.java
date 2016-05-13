@@ -248,7 +248,7 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
         if ( parsingRequestLinePhase == 2 ) {
             //
             // Reading the method name
-            // Method name is always US-ASCII
+            // Method name is a token
             //
             boolean space = false;
             while (!space) {
@@ -257,21 +257,20 @@ public class InternalNioInputBuffer extends AbstractInputBuffer<NioChannel> {
                     if (!fill(true, false)) //request line parsing
                         return false;
                 }
-                // Spec says no CR or LF in method name
-                if (buf[pos] == Constants.CR || buf[pos] == Constants.LF) {
-                    throw new IllegalArgumentException(
-                            sm.getString("iib.invalidmethod"));
-                }
+                // Spec says method name is a token followed by a single SP but
+                // also be tolerant of multiple SP and/or HT.
                 if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                     space = true;
                     request.method().setBytes(buf, parsingRequestLineStart, pos - parsingRequestLineStart);
+                } else if (!HTTP_TOKEN_CHAR[buf[pos]]) {
+                    throw new IllegalArgumentException(sm.getString("iib.invalidmethod"));
                 }
                 pos++;
             }
             parsingRequestLinePhase = 3;
         }
         if ( parsingRequestLinePhase == 3 ) {
-            // Spec says single SP but also be tolerant of multiple and/or HT
+            // Spec says single SP but also be tolerant of multiple SP and/or HT
             boolean space = true;
             while (space) {
                 // Read new bytes if needed

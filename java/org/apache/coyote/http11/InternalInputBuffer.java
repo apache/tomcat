@@ -113,7 +113,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
         //
         // Reading the method name
-        // Method name is always US-ASCII
+        // Method name is a token
         //
 
         boolean space = false;
@@ -126,23 +126,20 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
                     throw new EOFException(sm.getString("iib.eof.error"));
             }
 
-            // Spec says no CR or LF in method name
-            if (buf[pos] == Constants.CR || buf[pos] == Constants.LF) {
-                throw new IllegalArgumentException(
-                        sm.getString("iib.invalidmethod"));
-            }
-            // Spec says single SP but it also says be tolerant of HT
+            // Spec says method name is a token followed by a single SP but
+            // also be tolerant of multiple SP and/or HT.
             if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                 space = true;
                 request.method().setBytes(buf, start, pos - start);
+            } else if (!HTTP_TOKEN_CHAR[buf[pos]]) {
+                throw new IllegalArgumentException(sm.getString("iib.invalidmethod"));
             }
 
             pos++;
 
         }
 
-        
-        // Spec says single SP but also says be tolerant of multiple and/or HT
+        // Spec says single SP but also be tolerant of multiple SP and/or HT
         while (space) {
             // Read new bytes if needed
             if (pos >= lastValid) {
@@ -203,7 +200,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
             request.requestURI().setBytes(buf, start, end - start);
         }
 
-        // Spec says single SP but also says be tolerant of multiple and/or HT
+        // Spec says single SP but also says be tolerant of multiple SP and/or HT
         while (space) {
             // Read new bytes if needed
             if (pos >= lastValid) {
