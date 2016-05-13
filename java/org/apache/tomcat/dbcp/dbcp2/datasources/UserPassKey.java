@@ -35,7 +35,7 @@ class UserPassKey implements Serializable {
     private final String password;
     private final String username;
 
-    UserPassKey(String username, String password) {
+    UserPassKey(final String username, final String password) {
         this.username = username;
         this.password = password;
     }
@@ -64,7 +64,7 @@ class UserPassKey implements Serializable {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null) {
             return false;
         }
@@ -77,7 +77,7 @@ class UserPassKey implements Serializable {
             return false;
         }
 
-        UserPassKey key = (UserPassKey) obj;
+        final UserPassKey key = (UserPassKey) obj;
 
         return this.username == null ?
                 key.username == null :
@@ -95,7 +95,7 @@ class UserPassKey implements Serializable {
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer(50);
+        final StringBuffer sb = new StringBuffer(50);
         sb.append("UserPassKey(");
         sb.append(username).append(", ").append(password).append(')');
         return sb.toString();

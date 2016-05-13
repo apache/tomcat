@@ -43,7 +43,7 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
     /**
      * The {@link KeyedObjectPool} from which I was obtained.
      */
-    private final KeyedObjectPool<K,PoolablePreparedStatement<K>> _pool;
+    private final KeyedObjectPool<K, PoolablePreparedStatement<K>> _pool;
 
     /**
      * My "key" as used by {@link KeyedObjectPool}.
@@ -59,9 +59,9 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
      * @param pool the {@link KeyedObjectPool} from which I was obtained.
      * @param conn the {@link java.sql.Connection Connection} from which I was created
      */
-    public PoolablePreparedStatement(PreparedStatement stmt, K key,
-            KeyedObjectPool<K, PoolablePreparedStatement<K>> pool,
-            DelegatingConnection<?> conn) {
+    public PoolablePreparedStatement(final PreparedStatement stmt, final K key,
+            final KeyedObjectPool<K, PoolablePreparedStatement<K>> pool,
+            final DelegatingConnection<?> conn) {
         super(conn, stmt);
         _pool = pool;
         _key = key;
@@ -100,11 +100,11 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
         if (!isClosed()) {
             try {
                 _pool.returnObject(_key, this);
-            } catch(SQLException e) {
+            } catch(final SQLException e) {
                 throw e;
-            } catch(RuntimeException e) {
+            } catch(final RuntimeException e) {
                 throw e;
-            } catch(Exception e) {
+            } catch(final Exception e) {
                 throw new SQLException("Cannot close preparedstatement (return to pool failed)", e);
             }
         }
@@ -135,10 +135,10 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
         // ResultSet's when it is closed.
         // FIXME The PreparedStatement we're wrapping should handle this for us.
         // See bug 17301 for what could happen when ResultSets are closed twice.
-        List<AbandonedTrace> resultSets = getTrace();
+        final List<AbandonedTrace> resultSets = getTrace();
         if( resultSets != null) {
-            ResultSet[] set = resultSets.toArray(new ResultSet[resultSets.size()]);
-            for (ResultSet element : set) {
+            final ResultSet[] set = resultSets.toArray(new ResultSet[resultSets.size()]);
+            for (final ResultSet element : set) {
                 element.close();
             }
             clearTrace();

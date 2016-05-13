@@ -58,6 +58,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the internal fork of Commons DBCP 2 to r1743696 (2.1.1 plus
+        additional fixes). (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M6" rtext="release in progress">
   <subsection name="Catalina">

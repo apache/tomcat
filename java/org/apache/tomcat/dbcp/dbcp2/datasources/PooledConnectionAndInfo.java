@@ -31,7 +31,7 @@ final class PooledConnectionAndInfo {
     private final String username;
     private final UserPassKey upkey;
 
-    PooledConnectionAndInfo(PooledConnection pc, String username, String password) {
+    PooledConnectionAndInfo(final PooledConnection pc, final String username, final String password) {
         this.pooledConnection = pc;
         this.username = username;
         this.password = password;

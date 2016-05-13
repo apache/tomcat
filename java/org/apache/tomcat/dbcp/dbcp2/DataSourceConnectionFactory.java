@@ -28,11 +28,11 @@ import javax.sql.DataSource;
  * @since 2.0
  */
 public class DataSourceConnectionFactory implements ConnectionFactory {
-    public DataSourceConnectionFactory(DataSource source) {
+    public DataSourceConnectionFactory(final DataSource source) {
         this(source,null,null);
     }
 
-    public DataSourceConnectionFactory(DataSource source, String uname, String passwd) {
+    public DataSourceConnectionFactory(final DataSource source, final String uname, final String passwd) {
         _source = source;
         _uname = uname;
         _passwd = passwd;

@@ -34,7 +34,7 @@ public class SwallowedExceptionLogger implements SwallowedExceptionListener{
      *
      * @param log logger
      */
-    public SwallowedExceptionLogger(Log log) {
+    public SwallowedExceptionLogger(final Log log) {
         this(log, true);
     }
 
@@ -45,13 +45,13 @@ public class SwallowedExceptionLogger implements SwallowedExceptionListener{
      * @param log logger
      * @param logExpiredConnections false suppresses logging of expired connection events
      */
-    public SwallowedExceptionLogger(Log log, boolean logExpiredConnections) {
+    public SwallowedExceptionLogger(final Log log, final boolean logExpiredConnections) {
         this.log = log;
         this.logExpiredConnections = logExpiredConnections;
     }
 
     @Override
-    public void onSwallowException(Exception e) {
+    public void onSwallowException(final Exception e) {
         if (logExpiredConnections || !(e instanceof LifetimeExceededException)) {
             log.warn(Utils.getMessage(
                     "swallowedExceptionLogger.onSwallowedException"), e);

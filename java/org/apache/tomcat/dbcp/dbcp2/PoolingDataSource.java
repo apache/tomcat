@@ -49,20 +49,21 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
     /** Controls access to the underlying connection */
     private boolean accessToUnderlyingConnectionAllowed = false;
 
-    public PoolingDataSource(ObjectPool<C> pool) {
+    public PoolingDataSource(final ObjectPool<C> pool) {
         if (null == pool) {
             throw new NullPointerException("Pool must not be null.");
         }
         _pool = pool;
         // Verify that _pool's factory refers back to it.  If not, log a warning and try to fix.
         if (_pool instanceof GenericObjectPool<?>) {
-            PoolableConnectionFactory pcf = (PoolableConnectionFactory) ((GenericObjectPool<?>) _pool).getFactory();
+            final PoolableConnectionFactory pcf = (PoolableConnectionFactory) ((GenericObjectPool<?>) _pool).getFactory();
             if (pcf == null) {
                 throw new NullPointerException("PoolableConnectionFactory must not be null.");
             }
             if (pcf.getPool() != _pool) {
                 log.warn(Utils.getMessage("poolingDataSource.factoryConfig"));
                 @SuppressWarnings("unchecked") // PCF must have a pool of PCs
+                final
                 ObjectPool<PoolableConnection> p = (ObjectPool<PoolableConnection>) _pool;
                 pcf.setPool(p);
             }
@@ -77,9 +78,9 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
     public void close() throws Exception {
         try {
             _pool.close();
-        } catch(RuntimeException rte) {
+        } catch(final RuntimeException rte) {
             throw new RuntimeException(Utils.getMessage("pool.close.fail"), rte);
-        } catch(Exception e) {
+        } catch(final Exception e) {
             throw new SQLException(Utils.getMessage("pool.close.fail"), e);
         }
     }
@@ -100,18 +101,18 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
      *
      * @param allow Access to the underlying connection is granted when true.
      */
-    public void setAccessToUnderlyingConnectionAllowed(boolean allow) {
+    public void setAccessToUnderlyingConnectionAllowed(final boolean allow) {
         this.accessToUnderlyingConnectionAllowed = allow;
     }
 
     /* JDBC_4_ANT_KEY_BEGIN */
     @Override
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+    public boolean isWrapperFor(final Class<?> iface) throws SQLException {
         return false;
     }
 
     @Override
-    public <T> T unwrap(Class<T> iface) throws SQLException {
+    public <T> T unwrap(final Class<T> iface) throws SQLException {
         throw new SQLException("PoolingDataSource is not a wrapper.");
     }
     /* JDBC_4_ANT_KEY_END */
@@ -130,18 +131,18 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
     @Override
     public Connection getConnection() throws SQLException {
         try {
-            C conn = _pool.borrowObject();
+            final C conn = _pool.borrowObject();
             if (conn == null) {
                 return null;
             }
             return new PoolGuardConnectionWrapper<>(conn);
-        } catch(SQLException e) {
+        } catch(final SQLException e) {
             throw e;
-        } catch(NoSuchElementException e) {
+        } catch(final NoSuchElementException e) {
             throw new SQLException("Cannot get a connection, pool error " + e.getMessage(), e);
-        } catch(RuntimeException e) {
+        } catch(final RuntimeException e) {
             throw e;
-        } catch(Exception e) {
+        } catch(final Exception e) {
             throw new SQLException("Cannot get a connection, general error", e);
         }
     }
@@ -151,7 +152,7 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
      * @throws UnsupportedOperationException This is unsupported
      */
     @Override
-    public Connection getConnection(String uname, String passwd) throws SQLException {
+    public Connection getConnection(final String uname, final String passwd) throws SQLException {
         throw new UnsupportedOperationException();
     }
 
@@ -181,7 +182,7 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
      *   implementation does not support this feature.
      */
     @Override
-    public void setLoginTimeout(int seconds) {
+    public void setLoginTimeout(final int seconds) {
         throw new UnsupportedOperationException("Login timeout is not supported.");
     }
 
@@ -190,7 +191,7 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
      * @see DataSource#setLogWriter
      */
     @Override
-    public void setLogWriter(PrintWriter out) {
+    public void setLogWriter(final PrintWriter out) {
         _logWriter = out;
     }
 
@@ -211,7 +212,7 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
     private class PoolGuardConnectionWrapper<D extends Connection>
             extends DelegatingConnection<D> {
 
-        PoolGuardConnectionWrapper(D delegate) {
+        PoolGuardConnectionWrapper(final D delegate) {
             super(delegate);
         }
 

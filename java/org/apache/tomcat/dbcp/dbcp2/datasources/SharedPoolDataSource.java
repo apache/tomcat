@@ -91,7 +91,7 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
      * Set {@link GenericKeyedObjectPool#getMaxTotal()} for this pool.
      * @param maxTotal The max total value
      */
-    public void setMaxTotal(int maxTotal) {
+    public void setMaxTotal(final int maxTotal) {
         assertInitializationAllowed();
         this.maxTotal = maxTotal;
     }
@@ -119,14 +119,14 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
 
     @Override
     protected PooledConnectionAndInfo
-        getPooledConnectionAndInfo(String username, String password)
+        getPooledConnectionAndInfo(final String username, final String password)
         throws SQLException {
 
         synchronized(this) {
             if (pool == null) {
                 try {
                     registerPool(username, password);
-                } catch (NamingException e) {
+                } catch (final NamingException e) {
                     throw new SQLException("RegisterPool failed", e);
                 }
             }
@@ -134,12 +134,12 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
 
         PooledConnectionAndInfo info = null;
 
-        UserPassKey key = new UserPassKey(username, password);
+        final UserPassKey key = new UserPassKey(username, password);
 
         try {
             info = pool.borrowObject(key);
         }
-        catch (Exception e) {
+        catch (final Exception e) {
             throw new SQLException(
                     "Could not retrieve connection info from pool", e);
         }
@@ -147,7 +147,7 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
     }
 
     @Override
-    protected PooledConnectionManager getConnectionManager(UserPassKey upkey)  {
+    protected PooledConnectionManager getConnectionManager(final UserPassKey upkey)  {
         return factory;
     }
 
@@ -157,23 +157,23 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
      */
     @Override
     public Reference getReference() throws NamingException {
-        Reference ref = new Reference(getClass().getName(),
+        final Reference ref = new Reference(getClass().getName(),
             SharedPoolDataSourceFactory.class.getName(), null);
         ref.add(new StringRefAddr("instanceKey", getInstanceKey()));
         return ref;
     }
 
-    private void registerPool(String username, String password)
+    private void registerPool(final String username, final String password)
             throws NamingException, SQLException {
 
-        ConnectionPoolDataSource cpds = testCPDS(username, password);
+        final ConnectionPoolDataSource cpds = testCPDS(username, password);
 
         // Create an object pool to contain our PooledConnections
         factory = new KeyedCPDSConnectionFactory(cpds, getValidationQuery(),
                 getValidationQueryTimeout(), isRollbackAfterValidation());
         factory.setMaxConnLifetimeMillis(getMaxConnLifetimeMillis());
 
-        GenericKeyedObjectPoolConfig config =
+        final GenericKeyedObjectPoolConfig config =
                 new GenericKeyedObjectPoolConfig();
         config.setBlockWhenExhausted(getDefaultBlockWhenExhausted());
         config.setEvictionPolicyClassName(getDefaultEvictionPolicyClassName());
@@ -195,26 +195,26 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
         config.setTimeBetweenEvictionRunsMillis(
                 getDefaultTimeBetweenEvictionRunsMillis());
 
-        KeyedObjectPool<UserPassKey,PooledConnectionAndInfo> tmpPool =
+        final KeyedObjectPool<UserPassKey,PooledConnectionAndInfo> tmpPool =
                 new GenericKeyedObjectPool<>(factory, config);
         factory.setPool(tmpPool);
         pool = tmpPool;
     }
 
     @Override
-    protected void setupDefaults(Connection con, String username) throws SQLException {
-        Boolean defaultAutoCommit = isDefaultAutoCommit();
+    protected void setupDefaults(final Connection con, final String username) throws SQLException {
+        final Boolean defaultAutoCommit = isDefaultAutoCommit();
         if (defaultAutoCommit != null &&
                 con.getAutoCommit() != defaultAutoCommit.booleanValue()) {
             con.setAutoCommit(defaultAutoCommit.booleanValue());
         }
 
-        int defaultTransactionIsolation = getDefaultTransactionIsolation();
+        final int defaultTransactionIsolation = getDefaultTransactionIsolation();
         if (defaultTransactionIsolation != UNKNOWN_TRANSACTIONISOLATION) {
             con.setTransactionIsolation(defaultTransactionIsolation);
         }
 
-        Boolean defaultReadOnly = isDefaultReadOnly();
+        final Boolean defaultReadOnly = isDefaultReadOnly();
         if (defaultReadOnly != null &&
                 con.isReadOnly() != defaultReadOnly.booleanValue()) {
             con.setReadOnly(defaultReadOnly.booleanValue());
@@ -228,17 +228,17 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
      * @exception IOException if an error occurs
      * @exception ClassNotFoundException if an error occurs
      */
-    private void readObject(ObjectInputStream in)
+    private void readObject(final ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         try
         {
             in.defaultReadObject();
-            SharedPoolDataSource oldDS = (SharedPoolDataSource)
+            final SharedPoolDataSource oldDS = (SharedPoolDataSource)
                 new SharedPoolDataSourceFactory()
                     .getObjectInstance(getReference(), null, null, null);
             this.pool = oldDS.pool;
         }
-        catch (NamingException e)
+        catch (final NamingException e)
         {
             throw new IOException("NamingException: " + e);
         }
