@@ -51,6 +51,11 @@
         Ensure that requests with HTTP method names that are not tokens (as
         required by RFC 7231) are rejected with a 400 response. (markt)
       </fix>
+      <fix>
+        When an asynchronous request is processed by the AJP connector, ensure
+        that request processing has fully completed before starting the next
+        request. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

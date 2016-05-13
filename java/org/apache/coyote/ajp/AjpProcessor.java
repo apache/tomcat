@@ -684,6 +684,7 @@ public class AjpProcessor extends AbstractProcessor {
         if (keepAliveTimeout > 0) {
             socketWrapper.setReadTimeout(keepAliveTimeout);
         }
+        recycle();
         return SocketState.OPEN;
     }
 
