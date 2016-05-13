@@ -582,6 +582,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             if (getErrorState().isError()) {
                 return SocketState.CLOSED;
             } else {
+                recycle(false);
                 return SocketState.OPEN;
             }
         }
