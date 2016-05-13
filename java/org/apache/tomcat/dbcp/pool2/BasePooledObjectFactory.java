@@ -64,7 +64,7 @@ public abstract class BasePooledObjectFactory<T> extends BaseObject implements P
      *  @param p ignored
      */
     @Override
-    public void destroyObject(PooledObject<T> p)
+    public void destroyObject(final PooledObject<T> p)
         throws Exception  {
     }
 
@@ -76,7 +76,7 @@ public abstract class BasePooledObjectFactory<T> extends BaseObject implements P
      * @return {@code true}
      */
     @Override
-    public boolean validateObject(PooledObject<T> p) {
+    public boolean validateObject(final PooledObject<T> p) {
         return true;
     }
 
@@ -86,7 +86,7 @@ public abstract class BasePooledObjectFactory<T> extends BaseObject implements P
      *  @param p ignored
      */
     @Override
-    public void activateObject(PooledObject<T> p) throws Exception {
+    public void activateObject(final PooledObject<T> p) throws Exception {
     }
 
     /**
@@ -95,7 +95,7 @@ public abstract class BasePooledObjectFactory<T> extends BaseObject implements P
      * @param p ignored
      */
     @Override
-    public void passivateObject(PooledObject<T> p)
+    public void passivateObject(final PooledObject<T> p)
         throws Exception {
     }
 }

@@ -83,7 +83,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * @param factory The object factory to be used to create object instances
      *                used by this pool
      */
-    public GenericObjectPool(PooledObjectFactory<T> factory) {
+    public GenericObjectPool(final PooledObjectFactory<T> factory) {
         this(factory, new GenericObjectPoolConfig());
     }
 
@@ -98,8 +98,8 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      *                  the configuration object will not be reflected in the
      *                  pool.
      */
-    public GenericObjectPool(PooledObjectFactory<T> factory,
-            GenericObjectPoolConfig config) {
+    public GenericObjectPool(final PooledObjectFactory<T> factory,
+            final GenericObjectPoolConfig config) {
 
         super(config, ONAME_BASE, config.getJmxNamePrefix());
 
@@ -129,8 +129,8 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * @param abandonedConfig  Configuration for abandoned object identification
      *                         and removal.  The configuration is used by value.
      */
-    public GenericObjectPool(PooledObjectFactory<T> factory,
-            GenericObjectPoolConfig config, AbandonedConfig abandonedConfig) {
+    public GenericObjectPool(final PooledObjectFactory<T> factory,
+            final GenericObjectPoolConfig config, final AbandonedConfig abandonedConfig) {
         this(factory, config);
         setAbandonedConfig(abandonedConfig);
     }
@@ -170,7 +170,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      *
      * @see #getMaxIdle
      */
-    public void setMaxIdle(int maxIdle) {
+    public void setMaxIdle(final int maxIdle) {
         this.maxIdle = maxIdle;
     }
 
@@ -191,7 +191,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * @see #getMaxIdle()
      * @see #getTimeBetweenEvictionRunsMillis()
      */
-    public void setMinIdle(int minIdle) {
+    public void setMinIdle(final int minIdle) {
         this.minIdle = minIdle;
     }
 
@@ -213,7 +213,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      */
     @Override
     public int getMinIdle() {
-        int maxIdleSave = getMaxIdle();
+        final int maxIdleSave = getMaxIdle();
         if (this.minIdle > maxIdleSave) {
             return maxIdleSave;
         }
@@ -241,7 +241,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      */
     @Override
     public boolean getLogAbandoned() {
-        AbandonedConfig ac = this.abandonedConfig;
+        final AbandonedConfig ac = this.abandonedConfig;
         return ac != null && ac.getLogAbandoned();
     }
 
@@ -256,7 +256,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      */
     @Override
     public boolean getRemoveAbandonedOnBorrow() {
-        AbandonedConfig ac = this.abandonedConfig;
+        final AbandonedConfig ac = this.abandonedConfig;
         return ac != null && ac.getRemoveAbandonedOnBorrow();
     }
 
@@ -270,7 +270,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      */
     @Override
     public boolean getRemoveAbandonedOnMaintenance() {
-        AbandonedConfig ac = this.abandonedConfig;
+        final AbandonedConfig ac = this.abandonedConfig;
         return ac != null && ac.getRemoveAbandonedOnMaintenance();
     }
 
@@ -285,7 +285,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      */
     @Override
     public int getRemoveAbandonedTimeout() {
-        AbandonedConfig ac = this.abandonedConfig;
+        final AbandonedConfig ac = this.abandonedConfig;
         return ac != null ? ac.getRemoveAbandonedTimeout() : Integer.MAX_VALUE;
     }
 
@@ -297,7 +297,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      *
      * @see GenericObjectPoolConfig
      */
-    public void setConfig(GenericObjectPoolConfig conf) {
+    public void setConfig(final GenericObjectPoolConfig conf) {
         setLifo(conf.getLifo());
         setMaxIdle(conf.getMaxIdle());
         setMinIdle(conf.getMinIdle());
@@ -324,7 +324,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      *
      * @see AbandonedConfig
      */
-    public void setAbandonedConfig(AbandonedConfig abandonedConfig) {
+    public void setAbandonedConfig(final AbandonedConfig abandonedConfig) {
         if (abandonedConfig == null) {
             this.abandonedConfig = null;
         } else {
@@ -404,10 +404,10 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * @throws Exception if an object instance cannot be returned due to an
      *                   error
      */
-    public T borrowObject(long borrowMaxWaitMillis) throws Exception {
+    public T borrowObject(final long borrowMaxWaitMillis) throws Exception {
         assertOpen();
 
-        AbandonedConfig ac = this.abandonedConfig;
+        final AbandonedConfig ac = this.abandonedConfig;
         if (ac != null && ac.getRemoveAbandonedOnBorrow() &&
                 (getNumIdle() < 2) &&
                 (getNumActive() > getMaxTotal() - 3) ) {
@@ -418,21 +418,21 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
 
         // Get local copy of current config so it is consistent for entire
         // method execution
-        boolean blockWhenExhausted = getBlockWhenExhausted();
+        final boolean blockWhenExhausted = getBlockWhenExhausted();
 
         boolean create;
-        long waitTime = System.currentTimeMillis();
+        final long waitTime = System.currentTimeMillis();
 
         while (p == null) {
             create = false;
-            if (blockWhenExhausted) {
-                p = idleObjects.pollFirst();
-                if (p == null) {
-                    p = create();
-                    if (p != null) {
-                        create = true;
-                    }
+            p = idleObjects.pollFirst();
+            if (p == null) {
+                p = create();
+                if (p != null) {
+                    create = true;
                 }
+            }
+            if (blockWhenExhausted) {
                 if (p == null) {
                     if (borrowMaxWaitMillis < 0) {
                         p = idleObjects.takeFirst();
@@ -445,37 +445,27 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                     throw new NoSuchElementException(
                             "Timeout waiting for idle object");
                 }
-                if (!p.allocate()) {
-                    p = null;
-                }
             } else {
-                p = idleObjects.pollFirst();
-                if (p == null) {
-                    p = create();
-                    if (p != null) {
-                        create = true;
-                    }
-                }
                 if (p == null) {
                     throw new NoSuchElementException("Pool exhausted");
                 }
-                if (!p.allocate()) {
-                    p = null;
-                }
+            }
+            if (!p.allocate()) {
+                p = null;
             }
 
             if (p != null) {
                 try {
                     factory.activateObject(p);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     try {
                         destroy(p);
-                    } catch (Exception e1) {
+                    } catch (final Exception e1) {
                         // Ignore - activation failure is more important
                     }
                     p = null;
                     if (create) {
-                        NoSuchElementException nsee = new NoSuchElementException(
+                        final NoSuchElementException nsee = new NoSuchElementException(
                                 "Unable to activate object");
                         nsee.initCause(e);
                         throw nsee;
@@ -486,7 +476,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                     Throwable validationThrowable = null;
                     try {
                         validate = factory.validateObject(p);
-                    } catch (Throwable t) {
+                    } catch (final Throwable t) {
                         PoolUtils.checkRethrow(t);
                         validationThrowable = t;
                     }
@@ -494,12 +484,12 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                         try {
                             destroy(p);
                             destroyedByBorrowValidationCount.incrementAndGet();
-                        } catch (Exception e) {
+                        } catch (final Exception e) {
                             // Ignore - validation failure is more important
                         }
                         p = null;
                         if (create) {
-                            NoSuchElementException nsee = new NoSuchElementException(
+                            final NoSuchElementException nsee = new NoSuchElementException(
                                     "Unable to validate object");
                             nsee.initCause(validationThrowable);
                             throw nsee;
@@ -530,8 +520,8 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * {@link org.apache.tomcat.dbcp.pool2.SwallowedExceptionListener}.
      */
     @Override
-    public void returnObject(T obj) {
-        PooledObject<T> p = allObjects.get(new IdentityWrapper<>(obj));
+    public void returnObject(final T obj) {
+        final PooledObject<T> p = allObjects.get(new IdentityWrapper<>(obj));
 
         if (p == null) {
             if (!isAbandonedConfig()) {
@@ -550,18 +540,18 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
             p.markReturning(); // Keep from being marked abandoned
         }
 
-        long activeTime = p.getActiveTimeMillis();
+        final long activeTime = p.getActiveTimeMillis();
 
         if (getTestOnReturn()) {
             if (!factory.validateObject(p)) {
                 try {
                     destroy(p);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     swallowException(e);
                 }
                 try {
                     ensureIdle(1, false);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     swallowException(e);
                 }
                 updateStatsReturn(activeTime);
@@ -571,16 +561,16 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
 
         try {
             factory.passivateObject(p);
-        } catch (Exception e1) {
+        } catch (final Exception e1) {
             swallowException(e1);
             try {
                 destroy(p);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 swallowException(e);
             }
             try {
                 ensureIdle(1, false);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 swallowException(e);
             }
             updateStatsReturn(activeTime);
@@ -592,11 +582,11 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                     "Object has already been returned to this pool or is invalid");
         }
 
-        int maxIdleSave = getMaxIdle();
+        final int maxIdleSave = getMaxIdle();
         if (isClosed() || maxIdleSave > -1 && maxIdleSave <= idleObjects.size()) {
             try {
                 destroy(p);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 swallowException(e);
             }
         } else {
@@ -626,8 +616,8 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * @throws IllegalStateException if obj does not belong to this pool
      */
     @Override
-    public void invalidateObject(T obj) throws Exception {
-        PooledObject<T> p = allObjects.get(new IdentityWrapper<>(obj));
+    public void invalidateObject(final T obj) throws Exception {
+        final PooledObject<T> p = allObjects.get(new IdentityWrapper<>(obj));
         if (p == null) {
             if (isAbandonedConfig()) {
                 return;
@@ -668,7 +658,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         while (p != null) {
             try {
                 destroy(p);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 swallowException(e);
             }
             p = idleObjects.poll();
@@ -732,15 +722,15 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         if (idleObjects.size() > 0) {
 
             PooledObject<T> underTest = null;
-            EvictionPolicy<T> evictionPolicy = getEvictionPolicy();
+            final EvictionPolicy<T> evictionPolicy = getEvictionPolicy();
 
             synchronized (evictionLock) {
-                EvictionConfig evictionConfig = new EvictionConfig(
+                final EvictionConfig evictionConfig = new EvictionConfig(
                         getMinEvictableIdleTimeMillis(),
                         getSoftMinEvictableIdleTimeMillis(),
                         getMinIdle());
 
-                boolean testWhileIdle = getTestWhileIdle();
+                final boolean testWhileIdle = getTestWhileIdle();
 
                 for (int i = 0, m = getNumTests(); i < m; i++) {
                     if (evictionIterator == null || !evictionIterator.hasNext()) {
@@ -753,7 +743,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
 
                     try {
                         underTest = evictionIterator.next();
-                    } catch (NoSuchElementException nsee) {
+                    } catch (final NoSuchElementException nsee) {
                         // Object was borrowed in another thread
                         // Don't count this as an eviction test so reduce i;
                         i--;
@@ -775,7 +765,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                     try {
                         evict = evictionPolicy.evict(evictionConfig, underTest,
                                 idleObjects.size());
-                    } catch (Throwable t) {
+                    } catch (final Throwable t) {
                         // Slightly convoluted as SwallowedExceptionListener uses
                         // Exception rather than Throwable
                         PoolUtils.checkRethrow(t);
@@ -793,7 +783,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                             try {
                                 factory.activateObject(underTest);
                                 active = true;
-                            } catch (Exception e) {
+                            } catch (final Exception e) {
                                 destroy(underTest);
                                 destroyedByEvictorCount.incrementAndGet();
                             }
@@ -804,7 +794,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                                 } else {
                                     try {
                                         factory.passivateObject(underTest);
-                                    } catch (Exception e) {
+                                    } catch (final Exception e) {
                                         destroy(underTest);
                                         destroyedByEvictorCount.incrementAndGet();
                                     }
@@ -819,7 +809,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                 }
             }
         }
-        AbandonedConfig ac = this.abandonedConfig;
+        final AbandonedConfig ac = this.abandonedConfig;
         if (ac != null && ac.getRemoveAbandonedOnMaintenance()) {
             removeAbandoned(ac);
         }
@@ -851,10 +841,45 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      */
     private PooledObject<T> create() throws Exception {
         int localMaxTotal = getMaxTotal();
-        long newCreateCount = createCount.incrementAndGet();
-        if (localMaxTotal > -1 && newCreateCount > localMaxTotal ||
-                newCreateCount > Integer.MAX_VALUE) {
-            createCount.decrementAndGet();
+        // This simplifies the code later in this method
+        if (localMaxTotal < 0) {
+            localMaxTotal = Integer.MAX_VALUE;
+        }
+
+        // Flag that indicates if create should:
+        // - TRUE:  call the factory to create an object
+        // - FALSE: return null
+        // - null:  loop and re-test the condition that determines whether to
+        //          call the factory
+        Boolean create = null;
+        while (create == null) {
+            synchronized (makeObjectCountLock) {
+                final long newCreateCount = createCount.incrementAndGet();
+                if (newCreateCount > localMaxTotal) {
+                    // The pool is currently at capacity or in the process of
+                    // making enough new objects to take it to capacity.
+                    createCount.decrementAndGet();
+                    if (makeObjectCount == 0) {
+                        // There are no makeObject() calls in progress so the
+                        // pool is at capacity. Do not attempt to create a new
+                        // object. Return and wait for an object to be returned
+                        create = Boolean.FALSE;
+                    } else {
+                        // There are makeObject() calls in progress that might
+                        // bring the pool to capacity. Those calls might also
+                        // fail so wait until they complete and then re-test if
+                        // the pool is at capacity or not.
+                        makeObjectCountLock.wait();
+                    }
+                } else {
+                    // The pool is not at capacity. Create a new object.
+                    makeObjectCount++;
+                    create = Boolean.TRUE;
+                }
+            }
+        }
+
+        if (!create.booleanValue()) {
             return null;
         }
 
@@ -864,9 +889,14 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         } catch (Exception e) {
             createCount.decrementAndGet();
             throw e;
+        } finally {
+            synchronized (makeObjectCountLock) {
+                makeObjectCount--;
+                makeObjectCountLock.notifyAll();
+            }
         }
 
-        AbandonedConfig ac = this.abandonedConfig;
+        final AbandonedConfig ac = this.abandonedConfig;
         if (ac != null && ac.getLogAbandoned()) {
             p.setLogAbandoned(true);
         }
@@ -879,17 +909,17 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
     /**
      * Destroys a wrapped pooled object.
      *
-     * @param toDestory The wrapped pooled object to destroy
+     * @param toDestroy The wrapped pooled object to destroy
      *
      * @throws Exception If the factory fails to destroy the pooled object
      *                   cleanly
      */
-    private void destroy(PooledObject<T> toDestory) throws Exception {
-        toDestory.invalidate();
-        idleObjects.remove(toDestory);
-        allObjects.remove(new IdentityWrapper<>(toDestory.getObject()));
+    private void destroy(final PooledObject<T> toDestroy) throws Exception {
+        toDestroy.invalidate();
+        idleObjects.remove(toDestroy);
+        allObjects.remove(new IdentityWrapper<>(toDestroy.getObject()));
         try {
-            factory.destroyObject(toDestory);
+            factory.destroyObject(toDestroy);
         } finally {
             destroyedCount.incrementAndGet();
             createCount.decrementAndGet();
@@ -913,13 +943,13 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * @param always true means create instances even if the pool has no threads waiting
      * @throws Exception if the factory's makeObject throws
      */
-    private void ensureIdle(int idleCount, boolean always) throws Exception {
+    private void ensureIdle(final int idleCount, final boolean always) throws Exception {
         if (idleCount < 1 || isClosed() || (!always && !idleObjects.hasTakeWaiters())) {
             return;
         }
 
         while (idleObjects.size() < idleCount) {
-            PooledObject<T> p = create();
+            final PooledObject<T> p = create();
             if (p == null) {
                 // Can't create objects, no reason to think another call to
                 // create will work. Give up.
@@ -953,7 +983,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
             throw new IllegalStateException(
                     "Cannot add objects without a factory.");
         }
-        PooledObject<T> p = create();
+        final PooledObject<T> p = create();
         addIdleObject(p);
     }
 
@@ -966,7 +996,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      *
      * @throws Exception If the factory fails to passivate the object
      */
-    private void addIdleObject(PooledObject<T> p) throws Exception {
+    private void addIdleObject(final PooledObject<T> p) throws Exception {
         if (p != null) {
             factory.passivateObject(p);
             if (getLifo()) {
@@ -984,7 +1014,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * @return The number of objects to test for validity
      */
     private int getNumTests() {
-        int numTestsPerEvictionRun = getNumTestsPerEvictionRun();
+        final int numTestsPerEvictionRun = getNumTestsPerEvictionRun();
         if (numTestsPerEvictionRun >= 0) {
             return Math.min(numTestsPerEvictionRun, idleObjects.size());
         }
@@ -998,15 +1028,15 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      *
      * @param ac The configuration to use to identify abandoned objects
      */
-    private void removeAbandoned(AbandonedConfig ac) {
+    private void removeAbandoned(final AbandonedConfig ac) {
         // Generate a list of abandoned objects to remove
         final long now = System.currentTimeMillis();
         final long timeout =
                 now - (ac.getRemoveAbandonedTimeout() * 1000L);
-        ArrayList<PooledObject<T>> remove = new ArrayList<>();
-        Iterator<PooledObject<T>> it = allObjects.values().iterator();
+        final ArrayList<PooledObject<T>> remove = new ArrayList<>();
+        final Iterator<PooledObject<T>> it = allObjects.values().iterator();
         while (it.hasNext()) {
-            PooledObject<T> pooledObject = it.next();
+            final PooledObject<T> pooledObject = it.next();
             synchronized (pooledObject) {
                 if (pooledObject.getState() == PooledObjectState.ALLOCATED &&
                         pooledObject.getLastUsedTime() <= timeout) {
@@ -1017,15 +1047,15 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         }
 
         // Now remove the abandoned objects
-        Iterator<PooledObject<T>> itr = remove.iterator();
+        final Iterator<PooledObject<T>> itr = remove.iterator();
         while (itr.hasNext()) {
-            PooledObject<T> pooledObject = itr.next();
+            final PooledObject<T> pooledObject = itr.next();
             if (ac.getLogAbandoned()) {
                 pooledObject.printStackTrace(ac.getLogWriter());
             }
             try {
                 invalidateObject(pooledObject.getObject());
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 e.printStackTrace();
             }
         }
@@ -1035,10 +1065,10 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
     //--- Usage tracking support -----------------------------------------------
 
     @Override
-    public void use(T pooledObject) {
-        AbandonedConfig ac = this.abandonedConfig;
+    public void use(final T pooledObject) {
+        final AbandonedConfig ac = this.abandonedConfig;
         if (ac != null && ac.getUseUsageTracking()) {
-            PooledObject<T> wrapper = allObjects.get(new IdentityWrapper<>(pooledObject));
+            final PooledObject<T> wrapper = allObjects.get(new IdentityWrapper<>(pooledObject));
             wrapper.use();
         }
     }
@@ -1074,10 +1104,10 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
     public String getFactoryType() {
         // Not thread safe. Accept that there may be multiple evaluations.
         if (factoryType == null) {
-            StringBuilder result = new StringBuilder();
+            final StringBuilder result = new StringBuilder();
             result.append(factory.getClass().getName());
             result.append('<');
-            Class<?> pooledObjectType =
+            final Class<?> pooledObjectType =
                     PoolImplUtils.getFactoryType(factory.getClass());
             result.append(pooledObjectType.getName());
             result.append('>');
@@ -1099,9 +1129,9 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      */
     @Override
     public Set<DefaultPooledObjectInfo> listAllObjects() {
-        Set<DefaultPooledObjectInfo> result =
+        final Set<DefaultPooledObjectInfo> result =
                 new HashSet<>(allObjects.size());
-        for (PooledObject<T> p : allObjects.values()) {
+        for (final PooledObject<T> p : allObjects.values()) {
             result.add(new DefaultPooledObjectInfo(p));
         }
         return result;
@@ -1133,6 +1163,8 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * {@link #_maxActive} objects created at any one time.
      */
     private final AtomicLong createCount = new AtomicLong(0);
+    private long makeObjectCount = 0;
+    private final Object makeObjectCountLock = new Object();
     private final LinkedBlockingDeque<PooledObject<T>> idleObjects;
 
     // JMX specific attributes
@@ -1143,7 +1175,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
     private volatile AbandonedConfig abandonedConfig = null;
 
     @Override
-    protected void toStringAppendFields(StringBuilder builder) {
+    protected void toStringAppendFields(final StringBuilder builder) {
         super.toStringAppendFields(builder);
         builder.append(", factoryType=");
         builder.append(factoryType);

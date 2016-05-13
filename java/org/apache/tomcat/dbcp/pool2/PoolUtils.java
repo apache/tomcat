@@ -66,7 +66,7 @@ public final class PoolUtils {
      * @throws VirtualMachineError
      *             if that is passed in
      */
-    public static void checkRethrow(Throwable t) {
+    public static void checkRethrow(final Throwable t) {
         if (t instanceof ThreadDeath) {
             throw (ThreadDeath) t;
         }
@@ -603,7 +603,7 @@ public final class PoolUtils {
                 }
                 success = true;
 
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 cancel();
             } finally {
                 // detect other types of Throwable and cancel this Timer
@@ -678,7 +678,7 @@ public final class PoolUtils {
                 }
                 success = true;
 
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 cancel();
 
             } finally {
@@ -750,7 +750,7 @@ public final class PoolUtils {
         @Override
         public T borrowObject() throws Exception, NoSuchElementException,
                 IllegalStateException {
-            WriteLock writeLock = readWriteLock.writeLock();
+            final WriteLock writeLock = readWriteLock.writeLock();
             writeLock.lock();
             try {
                 return pool.borrowObject();
@@ -764,11 +764,11 @@ public final class PoolUtils {
          */
         @Override
         public void returnObject(final T obj) {
-            WriteLock writeLock = readWriteLock.writeLock();
+            final WriteLock writeLock = readWriteLock.writeLock();
             writeLock.lock();
             try {
                 pool.returnObject(obj);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // swallowed as of Pool 2
             } finally {
                 writeLock.unlock();
@@ -780,11 +780,11 @@ public final class PoolUtils {
          */
         @Override
         public void invalidateObject(final T obj) {
-            WriteLock writeLock = readWriteLock.writeLock();
+            final WriteLock writeLock = readWriteLock.writeLock();
             writeLock.lock();
             try {
                 pool.invalidateObject(obj);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // swallowed as of Pool 2
             } finally {
                 writeLock.unlock();
@@ -797,7 +797,7 @@ public final class PoolUtils {
         @Override
         public void addObject() throws Exception, IllegalStateException,
                 UnsupportedOperationException {
-            WriteLock writeLock = readWriteLock.writeLock();
+            final WriteLock writeLock = readWriteLock.writeLock();
             writeLock.lock();
             try {
                 pool.addObject();
@@ -811,7 +811,7 @@ public final class PoolUtils {
          */
         @Override
         public int getNumIdle() {
-            ReadLock readLock = readWriteLock.readLock();
+            final ReadLock readLock = readWriteLock.readLock();
             readLock.lock();
             try {
                 return pool.getNumIdle();
@@ -825,7 +825,7 @@ public final class PoolUtils {
          */
         @Override
         public int getNumActive() {
-            ReadLock readLock = readWriteLock.readLock();
+            final ReadLock readLock = readWriteLock.readLock();
             readLock.lock();
             try {
                 return pool.getNumActive();
@@ -839,7 +839,7 @@ public final class PoolUtils {
          */
         @Override
         public void clear() throws Exception, UnsupportedOperationException {
-            WriteLock writeLock = readWriteLock.writeLock();
+            final WriteLock writeLock = readWriteLock.writeLock();
             writeLock.lock();
             try {
                 pool.clear();
@@ -853,11 +853,11 @@ public final class PoolUtils {
          */
         @Override
         public void close() {
-            WriteLock writeLock = readWriteLock.writeLock();
+            final WriteLock writeLock = readWriteLock.writeLock();
             writeLock.lock();
             try {
                 pool.close();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // swallowed as of Pool 2
             } finally {
                 writeLock.unlock();
@@ -924,7 +924,7 @@ public final class PoolUtils {
         @Override
         public V borrowObject(final K key) throws Exception,
                 NoSuchElementException, IllegalStateException {
-            WriteLock writeLock = readWriteLock.writeLock();
+            final WriteLock writeLock = readWriteLock.writeLock();
             writeLock.lock();
             try {
                 return keyedPool.borrowObject(key);
@@ -938,11 +938,11 @@ public final class PoolUtils {
          */
         @Override
         public void returnObject(final K key, final V obj) {
-            WriteLock writeLock = readWriteLock.writeLock();
+            final WriteLock writeLock = readWriteLock.writeLock();
             writeLock.lock();
             try {
                 keyedPool.returnObject(key, obj);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // swallowed
             } finally {
                 writeLock.unlock();
@@ -954,11 +954,11 @@ public final class PoolUtils {
          */
         @Override
         public void invalidateObject(final K key, final V obj) {
-            WriteLock writeLock = readWriteLock.writeLock();
+            final WriteLock writeLock = readWriteLock.writeLock();
             writeLock.lock();
             try {
                 keyedPool.invalidateObject(key, obj);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // swallowed as of Pool 2
             } finally {
                 writeLock.unlock();
@@ -971,7 +971,7 @@ public final class PoolUtils {
         @Override
         public void addObject(final K key) throws Exception,
                 IllegalStateException, UnsupportedOperationException {
-            WriteLock writeLock = readWriteLock.writeLock();
+            final WriteLock writeLock = readWriteLock.writeLock();
             writeLock.lock();
             try {
                 keyedPool.addObject(key);
@@ -985,7 +985,7 @@ public final class PoolUtils {
          */
         @Override
         public int getNumIdle(final K key) {
-            ReadLock readLock = readWriteLock.readLock();
+            final ReadLock readLock = readWriteLock.readLock();
             readLock.lock();
             try {
                 return keyedPool.getNumIdle(key);
@@ -999,7 +999,7 @@ public final class PoolUtils {
          */
         @Override
         public int getNumActive(final K key) {
-            ReadLock readLock = readWriteLock.readLock();
+            final ReadLock readLock = readWriteLock.readLock();
             readLock.lock();
             try {
                 return keyedPool.getNumActive(key);
@@ -1013,7 +1013,7 @@ public final class PoolUtils {
          */
         @Override
         public int getNumIdle() {
-            ReadLock readLock = readWriteLock.readLock();
+            final ReadLock readLock = readWriteLock.readLock();
             readLock.lock();
             try {
                 return keyedPool.getNumIdle();
@@ -1027,7 +1027,7 @@ public final class PoolUtils {
          */
         @Override
         public int getNumActive() {
-            ReadLock readLock = readWriteLock.readLock();
+            final ReadLock readLock = readWriteLock.readLock();
             readLock.lock();
             try {
                 return keyedPool.getNumActive();
@@ -1041,7 +1041,7 @@ public final class PoolUtils {
          */
         @Override
         public void clear() throws Exception, UnsupportedOperationException {
-            WriteLock writeLock = readWriteLock.writeLock();
+            final WriteLock writeLock = readWriteLock.writeLock();
             writeLock.lock();
             try {
                 keyedPool.clear();
@@ -1056,7 +1056,7 @@ public final class PoolUtils {
         @Override
         public void clear(final K key) throws Exception,
                 UnsupportedOperationException {
-            WriteLock writeLock = readWriteLock.writeLock();
+            final WriteLock writeLock = readWriteLock.writeLock();
             writeLock.lock();
             try {
                 keyedPool.clear(key);
@@ -1070,11 +1070,11 @@ public final class PoolUtils {
          */
         @Override
         public void close() {
-            WriteLock writeLock = readWriteLock.writeLock();
+            final WriteLock writeLock = readWriteLock.writeLock();
             writeLock.lock();
             try {
                 keyedPool.close();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // swallowed as of Pool 2
             } finally {
                 writeLock.unlock();
@@ -1464,7 +1464,7 @@ public final class PoolUtils {
                 } else {
                     pool.returnObject(obj);
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // swallowed
             }
         }
@@ -1476,7 +1476,7 @@ public final class PoolUtils {
         public void invalidateObject(final T obj) {
             try {
                 pool.invalidateObject(obj);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // swallowed
             }
         }
@@ -1521,7 +1521,7 @@ public final class PoolUtils {
         public void close() {
             try {
                 pool.close();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // swallowed
             }
         }
@@ -1629,7 +1629,7 @@ public final class PoolUtils {
                 } else {
                     keyedPool.returnObject(key, obj);
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // swallowed
             }
         }
@@ -1652,7 +1652,7 @@ public final class PoolUtils {
         public void invalidateObject(final K key, final V obj) {
             try {
                 keyedPool.invalidateObject(key, obj);
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // swallowed
             }
         }
@@ -1722,7 +1722,7 @@ public final class PoolUtils {
         public void close() {
             try {
                 keyedPool.close();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // swallowed
             }
         }

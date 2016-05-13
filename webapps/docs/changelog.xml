@@ -64,6 +64,10 @@
         Update the internal fork of Commons DBCP 2 to r1743696 (2.1.1 plus
         additional fixes). (markt)
       </update>
+      <update>
+        Update the internal fork of Commons Pool 2 to r1743697 (2.4.2 plus
+        additional fixes). (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
