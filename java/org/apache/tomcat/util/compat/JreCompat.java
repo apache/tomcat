@@ -49,12 +49,12 @@ public class JreCompat {
     }
 
 
+    // Java 8 implementation of Java 9 methods
+
     public static boolean isJre9Available() {
         return jre9Available;
     }
 
-
-    // Java 8 implementation of Java 9 methods
 
     /**
      * Test if the provided exception is an instance of
@@ -66,7 +66,7 @@ public class JreCompat {
      *         InaccessibleObjectException, otherwise {@code false}
      */
     public boolean isInstanceOfInaccessibleObjectException(Exception e) {
-        // Exception does not exist in Java 8
+        // Exception does not exist prior to Java 9
         return false;
     }
 }
