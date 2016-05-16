@@ -119,7 +119,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
      * multiple root causes for this. Some of these are particularly nasty as
      * profilers may not identify any GC roots related to the leak. For example,
      * with YourKit you need to ensure that HPROF format memory snapshots are
-     * used to be abel to trace some of the leaks.
+     * used to be able to trace some of the leaks.
      */
     private boolean xmlParsingProtection = true;
     public boolean isXmlParsingProtection() { return xmlParsingProtection; }
