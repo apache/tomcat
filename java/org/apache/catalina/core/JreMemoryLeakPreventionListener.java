@@ -286,33 +286,25 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                     }
                 }
 
-                /*
-                 * Various leaks related to the use of XML parsing.
-                 */
                 if (xmlParsingProtection) {
-                    // There are three known issues with XML parsing
-                    // 1. DocumentBuilderFactory.newInstance().newDocumentBuilder();
-                    // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6916498
-                    // This issue is fixed in Java 7 onwards
+                    // There are two known issues with XML parsing that affect
+                    // Java 8+. The issues both relate to cached Exception
+                    // instances that retain a link to the TCCL via the
+                    // backtrace field. Note that YourKit only shows this field
+                    // when using the HPROF format memory snapshots.
+                    // https://bz.apache.org/bugzilla/show_bug.cgi?id=58486
                     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                     try {
                         DocumentBuilder documentBuilder = factory.newDocumentBuilder();
-
-                        // The 2nd and 3rd links both relate to cached Exception
-                        // instances that retain a link to the TCCL via the
-                        // backtrace field. Note that YourKit only shows this
-                        // field when using the HPROF format memory snapshots.
-                        // https://bz.apache.org/bugzilla/show_bug.cgi?id=58486
-                        // These issues are currently present in all current
-                        // versions of Java
-
-                        // 2. com.sun.org.apache.xml.internal.serialize.DOMSerializerImpl
+                        // Issue 1
+                        // com.sun.org.apache.xml.internal.serialize.DOMSerializerImpl
                         Document document = documentBuilder.newDocument();
                         document.createElement("dummy");
                         DOMImplementationLS implementation =
                                 (DOMImplementationLS)document.getImplementation();
                         implementation.createLSSerializer().writeToString(document);
-                        // 3. com.sun.org.apache.xerces.internal.dom.DOMNormalizer
+                        // Issue 1
+                        // com.sun.org.apache.xerces.internal.dom.DOMNormalizer
                         document.normalize();
                     } catch (ParserConfigurationException e) {
                         log.error(sm.getString("jreLeakListener.xmlParseFail"),
