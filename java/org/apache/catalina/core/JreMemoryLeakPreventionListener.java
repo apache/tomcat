@@ -193,7 +193,8 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 }
 
                 // Trigger the creation of the AWT (AWT-Windows, AWT-XAWT,
-                // etc.) thread
+                // etc.) thread.
+                // Note this issue is fixed in Java 8 update 05 onwards.
                 if (awtThreadProtection) {
                     java.awt.Toolkit.getDefaultToolkit();
                 }
