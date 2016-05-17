@@ -1898,7 +1898,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       docencoding="ISO-8859-1"
       charset="ISO-8859-1"
       additionalparam="-breakiterator -notimestamp"
-      maxmemory="256m"
+      maxmemory="512m"
       failonerror="true"
       executable="${java.7.home}/bin/javadoc">
       <classpath>
@@ -1919,7 +1919,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       docencoding="ISO-8859-1"
       charset="ISO-8859-1"
       additionalparam="-breakiterator -notimestamp"
-      maxmemory="256m"
+      maxmemory="512m"
       failonerror="true"
       executable="${java.7.home}/bin/javadoc">
       <classpath>
@@ -1940,7 +1940,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       docencoding="ISO-8859-1"
       charset="ISO-8859-1"
       additionalparam="-breakiterator -notimestamp"
-      maxmemory="256m"
+      maxmemory="512m"
       failonerror="true"
       executable="${java.7.home}/bin/javadoc">
       <classpath>
@@ -1961,7 +1961,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       docencoding="ISO-8859-1"
       charset="ISO-8859-1"
       additionalparam="-breakiterator -notimestamp"
-      maxmemory="256m"
+      maxmemory="512m"
       failonerror="true"
       executable="${java.7.home}/bin/javadoc">
       <classpath>
@@ -1981,7 +1981,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       docencoding="ISO-8859-1"
       charset="ISO-8859-1"
       additionalparam="-breakiterator -notimestamp"
-      maxmemory="256m"
+      maxmemory="512m"
       failonerror="true"
       executable="${java.7.home}/bin/javadoc">
       <classpath>
