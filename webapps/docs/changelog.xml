@@ -53,6 +53,10 @@
         around. Therefore, start logging RMI Target related memory leaks on web
         application stop. (markt)
       </fix>
+      <fix>
+        Ensure NPE will not be thrown during deployment when scanning jar files
+        without MANIFEST.MF file. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

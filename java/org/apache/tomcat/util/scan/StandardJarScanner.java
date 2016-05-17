@@ -370,40 +370,42 @@ public class StandardJarScanner implements JarScanner {
         }
 
         Manifest manifest = jar.getManifest();
-        Attributes attributes = manifest.getMainAttributes();
-        String classPathAttribute = attributes.getValue("Class-Path");
-        if (classPathAttribute == null) {
-            return;
-        }
-        String[] classPathEntries = classPathAttribute.split(" ");
-        for (String classPathEntry : classPathEntries) {
-            classPathEntry = classPathEntry.trim();
-            if (classPathEntry.length() == 0) {
-                continue;
+        if (manifest != null) {
+            Attributes attributes = manifest.getMainAttributes();
+            String classPathAttribute = attributes.getValue("Class-Path");
+            if (classPathAttribute == null) {
+                return;
             }
-            URL jarURL = jar.getJarFileURL();
-            URI jarURI;
-            try {
-                jarURI = jarURL.toURI();
-            } catch (URISyntaxException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("jarScan.invalidUri", jarURL));
+            String[] classPathEntries = classPathAttribute.split(" ");
+            for (String classPathEntry : classPathEntries) {
+                classPathEntry = classPathEntry.trim();
+                if (classPathEntry.length() == 0) {
+                    continue;
                 }
-                continue;
+                URL jarURL = jar.getJarFileURL();
+                URI jarURI;
+                try {
+                    jarURI = jarURL.toURI();
+                } catch (URISyntaxException e) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("jarScan.invalidUri", jarURL));
+                    }
+                    continue;
+                }
+                /*
+                 * Note: Resolving the relative URLs from the manifest has the
+                 *       potential to introduce security concerns. However, since
+                 *       only JARs provided by the container and NOT those provided
+                 *       by web applications are processed, there should be no
+                 *       issues.
+                 *       If this feature is ever extended to include JARs provided
+                 *       by web applications, checks should be added to ensure that
+                 *       any relative URL does not step outside the web application.
+                 */
+                URI classPathEntryURI = jarURI.resolve(classPathEntry);
+                URL classPathEntryURL = classPathEntryURI.toURL();
+                classPathUrlsToProcess.add(classPathEntryURL);
             }
-            /*
-             * Note: Resolving the relative URLs from the manifest has the
-             *       potential to introduce security concerns. However, since
-             *       only JARs provided by the container and NOT those provided
-             *       by web applications are processed, there should be no
-             *       issues.
-             *       If this feature is ever extended to include JARs provided
-             *       by web applications, checks should be added to ensure that
-             *       any relative URL does not step outside the web application.
-             */
-            URI classPathEntryURI = jarURI.resolve(classPathEntry);
-            URL classPathEntryURL = classPathEntryURI.toURL();
-            classPathUrlsToProcess.add(classPathEntryURL);
         }
     }
 
