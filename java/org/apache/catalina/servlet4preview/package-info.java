@@ -21,8 +21,8 @@
  * in Tomcat 9 and applications depending on classes in this package will need
  * to be modified before they will work with Tomcat 9. It is intended that any
  * such modifications will be limited to replacing
- * <code>import org.apache.catalina.servlet4preview...<code> with
- * <code>import javax.servlet...<code> and removing casts.
+ * <code>import org.apache.catalina.servlet4preview...</code> with
+ * <code>import javax.servlet...</code> and removing casts.
  * <p>
  * This package is not a complete copy of the proposed Servlet 4.0 API. It
  * contains only a sub-set of those classes that are new or modified in Servlet
