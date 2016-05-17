@@ -1899,6 +1899,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       charset="ISO-8859-1"
       additionalparam="-breakiterator -notimestamp"
       maxmemory="256m"
+      failonerror="true"
       executable="${java.7.home}/bin/javadoc">
       <classpath>
         <path refid="compile.classpath"/>
@@ -1919,6 +1920,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       charset="ISO-8859-1"
       additionalparam="-breakiterator -notimestamp"
       maxmemory="256m"
+      failonerror="true"
       executable="${java.7.home}/bin/javadoc">
       <classpath>
         <path refid="compile.classpath"/>
@@ -1939,6 +1941,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       charset="ISO-8859-1"
       additionalparam="-breakiterator -notimestamp"
       maxmemory="256m"
+      failonerror="true"
       executable="${java.7.home}/bin/javadoc">
       <classpath>
         <path refid="compile.classpath"/>
@@ -1959,6 +1962,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       charset="ISO-8859-1"
       additionalparam="-breakiterator -notimestamp"
       maxmemory="256m"
+      failonerror="true"
       executable="${java.7.home}/bin/javadoc">
       <classpath>
         <path refid="compile.classpath"/>
@@ -1978,6 +1982,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       charset="ISO-8859-1"
       additionalparam="-breakiterator -notimestamp"
       maxmemory="256m"
+      failonerror="true"
       executable="${java.7.home}/bin/javadoc">
       <classpath>
         <path refid="compile.classpath"/>
