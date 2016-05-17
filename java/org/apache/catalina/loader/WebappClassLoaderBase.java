@@ -77,6 +77,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstrumentableClassLoader;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.compat.JreVendor;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -328,6 +329,13 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
+     * Enables the RMI Target memory leak detection to be controlled. This is
+     * necessary since the detection can only work on Java 9 if some of the
+     * modularity checks are disabled.
+     */
+    private boolean clearReferencesRmiTargets = true;
+
+    /**
      * Should Tomcat attempt to null out any static or final fields from loaded
      * classes when a web application is stopped as a work around for apparent
      * garbage collection bugs and application coding errors? There have been
@@ -518,6 +526,16 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if ((securityManager != null) && (permission != null)) {
             permissionList.add(permission);
         }
+    }
+
+
+    public boolean getClearReferencesRmiTargets() {
+        return this.clearReferencesRmiTargets;
+    }
+
+
+    public void setClearReferencesRmiTargets(boolean clearReferencesRmiTargets) {
+        this.clearReferencesRmiTargets = clearReferencesRmiTargets;
     }
 
 
@@ -1529,7 +1547,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         checkThreadLocalsForLeaks();
 
         // Clear RMI Targets loaded by this class loader
-        clearReferencesRmiTargets();
+        if (clearReferencesRmiTargets) {
+            clearReferencesRmiTargets();
+        }
 
         // Null out any static or final fields from loaded classes,
         // as a workaround for apparent garbage collection bugs
@@ -2274,6 +2294,16 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 IllegalAccessException e) {
             log.warn(sm.getString("webappClassLoader.clearRmiFail",
                     getContextName()), e);
+        } catch (Exception e) {
+            JreCompat jreCompat = JreCompat.getInstance();
+            if (jreCompat.isInstanceOfInaccessibleObjectException(e)) {
+                // Must be running on Java 9 without the necessary command line
+                // options.
+                log.warn(sm.getString("webappClassLoader.addExports"));
+            } else {
+                // Re-throw all other exceptions
+                throw e;
+            }
         }
     }
 
