@@ -1953,7 +1953,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       docencoding="UTF-8"
       charset="UTF-8"
       additionalparam="-breakiterator -notimestamp"
-      maxmemory="256m"
+      maxmemory="512m"
       failonerror="true"
       failonwarning="true">
       <classpath>
@@ -1974,7 +1974,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       docencoding="UTF-8"
       charset="UTF-8"
       additionalparam="-breakiterator -notimestamp"
-      maxmemory="256m"
+      maxmemory="512m"
       failonerror="true"
       failonwarning="true">
       <classpath>
@@ -1995,7 +1995,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       docencoding="UTF-8"
       charset="UTF-8"
       additionalparam="-breakiterator -notimestamp"
-      maxmemory="256m"
+      maxmemory="512m"
       failonerror="true"
       failonwarning="true">
       <classpath>
@@ -2016,7 +2016,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       docencoding="UTF-8"
       charset="UTF-8"
       additionalparam="-breakiterator -notimestamp"
-      maxmemory="256m"
+      maxmemory="512m"
       failonerror="true"
       failonwarning="true">
       <classpath>
@@ -2036,7 +2036,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       docencoding="UTF-8"
       charset="UTF-8"
       additionalparam="-breakiterator -notimestamp"
-      maxmemory="256m"
+      maxmemory="512m"
       failonerror="true"
       failonwarning="true">
       <classpath>
