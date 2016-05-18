@@ -391,6 +391,9 @@ public class TldScanner {
             // IDEs.
 
             Set<String> paths = context.getResourcePaths(WEB_INF + "classes/META-INF");
+            if (paths == null) {
+                return;
+            }
 
             for (String path : paths) {
                 if (path.endsWith(TLD_EXT)) {
