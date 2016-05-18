@@ -511,6 +511,13 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
+     * Enables the RMI Target memory leak detection to be controlled. This is
+     * necessary since the detection can only work on Java 9 if some of the
+     * modularity checks are disabled.
+     */
+    private boolean clearReferencesRmiTargets = true;
+
+    /**
      * Should Tomcat attempt to null out any static or final fields from loaded
      * classes when a web application is stopped as a work around for apparent
      * garbage collection bugs and application coding errors? There have been
@@ -666,6 +673,16 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     public boolean getSearchExternalFirst() {
         return searchExternalFirst;
     }
+
+    public boolean getClearReferencesRmiTargets() {
+        return this.clearReferencesRmiTargets;
+    }
+
+
+    public void setClearReferencesRmiTargets(boolean clearReferencesRmiTargets) {
+        this.clearReferencesRmiTargets = clearReferencesRmiTargets;
+    }
+
 
     /**
      * @param searchExternalFirst Whether external repositories should be searched first
@@ -2174,7 +2191,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         checkThreadLocalsForLeaks();
 
         // Clear RMI Targets loaded by this class loader
-        clearReferencesRmiTargets();
+        if (clearReferencesRmiTargets) {
+            clearReferencesRmiTargets();
+        }
 
         // Null out any static or final fields from loaded classes,
         // as a workaround for apparent garbage collection bugs
@@ -2928,6 +2947,17 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         } catch (IllegalAccessException e) {
             log.warn(sm.getString("webappClassLoader.clearRmiFail",
                     contextName), e);
+        } catch (Exception e) {
+            JreCompat jreCompat = JreCompat.getInstance();
+            if (jreCompat.isInstanceOfInaccessibleObjectException(e)) {
+                // Must be running on Java 9 without the necessary command line
+                // options.
+                log.warn(sm.getString("webappClassLoader.addExports"));
+            } else {
+                // Re-throw all other exceptions
+                // Have to wrap this below Java 7
+                throw new RuntimeException(e);
+            }
         }
     }
 

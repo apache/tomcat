@@ -586,6 +586,8 @@ public class WebappLoader extends LifecycleMBeanBase
             if (container instanceof StandardContext) {
                 classLoader.setAntiJARLocking(
                         ((StandardContext) container).getAntiJARLocking());
+                classLoader.setClearReferencesRmiTargets(
+                        ((StandardContext) container).getClearReferencesRmiTargets());
                 classLoader.setClearReferencesStatic(
                         ((StandardContext) container).getClearReferencesStatic());
                 classLoader.setClearReferencesStopThreads(
