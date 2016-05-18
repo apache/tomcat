@@ -82,6 +82,10 @@
                description="Object names of all children"
                type="[Ljavax.management.ObjectName;"/>
 
+    <attribute name="clearReferencesRmiTargets"
+               description="Should Tomcat look for memory leaks in RMI Targets and clear them if found as a work around for application coding errors?"
+               type="boolean"/>
+
     <attribute name="clearReferencesStatic"
                description="Should Tomcat attempt to null out any static or final fields from loaded classes when a web application is stopped as a work around for apparent garbage collection bugs and application coding errors?"
                type="boolean"/>

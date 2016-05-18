@@ -707,6 +707,13 @@ public class StandardContext extends ContainerBase
     private JarScanner jarScanner = null;
 
     /**
+     * Enables the RMI Target memory leak detection to be controlled. This is
+     * necessary since the detection can only work on Java 9 if some of the
+     * modularity checks are disabled.
+     */
+    private boolean clearReferencesRmiTargets = true;
+
+    /**
      * Should Tomcat attempt to null out any static or final fields from loaded
      * classes when a web application is stopped as a work around for apparent
      * garbage collection bugs and application coding errors? There have been
@@ -2567,6 +2574,19 @@ public class StandardContext extends ContainerBase
         if (getState().isAvailable()) {
             postWorkDirectory();
         }
+    }
+
+
+    public boolean getClearReferencesRmiTargets() {
+        return this.clearReferencesRmiTargets;
+    }
+
+
+    public void setClearReferencesRmiTargets(boolean clearReferencesRmiTargets) {
+        boolean oldClearReferencesRmiTargets = this.clearReferencesRmiTargets;
+        this.clearReferencesRmiTargets = clearReferencesRmiTargets;
+        support.firePropertyChange("clearReferencesRmiTargets",
+                oldClearReferencesRmiTargets, this.clearReferencesRmiTargets);
     }
 
 
@@ -5047,6 +5067,8 @@ public class StandardContext extends ContainerBase
 
                 // since the loader just started, the webapp classloader is now
                 // created.
+                setClassLoaderProperty("clearReferencesRmiTargets",
+                        getClearReferencesRmiTargets());
                 setClassLoaderProperty("clearReferencesStatic",
                         getClearReferencesStatic());
                 setClassLoaderProperty("clearReferencesStopThreads",

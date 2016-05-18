@@ -51,7 +51,9 @@
         RMI Target related memory leaks are avoidable which makes them an
         application bug that needs to be fixed rather than a JRE bug to work
         around. Therefore, start logging RMI Target related memory leaks on web
-        application stop. (markt)
+        application stop. Add an option that controls if the check for these
+        leaks is made. Log a warning if running on Java 9 with this check
+        enabled but without the command line option it requires. (markt)
       </fix>
       <fix>
         Ensure NPE will not be thrown during deployment when scanning jar files
