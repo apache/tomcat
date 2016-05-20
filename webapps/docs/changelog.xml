@@ -133,16 +133,20 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Fix a memory leak in the expression language implementation that caused
+        the class loader of the first web application to use expressions to be
+        pinned in memory. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
         Ensure that a client disconnection triggers the error handling for the
         associated WebSocket end point. (markt)
-      </fix>
-      <fix>
-        Fix a memory leak in the expression language implementation that caused
-        the class loader of the first web application to use expressions to be
-        pinned in memory. (markt)
       </fix>
     </changelog>
   </subsection>
