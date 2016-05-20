@@ -238,6 +238,7 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
 
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testCopiedClassLoaderExcludesResourcesAndTransformers() throws Exception {
 

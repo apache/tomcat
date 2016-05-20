@@ -838,7 +838,10 @@ public class StandardContext extends ContainerBase
      * without memory leaks using recent JVMs should operate correctly with this
      * option set to <code>false</code>. If not specified, the default value of
      * <code>false</code> will be used. 
+     *
+     * @deprecated This option will be removed in Tomcat 8.5
      */
+    @Deprecated
     private boolean clearReferencesStatic = false;
     
     /**
@@ -2809,7 +2812,10 @@ public class StandardContext extends ContainerBase
 
     /**
      * Return the clearReferencesStatic flag for this Context.
+     *
+     * @deprecated This option will be removed in Tomcat 8.5
      */
+    @Deprecated
     public boolean getClearReferencesStatic() {
 
         return (this.clearReferencesStatic);
@@ -2821,7 +2827,10 @@ public class StandardContext extends ContainerBase
      * Set the clearReferencesStatic feature for this Context.
      *
      * @param clearReferencesStatic The new flag value
+     *
+     * @deprecated This option will be removed in Tomcat 8.5
      */
+    @Deprecated
     public void setClearReferencesStatic(boolean clearReferencesStatic) {
 
         boolean oldClearReferencesStatic = this.clearReferencesStatic;

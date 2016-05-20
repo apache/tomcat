@@ -788,6 +788,8 @@
         JVMs should operate correctly with this attribute set to
         <code>false</code>. If not specified, the default value of
         <code>false</code> will be used.</p>
+        <p>This attribute has been deprecated and will be removed in Tomcat
+        8.5.</p>
       </attribute>
 
       <attribute name="clearReferencesStopThreads" required="false">
