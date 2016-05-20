@@ -343,7 +343,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * without memory leaks using recent JVMs should operate correctly with this
      * option set to <code>false</code>. If not specified, the default value of
      * <code>false</code> will be used.
+     *
+     * @deprecated This option will be removed in Tomcat 8.5
      */
+    @Deprecated
     private boolean clearReferencesStatic = false;
 
     /**
@@ -543,7 +546,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * Return the clearReferencesStatic flag for this Context.
      * @return <code>true</code> if the classloader should attempt to set to null
      *    static final fields in loaded classes
+     *
+     * @deprecated This option will be removed in Tomcat 8.5
      */
+    @Deprecated
     public boolean getClearReferencesStatic() {
         return (this.clearReferencesStatic);
     }
@@ -553,7 +559,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * Set the clearReferencesStatic feature for this Context.
      *
      * @param clearReferencesStatic The new flag value
+     *
+     * @deprecated This option will be removed in Tomcat 8.5
      */
+    @Deprecated
     public void setClearReferencesStatic(boolean clearReferencesStatic) {
         this.clearReferencesStatic = clearReferencesStatic;
     }
