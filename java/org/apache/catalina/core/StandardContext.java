@@ -713,20 +713,6 @@ public class StandardContext extends ContainerBase
     private boolean clearReferencesRmiTargets = true;
 
     /**
-     * Should Tomcat attempt to null out any static or final fields from loaded
-     * classes when a web application is stopped as a work around for apparent
-     * garbage collection bugs and application coding errors? There have been
-     * some issues reported with log4j when this option is true. Applications
-     * without memory leaks using recent JVMs should operate correctly with this
-     * option set to <code>false</code>. If not specified, the default value of
-     * <code>false</code> will be used.
-     *
-     * @deprecated This option will be removed in Tomcat 8.5
-     */
-    @Deprecated
-    private boolean clearReferencesStatic = false;
-
-    /**
      * Should Tomcat attempt to terminate threads that have been started by the
      * web application? Stopping threads is performed via the deprecated (for
      * good reason) <code>Thread.stop()</code> method and is likely to result in
@@ -2589,38 +2575,6 @@ public class StandardContext extends ContainerBase
         this.clearReferencesRmiTargets = clearReferencesRmiTargets;
         support.firePropertyChange("clearReferencesRmiTargets",
                 oldClearReferencesRmiTargets, this.clearReferencesRmiTargets);
-    }
-
-
-    /**
-     * @return the clearReferencesStatic flag for this Context.
-     *
-     * @deprecated This option will be removed in Tomcat 8.5
-     */
-    @Deprecated
-    public boolean getClearReferencesStatic() {
-
-        return (this.clearReferencesStatic);
-
-    }
-
-
-    /**
-     * Set the clearReferencesStatic feature for this Context.
-     *
-     * @param clearReferencesStatic The new flag value
-     *
-     * @deprecated This option will be removed in Tomcat 8.5
-     */
-    @Deprecated
-    public void setClearReferencesStatic(boolean clearReferencesStatic) {
-
-        boolean oldClearReferencesStatic = this.clearReferencesStatic;
-        this.clearReferencesStatic = clearReferencesStatic;
-        support.firePropertyChange("clearReferencesStatic",
-                                   oldClearReferencesStatic,
-                                   this.clearReferencesStatic);
-
     }
 
 
@@ -5077,8 +5031,6 @@ public class StandardContext extends ContainerBase
                 // created.
                 setClassLoaderProperty("clearReferencesRmiTargets",
                         getClearReferencesRmiTargets());
-                setClassLoaderProperty("clearReferencesStatic",
-                        getClearReferencesStatic());
                 setClassLoaderProperty("clearReferencesStopThreads",
                         getClearReferencesStopThreads());
                 setClassLoaderProperty("clearReferencesStopTimerThreads",

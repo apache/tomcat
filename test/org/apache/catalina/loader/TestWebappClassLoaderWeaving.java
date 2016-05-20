@@ -239,7 +239,6 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
 
     }
 
-    @SuppressWarnings("deprecation")
     @Test
     public void testCopiedClassLoaderExcludesResourcesAndTransformers() throws Exception {
 
@@ -266,9 +265,6 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         assertEquals("getClearReferencesLogFactoryRelease did not match.",
                 Boolean.valueOf(this.loader.getClearReferencesLogFactoryRelease()),
                 Boolean.valueOf(copiedLoader.getClearReferencesLogFactoryRelease()));
-        assertEquals("getClearReferencesStatic did not match.",
-                Boolean.valueOf(this.loader.getClearReferencesStatic()),
-                Boolean.valueOf(copiedLoader.getClearReferencesStatic()));
         assertEquals("getClearReferencesStopThreads did not match.",
                 Boolean.valueOf(this.loader.getClearReferencesStopThreads()),
                 Boolean.valueOf(copiedLoader.getClearReferencesStopThreads()));

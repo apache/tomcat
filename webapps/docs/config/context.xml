@@ -698,19 +698,6 @@
         If not specified, the default value of <code>true</code> will be used.</p>
       </attribute>
 
-      <attribute name="clearReferencesStatic" required="false">
-        <p>If <code>true</code>, Tomcat attempts to null out any static or final
-        fields from loaded classes when a web application is stopped as a work
-        around for apparent garbage collection bugs and application coding
-        errors. There have been some issues reported with log4j when this
-        is <code>true</code>. Applications without memory leaks using recent
-        JVMs should operate correctly with this attribute set to
-        <code>false</code>. If not specified, the default value of
-        <code>false</code> will be used.</p>
-        <p>This attribute has been deprecated and will be removed in Tomcat
-        8.5.</p>
-      </attribute>
-
       <attribute name="clearReferencesStopThreads" required="false">
         <p>If <code>true</code>, Tomcat attempts to terminate threads that have
         been started by the web application. Stopping threads is performed via

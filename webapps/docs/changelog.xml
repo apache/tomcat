@@ -59,6 +59,13 @@
         Ensure NPE will not be thrown during deployment when scanning jar files
         without MANIFEST.MF file. (violetagg)
       </fix>
+      <scode>
+        Remove the <code>clearReferencesStatic</code> option from
+        <code>StandardContext</code>. It was known to cause problems with some
+        libraries (such as log4j) and was only linked to suspected memory leaks
+        rather than known memory leaks. It had been disabled by default with no
+        increase in the reports of memory leaks for some time. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -86,10 +86,6 @@
                description="Should Tomcat look for memory leaks in RMI Targets and clear them if found as a work around for application coding errors?"
                type="boolean"/>
 
-    <attribute name="clearReferencesStatic"
-               description="Deprecated. Will be removed in Tomcat 8.5. Should Tomcat attempt to null out any static or final fields from loaded classes when a web application is stopped as a work around for apparent garbage collection bugs and application coding errors?"
-               type="boolean"/>
-
     <attribute name="clearReferencesStopThreads"
                description="Should Tomcat attempt to terminate threads that have been started by the web application? Advisable to be used only in a development environment."
                type="boolean"/>
