@@ -26,7 +26,6 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -336,20 +335,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     private boolean clearReferencesRmiTargets = true;
 
     /**
-     * Should Tomcat attempt to null out any static or final fields from loaded
-     * classes when a web application is stopped as a work around for apparent
-     * garbage collection bugs and application coding errors? There have been
-     * some issues reported with log4j when this option is true. Applications
-     * without memory leaks using recent JVMs should operate correctly with this
-     * option set to <code>false</code>. If not specified, the default value of
-     * <code>false</code> will be used.
-     *
-     * @deprecated This option will be removed in Tomcat 8.5
-     */
-    @Deprecated
-    private boolean clearReferencesStatic = false;
-
-    /**
      * Should Tomcat attempt to terminate threads that have been started by the
      * web application? Stopping threads is performed via the deprecated (for
      * good reason) <code>Thread.stop()</code> method and is likely to result in
@@ -543,32 +528,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
-     * Return the clearReferencesStatic flag for this Context.
-     * @return <code>true</code> if the classloader should attempt to set to null
-     *    static final fields in loaded classes
-     *
-     * @deprecated This option will be removed in Tomcat 8.5
-     */
-    @Deprecated
-    public boolean getClearReferencesStatic() {
-        return (this.clearReferencesStatic);
-    }
-
-
-    /**
-     * Set the clearReferencesStatic feature for this Context.
-     *
-     * @param clearReferencesStatic The new flag value
-     *
-     * @deprecated This option will be removed in Tomcat 8.5
-     */
-    @Deprecated
-    public void setClearReferencesStatic(boolean clearReferencesStatic) {
-        this.clearReferencesStatic = clearReferencesStatic;
-    }
-
-
-    /**
      * @return the clearReferencesStopThreads flag for this Context.
      */
     public boolean getClearReferencesStopThreads() {
@@ -704,7 +663,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         base.resources = this.resources;
         base.delegate = this.delegate;
         base.state = LifecycleState.NEW;
-        base.clearReferencesStatic = this.clearReferencesStatic;
         base.clearReferencesStopThreads = this.clearReferencesStopThreads;
         base.clearReferencesStopTimerThreads = this.clearReferencesStopTimerThreads;
         base.clearReferencesLogFactoryRelease = this.clearReferencesLogFactoryRelease;
@@ -1562,12 +1520,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             clearReferencesRmiTargets();
         }
 
-        // Null out any static or final fields from loaded classes,
-        // as a workaround for apparent garbage collection bugs
-        if (clearReferencesStatic) {
-            clearReferencesStaticFinal();
-        }
-
          // Clear the IntrospectionUtils cache.
         IntrospectionUtils.clear();
 
@@ -1644,131 +1596,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             ExceptionUtils.handleThrowable(t);
             log.warn(sm.getString(
                     "webappClassLoader.jdbcRemoveFailed", getContextName()), t);
-        }
-    }
-
-
-    private final void clearReferencesStaticFinal() {
-
-        Collection<ResourceEntry> values = resourceEntries.values();
-        Iterator<ResourceEntry> loadedClasses = values.iterator();
-        //
-        // walk through all loaded class to trigger initialization for
-        //    any uninitialized classes, otherwise initialization of
-        //    one class may call a previously cleared class.
-        while(loadedClasses.hasNext()) {
-            ResourceEntry entry = loadedClasses.next();
-            if (entry.loadedClass != null) {
-                Class<?> clazz = entry.loadedClass;
-                try {
-                    Field[] fields = clazz.getDeclaredFields();
-                    for (int i = 0; i < fields.length; i++) {
-                        if(Modifier.isStatic(fields[i].getModifiers())) {
-                            fields[i].get(null);
-                            break;
-                        }
-                    }
-                } catch(Throwable t) {
-                    // Ignore
-                }
-            }
-        }
-        loadedClasses = values.iterator();
-        while (loadedClasses.hasNext()) {
-            ResourceEntry entry = loadedClasses.next();
-            if (entry.loadedClass != null) {
-                Class<?> clazz = entry.loadedClass;
-                try {
-                    Field[] fields = clazz.getDeclaredFields();
-                    for (int i = 0; i < fields.length; i++) {
-                        Field field = fields[i];
-                        int mods = field.getModifiers();
-                        if (field.getType().isPrimitive()
-                                || (field.getName().indexOf('$') != -1)) {
-                            continue;
-                        }
-                        if (Modifier.isStatic(mods)) {
-                            try {
-                                field.setAccessible(true);
-                                if (Modifier.isFinal(mods)) {
-                                    if (!((field.getType().getName().startsWith("java."))
-                                            || (field.getType().getName().startsWith("javax.")))) {
-                                        nullInstance(field.get(null));
-                                    }
-                                } else {
-                                    field.set(null, null);
-                                    if (log.isDebugEnabled()) {
-                                        log.debug("Set field " + field.getName()
-                                                + " to null in class " + clazz.getName());
-                                    }
-                                }
-                            } catch (Throwable t) {
-                                ExceptionUtils.handleThrowable(t);
-                                if (log.isDebugEnabled()) {
-                                    log.debug("Could not set field " + field.getName()
-                                            + " to null in class " + clazz.getName(), t);
-                                }
-                            }
-                        }
-                    }
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    if (log.isDebugEnabled()) {
-                        log.debug("Could not clean fields for class " + clazz.getName(), t);
-                    }
-                }
-            }
-        }
-
-    }
-
-
-    private void nullInstance(Object instance) {
-        if (instance == null) {
-            return;
-        }
-        Field[] fields = instance.getClass().getDeclaredFields();
-        for (int i = 0; i < fields.length; i++) {
-            Field field = fields[i];
-            int mods = field.getModifiers();
-            if (field.getType().isPrimitive()
-                    || (field.getName().indexOf('$') != -1)) {
-                continue;
-            }
-            try {
-                field.setAccessible(true);
-                if (Modifier.isStatic(mods) && Modifier.isFinal(mods)) {
-                    // Doing something recursively is too risky
-                    continue;
-                }
-                Object value = field.get(instance);
-                if (null != value) {
-                    Class<? extends Object> valueClass = value.getClass();
-                    if (!loadedByThisOrChild(valueClass)) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Not setting field " + field.getName() +
-                                    " to null in object of class " +
-                                    instance.getClass().getName() +
-                                    " because the referenced object was of type " +
-                                    valueClass.getName() +
-                                    " which was not loaded by this web application class loader.");
-                        }
-                    } else {
-                        field.set(instance, null);
-                        if (log.isDebugEnabled()) {
-                            log.debug("Set field " + field.getName()
-                                    + " to null in class " + instance.getClass().getName());
-                        }
-                    }
-                }
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                if (log.isDebugEnabled()) {
-                    log.debug("Could not set field " + field.getName()
-                            + " to null in object instance of class "
-                            + instance.getClass().getName(), t);
-                }
-            }
         }
     }
 
