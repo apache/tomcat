@@ -20,6 +20,8 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -1289,9 +1291,12 @@ public class ConnectionPool {
             ClassLoader loader = Thread.currentThread().getContextClassLoader();
             try {
                 Thread.currentThread().setContextClassLoader(ConnectionPool.class.getClassLoader());
-                poolCleanTimer = new Timer("Tomcat JDBC Pool Cleaner["+ System.identityHashCode(ConnectionPool.class.getClassLoader()) + ":"+
-                                           System.currentTimeMillis() + "]", true);
-            }finally {
+                // Create the timer thread in a PrivilegedAction so that a
+                // reference to the web application class loader is not created
+                // via Thread.inheritedAccessControlContext
+                PrivilegedAction<Timer> pa = new PrivilegedNewTimer();
+                poolCleanTimer = AccessController.doPrivileged(pa);
+            } finally {
                 Thread.currentThread().setContextClassLoader(loader);
             }
         }
@@ -1309,6 +1314,14 @@ public class ConnectionPool {
                     poolCleanTimer = null;
                 }
             }
+        }
+    }
+
+    private static class PrivilegedNewTimer implements PrivilegedAction<Timer> {
+        @Override
+        public Timer run() {
+            return new Timer("Tomcat JDBC Pool Cleaner["+ System.identityHashCode(ConnectionPool.class.getClassLoader()) + ":"+
+                    System.currentTimeMillis() + "]", true);
         }
     }
 
