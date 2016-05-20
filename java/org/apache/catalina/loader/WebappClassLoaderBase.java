@@ -2317,7 +2317,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * based approach is more likely to be complete.
      *
      * The ResourceBundle is using WeakReferences so it shouldn't be pinning the
-     * class loader in memory. However, it is. Therefore clear ou the
+     * class loader in memory. However, it is. Therefore clear out the
      * references.
      */
     private void clearReferencesResourceBundles() {
