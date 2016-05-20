@@ -80,6 +80,11 @@
         <bug>59567</bug>: Fix NPE scanning webapps for TLDs when an exploded
         JAR has an empty WEB-INF/classes/META-INF folder. (remm)
       </fix>
+      <fix>
+        Fix a memory leak in the expression language implementation that caused
+        the class loader of the first web application to use expressions to be
+        pinned in memory. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
