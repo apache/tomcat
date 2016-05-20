@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
@@ -383,27 +382,27 @@ public class StandardJarScanner implements JarScanner {
                     continue;
                 }
                 URL jarURL = jar.getJarFileURL();
-                URI jarURI;
+                URL classPathEntryURL;
                 try {
-                    jarURI = jarURL.toURI();
-                } catch (URISyntaxException e) {
+                    URI jarURI = jarURL.toURI();
+                    /*
+                     * Note: Resolving the relative URLs from the manifest has the
+                     *       potential to introduce security concerns. However, since
+                     *       only JARs provided by the container and NOT those provided
+                     *       by web applications are processed, there should be no
+                     *       issues.
+                     *       If this feature is ever extended to include JARs provided
+                     *       by web applications, checks should be added to ensure that
+                     *       any relative URL does not step outside the web application.
+                     */
+                    URI classPathEntryURI = jarURI.resolve(classPathEntry);
+                    classPathEntryURL = classPathEntryURI.toURL();
+                } catch (Exception e) {
                     if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("jarScan.invalidUri", jarURL));
+                        log.debug(sm.getString("jarScan.invalidUri", jarURL), e);
                     }
                     continue;
                 }
-                /*
-                 * Note: Resolving the relative URLs from the manifest has the
-                 *       potential to introduce security concerns. However, since
-                 *       only JARs provided by the container and NOT those provided
-                 *       by web applications are processed, there should be no
-                 *       issues.
-                 *       If this feature is ever extended to include JARs provided
-                 *       by web applications, checks should be added to ensure that
-                 *       any relative URL does not step outside the web application.
-                 */
-                URI classPathEntryURI = jarURI.resolve(classPathEntry);
-                URL classPathEntryURL = classPathEntryURI.toURL();
                 classPathUrlsToProcess.add(classPathEntryURL);
             }
         }

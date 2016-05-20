@@ -66,6 +66,11 @@
         rather than known memory leaks. It had been disabled by default with no
         increase in the reports of memory leaks for some time. (markt)
       </scode>
+      <fix>
+        <bug>59608</bug>: Skip over any invalid <code>Class-Path</code> attribute
+        from JAR manifests. Log errors at debug level due to many bad libraries.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
