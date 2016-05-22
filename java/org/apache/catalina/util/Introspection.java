@@ -151,11 +151,7 @@ public class Introspection {
         Class<?> clazz = null;
         try {
             clazz = cl.loadClass(className);
-        } catch (ClassNotFoundException e) {
-            log.debug(sm.getString("introspection.classLoadFailed", className), e);
-        } catch (NoClassDefFoundError e) {
-            log.debug(sm.getString("introspection.classLoadFailed", className), e);
-        } catch (ClassFormatError e) {
+        } catch (ClassNotFoundException | NoClassDefFoundError | ClassFormatError e) {
             log.debug(sm.getString("introspection.classLoadFailed", className), e);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);

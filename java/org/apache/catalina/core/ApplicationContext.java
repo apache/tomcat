@@ -785,16 +785,11 @@ public class ApplicationContext implements ServletContext {
             @SuppressWarnings("unchecked")
             T filter = (T) context.getInstanceManager().newInstance(c.getName());
             return filter;
-        } catch (IllegalAccessException e) {
-            throw new ServletException(e);
         } catch (InvocationTargetException e) {
             ExceptionUtils.handleThrowable(e.getCause());
             throw new ServletException(e);
-        } catch (NamingException e) {
-            throw new ServletException(e);
-        } catch (InstantiationException e) {
-            throw new ServletException(e);
-        } catch (ClassNotFoundException e) {
+        } catch (IllegalAccessException | NamingException | InstantiationException |
+                ClassNotFoundException e) {
             throw new ServletException(e);
         }
     }
@@ -882,16 +877,11 @@ public class ApplicationContext implements ServletContext {
             T servlet = (T) context.getInstanceManager().newInstance(c.getName());
             context.dynamicServletCreated(servlet);
             return servlet;
-        } catch (IllegalAccessException e) {
-            throw new ServletException(e);
         } catch (InvocationTargetException e) {
             ExceptionUtils.handleThrowable(e.getCause());
             throw new ServletException(e);
-        } catch (NamingException e) {
-            throw new ServletException(e);
-        } catch (InstantiationException e) {
-            throw new ServletException(e);
-        } catch (ClassNotFoundException e) {
+        } catch (IllegalAccessException | NamingException | InstantiationException |
+                ClassNotFoundException e) {
             throw new ServletException(e);
         }
     }
@@ -1026,24 +1016,13 @@ public class ApplicationContext implements ServletContext {
                 EventListener listener = (EventListener) obj;
                 addListener(listener);
             }
-        } catch (IllegalAccessException e) {
-            throw new IllegalArgumentException(sm.getString(
-                    "applicationContext.addListener.iae.cnfe", className),
-                    e);
         } catch (InvocationTargetException e) {
             ExceptionUtils.handleThrowable(e.getCause());
             throw new IllegalArgumentException(sm.getString(
                     "applicationContext.addListener.iae.cnfe", className),
                     e);
-        } catch (NamingException e) {
-            throw new IllegalArgumentException(sm.getString(
-                    "applicationContext.addListener.iae.cnfe", className),
-                    e);
-        } catch (InstantiationException e) {
-            throw new IllegalArgumentException(sm.getString(
-                    "applicationContext.addListener.iae.cnfe", className),
-                    e);
-        } catch (ClassNotFoundException e) {
+        } catch (IllegalAccessException | NamingException | InstantiationException |
+                ClassNotFoundException e) {
             throw new IllegalArgumentException(sm.getString(
                     "applicationContext.addListener.iae.cnfe", className),
                     e);
@@ -1112,14 +1091,10 @@ public class ApplicationContext implements ServletContext {
             throw new IllegalArgumentException(sm.getString(
                     "applicationContext.addListener.iae.wrongType",
                     listener.getClass().getName()));
-        } catch (IllegalAccessException e) {
-            throw new ServletException(e);
         } catch (InvocationTargetException e) {
             ExceptionUtils.handleThrowable(e.getCause());
             throw new ServletException(e);
-        } catch (NamingException e) {
-            throw new ServletException(e);
-        } catch (InstantiationException e) {
+        } catch (IllegalAccessException | NamingException | InstantiationException e) {
             throw new ServletException(e);
         }
     }
