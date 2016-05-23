@@ -1223,7 +1223,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     public void reset(int streamId, long errorCode) throws Http2Exception  {
         Stream stream = getStream(streamId, true);
         stream.checkState(FrameType.RST);
-        stream.reset(errorCode);
+        stream.receiveReset(errorCode);
     }
 
 
