@@ -1606,15 +1606,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
                     // JVM controlled threads
                     ThreadGroup tg = thread.getThreadGroup();
-                    if (tg != null &&
-                            JVM_THREAD_GROUP_NAMES.contains(tg.getName())) {
-
+                    if (tg != null && JVM_THREAD_GROUP_NAMES.contains(tg.getName())) {
                         // HttpClient keep-alive threads
                         if (clearReferencesHttpClientKeepAliveThread &&
                                 threadName.equals("Keep-Alive-Timer")) {
                             thread.setContextClassLoader(parent);
-                            log.debug(sm.getString(
-                                    "webappClassLoader.checkThreadsHttpClient"));
+                            log.debug(sm.getString("webappClassLoader.checkThreadsHttpClient"));
                         }
 
                         // Don't warn about remaining JVM controlled threads
@@ -1659,11 +1656,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         // "runnable" in IBM JDK
                         // "action" in Apache Harmony
                         Object target = null;
-                        for (String fieldName : new String[] { "target",
-                                "runnable", "action" }) {
+                        for (String fieldName : new String[] { "target", "runnable", "action" }) {
                             try {
-                                Field targetField = thread.getClass()
-                                        .getDeclaredField(fieldName);
+                                Field targetField = thread.getClass().getDeclaredField(fieldName);
                                 targetField.setAccessible(true);
                                 target = targetField.get(thread);
                                 break;
@@ -1674,12 +1669,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
                         // "java.util.concurrent" code is in public domain,
                         // so all implementations are similar
-                        if (target != null &&
-                                target.getClass().getCanonicalName() != null
-                                && target.getClass().getCanonicalName().equals(
-                                "java.util.concurrent.ThreadPoolExecutor.Worker")) {
-                            Field executorField =
-                                target.getClass().getDeclaredField("this$0");
+                        if (target != null && target.getClass().getCanonicalName() != null &&
+                                target.getClass().getCanonicalName().equals(
+                                        "java.util.concurrent.ThreadPoolExecutor.Worker")) {
+                            Field executorField = target.getClass().getDeclaredField("this$0");
                             executorField.setAccessible(true);
                             Object executor = executorField.get(target);
                             if (executor instanceof ThreadPoolExecutor) {
@@ -1687,21 +1680,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                                 usingExecutor = true;
                             }
                         }
-                    } catch (SecurityException e) {
-                        log.warn(sm.getString(
-                                "webappClassLoader.stopThreadFail",
-                                thread.getName(), getContextName()), e);
-                    } catch (NoSuchFieldException e) {
-                        log.warn(sm.getString(
-                                "webappClassLoader.stopThreadFail",
-                                thread.getName(), getContextName()), e);
-                    } catch (IllegalArgumentException e) {
-                        log.warn(sm.getString(
-                                "webappClassLoader.stopThreadFail",
-                                thread.getName(), getContextName()), e);
-                    } catch (IllegalAccessException e) {
-                        log.warn(sm.getString(
-                                "webappClassLoader.stopThreadFail",
+                    } catch (SecurityException | NoSuchFieldException | IllegalArgumentException |
+                            IllegalAccessException e) {
+                        log.warn(sm.getString("webappClassLoader.stopThreadFail",
                                 thread.getName(), getContextName()), e);
                     }
 
