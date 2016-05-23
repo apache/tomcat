@@ -111,75 +111,42 @@ for each external interface (IP address) that accepts secure connections.
 The theory behind this design is that a server should provide some kind of
 reasonable assurance that its owner is who you think it is, particularly
 before receiving any sensitive information.  While a broader explanation of
-Certificates is beyond the scope of this document, think of a Certificate
-as a "digital driver's license" for an Internet address.  It states what
-company the site is associated with, along with some basic contact
-information about the site owner or administrator.</p>
+Certificates is beyond the scope of this document, think of a Certificate as a
+"digital passport" for an Internet address. It states which organisation the
+site is associated with, along with some basic contact information about the
+site owner or administrator.</p>
 
-<p>This "driver's license" is cryptographically signed by its owner, and is
-therefore extremely difficult for anyone else to forge.  For sites involved
-in e-commerce, or any other business transaction in which authentication of
-identity is important, a Certificate is typically purchased from a well-known
-<em>Certificate Authority</em> (CA) such as VeriSign or Thawte.  Such
-certificates can be electronically verified -- in effect, the Certificate
-Authority will vouch for the authenticity of the certificates that it grants,
-so you can believe that the Certificate is valid if you trust the Certificate
-Authority that granted it.</p>
+<p>This certificate is cryptographically signed by its owner, and is
+therefore extremely difficult for anyone else to forge. For the certificate to
+work in the visitors browsers without warnings, it needs to be signed by a
+trusted third party. These are called <em>Certificate Authorities</em> (CAs). To
+obtain a signed certificate, you need to choose a CA and follow the instructions
+your chosen CA provides to obtain your certificate. A range of CAs is available
+including some that offer certificates at no cost.</p>
 
-<p>In many cases, however, authentication is not really a concern.  An
-administrator may simply want to ensure that the data being transmitted and
-received by the server is private and cannot be snooped by anyone who may be
-eavesdropping on the connection.  Fortunately, Java provides a relatively
-simple command-line tool, called <code>keytool</code>, which can easily create
-a "self-signed" Certificate.  Self-signed Certificates are simply user
-generated Certificates which have not been officially registered with any
-well-known CA, and are therefore not really guaranteed to be authentic at all.
-Again, this may or may not even be important, depending on your needs.</p>
+<p>Java provides a relatively simple command-line tool, called
+<code>keytool</code>, which can easily create a "self-signed" Certificate.
+Self-signed Certificates are simply user generated Certificates which have not
+been signed by a well-known CA and are, therefore, not really guaranteed to be
+authentic at all. While self-signed certificates can be useful for some testing
+scenarios, they are not suitable for any form of production use.</p>
 
 </section>
 
 <section name="General Tips on Running SSL">
 
-<p>The first time a user attempts to access a secured page on your site,
-he or she is typically presented with a dialog containing the details of
-the certificate (such as the company and contact name), and asked if he or she
-wishes to accept the Certificate as valid and continue with the transaction.
-Some browsers will provide an option for permanently accepting a given
-Certificate as valid, in which case the user will not be bothered with a
-prompt each time they visit your site.  Other browsers do not provide this
-option.  Once approved by the user, a Certificate will be considered valid
-for at least the entire browser session.</p>
+<p>When securing a website with SSL it's important to make sure that all assets
+that the site uses are served over SSL, so that an attacker can&apos;t bypass
+the security by injecting malicious content in a javascript file or similar. To
+further enhance the security of your website, you should evaluate to use the 
+HSTS header. It allows you to communicate to the browser that your site should
+always be accessed over https.</p>
 
-<p>Also, while the SSL protocol was designed to be as efficient as securely
-possible, encryption/decryption is a computationally expensive process from
-a performance standpoint.  It is not strictly necessary to run an entire
-web application over SSL, and indeed a developer can pick and choose which
-pages require a secure connection and which do not.  For a reasonably busy
-site, it is customary to only run certain pages under SSL, namely those
-pages where sensitive information could possibly be exchanged.  This would
-include things like login pages, personal information pages, and shopping
-cart checkouts, where credit card information could possibly be transmitted.
-Any page within an application can be requested over a secure socket by
-simply prefixing the address with <code>https:</code> instead of
-<code>http:</code>.  Any pages which absolutely <strong>require</strong>
-a secure connection should check the protocol type associated with the
-page request and take the appropriate action if <code>https</code> is not
-specified.</p>
-
-<p>Finally, using name-based virtual hosts on a secured connection can be
-problematic.  This is a design limitation of the SSL protocol itself.  The SSL
-handshake, where the client browser accepts the server certificate, must occur
-before the HTTP request is accessed.  As a result, the request information
-containing the virtual host name cannot be determined prior to authentication,
-and it is therefore not possible to assign multiple certificates to a single
-IP address.  If all virtual hosts on a single IP address need to authenticate
-against the same certificate, the addition of multiple virtual hosts should not
-interfere with normal SSL operations on the server.  Be aware, however, that
-most client browsers will compare the server's domain name against the domain
-name listed in the certificate, if any (applicable primarily to official,
-CA-signed certificates).  If the domain names do not match, these browsers will
-display a warning to the client user.  In general, only address-based virtual
-hosts are commonly used with SSL in a production environment.</p>
+<p>Using name-based virtual hosts on a secured connection requires careful
+configuration of the names specfied in a single certificate or Tomcat 8.5
+onwards where Server Name Indication (SNI) support is available. SNI allows
+multiple certificates with different names to be associated with a single TLS
+connector.</p>
 
 </section>
 
