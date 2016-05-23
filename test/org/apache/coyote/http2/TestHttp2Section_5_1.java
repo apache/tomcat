@@ -219,8 +219,9 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         sendSimpleGetRequest(5);
 
-        // Default connection window size is 64k - 1. Initial request will have
-        // used 8k (56k -1).
+        // Default connection window size is 64k-1.
+        // Initial request will have used 8k leaving 56k-1.
+        // Stream window will be 64k-1.
         // Expecting
         // 1 * headers
         // 56k-1 of body (7 * ~8k)
@@ -230,18 +231,23 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         }
         parser.readFrame(true);
 
+        Assert.assertTrue(output.getTrace(),
+                output.getTrace().contains("5-RST-[" +
+                        Http2Error.REFUSED_STREAM.getCode() + "]"));
+        output.clearTrace();
+
+        // Connection window is zero.
+        // Stream window is 8k
+
         // Release the remaining body
-        sendWindowUpdate(0, (1 << 31) - 1);
-        sendWindowUpdate(3, (1 << 31) - 1);
+        sendWindowUpdate(0, (1 << 31) - 2);
+        // Allow for the 8k still in the stream window
+        sendWindowUpdate(3, (1 << 31) - 8193);
 
         // 192k of body (24 * 8k)
         // 1 * error (could be in any order)
         for (int i = 0; i < 24; i++) {
             parser.readFrame(true);
         }
-
-        Assert.assertTrue(output.getTrace(),
-                output.getTrace().contains("5-RST-[" +
-                        Http2Error.REFUSED_STREAM.getCode() + "]"));
     }
 }
