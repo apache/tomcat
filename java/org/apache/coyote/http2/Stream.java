@@ -89,7 +89,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    public void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
+    void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.reprioritisation.debug",
                     getConnectionId(), getIdentifier(), Boolean.toString(exclusive),
@@ -141,7 +141,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     @Override
-    public synchronized void incrementWindowSize(int windowSizeIncrement) throws Http2Exception {
+    protected synchronized void incrementWindowSize(int windowSizeIncrement) throws Http2Exception {
         // If this is zero then any thread that has been trying to write for
         // this stream will be waiting. Notify that thread it can continue. Use
         // notify all even though only one thread is waiting to be on the safe
