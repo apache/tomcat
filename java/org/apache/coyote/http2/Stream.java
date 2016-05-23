@@ -89,7 +89,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    public void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
+    void rePrioritise(AbstractStream parent, boolean exclusive, int weight) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.reprioritisation.debug",
                     getConnectionId(), getIdentifier(), Boolean.toString(exclusive),
@@ -117,7 +117,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    public void reset(long errorCode) {
+    void receiveReset(long errorCode) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.reset.debug", getConnectionId(), getIdentifier(),
                     Long.toString(errorCode)));
@@ -141,7 +141,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     @Override
-    public synchronized void incrementWindowSize(int windowSizeIncrement) throws Http2Exception {
+    protected synchronized void incrementWindowSize(int windowSizeIncrement) throws Http2Exception {
         // If this is zero then any thread that has been trying to write for
         // this stream will be waiting. Notify that thread it can continue. Use
         // notify all even though only one thread is waiting to be on the safe
@@ -379,7 +379,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         if (http2Exception instanceof StreamException) {
             try {
                 StreamException se = (StreamException) http2Exception;
-                reset(se.getError().getCode());
+                receiveReset(se.getError().getCode());
                 handler.sendStreamReset(se);
             } catch (IOException ioe) {
                 ConnectionException ce = new ConnectionException(
