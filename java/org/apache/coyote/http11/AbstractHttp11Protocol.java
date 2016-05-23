@@ -196,6 +196,13 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    private boolean serverRemoveAppProvidedValues = false;
+    public boolean getServerRemoveAppProvidedValues() { return serverRemoveAppProvidedValues; }
+    public void setServerRemoveAppProvidedValues(boolean serverRemoveAppProvidedValues) {
+        this.serverRemoveAppProvidedValues = serverRemoveAppProvidedValues;
+    }
+
+
     /**
      * Maximum size of trailing headers in bytes
      */
@@ -640,6 +647,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setRestrictedUserAgents(getRestrictedUserAgents());
         processor.setMaxSavePostSize(getMaxSavePostSize());
         processor.setServer(getServer());
+        processor.setServerRemoveAppProvidedValues(getServerRemoveAppProvidedValues());
         return processor;
     }
 
