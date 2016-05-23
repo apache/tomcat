@@ -533,12 +533,16 @@
 
     <attribute name="server" required="false">
       <p>Overrides the Server header for the http response. If set, the value
-      for this attribute overrides the Tomcat default and any Server header set
-      by a web application. If not set, any value specified by the application
-      is used. If the application does not specify a value then
-      <code>Apache-Coyote/1.1</code> is used. Unless you are paranoid, you won't
-      need this feature.
-      </p>
+      for this attribute overrides any Server header set by a web application.
+      If not set, any value specified by the application is used. If the
+      application does not specify a value then no Server header is set.</p>
+    </attribute>
+
+    <attribute name="serverRemoveAppProvidedValues" required="false">
+      <p>If <code>true</code>, any Server header Server header set by a web
+      application will be removed. Note that if <strong>server</strong> is set,
+      this attribute is effectively ignored. If not set, the default value of
+      <code>false</code> will be used.</p>
     </attribute>
 
     <attribute name="SSLEnabled" required="false">

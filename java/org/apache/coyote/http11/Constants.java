@@ -35,13 +35,6 @@ public final class Constants {
 
 
     /**
-     * Server string.
-     */
-    public static final byte[] SERVER_BYTES =
-        ByteChunk.convertToBytes("Server: Apache-Coyote/1.1" + CRLF);
-
-
-    /**
      * CR.
      */
     public static final byte CR = (byte) '\r';
