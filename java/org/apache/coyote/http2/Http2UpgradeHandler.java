@@ -293,7 +293,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                         } catch (StreamException se) {
                             // Stream errors are not fatal to the connection so
                             // continue reading frames
-                            resetStream(se);
+                            Stream stream = getStream(se.getStreamId(), false);
+                            if (stream == null) {
+                                sendStreamReset(se);
+                            } else {
+                                stream.close(se);
+                            }
                         }
                     }
                     // No more frames to read so switch to the keep-alive
@@ -384,7 +389,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    void resetStream(StreamException se) throws IOException {
+    void sendStreamReset(StreamException se) throws IOException {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.rst.debug", connectionId,
@@ -1234,17 +1239,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 try {
                     stream.incrementWindowSize(diff);
                 } catch (Http2Exception h2e) {
-                    try {
-                        resetStream(new StreamException(sm.getString(
-                                "upgradeHandler.windowSizeTooBig", connectionId,
-                                stream.getIdentifier()),
-                                h2e.getError(), stream.getIdentifier().intValue()));
-                    } catch (IOException ioe) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("upgradeHandler.socketCloseFailed"), ioe);
-                        }
-                    }
-                }
+                    stream.close(new StreamException(sm.getString(
+                            "upgradeHandler.windowSizeTooBig", connectionId,
+                            stream.getIdentifier()),
+                            h2e.getError(), stream.getIdentifier().intValue()));
+               }
             }
         } else {
             remoteSettings.set(setting, value);

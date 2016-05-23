@@ -84,6 +84,9 @@
         that request processing has fully completed before starting the next
         request. (markt)
       </fix>
+      <fix>
+        Improve handling of HTTP/2 stream resets. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
