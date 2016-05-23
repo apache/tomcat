@@ -102,6 +102,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>58891</bug>: Update the SSL how-to. Based on a suggestion by
+        Alexander Kjäll. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
