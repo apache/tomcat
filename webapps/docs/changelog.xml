@@ -156,6 +156,10 @@
         Correct a typo in SSL/TLS Configuration How-To.
         Issue reported via comments.apache.org. (violetagg)
       </fix>
+      <fix>
+        <bug>58891</bug>: Update the SSL how-to. Based on a suggestion by
+        Alexander Kjäll. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
