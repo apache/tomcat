@@ -818,7 +818,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         @Override
         public void reset(int streamId, long errorCode) {
-            trace.append(streamId + "-RST-[" + errorCode + "]");
+            trace.append(streamId + "-RST-[" + errorCode + "]\n");
         }
 
 

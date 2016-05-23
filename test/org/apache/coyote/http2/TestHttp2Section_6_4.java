@@ -81,7 +81,7 @@ public class TestHttp2Section_6_4 extends Http2TestBase {
         // Read GOAWAY frame
         parser.readFrame(true);
 
-        Assert.assertEquals("3-RST-[" + Http2Error.FRAME_SIZE_ERROR.getCode() + "]",
+        Assert.assertEquals("3-RST-[" + Http2Error.FRAME_SIZE_ERROR.getCode() + "]\n",
                 output.getTrace());
     }
 }

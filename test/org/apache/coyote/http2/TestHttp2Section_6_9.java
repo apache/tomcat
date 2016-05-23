@@ -52,7 +52,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
 
         parser.readFrame(true);
 
-        Assert.assertEquals("3-RST-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]",
+        Assert.assertEquals("3-RST-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]\n",
                 output.getTrace());
     }
 
@@ -138,7 +138,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
 
         parser.readFrame(true);
 
-        Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]",
+        Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]\n",
                 output.getTrace());
     }
 
@@ -283,7 +283,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         sendSettings(0, false, new SettingValue(4,  1 << 30));
         // Ack
         parser.readFrame(true);
-        Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]",
+        Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]\n",
                 output.getTrace());
 
     }

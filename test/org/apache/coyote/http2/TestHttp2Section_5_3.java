@@ -44,7 +44,7 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
 
         parser.readFrame(true);
 
-        Assert.assertEquals("3-RST-[1]",  output.getTrace());
+        Assert.assertEquals("3-RST-[1]\n",  output.getTrace());
     }
 
 
