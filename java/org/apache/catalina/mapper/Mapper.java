@@ -238,26 +238,6 @@ public final class Mapper {
      * @param context Context object
      * @param welcomeResources Welcome files defined for this context
      * @param resources Static resources of the context
-     * @deprecated Use {@link #addContextVersion(String, Host, String, String, Context, String[], WebResourceRoot, Collection)}
-     */
-    @Deprecated
-    public void addContextVersion(String hostName, Host host, String path,
-            String version, Context context, String[] welcomeResources,
-            WebResourceRoot resources) {
-        addContextVersion(hostName, host, path, version, context,
-                welcomeResources, resources, null);
-    }
-
-    /**
-     * Add a new Context to an existing Host.
-     *
-     * @param hostName Virtual host name this context belongs to
-     * @param host Host object
-     * @param path Context path
-     * @param version Context version
-     * @param context Context object
-     * @param welcomeResources Welcome files defined for this context
-     * @param resources Static resources of the context
      * @param wrappers Information on wrapper mappings
      */
     public void addContextVersion(String hostName, Host host, String path,
