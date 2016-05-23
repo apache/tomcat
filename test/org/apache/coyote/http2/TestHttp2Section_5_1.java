@@ -250,4 +250,60 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
             parser.readFrame(true);
         }
     }
+
+
+    @Test
+    public void testErrorOnWaitingStream() throws Exception {
+        // http2Connect() - modified
+        enableHttp2(1);
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+
+        // validateHttp2InitialResponse() - modified
+        parser.readFrame(true);
+        parser.readFrame(true);
+        parser.readFrame(true);
+        parser.readFrame(true);
+        parser.readFrame(true);
+
+        Assert.assertEquals("0-Settings-[3]-[1]\n" +
+                "0-Settings-End\n" +
+                "0-Settings-Ack\n" +
+                "0-Ping-[0,0,0,0,0,0,0,1]\n" +
+                getSimpleResponseTrace(1)
+                , output.getTrace());
+        output.clearTrace();
+
+        sendLargeGetRequest(3);
+
+        sendSimpleGetRequest(5);
+
+        // Default connection window size is 64k-1.
+        // Initial request will have used 8k leaving 56k-1.
+        // Stream window will be 64k-1.
+        // Expecting
+        // 1 * headers
+        // 56k-1 of body (7 * ~8k)
+        // 1 * error (could be in any order)
+        for (int i = 0; i < 8; i++) {
+            parser.readFrame(true);
+        }
+        parser.readFrame(true);
+
+        Assert.assertTrue(output.getTrace(),
+                output.getTrace().contains("5-RST-[" +
+                        Http2Error.REFUSED_STREAM.getCode() + "]"));
+        output.clearTrace();
+
+        // Connection window is zero.
+        // Stream window is 8k
+
+        // Expand the stream window too much to trigger an error
+        // Allow for the 8k still in the stream window
+        sendWindowUpdate(3, (1 << 31) - 1);
+
+        parser.readFrame(true);
+    }
 }

@@ -122,7 +122,16 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             log.debug(sm.getString("stream.reset.debug", getConnectionId(), getIdentifier(),
                     Long.toString(errorCode)));
         }
+        // Set the new state first since read and write both check this
         state.receiveReset();
+        // Reads wait internally so need to call a method to break the wait()
+        if (inputBuffer != null) {
+            inputBuffer.receiveReset();
+        }
+        // Writes wait on Stream so we can notify directly
+        synchronized (this) {
+            this.notifyAll();
+        }
     }
 
 
@@ -603,6 +612,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         // 'write mode'.
         private volatile ByteBuffer inBuffer;
         private volatile boolean readInterest;
+        private boolean reset = false;
 
         @Override
         public int doRead(ByteChunk chunk) throws IOException {
@@ -620,6 +630,10 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                             log.debug(sm.getString("stream.inputBuffer.empty"));
                         }
                         inBuffer.wait();
+                        if (reset) {
+                            // TODO: i18n
+                            throw new IOException("HTTP/2 Stream reset");
+                        }
                     } catch (InterruptedException e) {
                         // Possible shutdown / rst or similar. Use an
                         // IOException to signal to the client that further I/O
@@ -726,6 +740,16 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                         inBuffer = ByteBuffer.allocate(size);
                         outBuffer = new byte[size];
                     }
+                }
+            }
+        }
+
+
+        protected void receiveReset() {
+            if (inBuffer != null) {
+                synchronized (inBuffer) {
+                    reset = true;
+                    inBuffer.notifyAll();
                 }
             }
         }
