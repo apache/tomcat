@@ -92,7 +92,7 @@
         Server header may be configured by setting the <code>server</code>
         attribute on the <code>Connector</code>. A new <code>Connector</code>
         attribute, <code>serverRemoveAppProvidedValues</code> may be used to
-        remove any Server header set by a web application. (markt) 
+        remove any Server header set by a web application. (markt)
       </add>
     </changelog>
   </subsection>
