@@ -77,7 +77,7 @@ import org.apache.tomcat.util.modeler.Util;
 public class StandardWrapper extends ContainerBase
     implements ServletConfig, Wrapper, NotificationEmitter {
 
-    private static final Log log = LogFactory.getLog( StandardWrapper.class );
+    private static final Log log = LogFactory.getLog(StandardWrapper.class);
 
     protected static final String[] DEFAULT_SERVLET_METHODS = new String[] {
                                                     "GET", "HEAD", "POST" };

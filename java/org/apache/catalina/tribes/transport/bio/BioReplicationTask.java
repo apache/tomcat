@@ -44,7 +44,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class BioReplicationTask extends AbstractRxTask {
 
-    private static final Log log = LogFactory.getLog( BioReplicationTask.class );
+    private static final Log log = LogFactory.getLog(BioReplicationTask.class);
 
     protected static final StringManager sm = StringManager.getManager(BioReplicationTask.class);
 

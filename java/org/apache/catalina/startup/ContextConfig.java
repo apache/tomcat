@@ -116,7 +116,7 @@ import org.xml.sax.SAXParseException;
  */
 public class ContextConfig implements LifecycleListener {
 
-    private static final Log log = LogFactory.getLog( ContextConfig.class );
+    private static final Log log = LogFactory.getLog(ContextConfig.class);
 
 
     /**

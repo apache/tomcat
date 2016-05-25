@@ -38,7 +38,7 @@ public class EngineConfig
     implements LifecycleListener {
 
 
-    private static final Log log = LogFactory.getLog( EngineConfig.class );
+    private static final Log log = LogFactory.getLog(EngineConfig.class);
 
     // ----------------------------------------------------- Instance Variables
 
