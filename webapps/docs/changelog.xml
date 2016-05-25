@@ -117,6 +117,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Extras">
+    <changelog>
+      <scode>
+        <bug>58588</bug>: Remove the JULI extras package from the distribution.
+        It was onyl useful for switching Tomcat's internal logging to log4j
+        1.2.x and that version of log4j is no longer supported. No additional
+        Tomcat code is required if switching Tomcat's internal logging to log
+        via log4j 2.x. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
