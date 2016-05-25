@@ -50,7 +50,7 @@
       logging framework for redirecting logging for applications that use
       <code>java.util.logging</code>. Keep in mind that the alternative logging
       framework will need to be capable of working in an environment where
-      different loggers with the same name may exist in different class loaders. 
+      different loggers with the same name may exist in different class loaders.
     </p>
 
     <p>
