@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.Attributes;
@@ -335,7 +336,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * The cache of ResourceEntry for classes and resources we have loaded,
      * keyed by resource name.
      */
-    protected HashMap<String, ResourceEntry> resourceEntries = new HashMap<String, ResourceEntry>();
+    protected Map<String, ResourceEntry> resourceEntries = new ConcurrentHashMap<String, ResourceEntry>();
 
 
     /**
@@ -2301,9 +2302,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     private final void clearReferencesStaticFinal() {
 
-        @SuppressWarnings("unchecked") // resourceEntries is HashMap<String, ResourceEntry>
-        Collection<ResourceEntry> values =
-            ((HashMap<String,ResourceEntry>) resourceEntries.clone()).values();
+        List<ResourceEntry> values = new ArrayList<ResourceEntry>();
+        values.addAll(resourceEntries.values());
         Iterator<ResourceEntry> loadedClasses = values.iterator();
         //
         // walk through all loaded class to trigger initialization for

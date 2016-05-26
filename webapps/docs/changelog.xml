@@ -109,6 +109,10 @@
         leaks is made. Log a warning if running on Java 9 with this check
         enabled but without the command line option it requires. (markt)
       </fix>
+      <fix>
+        Fix potential concurrency issue with web application class loader with
+        concurrent reads and writes of the resource cache. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
