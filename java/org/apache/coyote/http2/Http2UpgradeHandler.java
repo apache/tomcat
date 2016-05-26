@@ -1065,7 +1065,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     @Override
     public boolean fill(boolean block, ByteBuffer data, int len) throws IOException {
-        boolean result = fill(block, data.array(), data.arrayOffset(), len);
+        boolean result = fill(block, data.array(), data.arrayOffset() + data.position(), len);
         if (result) {
             data.position(data.position() + len);
         }

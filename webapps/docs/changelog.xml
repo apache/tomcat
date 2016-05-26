@@ -94,6 +94,10 @@
         attribute, <code>serverRemoveAppProvidedValues</code> may be used to
         remove any Server header set by a web application. (markt)
       </add>
+      <fix>
+        <bug>59564</bug>: Correct offset when reading into HTTP/2 input buffer
+        that could cause problems reading request bodies. (violetagg/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
