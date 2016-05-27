@@ -98,12 +98,6 @@
         <bug>59564</bug>: Correct offset when reading into HTTP/2 input buffer
         that could cause problems reading request bodies. (violetagg/markt)
       </fix>
-      <fix>
-        If a request processor in async mode experiences a read or write
-        timeout, ensure that the request processor is removed from the set of
-        waiting request processors else the async timeout thread may attempt to
-        timeout the request processor after it has been recycled. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
