@@ -1280,11 +1280,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
         @Override
         protected boolean flushNonBlocking() throws IOException {
-            checkError();
             return flushNonBlocking(false);
         }
 
-        private boolean flushNonBlocking(boolean hasPermit) {
+        private boolean flushNonBlocking(boolean hasPermit) throws IOException {
+            checkError();
             synchronized (writeCompletionHandler) {
                 if (hasPermit || writePending.tryAcquire()) {
                     socketBufferHandler.configureWriteBufferForRead();
