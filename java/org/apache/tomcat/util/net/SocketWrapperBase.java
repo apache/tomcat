@@ -312,7 +312,7 @@ public abstract class SocketWrapperBase<E> {
      * @throws IOException If an IO error occurs during the write
      */
     public final void write(boolean block, byte[] buf, int off, int len) throws IOException {
-        if (len == 0 || buf == null || getSocket() == null) {
+        if (len == 0 || buf == null) {
             return;
         }
 
@@ -412,10 +412,6 @@ public abstract class SocketWrapperBase<E> {
      * @throws IOException If an IO error occurs during the write
      */
     public boolean flush(boolean block) throws IOException {
-        if (getSocket() == null) {
-            return false;
-        }
-
         boolean result = false;
         if (block) {
             // A blocking flush will always empty the buffer.

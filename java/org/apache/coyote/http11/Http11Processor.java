@@ -825,7 +825,7 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case REQ_SSL_CERTIFICATE: {
-            if (sslSupport != null && socketWrapper.getSocket() != null) {
+            if (sslSupport != null) {
                 // Consume and buffer the request body, so that it does not
                 // interfere with the client's handshake messages
                 InputFilter[] inputFilters = inputBuffer.getFilters();
