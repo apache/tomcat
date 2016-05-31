@@ -2250,33 +2250,25 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
      * This class is the equivalent of the Worker, but will simply use in an
      * external Executor thread pool.
      */
-    protected class SocketProcessor implements Runnable {
-
-        private final SocketWrapperBase<Long> socket;
-        private final SocketEvent status;
+    protected class SocketProcessor extends  SocketProcessorBase<Long> {
 
         public SocketProcessor(SocketWrapperBase<Long> socket,
-                SocketEvent status) {
-            this.socket = socket;
-            if (status == null) {
-                // Should never happen
-                throw new NullPointerException();
-            }
-            this.status = status;
+                SocketEvent event) {
+            super(socket, event);
         }
 
         @Override
         public void run() {
-            synchronized (socket) {
+            synchronized (socketWrapper) {
                 // Process the request from this socket
-                if (socket.getSocket() == null) {
+                if (socketWrapper.getSocket() == null) {
                     // Closed in another thread
                     return;
                 }
-                SocketState state = getHandler().process(socket, status);
+                SocketState state = getHandler().process(socketWrapper, event);
                 if (state == Handler.SocketState.CLOSED) {
                     // Close socket and pool
-                    closeSocket(socket.getSocket().longValue());
+                    closeSocket(socketWrapper.getSocket().longValue());
                 }
             }
         }

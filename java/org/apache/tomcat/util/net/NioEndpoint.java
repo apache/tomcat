@@ -1423,23 +1423,15 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
      * This class is the equivalent of the Worker, but will simply use in an
      * external Executor thread pool.
      */
-    protected class SocketProcessor implements Runnable {
+    protected class SocketProcessor extends SocketProcessorBase<NioChannel> {
 
-        private NioSocketWrapper ka = null;
-        private SocketEvent status = null;
-
-        public SocketProcessor(NioSocketWrapper ka, SocketEvent status) {
-            reset(ka, status);
-        }
-
-        public void reset(NioSocketWrapper ka, SocketEvent status) {
-            this.ka = ka;
-            this.status = status;
+        public SocketProcessor(SocketWrapperBase<NioChannel> ka, SocketEvent event) {
+            super(ka, event);
         }
 
         @Override
         public void run() {
-            NioChannel socket = ka.getSocket();
+            NioChannel socket = socketWrapper.getSocket();
             if (socket == null) {
                 return;
             }
@@ -1455,7 +1447,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                             // For STOP there is no point trying to handshake as the
                             // Poller has been stopped.
                             if (socket.isHandshakeComplete() ||
-                                    status == SocketEvent.STOP) {
+                                    event == SocketEvent.STOP) {
                                 handshake = 0;
                             } else {
                                 handshake = socket.handshake(
@@ -1467,7 +1459,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                                 // must always be OPEN_READ after it completes. It
                                 // is OK to always set this as it is only used if
                                 // the handshake completes.
-                                status = SocketEvent.OPEN_READ;
+                                event = SocketEvent.OPEN_READ;
                             }
                         }
                     } catch (IOException x) {
@@ -1479,18 +1471,20 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     if (handshake == 0) {
                         SocketState state = SocketState.OPEN;
                         // Process the request from this socket
-                        if (status == null) {
-                            state = getHandler().process(ka, SocketEvent.OPEN_READ);
+                        if (event == null) {
+                            state = getHandler().process(socketWrapper, SocketEvent.OPEN_READ);
                         } else {
-                            state = getHandler().process(ka, status);
+                            state = getHandler().process(socketWrapper, event);
                         }
                         if (state == SocketState.CLOSED) {
                             close(socket, key);
                         }
                     } else if (handshake == -1 ) {
                         close(socket, key);
-                    } else {
-                        ka.getPoller().add(socket,handshake);
+                    } else if (handshake == SelectionKey.OP_READ){
+                        socketWrapper.registerReadInterest();
+                    } else if (handshake == SelectionKey.OP_WRITE){
+                        socketWrapper.registerWriteInterest();
                     }
                 } catch (CancelledKeyException cx) {
                     socket.getPoller().cancelledKey(key);
@@ -1500,8 +1494,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     log.error("", t);
                     socket.getPoller().cancelledKey(key);
                 } finally {
-                    ka = null;
-                    status = null;
+                    socketWrapper = null;
+                    event = null;
                     //return to cache
                     if (running && !paused) {
                         processorCache.push(this);
