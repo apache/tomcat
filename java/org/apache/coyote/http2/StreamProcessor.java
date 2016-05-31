@@ -130,8 +130,8 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             try {
                 stream.flushData();
             } catch (IOException ioe) {
-                response.setErrorException(ioe);
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
+                response.setErrorException(ioe);
             }
             break;
         }
