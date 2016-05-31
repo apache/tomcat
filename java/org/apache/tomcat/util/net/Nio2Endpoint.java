@@ -839,6 +839,12 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
         public IOException getError() { return error; }
         public void setError(IOException error) { this.error = error; }
+        public void checkError() throws IOException {
+            IOException ioe = error;
+            if (ioe != null) {
+                throw ioe;
+            }
+        }
 
 
         @Override
@@ -868,9 +874,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
         @Override
         public int read(boolean block, byte[] b, int off, int len) throws IOException {
-            if (getError() != null) {
-                throw getError();
-            }
+            checkError();
 
             if (log.isDebugEnabled()) {
                 log.debug("Socket: [" + this + "], block: [" + block + "], length: [" + len + "]");
@@ -1257,9 +1261,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
         @Override
         protected void flushBlocking() throws IOException {
-            if (getError() != null) {
-                throw getError();
-            }
+            checkError();
 
             // Before doing a blocking flush, make sure that any pending non
             // blocking write has completed.
@@ -1278,14 +1280,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
         @Override
         protected boolean flushNonBlocking() throws IOException {
-            if (getError() != null) {
-                throw getError();
-            }
-
             return flushNonBlocking(false);
         }
 
-        private boolean flushNonBlocking(boolean hasPermit) {
+        private boolean flushNonBlocking(boolean hasPermit) throws IOException {
+            checkError();
             synchronized (writeCompletionHandler) {
                 if (hasPermit || writePending.tryAcquire()) {
                     socketBufferHandler.configureWriteBufferForRead();
