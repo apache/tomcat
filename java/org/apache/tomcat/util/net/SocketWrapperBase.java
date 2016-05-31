@@ -104,11 +104,17 @@ public abstract class SocketWrapperBase<E> {
     }
 
     public IOException getError() { return error; }
-    public void setError(IOException error) { this.error = error; }
+    public void setError(IOException error) {
+        // Not perfectly thread-safe but good enough. Just needs to ensure that
+        // once this.error is non-null, it can never be null.
+        if (this.error != null) {
+            return;
+        }
+        this.error = error;
+    }
     public void checkError() throws IOException {
-        IOException ioe = error;
-        if (ioe != null) {
-            throw ioe;
+        if (error != null) {
+            throw error;
         }
     }
 
