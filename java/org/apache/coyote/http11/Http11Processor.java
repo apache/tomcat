@@ -1117,10 +1117,8 @@ public class Http11Processor extends AbstractProcessor {
                     // set the status to 500 and set the errorException.
                     // If we fail here, then the response is likely already
                     // committed, so we can't try and set headers.
-                    if(keepAlive && !getErrorState().isError() && (
-                            response.getErrorException() != null ||
-                                    (!isAsync() &&
-                                    statusDropsConnection(response.getStatus())))) {
+                    if(keepAlive && !getErrorState().isError() && !isAsync() &&
+                            statusDropsConnection(response.getStatus())) {
                         setErrorState(ErrorState.CLOSE_CLEAN, null);
                     }
                 } catch (InterruptedIOException e) {
