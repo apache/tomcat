@@ -1230,10 +1230,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
         @Override
         public void close() throws IOException {
-            NioChannel socket = getSocket();
-            if (socket != null) {
-                socket.close();
-            }
+            getSocket().close();
         }
 
 
@@ -1432,9 +1429,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         @Override
         public void run() {
             NioChannel socket = socketWrapper.getSocket();
-            if (socket == null) {
-                return;
-            }
             SelectionKey key = socket.getIOChannel().keyFor(
                     socket.getPoller().getSelector());
 

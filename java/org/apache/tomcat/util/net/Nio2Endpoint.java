@@ -424,12 +424,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             if (log.isDebugEnabled()) log.error("",e);
         }
         try {
-            if (socket.getSocket() != null) {
-                synchronized (socket.getSocket()) {
-                    if (socket.getSocket() != null && socket.getSocket().isOpen()) {
-                        countDownConnection();
-                        socket.getSocket().close(true);
-                    }
+            synchronized (socket.getSocket()) {
+                if (socket.getSocket().isOpen()) {
+                    countDownConnection();
+                    socket.getSocket().close(true);
                 }
             }
         } catch (Throwable e) {
@@ -942,10 +940,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
         @Override
         public void close() throws IOException {
-            Nio2Channel socket = getSocket();
-            if (socket != null) {
-                socket.close();
-            }
+            getSocket().close();
         }
 
         @Override
@@ -1395,9 +1390,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
 
         public void awaitBytes() {
-            if (getSocket() == null) {
-                return;
-            }
             // NO-OP is there is already a read in progress.
             if (readPending.tryAcquire()) {
                 getSocket().getBufHandler().configureReadBufferForWrite();
@@ -1643,26 +1635,24 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     int handshake = -1;
 
                     try {
-                        if (socketWrapper.getSocket() != null) {
-                            // For STOP there is no point trying to handshake as the
-                            // Poller has been stopped.
-                            if (!socketWrapper.getSocket().isHandshakeComplete() && event == SocketEvent.ERROR) {
-                                handshake = -1;
-                            } else if (socketWrapper.getSocket().isHandshakeComplete() ||
-                                    event == SocketEvent.STOP ||
-                                    event == SocketEvent.ERROR) {
-                                handshake = 0;
-                            } else {
-                                handshake = socketWrapper.getSocket().handshake();
-                                // The handshake process reads/writes from/to the
-                                // socket. status may therefore be OPEN_WRITE once
-                                // the handshake completes. However, the handshake
-                                // happens when the socket is opened so the status
-                                // must always be OPEN_READ after it completes. It
-                                // is OK to always set this as it is only used if
-                                // the handshake completes.
-                                event = SocketEvent.OPEN_READ;
-                            }
+                        // For STOP there is no point trying to handshake as the
+                        // Poller has been stopped.
+                        if (!socketWrapper.getSocket().isHandshakeComplete() && event == SocketEvent.ERROR) {
+                            handshake = -1;
+                        } else if (socketWrapper.getSocket().isHandshakeComplete() ||
+                                event == SocketEvent.STOP ||
+                                event == SocketEvent.ERROR) {
+                            handshake = 0;
+                        } else {
+                            handshake = socketWrapper.getSocket().handshake();
+                            // The handshake process reads/writes from/to the
+                            // socket. status may therefore be OPEN_WRITE once
+                            // the handshake completes. However, the handshake
+                            // happens when the socket is opened so the status
+                            // must always be OPEN_READ after it completes. It
+                            // is OK to always set this as it is only used if
+                            // the handshake completes.
+                            event = SocketEvent.OPEN_READ;
                         }
                     } catch (IOException x) {
                         handshake = -1;

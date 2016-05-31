@@ -716,10 +716,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             }
 
             S socket = wrapper.getSocket();
-            if (socket == null) {
-                // Nothing to do. Socket has been closed.
-                return SocketState.CLOSED;
-            }
 
             Processor processor = connections.get(socket);
             if (status == SocketEvent.DISCONNECT && processor == null) {
@@ -975,11 +971,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         @Override
         public void release(SocketWrapperBase<S> socketWrapper) {
             S socket = socketWrapper.getSocket();
-            if (socket != null) {
-                Processor processor = connections.remove(socket);
-                //getProtocol().removeWaitingProcessor(processor);
-                release(processor);
-            }
+            Processor processor = connections.remove(socket);
+            //getProtocol().removeWaitingProcessor(processor);
+            release(processor);
         }
 
 
