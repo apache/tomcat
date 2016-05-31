@@ -567,7 +567,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         private final Semaphore writePending = new Semaphore(1);
         private boolean writeInterest = false; // Guarded by writeCompletionHandler
         private boolean writeNotify = false;
-        private volatile IOException error = null;
 
         private CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> awaitBytesHandler
                 = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
@@ -836,16 +835,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
         public void setSendfileData(SendfileData sf) { this.sendfileData = sf; }
         public SendfileData getSendfileData() { return this.sendfileData; }
-
-        public IOException getError() { return error; }
-        public void setError(IOException error) { this.error = error; }
-        public void checkError() throws IOException {
-            IOException ioe = error;
-            if (ioe != null) {
-                throw ioe;
-            }
-        }
-
 
         @Override
         public boolean isReadyForRead() throws IOException {
