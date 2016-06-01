@@ -833,7 +833,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
     @Override
-    public void processSocket(SocketWrapperBase<Long> socket, SocketEvent status,
+    public boolean processSocket(SocketWrapperBase<Long> socket, SocketEvent status,
             boolean dispatch) {
         try {
             // Synchronisation is required here as this code may be called as a
@@ -850,12 +850,15 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             }
         } catch (RejectedExecutionException ree) {
             log.warn(sm.getString("endpoint.executor.fail", socket) , ree);
+            return false;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             // This means we got an OOM or similar creating a thread, or that
             // the pool and its queue are full
             log.error(sm.getString("endpoint.process.fail"), t);
+            return false;
         }
+        return true;
     }
 
     private void closeSocket(long socket) {
