@@ -804,24 +804,24 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
      *         <code>false</code> which indicates an error occurred and that the
      *         socket should be closed
      */
-    public boolean processSocket(long socket, SocketEvent event) {
+    protected boolean processSocket(long socket, SocketEvent event) {
         SocketWrapperBase<Long> socketWrapper = connections.get(Long.valueOf(socket));
-        if (socketWrapper != null) {
-            return processSocket(socketWrapper, event, true);
-        }
-        return true;
+        return processSocket(socketWrapper, event, true);
     }
 
 
     @Override
-    public boolean processSocket(SocketWrapperBase<Long> socket, SocketEvent event,
-            boolean dispatch) {
+    public boolean processSocket(SocketWrapperBase<Long> socketWrapper,
+            SocketEvent event, boolean dispatch) {
         try {
+            if (socketWrapper == null) {
+                return false;
+            }
             // Synchronisation is required here as this code may be called as a
             // result of calling AsyncContext.dispatch() from a non-container
             // thread
-            synchronized (socket) {
-                SocketProcessor proc = new SocketProcessor(socket, event);
+            synchronized (socketWrapper) {
+                SocketProcessor proc = new SocketProcessor(socketWrapper, event);
                 Executor executor = getExecutor();
                 if (dispatch && executor != null) {
                     executor.execute(proc);
@@ -830,7 +830,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 }
             }
         } catch (RejectedExecutionException ree) {
-            log.warn(sm.getString("endpoint.executor.fail", socket) , ree);
+            log.warn(sm.getString("endpoint.executor.fail", socketWrapper) , ree);
             return false;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
