@@ -36,8 +36,6 @@ import java.nio.channels.WritableByteChannel;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -92,11 +90,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
      *
      */
     private volatile CountDownLatch stopLatch = null;
-
-    /**
-     * Cache for SocketProcessor objects
-     */
-    private SynchronizedStack<SocketProcessor> processorCache;
 
     /**
      * Cache for poller events
@@ -434,38 +427,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
 
     @Override
-    public boolean processSocket(SocketWrapperBase<NioChannel> socketWrapper,
-            SocketEvent event, boolean dispatch) {
-        try {
-            if (socketWrapper == null) {
-                return false;
-            }
-            SocketProcessor sc = processorCache.pop();
-            if (sc == null) {
-                sc = new SocketProcessor(socketWrapper, event);
-            } else {
-                sc.reset(socketWrapper, event);
-            }
-            Executor executor = getExecutor();
-            if (dispatch && executor != null) {
-                executor.execute(sc);
-            } else {
-                sc.run();
-            }
-        } catch (RejectedExecutionException ree) {
-            log.warn(sm.getString("endpoint.executor.fail", socketWrapper.getSocket()), ree);
-            return false;
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            // This means we got an OOM or similar creating a thread, or that
-            // the pool and its queue are full
-            log.error(sm.getString("endpoint.process.fail"), t);
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     protected Log getLog() {
         return log;
     }
@@ -545,6 +506,13 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             }
             state = AcceptorState.ENDED;
         }
+    }
+
+
+    @Override
+    protected SocketProcessorBase<NioChannel> createSocketProcessor(
+            SocketWrapperBase<NioChannel> socketWrapper, SocketEvent event) {
+        return new SocketProcessor(socketWrapper, event);
     }
 
 

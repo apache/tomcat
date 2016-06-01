@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
@@ -107,10 +106,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
     private final Map<Long,AprSocketWrapper> connections = new ConcurrentHashMap<>();
 
-    /**
-     * Cache for SocketProcessor objects
-     */
-    private SynchronizedStack<SocketProcessor> processorCache;
 
     // ------------------------------------------------------------ Constructor
 
@@ -821,36 +816,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
     @Override
-    public boolean processSocket(SocketWrapperBase<Long> socketWrapper,
-            SocketEvent event, boolean dispatch) {
-        try {
-            if (socketWrapper == null) {
-                return false;
-            }
-            SocketProcessor sc = processorCache.pop();
-            if (sc == null) {
-                sc = new SocketProcessor(socketWrapper, event);
-            } else {
-                sc.reset(socketWrapper, event);
-            }
-            Executor executor = getExecutor();
-            if (dispatch && executor != null) {
-                executor.execute(sc);
-            } else {
-                sc.run();
-            }
-        } catch (RejectedExecutionException ree) {
-            log.warn(sm.getString("endpoint.executor.fail", socketWrapper) , ree);
-            return false;
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            // This means we got an OOM or similar creating a thread, or that
-            // the pool and its queue are full
-            log.error(sm.getString("endpoint.process.fail"), t);
-            return false;
-        }
-        return true;
+    protected SocketProcessorBase<Long> createSocketProcessor(
+            SocketWrapperBase<Long> socketWrapper, SocketEvent event) {
+        return new SocketProcessor(socketWrapper, event);
     }
+
 
     private void closeSocket(long socket) {
         // Once this is called, the mapping from socket to wrapper will no
