@@ -1218,7 +1218,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
          *              blocking case
          */
         @Override
-        protected void doWriteInternal(boolean block) throws IOException {
+        protected void doWrite(boolean block) throws IOException {
             Future<Integer> integer = null;
             try {
                 socketBufferHandler.configureWriteBufferForRead();

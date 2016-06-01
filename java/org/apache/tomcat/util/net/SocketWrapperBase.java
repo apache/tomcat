@@ -475,19 +475,6 @@ public abstract class SocketWrapperBase<E> {
         return !socketBufferHandler.isWriteBufferEmpty();
     }
 
-    /**
-     * Write the contents of the socketWriteBuffer to the socket. For blocking
-     * writes either then entire contents of the buffer will be written or an
-     * IOException will be thrown. Partial blocking writes will not occur.
-     *
-     * @param block Should the write be blocking or not?
-     *
-     * @throws IOException If an I/O error such as a timeout occurs during the
-     *                     write
-     */
-    protected final void doWrite(boolean block) throws IOException {
-        doWriteInternal(block);
-    }
 
     /**
      * Write the contents of the socketWriteBuffer to the socket. For blocking
@@ -499,7 +486,7 @@ public abstract class SocketWrapperBase<E> {
      * @throws IOException If an I/O error such as a timeout occurs during the
      *                     write
      */
-    protected abstract void doWriteInternal(boolean block) throws IOException;
+    protected abstract void doWrite(boolean block) throws IOException;
 
 
     protected void addToBuffers(byte[] buf, int offset, int length) {
