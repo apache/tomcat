@@ -51,6 +51,7 @@ import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLHostConfig.Type;
@@ -105,6 +106,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
     private final Map<Long,AprSocketWrapper> connections = new ConcurrentHashMap<>();
+
+    /**
+     * Cache for SocketProcessor objects
+     */
+    private SynchronizedStack<SocketProcessor> processorCache;
 
     // ------------------------------------------------------------ Constructor
 
@@ -533,6 +539,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             running = true;
             paused = false;
 
+            processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                    socketProperties.getProcessorCache());
+
             // Create worker collection
             if (getExecutor() == null) {
                 createExecutor();
@@ -622,6 +631,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 }
                 sendfile = null;
             }
+            processorCache.clear();
         }
         shutdownExecutor();
     }
@@ -821,12 +831,17 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             // result of calling AsyncContext.dispatch() from a non-container
             // thread
             synchronized (socketWrapper) {
-                SocketProcessor proc = new SocketProcessor(socketWrapper, event);
+                SocketProcessor sc = processorCache.pop();
+                if (sc == null) {
+                    sc = new SocketProcessor(socketWrapper, event);
+                } else {
+                    sc.reset(socketWrapper, event);
+                }
                 Executor executor = getExecutor();
                 if (dispatch && executor != null) {
-                    executor.execute(proc);
+                    executor.execute(sc);
                 } else {
-                    proc.run();
+                    sc.run();
                 }
             }
         } catch (RejectedExecutionException ree) {
