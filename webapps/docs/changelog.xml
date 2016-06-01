@@ -436,7 +436,7 @@
         application is deployed as a packed WAR. (markt)
       </fix>
       <fix>
-        NPEs with not found TLDs. (remm)
+        <bug>59640</bug>: NPEs with not found TLDs. (remm)
       </fix>
     </changelog>
   </subsection>
