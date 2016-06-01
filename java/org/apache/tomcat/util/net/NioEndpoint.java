@@ -1269,7 +1269,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
 
         @Override
-        protected synchronized void doWrite(boolean block) throws IOException {
+        protected void doWrite(boolean block) throws IOException {
             socketBufferHandler.configureWriteBufferForRead();
 
             long writeTimeout = getWriteTimeout();
