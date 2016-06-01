@@ -195,15 +195,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     }
 
 
-    protected void releaseCaches() {
-        this.nioChannels.clear();
-        this.processorCache.clear();
-        if (getHandler() != null ) {
-            getHandler().recycle();
-        }
-    }
-
-
     // --------------------------------------------------------- Public Methods
     /**
      * Number of keep-alive sockets.
@@ -342,7 +333,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         serverSock = null;
         destroySsl();
         super.unbind();
-        releaseCaches();
+        this.nioChannels.clear();
+        this.processorCache.clear();
+        if (getHandler() != null ) {
+            getHandler().recycle();
+        }
         selectorPool.close();
         if (log.isDebugEnabled()) {
             log.debug("Destroy completed for "+new InetSocketAddress(getAddress(),getPort()));

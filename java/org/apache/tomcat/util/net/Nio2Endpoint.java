@@ -136,15 +136,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
     }
 
 
-    protected void releaseCaches() {
-        this.nioChannels.clear();
-        this.processorCache.clear();
-        if (getHandler() != null) {
-            getHandler().recycle();
-        }
-    }
-
-
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -272,7 +263,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         super.unbind();
         // Unlike other connectors, the thread pool is tied to the server socket
         shutdownExecutor();
-        releaseCaches();
+        this.nioChannels.clear();
+        this.processorCache.clear();
+        if (getHandler() != null) {
+            getHandler().recycle();
+        }
     }
 
 
