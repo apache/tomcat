@@ -380,6 +380,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
     public boolean  processSocket(SocketWrapperBase<Nio2Channel> socketWrapper,
             SocketEvent event, boolean dispatch) {
         try {
+            if (socketWrapper == null) {
+                return false;
+            }
             SocketProcessor sc = processorCache.pop();
             if (sc == null) {
                 sc = new SocketProcessor(socketWrapper, event);
@@ -393,7 +396,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 sc.run();
             }
         } catch (RejectedExecutionException ree) {
-            log.debug(sm.getString("endpoint.executor.fail", socketWrapper), ree);
+            log.warn(sm.getString("endpoint.executor.fail", socketWrapper), ree);
             return false;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
