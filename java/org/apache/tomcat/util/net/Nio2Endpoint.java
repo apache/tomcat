@@ -263,8 +263,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         super.unbind();
         // Unlike other connectors, the thread pool is tied to the server socket
         shutdownExecutor();
-        this.nioChannels.clear();
-        this.processorCache.clear();
         if (getHandler() != null) {
             getHandler().recycle();
         }

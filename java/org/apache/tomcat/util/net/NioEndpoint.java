@@ -333,8 +333,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         serverSock = null;
         destroySsl();
         super.unbind();
-        this.nioChannels.clear();
-        this.processorCache.clear();
         if (getHandler() != null ) {
             getHandler().recycle();
         }
