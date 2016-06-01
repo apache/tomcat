@@ -347,6 +347,7 @@ public final class UDecoder {
         try {
             if (enc == null) {
                 bytes = str.getBytes(StandardCharsets.ISO_8859_1);
+                enc = "ISO-8859-1";
             } else {
                 bytes = str.getBytes(B2CConverter.getCharset(enc));
             }

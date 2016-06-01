@@ -67,6 +67,11 @@
         increase in the reports of memory leaks for some time. (markt)
       </scode>
       <fix>
+        <bug>59604</bug>: Correct the assumption made in the URL decoding that
+        the default platform encoding is always compatible with ISO-8859-1. This
+        assumption is not always valid, e.g. on z/OS. (markt)
+      </fix>
+      <fix>
         <bug>59608</bug>: Skip over any invalid <code>Class-Path</code> attribute
         from JAR manifests. Log errors at debug level due to many bad libraries.
         (remm)
