@@ -1422,82 +1422,76 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
      */
     protected class SocketProcessor extends SocketProcessorBase<NioChannel> {
 
-        public SocketProcessor(SocketWrapperBase<NioChannel> ka, SocketEvent event) {
-            super(ka, event);
+        public SocketProcessor(SocketWrapperBase<NioChannel> socketWrapper, SocketEvent event) {
+            super(socketWrapper, event);
         }
 
         @Override
-        public void run() {
+        protected void doRun() {
             NioChannel socket = socketWrapper.getSocket();
-            SelectionKey key = socket.getIOChannel().keyFor(
-                    socket.getPoller().getSelector());
+            SelectionKey key = socket.getIOChannel().keyFor(socket.getPoller().getSelector());
 
-            synchronized (socket) {
+            try {
+                int handshake = -1;
+
                 try {
-                    int handshake = -1;
-
-                    try {
-                        if (key != null) {
-                            // For STOP there is no point trying to handshake as the
-                            // Poller has been stopped.
-                            if (socket.isHandshakeComplete() ||
-                                    event == SocketEvent.STOP) {
-                                handshake = 0;
-                            } else {
-                                handshake = socket.handshake(
-                                        key.isReadable(), key.isWritable());
-                                // The handshake process reads/writes from/to the
-                                // socket. status may therefore be OPEN_WRITE once
-                                // the handshake completes. However, the handshake
-                                // happens when the socket is opened so the status
-                                // must always be OPEN_READ after it completes. It
-                                // is OK to always set this as it is only used if
-                                // the handshake completes.
-                                event = SocketEvent.OPEN_READ;
-                            }
-                        }
-                    } catch (IOException x) {
-                        handshake = -1;
-                        if (log.isDebugEnabled()) log.debug("Error during SSL handshake",x);
-                    } catch (CancelledKeyException ckx) {
-                        handshake = -1;
-                    }
-                    if (handshake == 0) {
-                        SocketState state = SocketState.OPEN;
-                        // Process the request from this socket
-                        if (event == null) {
-                            state = getHandler().process(socketWrapper, SocketEvent.OPEN_READ);
+                    if (key != null) {
+                        // For STOP there is no point trying to handshake as the
+                        // Poller has been stopped.
+                        if (socket.isHandshakeComplete() || event == SocketEvent.STOP) {
+                            handshake = 0;
                         } else {
-                            state = getHandler().process(socketWrapper, event);
+                            handshake = socket.handshake(key.isReadable(), key.isWritable());
+                            // The handshake process reads/writes from/to the
+                            // socket. status may therefore be OPEN_WRITE once
+                            // the handshake completes. However, the handshake
+                            // happens when the socket is opened so the status
+                            // must always be OPEN_READ after it completes. It
+                            // is OK to always set this as it is only used if
+                            // the handshake completes.
+                            event = SocketEvent.OPEN_READ;
                         }
-                        if (state == SocketState.CLOSED) {
-                            close(socket, key);
-                        }
-                    } else if (handshake == -1 ) {
+                    }
+                } catch (IOException x) {
+                    handshake = -1;
+                    if (log.isDebugEnabled()) log.debug("Error during SSL handshake",x);
+                } catch (CancelledKeyException ckx) {
+                    handshake = -1;
+                }
+                if (handshake == 0) {
+                    SocketState state = SocketState.OPEN;
+                    // Process the request from this socket
+                    if (event == null) {
+                        state = getHandler().process(socketWrapper, SocketEvent.OPEN_READ);
+                    } else {
+                        state = getHandler().process(socketWrapper, event);
+                    }
+                    if (state == SocketState.CLOSED) {
                         close(socket, key);
-                    } else if (handshake == SelectionKey.OP_READ){
-                        socketWrapper.registerReadInterest();
-                    } else if (handshake == SelectionKey.OP_WRITE){
-                        socketWrapper.registerWriteInterest();
                     }
-                } catch (CancelledKeyException cx) {
-                    socket.getPoller().cancelledKey(key);
-                } catch (VirtualMachineError vme) {
-                    ExceptionUtils.handleThrowable(vme);
-                } catch (Throwable t) {
-                    log.error("", t);
-                    socket.getPoller().cancelledKey(key);
-                } finally {
-                    socketWrapper = null;
-                    event = null;
-                    //return to cache
-                    if (running && !paused) {
-                        processorCache.push(this);
-                    }
+                } else if (handshake == -1 ) {
+                    close(socket, key);
+                } else if (handshake == SelectionKey.OP_READ){
+                    socketWrapper.registerReadInterest();
+                } else if (handshake == SelectionKey.OP_WRITE){
+                    socketWrapper.registerWriteInterest();
+                }
+            } catch (CancelledKeyException cx) {
+                socket.getPoller().cancelledKey(key);
+            } catch (VirtualMachineError vme) {
+                ExceptionUtils.handleThrowable(vme);
+            } catch (Throwable t) {
+                log.error("", t);
+                socket.getPoller().cancelledKey(key);
+            } finally {
+                socketWrapper = null;
+                event = null;
+                //return to cache
+                if (running && !paused) {
+                    processorCache.push(this);
                 }
             }
         }
-
     }
 
     // ----------------------------------------------- SendfileData Inner Class

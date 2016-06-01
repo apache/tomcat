@@ -2246,20 +2246,17 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
      */
     protected class SocketProcessor extends  SocketProcessorBase<Long> {
 
-        public SocketProcessor(SocketWrapperBase<Long> socket,
-                SocketEvent event) {
-            super(socket, event);
+        public SocketProcessor(SocketWrapperBase<Long> socketWrapper, SocketEvent event) {
+            super(socketWrapper, event);
         }
 
         @Override
-        public void run() {
-            synchronized (socketWrapper) {
-                // Process the request from this socket
-                SocketState state = getHandler().process(socketWrapper, event);
-                if (state == Handler.SocketState.CLOSED) {
-                    // Close socket and pool
-                    closeSocket(socketWrapper.getSocket().longValue());
-                }
+        protected void doRun() {
+            // Process the request from this socket
+            SocketState state = getHandler().process(socketWrapper, event);
+            if (state == Handler.SocketState.CLOSED) {
+                // Close socket and pool
+                closeSocket(socketWrapper.getSocket().longValue());
             }
         }
     }
