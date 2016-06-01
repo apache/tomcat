@@ -358,7 +358,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             socketWrapper.setReadTimeout(getSoTimeout());
             socketWrapper.setWriteTimeout(getSoTimeout());
             // Continue processing on another thread
-            return processSocket0(socketWrapper, SocketEvent.OPEN_READ, true);
+            return processSocket(socketWrapper, SocketEvent.OPEN_READ, true);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log.error("",t);
@@ -378,17 +378,13 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
     @Override
     public boolean  processSocket(SocketWrapperBase<Nio2Channel> socketWrapper,
-            SocketEvent socketStatus, boolean dispatch) {
-        return processSocket0(socketWrapper, socketStatus, dispatch);
-    }
-
-    protected boolean processSocket0(SocketWrapperBase<Nio2Channel> socketWrapper, SocketEvent status, boolean dispatch) {
+            SocketEvent event, boolean dispatch) {
         try {
             SocketProcessor sc = processorCache.pop();
             if (sc == null) {
-                sc = new SocketProcessor(socketWrapper, status);
+                sc = new SocketProcessor(socketWrapper, event);
             } else {
-                sc.reset(socketWrapper, status);
+                sc.reset(socketWrapper, event);
             }
             Executor executor = getExecutor();
             if (dispatch && executor != null) {
