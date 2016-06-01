@@ -2216,11 +2216,20 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
         @Override
         protected void doRun() {
-            // Process the request from this socket
-            SocketState state = getHandler().process(socketWrapper, event);
-            if (state == Handler.SocketState.CLOSED) {
-                // Close socket and pool
-                closeSocket(socketWrapper.getSocket().longValue());
+            try {
+                // Process the request from this socket
+                SocketState state = getHandler().process(socketWrapper, event);
+                if (state == Handler.SocketState.CLOSED) {
+                    // Close socket and pool
+                    closeSocket(socketWrapper.getSocket().longValue());
+                }
+            } finally {
+                socketWrapper = null;
+                event = null;
+                //return to cache
+                if (running && !paused) {
+                    processorCache.push(this);
+                }
             }
         }
     }
