@@ -103,6 +103,12 @@
         <bug>59564</bug>: Correct offset when reading into HTTP/2 input buffer
         that could cause problems reading request bodies. (violetagg/markt)
       </fix>
+      <fix>
+        Modify the handling of read/write timeouts so that the appropriate error
+        handling (<code>ReadListener.onError()</code>,
+        <code>WriteListener.onError()</code> or
+        <code>AsycnListener.onError()</code>) is called. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -1466,10 +1466,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     log.debug(sm.getString("endpoint.debug.socketTimeout",
                             Long.valueOf(socket)));
                 }
-                removeFromPoller(socket);
-                destroySocket(socket);
-                addList.remove(socket);
-                closeList.remove(socket);
+                SocketWrapperBase<Long> socketWrapper = connections.get(Long.valueOf(socket));
+                socketWrapper.setError(new SocketTimeoutException());
+                processSocket(socketWrapper, SocketEvent.ERROR, true);
                 socket = timeouts.check(date);
             }
 

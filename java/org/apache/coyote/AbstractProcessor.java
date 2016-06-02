@@ -195,6 +195,25 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             }
         } else if (status == SocketEvent.OPEN_READ && request.getReadListener() != null) {
             dispatchNonBlockingRead();
+        } else if (status == SocketEvent.ERROR) {
+            // An I/O error occurred on a non-container thread. This includes:
+            // - read/write timeouts fired by the Poller (NIO & APR)
+            // - completion handler failures in NIO2
+
+            if (request.getAttribute(RequestDispatcher.ERROR_EXCEPTION) == null) {
+                // Because the error did not occur on a container thread the
+                // request's error attribute has not been set. If an exception
+                // is available from the socketWrapper, use it to set the
+                // request's error attribute here so it is visible to the error
+                // handling.
+                request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, socketWrapper.getError());
+            }
+
+            if (request.getReadListener() != null || response.getWriteListener() != null) {
+                // The error occurred during non-blocking I/O. Set the correct
+                // state else the error handling will trigger an ISE.
+                asyncStateMachine.asyncOperation();
+            }
         }
 
         RequestInfo rp = request.getRequestProcessor();

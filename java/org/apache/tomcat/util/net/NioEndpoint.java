@@ -1041,7 +1041,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                             if (isTimedOut) {
                                 key.interestOps(0);
                                 ka.interestOps(0); //avoid duplicate timeout calls
-                                cancelledKey(key);
+                                ka.setError(new SocketTimeoutException());
+                                if (!processSocket(ka, SocketEvent.ERROR, true)) {
+                                    cancelledKey(key);
+                                }
                             }
                         }
                     }catch ( CancelledKeyException ckx ) {
