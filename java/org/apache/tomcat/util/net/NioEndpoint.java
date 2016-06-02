@@ -441,8 +441,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 return false;
             }
             SocketProcessor sc = processorCache.pop();
-            if ( sc == null ) sc = new SocketProcessor(socketWrapper, event);
-            else sc.reset(socketWrapper, event);
+            if (sc == null) {
+                sc = new SocketProcessor(socketWrapper, event);
+            } else {
+                sc.reset(socketWrapper, event);
+            }
             Executor executor = getExecutor();
             if (dispatch && executor != null) {
                 executor.execute(sc);
