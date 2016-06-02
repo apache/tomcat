@@ -377,9 +377,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
     }
 
     @Override
-    public void processSocket(SocketWrapperBase<Nio2Channel> socketWrapper,
+    public boolean  processSocket(SocketWrapperBase<Nio2Channel> socketWrapper,
             SocketEvent socketStatus, boolean dispatch) {
-        processSocket0(socketWrapper, socketStatus, dispatch);
+        return processSocket0(socketWrapper, socketStatus, dispatch);
     }
 
     protected boolean processSocket0(SocketWrapperBase<Nio2Channel> socketWrapper, SocketEvent status, boolean dispatch) {

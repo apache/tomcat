@@ -774,8 +774,10 @@ public abstract class AbstractEndpoint<S> {
      * @param socketStatus  The input status to the processing
      * @param dispatch      Should the processing be performed on a new
      *                          container thread
+     *
+     * @return if processing was triggered successfully
      */
-    public abstract void processSocket(SocketWrapperBase<S> socketWrapper,
+    public abstract boolean processSocket(SocketWrapperBase<S> socketWrapper,
             SocketEvent socketStatus, boolean dispatch);
 
 
