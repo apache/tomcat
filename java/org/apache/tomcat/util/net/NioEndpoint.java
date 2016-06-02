@@ -436,10 +436,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     @Override
     public boolean processSocket(SocketWrapperBase<NioChannel> socketWrapper,
             SocketEvent event, boolean dispatch) {
-        return processSocket((NioSocketWrapper) socketWrapper, event, dispatch);
-    }
-
-    protected boolean processSocket(NioSocketWrapper socketWrapper, SocketEvent event, boolean dispatch) {
         try {
             if (socketWrapper == null) {
                 return false;
