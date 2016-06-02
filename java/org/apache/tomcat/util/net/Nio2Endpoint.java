@@ -1623,94 +1623,92 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         }
 
         @Override
-        public void run() {
-            synchronized (socketWrapper) {
-                if (SocketEvent.OPEN_WRITE != event) {
-                    // Anything other than OPEN_WRITE is a genuine read or an
-                    // error condition so for all of those release the semaphore
-                    ((Nio2SocketWrapper) socketWrapper).releaseReadPending();
-                }
-                boolean launch = false;
-                try {
-                    int handshake = -1;
+        protected void doRun() {
+            if (SocketEvent.OPEN_WRITE != event) {
+                // Anything other than OPEN_WRITE is a genuine read or an
+                // error condition so for all of those release the semaphore
+                ((Nio2SocketWrapper) socketWrapper).releaseReadPending();
+            }
+            boolean launch = false;
+            try {
+                int handshake = -1;
 
-                    try {
-                        // For STOP there is no point trying to handshake as the
-                        // Poller has been stopped.
-                        if (!socketWrapper.getSocket().isHandshakeComplete() && event == SocketEvent.ERROR) {
-                            handshake = -1;
-                        } else if (socketWrapper.getSocket().isHandshakeComplete() ||
-                                event == SocketEvent.STOP ||
-                                event == SocketEvent.ERROR) {
-                            handshake = 0;
-                        } else {
-                            handshake = socketWrapper.getSocket().handshake();
-                            // The handshake process reads/writes from/to the
-                            // socket. status may therefore be OPEN_WRITE once
-                            // the handshake completes. However, the handshake
-                            // happens when the socket is opened so the status
-                            // must always be OPEN_READ after it completes. It
-                            // is OK to always set this as it is only used if
-                            // the handshake completes.
-                            event = SocketEvent.OPEN_READ;
-                        }
-                    } catch (IOException x) {
+                try {
+                    // For STOP there is no point trying to handshake as the
+                    // Poller has been stopped.
+                    if (!socketWrapper.getSocket().isHandshakeComplete() && event == SocketEvent.ERROR) {
                         handshake = -1;
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("endpoint.err.handshake"), x);
-                        }
+                    } else if (socketWrapper.getSocket().isHandshakeComplete() ||
+                            event == SocketEvent.STOP ||
+                            event == SocketEvent.ERROR) {
+                        handshake = 0;
+                    } else {
+                        handshake = socketWrapper.getSocket().handshake();
+                        // The handshake process reads/writes from/to the
+                        // socket. status may therefore be OPEN_WRITE once
+                        // the handshake completes. However, the handshake
+                        // happens when the socket is opened so the status
+                        // must always be OPEN_READ after it completes. It
+                        // is OK to always set this as it is only used if
+                        // the handshake completes.
+                        event = SocketEvent.OPEN_READ;
                     }
-                    if (handshake == 0) {
-                        SocketState state = SocketState.OPEN;
-                        // Process the request from this socket
-                        if (event == null) {
-                            state = getHandler().process(socketWrapper, SocketEvent.OPEN_READ);
-                        } else {
-                            state = getHandler().process(socketWrapper, event);
-                        }
-                        if (state == SocketState.CLOSED) {
-                            // Close socket and pool
-                            closeSocket(socketWrapper);
-                            if (running && !paused) {
-                                if (!nioChannels.push(socketWrapper.getSocket())) {
-                                    socketWrapper.getSocket().free();
-                                }
-                            }
-                        } else if (state == SocketState.UPGRADING) {
-                            launch = true;
-                        }
-                    } else if (handshake == -1 ) {
+                } catch (IOException x) {
+                    handshake = -1;
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("endpoint.err.handshake"), x);
+                    }
+                }
+                if (handshake == 0) {
+                    SocketState state = SocketState.OPEN;
+                    // Process the request from this socket
+                    if (event == null) {
+                        state = getHandler().process(socketWrapper, SocketEvent.OPEN_READ);
+                    } else {
+                        state = getHandler().process(socketWrapper, event);
+                    }
+                    if (state == SocketState.CLOSED) {
+                        // Close socket and pool
                         closeSocket(socketWrapper);
                         if (running && !paused) {
                             if (!nioChannels.push(socketWrapper.getSocket())) {
                                 socketWrapper.getSocket().free();
                             }
                         }
+                    } else if (state == SocketState.UPGRADING) {
+                        launch = true;
                     }
-                } catch (VirtualMachineError vme) {
-                    ExceptionUtils.handleThrowable(vme);
-                } catch (Throwable t) {
-                    log.error(sm.getString("endpoint.processing.fail"), t);
-                    if (socketWrapper != null) {
-                        closeSocket(socketWrapper);
-                    }
-                } finally {
-                    if (launch) {
-                        try {
-                            getExecutor().execute(new SocketProcessor(socketWrapper, SocketEvent.OPEN_READ));
-                        } catch (NullPointerException npe) {
-                            if (running) {
-                                log.error(sm.getString("endpoint.launch.fail"),
-                                        npe);
-                            }
+                } else if (handshake == -1 ) {
+                    closeSocket(socketWrapper);
+                    if (running && !paused) {
+                        if (!nioChannels.push(socketWrapper.getSocket())) {
+                            socketWrapper.getSocket().free();
                         }
                     }
-                    socketWrapper = null;
-                    event = null;
-                    //return to cache
-                    if (running && !paused) {
-                        processorCache.push(this);
+                }
+            } catch (VirtualMachineError vme) {
+                ExceptionUtils.handleThrowable(vme);
+            } catch (Throwable t) {
+                log.error(sm.getString("endpoint.processing.fail"), t);
+                if (socketWrapper != null) {
+                    closeSocket(socketWrapper);
+                }
+            } finally {
+                if (launch) {
+                    try {
+                        getExecutor().execute(new SocketProcessor(socketWrapper, SocketEvent.OPEN_READ));
+                    } catch (NullPointerException npe) {
+                        if (running) {
+                            log.error(sm.getString("endpoint.launch.fail"),
+                                    npe);
+                        }
                     }
+                }
+                socketWrapper = null;
+                event = null;
+                //return to cache
+                if (running && !paused) {
+                    processorCache.push(this);
                 }
             }
         }

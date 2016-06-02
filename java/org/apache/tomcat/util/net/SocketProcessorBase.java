@@ -36,4 +36,15 @@ public abstract class SocketProcessorBase<S> implements Runnable {
             this.event = event;
         }
     }
+
+
+    @Override
+    public final void run() {
+        synchronized (socketWrapper) {
+            doRun();
+        }
+    }
+
+
+    protected abstract void doRun();
 }
