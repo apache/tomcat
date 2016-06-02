@@ -35,10 +35,8 @@ import java.nio.channels.WritePendingException;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -85,11 +83,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
     private AsynchronousChannelGroup threadGroup = null;
 
     private volatile boolean allClosed;
-
-    /**
-     * Cache for SocketProcessor objects
-     */
-    private SynchronizedStack<SocketProcessor> processorCache;
 
     /**
      * Bytebuffer cache, each channel holds a set of buffers (two, except for SSL holds four)
@@ -376,37 +369,13 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         return true;
     }
 
+
     @Override
-    public boolean  processSocket(SocketWrapperBase<Nio2Channel> socketWrapper,
-            SocketEvent event, boolean dispatch) {
-        try {
-            if (socketWrapper == null) {
-                return false;
-            }
-            SocketProcessor sc = processorCache.pop();
-            if (sc == null) {
-                sc = new SocketProcessor(socketWrapper, event);
-            } else {
-                sc.reset(socketWrapper, event);
-            }
-            Executor executor = getExecutor();
-            if (dispatch && executor != null) {
-                executor.execute(sc);
-            } else {
-                sc.run();
-            }
-        } catch (RejectedExecutionException ree) {
-            log.warn(sm.getString("endpoint.executor.fail", socketWrapper), ree);
-            return false;
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            // This means we got an OOM or similar creating a thread, or that
-            // the pool and its queue are full
-            log.error(sm.getString("endpoint.process.fail"), t);
-            return false;
-        }
-        return true;
+    protected SocketProcessorBase<Nio2Channel> createSocketProcessor(
+            SocketWrapperBase<Nio2Channel> socketWrapper, SocketEvent event) {
+        return new SocketProcessor(socketWrapper, event);
     }
+
 
     public void closeSocket(SocketWrapperBase<Nio2Channel> socket) {
         if (log.isDebugEnabled()) {

@@ -26,10 +26,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.juli.logging.Log;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.LimitLatch;
@@ -178,6 +181,10 @@ public abstract class AbstractEndpoint<S> {
      */
     protected Acceptor[] acceptors;
 
+    /**
+     * Cache for SocketProcessor objects
+     */
+    protected SynchronizedStack<SocketProcessorBase<S>> processorCache;
 
     // ----------------------------------------------------------------- Properties
 
@@ -771,14 +778,46 @@ public abstract class AbstractEndpoint<S> {
      * selected the socket.
      *
      * @param socketWrapper The socket wrapper to process
-     * @param socketStatus  The input status to the processing
+     * @param event         The socket event to be processed
      * @param dispatch      Should the processing be performed on a new
      *                          container thread
      *
      * @return if processing was triggered successfully
      */
-    public abstract boolean processSocket(SocketWrapperBase<S> socketWrapper,
-            SocketEvent socketStatus, boolean dispatch);
+    public boolean processSocket(SocketWrapperBase<S> socketWrapper,
+            SocketEvent event, boolean dispatch) {
+        try {
+            if (socketWrapper == null) {
+                return false;
+            }
+            SocketProcessorBase<S> sc = processorCache.pop();
+            if (sc == null) {
+                sc = createSocketProcessor(socketWrapper, event);
+            } else {
+                sc.reset(socketWrapper, event);
+            }
+            Executor executor = getExecutor();
+            if (dispatch && executor != null) {
+                executor.execute(sc);
+            } else {
+                sc.run();
+            }
+        } catch (RejectedExecutionException ree) {
+            getLog().warn(sm.getString("endpoint.executor.fail", socketWrapper) , ree);
+            return false;
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            // This means we got an OOM or similar creating a thread, or that
+            // the pool and its queue are full
+            getLog().error(sm.getString("endpoint.process.fail"), t);
+            return false;
+        }
+        return true;
+    }
+
+
+    protected abstract SocketProcessorBase<S> createSocketProcessor(
+            SocketWrapperBase<S> socketWrapper, SocketEvent event);
 
 
     // ------------------------------------------------------- Lifecycle methods
