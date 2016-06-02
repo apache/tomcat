@@ -51,6 +51,7 @@ import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLHostConfig.Type;
@@ -105,6 +106,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
     private final Map<Long,AprSocketWrapper> connections = new ConcurrentHashMap<>();
+
+    /**
+     * Cache for SocketProcessor objects
+     */
+    private SynchronizedStack<SocketProcessor> processorCache;
 
     // ------------------------------------------------------------ Constructor
 
@@ -537,6 +543,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             running = true;
             paused = false;
 
+            processorCache = new SynchronizedStack<>(SynchronizedStack.DEFAULT_SIZE,
+                    socketProperties.getProcessorCache());
+
             // Create worker collection
             if (getExecutor() == null) {
                 createExecutor();
@@ -626,6 +635,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 }
                 sendfile = null;
             }
+            processorCache.clear();
         }
         shutdownExecutor();
     }
@@ -808,33 +818,33 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
      *         <code>false</code> which indicates an error occurred and that the
      *         socket should be closed
      */
-    public boolean processSocket(long socket, SocketEvent event) {
+    protected boolean processSocket(long socket, SocketEvent event) {
         SocketWrapperBase<Long> socketWrapper = connections.get(Long.valueOf(socket));
-        if (socketWrapper != null) {
-            return processSocket(socketWrapper, event, true);
-        }
-        return true;
+        return processSocket(socketWrapper, event, true);
     }
 
 
     @Override
-    public boolean processSocket(SocketWrapperBase<Long> socket, SocketEvent event,
-            boolean dispatch) {
+    public boolean processSocket(SocketWrapperBase<Long> socketWrapper,
+            SocketEvent event, boolean dispatch) {
         try {
-            // Synchronisation is required here as this code may be called as a
-            // result of calling AsyncContext.dispatch() from a non-container
-            // thread
-            synchronized (socket) {
-                SocketProcessor proc = new SocketProcessor(socket, event);
-                Executor executor = getExecutor();
-                if (dispatch && executor != null) {
-                    executor.execute(proc);
-                } else {
-                    proc.run();
-                }
+            if (socketWrapper == null) {
+                return false;
+            }
+            SocketProcessor sc = processorCache.pop();
+            if (sc == null) {
+                sc = new SocketProcessor(socketWrapper, event);
+            } else {
+                sc.reset(socketWrapper, event);
+            }
+            Executor executor = getExecutor();
+            if (dispatch && executor != null) {
+                executor.execute(sc);
+            } else {
+                sc.run();
             }
         } catch (RejectedExecutionException ree) {
-            log.warn(sm.getString("endpoint.executor.fail", socket) , ree);
+            log.warn(sm.getString("endpoint.executor.fail", socketWrapper) , ree);
             return false;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -2242,11 +2252,20 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
         @Override
         protected void doRun() {
-            // Process the request from this socket
-            SocketState state = getHandler().process(socketWrapper, event);
-            if (state == Handler.SocketState.CLOSED) {
-                // Close socket and pool
-                closeSocket(socketWrapper.getSocket().longValue());
+            try {
+                // Process the request from this socket
+                SocketState state = getHandler().process(socketWrapper, event);
+                if (state == Handler.SocketState.CLOSED) {
+                    // Close socket and pool
+                    closeSocket(socketWrapper.getSocket().longValue());
+                }
+            } finally {
+                socketWrapper = null;
+                event = null;
+                //return to cache
+                if (running && !paused) {
+                    processorCache.push(this);
+                }
             }
         }
     }
