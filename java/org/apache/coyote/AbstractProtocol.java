@@ -718,7 +718,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             S socket = wrapper.getSocket();
 
             Processor processor = connections.get(socket);
-            if (status == SocketEvent.DISCONNECT && processor == null) {
+            if ((status == SocketEvent.DISCONNECT || status == SocketEvent.ERROR)
+                    && processor == null) {
                 // Nothing to do. Endpoint requested a close and there is no
                 // longer a processor associated with this socket.
                 return SocketState.CLOSED;
