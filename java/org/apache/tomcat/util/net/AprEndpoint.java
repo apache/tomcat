@@ -802,49 +802,30 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
      * Process the given socket. Typically keep alive or upgraded protocol.
      *
      * @param socket    The socket to process
-     * @param status    The current status of the socket
+     * @param event     The event to process
      *
      * @return <code>true</code> if the processing completed normally otherwise
      *         <code>false</code> which indicates an error occurred and that the
      *         socket should be closed
      */
-    public boolean processSocket(long socket, SocketEvent status) {
-        try {
-            Executor executor = getExecutor();
-            if (executor == null) {
-                log.warn(sm.getString("endpoint.warn.noExector",
-                        Long.valueOf(socket), null));
-            } else {
-                SocketWrapperBase<Long> wrapper =
-                        connections.get(Long.valueOf(socket));
-                // Make sure connection hasn't been closed
-                if (wrapper != null) {
-                    executor.execute(new SocketProcessor(wrapper, status));
-                }
-            }
-        } catch (RejectedExecutionException x) {
-            log.warn("Socket processing request was rejected for:"+socket,x);
-            return false;
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            // This means we got an OOM or similar creating a thread, or that
-            // the pool and its queue are full
-            log.error(sm.getString("endpoint.process.fail"), t);
-            return false;
+    public boolean processSocket(long socket, SocketEvent event) {
+        SocketWrapperBase<Long> socketWrapper = connections.get(Long.valueOf(socket));
+        if (socketWrapper != null) {
+            return processSocket(socketWrapper, event, true);
         }
         return true;
     }
 
 
     @Override
-    public boolean processSocket(SocketWrapperBase<Long> socket, SocketEvent status,
+    public boolean processSocket(SocketWrapperBase<Long> socket, SocketEvent event,
             boolean dispatch) {
         try {
             // Synchronisation is required here as this code may be called as a
             // result of calling AsyncContext.dispatch() from a non-container
             // thread
             synchronized (socket) {
-                SocketProcessor proc = new SocketProcessor(socket, status);
+                SocketProcessor proc = new SocketProcessor(socket, event);
                 Executor executor = getExecutor();
                 if (dispatch && executor != null) {
                     executor.execute(proc);
