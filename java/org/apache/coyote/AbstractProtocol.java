@@ -972,7 +972,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         public void release(SocketWrapperBase<S> socketWrapper) {
             S socket = socketWrapper.getSocket();
             Processor processor = connections.remove(socket);
-            //getProtocol().removeWaitingProcessor(processor);
             release(processor);
         }
 
