@@ -435,18 +435,18 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
     @Override
     public void processSocket(SocketWrapperBase<NioChannel> socketWrapper,
-            SocketEvent socketStatus, boolean dispatch) {
-        processSocket((NioSocketWrapper) socketWrapper, socketStatus, dispatch);
+            SocketEvent event, boolean dispatch) {
+        processSocket((NioSocketWrapper) socketWrapper, event, dispatch);
     }
 
-    protected boolean processSocket(NioSocketWrapper attachment, SocketEvent status, boolean dispatch) {
+    protected boolean processSocket(NioSocketWrapper socketWrapper, SocketEvent event, boolean dispatch) {
         try {
-            if (attachment == null) {
+            if (socketWrapper == null) {
                 return false;
             }
             SocketProcessor sc = processorCache.pop();
-            if ( sc == null ) sc = new SocketProcessor(attachment, status);
-            else sc.reset(attachment, status);
+            if ( sc == null ) sc = new SocketProcessor(socketWrapper, event);
+            else sc.reset(socketWrapper, event);
             Executor executor = getExecutor();
             if (dispatch && executor != null) {
                 executor.execute(sc);
@@ -454,7 +454,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 sc.run();
             }
         } catch (RejectedExecutionException ree) {
-            log.warn(sm.getString("endpoint.executor.fail", attachment.getSocket()), ree);
+            log.warn(sm.getString("endpoint.executor.fail", socketWrapper.getSocket()), ree);
             return false;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -1269,7 +1269,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
 
         @Override
-        protected synchronized void doWriteInternal(boolean block) throws IOException {
+        protected synchronized void doWrite(boolean block) throws IOException {
             socketBufferHandler.configureWriteBufferForRead();
 
             long writeTimeout = getWriteTimeout();
