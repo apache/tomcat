@@ -1727,6 +1727,7 @@ public class Http11Processor extends AbstractProcessor {
         if (!keepAlive) {
             return SocketState.CLOSED;
         } else {
+            endRequest();
             inputBuffer.nextRequest();
             outputBuffer.nextRequest();
             if (socketWrapper.isReadPending()) {
