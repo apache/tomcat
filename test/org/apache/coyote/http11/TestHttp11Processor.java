@@ -765,7 +765,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
     }
 
 
-    private class Bug57621Client extends SimpleHttpClient {
+    private static class Bug57621Client extends SimpleHttpClient {
 
         private Exception doRequest() {
             try {
@@ -827,22 +827,19 @@ public class TestHttp11Processor extends TomcatBaseTest {
     }
 
 
-    private class Bug59310Servlet extends HttpServlet {
+    private static class Bug59310Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            // TODO Auto-generated method stub
             super.doGet(req, resp);
         }
 
         @Override
         protected void doHead(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            //resp.setContentLengthLong(-1);
-            //resp.flushBuffer();
         }
     }
 }
