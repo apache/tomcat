@@ -410,15 +410,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     }
 
 
-    /**
-     * Returns true if a worker thread is available for processing.
-     * @return boolean
-     */
-    protected boolean isWorkerAvailable() {
-        return true;
-    }
-
-
     @Override
     protected Log getLog() {
         return log;
@@ -852,23 +843,21 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         if ( attachment.getSendfileData() != null ) {
                             processSendfile(sk,attachment, false);
                         } else {
-                            if ( isWorkerAvailable() ) {
-                                unreg(sk, attachment, sk.readyOps());
-                                boolean closeSocket = false;
-                                // Read goes before write
-                                if (sk.isReadable()) {
-                                    if (!processSocket(attachment, SocketEvent.OPEN_READ, true)) {
-                                        closeSocket = true;
-                                    }
+                            unreg(sk, attachment, sk.readyOps());
+                            boolean closeSocket = false;
+                            // Read goes before write
+                            if (sk.isReadable()) {
+                                if (!processSocket(attachment, SocketEvent.OPEN_READ, true)) {
+                                    closeSocket = true;
                                 }
-                                if (!closeSocket && sk.isWritable()) {
-                                    if (!processSocket(attachment, SocketEvent.OPEN_WRITE, true)) {
-                                        closeSocket = true;
-                                    }
+                            }
+                            if (!closeSocket && sk.isWritable()) {
+                                if (!processSocket(attachment, SocketEvent.OPEN_WRITE, true)) {
+                                    closeSocket = true;
                                 }
-                                if (closeSocket) {
-                                    cancelledKey(sk);
-                                }
+                            }
+                            if (closeSocket) {
+                                cancelledKey(sk);
                             }
                         }
                     }
