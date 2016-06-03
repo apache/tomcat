@@ -863,7 +863,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
 
-        SempahoreServlet servlet = new SempahoreServlet();
+        DispatchingServlet servlet = new DispatchingServlet();
         Wrapper w = Tomcat.addServlet(ctx, "Test", servlet);
         w.setAsyncSupported(true);
         ctx.addServletMapping("/test", "Test");
@@ -929,7 +929,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
     }
 
 
-    private static class SempahoreServlet extends HttpServlet {
+    private static class DispatchingServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 
