@@ -109,6 +109,12 @@
         <code>WriteListener.onError()</code> or
         <code>AsycnListener.onError()</code>) is called. (markt)
       </fix>
+      <fix>
+       If an async dispatch results in the completion of request processing,
+       ensure that any remaining request body is swallowed before starting the
+       processing of the next request else the remaining body may be read as the
+       start of the next request leading to a 400 response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
