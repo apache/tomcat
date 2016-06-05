@@ -161,6 +161,13 @@
         Update the internal fork of Commons File Upload to r1743698 (1.3.1 plus
         additional fixes). (markt)
       </update>
+      <fix>
+        <bug>58626</bug>: Add support for a new environment variable
+        (<code>USE_NOHUP</code>) that causes <code>nohup</code> to be used when
+        starting Tomcat. It is disabled by default except on HP-UX where it is
+        enabled by default since it is required when starting Tomcat at boot on
+        HP-UX. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
