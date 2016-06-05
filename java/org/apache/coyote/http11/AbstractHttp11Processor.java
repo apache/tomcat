@@ -1701,7 +1701,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             if (!keepAlive) {
                 return SocketState.CLOSED;
             } else {
-            	endRequest();
+                endRequest();
                 getInputBuffer().nextRequest();
                 getOutputBuffer().nextRequest();
                 return SocketState.OPEN;
