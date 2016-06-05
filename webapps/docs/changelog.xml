@@ -175,6 +175,13 @@
       <scode>
         Use UTF-8 with a standard prolog for all XML files. (markt)
       </scode>
+      <fix>
+        <bug>58626</bug>: Add support for a new environment variable
+        (<code>USE_NOHUP</code>) that causes <code>nohup</code> to be used when
+        starting Tomcat. It is disabled by default except on HP-UX where it is
+        enabled by default since it is required when starting Tomcat at boot on
+        HP-UX. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
