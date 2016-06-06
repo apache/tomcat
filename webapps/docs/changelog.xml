@@ -131,6 +131,10 @@
         the class loader of the first web application to use expressions to be
         pinned in memory. (markt)
       </fix>
+      <fix>
+        <bug>59654</bug>: Improve error message when attempting to use a TLD
+        file from an invalid location. Patch provided by Huxing Zhang. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
