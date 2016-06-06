@@ -120,6 +120,9 @@
         enabled file based configuration resources to be loaded from the class
         path. (markt)
       </fix>
+      <fix>
+        Fix error message when failed to register MBean. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
