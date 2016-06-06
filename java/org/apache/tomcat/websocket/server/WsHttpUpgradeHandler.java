@@ -153,6 +153,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                     CloseReason cr = new CloseReason(
                             CloseCodes.CLOSED_ABNORMALLY, ioe.getMessage());
                     close(cr);
+                    return SocketState.CLOSED;
                 }
                 break;
             case OPEN_WRITE:
@@ -168,6 +169,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                     cr = new CloseReason(
                             CloseCodes.CLOSED_ABNORMALLY, ioe.getMessage());
                     close(cr);
+                    return SocketState.CLOSED;
                 }
                 break;
             case ERROR:
