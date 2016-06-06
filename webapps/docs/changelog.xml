@@ -76,6 +76,9 @@
         from JAR manifests. Log errors at debug level due to many bad libraries.
         (remm)
       </fix>
+      <fix>
+        Fix error message when failed to register MBean. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
