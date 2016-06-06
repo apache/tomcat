@@ -340,9 +340,14 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                 err.jspError("jsp.error.tld.missing_jar", uri);
             }
             return new TldLocation("META-INF/taglib.tld", url.toString());
-        } else {
-            return new TldLocation(uri);
+        } else if (uri.startsWith("/WEB-INF/lib/")
+                || uri.startsWith("/WEB-INF/classes/") ||
+                (uri.startsWith("/WEB-INF/tags/") && uri.endsWith(".tld")
+                        && !uri.endsWith("implicit.tld"))) {
+            err.jspError("jsp.error.tld.invalid_tld_file", uri);
         }
+
+        return new TldLocation(uri);
     }
 
     private TagInfo createTagInfo(TreeNode elem, String jspVersion)
