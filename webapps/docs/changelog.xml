@@ -79,6 +79,11 @@
       <fix>
         Fix error message when failed to register MBean. (kfujino)
       </fix>
+      <fix>
+        <bug>59655</bug>: Configure the cookie name validation to use RFC6265 rules by default to
+        align it with the default cookie parser. Document the impact system properties have on
+        cookie name validation. (mark)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -49,7 +49,7 @@ import java.util.ResourceBundle;
  * support the cache control defined with HTTP 1.1.
  * <p>
  * This class supports both the Version 0 (by Netscape) and Version 1 (by RFC
- * 2109) cookie specifications. By default, cookies are created using Version 0
+ * 2109) cookie specifications. By default, cookies are created using RFC6265
  * to ensure the best interoperability.
  */
 public class Cookie implements Cloneable, Serializable {
@@ -68,7 +68,7 @@ public class Cookie implements Cloneable, Serializable {
             validation = new RFC2109Validator();
         }
         else {
-            validation = new NetscapeValidator();
+            validation = new RFC6265Validator();
         }
     }
 
