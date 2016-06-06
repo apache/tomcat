@@ -129,9 +129,9 @@ public class TestCookie {
 
     @Test
     public void strictNamingImpliesRFC2109() {
-        // Not using strict naming here so this should be OK
+        // Needs to be something RFC6265 allows, but strict naming does not.
         @SuppressWarnings("unused")
-        Cookie cookie = new Cookie("@Foo", null);
+        Cookie cookie = new Cookie("$Foo", null);
     }
 
     public static void checkCharInName(CookieNameValidator validator, BitSet allowed) {
