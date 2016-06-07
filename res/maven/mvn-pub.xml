@@ -333,14 +333,6 @@
     <doMavenDeployNoSrc artifactId="tomcat-i18n-ja"/>
 
     <!-- Extras jars -->
-    <doMavenDeploy artifactId="tomcat-extras-juli"
-        groupId="org.apache.tomcat.extras"
-        file="${tomcat.extras.path}/tomcat-juli.jar"
-        src="${tomcat.extras.src.path}/tomcat-juli-src.jar" />
-    <doMavenDeploy artifactId="tomcat-extras-juli-adapters"
-        groupId="org.apache.tomcat.extras"
-        file="${tomcat.extras.path}/tomcat-juli-adapters.jar"
-        src="${tomcat.extras.src.path}/tomcat-juli-adapters-src.jar" />
     <doMavenDeploy artifactId="tomcat-catalina-jmx-remote"
         groupId="org.apache.tomcat.extras"
         file="${tomcat.extras.path}/catalina-jmx-remote.jar"
@@ -372,16 +364,6 @@
         file="${tomcat.embed.path}/tomcat-embed-websocket.jar"
         pom="tomcat-embed-websocket.pom"
         src="${tomcat.embed.src.path}/tomcat-embed-websocket-src.jar"/>
-    <doMavenDeploy artifactId="tomcat-embed-logging-juli"
-        groupId="org.apache.tomcat.embed"
-        file="${tomcat.embed.path}/tomcat-embed-logging-juli.jar"
-        pom="tomcat-embed-logging-juli.pom"
-        src="${tomcat.embed.src.path}/tomcat-embed-logging-juli-src.jar"/>
-    <doMavenDeploy artifactId="tomcat-embed-logging-log4j"
-        groupId="org.apache.tomcat.embed"
-        file="${tomcat.embed.path}/tomcat-embed-logging-log4j.jar"
-        pom="tomcat-embed-logging-log4j.pom"
-        src="${tomcat.embed.src.path}/tomcat-embed-logging-log4j-src.jar"/>
 
     <!-- Binaries -->
     <doMavenDeployBinaries
