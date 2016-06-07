@@ -45,12 +45,12 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M9" rtext="in development">
-  <section name="Other">
+  <subsection name="Other">
     <fix>
       Remove JULI plus log4j extras and embedded artifacts from Maven release
       script. (markt)
     </fix>
-  </section>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M8" rtext="release in progress">
   <subsection name="Coyote">
