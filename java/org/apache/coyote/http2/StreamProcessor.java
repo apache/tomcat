@@ -169,12 +169,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             // control windows are correctly tracked.
             break;
         }
-        case END_REQUEST: {
-            // NO-OP
-            // This action is geared towards handling HTTP/1.1 expectations and
-            // keep-alive. Does not apply to HTTP/2 streams.
-            break;
-        }
 
         // Request attribute support
         case REQ_HOST_ADDR_ATTRIBUTE: {

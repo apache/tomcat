@@ -717,11 +717,21 @@ public class TestHttp11Processor extends TomcatBaseTest {
      * async processing.
      */
     @Test
-    public void testBug57621() throws Exception {
+    public void testBug57621a() throws Exception {
+        doTestBug57621(true);
+    }
 
+
+    @Test
+    public void testBug57621b() throws Exception {
+        doTestBug57621(false);
+    }
+
+
+    private void doTestBug57621(boolean delayAsyncThread) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", null);
-        Wrapper w = Tomcat.addServlet(root, "Bug57621", new Bug57621Servlet());
+        Wrapper w = Tomcat.addServlet(root, "Bug57621", new Bug57621Servlet(delayAsyncThread));
         w.setAsyncSupported(true);
         root.addServletMapping("/test", "Bug57621");
 
@@ -752,6 +762,14 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
+        private final boolean delayAsyncThread;
+
+
+        public Bug57621Servlet(boolean delayAsyncThread) {
+            this.delayAsyncThread = delayAsyncThread;
+        }
+
+
         @Override
         protected void doPut(HttpServletRequest req, final HttpServletResponse resp)
                 throws ServletException, IOException {
@@ -759,6 +777,15 @@ public class TestHttp11Processor extends TomcatBaseTest {
             ac.start(new Runnable() {
                 @Override
                 public void run() {
+                    if (delayAsyncThread) {
+                        // Makes the difference between calling complete before
+                        // the request body is received of after.
+                        try {
+                            Thread.sleep(1500);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     resp.setContentType("text/plain");
                     resp.setCharacterEncoding("UTF-8");
                     try {

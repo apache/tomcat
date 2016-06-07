@@ -239,12 +239,6 @@ public enum ActionCode {
     DISPATCH_EXECUTE,
 
     /**
-     * Trigger end of request processing (remaining input swallowed, write any
-     * remaining parts of the response etc.).
-     */
-    END_REQUEST,
-
-    /**
      * Is server push supported and allowed for the current request?
      */
     IS_PUSH_SUPPORTED,

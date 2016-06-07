@@ -733,10 +733,6 @@ public class Http11Processor extends AbstractProcessor {
             inputBuffer.setSwallowInput(false);
             break;
         }
-        case END_REQUEST: {
-            endRequest();
-            break;
-        }
 
         // Request attribute support
         case REQ_HOST_ADDR_ATTRIBUTE: {
