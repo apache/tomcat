@@ -44,7 +44,14 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 9.0.0.M7" rtext="in development">
+<section name="Tomcat 9.0.0.M8" rtext="in development">
+  <subsection name="Coyote">
+    <fix>
+      Remove accidentally committed debug code. (markt)
+    </fix>
+  </subsection>
+</section>
+<section name="Tomcat 9.0.0.M7" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
