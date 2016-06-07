@@ -432,10 +432,6 @@ public class AjpProcessor extends AbstractProcessor {
             setErrorState(ErrorState.CLOSE_CLEAN, null);
             break;
         }
-        case END_REQUEST: {
-            // NO-OP for AJP
-            break;
-        }
 
         // Request attribute support
         case REQ_HOST_ADDR_ATTRIBUTE: {

@@ -321,6 +321,9 @@ public class Http11InputBuffer implements InputBuffer {
 
         lastValid = 0;
         pos = 0;
+
+        System.out.println("Http11InputBuffer.recycle(): pos [" + pos + "], lastValid [" + lastValid + "]");
+
         lastActiveFilter = -1;
         parsingHeader = true;
         swallowInput = true;
@@ -351,6 +354,8 @@ public class Http11InputBuffer implements InputBuffer {
         // Always reset pos to zero
         lastValid = lastValid - pos;
         pos = 0;
+
+        System.out.println("Http11InputBuffer.nextRequest(): pos [" + pos + "], lastValid [" + lastValid + "]");
 
         // Recycle filters
         for (int i = 0; i <= lastActiveFilter; i++) {
@@ -412,7 +417,7 @@ public class Http11InputBuffer implements InputBuffer {
                 }
                 if (!keptAlive && pos == 0 && lastValid >= CLIENT_PREFACE_START.length - 1) {
                     boolean prefaceMatch = true;
-                    for (int i = 0; i < CLIENT_PREFACE_START.length; i++) {
+                    for (int i = 0; i < CLIENT_PREFACE_START.length && prefaceMatch; i++) {
                         if (CLIENT_PREFACE_START[i] != buf[i]) {
                             prefaceMatch = false;
                         }
@@ -631,6 +636,8 @@ public class Http11InputBuffer implements InputBuffer {
         if (swallowInput && (lastActiveFilter != -1)) {
             int extraBytes = (int) activeFilters[lastActiveFilter].end();
             pos = pos - extraBytes;
+            System.out.println("Http11InputBuffer.endRequest(): pos [" + pos + "], lastValid [" + lastValid + "]");
+            (new Exception()).printStackTrace();
         }
     }
 
@@ -742,6 +749,7 @@ public class Http11InputBuffer implements InputBuffer {
         int nRead = wrapper.read(block, buf, pos, buf.length - pos);
         if (nRead > 0) {
             lastValid = pos + nRead;
+            System.out.println("Http11InputBuffer.fill(): pos [" + pos + "], lastValid [" + lastValid + "]");
             return true;
         } else if (nRead == -1) {
             throw new EOFException(sm.getString("iib.eof.error"));
@@ -1077,6 +1085,7 @@ public class Http11InputBuffer implements InputBuffer {
             int length = lastValid - pos;
             chunk.setBytes(buf, pos, length);
             pos = lastValid;
+            System.out.println("SocketInputBuffer.doRead(): pos [" + pos + "], lastValid [" + lastValid + "]");
 
             return length;
         }
