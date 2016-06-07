@@ -99,9 +99,9 @@
         Fix error message when failed to register MBean. (kfujino)
       </fix>
       <fix>
-        <bug>59655</bug>: Configure the cookie name validation to use RFC6265 rules by default to
-        align it with the default cookie parser. Document the impact system properties have on
-        cookie name validation. (mark)
+        <bug>59655</bug>: Configure the cookie name validation to use RFC6265
+        rules by default to align it with the default cookie parser. Document
+        the impact system properties have on cookie name validation. (mark)
       </fix>
     </changelog>
   </subsection>
@@ -181,7 +181,7 @@
     <changelog>
       <scode>
         <bug>58588</bug>: Remove the JULI extras package from the distribution.
-        It was onyl useful for switching Tomcat's internal logging to log4j
+        It was only useful for switching Tomcat's internal logging to log4j
         1.2.x and that version of log4j is no longer supported. No additional
         Tomcat code is required if switching Tomcat's internal logging to log
         via log4j 2.x. (markt)
