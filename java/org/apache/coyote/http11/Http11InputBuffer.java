@@ -321,7 +321,6 @@ public class Http11InputBuffer implements InputBuffer {
 
         lastValid = 0;
         pos = 0;
-
         lastActiveFilter = -1;
         parsingHeader = true;
         swallowInput = true;
@@ -632,7 +631,6 @@ public class Http11InputBuffer implements InputBuffer {
         if (swallowInput && (lastActiveFilter != -1)) {
             int extraBytes = (int) activeFilters[lastActiveFilter].end();
             pos = pos - extraBytes;
-            (new Exception()).printStackTrace();
         }
     }
 
