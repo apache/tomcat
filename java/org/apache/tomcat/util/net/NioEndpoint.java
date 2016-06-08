@@ -1186,6 +1186,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         }
 
 
+        @Override
+        public boolean isClosed() {
+            return !getSocket().isOpen();
+        }
+
+
         private int fillReadBuffer(boolean block) throws IOException {
             int nRead;
             NioChannel channel = getSocket();

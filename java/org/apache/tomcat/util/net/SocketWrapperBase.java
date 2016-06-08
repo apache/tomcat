@@ -297,7 +297,7 @@ public abstract class SocketWrapperBase<E> {
 
 
     public abstract void close() throws IOException;
-
+    public abstract boolean isClosed();
 
     /**
      * Writes the provided data to the socket, buffering any remaining data if
@@ -852,5 +852,4 @@ public abstract class SocketWrapperBase<E> {
         to.put(from);
         from.limit(fromLimit);
     }
-
 }
