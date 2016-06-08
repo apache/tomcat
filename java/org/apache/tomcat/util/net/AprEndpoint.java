@@ -2443,6 +2443,14 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
         @Override
+        public boolean isClosed() {
+            synchronized (closedLock) {
+                return closed;
+            }
+        }
+
+
+        @Override
         protected void doWrite(boolean block) throws IOException {
             if (closed) {
                 throw new IOException(sm.getString("socket.apr.closed", getSocket()));

@@ -123,6 +123,9 @@
        processing of the next request else the remaining body may be read as the
        start of the next request leading to a 400 response. (markt)
       </fix>
+      <fix>
+        Fix a cause of multiple attempts to close the same socket. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
