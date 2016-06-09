@@ -269,7 +269,30 @@ You can build them by using the following commands:
     open the command prompt used for the build with the "Run as administrator"
     option.
 
- 3. Build the release:
+ 3. Configure the code signing service
+
+    ASF committers performing official releases will need to configure the code
+    signing service so that the Windows installer is signed during the build
+    process. The following properties need to be added to the build.properties
+    file:
+
+        # Location of GPG executable (used only for releases)
+        # Code signing of Windows installer
+        do.codesigning=true
+        codesigning.user=request-via-pmc
+        codesigning.pwd=request-via-pmc
+        codesigning.partnercode=request-via-pmc
+        codesigning.service=Microsoft Signing
+
+    Release managers will be provided with the necessary credentials by the PMC.
+    It will also be necessary to enable TLS 1.1 and TLS 1.2 by default (they are
+    disabled by default on Java 7) for the build process to communicate with the
+    code signing service. The simplest way is by setting the ANT_OPTS
+    environment variable. E.g. (for Windows):
+
+    set ANT_OPTS=-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2
+
+ 4. Build the release:
 
     cd ${tomcat.source}
     ant release
