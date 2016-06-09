@@ -46,7 +46,11 @@ public class SynchronizedStack<T> {
     }
 
     public SynchronizedStack(int size, int limit) {
-        this.size = size;
+        if (limit > -1 && size > limit) {
+            this.size = limit;
+        } else {
+            this.size = size;
+        }
         this.limit = limit;
         stack = new Object[size];
     }
