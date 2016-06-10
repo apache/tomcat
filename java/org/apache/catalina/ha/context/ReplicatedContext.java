@@ -192,7 +192,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
             Set<String> names = new HashSet<>();
             names.addAll(attributes.keySet());
 
-            return (Enumeration<String>) new MultiEnumeration<>(new Enumeration[] {
+            return new MultiEnumeration<>(new Enumeration[] {
                     super.getAttributeNames(),
                     Collections.enumeration(names) });
         }
