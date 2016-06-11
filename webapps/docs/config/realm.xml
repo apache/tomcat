@@ -1094,10 +1094,10 @@
     that extends the CombinedRealm, e.g. the LockOutRealm, one or more
     <strong>&lt;Realm&gt;</strong> elements may be nested inside it.</li>
   <li><a href="credentialhandler.html"><strong>CredentialHandler</strong></a> -
-      You may next at most one instance of this element inside a Realm. This
+      You may nest at most one instance of this element inside a Realm. This
       configures the credential handler that will be used to validate provided
       credentials with those stored by the Realm. If not specified a default
-      <em>MessageDigestCredentialHandler</em> will configured.</li>
+      <em>MessageDigestCredentialHandler</em> will be configured.</li>
   </ul>
 
 </section>
