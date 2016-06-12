@@ -168,13 +168,15 @@ authentication.</p>
 
 <p>When a standard realm authenticates by retrieving the stored
 password and comparing it with the value presented by the user, you
-can select digested passwords by specifying the <code>digest</code>
-attribute on your <code>&lt;Realm&gt;</code> element.  The value for
-this attribute must be one of the digest algorithms supported by the
-<code>java.security.MessageDigest</code> class (SHA, MD2, or MD5).
-When you select this option, the contents of the password that is
-stored in the <code>Realm</code> must be the cleartext version of the
-password, as digested by the specified algorithm.</p>
+can select digested passwords by placing a <a href="config/credentialhandler.html">
+<code>CredentialHandler</code></a> element inside your <code>&lt;Realm&gt;</code>
+element. An easy choice to support one of the algorithms SSHA, SHA or MD5
+would be the usage of the <code>MessageDigestCredentialHandler</code>.
+This element must be configured to one of the digest algorithms supported
+by the <code>java.security.MessageDigest</code> class (SSHA, SHA or MD5).
+When you select this option, the contents of the password that is stored
+in the <code>Realm</code> must be the cleartext version of the password,
+as digested by the specified algorithm.</p>
 
 <p>When the <code>authenticate()</code> method of the Realm is called, the
 (cleartext) password specified by the user is itself digested by the same
