@@ -433,10 +433,6 @@ Operations</a> that can be performed when the administrative application is
       establishing a JDBC connection.</li>
   <li><code>connectionURL</code> - Connection URL to use when establishing
       a JDBC connection.</li>
-  <li><code>debug</code> - Debugging detail level.  [0]</li>
-  <li><code>digest</code> - Name of the <code>MessageDigest</code> algorithm
-      used to encode passwords in the database, or a zero-length string for
-      no encoding.  [Zero-length String]</li>
   <li><code>driverName</code> - Fully qualified Java class name of the JDBC
       driver to be utilized.</li>
   <li><code>roleNameCol</code> - Name of the column, in the User Roles table,
