@@ -949,21 +949,41 @@
   <subsection name="HTTP/1.1 and HTTP/1.0 Support">
 
   <p>This <strong>Connector</strong> supports all of the required features
-  of the HTTP/1.1 protocol, as described in RFC 2616, including persistent
+  of the HTTP/1.1 protocol, as described in RFCs 7230-7235, including persistent
   connections, pipelining, expectations and chunked encoding.  If the client
-  (typically a browser) supports only HTTP/1.0, the
+  supports only HTTP/1.0 or HTTP/0.9, the
   <strong>Connector</strong> will gracefully fall back to supporting this
   protocol as well.  No special configuration is required to enable this
   support. The <strong>Connector</strong> also supports HTTP/1.0
   keep-alive.</p>
 
-  <p>RFC 2616 requires that HTTP servers always begin their responses with
+  <p>RFC 7230 requires that HTTP servers always begin their responses with
   the highest HTTP version that they claim to support.  Therefore, this
   <strong>Connector</strong> will always return <code>HTTP/1.1</code> at
   the beginning of its responses.</p>
 
   </subsection>
 
+  <subsection name="HTTP/2 Support">
+
+  <p>HTTP/2 is support is provided for TLS (h2), non-TLS via HTTP upgrade (h2c)
+     and direct HTTP/2 (h2c) connections. To enable HTTP/2 support for an HTTP
+     connector the following <strong>UpgradeProtocol</strong> element must be
+     nested within the <strong>Connector</strong> with a
+     <strong>className</strong> attribute of
+     <code>org.apache.coyote.http2.Http2Protocol</code>.</p>
+
+<source><![CDATA[<Connector ... >
+  <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" />
+</Connector>]]></source>
+
+  <p>Because Java 8's TLS implementation does not support ALPN (which is
+     required for HTTP/2 over TLS), you must be using an OpenSSL based TLS
+     implementation to enable HTTP/2 support. See the
+     <code>sslImplementationName</code> attribute of the
+     <strong>Connector</strong>.</p>
+
+  </subsection>
 
   <subsection name="Proxy Support">
 
