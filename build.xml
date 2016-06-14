@@ -152,11 +152,9 @@
   <!-- Extras JARs & source JARs -->
   <property name="catalina-ws.jar" value="${tomcat.extras}/catalina-ws.jar"/>
   <property name="catalina-jmx-remote.jar" value="${tomcat.extras}/catalina-jmx-remote.jar"/>
-  <property name="tomcat-embed-log4j.jar" value="${tomcat.embed}/tomcat-embed-logging-log4j.jar"/>
 
   <property name="catalina-ws-src.jar" value="${tomcat.extras.sources}/catalina-ws-src.jar"/>
   <property name="catalina-jmx-remote-src.jar" value="${tomcat.extras.sources}/catalina-jmx-remote-src.jar"/>
-  <property name="tomcat-embed-log4j-src.jar" value="${tomcat.embed.sources}/tomcat-embed-logging-log4j-src.jar"/>
 
   <!-- jdbc-pool JARs & source JARs -->
   <property name="tomcat-jdbc.jar" value="${tomcat.pool}/tomcat-jdbc.jar"/>
@@ -441,6 +439,7 @@
     <patternset refid="files.servlet-api" />
     <patternset refid="files.jaspic-api" />
     <patternset refid="files.tomcat-api" />
+    <patternset refid="files.tomcat-juli" />
     <!-- These pattern sets conflict so include files directly
       <patternset refid="files.tomcat-coyote" />
       <patternset refid="files.tomcat-util" />
@@ -467,9 +466,6 @@
     <patternset refid="files.websocket-api" />
     <patternset refid="files.tomcat-websocket" />
   </patternset>
-
-  <!-- Pattern sets used directly -->
-    <!--<patternset refid="files.tomcat-juli" />-->
 
   <!-- Pattern sets not included in embedded -->
     <!-- Cluster support not included in embedded -->
