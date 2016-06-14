@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.4" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Correct a regression in the fix for <bug>58588</bug> that removed the
+        entire <code>org.apache.juli</code> package from the embedded JARs
+        rendering them unusable. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.3" rtext="release in progress">
   <subsection name="Catalina">
