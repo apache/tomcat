@@ -52,6 +52,11 @@
         entire <code>org.apache.juli</code> package from the embedded JARs
         rendering them unusable. (markt)
       </fix>
+      <add>
+        <bug>59399</bug>: Add a new option to the Realm implementations that
+        ship with Tomcat that allows the HTTP status code used for HTTP -> HTTPS
+        redirects to be controlled per Realm. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
