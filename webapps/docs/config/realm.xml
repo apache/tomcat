@@ -1034,7 +1034,11 @@
 
       <attribute name="lockOutTime" required="false">
        <p>The time (in seconds) a user is locked out for after too many
-       authentication failures. Defaults to 300 (5 minutes).</p>
+       authentication failures. Defaults to 300 (5 minutes). Further
+       authentication failures during the lock out time will cause the lock out
+       timer to reset to zero, effectively extending the lock out time. Valid
+       authentication attempts during the lock out period will not succeed but
+       will also not reset the lock out time.</p>
       </attribute>
 
     </attributes>

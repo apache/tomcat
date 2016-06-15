@@ -57,6 +57,11 @@
         ship with Tomcat that allows the HTTP status code used for HTTP -> HTTPS
         redirects to be controlled per Realm. (markt)
       </add>
+      <fix>
+        <bug>59708</bug>: Modify the LockOutRealm logic. Valid authentication
+        attempts during the lock out period will no longer reset the lock out
+        timer to zero. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
