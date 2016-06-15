@@ -170,7 +170,31 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     protected boolean stripRealmForGss = true;
 
     
+    private int transportGuaranteeRedirectStatus = HttpServletResponse.SC_FOUND;
+
+
     // ------------------------------------------------------------- Properties
+
+    /**
+     * @return The HTTP status code used when the container needs to issue an
+     *         HTTP redirect to meet the requirements of a configured transport
+     *         guarantee.
+     */
+    public int getTransportGuaranteeRedirectStatus() {
+        return transportGuaranteeRedirectStatus;
+    }
+
+
+    /**
+     * Set the HTTP status code used when the container needs to issue an HTTP
+     * redirect to meet the requirements of a configured transport guarantee.
+     *
+     * @param transportGuaranteeRedirectStatus The status to use. This value is
+     *                                         not validated
+     */
+    public void setTransportGuaranteeRedirectStatus(int transportGuaranteeRedirectStatus) {
+        this.transportGuaranteeRedirectStatus = transportGuaranteeRedirectStatus;
+    }
 
 
     /**
@@ -1117,7 +1141,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         }
         if (log.isDebugEnabled())
             log.debug("  Redirecting to " + file.toString());
-        response.sendRedirect(file.toString());
+        response.sendRedirect(file.toString(), transportGuaranteeRedirectStatus);
         return (false);
 
     }

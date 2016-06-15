@@ -169,6 +169,13 @@
         name. If not specified, the default is <code>true</code>.</p>
       </attribute>
 
+      <attribute name="transportGuaranteeRedirectStatus" required="false">
+        <p>The HTTP status code to use when the container needs to issue an HTTP
+           redirect to meet the requirements of a configured transport
+           guarantee. The prpvoded status code is not validated. If not
+           specified, the default value of <code>302</code> is used.</p>
+      </attribute>
+
       <attribute name="userCredCol" required="true">
         <p>Name of the column, in the "users" table, which contains
         the user's credentials (i.e. password).  If a value for the

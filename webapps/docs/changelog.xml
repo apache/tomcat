@@ -96,6 +96,11 @@
         constructed correctly according to the specification when
         <code>ALLOW-FROM</code> option is used. (violetagg)
       </fix>
+      <add>
+        <bug>59399</bug>: Add a new option to the Realm implementations that
+        ship with Tomcat that allows the HTTP status code used for HTTP -> HTTPS
+        redirects to be controlled per Realm. (markt)
+      </add>
       <fix>
         <bug>59449</bug>: In <code>ContainerBase</code>, ensure that the process
         to remove a child container is the reverse of the process to add one.
