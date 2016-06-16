@@ -58,6 +58,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.71 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>57705</bug>: Add debug logging for requests denied by the remote
+        host and remote address valves and filters. Based on a patch by Graham
+        Leggett. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.70 (violetagg)">
   <subsection name="Catalina">

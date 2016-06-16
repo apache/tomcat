@@ -27,6 +27,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.juli.logging.Log;
 
 /**
  * Implementation of a Valve that performs filtering based on comparing the
@@ -335,10 +336,17 @@ public abstract class RequestFilterValve extends ValveBase {
             return;
         }
 
+        if (getLog().isDebugEnabled()) {
+            getLog().debug(sm.getString("requestFilterValve.deny",
+                    request.getRequestURI(), property));
+        }
+
         // Deny this request
         denyRequest(request, response);
-
     }
+
+
+    protected abstract Log getLog();
 
 
     /**

@@ -24,6 +24,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.comet.CometEvent;
@@ -205,6 +206,10 @@ public abstract class RequestFilter extends FilterBase implements CometFilter {
             chain.doFilter(request, response);
         } else {
             if (response instanceof HttpServletResponse) {
+                if (getLogger().isDebugEnabled()) {
+                    getLogger().debug(sm.getString("requestFilter.deny",
+                            ((HttpServletRequest) request).getRequestURI(), property));
+                }
                 ((HttpServletResponse) response).sendError(denyStatus);
             } else {
                 sendErrorWhenNotHttp(response);

@@ -16,14 +16,14 @@
  */
 package org.apache.catalina.valves;
 
-
 import java.io.IOException;
 
 import javax.servlet.ServletException;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Concrete implementation of <code>RequestFilterValve</code> that filters
@@ -32,13 +32,12 @@ import org.apache.catalina.connector.Response;
  *
  * @author Craig R. McClanahan
  */
+public final class RemoteHostValve extends RequestFilterValve {
 
-public final class RemoteHostValve
-    extends RequestFilterValve {
+    private static final Log log = LogFactory.getLog(RemoteHostValve.class);
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * The descriptive information related to this implementation.
@@ -93,23 +92,8 @@ public final class RemoteHostValve
 
     // --------------------------------------------------------- Public Methods
 
-
-    /**
-     * Extract the desired request property, and pass it (along with the
-     * specified request and response objects) to the protected
-     * <code>process()</code> method to perform the actual filtering.
-     * This method must be implemented by a concrete subclass.
-     *
-     * @param request The servlet request to be processed
-     * @param response The servlet response to be created
-     *
-     * @exception IOException if an input/output error occurs
-     * @exception ServletException if a servlet error occurs
-     */
     @Override
-    public void invoke(Request request, Response response)
-        throws IOException, ServletException {
-
+    public void invoke(Request request, Response response) throws IOException, ServletException {
         String property;
         if (addConnectorPort) {
             property = request.getRequest().getRemoteHost() + ";" + request.getConnector().getPort();
@@ -117,8 +101,11 @@ public final class RemoteHostValve
             property = request.getRequest().getRemoteHost();
         }
         process(property, request, response);
-
     }
 
 
+    @Override
+    protected Log getLog() {
+        return log;
+    }
 }
