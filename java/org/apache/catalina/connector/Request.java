@@ -2630,17 +2630,10 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
         return parametersParsed;
     }
 
-    /**
-     * @return <code>true</code> if bytes are available.
-     */
-    public boolean getAvailable() {
-        return (inputBuffer.available() > 0);
-    }
-
 
     /**
-     * @return <code>true</code> if an attempt has been made to read the request body and all
-     * of the request body has been read
+     * @return <code>true</code> if an attempt has been made to read the request
+     *         body and all of the request body has been read.
      */
     public boolean isFinished() {
         return coyoteRequest.isFinished();
