@@ -72,6 +72,11 @@
         caused when a Servlet is mapped to <code>/*</code> are more significant
         than the security risk of not enabling this option by default. (markt)
       </update>
+      <fix>
+        <bug>59708</bug>: Modify the LockOutRealm logic. Valid authentication
+        attempts during the lock out period will no longer reset the lock out
+        timer to zero. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
