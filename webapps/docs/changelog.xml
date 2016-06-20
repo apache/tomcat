@@ -67,6 +67,13 @@
         attempts during the lock out period will no longer reset the lock out
         timer to zero. (markt)
       </fix>
+      <update>
+        Change the default of the
+        <code>sessionCookiePathUsesTrailingSlash</code> attribute of the
+        <code>Context</code> element to <code>false</code> since the problems
+        caused when a Servlet is mapped to <code>/*</code> are more significant
+        than the security risk of not enabling this option by default. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
