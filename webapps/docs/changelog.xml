@@ -91,6 +91,10 @@
       <fix>
         Fix a cause of multiple attempts to close the same socket. (markt)
       </fix>
+      <scode>
+        Refactor the certifcate keystore and trust store generation to make it
+        easier for embedded users to inject their own key stores. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Other">

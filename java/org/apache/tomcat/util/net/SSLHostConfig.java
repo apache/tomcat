@@ -17,6 +17,9 @@
 package org.apache.tomcat.util.net;
 
 import java.io.File;
+import java.io.IOException;
+import java.security.KeyStore;
+import java.security.UnrecoverableKeyException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -96,6 +99,7 @@ public class SSLHostConfig {
     private String truststorePassword = System.getProperty("javax.net.ssl.trustStorePassword");
     private String truststoreProvider = System.getProperty("javax.net.ssl.trustStoreProvider");
     private String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
+    private KeyStore truststore = null;
     // OpenSSL
     private String certificateRevocationListPath;
     private String caCertificateFile;
@@ -580,6 +584,38 @@ public class SSLHostConfig {
         } else {
             return truststoreType;
         }
+    }
+
+
+    public void setTrustStore(KeyStore truststore) {
+        this.truststore = truststore;
+    }
+
+
+    public KeyStore getTruststore() throws IOException {
+        KeyStore result = truststore;
+        if (result == null) {
+            if (truststoreFile != null){
+                try {
+                    result = SSLUtilBase.getStore(truststoreType, truststoreProvider,
+                            truststoreFile, truststorePassword);
+                } catch (IOException ioe) {
+                    Throwable cause = ioe.getCause();
+                    if (cause instanceof UnrecoverableKeyException) {
+                        // Log a warning we had a password issue
+                        log.warn(sm.getString("jsse.invalid_truststore_password"),
+                                cause);
+                        // Re-try
+                        result = SSLUtilBase.getStore(truststoreType, truststoreProvider,
+                                truststoreFile, null);
+                    } else {
+                        // Something else went wrong - re-throw
+                        throw ioe;
+                    }
+                }
+            }
+        }
+        return result;
     }
 
 

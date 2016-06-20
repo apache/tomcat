@@ -16,12 +16,18 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -29,6 +35,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class SSLUtilBase implements SSLUtil {
 
+    private static final Log log = LogFactory.getLog(SSLUtilBase.class);
     private static final StringManager sm = StringManager.getManager(SSLUtilBase.class);
 
     protected final SSLHostConfigCertificate certificate;
@@ -100,6 +107,59 @@ public abstract class SSLUtilBase implements SSLUtil {
 
         return enabled;
     }
+
+
+    /*
+     * Gets the key- or truststore with the specified type, path, and password.
+     */
+    static KeyStore getStore(String type, String provider, String path,
+            String pass) throws IOException {
+
+        KeyStore ks = null;
+        InputStream istream = null;
+        try {
+            if (provider == null) {
+                ks = KeyStore.getInstance(type);
+            } else {
+                ks = KeyStore.getInstance(type, provider);
+            }
+            if(!("PKCS11".equalsIgnoreCase(type) ||
+                    "".equalsIgnoreCase(path)) ||
+                    "NONE".equalsIgnoreCase(path)) {
+                istream = ConfigFileLoader.getInputStream(path);
+            }
+
+            char[] storePass = null;
+            if (pass != null && !"".equals(pass)) {
+                storePass = pass.toCharArray();
+            }
+            ks.load(istream, storePass);
+        } catch (FileNotFoundException fnfe) {
+            log.error(sm.getString("jsse.keystore_load_failed", type, path,
+                    fnfe.getMessage()), fnfe);
+            throw fnfe;
+        } catch (IOException ioe) {
+            // May be expected when working with a trust store
+            // Re-throw. Caller will catch and log as required
+            throw ioe;
+        } catch(Exception ex) {
+            String msg = sm.getString("jsse.keystore_load_failed", type, path,
+                    ex.getMessage());
+            log.error(msg, ex);
+            throw new IOException(msg);
+        } finally {
+            if (istream != null) {
+                try {
+                    istream.close();
+                } catch (IOException ioe) {
+                    // Do nothing
+                }
+            }
+        }
+
+        return ks;
+    }
+
 
     @Override
     public String[] getEnabledProtocols() {

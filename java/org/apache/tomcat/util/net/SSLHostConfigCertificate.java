@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.IOException;
+import java.security.KeyStore;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -53,6 +55,7 @@ public class SSLHostConfigCertificate {
     private String certificateKeystoreFile = System.getProperty("user.home")+"/.keystore";
     private String certificateKeystoreProvider = DEFAULT_KEYSTORE_PROVIDER;
     private String certificateKeystoreType = DEFAULT_KEYSTORE_TYPE;
+    private KeyStore certificateKeystore = null;
 
     // OpenSSL
     private String certificateChainFile;
@@ -167,6 +170,23 @@ public class SSLHostConfigCertificate {
 
     public String getCertificateKeystoreType() {
         return certificateKeystoreType;
+    }
+
+
+    public void setCertificateKeystore(KeyStore certificateKeystore) {
+        this.certificateKeystore = certificateKeystore;
+    }
+
+
+    public KeyStore getCertificateKeystore() throws IOException {
+        KeyStore result = certificateKeystore;
+
+        if (result == null) {
+            result = SSLUtilBase.getStore(certificateKeystoreType, certificateKeystoreProvider,
+                    certificateKeystoreFile, certificateKeystorePassword);
+        }
+
+        return result;
     }
 
 
