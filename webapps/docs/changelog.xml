@@ -78,6 +78,12 @@
         Follow-up to <bug>59655</bug>. Improve the documentation for configuring
         permitted cookie names. Patch provided by Kyohei Nakamura. (markt)
       </fix>
+      <fix>
+        Do not attempt to start web resources during a web application's
+        initialisation phase since the web application is not fully configured
+        at that point and the web resources may not be correctly configured.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
