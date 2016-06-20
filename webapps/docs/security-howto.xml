@@ -342,6 +342,15 @@
       operating systems (this includes Windows) will disable a number of
       security measures and allow, among other things, direct access to the
       WEB-INF directory.</p>
+
+      <p>The <strong>sessionCookiePathUsesTrailingSlash</strong> can be used to
+      work around a bug in a number of browsers (Internet Explorer, Safari and
+      Edge) to prevent session cookies being exposed across applications when
+      applications share a common path prefix. However, enabling this option
+      can create problems for applications with Servlets mapped to
+      <code>/*</code>. It should also be noted the RFC6265 section 8.5 makes it
+      clear that different paths should not be considered sufficient to isolate
+      cookies from other applications.</p>
     </subsection>
 
     <subsection name="Valves">

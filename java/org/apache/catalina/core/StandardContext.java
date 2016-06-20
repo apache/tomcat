@@ -814,7 +814,7 @@ public class StandardContext extends ContainerBase
      * particularly IE, don't send a session cookie for context /foo with
      * requests intended for context /foobar.
      */
-    private boolean sessionCookiePathUsesTrailingSlash = true;
+    private boolean sessionCookiePathUsesTrailingSlash = false;
 
 
     /**
