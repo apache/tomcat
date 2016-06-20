@@ -188,9 +188,6 @@ public class Arrays {
         int idx = indexOf(member,members)+1;
         if (idx >= members.length ) idx = ((members.length>0)?0:-1);
         
-//System.out.println("Next index:"+idx);
-//System.out.println("Member:"+member.getName());
-//System.out.println("Members:"+toNameString(members));
         return idx;
     }
     
