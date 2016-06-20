@@ -4825,8 +4825,8 @@ public class StandardContext extends ContainerBase
      */
     public void resourcesStart() throws LifecycleException {
 
-        // May have been started (but not fully configured) in init() so no need
-        // to start the resources if they are already available
+        // Check current status in case resources were added that had already
+        // been started
         if (!resources.getState().isAvailable()) {
             resources.start();
         }
@@ -6210,10 +6210,6 @@ public class StandardContext extends ContainerBase
         // Register the naming resources
         if (namingResources != null) {
             namingResources.init();
-        }
-
-        if (resources != null) {
-            resources.start();
         }
 
         // Send j2ee.object.created notification
