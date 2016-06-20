@@ -48,9 +48,8 @@ import java.util.ResourceBundle;
  * cache pages that use cookies created with this class. This class does not
  * support the cache control defined with HTTP 1.1.
  * <p>
- * This class supports both the Version 0 (by Netscape) and Version 1 (by RFC
- * 2109) cookie specifications. By default, cookies are created using RFC6265
- * to ensure the best interoperability.
+ * This class supports both the RFC 2109 and the RFC 6265 specifications.
+ * By default, cookies are created using RFC 6265.
  */
 public class Cookie implements Cloneable, Serializable {
 

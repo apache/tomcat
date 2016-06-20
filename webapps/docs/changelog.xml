@@ -74,6 +74,10 @@
         caused when a Servlet is mapped to <code>/*</code> are more significant
         than the security risk of not enabling this option by default. (markt)
       </update>
+      <fix>
+        Follow-up to <bug>59655</bug>. Improve the documentation for configuring
+        permitted cookie names. Patch provided by Kyohei Nakamura. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
