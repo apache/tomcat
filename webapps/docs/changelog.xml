@@ -97,6 +97,13 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <add>
+        Add log message when the ping has timed-out. (kfujino)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
