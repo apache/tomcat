@@ -102,6 +102,11 @@
       <add>
         Add log message when the ping has timed-out. (kfujino)
       </add>
+      <fix>
+        If the ping message has been received at the
+        <code>AbstractReplicatedMap#leftOver</code> method, ensure that notify
+        the member is alive than ignore it. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
