@@ -27,12 +27,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
@@ -50,8 +44,6 @@ import javax.websocket.server.ServerEndpoint;
 import javax.websocket.server.ServerEndpointConfig;
 import javax.websocket.server.ServerEndpointConfig.Configurator;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WsSession;
@@ -72,7 +64,6 @@ public class WsServerContainer extends WsWebSocketContainer
         implements ServerContainer {
 
     private static final StringManager sm = StringManager.getManager(WsServerContainer.class);
-    private static final Log log = LogFactory.getLog(WsServerContainer.class);
 
     private static final CloseReason AUTHENTICATED_HTTP_SESSION_CLOSED =
             new CloseReason(CloseCodes.VIOLATED_POLICY,
@@ -91,8 +82,6 @@ public class WsServerContainer extends WsWebSocketContainer
     private volatile boolean addAllowed = true;
     private final ConcurrentMap<String,Set<WsSession>> authenticatedSessions =
             new ConcurrentHashMap<>();
-    private final ExecutorService executorService;
-    private final ThreadGroup threadGroup;
     private volatile boolean endpointsRegistered = false;
 
     WsServerContainer(ServletContext servletContext) {
@@ -118,19 +107,6 @@ public class WsServerContainer extends WsWebSocketContainer
         if (value != null) {
             setEnforceNoAddAfterHandshake(Boolean.parseBoolean(value));
         }
-        // Executor config
-        int executorCoreSize = 0;
-        long executorKeepAliveTimeSeconds = 60;
-        value = servletContext.getInitParameter(
-                Constants.EXECUTOR_CORE_SIZE_INIT_PARAM);
-        if (value != null) {
-            executorCoreSize = Integer.parseInt(value);
-        }
-        value = servletContext.getInitParameter(
-                Constants.EXECUTOR_KEEPALIVETIME_SECONDS_INIT_PARAM);
-        if (value != null) {
-            executorKeepAliveTimeSeconds = Long.parseLong(value);
-        }
 
         FilterRegistration.Dynamic fr = servletContext.addFilter(
                 "Tomcat WebSocket (JSR356) Filter", new WsFilter());
@@ -140,24 +116,6 @@ public class WsServerContainer extends WsWebSocketContainer
                 DispatcherType.FORWARD);
 
         fr.addMappingForUrlPatterns(types, true, "/*");
-
-        // Use a per web application executor for any threads that the WebSocket
-        // server code needs to create. Group all of the threads under a single
-        // ThreadGroup.
-        StringBuffer threadGroupName = new StringBuffer("WebSocketServer-");
-        threadGroupName.append(servletContext.getVirtualServerName());
-        threadGroupName.append('-');
-        if ("".equals(servletContext.getContextPath())) {
-            threadGroupName.append("ROOT");
-        } else {
-            threadGroupName.append(servletContext.getContextPath());
-        }
-        threadGroup = new ThreadGroup(threadGroupName.toString());
-        WsThreadFactory wsThreadFactory = new WsThreadFactory(threadGroup);
-
-        executorService = new ThreadPoolExecutor(executorCoreSize,
-                Integer.MAX_VALUE, executorKeepAliveTimeSeconds, TimeUnit.SECONDS,
-                new SynchronousQueue<Runnable>(), wsThreadFactory);
     }
 
 
@@ -274,50 +232,6 @@ public class WsServerContainer extends WsWebSocketContainer
                 build();
 
         addEndpoint(sec);
-    }
-
-
-    @Override
-    public void destroy() {
-        shutdownExecutor();
-        super.destroy();
-        // If the executor hasn't fully shutdown it won't be possible to
-        // destroy this thread group as there will still be threads running.
-        // Mark the thread group as daemon one, so that it destroys itself
-        // when thread count reaches zero.
-        // Synchronization on threadGroup is needed, as there is a race between
-        // destroy() call from termination of the last thread in thread group
-        // marked as daemon versus the explicit destroy() call.
-        int threadCount = threadGroup.activeCount();
-        boolean success = false;
-        try {
-            while (true) {
-                int oldThreadCount = threadCount;
-                synchronized (threadGroup) {
-                    if (threadCount > 0) {
-                        Thread.yield();
-                        threadCount = threadGroup.activeCount();
-                    }
-                    if (threadCount > 0 && threadCount != oldThreadCount) {
-                        // Value not stabilized. Retry.
-                        continue;
-                    }
-                    if (threadCount > 0) {
-                        threadGroup.setDaemon(true);
-                    } else {
-                        threadGroup.destroy();
-                        success = true;
-                    }
-                    break;
-                }
-            }
-        } catch (IllegalThreadStateException exception) {
-            // Fall-through
-        }
-        if (!success) {
-            log.warn(sm.getString("serverContainer.threadGroupNotDestroyed",
-                    threadGroup.getName(), Integer.valueOf(threadCount)));
-        }
     }
 
 
@@ -495,23 +409,6 @@ public class WsServerContainer extends WsWebSocketContainer
     }
 
 
-    ExecutorService getExecutorService() {
-        return executorService;
-    }
-
-
-    private void shutdownExecutor() {
-        if (executorService == null) {
-            return;
-        }
-        executorService.shutdown();
-        try {
-            executorService.awaitTermination(10, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            // Ignore the interruption and carry on
-        }
-    }
-
     private static void validateEncoders(Class<? extends Encoder>[] encoders)
             throws DeploymentException {
 
@@ -574,24 +471,6 @@ public class WsServerContainer extends WsWebSocketContainer
         public int compare(TemplatePathMatch tpm1, TemplatePathMatch tpm2) {
             return tpm1.getUriTemplate().getNormalizedPath().compareTo(
                     tpm2.getUriTemplate().getNormalizedPath());
-        }
-    }
-
-
-    private static class WsThreadFactory implements ThreadFactory {
-
-        private final ThreadGroup tg;
-        private final AtomicLong count = new AtomicLong(0);
-
-        private WsThreadFactory(ThreadGroup tg) {
-            this.tg = tg;
-        }
-
-        @Override
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(tg, r);
-            t.setName(tg.getName() + "-" + count.incrementAndGet());
-            return t;
         }
     }
 }

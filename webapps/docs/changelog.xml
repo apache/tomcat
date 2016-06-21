@@ -94,6 +94,16 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <scode>
+        Now the WebSocket implementation is not built directly on top of the
+        Servlet API and can use Tomcat internals, there is no need for the
+        dedicated WebSocket Executor. It has been replaced by the use of the
+        Connector/Endpoint provided Executor. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <add>
