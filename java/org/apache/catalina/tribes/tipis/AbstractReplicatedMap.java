@@ -313,6 +313,8 @@ public abstract class AbstractReplicatedMap<K,V>
             for (Member member : members) {
                 long access = mapMembers.get(member).longValue();
                 if ( (now - access) > timeout ) {
+                    log.warn("Member[" + member + "] in the Map[" + mapname
+                            + "] has timed-out in the ping processing.");
                     memberDisappeared(member);
                 }
             }
