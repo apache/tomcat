@@ -182,8 +182,9 @@ public class SSLHostConfigCertificate {
         KeyStore result = certificateKeystore;
 
         if (result == null) {
-            result = SSLUtilBase.getStore(certificateKeystoreType, certificateKeystoreProvider,
-                    certificateKeystoreFile, certificateKeystorePassword);
+            result = SSLUtilBase.getStore(getCertificateKeystoreType(),
+                    getCertificateKeystoreProvider(), getCertificateKeystoreFile(),
+                    getCertificateKeystorePassword());
         }
 
         return result;

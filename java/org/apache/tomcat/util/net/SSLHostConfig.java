@@ -597,8 +597,8 @@ public class SSLHostConfig {
         if (result == null) {
             if (truststoreFile != null){
                 try {
-                    result = SSLUtilBase.getStore(truststoreType, truststoreProvider,
-                            truststoreFile, truststorePassword);
+                    result = SSLUtilBase.getStore(getTruststoreType(), getTruststoreProvider(),
+                            getTruststoreFile(), getTruststorePassword());
                 } catch (IOException ioe) {
                     Throwable cause = ioe.getCause();
                     if (cause instanceof UnrecoverableKeyException) {
@@ -606,8 +606,8 @@ public class SSLHostConfig {
                         log.warn(sm.getString("jsse.invalid_truststore_password"),
                                 cause);
                         // Re-try
-                        result = SSLUtilBase.getStore(truststoreType, truststoreProvider,
-                                truststoreFile, null);
+                        result = SSLUtilBase.getStore(getTruststoreType(), getTruststoreProvider(),
+                                getTruststoreFile(), null);
                     } else {
                         // Something else went wrong - re-throw
                         throw ioe;
