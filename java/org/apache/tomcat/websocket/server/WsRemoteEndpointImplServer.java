@@ -20,13 +20,13 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
-import java.util.concurrent.ExecutorService;
-
+import java.util.concurrent.Executor;
 import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.Transformation;
@@ -44,7 +44,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
     private final SocketWrapperBase<?> socketWrapper;
     private final WsWriteTimeout wsWriteTimeout;
-    private final ExecutorService executorService;
     private volatile SendHandler handler = null;
     private volatile ByteBuffer[] buffers = null;
 
@@ -55,7 +54,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
             WsServerContainer serverContainer) {
         this.socketWrapper = socketWrapper;
         this.wsWriteTimeout = serverContainer.getTimeout();
-        this.executorService = serverContainer.getExecutorService();
     }
 
 
@@ -227,7 +225,11 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
         if (sh != null) {
             if (useDispatch) {
                 OnResultRunnable r = new OnResultRunnable(sh, t);
-                if (executorService == null || executorService.isShutdown()) {
+                AbstractEndpoint<?> endpoint = socketWrapper.getEndpoint();
+                Executor containerExecutor = endpoint.getExecutor();
+                if (endpoint.isRunning() && containerExecutor != null) {
+                    containerExecutor.execute(r);
+                } else {
                     // Can't use the executor so call the runnable directly.
                     // This may not be strictly specification compliant in all
                     // cases but during shutdown only close messages are going
@@ -236,8 +238,6 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     // 55715. The issues with nested calls was the reason for
                     // the separate thread requirement in the specification.
                     r.run();
-                } else {
-                    executorService.execute(r);
                 }
             } else {
                 if (t == null) {
