@@ -128,7 +128,7 @@ public abstract class SocketWrapperBase<E> {
     }
 
     /**
-     * Set the timeout for reading. Values of zero or less will be changed to]
+     * Set the timeout for reading. Values of zero or less will be changed to
      * -1.
      *
      * @param readTimeout The timeout in milliseconds. A value of -1 indicates
