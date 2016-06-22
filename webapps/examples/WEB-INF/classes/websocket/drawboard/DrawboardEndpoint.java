@@ -17,6 +17,7 @@
 package websocket.drawboard;
 
 import java.io.EOFException;
+import java.io.IOException;
 
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
@@ -153,6 +154,9 @@ public final class DrawboardEndpoint extends Endpoint {
         if (root instanceof EOFException) {
             // Assume this is triggered by the user closing their browser and
             // ignore it.
+        } else if (!session.isOpen() && root instanceof IOException) {
+            // IOException after close. Assume this is a variation of the user
+            // closing their browser (or refreshing very quickly) and ignore it.
         } else {
             log.error("onError: " + t.toString(), t);
         }
