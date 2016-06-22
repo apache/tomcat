@@ -107,6 +107,15 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <fix>
+        Do not log an additional case of <code>IOException</code>s in the
+        error handler for the Drawboard WebSocket example when the root cause is
+        the client disconnecting since the logs add no value. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <add>
