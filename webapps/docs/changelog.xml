@@ -96,6 +96,12 @@
         <bug>59233</bug>: Add the ability to add TLS virtual hosts dynamically.
         (markt)
       </add>
+      <update>
+        Add a <code>maxConcurrentStreamExecution</code> on the HTTP/2
+        protocol handler to allow restricting the amount of concurrent stream
+        that are being executed in a single connection. The default is to
+        not limit it. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

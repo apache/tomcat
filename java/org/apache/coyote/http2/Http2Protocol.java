@@ -35,6 +35,9 @@ public class Http2Protocol implements UpgradeProtocol {
     static final long DEFAULT_WRITE_TIMEOUT = 10000;
     // The HTTP/2 specification recommends a minimum default of 100
     static final long DEFAULT_MAX_CONCURRENT_STREAMS = 200;
+    // Maximum amount of streams which can be concurrently executed over
+    // a single connection
+    static final int DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION = 200;
     // This default is defined by the HTTP/2 specification
     static final int DEFAULT_INITIAL_WINDOW_SIZE = (1 << 16) - 1;
 
@@ -47,6 +50,7 @@ public class Http2Protocol implements UpgradeProtocol {
     private long keepAliveTimeout = DEFAULT_KEEP_ALIVE_TIMEOUT;
     private long writeTimeout = DEFAULT_WRITE_TIMEOUT;
     private long maxConcurrentStreams = DEFAULT_MAX_CONCURRENT_STREAMS;
+    private int maxConcurrentStreamExecution = DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION;
     // If a lower initial value is required, set it here but DO NOT change the
     // default defined above.
     private int initialWindowSize = DEFAULT_INITIAL_WINDOW_SIZE;
@@ -87,6 +91,7 @@ public class Http2Protocol implements UpgradeProtocol {
         result.setKeepAliveTimeout(getKeepAliveTimeout());
         result.setWriteTimeout(getWriteTimeout());
         result.setMaxConcurrentStreams(getMaxConcurrentStreams());
+        result.setMaxConcurrentStreamExecution(getMaxConcurrentStreamExecution());
         result.setInitialWindowSize(getInitialWindowSize());
 
         return result;
@@ -152,6 +157,16 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public void setMaxConcurrentStreams(long maxConcurrentStreams) {
         this.maxConcurrentStreams = maxConcurrentStreams;
+    }
+
+
+    public int getMaxConcurrentStreamExecution() {
+        return maxConcurrentStreamExecution;
+    }
+
+
+    public void setMaxConcurrentStreamExecution(int maxConcurrentStreamExecution) {
+        this.maxConcurrentStreamExecution = maxConcurrentStreamExecution;
     }
 
 
