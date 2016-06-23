@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.util.Objects;
 
 public abstract class SocketProcessorBase<S> implements Runnable {
 
@@ -28,13 +29,9 @@ public abstract class SocketProcessorBase<S> implements Runnable {
 
 
     public void reset(SocketWrapperBase<S> socketWrapper, SocketEvent event) {
+        Objects.requireNonNull(event);
         this.socketWrapper = socketWrapper;
-        if (event == null) {
-            // Should never happen
-            throw new NullPointerException();
-        } else {
-            this.event = event;
-        }
+        this.event = event;
     }
 
 
