@@ -19,6 +19,7 @@ package javax.el;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class CompositeELResolver extends ELResolver {
 
@@ -43,9 +44,7 @@ public class CompositeELResolver extends ELResolver {
     }
 
     public void add(ELResolver elResolver) {
-        if (elResolver == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(elResolver);
 
         if (this.size >= this.resolvers.length) {
             ELResolver[] nr = new ELResolver[this.size * 2];

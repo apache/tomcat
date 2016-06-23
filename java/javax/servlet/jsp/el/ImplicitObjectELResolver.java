@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Vector;
 
@@ -77,9 +78,7 @@ public class ImplicitObjectELResolver extends ELResolver {
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         if (base == null && property != null) {
             int idx = Arrays.binarySearch(SCOPE_NAMES, property.toString());
@@ -120,9 +119,7 @@ public class ImplicitObjectELResolver extends ELResolver {
     @Override
     @SuppressWarnings({ "unchecked", "rawtypes" }) // TCK signature test fails with generics
     public Class getType(ELContext context, Object base, Object property) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         if (base == null && property != null) {
             int idx = Arrays.binarySearch(SCOPE_NAMES, property.toString());
@@ -136,9 +133,7 @@ public class ImplicitObjectELResolver extends ELResolver {
     @Override
     public void setValue(ELContext context, Object base, Object property,
             Object value) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         if (base == null && property != null) {
             int idx = Arrays.binarySearch(SCOPE_NAMES, property.toString());
@@ -151,9 +146,7 @@ public class ImplicitObjectELResolver extends ELResolver {
 
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         if (base == null && property != null) {
             int idx = Arrays.binarySearch(SCOPE_NAMES, property.toString());
@@ -597,9 +590,7 @@ public class ImplicitObjectELResolver extends ELResolver {
 
         @Override
         public final V put(String key, V value) {
-            if (key == null) {
-                throw new NullPointerException();
-            }
+            Objects.requireNonNull(key);
             if (value == null) {
                 this.removeAttribute(key);
             } else {
@@ -610,13 +601,9 @@ public class ImplicitObjectELResolver extends ELResolver {
 
         @Override
         public final V remove(Object key) {
-            if (key == null) {
-                throw new NullPointerException();
-            }
+            Objects.requireNonNull(key);
             this.removeAttribute((String) key);
             return null;
         }
-
     }
-
 }

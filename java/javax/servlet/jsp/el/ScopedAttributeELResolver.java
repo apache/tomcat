@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import javax.el.ELClass;
 import javax.el.ELContext;
@@ -51,9 +52,7 @@ public class ScopedAttributeELResolver extends ELResolver {
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         Object result = null;
 
@@ -112,9 +111,7 @@ public class ScopedAttributeELResolver extends ELResolver {
 
     @Override
     public Class<Object> getType(ELContext context, Object base, Object property) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         if (base == null) {
             context.setPropertyResolved(base, property);
@@ -126,9 +123,7 @@ public class ScopedAttributeELResolver extends ELResolver {
 
     @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         if (base == null) {
             context.setPropertyResolved(base, property);
@@ -147,9 +142,7 @@ public class ScopedAttributeELResolver extends ELResolver {
 
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         if (base == null) {
             context.setPropertyResolved(base, property);

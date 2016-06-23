@@ -23,6 +23,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.MissingResourceException;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class ResourceBundleELResolver extends ELResolver {
@@ -33,10 +34,7 @@ public class ResourceBundleELResolver extends ELResolver {
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
-
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         if (base instanceof ResourceBundle) {
             context.setPropertyResolved(base, property);
@@ -56,9 +54,7 @@ public class ResourceBundleELResolver extends ELResolver {
 
     @Override
     public Class<?> getType(ELContext context, Object base, Object property) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         if (base instanceof ResourceBundle) {
             context.setPropertyResolved(base, property);
@@ -70,9 +66,7 @@ public class ResourceBundleELResolver extends ELResolver {
     @Override
     public void setValue(ELContext context, Object base, Object property,
             Object value) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         if (base instanceof ResourceBundle) {
             context.setPropertyResolved(base, property);
@@ -83,9 +77,7 @@ public class ResourceBundleELResolver extends ELResolver {
 
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         if (base instanceof ResourceBundle) {
             context.setPropertyResolved(base, property);
