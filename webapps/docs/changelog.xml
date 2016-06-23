@@ -122,6 +122,10 @@
         the client disconnecting since the logs add no value. (markt)
       </fix>
       <fix>
+        <bug>59642</bug>: Mention the <code>localDataSource</code> in the
+        <code>DataSourceRealm</code> section of the Realm How-To. (markt)
+      </fix>
+      <fix>
         <bug>59672</bug>: Update the security considerations page of the
         documentation web application to take account of the fact that the
         Manager and HostManager applications now have a
