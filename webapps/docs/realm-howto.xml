@@ -426,8 +426,11 @@ as your database structure conforms to the following requirements:</p>
     at least read only access to the tables described above.  (Tomcat will
     never attempt to write to these tables.)</li>
 <li>Configure a JNDI named JDBC DataSource for your database.  Refer to the
-    <a href="jndi-datasource-examples-howto.html">JNDI DataSource Example HOW-TO</a>
-    for information on how to configure a JNDI named JDBC DataSource.</li>
+    <a href="jndi-datasource-examples-howto.html">JNDI DataSource Example
+    HOW-TO</a> for information on how to configure a JNDI named JDBC DataSource.
+    Be sure to set the <code>Realm</code>&apos;s <code>localDataSource</code>
+    attribute appropriately, depending on where the JNDI DataSource is
+    defined.</li>
 <li>Set up a <code>&lt;Realm&gt;</code> element, as described below, in your
     <code>$CATALINA_BASE/conf/server.xml</code> file.</li>
 <li>Restart Tomcat if it is already running.</li>

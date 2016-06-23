@@ -86,6 +86,10 @@
         error handler for the Drawboard WebSocket example when the root cause is
         the client disconnecting since the logs add no value. (markt)
       </fix>
+      <fix>
+        <bug>59642</bug>: Mention the <code>localDataSource</code> in the
+        <code>DataSourceRealm</code> section of the Realm How-To. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
