@@ -95,6 +95,12 @@
         Refactor the certifcate keystore and trust store generation to make it
         easier for embedded users to inject their own key stores. (markt)
       </scode>
+      <update>
+        Add a <code>maxConcurrentStreamExecution</code> on the HTTP/2
+        protocol handler to allow restricting the amount of concurrent stream
+        that are being executed in a single connection. The default is to
+        not limit it. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
