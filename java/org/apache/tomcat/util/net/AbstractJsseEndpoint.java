@@ -77,26 +77,36 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
             sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
 
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
-                boolean firstCertificate = true;
-                for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
-                    SSLUtil sslUtil = sslImplementation.getSSLUtil(certificate);
-                    if (firstCertificate) {
-                        firstCertificate = false;
-                        sslHostConfig.setEnabledProtocols(sslUtil.getEnabledProtocols());
-                        sslHostConfig.setEnabledCiphers(sslUtil.getEnabledCiphers());
-                    }
+                createSSLContext(sslHostConfig);
+            }
+        }
+    }
 
-                    SSLContext sslContext = sslUtil.createSSLContext(negotiableProtocols);
-                    sslContext.init(sslUtil.getKeyManagers(), sslUtil.getTrustManagers(), null);
 
-                    SSLSessionContext sessionContext = sslContext.getServerSessionContext();
-                    if (sessionContext != null) {
-                        sslUtil.configureSessionContext(sessionContext);
-                    }
-                    certificate.setSslContext(sslContext);
-                }
+    @Override
+    protected void createSSLContext(SSLHostConfig sslHostConfig) throws IllegalArgumentException {
+        boolean firstCertificate = true;
+        for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
+            SSLUtil sslUtil = sslImplementation.getSSLUtil(certificate);
+            if (firstCertificate) {
+                firstCertificate = false;
+                sslHostConfig.setEnabledProtocols(sslUtil.getEnabledProtocols());
+                sslHostConfig.setEnabledCiphers(sslUtil.getEnabledCiphers());
             }
 
+            SSLContext sslContext;
+            try {
+                sslContext = sslUtil.createSSLContext(negotiableProtocols);
+                sslContext.init(sslUtil.getKeyManagers(), sslUtil.getTrustManagers(), null);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(e);
+            }
+
+            SSLSessionContext sessionContext = sslContext.getServerSessionContext();
+            if (sessionContext != null) {
+                sslUtil.configureSessionContext(sessionContext);
+            }
+            certificate.setSslContext(sslContext);
         }
     }
 
@@ -104,17 +114,24 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
     protected void destroySsl() throws Exception {
         if (isSSLEnabled()) {
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
-                for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
-                    if (certificate.getSslContext() != null) {
-                        SSLContext sslContext = certificate.getSslContext();
-                        if (sslContext != null) {
-                            sslContext.destroy();
-                        }
-                    }
+                releaseSSLContext(sslHostConfig);
+            }
+        }
+    }
+
+
+    @Override
+    protected void releaseSSLContext(SSLHostConfig sslHostConfig) {
+        for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
+            if (certificate.getSslContext() != null) {
+                SSLContext sslContext = certificate.getSslContext();
+                if (sslContext != null) {
+                    sslContext.destroy();
                 }
             }
         }
     }
+
 
     protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers) {
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);

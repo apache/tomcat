@@ -18,6 +18,7 @@ package org.apache.tomcat.util.net;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.security.KeyStore;
 import java.security.UnrecoverableKeyException;
 import java.util.HashMap;
@@ -39,7 +40,9 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Represents the TLS configuration for a virtual host.
  */
-public class SSLHostConfig {
+public class SSLHostConfig implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private static final Log log = LogFactory.getLog(SSLHostConfig.class);
     private static final StringManager sm = StringManager.getManager(SSLHostConfig.class);
@@ -69,7 +72,7 @@ public class SSLHostConfig {
     // OpenSSL can handle multiple certs in a single config so the reference to
     // the context is here at the virtual host level. JSSE can't so the
     // reference is held on the certificate.
-    private Long openSslContext;
+    private transient Long openSslContext;
 
     // Configuration properties
 
@@ -99,7 +102,7 @@ public class SSLHostConfig {
     private String truststorePassword = System.getProperty("javax.net.ssl.trustStorePassword");
     private String truststoreProvider = System.getProperty("javax.net.ssl.trustStoreProvider");
     private String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
-    private KeyStore truststore = null;
+    private transient KeyStore truststore = null;
     // OpenSSL
     private String certificateRevocationListPath;
     private String caCertificateFile;

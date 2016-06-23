@@ -101,6 +101,10 @@
         that are being executed in a single connection. The default is to
         not limit it. (remm)
       </update>
+      <add>
+        <bug>59233</bug>: Add the ability to add TLS virtual hosts dynamically.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
