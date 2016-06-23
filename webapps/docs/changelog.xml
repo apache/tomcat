@@ -159,12 +159,12 @@
         enabled but without the command line option it requires. (markt)
       </fix>
       <fix>
-        Fix potential concurrency issue with web application class loader with
-        concurrent reads and writes of the resource cache. (markt)
+        Fix a potential concurrency issue with the web application class loader
+        and  concurrent reads and writes of the resource cache. (markt)
       </fix>
       <fix>
         <bug>59619</bug>: Within the web application class loader, always use
-        path as the key for the resource cache to improve the hit ration. This
+        path as the key for the resource cache to improve the hit ratio. This
         also fixes a problem exposed by the fix for <bug>56777</bug> that
         enabled file based configuration resources to be loaded from the class
         path. (markt)
