@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 public class ListELResolver extends ELResolver {
 
@@ -40,9 +41,7 @@ public class ListELResolver extends ELResolver {
 
     @Override
     public Class<?> getType(ELContext context, Object base, Object property) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         if (base instanceof List<?>) {
             context.setPropertyResolved(base, property);
@@ -60,9 +59,7 @@ public class ListELResolver extends ELResolver {
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         if (base instanceof List<?>) {
             context.setPropertyResolved(base, property);
@@ -80,9 +77,7 @@ public class ListELResolver extends ELResolver {
     @Override
     public void setValue(ELContext context, Object base, Object property,
             Object value) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         if (base instanceof List<?>) {
             context.setPropertyResolved(base, property);
@@ -107,9 +102,7 @@ public class ListELResolver extends ELResolver {
 
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
 
         if (base instanceof List<?>) {
             context.setPropertyResolved(base, property);

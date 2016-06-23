@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
@@ -484,8 +485,8 @@ public final class Room {
          * @param content
          */
         private void sendRoomMessage(MessageType type, String content) {
-            if (content == null || type == null)
-                throw new NullPointerException();
+            Objects.requireNonNull(content);
+            Objects.requireNonNull(type);
 
             String completeMsg = String.valueOf(type.flag) + content;
 

@@ -18,6 +18,7 @@ package javax.el;
 
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * @since EL 3.0
@@ -32,10 +33,7 @@ public class BeanNameELResolver extends ELResolver {
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
-
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
         if (base != null || !(property instanceof String)) {
             return null;
         }
@@ -59,10 +57,7 @@ public class BeanNameELResolver extends ELResolver {
     @Override
     public void setValue(ELContext context, Object base, Object property,
             Object value) {
-
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
         if (base != null || !(property instanceof String)) {
             return;
         }
@@ -100,10 +95,7 @@ public class BeanNameELResolver extends ELResolver {
 
     @Override
     public Class<?> getType(ELContext context, Object base, Object property) {
-
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
         if (base != null || !(property instanceof String)) {
             return null;
         }
@@ -126,10 +118,7 @@ public class BeanNameELResolver extends ELResolver {
 
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
-
-        if (context == null) {
-            throw new NullPointerException();
-        }
+        Objects.requireNonNull(context);
         if (base != null || !(property instanceof String)) {
             // Return value undefined
             return false;
