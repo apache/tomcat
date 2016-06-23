@@ -121,6 +121,12 @@
         error handler for the Drawboard WebSocket example when the root cause is
         the client disconnecting since the logs add no value. (markt)
       </fix>
+      <fix>
+        <bug>59672</bug>: Update the security considerations page of the
+        documentation web application to take account of the fact that the
+        Manager and HostManager applications now have a
+        <code>RemoteAddrValve</code> configured by default. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
