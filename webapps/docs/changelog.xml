@@ -92,6 +92,10 @@
         Refactor the certifcate keystore and trust store generation to make it
         easier for embedded users to inject their own key stores. (markt)
       </scode>
+      <add>
+        <bug>59233</bug>: Add the ability to add TLS virtual hosts dynamically.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

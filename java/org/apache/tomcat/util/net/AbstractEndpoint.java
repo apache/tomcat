@@ -22,9 +22,9 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -197,22 +197,49 @@ public abstract class AbstractEndpoint<S> {
     }
 
 
-    protected Map<String,SSLHostConfig> sslHostConfigs = new ConcurrentHashMap<>();
-    public void addSslHostConfig(SSLHostConfig sslHostConfig) {
+    protected ConcurrentMap<String,SSLHostConfig> sslHostConfigs = new ConcurrentHashMap<>();
+    public void addSslHostConfig(SSLHostConfig sslHostConfig) throws IllegalArgumentException {
         String key = sslHostConfig.getHostName();
         if (key == null || key.length() == 0) {
             throw new IllegalArgumentException(sm.getString("endpoint.noSslHostName"));
         }
-        SSLHostConfig duplicate = sslHostConfigs.put(key, sslHostConfig);
+        sslHostConfig.setConfigType(getSslConfigType());
+        if (bindState != BindState.UNBOUND) {
+            try {
+                createSSLContext(sslHostConfig);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(e);
+            }
+        }
+        SSLHostConfig duplicate = sslHostConfigs.putIfAbsent(key, sslHostConfig);
         if (duplicate != null) {
+            releaseSSLContext(sslHostConfig);
             throw new IllegalArgumentException(sm.getString("endpoint.duplicateSslHostName", key));
         }
-        sslHostConfig.setConfigType(getSslConfigType());
     }
     public SSLHostConfig[] findSslHostConfigs() {
         return sslHostConfigs.values().toArray(new SSLHostConfig[0]);
     }
+
     protected abstract SSLHostConfig.Type getSslConfigType();
+
+    /**
+     * Create the SSLContextfor the the given SSLHostConfig.
+     *
+     * @param sslHostConfig The SSLHostConfig for which the SSLContext should be
+     *                      created
+     * @throws Exception If the SSLContext cannot be created for the given
+     *                   SSLHostConfig
+     */
+    protected abstract void createSSLContext(SSLHostConfig sslHostConfig) throws Exception;
+
+    /**
+     * Release the SSLContext, if any, associated with the SSLHostConfig.
+     *
+     * @param sslHostConfig The SSLHostConfig for which the SSLContext should be
+     *                      released
+     */
+    protected abstract void releaseSSLContext(SSLHostConfig sslHostConfig);
 
     protected SSLHostConfig getSSLHostConfig(String sniHostName) {
         SSLHostConfig result = null;
@@ -376,7 +403,7 @@ public abstract class AbstractEndpoint<S> {
     private boolean bindOnInit = true;
     public boolean getBindOnInit() { return bindOnInit; }
     public void setBindOnInit(boolean b) { this.bindOnInit = b; }
-    private BindState bindState = BindState.UNBOUND;
+    private volatile BindState bindState = BindState.UNBOUND;
 
     /**
      * Keepalive timeout, if not set the soTimeout is used.
