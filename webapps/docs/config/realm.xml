@@ -49,8 +49,9 @@
   this one Realm may itself contain multiple nested Realms). In addition, the
   Realm associated with an Engine or a Host is automatically inherited by
   lower-level containers unless the lower level container explicitly defines its
-  own Realm.
-  </p>
+  own Realm. If no Realm is configured for the Engine, an instance of the
+  <a href="#Null_Realm_-_org.apache.catalina.realm.NullRealm">Null Realm</a>
+  will be configured for the Engine automatically.</p>
 
   <p>For more in-depth information about container managed security in web
   applications, as well as more information on configuring and using the
@@ -172,7 +173,7 @@
       <attribute name="transportGuaranteeRedirectStatus" required="false">
         <p>The HTTP status code to use when the container needs to issue an HTTP
            redirect to meet the requirements of a configured transport
-           guarantee. The prpvoded status code is not validated. If not
+           guarantee. The provided status code is not validated. If not
            specified, the default value of <code>302</code> is used.</p>
       </attribute>
 
@@ -287,6 +288,13 @@
         <p>This attribute is <strong>required</strong> in majority of
         configurations. See <strong>allRolesMode</strong> attribute for
         a rare case when it can be omitted.</p>
+      </attribute>
+
+      <attribute name="transportGuaranteeRedirectStatus" required="false">
+        <p>The HTTP status code to use when the container needs to issue an HTTP
+           redirect to meet the requirements of a configured transport
+           guarantee. The provided status code is not validated. If not
+           specified, the default value of <code>302</code> is used.</p>
       </attribute>
 
       <attribute name="stripRealmForGss" required="false">
@@ -618,6 +626,13 @@
         limit.</p>
       </attribute>
 
+      <attribute name="transportGuaranteeRedirectStatus" required="false">
+        <p>The HTTP status code to use when the container needs to issue an HTTP
+           redirect to meet the requirements of a configured transport
+           guarantee. The provided status code is not validated. If not
+           specified, the default value of <code>302</code> is used.</p>
+      </attribute>
+
       <attribute name="useDelegatedCredential" required="false">
         <p>When the JNDIRealm is used with the SPNEGO authenticator, delegated
         credentials for the user may be available. If such credentials are
@@ -762,6 +777,13 @@
         that this realm will use for user, password and role information.</p>
       </attribute>
 
+      <attribute name="transportGuaranteeRedirectStatus" required="false">
+        <p>The HTTP status code to use when the container needs to issue an HTTP
+           redirect to meet the requirements of a configured transport
+           guarantee. The provided status code is not validated. If not
+           specified, the default value of <code>302</code> is used.</p>
+      </attribute>
+
       <attribute name="X509UsernameRetrieverClassName" required="false">
         <p>When using X509 client certificates, this specifies the class name
         that will be used to retrieve the user name from the certificate.
@@ -828,6 +850,13 @@
         <p>When processing users authenticated via the GSS-API, this attribute
         controls if any &quot;@...&quot; is removed from the end of the user
         name. If not specified, the default is <code>true</code>.</p>
+      </attribute>
+
+      <attribute name="transportGuaranteeRedirectStatus" required="false">
+        <p>The HTTP status code to use when the container needs to issue an HTTP
+           redirect to meet the requirements of a configured transport
+           guarantee. The provided status code is not validated. If not
+           specified, the default value of <code>302</code> is used.</p>
       </attribute>
 
       <attribute name="X509UsernameRetrieverClassName" required="false">
@@ -939,6 +968,13 @@
         name. If not specified, the default is <code>true</code>.</p>
       </attribute>
 
+      <attribute name="transportGuaranteeRedirectStatus" required="false">
+        <p>The HTTP status code to use when the container needs to issue an HTTP
+           redirect to meet the requirements of a configured transport
+           guarantee. The provided status code is not validated. If not
+           specified, the default value of <code>302</code> is used.</p>
+      </attribute>
+
       <attribute name="useContextClassLoader" required="false">
         <p>Instructs JAASRealm to use the context class loader for loading the
         user-specified <code>LoginModule</code> class and associated
@@ -1004,6 +1040,13 @@
         one of those roles.</p>
       </attribute>
      
+      <attribute name="transportGuaranteeRedirectStatus" required="false">
+        <p>The HTTP status code to use when the container needs to issue an HTTP
+           redirect to meet the requirements of a configured transport
+           guarantee. The provided status code is not validated. If not
+           specified, the default value of <code>302</code> is used.</p>
+      </attribute>
+
     </attributes>
   </subsection>
 
@@ -1074,11 +1117,42 @@
        will also not reset the lock out time.</p>
       </attribute>
 
+      <attribute name="transportGuaranteeRedirectStatus" required="false">
+        <p>The HTTP status code to use when the container needs to issue an HTTP
+           redirect to meet the requirements of a configured transport
+           guarantee. The provided status code is not validated. If not
+           specified, the default value of <code>302</code> is used.</p>
+      </attribute>
+
     </attributes>
 
     <p>See the <a href="../realm-howto.html">Container-Managed Security
     Guide</a> for more information on setting up container managed security
     using the LockOutRealm component.</p>
+
+  </subsection>
+
+  <subsection name="Null Realm - org.apache.catalina.realm.NullRealm">
+
+    <p><strong>NullRealm</strong> is a minimal implementation of the Tomcat
+    <code>Realm</code> interface that always returns null when an attempt is
+    made to validate a user name and associated credentials. It is intended to
+    be used as a default Realm implementation when no other Realm is
+    specified.</p>
+
+    <p>The NullRealm implementation supports the following additional
+    attributes.</p>
+
+    <attributes>
+
+      <attribute name="transportGuaranteeRedirectStatus" required="false">
+        <p>The HTTP status code to use when the container needs to issue an HTTP
+           redirect to meet the requirements of a configured transport
+           guarantee. The provided status code is not validated. If not
+           specified, the default value of <code>302</code> is used.</p>
+      </attribute>
+
+    </attributes>
 
   </subsection>
 

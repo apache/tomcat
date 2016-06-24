@@ -90,6 +90,12 @@
         <bug>59642</bug>: Mention the <code>localDataSource</code> in the
         <code>DataSourceRealm</code> section of the Realm How-To. (markt)
       </fix>
+      <fix>
+        Follow-up to the fix for <bug>59399</bug>. Ensure that the new attribute
+        <code>transportGuaranteeRedirectStatus</code> is documented for all
+        <strong>Realm</strong>s. Also document the <code>NullRealm</code> and
+        when it is automatically created for an <strong>Engine</strong>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
