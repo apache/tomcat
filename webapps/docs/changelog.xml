@@ -151,6 +151,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        Fix the duplicated connection release when connection verification
+        failed. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
