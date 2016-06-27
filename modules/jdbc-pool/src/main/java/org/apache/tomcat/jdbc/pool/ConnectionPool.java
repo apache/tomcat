@@ -816,8 +816,6 @@ public class ConnectionPool {
                     return con;
                 } else {
                     //validation failed.
-                    release(con);
-                    setToNull = true;
                     throw new SQLException("Failed to validate a newly established connection.");
                 }
             } catch (Exception x) {
