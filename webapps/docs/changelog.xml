@@ -110,6 +110,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        Fix the duplicated connection release when connection verification
+        failed. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.70 (violetagg)" rtext="released 2016-06-20">
   <subsection name="Catalina">
