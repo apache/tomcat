@@ -451,11 +451,17 @@
     </attribute>
 
     <attribute name="maxAge" required="false">
-      <p>(long) Time in milliseconds to keep this connection. When a connection is returned to the pool,
-         the pool will check to see if the <code>now - time-when-connected > maxAge</code> has been reached,
-         and if so, it closes the connection rather than returning it to the pool.
-         The default value is <code>0</code>, which implies that connections will be left open and no age check
-         will be done upon returning the connection to the pool.</p>
+      <p>(long) Time in milliseconds to keep this connection. This attribute
+         works both when returning connection and when borrowing connection.
+         When a connection is borrowed from the pool, the pool will check to see
+         if the <code>now - time-when-connected > maxAge</code> has been reached
+         , and if so, it reconnects before borrow it. When a connection is
+         returned to the pool, the pool will check to see if the
+         <code>now - time-when-connected > maxAge</code> has been reached, and
+         if so, it closes the connection rather than returning it to the pool.
+         The default value is <code>0</code>, which implies that connections
+         will be left open and no age check will be done upon borrowing from the
+         pool and returning the connection to the pool.</p>
     </attribute>
 
     <attribute name="useEquals" required="false">
