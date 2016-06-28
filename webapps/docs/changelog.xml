@@ -162,6 +162,10 @@
         Fix the duplicated connection release when connection verification
         failed. (kfujino)
       </fix>
+      <fix>
+        Ensure that do not remove the abandoned connection that has been already
+        released. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
