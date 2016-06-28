@@ -953,9 +953,9 @@ public class ConnectionPool {
                 boolean setToNull = false;
                 try {
                     con.lock();
-                    //the con has been returned to the pool
+                    //the con has been returned to the pool or released
                     //ignore it
-                    if (idle.contains(con))
+                    if (idle.contains(con) || con.isReleased())
                         continue;
                     long time = con.getTimestamp();
                     long now = System.currentTimeMillis();
