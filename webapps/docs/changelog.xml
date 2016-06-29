@@ -105,6 +105,11 @@
         <bug>59233</bug>: Add the ability to add TLS virtual hosts dynamically.
         (markt)
       </add>
+      <fix>
+        Correct a problem with <code>ServletRequest.getServerPort()</code> for
+        secure HTTP/2 connections that meant an incorrect value was retured when
+        using the default port. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

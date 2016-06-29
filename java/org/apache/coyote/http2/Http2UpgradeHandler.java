@@ -1036,11 +1036,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    String getProperty(String key) {
-        return socketWrapper.getEndpoint().getProperty(key);
-    }
-
-
     @Override
     protected final String getConnectionId() {
         return connectionId;

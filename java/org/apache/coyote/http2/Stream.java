@@ -237,12 +237,6 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 coyoteRequest.setServerPort(Integer.parseInt(value.substring(i + 1)));
             } else {
                 coyoteRequest.serverName().setString(value);
-                boolean secure = Boolean.parseBoolean(handler.getProperty("secure"));
-                if (secure) {
-                    coyoteRequest.setServerPort(443);
-                } else {
-                    coyoteRequest.setServerPort(80);
-                }
             }
             break;
         }
