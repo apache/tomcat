@@ -68,12 +68,6 @@ public class DeltaManager extends ClusterManagerBase{
 
     // ----------------------------------------------------- Instance Variables
 
-    /**
-     * The descriptive name of this Manager implementation (for logging).
-     * @deprecated Unused. Will be removed in Tomcat 9
-     */
-    @Deprecated
-    protected static final String managerName = "DeltaManager";
     protected String name = null;
 
     private boolean expireSessionsOnShutdown = false;
