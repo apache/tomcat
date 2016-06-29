@@ -14,22 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.realm;
-
 
 /**
  * Manifest constants for this Java package.
  *
- *
  * @author Craig R. McClanahan
+ *
+ * @deprecated Unused. Will be removed in Tomcat 9
  */
+@Deprecated
 public final class Constants {
 
     public static final String Package = "org.apache.catalina.realm";
 
-        // Authentication methods for login configuration
+    // Authentication methods for login configuration
     public static final String FORM_METHOD = "FORM";
 
     // Form based authentication constants
