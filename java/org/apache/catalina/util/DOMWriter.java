@@ -31,38 +31,13 @@ import org.w3c.dom.NodeList;
  */
 public class DOMWriter {
 
-    /** Default Encoding */
-    private static final String PRINTWRITER_ENCODING = "UTF8";
-
-    /** Print writer.
-     *
-     * @deprecated Will be made private in Tomcat 9.
-     */
-    @Deprecated
-    protected final PrintWriter out;
-
-    /** Canonical output.
-     *
-     * @deprecated Will be made private in Tomcat 9.
-     */
-    @Deprecated
-    protected final boolean canonical;
+    private final PrintWriter out;
+    private final boolean canonical;
 
 
     public DOMWriter(Writer writer, boolean canonical) {
         out = new PrintWriter(writer);
         this.canonical = canonical;
-    }
-
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 9.
-     *
-     * @return Always <code>UTF-8</code>
-     */
-    @Deprecated
-    public static String getWriterEncoding() {
-        return (PRINTWRITER_ENCODING);
     }
 
 
@@ -99,7 +74,7 @@ public class DOMWriter {
                     out.print(attr.getLocalName());
 
                     out.print("=\"");
-                    out.print(normalize(attr.getNodeValue()));
+                    out.print(escape(attr.getNodeValue()));
                     out.print('"');
                 }
                 out.print('>');
@@ -120,7 +95,7 @@ public class DOMWriter {
             // print cdata sections
             case Node.CDATA_SECTION_NODE:
                 if (canonical) {
-                    out.print(normalize(node.getNodeValue()));
+                    out.print(escape(node.getNodeValue()));
                 } else {
                     out.print("<![CDATA[");
                     out.print(node.getNodeValue());
@@ -130,7 +105,7 @@ public class DOMWriter {
 
             // print text
             case Node.TEXT_NODE:
-                out.print(normalize(node.getNodeValue()));
+                out.print(escape(node.getNodeValue()));
                 break;
 
             // print processing instruction
@@ -173,11 +148,8 @@ public class DOMWriter {
      * Returns a sorted list of attributes.
      * @param attrs The map to sort
      * @return a sorted attribute array
-     *
-     * @deprecated Will be made private in Tomcat 9.
      */
-    @Deprecated
-    protected Attr[] sortAttributes(NamedNodeMap attrs) {
+    private Attr[] sortAttributes(NamedNodeMap attrs) {
         if (attrs == null) {
             return new Attr[0];
         }
@@ -214,11 +186,8 @@ public class DOMWriter {
      * Normalizes the given string.
      * @param s The string to escape
      * @return the escaped string
-     *
-     * @deprecated Will be made private in Tomcat 9.
      */
-    @Deprecated
-    protected String normalize(String s) {
+    private String escape(String s) {
         if (s == null) {
             return "";
         }
