@@ -30,7 +30,8 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm =
+            StringManager.getManager(DigestCredentialHandlerBase.class);
 
     public static final int DEFAULT_SALT_LENGTH = 32;
 

@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.servlet.annotation.ServletSecurity.TransportGuarantee;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Container;
@@ -106,8 +107,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(RealmBase.class);
 
 
     /**
@@ -963,7 +963,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     log.debug("  No applicable user data constraint defined");
                 return true;
             }
-            if (userConstraint.equals(Constants.NONE_TRANSPORT)) {
+            if (userConstraint.equals(TransportGuarantee.NONE.name())) {
                 if (log.isDebugEnabled())
                     log.debug("  User data constraint has no restrictions");
                 return true;
