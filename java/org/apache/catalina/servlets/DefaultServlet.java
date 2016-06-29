@@ -147,13 +147,6 @@ public class DefaultServlet extends HttpServlet {
     protected static final String mimeSeparation = "CATALINA_MIME_BOUNDARY";
 
     /**
-     * JNDI resources name.
-     * @deprecated Unused. Will be removed in Tomcat 9.
-     */
-    @Deprecated
-    protected static final String RESOURCES_JNDI_NAME = "java:/comp/Resources";
-
-    /**
      * Size of file transfer buffer in bytes.
      */
     protected static final int BUFFER_SIZE = 4096;
@@ -1362,23 +1355,18 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-
     /**
      * Decide which way to render. HTML or XML.
+     *
      * @param contextPath The path
-     * @param resource The resource
+     * @param resource    The resource
+     * @param encoding    The encoding to use to process the readme (if any)
+     *
      * @return the input stream with the rendered output
+     *
      * @throws IOException an IO error occurred
      * @throws ServletException rendering error
-     *
-     * @deprecated Unused. Will be removed in Tomcat 9
      */
-    @Deprecated
-    protected InputStream render(String contextPath, WebResource resource)
-        throws IOException, ServletException {
-        return render(contextPath, resource, null);
-    }
-
     protected InputStream render(String contextPath, WebResource resource, String encoding)
         throws IOException, ServletException {
 
@@ -1388,29 +1376,23 @@ public class DefaultServlet extends HttpServlet {
             return renderHtml(contextPath, resource, encoding);
         }
         return renderXml(contextPath, resource, xsltSource, encoding);
-
     }
+
 
     /**
-     * Return an InputStream to an HTML representation of the contents
-     * of this directory.
+     * Return an InputStream to an XML representation of the contents this
+     * directory.
      *
-     * @param contextPath Context path to which our internal paths are
-     *  relative
-     * @param resource The associated resource
-     * @param xsltSource The XSL stylesheet
+     * @param contextPath Context path to which our internal paths are relative
+     * @param resource    The associated resource
+     * @param xsltSource  The XSL stylesheet
+     * @param encoding    The encoding to use to process the readme (if any)
+     *
      * @return the XML data
+     *
      * @throws IOException an IO error occurred
      * @throws ServletException rendering error
-     *
-     * @deprecated Unused. Will be removed in Tomcat 9
      */
-    @Deprecated
-    protected InputStream renderXml(String contextPath, WebResource resource, Source xsltSource)
-        throws IOException, ServletException {
-        return renderXml(contextPath, resource, xsltSource, null);
-    }
-
     protected InputStream renderXml(String contextPath, WebResource resource, Source xsltSource,
             String encoding)
         throws IOException, ServletException {
@@ -1530,23 +1512,17 @@ public class DefaultServlet extends HttpServlet {
     }
 
     /**
-     * Return an InputStream to an HTML representation of the contents
-     * of this directory.
+     * Return an InputStream to an HTML representation of the contents of this
+     * directory.
      *
-     * @param contextPath Context path to which our internal paths are
-     *  relative
-     * @param resource The resource
+     * @param contextPath Context path to which our internal paths are relative
+     * @param resource    The associated resource
+     * @param encoding    The encoding to use to process the readme (if any)
+     *
      * @return the HTML data
-     * @throws IOException an IO error occurred
      *
-     * @deprecated Unused. Will be removed in Tomcat 9
+     * @throws IOException an IO error occurred
      */
-    @Deprecated
-    protected InputStream renderHtml(String contextPath, WebResource resource)
-        throws IOException {
-        return renderHtml(contextPath, resource, null);
-    }
-
     protected InputStream renderHtml(String contextPath, WebResource resource, String encoding)
         throws IOException {
 
@@ -1705,18 +1681,6 @@ public class DefaultServlet extends HttpServlet {
 
     }
 
-
-    /**
-     * Get the readme file as a string.
-     * @param directory The directory to search
-     * @return the readme for the specified directory
-     *
-     * @deprecated Unused. Will be removed in Tomcat 9
-     */
-    @Deprecated
-    protected String getReadme(WebResource directory) {
-        return getReadme(directory, null);
-    }
 
     /**
      * Get the readme file as a string.
