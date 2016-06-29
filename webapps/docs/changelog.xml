@@ -102,6 +102,11 @@
         that are being executed in a single connection. The default is to
         not limit it. (remm)
       </update>
+      <fix>
+        Correct a problem with <code>ServletRequest.getServerPort()</code> for
+        secure HTTP/2 connections that meant an incorrect value was retured when
+        using the default port. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
