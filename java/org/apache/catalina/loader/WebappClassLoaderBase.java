@@ -318,14 +318,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     /**
-     * All permission.
-     * @deprecated Unused. This will be removed in Tomcat 9.
-     */
-    @Deprecated
-    protected final Permission allPermission = new java.security.AllPermission();
-
-
-    /**
      * Enables the RMI Target memory leak detection to be controlled. This is
      * necessary since the detection can only work on Java 9 if some of the
      * modularity checks are disabled.
@@ -2436,20 +2428,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
         }
         return false;
-    }
-
-
-    /**
-     * Filter classes.
-     *
-     * @param name class name
-     * @return <code>true</code> if the class should be filtered
-     * @deprecated Use {@link #filter(String, boolean)} This will be removed in
-     *             Tomcat 9
-     */
-    @Deprecated
-    protected boolean filter(String name) {
-        return filter(name, true) || filter(name, false);
     }
 
 
