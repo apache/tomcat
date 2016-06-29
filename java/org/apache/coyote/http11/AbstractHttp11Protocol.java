@@ -322,9 +322,9 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      */
     private final Map<String,UpgradeProtocol> negotiatedProtocols = new HashMap<>();
     private void configureUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
-        boolean secure = getEndpoint().isSSLEnabled();
+        boolean isSSLEnabled = getEndpoint().isSSLEnabled();
         // HTTP Upgrade
-        String httpUpgradeName = upgradeProtocol.getHttpUpgradeName(secure);
+        String httpUpgradeName = upgradeProtocol.getHttpUpgradeName(isSSLEnabled);
         boolean httpUpgradeConfigured = false;
         if (httpUpgradeName != null && httpUpgradeName.length() > 0) {
             httpUpgradeProtocols.put(httpUpgradeName, upgradeProtocol);
@@ -337,7 +337,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         String alpnName = upgradeProtocol.getAlpnName();
         if (alpnName != null && alpnName.length() > 0) {
             // ALPN requires SSL
-            if (secure) {
+            if (isSSLEnabled) {
                 negotiatedProtocols.put(alpnName, upgradeProtocol);
                 getEndpoint().addNegotiatedProtocol(alpnName);
                 getLog().info(sm.getString("abstractHttp11Protocol.alpnConfigured",
