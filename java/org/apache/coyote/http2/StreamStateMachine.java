@@ -53,7 +53,7 @@ public class StreamStateMachine {
     }
 
 
-    public synchronized void receivedPushPromis() {
+    public synchronized void receivedPushPromise() {
         stateChange(State.IDLE, State.RESERVED_REMOTE);
     }
 
