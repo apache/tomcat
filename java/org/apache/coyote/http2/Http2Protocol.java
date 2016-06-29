@@ -56,8 +56,8 @@ public class Http2Protocol implements UpgradeProtocol {
     private int initialWindowSize = DEFAULT_INITIAL_WINDOW_SIZE;
 
     @Override
-    public String getHttpUpgradeName(boolean isSecure) {
-        if (isSecure) {
+    public String getHttpUpgradeName(boolean isSSLEnabled) {
+        if (isSSLEnabled) {
             return null;
         } else {
             return HTTP_UPGRADE_NAME;
