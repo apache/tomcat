@@ -100,7 +100,7 @@ public class SelectorContext implements Context {
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm = StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(SelectorContext.class);
 
 
     /**

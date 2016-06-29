@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.naming;
 
 
 /**
  * Static constants for this package.
+ *
+ * @deprecated Unused. Will be removed in Tomcat 9.
  */
-
+@Deprecated
 public final class Constants {
 
     public static final String Package = "org.apache.naming";
