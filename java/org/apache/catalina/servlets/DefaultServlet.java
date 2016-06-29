@@ -147,7 +147,9 @@ public class DefaultServlet extends HttpServlet {
 
     /**
      * JNDI resources name.
+     * @deprecated Unused. Will be removed in Tomcat 9.
      */
+    @Deprecated
     protected static final String RESOURCES_JNDI_NAME = "java:/comp/Resources";
 
     /**
@@ -1367,7 +1369,10 @@ public class DefaultServlet extends HttpServlet {
      * @return the input stream with the rendered output
      * @throws IOException an IO error occurred
      * @throws ServletException rendering error
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9
      */
+    @Deprecated
     protected InputStream render(String contextPath, WebResource resource)
         throws IOException, ServletException {
         return render(contextPath, resource, null);
@@ -1396,7 +1401,10 @@ public class DefaultServlet extends HttpServlet {
      * @return the XML data
      * @throws IOException an IO error occurred
      * @throws ServletException rendering error
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9
      */
+    @Deprecated
     protected InputStream renderXml(String contextPath, WebResource resource, Source xsltSource)
         throws IOException, ServletException {
         return renderXml(contextPath, resource, xsltSource, null);
@@ -1529,7 +1537,10 @@ public class DefaultServlet extends HttpServlet {
      * @param resource The resource
      * @return the HTML data
      * @throws IOException an IO error occurred
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9
      */
+    @Deprecated
     protected InputStream renderHtml(String contextPath, WebResource resource)
         throws IOException {
         return renderHtml(contextPath, resource, null);
@@ -1698,7 +1709,10 @@ public class DefaultServlet extends HttpServlet {
      * Get the readme file as a string.
      * @param directory The directory to search
      * @return the readme for the specified directory
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9
      */
+    @Deprecated
     protected String getReadme(WebResource directory) {
         return getReadme(directory, null);
     }
