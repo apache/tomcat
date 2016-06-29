@@ -174,4 +174,8 @@ public class StringManager {
         return mgr;
     }
 
+
+    public static final StringManager getManager(Class<?> clazz) {
+        return getManager(clazz.getPackage().getName());
+    }
 }
