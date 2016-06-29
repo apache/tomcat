@@ -469,7 +469,10 @@ import java.util.Map;
  * </TABLE>
  *
  * @author TAMURA Kent &lt;kent@trl.ibm.co.jp&gt;
+ *
+ * @deprecated Unused. Will be removed in Tomcat 9.
  */
+@Deprecated
 public class MIME2Java {
 
     private static final Map<String,String> s_enchash;
