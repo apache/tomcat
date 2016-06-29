@@ -29,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.AccessController;
@@ -2378,7 +2379,8 @@ public class DefaultServlet extends HttpServlet {
         }
     }
 
-    protected static class CompressionFormat {
+    protected static class CompressionFormat implements Serializable {
+        private static final long serialVersionUID = 1L;
         public final String extension;
         public final String encoding;
 

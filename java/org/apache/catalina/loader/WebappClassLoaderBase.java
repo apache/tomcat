@@ -2125,11 +2125,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         checkStateForResourceLoading(name);
 
-        String path = binaryNameToPath(name, true);
-
-        if (name == null || path == null) {
+        if (name == null) {
             return null;
         }
+        String path = binaryNameToPath(name, true);
 
         ResourceEntry entry = resourceEntries.get(path);
         WebResource resource = null;
