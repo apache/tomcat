@@ -775,12 +775,8 @@ public class Request implements HttpServletRequest {
      * @exception IOException if an input/output error occurs
      */
     public void finishRequest() throws IOException {
-        // Optionally disable swallowing of additional request data.
-        Context context = getContext();
-        if (context != null &&
-                response.getStatus() == HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE &&
-                !context.getSwallowAbortedUploads()) {
-            coyoteRequest.action(ActionCode.DISABLE_SWALLOW_INPUT, null);
+        if (response.getStatus() == HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE) {
+            checkSwallowInput();
         }
     }
 
@@ -2640,7 +2636,9 @@ public class Request implements HttpServletRequest {
 
 
     /**
-     * Disable swallowing of remaining input if configured
+     * Check the configuration for aborted uploads and if configured to do so,
+     * disable the swallowing of any remaining input and close the connection
+     * once the response has been written.
      */
     protected void checkSwallowInput() {
         Context context = getContext();
