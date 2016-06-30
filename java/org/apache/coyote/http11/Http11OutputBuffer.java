@@ -56,7 +56,7 @@ public class Http11OutputBuffer implements OutputBuffer {
     /**
      * Associated Coyote response.
      */
-    protected Response response;
+    protected final Response response;
 
 
     /**
@@ -74,7 +74,7 @@ public class Http11OutputBuffer implements OutputBuffer {
     /**
      * The buffer used for header composition.
      */
-    protected byte[] headerBuffer;
+    protected final byte[] headerBuffer;
 
 
     /**
