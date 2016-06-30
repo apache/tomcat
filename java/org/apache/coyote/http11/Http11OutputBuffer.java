@@ -60,12 +60,6 @@ public class Http11OutputBuffer implements OutputBuffer {
 
 
     /**
-     * Committed flag.
-     */
-    protected boolean committed;
-
-
-    /**
      * Finished flag.
      */
     protected boolean finished;
@@ -129,7 +123,6 @@ public class Http11OutputBuffer implements OutputBuffer {
         activeFilters = new OutputFilter[0];
         lastActiveFilter = -1;
 
-        committed = false;
         finished = false;
 
         outputStreamOutputBuffer = new SocketOutputBuffer();
@@ -200,7 +193,7 @@ public class Http11OutputBuffer implements OutputBuffer {
     @Override
     public int doWrite(ByteChunk chunk) throws IOException {
 
-        if (!committed) {
+        if (!response.isCommitted()) {
             // Send the connector a request for commit. The connector should
             // then validate the headers, send them (using sendHeaders) and
             // set the filters accordingly.
@@ -258,7 +251,7 @@ public class Http11OutputBuffer implements OutputBuffer {
      */
     public void reset() {
 
-        if (committed) {
+        if (response.isCommitted()) {
             throw new IllegalStateException(sm.getString("iob.illegalreset"));
         }
 
@@ -295,7 +288,6 @@ public class Http11OutputBuffer implements OutputBuffer {
         // Reset pointers
         pos = 0;
         lastActiveFilter = -1;
-        committed = false;
         finished = false;
         byteCount = 0;
     }
@@ -327,7 +319,7 @@ public class Http11OutputBuffer implements OutputBuffer {
 
 
     public void sendAck() throws IOException {
-        if (!committed) {
+        if (!response.isCommitted()) {
             socketWrapper.write(isBlocking(), Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
             if (flushBuffer(true)) {
                 throw new IOException(sm.getString("iob.failedwrite.ack"));
@@ -342,8 +334,6 @@ public class Http11OutputBuffer implements OutputBuffer {
      * @throws IOException an underlying I/O error occurred
      */
     protected void commit() throws IOException {
-        // The response is now committed
-        committed = true;
         response.setCommitted(true);
 
         if (pos > 0) {
