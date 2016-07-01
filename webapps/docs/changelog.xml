@@ -84,6 +84,11 @@
         attempts during the lock out period will no longer reset the lock out
         timer to zero. (markt)
       </fix>
+      <fix>
+        Improve error handling around user code prior to calling
+        <code>InstanceManager.destroy()</code> to ensure that the method is
+        executed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -107,14 +112,19 @@
         secure HTTP/2 connections that meant an incorrect value was retured when
         using the default port. (markt)
       </fix>
+      <fix>
+        Improve error handling around user code prior to calling
+        <code>InstanceManager.destroy()</code> to ensure that the method is
+        executed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
-        Catch and log any <code>Exception</code>s during calls to
-        <code>Servlet.destroy()</code> when destroying the Servlet associated
-        with a JSP page. (markt)
+        Improve error handling around user code prior to calling
+        <code>InstanceManager.destroy()</code> to ensure that the method is
+        executed. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -126,6 +136,11 @@
         dedicated WebSocket Executor. It has been replaced by the use of the
         Connector/Endpoint provided Executor. (markt)
       </scode>
+      <fix>
+        Improve error handling around user code prior to calling
+        <code>InstanceManager.destroy()</code> to ensure that the method is
+        executed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Applications">
