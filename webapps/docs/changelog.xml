@@ -150,6 +150,11 @@
         This attribute works both when a connection is returned and when a
         connection is borrowed. (kfujino)
       </fix>
+      <fix>
+        <bug>59774</bug>: Correct the <code>prefix</code> values in the the
+        documented examples for configuring the <code>AccessLogValve</code>.
+        Patch provided by Mike Noordermeer. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">

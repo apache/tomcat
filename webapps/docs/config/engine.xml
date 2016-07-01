@@ -195,7 +195,7 @@
 <source><![CDATA[<Engine name="Standalone" ...>
   ...
   <Valve className="org.apache.catalina.valves.AccessLogValve"
-         prefix="catalina_access_log." suffix=".txt"
+         prefix="catalina_access_log" suffix=".txt"
          pattern="common"/>
   ...
 </Engine>]]></source>
