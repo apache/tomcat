@@ -1486,12 +1486,7 @@ public class StandardWrapper extends ContainerBase
                 
                 instanceSupport.fireInstanceEvent
                   (InstanceEvent.AFTER_DESTROY_EVENT, instance);
-    
-                // Annotation processing
-                if (!((Context) getParent()).getIgnoreAnnotations()) {
-                   ((StandardContext)getParent()).getInstanceManager().destroyInstance(instance);
-                }
-    
+
             } catch (Throwable t) {
                 t = ExceptionUtils.unwrapInvocationTargetException(t);
                 ExceptionUtils.handleThrowable(t);
@@ -1506,6 +1501,15 @@ public class StandardWrapper extends ContainerBase
                     (sm.getString("standardWrapper.destroyException", getName()),
                      t);
             } finally {
+                // Annotation processing
+                if (!((Context) getParent()).getIgnoreAnnotations()) {
+                    try {
+                        ((Context)getParent()).getInstanceManager().destroyInstance(instance);
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                        log.error(sm.getString("standardWrapper.destroyInstance", getName()), t);
+                    }
+                }
                 // Write captured output
                 if (swallowOutput) {
                     String log = SystemLogHandler.stopCapture();

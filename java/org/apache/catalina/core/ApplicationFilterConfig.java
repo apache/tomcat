@@ -300,8 +300,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
 
         unregisterJMX();
         
-        if (this.filter != null)
-        {
+        if (this.filter != null) {
             try {
                 if (Globals.IS_SECURITY_ENABLED) {
                     try {
