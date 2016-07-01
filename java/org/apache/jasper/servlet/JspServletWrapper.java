@@ -482,7 +482,12 @@ public class JspServletWrapper {
 
     public void destroy() {
         if (theServlet != null) {
-            theServlet.destroy();
+            try {
+                theServlet.destroy();
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.error(Localizer.getMessage("jsp.error.servlet.destroy.failed"), t);
+            }
             InstanceManager instanceManager = InstanceManagerFactory.getInstanceManager(config);
             try {
                 instanceManager.destroyInstance(theServlet);
