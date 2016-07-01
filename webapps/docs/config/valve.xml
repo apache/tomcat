@@ -130,7 +130,7 @@
 
       <attribute name="prefix" required="false">
         <p>The prefix added to the start of each log file's name.  If not
-        specified, the default value is "access_log.".</p>
+        specified, the default value is "access_log".</p>
       </attribute>
 
       <attribute name="suffix" required="false">
