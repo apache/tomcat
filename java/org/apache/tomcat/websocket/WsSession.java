@@ -537,23 +537,35 @@ public class WsSession implements Session {
     private void fireEndpointOnClose(CloseReason closeReason) {
 
         // Fire the onClose event
+        Throwable throwable = null;
         InstanceManager instanceManager = webSocketContainer.getInstanceManager();
+        if (instanceManager == null) {
+            instanceManager = InstanceManagerBindings.get(applicationClassLoader);
+        }
         Thread t = Thread.currentThread();
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
         try {
             localEndpoint.onClose(this, closeReason);
-            if (instanceManager == null) {
-                instanceManager = InstanceManagerBindings.get(applicationClassLoader);
-            }
-            if (instanceManager != null) {
-                instanceManager.destroyInstance(localEndpoint);
-            }
-        } catch (Throwable throwable) {
-            ExceptionUtils.handleThrowable(throwable);
-            localEndpoint.onError(this, throwable);
+        } catch (Throwable t1) {
+            ExceptionUtils.handleThrowable(t1);
+            throwable = t1;
         } finally {
+            if (instanceManager != null) {
+                try {
+                    instanceManager.destroyInstance(localEndpoint);
+                } catch (Throwable t2) {
+                    ExceptionUtils.handleThrowable(t2);
+                    if (throwable == null) {
+                        throwable = t2;
+                    }
+                }
+            }
             t.setContextClassLoader(cl);
+        }
+
+        if (throwable != null) {
+            fireEndpointOnError(throwable);
         }
     }
 

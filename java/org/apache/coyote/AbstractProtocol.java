@@ -880,8 +880,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                             ClassLoader oldCL = upgradeToken.getContextBind().bind(false, null);
                             try {
                                 httpUpgradeHandler.destroy();
-                                instanceManager.destroyInstance(httpUpgradeHandler);
                             } finally {
+                                try {
+                                    instanceManager.destroyInstance(httpUpgradeHandler);
+                                } catch (Throwable e) {
+                                    ExceptionUtils.handleThrowable(e);
+                                    getLog().error(sm.getString("abstractConnectionHandler.error"), e);
+                                }
                                 upgradeToken.getContextBind().unbind(false, oldCL);
                             }
                         }
