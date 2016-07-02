@@ -215,6 +215,11 @@
         Use the mirror network rather than the ASF master site to download the
         current ASF dependencies. (markt)
       </add>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.8 to
+        pick up the latest fixes and make 1.2.8 the minimum recommended version.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
