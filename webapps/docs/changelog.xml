@@ -207,6 +207,10 @@
       <update>
         <bug>59276</bug>: Update optional Checkstyle library to 6.17. (kkolinko)
       </update>
+      <add>
+        Use the mirror network rather than the ASF master site to download the
+        current ASF dependencies. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
