@@ -159,6 +159,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Use the mirror network rather than the ASF master site to download the
+        current ASF dependencies. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.70 (violetagg)" rtext="released 2016-06-20">
   <subsection name="Catalina">
