@@ -211,6 +211,10 @@
         Remove JULI plus log4j extras and embedded artifacts from Maven release
         script. (markt)
       </fix>
+      <add>
+        Use the mirror network rather than the ASF master site to download the
+        current ASF dependencies. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
