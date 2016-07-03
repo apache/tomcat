@@ -48,6 +48,12 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>18500</bug>: Add limited support for wildcard host names and host
+        aliases. Names of the form <code>*.domainname</code> are now permitted.
+        Note that an exact host name match takes precedence over a wild card
+        host name match. (markt)
+      </fix>
+      <fix>
         <bug>57705</bug>: Add debug logging for requests denied by the remote
         host and remote address valves and filters. Based on a patch by Graham
         Leggett. (markt)

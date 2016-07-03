@@ -66,6 +66,7 @@ public final class Mapper {
      * Default host name.
      */
     private String defaultHostName = null;
+    private volatile MappedHost defaultHost = null;
 
 
     /**
@@ -83,9 +84,15 @@ public final class Mapper {
      *
      * @param defaultHostName Default host name
      */
-    public void setDefaultHostName(String defaultHostName) {
-        this.defaultHostName = defaultHostName;
+    public synchronized void setDefaultHostName(String defaultHostName) {
+        this.defaultHostName = renameWildcardHost(defaultHostName);
+        if (this.defaultHostName == null) {
+            defaultHost = null;
+        } else {
+            defaultHost = exactFind(hosts, this.defaultHostName);
+        }
     }
+
 
     /**
      * Add a new host to the mapper.
@@ -96,10 +103,14 @@ public final class Mapper {
      */
     public synchronized void addHost(String name, String[] aliases,
                                      Host host) {
+        name = renameWildcardHost(name);
         MappedHost[] newHosts = new MappedHost[hosts.length + 1];
         MappedHost newHost = new MappedHost(name, host);
         if (insertMap(hosts, newHosts, newHost)) {
             hosts = newHosts;
+            if (newHost.name.equals(defaultHostName)) {
+                defaultHost = newHost;
+            }
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("mapper.addHost.success", name));
             }
@@ -122,6 +133,7 @@ public final class Mapper {
         }
         List<MappedHost> newAliases = new ArrayList<>(aliases.length);
         for (String alias : aliases) {
+            alias = renameWildcardHost(alias);
             MappedHost newAlias = new MappedHost(alias, newHost);
             if (addHostAliasImpl(newAlias)) {
                 newAliases.add(newAlias);
@@ -137,6 +149,7 @@ public final class Mapper {
      * @param name Virtual host name
      */
     public synchronized void removeHost(String name) {
+        name = renameWildcardHost(name);
         // Find and remove the old host
         MappedHost host = exactFind(hosts, name);
         if (host == null || host.isAlias()) {
@@ -165,6 +178,7 @@ public final class Mapper {
             // just in case...
             return;
         }
+        alias = renameWildcardHost(alias);
         MappedHost newAlias = new MappedHost(alias, realHost);
         if (addHostAliasImpl(newAlias)) {
             realHost.addAlias(newAlias);
@@ -175,6 +189,9 @@ public final class Mapper {
         MappedHost[] newHosts = new MappedHost[hosts.length + 1];
         if (insertMap(hosts, newHosts, newAlias)) {
             hosts = newHosts;
+            if (newAlias.name.equals(defaultHostName)) {
+                defaultHost = newAlias;
+            }
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("mapper.addHostAlias.success",
                         newAlias.name, newAlias.getRealHostName()));
@@ -203,6 +220,7 @@ public final class Mapper {
      * @param alias The alias to remove
      */
     public synchronized void removeHostAlias(String alias) {
+        alias = renameWildcardHost(alias);
         // Find and remove the alias
         MappedHost hostMapping = exactFind(hosts, alias);
         if (hostMapping == null || !hostMapping.isAlias()) {
@@ -244,6 +262,8 @@ public final class Mapper {
     public void addContextVersion(String hostName, Host host, String path,
             String version, Context context, String[] welcomeResources,
             WebResourceRoot resources, Collection<WrapperMappingInfo> wrappers) {
+
+        hostName = renameWildcardHost(hostName);
 
         MappedHost mappedHost  = exactFind(hosts, hostName);
         if (mappedHost == null) {
@@ -309,6 +329,7 @@ public final class Mapper {
     public void removeContextVersion(Context ctxt, String hostName,
             String path, String version) {
 
+        hostName = renameWildcardHost(hostName);
         contextObjectToContextVersionMap.remove(ctxt);
 
         MappedHost host = exactFind(hosts, hostName);
@@ -352,7 +373,7 @@ public final class Mapper {
      */
     public void pauseContextVersion(Context ctxt, String hostName,
             String contextPath, String version) {
-
+        hostName = renameWildcardHost(hostName);
         ContextVersion contextVersion = findContextVersion(hostName,
                 contextPath, version, true);
         if (contextVersion == null || !ctxt.equals(contextVersion.object)) {
@@ -394,6 +415,7 @@ public final class Mapper {
     public void addWrapper(String hostName, String contextPath, String version,
                            String path, Wrapper wrapper, boolean jspWildCard,
                            boolean resourceOnly) {
+        hostName = renameWildcardHost(hostName);
         ContextVersion contextVersion = findContextVersion(hostName,
                 contextPath, version, false);
         if (contextVersion == null) {
@@ -404,6 +426,7 @@ public final class Mapper {
 
     public void addWrappers(String hostName, String contextPath,
             String version, Collection<WrapperMappingInfo> wrappers) {
+        hostName = renameWildcardHost(hostName);
         ContextVersion contextVersion = findContextVersion(hostName,
                 contextPath, version, false);
         if (contextVersion == null) {
@@ -504,6 +527,7 @@ public final class Mapper {
      */
     public void removeWrapper(String hostName, String contextPath,
             String version, String path) {
+        hostName = renameWildcardHost(hostName);
         ContextVersion contextVersion = findContextVersion(hostName,
                 contextPath, version, true);
         if (contextVersion == null || contextVersion.isPaused()) {
@@ -588,6 +612,7 @@ public final class Mapper {
      */
     public void addWelcomeFile(String hostName, String contextPath, String version,
             String welcomeFile) {
+        hostName = renameWildcardHost(hostName);
         ContextVersion contextVersion = findContextVersion(hostName, contextPath, version, false);
         if (contextVersion == null) {
             return;
@@ -610,6 +635,7 @@ public final class Mapper {
      */
     public void removeWelcomeFile(String hostName, String contextPath,
             String version, String welcomeFile) {
+        hostName = renameWildcardHost(hostName);
         ContextVersion contextVersion = findContextVersion(hostName, contextPath, version, false);
         if (contextVersion == null || contextVersion.isPaused()) {
             return;
@@ -642,6 +668,7 @@ public final class Mapper {
      * @param version     The version of the context to be cleared
      */
     public void clearWelcomeFiles(String hostName, String contextPath, String version) {
+        hostName = renameWildcardHost(hostName);
         ContextVersion contextVersion = findContextVersion(hostName, contextPath, version, false);
         if (contextVersion == null) {
             return;
@@ -720,12 +747,24 @@ public final class Mapper {
         MappedHost[] hosts = this.hosts;
         MappedHost mappedHost = exactFindIgnoreCase(hosts, host);
         if (mappedHost == null) {
-            if (defaultHostName == null) {
-                return;
+            // Note: Internally, the Mapper does not use the leading * on a
+            //       wildcard host. This is to allow this shortcut.
+            int firstDot = host.indexOf('.');
+            if (firstDot > -1) {
+                int offset = host.getOffset();
+                try {
+                    host.setOffset(firstDot + offset);
+                    mappedHost = exactFindIgnoreCase(hosts, host);
+                } finally {
+                    // Make absolutely sure this gets reset
+                    host.setOffset(offset);
+                }
             }
-            mappedHost = exactFind(hosts, defaultHostName);
             if (mappedHost == null) {
-                return;
+                mappedHost = defaultHost;
+                if (mappedHost == null) {
+                    return;
+                }
             }
         }
         mappingData.host = mappedHost.object;
@@ -1494,6 +1533,22 @@ public final class Mapper {
             return true;
         }
         return false;
+    }
+
+
+    /*
+     * To simplify the mapping process, wild card hosts take the form
+     * ".apache.org" rather than "*.apache.org" internally. However, for ease
+     * of use the external form remains "*.apache.org". Any host name passed
+     * into this class needs to be passed through this method to rename and
+     * wild card host names from the external to internal form.
+     */
+    private static String renameWildcardHost(String hostName) {
+        if (hostName.startsWith("*.")) {
+            return hostName.substring(1);
+        } else {
+            return hostName;
+        }
     }
 
 

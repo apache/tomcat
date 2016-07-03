@@ -192,7 +192,10 @@
         have a name that matches the <code>defaultHost</code> setting for that
         Engine.  See <a href="#Host_Name_Aliases">Host Name Aliases</a> for
         information on how to assign more than one network name to the same
-        virtual host.</p>
+        virtual host. If the name takes the form of <code>*.domainname</code>
+        (e.g. <code>*.apache.org</code>) then it will be treated as a match for
+        any host in that domain unless a host that has an exactly matching name
+        is found.</p>
       </attribute>
 
       <attribute name="startStopThreads" required="false">
@@ -475,6 +478,10 @@
     <p>In order for this strategy to be effective, all of the network names
     involved must be registered in your DNS server to resolve to the
     same computer that is running this instance of Catalina.</p>
+
+    <p>Aliases may also use the wildcard form (<code>*.domainname</code>)
+       permitted for the <strong>name</strong> attribute of a
+       <strong>Host</strong>.</p>
 
   </subsection>
 

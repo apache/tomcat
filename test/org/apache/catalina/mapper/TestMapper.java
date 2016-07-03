@@ -88,6 +88,9 @@ public class TestMapper extends LoggingBaseTest {
         mapper.addHost("zzzuyopjvewpovewjhfewoih", new String[0], createHost("blah12"));
         mapper.addHost("xxxxgqwiwoih", new String[0], createHost("blah13"));
         mapper.addHost("qwigqwiwoih", new String[0], createHost("blah14"));
+        mapper.addHost("qwerty.net", new String[0], createHost("blah15"));
+        mapper.addHost("*.net", new String[0], createHost("blah16"));
+        mapper.addHost("zzz.com", new String[0], createHost("blah17"));
         mapper.addHostAlias("iowejoiejfoiew", "iowejoiejfoiew_alias");
 
         mapper.setDefaultHostName("ylwrehirkuewh");
@@ -135,6 +138,14 @@ public class TestMapper extends LoggingBaseTest {
                 null,
                 Arrays.asList(new WrapperMappingInfo[] { new WrapperMappingInfo(
                         "/bobou/*", createWrapper("wrapper7"), false, false) }));
+
+        host = createHost("blah16");
+        mapper.addContextVersion("*.net", host, "", "0", createContext("context4"),
+                new String[0], null, null);
+        mapper.addWrappers("*.net", "", "0", Arrays
+                .asList(new WrapperMappingInfo[] {
+                        new WrapperMappingInfo("/",
+                                createWrapper("context4-defaultWrapper"), false, false) }));
     }
 
     @Test
@@ -153,14 +164,14 @@ public class TestMapper extends LoggingBaseTest {
         mapper.addHostAlias("iowejoiejfoiew", "iowejoiejfoiew_alias");
 
         // Check we have the right number
-        // (added 16 including one host alias. Three duplicates do not increase the count.)
-        assertEquals(16, mapper.hosts.length);
+        // (added 17 including one host alias. Three duplicates do not increase the count.)
+        assertEquals(19, mapper.hosts.length);
 
         // Make sure adding a duplicate *does not* overwrite
-        final int iowPos = 3;
+        final int iowPos = 4;
         assertEquals("blah7", mapper.hosts[iowPos].object.getName());
 
-        final int qwigPos = 8;
+        final int qwigPos = 10;
         assertEquals("blah14", mapper.hosts[qwigPos].object.getName());
 
         // Check for alphabetical order of host names
@@ -185,38 +196,38 @@ public class TestMapper extends LoggingBaseTest {
         Host hostZ = createHost("zzzz");
         Context contextZ = createContext("contextZ");
 
-        assertEquals(16, mapper.hosts.length);
+        assertEquals(19, mapper.hosts.length);
         mapper.addContextVersion("zzzz", hostZ, "/", "", contextZ, null, null,
                 null);
-        assertEquals(17, mapper.hosts.length);
+        assertEquals(20, mapper.hosts.length);
 
         mapper.addHost("zzzz", new String[] { "zzzz_alias1", "zzzz_alias2" },
                 hostZ);
-        assertEquals(19, mapper.hosts.length);
+        assertEquals(22, mapper.hosts.length);
 
-        assertEquals("zzzz", mapper.hosts[16].name);
-        assertEquals("zzzz_alias1", mapper.hosts[17].name);
-        assertEquals("zzzz_alias2", mapper.hosts[18].name);
-        assertEquals(2, mapper.hosts[16].getAliases().size());
+        assertEquals("zzzz", mapper.hosts[19].name);
+        assertEquals("zzzz_alias1", mapper.hosts[20].name);
+        assertEquals("zzzz_alias2", mapper.hosts[21].name);
+        assertEquals(2, mapper.hosts[19].getAliases().size());
         assertSame(contextZ,
-                mapper.hosts[16].contextList.contexts[0].versions[0].object);
+                mapper.hosts[19].contextList.contexts[0].versions[0].object);
         assertSame(contextZ,
-                mapper.hosts[18].contextList.contexts[0].versions[0].object);
+                mapper.hosts[21].contextList.contexts[0].versions[0].object);
     }
 
     @Test
     public void testRemoveHost() {
-        assertEquals(16, mapper.hosts.length);
+        assertEquals(19, mapper.hosts.length);
         mapper.removeHostAlias("iowejoiejfoiew");
         mapper.removeHost("iowejoiejfoiew_alias");
-        assertEquals(16, mapper.hosts.length); // No change
+        assertEquals(19, mapper.hosts.length); // No change
         mapper.removeHostAlias("iowejoiejfoiew_alias");
-        assertEquals(15, mapper.hosts.length); // Removed
+        assertEquals(18, mapper.hosts.length); // Removed
 
         mapper.addHostAlias("iowejoiejfoiew", "iowejoiejfoiew_alias");
-        assertEquals(16, mapper.hosts.length);
+        assertEquals(19, mapper.hosts.length);
 
-        final int iowPos = 3;
+        final int iowPos = 4;
         Mapper.MappedHost hostMapping = mapper.hosts[iowPos];
         Mapper.MappedHost aliasMapping = mapper.hosts[iowPos + 1];
         assertEquals("iowejoiejfoiew_alias", aliasMapping.name);
@@ -229,7 +240,7 @@ public class TestMapper extends LoggingBaseTest {
         assertSame(hostMapping, aliasMapping.getRealHost());
 
         mapper.removeHost("iowejoiejfoiew");
-        assertEquals(14, mapper.hosts.length); // Both host and alias removed
+        assertEquals(17, mapper.hosts.length); // Both host and alias removed
         for (Mapper.MappedHost host : mapper.hosts) {
             assertTrue(host.name, !host.name.startsWith("iowejoiejfoiew"));
         }
@@ -240,6 +251,8 @@ public class TestMapper extends LoggingBaseTest {
         MappingData mappingData = new MappingData();
         MessageBytes host = MessageBytes.newInstance();
         host.setString("iowejoiejfoiew");
+        MessageBytes wildcard = MessageBytes.newInstance();
+        wildcard.setString("foo.net");
         MessageBytes alias = MessageBytes.newInstance();
         alias.setString("iowejoiejfoiew_alias");
         MessageBytes uri = MessageBytes.newInstance();
@@ -271,6 +284,20 @@ public class TestMapper extends LoggingBaseTest {
         assertTrue(mappingData.redirectPath.isNull());
 
         mappingData.recycle();
+        uri.recycle();
+        uri.setString("/foo/bar/bla/bobou/foo");
+        uri.toChars();
+        uri.getCharChunk().setLimit(-1);
+        mapper.map(wildcard, uri, null, mappingData);
+        assertEquals("blah16", mappingData.host.getName());
+        assertEquals("context4", mappingData.context.getName());
+        assertEquals("context4-defaultWrapper", mappingData.wrapper.getName());
+        assertEquals("", mappingData.contextPath.toString());
+        assertEquals("/foo/bar/bla/bobou/foo", mappingData.wrapperPath.toString());
+        assertTrue(mappingData.pathInfo.isNull());
+        assertTrue(mappingData.redirectPath.isNull());
+
+        mappingData.recycle();
         uri.setString("/foo/bar/bla/bobou/foo");
         uri.toChars();
         uri.getCharChunk().setLimit(-1);
@@ -287,7 +314,7 @@ public class TestMapper extends LoggingBaseTest {
     @Test
     public void testAddRemoveContextVersion() throws Exception {
         final String hostName = "iowejoiejfoiew";
-        final int iowPos = 3;
+        final int iowPos = 4;
         final String contextPath = "/foo/bar";
         final int contextPos = 2;
 
@@ -394,7 +421,7 @@ public class TestMapper extends LoggingBaseTest {
     @Test
     public void testReloadContextVersion() throws Exception {
         final String hostName = "iowejoiejfoiew";
-        final int iowPos = 3;
+        final int iowPos = 4;
         final String contextPath = "/foo/bar";
         final int contextPos = 2;
 

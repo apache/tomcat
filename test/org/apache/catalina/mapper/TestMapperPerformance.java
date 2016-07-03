@@ -26,24 +26,42 @@ public class TestMapperPerformance extends TestMapper {
 
     @Test
     public void testPerformance() throws Exception {
+        String[] requestedHostNames = new String[] {
+                "xxxxxxxxxxx",
+                "iowejoiejfoiew",
+                "iowejoiejfoiex",
+                "owefojiwefoi",
+                "owefojiwefoix",
+                "qwerty.net",
+                "foo.net",
+                "zzz.com",
+                "abc.com"};
+
+        for (String requestedHostName : requestedHostNames) {
+            testPerformance(requestedHostName);
+        }
+    }
+
+    private void testPerformance(String requestedHostName) throws Exception {
         // Takes ~1s on markt's laptop. If this takes more than 5s something
         // probably needs looking at. If this fails repeatedly then we may need
         // to increase this limit.
         final long maxTime = 5000;
-        long time = testPerformanceImpl();
+        long time = testPerformanceImpl(requestedHostName);
+        log.info("Host [" + requestedHostName + "], Time [" + time + "]ms");
         if (time >= maxTime) {
             // Rerun to reject occasional failures, e.g. because of gc
             log.warn("testPerformance() test completed in " + time + " ms");
-            time = testPerformanceImpl();
+            time = testPerformanceImpl(requestedHostName);
             log.warn("testPerformance() test rerun completed in " + time + " ms");
         }
         assertTrue(String.valueOf(time), time < maxTime);
     }
 
-    private long testPerformanceImpl() throws Exception {
+    private long testPerformanceImpl(String requestedHostName) throws Exception {
         MappingData mappingData = new MappingData();
         MessageBytes host = MessageBytes.newInstance();
-        host.setString("iowejoiejfoiew");
+        host.setString(requestedHostName);
         MessageBytes uri = MessageBytes.newInstance();
         uri.setString("/foo/bar/blah/bobou/foo");
         uri.toChars();
