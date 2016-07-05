@@ -469,6 +469,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             }
             if (!coyoteResponse.isCommitted()) {
                 coyoteResponse.sendHeaders();
+            }
             int len = chunk.getLength();
             int offset = 0;
             while (len > 0) {
