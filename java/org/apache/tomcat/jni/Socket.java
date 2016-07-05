@@ -76,11 +76,6 @@ public class Socket {
     public static final int APR_IPV4_ADDR_OK = 0x01;
     public static final int APR_IPV6_ADDR_OK = 0x02;
 
-    /* TODO: Missing:
-     * APR_INET
-     * APR_UNSPEC
-     * APR_INET6
-     */
     public static final int APR_UNSPEC = 0;
     public static final int APR_INET   = 1;
     public static final int APR_INET6  = 2;
