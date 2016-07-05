@@ -467,6 +467,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 throw new IllegalStateException(
                         sm.getString("stream.closed", getConnectionId(), getIdentifier()));
             }
+            if (!coyoteResponse.isCommitted()) {
+                coyoteResponse.sendHeaders();
             int len = chunk.getLength();
             int offset = 0;
             while (len > 0) {
@@ -496,9 +498,6 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 log.debug(sm.getString("stream.outputBuffer.flush.debug", getConnectionId(),
                         getIdentifier(), Integer.toString(buffer.position()),
                         Boolean.toString(writeInProgress), Boolean.toString(closed)));
-            }
-            if (!coyoteResponse.isCommitted()) {
-                coyoteResponse.sendHeaders();
             }
             if (buffer.position() == 0) {
                 if (closed && !endOfStreamSent) {
