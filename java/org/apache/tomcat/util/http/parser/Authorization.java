@@ -22,10 +22,14 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * Parser for an "Authorization" header.
  */
 public class Authorization {
+
+    private static final StringManager sm = StringManager.getManager(Authorization.class);
 
     @SuppressWarnings("unused")  // Unused due to buggy client implementations
     private static final Integer FIELD_TYPE_TOKEN = Integer.valueOf(0);
@@ -119,7 +123,8 @@ public class Authorization {
                     break;
                 default:
                     // Error
-                    throw new IllegalArgumentException("TODO i18n: Unsupported type");
+                    throw new IllegalArgumentException(
+                            sm.getString("authorization.unknownType", type));
             }
 
             if (value == null) {
