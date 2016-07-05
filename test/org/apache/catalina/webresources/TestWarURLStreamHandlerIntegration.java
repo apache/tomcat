@@ -34,13 +34,14 @@ public class TestWarURLStreamHandlerIntegration extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File docBase = new File("test/webresources/war-url-connection.war");
-        Context context = tomcat.addWebapp("/test", docBase.getAbsolutePath());
+        Context ctx = tomcat.addWebapp("/test", docBase.getAbsolutePath());
+        skipTldsForResourceJars(ctx);
 
         ((StandardHost) tomcat.getHost()).setUnpackWARs(false);
 
         tomcat.start();
 
-        URL url = context.getServletContext().getResource("/index.html");
+        URL url = ctx.getServletContext().getResource("/index.html");
         try {
             url.toURI();
         } catch (Exception e) {

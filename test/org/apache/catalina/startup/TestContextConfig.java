@@ -73,7 +73,8 @@ public class TestContextConfig extends TomcatBaseTest {
 
         File appDir =  new File("test/webapp-fragments");
         // app dir is relative to server home
-        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        Context ctx = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        skipTldsForResourceJars(ctx);
 
         tomcat.start();
 

@@ -67,6 +67,8 @@ import org.apache.catalina.webresources.StandardRoot;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
+import org.apache.tomcat.util.scan.StandardJarScanFilter;
+import org.apache.tomcat.util.scan.StandardJarScanner;
 
 /**
  * Base test case that provides a Tomcat instance for each test - mainly so we
@@ -856,5 +858,12 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                 // NO-OP
                 return FileVisitResult.CONTINUE;
             }});
+    }
+
+
+    public static void skipTldsForResourceJars(Context context) {
+        StandardJarScanner scanner = (StandardJarScanner) context.getJarScanner();
+        StandardJarScanFilter filter = (StandardJarScanFilter) scanner.getJarScanFilter();
+        filter.setTldSkip(filter.getTldSkip() + ",resources*.jar");
     }
 }
