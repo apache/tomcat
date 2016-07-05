@@ -448,7 +448,7 @@ public class MyBean2 {
     files are placed in <code>$CATALINA_BASE/conf</code>. A typical XML would
     look like:</p>
 
-<source><![CDATA[<?xml version='1.0' encoding='utf-8'?>
+<source><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <tomcat-users>
   <role rolename="tomcat"/>
   <role rolename="role1"/>

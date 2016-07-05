@@ -227,6 +227,9 @@
         pick up the latest fixes and make 1.2.8 the minimum recommended version.
         (markt)
       </update>
+      <scode>
+        Use UTF-8 with a standard prolog for all XML files. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
