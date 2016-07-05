@@ -192,7 +192,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
             // Arbitrarily located in the init, could be in the initial read event, asynchronous, etc.
             // Note: the completion check used will not call the completion handler if the IO completed inline and without error.
             // Using a completion check that always calls complete would be easier here since the action is the same even with inline completion.
-            ByteBuffer buffer = ByteBuffer.allocate(1024);
+            final ByteBuffer buffer = ByteBuffer.allocate(1024);
             CompletionState state = wrapper.read(false, 10, TimeUnit.SECONDS, null, SocketWrapperBase.READ_DATA, new CompletionHandler<Long, Void>() {
                 @Override
                 public void completed(Long result, Void attachment) {

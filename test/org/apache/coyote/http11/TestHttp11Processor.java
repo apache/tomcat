@@ -771,9 +771,9 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
 
         @Override
-        protected void doPut(HttpServletRequest req, HttpServletResponse resp)
+        protected void doPut(HttpServletRequest req, final HttpServletResponse resp)
                 throws ServletException, IOException {
-            AsyncContext ac = req.startAsync();
+            final AsyncContext ac = req.startAsync();
             ac.start(new Runnable() {
                 @Override
                 public void run() {
