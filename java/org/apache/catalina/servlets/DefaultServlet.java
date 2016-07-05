@@ -29,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.AccessController;
@@ -1361,12 +1362,14 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-
     /**
      * Decide which way to render. HTML or XML.
+     *
      * @param contextPath The path
      * @param resource The resource
+     *
      * @return the input stream with the rendered output
+     *
      * @throws IOException an IO error occurred
      * @throws ServletException rendering error
      *
@@ -1387,18 +1390,19 @@ public class DefaultServlet extends HttpServlet {
             return renderHtml(contextPath, resource, encoding);
         }
         return renderXml(contextPath, resource, xsltSource, encoding);
-
     }
 
+
     /**
-     * Return an InputStream to an HTML representation of the contents
-     * of this directory.
+     * Return an InputStream to an XML representation of the contents this
+     * directory.
      *
-     * @param contextPath Context path to which our internal paths are
-     *  relative
+     * @param contextPath Context path to which our internal paths are relative
      * @param resource The associated resource
      * @param xsltSource The XSL stylesheet
+     *
      * @return the XML data
+     *
      * @throws IOException an IO error occurred
      * @throws ServletException rendering error
      *
@@ -1529,13 +1533,14 @@ public class DefaultServlet extends HttpServlet {
     }
 
     /**
-     * Return an InputStream to an HTML representation of the contents
-     * of this directory.
+     * Return an InputStream to an HTML representation of the contents of this
+     * directory.
      *
-     * @param contextPath Context path to which our internal paths are
-     *  relative
-     * @param resource The resource
+     * @param contextPath Context path to which our internal paths are relative
+     * @param resource    The associated resource
+     *
      * @return the HTML data
+     *
      * @throws IOException an IO error occurred
      *
      * @deprecated Unused. Will be removed in Tomcat 9
@@ -2392,7 +2397,8 @@ public class DefaultServlet extends HttpServlet {
         }
     }
 
-    protected static class CompressionFormat {
+    protected static class CompressionFormat implements Serializable {
+        private static final long serialVersionUID = 1L;
         public final String extension;
         public final String encoding;
 
