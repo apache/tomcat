@@ -610,7 +610,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             }
         };
 
-        public Nio2SocketWrapper(Nio2Channel channel, Nio2Endpoint endpoint) {
+        public Nio2SocketWrapper(Nio2Channel channel, final Nio2Endpoint endpoint) {
             super(channel, endpoint);
             socketBufferHandler = channel.getBufHandler();
 

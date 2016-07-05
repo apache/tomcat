@@ -868,6 +868,7 @@ public abstract class AbstractEndpoint<S> {
         }
     }
 
+
     public final void start() throws Exception {
         if (bindState == BindState.UNBOUND) {
             bind();
