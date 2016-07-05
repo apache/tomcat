@@ -1379,7 +1379,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         protected void doGet(HttpServletRequest req, final HttpServletResponse resp)
                 throws ServletException, IOException {
 
-            AsyncContext actxt = req.startAsync();
+            final AsyncContext actxt = req.startAsync();
             actxt.setTimeout(TIMEOUT);
             if (threaded) {
                 actxt.start(new Runnable() {
