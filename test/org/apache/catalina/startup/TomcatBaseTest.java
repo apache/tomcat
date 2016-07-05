@@ -55,6 +55,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
+import org.apache.catalina.Session;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.AprLifecycleListener;
@@ -106,6 +107,11 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             throws LifecycleException {
         File appDir = new File("test/webapp");
         Context ctx = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        StandardJarScanner scanner = (StandardJarScanner) ctx.getJarScanner();
+        StandardJarScanFilter filter = (StandardJarScanFilter) scanner.getJarScanFilter();
+        filter.setTldSkip(filter.getTldSkip() + ",testclasses");
+        filter.setPluggabilitySkip(filter.getPluggabilitySkip() + ",testclasses");
 
         if (addJstl) {
             File lib = new File("webapps/examples/WEB-INF/lib");
@@ -865,5 +871,13 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         StandardJarScanner scanner = (StandardJarScanner) context.getJarScanner();
         StandardJarScanFilter filter = (StandardJarScanFilter) scanner.getJarScanFilter();
         filter.setTldSkip(filter.getTldSkip() + ",resources*.jar");
+    }
+
+
+    public static void forceSessionMaxInactiveInterval(Context context, int newIntervalSecs) {
+        Session[] sessions = context.getManager().findSessions();
+        for (Session session : sessions) {
+            session.setMaxInactiveInterval(newIntervalSecs);
+        }
     }
 }
