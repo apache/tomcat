@@ -28,6 +28,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -173,7 +174,9 @@ public class TestCompiler extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File("test/webapp-fragments");
-        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        Context ctx = tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+        skipTldsForResourceJars(ctx);
+
         tomcat.start();
 
         // No further tests required. The bug triggers an infinite loop on

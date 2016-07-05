@@ -153,7 +153,8 @@ public class TestStandardWrapper extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File("test/webapp-fragments");
-        tomcat.addWebapp(null, "", appDir.getAbsolutePath());
+        Context ctx = tomcat.addWebapp(null, "", appDir.getAbsolutePath());
+        skipTldsForResourceJars(ctx);
 
         tomcat.start();
 

@@ -112,6 +112,7 @@ public class TestWarDirContext extends TomcatBaseTest {
         StandardRoot root = new StandardRoot();
         root.setCachingAllowed(true);
         ctxt.setResources(root);
+        skipTldsForResourceJars(ctxt);
 
         tomcat.start();
 

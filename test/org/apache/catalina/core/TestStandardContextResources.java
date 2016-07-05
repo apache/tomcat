@@ -211,6 +211,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
         // app dir is relative to server home
         StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test",
                 appDir.getAbsolutePath());
+        skipTldsForResourceJars(ctx);
 
         Tomcat.addServlet(ctx, "getresource", new GetResourceServlet());
         ctx.addServletMapping("/getresource", "getresource");
