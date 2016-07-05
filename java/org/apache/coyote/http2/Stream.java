@@ -422,7 +422,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    private static void push(Http2UpgradeHandler handler, Request request, Stream stream)
+    private static void push(final Http2UpgradeHandler handler, final Request request, final Stream stream)
             throws IOException {
         if (org.apache.coyote.Constants.IS_SECURITY_ENABLED) {
             try {
