@@ -296,16 +296,8 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                             log.debug(sm.getString(
                                     "jreLeakListener.gcDaemonFail"), e);
                         }
-                    } catch (SecurityException e) {
-                        log.error(sm.getString("jreLeakListener.gcDaemonFail"),
-                                e);
-                    } catch (NoSuchMethodException e) {
-                        log.error(sm.getString("jreLeakListener.gcDaemonFail"),
-                                e);
-                    } catch (IllegalArgumentException e) {
-                        log.error(sm.getString("jreLeakListener.gcDaemonFail"),
-                                e);
-                    } catch (IllegalAccessException e) {
+                    } catch (SecurityException | NoSuchMethodException | IllegalArgumentException |
+                            IllegalAccessException e) {
                         log.error(sm.getString("jreLeakListener.gcDaemonFail"),
                                 e);
                     } catch (InvocationTargetException e) {

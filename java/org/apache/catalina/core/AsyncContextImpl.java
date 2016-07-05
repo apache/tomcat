@@ -17,7 +17,6 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -263,20 +262,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         try {
              listener = (T) getInstanceManager().newInstance(clazz.getName(),
                      clazz.getClassLoader());
-        } catch (InstantiationException e) {
-            ServletException se = new ServletException(e);
-            throw se;
-        } catch (IllegalAccessException e) {
-            ServletException se = new ServletException(e);
-            throw se;
-        } catch (InvocationTargetException e) {
-            ExceptionUtils.handleThrowable(e.getCause());
-            ServletException se = new ServletException(e);
-            throw se;
-        } catch (NamingException e) {
-            ServletException se = new ServletException(e);
-            throw se;
-        } catch (ClassNotFoundException e) {
+        } catch (InstantiationException | IllegalAccessException | NamingException |
+                ClassNotFoundException e) {
             ServletException se = new ServletException(e);
             throw se;
         } catch (Exception e) {
