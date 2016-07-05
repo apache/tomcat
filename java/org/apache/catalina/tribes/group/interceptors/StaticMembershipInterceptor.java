@@ -155,7 +155,7 @@ public class StaticMembershipInterceptor extends ChannelInterceptorBase {
         if ( (Channel.SND_RX_SEQ&svc)==Channel.SND_RX_SEQ ) super.start(Channel.SND_RX_SEQ);
         if ( (Channel.SND_TX_SEQ&svc)==Channel.SND_TX_SEQ ) super.start(Channel.SND_TX_SEQ);
         final ChannelInterceptorBase base = this;
-        for (Member member : members) {
+        for (final Member member : members) {
             Thread t = new Thread() {
                 @Override
                 public void run() {
