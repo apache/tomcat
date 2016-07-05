@@ -75,15 +75,14 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
     private static final String URI_PROTECTED = "/protected";
     private static final String URI_PUBLIC = "/anyoneCanAccess";
 
-    private static final int SHORT_SESSION_TIMEOUT_MINS = 1;
-    private static final int LONG_SESSION_TIMEOUT_MINS = 2;
-    private static final int MANAGER_SCAN_INTERVAL_SECS = 10;
+    private static final int SHORT_SESSION_TIMEOUT_SECS = 1;
+    private static final int MANAGER_SCAN_INTERVAL_SECS = 2;
     private static final int MANAGER_EXPIRE_SESSIONS_FAST = 1;
     private static final int EXTRA_DELAY_SECS = 5;
     private static final long TIMEOUT_DELAY_MSECS =
-            (((SHORT_SESSION_TIMEOUT_MINS * 60)
-            + (MANAGER_SCAN_INTERVAL_SECS * MANAGER_EXPIRE_SESSIONS_FAST)
-            + EXTRA_DELAY_SECS) * 1000);
+            ((SHORT_SESSION_TIMEOUT_SECS +
+                    (MANAGER_SCAN_INTERVAL_SECS * MANAGER_EXPIRE_SESSIONS_FAST) +
+                    EXTRA_DELAY_SECS) * 1000);
 
     private static final String CLIENT_AUTH_HEADER = "authorization";
     private static final String SERVER_AUTH_HEADER = "WWW-Authenticate";
@@ -287,6 +286,11 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
         doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS,
                 USE_COOKIES, HttpServletResponse.SC_OK);
 
+        // Force session to expire one second from now
+        forceSessionMaxInactiveInterval(
+                (Context) getTomcatInstance().getHost().findChild(CONTEXT_PATH_LOGIN),
+                SHORT_SESSION_TIMEOUT_SECS);
+
         // allow the session to time out and lose authentication
         Thread.sleep(TIMEOUT_DELAY_MSECS);
 
@@ -451,7 +455,6 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
         // Must have a real docBase for webapps - just use temp
         nonloginContext = tomcat.addContext(CONTEXT_PATH_NOLOGIN,
                 System.getProperty("java.io.tmpdir"));
-        nonloginContext.setSessionTimeout(LONG_SESSION_TIMEOUT_MINS);
 
         // Add protected servlet to the context
         Tomcat.addServlet(nonloginContext, "TesterServlet1", new TesterServlet());
@@ -488,7 +491,6 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
         // Must have a real docBase for webapps - just use temp
         basicContext = tomcat.addContext(CONTEXT_PATH_LOGIN,
                 System.getProperty("java.io.tmpdir"));
-        basicContext.setSessionTimeout(SHORT_SESSION_TIMEOUT_MINS);
 
         // Add protected servlet to the context
         Tomcat.addServlet(basicContext, "TesterServlet3", new TesterServlet());
@@ -536,7 +538,8 @@ public class TestNonLoginAndBasicAuthenticator extends TomcatBaseTest {
      * with a session expiry scan every 6 cycles.
      */
     private void setRapidSessionTimeout() {
-
+        basicContext.getParent().getParent().setBackgroundProcessorDelay(
+                MANAGER_SCAN_INTERVAL_SECS);
         ((ManagerBase) basicContext.getManager())
                 .setProcessExpiresFrequency(MANAGER_EXPIRE_SESSIONS_FAST);
     }

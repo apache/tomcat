@@ -95,9 +95,8 @@ public class TestFormAuthenticator extends TomcatBaseTest {
     protected static final boolean SERVER_FREEZE_SESSID = !SERVER_CHANGE_SESSID;
 
     // minimum session timeout
-    private static final int TIMEOUT_MINS = 1;
-    private static final long TIMEOUT_DELAY_MSECS =
-                            (((TIMEOUT_MINS * 60) + 10) * 1000);
+    private static final int SHORT_SESSION_TIMEOUT_SECS = 1;
+    private static final long TIMEOUT_DELAY_MSECS = ((SHORT_SESSION_TIMEOUT_SECS + 10) * 1000);
 
     private FormAuthClient client;
 
@@ -238,6 +237,10 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         String protectedUri = doTest("GET", "GET", NO_100_CONTINUE,
                 CLIENT_NO_COOKIES, SERVER_USE_COOKIES,
                 SERVER_FREEZE_SESSID);
+
+        // Force session to expire one second from now
+        Context context = (Context) getTomcatInstance().getHost().findChildren()[0];
+        forceSessionMaxInactiveInterval(context, SHORT_SESSION_TIMEOUT_SECS);
 
         // wait long enough for my session to expire
         Thread.sleep(TIMEOUT_DELAY_MSECS);
@@ -656,9 +659,6 @@ public class TestFormAuthenticator extends TomcatBaseTest {
 
             tomcat.start();
 
-            // perhaps this does not work until tomcat has started?
-            ctx.setSessionTimeout(TIMEOUT_MINS);
-
             // Valve pipeline is only established after tomcat starts
             Valve[] valves = ctx.getPipeline().getValves();
             for (Valve valve : valves) {
@@ -733,9 +733,6 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             ctx.setRealm(realm);
 
             tomcat.start();
-
-            // perhaps this does not work until tomcat has started?
-            ctx.setSessionTimeout(TIMEOUT_MINS);
 
             // Valve pipeline is only established after tomcat starts
             Valve[] valves = ctx.getPipeline().getValves();
