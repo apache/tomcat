@@ -230,7 +230,7 @@ public class JspC extends Task implements Options {
     // Generation of web.xml fragments
     protected String webxmlFile;
     protected int webxmlLevel;
-    protected String webxmlEncoding;
+    protected String webxmlEncoding = "UTF-8";
     protected boolean addWebXmlMappings = false;
 
     protected Writer mapout;
@@ -983,7 +983,7 @@ public class JspC extends Task implements Options {
      * Sets the encoding to be used to read and write web.xml files.
      *
      * <p>
-     * If not specified, defaults to the platform default encoding.
+     * If not specified, defaults to UTF-8.
      * </p>
      *
      * @param encoding
@@ -1473,7 +1473,7 @@ public class JspC extends Task implements Options {
                 mappingout = null;
             }
             if (webxmlLevel >= ALL_WEBXML) {
-                mapout.write(Localizer.getMessage("jspc.webxml.header"));
+                mapout.write(Localizer.getMessage("jspc.webxml.header", webxmlEncoding));
                 mapout.flush();
             } else if ((webxmlLevel>= INC_WEBXML) && !addWebXmlMappings) {
                 mapout.write(Localizer.getMessage("jspc.webinc.header"));

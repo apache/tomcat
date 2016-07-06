@@ -45,6 +45,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.4" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        When writing out a full web.xml file with JspC ensure that the encoding
+        used in the XML prolog matches the encoding used to write the contents
+        of the file. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 8.5.3" rtext="release in progress">
   <subsection name="Catalina">
     <changelog>
       <fix>
