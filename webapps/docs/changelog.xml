@@ -45,6 +45,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M10" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>59813</bug>: Ensure that circular relations of the Class-Path
+        attribute from JAR manifests will be processed correctly. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>

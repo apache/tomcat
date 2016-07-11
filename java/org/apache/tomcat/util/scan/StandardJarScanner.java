@@ -273,6 +273,7 @@ public class StandardJarScanner implements JarScanner {
                                 log.debug(sm.getString("jarScan.classloaderJarScan", url));
                             }
                             try {
+                                processedURLs.add(url);
                                 process(scanType, callback, url, null, isWebapp, classPathUrlsToProcess);
                             } catch (IOException ioe) {
                                 log.warn(sm.getString("jarScan.classloaderFail", url), ioe);
