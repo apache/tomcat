@@ -51,6 +51,13 @@
         <bug>59813</bug>: Ensure that circular relations of the Class-Path
         attribute from JAR manifests will be processed correctly. (violetagg)
       </fix>
+      <fix>
+        Ensure that reading the <code>singleThreadModel</code> attribute of a
+        <code>StandardWrapper</code> via JMX does not trigger initialisation of
+        the associated servlet. With some frameworks this can trigger an
+        unexpected initialisation thread and if initilisation is not thread-safe
+        the initialisation can then fail. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
