@@ -573,35 +573,22 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * Return <code>true</code> if the servlet class represented by this
-     * component implements the <code>SingleThreadModel</code> interface.
+     * Does the servlet class represented by this component implement the
+     * <code>SingleThreadModel</code> interface? This can only be determined
+     * once the class is loaded. Calling this method will not trigger loading
+     * the class since that may cause the application to behave unexpectedly.
+     *
+     * @return {@code null} if the class has not been loaded, otherwise {@code
+     *         true} if the servlet does implement {@code SingleThreadModel} and
+     *         {@code false} if it does not.
      */
-    public boolean isSingleThreadModel() {
-
-        // Short-cuts
-        // If singleThreadModel is true, must have already checked this
-        // If instance != null, must have already loaded 
+    public Boolean isSingleThreadModel() {
+        // If the servlet has been loaded either singleThreadModel will be true
+        // or instance will be non-null
         if (singleThreadModel || instance != null) {
-            return singleThreadModel;
+            return Boolean.valueOf(singleThreadModel);
         }
-        
-        // The logic to determine this safely is more complex than one might
-        // expect. allocate() already has the necessary logic so re-use it.
-        // Make sure the Servlet is loaded with the right class loader
-        ClassLoader old = Thread.currentThread().getContextClassLoader();
-        ClassLoader webappClassLoader =
-                ((Context) getParent()).getLoader().getClassLoader();
-        try {
-            Thread.currentThread().setContextClassLoader(webappClassLoader);
-            Servlet s = allocate();
-            deallocate(s);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-        } finally {
-            Thread.currentThread().setContextClassLoader(old);
-        }
-        return singleThreadModel;
-
+        return null;
     }
 
 

@@ -1718,7 +1718,7 @@
           
     <attribute name="singleThreadModel"
                description="Does this servlet implement the SingleThreadModel interface?"
-               type="boolean"
+               type="java.lang.Boolean"
                is="true"
                writeable="false" />
 
