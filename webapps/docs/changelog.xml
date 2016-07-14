@@ -60,6 +60,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Correct a regression in refactoring to enable injection of custom
+        keystores that broke the automatic conversion of OpenSSL style PEM
+        key and certificate files for use with JSSE TLS connectors. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>

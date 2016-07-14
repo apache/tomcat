@@ -183,7 +183,7 @@ public class SSLHostConfigCertificate implements Serializable {
     public KeyStore getCertificateKeystore() throws IOException {
         KeyStore result = certificateKeystore;
 
-        if (result == null) {
+        if (result == null && storeType == StoreType.KEYSTORE) {
             result = SSLUtilBase.getStore(getCertificateKeystoreType(),
                     getCertificateKeystoreProvider(), getCertificateKeystoreFile(),
                     getCertificateKeystorePassword());
