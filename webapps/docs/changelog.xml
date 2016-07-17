@@ -78,6 +78,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>59867</bug>: Correct the documentation provided by Manager's
+        403.jsp. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.4" rtext="2016-07-12">
   <subsection name="Catalina">
