@@ -34,9 +34,9 @@
     You are not authorized to view this page.
    </p>
    <p>
-    By default the Host Manager is only accessible from a browser running on the
+    By default the Manager is only accessible from a browser running on the
     same machine as Tomcat. If you wish to modify this restriction, you'll need
-    to edit the Host Manager's <tt>context.xml</tt> file.
+    to edit the Manager's <tt>context.xml</tt> file.
    </p>
    <p>
     If you have already configured the Manager application to allow access and
