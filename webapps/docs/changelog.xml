@@ -58,12 +58,6 @@
         unexpected initialisation thread and if initilisation is not thread-safe
         the initialisation can then fail. (markt)
       </fix>
-      <fix>
-        <bug>59862</bug>: Allow nested jar files scanning to be filtered with
-        the system property
-        <code>tomcat.util.scan.StandardJarScanFilter.jarsToSkip</code>. Patch
-        is provided by Terence Bandoian. (violetagg)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
