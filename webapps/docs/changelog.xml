@@ -58,6 +58,10 @@
         unexpected initialisation thread and if initilisation is not thread-safe
         the initialisation can then fail. (markt)
       </fix>
+      <fix>
+        Compatibility with rewrite from httpd for non existing headers.
+        (jfclere)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

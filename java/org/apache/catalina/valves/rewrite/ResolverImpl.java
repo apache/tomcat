@@ -143,10 +143,11 @@ public class ResolverImpl extends Resolver {
     @Override
     public String resolveHttp(String key) {
         String header = request.getHeader(key);
-        if (header == null)
-            return ""; 
-        else
+        if (header == null) {
+            return "";
+        } else {
             return header;
+        }
     }
 
     @Override
