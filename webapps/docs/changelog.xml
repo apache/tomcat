@@ -97,6 +97,10 @@
         remove the check code of the execution interval in the task that has
         been scheduled. (kfujino)
       </fix>
+      <fix>
+        <bug>59850</bug>: Ensure that the <code>ResultSet</code> is closed when
+        enabling the <code>StatementCache</code> interceptor. (kfujino)
+      </fix>
     </changelog>
   </subsection>
 </section>
