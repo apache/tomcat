@@ -170,6 +170,11 @@
         been scheduled. (kfujino)
       </fix>
       <fix>
+        <bug>59849</bug>: Ensure that the connection verification is executed by
+        <code>initSQL</code> (if required) if the borrowing
+        <code>PooledConnection</code> has not been initialized. (kfujino)
+      </fix>
+      <fix>
         <bug>59850</bug>: Ensure that the <code>ResultSet</code> is closed when
         enabling the <code>StatementCache</code> interceptor. (kfujino)
       </fix>
