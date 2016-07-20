@@ -164,6 +164,11 @@
         Ensure that do not remove the abandoned connection that has been already
         released. (kfujino)
       </fix>
+      <fix>
+        In order to avoid the unintended skip of <code>PoolCleaner</code>,
+        remove the check code of the execution interval in the task that has
+        been scheduled. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
