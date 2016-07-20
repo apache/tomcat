@@ -18,6 +18,7 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -236,6 +237,11 @@ public class StatementCache extends StatementDecoratorInterceptor {
                 //cache a proxy so that we don't reuse the facade
                 CachedStatement proxy = new CachedStatement(getDelegate(),getSql());
                 try {
+                    // clear Resultset
+                    ResultSet result = getDelegate().getResultSet();
+                    if (result != null && !result.isClosed()) {
+                        result.close();
+                    }
                     //create a new facade
                     Object actualProxy = getConstructor().newInstance(new Object[] { proxy });
                     proxy.setActualProxy(actualProxy);
