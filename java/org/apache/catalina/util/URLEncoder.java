@@ -77,10 +77,10 @@ public class URLEncoder {
      *
      * @deprecated Use {@link #encode(String, String)}
      */
-    //@Deprecated
-    //public String encode(String path) {
-    //    return encode(path, "UTF-8");
-    //}
+    @Deprecated
+    public String encode(String path) {
+        return encode(path, "UTF-8");
+    }
 
 
     /**
