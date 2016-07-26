@@ -80,6 +80,10 @@
         used in the XML prolog matches the encoding used to write the contents
         of the file. (markt)
       </fix>
+      <fix>
+        Improve the error handling for custom tags to ensure that the tag is
+        returned to the pool or released and destroyed once used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

@@ -2399,6 +2399,10 @@ class Generator {
                 writeNewInstance(tagHandlerVar, tagHandlerClassName);
             }
 
+            // Wrap use of tag in try/finally to ensure clean-up takes place
+            out.printil("try {");
+            out.pushIndent();
+
             // includes setting the context
             generateSetters(n, tagHandlerVar, handlerInfo, false);
 
@@ -2559,18 +2563,6 @@ class Generator {
             out.print(tagHandlerVar);
             out.println(".doEndTag() == javax.servlet.jsp.tagext.Tag.SKIP_PAGE) {");
             out.pushIndent();
-            if (!n.implementsTryCatchFinally()) {
-                if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
-                    out.printin(n.getTagHandlerPoolName());
-                    out.print(".reuse(");
-                    out.print(tagHandlerVar);
-                    out.println(");");
-                } else {
-                    out.printin(tagHandlerVar);
-                    out.println(".release();");
-                    writeDestroyInstance(tagHandlerVar);
-                }
-            }
             if (isTagFile || isFragment) {
                 out.printil("throw new javax.servlet.jsp.SkipPageException();");
             } else {
@@ -2603,6 +2595,15 @@ class Generator {
                 out.println(".doFinally();");
             }
 
+            if (n.implementsTryCatchFinally()) {
+                out.popIndent();
+                out.printil("}");
+            }
+
+            // Ensure clean-up takes place
+            out.popIndent();
+            out.printil("} finally {");
+            out.pushIndent();
             if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
                 out.printin(n.getTagHandlerPoolName());
                 out.print(".reuse(");
@@ -2613,11 +2614,8 @@ class Generator {
                 out.println(".release();");
                 writeDestroyInstance(tagHandlerVar);
             }
-
-            if (n.implementsTryCatchFinally()) {
-                out.popIndent();
-                out.printil("}");
-            }
+            out.popIndent();
+            out.printil("}");
 
             // Declare and synchronize AT_END scripting variables (must do this
             // outside the try/catch/finally block)
