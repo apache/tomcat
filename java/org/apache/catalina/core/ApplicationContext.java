@@ -464,7 +464,7 @@ public class ApplicationContext implements ServletContext {
 
         mappingData.recycle();
 
-        String encodedUri = URLEncoder.DEFAULT.encode(uriCC.toString());
+        String encodedUri = URLEncoder.DEFAULT.encode(uriCC.toString(), "UTF-8");
 
         // Construct a RequestDispatcher to process this request
         return new ApplicationDispatcher(wrapper, encodedUri, wrapperPath, pathInfo,

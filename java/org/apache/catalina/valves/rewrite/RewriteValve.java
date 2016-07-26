@@ -433,7 +433,7 @@ public class RewriteValve extends ValveBase {
                     if (context) {
                         chunk.append(contextPath);
                     }
-                    chunk.append(URLEncoder.DEFAULT.encode(urlString));
+                    chunk.append(URLEncoder.DEFAULT.encode(urlString, "UTF-8"));
                     request.getCoyoteRequest().requestURI().toChars();
                     // Decoded and normalized URI
                     request.getCoyoteRequest().decodedURI().setString(null);
