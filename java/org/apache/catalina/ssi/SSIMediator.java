@@ -296,7 +296,7 @@ public class SSIMediator {
     protected String encode(String value, String encoding) {
         String retVal = null;
         if (encoding.equalsIgnoreCase("url")) {
-            retVal = urlEncoder.encode(value);
+            retVal = urlEncoder.encode(value, "UTF-8");
         } else if (encoding.equalsIgnoreCase("none")) {
             retVal = value;
         } else if (encoding.equalsIgnoreCase("entity")) {

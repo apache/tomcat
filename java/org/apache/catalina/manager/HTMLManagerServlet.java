@@ -456,10 +456,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
                 StringBuilder tmp = new StringBuilder();
                 tmp.append("path=");
-                tmp.append(URL_ENCODER.encode(displayPath));
+                tmp.append(URL_ENCODER.encode(displayPath, "UTF-8"));
                 if (ctxt.getWebappVersion().length() > 0) {
                     tmp.append("&version=");
-                    tmp.append(URL_ENCODER.encode(ctxt.getWebappVersion()));
+                    tmp.append(URL_ENCODER.encode(ctxt.getWebappVersion(), "UTF-8"));
                 }
                 String pathVersion = tmp.toString();
 
@@ -471,7 +471,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 }
                 
                 args = new Object[7];
-                args[0] = "<a href=\"" + URL_ENCODER.encode(contextPath + "/")
+                args[0] = "<a href=\"" + URL_ENCODER.encode(contextPath + "/", "UTF-8")
                         + "\">" + RequestUtil.filter(displayPath) + "</a>";
                 if ("".equals(ctxt.getWebappVersion())) {
                     args[1] = noVersion;

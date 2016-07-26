@@ -2261,7 +2261,7 @@ public class StandardContext extends ContainerBase
             log.warn(sm.getString(
                     "standardContext.pathInvalid", path, this.path));
         }
-        encodedPath = urlEncoder.encode(this.path);
+        encodedPath = urlEncoder.encode(this.path, "UTF-8");
         if (getName() == null) {
             setName(this.path);
         }
