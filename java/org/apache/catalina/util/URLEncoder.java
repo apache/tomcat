@@ -69,21 +69,6 @@ public class URLEncoder {
 
 
     /**
-     * URL encodes the provided path using UTF-8.
-     *
-     * @param path The path to encode
-     *
-     * @return The encoded path
-     *
-     * @deprecated Use {@link #encode(String, String)}
-     */
-    @Deprecated
-    public String encode(String path) {
-        return encode(path, "UTF-8");
-    }
-
-
-    /**
      * URL encodes the provided path using the given encoding.
      *
      * @param path      The path to encode
