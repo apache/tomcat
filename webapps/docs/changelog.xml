@@ -107,6 +107,10 @@
         <code>InstanceManager.destroy()</code> to ensure that the method is
         executed. (markt)
       </fix>
+      <fix>
+        Improve the error handling for custom tags to ensure that the tag is
+        returned to the pool or released and destroyed once used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
