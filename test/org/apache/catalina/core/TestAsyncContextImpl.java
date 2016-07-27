@@ -2591,4 +2591,10 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             }
         }
     }
+
+
+    @Test
+    public void testAsyncDispatchEncoding() throws Exception {
+
+    }
 }
