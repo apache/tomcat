@@ -929,9 +929,28 @@ public class StandardContext extends ContainerBase
 
     private boolean useRelativeRedirects = !Globals.STRICT_SERVLET_COMPLIANCE;
 
+    private boolean dispatchersUseEncodedPaths = true;
+
 
     // ----------------------------------------------------- Context Properties
     
+    @Override
+    public void setDispatchersUseEncodedPaths(boolean dispatchersUseEncodedPaths) {
+        this.dispatchersUseEncodedPaths = dispatchersUseEncodedPaths;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The default value for this implementation is {@code true}.
+     */
+    @Override
+    public boolean getDispatchersUseEncodedPaths() {
+        return dispatchersUseEncodedPaths;
+    }
+
+
     @Override
     public void setUseRelativeRedirects(boolean useRelativeRedirects) {
         this.useRelativeRedirects = useRelativeRedirects;

@@ -89,6 +89,12 @@
         unexpected initialisation thread and if initilisation is not thread-safe
         the initialisation can then fail. (markt)
       </fix>
+      <fix>
+        By default, treat paths used to obtain a request dispatcher as encoded.
+        This behaviour can be changed per web application via the
+        <code>dispatchersUseEncodedPaths</code> attribute of the Context.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

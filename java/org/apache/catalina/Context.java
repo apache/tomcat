@@ -1714,4 +1714,26 @@ public interface Context extends Container {
      * @see #setUseRelativeRedirects(boolean)
      */
     public boolean getUseRelativeRedirects();
+
+    /**
+     * Are paths used in calls to obtain a request dispatcher expected to be
+     * encoded? This affects both how Tomcat handles calls to obtain a request
+     * dispatcher as well as how Tomcat generates paths used to obtain request
+     * dispatchers internally.
+     *
+     * @param dispatchersUseEncodedPaths {@code true} to use encoded paths,
+     *        otherwise {@code false}
+     */
+    public void setDispatchersUseEncodedPaths(boolean dispatchersUseEncodedPaths);
+
+    /**
+     * Are paths used in calls to obtain a request dispatcher expected to be
+     * encoded? This applys to both how Tomcat handles calls to obtain a request
+     * dispatcher as well as how Tomcat generates paths used to obtain request
+     * dispatchers internally.
+     *
+     * @return {@code true} if encoded paths will be used, otherwise
+     *         {@code false}
+     */
+    public boolean getDispatchersUseEncodedPaths();
 }
