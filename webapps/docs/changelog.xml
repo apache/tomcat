@@ -62,6 +62,12 @@
         Compatibility with rewrite from httpd for non existing headers.
         (jfclere)
       </fix>
+      <fix>
+        By default, treat paths used to obtain a request dispatcher as encoded.
+        This behaviour can be changed per web application via the
+        <code>dispatchersUseEncodedPaths</code> attribute of the Context.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
