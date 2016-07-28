@@ -76,6 +76,10 @@
         extend SecurityManager protection to the system property replacement
         feature of the digester. (markt)
       </add>
+      <fix>
+        <bug>59839</bug>: Apply <code>roleSearchAsUser</code> to all nested searches
+        in JNDIRealm. (fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
