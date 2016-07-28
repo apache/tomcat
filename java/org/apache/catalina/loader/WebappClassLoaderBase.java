@@ -75,6 +75,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.PermissionCheck;
 
 /**
  * Specialized web application class loader.
@@ -120,7 +121,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  */
 public abstract class WebappClassLoaderBase extends URLClassLoader
-        implements Lifecycle, InstrumentableClassLoader, WebappProperties {
+        implements Lifecycle, InstrumentableClassLoader, WebappProperties, PermissionCheck {
 
     private static final Log log = LogFactory.getLog(WebappClassLoaderBase.class);
 
@@ -1325,6 +1326,24 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
         return (pc);
 
+    }
+
+
+    @Override
+    public boolean check(Permission permission) {
+        if (!Globals.IS_SECURITY_ENABLED) {
+            return true;
+        }
+        Policy currentPolicy = Policy.getPolicy();
+        if (currentPolicy != null) {
+            URL contextRootUrl = resources.getResource("/").getCodeBase();
+            CodeSource cs = new CodeSource(contextRootUrl, (Certificate[]) null);
+            PermissionCollection pc = currentPolicy.getPermissions(cs);
+            if (pc.implies(permission)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
