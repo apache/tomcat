@@ -474,8 +474,7 @@ public final class EmbeddedServletOptions implements Options {
      * @param config The Servlet config
      * @param context The Servlet context
      */
-    public EmbeddedServletOptions(ServletConfig config,
-            ServletContext context) {
+    public EmbeddedServletOptions(ServletConfig config, ServletContext context) {
 
         Enumeration<String> enumeration=config.getInitParameterNames();
         while( enumeration.hasMoreElements() ) {
@@ -512,8 +511,7 @@ public final class EmbeddedServletOptions implements Options {
         }
 
         this.isPoolingEnabled = true;
-        String poolingEnabledParam
-        = config.getInitParameter("enablePooling");
+        String poolingEnabledParam = config.getInitParameter("enablePooling");
         if (poolingEnabledParam != null
                 && !poolingEnabledParam.equalsIgnoreCase("true")) {
             if (poolingEnabledParam.equalsIgnoreCase("false")) {
@@ -637,8 +635,7 @@ public final class EmbeddedServletOptions implements Options {
             }
         }
 
-        String errBeanClass =
-            config.getInitParameter("errorOnUseBeanInvalidClassAttribute");
+        String errBeanClass = config.getInitParameter("errorOnUseBeanInvalidClassAttribute");
         if (errBeanClass != null) {
             if (errBeanClass.equalsIgnoreCase("true")) {
                 errorOnUseBeanInvalidClassAttribute = true;
