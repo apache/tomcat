@@ -88,7 +88,6 @@ public class NamingContext implements Context {
             HashMap<String,NamingEntry> bindings) {
 
         this.env = new Hashtable<>();
-        // FIXME ? Could be put in the environment ?
         this.name = name;
         // Populating the environment hashtable
         if (env != null ) {
