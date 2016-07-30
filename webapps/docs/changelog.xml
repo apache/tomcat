@@ -68,6 +68,10 @@
         <code>dispatchersUseEncodedPaths</code> attribute of the Context.
         (markt)
       </fix>
+      <fix>
+        <bug>59839</bug>: Apply <code>roleSearchAsUser</code> to all nested searches
+        in JNDIRealm. (fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
