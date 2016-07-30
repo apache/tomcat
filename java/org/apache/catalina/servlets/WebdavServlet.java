@@ -17,6 +17,7 @@
 package org.apache.catalina.servlets;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -1709,11 +1710,15 @@ public class WebdavServlet
                     }
                 }
             }
-            if (!resources.write(dest, sourceResource.getInputStream(),
-                    false)) {
-                errorList.put(source,
-                        Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
-                return false;
+            try (InputStream is = sourceResource.getInputStream()) {
+                if (!resources.write(dest, is,
+                        false)) {
+                    errorList.put(source,
+                            Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
+                    return false;
+                }
+            } catch (IOException e) {
+                log(sm.getString("webdavservlet.inputstreamclosefail", source), e);
             }
         } else {
             errorList.put(source,

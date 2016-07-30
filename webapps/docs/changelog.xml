@@ -84,6 +84,10 @@
         When retrieving an object via a <code>ResourceLink</code>, ensure that
         the object obtained is of the expected type. (markt)
       </add>
+      <fix>
+        <bug>59859</bug>: Fix resource leak in WebDAV servlet. Based on patch by
+        Coty Sutherland. (fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
