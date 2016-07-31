@@ -1998,18 +1998,8 @@ public class JNDIRealm extends RealmBase {
         }
 
         // Perform the configured search and process the results
-        NamingEnumeration<SearchResult> results = null;
-        boolean thisRoleSearchAsUser = isRoleSearchAsUser();
-        try {
-            if (thisRoleSearchAsUser) {
-                userCredentialsAdd(context, dn, user.getPassword());
-            }
-            results = context.search(base, filter, controls);
-        } finally {
-            if (thisRoleSearchAsUser) {
-                userCredentialsRemove(context);
-            }
-        }
+        NamingEnumeration<SearchResult> results = searchAsUser(context, user, base, filter, controls,
+                isRoleSearchAsUser());
 
         if (results == null)
             return list;  // Should never happen, but just in case ...
@@ -2060,7 +2050,8 @@ public class JNDIRealm extends RealmBase {
                         containerLog.trace("Perform a nested group search with base "+ roleBase + " and filter " + filter);
                     }
 
-                    results = context.search(roleBase, filter, controls);
+                    results = searchAsUser(context, user, roleBase, filter, controls,
+                            isRoleSearchAsUser());
 
                     try {
                         while (results.hasMore()) {
@@ -2094,6 +2085,45 @@ public class JNDIRealm extends RealmBase {
 
         list.addAll(groupMap.values());
         return list;
+    }
+
+    /**
+     * Perform the search on the context as the {@code dn}, when
+     * {@code searchAsUser} is {@code true}, otherwise search the context with
+     * the default credentials.
+     *
+     * @param context
+     *            context to search on
+     * @param user
+     *            user to bind on
+     * @param base
+     *            base to start the search from
+     * @param filter
+     *            filter to use for the search
+     * @param controls
+     *            controls to use for the search
+     * @param searchAsUser
+     *            {@code true} when the search should be done as user, or
+     *            {@code false} for using the default credentials
+     * @return enumeration with all found entries
+     * @throws NamingException
+     *             if a directory server error occurs
+     */
+    private NamingEnumeration<SearchResult> searchAsUser(DirContext context,
+            User user, String base, String filter,
+            SearchControls controls, boolean searchAsUser) throws NamingException {
+        NamingEnumeration<SearchResult> results;
+        try {
+            if (searchAsUser) {
+                userCredentialsAdd(context, user.getDN(), user.getPassword());
+            }
+            results = context.search(base, filter, controls);
+        } finally {
+            if (searchAsUser) {
+                userCredentialsRemove(context);
+            }
+        }
+        return results;
     }
 
 
