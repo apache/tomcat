@@ -99,6 +99,14 @@
         <bug>59839</bug>: Apply <code>roleSearchAsUser</code> to all nested searches
         in JNDIRealm. (fschumacher)
       </fix>
+      <add>
+        Provide a mechanism that enables the container to check if a component
+        (typically a web application) has been granted a given permission when
+        running under a SecurityManager without the current execution stack
+        having to have passed through the component. Use this new mechanism to
+        extend SecurityManager protection to the system property replacement
+        feature of the digester. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
