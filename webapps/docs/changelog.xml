@@ -82,6 +82,14 @@
         <bug>59859</bug>: Fix resource leak in WebDAV servlet. Based on patch by
         Coty Sutherland. (fschumacher)
       </fix>
+      <add>
+        Provide a mechanism that enables the container to check if a component
+        (typically a web application) has been granted a given permission when
+        running under a SecurityManager without the current execution stack
+        having to have passed through the component. Use this new mechanism to
+        extend SecurityManager protection to the system property replacement
+        feature of the digester. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

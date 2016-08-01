@@ -23,11 +23,13 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Permission;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.PropertyPermission;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -37,6 +39,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.security.PermissionCheck;
 import org.xml.sax.Attributes;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
@@ -78,6 +81,13 @@ public class Digester extends DefaultHandler2 {
         implements IntrospectionUtils.PropertySource {
         @Override
         public String getProperty( String key ) {
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            if (cl instanceof PermissionCheck) {
+                Permission p = new PropertyPermission(key, "read");
+                if (!((PermissionCheck) cl).check(p)) {
+                    return null;
+                }
+            }
             return System.getProperty(key);
         }
     }
