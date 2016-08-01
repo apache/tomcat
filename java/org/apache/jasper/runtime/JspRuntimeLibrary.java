@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.runtime;
 
 import java.beans.PropertyEditor;
@@ -23,9 +22,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.Enumeration;
 
 import javax.servlet.RequestDispatcher;
@@ -37,7 +33,6 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.BodyContent;
 
-import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.util.ExceptionUtils;
@@ -55,36 +50,6 @@ import org.apache.jasper.util.ExceptionUtils;
  * @author Shawn Bayern
  */
 public class JspRuntimeLibrary {
-
-    protected static class PrivilegedIntrospectHelper
-        implements PrivilegedExceptionAction<Void> {
-
-        private final Object bean;
-        private final String prop;
-        private final String value;
-        private final ServletRequest request;
-        private final String param;
-        private final boolean ignoreMethodNF;
-
-        PrivilegedIntrospectHelper(Object bean, String prop,
-                                   String value, ServletRequest request,
-                                   String param, boolean ignoreMethodNF)
-        {
-            this.bean = bean;
-            this.prop = prop;
-            this.value = value;
-            this.request = request;
-            this.param = param;
-            this.ignoreMethodNF = ignoreMethodNF;
-        }
-
-        @Override
-        public Void run() throws JasperException {
-            internalIntrospecthelper(
-                bean,prop,value,request,param,ignoreMethodNF);
-            return null;
-        }
-    }
 
     /**
      * Returns the value of the javax.servlet.error.exception request
@@ -294,29 +259,7 @@ public class JspRuntimeLibrary {
     public static void introspecthelper(Object bean, String prop,
                                         String value, ServletRequest request,
                                         String param, boolean ignoreMethodNF)
-                                        throws JasperException
-    {
-        if( Constants.IS_SECURITY_ENABLED ) {
-            try {
-                PrivilegedIntrospectHelper dp =
-                    new PrivilegedIntrospectHelper(
-                        bean,prop,value,request,param,ignoreMethodNF);
-                AccessController.doPrivileged(dp);
-            } catch( PrivilegedActionException pe) {
-                Exception e = pe.getException();
-                throw (JasperException)e;
-            }
-        } else {
-            internalIntrospecthelper(
-                bean,prop,value,request,param,ignoreMethodNF);
-        }
-    }
-
-    private static void internalIntrospecthelper(Object bean, String prop,
-                                        String value, ServletRequest request,
-                                        String param, boolean ignoreMethodNF)
-                                        throws JasperException
-    {
+                                        throws JasperException {
         Method method = null;
         Class<?> type = null;
         Class<?> propertyEditorClass = null;
