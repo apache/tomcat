@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.juli;
 
 import java.io.PrintWriter;
@@ -26,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Formatter;
+import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 
 /**
@@ -62,7 +62,7 @@ public class OneLineFormatter extends Formatter {
     };
 
     /* Timestamp format */
-    private static final String timeFormat = "dd-MMM-yyyy HH:mm:ss";
+    private static final String DEFAULT_TIME_FORMAT = "dd-MMM-yyyy HH:mm:ss";
 
     /**
      * The size of our global date format cache
@@ -75,21 +75,47 @@ public class OneLineFormatter extends Formatter {
     private static final int localCacheSize = 5;
 
     /**
-     * Global date format cache.
-     */
-    private static final DateFormatCache globalDateCache =
-            new DateFormatCache(globalCacheSize, timeFormat, null);
-
-    /**
      * Thread local date format cache.
      */
-    private static final ThreadLocal<DateFormatCache> localDateCache =
-            new ThreadLocal<DateFormatCache>() {
-        @Override
-        protected DateFormatCache initialValue() {
-            return new DateFormatCache(localCacheSize, timeFormat, globalDateCache);
+    private ThreadLocal<DateFormatCache> localDateCache;
+
+
+    public OneLineFormatter() {
+        String timeFormat = LogManager.getLogManager().getProperty(
+                OneLineFormatter.class.getName() + ".timeFormat");
+        if (timeFormat == null) {
+            timeFormat = DEFAULT_TIME_FORMAT;
         }
-    };
+        setTimeFormat(timeFormat);
+    }
+
+
+    /**
+     * Specify the time format to use for time stamps in log messages.
+     *
+     * @param timeFormat The format to use using the
+     *                   {@link java.text.SimpleDateFormat} syntax
+     */
+    public void setTimeFormat(String timeFormat) {
+        DateFormatCache globalDateCache = new DateFormatCache(globalCacheSize, timeFormat, null);
+        localDateCache = new ThreadLocal<DateFormatCache>() {
+            @Override
+            protected DateFormatCache initialValue() {
+                return new DateFormatCache(localCacheSize, timeFormat, globalDateCache);
+            }
+        };
+    }
+
+
+    /**
+     * Obtain the format currently being used for time stamps in log messages.
+     *
+     * @return The current format in {@link java.text.SimpleDateFormat} syntax
+     */
+    public String getTimeFormat() {
+        return localDateCache.get().getTimeFormat();
+    }
+
 
     @Override
     public String format(LogRecord record) {
