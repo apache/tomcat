@@ -59,7 +59,7 @@ public class TestImportHandler {
         ImportHandler handler = new ImportHandler();
 
         handler.importPackage("org.apache.tomcat.util");
-        handler.importPackage("org.apache.jasper.util");
+        handler.importPackage("org.apache.jasper.runtime");
 
         for (int i = 1; i <= 3; i++) {
             try {
