@@ -96,6 +96,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        <bug>59871</bug>: Add a property (<code>timeFormat</code>) to
+        JULI&apos;s <code>OneLineFormatter</code> to enable the format of the
+        time stamp used in log messages to be configured. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.94 (markt)" rtext="released 2019-04-12">
   <subsection name="Catalina">

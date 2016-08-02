@@ -95,6 +95,10 @@ public class DateFormatCache {
         return cache.getFormat(time);
     }
 
+    public String getTimeFormat() {
+        return format;
+    }
+
     private class Cache {
 
         /* Second formatted in most recent invocation */
