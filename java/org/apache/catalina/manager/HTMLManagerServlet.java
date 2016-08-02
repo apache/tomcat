@@ -583,8 +583,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
         args[4] = smClient.getString("htmlManagerServlet.serverOSName");
         args[5] = smClient.getString("htmlManagerServlet.serverOSVersion");
         args[6] = smClient.getString("htmlManagerServlet.serverOSArch");
-        args[7] = sm.getString("htmlManagerServlet.serverHostname");
-        args[8] = sm.getString("htmlManagerServlet.serverIPAddress");
+        args[7] = smClient.getString("htmlManagerServlet.serverHostname");
+        args[8] = smClient.getString("htmlManagerServlet.serverIPAddress");
         writer.print(MessageFormat.format
                      (Constants.SERVER_HEADER_SECTION, args));
 
