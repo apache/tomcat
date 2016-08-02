@@ -1141,6 +1141,11 @@ public class ContextConfig implements LifecycleListener {
                         context.getResources().listResources("/WEB-INF/classes");
 
                 for (WebResource webResource : webResources) {
+                    // Skip the META-INF directory from any JARs that have been
+                    // expanded in to WEB-INF/classes (sometimes IDEs do this).
+                    if ("META-INF".equals(webResource.getName())) {
+                        continue;
+                    }
                     processAnnotationsWebResource(webResource, webXml,
                             webXml.isMetadataComplete(), javaClassCache);
                 }
