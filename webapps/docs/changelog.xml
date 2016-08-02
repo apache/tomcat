@@ -128,6 +128,11 @@
         <bug>59867</bug>: Correct the documentation provided by Manager's
         403.jsp. (violetagg)
       </fix>
+      <fix>
+        <bug>59868</bug>: Clarify the documentation for the Manager web
+        application to make clearer that the host name and IP address in the
+        server section are the primary host name and IP address. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
