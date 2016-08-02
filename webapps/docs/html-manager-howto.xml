@@ -526,9 +526,11 @@ you will need to check using tools like GC logging, JConsole or similar.</p>
 
 <section name="Server Information">
 
-<p>This section displays information about Tomcat, the operating system of
-the server Tomcat is hosted on, and the Java Virtual Machine Tomcat is
-running in.</p>
+<p>This section displays information about Tomcat, the operating system of the
+server Tomcat is hosted on, the Java Virtual Machine Tomcat is running in, the
+primary host name of the server (may not be the host name used to access Tomcat)
+and the primary IP address of the server (may not be the IP address used to
+access Tomcat).</p>
 
 </section>
 
