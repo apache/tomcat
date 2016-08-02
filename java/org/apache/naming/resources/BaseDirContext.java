@@ -497,7 +497,13 @@ public abstract class BaseDirContext implements DirContext {
             return obj;
         }
 
-        // Check the alternate locations
+        // Class files may not be loaded from the alternate locations so don't
+        // waste cycles looking.
+        if (name.endsWith(".class")) {
+            return null;
+        }
+        
+        // Check the alternate locations (Resource JARs)
         String resourceName = "/META-INF/resources" + name;
         for (DirContext altDirContext : altDirContexts) {
             if (altDirContext instanceof BaseDirContext) {
