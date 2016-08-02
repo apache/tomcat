@@ -113,6 +113,11 @@
         keystores that broke the automatic conversion of OpenSSL style PEM
         key and certificate files for use with JSSE TLS connectors. (markt)
       </fix>
+      <fix>
+        <bug>59867</bug>: Don't hardcode key alias value to "tomcat" for JSSE.
+        When using a keystore, OpenSSL will still need default to though.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
