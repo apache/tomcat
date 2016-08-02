@@ -90,6 +90,11 @@ public class RewriteValve extends ValveBase {
     protected Map<String, RewriteMap> maps = new Hashtable<>();
 
 
+    public RewriteValve() {
+        super(true);
+    }
+
+
     public boolean getEnabled() {
         return enabled;
     }

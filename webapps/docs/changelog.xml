@@ -88,6 +88,10 @@
         <bug>59859</bug>: Fix resource leak in WebDAV servlet. Based on patch by
         Coty Sutherland. (fschumacher)
       </fix>
+      <fix>
+        <bug>59824</bug>: Mark the <code>RewriteValve</code> as supporting async
+        processing by default. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
