@@ -52,7 +52,7 @@ public class SSLHostConfigCertificate implements Serializable {
     private String certificateKeyPassword = null;
 
     // JSSE
-    private String certificateKeyAlias = "tomcat";
+    private String certificateKeyAlias;
     private String certificateKeystorePassword = "changeit";
     private String certificateKeystoreFile = System.getProperty("user.home")+"/.keystore";
     private String certificateKeystoreProvider = DEFAULT_KEYSTORE_PROVIDER;

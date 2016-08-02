@@ -206,6 +206,9 @@ public class JSSEUtil extends SSLUtilBase {
                 chain.addAll(certificateChainFile.getCertificates());
             }
 
+            if (keyAlias == null) {
+                keyAlias = "tomcat";
+            }
             ks.setKeyEntry(keyAlias, privateKeyFile.getPrivateKey(), keyPass.toCharArray(), chain.toArray(new Certificate[chain.size()]));
         }
 
