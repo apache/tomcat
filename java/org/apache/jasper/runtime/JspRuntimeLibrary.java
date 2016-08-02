@@ -35,7 +35,6 @@ import javax.servlet.jsp.tagext.BodyContent;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.Localizer;
-import org.apache.jasper.util.ExceptionUtils;
 
 /**
  * Bunch of util methods that are used by code generated for useBean,
