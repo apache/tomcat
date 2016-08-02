@@ -157,11 +157,6 @@
         <strong>Realm</strong>s. Also document the <code>NullRealm</code> and
         when it is automatically created for an <strong>Engine</strong>. (markt)
       </fix>
-      <fix>
-        Fix the description of <code>maxAge</code> attribute in jdbc-pool doc.
-        This attribute works both when a connection is returned and when a
-        connection is borrowed. (kfujino)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
