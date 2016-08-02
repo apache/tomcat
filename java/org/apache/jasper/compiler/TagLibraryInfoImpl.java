@@ -47,7 +47,7 @@ import javax.servlet.jsp.tagext.VariableInfo;
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
-import org.apache.jasper.util.ExceptionUtils;
+import org.apache.jasper.runtime.ExceptionUtils;
 import org.apache.jasper.xmlparser.ParserUtils;
 import org.apache.jasper.xmlparser.TreeNode;
 import org.apache.juli.logging.Log;

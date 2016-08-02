@@ -21,7 +21,7 @@ import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.apache.jasper.util.ExceptionUtils;
+import org.apache.jasper.runtime.ExceptionUtils;
 
 /**
  * Class responsible for converting error codes to corresponding localized

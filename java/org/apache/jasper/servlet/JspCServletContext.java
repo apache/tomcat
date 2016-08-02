@@ -48,7 +48,7 @@ import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
 import org.apache.jasper.JasperException;
-import org.apache.jasper.util.ExceptionUtils;
+import org.apache.jasper.runtime.ExceptionUtils;
 
 
 /**
