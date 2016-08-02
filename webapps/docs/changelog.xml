@@ -111,6 +111,12 @@
         When retrieving an object via a <code>ResourceLink</code>, ensure that
         the object obtained is of the expected type. (markt)
       </add>
+      <fix>
+        <bug>59866</bug>: When scanning <code>WEB-INF/classes</code> for
+        annotations, don't scan the contents of
+        <code>WEB-INF/classes/META-INF</code> (if present) since classes will
+        never be loaded from that location. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

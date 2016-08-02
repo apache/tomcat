@@ -1301,6 +1301,9 @@ public class ContextConfig implements LifecycleListener {
                                     ((FileDirContext) binding.getObject()).getDocBase());
                             processAnnotationsFile(webInfClassDir, webXml,
                                     webXml.isMetadataComplete());
+                        } else if ("META-INF".equals(binding.getName())) {
+                            // Skip the META-INF directory from any JARs that have been
+                            // expanded in to WEB-INF/classes (sometimes IDEs do this).
                         } else {
                             String resource =
                                     "/WEB-INF/classes/" + binding.getName();
