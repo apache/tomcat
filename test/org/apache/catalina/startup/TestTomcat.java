@@ -375,6 +375,7 @@ public class TestTomcat extends TomcatBaseTest {
         ContextResourceLink link = new ContextResourceLink();
         link.setGlobal("globalTest");
         link.setName(HelloWorldJndi.JNDI_ENV_NAME);
+        link.setType("java.lang.String");
         ctx.getNamingResources().addResourceLink(link);
 
         Tomcat.addServlet(ctx, "jndiServlet", new HelloWorldJndi());

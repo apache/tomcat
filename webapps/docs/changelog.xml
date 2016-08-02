@@ -107,6 +107,10 @@
         extend SecurityManager protection to the system property replacement
         feature of the digester. (markt)
       </add>
+      <add>
+        When retrieving an object via a <code>ResourceLink</code>, ensure that
+        the object obtained is of the expected type. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
