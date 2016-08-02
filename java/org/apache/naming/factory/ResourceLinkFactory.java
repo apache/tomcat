@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.naming.factory;
 
 import java.util.Hashtable;
@@ -29,21 +27,14 @@ import javax.naming.spi.ObjectFactory;
 
 import org.apache.naming.ResourceLinkRef;
 
-
 /**
  * <p>Object factory for resource links.</p>
  *
  * @author Remy Maucherat
  */
-public class ResourceLinkFactory
-    implements ObjectFactory {
-
-
-    // ----------------------------------------------------------- Constructors
-
+public class ResourceLinkFactory implements ObjectFactory {
 
     // ------------------------------------------------------- Static Variables
-
 
     /**
      * Global naming context.
@@ -52,7 +43,6 @@ public class ResourceLinkFactory
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Set the global context (note: can only be used once).
@@ -71,7 +61,6 @@ public class ResourceLinkFactory
 
     // -------------------------------------------------- ObjectFactory Methods
 
-
     /**
      * Create a new DataSource instance.
      *
@@ -79,11 +68,11 @@ public class ResourceLinkFactory
      */
     @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-                                    Hashtable<?,?> environment)
-        throws NamingException {
+            Hashtable<?,?> environment) throws NamingException {
 
-        if (!(obj instanceof ResourceLinkRef))
+        if (!(obj instanceof ResourceLinkRef)) {
             return null;
+        }
 
         // Can we process this request?
         Reference ref = (Reference) obj;
@@ -95,14 +84,20 @@ public class ResourceLinkFactory
             globalName = refAddr.getContent().toString();
             Object result = null;
             result = globalContext.lookup(globalName);
-            // FIXME: Check type
+            // Check the expected type
+            String expectedClassName = ref.getClassName();
+            try {
+                Class<?> expectedClazz = Class.forName(
+                        expectedClassName, true, Thread.currentThread().getContextClassLoader());
+                if (!expectedClazz.isAssignableFrom(result.getClass())) {
+                    throw new IllegalArgumentException();
+                }
+            } catch (ClassNotFoundException e) {
+                throw new IllegalStateException(e);
+            }
             return result;
         }
 
-        return (null);
-
-
+        return null;
     }
-
-
 }
