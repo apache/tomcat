@@ -157,6 +157,10 @@
         that continues to return an invalid connection after database restart.
         (kfujino)
       </fix>
+      <fix>
+        Ensure that the <code>ResultSet</code> is returned as Proxy object when
+        enabling the <code>StatementDecoratorInterceptor</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
