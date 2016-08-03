@@ -73,7 +73,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private volatile String name = "Tomcat Connection Pool["+(poolCounter.addAndGet(1))+"-"+System.identityHashCode(PoolProperties.class)+"]";
     private volatile String password;
     private volatile String username;
-    private volatile long validationInterval = 30000;
+    private volatile long validationInterval = 3000;
     private volatile boolean jmxEnabled = true;
     private volatile String initSQL;
     private volatile boolean testOnConnect =false;
