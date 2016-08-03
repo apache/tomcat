@@ -151,6 +151,12 @@
         <bug>59850</bug>: Ensure that the <code>ResultSet</code> is closed when
         enabling the <code>StatementCache</code> interceptor. (kfujino)
       </fix>
+      <fix>
+        <bug>59923</bug>: Reduce the default value of
+        <code>validationInterval</code> in order to avoid the potential issue
+        that continues to return an invalid connection after database restart.
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
