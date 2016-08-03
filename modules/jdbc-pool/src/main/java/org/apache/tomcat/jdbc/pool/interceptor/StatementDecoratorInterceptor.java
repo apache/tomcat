@@ -40,7 +40,11 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
 
     private static final Log logger = LogFactory.getLog(StatementDecoratorInterceptor.class);
 
-    private static final String[] EXECUTE_QUERY_TYPES = { "executeQuery" };
+    protected static final String EXECUTE_QUERY  = "executeQuery";
+    protected static final String GETGENERATEDKEYS = "getGeneratedKeys";
+    protected static final String GET_RESULTSET  = "getResultSet";
+
+    protected static final String[] RESULTSET_TYPES = {EXECUTE_QUERY, GETGENERATEDKEYS, GET_RESULTSET};
 
     /**
      * the constructors that are used to create statement proxies
@@ -154,11 +158,15 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     }
 
     protected boolean isExecuteQuery(String methodName) {
-        return EXECUTE_QUERY_TYPES[0].equals(methodName);
+        return EXECUTE_QUERY.equals(methodName);
     }
 
     protected boolean isExecuteQuery(Method method) {
         return isExecuteQuery(method.getName());
+    }
+
+    protected boolean isResultSet(Method method, boolean process) {
+        return process(RESULTSET_TYPES, method, process);
     }
 
     /**
@@ -239,7 +247,8 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             if (compare(GETCONNECTION_VAL,method)){
                 return connection;
             }
-            boolean process = isExecuteQuery(method);
+            boolean process = false;
+            process = isResultSet(method, process);
             // check to see if we are about to execute a query
             // if we are executing, get the current time
             Object result = null;
@@ -259,7 +268,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
                     throw t;
                 }
             }
-            if (process){
+            if (process && result != null) {
                 Constructor<?> cons = getResultSetConstructor();
                 result = cons.newInstance(new Object[]{new ResultSetProxy(actualProxy, result)});
             }
