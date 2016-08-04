@@ -89,6 +89,10 @@
         Coty Sutherland. (fschumacher)
       </fix>
       <fix>
+        <bug>59823</bug>: Ensure that JASPIC configuration is taken into account
+        when calling <code>HttpServletRequest.authenticate()</code>. (markt)
+      </fix>
+      <fix>
         <bug>59824</bug>: Mark the <code>RewriteValve</code> as supporting async
         processing by default. (markt)
       </fix>
