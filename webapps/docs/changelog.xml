@@ -76,18 +76,10 @@
         extend SecurityManager protection to the system property replacement
         feature of the digester. (markt)
       </add>
-      <fix>
-        <bug>59839</bug>: Apply <code>roleSearchAsUser</code> to all nested searches
-        in JNDIRealm. (fschumacher)
-      </fix>
       <add>
         When retrieving an object via a <code>ResourceLink</code>, ensure that
         the object obtained is of the expected type. (markt)
       </add>
-      <fix>
-        <bug>59859</bug>: Fix resource leak in WebDAV servlet. Based on patch by
-        Coty Sutherland. (fschumacher)
-      </fix>
       <fix>
         <bug>59823</bug>: Ensure that JASPIC configuration is taken into account
         when calling <code>HttpServletRequest.authenticate()</code>. (markt)
@@ -95,6 +87,14 @@
       <fix>
         <bug>59824</bug>: Mark the <code>RewriteValve</code> as supporting async
         processing by default. (markt)
+      </fix>
+      <fix>
+        <bug>59839</bug>: Apply <code>roleSearchAsUser</code> to all nested searches
+        in JNDIRealm. (fschumacher)
+      </fix>
+      <fix>
+        <bug>59859</bug>: Fix resource leak in WebDAV servlet. Based on patch by
+        Coty Sutherland. (fschumacher)
       </fix>
       <fix>
         <bug>59866</bug>: When scanning <code>WEB-INF/classes</code> for
