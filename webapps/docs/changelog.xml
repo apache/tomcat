@@ -190,6 +190,10 @@
         JULI&apos;s <code>OneLineFormatter</code> to enable the format of the
         time stamp used in log messages to be configured. (markt)
       </add>
+      <fix>
+        <bug>59899</bug>: Update Tomcat&apos;s copy of the Java Persistence
+        annotations to include the changes made in 2.1 / JavaEE 7. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
