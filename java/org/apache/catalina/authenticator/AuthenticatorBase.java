@@ -465,43 +465,7 @@ public abstract class AuthenticatorBase extends ValveBase
             }
         }
 
-        // Special handling for form-based logins to deal with the case
-        // where the login form (and therefore the "j_security_check" URI
-        // to which it submits) might be outside the secured area
-        String contextPath = this.context.getPath();
-        String decodedRequestURI = request.getDecodedRequestURI();
-        if (decodedRequestURI.startsWith(contextPath) &&
-                decodedRequestURI.endsWith(Constants.FORM_ACTION)) {
-            if (!authenticate(request, response, serverAuthContext, messageInfo)) {
-                if (log.isDebugEnabled()) {
-                    log.debug(" Failed authenticate() test ??" + decodedRequestURI);
-                }
-                return;
-            }
-        }
-
-        // Special handling for form-based logins to deal with the case where
-        // a resource is protected for some HTTP methods but not protected for
-        // GET which is used after authentication when redirecting to the
-        // protected resource.
-        // TODO: This is similar to the FormAuthenticator.matchRequest() logic
-        // Is there a way to remove the duplication?
-        Session session = request.getSessionInternal(false);
-        if (session != null) {
-            SavedRequest savedRequest = (SavedRequest) session.getNote(Constants.FORM_REQUEST_NOTE);
-            if (savedRequest != null &&
-                    decodedRequestURI.equals(savedRequest.getDecodedRequestURI()) &&
-                    !authenticate(request, response)) {
-                if (log.isDebugEnabled()) {
-                    log.debug(" Failed authenticate() test");
-                }
-                /*
-                 * ASSERT: Authenticator already set the appropriate HTTP status
-                 * code, so we do not have to do anything special
-                 */
-                return;
-            }
-        }
+        boolean authRequired = isContinuationRequired(request);
 
         // The Servlet may specify security constraints through annotations.
         // Ensure that they have been processed before constraints are checked
@@ -556,10 +520,7 @@ public abstract class AuthenticatorBase extends ValveBase
 
         // Since authenticate modifies the response on failure,
         // we have to check for allow-from-all first.
-        boolean authRequired;
-        if (constraints == null) {
-            authRequired = false;
-        } else {
+        if (!authRequired && constraints != null) {
             authRequired = true;
             for (int i = 0; i < constraints.length && authRequired; i++) {
                 if (!constraints[i].getAuthConstraint()) {
@@ -666,6 +627,21 @@ public abstract class AuthenticatorBase extends ValveBase
      */
     protected abstract boolean doAuthenticate(Request request, HttpServletResponse resonse)
             throws IOException;
+
+
+    /**
+     * Does this authenticator require that {@link #authenticate(Request,
+     * HttpServletResponse)} is called to continue an authentication process
+     * that started in a previous request?
+     *
+     * @param request The request currently being processed
+     *
+     * @return {@code true} if authenticate() must be called, otherwise
+     *         {@code false}
+     */
+    protected boolean isContinuationRequired(Request request) {
+        return false;
+    }
 
 
     /**
