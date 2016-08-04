@@ -641,7 +641,32 @@ public abstract class AuthenticatorBase extends ValveBase
         }
     }
 
+
+    @Override
+    public boolean authenticate(Request request, HttpServletResponse response) throws IOException {
+        return doAuthenticate(request, response);
+    }
+
+
     // ------------------------------------------------------ Protected Methods
+
+    /**
+     * Provided for sub-classes to implement their specific authentication
+     * mechanism.
+     *
+     * @param request The request that triggered the authentication
+     * @param resonse The response associated with the request
+     *
+     * @return {@code true} if the the user was authenticated, otherwise {@code
+     *         false}, in which case an authentication challenge will have been
+     *         written to the response
+     *
+     * @throws IOException If an I/O problem occurred during the authentication
+     *                     process
+     */
+    protected abstract boolean doAuthenticate(Request request, HttpServletResponse resonse)
+            throws IOException;
+
 
     /**
      * Look for the X509 certificate chain in the Request under the key
