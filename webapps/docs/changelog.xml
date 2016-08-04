@@ -146,6 +146,12 @@
         application to make clearer that the host name and IP address in the
         server section are the primary host name and IP address. (markt)
       </fix>
+      <fix>
+        <bug>59940</bug>: Correct the name of the
+        <code>truststorePassword</code> attribute of the
+        <code>SSLHostConfig</code> element in the configuration documentation.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
