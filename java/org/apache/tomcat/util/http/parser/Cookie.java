@@ -86,7 +86,7 @@ public class Cookie {
             }
         }
         for (int i = 0; i < 256; i++) {
-            if (i < 0x21 || i == DEL_BYTE) {
+            if (i < TAB_BYTE || (i > TAB_BYTE && i < SPACE_BYTE) || i == DEL_BYTE) {
                 isText[i] = false;
             } else {
                 isText[i] = true;

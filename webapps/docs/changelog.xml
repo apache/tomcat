@@ -108,6 +108,10 @@
         <code>WEB-INF/classes/META-INF</code> (if present) since classes will
         never be loaded from that location. (markt)
       </fix>
+      <fix>
+        <bug>59888</bug>: Correctly handle tabs and spaces in quoted version one
+        cookies when using the <code>Rfc6265CookieProcessor</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
