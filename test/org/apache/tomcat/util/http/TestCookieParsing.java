@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.http;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -48,7 +49,7 @@ public class TestCookieParsing extends TomcatBaseTest {
     private static final String COOKIES_WITH_SEPS_TRUNC = "name=val";
 
     private static final String[] COOKIES_WITH_QUOTES = new String[] {
-            "name=\"val\\\"ue\"" };
+            "name=\"val\\\"ue\"", "name=\"value\"" };
 
     @Test
     public void testLegacyWithEquals() throws Exception {
@@ -306,7 +307,11 @@ public class TestCookieParsing extends TomcatBaseTest {
         throws ServletException, IOException {
             req.getCookies();
             // Never do this in production code. It triggers an XSS.
-            resp.getWriter().write(req.getHeader("Cookie"));
+            Enumeration<String> cookieHeaders = req.getHeaders("Cookie");
+            while (cookieHeaders.hasMoreElements()) {
+                String cookieHeader = cookieHeaders.nextElement();
+                resp.getWriter().write(cookieHeader);
+            }
             resp.flushBuffer();
         }
     }
