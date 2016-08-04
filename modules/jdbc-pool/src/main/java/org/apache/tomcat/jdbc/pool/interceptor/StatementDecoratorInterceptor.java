@@ -41,10 +41,10 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     private static final Log logger = LogFactory.getLog(StatementDecoratorInterceptor.class);
 
     protected static final String EXECUTE_QUERY  = "executeQuery";
-    protected static final String GETGENERATEDKEYS = "getGeneratedKeys";
+    protected static final String GET_GENERATED_KEYS = "getGeneratedKeys";
     protected static final String GET_RESULTSET  = "getResultSet";
 
-    protected static final String[] RESULTSET_TYPES = {EXECUTE_QUERY, GETGENERATEDKEYS, GET_RESULTSET};
+    protected static final String[] RESULTSET_TYPES = {EXECUTE_QUERY, GET_GENERATED_KEYS, GET_RESULTSET};
 
     /**
      * the constructors that are used to create statement proxies
