@@ -537,7 +537,6 @@ public abstract class AuthenticatorBase extends ValveBase
             response.setHeader("Expires", DATE_ONE);
         }
 
-        int i;
         if (constraints != null) {
             // Enforce any user data constraint for this security constraint
             if (log.isDebugEnabled()) {
@@ -562,7 +561,7 @@ public abstract class AuthenticatorBase extends ValveBase
             authRequired = false;
         } else {
             authRequired = true;
-            for (i = 0; i < constraints.length && authRequired; i++) {
+            for (int i = 0; i < constraints.length && authRequired; i++) {
                 if (!constraints[i].getAuthConstraint()) {
                     authRequired = false;
                     break;
