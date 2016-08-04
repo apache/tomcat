@@ -428,10 +428,6 @@ public abstract class AuthenticatorBase extends ValveBase
                     request.getRequestURI());
         }
 
-        AuthConfigProvider jaspicProvider = getJaspicProvider();
-        MessageInfo messageInfo = null;
-        ServerAuthContext serverAuthContext = null;
-
         // Have we got a cached authenticated Principal to record?
         if (cache) {
             Principal principal = request.getUserPrincipal();
@@ -451,20 +447,6 @@ public abstract class AuthenticatorBase extends ValveBase
             }
         }
 
-        if (jaspicProvider != null) {
-            messageInfo = new MessageInfoImpl(request.getRequest(), response.getResponse(), true);
-            try {
-                ServerAuthConfig serverAuthConfig = jaspicProvider.getServerAuthConfig(
-                        "HttpServlet", jaspicAppContextID, CallbackHandlerImpl.getInstance());
-                String authContextID = serverAuthConfig.getAuthContextID(messageInfo);
-                serverAuthContext = serverAuthConfig.getAuthContext(authContextID, null, null);
-            } catch (AuthException e) {
-                log.warn(sm.getString("authenticator.jaspicServerAuthContextFail"), e);
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                return;
-            }
-        }
-
         boolean authRequired = isContinuationRequired(request);
 
         // The Servlet may specify security constraints through annotations.
@@ -478,8 +460,12 @@ public abstract class AuthenticatorBase extends ValveBase
         // Is this request URI subject to a security constraint?
         SecurityConstraint[] constraints = realm.findSecurityConstraints(request, this.context);
 
-        if (constraints == null && !context.getPreemptiveAuthentication() &&
-                jaspicProvider == null && !authRequired) {
+        AuthConfigProvider jaspicProvider = getJaspicProvider();
+        if (jaspicProvider != null) {
+            authRequired = true;
+        }
+
+        if (constraints == null && !context.getPreemptiveAuthentication() && !authRequired) {
             if (log.isDebugEnabled()) {
                 log.debug(" Not subject to any constraint");
             }
@@ -548,14 +534,28 @@ public abstract class AuthenticatorBase extends ValveBase
             authRequired = certs != null && certs.length > 0;
         }
 
-        if (!authRequired && jaspicProvider != null) {
-            authRequired = true;
-        }
+        MessageInfo messageInfo = null;
+        ServerAuthContext serverAuthContext = null;
 
         if (authRequired) {
             if (log.isDebugEnabled()) {
                 log.debug(" Calling authenticate()");
             }
+
+            if (jaspicProvider != null) {
+                messageInfo = new MessageInfoImpl(request.getRequest(), response.getResponse(), true);
+                try {
+                    ServerAuthConfig serverAuthConfig = jaspicProvider.getServerAuthConfig(
+                            "HttpServlet", jaspicAppContextID, CallbackHandlerImpl.getInstance());
+                    String authContextID = serverAuthConfig.getAuthContextID(messageInfo);
+                    serverAuthContext = serverAuthConfig.getAuthContext(authContextID, null, null);
+                } catch (AuthException e) {
+                    log.warn(sm.getString("authenticator.jaspicServerAuthContextFail"), e);
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    return;
+                }
+            }
+
             if (!authenticate(request, response, serverAuthContext, messageInfo)) {
                 if (log.isDebugEnabled()) {
                     log.debug(" Failed authenticate() test");
