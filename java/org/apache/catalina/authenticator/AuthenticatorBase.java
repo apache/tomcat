@@ -556,7 +556,9 @@ public abstract class AuthenticatorBase extends ValveBase
                 }
             }
 
-            if (!authenticate(request, response, serverAuthContext, messageInfo)) {
+            if (jaspicProvider == null && !doAuthenticate(request, response) ||
+                    jaspicProvider != null && !authenticateJaspic(
+                            request, response, serverAuthContext, messageInfo)) {
                 if (log.isDebugEnabled()) {
                     log.debug(" Failed authenticate() test");
                 }
@@ -604,8 +606,42 @@ public abstract class AuthenticatorBase extends ValveBase
 
 
     @Override
-    public boolean authenticate(Request request, HttpServletResponse response) throws IOException {
-        return doAuthenticate(request, response);
+    public boolean authenticate(Request request, HttpServletResponse httpResponse)
+            throws IOException {
+
+        AuthConfigProvider jaspicProvider = getJaspicProvider();
+
+        if (jaspicProvider == null) {
+            return doAuthenticate(request, httpResponse);
+        } else {
+            Response response = request.getResponse();
+            MessageInfo messageInfo =
+                    new MessageInfoImpl(request.getRequest(), response.getResponse(), true);
+            ServerAuthContext serverAuthContext = null;
+
+            try {
+                ServerAuthConfig serverAuthConfig = jaspicProvider.getServerAuthConfig(
+                        "HttpServlet", jaspicAppContextID, CallbackHandlerImpl.getInstance());
+                String authContextID = serverAuthConfig.getAuthContextID(messageInfo);
+                serverAuthContext = serverAuthConfig.getAuthContext(authContextID, null, null);
+            } catch (AuthException e) {
+                log.warn(sm.getString("authenticator.jaspicServerAuthContextFail"), e);
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                return false;
+            }
+
+            boolean result = authenticateJaspic(request, response, serverAuthContext, messageInfo);
+
+            try {
+                serverAuthContext.secureResponse(messageInfo, null);
+                request.setRequest((HttpServletRequest) messageInfo.getRequestMessage());
+                response.setResponse((HttpServletResponse) messageInfo.getResponseMessage());
+            } catch (AuthException e) {
+                log.warn(sm.getString("authenticator.jaspicSecureResponseFail"), e);
+            }
+
+            return result;
+        }
     }
 
 
@@ -692,51 +728,46 @@ public abstract class AuthenticatorBase extends ValveBase
     }
 
 
-    private boolean authenticate(Request request, Response response,
-            ServerAuthContext serverAuthContext, MessageInfo messageInfo) throws IOException {
+    private boolean authenticateJaspic(Request request, Response response,
+            ServerAuthContext serverAuthContext, MessageInfo messageInfo) {
 
-        if (serverAuthContext == null) {
-            // No JASPIC configuration. Use the standard authenticator.
-            return authenticate(request, response);
-        } else {
-            boolean cachedAuth = checkForCachedAuthentication(request, response, false);
-            Subject client = new Subject();
-            AuthStatus authStatus;
-            try {
-                authStatus = serverAuthContext.validateRequest(messageInfo, client, null);
-            } catch (AuthException e) {
-                log.debug(sm.getString("authenticator.loginFail"), e);
-                return false;
-            }
-
-            request.setRequest((HttpServletRequest) messageInfo.getRequestMessage());
-            response.setResponse((HttpServletResponse) messageInfo.getResponseMessage());
-
-            if (authStatus == AuthStatus.SUCCESS) {
-                GenericPrincipal principal = getPrincipal(client);
-                if (log.isDebugEnabled()) {
-                    log.debug("Authenticated user: " + principal);
-                }
-                if (principal == null) {
-                    request.setUserPrincipal(null);
-                    request.setAuthType(null);
-                } else if (cachedAuth == false ||
-                        !principal.getUserPrincipal().equals(request.getUserPrincipal())) {
-                    // Skip registration if authentication credentials were
-                    // cached and the Principal did not change.
-                    request.setNote(Constants.REQ_JASPIC_SUBJECT_NOTE, client);
-                    @SuppressWarnings("rawtypes")// JASPIC API uses raw types
-                    Map map = messageInfo.getMap();
-                    if (map != null && map.containsKey("javax.servlet.http.registerSession")) {
-                        register(request, response, principal, "JASPIC", null, null, true, true);
-                    } else {
-                        register(request, response, principal, "JASPIC", null, null);
-                    }
-                }
-                return true;
-            }
+        boolean cachedAuth = checkForCachedAuthentication(request, response, false);
+        Subject client = new Subject();
+        AuthStatus authStatus;
+        try {
+            authStatus = serverAuthContext.validateRequest(messageInfo, client, null);
+        } catch (AuthException e) {
+            log.debug(sm.getString("authenticator.loginFail"), e);
             return false;
         }
+
+        request.setRequest((HttpServletRequest) messageInfo.getRequestMessage());
+        response.setResponse((HttpServletResponse) messageInfo.getResponseMessage());
+
+        if (authStatus == AuthStatus.SUCCESS) {
+            GenericPrincipal principal = getPrincipal(client);
+            if (log.isDebugEnabled()) {
+                log.debug("Authenticated user: " + principal);
+            }
+            if (principal == null) {
+                request.setUserPrincipal(null);
+                request.setAuthType(null);
+            } else if (cachedAuth == false ||
+                    !principal.getUserPrincipal().equals(request.getUserPrincipal())) {
+                // Skip registration if authentication credentials were
+                // cached and the Principal did not change.
+                request.setNote(Constants.REQ_JASPIC_SUBJECT_NOTE, client);
+                @SuppressWarnings("rawtypes")// JASPIC API uses raw types
+                Map map = messageInfo.getMap();
+                if (map != null && map.containsKey("javax.servlet.http.registerSession")) {
+                    register(request, response, principal, "JASPIC", null, null, true, true);
+                } else {
+                    register(request, response, principal, "JASPIC", null, null);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
 
