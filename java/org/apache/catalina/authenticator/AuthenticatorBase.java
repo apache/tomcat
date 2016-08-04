@@ -479,7 +479,7 @@ public abstract class AuthenticatorBase extends ValveBase
         SecurityConstraint[] constraints = realm.findSecurityConstraints(request, this.context);
 
         if (constraints == null && !context.getPreemptiveAuthentication() &&
-                jaspicProvider == null) {
+                jaspicProvider == null && !authRequired) {
             if (log.isDebugEnabled()) {
                 log.debug(" Not subject to any constraint");
             }
