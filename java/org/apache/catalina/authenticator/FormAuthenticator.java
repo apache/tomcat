@@ -115,7 +115,7 @@ public class FormAuthenticator
     }
 
 
-    // --------------------------------------------------------- Public Methods
+    // ------------------------------------------------------ Protected Methods
 
 
     /**
@@ -130,7 +130,7 @@ public class FormAuthenticator
      * @exception IOException if an input/output error occurs
      */
     @Override
-    public boolean authenticate(Request request, HttpServletResponse response)
+    protected boolean doAuthenticate(Request request, HttpServletResponse response)
             throws IOException {
 
         if (checkForCachedAuthentication(request, response, true)) {
@@ -344,12 +344,40 @@ public class FormAuthenticator
 
 
     @Override
-    protected String getAuthMethod() {
-        return HttpServletRequest.FORM_AUTH;
+    protected boolean isContinuationRequired(Request request) {
+        // Special handling for form-based logins to deal with the case
+        // where the login form (and therefore the "j_security_check" URI
+        // to which it submits) might be outside the secured area
+        String contextPath = this.context.getPath();
+        String decodedRequestURI = request.getDecodedRequestURI();
+        if (decodedRequestURI.startsWith(contextPath) &&
+                decodedRequestURI.endsWith(Constants.FORM_ACTION)) {
+            return true;
+        }
+
+        // Special handling for form-based logins to deal with the case where
+        // a resource is protected for some HTTP methods but not protected for
+        // GET which is used after authentication when redirecting to the
+        // protected resource.
+        // TODO: This is similar to the FormAuthenticator.matchRequest() logic
+        // Is there a way to remove the duplication?
+        Session session = request.getSessionInternal(false);
+        if (session != null) {
+            SavedRequest savedRequest = (SavedRequest) session.getNote(Constants.FORM_REQUEST_NOTE);
+            if (savedRequest != null &&
+                    decodedRequestURI.equals(savedRequest.getDecodedRequestURI())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
-    // ------------------------------------------------------ Protected Methods
+    @Override
+    protected String getAuthMethod() {
+        return HttpServletRequest.FORM_AUTH;
+    }
 
 
     /**
