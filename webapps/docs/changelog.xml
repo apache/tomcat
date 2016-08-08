@@ -106,6 +106,12 @@
         <bug>59888</bug>: Correctly handle tabs and spaces in quoted version one
         cookies when using the <code>Rfc6265CookieProcessor</code>. (markt)
       </fix>
+      <fix>
+        A number of the JRE memory leaks addressed by the
+        <code>JreMemoryLeakPreventionListener</code> have been fixed in Java 9
+        so the associated protection is now disabled when running on Java 9
+        onwards. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
