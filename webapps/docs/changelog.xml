@@ -127,6 +127,12 @@
         (remm)
       </fix>
       <fix>
+        <bug>59925</bug>: Correct regression in r1628368 and ensure that HTTP
+        separators are handled as configured in the
+        <code>LegacyCookieProcessor</code>. Patch provided by Kyohei Nakamura.
+        (markt)
+      </fix>
+      <fix>
         <bug>59950</bug>: Correct log message when reporting that the current
         number of HTTP/2 streams for a connection could not be pruned to below
         the limit. (markt)
