@@ -84,6 +84,8 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
       RequestDispatcher.FORWARD_QUERY_STRING,
       RequestDispatcher.FORWARD_MAPPING};
 
+    private static final int SPECIALS_FIRST_FORWARD_INDEX = 6;
+
 
     // ----------------------------------------------------------- Constructors
 
@@ -235,8 +237,9 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         if (pos == -1) {
             return getRequest().getAttribute(name);
         } else {
-            if ((specialAttributes[pos] == null)
-                && (specialAttributes[5] == null) && (pos >= 5)) {
+            if ((specialAttributes[pos] == null) &&
+                    (specialAttributes[SPECIALS_FIRST_FORWARD_INDEX] == null) &&
+                    (pos >= SPECIALS_FIRST_FORWARD_INDEX)) {
                 // If it's a forward special attribute, and null, it means this
                 // is an include, so we check the wrapped request since
                 // the request could have been forwarded before the include

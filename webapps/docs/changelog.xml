@@ -112,6 +112,12 @@
         so the associated protection is now disabled when running on Java 9
         onwards. (markt)
       </fix>
+      <fix>
+        <bug>59913</bug>: Correct a regression introduced with the support for
+        the Servlet 4 <code>HttpServletRequest.getMapping()</code> API that
+        caused the attributes for forwarded requests to be lost if requested
+        from within a subsequent include. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
