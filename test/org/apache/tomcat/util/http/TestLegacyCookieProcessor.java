@@ -18,9 +18,10 @@ package org.apache.tomcat.util.http;
 
 import java.nio.charset.StandardCharsets;
 
-import org.apache.tomcat.util.buf.MessageBytes;
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.tomcat.util.buf.MessageBytes;
 
 public class TestLegacyCookieProcessor {
 
