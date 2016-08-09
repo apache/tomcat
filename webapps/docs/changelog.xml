@@ -126,6 +126,11 @@
         When using a keystore, OpenSSL will still need default to though.
         (remm)
       </fix>
+      <fix>
+        <bug>59950</bug>: Correct log message when reporting that the current
+        number of HTTP/2 streams for a connection could not be pruned to below
+        the limit. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
