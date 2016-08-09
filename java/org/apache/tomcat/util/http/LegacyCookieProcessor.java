@@ -515,7 +515,7 @@ public final class LegacyCookieProcessor implements CookieProcessor {
                     break;
                 default:
                     if (version == 0 &&
-                                isV0Separator((char)bytes[pos]) &&
+                                !isV0Separator((char)bytes[pos]) &&
                                 getAllowHttpSepsInV0() ||
                             !isHttpSeparator((char)bytes[pos]) ||
                             bytes[pos] == '=') {
