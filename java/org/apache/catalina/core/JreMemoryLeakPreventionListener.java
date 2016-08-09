@@ -266,6 +266,8 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                  * include:
                  * - log4j versions 1.2.15 and earlier
                  * - javax.xml.bind.JAXBContext.newInstance()
+                 *
+                 * https://bugs.openjdk.java.net/browse/JDK-8163449
                  */
 
                 // Set the default URL caching policy to not to cache
