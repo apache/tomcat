@@ -1161,7 +1161,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
             // Fill the read buffer as best we can.
             int nRead = fillReadBuffer(block);
-            lastRead = System.currentTimeMillis();
+            updateLastRead();
 
             // Full as much of the remaining byte array as possible with the
             // data that was just read
@@ -1246,7 +1246,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         if (getSocket().flush(true, selector, writeTimeout)) break;
                     } while (true);
                 }
-                lastWrite = System.currentTimeMillis();
+                updateLastWrite();
             } finally {
                 if (selector != null) {
                     pool.put(selector);
