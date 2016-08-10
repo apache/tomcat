@@ -442,19 +442,14 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
         // grow in larger chunks
         if( desiredSize < 2 * buff.length ) {
             newSize= buff.length * 2;
-            if( limit >0 &&
-                newSize > limit ) {
-                newSize=limit;
-            }
-            tmp=new char[newSize];
         } else {
             newSize= buff.length * 2 + count ;
-            if( limit > 0 &&
-                newSize > limit ) {
-                newSize=limit;
-            }
-            tmp=new char[newSize];
         }
+
+        if (limit > 0 && newSize > limit) {
+            newSize = limit;
+        }
+        tmp = new char[newSize];
 
         System.arraycopy(buff, 0, tmp, 0, end);
         buff = tmp;
