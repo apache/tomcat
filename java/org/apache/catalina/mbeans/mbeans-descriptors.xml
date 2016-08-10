@@ -188,7 +188,7 @@
           description="The context path for this Context"
                  type="java.lang.String"/>
       <parameter name="docBase"
-          description="Document base directory (or WAR) for ths Context"
+          description="Document base directory (or WAR) for this Context"
                  type="java.lang.String"/>
     </operation>
 

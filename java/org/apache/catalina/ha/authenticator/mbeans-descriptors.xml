@@ -38,7 +38,7 @@
       type="boolean"/>
     <attribute
       name="cookieDomain"
-      description="(Optiona) Domain to be used by sso cookies"
+      description="(Optional) Domain to be used by sso cookies"
       type="java.lang.String"/>
     <attribute
       name="mapSendOptions"

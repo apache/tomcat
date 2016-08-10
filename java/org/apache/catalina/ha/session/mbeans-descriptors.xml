@@ -311,7 +311,7 @@
       writeable="false"/>
     <attribute
       name="rejectedSessions"
-      description="Number of sessions we rejected due to maxActive beeing reached"
+      description="Number of sessions we rejected due to maxActive being reached"
       type="int"
       writeable="false"/>
     <attribute
@@ -391,7 +391,7 @@
       returnType="void"/>
     <operation
       name="getCreationTime"
-      description="Return the creatio time for this session"
+      description="Return the creation time for this session"
       impact="ACTION"
       returnType="java.lang.String">
       <parameter
@@ -552,7 +552,7 @@
       writeable="false"/>
     <attribute
       name="rejectedSessions"
-      description="Number of sessions we rejected due to maxActive beeing reached"
+      description="Number of sessions we rejected due to maxActive being reached"
       type="int"/>
     <attribute
       name="rpcTimeout"
@@ -582,7 +582,7 @@
       type="boolean"/>
     <attribute
       name="sessionAttributeNameFilter"
-      descritpion="The string pattern used for including session attributes in replication. Null means all attributes are included."
+      description="The string pattern used for including session attributes in replication. Null means all attributes are included."
       type="java.lang.String"/>
     <attribute
       name="sessionAttributeValueClassNameFilter"
@@ -620,7 +620,7 @@
     </operation>  
     <operation
       name="getCreationTime"
-      description="Return the creatio time for this session"
+      description="Return the creation time for this session"
       impact="ACTION"
       returnType="java.lang.String">
       <parameter

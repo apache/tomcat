@@ -348,7 +348,7 @@
                writeable="false"/>
 
     <attribute name="interruptible"
-               description="Should this be blocked interruptibly until a permit is availabl?"
+               description="Should this be blocked interruptibly until a permit is available?"
                type="boolean"/>
 
     <attribute name="stateName"

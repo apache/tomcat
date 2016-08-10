@@ -91,7 +91,7 @@
   </mbean>
 
   <mbean         name="JAASRealm"
-          description="Implmentation of Realm that authenticates users via the Java Authentication and Authorization Service (JAAS)"
+          description="Implementation of Realm that authenticates users via the Java Authentication and Authorization Service (JAAS)"
                domain="Catalina"
                 group="Realm"
                  type="org.apache.catalina.realm.JAASRealm">

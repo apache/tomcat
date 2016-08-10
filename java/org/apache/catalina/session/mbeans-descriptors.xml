@@ -129,7 +129,7 @@
             writeable="false"/>
 
     <attribute   name="rejectedSessions"
-          description="Number of sessions we rejected due to maxActive beeing reached"
+          description="Number of sessions we rejected due to maxActive being reached"
                  type="int"
             writeable="false"/>
                  
@@ -329,7 +329,7 @@
             writeable="false"/>
 
     <attribute   name="rejectedSessions"
-          description="Number of sessions we rejected due to maxActive beeing reached"
+          description="Number of sessions we rejected due to maxActive being reached"
                  type="int"
             writeable="false"/>
 
@@ -417,7 +417,7 @@
     <operation   name="isLoaded"
           description="If the session id is loaded in memory?"
                impact="ACTION"
-           returnType="booelan">
+           returnType="boolean">
       <parameter name="sessionId"
           description="Id of the session"
                  type="java.lang.String"/>

@@ -34,7 +34,7 @@
                 writeable="false"/>                               
 
      <attribute name="filterInitParameterMap"
-                description="Return the initiaization parameters associated with this filter"
+                description="Return the initialization parameters associated with this filter"
                 type="java.util.Map"
                 writeable="false" />
                     
@@ -833,7 +833,7 @@
     </operation>
     
     <operation name="reload"
-               description="Reload the webapplication"
+               description="Reload the web application"
                impact="ACTION"
                returnType="void">
     </operation>
@@ -1864,7 +1864,7 @@
                impact="ACTION"
                returnType="void">
       <parameter name="name"
-                 description="Security role used within this servlet to be removeds"
+                 description="Security role used within this servlet to be removed"
                  type="java.lang.String"/>
     </operation>
     
