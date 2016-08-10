@@ -35,7 +35,7 @@
       type="java.lang.String"/>
     <attribute
       name="dropTime"
-      description="Timeout from frequency ping after member disapper notify"
+      description="Timeout from frequency ping after member disappear notify"
       type="long"/>
     <attribute
       name="frequency"
