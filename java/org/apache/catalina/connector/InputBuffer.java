@@ -362,7 +362,7 @@ public class InputBuffer extends Reader
         } else {
             // Make sure there's enough space in the worst case
             cb.makeSpace(bb.getLength());
-            if ((cb.getBuffer().length - cb.getEnd()) == 0) {
+            if ((cb.getBuffer().length - cb.getEnd()) == 0 && bb.getLength() != 0) {
                 // We went over the limit
                 cb.setOffset(0);
                 cb.setEnd(0);

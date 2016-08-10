@@ -117,6 +117,11 @@
         <code>WEB-INF/classes/META-INF</code> (if present) since classes will
         never be loaded from that location. (markt)
       </fix>
+      <fix>
+        <bug>59912</bug>: Fix an edge case in input stream handling where an
+        <code>IOException</code> could be thrown when reading a POST body.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
