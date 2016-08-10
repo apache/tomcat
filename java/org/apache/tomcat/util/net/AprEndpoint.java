@@ -2293,13 +2293,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             int remaining = readBuffer.remaining();
 
             // Is there enough data in the read buffer to satisfy this request?
-            if (remaining >= len) {
-                readBuffer.get(b, off, len);
-                return len;
-            }
-
             // Copy what data there is in the read buffer to the byte array
             if (remaining > 0) {
+                remaining = Math.min(remaining, len);
                 readBuffer.get(b, off, remaining);
                 return remaining;
                 /*
@@ -2318,16 +2314,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             // data that was just read
             if (nRead > 0) {
                 socketBufferHandler.configureReadBufferForRead();
-                if (nRead > len) {
-                    readBuffer.get(b, off, len);
-                    return len;
-                } else {
-                    readBuffer.get(b, off, nRead);
-                    return nRead;
-                }
-            } else {
-                return nRead;
+                nRead = Math.min(nRead, len);
+                readBuffer.get(b, off, nRead);
             }
+            return nRead;
         }
 
 
