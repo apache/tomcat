@@ -101,7 +101,7 @@ Apache Tomcat 7, and using many of the Apache Tomcat features.</p>
 <li><a href="proxy-howto.html"><strong>Proxy Support</strong></a> -
     Configuring Apache Tomcat to run behind a proxy server (or a web server
     functioning as a proxy server).</li>
-<li><a href="mbeans-descriptor-howto.html"><strong>MBean Descriptor</strong></a> -
+<li><a href="mbeans-descriptors-howto.html"><strong>MBeans Descriptors</strong></a> -
     Configuring MBean descriptors files for custom components.</li>
 <li><a href="default-servlet.html"><strong>Default Servlet</strong></a> -
     Configuring the default servlet and customizing directory listings.</li>

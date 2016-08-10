@@ -18,13 +18,13 @@
 <!DOCTYPE document [
   <!ENTITY project SYSTEM "project.xml">
 ]>
-<document url="mbeans-descriptor-howto.html">
+<document url="mbeans-descriptors-howto.html">
 
     &project;
 
     <properties>
         <author email="amyroh@apache.org">Amy Roh</author>
-        <title>MBean Descriptor How To</title>
+        <title>MBeans Descriptors How To</title>
     </properties>
 
 <body>

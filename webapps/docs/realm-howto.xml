@@ -109,7 +109,7 @@ and integrate it with Tomcat.  To do so, you need to:
   <li>Implement <code>org.apache.catalina.Realm</code>,</li>
   <li>Place your compiled realm in $CATALINA_HOME/lib,</li>
   <li>Declare your realm as described in the "Configuring a Realm" section below,</li>
-  <li>Declare your realm to the <a href="mbeans-descriptor-howto.html">MBeans Descriptor</a>.</li>
+  <li>Declare your realm to the <a href="mbeans-descriptors-howto.html">MBeans Descriptors</a>.</li>
 </ul>
 </p>
 
