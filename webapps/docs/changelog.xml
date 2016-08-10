@@ -211,6 +211,9 @@
         <bug>59899</bug>: Update Tomcat&apos;s copy of the Java Persistence
         annotations to include the changes made in 2.1 / JavaEE 7. (markt)
       </fix>
+      <fix>
+        Fixed typos in mbeans-descriptors.xml files. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>
@@ -273,7 +276,7 @@
         Fix a cause of multiple attempts to close the same socket. (markt)
       </fix>
       <scode>
-        Refactor the certifcate keystore and trust store generation to make it
+        Refactor the certificate keystore and trust store generation to make it
         easier for embedded users to inject their own key stores. (markt)
       </scode>
       <update>
@@ -288,7 +291,7 @@
       </add>
       <fix>
         Correct a problem with <code>ServletRequest.getServerPort()</code> for
-        secure HTTP/2 connections that meant an incorrect value was retured when
+        secure HTTP/2 connections that meant an incorrect value was returned when
         using the default port. (markt)
       </fix>
       <fix>
