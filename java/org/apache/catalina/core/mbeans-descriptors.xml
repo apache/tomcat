@@ -34,7 +34,7 @@
                 writeable="false"/>
 
      <attribute name="filterInitParameterMap"
-                description="Return the initiaization parameters associated with this filter"
+                description="Return the initialization parameters associated with this filter"
                 type="java.util.Map"
                 writeable="false" />
 
