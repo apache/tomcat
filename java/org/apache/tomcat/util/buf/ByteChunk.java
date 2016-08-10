@@ -454,19 +454,14 @@ public final class ByteChunk implements Cloneable, Serializable {
         // grow in larger chunks
         if( desiredSize < 2 * buff.length ) {
             newSize= buff.length * 2;
-            if( limit >0 &&
-                newSize > limit ) {
-                newSize=limit;
-            }
-            tmp=new byte[newSize];
         } else {
             newSize= buff.length * 2 + count ;
-            if( limit > 0 &&
-                newSize > limit ) {
-                newSize=limit;
-            }
-            tmp=new byte[newSize];
         }
+
+        if (limit > 0 && newSize > limit) {
+            newSize = limit;
+        }
+        tmp = new byte[newSize];
 
         System.arraycopy(buff, start, tmp, 0, end-start);
         buff = tmp;
