@@ -24,7 +24,7 @@
                  type="org.apache.catalina.webresources.StandardRoot">
 
     <attribute   name="allowLinking"
-          description="Does this resources implementaion allow the use of symbolic links?"
+          description="Does this resources implementation allow the use of symbolic links?"
                  type="boolean"
             writeable="true"/>
 
