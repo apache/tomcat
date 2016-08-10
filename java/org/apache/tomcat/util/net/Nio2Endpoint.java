@@ -838,23 +838,17 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 throw new IOException(sm.getString("socket.closed"));
             }
             socketBufferHandler.configureReadBufferForRead();
-
-            int remaining = socketBufferHandler.getReadBuffer().remaining();
+            ByteBuffer readBuffer = socketBufferHandler.getReadBuffer();
+            int remaining = readBuffer.remaining();
 
             // Is there enough data in the read buffer to satisfy this request?
-            if (remaining >= len) {
-                socketBufferHandler.getReadBuffer().get(b, off, len);
-                if (log.isDebugEnabled()) {
-                    log.debug("Socket: [" + this + "], Read from buffer: [" + len + "]");
-                }
-                // No read is going to take place so release here.
-                readPending.release();
-                return len;
-            }
-
             // Copy what data there is in the read buffer to the byte array
             if (remaining > 0) {
-                socketBufferHandler.getReadBuffer().get(b, off, remaining);
+                remaining = Math.min(remaining, len);
+            	readBuffer.get(b, off, remaining);
+                if (log.isDebugEnabled()) {
+                    log.debug("Socket: [" + this + "], Read from buffer: [" + remaining + "]");
+                }
                 // This may be sufficient to complete the request and we
                 // don't want to trigger another read since if there is no
                 // more data to read and this request takes a while to
@@ -871,21 +865,16 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 // data that was just read
                 if (nRead > 0) {
                     socketBufferHandler.configureReadBufferForRead();
-                    if (nRead > len) {
-                        socketBufferHandler.getReadBuffer().get(b, off, len);
-                    } else {
-                        socketBufferHandler.getReadBuffer().get(b, off, nRead);
-                    }
+                    nRead = Math.min(nRead, len);
+                    readBuffer.get(b, off, nRead);
                 } else if (nRead == 0 && !block) {
                     readInterest = true;
-                } else if (nRead == -1) {
-                    return -1;
                 }
 
                 if (log.isDebugEnabled()) {
                     log.debug("Socket: [" + this + "], Read: [" + nRead + "]");
                 }
-                return (nRead > len) ? len : nRead;
+                return nRead;
             }
         }
 
