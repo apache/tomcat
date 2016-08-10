@@ -158,6 +158,10 @@
         application to make clearer that the host name and IP address in the
         server section are the primary host name and IP address. (markt)
       </fix>
+      <fix>
+        <bug>59908</bug>: Ensure that a reason phrase is included in the close
+        message if a session is closed due to a timeout. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Applications">
