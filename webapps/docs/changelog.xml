@@ -113,6 +113,11 @@
         cookies when using the <code>Rfc6265CookieProcessor</code>. (markt)
       </fix>
       <fix>
+        <bug>59912</bug>: Fix an edge case in input stream handling where an
+        <code>IOException</code> could be thrown when reading a POST body.
+        (markt)
+      </fix>
+      <fix>
         <bug>59913</bug>: Correct a regression introduced with the support for
         the Servlet 4 <code>HttpServletRequest.getMapping()</code> API that
         caused the attributes for forwarded requests to be lost if requested
