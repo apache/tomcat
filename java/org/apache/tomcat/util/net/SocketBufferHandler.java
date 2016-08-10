@@ -44,16 +44,16 @@ public class SocketBufferHandler {
 
 
     public void configureReadBufferForWrite() {
-        setReadBufferConFiguredForWrite(true);
+        setReadBufferConfiguredForWrite(true);
     }
 
 
     public void configureReadBufferForRead() {
-        setReadBufferConFiguredForWrite(false);
+        setReadBufferConfiguredForWrite(false);
     }
 
 
-    private void setReadBufferConFiguredForWrite(boolean readBufferConFiguredForWrite) {
+    private void setReadBufferConfiguredForWrite(boolean readBufferConFiguredForWrite) {
         // NO-OP if buffer is already in correct state
         if (this.readBufferConfiguredForWrite != readBufferConFiguredForWrite) {
             if (readBufferConFiguredForWrite) {
