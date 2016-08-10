@@ -233,6 +233,9 @@
         pick up the latest fixes and make 1.2.8 the minimum recommended version.
         (markt)
       </update>
+      <fix>
+        Fixed typos in mbeans-descriptors.xml files. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>
