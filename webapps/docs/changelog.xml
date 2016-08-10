@@ -175,6 +175,11 @@
         <code>SSLHostConfig</code> element in the configuration documentation.
         (markt)
       </fix>
+      <fix>
+        MBeans Descriptors How-To is moved to
+        <code>mbeans-descriptors-howto.html</code>. Patch provided by Radoslav
+        Husar. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">

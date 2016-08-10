@@ -51,8 +51,8 @@
         <item name="13) SSI"                href="ssi-howto.html"/>
         <item name="14) CGI"                href="cgi-howto.html"/>
         <item name="15) Proxy Support"      href="proxy-howto.html"/>
-        <item name="16) MBean Descriptor"
-              href="mbeans-descriptor-howto.html"/>
+        <item name="16) MBeans Descriptors"
+              href="mbeans-descriptors-howto.html"/>
         <item name="17) Default Servlet"    href="default-servlet.html"/>
         <item name="18) Clustering"         href="cluster-howto.html"/>
         <item name="19) Load Balancer"      href="balancer-howto.html"/>
