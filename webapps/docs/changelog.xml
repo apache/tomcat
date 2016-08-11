@@ -193,6 +193,10 @@
         <code>mbeans-descriptors-howto.html</code>. Patch provided by Radoslav
         Husar. (violetagg)
       </fix>
+      <fix>
+        Update NIO Connector configuration documentation with an information
+        about <code>socket.directSslBuffer</code>. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
