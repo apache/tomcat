@@ -281,6 +281,7 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
             processor.setSocketBuffer(proto.getSocketBuffer());
             processor.setMaxSavePostSize(proto.getMaxSavePostSize());
             processor.setServer(proto.getServer());
+            processor.setMaxCookieCount(proto.getMaxCookieCount());
             register(processor);
             return processor;
         }

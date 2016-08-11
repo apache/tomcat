@@ -86,6 +86,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     protected AbstractEndpoint<S> endpoint = null;
 
     
+    /**
+     * The maximum number of cookies permitted for a request. Use a value less
+     * than zero for no limit. Defaults to 200.
+     */
+    private int maxCookieCount = 200;
+
+
     // ----------------------------------------------- Generic property handling
 
     /**
@@ -153,6 +160,16 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     @Override
     public boolean isAprRequired() {
         return false;
+    }
+
+
+    public int getMaxCookieCount() {
+        return maxCookieCount;
+    }
+
+
+    public void setMaxCookieCount(int maxCookieCount) {
+        this.maxCookieCount = maxCookieCount;
     }
 
 

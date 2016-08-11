@@ -48,6 +48,7 @@ public final class Cookies {
     public static final int INITIAL_SIZE=4;
     ServerCookie scookies[]=new ServerCookie[INITIAL_SIZE];
     int cookieCount=0;
+    private int limit = 200;
     boolean unprocessed=true;
 
     MimeHeaders headers;
@@ -63,6 +64,18 @@ public final class Cookies {
         this.headers=headers;
     }
 
+    
+    public void setLimit(int limit) {
+        this.limit = limit;
+        if (limit > -1 && scookies.length > limit && cookieCount <= limit) {
+            // shrink cookie list array
+            ServerCookie scookiesTmp[] = new ServerCookie[limit];
+            System.arraycopy(scookies, 0, scookiesTmp, 0, cookieCount);
+            scookies = scookiesTmp;
+        }
+    }
+
+    
     /**
      * Recycle.
      */
@@ -115,8 +128,14 @@ public final class Cookies {
      *  The caller can set the name/value and attributes for the cookie
      */
     private ServerCookie addCookie() {
-        if( cookieCount >= scookies.length  ) {
-            ServerCookie scookiesTmp[]=new ServerCookie[2*cookieCount];
+        if (limit > -1 && cookieCount >= limit) {
+            throw new IllegalArgumentException(
+                    sm.getString("cookies.maxCountFail", Integer.valueOf(limit)));
+        }
+
+        if (cookieCount >= scookies.length) {
+            int newSize = Math.min(2*cookieCount, limit);
+            ServerCookie scookiesTmp[] = new ServerCookie[newSize];
             System.arraycopy( scookies, 0, scookiesTmp, 0, cookieCount);
             scookies=scookiesTmp;
         }

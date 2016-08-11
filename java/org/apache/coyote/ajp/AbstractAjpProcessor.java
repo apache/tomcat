@@ -766,6 +766,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
         // Set this every time in case limit has been changed via JMX
         headers.setLimit(endpoint.getMaxHeaderCount());
+        request.getCookies().setLimit(getMaxCookieCount());
 
         boolean contentLengthSet = false;
         int hCount = requestHeaderMessage.getInt();

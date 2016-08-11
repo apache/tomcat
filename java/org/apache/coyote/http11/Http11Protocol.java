@@ -182,6 +182,7 @@ public class Http11Protocol extends AbstractHttp11JsseProtocol<Socket> {
             processor.setServer(proto.getServer());
             processor.setDisableKeepAlivePercentage(
                     proto.getDisableKeepAlivePercentage());
+            processor.setMaxCookieCount(proto.getMaxCookieCount());
             register(processor);
             return processor;
         }

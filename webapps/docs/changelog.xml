@@ -131,6 +131,10 @@
         <code>InstanceManager.destroy()</code> to ensure that the method is
         executed. (markt)
       </fix>
+      <fix>
+        <bug>59904</bug>: Add a limit (default 200) for the number of cookies
+        allowed per request. Based on a patch by gehui. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

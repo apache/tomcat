@@ -40,6 +40,8 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     protected Request request;
     protected Response response;
     protected SocketWrapper<S> socketWrapper = null;
+    private int maxCookieCount = 200;
+
 
     /**
      * Error state for the request/response currently being processed.
@@ -207,7 +209,18 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
     @Override
     public abstract SocketState upgradeDispatch() throws IOException;
 
-    /**
+    
+    public int getMaxCookieCount() {
+        return maxCookieCount;
+    }
+
+
+    public void setMaxCookieCount(int maxCookieCount) {
+        this.maxCookieCount = maxCookieCount;
+    }
+
+
+     /**
      * @deprecated  Will be removed in Tomcat 8.0.x.
      */
     @Deprecated
