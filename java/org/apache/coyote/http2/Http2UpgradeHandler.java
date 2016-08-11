@@ -252,10 +252,23 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         }
 
         if (webConnection != null) {
-            // Process the initial request on a container thread
-            StreamProcessor streamProcessor = new StreamProcessor(this, stream, adapter, socketWrapper);
-            streamProcessor.setSslSupport(sslSupport);
+            processStreamOnContainerThread(stream);
+        }
+    }
+
+
+    private void processStreamOnContainerThread(Stream stream) {
+        StreamProcessor streamProcessor = new StreamProcessor(this, stream, adapter, socketWrapper);
+        streamProcessor.setSslSupport(sslSupport);
+        if (streamConcurrency == null) {
             socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
+        } else {
+            if (getStreamConcurrency() < maxConcurrentStreamExecution) {
+                increaseStreamConcurrency();
+                socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
+            } else {
+                queuedProcessors.offer(streamProcessor);
+            }
         }
     }
 
@@ -1027,13 +1040,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         pushStream.sentPushPromise();
 
-        // Process this stream on a container thread
-        StreamProcessor streamProcessor = new StreamProcessor(this, pushStream, adapter, socketWrapper);
-        streamProcessor.setSslSupport(sslSupport);
-        if (streamConcurrency != null) {
-            increaseStreamConcurrency();
-        }
-        socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
+        processStreamOnContainerThread(pushStream);
     }
 
 
@@ -1259,19 +1266,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         setMaxProcessedStream(streamId);
         Stream stream = getStream(streamId, connectionState.get().isNewStreamAllowed());
         if (stream != null) {
-            // Process this stream on a container thread
-            StreamProcessor streamProcessor = new StreamProcessor(this, stream, adapter, socketWrapper);
-            streamProcessor.setSslSupport(sslSupport);
-            if (streamConcurrency == null) {
-                socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
-            } else {
-                if (getStreamConcurrency() < maxConcurrentStreamExecution) {
-                    increaseStreamConcurrency();
-                    socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
-                } else {
-                    queuedProcessors.offer(streamProcessor);
-                }
-            }
+            processStreamOnContainerThread(stream);
         }
     }
 
