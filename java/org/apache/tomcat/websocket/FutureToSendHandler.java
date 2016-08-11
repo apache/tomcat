@@ -25,7 +25,8 @@ import java.util.concurrent.TimeoutException;
 import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
 
-import org.apache.naming.StringManager;
+import org.apache.tomcat.util.res.StringManager;
+
 
 /**
  * Converts a Future to a SendHandler.
