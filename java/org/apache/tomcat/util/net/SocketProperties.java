@@ -58,7 +58,7 @@ public class SocketProperties {
 
     /**
      * Enable/disable direct buffers for the network buffers
-     * Default value is enabled
+     * Default value is disabled
      */
     protected boolean directBuffer = false;
 
