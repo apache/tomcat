@@ -648,6 +648,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setMaxSavePostSize(getMaxSavePostSize());
         processor.setServer(getServer());
         processor.setServerRemoveAppProvidedValues(getServerRemoveAppProvidedValues());
+        processor.setMaxCookieCount(getMaxCookieCount());
         return processor;
     }
 

@@ -138,6 +138,10 @@
         (remm)
       </fix>
       <fix>
+        <bug>59904</bug>: Add a limit (default 200) for the number of cookies
+        allowed per request. Based on a patch by gehui. (markt)
+      </fix>
+      <fix>
         <bug>59925</bug>: Correct regression in r1628368 and ensure that HTTP
         separators are handled as configured in the
         <code>LegacyCookieProcessor</code>. Patch provided by Kyohei Nakamura.
