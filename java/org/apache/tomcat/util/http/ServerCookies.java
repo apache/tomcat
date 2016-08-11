@@ -23,7 +23,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ServerCookies {
 
-    StringManager sm = StringManager.getManager(ServerCookies.class);
+    private static final StringManager sm = StringManager.getManager(ServerCookies.class);
 
     private ServerCookie[] serverCookies;
 
