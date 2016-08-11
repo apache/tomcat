@@ -123,6 +123,10 @@
         caused the attributes for forwarded requests to be lost if requested
         from within a subsequent include. (markt)
       </fix>
+      <fix>
+        <bug>59966</bug>: Do not start the web application if the error page
+        configuration in web.xml is invalid. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
