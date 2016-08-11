@@ -549,7 +549,8 @@ public abstract class AuthenticatorBase extends ValveBase
             }
 
             if (jaspicProvider == null && !doAuthenticate(request, response) ||
-                    jaspicProvider != null && !authenticateJaspic(request, response, jaspicState)) {
+                    jaspicProvider != null &&
+                            !authenticateJaspic(request, response, jaspicState, false)) {
                 if (log.isDebugEnabled()) {
                     log.debug(" Failed authenticate() test");
                 }
@@ -605,7 +606,7 @@ public abstract class AuthenticatorBase extends ValveBase
                 return false;
             }
 
-            boolean result = authenticateJaspic(request, response, jaspicState);
+            boolean result = authenticateJaspic(request, response, jaspicState, true);
 
             secureResponseJspic(request, response, jaspicState);
 
@@ -730,7 +731,8 @@ public abstract class AuthenticatorBase extends ValveBase
     }
 
 
-    private boolean authenticateJaspic(Request request, Response response, JaspicState state) {
+    private boolean authenticateJaspic(Request request, Response response, JaspicState state,
+            boolean requirePrincipal) {
 
         boolean cachedAuth = checkForCachedAuthentication(request, response, false);
         Subject client = new Subject();
@@ -753,6 +755,9 @@ public abstract class AuthenticatorBase extends ValveBase
             if (principal == null) {
                 request.setUserPrincipal(null);
                 request.setAuthType(null);
+                if (requirePrincipal) {
+                    return false;
+                }
             } else if (cachedAuth == false ||
                     !principal.getUserPrincipal().equals(request.getUserPrincipal())) {
                 // Skip registration if authentication credentials were
