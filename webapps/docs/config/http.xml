@@ -453,6 +453,12 @@
       and connections are not counted.</p>
     </attribute>
 
+    <attribute name="maxCookieCount" required="false">
+      <p>The maximum number of cookies that are permitted for a request. A value
+      of less than zero means no limit. If not specified, a default value of 200
+      will be used.</p>
+    </attribute>
+
     <attribute name="maxExtensionSize" required="false">
       <p>Limits the total length of chunk extensions in chunked HTTP requests.
       If the value is <code>-1</code>, no limit will be imposed. If not
