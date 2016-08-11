@@ -103,6 +103,12 @@
         processing by default. (markt)
       </fix>
       <fix>
+        <bug>59862</bug>: Allow nested jar files scanning to be filtered with
+        the system property
+        <code>tomcat.util.scan.StandardJarScanFilter.jarsToSkip</code>. Patch
+        is provided by Terence Bandoian. (violetagg)
+      </fix>
+      <fix>
         <bug>59866</bug>: When scanning <code>WEB-INF/classes</code> for
         annotations, don't scan the contents of
         <code>WEB-INF/classes/META-INF</code> (if present) since classes will
