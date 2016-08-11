@@ -694,9 +694,26 @@
 
       <attribute name="socket.directBuffer" required="false">
         <p>(bool)Boolean value, whether to use direct ByteBuffers or java mapped
-        ByteBuffers. Default is <code>false</code>.<br/>
+        ByteBuffers. If <code>true</code> then
+        <code>java.nio.ByteBuffer.allocateDirect()</code> is used to allocate
+        the buffers, if <code>false</code> then
+        <code>java.nio.ByteBuffer.allocate()</code> is used. The default value
+        is <code>false</code>.<br/>
         When you are using direct buffers, make sure you allocate the
         appropriate amount of memory for the direct memory space. On Sun's JDK
+        that would be something like <code>-XX:MaxDirectMemorySize=256m</code>.
+        </p>
+      </attribute>
+
+      <attribute name="socket.directSslBuffer" required="false">
+        <p>(bool)Boolean value, whether to use direct ByteBuffers or java mapped
+        ByteBuffers for the SSL buffers. If <code>true</code> then
+        <code>java.nio.ByteBuffer.allocateDirect()</code> is used to allocate
+        the buffers, if <code>false</code> then
+        <code>java.nio.ByteBuffer.allocate()</code> is used. The default value
+        is <code>false</code>.<br/>
+        When you are using direct buffers, make sure you allocate the
+        appropriate amount of memory for the direct memory space. On Oracle's JDK
         that would be something like <code>-XX:MaxDirectMemorySize=256m</code>.
         </p>
       </attribute>
@@ -806,7 +823,11 @@
 
       <attribute name="socket.directBuffer" required="false">
         <p>(bool)Boolean value, whether to use direct ByteBuffers or java mapped
-        ByteBuffers. Default is <code>false</code>.<br/>
+        ByteBuffers. If <code>true</code> then
+        <code>java.nio.ByteBuffer.allocateDirect()</code> is used to allocate
+        the buffers, if <code>false</code> then
+        <code>java.nio.ByteBuffer.allocate()</code> is used. The default value
+        is <code>false</code>.<br/>
         When you are using direct buffers, make sure you allocate the
         appropriate amount of memory for the direct memory space. On Sun's JDK
         that would be something like <code>-XX:MaxDirectMemorySize=256m</code>.

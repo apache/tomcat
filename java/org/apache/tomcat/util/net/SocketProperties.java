@@ -52,13 +52,13 @@ public class SocketProperties {
 
     /**
      * Enable/disable direct buffers for the network buffers
-     * Default value is enabled
+     * Default value is disabled
      */
     protected boolean directBuffer = false;
 
     /**
      * Enable/disable direct buffers for the network buffers for SSL
-     * Default value is enabled
+     * Default value is disabled
      */
     protected boolean directSslBuffer = false;
 
