@@ -845,7 +845,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             // Copy what data there is in the read buffer to the byte array
             if (remaining > 0) {
                 remaining = Math.min(remaining, len);
-            	readBuffer.get(b, off, remaining);
+                readBuffer.get(b, off, remaining);
                 if (log.isDebugEnabled()) {
                     log.debug("Socket: [" + this + "], Read from buffer: [" + remaining + "]");
                 }
