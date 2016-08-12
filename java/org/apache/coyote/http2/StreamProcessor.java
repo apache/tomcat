@@ -220,6 +220,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case ASYNC_COMPLETE: {
+            clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
                 socketWrapper.getEndpoint().getExecutor().execute(this);
             }
