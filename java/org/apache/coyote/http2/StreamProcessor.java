@@ -156,12 +156,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
-    protected final boolean getPopulateRequestAttributesFromSocket() {
-        return true;
-    }
-
-
-    @Override
     protected final void populateRequestAttributeRemoteHost() {
         if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
             request.remoteHost().setString(socketWrapper.getRemoteHost());

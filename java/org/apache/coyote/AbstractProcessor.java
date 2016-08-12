@@ -571,7 +571,16 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected abstract void disableSwallowRequest();
 
 
-    protected abstract boolean getPopulateRequestAttributesFromSocket();
+    /**
+     * Processors that populate request attributes directly (e.g. AJP) should
+     * over-ride this method and return {@code false}.
+     *
+     * @return {@code true} if the SocketWrapper should be used to populate the
+     *         request attributes, otherwise {@code false}.
+     */
+    protected boolean getPopulateRequestAttributesFromSocket() {
+        return true;
+    }
 
 
     protected abstract void populateRequestAttributeRemoteHost();
