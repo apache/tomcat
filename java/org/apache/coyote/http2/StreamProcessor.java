@@ -139,7 +139,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case AVAILABLE: {
-            request.setAvailable(stream.getInputBuffer().available());
+            request.setAvailable(available(Boolean.TRUE.equals(param)));
             break;
         }
         case REQ_SET_BODY_REPLAY: {
@@ -400,6 +400,14 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     }
 
 
+    /**
+     * @param doRead Unused for HTTP/2 
+     */
+    private int available(boolean doRead) {
+        return stream.getInputBuffer().available();
+    }
+    
+    
     @Override
     public void recycle() {
         // StreamProcessor instances are not re-used.

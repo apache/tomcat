@@ -685,7 +685,7 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case AVAILABLE: {
-            request.setAvailable(inputBuffer.available(Boolean.TRUE.equals(param)));
+            request.setAvailable(available(Boolean.TRUE.equals(param)));
             break;
         }
         case REQ_SET_BODY_REPLAY: {
@@ -1812,6 +1812,11 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
+    private int available(boolean doRead) {
+        return inputBuffer.available(doRead);
+    }
+    
+    
     /**
      * Checks to see if the keep-alive loop should be broken, performing any
      * processing (e.g. sendfile handling) that may have an impact on whether

@@ -392,11 +392,7 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case AVAILABLE: {
-            if (available()) {
-                request.setAvailable(1);
-            } else {
-                request.setAvailable(0);
-            }
+            request.setAvailable(available(Boolean.TRUE.equals(param)));
             break;
         }
         case REQ_SET_BODY_REPLAY: {
@@ -669,7 +665,7 @@ public class AjpProcessor extends AbstractProcessor {
 
     @Override
     protected void dispatchNonBlockingRead() {
-        if (available()) {
+        if (available(true) > 0) {
             super.dispatchNonBlockingRead();
         }
     }
@@ -1450,21 +1446,25 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    private boolean available() {
+    private int available(boolean doRead) {
         if (endOfStream) {
-            return false;
+            return 0;
         }
-        if (empty) {
+        if (empty && doRead) {
             try {
                 refillReadBuffer(false);
             } catch (IOException timeout) {
                 // Not ideal. This will indicate that data is available
                 // which should trigger a read which in turn will trigger
                 // another IOException and that one can be thrown.
-                return true;
+                return 1;
             }
         }
-        return !empty;
+        if (empty) {
+            return 0;
+        } else {
+            return bodyBytes.getByteChunk().getLength();
+        }
     }
 
 
