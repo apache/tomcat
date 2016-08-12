@@ -17,7 +17,6 @@
 package org.apache.coyote.http2;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
@@ -25,7 +24,6 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.PushToken;
-import org.apache.coyote.UpgradeToken;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -177,14 +175,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
-    protected final void doHttpUpgrade(UpgradeToken upgradeToken) {
-        // Unsupported / illegal under HTTP/2
-        throw new UnsupportedOperationException(
-                sm.getString("streamProcessor.httpupgrade.notsupported"));
-    }
-
-
-    @Override
     protected final boolean isPushSupported() {
         return stream.isPushSupported();
     }
@@ -208,12 +198,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         // is reused
         setSocketWrapper(null);
         setAdapter(null);
-    }
-
-
-    @Override
-    public boolean isUpgrade() {
-        return false;
     }
 
 
@@ -277,19 +261,5 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     @Override
     protected SocketState dispatchEndRequest() {
         return SocketState.CLOSED;
-    }
-
-
-    @Override
-    public UpgradeToken getUpgradeToken() {
-        // Should never happen
-        throw new IllegalStateException(sm.getString("streamProcessor.httpupgrade.notsupported"));
-    }
-
-
-    @Override
-    public ByteBuffer getLeftoverInput() {
-        // Should never happen
-        throw new IllegalStateException(sm.getString("streamProcessor.httpupgrade.notsupported"));
     }
 }

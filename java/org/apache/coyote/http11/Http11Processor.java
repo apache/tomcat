@@ -1413,19 +1413,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
-    public boolean isUpgrade() {
-        return upgradeToken != null;
-    }
-
-
-
-    @Override
-    public UpgradeToken getUpgradeToken() {
-        return upgradeToken;
-    }
-
-
-    @Override
     protected Log getLog() {
         return log;
     }
@@ -1584,10 +1571,28 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
+    public UpgradeToken getUpgradeToken() {
+        return upgradeToken;
+    }
+
+
+    @Override
     protected final void doHttpUpgrade(UpgradeToken upgradeToken) {
         this.upgradeToken = upgradeToken;
         // Stop further HTTP output
         outputBuffer.responseFinished = true;
+    }
+
+
+    @Override
+    public ByteBuffer getLeftoverInput() {
+        return inputBuffer.getLeftover();
+    }
+
+
+    @Override
+    public boolean isUpgrade() {
+        return upgradeToken != null;
     }
 
 
@@ -1632,12 +1637,6 @@ public class Http11Processor extends AbstractProcessor {
         upgradeToken = null;
         socketWrapper = null;
         sendfileData = null;
-    }
-
-
-    @Override
-    public ByteBuffer getLeftoverInput() {
-        return inputBuffer.getLeftover();
     }
 
 

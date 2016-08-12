@@ -46,8 +46,21 @@ public interface Processor {
      */
     SocketState process(SocketWrapperBase<?> socketWrapper, SocketEvent status) throws IOException;
 
+    /**
+     * Generate an upgrade token.
+     *
+     * @return An upgrade token encapsulating the information required to
+     *         process the upgrade request
+     *
+     * @throws IllegalStateException if this is called on a Processor that does
+     *         not support upgrading
+     */
     UpgradeToken getUpgradeToken();
 
+    /**
+     * @return {@code true} if the Processor is currently processing an upgrade
+     *         request, otherwise {@code false}
+     */
     boolean isUpgrade();
     boolean isAsync();
 
@@ -81,8 +94,12 @@ public interface Processor {
     void setSslSupport(SSLSupport sslSupport);
 
     /**
-     * Allows retrieving additional input during the upgrade process
+     * Allows retrieving additional input during the upgrade process.
+     *
      * @return leftover bytes
+     *
+     * @throws IllegalStateException if this is called on a Processor that does
+     *         not support upgrading
      */
     ByteBuffer getLeftoverInput();
 

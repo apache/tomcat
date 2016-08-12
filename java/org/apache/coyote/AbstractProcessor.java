@@ -18,6 +18,7 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.nio.ByteBuffer;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -652,7 +653,55 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected abstract void executeDispatches(SocketWrapperBase<?> wrapper);
 
 
-    protected abstract void doHttpUpgrade(UpgradeToken upgradeToken);
+    /**
+     * {@inheritDoc}
+     * Processors that implement HTTP upgrade must override this method and
+     * provide the necessary token.
+     */
+    @Override
+    public UpgradeToken getUpgradeToken() {
+        // Should never reach this code but in case we do...
+        throw new IllegalStateException(
+                sm.getString("abstractProcessor.httpupgrade.notsupported"));
+    }
+
+
+    /**
+     * Process an HTTP upgrade. Processors that support HTTP upgrade should
+     * override this method and process the provided token.
+     *
+     * @param upgradeToken Contains all the information necessary for the
+     *                     Processor to process the upgrade
+     *
+     * @throws UnsupportedOperationException if the protocol does not support
+     *         HTTP upgrade
+     */
+    protected void doHttpUpgrade(UpgradeToken upgradeToken) {
+        // Should never happen
+        throw new UnsupportedOperationException(
+                sm.getString("abstractProcessor.httpupgrade.notsupported"));
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * Processors that implement HTTP upgrade must override this method.
+     */
+    @Override
+    public ByteBuffer getLeftoverInput() {
+        // Should never reach this code but in case we do...
+        throw new IllegalStateException(sm.getString("abstractProcessor.httpupgrade.notsupported"));
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * Processors that implement HTTP upgrade must override this method.
+     */
+    @Override
+    public boolean isUpgrade() {
+        return false;
+    }
 
 
     /**
