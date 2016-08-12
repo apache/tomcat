@@ -463,8 +463,7 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case REQ_SSL_CERTIFICATE: {
-            // NO-OP. Can't force a new SSL handshake with the client when using
-            // AJP as the reverse proxy controls that connection.
+            sslReHandShake();
             break;
         }
 
@@ -1501,6 +1500,12 @@ public class AjpProcessor extends AbstractProcessor {
         }
     }
     
+    
+    private void sslReHandShake() {
+        // NO-OP. Can't force a new SSL handshake with the client when using
+        // AJP as the reverse proxy controls that connection.
+    }
+
     
     /**
      * Read at least the specified amount of bytes, and place them

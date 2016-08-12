@@ -210,7 +210,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case REQ_SSL_CERTIFICATE: {
-            // No re-negotiation support in HTTP/2.
+            sslReHandShake();
             break;
         }
 
@@ -436,6 +436,11 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     }
 
 
+    private void sslReHandShake() {
+        // No re-negotiation support in HTTP/2.
+    }
+
+    
     @Override
     public void recycle() {
         // StreamProcessor instances are not re-used.

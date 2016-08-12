@@ -756,24 +756,7 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case REQ_SSL_CERTIFICATE: {
-            if (sslSupport != null) {
-                // Consume and buffer the request body, so that it does not
-                // interfere with the client's handshake messages
-                InputFilter[] inputFilters = inputBuffer.getFilters();
-                ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER]).setLimit(
-                        maxSavePostSize);
-                inputBuffer.addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
-
-                try {
-                    socketWrapper.doClientAuth(sslSupport);
-                    Object sslO = sslSupport.getPeerCertificateChain();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
-                    }
-                } catch (IOException ioe) {
-                    log.warn(sm.getString("http11processor.socket.ssl"), ioe);
-                }
-            }
+            sslReHandShake();
             break;
         }
 
@@ -1825,6 +1808,28 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
+    private void sslReHandShake() {
+        if (sslSupport != null) {
+            // Consume and buffer the request body, so that it does not
+            // interfere with the client's handshake messages
+            InputFilter[] inputFilters = inputBuffer.getFilters();
+            ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER]).setLimit(
+                    maxSavePostSize);
+            inputBuffer.addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
+
+            try {
+                socketWrapper.doClientAuth(sslSupport);
+                Object sslO = sslSupport.getPeerCertificateChain();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
+                }
+            } catch (IOException ioe) {
+                log.warn(sm.getString("http11processor.socket.ssl"), ioe);
+            }
+        }
+    }
+    
+    
     /**
      * Checks to see if the keep-alive loop should be broken, performing any
      * processing (e.g. sendfile handling) that may have an impact on whether
