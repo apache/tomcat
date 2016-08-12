@@ -321,25 +321,18 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
         // Servlet 3.1 HTTP Upgrade
         case UPGRADE: {
-            // Unsupported / illegal under HTTP/2
-            throw new UnsupportedOperationException(
-                    sm.getString("streamProcessor.httpupgrade.notsupported"));
+            doHttpUpgrade((UpgradeToken) param);
+            break;
         }
 
         // Servlet 4.0 Push requests
         case IS_PUSH_SUPPORTED: {
             AtomicBoolean result = (AtomicBoolean) param;
-            result.set(stream.isPushSupported());
+            result.set(isPushSupported());
             break;
         }
         case PUSH_REQUEST: {
-            try {
-                PushToken pushToken = (PushToken) param;
-                pushToken.setResult(stream.push(pushToken.getPushTarget()));
-            } catch (IOException ioe) {
-                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
-                response.setErrorException(ioe);
-            }
+            doPush((PushToken) param);
             break;
         }
         }
@@ -464,6 +457,31 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
     private void executeDispatches(SocketWrapperBase<?> wrapper) {
         wrapper.getEndpoint().getExecutor().execute(this);
+    }
+
+
+    /**
+     * @param upgradeToken Unused
+     */
+    private void doHttpUpgrade(UpgradeToken upgradeToken) {
+        // Unsupported / illegal under HTTP/2
+        throw new UnsupportedOperationException(
+                sm.getString("streamProcessor.httpupgrade.notsupported"));
+    }
+
+
+    private boolean isPushSupported() {
+        return stream.isPushSupported();
+    }
+
+
+    private void doPush(PushToken pushToken) {
+        try {
+            pushToken.setResult(stream.push(pushToken.getPushTarget()));
+        } catch (IOException ioe) {
+            setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
+            response.setErrorException(ioe);
+        }
     }
 
 

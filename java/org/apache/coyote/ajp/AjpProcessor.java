@@ -35,6 +35,7 @@ import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
+import org.apache.coyote.PushToken;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.UpgradeToken;
 import org.apache.juli.logging.Log;
@@ -574,22 +575,19 @@ public class AjpProcessor extends AbstractProcessor {
 
         // Servlet 3.1 HTTP Upgrade
         case UPGRADE: {
-            // HTTP connections only. Unsupported for AJP.
-            throw new UnsupportedOperationException(
-                    sm.getString("ajpprocessor.httpupgrade.notsupported"));
+            doHttpUpgrade((UpgradeToken) param);
+            break;
         }
 
         // Servlet 4.0 Push requests
         case IS_PUSH_SUPPORTED: {
-            // HTTP2 connections only. Unsupported for AJP.
             AtomicBoolean result = (AtomicBoolean) param;
-            result.set(false);
+            result.set(isPushSupported());
             break;
         }
         case PUSH_REQUEST: {
-            // HTTP2 connections only. Unsupported for AJP.
-            throw new UnsupportedOperationException(
-                    sm.getString("ajpprocessor.pushrequest.notsupported"));
+            doPush((PushToken) param);
+            break;
         }
         }
     }
@@ -1526,6 +1524,32 @@ public class AjpProcessor extends AbstractProcessor {
 
     private void executeDispatches(SocketWrapperBase<?> wrapper) {
         wrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
+    }
+
+
+    /**
+     * @param upgradeToken Unused.
+     */
+    private void doHttpUpgrade(UpgradeToken upgradeToken) {
+        // HTTP connections only. Unsupported for AJP.
+        throw new UnsupportedOperationException(
+                sm.getString("ajpprocessor.httpupgrade.notsupported"));
+    }
+
+
+    private boolean isPushSupported() {
+        // HTTP2 connections only. Unsupported for AJP.
+        return false;
+    }
+
+
+    /**
+     * @param pushToken Unused
+     */
+    private void doPush(PushToken pushToken) {
+        // HTTP2 connections only. Unsupported for AJP.
+        throw new UnsupportedOperationException(
+                sm.getString("ajpprocessor.pushrequest.notsupported"));
     }
 
 

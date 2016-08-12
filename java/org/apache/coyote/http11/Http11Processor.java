@@ -32,6 +32,7 @@ import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.ErrorState;
+import org.apache.coyote.PushToken;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.UpgradeProtocol;
@@ -867,23 +868,19 @@ public class Http11Processor extends AbstractProcessor {
 
         // Servlet 3.1 HTTP Upgrade
         case UPGRADE: {
-            upgradeToken = (UpgradeToken) param;
-            // Stop further HTTP output
-            outputBuffer.responseFinished = true;
+            doHttpUpgrade((UpgradeToken) param);
             break;
         }
 
         // Servlet 4.0 Push requests
         case IS_PUSH_SUPPORTED: {
-            // HTTP2 connections only. Unsupported for HTTP/1.x
             AtomicBoolean result = (AtomicBoolean) param;
-            result.set(false);
+            result.set(isPushSupported());
             break;
         }
         case PUSH_REQUEST: {
-            // HTTP2 connections only. Unsupported for AJP.
-            throw new UnsupportedOperationException(
-                    sm.getString("http11processor.pushrequest.notsupported"));
+            doPush((PushToken) param);
+            break;
         }
         }
     }
@@ -1849,6 +1846,29 @@ public class Http11Processor extends AbstractProcessor {
 
     private void executeDispatches(SocketWrapperBase<?> wrapper) {
         wrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
+    }
+
+
+    private void doHttpUpgrade(UpgradeToken upgradeToken) {
+        this.upgradeToken = upgradeToken;
+        // Stop further HTTP output
+        outputBuffer.responseFinished = true;
+    }
+
+
+    private boolean isPushSupported() {
+        // HTTP2 connections only. Unsupported for HTTP/1.x
+        return false;
+    }
+
+
+    /**
+     * @param pushToken Unused
+     */
+    private void doPush(PushToken pushToken) {
+        // HTTP2 connections only. Unsupported for AJP.
+        throw new UnsupportedOperationException(
+                sm.getString("http11processor.pushrequest.notsupported"));
     }
 
 
