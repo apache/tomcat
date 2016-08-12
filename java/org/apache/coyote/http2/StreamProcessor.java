@@ -289,7 +289,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         // Servlet 3.1 non-blocking I/O
         case REQUEST_BODY_FULLY_READ: {
             AtomicBoolean result = (AtomicBoolean) param;
-            result.set(stream.getInputBuffer().isRequestBodyFullyRead());
+            result.set(isRequestBodyFullyRead());
             break;
         }
         case NB_READ_INTEREST: {
@@ -441,6 +441,11 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         // No re-negotiation support in HTTP/2.
     }
 
+    
+    private boolean isRequestBodyFullyRead() {
+        return stream.getInputBuffer().isRequestBodyFullyRead();
+    }
+    
     
     @Override
     public void recycle() {

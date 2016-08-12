@@ -835,7 +835,7 @@ public class Http11Processor extends AbstractProcessor {
         // Servlet 3.1 non-blocking I/O
         case REQUEST_BODY_FULLY_READ: {
             AtomicBoolean result = (AtomicBoolean) param;
-            result.set(inputBuffer.isFinished());
+            result.set(isRequestBodyFullyRead());
             break;
         }
         case NB_READ_INTEREST: {
@@ -1827,6 +1827,11 @@ public class Http11Processor extends AbstractProcessor {
                 log.warn(sm.getString("http11processor.socket.ssl"), ioe);
             }
         }
+    }
+    
+    
+    private boolean isRequestBodyFullyRead() {
+        return inputBuffer.isFinished();
     }
     
     

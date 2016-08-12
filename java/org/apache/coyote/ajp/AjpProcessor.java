@@ -542,7 +542,7 @@ public class AjpProcessor extends AbstractProcessor {
         // Servlet 3.1 non-blocking I/O
         case REQUEST_BODY_FULLY_READ: {
             AtomicBoolean result = (AtomicBoolean) param;
-            result.set(endOfStream);
+            result.set(isRequestBodyFullyRead());
             break;
         }
         case NB_READ_INTEREST: {
@@ -1506,6 +1506,11 @@ public class AjpProcessor extends AbstractProcessor {
         // AJP as the reverse proxy controls that connection.
     }
 
+    
+    private boolean isRequestBodyFullyRead() {
+        return endOfStream;
+    }
+    
     
     /**
      * Read at least the specified amount of bytes, and place them
