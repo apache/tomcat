@@ -35,6 +35,7 @@ import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
+import org.apache.coyote.PushToken;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.UpgradeToken;
 import org.apache.juli.logging.Log;
@@ -542,19 +543,18 @@ public class AjpProcessor extends AbstractProcessor {
         // Servlet 3.1 non-blocking I/O
         case REQUEST_BODY_FULLY_READ: {
             AtomicBoolean result = (AtomicBoolean) param;
-            result.set(endOfStream);
+            result.set(isRequestBodyFullyRead());
             break;
         }
         case NB_READ_INTEREST: {
-            if (!endOfStream) {
-                socketWrapper.registerReadInterest();
+            if (!isRequestBodyFullyRead()) {
+                registerReadInterest();
             }
             break;
         }
         case NB_WRITE_INTEREST: {
             AtomicBoolean isReady = (AtomicBoolean)param;
-            boolean result = responseMsgPos == -1 && socketWrapper.isReadyForWrite();
-            isReady.set(result);
+            isReady.set(isReady());
             break;
         }
         case DISPATCH_READ: {
@@ -566,28 +566,28 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case DISPATCH_EXECUTE: {
-            socketWrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
+            SocketWrapperBase<?> wrapper = socketWrapper;
+            if (wrapper != null) {
+                executeDispatches(wrapper);
+            }
             break;
         }
 
         // Servlet 3.1 HTTP Upgrade
         case UPGRADE: {
-            // HTTP connections only. Unsupported for AJP.
-            throw new UnsupportedOperationException(
-                    sm.getString("ajpprocessor.httpupgrade.notsupported"));
+            doHttpUpgrade((UpgradeToken) param);
+            break;
         }
 
         // Servlet 4.0 Push requests
         case IS_PUSH_SUPPORTED: {
-            // HTTP2 connections only. Unsupported for AJP.
             AtomicBoolean result = (AtomicBoolean) param;
-            result.set(false);
+            result.set(isPushSupported());
             break;
         }
         case PUSH_REQUEST: {
-            // HTTP2 connections only. Unsupported for AJP.
-            throw new UnsupportedOperationException(
-                    sm.getString("ajpprocessor.pushrequest.notsupported"));
+            doPush((PushToken) param);
+            break;
         }
         }
     }
@@ -1422,13 +1422,13 @@ public class AjpProcessor extends AbstractProcessor {
         replay = true;
         endOfStream = false;
     }
-    
-    
+
+
     private void setSwallowResponse() {
         swallowResponse = true;
     }
-    
-    
+
+
     private void disableSwallowRequest() {
         /* NO-OP
          * With AJP, Tomcat controls when the client sends request body data. At
@@ -1436,15 +1436,15 @@ public class AjpProcessor extends AbstractProcessor {
          * in finishResponse().
          */
     }
-    
-    
+
+
     private boolean getPopulateRequestAttributesFromSocket() {
         // NO-OPs the attribute requests since they are pre-populated when
         // parsing the first AJP message.
         return false;
     }
 
-    
+
     private void populateRequestAttributeRemoteHost() {
         // Get remote host name using a DNS resolution
         if (request.remoteHost().isNull()) {
@@ -1456,8 +1456,8 @@ public class AjpProcessor extends AbstractProcessor {
             }
         }
     }
-    
-    
+
+
     private void populateSslRequestAttributes() {
         if (!certificates.isNull()) {
             ByteChunk certData = certificates.getByteChunk();
@@ -1499,14 +1499,60 @@ public class AjpProcessor extends AbstractProcessor {
             request.setAttribute(SSLSupport.CERTIFICATE_KEY, jsseCerts);
         }
     }
-    
-    
+
+
     private void sslReHandShake() {
         // NO-OP. Can't force a new SSL handshake with the client when using
         // AJP as the reverse proxy controls that connection.
     }
 
-    
+
+    private boolean isRequestBodyFullyRead() {
+        return endOfStream;
+    }
+
+
+    private void registerReadInterest() {
+        socketWrapper.registerReadInterest();
+    }
+
+
+    private boolean isReady() {
+        return responseMsgPos == -1 && socketWrapper.isReadyForWrite();
+    }
+
+
+    private void executeDispatches(SocketWrapperBase<?> wrapper) {
+        wrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
+    }
+
+
+    /**
+     * @param upgradeToken Unused.
+     */
+    private void doHttpUpgrade(UpgradeToken upgradeToken) {
+        // HTTP connections only. Unsupported for AJP.
+        throw new UnsupportedOperationException(
+                sm.getString("ajpprocessor.httpupgrade.notsupported"));
+    }
+
+
+    private boolean isPushSupported() {
+        // HTTP2 connections only. Unsupported for AJP.
+        return false;
+    }
+
+
+    /**
+     * @param pushToken Unused
+     */
+    private void doPush(PushToken pushToken) {
+        // HTTP2 connections only. Unsupported for AJP.
+        throw new UnsupportedOperationException(
+                sm.getString("ajpprocessor.pushrequest.notsupported"));
+    }
+
+
     /**
      * Read at least the specified amount of bytes, and place them
      * in the input buffer. Note that if any data is available to read then this

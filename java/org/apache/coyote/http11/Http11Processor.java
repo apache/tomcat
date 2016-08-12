@@ -32,6 +32,7 @@ import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.ErrorState;
+import org.apache.coyote.PushToken;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.UpgradeProtocol;
@@ -835,16 +836,18 @@ public class Http11Processor extends AbstractProcessor {
         // Servlet 3.1 non-blocking I/O
         case REQUEST_BODY_FULLY_READ: {
             AtomicBoolean result = (AtomicBoolean) param;
-            result.set(inputBuffer.isFinished());
+            result.set(isRequestBodyFullyRead());
             break;
         }
         case NB_READ_INTEREST: {
-            socketWrapper.registerReadInterest();
+            if (!isRequestBodyFullyRead()) {
+                registerReadInterest();
+            }
             break;
         }
         case NB_WRITE_INTEREST: {
             AtomicBoolean isReady = (AtomicBoolean)param;
-            isReady.set(outputBuffer.isReady());
+            isReady.set(isReady());
             break;
         }
         case DISPATCH_READ: {
@@ -858,30 +861,26 @@ public class Http11Processor extends AbstractProcessor {
         case DISPATCH_EXECUTE: {
             SocketWrapperBase<?> wrapper = socketWrapper;
             if (wrapper != null) {
-                wrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
+                executeDispatches(wrapper);
             }
             break;
         }
 
         // Servlet 3.1 HTTP Upgrade
         case UPGRADE: {
-            upgradeToken = (UpgradeToken) param;
-            // Stop further HTTP output
-            outputBuffer.responseFinished = true;
+            doHttpUpgrade((UpgradeToken) param);
             break;
         }
 
         // Servlet 4.0 Push requests
         case IS_PUSH_SUPPORTED: {
-            // HTTP2 connections only. Unsupported for HTTP/1.x
             AtomicBoolean result = (AtomicBoolean) param;
-            result.set(false);
+            result.set(isPushSupported());
             break;
         }
         case PUSH_REQUEST: {
-            // HTTP2 connections only. Unsupported for AJP.
-            throw new UnsupportedOperationException(
-                    sm.getString("http11processor.pushrequest.notsupported"));
+            doPush((PushToken) param);
+            break;
         }
         }
     }
@@ -1744,39 +1743,39 @@ public class Http11Processor extends AbstractProcessor {
     private int available(boolean doRead) {
         return inputBuffer.available(doRead);
     }
-    
-    
+
+
     private void setRequestBody(ByteChunk body) {
         InputFilter savedBody = new SavedRequestInputFilter(body);
         savedBody.setRequest(request);
-    
+
         Http11InputBuffer internalBuffer = (Http11InputBuffer) request.getInputBuffer();
         internalBuffer.addActiveFilter(savedBody);
     }
-    
-    
+
+
     private void setSwallowResponse() {
         outputBuffer.responseFinished = true;
     }
-    
-    
+
+
     private void disableSwallowRequest() {
         inputBuffer.setSwallowInput(false);
     }
-    
-    
+
+
     private boolean getPopulateRequestAttributesFromSocket() {
         return true;
     }
-    
-    
+
+
     private void populateRequestAttributeRemoteHost() {
         if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
             request.remoteHost().setString(socketWrapper.getRemoteHost());
         }
     }
-    
-    
+
+
     private void populateSslRequestAttributes() {
         try {
             if (sslSupport != null) {
@@ -1828,8 +1827,51 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
     }
-    
-    
+
+
+    private boolean isRequestBodyFullyRead() {
+        return inputBuffer.isFinished();
+    }
+
+
+    private void registerReadInterest() {
+        socketWrapper.registerReadInterest();
+    }
+
+
+    private boolean isReady() {
+        return outputBuffer.isReady();
+    }
+
+
+    private void executeDispatches(SocketWrapperBase<?> wrapper) {
+        wrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
+    }
+
+
+    private void doHttpUpgrade(UpgradeToken upgradeToken) {
+        this.upgradeToken = upgradeToken;
+        // Stop further HTTP output
+        outputBuffer.responseFinished = true;
+    }
+
+
+    private boolean isPushSupported() {
+        // HTTP2 connections only. Unsupported for HTTP/1.x
+        return false;
+    }
+
+
+    /**
+     * @param pushToken Unused
+     */
+    private void doPush(PushToken pushToken) {
+        // HTTP2 connections only. Unsupported for AJP.
+        throw new UnsupportedOperationException(
+                sm.getString("http11processor.pushrequest.notsupported"));
+    }
+
+
     /**
      * Checks to see if the keep-alive loop should be broken, performing any
      * processing (e.g. sendfile handling) that may have an impact on whether

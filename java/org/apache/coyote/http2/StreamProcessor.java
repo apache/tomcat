@@ -220,6 +220,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case ASYNC_COMPLETE: {
+            clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
                 socketWrapper.getEndpoint().getExecutor().execute(this);
             }
@@ -288,16 +289,18 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         // Servlet 3.1 non-blocking I/O
         case REQUEST_BODY_FULLY_READ: {
             AtomicBoolean result = (AtomicBoolean) param;
-            result.set(stream.getInputBuffer().isRequestBodyFullyRead());
+            result.set(isRequestBodyFullyRead());
             break;
         }
         case NB_READ_INTEREST: {
-            stream.getInputBuffer().registerReadInterest();
+            if (!isRequestBodyFullyRead()) {
+                registerReadInterest();
+            }
             break;
         }
         case NB_WRITE_INTEREST: {
             AtomicBoolean result = (AtomicBoolean) param;
-            result.set(stream.getOutputBuffer().isReady());
+            result.set(isReady());
             break;
         }
         case DISPATCH_READ: {
@@ -309,31 +312,27 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case DISPATCH_EXECUTE: {
-            socketWrapper.getEndpoint().getExecutor().execute(this);
+            SocketWrapperBase<?> wrapper = socketWrapper;
+            if (wrapper != null) {
+                executeDispatches(wrapper);
+            }
             break;
         }
 
         // Servlet 3.1 HTTP Upgrade
         case UPGRADE: {
-            // Unsupported / illegal under HTTP/2
-            throw new UnsupportedOperationException(
-                    sm.getString("streamProcessor.httpupgrade.notsupported"));
+            doHttpUpgrade((UpgradeToken) param);
+            break;
         }
 
         // Servlet 4.0 Push requests
         case IS_PUSH_SUPPORTED: {
             AtomicBoolean result = (AtomicBoolean) param;
-            result.set(stream.isPushSupported());
+            result.set(isPushSupported());
             break;
         }
         case PUSH_REQUEST: {
-            try {
-                PushToken pushToken = (PushToken) param;
-                pushToken.setResult(stream.push(pushToken.getPushTarget()));
-            } catch (IOException ioe) {
-                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
-                response.setErrorException(ioe);
-            }
+            doPush((PushToken) param);
             break;
         }
         }
@@ -368,43 +367,43 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     /**
-     * @param doRead Unused for HTTP/2 
+     * @param doRead Unused for HTTP/2
      */
     private int available(boolean doRead) {
         return stream.getInputBuffer().available();
     }
-    
-    
+
+
     private void setRequestBody(ByteChunk body) {
         stream.getInputBuffer().insertReplayedBody(body);
         stream.receivedEndOfStream();
     }
-    
-    
+
+
     private void setSwallowResponse() {
         // NO-OP
     }
-    
-    
+
+
     private void disableSwallowRequest() {
         // NO-OP
         // HTTP/2 has to swallow any input received to ensure that the flow
         // control windows are correctly tracked.
     }
-    
-    
+
+
     private boolean getPopulateRequestAttributesFromSocket() {
         return true;
     }
 
-    
+
     private void populateRequestAttributeRemoteHost() {
         if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
             request.remoteHost().setString(socketWrapper.getRemoteHost());
         }
     }
-    
-    
+
+
     private void populateSslRequestAttributes() {
         try {
             if (sslSupport != null) {
@@ -440,7 +439,52 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         // No re-negotiation support in HTTP/2.
     }
 
-    
+
+    private boolean isRequestBodyFullyRead() {
+        return stream.getInputBuffer().isRequestBodyFullyRead();
+    }
+
+
+    private void registerReadInterest() {
+        stream.getInputBuffer().registerReadInterest();
+    }
+
+
+    private boolean isReady() {
+        return stream.getOutputBuffer().isReady();
+    }
+
+
+    private void executeDispatches(SocketWrapperBase<?> wrapper) {
+        wrapper.getEndpoint().getExecutor().execute(this);
+    }
+
+
+    /**
+     * @param upgradeToken Unused
+     */
+    private void doHttpUpgrade(UpgradeToken upgradeToken) {
+        // Unsupported / illegal under HTTP/2
+        throw new UnsupportedOperationException(
+                sm.getString("streamProcessor.httpupgrade.notsupported"));
+    }
+
+
+    private boolean isPushSupported() {
+        return stream.isPushSupported();
+    }
+
+
+    private void doPush(PushToken pushToken) {
+        try {
+            pushToken.setResult(stream.push(pushToken.getPushTarget()));
+        } catch (IOException ioe) {
+            setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
+            response.setErrorException(ioe);
+        }
+    }
+
+
     @Override
     public void recycle() {
         // StreamProcessor instances are not re-used.
