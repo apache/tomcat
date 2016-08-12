@@ -82,9 +82,7 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     public boolean isNull() {
-        // should we check also hasStrValue ???
         return byteC.isNull() && charC.isNull() && ! hasStrValue;
-        // bytes==null && strValue==null;
     }
 
     /**
