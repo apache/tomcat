@@ -583,7 +583,15 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     }
 
 
-    protected abstract void populateRequestAttributeRemoteHost();
+    /**
+     * Populate the remote host request attribute. Processors (e.g. AJP) that
+     * populate this from an alternative source should override this method.
+     */
+    protected void populateRequestAttributeRemoteHost() {
+        if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+            request.remoteHost().setString(socketWrapper.getRemoteHost());
+        }
+    }
 
 
     /**
