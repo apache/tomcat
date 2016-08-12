@@ -413,8 +413,10 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case DISABLE_SWALLOW_INPUT: {
-            // TODO: Do not swallow request input but
-            // make sure we are closing the connection
+            // Aborted upload or similar.
+            // No point reading the remainder of the request.
+            disableSwallowRequest();
+            // This is an error state. Make sure it is marked as such.
             setErrorState(ErrorState.CLOSE_CLEAN, null);
             break;
         }
@@ -1470,6 +1472,15 @@ public class AjpProcessor extends AbstractProcessor {
     
     private void setSwallowResponse() {
         swallowResponse = true;
+    }
+    
+    
+    private void disableSwallowRequest() {
+        /* NO-OP
+         * With AJP, Tomcat controls when the client sends request body data. At
+         * most there will be a single packet to read and that will be handled
+         * in finishResponse().
+         */
     }
     
     

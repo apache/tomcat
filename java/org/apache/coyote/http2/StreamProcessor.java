@@ -160,9 +160,11 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case DISABLE_SWALLOW_INPUT: {
-            // NO-OP
-            // HTTP/2 has to swallow any input received to ensure that the flow
-            // control windows are correctly tracked.
+            // Aborted upload or similar.
+            // No point reading the remainder of the request.
+            disableSwallowRequest();
+            // This is an error state. Make sure it is marked as such.
+            setErrorState(ErrorState.CLOSE_CLEAN, null);
             break;
         }
 
@@ -409,6 +411,13 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     
     private void setSwallowResponse() {
         // NO-OP
+    }
+    
+    
+    private void disableSwallowRequest() {
+        // NO-OP
+        // HTTP/2 has to swallow any input received to ensure that the flow
+        // control windows are correctly tracked.
     }
     
     

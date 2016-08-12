@@ -706,10 +706,11 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case DISABLE_SWALLOW_INPUT: {
-            // Do not swallow request input and make sure we are closing the
-            // connection
+            // Aborted upload or similar.
+            // No point reading the remainder of the request.
+            disableSwallowRequest();
+            // This is an error state. Make sure it is marked as such.
             setErrorState(ErrorState.CLOSE_CLEAN, null);
-            inputBuffer.setSwallowInput(false);
             break;
         }
 
@@ -1818,6 +1819,11 @@ public class Http11Processor extends AbstractProcessor {
     
     private void setSwallowResponse() {
         outputBuffer.responseFinished = true;
+    }
+    
+    
+    private void disableSwallowRequest() {
+        inputBuffer.setSwallowInput(false);
     }
     
     
