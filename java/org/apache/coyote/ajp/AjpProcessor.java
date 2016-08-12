@@ -234,7 +234,7 @@ public class AjpProcessor extends AbstractProcessor {
     /**
      * Finished response.
      */
-    private boolean finished = false;
+    private boolean responseFinished = false;
 
 
     /**
@@ -371,14 +371,14 @@ public class AjpProcessor extends AbstractProcessor {
         case CLOSE: {
             action(ActionCode.COMMIT, null);
             try {
-                finish();
+                finishResponse();
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             }
             break;
         }
         case ACK: {
-            // NO_OP for AJP
+            ack();
             break;
         }
         case CLIENT_FLUSH: {
@@ -387,27 +387,17 @@ public class AjpProcessor extends AbstractProcessor {
                 flush();
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                response.setErrorException(e);
             }
             break;
         }
         case AVAILABLE: {
-            if (available()) {
-                request.setAvailable(1);
-            } else {
-                request.setAvailable(0);
-            }
+            request.setAvailable(available(Boolean.TRUE.equals(param)));
             break;
         }
         case REQ_SET_BODY_REPLAY: {
-            // Set the given bytes as the content
-            ByteChunk bc = (ByteChunk) param;
-            int length = bc.getLength();
-            bodyBytes.setBytes(bc.getBytes(), bc.getStart(), length);
-            request.setContentLength(length);
-            first = false;
-            empty = false;
-            replay = true;
-            endOfStream = false;
+            ByteChunk body = (ByteChunk) param;
+            setRequestBody(body);
             break;
         }
         case RESET: {
@@ -668,7 +658,7 @@ public class AjpProcessor extends AbstractProcessor {
 
     @Override
     protected void dispatchNonBlockingRead() {
-        if (available()) {
+        if (available(true) > 0) {
             super.dispatchNonBlockingRead();
         }
     }
@@ -795,10 +785,10 @@ public class AjpProcessor extends AbstractProcessor {
             }
 
             // Finish the response if not done yet
-            if (!finished && getErrorState().isIoAllowed()) {
+            if (!responseFinished && getErrorState().isIoAllowed()) {
                 try {
                     action(ActionCode.COMMIT, null);
-                    finish();
+                    finishResponse();
                 } catch (IOException ioe){
                     setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
                 } catch (Throwable t) {
@@ -856,7 +846,7 @@ public class AjpProcessor extends AbstractProcessor {
         waitingForBodyMessage = false;
         empty = true;
         replay = false;
-        finished = false;
+        responseFinished = false;
         certificates.recycle();
         swallowResponse = false;
         bytesWritten = 0;
@@ -1410,7 +1400,7 @@ public class AjpProcessor extends AbstractProcessor {
         // Calling code should ensure that there is no data in the buffers for
         // non-blocking writes.
         // TODO Validate the assertion above
-        if (!finished) {
+        if (!responseFinished) {
             if (ajpFlush) {
                 // Send the flush message
                 socketWrapper.write(true, flushMessageArray, 0, flushMessageArray.length);
@@ -1423,11 +1413,11 @@ public class AjpProcessor extends AbstractProcessor {
     /**
      * Finish AJP response.
      */
-    private void finish() throws IOException {
-        if (finished)
+    private void finishResponse() throws IOException {
+        if (responseFinished)
             return;
 
-        finished = true;
+        responseFinished = true;
 
         // Swallow the unread body packet if present
         if (waitingForBodyMessage || first && request.getContentLengthLong() > 0) {
@@ -1444,24 +1434,44 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    private boolean available() {
+    private void ack() {
+        // NO-OP for AJP
+    }
+
+
+    private int available(boolean doRead) {
         if (endOfStream) {
-            return false;
+            return 0;
         }
-        if (empty) {
+        if (empty && doRead) {
             try {
                 refillReadBuffer(false);
             } catch (IOException timeout) {
                 // Not ideal. This will indicate that data is available
                 // which should trigger a read which in turn will trigger
                 // another IOException and that one can be thrown.
-                return true;
+                return 1;
             }
         }
-        return !empty;
+        if (empty) {
+            return 0;
+        } else {
+            return bodyBytes.getByteChunk().getLength();
+        }
     }
 
 
+    private void setRequestBody(ByteChunk body) {
+        int length = body.getLength();
+        bodyBytes.setBytes(body.getBytes(), body.getStart(), length);
+        request.setContentLength(length);
+        first = false;
+        empty = false;
+        replay = true;
+        endOfStream = false;
+    }
+    
+    
     /**
      * Read at least the specified amount of bytes, and place them
      * in the input buffer. Note that if any data is available to read then this

@@ -118,26 +118,20 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         case CLOSE: {
             action(ActionCode.COMMIT, null);
             try {
-                stream.getOutputBuffer().close();
+                finishResponse();
             } catch (IOException ioe) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
             }
             break;
         }
         case ACK: {
-            if (!response.isCommitted() && request.hasExpectation()) {
-                try {
-                    stream.writeAck();
-                } catch (IOException ioe) {
-                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
-                }
-            }
+            ack();
             break;
         }
         case CLIENT_FLUSH: {
             action(ActionCode.COMMIT, null);
             try {
-                stream.flushData();
+                flush();
             } catch (IOException ioe) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
                 response.setErrorException(ioe);
@@ -145,13 +139,12 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case AVAILABLE: {
-            request.setAvailable(stream.getInputBuffer().available());
+            request.setAvailable(available(Boolean.TRUE.equals(param)));
             break;
         }
         case REQ_SET_BODY_REPLAY: {
             ByteChunk body = (ByteChunk) param;
-            stream.getInputBuffer().insertReplayedBody(body);
-            stream.receivedEndOfStream();
+            setRequestBody(body);
             break;
         }
         case RESET: {
@@ -385,6 +378,41 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     }
 
 
+    private void finishResponse() throws IOException {
+        stream.getOutputBuffer().close();
+    }
+
+
+    private void ack() {
+        if (!response.isCommitted() && request.hasExpectation()) {
+            try {
+                stream.writeAck();
+            } catch (IOException ioe) {
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
+            }
+        }
+    }
+
+
+    private void flush() throws IOException {
+        stream.flushData();
+    }
+
+
+    /**
+     * @param doRead Unused for HTTP/2 
+     */
+    private int available(boolean doRead) {
+        return stream.getInputBuffer().available();
+    }
+    
+    
+    private void setRequestBody(ByteChunk body) {
+        stream.getInputBuffer().insertReplayedBody(body);
+        stream.receivedEndOfStream();
+    }
+    
+    
     @Override
     public void recycle() {
         // StreamProcessor instances are not re-used.

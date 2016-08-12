@@ -664,30 +664,20 @@ public class Http11Processor extends AbstractProcessor {
         case CLOSE: {
             action(ActionCode.COMMIT, null);
             try {
-                outputBuffer.endRequest();
+                finishResponse();
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             }
             break;
         }
         case ACK: {
-            // Acknowledge request
-            // Send a 100 status back if it makes sense (response not committed
-            // yet, and client specified an expectation for 100-continue)
-            if (!response.isCommitted() && request.hasExpectation()) {
-                inputBuffer.setSwallowInput(true);
-                try {
-                    outputBuffer.sendAck();
-                } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
-                }
-            }
+            ack();
             break;
         }
         case CLIENT_FLUSH: {
             action(ActionCode.COMMIT, null);
             try {
-                outputBuffer.flush();
+                flush();
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 response.setErrorException(e);
@@ -695,17 +685,12 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case AVAILABLE: {
-            request.setAvailable(inputBuffer.available(Boolean.TRUE.equals(param)));
+            request.setAvailable(available(Boolean.TRUE.equals(param)));
             break;
         }
         case REQ_SET_BODY_REPLAY: {
             ByteChunk body = (ByteChunk) param;
-
-            InputFilter savedBody = new SavedRequestInputFilter(body);
-            savedBody.setRequest(request);
-
-            Http11InputBuffer internalBuffer = (Http11InputBuffer) request.getInputBuffer();
-            internalBuffer.addActiveFilter(savedBody);
+            setRequestBody(body);
             break;
         }
         case RESET: {
@@ -721,7 +706,7 @@ public class Http11Processor extends AbstractProcessor {
         }
         case CLOSE_NOW: {
             // Block further output
-            outputBuffer.finished = true;
+            outputBuffer.responseFinished = true;
             setErrorState(ErrorState.CLOSE_NOW, null);
             break;
         }
@@ -948,7 +933,7 @@ public class Http11Processor extends AbstractProcessor {
         case UPGRADE: {
             upgradeToken = (UpgradeToken) param;
             // Stop further HTTP output
-            outputBuffer.finished = true;
+            outputBuffer.responseFinished = true;
             break;
         }
 
@@ -1785,7 +1770,7 @@ public class Http11Processor extends AbstractProcessor {
         if (getErrorState().isIoAllowed()) {
             try {
                 action(ActionCode.COMMIT, null);
-                outputBuffer.endRequest();
+                outputBuffer.finishResponse();
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             } catch (Throwable t) {
@@ -1797,6 +1782,45 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
+    private void finishResponse() throws IOException {
+        outputBuffer.finishResponse();
+    }
+
+
+    private void ack() {
+        // Acknowledge request
+        // Send a 100 status back if it makes sense (response not committed
+        // yet, and client specified an expectation for 100-continue)
+        if (!response.isCommitted() && request.hasExpectation()) {
+            inputBuffer.setSwallowInput(true);
+            try {
+                outputBuffer.sendAck();
+            } catch (IOException e) {
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+            }
+        }
+    }
+
+
+    private void flush() throws IOException {
+        outputBuffer.flush();
+    }
+
+
+    private int available(boolean doRead) {
+        return inputBuffer.available(doRead);
+    }
+    
+    
+    private void setRequestBody(ByteChunk body) {
+        InputFilter savedBody = new SavedRequestInputFilter(body);
+        savedBody.setRequest(request);
+    
+        Http11InputBuffer internalBuffer = (Http11InputBuffer) request.getInputBuffer();
+        internalBuffer.addActiveFilter(savedBody);
+    }
+    
+    
     /**
      * Checks to see if the keep-alive loop should be broken, performing any
      * processing (e.g. sendfile handling) that may have an impact on whether
