@@ -839,7 +839,9 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case NB_READ_INTEREST: {
-            socketWrapper.registerReadInterest();
+            if (!isRequestBodyFullyRead()) {
+                registerReadInterest();
+            }
             break;
         }
         case NB_WRITE_INTEREST: {
@@ -1832,6 +1834,11 @@ public class Http11Processor extends AbstractProcessor {
     
     private boolean isRequestBodyFullyRead() {
         return inputBuffer.isFinished();
+    }
+    
+    
+    private void registerReadInterest() {
+        socketWrapper.registerReadInterest();
     }
     
     

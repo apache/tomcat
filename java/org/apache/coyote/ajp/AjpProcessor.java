@@ -546,8 +546,8 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case NB_READ_INTEREST: {
-            if (!endOfStream) {
-                socketWrapper.registerReadInterest();
+            if (!isRequestBodyFullyRead()) {
+                registerReadInterest();
             }
             break;
         }
@@ -1509,6 +1509,11 @@ public class AjpProcessor extends AbstractProcessor {
     
     private boolean isRequestBodyFullyRead() {
         return endOfStream;
+    }
+    
+    
+    private void registerReadInterest() {
+        socketWrapper.registerReadInterest();
     }
     
     

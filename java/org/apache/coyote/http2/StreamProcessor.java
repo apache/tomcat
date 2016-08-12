@@ -293,7 +293,9 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case NB_READ_INTEREST: {
-            stream.getInputBuffer().registerReadInterest();
+            if (!isRequestBodyFullyRead()) {
+                registerReadInterest();
+            }
             break;
         }
         case NB_WRITE_INTEREST: {
@@ -444,6 +446,11 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     
     private boolean isRequestBodyFullyRead() {
         return stream.getInputBuffer().isRequestBodyFullyRead();
+    }
+    
+    
+    private void registerReadInterest() {
+        stream.getInputBuffer().registerReadInterest();
     }
     
     
