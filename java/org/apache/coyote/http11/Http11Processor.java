@@ -756,28 +756,23 @@ public class Http11Processor extends AbstractProcessor {
                 if (sslSupport != null) {
                     Object sslO = sslSupport.getCipherSuite();
                     if (sslO != null) {
-                        request.setAttribute
-                            (SSLSupport.CIPHER_SUITE_KEY, sslO);
+                        request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
                     }
                     sslO = sslSupport.getPeerCertificateChain();
                     if (sslO != null) {
-                        request.setAttribute
-                            (SSLSupport.CERTIFICATE_KEY, sslO);
+                        request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
                     }
                     sslO = sslSupport.getKeySize();
                     if (sslO != null) {
-                        request.setAttribute
-                            (SSLSupport.KEY_SIZE_KEY, sslO);
+                        request.setAttribute (SSLSupport.KEY_SIZE_KEY, sslO);
                     }
                     sslO = sslSupport.getSessionId();
                     if (sslO != null) {
-                        request.setAttribute
-                            (SSLSupport.SESSION_ID_KEY, sslO);
+                        request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
                     }
                     sslO = sslSupport.getProtocol();
                     if (sslO != null) {
-                        request.setAttribute
-                            (SSLSupport.PROTOCOL_VERSION_KEY, sslO);
+                        request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
                     }
                     request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
                 }
