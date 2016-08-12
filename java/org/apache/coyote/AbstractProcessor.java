@@ -18,6 +18,7 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.nio.ByteBuffer;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -571,16 +572,73 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected abstract void disableSwallowRequest();
 
 
-    protected abstract boolean getPopulateRequestAttributesFromSocket();
+    /**
+     * Processors that populate request attributes directly (e.g. AJP) should
+     * over-ride this method and return {@code false}.
+     *
+     * @return {@code true} if the SocketWrapper should be used to populate the
+     *         request attributes, otherwise {@code false}.
+     */
+    protected boolean getPopulateRequestAttributesFromSocket() {
+        return true;
+    }
 
 
-    protected abstract void populateRequestAttributeRemoteHost();
+    /**
+     * Populate the remote host request attribute. Processors (e.g. AJP) that
+     * populate this from an alternative source should override this method.
+     */
+    protected void populateRequestAttributeRemoteHost() {
+        if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+            request.remoteHost().setString(socketWrapper.getRemoteHost());
+        }
+    }
 
 
-    protected abstract void populateSslRequestAttributes();
+    /**
+     * Populate the TLS related request attributes from the {@link SSLSupport}
+     * instance associated with this processor. Protocols that populate TLS
+     * attributes from a different source (e.g. AJP) should override this
+     * method.
+     */
+    protected void populateSslRequestAttributes() {
+        try {
+            if (sslSupport != null) {
+                Object sslO = sslSupport.getCipherSuite();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
+                }
+                sslO = sslSupport.getPeerCertificateChain();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
+                }
+                sslO = sslSupport.getKeySize();
+                if (sslO != null) {
+                    request.setAttribute (SSLSupport.KEY_SIZE_KEY, sslO);
+                }
+                sslO = sslSupport.getSessionId();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
+                }
+                sslO = sslSupport.getProtocol();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
+                }
+                request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
+            }
+        } catch (Exception e) {
+            getLog().warn(sm.getString("abstractProcessor.socket.ssl"), e);
+        }
+    }
 
 
-    protected abstract void sslReHandShake() ;
+    /**
+     * Processors that can perform a TLS re-handshake (e.g. HTTP/1.1) should
+     * override this method and implement the re-handshake.
+     */
+    protected void sslReHandShake() {
+        // NO-OP
+    }
 
 
     protected abstract boolean isRequestBodyFullyRead();
@@ -595,13 +653,83 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected abstract void executeDispatches(SocketWrapperBase<?> wrapper);
 
 
-    protected abstract void doHttpUpgrade(UpgradeToken upgradeToken);
+    /**
+     * {@inheritDoc}
+     * Processors that implement HTTP upgrade must override this method and
+     * provide the necessary token.
+     */
+    @Override
+    public UpgradeToken getUpgradeToken() {
+        // Should never reach this code but in case we do...
+        throw new IllegalStateException(
+                sm.getString("abstractProcessor.httpupgrade.notsupported"));
+    }
 
 
-    protected abstract boolean isPushSupported();
+    /**
+     * Process an HTTP upgrade. Processors that support HTTP upgrade should
+     * override this method and process the provided token.
+     *
+     * @param upgradeToken Contains all the information necessary for the
+     *                     Processor to process the upgrade
+     *
+     * @throws UnsupportedOperationException if the protocol does not support
+     *         HTTP upgrade
+     */
+    protected void doHttpUpgrade(UpgradeToken upgradeToken) {
+        // Should never happen
+        throw new UnsupportedOperationException(
+                sm.getString("abstractProcessor.httpupgrade.notsupported"));
+    }
 
 
-    protected abstract void doPush(PushToken pushToken);
+    /**
+     * {@inheritDoc}
+     * Processors that implement HTTP upgrade must override this method.
+     */
+    @Override
+    public ByteBuffer getLeftoverInput() {
+        // Should never reach this code but in case we do...
+        throw new IllegalStateException(sm.getString("abstractProcessor.httpupgrade.notsupported"));
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * Processors that implement HTTP upgrade must override this method.
+     */
+    @Override
+    public boolean isUpgrade() {
+        return false;
+    }
+
+
+    /**
+     * Protocols that support push should override this method and return {@code
+     * true}.
+     *
+     * @return {@code true} if push is supported by this processor, otherwise
+     *         {@code false}.
+     */
+    protected boolean isPushSupported() {
+        return false;
+    }
+
+
+    /**
+     * Process a push. Processors that support push should override this method
+     * and process the provided token.
+     *
+     * @param pushToken Contains all the information necessary for the Processor
+     *                  to process the push request
+     *
+     * @throws UnsupportedOperationException if the protocol does not support
+     *         push
+     */
+    protected void doPush(PushToken pushToken) {
+        throw new UnsupportedOperationException(
+                sm.getString("abstractProcessor.pushrequest.notsupported"));
+    }
 
 
     /**

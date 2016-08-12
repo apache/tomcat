@@ -21,7 +21,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetAddress;
-import java.nio.ByteBuffer;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -33,9 +32,7 @@ import org.apache.coyote.ActionCode;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
-import org.apache.coyote.PushToken;
 import org.apache.coyote.RequestInfo;
-import org.apache.coyote.UpgradeToken;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -537,14 +534,6 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     @Override
-    public UpgradeToken getUpgradeToken() {
-        // Should never reach this code but in case we do...
-        throw new IllegalStateException(
-                sm.getString("ajpprocessor.httpupgrade.notsupported"));
-    }
-
-
-    @Override
     public void recycle() {
         getAdapter().checkRecycled(request, response);
         super.recycle();
@@ -649,19 +638,6 @@ public class AjpProcessor extends AbstractProcessor {
             read(buf, Constants.H_SIZE, messageLength, true);
             return true;
         }
-    }
-
-
-    @Override
-    public final boolean isUpgrade() {
-        // AJP does not support HTTP upgrade
-        return false;
-    }
-
-
-    @Override
-    public ByteBuffer getLeftoverInput() {
-        return null;
     }
 
 
@@ -1270,13 +1246,6 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     @Override
-    protected final void sslReHandShake() {
-        // NO-OP. Can't force a new SSL handshake with the client when using
-        // AJP as the reverse proxy controls that connection.
-    }
-
-
-    @Override
     protected final boolean isRequestBodyFullyRead() {
         return endOfStream;
     }
@@ -1297,35 +1266,6 @@ public class AjpProcessor extends AbstractProcessor {
     @Override
     protected final void executeDispatches(SocketWrapperBase<?> wrapper) {
         wrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
-    }
-
-
-    /**
-     * @param upgradeToken Unused.
-     */
-    @Override
-    protected final void doHttpUpgrade(UpgradeToken upgradeToken) {
-        // HTTP connections only. Unsupported for AJP.
-        throw new UnsupportedOperationException(
-                sm.getString("ajpprocessor.httpupgrade.notsupported"));
-    }
-
-
-    @Override
-    protected final boolean isPushSupported() {
-        // HTTP2 connections only. Unsupported for AJP.
-        return false;
-    }
-
-
-    /**
-     * @param pushToken Unused
-     */
-    @Override
-    protected final void doPush(PushToken pushToken) {
-        // HTTP2 connections only. Unsupported for AJP.
-        throw new UnsupportedOperationException(
-                sm.getString("ajpprocessor.pushrequest.notsupported"));
     }
 
 

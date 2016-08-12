@@ -17,7 +17,6 @@
 package org.apache.coyote.http2;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
@@ -25,12 +24,10 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.PushToken;
-import org.apache.coyote.UpgradeToken;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -42,8 +39,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
     private final Http2UpgradeHandler handler;
     private final Stream stream;
-
-    private volatile SSLSupport sslSupport;
 
 
     public StreamProcessor(Http2UpgradeHandler handler, Stream stream, Adapter adapter, SocketWrapperBase<?> socketWrapper) {
@@ -156,58 +151,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
-    protected final boolean getPopulateRequestAttributesFromSocket() {
-        return true;
-    }
-
-
-    @Override
-    protected final void populateRequestAttributeRemoteHost() {
-        if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
-            request.remoteHost().setString(socketWrapper.getRemoteHost());
-        }
-    }
-
-
-    @Override
-    protected final void populateSslRequestAttributes() {
-        try {
-            if (sslSupport != null) {
-                Object sslO = sslSupport.getCipherSuite();
-                if (sslO != null) {
-                    request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
-                }
-                sslO = sslSupport.getPeerCertificateChain();
-                if (sslO != null) {
-                    request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
-                }
-                sslO = sslSupport.getKeySize();
-                if (sslO != null) {
-                    request.setAttribute (SSLSupport.KEY_SIZE_KEY, sslO);
-                }
-                sslO = sslSupport.getSessionId();
-                if (sslO != null) {
-                    request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
-                }
-                sslO = sslSupport.getProtocol();
-                if (sslO != null) {
-                    request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
-                }
-                request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
-            }
-        } catch (Exception e) {
-            log.warn(sm.getString("http11processor.socket.ssl"), e);
-        }
-    }
-
-
-    @Override
-    protected final void sslReHandShake() {
-        // No re-negotiation support in HTTP/2.
-    }
-
-
-    @Override
     protected final boolean isRequestBodyFullyRead() {
         return stream.getInputBuffer().isRequestBodyFullyRead();
     }
@@ -228,14 +171,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     @Override
     protected final void executeDispatches(SocketWrapperBase<?> wrapper) {
         wrapper.getEndpoint().getExecutor().execute(this);
-    }
-
-
-    @Override
-    protected final void doHttpUpgrade(UpgradeToken upgradeToken) {
-        // Unsupported / illegal under HTTP/2
-        throw new UnsupportedOperationException(
-                sm.getString("streamProcessor.httpupgrade.notsupported"));
     }
 
 
@@ -263,12 +198,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         // is reused
         setSocketWrapper(null);
         setAdapter(null);
-    }
-
-
-    @Override
-    public boolean isUpgrade() {
-        return false;
     }
 
 
@@ -332,19 +261,5 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     @Override
     protected SocketState dispatchEndRequest() {
         return SocketState.CLOSED;
-    }
-
-
-    @Override
-    public UpgradeToken getUpgradeToken() {
-        // Should never happen
-        throw new IllegalStateException(sm.getString("streamProcessor.httpupgrade.notsupported"));
-    }
-
-
-    @Override
-    public ByteBuffer getLeftoverInput() {
-        // Should never happen
-        throw new IllegalStateException(sm.getString("streamProcessor.httpupgrade.notsupported"));
     }
 }

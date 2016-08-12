@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ErrorState;
-import org.apache.coyote.PushToken;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.UpgradeProtocol;
@@ -1414,19 +1413,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
-    public boolean isUpgrade() {
-        return upgradeToken != null;
-    }
-
-
-
-    @Override
-    public UpgradeToken getUpgradeToken() {
-        return upgradeToken;
-    }
-
-
-    @Override
     protected Log getLog() {
         return log;
     }
@@ -1538,52 +1524,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
-    protected final boolean getPopulateRequestAttributesFromSocket() {
-        return true;
-    }
-
-
-    @Override
-    protected final void populateRequestAttributeRemoteHost() {
-        if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
-            request.remoteHost().setString(socketWrapper.getRemoteHost());
-        }
-    }
-
-
-    @Override
-    protected final void populateSslRequestAttributes() {
-        try {
-            if (sslSupport != null) {
-                Object sslO = sslSupport.getCipherSuite();
-                if (sslO != null) {
-                    request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
-                }
-                sslO = sslSupport.getPeerCertificateChain();
-                if (sslO != null) {
-                    request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
-                }
-                sslO = sslSupport.getKeySize();
-                if (sslO != null) {
-                    request.setAttribute (SSLSupport.KEY_SIZE_KEY, sslO);
-                }
-                sslO = sslSupport.getSessionId();
-                if (sslO != null) {
-                    request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
-                }
-                sslO = sslSupport.getProtocol();
-                if (sslO != null) {
-                    request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
-                }
-                request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
-            }
-        } catch (Exception e) {
-            log.warn(sm.getString("http11processor.socket.ssl"), e);
-        }
-    }
-
-
-    @Override
     protected final void sslReHandShake() {
         if (sslSupport != null) {
             // Consume and buffer the request body, so that it does not
@@ -1631,6 +1571,12 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
+    public UpgradeToken getUpgradeToken() {
+        return upgradeToken;
+    }
+
+
+    @Override
     protected final void doHttpUpgrade(UpgradeToken upgradeToken) {
         this.upgradeToken = upgradeToken;
         // Stop further HTTP output
@@ -1639,17 +1585,14 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
-    protected final boolean isPushSupported() {
-        // HTTP2 connections only. Unsupported for HTTP/1.x
-        return false;
+    public ByteBuffer getLeftoverInput() {
+        return inputBuffer.getLeftover();
     }
 
 
     @Override
-    protected final void doPush(PushToken pushToken) {
-        // HTTP2 connections only. Unsupported for AJP.
-        throw new UnsupportedOperationException(
-                sm.getString("http11processor.pushrequest.notsupported"));
+    public boolean isUpgrade() {
+        return upgradeToken != null;
     }
 
 
@@ -1694,12 +1637,6 @@ public class Http11Processor extends AbstractProcessor {
         upgradeToken = null;
         socketWrapper = null;
         sendfileData = null;
-    }
-
-
-    @Override
-    public ByteBuffer getLeftoverInput() {
-        return inputBuffer.getLeftover();
     }
 
 
