@@ -459,45 +459,7 @@ public class AjpProcessor extends AbstractProcessor {
 
         // SSL request attribute support
         case REQ_SSL_ATTRIBUTE: {
-            if (!certificates.isNull()) {
-                ByteChunk certData = certificates.getByteChunk();
-                X509Certificate jsseCerts[] = null;
-                ByteArrayInputStream bais =
-                    new ByteArrayInputStream(certData.getBytes(),
-                            certData.getStart(),
-                            certData.getLength());
-                // Fill the  elements.
-                try {
-                    CertificateFactory cf;
-                    String clientCertProvider = getClientCertProvider();
-                    if (clientCertProvider == null) {
-                        cf = CertificateFactory.getInstance("X.509");
-                    } else {
-                        cf = CertificateFactory.getInstance("X.509",
-                                clientCertProvider);
-                    }
-                    while(bais.available() > 0) {
-                        X509Certificate cert = (X509Certificate)
-                        cf.generateCertificate(bais);
-                        if(jsseCerts == null) {
-                            jsseCerts = new X509Certificate[1];
-                            jsseCerts[0] = cert;
-                        } else {
-                            X509Certificate [] temp = new X509Certificate[jsseCerts.length+1];
-                            System.arraycopy(jsseCerts,0,temp,0,jsseCerts.length);
-                            temp[jsseCerts.length] = cert;
-                            jsseCerts = temp;
-                        }
-                    }
-                } catch (java.security.cert.CertificateException e) {
-                    getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
-                    return;
-                } catch (NoSuchProviderException e) {
-                    getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
-                    return;
-                }
-                request.setAttribute(SSLSupport.CERTIFICATE_KEY, jsseCerts);
-            }
+            populateSslRequestAttributes();
             break;
         }
         case REQ_SSL_CERTIFICATE: {
@@ -1493,6 +1455,49 @@ public class AjpProcessor extends AbstractProcessor {
             } catch (IOException iex) {
                 // Ignore
             }
+        }
+    }
+    
+    
+    private void populateSslRequestAttributes() {
+        if (!certificates.isNull()) {
+            ByteChunk certData = certificates.getByteChunk();
+            X509Certificate jsseCerts[] = null;
+            ByteArrayInputStream bais =
+                new ByteArrayInputStream(certData.getBytes(),
+                        certData.getStart(),
+                        certData.getLength());
+            // Fill the  elements.
+            try {
+                CertificateFactory cf;
+                String clientCertProvider = getClientCertProvider();
+                if (clientCertProvider == null) {
+                    cf = CertificateFactory.getInstance("X.509");
+                } else {
+                    cf = CertificateFactory.getInstance("X.509",
+                            clientCertProvider);
+                }
+                while(bais.available() > 0) {
+                    X509Certificate cert = (X509Certificate)
+                    cf.generateCertificate(bais);
+                    if(jsseCerts == null) {
+                        jsseCerts = new X509Certificate[1];
+                        jsseCerts[0] = cert;
+                    } else {
+                        X509Certificate [] temp = new X509Certificate[jsseCerts.length+1];
+                        System.arraycopy(jsseCerts,0,temp,0,jsseCerts.length);
+                        temp[jsseCerts.length] = cert;
+                        jsseCerts = temp;
+                    }
+                }
+            } catch (java.security.cert.CertificateException e) {
+                getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
+                return;
+            } catch (NoSuchProviderException e) {
+                getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
+                return;
+            }
+            request.setAttribute(SSLSupport.CERTIFICATE_KEY, jsseCerts);
         }
     }
     

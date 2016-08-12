@@ -206,33 +206,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
         // SSL request attribute support
         case REQ_SSL_ATTRIBUTE: {
-            try {
-                if (sslSupport != null) {
-                    Object sslO = sslSupport.getCipherSuite();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
-                    }
-                    sslO = sslSupport.getPeerCertificateChain();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
-                    }
-                    sslO = sslSupport.getKeySize();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.KEY_SIZE_KEY, sslO);
-                    }
-                    sslO = sslSupport.getSessionId();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
-                    }
-                    sslO = sslSupport.getProtocol();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
-                    }
-                    request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
-                }
-            } catch (Exception e) {
-                log.warn(sm.getString("streamProcessor.ssl.error"), e);
-            }
+            populateSslRequestAttributes();
             break;
         }
         case REQ_SSL_CERTIFICATE: {
@@ -431,6 +405,37 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     }
     
     
+    private void populateSslRequestAttributes() {
+        try {
+            if (sslSupport != null) {
+                Object sslO = sslSupport.getCipherSuite();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
+                }
+                sslO = sslSupport.getPeerCertificateChain();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
+                }
+                sslO = sslSupport.getKeySize();
+                if (sslO != null) {
+                    request.setAttribute (SSLSupport.KEY_SIZE_KEY, sslO);
+                }
+                sslO = sslSupport.getSessionId();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
+                }
+                sslO = sslSupport.getProtocol();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
+                }
+                request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
+            }
+        } catch (Exception e) {
+            log.warn(sm.getString("http11processor.socket.ssl"), e);
+        }
+    }
+
+
     @Override
     public void recycle() {
         // StreamProcessor instances are not re-used.

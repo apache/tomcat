@@ -752,33 +752,7 @@ public class Http11Processor extends AbstractProcessor {
 
         // SSL request attribute support
         case REQ_SSL_ATTRIBUTE: {
-            try {
-                if (sslSupport != null) {
-                    Object sslO = sslSupport.getCipherSuite();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
-                    }
-                    sslO = sslSupport.getPeerCertificateChain();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
-                    }
-                    sslO = sslSupport.getKeySize();
-                    if (sslO != null) {
-                        request.setAttribute (SSLSupport.KEY_SIZE_KEY, sslO);
-                    }
-                    sslO = sslSupport.getSessionId();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
-                    }
-                    sslO = sslSupport.getProtocol();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
-                    }
-                    request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
-                }
-            } catch (Exception e) {
-                log.warn(sm.getString("http11processor.socket.ssl"), e);
-            }
+            populateSslRequestAttributes();
             break;
         }
         case REQ_SSL_CERTIFICATE: {
@@ -1820,6 +1794,37 @@ public class Http11Processor extends AbstractProcessor {
     }
     
     
+    private void populateSslRequestAttributes() {
+        try {
+            if (sslSupport != null) {
+                Object sslO = sslSupport.getCipherSuite();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
+                }
+                sslO = sslSupport.getPeerCertificateChain();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
+                }
+                sslO = sslSupport.getKeySize();
+                if (sslO != null) {
+                    request.setAttribute (SSLSupport.KEY_SIZE_KEY, sslO);
+                }
+                sslO = sslSupport.getSessionId();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
+                }
+                sslO = sslSupport.getProtocol();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
+                }
+                request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
+            }
+        } catch (Exception e) {
+            log.warn(sm.getString("http11processor.socket.ssl"), e);
+        }
+    }
+
+
     /**
      * Checks to see if the keep-alive loop should be broken, performing any
      * processing (e.g. sendfile handling) that may have an impact on whether
