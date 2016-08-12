@@ -25,13 +25,11 @@ import java.nio.ByteBuffer;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
@@ -47,9 +45,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
-import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SSLSupport;
-import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -353,245 +349,6 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     // --------------------------------------------------------- Public Methods
-
-    @Override
-    public final void action(ActionCode actionCode, Object param) {
-        switch (actionCode) {
-        // 'Normal' servlet support
-        case COMMIT: {
-            if (!response.isCommitted()) {
-                try {
-                    // Validate and write response headers
-                    prepareResponse();
-                } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
-                }
-            }
-            break;
-        }
-        case CLOSE: {
-            action(ActionCode.COMMIT, null);
-            try {
-                finishResponse();
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
-            }
-            break;
-        }
-        case ACK: {
-            ack();
-            break;
-        }
-        case CLIENT_FLUSH: {
-            action(ActionCode.COMMIT, null);
-            try {
-                flush();
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
-                response.setErrorException(e);
-            }
-            break;
-        }
-        case AVAILABLE: {
-            request.setAvailable(available(Boolean.TRUE.equals(param)));
-            break;
-        }
-        case REQ_SET_BODY_REPLAY: {
-            ByteChunk body = (ByteChunk) param;
-            setRequestBody(body);
-            break;
-        }
-
-        // Error handling
-        case IS_ERROR: {
-            ((AtomicBoolean) param).set(getErrorState().isError());
-            break;
-        }
-        case CLOSE_NOW: {
-            // Prevent further writes to the response
-            setSwallowResponse();
-            setErrorState(ErrorState.CLOSE_NOW, null);
-            break;
-        }
-        case DISABLE_SWALLOW_INPUT: {
-            // Aborted upload or similar.
-            // No point reading the remainder of the request.
-            disableSwallowRequest();
-            // This is an error state. Make sure it is marked as such.
-            setErrorState(ErrorState.CLOSE_CLEAN, null);
-            break;
-        }
-
-        // Request attribute support
-        case REQ_HOST_ADDR_ATTRIBUTE: {
-            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
-                request.remoteAddr().setString(socketWrapper.getRemoteAddr());
-            }
-            break;
-        }
-        case REQ_HOST_ATTRIBUTE: {
-            populateRequestAttributeRemoteHost();
-            break;
-        }
-        case REQ_LOCALPORT_ATTRIBUTE: {
-            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
-                request.setLocalPort(socketWrapper.getLocalPort());
-            }
-            break;
-        }
-        case REQ_LOCAL_ADDR_ATTRIBUTE: {
-            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
-                request.localAddr().setString(socketWrapper.getLocalAddr());
-            }
-            break;
-        }
-        case REQ_LOCAL_NAME_ATTRIBUTE: {
-            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
-                request.localName().setString(socketWrapper.getLocalName());
-            }
-            break;
-        }
-        case REQ_REMOTEPORT_ATTRIBUTE: {
-            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
-                request.setRemotePort(socketWrapper.getRemotePort());
-            }
-            break;
-        }
-
-        // SSL request attribute support
-        case REQ_SSL_ATTRIBUTE: {
-            populateSslRequestAttributes();
-            break;
-        }
-        case REQ_SSL_CERTIFICATE: {
-            sslReHandShake();
-            break;
-        }
-
-        // Servlet 3.0 asynchronous support
-        case ASYNC_START: {
-            asyncStateMachine.asyncStart((AsyncContextCallback) param);
-            break;
-        }
-        case ASYNC_COMPLETE: {
-            clearDispatches();
-            if (asyncStateMachine.asyncComplete()) {
-                socketWrapper.processSocket(SocketEvent.OPEN_READ, true);
-            }
-            break;
-        }
-        case ASYNC_DISPATCH: {
-            if (asyncStateMachine.asyncDispatch()) {
-                socketWrapper.processSocket(SocketEvent.OPEN_READ, true);
-            }
-            break;
-        }
-        case ASYNC_DISPATCHED: {
-            asyncStateMachine.asyncDispatched();
-            break;
-        }
-        case ASYNC_ERROR: {
-            asyncStateMachine.asyncError();
-            break;
-        }
-        case ASYNC_IS_ASYNC: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsync());
-            break;
-        }
-        case ASYNC_IS_COMPLETING: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isCompleting());
-            break;
-        }
-        case ASYNC_IS_DISPATCHING: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncDispatching());
-            break;
-        }
-        case ASYNC_IS_ERROR: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
-            break;
-        }
-        case ASYNC_IS_STARTED: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarted());
-            break;
-        }
-        case ASYNC_IS_TIMINGOUT: {
-            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
-            break;
-        }
-        case ASYNC_RUN: {
-            asyncStateMachine.asyncRun((Runnable) param);
-            break;
-        }
-        case ASYNC_SETTIMEOUT: {
-            if (param == null) {
-                return;
-            }
-            long timeout = ((Long) param).longValue();
-            setAsyncTimeout(timeout);
-            break;
-        }
-        case ASYNC_TIMEOUT: {
-            AtomicBoolean result = (AtomicBoolean) param;
-            result.set(asyncStateMachine.asyncTimeout());
-            break;
-        }
-        case ASYNC_POST_PROCESS: {
-            asyncStateMachine.asyncPostProcess();
-            break;
-        }
-
-        // Servlet 3.1 non-blocking I/O
-        case REQUEST_BODY_FULLY_READ: {
-            AtomicBoolean result = (AtomicBoolean) param;
-            result.set(isRequestBodyFullyRead());
-            break;
-        }
-        case NB_READ_INTEREST: {
-            if (!isRequestBodyFullyRead()) {
-                registerReadInterest();
-            }
-            break;
-        }
-        case NB_WRITE_INTEREST: {
-            AtomicBoolean isReady = (AtomicBoolean)param;
-            isReady.set(isReady());
-            break;
-        }
-        case DISPATCH_READ: {
-            addDispatch(DispatchType.NON_BLOCKING_READ);
-            break;
-        }
-        case DISPATCH_WRITE: {
-            addDispatch(DispatchType.NON_BLOCKING_WRITE);
-            break;
-        }
-        case DISPATCH_EXECUTE: {
-            SocketWrapperBase<?> wrapper = socketWrapper;
-            if (wrapper != null) {
-                executeDispatches(wrapper);
-            }
-            break;
-        }
-
-        // Servlet 3.1 HTTP Upgrade
-        case UPGRADE: {
-            doHttpUpgrade((UpgradeToken) param);
-            break;
-        }
-
-        // Servlet 4.0 Push requests
-        case IS_PUSH_SUPPORTED: {
-            AtomicBoolean result = (AtomicBoolean) param;
-            result.set(isPushSupported());
-            break;
-        }
-        case PUSH_REQUEST: {
-            doPush((PushToken) param);
-            break;
-        }
-        }
-    }
-
 
     @Override
     protected boolean flushBufferedWrite() throws IOException {
@@ -1274,7 +1031,8 @@ public class AjpProcessor extends AbstractProcessor {
      * When committing the response, we have to validate the set of headers, as
      * well as setup the response filters.
      */
-    private void prepareResponse() throws IOException {
+    @Override
+    protected final void prepareResponse() throws IOException {
 
         response.setCommitted(true);
 
@@ -1348,7 +1106,8 @@ public class AjpProcessor extends AbstractProcessor {
     /**
      * Callback to write data from the buffer.
      */
-    private void flush() throws IOException {
+    @Override
+    protected final void flush() throws IOException {
         // Calling code should ensure that there is no data in the buffers for
         // non-blocking writes.
         // TODO Validate the assertion above
@@ -1365,7 +1124,8 @@ public class AjpProcessor extends AbstractProcessor {
     /**
      * Finish AJP response.
      */
-    private void finishResponse() throws IOException {
+    @Override
+    protected final void finishResponse() throws IOException {
         if (responseFinished)
             return;
 
@@ -1386,12 +1146,14 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    private void ack() {
+    @Override
+    protected final void ack() {
         // NO-OP for AJP
     }
 
 
-    private int available(boolean doRead) {
+    @Override
+    protected final int available(boolean doRead) {
         if (endOfStream) {
             return 0;
         }
@@ -1413,7 +1175,8 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    private void setRequestBody(ByteChunk body) {
+    @Override
+    protected final void setRequestBody(ByteChunk body) {
         int length = body.getLength();
         bodyBytes.setBytes(body.getBytes(), body.getStart(), length);
         request.setContentLength(length);
@@ -1424,12 +1187,14 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    private void setSwallowResponse() {
+    @Override
+    protected final void setSwallowResponse() {
         swallowResponse = true;
     }
 
 
-    private void disableSwallowRequest() {
+    @Override
+    protected final void disableSwallowRequest() {
         /* NO-OP
          * With AJP, Tomcat controls when the client sends request body data. At
          * most there will be a single packet to read and that will be handled
@@ -1438,14 +1203,16 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    private boolean getPopulateRequestAttributesFromSocket() {
+    @Override
+    protected final boolean getPopulateRequestAttributesFromSocket() {
         // NO-OPs the attribute requests since they are pre-populated when
         // parsing the first AJP message.
         return false;
     }
 
 
-    private void populateRequestAttributeRemoteHost() {
+    @Override
+    protected final void populateRequestAttributeRemoteHost() {
         // Get remote host name using a DNS resolution
         if (request.remoteHost().isNull()) {
             try {
@@ -1458,7 +1225,8 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    private void populateSslRequestAttributes() {
+    @Override
+    protected final void populateSslRequestAttributes() {
         if (!certificates.isNull()) {
             ByteChunk certData = certificates.getByteChunk();
             X509Certificate jsseCerts[] = null;
@@ -1501,28 +1269,33 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    private void sslReHandShake() {
+    @Override
+    protected final void sslReHandShake() {
         // NO-OP. Can't force a new SSL handshake with the client when using
         // AJP as the reverse proxy controls that connection.
     }
 
 
-    private boolean isRequestBodyFullyRead() {
+    @Override
+    protected final boolean isRequestBodyFullyRead() {
         return endOfStream;
     }
 
 
-    private void registerReadInterest() {
+    @Override
+    protected final void registerReadInterest() {
         socketWrapper.registerReadInterest();
     }
 
 
-    private boolean isReady() {
+    @Override
+    protected final boolean isReady() {
         return responseMsgPos == -1 && socketWrapper.isReadyForWrite();
     }
 
 
-    private void executeDispatches(SocketWrapperBase<?> wrapper) {
+    @Override
+    protected final void executeDispatches(SocketWrapperBase<?> wrapper) {
         wrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
     }
 
@@ -1530,14 +1303,16 @@ public class AjpProcessor extends AbstractProcessor {
     /**
      * @param upgradeToken Unused.
      */
-    private void doHttpUpgrade(UpgradeToken upgradeToken) {
+    @Override
+    protected final void doHttpUpgrade(UpgradeToken upgradeToken) {
         // HTTP connections only. Unsupported for AJP.
         throw new UnsupportedOperationException(
                 sm.getString("ajpprocessor.httpupgrade.notsupported"));
     }
 
 
-    private boolean isPushSupported() {
+    @Override
+    protected final boolean isPushSupported() {
         // HTTP2 connections only. Unsupported for AJP.
         return false;
     }
@@ -1546,7 +1321,8 @@ public class AjpProcessor extends AbstractProcessor {
     /**
      * @param pushToken Unused
      */
-    private void doPush(PushToken pushToken) {
+    @Override
+    protected final void doPush(PushToken pushToken) {
         // HTTP2 connections only. Unsupported for AJP.
         throw new UnsupportedOperationException(
                 sm.getString("ajpprocessor.pushrequest.notsupported"));

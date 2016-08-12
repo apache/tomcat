@@ -19,11 +19,14 @@ package org.apache.coyote;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.RequestDispatcher;
 
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.AbstractEndpoint;
+import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketEvent;
@@ -246,6 +249,245 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     }
 
 
+    @Override
+    public final void action(ActionCode actionCode, Object param) {
+        switch (actionCode) {
+        // 'Normal' servlet support
+        case COMMIT: {
+            if (!response.isCommitted()) {
+                try {
+                    // Validate and write response headers
+                    prepareResponse();
+                } catch (IOException e) {
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                }
+            }
+            break;
+        }
+        case CLOSE: {
+            action(ActionCode.COMMIT, null);
+            try {
+                finishResponse();
+            } catch (IOException e) {
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+            }
+            break;
+        }
+        case ACK: {
+            ack();
+            break;
+        }
+        case CLIENT_FLUSH: {
+            action(ActionCode.COMMIT, null);
+            try {
+                flush();
+            } catch (IOException e) {
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                response.setErrorException(e);
+            }
+            break;
+        }
+        case AVAILABLE: {
+            request.setAvailable(available(Boolean.TRUE.equals(param)));
+            break;
+        }
+        case REQ_SET_BODY_REPLAY: {
+            ByteChunk body = (ByteChunk) param;
+            setRequestBody(body);
+            break;
+        }
+
+        // Error handling
+        case IS_ERROR: {
+            ((AtomicBoolean) param).set(getErrorState().isError());
+            break;
+        }
+        case CLOSE_NOW: {
+            // Prevent further writes to the response
+            setSwallowResponse();
+            setErrorState(ErrorState.CLOSE_NOW, null);
+            break;
+        }
+        case DISABLE_SWALLOW_INPUT: {
+            // Aborted upload or similar.
+            // No point reading the remainder of the request.
+            disableSwallowRequest();
+            // This is an error state. Make sure it is marked as such.
+            setErrorState(ErrorState.CLOSE_CLEAN, null);
+            break;
+        }
+
+        // Request attribute support
+        case REQ_HOST_ADDR_ATTRIBUTE: {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.remoteAddr().setString(socketWrapper.getRemoteAddr());
+            }
+            break;
+        }
+        case REQ_HOST_ATTRIBUTE: {
+            populateRequestAttributeRemoteHost();
+            break;
+        }
+        case REQ_LOCALPORT_ATTRIBUTE: {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.setLocalPort(socketWrapper.getLocalPort());
+            }
+            break;
+        }
+        case REQ_LOCAL_ADDR_ATTRIBUTE: {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.localAddr().setString(socketWrapper.getLocalAddr());
+            }
+            break;
+        }
+        case REQ_LOCAL_NAME_ATTRIBUTE: {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.localName().setString(socketWrapper.getLocalName());
+            }
+            break;
+        }
+        case REQ_REMOTEPORT_ATTRIBUTE: {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.setRemotePort(socketWrapper.getRemotePort());
+            }
+            break;
+        }
+
+        // SSL request attribute support
+        case REQ_SSL_ATTRIBUTE: {
+            populateSslRequestAttributes();
+            break;
+        }
+        case REQ_SSL_CERTIFICATE: {
+            sslReHandShake();
+            break;
+        }
+
+        // Servlet 3.0 asynchronous support
+        case ASYNC_START: {
+            asyncStateMachine.asyncStart((AsyncContextCallback) param);
+            break;
+        }
+        case ASYNC_COMPLETE: {
+            clearDispatches();
+            if (asyncStateMachine.asyncComplete()) {
+                socketWrapper.processSocket(SocketEvent.OPEN_READ, true);
+            }
+            break;
+        }
+        case ASYNC_DISPATCH: {
+            if (asyncStateMachine.asyncDispatch()) {
+                socketWrapper.processSocket(SocketEvent.OPEN_READ, true);
+            }
+            break;
+        }
+        case ASYNC_DISPATCHED: {
+            asyncStateMachine.asyncDispatched();
+            break;
+        }
+        case ASYNC_ERROR: {
+            asyncStateMachine.asyncError();
+            break;
+        }
+        case ASYNC_IS_ASYNC: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsync());
+            break;
+        }
+        case ASYNC_IS_COMPLETING: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isCompleting());
+            break;
+        }
+        case ASYNC_IS_DISPATCHING: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncDispatching());
+            break;
+        }
+        case ASYNC_IS_ERROR: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncError());
+            break;
+        }
+        case ASYNC_IS_STARTED: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncStarted());
+            break;
+        }
+        case ASYNC_IS_TIMINGOUT: {
+            ((AtomicBoolean) param).set(asyncStateMachine.isAsyncTimingOut());
+            break;
+        }
+        case ASYNC_RUN: {
+            asyncStateMachine.asyncRun((Runnable) param);
+            break;
+        }
+        case ASYNC_SETTIMEOUT: {
+            if (param == null) {
+                return;
+            }
+            long timeout = ((Long) param).longValue();
+            setAsyncTimeout(timeout);
+            break;
+        }
+        case ASYNC_TIMEOUT: {
+            AtomicBoolean result = (AtomicBoolean) param;
+            result.set(asyncStateMachine.asyncTimeout());
+            break;
+        }
+        case ASYNC_POST_PROCESS: {
+            asyncStateMachine.asyncPostProcess();
+            break;
+        }
+
+        // Servlet 3.1 non-blocking I/O
+        case REQUEST_BODY_FULLY_READ: {
+            AtomicBoolean result = (AtomicBoolean) param;
+            result.set(isRequestBodyFullyRead());
+            break;
+        }
+        case NB_READ_INTEREST: {
+            if (!isRequestBodyFullyRead()) {
+                registerReadInterest();
+            }
+            break;
+        }
+        case NB_WRITE_INTEREST: {
+            AtomicBoolean isReady = (AtomicBoolean)param;
+            isReady.set(isReady());
+            break;
+        }
+        case DISPATCH_READ: {
+            addDispatch(DispatchType.NON_BLOCKING_READ);
+            break;
+        }
+        case DISPATCH_WRITE: {
+            addDispatch(DispatchType.NON_BLOCKING_WRITE);
+            break;
+        }
+        case DISPATCH_EXECUTE: {
+            SocketWrapperBase<?> wrapper = socketWrapper;
+            if (wrapper != null) {
+                executeDispatches(wrapper);
+            }
+            break;
+        }
+
+        // Servlet 3.1 HTTP Upgrade
+        case UPGRADE: {
+            doHttpUpgrade((UpgradeToken) param);
+            break;
+        }
+
+        // Servlet 4.0 Push requests
+        case IS_PUSH_SUPPORTED: {
+            AtomicBoolean result = (AtomicBoolean) param;
+            result.set(isPushSupported());
+            break;
+        }
+        case PUSH_REQUEST: {
+            doPush((PushToken) param);
+            break;
+        }
+        }
+    }
+
+
     /**
      * Perform any necessary processing for a non-blocking read before
      * dispatching to the adapter.
@@ -303,6 +545,63 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         errorState = ErrorState.NONE;
         asyncStateMachine.recycle();
     }
+
+
+    protected abstract void prepareResponse() throws IOException;
+
+
+    protected abstract void finishResponse() throws IOException;
+
+
+    protected abstract void ack();
+
+
+    protected abstract void flush() throws IOException;
+
+
+    protected abstract int available(boolean doRead);
+
+
+    protected abstract void setRequestBody(ByteChunk body);
+
+
+    protected abstract void setSwallowResponse();
+
+
+    protected abstract void disableSwallowRequest();
+
+
+    protected abstract boolean getPopulateRequestAttributesFromSocket();
+
+
+    protected abstract void populateRequestAttributeRemoteHost();
+
+
+    protected abstract void populateSslRequestAttributes();
+
+
+    protected abstract void sslReHandShake() ;
+
+
+    protected abstract boolean isRequestBodyFullyRead();
+
+
+    protected abstract void registerReadInterest();
+
+
+    protected abstract boolean isReady();
+
+
+    protected abstract void executeDispatches(SocketWrapperBase<?> wrapper);
+
+
+    protected abstract void doHttpUpgrade(UpgradeToken upgradeToken);
+
+
+    protected abstract boolean isPushSupported();
+
+
+    protected abstract void doPush(PushToken pushToken);
 
 
     /**
