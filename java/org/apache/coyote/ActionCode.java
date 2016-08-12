@@ -71,13 +71,14 @@ public enum ActionCode {
     REQ_HOST_ADDR_ATTRIBUTE,
 
     /**
-     * Callback for lazy evaluation - extract the SSL-related attributes.
+     * Callback for lazy evaluation - extract the SSL-related attributes
+     * including the client certificate if present.
      */
     REQ_SSL_ATTRIBUTE,
 
     /**
-     * Callback for lazy evaluation - extract the SSL-certificate (including
-     * forcing a re-handshake if necessary)
+     * Force a TLS re-handshake and make the resulting client certificate (if
+     * any) available as a request attribute.
      */
     REQ_SSL_CERTIFICATE,
 

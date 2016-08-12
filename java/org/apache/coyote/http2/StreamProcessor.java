@@ -236,19 +236,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case REQ_SSL_CERTIFICATE: {
-            // No re-negotiation support in HTTP/2. Either the certificate is
-            // available or it isn't.
-            try {
-                if (sslSupport != null) {
-                    Object sslO = sslSupport.getCipherSuite();
-                    sslO = sslSupport.getPeerCertificateChain();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
-                    }
-                }
-            } catch (Exception e) {
-                log.warn(sm.getString("streamProcessor.ssl.error"), e);
-            }
+            // No re-negotiation support in HTTP/2.
             break;
         }
 
