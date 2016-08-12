@@ -690,12 +690,7 @@ public class Http11Processor extends AbstractProcessor {
         }
         case REQ_SET_BODY_REPLAY: {
             ByteChunk body = (ByteChunk) param;
-
-            InputFilter savedBody = new SavedRequestInputFilter(body);
-            savedBody.setRequest(request);
-
-            Http11InputBuffer internalBuffer = (Http11InputBuffer) request.getInputBuffer();
-            internalBuffer.addActiveFilter(savedBody);
+            setRequestBody(body);
             break;
         }
         case RESET: {
@@ -1814,6 +1809,15 @@ public class Http11Processor extends AbstractProcessor {
 
     private int available(boolean doRead) {
         return inputBuffer.available(doRead);
+    }
+    
+    
+    private void setRequestBody(ByteChunk body) {
+        InputFilter savedBody = new SavedRequestInputFilter(body);
+        savedBody.setRequest(request);
+    
+        Http11InputBuffer internalBuffer = (Http11InputBuffer) request.getInputBuffer();
+        internalBuffer.addActiveFilter(savedBody);
     }
     
     

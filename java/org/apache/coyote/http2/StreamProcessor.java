@@ -144,8 +144,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         }
         case REQ_SET_BODY_REPLAY: {
             ByteChunk body = (ByteChunk) param;
-            stream.getInputBuffer().insertReplayedBody(body);
-            stream.receivedEndOfStream();
+            setRequestBody(body);
             break;
         }
         case RESET: {
@@ -405,6 +404,12 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
      */
     private int available(boolean doRead) {
         return stream.getInputBuffer().available();
+    }
+    
+    
+    private void setRequestBody(ByteChunk body) {
+        stream.getInputBuffer().insertReplayedBody(body);
+        stream.receivedEndOfStream();
     }
     
     

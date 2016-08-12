@@ -396,15 +396,8 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case REQ_SET_BODY_REPLAY: {
-            // Set the given bytes as the content
-            ByteChunk bc = (ByteChunk) param;
-            int length = bc.getLength();
-            bodyBytes.setBytes(bc.getBytes(), bc.getStart(), length);
-            request.setContentLength(length);
-            first = false;
-            empty = false;
-            replay = true;
-            endOfStream = false;
+            ByteChunk body = (ByteChunk) param;
+            setRequestBody(body);
             break;
         }
         case RESET: {
@@ -1468,6 +1461,17 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
+    private void setRequestBody(ByteChunk body) {
+        int length = body.getLength();
+        bodyBytes.setBytes(body.getBytes(), body.getStart(), length);
+        request.setContentLength(length);
+        first = false;
+        empty = false;
+        replay = true;
+        endOfStream = false;
+    }
+    
+    
     /**
      * Read at least the specified amount of bytes, and place them
      * in the input buffer. Note that if any data is available to read then this
