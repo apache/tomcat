@@ -154,91 +154,63 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case CLOSE_NOW: {
-            // No need to block further output. This is called by the error
-            // reporting valve if the response is already committed. It will
-            // flush any remaining response data before this call.
-            // Setting the error state will then cause this stream to be reset.
+            // Prevent further writes to the response
+            setSwallowResponse();
             setErrorState(ErrorState.CLOSE_NOW,  null);
             break;
         }
         case DISABLE_SWALLOW_INPUT: {
-            // NO-OP
-            // HTTP/2 has to swallow any input received to ensure that the flow
-            // control windows are correctly tracked.
+            // Aborted upload or similar.
+            // No point reading the remainder of the request.
+            disableSwallowRequest();
+            // This is an error state. Make sure it is marked as such.
+            setErrorState(ErrorState.CLOSE_CLEAN, null);
             break;
         }
 
         // Request attribute support
         case REQ_HOST_ADDR_ATTRIBUTE: {
-            request.remoteAddr().setString(socketWrapper.getRemoteAddr());
+            populateRequestAttributeRemoteHost();
             break;
         }
         case REQ_HOST_ATTRIBUTE: {
-            request.remoteHost().setString(socketWrapper.getRemoteHost());
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.remoteHost().setString(socketWrapper.getRemoteHost());
+            }
             break;
         }
         case REQ_LOCALPORT_ATTRIBUTE: {
-            request.setLocalPort(socketWrapper.getLocalPort());
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.setLocalPort(socketWrapper.getLocalPort());
+            }
             break;
         }
         case REQ_LOCAL_ADDR_ATTRIBUTE: {
-            request.localAddr().setString(socketWrapper.getLocalAddr());
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.localAddr().setString(socketWrapper.getLocalAddr());
+            }
             break;
         }
         case REQ_LOCAL_NAME_ATTRIBUTE: {
-            request.localName().setString(socketWrapper.getLocalName());
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.localName().setString(socketWrapper.getLocalName());
+            }
             break;
         }
         case REQ_REMOTEPORT_ATTRIBUTE: {
-            request.setRemotePort(socketWrapper.getRemotePort());
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.setRemotePort(socketWrapper.getRemotePort());
+            }
             break;
         }
 
         // SSL request attribute support
         case REQ_SSL_ATTRIBUTE: {
-            try {
-                if (sslSupport != null) {
-                    Object sslO = sslSupport.getCipherSuite();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
-                    }
-                    sslO = sslSupport.getPeerCertificateChain();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
-                    }
-                    sslO = sslSupport.getKeySize();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.KEY_SIZE_KEY, sslO);
-                    }
-                    sslO = sslSupport.getSessionId();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
-                    }
-                    sslO = sslSupport.getProtocol();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
-                    }
-                    request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
-                }
-            } catch (Exception e) {
-                log.warn(sm.getString("streamProcessor.ssl.error"), e);
-            }
+            populateSslRequestAttributes();
             break;
         }
         case REQ_SSL_CERTIFICATE: {
-            // No re-negotiation support in HTTP/2. Either the certificate is
-            // available or it isn't.
-            try {
-                if (sslSupport != null) {
-                    Object sslO = sslSupport.getCipherSuite();
-                    sslO = sslSupport.getPeerCertificateChain();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
-                    }
-                }
-            } catch (Exception e) {
-                log.warn(sm.getString("streamProcessor.ssl.error"), e);
-            }
+            sslReHandShake();
             break;
         }
 
@@ -408,6 +380,66 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         stream.receivedEndOfStream();
     }
     
+    
+    private void setSwallowResponse() {
+        // NO-OP
+    }
+    
+    
+    private void disableSwallowRequest() {
+        // NO-OP
+        // HTTP/2 has to swallow any input received to ensure that the flow
+        // control windows are correctly tracked.
+    }
+    
+    
+    private boolean getPopulateRequestAttributesFromSocket() {
+        return true;
+    }
+
+    
+    private void populateRequestAttributeRemoteHost() {
+        if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+            request.remoteHost().setString(socketWrapper.getRemoteHost());
+        }
+    }
+    
+    
+    private void populateSslRequestAttributes() {
+        try {
+            if (sslSupport != null) {
+                Object sslO = sslSupport.getCipherSuite();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
+                }
+                sslO = sslSupport.getPeerCertificateChain();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
+                }
+                sslO = sslSupport.getKeySize();
+                if (sslO != null) {
+                    request.setAttribute (SSLSupport.KEY_SIZE_KEY, sslO);
+                }
+                sslO = sslSupport.getSessionId();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
+                }
+                sslO = sslSupport.getProtocol();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
+                }
+                request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
+            }
+        } catch (Exception e) {
+            log.warn(sm.getString("http11processor.socket.ssl"), e);
+        }
+    }
+
+
+    private void sslReHandShake() {
+        // No re-negotiation support in HTTP/2.
+    }
+
     
     @Override
     public void recycle() {

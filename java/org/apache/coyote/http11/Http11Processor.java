@@ -700,64 +700,51 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case CLOSE_NOW: {
-            // Block further output
-            outputBuffer.responseFinished = true;
+            // Prevent further writes to the response
+            setSwallowResponse();
             setErrorState(ErrorState.CLOSE_NOW, null);
             break;
         }
         case DISABLE_SWALLOW_INPUT: {
-            // Do not swallow request input and make sure we are closing the
-            // connection
+            // Aborted upload or similar.
+            // No point reading the remainder of the request.
+            disableSwallowRequest();
+            // This is an error state. Make sure it is marked as such.
             setErrorState(ErrorState.CLOSE_CLEAN, null);
-            inputBuffer.setSwallowInput(false);
             break;
         }
 
         // Request attribute support
         case REQ_HOST_ADDR_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.remoteAddr().recycle();
-            } else {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
                 request.remoteAddr().setString(socketWrapper.getRemoteAddr());
             }
             break;
         }
         case REQ_HOST_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.remoteHost().recycle();
-            } else {
-                request.remoteHost().setString(socketWrapper.getRemoteHost());
-            }
+            populateRequestAttributeRemoteHost();
             break;
         }
         case REQ_LOCALPORT_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.setLocalPort(0);
-            } else {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
                 request.setLocalPort(socketWrapper.getLocalPort());
             }
             break;
         }
         case REQ_LOCAL_ADDR_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.localAddr().recycle();
-            } else {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
                 request.localAddr().setString(socketWrapper.getLocalAddr());
             }
             break;
         }
         case REQ_LOCAL_NAME_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.localName().recycle();
-            } else {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
                 request.localName().setString(socketWrapper.getLocalName());
             }
             break;
         }
         case REQ_REMOTEPORT_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.setRemotePort(0);
-            } else {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
                 request.setRemotePort(socketWrapper.getRemotePort());
             }
             break;
@@ -765,59 +752,11 @@ public class Http11Processor extends AbstractProcessor {
 
         // SSL request attribute support
         case REQ_SSL_ATTRIBUTE: {
-            try {
-                if (sslSupport != null) {
-                    Object sslO = sslSupport.getCipherSuite();
-                    if (sslO != null) {
-                        request.setAttribute
-                            (SSLSupport.CIPHER_SUITE_KEY, sslO);
-                    }
-                    sslO = sslSupport.getPeerCertificateChain();
-                    if (sslO != null) {
-                        request.setAttribute
-                            (SSLSupport.CERTIFICATE_KEY, sslO);
-                    }
-                    sslO = sslSupport.getKeySize();
-                    if (sslO != null) {
-                        request.setAttribute
-                            (SSLSupport.KEY_SIZE_KEY, sslO);
-                    }
-                    sslO = sslSupport.getSessionId();
-                    if (sslO != null) {
-                        request.setAttribute
-                            (SSLSupport.SESSION_ID_KEY, sslO);
-                    }
-                    sslO = sslSupport.getProtocol();
-                    if (sslO != null) {
-                        request.setAttribute
-                            (SSLSupport.PROTOCOL_VERSION_KEY, sslO);
-                    }
-                    request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
-                }
-            } catch (Exception e) {
-                log.warn(sm.getString("http11processor.socket.ssl"), e);
-            }
+            populateSslRequestAttributes();
             break;
         }
         case REQ_SSL_CERTIFICATE: {
-            if (sslSupport != null) {
-                // Consume and buffer the request body, so that it does not
-                // interfere with the client's handshake messages
-                InputFilter[] inputFilters = inputBuffer.getFilters();
-                ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER]).setLimit(
-                        maxSavePostSize);
-                inputBuffer.addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
-
-                try {
-                    socketWrapper.doClientAuth(sslSupport);
-                    Object sslO = sslSupport.getPeerCertificateChain();
-                    if (sslO != null) {
-                        request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
-                    }
-                } catch (IOException ioe) {
-                    log.warn(sm.getString("http11processor.socket.ssl"), ioe);
-                }
-            }
+            sslReHandShake();
             break;
         }
 
@@ -1813,6 +1752,81 @@ public class Http11Processor extends AbstractProcessor {
     
         Http11InputBuffer internalBuffer = (Http11InputBuffer) request.getInputBuffer();
         internalBuffer.addActiveFilter(savedBody);
+    }
+    
+    
+    private void setSwallowResponse() {
+        outputBuffer.responseFinished = true;
+    }
+    
+    
+    private void disableSwallowRequest() {
+        inputBuffer.setSwallowInput(false);
+    }
+    
+    
+    private boolean getPopulateRequestAttributesFromSocket() {
+        return true;
+    }
+    
+    
+    private void populateRequestAttributeRemoteHost() {
+        if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+            request.remoteHost().setString(socketWrapper.getRemoteHost());
+        }
+    }
+    
+    
+    private void populateSslRequestAttributes() {
+        try {
+            if (sslSupport != null) {
+                Object sslO = sslSupport.getCipherSuite();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
+                }
+                sslO = sslSupport.getPeerCertificateChain();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
+                }
+                sslO = sslSupport.getKeySize();
+                if (sslO != null) {
+                    request.setAttribute (SSLSupport.KEY_SIZE_KEY, sslO);
+                }
+                sslO = sslSupport.getSessionId();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
+                }
+                sslO = sslSupport.getProtocol();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
+                }
+                request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
+            }
+        } catch (Exception e) {
+            log.warn(sm.getString("http11processor.socket.ssl"), e);
+        }
+    }
+
+
+    private void sslReHandShake() {
+        if (sslSupport != null) {
+            // Consume and buffer the request body, so that it does not
+            // interfere with the client's handshake messages
+            InputFilter[] inputFilters = inputBuffer.getFilters();
+            ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER]).setLimit(
+                    maxSavePostSize);
+            inputBuffer.addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
+
+            try {
+                socketWrapper.doClientAuth(sslSupport);
+                Object sslO = sslSupport.getPeerCertificateChain();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
+                }
+            } catch (IOException ioe) {
+                log.warn(sm.getString("http11processor.socket.ssl"), ioe);
+            }
+        }
     }
     
     

@@ -27,7 +27,8 @@ public enum ErrorState {
      * The current request/response is in an error state and while it is safe to
      * complete the current response it is not safe to continue to use the
      * existing connection which must be closed once the response has been
-     * completed.
+     * completed. For multiplexed protocols, the channel must be closed when the
+     * current request/response completes but the connection may continue.
      */
     CLOSE_CLEAN(true, 1, true, true),
 

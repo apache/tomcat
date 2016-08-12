@@ -408,106 +408,62 @@ public class AjpProcessor extends AbstractProcessor {
         }
         case CLOSE_NOW: {
             // Prevent further writes to the response
-            swallowResponse = true;
+            setSwallowResponse();
             setErrorState(ErrorState.CLOSE_NOW, null);
             break;
         }
         case DISABLE_SWALLOW_INPUT: {
-            // TODO: Do not swallow request input but
-            // make sure we are closing the connection
+            // Aborted upload or similar.
+            // No point reading the remainder of the request.
+            disableSwallowRequest();
+            // This is an error state. Make sure it is marked as such.
             setErrorState(ErrorState.CLOSE_CLEAN, null);
             break;
         }
 
         // Request attribute support
         case REQ_HOST_ADDR_ATTRIBUTE: {
-            // NO-OP
-            // Automatically populated during prepareRequest()
-            break;
-        }
-        case REQ_HOST_ATTRIBUTE: {
-            // Get remote host name using a DNS resolution
-            if (request.remoteHost().isNull()) {
-                try {
-                    request.remoteHost().setString(InetAddress.getByName
-                            (request.remoteAddr().toString()).getHostName());
-                } catch (IOException iex) {
-                    // Ignore
-                }
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.remoteAddr().setString(socketWrapper.getRemoteAddr());
             }
             break;
         }
+        case REQ_HOST_ATTRIBUTE: {
+            populateRequestAttributeRemoteHost();
+            break;
+        }
         case REQ_LOCALPORT_ATTRIBUTE: {
-            // NO-OP
-            // Automatically populated during prepareRequest()
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.setLocalPort(socketWrapper.getLocalPort());
+            }
             break;
         }
         case REQ_LOCAL_ADDR_ATTRIBUTE: {
-            // Automatically populated during prepareRequest() when using
-            // modern AJP forwarder, otherwise copy from local name
-            if (request.localAddr().isNull()) {
-                request.localAddr().setString(request.localName().toString());
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.localAddr().setString(socketWrapper.getLocalAddr());
             }
             break;
         }
         case REQ_LOCAL_NAME_ATTRIBUTE: {
-            // NO-OP
-            // Automatically populated during prepareRequest()
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.localName().setString(socketWrapper.getLocalName());
+            }
             break;
         }
         case REQ_REMOTEPORT_ATTRIBUTE: {
-            // NO-OP
-            // Automatically populated during prepareRequest() when using
-            // modern AJP forwarder, otherwise not available
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.setRemotePort(socketWrapper.getRemotePort());
+            }
             break;
         }
 
         // SSL request attribute support
         case REQ_SSL_ATTRIBUTE: {
-            if (!certificates.isNull()) {
-                ByteChunk certData = certificates.getByteChunk();
-                X509Certificate jsseCerts[] = null;
-                ByteArrayInputStream bais =
-                    new ByteArrayInputStream(certData.getBytes(),
-                            certData.getStart(),
-                            certData.getLength());
-                // Fill the  elements.
-                try {
-                    CertificateFactory cf;
-                    String clientCertProvider = getClientCertProvider();
-                    if (clientCertProvider == null) {
-                        cf = CertificateFactory.getInstance("X.509");
-                    } else {
-                        cf = CertificateFactory.getInstance("X.509",
-                                clientCertProvider);
-                    }
-                    while(bais.available() > 0) {
-                        X509Certificate cert = (X509Certificate)
-                        cf.generateCertificate(bais);
-                        if(jsseCerts == null) {
-                            jsseCerts = new X509Certificate[1];
-                            jsseCerts[0] = cert;
-                        } else {
-                            X509Certificate [] temp = new X509Certificate[jsseCerts.length+1];
-                            System.arraycopy(jsseCerts,0,temp,0,jsseCerts.length);
-                            temp[jsseCerts.length] = cert;
-                            jsseCerts = temp;
-                        }
-                    }
-                } catch (java.security.cert.CertificateException e) {
-                    getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
-                    return;
-                } catch (NoSuchProviderException e) {
-                    getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
-                    return;
-                }
-                request.setAttribute(SSLSupport.CERTIFICATE_KEY, jsseCerts);
-            }
+            populateSslRequestAttributes();
             break;
         }
         case REQ_SSL_CERTIFICATE: {
-            // NO-OP. Can't force a new SSL handshake with the client when using
-            // AJP as the reverse proxy controls that connection.
+            sslReHandShake();
             break;
         }
 
@@ -1467,6 +1423,89 @@ public class AjpProcessor extends AbstractProcessor {
         endOfStream = false;
     }
     
+    
+    private void setSwallowResponse() {
+        swallowResponse = true;
+    }
+    
+    
+    private void disableSwallowRequest() {
+        /* NO-OP
+         * With AJP, Tomcat controls when the client sends request body data. At
+         * most there will be a single packet to read and that will be handled
+         * in finishResponse().
+         */
+    }
+    
+    
+    private boolean getPopulateRequestAttributesFromSocket() {
+        // NO-OPs the attribute requests since they are pre-populated when
+        // parsing the first AJP message.
+        return false;
+    }
+
+    
+    private void populateRequestAttributeRemoteHost() {
+        // Get remote host name using a DNS resolution
+        if (request.remoteHost().isNull()) {
+            try {
+                request.remoteHost().setString(InetAddress.getByName
+                        (request.remoteAddr().toString()).getHostName());
+            } catch (IOException iex) {
+                // Ignore
+            }
+        }
+    }
+    
+    
+    private void populateSslRequestAttributes() {
+        if (!certificates.isNull()) {
+            ByteChunk certData = certificates.getByteChunk();
+            X509Certificate jsseCerts[] = null;
+            ByteArrayInputStream bais =
+                new ByteArrayInputStream(certData.getBytes(),
+                        certData.getStart(),
+                        certData.getLength());
+            // Fill the  elements.
+            try {
+                CertificateFactory cf;
+                String clientCertProvider = getClientCertProvider();
+                if (clientCertProvider == null) {
+                    cf = CertificateFactory.getInstance("X.509");
+                } else {
+                    cf = CertificateFactory.getInstance("X.509",
+                            clientCertProvider);
+                }
+                while(bais.available() > 0) {
+                    X509Certificate cert = (X509Certificate)
+                    cf.generateCertificate(bais);
+                    if(jsseCerts == null) {
+                        jsseCerts = new X509Certificate[1];
+                        jsseCerts[0] = cert;
+                    } else {
+                        X509Certificate [] temp = new X509Certificate[jsseCerts.length+1];
+                        System.arraycopy(jsseCerts,0,temp,0,jsseCerts.length);
+                        temp[jsseCerts.length] = cert;
+                        jsseCerts = temp;
+                    }
+                }
+            } catch (java.security.cert.CertificateException e) {
+                getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
+                return;
+            } catch (NoSuchProviderException e) {
+                getLog().error(sm.getString("ajpprocessor.certs.fail"), e);
+                return;
+            }
+            request.setAttribute(SSLSupport.CERTIFICATE_KEY, jsseCerts);
+        }
+    }
+    
+    
+    private void sslReHandShake() {
+        // NO-OP. Can't force a new SSL handshake with the client when using
+        // AJP as the reverse proxy controls that connection.
+    }
+
     
     /**
      * Read at least the specified amount of bytes, and place them

@@ -575,8 +575,11 @@ public final class Request {
         headers.recycle();
         serverNameMB.recycle();
         serverPort=-1;
+        localAddrMB.recycle();
         localNameMB.recycle();
         localPort = -1;
+        remoteAddrMB.recycle();
+        remoteHostMB.recycle();
         remotePort = -1;
         available = 0;
         sendfile = true;
