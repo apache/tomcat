@@ -154,10 +154,8 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case CLOSE_NOW: {
-            // No need to block further output. This is called by the error
-            // reporting valve if the response is already committed. It will
-            // flush any remaining response data before this call.
-            // Setting the error state will then cause this stream to be reset.
+            // Prevent further writes to the response
+            setSwallowResponse();
             setErrorState(ErrorState.CLOSE_NOW,  null);
             break;
         }
@@ -406,6 +404,11 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     private void setRequestBody(ByteChunk body) {
         stream.getInputBuffer().insertReplayedBody(body);
         stream.receivedEndOfStream();
+    }
+    
+    
+    private void setSwallowResponse() {
+        // NO-OP
     }
     
     

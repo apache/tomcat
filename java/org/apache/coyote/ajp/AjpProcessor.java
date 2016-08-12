@@ -408,7 +408,7 @@ public class AjpProcessor extends AbstractProcessor {
         }
         case CLOSE_NOW: {
             // Prevent further writes to the response
-            swallowResponse = true;
+            setSwallowResponse();
             setErrorState(ErrorState.CLOSE_NOW, null);
             break;
         }
@@ -1465,6 +1465,11 @@ public class AjpProcessor extends AbstractProcessor {
         empty = false;
         replay = true;
         endOfStream = false;
+    }
+    
+    
+    private void setSwallowResponse() {
+        swallowResponse = true;
     }
     
     

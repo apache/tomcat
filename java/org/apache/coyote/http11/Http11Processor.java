@@ -700,8 +700,8 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case CLOSE_NOW: {
-            // Block further output
-            outputBuffer.responseFinished = true;
+            // Prevent further writes to the response
+            setSwallowResponse();
             setErrorState(ErrorState.CLOSE_NOW, null);
             break;
         }
@@ -1813,6 +1813,11 @@ public class Http11Processor extends AbstractProcessor {
     
         Http11InputBuffer internalBuffer = (Http11InputBuffer) request.getInputBuffer();
         internalBuffer.addActiveFilter(savedBody);
+    }
+    
+    
+    private void setSwallowResponse() {
+        outputBuffer.responseFinished = true;
     }
     
     
