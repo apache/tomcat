@@ -300,7 +300,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         }
         case NB_WRITE_INTEREST: {
             AtomicBoolean result = (AtomicBoolean) param;
-            result.set(stream.getOutputBuffer().isReady());
+            result.set(isReady());
             break;
         }
         case DISPATCH_READ: {
@@ -451,6 +451,11 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     
     private void registerReadInterest() {
         stream.getInputBuffer().registerReadInterest();
+    }
+    
+    
+    private boolean isReady() {
+        return stream.getOutputBuffer().isReady();
     }
     
     

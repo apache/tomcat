@@ -846,7 +846,7 @@ public class Http11Processor extends AbstractProcessor {
         }
         case NB_WRITE_INTEREST: {
             AtomicBoolean isReady = (AtomicBoolean)param;
-            isReady.set(outputBuffer.isReady());
+            isReady.set(isReady());
             break;
         }
         case DISPATCH_READ: {
@@ -1839,6 +1839,11 @@ public class Http11Processor extends AbstractProcessor {
     
     private void registerReadInterest() {
         socketWrapper.registerReadInterest();
+    }
+    
+    
+    private boolean isReady() {
+        return outputBuffer.isReady();
     }
     
     

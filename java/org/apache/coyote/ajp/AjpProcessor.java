@@ -553,8 +553,7 @@ public class AjpProcessor extends AbstractProcessor {
         }
         case NB_WRITE_INTEREST: {
             AtomicBoolean isReady = (AtomicBoolean)param;
-            boolean result = responseMsgPos == -1 && socketWrapper.isReadyForWrite();
-            isReady.set(result);
+            isReady.set(isReady());
             break;
         }
         case DISPATCH_READ: {
@@ -1514,6 +1513,11 @@ public class AjpProcessor extends AbstractProcessor {
     
     private void registerReadInterest() {
         socketWrapper.registerReadInterest();
+    }
+    
+    
+    private boolean isReady() {
+        return responseMsgPos == -1 && socketWrapper.isReadyForWrite();
     }
     
     
