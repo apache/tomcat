@@ -170,37 +170,35 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
         // Request attribute support
         case REQ_HOST_ADDR_ATTRIBUTE: {
-            if (socketWrapper != null) {
-                request.remoteAddr().setString(socketWrapper.getRemoteAddr());
-            }
+            populateRequestAttributeRemoteHost();
             break;
         }
         case REQ_HOST_ATTRIBUTE: {
-            if (socketWrapper != null) {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
                 request.remoteHost().setString(socketWrapper.getRemoteHost());
             }
             break;
         }
         case REQ_LOCALPORT_ATTRIBUTE: {
-            if (socketWrapper != null) {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
                 request.setLocalPort(socketWrapper.getLocalPort());
             }
             break;
         }
         case REQ_LOCAL_ADDR_ATTRIBUTE: {
-            if (socketWrapper != null) {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
                 request.localAddr().setString(socketWrapper.getLocalAddr());
             }
             break;
         }
         case REQ_LOCAL_NAME_ATTRIBUTE: {
-            if (socketWrapper != null) {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
                 request.localName().setString(socketWrapper.getLocalName());
             }
             break;
         }
         case REQ_REMOTEPORT_ATTRIBUTE: {
-            if (socketWrapper != null) {
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
                 request.setRemotePort(socketWrapper.getRemotePort());
             }
             break;
@@ -430,6 +428,18 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         // NO-OP
         // HTTP/2 has to swallow any input received to ensure that the flow
         // control windows are correctly tracked.
+    }
+    
+    
+    private boolean getPopulateRequestAttributesFromSocket() {
+        return true;
+    }
+
+    
+    private void populateRequestAttributeRemoteHost() {
+        if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+            request.remoteHost().setString(socketWrapper.getRemoteHost());
+        }
     }
     
     

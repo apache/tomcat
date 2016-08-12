@@ -423,44 +423,37 @@ public class AjpProcessor extends AbstractProcessor {
 
         // Request attribute support
         case REQ_HOST_ADDR_ATTRIBUTE: {
-            // NO-OP
-            // Automatically populated during prepareRequest()
-            break;
-        }
-        case REQ_HOST_ATTRIBUTE: {
-            // Get remote host name using a DNS resolution
-            if (request.remoteHost().isNull()) {
-                try {
-                    request.remoteHost().setString(InetAddress.getByName
-                            (request.remoteAddr().toString()).getHostName());
-                } catch (IOException iex) {
-                    // Ignore
-                }
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.remoteAddr().setString(socketWrapper.getRemoteAddr());
             }
             break;
         }
+        case REQ_HOST_ATTRIBUTE: {
+            populateRequestAttributeRemoteHost();
+            break;
+        }
         case REQ_LOCALPORT_ATTRIBUTE: {
-            // NO-OP
-            // Automatically populated during prepareRequest()
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.setLocalPort(socketWrapper.getLocalPort());
+            }
             break;
         }
         case REQ_LOCAL_ADDR_ATTRIBUTE: {
-            // Automatically populated during prepareRequest() when using
-            // modern AJP forwarder, otherwise copy from local name
-            if (request.localAddr().isNull()) {
-                request.localAddr().setString(request.localName().toString());
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.localAddr().setString(socketWrapper.getLocalAddr());
             }
             break;
         }
         case REQ_LOCAL_NAME_ATTRIBUTE: {
-            // NO-OP
-            // Automatically populated during prepareRequest()
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.localName().setString(socketWrapper.getLocalName());
+            }
             break;
         }
         case REQ_REMOTEPORT_ATTRIBUTE: {
-            // NO-OP
-            // Automatically populated during prepareRequest() when using
-            // modern AJP forwarder, otherwise not available
+            if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
+                request.setRemotePort(socketWrapper.getRemotePort());
+            }
             break;
         }
 
@@ -1481,6 +1474,26 @@ public class AjpProcessor extends AbstractProcessor {
          * most there will be a single packet to read and that will be handled
          * in finishResponse().
          */
+    }
+    
+    
+    private boolean getPopulateRequestAttributesFromSocket() {
+        // NO-OPs the attribute requests since they are pre-populated when
+        // parsing the first AJP message.
+        return false;
+    }
+
+    
+    private void populateRequestAttributeRemoteHost() {
+        // Get remote host name using a DNS resolution
+        if (request.remoteHost().isNull()) {
+            try {
+                request.remoteHost().setString(InetAddress.getByName
+                        (request.remoteAddr().toString()).getHostName());
+            } catch (IOException iex) {
+                // Ignore
+            }
+        }
     }
     
     
