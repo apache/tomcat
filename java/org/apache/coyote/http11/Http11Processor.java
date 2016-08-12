@@ -1633,13 +1633,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
-    protected final boolean isPushSupported() {
-        // HTTP2 connections only. Unsupported for HTTP/1.x
-        return false;
-    }
-
-
-    @Override
     protected final void doPush(PushToken pushToken) {
         // HTTP2 connections only. Unsupported for AJP.
         throw new UnsupportedOperationException(

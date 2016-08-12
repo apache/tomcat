@@ -1304,13 +1304,6 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    @Override
-    protected final boolean isPushSupported() {
-        // HTTP2 connections only. Unsupported for AJP.
-        return false;
-    }
-
-
     /**
      * @param pushToken Unused
      */

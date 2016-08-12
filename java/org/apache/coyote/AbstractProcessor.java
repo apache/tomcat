@@ -613,7 +613,16 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected abstract void doHttpUpgrade(UpgradeToken upgradeToken);
 
 
-    protected abstract boolean isPushSupported();
+    /**
+     * Protocols that support push should override this method and return {@code
+     * true}.
+     *
+     * @return {@code true} if push is supported by this processor, otherwise
+     *         {@code false}.
+     */
+    protected boolean isPushSupported() {
+        return false;
+    }
 
 
     protected abstract void doPush(PushToken pushToken);
