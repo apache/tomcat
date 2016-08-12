@@ -626,7 +626,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
             }
         } catch (Exception e) {
-            getLog().warn(sm.getString("http11processor.socket.ssl"), e);
+            getLog().warn(sm.getString("abstractProcessor.socket.ssl"), e);
         }
     }
 
