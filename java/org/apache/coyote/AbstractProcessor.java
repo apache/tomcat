@@ -586,7 +586,41 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected abstract void populateRequestAttributeRemoteHost();
 
 
-    protected abstract void populateSslRequestAttributes();
+    /**
+     * Populate the TLS related request attributes from the {@link SSLSupport}
+     * instance associated with this processor. Protocols that populate TLS
+     * attributes from a different source (e.g. AJP) should override this
+     * method.
+     */
+    protected void populateSslRequestAttributes() {
+        try {
+            if (sslSupport != null) {
+                Object sslO = sslSupport.getCipherSuite();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
+                }
+                sslO = sslSupport.getPeerCertificateChain();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);
+                }
+                sslO = sslSupport.getKeySize();
+                if (sslO != null) {
+                    request.setAttribute (SSLSupport.KEY_SIZE_KEY, sslO);
+                }
+                sslO = sslSupport.getSessionId();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.SESSION_ID_KEY, sslO);
+                }
+                sslO = sslSupport.getProtocol();
+                if (sslO != null) {
+                    request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
+                }
+                request.setAttribute(SSLSupport.SESSION_MGR, sslSupport);
+            }
+        } catch (Exception e) {
+            getLog().warn(sm.getString("http11processor.socket.ssl"), e);
+        }
+    }
 
 
     /**
