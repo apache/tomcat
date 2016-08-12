@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ErrorState;
-import org.apache.coyote.PushToken;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.UpgradeProtocol;
@@ -1589,14 +1588,6 @@ public class Http11Processor extends AbstractProcessor {
         this.upgradeToken = upgradeToken;
         // Stop further HTTP output
         outputBuffer.responseFinished = true;
-    }
-
-
-    @Override
-    protected final void doPush(PushToken pushToken) {
-        // HTTP2 connections only. Unsupported for AJP.
-        throw new UnsupportedOperationException(
-                sm.getString("http11processor.pushrequest.notsupported"));
     }
 
 

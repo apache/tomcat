@@ -33,7 +33,6 @@ import org.apache.coyote.ActionCode;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
-import org.apache.coyote.PushToken;
 import org.apache.coyote.RequestInfo;
 import org.apache.coyote.UpgradeToken;
 import org.apache.juli.logging.Log;
@@ -1301,17 +1300,6 @@ public class AjpProcessor extends AbstractProcessor {
         // HTTP connections only. Unsupported for AJP.
         throw new UnsupportedOperationException(
                 sm.getString("ajpprocessor.httpupgrade.notsupported"));
-    }
-
-
-    /**
-     * @param pushToken Unused
-     */
-    @Override
-    protected final void doPush(PushToken pushToken) {
-        // HTTP2 connections only. Unsupported for AJP.
-        throw new UnsupportedOperationException(
-                sm.getString("ajpprocessor.pushrequest.notsupported"));
     }
 
 
