@@ -170,27 +170,39 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
         // Request attribute support
         case REQ_HOST_ADDR_ATTRIBUTE: {
-            request.remoteAddr().setString(socketWrapper.getRemoteAddr());
+            if (socketWrapper != null) {
+                request.remoteAddr().setString(socketWrapper.getRemoteAddr());
+            }
             break;
         }
         case REQ_HOST_ATTRIBUTE: {
-            request.remoteHost().setString(socketWrapper.getRemoteHost());
+            if (socketWrapper != null) {
+                request.remoteHost().setString(socketWrapper.getRemoteHost());
+            }
             break;
         }
         case REQ_LOCALPORT_ATTRIBUTE: {
-            request.setLocalPort(socketWrapper.getLocalPort());
+            if (socketWrapper != null) {
+                request.setLocalPort(socketWrapper.getLocalPort());
+            }
             break;
         }
         case REQ_LOCAL_ADDR_ATTRIBUTE: {
-            request.localAddr().setString(socketWrapper.getLocalAddr());
+            if (socketWrapper != null) {
+                request.localAddr().setString(socketWrapper.getLocalAddr());
+            }
             break;
         }
         case REQ_LOCAL_NAME_ATTRIBUTE: {
-            request.localName().setString(socketWrapper.getLocalName());
+            if (socketWrapper != null) {
+                request.localName().setString(socketWrapper.getLocalName());
+            }
             break;
         }
         case REQ_REMOTEPORT_ATTRIBUTE: {
-            request.setRemotePort(socketWrapper.getRemotePort());
+            if (socketWrapper != null) {
+                request.setRemotePort(socketWrapper.getRemotePort());
+            }
             break;
         }
 

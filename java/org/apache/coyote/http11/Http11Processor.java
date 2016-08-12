@@ -716,49 +716,37 @@ public class Http11Processor extends AbstractProcessor {
 
         // Request attribute support
         case REQ_HOST_ADDR_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.remoteAddr().recycle();
-            } else {
+            if (socketWrapper != null) {
                 request.remoteAddr().setString(socketWrapper.getRemoteAddr());
             }
             break;
         }
         case REQ_HOST_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.remoteHost().recycle();
-            } else {
+            if (socketWrapper != null) {
                 request.remoteHost().setString(socketWrapper.getRemoteHost());
             }
             break;
         }
         case REQ_LOCALPORT_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.setLocalPort(0);
-            } else {
+            if (socketWrapper != null) {
                 request.setLocalPort(socketWrapper.getLocalPort());
             }
             break;
         }
         case REQ_LOCAL_ADDR_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.localAddr().recycle();
-            } else {
+            if (socketWrapper != null) {
                 request.localAddr().setString(socketWrapper.getLocalAddr());
             }
             break;
         }
         case REQ_LOCAL_NAME_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.localName().recycle();
-            } else {
+            if (socketWrapper != null) {
                 request.localName().setString(socketWrapper.getLocalName());
             }
             break;
         }
         case REQ_REMOTEPORT_ATTRIBUTE: {
-            if (socketWrapper == null) {
-                request.setRemotePort(0);
-            } else {
+            if (socketWrapper != null) {
                 request.setRemotePort(socketWrapper.getRemotePort());
             }
             break;
