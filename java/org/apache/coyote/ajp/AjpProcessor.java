@@ -565,7 +565,10 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case DISPATCH_EXECUTE: {
-            socketWrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
+            SocketWrapperBase<?> wrapper = socketWrapper;
+            if (wrapper != null) {
+                executeDispatches(wrapper);
+            }
             break;
         }
 
@@ -1421,13 +1424,13 @@ public class AjpProcessor extends AbstractProcessor {
         replay = true;
         endOfStream = false;
     }
-    
-    
+
+
     private void setSwallowResponse() {
         swallowResponse = true;
     }
-    
-    
+
+
     private void disableSwallowRequest() {
         /* NO-OP
          * With AJP, Tomcat controls when the client sends request body data. At
@@ -1435,15 +1438,15 @@ public class AjpProcessor extends AbstractProcessor {
          * in finishResponse().
          */
     }
-    
-    
+
+
     private boolean getPopulateRequestAttributesFromSocket() {
         // NO-OPs the attribute requests since they are pre-populated when
         // parsing the first AJP message.
         return false;
     }
 
-    
+
     private void populateRequestAttributeRemoteHost() {
         // Get remote host name using a DNS resolution
         if (request.remoteHost().isNull()) {
@@ -1455,8 +1458,8 @@ public class AjpProcessor extends AbstractProcessor {
             }
         }
     }
-    
-    
+
+
     private void populateSslRequestAttributes() {
         if (!certificates.isNull()) {
             ByteChunk certData = certificates.getByteChunk();
@@ -1498,29 +1501,34 @@ public class AjpProcessor extends AbstractProcessor {
             request.setAttribute(SSLSupport.CERTIFICATE_KEY, jsseCerts);
         }
     }
-    
-    
+
+
     private void sslReHandShake() {
         // NO-OP. Can't force a new SSL handshake with the client when using
         // AJP as the reverse proxy controls that connection.
     }
 
-    
+
     private boolean isRequestBodyFullyRead() {
         return endOfStream;
     }
-    
-    
+
+
     private void registerReadInterest() {
         socketWrapper.registerReadInterest();
     }
-    
-    
+
+
     private boolean isReady() {
         return responseMsgPos == -1 && socketWrapper.isReadyForWrite();
     }
-    
-    
+
+
+    private void executeDispatches(SocketWrapperBase<?> wrapper) {
+        wrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
+    }
+
+
     /**
      * Read at least the specified amount of bytes, and place them
      * in the input buffer. Note that if any data is available to read then this

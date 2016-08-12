@@ -860,7 +860,7 @@ public class Http11Processor extends AbstractProcessor {
         case DISPATCH_EXECUTE: {
             SocketWrapperBase<?> wrapper = socketWrapper;
             if (wrapper != null) {
-                wrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
+                executeDispatches(wrapper);
             }
             break;
         }
@@ -1746,39 +1746,39 @@ public class Http11Processor extends AbstractProcessor {
     private int available(boolean doRead) {
         return inputBuffer.available(doRead);
     }
-    
-    
+
+
     private void setRequestBody(ByteChunk body) {
         InputFilter savedBody = new SavedRequestInputFilter(body);
         savedBody.setRequest(request);
-    
+
         Http11InputBuffer internalBuffer = (Http11InputBuffer) request.getInputBuffer();
         internalBuffer.addActiveFilter(savedBody);
     }
-    
-    
+
+
     private void setSwallowResponse() {
         outputBuffer.responseFinished = true;
     }
-    
-    
+
+
     private void disableSwallowRequest() {
         inputBuffer.setSwallowInput(false);
     }
-    
-    
+
+
     private boolean getPopulateRequestAttributesFromSocket() {
         return true;
     }
-    
-    
+
+
     private void populateRequestAttributeRemoteHost() {
         if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
             request.remoteHost().setString(socketWrapper.getRemoteHost());
         }
     }
-    
-    
+
+
     private void populateSslRequestAttributes() {
         try {
             if (sslSupport != null) {
@@ -1830,23 +1830,28 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
     }
-    
-    
+
+
     private boolean isRequestBodyFullyRead() {
         return inputBuffer.isFinished();
     }
-    
-    
+
+
     private void registerReadInterest() {
         socketWrapper.registerReadInterest();
     }
-    
-    
+
+
     private boolean isReady() {
         return outputBuffer.isReady();
     }
-    
-    
+
+
+    private void executeDispatches(SocketWrapperBase<?> wrapper) {
+        wrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
+    }
+
+
     /**
      * Checks to see if the keep-alive loop should be broken, performing any
      * processing (e.g. sendfile handling) that may have an impact on whether

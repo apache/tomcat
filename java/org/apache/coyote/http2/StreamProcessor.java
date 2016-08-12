@@ -312,7 +312,10 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case DISPATCH_EXECUTE: {
-            socketWrapper.getEndpoint().getExecutor().execute(this);
+            SocketWrapperBase<?> wrapper = socketWrapper;
+            if (wrapper != null) {
+                executeDispatches(wrapper);
+            }
             break;
         }
 
@@ -371,43 +374,43 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     /**
-     * @param doRead Unused for HTTP/2 
+     * @param doRead Unused for HTTP/2
      */
     private int available(boolean doRead) {
         return stream.getInputBuffer().available();
     }
-    
-    
+
+
     private void setRequestBody(ByteChunk body) {
         stream.getInputBuffer().insertReplayedBody(body);
         stream.receivedEndOfStream();
     }
-    
-    
+
+
     private void setSwallowResponse() {
         // NO-OP
     }
-    
-    
+
+
     private void disableSwallowRequest() {
         // NO-OP
         // HTTP/2 has to swallow any input received to ensure that the flow
         // control windows are correctly tracked.
     }
-    
-    
+
+
     private boolean getPopulateRequestAttributesFromSocket() {
         return true;
     }
 
-    
+
     private void populateRequestAttributeRemoteHost() {
         if (getPopulateRequestAttributesFromSocket() && socketWrapper != null) {
             request.remoteHost().setString(socketWrapper.getRemoteHost());
         }
     }
-    
-    
+
+
     private void populateSslRequestAttributes() {
         try {
             if (sslSupport != null) {
@@ -443,22 +446,27 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         // No re-negotiation support in HTTP/2.
     }
 
-    
+
     private boolean isRequestBodyFullyRead() {
         return stream.getInputBuffer().isRequestBodyFullyRead();
     }
-    
-    
+
+
     private void registerReadInterest() {
         stream.getInputBuffer().registerReadInterest();
     }
-    
-    
+
+
     private boolean isReady() {
         return stream.getOutputBuffer().isReady();
     }
-    
-    
+
+
+    private void executeDispatches(SocketWrapperBase<?> wrapper) {
+        wrapper.getEndpoint().getExecutor().execute(this);
+    }
+
+
     @Override
     public void recycle() {
         // StreamProcessor instances are not re-used.
