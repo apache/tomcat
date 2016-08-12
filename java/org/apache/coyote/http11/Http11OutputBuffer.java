@@ -245,6 +245,15 @@ public class Http11OutputBuffer implements OutputBuffer {
 
 
     /**
+     * Reset the header buffer if an error occurs during the writing of the
+     * headers so the error response can be written.
+     */
+    void resetHeaderBuffer() {
+        pos = 0;
+    }
+
+
+    /**
      * Recycle the output buffer. This should be called when closing the
      * connection.
      */

@@ -1501,9 +1501,6 @@ public class Http11Processor extends AbstractProcessor {
             headers.addValue(Constants.CONNECTION).setString(Constants.KEEPALIVE);
         }
 
-        // Build the response header
-        outputBuffer.sendStatus();
-
         // Add server header
         if (server == null) {
             if (serverRemoveAppProvidedValues) {
@@ -1514,11 +1511,22 @@ public class Http11Processor extends AbstractProcessor {
             headers.setValue("Server").setString(server);
         }
 
-        int size = headers.size();
-        for (int i = 0; i < size; i++) {
-            outputBuffer.sendHeader(headers.getName(i), headers.getValue(i));
+        // Build the response header
+        try {
+            outputBuffer.sendStatus();
+
+            int size = headers.size();
+            for (int i = 0; i < size; i++) {
+                outputBuffer.sendHeader(headers.getName(i), headers.getValue(i));
+            }
+            outputBuffer.endHeaders();
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            // If something goes wrong, reset the header buffer so the error
+            // response can be written instead.
+            outputBuffer.resetHeaderBuffer();
+            throw t;
         }
-        outputBuffer.endHeaders();
 
         outputBuffer.commit();
     }
