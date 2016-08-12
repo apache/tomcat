@@ -655,7 +655,6 @@ public class Http11Processor extends AbstractProcessor {
                 try {
                     // Validate and write response headers
                     prepareResponse();
-                    outputBuffer.commit();
                 } catch (IOException e) {
                     setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 }
@@ -1439,7 +1438,7 @@ public class Http11Processor extends AbstractProcessor {
      * When committing the response, we have to validate the set of headers, as
      * well as setup the response filters.
      */
-    private void prepareResponse() {
+    private void prepareResponse() throws IOException {
 
         boolean entityBody = true;
         contentDelimitation = false;
@@ -1448,8 +1447,8 @@ public class Http11Processor extends AbstractProcessor {
 
         if (http09 == true) {
             // HTTP/0.9
-            outputBuffer.addActiveFilter
-                (outputFilters[Constants.IDENTITY_FILTER]);
+            outputBuffer.addActiveFilter(outputFilters[Constants.IDENTITY_FILTER]);
+            outputBuffer.commit();
             return;
         }
 
@@ -1603,6 +1602,7 @@ public class Http11Processor extends AbstractProcessor {
         }
         outputBuffer.endHeaders();
 
+        outputBuffer.commit();
     }
 
     private static boolean isConnectionClose(MimeHeaders headers) {

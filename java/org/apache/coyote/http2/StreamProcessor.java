@@ -107,8 +107,8 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         case COMMIT: {
             if (!response.isCommitted()) {
                 try {
-                    response.setCommitted(true);
-                    stream.writeHeaders();
+                    // Validate and write response headers
+                    prepareResponse();
                 } catch (IOException ioe) {
                     setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
                 }
@@ -376,6 +376,12 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         }
+    }
+
+
+    private void prepareResponse() throws IOException {
+        response.setCommitted(true);
+        stream.writeHeaders();
     }
 
 
