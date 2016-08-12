@@ -400,10 +400,6 @@ public class AjpProcessor extends AbstractProcessor {
             setRequestBody(body);
             break;
         }
-        case RESET: {
-            // NO-OP
-            break;
-        }
 
         // Error handling
         case IS_ERROR: {

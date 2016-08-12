@@ -245,24 +245,6 @@ public class Http11OutputBuffer implements OutputBuffer {
 
 
     /**
-     * Reset current response.
-     *
-     * @throws IllegalStateException if the response has already been committed
-     */
-    public void reset() {
-
-        if (response.isCommitted()) {
-            throw new IllegalStateException(sm.getString("iob.illegalreset"));
-        }
-
-        // These will need to be reset if the reset was triggered by the error
-        // handling if the headers were too large
-        pos = 0;
-        byteCount = 0;
-    }
-
-
-    /**
      * Recycle the output buffer. This should be called when closing the
      * connection.
      */

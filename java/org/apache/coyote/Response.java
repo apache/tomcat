@@ -268,9 +268,6 @@ public final class Response {
         }
 
         recycle();
-
-        // Reset the stream
-        action(ActionCode.RESET, this);
     }
 
 

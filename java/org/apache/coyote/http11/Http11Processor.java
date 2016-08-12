@@ -693,11 +693,6 @@ public class Http11Processor extends AbstractProcessor {
             setRequestBody(body);
             break;
         }
-        case RESET: {
-            // Note: This must be called before the response is committed
-            outputBuffer.reset();
-            break;
-        }
 
         // Error handling
         case IS_ERROR: {
