@@ -131,7 +131,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         case CLIENT_FLUSH: {
             action(ActionCode.COMMIT, null);
             try {
-                stream.flushData();
+                flush();
             } catch (IOException ioe) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
                 response.setErrorException(ioe);
@@ -392,6 +392,11 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
             }
         }
+    }
+
+
+    private void flush() throws IOException {
+        stream.flushData();
     }
 
 

@@ -677,7 +677,7 @@ public class Http11Processor extends AbstractProcessor {
         case CLIENT_FLUSH: {
             action(ActionCode.COMMIT, null);
             try {
-                outputBuffer.flush();
+                flush();
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
                 response.setErrorException(e);
@@ -1804,6 +1804,11 @@ public class Http11Processor extends AbstractProcessor {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             }
         }
+    }
+
+
+    private void flush() throws IOException {
+        outputBuffer.flush();
     }
 
 

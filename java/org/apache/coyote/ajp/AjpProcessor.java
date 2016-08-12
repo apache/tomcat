@@ -387,6 +387,7 @@ public class AjpProcessor extends AbstractProcessor {
                 flush();
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                response.setErrorException(e);
             }
             break;
         }
