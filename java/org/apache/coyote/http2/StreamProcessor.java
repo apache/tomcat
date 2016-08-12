@@ -125,13 +125,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             break;
         }
         case ACK: {
-            if (!response.isCommitted() && request.hasExpectation()) {
-                try {
-                    stream.writeAck();
-                } catch (IOException ioe) {
-                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
-                }
-            }
+            ack();
             break;
         }
         case CLIENT_FLUSH: {
@@ -387,6 +381,17 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
     private void finishResponse() throws IOException {
         stream.getOutputBuffer().close();
+    }
+
+
+    private void ack() {
+        if (!response.isCommitted() && request.hasExpectation()) {
+            try {
+                stream.writeAck();
+            } catch (IOException ioe) {
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
+            }
+        }
     }
 
 

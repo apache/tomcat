@@ -378,7 +378,7 @@ public class AjpProcessor extends AbstractProcessor {
             break;
         }
         case ACK: {
-            // NO_OP for AJP
+            ack();
             break;
         }
         case CLIENT_FLUSH: {
@@ -1441,6 +1441,11 @@ public class AjpProcessor extends AbstractProcessor {
             socketWrapper.write(true, endMessageArray, 0, endMessageArray.length);
         }
         socketWrapper.flush(true);
+    }
+
+
+    private void ack() {
+        // NO-OP for AJP
     }
 
 

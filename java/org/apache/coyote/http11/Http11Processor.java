@@ -671,17 +671,7 @@ public class Http11Processor extends AbstractProcessor {
             break;
         }
         case ACK: {
-            // Acknowledge request
-            // Send a 100 status back if it makes sense (response not committed
-            // yet, and client specified an expectation for 100-continue)
-            if (!response.isCommitted() && request.hasExpectation()) {
-                inputBuffer.setSwallowInput(true);
-                try {
-                    outputBuffer.sendAck();
-                } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
-                }
-            }
+            ack();
             break;
         }
         case CLIENT_FLUSH: {
@@ -1799,6 +1789,21 @@ public class Http11Processor extends AbstractProcessor {
 
     private void finishResponse() throws IOException {
         outputBuffer.finishResponse();
+    }
+
+
+    private void ack() {
+        // Acknowledge request
+        // Send a 100 status back if it makes sense (response not committed
+        // yet, and client specified an expectation for 100-continue)
+        if (!response.isCommitted() && request.hasExpectation()) {
+            inputBuffer.setSwallowInput(true);
+            try {
+                outputBuffer.sendAck();
+            } catch (IOException e) {
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+            }
+        }
     }
 
 
