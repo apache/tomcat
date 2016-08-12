@@ -589,7 +589,13 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected abstract void populateSslRequestAttributes();
 
 
-    protected abstract void sslReHandShake() ;
+    /**
+     * Processors that can perform a TLS re-handshake (e.g. HTTP/1.1) should
+     * override this method and implement the re-handshake.
+     */
+    protected void sslReHandShake() {
+        // NO-OP
+    }
 
 
     protected abstract boolean isRequestBodyFullyRead();

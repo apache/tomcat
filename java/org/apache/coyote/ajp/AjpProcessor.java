@@ -1270,13 +1270,6 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     @Override
-    protected final void sslReHandShake() {
-        // NO-OP. Can't force a new SSL handshake with the client when using
-        // AJP as the reverse proxy controls that connection.
-    }
-
-
-    @Override
     protected final boolean isRequestBodyFullyRead() {
         return endOfStream;
     }

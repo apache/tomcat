@@ -196,12 +196,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
-    protected final void sslReHandShake() {
-        // No re-negotiation support in HTTP/2.
-    }
-
-
-    @Override
     protected final boolean isRequestBodyFullyRead() {
         return stream.getInputBuffer().isRequestBodyFullyRead();
     }
