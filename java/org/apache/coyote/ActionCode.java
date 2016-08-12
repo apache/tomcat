@@ -47,8 +47,6 @@ public enum ActionCode {
      */
     CLIENT_FLUSH,
 
-    RESET,
-
     /**
      * Has the processor been placed into the error state? Note that the
      * response may not have an appropriate error code set.

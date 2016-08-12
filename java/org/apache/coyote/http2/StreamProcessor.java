@@ -147,10 +147,6 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
             setRequestBody(body);
             break;
         }
-        case RESET: {
-            stream.getOutputBuffer().reset();
-            break;
-        }
 
         // Error handling
         case IS_ERROR: {
