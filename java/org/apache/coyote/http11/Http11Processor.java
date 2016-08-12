@@ -664,7 +664,7 @@ public class Http11Processor extends AbstractProcessor {
         case CLOSE: {
             action(ActionCode.COMMIT, null);
             try {
-                outputBuffer.endRequest();
+                finishResponse();
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             }
@@ -721,7 +721,7 @@ public class Http11Processor extends AbstractProcessor {
         }
         case CLOSE_NOW: {
             // Block further output
-            outputBuffer.finished = true;
+            outputBuffer.responseFinished = true;
             setErrorState(ErrorState.CLOSE_NOW, null);
             break;
         }
@@ -948,7 +948,7 @@ public class Http11Processor extends AbstractProcessor {
         case UPGRADE: {
             upgradeToken = (UpgradeToken) param;
             // Stop further HTTP output
-            outputBuffer.finished = true;
+            outputBuffer.responseFinished = true;
             break;
         }
 
@@ -1785,7 +1785,7 @@ public class Http11Processor extends AbstractProcessor {
         if (getErrorState().isIoAllowed()) {
             try {
                 action(ActionCode.COMMIT, null);
-                outputBuffer.endRequest();
+                outputBuffer.finishResponse();
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             } catch (Throwable t) {
@@ -1794,6 +1794,11 @@ public class Http11Processor extends AbstractProcessor {
                 log.error(sm.getString("http11processor.response.finish"), t);
             }
         }
+    }
+
+
+    private void finishResponse() throws IOException {
+        outputBuffer.finishResponse();
     }
 
 

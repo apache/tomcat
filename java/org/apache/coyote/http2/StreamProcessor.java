@@ -118,7 +118,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
         case CLOSE: {
             action(ActionCode.COMMIT, null);
             try {
-                stream.getOutputBuffer().close();
+                finishResponse();
             } catch (IOException ioe) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
             }
@@ -382,6 +382,11 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     private void prepareResponse() throws IOException {
         response.setCommitted(true);
         stream.writeHeaders();
+    }
+
+
+    private void finishResponse() throws IOException {
+        stream.getOutputBuffer().close();
     }
 
 

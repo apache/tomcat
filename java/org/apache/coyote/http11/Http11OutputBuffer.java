@@ -62,7 +62,7 @@ public class Http11OutputBuffer implements OutputBuffer {
     /**
      * Finished flag.
      */
-    protected boolean finished;
+    protected boolean responseFinished;
 
 
     /**
@@ -123,7 +123,7 @@ public class Http11OutputBuffer implements OutputBuffer {
         activeFilters = new OutputFilter[0];
         lastActiveFilter = -1;
 
-        finished = false;
+        responseFinished = false;
 
         outputStreamOutputBuffer = new SocketOutputBuffer();
     }
@@ -288,18 +288,18 @@ public class Http11OutputBuffer implements OutputBuffer {
         // Reset pointers
         pos = 0;
         lastActiveFilter = -1;
-        finished = false;
+        responseFinished = false;
         byteCount = 0;
     }
 
 
     /**
-     * End request.
+     * Finish writing the response.
      *
      * @throws IOException an underlying I/O error occurred
      */
-    public void endRequest() throws IOException {
-        if (finished) {
+    public void finishResponse() throws IOException {
+        if (responseFinished) {
             return;
         }
 
@@ -309,7 +309,7 @@ public class Http11OutputBuffer implements OutputBuffer {
 
         flushBuffer(true);
 
-        finished = true;
+        responseFinished = true;
     }
 
 
