@@ -1086,7 +1086,7 @@ public final class CGIServlet extends HttpServlet {
                         try {
                             is.close();
                         } catch (IOException e) {
-                            log("Could not close is.", e);
+                            log.warn(sm.getString("cgiServlet.expandError"), e);
                         }
                         fos.close();
                     }
