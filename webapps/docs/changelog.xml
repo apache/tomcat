@@ -133,6 +133,10 @@
         <bug>59966</bug>: Do not start the web application if the error page
         configuration in web.xml is invalid. (markt)
       </fix>
+      <fix>
+        Switch the CGI servlet to the standard logging mechanisn and remove
+        support for the debug attribute. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
