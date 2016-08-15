@@ -40,7 +40,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -329,28 +328,6 @@ public final class CGIServlet extends HttpServlet {
 
     }
 
-
-    /**
-     * Logs important Servlet API and container information.
-     *
-     * <p>
-     * Copied from SnoopAllServlet by Craig R. McClanahan
-     * </p>
-     *
-     * @param  out    Unused
-     * @param  req    HttpServletRequest object used as source of information
-     * @param  res    Unused
-     *
-     * @exception  IOException  if a write operation exception occurs
-     *
-     * @deprecated Use {@link #printServletEnvironment(HttpServletRequest).
-     *             This will be removed in Tomcat 8.5.X onwards
-     */
-    @Deprecated
-    protected void printServletEnvironment(ServletOutputStream out,
-            HttpServletRequest req, HttpServletResponse res) throws IOException {
-        printServletEnvironment(req);
-    }
 
     /**
      * Logs important Servlet API and container information.
