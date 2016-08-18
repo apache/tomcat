@@ -166,6 +166,10 @@
         number of HTTP/2 streams for a connection could not be pruned to below
         the limit. (markt)
       </fix>
+      <fix>
+        Ensure that <code>Semaphore.release</code> is called in all cases. Even
+        when there is an exception. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
