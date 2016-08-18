@@ -25,7 +25,6 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SelectionKey;
@@ -1133,19 +1132,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
 
         @Override
-        public int read(boolean block, byte[] b, int off, int len)
-                throws IOException {
-
-            socketBufferHandler.configureReadBufferForRead();
-            ByteBuffer readBuffer = socketBufferHandler.getReadBuffer();
-            int remaining = readBuffer.remaining();
-
-            // Is there enough data in the read buffer to satisfy this request?
-            // Copy what data there is in the read buffer to the byte array
-            if (remaining > 0) {
-                remaining = Math.min(remaining, len);
-                readBuffer.get(b, off, remaining);
-                return remaining;
+        public int read(boolean block, byte[] b, int off, int len) throws IOException {
+            int nRead = populateReadBuffer(b, off, len);
+            if (nRead > 0) {
+                return nRead;
                 /*
                  * Since more bytes may have arrived since the buffer was last
                  * filled, it is an option at this point to perform a
@@ -1156,15 +1146,15 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             }
 
             // Fill the read buffer as best we can.
-            int nRead = fillReadBuffer(block);
+            nRead = fillReadBuffer(block);
             updateLastRead();
 
-            // Full as much of the remaining byte array as possible with the
+            // Fill as much of the remaining byte array as possible with the
             // data that was just read
             if (nRead > 0) {
                 socketBufferHandler.configureReadBufferForRead();
                 nRead = Math.min(nRead, len);
-                readBuffer.get(b, off, nRead);
+                socketBufferHandler.getReadBuffer().get(b, off, nRead);
             }
             return nRead;
         }

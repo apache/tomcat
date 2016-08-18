@@ -2285,19 +2285,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
         @Override
-        public int read(boolean block, byte[] b, int off, int len)
-                throws IOException {
-
-            socketBufferHandler.configureReadBufferForRead();
-            ByteBuffer readBuffer = socketBufferHandler.getReadBuffer();
-            int remaining = readBuffer.remaining();
-
-            // Is there enough data in the read buffer to satisfy this request?
-            // Copy what data there is in the read buffer to the byte array
-            if (remaining > 0) {
-                remaining = Math.min(remaining, len);
-                readBuffer.get(b, off, remaining);
-                return remaining;
+        public int read(boolean block, byte[] b, int off, int len) throws IOException {
+            int nRead = populateReadBuffer(b, off, len);
+            if (nRead > 0) {
+                return nRead;
                 /*
                  * Since more bytes may have arrived since the buffer was last
                  * filled, it is an option at this point to perform a
@@ -2308,14 +2299,14 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             }
 
             // Fill the read buffer as best we can.
-            int nRead = fillReadBuffer(block);
+            nRead = fillReadBuffer(block);
 
-            // Full as much of the remaining byte array as possible with the
+            // Fill as much of the remaining byte array as possible with the
             // data that was just read
             if (nRead > 0) {
                 socketBufferHandler.configureReadBufferForRead();
                 nRead = Math.min(nRead, len);
-                readBuffer.get(b, off, nRead);
+                socketBufferHandler.getReadBuffer().get(b, off, nRead);
             }
             return nRead;
         }

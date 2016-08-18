@@ -838,36 +838,26 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 }
             }
 
-            socketBufferHandler.configureReadBufferForRead();
-            ByteBuffer readBuffer = socketBufferHandler.getReadBuffer();
-            int remaining = readBuffer.remaining();
-
-            // Is there enough data in the read buffer to satisfy this request?
-            // Copy what data there is in the read buffer to the byte array
-            if (remaining > 0) {
-                remaining = Math.min(remaining, len);
-                readBuffer.get(b, off, remaining);
-                if (log.isDebugEnabled()) {
-                    log.debug("Socket: [" + this + "], Read from buffer: [" + remaining + "]");
-                }
+            int nRead = populateReadBuffer(b, off, len);
+            if (nRead > 0) {
                 // This may be sufficient to complete the request and we
                 // don't want to trigger another read since if there is no
                 // more data to read and this request takes a while to
                 // process the read will timeout triggering an error.
                 readPending.release();
-                return remaining;
+                return nRead;
             }
 
             synchronized (readCompletionHandler) {
                 // Fill the read buffer as best we can.
-                int nRead = fillReadBuffer(block);
+                nRead = fillReadBuffer(block);
 
                 // Fill as much of the remaining byte array as possible with the
                 // data that was just read
                 if (nRead > 0) {
                     socketBufferHandler.configureReadBufferForRead();
                     nRead = Math.min(nRead, len);
-                    readBuffer.get(b, off, nRead);
+                    socketBufferHandler.getReadBuffer().get(b, off, nRead);
                 } else if (nRead == 0 && !block) {
                     readInterest = true;
                 }
