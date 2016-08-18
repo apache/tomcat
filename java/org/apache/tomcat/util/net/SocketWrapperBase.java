@@ -26,10 +26,14 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteBufferHolder;
 import org.apache.tomcat.util.res.StringManager;
 
 public abstract class SocketWrapperBase<E> {
+
+    private static final Log log = LogFactory.getLog(SocketWrapperBase.class);
 
     protected static final StringManager sm = StringManager.getManager(SocketWrapperBase.class);
 
@@ -276,6 +280,25 @@ public abstract class SocketWrapperBase<E> {
 
     public abstract int read(boolean block, byte[] b, int off, int len) throws IOException;
     public abstract boolean isReadyForRead() throws IOException;
+
+    protected int populateReadBuffer(byte[] b, int off, int len) {
+        socketBufferHandler.configureReadBufferForRead();
+        ByteBuffer readBuffer = socketBufferHandler.getReadBuffer();
+        int remaining = readBuffer.remaining();
+
+        // Is there enough data in the read buffer to satisfy this request?
+        // Copy what data there is in the read buffer to the byte array
+        if (remaining > 0) {
+            remaining = Math.min(remaining, len);
+            readBuffer.get(b, off, remaining);
+
+            if (log.isDebugEnabled()) {
+                log.debug("Socket: [" + this + "], Read from buffer: [" + remaining + "]");
+            }
+        }
+        return remaining;
+    }
+
 
     /**
      * Return input that has been read to the input buffer for re-reading by the
