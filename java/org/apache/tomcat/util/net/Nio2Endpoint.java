@@ -819,6 +819,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 log.debug("Socket: [" + this + "], block: [" + block + "], length: [" + len + "]");
             }
 
+            if (socketBufferHandler == null) {
+                throw new IOException(sm.getString("socket.closed"));
+            }
+
             if (block) {
                 try {
                     readPending.acquire();
@@ -834,9 +838,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 }
             }
 
-            if (socketBufferHandler == null) {
-                throw new IOException(sm.getString("socket.closed"));
-            }
             socketBufferHandler.configureReadBufferForRead();
             ByteBuffer readBuffer = socketBufferHandler.getReadBuffer();
             int remaining = readBuffer.remaining();
@@ -1096,9 +1097,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 try {
                     integer = getSocket().read(socketBufferHandler.getReadBuffer());
                     nRead = integer.get(getNio2ReadTimeout(), TimeUnit.MILLISECONDS).intValue();
-                    // Blocking read so need to release here since there will
-                    // not be a callback to a completion handler.
-                    readPending.release();
                 } catch (ExecutionException e) {
                     if (e.getCause() instanceof IOException) {
                         throw (IOException) e.getCause();
@@ -1110,6 +1108,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 } catch (TimeoutException e) {
                     integer.cancel(true);
                     throw new SocketTimeoutException();
+                } finally {
+                    // Blocking read so need to release here since there will
+                    // not be a callback to a completion handler.
+                    readPending.release();
                 }
             } else {
                 Nio2Endpoint.startInline();
