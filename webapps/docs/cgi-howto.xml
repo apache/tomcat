@@ -103,6 +103,12 @@ if your script is itself executable (e.g. an exe file). Default is
 <li><strong>executable-arg-1</strong>, <strong>executable-arg-2</strong>,
 and so on - additional arguments for the executable. These precede the
 CGI script name. By default there are no additional arguments.</li>
+<li><strong>envHttpHeaders</strong> - A regular expression used to select the
+HTTP headers passed to the CGI process as environment variables. Note that
+headers are converted to upper case before matching and that the entire header
+name must match the pattern. Default is
+<code>ACCEPT[-0-9A-Z]*|CACHE-CONTROL|COOKIE|HOST|IF-[-0-9A-Z]*|REFERER|USER-AGENT</code>
+</li>
 <li><strong>parameterEncoding</strong> - Name of the parameter encoding
 to be used with the CGI servlet. Default is
 <code>System.getProperty("file.encoding","UTF-8")</code>. That is the system
