@@ -438,7 +438,7 @@ public abstract class AuthenticatorBase extends ValveBase
                     if (principal != null) {
                         if (log.isDebugEnabled()) {
                             log.debug("We have cached auth type " + session.getAuthType() +
-                                    " for principal " + session.getPrincipal());
+                                    " for principal " + principal);
                         }
                         request.setAuthType(session.getAuthType());
                         request.setUserPrincipal(principal);
