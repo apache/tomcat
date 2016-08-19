@@ -35,6 +35,7 @@ import java.util.Locale;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -268,6 +269,16 @@ public final class CGIServlet extends HttpServlet {
      */
     private long stderrTimeout = 2000;
 
+    /**
+     * The regular expression used to select HTTP headers to be passed to the
+     * CGI process as environment variables. The name of the environment
+     * variable will be the name of the HTTP header converter to upper case,
+     * prefixed with <code>HTTP_</code> and with all <code>-</code> characters
+     * converted to <code>_</code>.
+     */
+    private Pattern envHttpHeadersPattern = Pattern.compile(
+            "ACCEPT[-0-9A-Z]*|CACHE-CONTROL|COOKIE|HOST|IF-[-0-9A-Z]*|REFERER|USER-AGENT");
+
     /** object used to ensure multiple threads don't try to expand same file */
     private static final Object expandFileLock = new Object();
 
@@ -329,6 +340,10 @@ public final class CGIServlet extends HttpServlet {
                     "stderrTimeout"));
         }
 
+        if (getServletConfig().getInitParameter("envHttpHeaders") != null) {
+            envHttpHeadersPattern =
+                    Pattern.compile(getServletConfig().getInitParameter("envHttpHeaders"));
+        }
     }
 
 
@@ -989,12 +1004,8 @@ public final class CGIServlet extends HttpServlet {
                 //REMIND: rewrite multiple headers as if received as single
                 //REMIND: change character set
                 //REMIND: I forgot what the previous REMIND means
-                if ("AUTHORIZATION".equalsIgnoreCase(header) ||
-                    "PROXY_AUTHORIZATION".equalsIgnoreCase(header)) {
-                    //NOOP per CGI specification section 11.2
-                } else {
-                    envp.put("HTTP_" + header.replace('-', '_'),
-                             req.getHeader(header));
+                if (envHttpHeadersPattern.matcher(header).matches()) {
+                    envp.put("HTTP_" + header.replace('-', '_'), req.getHeader(header));
                 }
             }
 

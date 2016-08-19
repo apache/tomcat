@@ -329,6 +329,15 @@
   <!--   executable           Name of the executable used to run the        -->
   <!--                        script. [perl]                                -->
   <!--                                                                      -->
+  <!--   envHttpHeaders       A regular expression used to select the HTTP  -->
+  <!--                        headers passed to the CGI process as          -->
+  <!--                        environment variables. Note that headers are  -->
+  <!--                        converted to upper case before matching and   -->
+  <!--                        that the entire header name must match the    -->
+  <!--                        pattern.                                      -->
+  <!--                        [ACCEPT[-0-9A-Z]*|CACHE-CONTROL|COOKIE|HOST|  -->
+  <!--                         IF-[-0-9A-Z]*|REFERER|USER-AGENT]            -->
+  <!--                                                                      -->
   <!--   parameterEncoding    Name of parameter encoding to be used with    -->
   <!--                        CGI servlet.                                  -->
   <!--                        [System.getProperty("file.encoding","UTF-8")] -->
@@ -348,7 +357,7 @@
           <param-name>cgiPathPrefix</param-name>
           <param-value>WEB-INF/cgi</param-value>
         </init-param>
-         <load-on-startup>5</load-on-startup>
+        <load-on-startup>5</load-on-startup>
     </servlet>
 -->
 

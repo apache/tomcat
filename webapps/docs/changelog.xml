@@ -130,6 +130,13 @@
         Switch the CGI servlet to the standard logging mechanism and remove
         support for the debug attribute. (markt)
       </fix>
+      <add>
+        Add a new initialisation parameter, <code>envHttpHeaders</code>, to
+        the CGI Servlet to mitigate <a href="https://httpoxy.org">httpoxy</a>
+        (<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-5388"
+        >CVE-2016-5388</a>) by default and to provide a mechanism that can be
+        used to mitigate any future, similar issues. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
