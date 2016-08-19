@@ -472,6 +472,10 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
     @Override
     public void setAllowLinking(boolean allowLinking) {
+        if (this.allowLinking != allowLinking && cachingAllowed) {
+            // If allow linking changes, invalidate the cache.
+            cache.clear();
+        }
         this.allowLinking = allowLinking;
     }
 

@@ -141,6 +141,11 @@
         <bug>60012</bug>: Improvements in the log messages. Based on
         suggestions by Nemo Chen. (violetagg)
       </fix>
+      <fix>
+        Changes to the <code>allowLinking</code> attribute of a
+        <code>StandardRoot</code> instance now invalidate the cache if caching
+        is enabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
