@@ -60,8 +60,6 @@ public class CatalinaProperties {
     private static void loadProperties() {
 
         InputStream is = null;
-        Throwable error = null;
-
         try {
             String configUrl = System.getProperty("catalina.config");
             if (configUrl != null) {
@@ -97,7 +95,7 @@ public class CatalinaProperties {
                 properties.load(is);
             } catch (Throwable t) {
                 handleThrowable(t);
-                error = t;
+                log.warn(t);
             } finally {
                 try {
                     is.close();
@@ -107,9 +105,9 @@ public class CatalinaProperties {
             }
         }
 
-        if ((is == null) || (error != null)) {
+        if ((is == null)) {
             // Do something
-            log.warn("Failed to load catalina.properties", error);
+            log.warn("Failed to load catalina.properties");
             // That's fine - we have reasonable defaults.
             properties = new Properties();
         }

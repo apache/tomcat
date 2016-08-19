@@ -137,6 +137,10 @@
         Switch the CGI servlet to the standard logging mechanism and remove
         support for the debug attribute. (markt)
       </fix>
+      <fix>
+        <bug>60012</bug>: Improvements in the log messages. Based on
+        suggestions by Nemo Chen. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

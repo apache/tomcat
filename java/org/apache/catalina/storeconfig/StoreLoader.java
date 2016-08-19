@@ -194,7 +194,6 @@ public class StoreLoader {
     public void load() {
 
         InputStream is = null;
-        Throwable error = null;
         registryResource = null ;
         try {
             String configUrl = getConfigUrl();
@@ -241,7 +240,7 @@ public class StoreLoader {
                     registry = (StoreRegistry) digester.parse(is);
                 }
             } catch (Throwable t) {
-                error = t;
+                log.error(t);
             } finally {
                 try {
                     is.close();
@@ -249,8 +248,8 @@ public class StoreLoader {
                 }
             }
         }
-        if ((is == null) || (error != null)) {
-            log.error(error);
+        if (is == null) {
+            log.error("Failed to load server-registry.xml");
         }
     }
 
