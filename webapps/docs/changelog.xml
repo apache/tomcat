@@ -273,6 +273,10 @@
         Update the internal fork of Commons BCEL to r1757132 to align with the
         BCEL 6 release. (markt)
       </update>
+      <update>
+        Update the internal fork of Commons Codec to r1757174. Code formatting
+        changes only. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
