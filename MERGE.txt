@@ -56,8 +56,17 @@ Note: Only classes required for Base64 encoding/decoding. The rest are removed.
 GIT
 ===
 
-Process TBD
+Updates from Git are applied manually via patch files. Patch files are generated
+using:
+git diff <last SHA1>:<sub-tree> HEAD:<sub-tree> > temp.patch
+The more recently merged SHA1 for the component below should be updated after
+the patch file has been applied and committed
 
 FileUpload
+Sub-tree:
+src/main/java/org/apache/commons/fileupload
+The SHA1 ID for the most recent commit to be merged to Tomcat is:
+86b11bbc1437a12fa64bc1484c4edc0bdd5a0966
+
 Note: Tomcat's copy of fileupload also includes classes copied manually (rather
       than svn copied) from Commons IO.
