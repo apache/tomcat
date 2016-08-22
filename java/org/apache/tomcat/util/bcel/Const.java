@@ -127,6 +127,6 @@ public final class Const {
     "CONSTANT_MethodType", "", "CONSTANT_InvokeDynamic" };
 
     public static String getConstantName(int index) {
-      return CONSTANT_NAMES[index];
+        return CONSTANT_NAMES[index];
     }
 }
