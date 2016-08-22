@@ -598,10 +598,9 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace
         }
     }
 
-
     @Override
     public boolean isClosed() throws SQLException {
-        return _closed || _conn.isClosed();
+        return _closed || _conn == null || _conn.isClosed();
     }
 
     protected void checkOpen() throws SQLException {
