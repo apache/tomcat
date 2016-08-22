@@ -137,9 +137,8 @@ public class ResourceLinkFactory implements ObjectFactory {
         RefAddr refAddr = ref.get(ResourceLinkRef.GLOBALNAME);
         if (refAddr != null) {
             globalName = refAddr.getContent().toString();
-            // When running under a security manager confirm that the current
-            // web application has really been configured to access the specified
-            // global resource
+            // Confirm that the current web application is currently configured
+            // to access the specified global resource
             if (!validateGlobalResourceAccess(globalName)) {
                 return null;
             }
