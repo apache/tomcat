@@ -26,7 +26,7 @@ public abstract class ElementValue
     private final ConstantPool cpool;
 
 
-    ElementValue(int type, ConstantPool cpool) {
+    ElementValue(final int type, final ConstantPool cpool) {
         this.type = type;
         this.cpool = cpool;
     }
@@ -47,7 +47,7 @@ public abstract class ElementValue
     public static final byte PRIMITIVE_SHORT   = 'S';
     public static final byte PRIMITIVE_BOOLEAN = 'Z';
 
-    public static ElementValue readElementValue(DataInput input, ConstantPool cpool) throws IOException
+    public static ElementValue readElementValue(final DataInput input, final ConstantPool cpool) throws IOException
     {
         byte type = input.readByte();
         switch (type)

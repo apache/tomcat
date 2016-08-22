@@ -33,7 +33,7 @@ public final class ConstantUtf8 extends Constant {
     private final String bytes;
 
 
-    static ConstantUtf8 getInstance(DataInput input) throws IOException {
+    static ConstantUtf8 getInstance(final DataInput input) throws IOException {
         return new ConstantUtf8(input.readUTF());
     }
 
@@ -41,7 +41,7 @@ public final class ConstantUtf8 extends Constant {
     /**
      * @param bytes Data
      */
-    private ConstantUtf8(String bytes) {
+    private ConstantUtf8(final String bytes) {
         super(Const.CONSTANT_Utf8);
         if (bytes == null) {
             throw new IllegalArgumentException("bytes must not be null!");

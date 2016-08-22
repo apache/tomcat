@@ -41,12 +41,12 @@ public class AnnotationEntry {
      * @param constant_pool
      * @throws IOException
      */
-    AnnotationEntry(DataInput input, ConstantPool constant_pool) throws IOException {
+    AnnotationEntry(final DataInput input, final ConstantPool constant_pool) throws IOException {
 
         this.constant_pool = constant_pool;
 
         type_index = input.readUnsignedShort();
-        int num_element_value_pairs = input.readUnsignedShort();
+        final int num_element_value_pairs = input.readUnsignedShort();
 
         element_value_pairs = new ArrayList<>(num_element_value_pairs);
         for (int i = 0; i < num_element_value_pairs; i++) {

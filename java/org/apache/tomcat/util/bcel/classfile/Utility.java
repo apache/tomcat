@@ -40,11 +40,11 @@ final class Utility {
      * @param str The long class name
      * @return Compacted class name
      */
-    static String compactClassName(String str) {
+    static String compactClassName(final String str) {
         return str.replace('/', '.'); // Is `/' on all systems, even DOS
     }
 
-    static String getClassName(ConstantPool constant_pool, int index) {
+    static String getClassName(final ConstantPool constant_pool, final int index) {
         Constant c = constant_pool.getConstant(index, Const.CONSTANT_Class);
         int i = ((ConstantClass) c).getNameIndex();
 
@@ -55,14 +55,14 @@ final class Utility {
         return compactClassName(name);
     }
 
-    static void skipFully(DataInput file, int length) throws IOException {
+    static void skipFully(final DataInput file, final int length) throws IOException {
         int total = file.skipBytes(length);
         if (total != length) {
             throw new EOFException();
         }
     }
 
-    static void swallowFieldOrMethod(DataInput file)
+    static void swallowFieldOrMethod(final DataInput file)
             throws IOException {
         // file.readUnsignedShort(); // Unused access flags
         // file.readUnsignedShort(); // name index
@@ -75,7 +75,7 @@ final class Utility {
         }
     }
 
-    static void swallowAttribute(DataInput file)
+    static void swallowAttribute(final DataInput file)
             throws IOException {
         //file.readUnsignedShort();   // Unused name index
         skipFully(file, 2);

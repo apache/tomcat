@@ -23,7 +23,7 @@ public class SimpleElementValue extends ElementValue
 {
     private final int index;
 
-    SimpleElementValue(int type, int index, ConstantPool cpool) {
+    SimpleElementValue(final int type, final int index, final ConstantPool cpool) {
         super(type, cpool);
         this.index = index;
     }

@@ -56,7 +56,7 @@ public final class ClassParser {
      *
      * @param inputStream Input stream
      */
-    public ClassParser(InputStream inputStream) {
+    public ClassParser(final InputStream inputStream) {
         this.dataInputStream = new DataInputStream(new BufferedInputStream(inputStream, BUFSIZE));
     }
 

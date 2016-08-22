@@ -39,7 +39,7 @@ public final class ConstantInteger extends Constant {
      * @param file Input stream
      * @throws IOException
      */
-    ConstantInteger(DataInput file) throws IOException {
+    ConstantInteger(final DataInput file) throws IOException {
         super(Const.CONSTANT_Integer);
         this.bytes = file.readInt();
     }

@@ -39,7 +39,7 @@ public final class ConstantFloat extends Constant {
      * @param file Input stream
      * @throws IOException
      */
-    ConstantFloat(DataInput file) throws IOException {
+    ConstantFloat(final DataInput file) throws IOException {
         super(Const.CONSTANT_Float);
         this.bytes = file.readFloat();
     }
