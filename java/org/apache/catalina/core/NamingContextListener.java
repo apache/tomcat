@@ -40,6 +40,7 @@ import javax.naming.StringRefAddr;
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -58,6 +59,7 @@ import org.apache.naming.ResourceLinkRef;
 import org.apache.naming.ResourceRef;
 import org.apache.naming.ServiceRef;
 import org.apache.naming.TransactionRef;
+import org.apache.naming.factory.ResourceLinkFactory;
 import org.apache.tomcat.util.descriptor.web.ContextEjb;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.descriptor.web.ContextHandler;
@@ -315,6 +317,11 @@ public class NamingContextListener
                     for (ObjectName objectName : names) {
                         registry.unregisterComponent(objectName);
                     }
+                }
+
+                javax.naming.Context global = getGlobalNamingContext();
+                if (global != null) {
+                    ResourceLinkFactory.deregisterGlobalResourceAccess(global);
                 }
             } finally {
                 objectNames.clear();
@@ -1152,6 +1159,17 @@ public class NamingContextListener
             log.error(sm.getString("naming.bindFailed", e));
         }
 
+        ResourceLinkFactory.registerGlobalResourceAccess(
+                getGlobalNamingContext(), resourceLink.getName(), resourceLink.getGlobal());
+    }
+
+
+    private javax.naming.Context getGlobalNamingContext() {
+        if (container instanceof Context) {
+            Engine e = (Engine) ((Context) container).getParent().getParent();
+            return e.getService().getServer().getGlobalNamingContext();
+        }
+        return null;
     }
 
 
@@ -1269,6 +1287,7 @@ public class NamingContextListener
             log.error(sm.getString("naming.unbindFailed", e));
         }
 
+        ResourceLinkFactory.deregisterGlobalResourceAccess(getGlobalNamingContext(), name);
     }
 
 
