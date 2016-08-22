@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,6 +41,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -68,6 +69,7 @@ import org.apache.naming.ResourceLinkRef;
 import org.apache.naming.ResourceRef;
 import org.apache.naming.ServiceRef;
 import org.apache.naming.TransactionRef;
+import org.apache.naming.factory.ResourceLinkFactory;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -88,8 +90,8 @@ public class NamingContextListener
 
 
     protected Log logger = log;
-    
-    
+
+
     /**
      * Name of the associated naming context.
      */
@@ -131,13 +133,13 @@ public class NamingContextListener
      */
     protected javax.naming.Context envCtx = null;
 
-    
+
     /**
      * Objectnames hashtable.
      */
     protected HashMap<String, ObjectName> objectNames =
         new HashMap<String, ObjectName>();
-    
+
 
     /**
      * Determines if an attempt to write to a read-only context results in an
@@ -192,7 +194,7 @@ public class NamingContextListener
         this.name = name;
     }
 
-    
+
     /**
      * Return the comp context.
      */
@@ -200,7 +202,7 @@ public class NamingContextListener
     public javax.naming.Context getCompContext() {
         return this.compCtx;
     }
-    
+
 
     /**
      * Return the env context.
@@ -208,7 +210,7 @@ public class NamingContextListener
     public javax.naming.Context getEnvContext() {
         return this.envCtx;
     }
-    
+
 
     /**
      * Return the associated naming context.
@@ -282,7 +284,7 @@ public class NamingContextListener
                     ContextAccessController.setReadOnly(getName());
                     try {
                         ContextBindings.bindClassLoader
-                        (container, container, 
+                        (container, container,
                                 ((Container) container).getLoader().getClassLoader());
                     } catch (NamingException e) {
                         logger.error(sm.getString("naming.bindFailed", e));
@@ -294,7 +296,7 @@ public class NamingContextListener
                     (namingContext);
                     try {
                         ContextBindings.bindClassLoader
-                        (container, container, 
+                        (container, container,
                                 this.getClass().getClassLoader());
                     } catch (NamingException e) {
                         logger.error(sm.getString("naming.bindFailed", e));
@@ -322,14 +324,14 @@ public class NamingContextListener
 
                 if (container instanceof Context) {
                     ContextBindings.unbindClassLoader
-                    (container, container, 
+                    (container, container,
                             ((Container) container).getLoader().getClassLoader());
                 }
 
                 if (container instanceof Server) {
                     namingResources.removePropertyChangeListener(this);
                     ContextBindings.unbindClassLoader
-                    (container, container, 
+                    (container, container,
                             this.getClass().getClassLoader());
                 }
 
@@ -343,6 +345,11 @@ public class NamingContextListener
                     for (ObjectName objectName : names) {
                         registry.unregisterComponent(objectName);
                     }
+                }
+
+                javax.naming.Context global = getGlobalNamingContext();
+                if (global != null) {
+                    ResourceLinkFactory.deregisterGlobalResourceAccess(global);
                 }
             } finally {
                 objectNames.clear();
@@ -391,7 +398,7 @@ public class NamingContextListener
 
             String environmentName = (String) event.getData();
             if (environmentName != null) {
-                ContextEnvironment env = 
+                ContextEnvironment env =
                     namingResources.findEnvironment(environmentName);
                 addEnvironment(env);
             }
@@ -400,7 +407,7 @@ public class NamingContextListener
 
             String localEjbName = (String) event.getData();
             if (localEjbName != null) {
-                ContextLocalEjb localEjb = 
+                ContextLocalEjb localEjb =
                     namingResources.findLocalEjb(localEjbName);
                 addLocalEjb(localEjb);
             }
@@ -409,7 +416,7 @@ public class NamingContextListener
 
             String resourceName = (String) event.getData();
             if (resourceName != null) {
-                ContextResource resource = 
+                ContextResource resource =
                     namingResources.findResource(resourceName);
                 addResource(resource);
             }
@@ -418,7 +425,7 @@ public class NamingContextListener
 
             String resourceLinkName = (String) event.getData();
             if (resourceLinkName != null) {
-                ContextResourceLink resourceLink = 
+                ContextResourceLink resourceLink =
                     namingResources.findResourceLink(resourceLinkName);
                 addResourceLink(resourceLink);
             }
@@ -427,7 +434,7 @@ public class NamingContextListener
 
             String resourceEnvRefName = (String) event.getData();
             if (resourceEnvRefName != null) {
-                ContextResourceEnvRef resourceEnvRef = 
+                ContextResourceEnvRef resourceEnvRef =
                     namingResources.findResourceEnvRef(resourceEnvRefName);
                 addResourceEnvRef(resourceEnvRef);
             }
@@ -436,7 +443,7 @@ public class NamingContextListener
 
             String serviceName = (String) event.getData();
             if (serviceName != null) {
-                ContextService service = 
+                ContextService service =
                     namingResources.findService(serviceName);
                 addService(service);
             }
@@ -599,14 +606,14 @@ public class NamingContextListener
             }
         } else if (name.equals("resourceEnvRef")) {
             if (oldValue != null) {
-                ContextResourceEnvRef resourceEnvRef = 
+                ContextResourceEnvRef resourceEnvRef =
                     (ContextResourceEnvRef) oldValue;
                 if (resourceEnvRef.getName() != null) {
                     removeResourceEnvRef(resourceEnvRef.getName());
                 }
             }
             if (newValue != null) {
-                ContextResourceEnvRef resourceEnvRef = 
+                ContextResourceEnvRef resourceEnvRef =
                     (ContextResourceEnvRef) newValue;
                 if (resourceEnvRef.getName() != null) {
                     addResourceEnvRef(resourceEnvRef);
@@ -670,7 +677,7 @@ public class NamingContextListener
         }
 
         // Resource links
-        ContextResourceLink[] resourceLinks = 
+        ContextResourceLink[] resourceLinks =
             namingResources.findResourceLinks();
         for (i = 0; i < resourceLinks.length; i++) {
             addResourceLink(resourceLinks[i]);
@@ -689,7 +696,7 @@ public class NamingContextListener
         }
 
         // Environment entries
-        ContextEnvironment[] contextEnvironments = 
+        ContextEnvironment[] contextEnvironments =
             namingResources.findEnvironments();
         for (i = 0; i < contextEnvironments.length; i++) {
             addEnvironment(contextEnvironments[i]);
@@ -723,7 +730,7 @@ public class NamingContextListener
                     }
                 }
             } catch (NameAlreadyBoundException e) {
-                // Ignore because UserTransaction was obviously 
+                // Ignore because UserTransaction was obviously
                 // added via ResourceLink
             } catch (NamingException e) {
                 logger.error(sm.getString("naming.bindFailed", e));
@@ -733,7 +740,7 @@ public class NamingContextListener
         // Binding the resources directory context
         if (container instanceof Context) {
             try {
-                compCtx.bind("Resources", 
+                compCtx.bind("Resources",
                              ((Container) container).getResources());
             } catch (NamingException e) {
                 logger.error(sm.getString("naming.bindFailed", e));
@@ -763,30 +770,30 @@ public class NamingContextListener
         if (domain == null) {
             domain = "Catalina";
         }
-        
+
         ObjectName name = null;
         String quotedResourceName = ObjectName.quote(resource.getName());
-        if (container instanceof Server) {        
+        if (container instanceof Server) {
             name = new ObjectName(domain + ":type=DataSource" +
-                        ",class=" + resource.getType() + 
+                        ",class=" + resource.getType() +
                         ",name=" + quotedResourceName);
-        } else if (container instanceof Context) {                    
+        } else if (container instanceof Context) {
             String contextName = ((Context)container).getName();
             if (!contextName.startsWith("/"))
                 contextName = "/" + contextName;
             Host host = (Host) ((Context)container).getParent();
             name = new ObjectName(domain + ":type=DataSource" +
-                        ",context=" + contextName + 
+                        ",context=" + contextName +
                         ",host=" + host.getName() +
                         ",class=" + resource.getType() +
                         ",name=" + quotedResourceName);
         }
-        
+
         return (name);
 
     }
 
-    
+
     /**
      * Set the specified EJBs in the naming context.
      */
@@ -964,7 +971,7 @@ public class NamingContextListener
                     wsdlURL = ((Context) container).
                                                     getServletContext().
                                                     getResource("/" + service.getWsdlfile());
-                    logger.debug("  Changing service ref wsdl file for /" 
+                    logger.debug("  Changing service ref wsdl file for /"
                                 + service.getWsdlfile());
                 } catch (MalformedURLException e) {
                     logger.error(sm.getString("naming.wsdlFailed", e));
@@ -998,7 +1005,7 @@ public class NamingContextListener
                     jaxrpcURL = ((Context) container).
                                                     getServletContext().
                                                     getResource("/" + service.getJaxrpcmappingfile());
-                    logger.debug("  Changing service ref jaxrpc file for /" 
+                    logger.debug("  Changing service ref jaxrpc file for /"
                                 + service.getJaxrpcmappingfile());
                 } catch (MalformedURLException e) {
                     logger.error(sm.getString("naming.wsdlFailed", e));
@@ -1055,7 +1062,7 @@ public class NamingContextListener
 
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("  Adding service ref " 
+                logger.debug("  Adding service ref "
                              + service.getName() + "  " + ref);
             }
             createSubcontexts(envCtx, service.getName());
@@ -1087,7 +1094,7 @@ public class NamingContextListener
         }
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("  Adding resource ref " 
+                logger.debug("  Adding resource ref "
                              + resource.getName() + "  " + ref);
             }
             createSubcontexts(envCtx, resource.getName());
@@ -1107,7 +1114,7 @@ public class NamingContextListener
                 logger.warn(sm.getString("naming.jmxRegistrationFailed", e));
             }
         }
-        
+
     }
 
 
@@ -1155,8 +1162,8 @@ public class NamingContextListener
                 ref.add(refAddr);
             }
         }
-        javax.naming.Context ctx = 
-            "UserTransaction".equals(resourceLink.getName()) 
+        javax.naming.Context ctx =
+            "UserTransaction".equals(resourceLink.getName())
             ? compCtx : envCtx;
         try {
             if (logger.isDebugEnabled())
@@ -1167,6 +1174,17 @@ public class NamingContextListener
             logger.error(sm.getString("naming.bindFailed", e));
         }
 
+        ResourceLinkFactory.registerGlobalResourceAccess(
+                getGlobalNamingContext(), resourceLink.getName(), resourceLink.getGlobal());
+    }
+
+
+    private javax.naming.Context getGlobalNamingContext() {
+        if (container instanceof Context) {
+            Engine e = (Engine) ((Context) container).getParent().getParent();
+            return e.getService().getServer().getGlobalNamingContext();
+        }
+        return null;
     }
 
 
@@ -1270,6 +1288,7 @@ public class NamingContextListener
             logger.error(sm.getString("naming.unbindFailed", e));
         }
 
+        ResourceLinkFactory.deregisterGlobalResourceAccess(getGlobalNamingContext(), name);
     }
 
 

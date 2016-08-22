@@ -137,6 +137,11 @@
         >CVE-2016-5388</a>) by default and to provide a mechanism that can be
         used to mitigate any future, similar issues. (markt)
       </add>
+      <add>
+        When adding and removing <code>ResourceLink</code>s dynamically, ensure
+        that the global resource is only visible via the
+        <code>ResourceLinkFactory</code> when it is meant to be. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

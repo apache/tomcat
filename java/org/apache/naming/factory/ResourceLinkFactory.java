@@ -5,18 +5,21 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 package org.apache.naming.factory;
 
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.naming.Context;
 import javax.naming.Name;
@@ -29,7 +32,7 @@ import org.apache.naming.ResourceLinkRef;
 
 /**
  * <p>Object factory for resource links.</p>
- * 
+ *
  * @author Remy Maucherat
  */
 public class ResourceLinkFactory implements ObjectFactory {
@@ -41,12 +44,14 @@ public class ResourceLinkFactory implements ObjectFactory {
      */
     private static Context globalContext = null;
 
+    private static Map<ClassLoader,Map<String,String>> globalResourceRegistrations =
+            new ConcurrentHashMap<ClassLoader,Map<String,String>>();
 
     // --------------------------------------------------------- Public Methods
 
     /**
      * Set the global context (note: can only be used once).
-     * 
+     *
      * @param newGlobalContext new global context value
      */
     public static void setGlobalContext(Context newGlobalContext) {
@@ -59,17 +64,67 @@ public class ResourceLinkFactory implements ObjectFactory {
     }
 
 
+    public static void registerGlobalResourceAccess(Context globalContext, String localName,
+            String globalName) {
+        validateGlobalContext(globalContext);
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        Map<String,String> registrations = globalResourceRegistrations.get(cl);
+        if (registrations == null) {
+            // Web application initialization is single threaded so this is
+            // safe.
+            registrations = new HashMap<String,String>();
+            globalResourceRegistrations.put(cl, registrations);
+        }
+        registrations.put(localName, globalName);
+    }
+
+
+    public static void deregisterGlobalResourceAccess(Context globalContext, String localName) {
+        validateGlobalContext(globalContext);
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        Map<String,String> registrations = globalResourceRegistrations.get(cl);
+        if (registrations != null) {
+            registrations.remove(localName);
+        }
+    }
+
+
+    public static void deregisterGlobalResourceAccess(Context globalContext) {
+        validateGlobalContext(globalContext);
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        globalResourceRegistrations.remove(cl);
+    }
+
+
+    private static void validateGlobalContext(Context globalContext) {
+        if (ResourceLinkFactory.globalContext != null &&
+                ResourceLinkFactory.globalContext != globalContext) {
+            throw new SecurityException("Caller provided invalid global context");
+        }
+    }
+
+
+    private static boolean validateGlobalResourceAccess(String globalName) {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        Map<String,String> registrations = globalResourceRegistrations.get(cl);
+        if (registrations != null && registrations.containsValue(globalName)) {
+            return true;
+        }
+        return false;
+    }
+
+
     // -------------------------------------------------- ObjectFactory Methods
 
     /**
      * Create a new DataSource instance.
-     * 
+     *
      * @param obj The reference object describing the DataSource
      */
     @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
             Hashtable<?,?> environment) throws NamingException {
-        
+
         if (!(obj instanceof ResourceLinkRef)) {
             return null;
         }
@@ -82,6 +137,12 @@ public class ResourceLinkFactory implements ObjectFactory {
         RefAddr refAddr = ref.get(ResourceLinkRef.GLOBALNAME);
         if (refAddr != null) {
             globalName = refAddr.getContent().toString();
+            // When running under a security manager confirm that the current
+            // web application has really been configured to access the specified
+            // global resource
+            if (!validateGlobalResourceAccess(globalName)) {
+                return null;
+            }
             Object result = null;
             result = globalContext.lookup(globalName);
             // Check the expected type
