@@ -42,7 +42,7 @@ public abstract class Constant {
     protected final byte tag;
 
 
-    Constant(byte tag) {
+    Constant(final byte tag) {
         this.tag = tag;
     }
 
@@ -62,9 +62,9 @@ public abstract class Constant {
      * @param input Input stream
      * @return Constant object
      */
-    static Constant readConstant(DataInput input) throws IOException,
+    static Constant readConstant(final DataInput input) throws IOException,
             ClassFormatException {
-        byte b = input.readByte(); // Read tag byte
+        final byte b = input.readByte(); // Read tag byte
         int skipSize;
         switch (b) {
             case Const.CONSTANT_Class:
@@ -99,7 +99,6 @@ public abstract class Constant {
         Utility.skipFully(input, skipSize);
         return null;
     }
-
 
 
     @Override

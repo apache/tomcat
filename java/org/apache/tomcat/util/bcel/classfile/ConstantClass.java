@@ -39,7 +39,7 @@ public final class ConstantClass extends Constant {
      * @param file Input stream
      * @throws IOException
      */
-    ConstantClass(DataInput file) throws IOException {
+    ConstantClass(final DataInput file) throws IOException {
         super(Const.CONSTANT_Class);
         this.name_index = file.readUnsignedShort();
     }

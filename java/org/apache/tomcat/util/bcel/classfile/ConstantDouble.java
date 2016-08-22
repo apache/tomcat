@@ -39,7 +39,7 @@ public final class ConstantDouble extends Constant {
      * @param file Input stream
      * @throws IOException
      */
-    ConstantDouble(DataInput file) throws IOException {
+    ConstantDouble(final DataInput file) throws IOException {
         super(Const.CONSTANT_Double);
         this.bytes = file.readDouble();
     }

@@ -56,7 +56,7 @@ public final class ClassParser {
      *
      * @param inputStream Input stream
      */
-    public ClassParser(InputStream inputStream) {
+    public ClassParser(final InputStream inputStream) {
         this.dataInputStream = new DataInputStream(new BufferedInputStream(inputStream, BUFSIZE));
     }
 
@@ -106,7 +106,7 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     private void readAttributes() throws IOException, ClassFormatException {
-        int attributes_count = dataInputStream.readUnsignedShort();
+        final int attributes_count = dataInputStream.readUnsignedShort();
         for (int i = 0; i < attributes_count; i++) {
             ConstantUtf8 c;
             String name;
@@ -181,7 +181,7 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     private void readFields() throws IOException, ClassFormatException {
-        int fields_count = dataInputStream.readUnsignedShort();
+        final int fields_count = dataInputStream.readUnsignedShort();
         for (int i = 0; i < fields_count; i++) {
             Utility.swallowFieldOrMethod(dataInputStream);
         }
@@ -208,7 +208,7 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     private void readInterfaces() throws IOException, ClassFormatException {
-        int interfaces_count = dataInputStream.readUnsignedShort();
+        final int interfaces_count = dataInputStream.readUnsignedShort();
         if (interfaces_count > 0) {
             interface_names = new String[interfaces_count];
             for (int i = 0; i < interfaces_count; i++) {
@@ -227,7 +227,7 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     private void readMethods() throws IOException, ClassFormatException {
-        int methods_count = dataInputStream.readUnsignedShort();
+        final int methods_count = dataInputStream.readUnsignedShort();
         for (int i = 0; i < methods_count; i++) {
             Utility.swallowFieldOrMethod(dataInputStream);
         }

@@ -31,7 +31,7 @@ public class Annotations {
      * @param input Input stream
      * @param constant_pool Array of constants
      */
-    Annotations(DataInput input, ConstantPool constant_pool) throws IOException {
+    Annotations(final DataInput input, final ConstantPool constant_pool) throws IOException {
         final int annotation_table_length = input.readUnsignedShort();
         annotation_table = new AnnotationEntry[annotation_table_length];
         for (int i = 0; i < annotation_table_length; i++) {

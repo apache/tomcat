@@ -44,8 +44,8 @@ public class ConstantPool {
      * @throws IOException
      * @throws ClassFormatException
      */
-    ConstantPool(DataInput input) throws IOException, ClassFormatException {
-        int constant_pool_count = input.readUnsignedShort();
+    ConstantPool(final DataInput input) throws IOException, ClassFormatException {
+        final int constant_pool_count = input.readUnsignedShort();
         constant_pool = new Constant[constant_pool_count];
         /* constant_pool[0] is unused by the compiler and may be used freely
          * by the implementation.
@@ -76,7 +76,7 @@ public class ConstantPool {
      * @return Constant value
      * @see    Constant
      */
-    public Constant getConstant( int index ) {
+    public Constant getConstant( final int index ) {
         if (index >= constant_pool.length || index < 0) {
             throw new ClassFormatException("Invalid constant pool reference: " + index
                     + ". Constant pool size is: " + constant_pool.length);
@@ -95,7 +95,7 @@ public class ConstantPool {
      * @see    Constant
      * @throws  ClassFormatException If the constant is not of the expected type
      */
-    public Constant getConstant( int index, byte tag ) throws ClassFormatException {
+    public Constant getConstant( final int index, final byte tag ) throws ClassFormatException {
         Constant c;
         c = getConstant(index);
         if (c == null) {
