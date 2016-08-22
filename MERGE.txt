@@ -21,11 +21,15 @@ ideal. These include:
 - potential conflicts if a web application ships with the same JAR
 - a large JAR where Tomcat only depends on a small fraction
 
-There are various approaches taken to dealing with this. One of those approaches
-is to svn copy the classes to the Tomcat source tree, modify them (always with a
-package rename, sometimes with additional changes) and then keep them in sync
-with the original via regular svn merges. This file keeps track of these copies
-to assist committers in keeping them up to date.
+
+SVN
+===
+
+For sources hosted in svn the approache is to svn copy the classes to the Tomcat
+source tree, modify them (always with a package rename, sometimes with
+additional changes) and then keep them in sync with the original via regular svn
+merges. This file keeps track of these copies to assist committers in keeping
+them up to date.
 
 BCEL
 org.apache.tomcat.util.bcel is copied from:
@@ -40,10 +44,8 @@ org.apache.tomcat.dbcp.pool2 is copied from:
 /commons/proper/pool/trunk/src/main/java/org/apache/commons/pool2
 
 FileUpload
-org.apache.tomcat.util.http.fileupload is copied from:
-/commons/proper/fileupload/trunk/src/main/java/org/apache/commons/fileupload
-Note: Tomcat's copy of fileupload also includes classes copied manually (rather
-      than svn copied) from Commons IO.
+This used to be hosted in svn. All changes up to the point where FileUpload was
+migrated to git have been merged.
 
 Codec
 org.apache.tomcat.util.codec is copied from:
@@ -51,3 +53,20 @@ org.apache.tomcat.util.codec is copied from:
 Note: Only classes required for Base64 encoding/decoding. The rest are removed.
 
 
+GIT
+===
+
+Updates from Git are applied manually via patch files. Patch files are generated
+using:
+git diff <last SHA1>:<sub-tree> HEAD:<sub-tree> > temp.patch
+The more recently merged SHA1 for the component below should be updated after
+the patch file has been applied and committed
+
+FileUpload
+Sub-tree:
+src/main/java/org/apache/commons/fileupload
+The SHA1 ID for the most recent commit to be merged to Tomcat is:
+86b11bbc1437a12fa64bc1484c4edc0bdd5a0966
+
+Note: Tomcat's copy of fileupload also includes classes copied manually (rather
+      than svn copied) from Commons IO.
