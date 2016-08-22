@@ -44,12 +44,12 @@ public abstract class LimitedInputStream extends FilterInputStream implements Cl
     /**
      * Creates a new instance.
      *
-     * @param pIn The input stream, which shall be limited.
+     * @param inputStream The input stream, which shall be limited.
      * @param pSizeMax The limit; no more than this number of bytes
      *   shall be returned by the source stream.
      */
-    public LimitedInputStream(InputStream pIn, long pSizeMax) {
-        super(pIn);
+    public LimitedInputStream(InputStream inputStream, long pSizeMax) {
+        super(inputStream);
         sizeMax = pSizeMax;
     }
 
@@ -91,7 +91,7 @@ public abstract class LimitedInputStream extends FilterInputStream implements Cl
      *
      * @return     the next byte of data, or <code>-1</code> if the end of the
      *             stream is reached.
-     * @exception  IOException  if an I/O error occurs.
+     * @throws  IOException  if an I/O error occurs.
      * @see        java.io.FilterInputStream#in
      */
     @Override
@@ -120,11 +120,11 @@ public abstract class LimitedInputStream extends FilterInputStream implements Cl
      * @return     the total number of bytes read into the buffer, or
      *             <code>-1</code> if there is no more data because the end of
      *             the stream has been reached.
-     * @exception  NullPointerException If <code>b</code> is <code>null</code>.
-     * @exception  IndexOutOfBoundsException If <code>off</code> is negative,
+     * @throws  NullPointerException If <code>b</code> is <code>null</code>.
+     * @throws  IndexOutOfBoundsException If <code>off</code> is negative,
      * <code>len</code> is negative, or <code>len</code> is greater than
      * <code>b.length - off</code>
-     * @exception  IOException  if an I/O error occurs.
+     * @throws  IOException  if an I/O error occurs.
      * @see        java.io.FilterInputStream#in
      */
     @Override
@@ -154,7 +154,7 @@ public abstract class LimitedInputStream extends FilterInputStream implements Cl
      * This
      * method simply performs <code>in.close()</code>.
      *
-     * @exception  IOException  if an I/O error occurs.
+     * @throws  IOException  if an I/O error occurs.
      * @see        java.io.FilterInputStream#in
      */
     @Override

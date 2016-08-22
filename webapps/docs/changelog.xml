@@ -277,6 +277,11 @@
         Update the internal fork of Commons Codec to r1757174. Code formatting
         changes only. (markt)
       </update>
+      <update>
+        Update the internal fork of Commons FileUpload to afdedc9. This pulls in
+        a fix to improve the performance with large multipart boundaries.
+        (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

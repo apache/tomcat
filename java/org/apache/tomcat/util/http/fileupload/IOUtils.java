@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.http.fileupload;
 
 import java.io.Closeable;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -119,7 +120,7 @@ public class IOUtils {
             // ignore
         }
     }
-    
+
     // copy from InputStream
     //-----------------------------------------------------------------------
     /**
@@ -133,7 +134,7 @@ public class IOUtils {
      * <code>-1</code> after the copy has completed since the correct
      * number of bytes cannot be returned as an int. For large streams
      * use the <code>copyLarge(InputStream, OutputStream)</code> method.
-     * 
+     *
      * @param input  the <code>InputStream</code> to read from
      * @param output  the <code>OutputStream</code> to write to
      * @return the number of bytes copied, or -1 if &gt; Integer.MAX_VALUE
@@ -176,5 +177,76 @@ public class IOUtils {
             count += n;
         }
         return count;
+    }
+
+    /**
+     * Reads bytes from an input stream.
+     * This implementation guarantees that it will read as many bytes
+     * as possible before giving up; this may not always be the case for
+     * subclasses of {@link InputStream}.
+     *
+     * @param input where to read input from
+     * @param buffer destination
+     * @param offset initial offset into buffer
+     * @param length length to read, must be &gt;= 0
+     * @return actual length read; may be less than requested if EOF was reached
+     * @throws IOException if a read error occurs
+     * @since 2.2
+     */
+    public static int read(final InputStream input, final byte[] buffer, final int offset, final int length) throws IOException {
+        if (length < 0) {
+            throw new IllegalArgumentException("Length must not be negative: " + length);
+        }
+        int remaining = length;
+        while (remaining > 0) {
+            final int location = length - remaining;
+            final int count = input.read(buffer, offset + location, remaining);
+            if (EOF == count) { // EOF
+                break;
+            }
+            remaining -= count;
+        }
+        return length - remaining;
+    }
+
+    /**
+     * Reads the requested number of bytes or fail if there are not enough left.
+     * <p>
+     * This allows for the possibility that {@link InputStream#read(byte[], int, int)} may
+     * not read as many bytes as requested (most likely because of reaching EOF).
+     *
+     * @param input where to read input from
+     * @param buffer destination
+     * @param offset initial offset into buffer
+     * @param length length to read, must be &gt;= 0
+     *
+     * @throws IOException if there is a problem reading the file
+     * @throws IllegalArgumentException if length is negative
+     * @throws EOFException if the number of bytes read was incorrect
+     * @since 2.2
+     */
+    public static void readFully(final InputStream input, final byte[] buffer, final int offset, final int length) throws IOException {
+        final int actual = read(input, buffer, offset, length);
+        if (actual != length) {
+            throw new EOFException("Length to read: " + length + " actual: " + actual);
+        }
+    }
+
+    /**
+     * Reads the requested number of bytes or fail if there are not enough left.
+     * <p>
+     * This allows for the possibility that {@link InputStream#read(byte[], int, int)} may
+     * not read as many bytes as requested (most likely because of reaching EOF).
+     *
+     * @param input where to read input from
+     * @param buffer destination
+     *
+     * @throws IOException if there is a problem reading the file
+     * @throws IllegalArgumentException if length is negative
+     * @throws EOFException if the number of bytes read was incorrect
+     * @since 2.2
+     */
+    public static void readFully(final InputStream input, final byte[] buffer) throws IOException {
+        readFully(input, buffer, 0, buffer.length);
     }
 }
