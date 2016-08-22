@@ -101,7 +101,6 @@ public abstract class Constant {
     }
 
 
-
     @Override
     public String toString() {
         return "[" + tag + "]";
