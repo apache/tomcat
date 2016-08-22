@@ -45,7 +45,7 @@ public class ConstantPool {
      * @throws ClassFormatException
      */
     ConstantPool(final DataInput input) throws IOException, ClassFormatException {
-        int constant_pool_count = input.readUnsignedShort();
+        final int constant_pool_count = input.readUnsignedShort();
         constant_pool = new Constant[constant_pool_count];
         /* constant_pool[0] is unused by the compiler and may be used freely
          * by the implementation.

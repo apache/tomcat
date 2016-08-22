@@ -43,7 +43,7 @@ public class ElementValuePair
 
     public String getNameString()
     {
-        ConstantUtf8 c = (ConstantUtf8) constantPool.getConstant(
+        final ConstantUtf8 c = (ConstantUtf8) constantPool.getConstant(
                 elementNameIndex, Const.CONSTANT_Utf8);
         return c.getBytes();
     }

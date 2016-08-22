@@ -64,7 +64,7 @@ public abstract class Constant {
      */
     static Constant readConstant(final DataInput input) throws IOException,
             ClassFormatException {
-        byte b = input.readByte(); // Read tag byte
+        final byte b = input.readByte(); // Read tag byte
         int skipSize;
         switch (b) {
             case Const.CONSTANT_Class:
