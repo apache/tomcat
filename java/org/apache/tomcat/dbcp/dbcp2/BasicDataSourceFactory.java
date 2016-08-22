@@ -236,7 +236,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
      * @param environment The possibly null environment that is used in
      *  creating this object
      *
-     * @exception Exception if an exception occurs creating the instance
+     * @throws Exception if an exception occurs creating the instance
      */
     @Override
     public Object getObjectInstance(final Object obj, final Name name, final Context nameCtx, final Hashtable<?,?> environment)

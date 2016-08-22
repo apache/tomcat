@@ -69,7 +69,7 @@ class ConnectionImpl extends DelegatingConnection<Connection> {
      * be used after closed() is called.  Any further usage will result in an
      * SQLException.
      *
-     * @exception SQLException The database connection couldn't be closed.
+     * @throws SQLException The database connection couldn't be closed.
      */
     @Override
     public void close() throws SQLException {
@@ -90,7 +90,7 @@ class ConnectionImpl extends DelegatingConnection<Connection> {
      *
      * @param sql SQL statement to be prepared
      * @return the prepared statement
-     * @exception SQLException if this connection is closed or an error occurs
+     * @throws SQLException if this connection is closed or an error occurs
      * in the wrapped connection.
      */
     @Override
@@ -111,7 +111,7 @@ class ConnectionImpl extends DelegatingConnection<Connection> {
      * {@link DriverAdapterCPDS}, a pooled object may be returned, otherwise
      * delegate to the wrapped JDBC 1.x {@link java.sql.Connection}.
      *
-     * @exception SQLException if this connection is closed or an error occurs
+     * @throws SQLException if this connection is closed or an error occurs
      * in the wrapped connection.
      */
     @Override

@@ -130,7 +130,7 @@ class PooledConnectionImpl
      * <code>PooledConnection</code> so that it may not be used
      * to generate any more logical <code>Connection</code>s.
      *
-     * @exception SQLException if an error occurs or the connection is already closed
+     * @throws SQLException if an error occurs or the connection is already closed
      */
     @Override
     public void close() throws SQLException {
