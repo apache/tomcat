@@ -17,13 +17,13 @@
  */
 package org.apache.tomcat.util.bcel.classfile;
 
-import org.apache.tomcat.util.bcel.Constants;
+import org.apache.tomcat.util.bcel.Const;
 
 public class SimpleElementValue extends ElementValue
 {
     private final int index;
 
-    SimpleElementValue(int type, int index, ConstantPool cpool) {
+    SimpleElementValue(final int type, final int index, final ConstantPool cpool) {
         super(type, cpool);
         this.index = index;
     }
@@ -35,57 +35,57 @@ public class SimpleElementValue extends ElementValue
     {
         return index;
     }
-    
+
 
     // Whatever kind of value it is, return it as a string
     @Override
     public String stringifyValue()
     {
-        switch (type)
+        final ConstantPool cpool = super.getConstantPool();
+        final int _type = super.getType();
+        switch (_type)
         {
         case PRIMITIVE_INT:
-            ConstantInteger c = (ConstantInteger) cpool.getConstant(getIndex(),
-                    Constants.CONSTANT_Integer);
+            final ConstantInteger c = (ConstantInteger) cpool.getConstant(getIndex(),
+                    Const.CONSTANT_Integer);
             return Integer.toString(c.getBytes());
         case PRIMITIVE_LONG:
-            ConstantLong j = (ConstantLong) cpool.getConstant(getIndex(),
-                    Constants.CONSTANT_Long);
+            final ConstantLong j = (ConstantLong) cpool.getConstant(getIndex(),
+                    Const.CONSTANT_Long);
             return Long.toString(j.getBytes());
         case PRIMITIVE_DOUBLE:
-            ConstantDouble d = (ConstantDouble) cpool.getConstant(getIndex(),
-                    Constants.CONSTANT_Double);
+            final ConstantDouble d = (ConstantDouble) cpool.getConstant(getIndex(),
+                    Const.CONSTANT_Double);
             return Double.toString(d.getBytes());
         case PRIMITIVE_FLOAT:
-            ConstantFloat f = (ConstantFloat) cpool.getConstant(getIndex(),
-                    Constants.CONSTANT_Float);
+            final ConstantFloat f = (ConstantFloat) cpool.getConstant(getIndex(),
+                    Const.CONSTANT_Float);
             return Float.toString(f.getBytes());
         case PRIMITIVE_SHORT:
-            ConstantInteger s = (ConstantInteger) cpool.getConstant(getIndex(),
-                    Constants.CONSTANT_Integer);
+            final ConstantInteger s = (ConstantInteger) cpool.getConstant(getIndex(),
+                    Const.CONSTANT_Integer);
             return Integer.toString(s.getBytes());
         case PRIMITIVE_BYTE:
-            ConstantInteger b = (ConstantInteger) cpool.getConstant(getIndex(),
-                    Constants.CONSTANT_Integer);
+            final ConstantInteger b = (ConstantInteger) cpool.getConstant(getIndex(),
+                    Const.CONSTANT_Integer);
             return Integer.toString(b.getBytes());
         case PRIMITIVE_CHAR:
-            ConstantInteger ch = (ConstantInteger) cpool.getConstant(
-                    getIndex(), Constants.CONSTANT_Integer);
+            final ConstantInteger ch = (ConstantInteger) cpool.getConstant(
+                    getIndex(), Const.CONSTANT_Integer);
             return String.valueOf((char)ch.getBytes());
         case PRIMITIVE_BOOLEAN:
-            ConstantInteger bo = (ConstantInteger) cpool.getConstant(
-                    getIndex(), Constants.CONSTANT_Integer);
+            final ConstantInteger bo = (ConstantInteger) cpool.getConstant(
+                    getIndex(), Const.CONSTANT_Integer);
             if (bo.getBytes() == 0) {
                 return "false";
             }
             return "true";
         case STRING:
-            ConstantUtf8 cu8 = (ConstantUtf8) cpool.getConstant(getIndex(),
-                    Constants.CONSTANT_Utf8);
+            final ConstantUtf8 cu8 = (ConstantUtf8) cpool.getConstant(getIndex(),
+                    Const.CONSTANT_Utf8);
             return cu8.getBytes();
         default:
-            throw new RuntimeException(
-                    "SimpleElementValue class does not know how to stringify type "
-                            + type);
+            throw new RuntimeException("SimpleElementValue class does not know how to stringify type " + _type);
         }
     }
 }

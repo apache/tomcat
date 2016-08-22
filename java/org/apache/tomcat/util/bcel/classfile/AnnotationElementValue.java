@@ -22,8 +22,8 @@ public class AnnotationElementValue extends ElementValue
     // For annotation element values, this is the annotation
     private final AnnotationEntry annotationEntry;
 
-    AnnotationElementValue(int type, AnnotationEntry annotationEntry,
-            ConstantPool cpool)
+    AnnotationElementValue(final int type, final AnnotationEntry annotationEntry,
+            final ConstantPool cpool)
     {
         super(type, cpool);
         if (type != ANNOTATION) {

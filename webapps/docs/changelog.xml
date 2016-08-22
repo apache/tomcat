@@ -269,6 +269,10 @@
       <fix>
         Fixed typos in mbeans-descriptors.xml files. (violetagg)
       </fix>
+      <update>
+        Update the internal fork of Commons BCEL to r1757132 to align with the
+        BCEL 6 release. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

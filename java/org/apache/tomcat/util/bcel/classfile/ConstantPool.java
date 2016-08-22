@@ -20,7 +20,7 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInput;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
+import org.apache.tomcat.util.bcel.Const;
 
 /**
  * This class represents the constant pool, i.e., a table of constants, of
@@ -31,7 +31,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * ConstantPoolGen</a>.
 
  * @see     Constant
- * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public class ConstantPool {
 
@@ -45,8 +44,8 @@ public class ConstantPool {
      * @throws IOException
      * @throws ClassFormatException
      */
-    ConstantPool(DataInput input) throws IOException, ClassFormatException {
-        int constant_pool_count = input.readUnsignedShort();
+    ConstantPool(final DataInput input) throws IOException, ClassFormatException {
+        final int constant_pool_count = input.readUnsignedShort();
         constant_pool = new Constant[constant_pool_count];
         /* constant_pool[0] is unused by the compiler and may be used freely
          * by the implementation.
@@ -57,12 +56,12 @@ public class ConstantPool {
              * "All eight byte constants take up two spots in the constant pool.
              * If this is the n'th byte in the constant pool, then the next item
              * will be numbered n+2"
-             * 
+             *
              * Thus we have to increment the index counter.
              */
             if (constant_pool[i] != null) {
                 byte tag = constant_pool[i].getTag();
-                if ((tag == Constants.CONSTANT_Double) || (tag == Constants.CONSTANT_Long)) {
+                if ((tag == Const.CONSTANT_Double) || (tag == Const.CONSTANT_Long)) {
                     i++;
                 }
             }
@@ -77,7 +76,7 @@ public class ConstantPool {
      * @return Constant value
      * @see    Constant
      */
-    public Constant getConstant( int index ) {
+    public Constant getConstant( final int index ) {
         if (index >= constant_pool.length || index < 0) {
             throw new ClassFormatException("Invalid constant pool reference: " + index
                     + ". Constant pool size is: " + constant_pool.length);
@@ -94,16 +93,16 @@ public class ConstantPool {
      * @param  tag Tag of expected constant, i.e., its type
      * @return Constant value
      * @see    Constant
-     * @throws  ClassFormatException
+     * @throws  ClassFormatException If the constant is not of the expected type
      */
-    public Constant getConstant( int index, byte tag ) throws ClassFormatException {
+    public Constant getConstant( final int index, final byte tag ) throws ClassFormatException {
         Constant c;
         c = getConstant(index);
         if (c == null) {
             throw new ClassFormatException("Constant pool at index " + index + " is null.");
         }
         if (c.getTag() != tag) {
-            throw new ClassFormatException("Expected class `" + Constants.CONSTANT_NAMES[tag]
+            throw new ClassFormatException("Expected class `" + Const.getConstantName(tag)
                     + "' at index " + index + " and got " + c);
         }
         return c;

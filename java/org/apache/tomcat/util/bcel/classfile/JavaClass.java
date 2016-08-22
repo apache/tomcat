@@ -24,8 +24,6 @@ package org.apache.tomcat.util.bcel.classfile;
  * The intent of this class is to represent a parsed or otherwise existing
  * class file.  Those interested in programatically generating classes
  * should see the <a href="../generic/ClassGen.html">ClassGen</a> class.
-
- * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 public class JavaClass {
 
@@ -45,9 +43,9 @@ public class JavaClass {
      * @param interfaces Implemented interfaces
      * @param runtimeVisibleAnnotations "RuntimeVisibleAnnotations" attribute defined on the Class, or null
      */
-    JavaClass(String class_name, String superclass_name,
-            int access_flags, ConstantPool constant_pool, String[] interface_names,
-            Annotations runtimeVisibleAnnotations) {
+    JavaClass(final String class_name, final String superclass_name,
+            final int access_flags, final ConstantPool constant_pool, final String[] interface_names,
+            final Annotations runtimeVisibleAnnotations) {
         this.access_flags = access_flags;
         this.runtimeVisibleAnnotations = runtimeVisibleAnnotations;
         this.class_name = class_name;

@@ -23,7 +23,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.tomcat.util.bcel.Constants;
+import org.apache.tomcat.util.bcel.Const;
 
 /**
  * Wrapper class that parses a given Java .class file. The method <A
@@ -36,8 +36,6 @@ import org.apache.tomcat.util.bcel.Constants;
  * exactly with the <A href="http://docs.oracle.com/javase/specs/">
  * JVM specification 1.0</a>. See this paper for
  * further details about the structure of a bytecode file.
- *
- * @author <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A> 
  */
 public final class ClassParser {
 
@@ -58,7 +56,7 @@ public final class ClassParser {
      *
      * @param inputStream Input stream
      */
-    public ClassParser(InputStream inputStream) {
+    public ClassParser(final InputStream inputStream) {
         this.dataInputStream = new DataInputStream(new BufferedInputStream(inputStream, BUFSIZE));
     }
 
@@ -71,8 +69,8 @@ public final class ClassParser {
      * is performed by the java interpreter).
      *
      * @return Class object representing the parsed class file
-     * @throws  IOException
-     * @throws  ClassFormatException
+     * @throws  IOException If an I/O occurs reading the byte code
+     * @throws  ClassFormatException If the byte code is invalid
      */
     public JavaClass parse() throws IOException, ClassFormatException {
         /****************** Read headers ********************************/
@@ -108,7 +106,7 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     private void readAttributes() throws IOException, ClassFormatException {
-        int attributes_count = dataInputStream.readUnsignedShort();
+        final int attributes_count = dataInputStream.readUnsignedShort();
         for (int i = 0; i < attributes_count; i++) {
             ConstantUtf8 c;
             String name;
@@ -117,7 +115,7 @@ public final class ClassParser {
             // Get class name from constant pool via `name_index' indirection
             name_index = dataInputStream.readUnsignedShort();
             c = (ConstantUtf8) constant_pool.getConstant(name_index,
-                    Constants.CONSTANT_Utf8);
+                    Const.CONSTANT_Utf8);
             name = c.getBytes();
             // Length of data in bytes
             length = dataInputStream.readInt();
@@ -146,11 +144,11 @@ public final class ClassParser {
         /* Interfaces are implicitely abstract, the flag should be set
          * according to the JVM specification.
          */
-        if ((access_flags & Constants.ACC_INTERFACE) != 0) {
-            access_flags |= Constants.ACC_ABSTRACT;
+        if ((access_flags & Const.ACC_INTERFACE) != 0) {
+            access_flags |= Const.ACC_ABSTRACT;
         }
-        if (((access_flags & Constants.ACC_ABSTRACT) != 0)
-                && ((access_flags & Constants.ACC_FINAL) != 0)) {
+        if (((access_flags & Const.ACC_ABSTRACT) != 0)
+                && ((access_flags & Const.ACC_FINAL) != 0)) {
             throw new ClassFormatException("Class can't be both final and abstract");
         }
 
@@ -183,7 +181,7 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     private void readFields() throws IOException, ClassFormatException {
-        int fields_count = dataInputStream.readUnsignedShort();
+        final int fields_count = dataInputStream.readUnsignedShort();
         for (int i = 0; i < fields_count; i++) {
             Utility.swallowFieldOrMethod(dataInputStream);
         }
@@ -210,7 +208,7 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     private void readInterfaces() throws IOException, ClassFormatException {
-        int interfaces_count = dataInputStream.readUnsignedShort();
+        final int interfaces_count = dataInputStream.readUnsignedShort();
         if (interfaces_count > 0) {
             interface_names = new String[interfaces_count];
             for (int i = 0; i < interfaces_count; i++) {
@@ -229,7 +227,7 @@ public final class ClassParser {
      * @throws  ClassFormatException
      */
     private void readMethods() throws IOException, ClassFormatException {
-        int methods_count = dataInputStream.readUnsignedShort();
+        final int methods_count = dataInputStream.readUnsignedShort();
         for (int i = 0; i < methods_count; i++) {
             Utility.swallowFieldOrMethod(dataInputStream);
         }

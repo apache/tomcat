@@ -22,20 +22,17 @@ import java.io.IOException;
 
 /**
  * base class for annotations
- * 
- * @author  <A HREF="mailto:dbrosius@qis.net">D. Brosius</A>
- * @since 6.0
  */
 public class Annotations {
 
     private final AnnotationEntry[] annotation_table;
-    
+
     /**
      * @param input Input stream
      * @param constant_pool Array of constants
      */
-    Annotations(DataInput input, ConstantPool constant_pool) throws IOException {
-        final int annotation_table_length = (input.readUnsignedShort());
+    Annotations(final DataInput input, final ConstantPool constant_pool) throws IOException {
+        final int annotation_table_length = input.readUnsignedShort();
         annotation_table = new AnnotationEntry[annotation_table_length];
         for (int i = 0; i < annotation_table_length; i++) {
             annotation_table[i] = new AnnotationEntry(input, constant_pool);
@@ -44,7 +41,7 @@ public class Annotations {
 
 
     /**
-     * returns the array of annotation entries in this annotation
+     * @return the array of annotation entries in this annotation
      */
     public AnnotationEntry[] getAnnotationEntries() {
         return annotation_table;

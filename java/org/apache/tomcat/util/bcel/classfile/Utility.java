@@ -20,12 +20,10 @@ import java.io.DataInput;
 import java.io.EOFException;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
+import org.apache.tomcat.util.bcel.Const;
 
 /**
  * Utility functions that do not really belong to any class in particular.
- *
- * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  */
 final class Utility {
 
@@ -42,29 +40,29 @@ final class Utility {
      * @param str The long class name
      * @return Compacted class name
      */
-    static String compactClassName(String str) {
+    static String compactClassName(final String str) {
         return str.replace('/', '.'); // Is `/' on all systems, even DOS
     }
 
-    static String getClassName(ConstantPool constant_pool, int index) {
-        Constant c = constant_pool.getConstant(index, Constants.CONSTANT_Class);
+    static String getClassName(final ConstantPool constant_pool, final int index) {
+        Constant c = constant_pool.getConstant(index, Const.CONSTANT_Class);
         int i = ((ConstantClass) c).getNameIndex();
 
         // Finally get the string from the constant pool
-        c = constant_pool.getConstant(i, Constants.CONSTANT_Utf8);
+        c = constant_pool.getConstant(i, Const.CONSTANT_Utf8);
         String name = ((ConstantUtf8) c).getBytes();
 
         return compactClassName(name);
     }
 
-    static void skipFully(DataInput file, int length) throws IOException {
+    static void skipFully(final DataInput file, final int length) throws IOException {
         int total = file.skipBytes(length);
         if (total != length) {
             throw new EOFException();
         }
     }
 
-    static void swallowFieldOrMethod(DataInput file)
+    static void swallowFieldOrMethod(final DataInput file)
             throws IOException {
         // file.readUnsignedShort(); // Unused access flags
         // file.readUnsignedShort(); // name index
@@ -77,7 +75,7 @@ final class Utility {
         }
     }
 
-    static void swallowAttribute(DataInput file)
+    static void swallowAttribute(final DataInput file)
             throws IOException {
         //file.readUnsignedShort();   // Unused name index
         skipFully(file, 2);

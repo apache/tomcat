@@ -19,18 +19,14 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInput;
 import java.io.IOException;
 
-/**
- * @author <A HREF="mailto:dbrosius@qis.net">D. Brosius</A>
- * @since 6.0
- */
 public abstract class ElementValue
 {
-    protected final int type;
+    private final int type;
 
-    protected final ConstantPool cpool;
+    private final ConstantPool cpool;
 
 
-    ElementValue(int type, ConstantPool cpool) {
+    ElementValue(final int type, final ConstantPool cpool) {
         this.type = type;
         this.cpool = cpool;
     }
@@ -51,9 +47,9 @@ public abstract class ElementValue
     public static final byte PRIMITIVE_SHORT   = 'S';
     public static final byte PRIMITIVE_BOOLEAN = 'Z';
 
-    public static ElementValue readElementValue(DataInput input, ConstantPool cpool) throws IOException
+    public static ElementValue readElementValue(final DataInput input, final ConstantPool cpool) throws IOException
     {
-        byte type = input.readByte();
+        final byte type = input.readByte();
         switch (type)
         {
             case PRIMITIVE_BYTE:
@@ -79,8 +75,8 @@ public abstract class ElementValue
                 return new AnnotationElementValue(ANNOTATION, new AnnotationEntry(input, cpool), cpool);
 
             case ARRAY:
-                int numArrayVals = input.readUnsignedShort();
-                ElementValue[] evalues = new ElementValue[numArrayVals];
+                final int numArrayVals = input.readUnsignedShort();
+                final ElementValue[] evalues = new ElementValue[numArrayVals];
                 for (int j = 0; j < numArrayVals; j++)
                 {
                     evalues[j] = ElementValue.readElementValue(input, cpool);
@@ -91,5 +87,13 @@ public abstract class ElementValue
                 throw new ClassFormatException(
                         "Unexpected element value kind in annotation: " + type);
         }
+    }
+
+    final ConstantPool getConstantPool() {
+        return cpool;
+    }
+
+    final int getType() {
+        return type;
     }
 }

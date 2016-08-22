@@ -19,14 +19,13 @@ package org.apache.tomcat.util.bcel.classfile;
 import java.io.DataInput;
 import java.io.IOException;
 
-import org.apache.tomcat.util.bcel.Constants;
+import org.apache.tomcat.util.bcel.Const;
 
-/** 
- * This class is derived from the abstract 
- * <A HREF="org.apache.tomcat.util.bcel.classfile.Constant.html">Constant</A> class 
+/**
+ * This class is derived from the abstract
+ * <A HREF="org.apache.tomcat.util.bcel.classfile.Constant.html">Constant</A> class
  * and represents a reference to a Utf8 encoded string.
  *
- * @author  <A HREF="mailto:m.dahm@gmx.de">M. Dahm</A>
  * @see     Constant
  */
 public final class ConstantUtf8 extends Constant {
@@ -34,7 +33,7 @@ public final class ConstantUtf8 extends Constant {
     private final String bytes;
 
 
-    static ConstantUtf8 getInstance(DataInput input) throws IOException {
+    static ConstantUtf8 getInstance(final DataInput input) throws IOException {
         return new ConstantUtf8(input.readUTF());
     }
 
@@ -42,8 +41,8 @@ public final class ConstantUtf8 extends Constant {
     /**
      * @param bytes Data
      */
-    private ConstantUtf8(String bytes) {
-        super(Constants.CONSTANT_Utf8);
+    private ConstantUtf8(final String bytes) {
+        super(Const.CONSTANT_Utf8);
         if (bytes == null) {
             throw new IllegalArgumentException("bytes must not be null!");
         }
