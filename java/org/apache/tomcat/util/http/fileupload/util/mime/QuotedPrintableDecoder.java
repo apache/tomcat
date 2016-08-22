@@ -44,7 +44,7 @@ final class QuotedPrintableDecoder {
      * @param out    The output stream used to return the decoded data.
      *
      * @return the number of bytes produced.
-     * @exception IOException if aproblem occurs during either decoding or
+     * @throws IOException if a problem occurs during either decoding or
      *            writing to the stream
      */
     public static int decode(byte[] data, OutputStream out) throws IOException {
