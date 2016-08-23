@@ -16,10 +16,10 @@
  */
 package org.apache.catalina.valves.rewrite;
 
+import java.nio.charset.StandardCharsets;
+
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.nio.charset.StandardCharsets;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
