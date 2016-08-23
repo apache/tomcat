@@ -453,11 +453,12 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             StringBuilder value;
             Object attribute;
 
+            response.setContentType("text/plain");
+            response.setCharacterEncoding("UTF-8");
+
             ServletContext ctx = this.getServletContext();
             HttpSession session = request.getSession(false);
             PrintWriter out = response.getWriter();
-
-            response.setContentType("text/plain");
 
             out.println("CONTEXT-NAME: " + ctx.getServletContextName());
             out.println("CONTEXT-PATH: " + ctx.getContextPath());

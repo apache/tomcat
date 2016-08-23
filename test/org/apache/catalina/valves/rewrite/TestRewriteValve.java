@@ -19,6 +19,8 @@ package org.apache.catalina.valves.rewrite;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
@@ -102,7 +104,28 @@ public class TestRewriteValve extends TomcatBaseTest {
         }
     }
 
+    // https://bz.apache.org/bugzilla/show_bug.cgi?id=60013
+    @Test
+    public void testRewriteWithEncoding01() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*)$ /c/?param=$1 [L]",
+                "/b/\u5728\u7EBF\u6D4B\u8BD5", "/c/", "param=\u5728\u7EBF\u6D4B\u8BD5");
+    }
+
+    // https://bz.apache.org/bugzilla/show_bug.cgi?id=60013
+    // With % encoding
+    @Test
+    public void testRewriteWithEncoding02() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*)$ /c/?param=$1 [L]",
+                "/b/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95", "/c/", "param=\u5728\u7EBF\u6D4B\u8BD5");
+    }
+
     private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
+        doTestRewrite(config, request, expectedURI, null);
+    }
+
+    private void doTestRewrite(String config, String request, String expectedURI,
+            String expectedQueryString) throws Exception {
+
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
@@ -124,10 +147,16 @@ public class TestRewriteValve extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() + request);
+        res.setCharset(StandardCharsets.UTF_8);
 
         String body = res.toString();
         RequestDescriptor requestDesc = SnoopResult.parse(body);
         String requestURI = requestDesc.getRequestInfo("REQUEST-URI");
         Assert.assertEquals(expectedURI, requestURI);
+
+        if (expectedQueryString != null) {
+            String queryString = requestDesc.getRequestInfo("REQUEST-QUERY-STRING");
+            Assert.assertEquals(expectedQueryString, queryString);
+        }
     }
 }
