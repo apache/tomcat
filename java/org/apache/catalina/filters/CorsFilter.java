@@ -827,7 +827,7 @@ public final class CorsFilter extends GenericFilter {
         }
 
         // RFC6454, section 4. "If uri-scheme is file, the implementation MAY
-        // return an implementation-defined value.". No limits are okaced on
+        // return an implementation-defined value.". No limits are placed on
         // that value so treat all file URIs as valid origins.
         if (origin.startsWith("file://")) {
             return true;
