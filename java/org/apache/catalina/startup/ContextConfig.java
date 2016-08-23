@@ -652,6 +652,9 @@ public class ContextConfig implements LifecycleListener {
             }
         }
 
+        // Re-calculate now docBase is a canonical path
+        docBaseInAppBase = docBase.startsWith(appBase.getPath() + File.separatorChar);
+
         if (docBaseInAppBase) {
             docBase = docBase.substring(appBase.getPath().length());
             docBase = docBase.replace(File.separatorChar, '/');
