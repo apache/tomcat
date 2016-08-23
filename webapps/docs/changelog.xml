@@ -162,6 +162,11 @@
         <bug>60008</bug>: When processing CORs requests, treat any origin with a
         URI scheme of <code>file</code> as a valid origin. (markt)
       </fix>
+      <fix>
+        Improve handling of exceptions during a Lifecycle events triggered by a
+        state transition. The exception is now caught and the component is now
+        placed into the <code>FAILED</code> state. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
