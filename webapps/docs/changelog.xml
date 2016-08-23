@@ -158,6 +158,10 @@
         that the global resource is only visible via the
         <code>ResourceLinkFactory</code> when it is meant to be. (markt)
       </add>
+      <fix>
+        <bug>60008</bug>: When processing CORs requests, treat any origin with a
+        URI scheme of <code>file</code> as a valid origin. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

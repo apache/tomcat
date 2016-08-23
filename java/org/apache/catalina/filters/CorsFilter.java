@@ -841,8 +841,14 @@ public final class CorsFilter implements Filter {
             return true;
         }
 
-        URI originURI;
+        // RFC6454, section 4. "If uri-scheme is file, the implementation MAY
+        // return an implementation-defined value.". No limits are okaced on
+        // that value so treat all file URIs as valid origins.
+        if (origin.startsWith("file://")) {
+            return true;
+        }
 
+        URI originURI;
         try {
             originURI = new URI(origin);
         } catch (URISyntaxException e) {
