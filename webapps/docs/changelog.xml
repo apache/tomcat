@@ -167,6 +167,10 @@
         state transition. The exception is now caught and the component is now
         placed into the <code>FAILED</code> state. (markt)
       </fix>
+      <fix>
+        <bug>60022</bug>: Improve handling when a WAR file and/or the associated
+        exploded directory are symlinked into the <code>appBase</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
