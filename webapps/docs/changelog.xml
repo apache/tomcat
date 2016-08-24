@@ -263,7 +263,7 @@
       </fix>
       <fix>
         <bug>60034</bug>: Correct a typo in the Manager How-To page of the
-        documentation web application. (markt) 
+        documentation web application. (markt)
       </fix>
     </changelog>
   </subsection>

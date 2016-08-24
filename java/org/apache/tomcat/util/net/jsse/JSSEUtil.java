@@ -32,6 +32,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.X509CertSelector;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -50,6 +51,7 @@ import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -275,7 +277,16 @@ public class JSSEUtil extends SSLUtilBase {
             }
         }
 
-        return tms;
+        if (tms == null) {
+            return tms;
+        }
+
+        TrustManager[] result = new TrustManager[tms.length];
+
+        for (int i = 0; i < tms.length; i++) {
+            result[i] = new DebugTrustManager((X509TrustManager) tms[i]);
+        }
+        return result;
     }
 
     @Override
@@ -339,5 +350,31 @@ public class JSSEUtil extends SSLUtilBase {
             throw ce;
         }
         return crls;
+    }
+
+
+    private static class DebugTrustManager implements X509TrustManager {
+
+        private final X509TrustManager tm;
+
+        private DebugTrustManager(X509TrustManager tm) {
+            this.tm = tm;
+        }
+
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            tm.checkClientTrusted(chain, authType);
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+            tm.checkServerTrusted(chain, authType);
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return tm.getAcceptedIssuers();
+        }
     }
 }
