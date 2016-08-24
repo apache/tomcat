@@ -211,6 +211,12 @@
         <bug>60030</bug>: Correct a potential infinite loop in the SNI parsing
         code triggered by failing to handle an end of stream condition. (markt)
       </fix>
+      <fix>
+        Refactor the JSSE client certificate validation so that the
+        effectiveness of the <code>certificateVerificationDepth</code>
+        configuration attribute does not depend on the presence of a certificate
+        revokation list. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
