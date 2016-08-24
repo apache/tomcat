@@ -171,6 +171,9 @@
         <bug>60022</bug>: Improve handling when a WAR file and/or the associated
         exploded directory are symlinked into the <code>appBase</code>. (markt)
       </fix>
+      <fix>
+        Fix a file descriptor leak when reading the global web.xml. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
