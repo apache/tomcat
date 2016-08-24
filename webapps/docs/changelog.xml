@@ -261,6 +261,10 @@
         Update NIO Connector configuration documentation with an information
         about <code>socket.directSslBuffer</code>. (violetagg)
       </fix>
+      <fix>
+        <bug>60034</bug>: Correct a typo in the Manager How-To page of the
+        documentation web application. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
