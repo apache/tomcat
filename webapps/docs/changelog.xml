@@ -274,6 +274,10 @@
         <bug>60034</bug>: Correct a typo in the Manager How-To page of the
         documentation web application. (markt)
       </fix>
+      <fix>
+        Correct the name of the CRL location configuration attributes in the
+        documentation web application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">

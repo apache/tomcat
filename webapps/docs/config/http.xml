@@ -1080,7 +1080,7 @@
 
   <attributes>
 
-    <attribute name="certificateRevocationFile" required="false">
+    <attribute name="certificateRevocationListFile" required="false">
       <p>Name of the file that contains the concatenated certificate revocation
       lists for the certificate authorities. The format is PEM-encoded. If not
       defined, client certificates will not be checked against a certificate
@@ -1090,7 +1090,7 @@
       connectors may also specify a URL for this attribute.</p>
     </attribute>
 
-    <attribute name="certificateRevocationPath" required="false">
+    <attribute name="certificateRevocationListPath" required="false">
       <p>OpenSSL only.</p>
       <p>Name of the directory that contains the certificate revocation lists
       for the certificate authorities. The format is PEM-encoded. Relative paths
