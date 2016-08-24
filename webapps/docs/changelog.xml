@@ -219,6 +219,10 @@
         <code>mbeans-descriptors-howto.html</code>. Patch provided by Radoslav
         Husar. (violetagg)
       </fix>
+      <fix>
+        <bug>60034</bug>: Correct a typo in the Manager How-To page of the
+        documentation web application. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">

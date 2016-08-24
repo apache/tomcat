@@ -974,7 +974,7 @@ on each of deployed web applications will be available.</p>
     The JMX Proxy Servlet is a lightweight proxy to get and set the
     tomcat internals. (Or any class that has been exposed via an MBean)
     Its usage is not very user friendly but the UI is
-    extremely help for integrating command line scripts for monitoring
+    extremely helpful for integrating command line scripts for monitoring
     and changing the internals of tomcat. You can do two things with the proxy:
     get information and set information. For you to really understand the
     JMX Proxy Servlet, you should have a general understanding of JMX.
