@@ -178,6 +178,8 @@ public final class AstFunction extends SimpleNode {
                                 varargs[j-i] = parameters.jjtGetChild(j).getValue(ctx);
                                 varargs[j-i] = coerceToType(ctx, varargs[j-i], target);
                             }
+                            params[i] = varargs;
+                            params[i] = coerceToType(ctx, params[i], paramTypes[i]);
                         }
                     } else {
                         params[i] = parameters.jjtGetChild(i).getValue(ctx);
