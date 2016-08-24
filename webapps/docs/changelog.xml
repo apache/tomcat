@@ -89,8 +89,8 @@
         processing by default. (markt)
       </fix>
       <fix>
-        <bug>59839</bug>: Apply <code>roleSearchAsUser</code> to all nested searches
-        in JNDIRealm. (fschumacher)
+        <bug>59839</bug>: Apply <code>roleSearchAsUser</code> to all nested
+        searches in JNDIRealm. (fschumacher)
       </fix>
       <fix>
         <bug>59859</bug>: Fix resource leak in WebDAV servlet. Based on patch by
