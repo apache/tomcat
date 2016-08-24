@@ -22,6 +22,18 @@ public class TesterFunctions {
         return input.trim();
     }
 
+    public static String concat(String... inputs) {
+        if (inputs == null || inputs.length == 0) {
+            return null;
+        }
+        StringBuilder result = new StringBuilder();
+        for (String input : inputs) {
+            result.append(input);
+        }
+        return result.toString();
+    }
+
+
     public static class Inner$Class {
 
         public static final String RETVAL = "Return from bug49555";
