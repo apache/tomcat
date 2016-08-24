@@ -204,6 +204,10 @@
         Ensure that <code>Semaphore.release</code> is called in all cases. Even
         when there is an exception. (violetagg)
       </fix>
+      <fix>
+        <bug>60030</bug>: Correct a potential infinite loop in the SNI parsing
+        code triggered by failing to handle an end of stream condition. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
