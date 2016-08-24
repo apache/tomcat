@@ -257,7 +257,12 @@ public class SecureNioChannel extends NioChannel  {
      */
     private int processSNI() throws IOException {
         // Read some data into the network input buffer so we can peek at it.
-        sc.read(netInBuffer);
+        int bytesRead = sc.read(netInBuffer);
+        if (bytesRead == -1) {
+            // Reached end of stream before SNI could be processed. Treat this
+            // as if no SNI was present.
+            return 0;
+        }
         TLSClientHelloExtractor extractor = new TLSClientHelloExtractor(netInBuffer);
 
         while (extractor.getResult() == ExtractorResult.UNDERFLOW &&
