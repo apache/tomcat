@@ -31,7 +31,7 @@
       java.lang.String trim(java.lang.String)
     </function-signature>
   </function>
-  
+
   <function>
     <name>concat</name>
     <function-class>org.apache.el.TesterFunctions</function-class>
@@ -39,5 +39,5 @@
       java.lang.String concat(java.lang.String[])
     </function-signature>
   </function>
-  
+
 </taglib>
