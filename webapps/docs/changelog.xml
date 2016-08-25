@@ -154,6 +154,12 @@
       <fix>
         Fix a file descriptor leak when reading the global web.xml. (markt)
       </fix>
+      <fix>
+        <bug>60041</bug>: Better error message if a JAR is deleted while a web
+        application is running. Note: Deleting a JAR while the application is
+        running is not supported and errors are expected. Based on a patch by
+        gehui. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

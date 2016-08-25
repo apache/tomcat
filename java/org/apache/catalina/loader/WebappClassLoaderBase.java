@@ -156,9 +156,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     private static final String CLASS_FILE_SUFFIX = ".class";
 
     private static final Manifest MANIFEST_UNKNOWN = new Manifest();
-    
+
     private static final Method GET_CLASSLOADING_LOCK_METHOD;
-    
+
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     static {
@@ -176,7 +176,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     }
                 });
                 registerParallel.invoke(null);
-                getClassLoadingLockMethod = 
+                getClassLoadingLockMethod =
                         ClassLoader.class.getDeclaredMethod("getClassLoadingLock", String.class);
             }
         } catch (Exception e) {
@@ -187,7 +187,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         JVM_THREAD_GROUP_NAMES.add("RMI Runtime");
     }
 
-    
+
     protected class PrivilegedFindResourceByName
         implements PrivilegedAction<ResourceEntry> {
 
@@ -963,7 +963,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     }
 
-    
+
     protected void copyStateWithoutTransformers(WebappClassLoaderBase base) {
         base.antiJARLocking = this.antiJARLocking;
         base.resources = this.resources;
@@ -993,7 +993,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         base.searchExternalFirst = this.searchExternalFirst;
     }
 
-    
+
    /**
      * Add a new repository to the set of places this ClassLoader can look for
      * classes to be loaded.
@@ -1443,7 +1443,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         URL url = null;
         String path = nameToPath(name);
-        
+
         if (hasExternalRepositories && searchExternalFirst)
             url = super.findResource(name);
 
@@ -1770,7 +1770,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (log.isDebugEnabled())
                 log.debug("loadClass(" + name + ", " + resolve + ")");
             Class<?> clazz = null;
-    
+
             // Log access to stopped classloader
             if (!started) {
                 try {
@@ -1779,7 +1779,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     log.info(sm.getString("webappClassLoader.stopped", name), e);
                 }
             }
-    
+
             // (0) Check our previously loaded local class cache
             clazz = findLoadedClass0(name);
             if (clazz != null) {
@@ -1789,7 +1789,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     resolveClass(clazz);
                 return (clazz);
             }
-    
+
             // (0.1) Check our previously loaded class cache
             clazz = findLoadedClass(name);
             if (clazz != null) {
@@ -1799,7 +1799,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     resolveClass(clazz);
                 return (clazz);
             }
-    
+
             // (0.2) Try loading the class with the system class loader, to prevent
             //       the webapp from overriding J2SE classes
             try {
@@ -1812,7 +1812,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             } catch (ClassNotFoundException e) {
                 // Ignore
             }
-    
+
             // (0.5) Permission to access this class when using a SecurityManager
             if (securityManager != null) {
                 int i = name.lastIndexOf('.');
@@ -1833,9 +1833,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     }
                 }
             }
-    
+
             boolean delegateLoad = delegate || filter(name);
-    
+
             // (1) Delegate to our parent if requested
             if (delegateLoad) {
                 if (log.isDebugEnabled())
@@ -1853,7 +1853,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     // Ignore
                 }
             }
-    
+
             // (2) Search local repositories
             if (log.isDebugEnabled())
                 log.debug("  Searching local repositories");
@@ -1869,7 +1869,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             } catch (ClassNotFoundException e) {
                 // Ignore
             }
-    
+
             // (3) Delegate to parent unconditionally
             if (!delegateLoad) {
                 if (log.isDebugEnabled())
@@ -1888,7 +1888,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 }
             }
         }
-        
+
         throw new ClassNotFoundException(name);
     }
 
@@ -1903,8 +1903,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
         return this;
     }
-    
-    
+
+
     /**
      * Get the Permissions for a CodeSource.  If this instance
      * of WebappClassLoaderBase is for a web application context,
@@ -2102,7 +2102,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 break;
             }
         }
-        
+
     }
 
 
@@ -3098,9 +3098,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     try {
                         jarFiles[i] = new JarFile(jarRealFiles[i]);
                     } catch (IOException e) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("Failed to open JAR", e);
-                        }
+                        log.warn(sm.getString("webappClassLoader.jarOpenFail", jarFiles[i]), e);
+                        closeJARs(true);
                         return false;
                     }
                 }
@@ -3613,8 +3612,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         path.append(name);
         return path.toString();
     }
-    
-    
+
+
     /**
      * Returns true if the specified package name is sealed according to the
      * given manifest.
