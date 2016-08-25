@@ -217,6 +217,10 @@
         configuration attribute does not depend on the presence of a certificate
         revokation list. (markt)
       </fix>
+      <fix>
+        Small logging optimization in the <code>Rfc6265CookieProcessor</code>.
+        Patch provided by Svetlin Zarev. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
