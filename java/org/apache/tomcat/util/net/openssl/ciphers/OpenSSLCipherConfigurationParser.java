@@ -421,6 +421,10 @@ public class OpenSSLCipherConfigurationParser {
         List<Cipher> allCiphersList = Arrays.asList(Cipher.values());
         Collections.reverse(allCiphersList);
         LinkedHashSet<Cipher> allCiphers = defaultSort(new LinkedHashSet<>(allCiphersList));
+        // OpenSSL has disabled 3DES by default so remove it from the set of
+        // known ciphers
+        allCiphers.removeAll(filterByEncryption(allCiphers, Collections.singleton(Encryption.TRIPLE_DES)));
+
         addListAlias(eNULL, filterByEncryption(allCiphers, Collections.singleton(Encryption.eNULL)));
         LinkedHashSet<Cipher> all = new LinkedHashSet<>(allCiphers);
         remove(all, eNULL);
@@ -524,7 +528,7 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(SRP, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.SRP)));
         initialized = true;
         // Despite what the OpenSSL docs say, DEFAULT also excludes SSLv2
-        addListAlias(DEFAULT, parse("ALL:!EXPORT:!eNULL:!aNULL:!SSLv2:!DES:!RC2:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM"));
+        addListAlias(DEFAULT, parse("ALL:!EXPORT:!eNULL:!aNULL:!SSLv2:!DES:!RC2:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM:!3DES"));
         // COMPLEMENTOFDEFAULT is also not exactly as defined by the docs
         LinkedHashSet<Cipher> complementOfDefault = filterByKeyExchange(all, new HashSet<>(Arrays.asList(KeyExchange.EDH,KeyExchange.EECDH)));
         complementOfDefault = filterByAuthentication(complementOfDefault, Collections.singleton(Authentication.aNULL));
@@ -532,6 +536,7 @@ public class OpenSSLCipherConfigurationParser {
         complementOfDefault.addAll(aliases.get(Constants.SSL_PROTO_SSLv2));
         complementOfDefault.addAll(aliases.get(EXPORT));
         complementOfDefault.addAll(aliases.get(DES));
+        complementOfDefault.addAll(aliases.get(TRIPLE_DES));
         complementOfDefault.addAll(aliases.get(RC2));
         complementOfDefault.addAll(aliases.get(RC4));
         complementOfDefault.addAll(aliases.get(aDSS));
