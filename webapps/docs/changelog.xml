@@ -221,6 +221,10 @@
         Small logging optimization in the <code>Rfc6265CookieProcessor</code>.
         Patch provided by Svetlin Zarev. (markt)
       </fix>
+      <fix>
+        OpenSSl now disables 3DES by default so reflect this when using OpenSSL
+        syntax to select ciphers. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
