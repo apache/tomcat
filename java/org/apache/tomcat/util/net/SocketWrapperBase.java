@@ -351,6 +351,33 @@ public abstract class SocketWrapperBase<E> {
 
 
     /**
+     * Writes the provided data to the socket, buffering any remaining data if
+     * used in non-blocking mode.
+     *
+     * @param block  <code>true</code> if a blocking write should be used,
+     *               otherwise a non-blocking write will be used
+     * @param from   The ByteBuffer containing the data to be written
+     *
+     * @throws IOException If an IO error occurs during the write
+     */
+    public final void write(boolean block, ByteBuffer from) throws IOException {
+        if (from == null || from.remaining() == 0) {
+            return;
+        }
+
+        // While the implementations for blocking and non-blocking writes are
+        // very similar they have been split into separate methods to allow
+        // sub-classes to override them individually. NIO2, for example,
+        // overrides the non-blocking write but not the blocking write.
+        if (block) {
+            writeBlocking(from);
+        } else {
+            writeNonBlocking(from);
+        }
+    }
+
+
+    /**
      * Transfers the data to the socket write buffer (writing that data to the
      * socket if the buffer fills up using a blocking write) until all the data
      * has been transferred and space remains in the socket write buffer.
@@ -377,6 +404,54 @@ public abstract class SocketWrapperBase<E> {
             doWrite(true);
             socketBufferHandler.configureWriteBufferForWrite();
             thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
+        }
+    }
+
+
+    /**
+     * Write the data to the socket (writing that data to the socket using a
+     * blocking write) until all the data has been transferred and space remains
+     * in the socket write buffer. If it is possible use the provided buffer
+     * directly and do not transfer to the socket write buffer.
+     *
+     * @param from The ByteBuffer containing the data to be written
+     *
+     * @throws IOException If an IO error occurs during the write
+     */
+    protected void writeBlocking(ByteBuffer from) throws IOException {
+        // Note: There is an implementation assumption that if the switch from
+        // non-blocking to blocking has been made then any pending
+        // non-blocking writes were flushed at the time the switch
+        // occurred.
+
+        // If it is possible write the data to the socket directly from the
+        // provided buffer otherwise transfer it to the socket write buffer
+        if (socketBufferHandler.isWriteBufferEmpty()) {
+            writeBlockingInternal(from);
+        } else {
+            socketBufferHandler.configureWriteBufferForWrite();
+            transfer(from, socketBufferHandler.getWriteBuffer());
+            if (!socketBufferHandler.isWriteBufferWritable()) {
+                doWrite(true);
+                writeBlockingInternal(from);
+            }
+        }
+    }
+
+
+    private void writeBlockingInternal(ByteBuffer from) throws IOException {
+        // The socket write buffer capacity is socket.appWriteBufSize
+        int limit = socketBufferHandler.getWriteBuffer().capacity();
+        int fromLimit = from.limit();
+        while (from.remaining() >= limit) {
+            from.limit(from.position() + limit);
+            doWrite(true, from);
+            from.limit(fromLimit);
+        }
+
+        if (from.remaining() > 0) {
+            socketBufferHandler.configureWriteBufferForWrite();
+            transfer(from, socketBufferHandler.getWriteBuffer());
         }
     }
 
@@ -418,6 +493,66 @@ public abstract class SocketWrapperBase<E> {
             // Remaining data must be buffered
             addToBuffers(buf, off, len);
         }
+    }
+
+
+    /**
+     * Writes the data to the socket (writing that data to the socket using a
+     * non-blocking write) until either all the data has been transferred and
+     * space remains in the socket write buffer or a non-blocking write leaves
+     * data in the socket write buffer. If it is possible use the provided
+     * buffer directly and do not transfer to the socket write buffer.
+     *
+     * @param from The ByteBuffer containing the data to be written
+     *
+     * @throws IOException If an IO error occurs during the write
+     */
+    protected void writeNonBlocking(ByteBuffer from) throws IOException {
+        if (bufferedWrites.size() == 0 && socketBufferHandler.isWriteBufferWritable()) {
+            if (socketBufferHandler.isWriteBufferEmpty()) {
+                writeNonBlockingInternal(from);
+            } else {
+                socketBufferHandler.configureWriteBufferForWrite();
+                transfer(from, socketBufferHandler.getWriteBuffer());
+                if (!socketBufferHandler.isWriteBufferWritable()) {
+                    doWrite(false);
+                    if (socketBufferHandler.isWriteBufferWritable()) {
+                        writeNonBlockingInternal(from);
+                    }
+                }
+            }
+        }
+
+        if (from.remaining() > 0) {
+            // Remaining data must be buffered
+            addToBuffers(from);
+        }
+    }
+
+
+    private boolean writeNonBlockingInternal(ByteBuffer from) throws IOException {
+        // The socket write buffer capacity is socket.appWriteBufSize
+        int limit = socketBufferHandler.getWriteBuffer().capacity();
+        int fromLimit = from.limit();
+        while (from.remaining() >= limit) {
+            int newLimit = from.position() + limit;
+            from.limit(newLimit);
+            doWrite(false, from);
+            from.limit(fromLimit);
+            if (from.position() != newLimit) {
+                // Didn't write the whole amount of data in the last
+                // non-blocking write.
+                // Exit the loop.
+                return false;
+            }
+        }
+
+        if (from.remaining() > 0) {
+            socketBufferHandler.configureWriteBufferForWrite();
+            transfer(from, socketBufferHandler.getWriteBuffer());
+        }
+
+        return socketBufferHandler.isWriteBufferWritable();
     }
 
 
@@ -897,15 +1032,19 @@ public abstract class SocketWrapperBase<E> {
 
     protected static int transfer(byte[] from, int offset, int length, ByteBuffer to) {
         int max = Math.min(length, to.remaining());
-        to.put(from, offset, max);
+        if (max > 0) {
+            to.put(from, offset, max);
+        }
         return max;
     }
 
     protected static void transfer(ByteBuffer from, ByteBuffer to) {
         int max = Math.min(from.remaining(), to.remaining());
-        int fromLimit = from.limit();
-        from.limit(from.position() + max);
-        to.put(from);
-        from.limit(fromLimit);
+        if (max > 0) {
+            int fromLimit = from.limit();
+            from.limit(from.position() + max);
+            to.put(from);
+            from.limit(fromLimit);
+        }
     }
 }
