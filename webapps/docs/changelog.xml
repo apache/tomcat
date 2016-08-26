@@ -223,6 +223,10 @@
         Use the proper ERROR socket status code for async errors with NIO2.
         (remm)
       </fix>
+      <fix>
+        <bug>60035</bug>: Fix a potential connection leak if the client drops a
+        TLS connection before the handshake completes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
