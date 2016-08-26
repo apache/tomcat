@@ -225,6 +225,10 @@
         OpenSSl now disables 3DES by default so reflect this when using OpenSSL
         syntax to select ciphers. (markt)
       </fix>
+      <fix>
+        Use the proper ERROR socket status code for async errors with NIO2.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
