@@ -1608,14 +1608,15 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 int handshake = -1;
 
                 try {
-                    // For STOP there is no point trying to handshake as the
-                    // Poller has been stopped.
-                    if (!socketWrapper.getSocket().isHandshakeComplete() && event == SocketEvent.ERROR) {
-                        handshake = -1;
-                    } else if (socketWrapper.getSocket().isHandshakeComplete() ||
-                            event == SocketEvent.STOP ||
-                            event == SocketEvent.ERROR) {
+                    if (socketWrapper.getSocket().isHandshakeComplete()) {
+                        // No TLS handshaking required. Let the handler
+                        // process this socket / event combination.
                         handshake = 0;
+                    } else if (event == SocketEvent.STOP || event == SocketEvent.DISCONNECT ||
+                            event == SocketEvent.ERROR) {
+                        // Unable to complete the TLS handshake. Treat it as
+                        // if the handshake failed.
+                        handshake = -1;
                     } else {
                         handshake = socketWrapper.getSocket().handshake();
                         // The handshake process reads/writes from/to the
