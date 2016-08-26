@@ -25,6 +25,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SelectionKey;
@@ -1207,9 +1208,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
 
         @Override
-        protected void doWrite(boolean block) throws IOException {
-            socketBufferHandler.configureWriteBufferForRead();
-
+        protected void doWrite(boolean block, ByteBuffer from) throws IOException {
             long writeTimeout = getWriteTimeout();
             Selector selector = null;
             try {
@@ -1218,12 +1217,13 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 // Ignore
             }
             try {
-                pool.write(socketBufferHandler.getWriteBuffer(), getSocket(),
-                        selector, writeTimeout, block);
+                pool.write(from, getSocket(), selector, writeTimeout, block);
                 if (block) {
                     // Make sure we are flushed
                     do {
-                        if (getSocket().flush(true, selector, writeTimeout)) break;
+                        if (getSocket().flush(true, selector, writeTimeout)) {
+                            break;
+                        }
                     } while (true);
                 }
                 updateLastWrite();

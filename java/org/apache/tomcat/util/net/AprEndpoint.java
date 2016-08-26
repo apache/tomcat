@@ -2441,7 +2441,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
         @Override
-        protected void doWrite(boolean block) throws IOException {
+        protected void doWrite(boolean block, ByteBuffer from) throws IOException {
             if (closed) {
                 throw new IOException(sm.getString("socket.apr.closed", getSocket()));
             }
@@ -2455,7 +2455,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     if (block) {
                         Socket.timeoutSet(getSocket().longValue(), getWriteTimeout() * 1000);
                     }
-                    doWriteInternal();
+                    doWriteInternal(from);
                     return;
                 }
             } finally {
@@ -2476,7 +2476,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 readLock.lock();
                 try {
                     writeLock.unlock();
-                    doWriteInternal();
+                    doWriteInternal(from);
                 } finally {
                     readLock.unlock();
                 }
@@ -2490,18 +2490,16 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         }
 
 
-        private void doWriteInternal() throws IOException {
+        private void doWriteInternal(ByteBuffer from) throws IOException {
             int thisTime;
 
-            ByteBuffer socketWriteBuffer = socketBufferHandler.getWriteBuffer();
             do {
                 thisTime = 0;
                 if (getEndpoint().isSSLEnabled()) {
                     if (sslOutputBuffer.remaining() == 0) {
                         // Buffer was fully written last time around
                         sslOutputBuffer.clear();
-                        socketBufferHandler.configureWriteBufferForRead();
-                        transfer(socketWriteBuffer, sslOutputBuffer);
+                        transfer(from, sslOutputBuffer);
                         sslOutputBuffer.flip();
                     } else {
                         // Buffer still has data from previous attempt to write
@@ -2514,11 +2512,10 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         sslOutputBuffer.position(sslOutputBuffer.position() + thisTime);
                     }
                 } else {
-                    socketBufferHandler.configureWriteBufferForRead();
-                    thisTime = Socket.sendb(getSocket().longValue(), socketWriteBuffer,
-                            socketWriteBuffer.position(), socketWriteBuffer.remaining());
+                    thisTime = Socket.sendb(getSocket().longValue(), from, from.position(),
+                            from.remaining());
                     if (thisTime > 0) {
-                        socketWriteBuffer.position(socketWriteBuffer.position() + thisTime);
+                        from.position(from.position() + thisTime);
                     }
                 }
                 if (Status.APR_STATUS_IS_EAGAIN(-thisTime)) {
@@ -2533,7 +2530,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     throw new IOException(sm.getString("socket.apr.write.error",
                             Integer.valueOf(-thisTime), getSocket(), this));
                 }
-            } while ((thisTime > 0 || getBlockingStatus()) && socketWriteBuffer.hasRemaining());
+            } while ((thisTime > 0 || getBlockingStatus()) && from.hasRemaining());
 
             // If there is data left in the buffer the socket will be registered for
             // write further up the stack. This is to ensure the socket is only
