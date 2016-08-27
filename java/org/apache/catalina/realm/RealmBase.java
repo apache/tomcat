@@ -401,23 +401,44 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      */
     @Override
     public Principal authenticate(String username, String credentials) {
-
-        String serverCredentials = getPassword(username);
-
-        boolean validated = compareCredentials(credentials, serverCredentials);
-        if (!validated) {
+        // No user or no credentials
+        // Can't possibly authenticate, don't bother doing anything.
+        if(username == null || credentials == null) {
             if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("realmBase.authenticateFailure",
                                                 username));
             }
             return null;
         }
-        if (containerLog.isTraceEnabled()) {
-            containerLog.trace(sm.getString("realmBase.authenticateSuccess",
-                                            username));
+
+        // Look up the user's credentials
+        String serverCredentials = getPassword(username);
+
+        if (serverCredentials == null) {
+            // User was not found
+
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace(sm.getString("realmBase.authenticateFailure",
+                                                username));
+            }
+            return null;
         }
 
-        return getPrincipal(username);
+        boolean validated = compareCredentials(credentials, serverCredentials);
+
+        if (validated) {
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace(sm.getString("realmBase.authenticateSuccess",
+                                                username));
+            }
+            return getPrincipal(username);
+        } else {
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace(sm.getString("realmBase.authenticateFailure",
+                                                username));
+            }
+            return null;
+        }
     }
 
 
