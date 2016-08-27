@@ -26,9 +26,9 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testDEFAULT() throws Exception {
-        // NULL, RC4, DSS, SEED, IDEA, CAMELLIA and SEC-CCM were removed from default in 1.1.0-dev
         if (TesterOpenSSL.VERSION < 10100) {
-            testSpecification("DEFAULT:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM");
+            // Account for classes of ciphers removed from DEFAULT in 1.1.0
+            testSpecification("DEFAULT:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM:!3DES");
         } else {
             testSpecification("DEFAULT");
         }
@@ -37,9 +37,9 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testCOMPLEMENTOFDEFAULT() throws Exception {
-        // NULL, RC4, DSS, SEED, IDEA, CAMELLIA and SEC-CCM were removed from default in 1.1.0-dev
         if (TesterOpenSSL.VERSION < 10100) {
-            testSpecification("COMPLEMENTOFDEFAULT:RC4:DSS:SEED:IDEA:CAMELLIA:AESCCM:aNULL");
+            // Account for classes of ciphers removed from DEFAULT in 1.1.0
+            testSpecification("COMPLEMENTOFDEFAULT:RC4:DSS:SEED:IDEA:CAMELLIA:AESCCM:aNULL:3DES");
         } else {
             testSpecification("COMPLEMENTOFDEFAULT");
         }
