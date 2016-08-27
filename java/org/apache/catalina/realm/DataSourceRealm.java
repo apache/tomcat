@@ -287,16 +287,26 @@ public class DataSourceRealm extends RealmBase {
      * @return the associated principal, or <code>null</code> if there is none.
      */
     protected Principal authenticate(Connection dbConnection,
-                                               String username,
-                                               String credentials) {
+                                     String username,
+                                     String credentials) {
+        // No user or no credentials
+        // Can't possibly authenticate, don't bother the database then
+        if (username == null || credentials == null) {
+            if (containerLog.isTraceEnabled())
+                containerLog.trace(sm.getString("dataSourceRealm.authenticateFailure",
+                                                username));
+            return null;
+        }
 
+        // Look up the user's credentials
         String dbCredentials = getPassword(dbConnection, username);
 
-        if (credentials == null || dbCredentials == null) {
+        if(dbCredentials == null) {
+            // User was not found in the database.
+
             if (containerLog.isTraceEnabled())
-                containerLog.trace(
-                    sm.getString("dataSourceRealm.authenticateFailure",
-                                 username));
+                containerLog.trace(sm.getString("dataSourceRealm.authenticateFailure",
+                                                username));
             return null;
         }
 
@@ -305,15 +315,13 @@ public class DataSourceRealm extends RealmBase {
 
         if (validated) {
             if (containerLog.isTraceEnabled())
-                containerLog.trace(
-                    sm.getString("dataSourceRealm.authenticateSuccess",
-                                 username));
+                containerLog.trace(sm.getString("dataSourceRealm.authenticateSuccess",
+                                                username));
         } else {
             if (containerLog.isTraceEnabled())
-                containerLog.trace(
-                    sm.getString("dataSourceRealm.authenticateFailure",
-                                 username));
-            return (null);
+                containerLog.trace(sm.getString("dataSourceRealm.authenticateFailure",
+                                                username));
+            return null;
         }
 
         ArrayList<String> list = getRoles(dbConnection, username);
