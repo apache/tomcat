@@ -2306,6 +2306,42 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         }
 
 
+        @Override
+        public int read(boolean block, ByteBuffer to) throws IOException {
+            int nRead = populateReadBuffer(to);
+            if (nRead > 0) {
+                to.flip();
+                return nRead;
+                /*
+                 * Since more bytes may have arrived since the buffer was last
+                 * filled, it is an option at this point to perform a
+                 * non-blocking read. However correctly handling the case if
+                 * that read returns end of stream adds complexity. Therefore,
+                 * at the moment, the preference is for simplicity.
+                 */
+            }
+
+            // The socket read buffer capacity is socket.appReadBufSize
+            int limit = socketBufferHandler.getReadBuffer().capacity();
+            if (to.remaining() >= limit) {
+                to.limit(to.position() + limit);
+                nRead = fillReadBuffer(block, to);
+                to.flip();
+            } else {
+                // Fill the read buffer as best we can.
+                nRead = fillReadBuffer(block);
+
+                // Fill as much of the remaining byte array as possible with the
+                // data that was just read
+                if (nRead > 0) {
+                    nRead = populateReadBuffer(to);
+                    to.flip();
+                }
+            }
+            return nRead;
+        }
+
+
         private int fillReadBuffer(boolean block) throws IOException {
             socketBufferHandler.configureReadBufferForWrite();
             return fillReadBuffer(block, socketBufferHandler.getReadBuffer());
