@@ -1174,31 +1174,35 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
 
         private int fillReadBuffer(boolean block) throws IOException {
+            socketBufferHandler.configureReadBufferForWrite();
+            return fillReadBuffer(block, socketBufferHandler.getReadBuffer());
+        }
+
+
+        private int fillReadBuffer(boolean block, ByteBuffer to) throws IOException {
             int nRead;
             NioChannel channel = getSocket();
-            socketBufferHandler.configureReadBufferForWrite();
             if (block) {
                 Selector selector = null;
                 try {
                     selector = pool.get();
-                } catch ( IOException x ) {
+                } catch (IOException x) {
                     // Ignore
                 }
                 try {
-                    NioEndpoint.NioSocketWrapper att =
-                            (NioEndpoint.NioSocketWrapper) channel.getAttachment();
+                    NioEndpoint.NioSocketWrapper att = (NioEndpoint.NioSocketWrapper) channel
+                            .getAttachment();
                     if (att == null) {
                         throw new IOException("Key must be cancelled.");
                     }
-                    nRead = pool.read(socketBufferHandler.getReadBuffer(),
-                            channel, selector, att.getReadTimeout());
+                    nRead = pool.read(to, channel, selector, att.getReadTimeout());
                 } finally {
                     if (selector != null) {
                         pool.put(selector);
                     }
                 }
             } else {
-                nRead = channel.read(socketBufferHandler.getReadBuffer());
+                nRead = channel.read(to);
                 if (nRead == -1) {
                     throw new EOFException();
                 }

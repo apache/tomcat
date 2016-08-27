@@ -1081,11 +1081,15 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
          */
         private int fillReadBuffer(boolean block) throws IOException {
             socketBufferHandler.configureReadBufferForWrite();
+            return fillReadBuffer(block, socketBufferHandler.getReadBuffer());
+        }
+
+        private int fillReadBuffer(boolean block, ByteBuffer to) throws IOException {
             int nRead = 0;
             Future<Integer> integer = null;
             if (block) {
                 try {
-                    integer = getSocket().read(socketBufferHandler.getReadBuffer());
+                    integer = getSocket().read(to);
                     nRead = integer.get(getNio2ReadTimeout(), TimeUnit.MILLISECONDS).intValue();
                 } catch (ExecutionException e) {
                     if (e.getCause() instanceof IOException) {
@@ -1105,11 +1109,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 }
             } else {
                 Nio2Endpoint.startInline();
-                getSocket().read(socketBufferHandler.getReadBuffer(), getNio2ReadTimeout(),
-                        TimeUnit.MILLISECONDS, this, readCompletionHandler);
+                getSocket().read(to, getNio2ReadTimeout(), TimeUnit.MILLISECONDS, this,
+                        readCompletionHandler);
                 Nio2Endpoint.endInline();
                 if (readPending.availablePermits() == 1) {
-                    nRead = socketBufferHandler.getReadBuffer().position();
+                    nRead = to.position();
                 }
             }
             return nRead;
