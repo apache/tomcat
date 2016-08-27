@@ -427,19 +427,19 @@ public abstract class SocketWrapperBase<E> {
         // If it is possible write the data to the socket directly from the
         // provided buffer otherwise transfer it to the socket write buffer
         if (socketBufferHandler.isWriteBufferEmpty()) {
-            writeBlockingInternal(from);
+            writeByteBufferBlocking(from);
         } else {
             socketBufferHandler.configureWriteBufferForWrite();
             transfer(from, socketBufferHandler.getWriteBuffer());
             if (!socketBufferHandler.isWriteBufferWritable()) {
                 doWrite(true);
-                writeBlockingInternal(from);
+                writeByteBufferBlocking(from);
             }
         }
     }
 
 
-    private void writeBlockingInternal(ByteBuffer from) throws IOException {
+    private void writeByteBufferBlocking(ByteBuffer from) throws IOException {
         // The socket write buffer capacity is socket.appWriteBufSize
         int limit = socketBufferHandler.getWriteBuffer().capacity();
         int fromLimit = from.limit();
@@ -509,18 +509,7 @@ public abstract class SocketWrapperBase<E> {
      */
     protected void writeNonBlocking(ByteBuffer from) throws IOException {
         if (bufferedWrites.size() == 0 && socketBufferHandler.isWriteBufferWritable()) {
-            if (socketBufferHandler.isWriteBufferEmpty()) {
-                writeNonBlockingInternal(from);
-            } else {
-                socketBufferHandler.configureWriteBufferForWrite();
-                transfer(from, socketBufferHandler.getWriteBuffer());
-                if (!socketBufferHandler.isWriteBufferWritable()) {
-                    doWrite(false);
-                    if (socketBufferHandler.isWriteBufferWritable()) {
-                        writeNonBlockingInternal(from);
-                    }
-                }
-            }
+            writeNonBlockingInternal(from);
         }
 
         if (from.remaining() > 0) {
@@ -531,6 +520,24 @@ public abstract class SocketWrapperBase<E> {
 
 
     private boolean writeNonBlockingInternal(ByteBuffer from) throws IOException {
+        if (socketBufferHandler.isWriteBufferEmpty()) {
+            return writeByteBufferNonBlocking(from);
+        } else {
+            socketBufferHandler.configureWriteBufferForWrite();
+            transfer(from, socketBufferHandler.getWriteBuffer());
+            if (!socketBufferHandler.isWriteBufferWritable()) {
+                doWrite(false);
+                if (socketBufferHandler.isWriteBufferWritable()) {
+                    return writeByteBufferNonBlocking(from);
+                }
+            }
+        }
+
+        return !socketBufferHandler.isWriteBufferWritable();
+    }
+
+
+    private boolean writeByteBufferNonBlocking(ByteBuffer from) throws IOException {
         // The socket write buffer capacity is socket.appWriteBufSize
         int limit = socketBufferHandler.getWriteBuffer().capacity();
         int fromLimit = from.limit();
@@ -543,7 +550,7 @@ public abstract class SocketWrapperBase<E> {
                 // Didn't write the whole amount of data in the last
                 // non-blocking write.
                 // Exit the loop.
-                return false;
+                return true;
             }
         }
 
@@ -552,7 +559,7 @@ public abstract class SocketWrapperBase<E> {
             transfer(from, socketBufferHandler.getWriteBuffer());
         }
 
-        return socketBufferHandler.isWriteBufferWritable();
+        return false;
     }
 
 
@@ -586,18 +593,17 @@ public abstract class SocketWrapperBase<E> {
 
         if (bufferedWrites.size() > 0) {
             Iterator<ByteBufferHolder> bufIter = bufferedWrites.iterator();
-            while (socketBufferHandler.isWriteBufferEmpty() && bufIter.hasNext()) {
+            while (bufIter.hasNext()) {
                 ByteBufferHolder buffer = bufIter.next();
                 buffer.flip();
-                while (socketBufferHandler.isWriteBufferEmpty()
-                        && buffer.getBuf().remaining() > 0) {
-                    socketBufferHandler.configureWriteBufferForWrite();
-                    transfer(buffer.getBuf(), socketBufferHandler.getWriteBuffer());
-                    if (buffer.getBuf().remaining() == 0) {
-                        bufIter.remove();
-                    }
-                    doWrite(true);
+                writeBlocking(buffer.getBuf());
+                if (buffer.getBuf().remaining() == 0) {
+                    bufIter.remove();
                 }
+            }
+
+            if (!socketBufferHandler.isWriteBufferEmpty()) {
+                doWrite(true);
             }
         }
 
@@ -610,28 +616,27 @@ public abstract class SocketWrapperBase<E> {
         // Write to the socket, if there is anything to write
         if (dataLeft) {
             doWrite(false);
+            dataLeft = !socketBufferHandler.isWriteBufferEmpty();
         }
-
-        dataLeft = !socketBufferHandler.isWriteBufferEmpty();
 
         if (!dataLeft && bufferedWrites.size() > 0) {
             Iterator<ByteBufferHolder> bufIter = bufferedWrites.iterator();
-            while (socketBufferHandler.isWriteBufferEmpty() && bufIter.hasNext()) {
+            while (!dataLeft && bufIter.hasNext()) {
                 ByteBufferHolder buffer = bufIter.next();
                 buffer.flip();
-                while (socketBufferHandler.isWriteBufferEmpty()
-                        && buffer.getBuf().remaining() > 0) {
-                    socketBufferHandler.configureWriteBufferForWrite();
-                    transfer(buffer.getBuf(), socketBufferHandler.getWriteBuffer());
-                    if (buffer.getBuf().remaining() == 0) {
-                        bufIter.remove();
-                    }
-                    doWrite(false);
+                dataLeft = writeNonBlockingInternal(buffer.getBuf());
+                if (buffer.getBuf().remaining() == 0) {
+                    bufIter.remove();
                 }
+            }
+
+            if (!dataLeft && !socketBufferHandler.isWriteBufferEmpty()) {
+                doWrite(false);
+                dataLeft = !socketBufferHandler.isWriteBufferEmpty();
             }
         }
 
-        return !socketBufferHandler.isWriteBufferEmpty();
+        return dataLeft;
     }
 
 
