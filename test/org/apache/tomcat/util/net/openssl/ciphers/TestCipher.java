@@ -73,11 +73,10 @@ public class TestCipher {
      */
     @Test
     public void testOpenSSLCipherAvailability() throws Exception {
-        // OpenSSL 0.9.8 does not include aNULL or eNULL in all.
         // OpenSSL does not include ECDH/ECDHE ciphers in all and there is no
         //         EC alias. Use aRSA.
         // OpenSSL 1.0.0 onwards does not include eNULL in all.
-        Set<String> availableCipherSuites = TesterOpenSSL.getOpenSSLCiphersAsSet("ALL:eNULL:aNULL:aRSA");
+        Set<String> availableCipherSuites = TesterOpenSSL.getOpenSSLCiphersAsSet("ALL:eNULL:aRSA");
         Set<String> expectedCipherSuites = new HashSet<>();
         for (Cipher cipher : Cipher.values()) {
             if (TesterOpenSSL.OPENSSL_UNIMPLEMENTED_CIPHERS.contains(cipher)) {

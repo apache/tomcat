@@ -216,7 +216,7 @@
         Patch provided by Svetlin Zarev. (markt)
       </fix>
       <fix>
-        OpenSSl now disables 3DES by default so reflect this when using OpenSSL
+        OpenSSL now disables 3DES by default so reflect this when using OpenSSL
         syntax to select ciphers. (markt)
       </fix>
       <fix>
