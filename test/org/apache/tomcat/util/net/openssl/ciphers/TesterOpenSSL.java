@@ -126,26 +126,10 @@ public class TesterOpenSSL {
             unimplemented.add(Cipher.TLS_DH_RSA_WITH_DES_CBC_SHA);
             unimplemented.add(Cipher.TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA);
             unimplemented.add(Cipher.TLS_DH_RSA_WITH_SEED_CBC_SHA);
-
         } else {
             // These were removed in 1.0.2 so won't be available from that
             // version onwards.
-            // DES and 3DES require compile time switches to enable. Treat as
-            // removed.
-            unimplemented.add(Cipher.TLS_PSK_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_SRP_SHA_DSS_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_DH_anon_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_SRP_SHA_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_RSA_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA);
-            unimplemented.add(Cipher.TLS_SRP_SHA_RSA_WITH_3DES_EDE_CBC_SHA);
+            // None at present.
         }
 
         if (VERSION < 10100) {
@@ -298,6 +282,21 @@ public class TesterOpenSSL {
             unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_RC4_128_SHA);
             unimplemented.add(Cipher.TLS_DHE_PSK_WITH_RC4_128_SHA);
             unimplemented.add(Cipher.TLS_ECDH_anon_WITH_RC4_128_SHA);
+            // 3DES requires a compile time switch to enable. Treat as removed.
+            unimplemented.add(Cipher.TLS_PSK_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_SRP_SHA_DSS_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_DH_anon_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_SRP_SHA_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_RSA_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA);
+            unimplemented.add(Cipher.TLS_SRP_SHA_RSA_WITH_3DES_EDE_CBC_SHA);
         }
         OPENSSL_UNIMPLEMENTED_CIPHERS = Collections.unmodifiableSet(unimplemented);
     }
