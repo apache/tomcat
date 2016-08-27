@@ -329,10 +329,22 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      */
     @Override
     public Principal authenticate(String username, String credentials) {
+        // No user or no credentials
+        // Can't possibly authenticate, don't bother doing anything.
+        if(username == null || credentials == null) {
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace(sm.getString("realmBase.authenticateFailure",
+                                                username));
+            }
+            return null;
+        }
 
+        // Look up the user's credentials
         String serverCredentials = getPassword(username);
 
-        if (credentials == null || serverCredentials == null) {
+        if (serverCredentials == null) {
+            // User was not found
+
             if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("realmBase.authenticateFailure",
                                                 username));
@@ -341,19 +353,20 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         }
 
         boolean validated = getCredentialHandler().matches(credentials, serverCredentials);
-        if (!validated) {
+
+        if (validated) {
+            if (containerLog.isTraceEnabled()) {
+                containerLog.trace(sm.getString("realmBase.authenticateSuccess",
+                                                username));
+            }
+            return getPrincipal(username);
+        } else {
             if (containerLog.isTraceEnabled()) {
                 containerLog.trace(sm.getString("realmBase.authenticateFailure",
                                                 username));
             }
             return null;
         }
-        if (containerLog.isTraceEnabled()) {
-            containerLog.trace(sm.getString("realmBase.authenticateSuccess",
-                                            username));
-        }
-
-        return getPrincipal(username);
     }
 
     /**

@@ -370,10 +370,12 @@ public class JDBCRealm
     public synchronized Principal authenticate(Connection dbConnection,
                                                String username,
                                                String credentials) {
-
         // No user or no credentials
         // Can't possibly authenticate, don't bother the database then
         if (username == null || credentials == null) {
+            if (containerLog.isTraceEnabled())
+                containerLog.trace(sm.getString("jdbcRealm.authenticateFailure",
+                                                username));
             return null;
         }
 
@@ -381,6 +383,8 @@ public class JDBCRealm
         String dbCredentials = getPassword(username);
 
         if (dbCredentials == null) {
+            // User was not found in the database.
+
             if (containerLog.isTraceEnabled())
                 containerLog.trace(sm.getString("jdbcRealm.authenticateFailure",
                                                 username));
@@ -398,14 +402,13 @@ public class JDBCRealm
             if (containerLog.isTraceEnabled())
                 containerLog.trace(sm.getString("jdbcRealm.authenticateFailure",
                                                 username));
-            return (null);
+            return null;
         }
 
         ArrayList<String> roles = getRoles(username);
 
         // Create and return a suitable Principal for this user
         return (new GenericPrincipal(username, credentials, roles));
-
     }
 
 
