@@ -421,10 +421,6 @@ public class OpenSSLCipherConfigurationParser {
         List<Cipher> allCiphersList = Arrays.asList(Cipher.values());
         Collections.reverse(allCiphersList);
         LinkedHashSet<Cipher> allCiphers = defaultSort(new LinkedHashSet<>(allCiphersList));
-        // OpenSSL has disabled 3DES by default so remove it from the set of
-        // known ciphers
-        allCiphers.removeAll(filterByEncryption(allCiphers, Collections.singleton(Encryption.TRIPLE_DES)));
-
         addListAlias(eNULL, filterByEncryption(allCiphers, Collections.singleton(Encryption.eNULL)));
         LinkedHashSet<Cipher> all = new LinkedHashSet<>(allCiphers);
         remove(all, eNULL);
