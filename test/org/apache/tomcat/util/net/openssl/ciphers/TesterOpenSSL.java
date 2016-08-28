@@ -64,7 +64,7 @@ public class TesterOpenSSL {
             VERSION = -1;
         }
 
-         HashSet<Cipher> unimplemented = new HashSet<>();
+        HashSet<Cipher> unimplemented = new HashSet<>();
 
         // These have been removed from all supported versions.
         unimplemented.add(Cipher.TLS_DHE_DSS_WITH_RC4_128_SHA);

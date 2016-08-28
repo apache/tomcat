@@ -72,23 +72,13 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testHIGH() throws Exception {
-        // 3DES has been moved to medium in 1.1.0-dev
-        if (TesterOpenSSL.VERSION < 10100) {
-            testSpecification("HIGH:!3DES");
-        } else {
-            testSpecification("HIGH");
-        }
+        testSpecification("HIGH");
     }
 
 
     @Test
     public void testMEDIUM() throws Exception {
-        // 3DES has been moved to medium in 1.1.0-dev
-        if (TesterOpenSSL.VERSION < 10100) {
-             testSpecification("MEDIUM:3DES");
-        } else {
-            testSpecification("MEDIUM");
-        }
+        testSpecification("MEDIUM");
     }
 
 
@@ -542,12 +532,7 @@ public class TestOpenSSLCipherConfigurationParser {
         // Tomcat 8 default as of 2014-08-04
         // This gets an A- from https://www.ssllabs.com/ssltest with no FS for
         // a number of the reference browsers
-        // 3DES has been moved to medium in 1.1.0-dev
-        if (TesterOpenSSL.VERSION < 10100) {
-            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!3DES:!DES:!RC4:!MD5");
-        } else {
-            testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
-        }
+        testSpecification("HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5");
     }
 
 
