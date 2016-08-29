@@ -16,7 +16,10 @@
  */
 package org.apache.catalina.connector;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel.MapMode;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -97,6 +100,27 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
     @Test
     public void testNonBlockingWriteTwiceBlockingWriteOnceNonContainerThread() throws Exception {
         doNonBlockingTest(2, 1, false);
+    }
+
+    @Test
+    public void testWriteWithByteBuffer() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context root = tomcat.addContext("", TEMP_DIR);
+        Tomcat.addServlet(root, "testServlet", new TestServlet());
+        root.addServletMapping("/", "testServlet");
+
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/", bc, null, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        File file = new File("test/org/apache/catalina/connector/test_content.txt");
+        try (RandomAccessFile raf = new RandomAccessFile(file, "r");) {
+            ByteChunk expected = new ByteChunk();
+            expected.append(raf.getChannel().map(MapMode.READ_ONLY, 0, file.length()));
+            Assert.assertTrue(expected.equals(bc));
+        }
     }
 
     private void doNonBlockingTest(int asyncWriteTarget, int syncWriteTarget,
@@ -249,5 +273,21 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
                         StandardCharsets.UTF_8));
             }
         }
+    }
+
+    private static final class TestServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            CoyoteOutputStream os = (CoyoteOutputStream) resp.getOutputStream();
+            File file = new File("test/org/apache/catalina/connector/test_content.txt");
+            try (RandomAccessFile raf = new RandomAccessFile(file, "r");) {
+                os.write(raf.getChannel().map(MapMode.READ_ONLY, 0, file.length()));
+            }
+        }
+
     }
 }
