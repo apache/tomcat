@@ -18,6 +18,7 @@ package org.apache.coyote.http11.filters;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
@@ -107,6 +108,11 @@ public class TesterOutputBuffer extends Http11OutputBuffer {
             outputStream.write(chunk.getBuffer(), chunk.getStart(), length);
             byteCount += chunk.getLength();
             return chunk.getLength();
+        }
+
+        @Override
+        public int doWrite(ByteBuffer chunk) throws IOException {
+            throw new UnsupportedOperationException();
         }
 
         @Override

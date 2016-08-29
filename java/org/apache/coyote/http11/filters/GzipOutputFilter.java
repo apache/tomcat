@@ -19,6 +19,7 @@ package org.apache.coyote.http11.filters;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.coyote.OutputBuffer;
@@ -70,6 +71,23 @@ public class GzipOutputFilter implements OutputFilter {
         compressionStream.write(chunk.getBytes(), chunk.getStart(),
                                 chunk.getLength());
         return chunk.getLength();
+    }
+
+
+    @Override
+    public int doWrite(ByteBuffer chunk) throws IOException {
+        if (compressionStream == null) {
+            compressionStream = new GZIPOutputStream(fakeOutputStream, true);
+        }
+        int len = chunk.remaining();
+        if (chunk.hasArray()) {
+            compressionStream.write(chunk.array(), chunk.arrayOffset() + chunk.position(), len);
+        } else {
+            byte[] bytes = new byte[len];
+            chunk.put(bytes);
+            compressionStream.write(bytes, 0, len);
+        }
+        return len;
     }
 
 

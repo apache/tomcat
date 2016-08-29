@@ -21,6 +21,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.InetAddress;
+import java.nio.ByteBuffer;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -1313,13 +1314,37 @@ public class AjpProcessor extends AbstractProcessor {
 
         // Write this chunk
         while (len > 0) {
-            int thisTime = len;
-            if (thisTime > outputMaxChunkSize) {
-                thisTime = outputMaxChunkSize;
-            }
+            int thisTime = Math.min(len, outputMaxChunkSize);
+
             responseMessage.reset();
             responseMessage.appendByte(Constants.JK_AJP13_SEND_BODY_CHUNK);
             responseMessage.appendBytes(chunk.getBytes(), chunk.getOffset() + off, thisTime);
+            responseMessage.end();
+            socketWrapper.write(blocking, responseMessage.getBuffer(), 0, responseMessage.getLen());
+            socketWrapper.flush(blocking);
+
+            len -= thisTime;
+            off += thisTime;
+        }
+
+        bytesWritten += off;
+    }
+
+
+    private void writeData(ByteBuffer chunk) throws IOException {
+        boolean blocking = (response.getWriteListener() == null);
+
+        int len = chunk.remaining();
+        int off = 0;
+
+        // Write this chunk
+        while (len > 0) {
+            int thisTime = Math.min(len, outputMaxChunkSize);
+
+            responseMessage.reset();
+            responseMessage.appendByte(Constants.JK_AJP13_SEND_BODY_CHUNK);
+            chunk.limit(chunk.position() + thisTime);
+            responseMessage.appendBytes(chunk);
             responseMessage.end();
             socketWrapper.write(blocking, responseMessage.getBuffer(), 0, responseMessage.getLen());
             socketWrapper.flush(blocking);
@@ -1394,6 +1419,27 @@ public class AjpProcessor extends AbstractProcessor {
                 writeData(chunk);
             }
             return chunk.getLength();
+        }
+
+        @Override
+        public int doWrite(ByteBuffer chunk) throws IOException {
+
+            if (!response.isCommitted()) {
+                // Validate and write response headers
+                try {
+                    prepareResponse();
+                } catch (IOException e) {
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                }
+            }
+
+            int len = 0;
+            if (!swallowResponse) {
+                len = chunk.remaining();
+                writeData(chunk);
+                len -= chunk.remaining();
+            }
+            return len;
         }
 
         @Override

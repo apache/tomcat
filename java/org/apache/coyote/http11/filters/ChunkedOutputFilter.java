@@ -18,6 +18,7 @@
 package org.apache.coyote.http11.filters;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
@@ -89,8 +90,7 @@ public class ChunkedOutputFilter implements OutputFilter {
     // --------------------------------------------------- OutputBuffer Methods
 
     @Override
-    public int doWrite(ByteChunk chunk)
-        throws IOException {
+    public int doWrite(ByteChunk chunk) throws IOException {
 
         int result = chunk.getLength();
 
@@ -98,14 +98,8 @@ public class ChunkedOutputFilter implements OutputFilter {
             return 0;
         }
 
-        // Calculate chunk header
-        int pos = 7;
-        int current = result;
-        while (current > 0) {
-            int digit = current % 16;
-            current = current / 16;
-            chunkLength[pos--] = HexUtils.getHex(digit);
-        }
+        int pos = calculateChunkHeader(result);
+
         chunkHeader.setBytes(chunkLength, pos + 1, 9 - pos);
         buffer.doWrite(chunkHeader);
 
@@ -116,6 +110,43 @@ public class ChunkedOutputFilter implements OutputFilter {
 
         return result;
 
+    }
+
+
+    @Override
+    public int doWrite(ByteBuffer chunk) throws IOException {
+
+        int result = chunk.remaining();
+
+        if (result <= 0) {
+            return 0;
+        }
+
+        int pos = calculateChunkHeader(result);
+
+        chunkHeader.setBytes(chunkLength, pos + 1, 9 - pos);
+        buffer.doWrite(chunkHeader);
+
+        buffer.doWrite(chunk);
+
+        chunkHeader.setBytes(chunkLength, 8, 2);
+        buffer.doWrite(chunkHeader);
+
+        return result;
+
+    }
+
+
+    private int calculateChunkHeader(int len) {
+        // Calculate chunk header
+        int pos = 7;
+        int current = len;
+        while (current > 0) {
+            int digit = current % 16;
+            current = current / 16;
+            chunkLength[pos--] = HexUtils.getHex(digit);
+        }
+        return pos;
     }
 
 
