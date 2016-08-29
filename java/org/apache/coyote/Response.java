@@ -18,6 +18,7 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -498,6 +499,20 @@ public final class Response {
     public void doWrite(ByteChunk chunk) throws IOException {
         outputBuffer.doWrite(chunk);
         contentWritten+=chunk.getLength();
+    }
+
+
+    /**
+     * Write a chunk of bytes.
+     *
+     * @param chunk The ByteBuffer to write
+     *
+     * @throws IOException If an I/O error occurs during the write
+     */
+    public void doWrite(ByteBuffer chunk) throws IOException {
+        int len = chunk.remaining();
+        outputBuffer.doWrite(chunk);
+        contentWritten += len - chunk.remaining();
     }
 
     // --------------------
