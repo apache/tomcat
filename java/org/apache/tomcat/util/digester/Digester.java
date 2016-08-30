@@ -51,6 +51,7 @@ import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.ext.DefaultHandler2;
+import org.xml.sax.ext.Locator2;
 import org.xml.sax.helpers.AttributesImpl;
 
 
@@ -1127,6 +1128,10 @@ public class Digester extends DefaultHandler2 {
 
         if (saxLog.isDebugEnabled()) {
             saxLog.debug("startDocument()");
+        }
+
+        if (locator instanceof Locator2 && root instanceof DocumentProperties.Encoding) {
+            ((DocumentProperties.Encoding) root).setEncoding(((Locator2) locator).getEncoding());
         }
 
         // ensure that the digester is properly configured, as
