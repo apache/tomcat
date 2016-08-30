@@ -303,6 +303,8 @@ public class DataSourceRealm extends RealmBase {
 
         if(dbCredentials == null) {
             // User was not found in the database.
+            // Waste a bit of time as not to reveal that the user does not exist.
+            getCredentialHandler().mutate(credentials);
 
             if (containerLog.isTraceEnabled())
                 containerLog.trace(sm.getString("dataSourceRealm.authenticateFailure",
