@@ -53,6 +53,15 @@ import org.apache.tomcat.util.http.RequestUtil;
 
 public class RewriteValve extends ValveBase {
 
+    private static final URLEncoder QUERY_STRING_ENCODER;
+
+    static {
+        QUERY_STRING_ENCODER = new URLEncoder();
+        QUERY_STRING_ENCODER.addSafeCharacter('=');
+        QUERY_STRING_ENCODER.addSafeCharacter('&');
+    }
+
+
     /**
      * The rewrite rules that the valve will use.
      */
@@ -323,15 +332,26 @@ public class RewriteValve extends ValveBase {
                 // - redirect (code)
                 if (rule.isRedirect() && newtest != null) {
                     // append the query string to the url if there is one and it hasn't been rewritten
-                    String queryString = request.getQueryString();
+                    String originalQueryString = request.getQueryString();
                     StringBuffer urlString = new StringBuffer(url);
-                    if (queryString != null && queryString.length() > 0) {
-                        int index = urlString.indexOf("?");
+                    int index = urlString.indexOf("?");
+                    String encodedUrl;
+                    if (index == -1) {
+                        encodedUrl = URLEncoder.DEFAULT.encode(urlString.toString(), "UTF-8");
+                        urlString.setLength(0);
+                        urlString.append(encodedUrl);
+                    } else {
+                        encodedUrl = URLEncoder.DEFAULT.encode(
+                                urlString.substring(0, index), "UTF-8");
+                        urlString.delete(0, index);
+                        urlString.insert(0, encodedUrl);
+                    }
+                    if (originalQueryString != null && originalQueryString.length() > 0) {
                         if (index != -1) {
                             // if qsa is specified append the query
                             if (rule.isQsappend()) {
                                 urlString.append('&');
-                                urlString.append(queryString);
+                                urlString.append(originalQueryString);
                             }
                             // if the ? is the last character delete it, its only purpose was to
                             // prevent the rewrite module from appending the query string
@@ -340,9 +360,10 @@ public class RewriteValve extends ValveBase {
                             }
                         } else {
                             urlString.append('?');
-                            urlString.append(queryString);
+                            urlString.append(originalQueryString);
                         }
                     }
+
                     // Insert the context if
                     // 1. this valve is associated with a context
                     // 2. the url starts with a leading slash
@@ -451,10 +472,13 @@ public class RewriteValve extends ValveBase {
                     request.getCoyoteRequest().decodedURI().toChars();
                     // Set the new Query if there is one
                     if (queryString != null) {
+                        // TODO: This isn't perfect. There are some edge cases
+                        //       that can only be handled if RewriteValve works
+                        //       with the original (undecoded) URI
                         request.getCoyoteRequest().queryString().setString(null);
                         chunk = request.getCoyoteRequest().queryString().getCharChunk();
                         chunk.recycle();
-                        chunk.append(queryString);
+                        chunk.append(QUERY_STRING_ENCODER.encode(queryString, "UTF-8"));
                         request.getCoyoteRequest().queryString().toChars();
                     }
                     // Set the new host if it changed

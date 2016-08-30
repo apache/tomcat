@@ -168,6 +168,10 @@
         placed into the <code>FAILED</code> state. (markt)
       </fix>
       <fix>
+        <bug>60013</bug>: Fix encoding issues when using the RewriteValve with
+        UTF-8 query strings or UTF-8 redirect URLs. (markt)
+      </fix>
+      <fix>
         <bug>60022</bug>: Improve handling when a WAR file and/or the associated
         exploded directory are symlinked into the <code>appBase</code>. (markt)
       </fix>
