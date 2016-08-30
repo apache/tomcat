@@ -275,9 +275,9 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
 
         // Add protected servlet
         Tomcat.addServlet(ctxt, "TesterServlet", new TesterServlet());
-        ctxt.addServletMapping(URI, "TesterServlet");
+        ctxt.addServletMappingDecoded(URI, "TesterServlet");
         SecurityCollection collection = new SecurityCollection();
-        collection.addPattern(URI);
+        collection.addPatternDecoded(URI);
         SecurityConstraint sc = new SecurityConstraint();
         sc.addAuthRole(ROLE);
         sc.addCollection(collection);

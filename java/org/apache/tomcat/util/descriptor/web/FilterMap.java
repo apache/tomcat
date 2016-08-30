@@ -57,6 +57,24 @@ public class FilterMap implements Serializable {
 
     private int dispatcherMapping = NOT_SET;
 
+    private String encoding = null;
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
+    /**
+     * Obtain the encoding of the XML source that was used to populated this
+     * object.
+     *
+     * @return The encoding of the associated XML source or <code>UTF-8</code>
+     *         if the encoding could not be determined
+     */
+    public String getEncoding() {
+        if (encoding == null || encoding.length() == 0) {
+            return "UTF-8";
+        }
+        return encoding;
+    }
+
     private String filterName = null;
 
     public String getFilterName() {
@@ -127,6 +145,9 @@ public class FilterMap implements Serializable {
     }
 
     public void addURLPattern(String urlPattern) {
+        addURLPatternDecoded(UDecoder.URLDecode(urlPattern, getEncoding()));
+    }
+    public void addURLPatternDecoded(String urlPattern) {
         if ("*".equals(urlPattern)) {
             this.matchAllUrlPatterns = true;
         } else {

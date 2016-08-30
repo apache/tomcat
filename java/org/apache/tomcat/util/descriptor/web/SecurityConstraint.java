@@ -61,6 +61,25 @@ public class SecurityConstraint implements Serializable {
             StringManager.getManager(Constants.PACKAGE_NAME);
 
 
+    private String encoding = null;
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
+    /**
+     * Obtain the encoding of the XML source that was used to populated this
+     * object.
+     *
+     * @return The encoding of the associated XML source or <code>UTF-8</code>
+     *         if the encoding could not be determined
+     */
+    public String getEncoding() {
+        if (encoding == null || encoding.length() == 0) {
+            return "UTF-8";
+        }
+        return encoding;
+    }
+
+
     // ----------------------------------------------------------- Constructors
 
     /**
@@ -280,6 +299,9 @@ public class SecurityConstraint implements Serializable {
 
         if (collection == null)
             return;
+
+        collection.setEncoding(getEncoding());
+
         SecurityCollection results[] =
             new SecurityCollection[collections.length + 1];
         for (int i = 0; i < collections.length; i++)
@@ -706,7 +728,7 @@ public class SecurityConstraint implements Serializable {
                     for (String method : methods) {
                         collection.addOmittedMethod(method);
                     }
-                    collection.addPattern(pattern);
+                    collection.addPatternDecoded(pattern);
                     collection.setName("deny-uncovered-http-methods");
                     SecurityConstraint constraint = new SecurityConstraint();
                     constraint.setAuthConstraint(true);
@@ -759,7 +781,7 @@ public class SecurityConstraint implements Serializable {
                 for (String method : omittedMethods) {
                     collection.addMethod(method);
                 }
-                collection.addPattern(pattern);
+                collection.addPatternDecoded(pattern);
                 collection.setName("deny-uncovered-http-methods");
                 SecurityConstraint constraint = new SecurityConstraint();
                 constraint.setAuthConstraint(true);

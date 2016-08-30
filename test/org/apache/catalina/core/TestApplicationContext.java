@@ -189,7 +189,7 @@ public class TestApplicationContext extends TomcatBaseTest {
         ctx.setCrossContext(true);
 
         Tomcat.addServlet(ctx, "Bug57190Servlet", new Bug57190Servlet());
-        ctx.addServletMapping("/", "Bug57190Servlet");
+        ctx.addServletMappingDecoded("/", "Bug57190Servlet");
 
         tomcat.start();
 
@@ -262,14 +262,14 @@ public class TestApplicationContext extends TomcatBaseTest {
         Context ctx2 = tomcat.addContext("/second", null);
         GetAttributeServlet getAttributeServlet = new GetAttributeServlet();
         Tomcat.addServlet(ctx2, "getAttributeServlet", getAttributeServlet);
-        ctx2.addServletMapping("/test", "getAttributeServlet");
+        ctx2.addServletMappingDecoded("/test", "getAttributeServlet");
 
         // No file system docBase required
         Context ctx1 = tomcat.addContext("/first", null);
         ctx1.setCrossContext(true);
         SetAttributeServlet setAttributeServlet = new SetAttributeServlet("/test", "/second");
         Tomcat.addServlet(ctx1, "setAttributeServlet", setAttributeServlet);
-        ctx1.addServletMapping("/test", "setAttributeServlet");
+        ctx1.addServletMappingDecoded("/test", "setAttributeServlet");
 
         tomcat.start();
 

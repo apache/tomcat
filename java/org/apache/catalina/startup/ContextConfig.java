@@ -1373,7 +1373,7 @@ public class ContextConfig implements LifecycleListener {
         }
         for (Entry<String, String> entry :
                 webxml.getServletMappings().entrySet()) {
-            context.addServletMapping(entry.getKey(), entry.getValue());
+            context.addServletMappingDecoded(entry.getKey(), entry.getValue());
         }
         SessionConfig sessionConfig = webxml.getSessionConfig();
         if (sessionConfig != null) {
@@ -1426,7 +1426,7 @@ public class ContextConfig implements LifecycleListener {
             }
             if (context.findChild(jspServletName) != null) {
                 for (String urlPattern : jspPropertyGroup.getUrlPatterns()) {
-                    context.addServletMapping(urlPattern, jspServletName, true);
+                    context.addServletMappingDecoded(urlPattern, jspServletName, true);
                 }
             } else {
                 if(log.isDebugEnabled()) {
@@ -2445,6 +2445,7 @@ public class ContextConfig implements LifecycleListener {
                 urlPatterns = processAnnotationsStringArray(evp.getValue());
                 urlPatternsSet = urlPatterns.length > 0;
                 for (String urlPattern : urlPatterns) {
+                    // % decoded (if required) using UTF-8
                     filterMap.addURLPattern(urlPattern);
                 }
             } else if ("servletNames".equals(name)) {
@@ -2526,6 +2527,7 @@ public class ContextConfig implements LifecycleListener {
                 if (urlPatternsSet
                         && (urlsPatterns == null || urlsPatterns.length == 0)) {
                     for (String urlPattern : filterMap.getURLPatterns()) {
+                        // % decoded (if required) using UTF-8
                         descMap.addURLPattern(urlPattern);
                     }
                 }

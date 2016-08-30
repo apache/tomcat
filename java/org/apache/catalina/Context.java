@@ -32,6 +32,7 @@ import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.tomcat.ContextBind;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
@@ -872,11 +873,49 @@ public interface Context extends Container, ContextBind {
      * Add a new servlet mapping, replacing any existing mapping for
      * the specified pattern.
      *
+     * @param pattern URL pattern to be mapped. The pattern will be % decoded
+     *                using UTF-8
+     * @param name    Name of the corresponding servlet to execute
+     *
+     * @deprecated Will be removed in Tomcat 9. Use
+     *             {@link #addServletMappingDecoded(String, String)}
+     */
+    @Deprecated
+    public default void addServletMapping(String pattern, String name) {
+        addServletMapping(pattern, name, false);
+    }
+
+
+    /**
+     * Add a new servlet mapping, replacing any existing mapping for
+     * the specified pattern.
+     *
+     * @param pattern     URL pattern to be mapped. The pattern will be %
+     *                    decoded using UTF-8
+     * @param name        Name of the corresponding servlet to execute
+     * @param jspWildcard true if name identifies the JspServlet and pattern
+     *                    contains a wildcard; false otherwise
+     *
+     * @deprecated Will be removed in Tomcat 9. Use
+     *             {@link #addServletMappingDecoded(String, String, boolean)}
+     */
+    @Deprecated
+    public default void addServletMapping(String pattern, String name,
+            boolean jspWildcard) {
+        addServletMappingDecoded(
+                UDecoder.URLDecode(pattern, "UTF-8"), name, jspWildcard);
+    }
+
+
+    /**
+     * Add a new servlet mapping, replacing any existing mapping for
+     * the specified pattern.
+     *
      * @param pattern URL pattern to be mapped
      * @param name Name of the corresponding servlet to execute
      */
-    public default void addServletMapping(String pattern, String name) {
-        addServletMapping(pattern, name, false);
+    public default void addServletMappingDecoded(String pattern, String name) {
+        addServletMappingDecoded(pattern, name, false);
     }
 
 
@@ -889,7 +928,7 @@ public interface Context extends Container, ContextBind {
      * @param jspWildcard true if name identifies the JspServlet
      * and pattern contains a wildcard; false otherwise
      */
-    public void addServletMapping(String pattern, String name,
+    public void addServletMappingDecoded(String pattern, String name,
             boolean jspWildcard);
 
 

@@ -21,10 +21,31 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.apache.tomcat.util.buf.UDecoder;
+
 /**
  * Representation of a jsp-property-group element in web.xml.
  */
 public class JspPropertyGroup {
+
+    private String encoding = null;
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
+    /**
+     * Obtain the encoding of the XML source that was used to populated this
+     * object.
+     *
+     * @return The encoding of the associated XML source or <code>UTF-8</code>
+     *         if the encoding could not be determined
+     */
+    public String getEncoding() {
+        if (encoding == null || encoding.length() == 0) {
+            return "UTF-8";
+        }
+        return encoding;
+    }
+
     private Boolean deferredSyntax = null;
     public void setDeferredSyntax(String deferredSyntax) {
         this.deferredSyntax = Boolean.valueOf(deferredSyntax);
@@ -75,6 +96,9 @@ public class JspPropertyGroup {
 
     private LinkedHashSet<String> urlPattern = new LinkedHashSet<>();
     public void addUrlPattern(String urlPattern) {
+        addUrlPatternDecoded(UDecoder.URLDecode(urlPattern, getEncoding()));
+    }
+    public void addUrlPatternDecoded(String urlPattern) {
         this.urlPattern.add(urlPattern);
     }
     public Set<String> getUrlPatterns() { return this.urlPattern; }

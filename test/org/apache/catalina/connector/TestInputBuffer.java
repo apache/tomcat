@@ -44,7 +44,7 @@ public class TestInputBuffer extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);
         Tomcat.addServlet(root, "Echo", new Utf8Echo());
-        root.addServletMapping("/test", "Echo");
+        root.addServletMappingDecoded("/test", "Echo");
 
         tomcat.getConnector().setProperty("soTimeout", "300000");
         tomcat.start();

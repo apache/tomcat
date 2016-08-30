@@ -218,7 +218,7 @@ public class TestContextConfigAnnotation {
 
         webxml.addFilter(filterDef);
         FilterMap filterMap = new FilterMap();
-        filterMap.addURLPattern("/param1");
+        filterMap.addURLPatternDecoded("/param1");
         filterMap.setFilterName("paramFilter");
         webxml.addFilterMapping(filterMap);
 

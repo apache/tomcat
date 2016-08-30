@@ -49,7 +49,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
             tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctx, "webdav", new WebdavServlet());
-        ctx.addServletMapping("/*", "webdav");
+        ctx.addServletMappingDecoded("/*", "webdav");
 
         tomcat.start();
 
@@ -93,7 +93,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
             tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
         Tomcat.addServlet(ctx, "webdav", new WebdavServlet());
-        ctx.addServletMapping("/webdav/*", "webdav");
+        ctx.addServletMappingDecoded("/webdav/*", "webdav");
         ctx.addApplicationListener(WsContextListener.class.getName());
 
         tomcat.start();

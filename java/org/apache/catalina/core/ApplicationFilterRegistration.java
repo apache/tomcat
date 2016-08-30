@@ -96,6 +96,7 @@ public class ApplicationFilterRegistration
         }
 
         if (urlPatterns != null) {
+            // % decoded (if necessary) using UTF-8
             for (String urlPattern : urlPatterns) {
                 filterMap.addURLPattern(urlPattern);
             }

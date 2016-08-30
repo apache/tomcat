@@ -291,7 +291,7 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
         context.setSessionTimeout(SHORT_SESSION_TIMEOUT_MINS);
 
         Tomcat.addServlet(context, SERVLET_NAME, new TesterServlet());
-        context.addServletMapping(URI_PROTECTED, SERVLET_NAME);
+        context.addServletMappingDecoded(URI_PROTECTED, SERVLET_NAME);
 
         FilterDef filterDef = new FilterDef();
         filterDef.setFilterName(FILTER_NAME);
@@ -301,11 +301,11 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
 
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName(FILTER_NAME);
-        filterMap.addURLPattern(URI_CSRF_PROTECTED);
+        filterMap.addURLPatternDecoded(URI_CSRF_PROTECTED);
         context.addFilterMap(filterMap);
 
         SecurityCollection collection = new SecurityCollection();
-        collection.addPattern(URI_PROTECTED);
+        collection.addPatternDecoded(URI_PROTECTED);
 
         SecurityConstraint sc = new SecurityConstraint();
         sc.addAuthRole(ROLE);

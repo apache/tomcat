@@ -100,7 +100,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         NBReadServlet servlet = new NBReadServlet(ignoreIsReady);
         String servletName = NBReadServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
-        ctx.addServletMapping("/", servletName);
+        ctx.addServletMappingDecoded("/", servletName);
 
         tomcat.start();
 
@@ -130,7 +130,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         NBWriteServlet servlet = new NBWriteServlet();
         String servletName = NBWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
-        ctx.addServletMapping("/", servletName);
+        ctx.addServletMappingDecoded("/", servletName);
         tomcat.getConnector().setProperty("socket.txBufSize", "1024");
         tomcat.start();
 
@@ -286,7 +286,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         NBWriteServlet servlet = new NBWriteServlet();
         String servletName = NBWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
-        ctx.addServletMapping("/", servletName);
+        ctx.addServletMappingDecoded("/", servletName);
         tomcat.getConnector().setProperty("socket.txBufSize", "1024");
         tomcat.start();
 
@@ -369,7 +369,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         NBReadWriteServlet servlet = new NBReadWriteServlet();
         String servletName = NBReadWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
-        ctx.addServletMapping("/", servletName);
+        ctx.addServletMappingDecoded("/", servletName);
 
         tomcat.start();
 

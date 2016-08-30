@@ -82,7 +82,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMapping("/", "snoop");
+        ctx.addServletMappingDecoded("/", "snoop");
 
         SimpleAjpClient ajpClient = new SimpleAjpClient(ajpPacketSize);
 
@@ -497,7 +497,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "helloWorld", new HelloWorldServlet());
-        ctx.addServletMapping("/", "helloWorld");
+        ctx.addServletMappingDecoded("/", "helloWorld");
 
         SimpleAjpClient ajpClient = new SimpleAjpClient();
 
@@ -557,7 +557,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "helloWorld", new HelloWorldServlet());
-        ctx.addServletMapping("/", "helloWorld");
+        ctx.addServletMappingDecoded("/", "helloWorld");
 
         SimpleAjpClient ajpClient = new SimpleAjpClient();
 
@@ -662,7 +662,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "bug55453", new Tester304WithBodyServlet());
-        ctx.addServletMapping("/", "bug55453");
+        ctx.addServletMappingDecoded("/", "bug55453");
 
         tomcat.start();
 
@@ -719,7 +719,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         ReadBodyServlet servlet = new ReadBodyServlet(callAvailable);
         Tomcat.addServlet(ctx, "ReadBody", servlet);
-        ctx.addServletMapping("/", "ReadBody");
+        ctx.addServletMappingDecoded("/", "ReadBody");
 
         tomcat.start();
 
@@ -776,7 +776,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
         FixedResponseSizeServlet servlet = new FixedResponseSizeServlet(15000, 16000);
         Tomcat.addServlet(ctx, "FixedResponseSizeServlet", servlet);
-        ctx.addServletMapping("/", "FixedResponseSizeServlet");
+        ctx.addServletMappingDecoded("/", "FixedResponseSizeServlet");
 
         tomcat.start();
 

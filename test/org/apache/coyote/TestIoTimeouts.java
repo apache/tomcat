@@ -93,7 +93,7 @@ public class TestIoTimeouts extends TomcatBaseTest {
             Context root = tomcat.addContext("", TEMP_DIR);
             Wrapper w = Tomcat.addServlet(root, "Test", new NonBlockingEchoServlet());
             w.setAsyncSupported(true);
-            root.addServletMapping("/test", "Test");
+            root.addServletMappingDecoded("/test", "Test");
 
             try {
                 tomcat.start();

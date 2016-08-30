@@ -58,7 +58,7 @@ public class TestKeepAliveCount extends TomcatBaseTest {
             Tomcat tomcat = getTomcatInstance();
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Simple", new SimpleServlet());
-            root.addServletMapping("/test", "Simple");
+            root.addServletMappingDecoded("/test", "Simple");
             tomcat.getConnector().setProperty("maxKeepAliveRequests", "5");
             tomcat.getConnector().setProperty("soTimeout", "20000");
             tomcat.getConnector().setProperty("keepAliveTimeout", "50000");

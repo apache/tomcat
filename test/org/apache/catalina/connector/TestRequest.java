@@ -177,7 +177,7 @@ public class TestRequest extends TomcatBaseTest {
             Tomcat tomcat = getTomcatInstance();
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
-            root.addServletMapping("/test", "Bug37794");
+            root.addServletMappingDecoded("/test", "Bug37794");
 
             if (createFilter) {
                 FilterDef failedRequestFilter = new FilterDef();
@@ -186,7 +186,7 @@ public class TestRequest extends TomcatBaseTest {
                         FailedRequestFilter.class.getName());
                 FilterMap failedRequestFilterMap = new FilterMap();
                 failedRequestFilterMap.setFilterName("failedRequestFilter");
-                failedRequestFilterMap.addURLPattern("/*");
+                failedRequestFilterMap.addURLPatternDecoded("/*");
                 root.addFilterDef(failedRequestFilter);
                 root.addFilterMap(failedRequestFilterMap);
             }
@@ -277,7 +277,7 @@ public class TestRequest extends TomcatBaseTest {
 
         // Add the Servlet
         Tomcat.addServlet(ctx, "servlet", new EchoQueryStringServlet());
-        ctx.addServletMapping("/", "servlet");
+        ctx.addServletMappingDecoded("/", "servlet");
 
         tomcat.start();
 
@@ -325,7 +325,7 @@ public class TestRequest extends TomcatBaseTest {
         ctx.getPipeline().addValve(new BasicAuthenticator());
 
         Tomcat.addServlet(ctx, "servlet", new LoginLogoutServlet());
-        ctx.addServletMapping("/", "servlet");
+        ctx.addServletMappingDecoded("/", "servlet");
 
         TesterMapRealm realm = new TesterMapRealm();
         realm.addUser(LoginLogoutServlet.USER, LoginLogoutServlet.PWD);
@@ -372,7 +372,7 @@ public class TestRequest extends TomcatBaseTest {
         Context root = tomcat.addContext("",
                 System.getProperty("java.io.tmpdir"));
         Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
-        root.addServletMapping("/", "Bug37794");
+        root.addServletMappingDecoded("/", "Bug37794");
         tomcat.start();
 
         HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/");
@@ -386,7 +386,7 @@ public class TestRequest extends TomcatBaseTest {
         Context root = tomcat.addContext("",
                 System.getProperty("java.io.tmpdir"));
         Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
-        root.addServletMapping("/", "Bug37794");
+        root.addServletMappingDecoded("/", "Bug37794");
         tomcat.start();
 
         HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/");
@@ -479,7 +479,7 @@ public class TestRequest extends TomcatBaseTest {
                 System.getProperty("java.io.tmpdir"));
         root.setAllowCasualMultipartParsing(true);
         Tomcat.addServlet(root, "Bug54984", new Bug54984Servlet());
-        root.addServletMapping("/", "Bug54984");
+        root.addServletMappingDecoded("/", "Bug54984");
         tomcat.start();
 
         HttpURLConnection conn = getConnection("http://localhost:" + getPort()
@@ -556,7 +556,7 @@ public class TestRequest extends TomcatBaseTest {
             Tomcat tomcat = getTomcatInstance();
             Context root = tomcat.addContext("", TEMP_DIR);
             Tomcat.addServlet(root, "EchoParameters", new EchoParametersServlet());
-            root.addServletMapping("/echo", "EchoParameters");
+            root.addServletMappingDecoded("/echo", "EchoParameters");
             tomcat.start();
 
             setPort(tomcat.getConnector().getLocalPort());
@@ -829,7 +829,7 @@ public class TestRequest extends TomcatBaseTest {
         Context ctx = tomcat.addContext(deployPath, null);
 
         Tomcat.addServlet(ctx, "servlet", new Bug56501Servelet());
-        ctx.addServletMapping("/*", "servlet");
+        ctx.addServletMappingDecoded("/*", "servlet");
 
         tomcat.start();
 

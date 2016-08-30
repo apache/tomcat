@@ -484,10 +484,10 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         // Add protected servlet to the context
         Tomcat.addServlet(nonloginContext, "TesterServlet1",
                 new TesterServletEncodeUrl());
-        nonloginContext.addServletMapping(URI_PROTECTED, "TesterServlet1");
+        nonloginContext.addServletMappingDecoded(URI_PROTECTED, "TesterServlet1");
 
         SecurityCollection collection1 = new SecurityCollection();
-        collection1.addPattern(URI_PROTECTED);
+        collection1.addPatternDecoded(URI_PROTECTED);
         SecurityConstraint sc1 = new SecurityConstraint();
         sc1.addAuthRole(ROLE);
         sc1.addCollection(collection1);
@@ -496,10 +496,10 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         // Add unprotected servlet to the context
         Tomcat.addServlet(nonloginContext, "TesterServlet2",
                 new TesterServletEncodeUrl());
-        nonloginContext.addServletMapping(URI_PUBLIC, "TesterServlet2");
+        nonloginContext.addServletMappingDecoded(URI_PUBLIC, "TesterServlet2");
 
         SecurityCollection collection2 = new SecurityCollection();
-        collection2.addPattern(URI_PUBLIC);
+        collection2.addPatternDecoded(URI_PUBLIC);
         SecurityConstraint sc2 = new SecurityConstraint();
         // do not add a role - which signals access permitted without one
         sc2.addCollection(collection2);
@@ -523,9 +523,9 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         // Add protected servlet to the context
         Tomcat.addServlet(basicContext, "TesterServlet3",
                 new TesterServletEncodeUrl());
-        basicContext.addServletMapping(URI_PROTECTED, "TesterServlet3");
+        basicContext.addServletMappingDecoded(URI_PROTECTED, "TesterServlet3");
         SecurityCollection collection = new SecurityCollection();
-        collection.addPattern(URI_PROTECTED);
+        collection.addPatternDecoded(URI_PROTECTED);
         SecurityConstraint sc = new SecurityConstraint();
         sc.addAuthRole(ROLE);
         sc.addCollection(collection);
@@ -534,9 +534,9 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         // Add unprotected servlet to the context
         Tomcat.addServlet(basicContext, "TesterServlet4",
                 new TesterServletEncodeUrl());
-        basicContext.addServletMapping(URI_PUBLIC, "TesterServlet4");
+        basicContext.addServletMappingDecoded(URI_PUBLIC, "TesterServlet4");
         SecurityCollection collection2 = new SecurityCollection();
-        collection2.addPattern(URI_PUBLIC);
+        collection2.addPatternDecoded(URI_PUBLIC);
         SecurityConstraint sc2 = new SecurityConstraint();
         // do not add a role - which signals access permitted without one
         sc2.addCollection(collection2);

@@ -394,11 +394,11 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         Context ctxt = tomcat.addContext("", null);
         Tomcat.addServlet(ctxt, "empty", new EmptyServlet());
-        ctxt.addServletMapping("/empty", "empty");
+        ctxt.addServletMappingDecoded("/empty", "empty");
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
-        ctxt.addServletMapping("/simple", "simple");
+        ctxt.addServletMappingDecoded("/simple", "simple");
         Tomcat.addServlet(ctxt, "large", new LargeServlet());
-        ctxt.addServletMapping("/large", "large");
+        ctxt.addServletMappingDecoded("/large", "large");
 
         tomcat.start();
     }

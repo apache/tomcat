@@ -57,7 +57,7 @@ public class TestStandardSessionIntegration extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "bug56578", new Bug56578Servlet());
-        ctx.addServletMapping("/bug56578", "bug56578");
+        ctx.addServletMappingDecoded("/bug56578", "bug56578");
 
         if (useClustering) {
             tomcat.getEngine().setCluster(new SimpleTcpCluster());
