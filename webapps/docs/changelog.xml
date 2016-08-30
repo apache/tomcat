@@ -307,6 +307,11 @@
         Ensure that the <code>ResultSet</code> is returned as Proxy object when
         enabling the <code>StatementDecoratorInterceptor</code>. (kfujino)
       </fix>
+      <fix>
+        <bug>60043</bug>: Ensure that the <code>suspectTimeout</code> works
+        without removing connection when the <code>removeAbandoned</code> is
+        disabled. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
