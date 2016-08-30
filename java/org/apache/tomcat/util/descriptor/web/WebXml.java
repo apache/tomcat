@@ -54,7 +54,7 @@ import org.apache.tomcat.util.res.StringManager;
  * This class checks for invalid duplicates (eg filter/servlet names)
  * StandardContext will check validity of values (eg URL formats etc)
  */
-public class WebXml implements DocumentProperties.Encoding {
+public class WebXml extends XmlEncodingBase implements DocumentProperties.Encoding {
 
     protected static final String ORDER_OTHERS =
         "org.apache.catalina.order.others";
@@ -130,25 +130,6 @@ public class WebXml implements DocumentProperties.Encoding {
     public Set<String> getBeforeOrdering() { return before; }
 
     // Common elements and attributes
-    private String encoding = null;
-    @Override
-    public void setEncoding(String encoding) {
-        this.encoding = encoding;
-    }
-    /**
-     * Obtain the encoding of the XML source that was used to populated this
-     * object.
-     *
-     * @return The encoding of the associated XML source or <code>UTF-8</code>
-     *         if the encoding could not be determined
-     */
-    public String getEncoding() {
-        if (encoding == null || encoding.length() == 0) {
-            return "UTF-8";
-        }
-        return encoding;
-    }
-
     // Required attribute of web-app element
     public String getVersion() {
         StringBuilder sb = new StringBuilder(3);

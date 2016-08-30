@@ -32,7 +32,7 @@ import org.apache.tomcat.util.buf.UDecoder;
  *
  * @author Craig R. McClanahan
  */
-public class FilterMap implements Serializable {
+public class FilterMap extends XmlEncodingBase implements Serializable {
 
 
     // ------------------------------------------------------------- Properties
@@ -56,24 +56,6 @@ public class FilterMap implements Serializable {
     private static final int NOT_SET = 0;
 
     private int dispatcherMapping = NOT_SET;
-
-    private String encoding = null;
-    public void setEncoding(String encoding) {
-        this.encoding = encoding;
-    }
-    /**
-     * Obtain the encoding of the XML source that was used to populated this
-     * object.
-     *
-     * @return The encoding of the associated XML source or <code>UTF-8</code>
-     *         if the encoding could not be determined
-     */
-    public String getEncoding() {
-        if (encoding == null || encoding.length() == 0) {
-            return "UTF-8";
-        }
-        return encoding;
-    }
 
     private String filterName = null;
 
