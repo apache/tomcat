@@ -28,13 +28,18 @@ import java.security.cert.CertStore;
 import java.security.cert.CertStoreParameters;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.X509CertSelector;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -259,6 +264,7 @@ public class JSSEUtil extends SSLUtilBase {
 
         KeyStore trustStore = sslHostConfig.getTruststore();
         if (trustStore != null) {
+            checkTrustStoreEntries(trustStore);
             String algorithm = sslHostConfig.getTruststoreAlgorithm();
             String crlf = sslHostConfig.getCertificateRevocationListFile();
 
@@ -281,6 +287,38 @@ public class JSSEUtil extends SSLUtilBase {
 
         return tms;
     }
+
+
+    private void checkTrustStoreEntries(KeyStore trustStore) throws Exception {
+        Enumeration<String> aliases = trustStore.aliases();
+        if (aliases != null) {
+            Date now = new Date();
+            while (aliases.hasMoreElements()) {
+                String alias = aliases.nextElement();
+                if (trustStore.isCertificateEntry(alias)) {
+                    Certificate cert = trustStore.getCertificate(alias);
+                    if (cert instanceof X509Certificate) {
+                        try {
+                            ((X509Certificate) cert).checkValidity(now);
+                        } catch (CertificateExpiredException | CertificateNotYetValidException e) {
+                            String msg = sm.getString("jsseUtil.trustedCertNotValid", alias,
+                                    ((X509Certificate) cert).getSubjectDN(), e.getMessage());
+                            if (log.isDebugEnabled()) {
+                                log.debug(msg, e);
+                            } else {
+                                log.warn(msg);
+                            }
+                        }
+                    } else {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("jsseUtil.trustedCertNotChecked", alias));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     @Override
     public void configureSessionContext(SSLSessionContext sslSessionContext) {

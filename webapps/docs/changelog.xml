@@ -242,6 +242,11 @@
         configuration attribute does not depend on the presence of a certificate
         revokation list. (markt)
       </fix>
+      <add>
+        Log a warning at start up if a JSSE TLS connector is configured with
+        a trusted certificate that is either not yet valid or has expired.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
