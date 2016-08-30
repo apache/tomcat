@@ -56,7 +56,7 @@ public class TestMimeHeadersIntegration extends TomcatBaseTest {
                 res.getWriter().write("OK");
             }
         });
-        ctx.addServletMapping("/", "servlet");
+        ctx.addServletMappingDecoded("/", "servlet");
 
         alv = new HeaderCountLogValve();
         tomcat.getHost().getPipeline().addValve(alv);

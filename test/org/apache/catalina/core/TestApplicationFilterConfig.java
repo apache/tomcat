@@ -41,7 +41,7 @@ public class TestApplicationFilterConfig extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "HelloWorld", new HelloWorldServlet());
-        ctx.addServletMapping("/", "HelloWorld");
+        ctx.addServletMappingDecoded("/", "HelloWorld");
 
         // Add a filter with a name that should be escaped if used in a JMX
         // object name

@@ -39,6 +39,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.UDecoder;
 
 @RunWith(value = Parameterized.class)
 public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
@@ -364,12 +365,11 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
 
         // Add a default servlet to return 404 for not found resources
         Tomcat.addServlet(ctx, "Default", new Default404Servlet());
-        ctx.addServletMapping("/*", "Default");
+        ctx.addServletMappingDecoded("/*", "Default");
 
         // Add a target servlet to dispatch to
         Tomcat.addServlet(ctx, "target", new TargetServlet());
-        // Note: This will decode the provided path
-        ctx.addServletMapping(targetPath, "target");
+        ctx.addServletMappingDecoded(UDecoder.URLDecode(targetPath, "UTF-8"), "target");
 
         if (useAsync) {
             Wrapper w = Tomcat.addServlet(
@@ -378,8 +378,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
         } else {
             Tomcat.addServlet(ctx, "rd", new DispatcherServlet(dispatchPath));
         }
-        // Note: This will decode the provided path
-        ctx.addServletMapping(startPath, "rd");
+        ctx.addServletMappingDecoded(UDecoder.URLDecode(startPath, "UTF-8"), "rd");
 
         tomcat.start();
 

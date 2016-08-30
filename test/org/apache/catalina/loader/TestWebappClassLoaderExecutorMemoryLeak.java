@@ -50,7 +50,7 @@ public class TestWebappClassLoaderExecutorMemoryLeak extends TomcatBaseTest {
 
         ExecutorServlet executorServlet = new ExecutorServlet();
         Tomcat.addServlet(ctx, "taskServlet", executorServlet);
-        ctx.addServletMapping("/", "taskServlet");
+        ctx.addServletMappingDecoded("/", "taskServlet");
 
         tomcat.start();
 

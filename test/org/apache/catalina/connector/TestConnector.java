@@ -43,7 +43,7 @@ public class TestConnector extends TomcatBaseTest {
         Wrapper w =
             Tomcat.addServlet(root, "tester", new TesterServlet());
         w.setAsyncSupported(true);
-        root.addServletMapping("/", "tester");
+        root.addServletMappingDecoded("/", "tester");
 
         Connector connector = tomcat.getConnector();
 

@@ -190,7 +190,7 @@ public class TestTomcat extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "myServlet", new HelloWorld());
-        ctx.addServletMapping("/", "myServlet");
+        ctx.addServletMappingDecoded("/", "myServlet");
 
         tomcat.start();
 
@@ -241,7 +241,7 @@ public class TestTomcat extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "myServlet", new HelloWorldSession());
-        ctx.addServletMapping("/", "myServlet");
+        ctx.addServletMappingDecoded("/", "myServlet");
 
         tomcat.start();
 
@@ -280,7 +280,7 @@ public class TestTomcat extends TomcatBaseTest {
         ctx.getNamingResources().addEnvironment(environment);
 
         Tomcat.addServlet(ctx, "jndiServlet", new HelloWorldJndi());
-        ctx.addServletMapping("/", "jndiServlet");
+        ctx.addServletMappingDecoded("/", "jndiServlet");
 
         tomcat.start();
 
@@ -314,7 +314,7 @@ public class TestTomcat extends TomcatBaseTest {
         ctx.getNamingResources().addResourceLink(link);
 
         Tomcat.addServlet(ctx, "jndiServlet", new HelloWorldJndi());
-        ctx.addServletMapping("/", "jndiServlet");
+        ctx.addServletMappingDecoded("/", "jndiServlet");
 
         tomcat.start();
 
@@ -339,7 +339,7 @@ public class TestTomcat extends TomcatBaseTest {
         ctx.addApplicationListener(WsContextListener.class.getName());
 
         Tomcat.addServlet(ctx, "testGetResource", new GetResource());
-        ctx.addServletMapping("/testGetResource", "testGetResource");
+        ctx.addServletMappingDecoded("/testGetResource", "testGetResource");
 
         tomcat.start();
 
@@ -379,7 +379,7 @@ public class TestTomcat extends TomcatBaseTest {
 
         InitCount initCount = new InitCount();
         Tomcat.addServlet(ctx, "initCount", initCount);
-        ctx.addServletMapping("/", "initCount");
+        ctx.addServletMappingDecoded("/", "initCount");
 
         tomcat.start();
 

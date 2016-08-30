@@ -32,7 +32,7 @@ import org.apache.tomcat.util.buf.UDecoder;
  *
  * @author Craig R. McClanahan
  */
-public class FilterMap implements Serializable {
+public class FilterMap extends XmlEncodingBase implements Serializable {
 
 
     // ------------------------------------------------------------- Properties
@@ -127,6 +127,9 @@ public class FilterMap implements Serializable {
     }
 
     public void addURLPattern(String urlPattern) {
+        addURLPatternDecoded(UDecoder.URLDecode(urlPattern, getEncoding()));
+    }
+    public void addURLPatternDecoded(String urlPattern) {
         if ("*".equals(urlPattern)) {
             this.matchAllUrlPatterns = true;
         } else {

@@ -572,6 +572,11 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void addServletMapping(String pattern, String name,
             boolean jspWildcard) { /* NO-OP */ }
     @Override
+    public void addServletMappingDecoded(String pattern, String name) { /* NO-OP */ }
+    @Override
+    public void addServletMappingDecoded(String pattern, String name,
+            boolean jspWildcard) { /* NO-OP */ }
+    @Override
     public String findServletMapping(String pattern) { return null; }
     @Override
     public String[] findServletMappings() { return null; }

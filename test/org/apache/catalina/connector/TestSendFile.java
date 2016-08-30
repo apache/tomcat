@@ -62,7 +62,7 @@ public class TestSendFile extends TomcatBaseTest{
             for (int i=0; i<ITERATIONS; i++) {
                 WritingServlet servlet = new WritingServlet(files[i]);
                 Tomcat.addServlet(root, "servlet" + i, servlet);
-                root.addServletMapping("/servlet" + i, "servlet" + i);
+                root.addServletMappingDecoded("/servlet" + i, "servlet" + i);
             }
 
             tomcat.start();

@@ -97,7 +97,7 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
         // Add the Servlet
         CharsetServlet servlet = new CharsetServlet(mode);
         Tomcat.addServlet(ctx, "servlet", servlet);
-        ctx.addServletMapping("/", "servlet");
+        ctx.addServletMappingDecoded("/", "servlet");
 
         // Add the Filter
         FilterDef filterDef = new FilterDef();

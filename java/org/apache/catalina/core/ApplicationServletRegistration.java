@@ -31,6 +31,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.util.ParameterMap;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.res.StringManager;
 
 public class ApplicationServletRegistration
@@ -189,7 +190,8 @@ public class ApplicationServletRegistration
         }
 
         for (String urlPattern : urlPatterns) {
-            context.addServletMapping(urlPattern, wrapper.getName());
+            context.addServletMappingDecoded(
+                    UDecoder.URLDecode(urlPattern, "UTF-8"), wrapper.getName());
         }
         return Collections.emptySet();
     }

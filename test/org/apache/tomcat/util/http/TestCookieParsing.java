@@ -255,7 +255,7 @@ public class TestCookieParsing extends TomcatBaseTest {
             } else {
                 Tomcat.addServlet(root, "Cookies", new EchoCookies());
             }
-            root.addServletMapping("/test", "Cookies");
+            root.addServletMappingDecoded("/test", "Cookies");
 
             tomcat.start();
             // Open connection

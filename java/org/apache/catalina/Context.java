@@ -872,10 +872,42 @@ public interface Context extends Container, ContextBind {
      * Add a new servlet mapping, replacing any existing mapping for
      * the specified pattern.
      *
+     * @param pattern URL pattern to be mapped. The pattern will be % decoded
+     *                using UTF-8
+     * @param name    Name of the corresponding servlet to execute
+     *
+     * @deprecated Will be removed in Tomcat 9. Use
+     *             {@link #addServletMappingDecoded(String, String)}
+     */
+    @Deprecated
+    public void addServletMapping(String pattern, String name);
+
+
+    /**
+     * Add a new servlet mapping, replacing any existing mapping for
+     * the specified pattern.
+     *
+     * @param pattern     URL pattern to be mapped. The pattern will be %
+     *                    decoded using UTF-8
+     * @param name        Name of the corresponding servlet to execute
+     * @param jspWildcard true if name identifies the JspServlet and pattern
+     *                    contains a wildcard; false otherwise
+     *
+     * @deprecated Will be removed in Tomcat 9. Use
+     *             {@link #addServletMappingDecoded(String, String, boolean)}
+     */
+    @Deprecated
+    public void addServletMapping(String pattern, String name, boolean jspWildcard);
+
+
+    /**
+     * Add a new servlet mapping, replacing any existing mapping for
+     * the specified pattern.
+     *
      * @param pattern URL pattern to be mapped
      * @param name Name of the corresponding servlet to execute
      */
-    public void addServletMapping(String pattern, String name);
+    public void addServletMappingDecoded(String pattern, String name);
 
 
     /**
@@ -887,7 +919,7 @@ public interface Context extends Container, ContextBind {
      * @param jspWildcard true if name identifies the JspServlet
      * and pattern contains a wildcard; false otherwise
      */
-    public void addServletMapping(String pattern, String name,
+    public void addServletMappingDecoded(String pattern, String name,
             boolean jspWildcard);
 
 

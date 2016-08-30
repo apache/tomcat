@@ -21,10 +21,13 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.apache.tomcat.util.buf.UDecoder;
+
 /**
  * Representation of a jsp-property-group element in web.xml.
  */
-public class JspPropertyGroup {
+public class JspPropertyGroup extends XmlEncodingBase {
+
     private Boolean deferredSyntax = null;
     public void setDeferredSyntax(String deferredSyntax) {
         this.deferredSyntax = Boolean.valueOf(deferredSyntax);
@@ -75,6 +78,9 @@ public class JspPropertyGroup {
 
     private LinkedHashSet<String> urlPattern = new LinkedHashSet<>();
     public void addUrlPattern(String urlPattern) {
+        addUrlPatternDecoded(UDecoder.URLDecode(urlPattern, getEncoding()));
+    }
+    public void addUrlPatternDecoded(String urlPattern) {
         this.urlPattern.add(urlPattern);
     }
     public Set<String> getUrlPatterns() { return this.urlPattern; }

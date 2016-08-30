@@ -34,7 +34,7 @@ public class TestHttp11OutputBuffer extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "echo", new EchoBodyServlet());
-        ctx.addServletMapping("/echo", "echo");
+        ctx.addServletMappingDecoded("/echo", "echo");
 
         tomcat.start();
 

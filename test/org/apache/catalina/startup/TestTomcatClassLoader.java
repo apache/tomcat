@@ -44,7 +44,7 @@ public class TestTomcatClassLoader extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "ClassLoaderReport", new ClassLoaderReport(null));
-        ctx.addServletMapping("/", "ClassLoaderReport");
+        ctx.addServletMappingDecoded("/", "ClassLoaderReport");
 
         tomcat.start();
 
@@ -67,7 +67,7 @@ public class TestTomcatClassLoader extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "ClassLoaderReport", new ClassLoaderReport(cl));
-        ctx.addServletMapping("/", "ClassLoaderReport");
+        ctx.addServletMappingDecoded("/", "ClassLoaderReport");
 
         tomcat.start();
 

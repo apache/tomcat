@@ -45,7 +45,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Context ctx = tomcat.addContext("", null);
         ctx.addApplicationListener(TesterFirehoseServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMapping("/", "default");
+        ctx.addServletMappingDecoded("/", "default");
 
         tomcat.start();
 
@@ -87,11 +87,11 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Context ctx = tomcat.addContext("", null);
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMapping("/", "default");
+        ctx.addServletMappingDecoded("/", "default");
         Context ctx2 = tomcat.addContext("/foo", null);
         ctx2.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx2, "default", new DefaultServlet());
-        ctx2.addServletMapping("/", "default");
+        ctx2.addServletMappingDecoded("/", "default");
 
         tomcat.start();
 

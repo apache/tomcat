@@ -660,7 +660,7 @@ public class TestRealmBase {
         deleteConstraint.addAuthRole(ROLE1);
         SecurityCollection deleteCollection = new SecurityCollection();
         deleteCollection.addMethod("DELETE");
-        deleteCollection.addPattern("/*");
+        deleteCollection.addPatternDecoded("/*");
         deleteConstraint.addCollection(deleteCollection);
 
         TesterMapRealm mapRealm = new TesterMapRealm();

@@ -108,11 +108,11 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
         Wrapper w = Tomcat.addServlet(root, "nbWrite",
                 new NonBlockingWriteServlet(asyncWriteTarget, useContainerThreadToSetListener));
         w.setAsyncSupported(true);
-        root.addServletMapping("/nbWrite", "nbWrite");
+        root.addServletMappingDecoded("/nbWrite", "nbWrite");
         Tomcat.addServlet(root, "write",
                 new BlockingWriteServlet(asyncWriteTarget, syncWriteTarget));
         w.setAsyncSupported(true);
-        root.addServletMapping("/write", "write");
+        root.addServletMappingDecoded("/write", "write");
 
         tomcat.start();
 

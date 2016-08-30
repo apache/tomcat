@@ -175,12 +175,12 @@ public final class TesterSupport {
         Context ctx = tomcat.addContext("", null);
 
         Tomcat.addServlet(ctx, "simple", new SimpleServlet());
-        ctx.addServletMapping("/unprotected", "simple");
-        ctx.addServletMapping("/protected", "simple");
+        ctx.addServletMappingDecoded("/unprotected", "simple");
+        ctx.addServletMappingDecoded("/protected", "simple");
 
         // Security constraints
         SecurityCollection collection = new SecurityCollection();
-        collection.addPattern("/protected");
+        collection.addPatternDecoded("/protected");
         SecurityConstraint sc = new SecurityConstraint();
         sc.addAuthRole(ROLE);
         sc.addCollection(collection);

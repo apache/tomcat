@@ -112,7 +112,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
                 "org.apache.catalina.servlets.DefaultServlet");
         defaultServlet.addInitParameter("gzip", "true");
-        ctxt.addServletMapping("/", "default");
+        ctxt.addServletMappingDecoded("/", "default");
 
         ctxt.addMimeMapping("html", "text/html");
 
@@ -168,7 +168,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
                 "org.apache.catalina.servlets.DefaultServlet");
         defaultServlet.addInitParameter("precompressed", "true");
 
-        ctxt.addServletMapping("/", "default");
+        ctxt.addServletMappingDecoded("/", "default");
         ctxt.addMimeMapping("html", "text/html");
 
         tomcat.start();
@@ -223,7 +223,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
                 DefaultServlet.class.getName());
         defaultServlet.addInitParameter("precompressed", "gzip=.gz,custom=.br");
 
-        ctxt.addServletMapping("/", "default");
+        ctxt.addServletMappingDecoded("/", "default");
         ctxt.addMimeMapping("html", "text/html");
 
         tomcat.start();
@@ -278,7 +278,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
                 DefaultServlet.class.getName());
         defaultServlet.addInitParameter("precompressed", "br=.br,gzip=.gz");
 
-        ctxt.addServletMapping("/", "default");
+        ctxt.addServletMappingDecoded("/", "default");
         ctxt.addMimeMapping("html", "text/html");
 
         tomcat.start();
@@ -332,7 +332,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
                 DefaultServlet.class.getName());
         defaultServlet.addInitParameter("precompressed", "true");
 
-        ctxt.addServletMapping("/", "default");
+        ctxt.addServletMappingDecoded("/", "default");
         ctxt.addMimeMapping("html", "text/html");
 
         tomcat.start();
@@ -388,9 +388,9 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
         // Override the default servlet with our own mappings
         Tomcat.addServlet(ctx, "default2", new DefaultServlet());
-        ctx.addServletMapping("/", "default2");
-        ctx.addServletMapping("/servlets/*", "default2");
-        ctx.addServletMapping("/static/*", "default2");
+        ctx.addServletMappingDecoded("/", "default2");
+        ctx.addServletMappingDecoded("/servlets/*", "default2");
+        ctx.addServletMappingDecoded("/static/*", "default2");
 
         tomcat.start();
 

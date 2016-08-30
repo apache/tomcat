@@ -76,7 +76,7 @@ public class TestMaxConnections extends TomcatBaseTest {
         StandardContext root = (StandardContext) tomcat.addContext("", SimpleHttpClient.TEMP_DIR);
         root.setUnloadDelay(soTimeout);
         Tomcat.addServlet(root, "Simple", new SimpleServlet());
-        root.addServletMapping("/test", "Simple");
+        root.addServletMappingDecoded("/test", "Simple");
         tomcat.getConnector().setProperty("maxKeepAliveRequests", "1");
         tomcat.getConnector().setProperty("maxThreads", "10");
         tomcat.getConnector().setProperty("soTimeout", "20000");

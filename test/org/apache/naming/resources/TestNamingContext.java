@@ -74,7 +74,7 @@ public class TestNamingContext extends TomcatBaseTest {
         // Map the test Servlet
         Bug49994Servlet bug49994Servlet = new Bug49994Servlet();
         Tomcat.addServlet(ctx, "bug49994Servlet", bug49994Servlet);
-        ctx.addServletMapping("/", "bug49994Servlet");
+        ctx.addServletMappingDecoded("/", "bug49994Servlet");
 
         tomcat.start();
 
@@ -134,7 +134,7 @@ public class TestNamingContext extends TomcatBaseTest {
         // Map the test Servlet
         Bug23950Servlet bug23950Servlet = new Bug23950Servlet();
         Tomcat.addServlet(ctx, "bug23950Servlet", bug23950Servlet);
-        ctx.addServletMapping("/", "bug23950Servlet");
+        ctx.addServletMappingDecoded("/", "bug23950Servlet");
 
         tomcat.start();
 
@@ -186,7 +186,7 @@ public class TestNamingContext extends TomcatBaseTest {
         // Map the test Servlet
         Bug50351Servlet bug50351Servlet = new Bug50351Servlet();
         Tomcat.addServlet(ctx, "bug50351Servlet", bug50351Servlet);
-        ctx.addServletMapping("/", "bug50351Servlet");
+        ctx.addServletMappingDecoded("/", "bug50351Servlet");
 
         tomcat.start();
 
@@ -239,7 +239,7 @@ public class TestNamingContext extends TomcatBaseTest {
         // Map the test Servlet
         Bug51744Servlet bug51744Servlet = new Bug51744Servlet();
         Tomcat.addServlet(ctx, "bug51744Servlet", bug51744Servlet);
-        ctx.addServletMapping("/", "bug51744Servlet");
+        ctx.addServletMappingDecoded("/", "bug51744Servlet");
 
         tomcat.start();
 
@@ -302,7 +302,7 @@ public class TestNamingContext extends TomcatBaseTest {
         // Map the test Servlet
         Bug52830Servlet bug52830Servlet = new Bug52830Servlet();
         Tomcat.addServlet(ctx, "bug52830Servlet", bug52830Servlet);
-        ctx.addServletMapping("/", "bug52830Servlet");
+        ctx.addServletMappingDecoded("/", "bug52830Servlet");
 
         tomcat.start();
 

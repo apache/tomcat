@@ -50,7 +50,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
-public class SecurityConstraint implements Serializable {
+public class SecurityConstraint extends XmlEncodingBase implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -280,6 +280,9 @@ public class SecurityConstraint implements Serializable {
 
         if (collection == null)
             return;
+
+        collection.setEncoding(getEncoding());
+
         SecurityCollection results[] =
             new SecurityCollection[collections.length + 1];
         for (int i = 0; i < collections.length; i++)
@@ -706,7 +709,7 @@ public class SecurityConstraint implements Serializable {
                     for (String method : methods) {
                         collection.addOmittedMethod(method);
                     }
-                    collection.addPattern(pattern);
+                    collection.addPatternDecoded(pattern);
                     collection.setName("deny-uncovered-http-methods");
                     SecurityConstraint constraint = new SecurityConstraint();
                     constraint.setAuthConstraint(true);
@@ -759,7 +762,7 @@ public class SecurityConstraint implements Serializable {
                 for (String method : omittedMethods) {
                     collection.addMethod(method);
                 }
-                collection.addPattern(pattern);
+                collection.addPatternDecoded(pattern);
                 collection.setName("deny-uncovered-http-methods");
                 SecurityConstraint constraint = new SecurityConstraint();
                 constraint.setAuthConstraint(true);

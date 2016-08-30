@@ -516,7 +516,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName(RemoteIpFilter.class.getName());
-        filterMap.addURLPattern("*");
+        filterMap.addURLPatternDecoded("*");
         root.addFilterMap(filterMap);
 
         getTomcatInstance().start();
@@ -583,13 +583,13 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         FilterMap filterMap = new FilterMap();
         filterMap.setFilterName(RemoteIpFilter.class.getName());
-        filterMap.addURLPattern("*");
+        filterMap.addURLPatternDecoded("*");
         root.addFilterMap(filterMap);
 
         MockHttpServlet mockServlet = new MockHttpServlet();
 
         Tomcat.addServlet(root, mockServlet.getClass().getName(), mockServlet);
-        root.addServletMapping("/test", mockServlet.getClass().getName());
+        root.addServletMappingDecoded("/test", mockServlet.getClass().getName());
 
         getTomcatInstance().start();
 

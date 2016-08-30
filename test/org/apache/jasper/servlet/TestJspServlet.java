@@ -46,7 +46,7 @@ public class TestJspServlet  extends TomcatBaseTest {
 
         // Create a servlet that always throws an exception for a PUT request
         Tomcat.addServlet(context, "Bug56568Servlet", new Bug56568aServlet());
-        context.addServletMapping("/bug56568", "Bug56568Servlet");
+        context.addServletMappingDecoded("/bug56568", "Bug56568Servlet");
 
         // Configure a JSP page to handle the 500 error response
         // The JSP page will see the same method as the original request (PUT)

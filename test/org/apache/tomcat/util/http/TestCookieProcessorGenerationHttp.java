@@ -45,7 +45,7 @@ public class TestCookieProcessorGenerationHttp extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
         ctx.setCookieProcessor(new Rfc6265CookieProcessor());
         Tomcat.addServlet(ctx, "test", new CookieServlet("\u0120"));
-        ctx.addServletMapping("/test", "test");
+        ctx.addServletMappingDecoded("/test", "test");
         tomcat.start();
 
         Map<String,List<String>> headers = new HashMap<>();

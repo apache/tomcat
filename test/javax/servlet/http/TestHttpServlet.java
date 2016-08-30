@@ -44,7 +44,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         // Map the test Servlet
         LargeBodyServlet largeBodyServlet = new LargeBodyServlet();
         Tomcat.addServlet(ctx, "largeBodyServlet", largeBodyServlet);
-        ctx.addServletMapping("/", "largeBodyServlet");
+        ctx.addServletMappingDecoded("/", "largeBodyServlet");
 
         tomcat.start();
 
@@ -84,11 +84,11 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         Bug57602ServletOuter outer = new Bug57602ServletOuter();
         Tomcat.addServlet(ctx, "Bug57602ServletOuter", outer);
-        ctx.addServletMapping("/outer", "Bug57602ServletOuter");
+        ctx.addServletMappingDecoded("/outer", "Bug57602ServletOuter");
 
         Bug57602ServletInner inner = new Bug57602ServletInner();
         Tomcat.addServlet(ctx, "Bug57602ServletInner", inner);
-        ctx.addServletMapping("/inner", "Bug57602ServletInner");
+        ctx.addServletMappingDecoded("/inner", "Bug57602ServletInner");
 
         tomcat.start();
 

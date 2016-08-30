@@ -252,7 +252,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
             } else {
                 w.setMultipartConfigElement(new MultipartConfigElement(""));
             }
-            context.addServletMapping(URI, servletName);
+            context.addServletMappingDecoded(URI, servletName);
             context.setSwallowAbortedUploads(swallow);
 
             tomcat.start();
@@ -360,7 +360,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
             servlet.setStatus(status);
             Tomcat.addServlet(context, servletName,
                               servlet);
-            context.addServletMapping(URI, servletName);
+            context.addServletMappingDecoded(URI, servletName);
             context.setSwallowAbortedUploads(swallow);
 
             tomcat.start();
