@@ -51,7 +51,7 @@ public class OutputBuffer extends Writer
 
     private static final StringManager sm = StringManager.getManager(OutputBuffer.class);
 
-    public static final int DEFAULT_BUFFER_SIZE = 8*1024;
+    public static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
 
     /**
      * Encoder cache.
@@ -247,8 +247,7 @@ public class OutputBuffer extends Writer
      * @throws IOException An underlying IOException occurred
      */
     @Override
-    public void close()
-        throws IOException {
+    public void close() throws IOException {
 
         if (closed) {
             return;
@@ -263,8 +262,8 @@ public class OutputBuffer extends Writer
             cb.flushBuffer();
         }
 
-        if ((!coyoteResponse.isCommitted()) && (coyoteResponse.getContentLengthLong() == -1) &&
-                !coyoteResponse.getRequest().method().equals("HEAD")) {
+        if ((!coyoteResponse.isCommitted()) && (coyoteResponse.getContentLengthLong() == -1)
+                && !coyoteResponse.getRequest().method().equals("HEAD")) {
             // If this didn't cause a commit of the response, the final content
             // length can be calculated. Only do this if this is not a HEAD
             // request since in that case no body should have been written and
@@ -275,8 +274,7 @@ public class OutputBuffer extends Writer
             }
         }
 
-        if (coyoteResponse.getStatus() ==
-                HttpServletResponse.SC_SWITCHING_PROTOCOLS) {
+        if (coyoteResponse.getStatus() == HttpServletResponse.SC_SWITCHING_PROTOCOLS) {
             doFlush(true);
         } else {
             doFlush(false);
@@ -286,8 +284,7 @@ public class OutputBuffer extends Writer
         // The request should have been completely read by the time the response
         // is closed. Further reads of the input a) are pointless and b) really
         // confuse AJP (bug 50189) so close the input buffer to prevent them.
-        Request req = (Request) coyoteResponse.getRequest().getNote(
-                CoyoteAdapter.ADAPTER_NOTES);
+        Request req = (Request) coyoteResponse.getRequest().getNote(CoyoteAdapter.ADAPTER_NOTES);
         req.inputBuffer.close();
 
         coyoteResponse.action(ActionCode.CLOSE, null);
@@ -358,8 +355,7 @@ public class OutputBuffer extends Writer
      * @throws IOException An underlying IOException occurred
      */
     @Override
-    public void realWriteBytes(byte buf[], int off, int cnt)
-            throws IOException {
+    public void realWriteBytes(byte buf[], int off, int cnt) throws IOException {
 
         if (closed) {
             return;
@@ -441,8 +437,7 @@ public class OutputBuffer extends Writer
     }
 
 
-    private void writeBytes(byte b[], int off, int len)
-        throws IOException {
+    private void writeBytes(byte b[], int off, int len) throws IOException {
 
         if (closed) {
             return;
@@ -478,8 +473,7 @@ public class OutputBuffer extends Writer
     }
 
 
-    public void writeByte(int b)
-        throws IOException {
+    public void writeByte(int b) throws IOException {
 
         if (suspended) {
             return;
@@ -504,8 +498,7 @@ public class OutputBuffer extends Writer
      * @throws IOException An underlying IOException occurred
      */
     @Override
-    public void realWriteChars(char buf[], int off, int len)
-        throws IOException {
+    public void realWriteChars(char buf[], int off, int len) throws IOException {
 
         outputCharChunk.setChars(buf, off, len);
         while (outputCharChunk.getLength() > 0) {
@@ -527,8 +520,7 @@ public class OutputBuffer extends Writer
     }
 
     @Override
-    public void write(int c)
-        throws IOException {
+    public void write(int c) throws IOException {
 
         if (suspended) {
             return;
@@ -541,8 +533,7 @@ public class OutputBuffer extends Writer
 
 
     @Override
-    public void write(char c[])
-        throws IOException {
+    public void write(char c[]) throws IOException {
 
         if (suspended) {
             return;
@@ -554,8 +545,7 @@ public class OutputBuffer extends Writer
 
 
     @Override
-    public void write(char c[], int off, int len)
-        throws IOException {
+    public void write(char c[], int off, int len) throws IOException {
 
         if (suspended) {
             return;
@@ -571,8 +561,7 @@ public class OutputBuffer extends Writer
      * Append a string to the buffer
      */
     @Override
-    public void write(String s, int off, int len)
-        throws IOException {
+    public void write(String s, int off, int len) throws IOException {
 
         if (suspended) {
             return;
@@ -587,8 +576,7 @@ public class OutputBuffer extends Writer
 
 
     @Override
-    public void write(String s)
-        throws IOException {
+    public void write(String s) throws IOException {
 
         if (suspended) {
             return;
@@ -637,13 +625,12 @@ public class OutputBuffer extends Writer
     private static Charset getCharset(final String encoding) throws IOException {
         if (Globals.IS_SECURITY_ENABLED) {
             try {
-                return AccessController.doPrivileged(
-                        new PrivilegedExceptionAction<Charset>() {
-                            @Override
-                            public Charset run() throws IOException {
-                                return B2CConverter.getCharset(encoding);
-                            }
-                        });
+                return AccessController.doPrivileged(new PrivilegedExceptionAction<Charset>() {
+                    @Override
+                    public Charset run() throws IOException {
+                        return B2CConverter.getCharset(encoding);
+                    }
+                });
             } catch (PrivilegedActionException ex) {
                 Exception e = ex.getException();
                 if (e instanceof IOException) {
@@ -659,16 +646,14 @@ public class OutputBuffer extends Writer
 
 
     private static C2BConverter createConverter(final Charset charset) throws IOException {
-        if (Globals.IS_SECURITY_ENABLED){
+        if (Globals.IS_SECURITY_ENABLED) {
             try {
-                return AccessController.doPrivileged(
-                        new PrivilegedExceptionAction<C2BConverter>(){
-                            @Override
-                            public C2BConverter run() throws IOException{
-                                return new C2BConverter(charset);
-                            }
-                        }
-                );
+                return AccessController.doPrivileged(new PrivilegedExceptionAction<C2BConverter>() {
+                    @Override
+                    public C2BConverter run() throws IOException {
+                        return new C2BConverter(charset);
+                    }
+                });
             } catch (PrivilegedActionException ex) {
                 Exception e = ex.getException();
                 if (e instanceof IOException) {

@@ -41,7 +41,7 @@ public final class C2BConverter {
     public C2BConverter(Charset charset) {
         encoder = charset.newEncoder();
         encoder.onUnmappableCharacter(CodingErrorAction.REPLACE)
-            .onMalformedInput(CodingErrorAction.REPLACE);
+                .onMalformedInput(CodingErrorAction.REPLACE);
         char[] left = new char[4];
         leftovers = CharBuffer.wrap(left);
     }
@@ -65,12 +65,10 @@ public final class C2BConverter {
      * @param bc byte output
      * @throws IOException An encoding error occurred
      */
-    public void convert(CharChunk cc, ByteChunk bc)
-            throws IOException {
+    public void convert(CharChunk cc, ByteChunk bc) throws IOException {
         if ((bb == null) || (bb.array() != bc.getBuffer())) {
             // Create a new byte buffer if anything changed
-            bb = ByteBuffer.wrap(bc.getBuffer(), bc.getEnd(),
-                    bc.getBuffer().length - bc.getEnd());
+            bb = ByteBuffer.wrap(bc.getBuffer(), bc.getEnd(), bc.getBuffer().length - bc.getEnd());
         } else {
             // Initialize the byte buffer
             bb.limit(bc.getBuffer().length);
@@ -78,8 +76,7 @@ public final class C2BConverter {
         }
         if ((cb == null) || (cb.array() != cc.getBuffer())) {
             // Create a new char buffer if anything changed
-            cb = CharBuffer.wrap(cc.getBuffer(), cc.getStart(),
-                    cc.getLength());
+            cb = CharBuffer.wrap(cc.getBuffer(), cc.getStart(), cc.getLength());
         } else {
             // Initialize the char buffer
             cb.limit(cc.getEnd());
