@@ -929,6 +929,10 @@
         Fix handling of missing messages in
         <code>org.apache.el.util.MessageFactory</code>. (violetagg)
       </fix>
+      <fix>
+        Ignore <code>engineOptionsClass</code> and <code>scratchdir</code> when
+        running under a security manager. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

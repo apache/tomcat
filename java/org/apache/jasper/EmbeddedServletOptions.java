@@ -650,6 +650,10 @@ public final class EmbeddedServletOptions implements Options {
          * scratchdir
          */
         String dir = config.getInitParameter("scratchdir"); 
+        if (dir != null && Constants.IS_SECURITY_ENABLED) {
+            log.info(Localizer.getMessage("jsp.info.ignoreSetting", "scratchdir", dir));
+            dir = null;
+        }
         if (dir != null) {
             scratchDir = new File(dir);
         } else {

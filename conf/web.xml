@@ -163,6 +163,8 @@
   <!--   engineOptionsClass  Allows specifying the Options class used to    -->
   <!--                       configure Jasper. If not present, the default  -->
   <!--                       EmbeddedServletOptions will be used.           -->
+  <!--                       This option is ignored when running under a    -->
+  <!--                       SecurityManager.                               -->
   <!--                                                                      -->
   <!--   errorOnUseBeanInvalidClassAttribute                                -->
   <!--                       Should Jasper issue an error when the value of -->
@@ -224,6 +226,8 @@
   <!--   scratchdir          What scratch directory should we use when      -->
   <!--                       compiling JSP pages?  [default work directory  -->
   <!--                       for the current web application]               -->
+  <!--                       This option is ignored when running under a    -->
+  <!--                       SecurityManager.                               -->
   <!--                                                                      -->
   <!--   suppressSmap        Should the generation of SMAP info for JSR45   -->
   <!--                       debugging be suppressed?  [false]              -->
