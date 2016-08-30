@@ -180,8 +180,8 @@
       </fix>
       <fix>
         Consistently decode URL patterns provided via web.xml using the encoding
-        of the web.xml file where specifified or UTF-8 where no explicit
-        encoding is specified. (markt)
+        of the web.xml file where specified or UTF-8 where no explicit encoding
+        is specified. (markt)
       </fix>
     </changelog>
   </subsection>
