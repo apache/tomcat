@@ -114,6 +114,31 @@ public class TestRewriteValve extends TomcatBaseTest {
         doTestRewrite(config, request, expectedURI, null);
     }
 
+    @Test
+    public void testNonAsciiPath() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1", "/b/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
+                "/c/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95");
+    }
+
+    @Test
+    public void testNonAsciiPathRedirect() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1 [R]",
+                "/b/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
+                "/c/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95");
+    }
+
+    @Test
+    public void testQueryString() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c?$1", "/b/id=1", "/c", "id=1");
+    }
+
+    @Test
+    public void testNonAsciiQueryString() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c?$1", "/b/id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
+                "/c", "id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95");
+    }
+
+
     private void doTestRewrite(String config, String request, String expectedURI,
             String expectedQueryString) throws Exception {
 
@@ -127,13 +152,11 @@ public class TestRewriteValve extends TomcatBaseTest {
 
         rewriteValve.setConfiguration(config);
 
-        // Note: URLPatterns should be URL encoded
-        //       (http://svn.apache.org/r285186)
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
-        ctx.addServletMapping("/a/%255A", "snoop");
-        ctx.addServletMapping("/c/*", "snoop");
+        ctx.addServletMappingDecoded("/a/%5A", "snoop");
+        ctx.addServletMappingDecoded("/c/*", "snoop");
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMapping("/", "default");
+        ctx.addServletMappingDecoded("/", "default");
 
         tomcat.start();
 
