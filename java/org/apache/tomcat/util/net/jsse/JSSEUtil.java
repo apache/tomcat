@@ -241,9 +241,6 @@ public class JSSEUtil extends SSLUtilBase {
 
     @Override
     public TrustManager[] getTrustManagers() throws Exception {
-        String algorithm = sslHostConfig.getTruststoreAlgorithm();
-
-        String crlf = sslHostConfig.getCertificateRevocationListFile();
 
         String className = sslHostConfig.getTrustManagerClassName();
         if(className != null && className.length() > 0) {
@@ -261,17 +258,24 @@ public class JSSEUtil extends SSLUtilBase {
         TrustManager[] tms = null;
 
         KeyStore trustStore = sslHostConfig.getTruststore();
-        if (trustStore != null || className != null) {
-            if (crlf == null) {
+        if (trustStore != null) {
+            String algorithm = sslHostConfig.getTruststoreAlgorithm();
+            String crlf = sslHostConfig.getCertificateRevocationListFile();
+
+            if ("PKIX".equalsIgnoreCase(algorithm)) {
                 TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
-                tmf.init(trustStore);
-                tms = tmf.getTrustManagers();
-            } else {
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
-                CertPathParameters params = getParameters(algorithm, crlf, trustStore);
+                CertPathParameters params = getParameters(crlf, trustStore);
                 ManagerFactoryParameters mfp = new CertPathTrustManagerParameters(params);
                 tmf.init(mfp);
                 tms = tmf.getTrustManagers();
+            } else {
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
+                tmf.init(trustStore);
+                tms = tmf.getTrustManagers();
+                if (crlf != null && crlf.length() > 0) {
+                    throw new CRLException(sm.getString("jsseUtil.noCrlSupport", algorithm));
+                }
+                log.warn(sm.getString("jsseUtil.noVerificationDepth"));
             }
         }
 
@@ -289,28 +293,26 @@ public class JSSEUtil extends SSLUtilBase {
      * Return the initialization parameters for the TrustManager.
      * Currently, only the default <code>PKIX</code> is supported.
      *
-     * @param algorithm The algorithm to get parameters for.
      * @param crlf The path to the CRL file.
      * @param trustStore The configured TrustStore.
      * @return The parameters including the CRLs and TrustStore.
      * @throws Exception An error occurred
      */
-    protected CertPathParameters getParameters(String algorithm, String crlf,
-            KeyStore trustStore) throws Exception {
+    protected CertPathParameters getParameters(String crlf, KeyStore trustStore) throws Exception {
 
-        if("PKIX".equalsIgnoreCase(algorithm)) {
-            PKIXBuilderParameters xparams =
-                    new PKIXBuilderParameters(trustStore, new X509CertSelector());
+        PKIXBuilderParameters xparams =
+                new PKIXBuilderParameters(trustStore, new X509CertSelector());
+        if (crlf != null && crlf.length() > 0) {
             Collection<? extends CRL> crls = getCRLs(crlf);
             CertStoreParameters csp = new CollectionCertStoreParameters(crls);
             CertStore store = CertStore.getInstance("Collection", csp);
             xparams.addCertStore(store);
             xparams.setRevocationEnabled(true);
-            xparams.setMaxPathLength(sslHostConfig.getCertificateVerificationDepth());
-            return xparams;
         } else {
-            throw new CRLException("CRLs not supported for type: "+algorithm);
+            xparams.setRevocationEnabled(false);
         }
+        xparams.setMaxPathLength(sslHostConfig.getCertificateVerificationDepth());
+        return xparams;
     }
 
 
