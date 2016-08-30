@@ -183,6 +183,9 @@
         of the web.xml file where specified or UTF-8 where no explicit encoding
         is specified. (markt)
       </fix>
+      <fix>
+        Make timing attacks against the Realm implementations harder. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
