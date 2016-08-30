@@ -84,9 +84,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 }
                 socketWrapper.setWriteTimeout(timeout);
                 try {
-                    socketWrapper.write(true, buffer.array(), buffer.arrayOffset(),
-                                    buffer.limit());
-                    buffer.position(buffer.limit());
+                    socketWrapper.write(true, buffer);
                     timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
                     if (timeout < 0) {
                         SendResult sr = new SendResult(new SocketTimeoutException());
@@ -121,9 +119,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 for (ByteBuffer buffer : buffers) {
                     if (buffer.hasRemaining()) {
                         complete = false;
-                        socketWrapper.write(
-                                false, buffer.array(), buffer.arrayOffset(), buffer.limit());
-                        buffer.position(buffer.limit());
+                        socketWrapper.write(false, buffer);
                         break;
                     }
                 }
