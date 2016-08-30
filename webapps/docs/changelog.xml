@@ -173,6 +173,9 @@
         <bug>59904</bug>: Add a limit (default 200) for the number of cookies
         allowed per request. Based on a patch by gehui. (markt)
       </fix>
+      <fix>
+        Make timing attacks against the Realm implementations harder. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
