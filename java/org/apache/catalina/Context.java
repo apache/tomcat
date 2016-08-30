@@ -875,7 +875,9 @@ public interface Context extends Container, ContextBind {
      * @param pattern URL pattern to be mapped
      * @param name Name of the corresponding servlet to execute
      */
-    public void addServletMapping(String pattern, String name);
+    public default void addServletMapping(String pattern, String name) {
+        addServletMapping(pattern, name, false);
+    }
 
 
     /**

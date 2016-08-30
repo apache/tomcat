@@ -567,8 +567,6 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void removeSecurityRole(String role) { /* NO-OP */ }
 
     @Override
-    public void addServletMapping(String pattern, String name) { /* NO-OP */ }
-    @Override
     public void addServletMapping(String pattern, String name,
             boolean jspWildcard) { /* NO-OP */ }
     @Override

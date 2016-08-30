@@ -3112,22 +3112,6 @@ public class StandardContext extends ContainerBase
      *
      * @param pattern URL pattern to be mapped
      * @param name Name of the corresponding servlet to execute
-     *
-     * @exception IllegalArgumentException if the specified servlet name
-     *  is not known to this Context
-     */
-    @Override
-    public void addServletMapping(String pattern, String name) {
-        addServletMapping(pattern, name, false);
-    }
-
-
-    /**
-     * Add a new servlet mapping, replacing any existing mapping for
-     * the specified pattern.
-     *
-     * @param pattern URL pattern to be mapped
-     * @param name Name of the corresponding servlet to execute
      * @param jspWildCard true if name identifies the JspServlet
      * and pattern contains a wildcard; false otherwise
      *
