@@ -132,7 +132,7 @@ default <code>true</code>.
 
 <li><strong>engineOptionsClass</strong> - Allows specifying the Options class
 used to configure Jasper. If not present, the default EmbeddedServletOptions
-will be used.
+will be used. This option is ignored if running under a SecurityManager.
 </li>
 
 <li><strong>errorOnUseBeanInvalidClassAttribute</strong> - Should Jasper issue
@@ -185,7 +185,7 @@ may be expensive and could lead to excessive resource usage.</li>
 
 <li><strong>scratchdir</strong> - What scratch directory should we use when
 compiling JSP pages? Default is the work directory for the current web
-application.</li>
+application. This option is ignored if running under a SecurityManager.</li>
 
 <li><strong>suppressSmap</strong> - Should the generation of SMAP info for JSR45
 debugging be suppressed? <code>true</code> or <code>false</code>, default
