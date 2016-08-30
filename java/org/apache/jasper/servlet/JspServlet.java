@@ -88,19 +88,14 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
         // Initialize the JSP Runtime Context
         // Check for a custom Options implementation
-        String engineOptionsName =
-            config.getInitParameter("engineOptionsClass");
+        String engineOptionsName = config.getInitParameter("engineOptionsClass");
         if (engineOptionsName != null) {
             // Instantiate the indicated Options implementation
             try {
-                ClassLoader loader = Thread.currentThread()
-                        .getContextClassLoader();
-                Class<?> engineOptionsClass =
-                    loader.loadClass(engineOptionsName);
-                Class<?>[] ctorSig =
-                    { ServletConfig.class, ServletContext.class };
-                Constructor<?> ctor =
-                    engineOptionsClass.getConstructor(ctorSig);
+                ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                Class<?> engineOptionsClass = loader.loadClass(engineOptionsName);
+                Class<?>[] ctorSig = { ServletConfig.class, ServletContext.class };
+                Constructor<?> ctor = engineOptionsClass.getConstructor(ctorSig);
                 Object[] args = { config, context };
                 options = (Options) ctor.newInstance(args);
             } catch (Throwable e) {
