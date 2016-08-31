@@ -251,8 +251,10 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                  * to the web application class loader.
                  *
                  * Instead we initialize JCA right now.
+                 *
+                 * Fixed in Java 9 onwards (from early access build 133)
                  */
-                if (tokenPollerProtection) {
+                if (tokenPollerProtection && !JreCompat.isJre9Available()) {
                     java.security.Security.getProviders();
                 }
 
@@ -287,7 +289,10 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                     }
                 }
 
-                if (xmlParsingProtection) {
+                /*
+                 * Fixed in Java 9 onwards (from early access build 133)
+                 */
+                if (xmlParsingProtection && !JreCompat.isJre9Available()) {
                     // There are two known issues with XML parsing that affect
                     // Java 8+. The issues both relate to cached Exception
                     // instances that retain a link to the TCCL via the
