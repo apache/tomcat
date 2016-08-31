@@ -18,6 +18,7 @@ package org.apache.catalina.startup;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -364,12 +365,13 @@ public class TestContextConfigAnnotation {
      *
      * @param className
      * @return File Resource
+     * @throws URISyntaxException
      */
-    private File paramClassResource(String className) {
+    private File paramClassResource(String className) throws URISyntaxException {
         URL url = getClass().getClassLoader().getResource(className + ".class");
         assertNotNull(url);
 
-        File file = new File(url.getPath());
+        File file = new File(url.toURI());
         return file;
     }
 }
