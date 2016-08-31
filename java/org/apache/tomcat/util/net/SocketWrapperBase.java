@@ -453,7 +453,7 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
-    private void writeByteBufferBlocking(ByteBuffer from) throws IOException {
+    protected void writeByteBufferBlocking(ByteBuffer from) throws IOException {
         // The socket write buffer capacity is socket.appWriteBufSize
         int limit = socketBufferHandler.getWriteBuffer().capacity();
         int fromLimit = from.limit();
@@ -551,7 +551,7 @@ public abstract class SocketWrapperBase<E> {
     }
 
 
-    private boolean writeByteBufferNonBlocking(ByteBuffer from) throws IOException {
+    protected boolean writeByteBufferNonBlocking(ByteBuffer from) throws IOException {
         // The socket write buffer capacity is socket.appWriteBufSize
         int limit = socketBufferHandler.getWriteBuffer().capacity();
         int fromLimit = from.limit();
