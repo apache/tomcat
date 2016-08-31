@@ -111,7 +111,7 @@ public class JspCompilationContext {
 
         this.baseURI = jspUri.substring(0, jspUri.lastIndexOf('/') + 1);
         // hack fix for resolveRelativeURI
-        if (baseURI == null) {
+        if (baseURI.isEmpty()) {
             baseURI = "/";
         } else if (baseURI.charAt(0) != '/') {
             // strip the base slash since it will be combined with the

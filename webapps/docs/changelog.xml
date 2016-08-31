@@ -189,6 +189,10 @@
         Improve the error handling for custom tags to ensure that the tag is
         returned to the pool or released and destroyed once used. (markt)
       </fix>
+      <fix>
+        Fixed StringIndexOutOfBoundsException. Based on a patch provided by
+        wuwen via Github. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
