@@ -186,6 +186,12 @@
       <fix>
         Make timing attacks against the Realm implementations harder. (schultz)
       </fix>
+      <fix>
+        A number of the JRE memory leaks addressed by the
+        <code>JreMemoryLeakPreventionListener</code> have been fixed in Java 9
+        so the associated protection is now disabled when running on Java 9
+        onwards. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

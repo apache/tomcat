@@ -37,6 +37,7 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.compat.JreVendor;
 import org.apache.tomcat.util.res.StringManager;
 import org.w3c.dom.Document;
@@ -258,13 +259,13 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 // Trigger a call to sun.awt.AppContext.getAppContext(). This
                 // will pin the system class loader in memory but that shouldn't
                 // be an issue.
-                if (appContextProtection) {
+                if (appContextProtection && !JreCompat.isJre8Available()) {
                     ImageIO.getCacheDirectory();
                 }
 
                 // Trigger the creation of the AWT (AWT-Windows, AWT-XAWT,
                 // etc.) thread
-                if (awtThreadProtection) {
+                if (awtThreadProtection && !JreCompat.isJre9Available()) {
                     java.awt.Toolkit.getDefaultToolkit();
                 }
 
@@ -281,7 +282,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                  *       to terminate
                  *
                  */
-                if (gcDaemonProtection) {
+                if (gcDaemonProtection && !JreCompat.isJre9Available()) {
                     try {
                         Class<?> clazz = Class.forName("sun.misc.GC");
                         Method method = clazz.getDeclaredMethod(
@@ -311,7 +312,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                  * Calling getPolicy retains a static reference to the context
                  * class loader.
                  */
-                if (securityPolicyProtection) {
+                if (securityPolicyProtection && !JreCompat.isJre8Available()) {
                     try {
                         // Policy.getPolicy();
                         Class<?> policyClass = Class
@@ -344,7 +345,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                  * Initializing javax.security.auth.login.Configuration retains a static reference to the context
                  * class loader.
                  */
-                if (securityLoginConfigurationProtection) {
+                if (securityLoginConfigurationProtection && !JreCompat.isJre8Available()) {
                     try {
                         Class.forName("javax.security.auth.login.Configuration", true, ClassLoader.getSystemClassLoader());
                     } catch(ClassNotFoundException e) {
@@ -359,8 +360,10 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                  * to the web application class loader.
                  *
                  * Instead we initialize JCA right now.
+                 *
+                 * Fixed in Java 9 onwards (from early access build 133)
                  */
-                if (tokenPollerProtection) {
+                if (tokenPollerProtection && !JreCompat.isJre9Available()) {
                     java.security.Security.getProviders();
                 }
 
@@ -393,7 +396,10 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                     }
                 }
 
-                if (xmlParsingProtection) {
+                /*
+                 * Fixed in Java 9 onwards (from early access build 133)
+                 */
+                if (xmlParsingProtection && !JreCompat.isJre9Available()) {
                     // There are two known issues with XML parsing that affect
                     // Java 7+. The issues both relate to cached Exception
                     // instances that retain a link to the TCCL via the
@@ -419,7 +425,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                     }
                 }
 
-                if (ldapPoolProtection) {
+                if (ldapPoolProtection && !JreCompat.isJre9Available()) {
                     try {
                         Class.forName("com.sun.jndi.ldap.LdapPoolManager");
                     } catch (ClassNotFoundException e) {
