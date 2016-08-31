@@ -227,7 +227,7 @@
         class the PoolCleaner thread will be configured with the thread's
         context class loader set to the web application class loader which in
         turn will trigger a memory leak on reload. Defaults to
-        <code>true</code>. This protection is disabled if running on Java 9 
+        <code>true</code>. This protection is disabled if running on Java 9
         onwards since the leak has been fixed for Java 9 onwards.</p>
       </attribute>
 
