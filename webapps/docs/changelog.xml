@@ -196,9 +196,8 @@
         key and certificate files for use with JSSE TLS connectors. (markt)
       </fix>
       <fix>
-        <bug>59867</bug>: Don't hardcode key alias value to "tomcat" for JSSE.
-        When using a keystore, OpenSSL will still need default to though.
-        (remm)
+        <bug>59910</bug>: Don't hardcode key alias value to "tomcat" for JSSE.
+        When using a keystore, OpenSSL will still default to it. (remm)
       </fix>
       <fix>
         <bug>59904</bug>: Add a limit (default 200) for the number of cookies
