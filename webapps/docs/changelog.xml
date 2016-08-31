@@ -339,6 +339,10 @@
         without removing connection when the <code>removeAbandoned</code> is
         disabled. (kfujino)
       </fix>
+      <fix>
+        Add log message of when returning the connection that has been marked
+        suspect. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
