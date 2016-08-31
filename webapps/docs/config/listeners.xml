@@ -264,7 +264,7 @@
         triggered by a web application. Defaults to <code>true</code>.</p>
         <p>Note: The underlying leak has been fixed in Java 7 update 51 onwards
         and Java 8 onwards. This protection is therefor disabled if running on
-        Java 8  onwards.</p>
+        Java 8 onwards.</p>
       </attribute>
 
       <attribute name="tokenPollerProtection" required="false">
