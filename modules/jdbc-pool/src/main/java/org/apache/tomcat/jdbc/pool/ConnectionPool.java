@@ -889,7 +889,12 @@ public class ConnectionPool {
         if (con != null) {
             try {
                 con.lock();
-
+                if (con.isSuspect()) {
+                    if (poolProperties.isLogAbandoned() && log.isInfoEnabled()) {
+                        log.info("Connection(" + con + ") that has been marked suspect was returned."
+                                + " The processing time is " + (System.currentTimeMillis()-con.getTimestamp()) + " ms.");
+                    }
+                }
                 if (busy.remove(con)) {
 
                     if (!shouldClose(con,PooledConnection.VALIDATE_RETURN)) {
