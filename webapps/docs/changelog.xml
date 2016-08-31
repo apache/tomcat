@@ -353,6 +353,10 @@
         Add log message of when returning the connection that has been marked
         suspect. (kfujino)
       </fix>
+      <fix>
+        Correct Javadoc for <code>ConnectionPool.suspect()</code>. Based on a
+        patch by Yahya Cahyadi. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
