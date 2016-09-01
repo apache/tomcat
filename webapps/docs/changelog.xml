@@ -329,6 +329,9 @@
         a fix to improve the performance with large multipart boundaries.
         (markt)
       </update>
+      <fix>
+        Update the download location for Objenesis. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>

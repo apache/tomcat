@@ -211,7 +211,7 @@ cglib.jar=${cglib.home}/cglib-nodep-${cglib.version}.jar
 # ----- objenesis, used by EasyMock, version 1.2 or later -----
 objenesis.version=1.2
 objenesis.home=${base.path}/objenesis-${objenesis.version}
-objenesis.loc=https://objenesis.googlecode.com/files/objenesis-${objenesis.version}-bin.zip
+objenesis.loc=https://bintray.com/easymock/distributions/download_file?file_path=objenesis-${objenesis.version}-bin.zip
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 
 # ----- Checkstyle, version 6.0 or later -----
