@@ -45,6 +45,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.6" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Update the download location for Objenesis. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.5" rtext="release in progress">
   <subsection name="Catalina">
