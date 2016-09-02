@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M11" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        <bug>59961</bug>: Add an option to the <code>StandardJarScanner</code>
+        to control whether or not JAR Manifests are scanned for additional
+        class path entries. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>

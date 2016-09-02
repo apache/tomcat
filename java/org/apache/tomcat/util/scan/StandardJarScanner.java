@@ -94,6 +94,17 @@ public class StandardJarScanner implements JarScanner {
     }
 
     /**
+     * Controls the JAR file Manifest scanning extension.
+     */
+    private boolean scanManifest = true;
+    public boolean isScanManifest() {
+        return scanManifest;
+    }
+    public void setScanManifest(boolean scanManifest) {
+        this.scanManifest = scanManifest;
+    }
+
+    /**
      * Controls the testing all files to see of they are JAR files extension.
      */
     private boolean scanAllFiles = false;
@@ -325,7 +336,9 @@ public class StandardJarScanner implements JarScanner {
 
         if ("jar".equals(url.getProtocol()) || url.getPath().endsWith(Constants.JAR_EXT)) {
             try (Jar jar = JarFactory.newInstance(url)) {
-                processManifest(jar, isWebapp, classPathUrlsToProcess);
+                if (isScanManifest()) {
+                    processManifest(jar, isWebapp, classPathUrlsToProcess);
+                }
                 callback.scan(jar, webappPath, isWebapp);
             }
         } else if ("file".equals(url.getProtocol())) {
@@ -336,7 +349,9 @@ public class StandardJarScanner implements JarScanner {
                     // Treat this file as a JAR
                     URL jarURL = UriUtil.buildJarUrl(f);
                     try (Jar jar = JarFactory.newInstance(jarURL)) {
-                        processManifest(jar, isWebapp, classPathUrlsToProcess);
+                        if (isScanManifest()) {
+                            processManifest(jar, isWebapp, classPathUrlsToProcess);
+                        }
                         callback.scan(jar, webappPath, isWebapp);
                     }
                 } else if (f.isDirectory()) {
