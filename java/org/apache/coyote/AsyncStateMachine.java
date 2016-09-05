@@ -244,18 +244,11 @@ public class AsyncStateMachine {
         if (state == AsyncState.STARTING || state == AsyncState.READ_WRITE_OP) {
             state = AsyncState.STARTED;
             return SocketState.LONG;
-        } else if (state == AsyncState.MUST_COMPLETE) {
+        } else if (state == AsyncState.MUST_COMPLETE || state == AsyncState.COMPLETING) {
             asyncCtxt.fireOnComplete();
             state = AsyncState.DISPATCHED;
             return SocketState.ASYNC_END;
-        } else if (state == AsyncState.COMPLETING) {
-            asyncCtxt.fireOnComplete();
-            state = AsyncState.DISPATCHED;
-            return SocketState.ASYNC_END;
-        } else if (state == AsyncState.MUST_DISPATCH) {
-            state = AsyncState.DISPATCHING;
-            return SocketState.ASYNC_END;
-        } else if (state == AsyncState.DISPATCHING) {
+        } else if (state == AsyncState.MUST_DISPATCH || state == AsyncState.DISPATCHING) {
             state = AsyncState.DISPATCHED;
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.STARTED) {
@@ -274,16 +267,12 @@ public class AsyncStateMachine {
         pauseNonContainerThread();
         clearNonBlockingListeners();
         boolean doComplete = false;
-        if (state == AsyncState.STARTING) {
+        if (state == AsyncState.STARTING || state == AsyncState.TIMING_OUT ||
+                state == AsyncState.ERROR || state == AsyncState.READ_WRITE_OP) {
             state = AsyncState.MUST_COMPLETE;
         } else if (state == AsyncState.STARTED) {
             state = AsyncState.COMPLETING;
             doComplete = true;
-        } else if (state == AsyncState.TIMING_OUT ||
-                state == AsyncState.ERROR) {
-            state = AsyncState.MUST_COMPLETE;
-        } else if (state == AsyncState.READ_WRITE_OP) {
-            state = AsyncState.MUST_COMPLETE;
         } else {
             throw new IllegalStateException(
                     sm.getString("asyncStateMachine.invalidAsyncState",
