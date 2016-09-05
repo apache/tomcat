@@ -64,7 +64,7 @@
         initiated thread has completed. Rather than implementing this by
         blocking the non-container thread, extend the internal state machine to
         track this. This removes the possibility that blocking the non-container
-        thread could trigger a deadlock. (markt)  
+        thread could trigger a deadlock. (markt)
       </add>
     </changelog>
   </subsection>
