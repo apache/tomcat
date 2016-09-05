@@ -248,7 +248,10 @@ public class AsyncStateMachine {
             asyncCtxt.fireOnComplete();
             state = AsyncState.DISPATCHED;
             return SocketState.ASYNC_END;
-        } else if (state == AsyncState.MUST_DISPATCH || state == AsyncState.DISPATCHING) {
+        } else if (state == AsyncState.MUST_DISPATCH) {
+            state = AsyncState.DISPATCHING;
+            return SocketState.ASYNC_END;
+        } else if (state == AsyncState.DISPATCHING) {
             state = AsyncState.DISPATCHED;
             return SocketState.ASYNC_END;
         } else if (state == AsyncState.STARTED) {
