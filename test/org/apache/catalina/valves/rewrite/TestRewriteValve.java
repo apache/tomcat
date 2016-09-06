@@ -140,8 +140,24 @@ public class TestRewriteValve extends TomcatBaseTest {
 
 
     @Test
-    public void testNonAsciiQueryStringAndRedirectPath() throws Exception {
+    public void testNonAsciiQueryStringAndPath() throws Exception {
         doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/$1?$2", "/b/%E5%9C%A8%E7%BA%BF/id=%E6%B5%8B%E8%AF%95",
+                "/c/%E5%9C%A8%E7%BA%BF", "id=%E6%B5%8B%E8%AF%95");
+    }
+
+
+    @Test
+    public void testNonAsciiQueryStringRedirect() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c?$1 [R]",
+                "/b/id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
+                "/c", "id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95");
+    }
+
+
+    @Test
+    public void testNonAsciiQueryStringAndRedirectPath() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/$1?$2 [R]",
+                "/b/%E5%9C%A8%E7%BA%BF/id=%E6%B5%8B%E8%AF%95",
                 "/c/%E5%9C%A8%E7%BA%BF", "id=%E6%B5%8B%E8%AF%95");
     }
 
