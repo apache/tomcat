@@ -37,6 +37,8 @@ public class RewriteRule {
             substitution = new Substitution();
             substitution.setSub(substitutionString);
             substitution.parse(maps);
+            substitution.setEscapeBackReferences(isEscapeBackReferences());
+            substitution.setNoEscape(isNoescape());
         }
         // Parse the pattern
         int flags = 0;
@@ -151,7 +153,7 @@ public class RewriteRule {
     }
 
 
-    private boolean escapeBackreferences = false;
+    private boolean escapeBackReferences = false;
 
     /**
      *  This flag chains the current rule with the next rule (which itself
@@ -328,11 +330,11 @@ public class RewriteRule {
     protected boolean type = false;
     protected String typeValue = null;
 
-    public boolean isEscapeBackreferences() {
-        return escapeBackreferences;
+    public boolean isEscapeBackReferences() {
+        return escapeBackReferences;
     }
-    public void setEscapeBackreferences(boolean escapeBackreferences) {
-        this.escapeBackreferences = escapeBackreferences;
+    public void setEscapeBackReferences(boolean escapeBackReferences) {
+        this.escapeBackReferences = escapeBackReferences;
     }
     public boolean isChain() {
         return chain;

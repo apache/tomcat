@@ -41,17 +41,17 @@ public class TestRewriteValve extends TomcatBaseTest {
 
     @Test
     public void testNoopRewrite() throws Exception {
-        doTestRewrite("RewriteRule ^(.*) $1", "/a/%255A", "/a/%255A");
+        doTestRewrite("RewriteRule ^(.*) $1 [B]", "/a/%255A", "/a/%255A");
     }
 
     @Test
     public void testPathRewrite() throws Exception {
-        doTestRewrite("RewriteRule ^/b(.*) /a$1", "/b/%255A", "/a/%255A");
+        doTestRewrite("RewriteRule ^/b(.*) /a$1 [B]", "/b/%255A", "/a/%255A");
     }
 
     @Test
     public void testNonNormalizedPathRewrite() throws Exception {
-        doTestRewrite("RewriteRule ^/b/(.*) /b/../a/$1", "/b/%255A", "/b/../a/%255A");
+        doTestRewrite("RewriteRule ^/b/(.*) /b/../a/$1 [B]", "/b/%255A", "/b/../a/%255A");
     }
 
     // BZ 57863
@@ -116,13 +116,13 @@ public class TestRewriteValve extends TomcatBaseTest {
 
     @Test
     public void testNonAsciiPath() throws Exception {
-        doTestRewrite("RewriteRule ^/b/(.*) /c/$1", "/b/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1 [B]", "/b/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
                 "/c/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95");
     }
 
     @Test
     public void testNonAsciiPathRedirect() throws Exception {
-        doTestRewrite("RewriteRule ^/b/(.*) /c/$1 [R]",
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1 [R,B]",
                 "/b/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
                 "/c/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95");
     }
@@ -134,21 +134,23 @@ public class TestRewriteValve extends TomcatBaseTest {
 
     @Test
     public void testNonAsciiQueryString() throws Exception {
-        doTestRewrite("RewriteRule ^/b/(.*) /c?$1", "/b/id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
+        doTestRewrite("RewriteRule ^/b/id=(.*) /c?id=$1 [B]",
+                "/b/id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
                 "/c", "id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95");
     }
 
 
     @Test
     public void testNonAsciiQueryStringAndPath() throws Exception {
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/$1?$2", "/b/%E5%9C%A8%E7%BA%BF/id=%E6%B5%8B%E8%AF%95",
+        doTestRewrite("RewriteRule ^/b/(.*)/id=(.*) /c/$1?id=$2 [B]",
+                "/b/%E5%9C%A8%E7%BA%BF/id=%E6%B5%8B%E8%AF%95",
                 "/c/%E5%9C%A8%E7%BA%BF", "id=%E6%B5%8B%E8%AF%95");
     }
 
 
     @Test
     public void testNonAsciiQueryStringRedirect() throws Exception {
-        doTestRewrite("RewriteRule ^/b/(.*) /c?$1 [R]",
+        doTestRewrite("RewriteRule ^/b/id=(.*) /c?id=$1 [R,B]",
                 "/b/id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
                 "/c", "id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95");
     }
@@ -156,7 +158,7 @@ public class TestRewriteValve extends TomcatBaseTest {
 
     @Test
     public void testNonAsciiQueryStringAndRedirectPath() throws Exception {
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/$1?$2 [R]",
+        doTestRewrite("RewriteRule ^/b/(.*)/id=(.*) /c/$1?id=$2 [R,B]",
                 "/b/%E5%9C%A8%E7%BA%BF/id=%E6%B5%8B%E8%AF%95",
                 "/c/%E5%9C%A8%E7%BA%BF", "id=%E6%B5%8B%E8%AF%95");
     }

@@ -44,10 +44,10 @@ import org.apache.catalina.Pipeline;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.http.RequestUtil;
 
@@ -439,7 +439,7 @@ public class RewriteValve extends ValveBase {
                     if (context) {
                         chunk.append(contextPath);
                     }
-                    chunk.append(URLEncoder.DEFAULT.encode(urlString, "UTF-8"));
+                    chunk.append(urlString);
                     request.getCoyoteRequest().requestURI().toChars();
                     // Decoded and normalized URI
                     request.getCoyoteRequest().decodedURI().setString(null);
@@ -448,7 +448,8 @@ public class RewriteValve extends ValveBase {
                     if (context) {
                         chunk.append(contextPath);
                     }
-                    chunk.append(RequestUtil.normalize(urlString));
+                    chunk.append(RequestUtil.normalize(UDecoder.URLDecode(
+                            urlString, request.getConnector().getURIEncoding())));
                     request.getCoyoteRequest().decodedURI().toChars();
                     // Set the new Query if there is one
                     if (queryString != null) {
@@ -641,7 +642,7 @@ public class RewriteValve extends ValveBase {
      */
     protected static void parseRuleFlag(String line, RewriteRule rule, String flag) {
         if (flag.equals("B")) {
-            rule.setEscapeBackreferences(true);
+            rule.setEscapeBackReferences(true);
         } else if (flag.equals("chain") || flag.equals("C")) {
             rule.setChain(true);
         } else if (flag.startsWith("cookie=") || flag.startsWith("CO=")) {

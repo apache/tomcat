@@ -177,4 +177,9 @@ public class ResolverImpl extends Resolver {
             return value;
         }
     }
+
+    @Override
+    public String getUriEncoding() {
+        return request.getConnector().getURIEncoding();
+    }
 }

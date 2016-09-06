@@ -20,7 +20,24 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Matcher;
 
+import org.apache.catalina.util.URLEncoder;
+
 public class Substitution {
+
+    private static URLEncoder STATIC_ENCODER = new URLEncoder();
+    static {
+        // Defaults
+        STATIC_ENCODER.addSafeCharacter('~');
+        STATIC_ENCODER.addSafeCharacter('-');
+        STATIC_ENCODER.addSafeCharacter('_');
+        STATIC_ENCODER.addSafeCharacter('.');
+        STATIC_ENCODER.addSafeCharacter('*');
+        STATIC_ENCODER.addSafeCharacter('/');
+        // httpd doesn't encode these either
+        STATIC_ENCODER.addSafeCharacter('?');
+        STATIC_ENCODER.addSafeCharacter('=');
+    }
+
 
     public abstract class SubstitutionElement {
         public abstract String evaluate(Matcher rule, Matcher cond, Resolver resolver);
@@ -31,7 +48,11 @@ public class Substitution {
 
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
-            return value;
+            if (noEscape) {
+                return value;
+            } else {
+                return STATIC_ENCODER.encode(value, resolver.getUriEncoding());
+            }
         }
 
     }
@@ -40,7 +61,15 @@ public class Substitution {
         public int n;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
-            return rule.group(n);
+            if (escapeBackReferences) {
+                // Note: This should be consistent with the way httpd behaves.
+                //       We might want to consider providing a dedicated decoder
+                //       with an option to add additional safe characters to
+                //       provide users with more flexibility
+                return URLEncoder.DEFAULT.encode(rule.group(n), resolver.getUriEncoding());
+            } else {
+                return rule.group(n);
+            }
         }
     }
 
@@ -104,6 +133,16 @@ public class Substitution {
     protected String sub = null;
     public String getSub() { return sub; }
     public void setSub(String sub) { this.sub = sub; }
+
+    private boolean escapeBackReferences;
+    void setEscapeBackReferences(boolean escapeBackReferences) {
+        this.escapeBackReferences = escapeBackReferences;
+    }
+
+    private boolean noEscape;
+    void setNoEscape(boolean noEscape) {
+        this.noEscape = noEscape;
+    }
 
     public void parse(Map<String, RewriteMap> maps) {
 
