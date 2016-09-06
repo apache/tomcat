@@ -663,7 +663,9 @@ public class RewriteValve extends ValveBase {
      * @param flag The flag
      */
     protected static void parseRuleFlag(String line, RewriteRule rule, String flag) {
-        if (flag.equals("chain") || flag.equals("C")) {
+        if (flag.equals("B")) {
+            rule.setEscapeBackreferences(true);
+        } else if (flag.equals("chain") || flag.equals("C")) {
             rule.setChain(true);
         } else if (flag.startsWith("cookie=") || flag.startsWith("CO=")) {
             rule.setCookie(true);

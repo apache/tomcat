@@ -151,6 +151,8 @@ public class RewriteRule {
     }
 
 
+    private boolean escapeBackreferences = false;
+
     /**
      *  This flag chains the current rule with the next rule (which itself
      *  can be chained with the following rule, etc.). This has the following
@@ -325,6 +327,13 @@ public class RewriteRule {
      */
     protected boolean type = false;
     protected String typeValue = null;
+
+    public boolean isEscapeBackreferences() {
+        return escapeBackreferences;
+    }
+    public void setEscapeBackreferences(boolean escapeBackreferences) {
+        this.escapeBackreferences = escapeBackreferences;
+    }
     public boolean isChain() {
         return chain;
     }
