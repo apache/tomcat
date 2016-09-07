@@ -233,12 +233,76 @@
   <strong>PreResources</strong>.
   </p>
 
+  <p>During web application start, the JAR scanning process checks scanned JARs
+  for content under <code>/META-INF/resources</code>. Where found, this static
+  content is added to the JarResources.
+  </p>
+
   <h3>Post-resources</h3>
 
   <p>PostResources are searched after the resource JARs. They will be searched
   in the order they are defined. To configure PostResources, nest a
   &lt;PostResources&gt; element inside the &lt;Resources&gt; element. The
   configuration attributes are the same as for <strong>PreResources</strong>.
+  </p>
+
+  <h3>Ordering</h3>
+
+  <p>In addition to the sets of resources described above, the standard
+  implementation also maintains ClassResources which represent the classes
+  contained in the JAR files mapped to <code>/WEB-INF/classes</code>. This
+  allows other components to search for classes with a single call rather than
+  one call to search <code>/WEB-INF/classes</code> followed by another to search
+  the JARs in <code>/WEB-INF/lib</code>. The ClassResources are populated
+  from the JARs mapped to <code>/WEB-INF/lib</code> when the web application
+  starts.</p>
+
+  <p>Therefore, the complete search order is:</p>
+  <ul>
+    <li>PreResources</li>
+    <li>MainResources</li>
+    <li>ClassResources</li>
+    <li>JarResources</li>
+    <li>PostResources</li>
+  </ul>
+
+  <p>The population of ClassResources and JarResources at web application start
+  means that care needs to be taken to add JAR based resources correctly to
+  obtain the desired behaviour. Consider the following example:</p>
+
+  <source><![CDATA[<Resources>
+  <PostResources base="D:\Projects\external\classes"
+                 className="org.apache.catalina.webresources.DirResourceSet"
+                 webAppMount="/WEB-INF/classes"/>
+  <PostResources base="D:\Projects\lib\library1.jar"
+                 className="org.apache.catalina.webresources.FileResourceSet"
+                 webAppMount="/WEB-INF/lib/library1.jar"/>
+</Resources>]]></source>
+
+  <p>Since both resources are PostResources, it might be expected that
+  <code>D:\Projects\external\classes</code> will be searched for classes before
+  <code>D:\Projects\lib\library1.jar</code>. However, by adding the JAR using a
+  <code>FileResourceSet</code>, the JAR is mapped to <code>/WEB-INF/lib</code>
+  and will be processed at application start along with the other JARs in
+  <code>/WEB-INF/lib</code>. The classes from the JAR file will be added to the
+  ClassResources which means they will be searched before the classes from
+  <code>D:\Projects\external\classes</code>. If the desired behaviour is that
+  <code>D:\Projects\external\classes</code> is searched before
+  <code>D:\Projects\lib\library1.jar</code> then a slightly different
+  configuration is required:</p>
+
+  <source><![CDATA[<Resources>
+  <PostResources base="D:\Projects\external\classes"
+                 className="org.apache.catalina.webresources.DirResourceSet"
+                 webAppMount="/WEB-INF/classes"/>
+  <PostResources base="D:\Projects\lib\library1.jar"
+                 className="org.apache.catalina.webresources.JarResourceSet"
+                 webAppMount="/WEB-INF/classes"/>
+</Resources>]]></source>
+
+  <p>In short, the JAR file should be added as a <code>JarResourceSet</code>
+  mapped to <code>/WEB-INF/classes</code> rather than using a
+  <code>FileResourceSet</code> mapped to <code>/WEB-INF/lib</code>.
   </p>
 
 </section>
