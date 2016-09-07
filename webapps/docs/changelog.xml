@@ -52,6 +52,11 @@
         to control whether or not JAR Manifests are scanned for additional
         class path entries. (markt)
       </add>
+      <fix>
+        <bug>60013</bug>: Refactor the previous fix to align the behaviour of
+        the Rewrite Valve with mod_rewite. As part of this, provide an
+        implementation for the <code>B</code> and <code>NE</code> flags. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
