@@ -68,6 +68,16 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Expand the documentation for the nested elements within a
+        <code>Resources</code> element to clarify the behaviour of different
+        configuration options with respect to the order in which resources are
+        searched. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
