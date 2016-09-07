@@ -360,7 +360,7 @@ public final class CGIServlet extends HttpServlet {
      *
      * @exception  IOException  if a write operation exception occurs
      *
-     * @deprecated Use {@link #printServletEnvironment(HttpServletRequest).
+     * @deprecated Use {@link #printServletEnvironment(HttpServletRequest)}.
      *             This will be removed in Tomcat 8.5.X onwards
      */
     @Deprecated
