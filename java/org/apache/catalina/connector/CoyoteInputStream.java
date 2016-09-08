@@ -191,7 +191,7 @@ public class CoyoteInputStream extends ServletInputStream {
      * before the operation, the limit will be the position incremented by
      * the number of the transfered bytes.
      *
-     * @param to the ByteBuffer into which bytes are to be written.
+     * @param b the ByteBuffer into which bytes are to be written.
      * @return an integer specifying the actual number of bytes read, or -1 if
      *         the end of the stream is reached
      * @throws IOException if an input or output exception has occurred
