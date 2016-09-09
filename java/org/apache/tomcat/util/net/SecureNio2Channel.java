@@ -666,7 +666,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                             getBufHandler()
                                     .expand(sslEngine.getSession().getApplicationBufferSize());
                             dst = getBufHandler().getReadBuffer();
-                        } else if(dst == getAppReadBufHandler()) {
+                        } else if (dst == getAppReadBufHandler().getByteBuffer()) {
                             getAppReadBufHandler()
                                     .expand(sslEngine.getSession().getApplicationBufferSize());
                             dst = getAppReadBufHandler().getByteBuffer();
