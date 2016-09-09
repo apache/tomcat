@@ -38,7 +38,6 @@ public class RewriteRule {
             substitution.setSub(substitutionString);
             substitution.parse(maps);
             substitution.setEscapeBackReferences(isEscapeBackReferences());
-            substitution.setNoEscape(isNoescape());
         }
         // Parse the pattern
         int flags = 0;

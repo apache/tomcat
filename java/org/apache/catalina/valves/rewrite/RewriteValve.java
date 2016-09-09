@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -44,14 +45,53 @@ import org.apache.catalina.Pipeline;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.http.RequestUtil;
 
 public class RewriteValve extends ValveBase {
+
+    static URLEncoder ENCODER = new URLEncoder();
+    static {
+        /*
+         * Replicates httpd's encoding
+         * Primarily aimed at encoding URI paths, so from the spec:
+         *
+         * pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
+         *
+         * unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
+         *
+         * sub-delims = "!" / "$" / "&" / "'" / "(" / ")"
+         *              / "*" / "+" / "," / ";" / "="
+         */
+        // ALPHA and DIGIT are always treated as safe characters
+        // Add the remaining unreserved characters
+        ENCODER.addSafeCharacter('-');
+        ENCODER.addSafeCharacter('.');
+        ENCODER.addSafeCharacter('_');
+        ENCODER.addSafeCharacter('~');
+        // Add the sub-delims
+        ENCODER.addSafeCharacter('!');
+        ENCODER.addSafeCharacter('$');
+        ENCODER.addSafeCharacter('&');
+        ENCODER.addSafeCharacter('\'');
+        ENCODER.addSafeCharacter('(');
+        ENCODER.addSafeCharacter(')');
+        ENCODER.addSafeCharacter('*');
+        ENCODER.addSafeCharacter('+');
+        ENCODER.addSafeCharacter(',');
+        ENCODER.addSafeCharacter(';');
+        ENCODER.addSafeCharacter('=');
+        // Add the remaining literals
+        ENCODER.addSafeCharacter(':');
+        ENCODER.addSafeCharacter('@');
+        // Add '/' so it isn't encoded when we encode a path
+        ENCODER.addSafeCharacter('/');
+    }
+
 
     /**
      * The rewrite rules that the valve will use.
@@ -285,13 +325,13 @@ public class RewriteValve extends ValveBase {
             // converted to a string
             MessageBytes urlMB = context ? request.getRequestPathMB() : request.getDecodedRequestURIMB();
             urlMB.toChars();
-            CharSequence url = urlMB.getCharChunk();
+            CharSequence urlDecoded = urlMB.getCharChunk();
             CharSequence host = request.getServerName();
             boolean rewritten = false;
             boolean done = false;
             for (int i = 0; i < rules.length; i++) {
                 RewriteRule rule = rules[i];
-                CharSequence test = (rule.isHost()) ? host : url;
+                CharSequence test = (rule.isHost()) ? host : urlDecoded;
                 CharSequence newtest = rule.evaluate(test, resolver);
                 if (newtest != null && !test.equals(newtest.toString())) {
                     if (container.getLogger().isDebugEnabled()) {
@@ -301,7 +341,7 @@ public class RewriteValve extends ValveBase {
                     if (rule.isHost()) {
                         host = newtest;
                     } else {
-                        url = newtest;
+                        urlDecoded = newtest;
                     }
                     rewritten = true;
                 }
@@ -323,35 +363,55 @@ public class RewriteValve extends ValveBase {
                 // - redirect (code)
                 if (rule.isRedirect() && newtest != null) {
                     // append the query string to the url if there is one and it hasn't been rewritten
-                    String queryString = request.getQueryString();
-                    StringBuffer urlString = new StringBuffer(url);
-                    if (queryString != null && queryString.length() > 0) {
-                        int index = urlString.indexOf("?");
-                        if (index != -1) {
-                            // if qsa is specified append the query
-                            if (rule.isQsappend()) {
-                                urlString.append('&');
-                                urlString.append(queryString);
-                            }
-                            // if the ? is the last character delete it, its only purpose was to
-                            // prevent the rewrite module from appending the query string
-                            else if (index == urlString.length() - 1) {
-                                urlString.deleteCharAt(index);
-                            }
+                    String originalQueryStringEncoded = request.getQueryString();
+                    String urlStringDecoded = urlDecoded.toString();
+                    int index = urlStringDecoded.indexOf("?");
+                    String rewrittenQueryStringDecoded;
+                    if (index == -1) {
+                        rewrittenQueryStringDecoded = null;
+                    } else {
+                        rewrittenQueryStringDecoded = urlStringDecoded.substring(index + 1);
+                        urlStringDecoded = urlStringDecoded.substring(0, index);
+                    }
+
+                    StringBuffer urlStringEncoded = new StringBuffer(ENCODER.encode(urlStringDecoded, request.getConnector().getURIEncoding()));
+                    if (originalQueryStringEncoded != null && originalQueryStringEncoded.length() > 0) {
+                        if (rewrittenQueryStringDecoded == null) {
+                            urlStringEncoded.append('?');
+                            urlStringEncoded.append(originalQueryStringEncoded);
                         } else {
-                            urlString.append('?');
-                            urlString.append(queryString);
+                            if (rule.isQsappend()) {
+                                // if qsa is specified append the query
+                                urlStringEncoded.append('?');
+                                urlStringEncoded.append(ENCODER.encode(rewrittenQueryStringDecoded, request.getConnector().getURIEncoding()));
+                                urlStringEncoded.append('&');
+                                urlStringEncoded.append(originalQueryStringEncoded);
+                            } else if (index == urlStringEncoded.length() - 1) {
+                                // if the ? is the last character delete it, its only purpose was to
+                                // prevent the rewrite module from appending the query string
+                                urlStringEncoded.deleteCharAt(index);
+                            } else {
+                                urlStringEncoded.append('?');
+                                urlStringEncoded.append(ENCODER.encode(rewrittenQueryStringDecoded, request.getConnector().getURIEncoding()));
+                            }
                         }
+                    } else if (rewrittenQueryStringDecoded != null) {
+                        urlStringEncoded.append('?');
+                        urlStringEncoded.append(ENCODER.encode(rewrittenQueryStringDecoded, request.getConnector().getURIEncoding()));
                     }
 
                     // Insert the context if
                     // 1. this valve is associated with a context
                     // 2. the url starts with a leading slash
                     // 3. the url isn't absolute
-                    if (context && urlString.charAt(0) == '/' && !UriUtil.hasScheme(urlString)) {
-                        urlString.insert(0, request.getContext().getEncodedPath());
+                    if (context && urlStringEncoded.charAt(0) == '/' && !UriUtil.hasScheme(urlStringEncoded)) {
+                        urlStringEncoded.insert(0, request.getContext().getEncodedPath());
                     }
-                    response.sendRedirect(urlString.toString());
+                    if (rule.isNoescape()) {
+                        response.sendRedirect(URLDecoder.decode(urlStringEncoded.toString(), request.getConnector().getURIEncoding()));
+                    } else {
+                        response.sendRedirect(urlStringEncoded.toString());
+                    }
                     response.setStatus(rule.getRedirectCode());
                     done = true;
                     break;
@@ -384,9 +444,9 @@ public class RewriteValve extends ValveBase {
                 // - qsappend
                 if (rule.isQsappend() && newtest != null) {
                     String queryString = request.getQueryString();
-                    String urlString = url.toString();
+                    String urlString = urlDecoded.toString();
                     if (urlString.indexOf('?') != -1 && queryString != null) {
-                        url = urlString + "&" + queryString;
+                        urlDecoded = urlString + "&" + queryString;
                     }
                 }
 
@@ -421,42 +481,46 @@ public class RewriteValve extends ValveBase {
             if (rewritten) {
                 if (!done) {
                     // See if we need to replace the query string
-                    String urlString = url.toString();
-                    String queryString = null;
-                    int queryIndex = urlString.indexOf('?');
+                    String urlStringDecoded = urlDecoded.toString();
+                    String queryStringDecoded = null;
+                    int queryIndex = urlStringDecoded.indexOf('?');
                     if (queryIndex != -1) {
-                        queryString = urlString.substring(queryIndex+1);
-                        urlString = urlString.substring(0, queryIndex);
+                        queryStringDecoded = urlStringDecoded.substring(queryIndex+1);
+                        urlStringDecoded = urlStringDecoded.substring(0, queryIndex);
                     }
-                    // Set the new 'original' URI
+                    // Save the current context path before re-writing starts
                     String contextPath = null;
                     if (context) {
                         contextPath = request.getContextPath();
                     }
+                    // Populated the encoded (i.e. undecoded) requestURI
                     request.getCoyoteRequest().requestURI().setString(null);
                     CharChunk chunk = request.getCoyoteRequest().requestURI().getCharChunk();
                     chunk.recycle();
                     if (context) {
+                        // This is neither decoded nor normalized
                         chunk.append(contextPath);
                     }
-                    chunk.append(urlString);
+                    chunk.append(ENCODER.encode(urlStringDecoded, request.getConnector().getURIEncoding()));
                     request.getCoyoteRequest().requestURI().toChars();
                     // Decoded and normalized URI
+                    // Rewriting may have denormalized the URL
+                    urlStringDecoded = RequestUtil.normalize(urlStringDecoded);
                     request.getCoyoteRequest().decodedURI().setString(null);
                     chunk = request.getCoyoteRequest().decodedURI().getCharChunk();
                     chunk.recycle();
                     if (context) {
-                        chunk.append(contextPath);
+                        // This is decoded and normalized
+                        chunk.append(request.getServletContext().getContextPath());
                     }
-                    chunk.append(RequestUtil.normalize(UDecoder.URLDecode(
-                            urlString, request.getConnector().getURIEncoding())));
+                    chunk.append(urlStringDecoded);
                     request.getCoyoteRequest().decodedURI().toChars();
                     // Set the new Query if there is one
-                    if (queryString != null) {
+                    if (queryStringDecoded != null) {
                         request.getCoyoteRequest().queryString().setString(null);
                         chunk = request.getCoyoteRequest().queryString().getCharChunk();
                         chunk.recycle();
-                        chunk.append(queryString);
+                        chunk.append(ENCODER.encode(queryStringDecoded, request.getConnector().getURIEncoding()));
                         request.getCoyoteRequest().queryString().toChars();
                     }
                     // Set the new host if it changed
