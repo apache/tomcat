@@ -378,7 +378,7 @@ public class SecureNio2Channel extends Nio2Channel  {
 
         // Ensure the application buffers (which have to be created earlier) are
         // big enough.
-        bufHandler.expand(sslEngine.getSession().getApplicationBufferSize());
+        getBufHandler().expand(sslEngine.getSession().getApplicationBufferSize());
         if (netOutBuffer.capacity() < sslEngine.getSession().getApplicationBufferSize()) {
             // Info for now as we may need to increase DEFAULT_NET_BUFFER_SIZE
             log.info(sm.getString("channel.nio.ssl.expandNetOutBuffer",
@@ -465,8 +465,8 @@ public class SecureNio2Channel extends Nio2Channel  {
         //so we can clear it here.
         netOutBuffer.clear();
         //perform the wrap
-        bufHandler.configureWriteBufferForRead();
-        SSLEngineResult result = sslEngine.wrap(bufHandler.getWriteBuffer(), netOutBuffer);
+        getBufHandler().configureWriteBufferForRead();
+        SSLEngineResult result = sslEngine.wrap(getBufHandler().getWriteBuffer(), netOutBuffer);
         //prepare the results to be written
         netOutBuffer.flip();
         //set the status
@@ -491,8 +491,8 @@ public class SecureNio2Channel extends Nio2Channel  {
             //prepare the buffer with the incoming data
             netInBuffer.flip();
             //call unwrap
-            bufHandler.configureReadBufferForWrite();
-            result = sslEngine.unwrap(netInBuffer, bufHandler.getReadBuffer());
+            getBufHandler().configureReadBufferForWrite();
+            result = sslEngine.unwrap(netInBuffer, getBufHandler().getReadBuffer());
             //compact the buffer, this is an optional method, wonder what would happen if we didn't
             netInBuffer.compact();
             //read in the status
@@ -661,11 +661,11 @@ public class SecureNio2Channel extends Nio2Channel  {
                     } else {
                         // The SSL session has increased the required buffer size
                         // since the buffer was created.
-                        if (dst == socket.getSocketBufferHandler().getReadBuffer()) {
+                        if (dst == getBufHandler().getReadBuffer()) {
                             // This is the normal case for this code
-                            socket.getSocketBufferHandler().expand(
-                                    sslEngine.getSession().getApplicationBufferSize());
-                            dst = socket.getSocketBufferHandler().getReadBuffer();
+                            getBufHandler()
+                                    .expand(sslEngine.getSession().getApplicationBufferSize());
+                            dst = getBufHandler().getReadBuffer();
                         } else {
                             // Can't expand the buffer as there is no way to signal
                             // to the caller that the buffer has been replaced.
@@ -846,11 +846,11 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 } else {
                                     // The SSL session has increased the required buffer size
                                     // since the buffer was created.
-                                    if (dst2 == socket.getSocketBufferHandler().getReadBuffer()) {
+                                    if (dst2 == getBufHandler().getReadBuffer()) {
                                         // This is the normal case for this code
-                                        socket.getSocketBufferHandler().expand(
+                                        getBufHandler().expand(
                                                 sslEngine.getSession().getApplicationBufferSize());
-                                        dst2 = socket.getSocketBufferHandler().getReadBuffer();
+                                        dst2 = getBufHandler().getReadBuffer();
                                     } else {
                                         // Can't expand the buffer as there is no way to signal
                                         // to the caller that the buffer has been replaced.
