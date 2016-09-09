@@ -232,4 +232,13 @@ public class NioChannel implements ByteChannel {
             throw new IOException(sm.getString("channel.nio.interrupted"));
         }
     }
+
+
+    private ApplicationBufferHandler appReadBufHandler;
+    public void setAppReadBufHandler(ApplicationBufferHandler handler) {
+        this.appReadBufHandler = handler;
+    }
+    protected ApplicationBufferHandler getAppReadBufHandler() {
+        return appReadBufHandler;
+    }
 }

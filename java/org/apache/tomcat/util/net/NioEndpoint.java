@@ -1391,6 +1391,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 }
             }
         }
+
+
+        @Override
+        public void setAppReadBufHandler(ApplicationBufferHandler handler) {
+            getSocket().setAppReadBufHandler(handler);
+        }
     }
 
 

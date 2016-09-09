@@ -666,6 +666,10 @@ public class SecureNio2Channel extends Nio2Channel  {
                             getBufHandler()
                                     .expand(sslEngine.getSession().getApplicationBufferSize());
                             dst = getBufHandler().getReadBuffer();
+                        } else if(dst == getAppReadBufHandler()) {
+                            getAppReadBufHandler()
+                                    .expand(sslEngine.getSession().getApplicationBufferSize());
+                            dst = getAppReadBufHandler().getByteBuffer();
                         } else {
                             // Can't expand the buffer as there is no way to signal
                             // to the caller that the buffer has been replaced.

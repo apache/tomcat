@@ -280,6 +280,7 @@ public abstract class SocketWrapperBase<E> {
     public abstract int read(boolean block, byte[] b, int off, int len) throws IOException;
     public abstract int read(boolean block, ByteBuffer to) throws IOException;
     public abstract boolean isReadyForRead() throws IOException;
+    public abstract void setAppReadBufHandler(ApplicationBufferHandler handler);
 
     protected int populateReadBuffer(byte[] b, int off, int len) {
         socketBufferHandler.configureReadBufferForRead();

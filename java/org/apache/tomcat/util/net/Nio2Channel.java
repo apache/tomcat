@@ -213,4 +213,12 @@ public class Nio2Channel implements AsynchronousByteChannel {
         return DONE;
     }
 
+
+    private ApplicationBufferHandler appReadBufHandler;
+    public void setAppReadBufHandler(ApplicationBufferHandler handler) {
+        this.appReadBufHandler = handler;
+    }
+    protected ApplicationBufferHandler getAppReadBufHandler() {
+        return appReadBufHandler;
+    }
 }
