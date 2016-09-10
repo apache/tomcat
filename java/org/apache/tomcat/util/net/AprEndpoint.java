@@ -2310,7 +2310,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         public int read(boolean block, ByteBuffer to) throws IOException {
             int nRead = populateReadBuffer(to);
             if (nRead > 0) {
-                to.flip();
                 return nRead;
                 /*
                  * Since more bytes may have arrived since the buffer was last
@@ -2326,7 +2325,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             if (to.isDirect() && to.remaining() >= limit) {
                 to.limit(to.position() + limit);
                 nRead = fillReadBuffer(block, to);
-                to.flip();
             } else {
                 // Fill the read buffer as best we can.
                 nRead = fillReadBuffer(block);
@@ -2335,7 +2333,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 // data that was just read
                 if (nRead > 0) {
                     nRead = populateReadBuffer(to);
-                    to.flip();
                 }
             }
             return nRead;

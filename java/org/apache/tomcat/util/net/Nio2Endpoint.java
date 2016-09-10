@@ -899,7 +899,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 // don't want to trigger another read since if there is no
                 // more data to read and this request takes a while to
                 // process the read will timeout triggering an error.
-                to.flip();
                 readPending.release();
                 return nRead;
             }
@@ -910,7 +909,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                 if (block && to.remaining() >= limit) {
                     to.limit(to.position() + limit);
                     nRead = fillReadBuffer(block, to);
-                    to.flip();
                 } else {
                     // Fill the read buffer as best we can.
                     nRead = fillReadBuffer(block);
@@ -919,7 +917,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                     // data that was just read
                     if (nRead > 0) {
                         nRead = populateReadBuffer(to);
-                        to.flip();
                     } else if (nRead == 0 && !block) {
                         readInterest = true;
                     }
