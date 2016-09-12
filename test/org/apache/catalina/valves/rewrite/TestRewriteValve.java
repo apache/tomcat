@@ -466,8 +466,9 @@ public class TestRewriteValve extends TomcatBaseTest {
         doTestRewrite(config, request, expectedURI, expectedQueryString, null);
     }
 
-        private void doTestRewrite(String config, String request, String expectedURI,
-                String expectedQueryString, String expectedAttributeValue) throws Exception {
+
+    private void doTestRewrite(String config, String request, String expectedURI,
+            String expectedQueryString, String expectedAttributeValue) throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
 
