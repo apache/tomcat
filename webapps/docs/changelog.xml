@@ -59,6 +59,11 @@
         improve the handling for the <code>QSA</code> flag. Includes multiple
         test cases by Santhana Preethi. (markt)
       </fix>
+      <fix>
+        <bug>60116</bug>: Fix a problem with the rewrite valve that caused back
+        references evaluated in conditions to be forced to lower case when using
+        the <code>NC</code> flag. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

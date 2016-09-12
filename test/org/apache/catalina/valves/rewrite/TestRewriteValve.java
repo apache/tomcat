@@ -447,6 +447,15 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testFlagsNC() throws Exception {
+        // https://bz.apache.org/bugzilla/show_bug.cgi?id=60116
+        doTestRewrite("RewriteCond %{QUERY_STRING} a=([a-z]*) [NC]\n"
+                + "RewriteRule .* - [E=X-Test:%1]",
+                    "/c?a=aAa", "/c", null, "aAa");
+    }
+
+
     private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
         doTestRewrite(config, request, expectedURI, null);
     }
@@ -454,6 +463,11 @@ public class TestRewriteValve extends TomcatBaseTest {
 
     private void doTestRewrite(String config, String request, String expectedURI,
             String expectedQueryString) throws Exception {
+        doTestRewrite(config, request, expectedURI, expectedQueryString, null);
+    }
+
+        private void doTestRewrite(String config, String request, String expectedURI,
+                String expectedQueryString, String expectedAttributeValue) throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
 
@@ -484,6 +498,11 @@ public class TestRewriteValve extends TomcatBaseTest {
         if (expectedQueryString != null) {
             String queryString = requestDesc.getRequestInfo("REQUEST-QUERY-STRING");
             Assert.assertEquals(expectedQueryString, queryString);
+        }
+
+        if (expectedAttributeValue != null) {
+            String attrbuteValue = requestDesc.getAttribute("X-Test");
+            Assert.assertEquals(expectedAttributeValue, attrbuteValue);
         }
     }
 }
