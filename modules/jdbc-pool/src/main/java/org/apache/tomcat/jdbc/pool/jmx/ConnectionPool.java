@@ -90,7 +90,7 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 
     public static MBeanNotificationInfo[] getDefaultNotificationInfo() {
         String[] types = new String[] {NOTIFY_INIT, NOTIFY_CONNECT, NOTIFY_ABANDON, SLOW_QUERY_NOTIFICATION,
-                FAILED_QUERY_NOTIFICATION, SUSPECT_ABANDONED_NOTIFICATION, SUSPECT_RETURNED_NOTIFICATION};
+                FAILED_QUERY_NOTIFICATION, SUSPECT_ABANDONED_NOTIFICATION, POOL_EMPTY, SUSPECT_RETURNED_NOTIFICATION};
         String name = Notification.class.getName();
         String description = "A connection pool error condition was met.";
         MBeanNotificationInfo info = new MBeanNotificationInfo(types, name, description);
