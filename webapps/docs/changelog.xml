@@ -92,6 +92,10 @@
         Notify jmx when returning the connection that has been marked suspect.
         (kfujino)
       </fix>
+      <fix>
+        Ensure that the <code>POOL_EMPTY</code> notification has been added to
+        the jmx notification types. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
