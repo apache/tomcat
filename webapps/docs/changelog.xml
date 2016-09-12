@@ -55,7 +55,9 @@
       <fix>
         <bug>60013</bug>: Refactor the previous fix to align the behaviour of
         the Rewrite Valve with mod_rewite. As part of this, provide an
-        implementation for the <code>B</code> and <code>NE</code> flags. (markt)
+        implementation for the <code>B</code> and <code>NE</code> flags and
+        improve the handling for the <code>QSA</code> flag. Includes multiple
+        test cases by Santhana Preethi. (markt)
       </fix>
     </changelog>
   </subsection>

@@ -323,12 +323,16 @@ public class RewriteValve extends ValveBase {
 
             // As long as MB isn't a char sequence or affiliated, this has to be
             // converted to a string
-            MessageBytes urlMB = context ? request.getRequestPathMB() : request.getDecodedRequestURIMB();
+            String uriEncoding = request.getConnector().getURIEncoding();
+            String originalQueryStringEncoded = request.getQueryString();
+            MessageBytes urlMB =
+                    context ? request.getRequestPathMB() : request.getDecodedRequestURIMB();
             urlMB.toChars();
             CharSequence urlDecoded = urlMB.getCharChunk();
             CharSequence host = request.getServerName();
             boolean rewritten = false;
             boolean done = false;
+            boolean qsa = false;
             for (int i = 0; i < rules.length; i++) {
                 RewriteRule rule = rules[i];
                 CharSequence test = (rule.isHost()) ? host : urlDecoded;
@@ -346,6 +350,13 @@ public class RewriteValve extends ValveBase {
                     rewritten = true;
                 }
 
+                // Check QSA before the final reply
+                if (!qsa && newtest != null && rule.isQsappend()) {
+                    // TODO: This logic will need some tweaks if we add QSD
+                    //       support
+                    qsa = true;
+                }
+
                 // Final reply
 
                 // - forbidden
@@ -360,10 +371,11 @@ public class RewriteValve extends ValveBase {
                     done = true;
                     break;
                 }
+
                 // - redirect (code)
                 if (rule.isRedirect() && newtest != null) {
-                    // append the query string to the url if there is one and it hasn't been rewritten
-                    String originalQueryStringEncoded = request.getQueryString();
+                    // Append the query string to the url if there is one and it
+                    // hasn't been rewritten
                     String urlStringDecoded = urlDecoded.toString();
                     int index = urlStringDecoded.indexOf("?");
                     String rewrittenQueryStringDecoded;
@@ -374,16 +386,19 @@ public class RewriteValve extends ValveBase {
                         urlStringDecoded = urlStringDecoded.substring(0, index);
                     }
 
-                    StringBuffer urlStringEncoded = new StringBuffer(ENCODER.encode(urlStringDecoded, request.getConnector().getURIEncoding()));
-                    if (originalQueryStringEncoded != null && originalQueryStringEncoded.length() > 0) {
+                    StringBuffer urlStringEncoded =
+                            new StringBuffer(ENCODER.encode(urlStringDecoded, uriEncoding));
+                    if (originalQueryStringEncoded != null &&
+                            originalQueryStringEncoded.length() > 0) {
                         if (rewrittenQueryStringDecoded == null) {
                             urlStringEncoded.append('?');
                             urlStringEncoded.append(originalQueryStringEncoded);
                         } else {
-                            if (rule.isQsappend()) {
+                            if (qsa) {
                                 // if qsa is specified append the query
                                 urlStringEncoded.append('?');
-                                urlStringEncoded.append(ENCODER.encode(rewrittenQueryStringDecoded, request.getConnector().getURIEncoding()));
+                                urlStringEncoded.append(
+                                        ENCODER.encode(rewrittenQueryStringDecoded, uriEncoding));
                                 urlStringEncoded.append('&');
                                 urlStringEncoded.append(originalQueryStringEncoded);
                             } else if (index == urlStringEncoded.length() - 1) {
@@ -392,23 +407,27 @@ public class RewriteValve extends ValveBase {
                                 urlStringEncoded.deleteCharAt(index);
                             } else {
                                 urlStringEncoded.append('?');
-                                urlStringEncoded.append(ENCODER.encode(rewrittenQueryStringDecoded, request.getConnector().getURIEncoding()));
+                                urlStringEncoded.append(
+                                        ENCODER.encode(rewrittenQueryStringDecoded, uriEncoding));
                             }
                         }
                     } else if (rewrittenQueryStringDecoded != null) {
                         urlStringEncoded.append('?');
-                        urlStringEncoded.append(ENCODER.encode(rewrittenQueryStringDecoded, request.getConnector().getURIEncoding()));
+                        urlStringEncoded.append(
+                                ENCODER.encode(rewrittenQueryStringDecoded, uriEncoding));
                     }
 
                     // Insert the context if
                     // 1. this valve is associated with a context
                     // 2. the url starts with a leading slash
                     // 3. the url isn't absolute
-                    if (context && urlStringEncoded.charAt(0) == '/' && !UriUtil.hasScheme(urlStringEncoded)) {
+                    if (context && urlStringEncoded.charAt(0) == '/' &&
+                            !UriUtil.hasScheme(urlStringEncoded)) {
                         urlStringEncoded.insert(0, request.getContext().getEncodedPath());
                     }
                     if (rule.isNoescape()) {
-                        response.sendRedirect(URLDecoder.decode(urlStringEncoded.toString(), request.getConnector().getURIEncoding()));
+                        response.sendRedirect(
+                                URLDecoder.decode(urlStringEncoded.toString(), uriEncoding));
                     } else {
                         response.sendRedirect(urlStringEncoded.toString());
                     }
@@ -440,14 +459,6 @@ public class RewriteValve extends ValveBase {
                 //   to do that)
                 if (rule.isType() && newtest != null) {
                     request.setContentType(rule.getTypeValue());
-                }
-                // - qsappend
-                if (rule.isQsappend() && newtest != null) {
-                    String queryString = request.getQueryString();
-                    String urlString = urlDecoded.toString();
-                    if (urlString.indexOf('?') != -1 && queryString != null) {
-                        urlDecoded = urlString + "&" + queryString;
-                    }
                 }
 
                 // Control flow processing
@@ -501,7 +512,7 @@ public class RewriteValve extends ValveBase {
                         // This is neither decoded nor normalized
                         chunk.append(contextPath);
                     }
-                    chunk.append(ENCODER.encode(urlStringDecoded, request.getConnector().getURIEncoding()));
+                    chunk.append(ENCODER.encode(urlStringDecoded, uriEncoding));
                     request.getCoyoteRequest().requestURI().toChars();
                     // Decoded and normalized URI
                     // Rewriting may have denormalized the URL
@@ -520,8 +531,14 @@ public class RewriteValve extends ValveBase {
                         request.getCoyoteRequest().queryString().setString(null);
                         chunk = request.getCoyoteRequest().queryString().getCharChunk();
                         chunk.recycle();
-                        chunk.append(ENCODER.encode(queryStringDecoded, request.getConnector().getURIEncoding()));
-                        request.getCoyoteRequest().queryString().toChars();
+                        chunk.append(ENCODER.encode(queryStringDecoded, uriEncoding));
+                        if (qsa) {
+                            chunk.append('&');
+                            chunk.append(originalQueryStringEncoded);
+                        }
+                        if (!chunk.isNull()) {
+                            request.getCoyoteRequest().queryString().toChars();
+                        }
                     }
                     // Set the new host if it changed
                     if (!host.equals(request.getServerName())) {

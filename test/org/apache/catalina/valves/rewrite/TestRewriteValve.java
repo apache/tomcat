@@ -131,6 +131,11 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
     @Test
+    public void testQueryStringRemove() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1?", "/b/d?=1", "/c/d", null);
+    }
+
+    @Test
     public void testNonAsciiQueryString() throws Exception {
         doTestRewrite("RewriteRule ^/b/(.*) /c?$1",
                 "/b/id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
@@ -237,7 +242,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Note %C2%A1 == \u00A1
         doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [B,QSA]",
                 "/b/%C2%A1/id=%C2%A1?di=%C2%AE", "/c/%C2%A1%25C2%25A1",
-                "id=%25C2%25A1&di=%25C2%25AE");
+                "id=%25C2%25A1&di=%C2%AE");
     }
 
 
@@ -354,6 +359,15 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Note %C2%A1 == \u00A1
         doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R]",
                 "/b/%C2%A1/id=%C2%A1", "/c/%C2%A1%C2%A1", "id=%C2%A1");
+    }
+
+
+    @Test
+    public void testUtf8WithBothQsFlagsQSA() throws Exception {
+        // Note %C2%A1 == \u00A1
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [QSA]",
+                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", "/c/%C2%A1%C2%A1",
+                "id=%C2%A1&di=%C2%AE");
     }
 
 
