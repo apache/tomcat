@@ -83,6 +83,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        Notify jmx when returning the connection that has been marked suspect.
+        (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>

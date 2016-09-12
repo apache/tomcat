@@ -902,6 +902,10 @@ public class ConnectionPool {
                         log.info("Connection(" + con + ") that has been marked suspect was returned."
                                 + " The processing time is " + (System.currentTimeMillis()-con.getTimestamp()) + " ms.");
                     }
+                    if (jmxPool!=null) {
+                        jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.SUSPECT_RETURNED_NOTIFICATION,
+                                "Connection(" + con + ") that has been marked suspect was returned.");
+                    }
                 }
                 if (busy.remove(con)) {
 
