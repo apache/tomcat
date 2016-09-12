@@ -60,8 +60,6 @@ public class JasperInitializer implements ServletContainerInitializer {
                 factory.getClass().getClassLoader().loadClass( basePackage +
                         "runtime.JspRuntimeLibrary");
                 factory.getClass().getClassLoader().loadClass( basePackage +
-                        "runtime.JspRuntimeLibrary$PrivilegedIntrospectHelper");
-                factory.getClass().getClassLoader().loadClass( basePackage +
                         "runtime.ServletResponseWrapperInclude");
                 factory.getClass().getClassLoader().loadClass( basePackage +
                         "servlet.JspServletWrapper");
