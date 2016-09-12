@@ -52,6 +52,11 @@
         to control whether or not JAR Manifests are scanned for additional
         class path entries. (markt)
       </add>
+      <fix>
+        <bug>60116</bug>: Fix a problem with the rewrite valve that caused back
+        references evaluated in conditions to be forced to lower case when using
+        the <code>NC</code> flag. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

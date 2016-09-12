@@ -110,10 +110,6 @@ public class TestRewriteValve extends TomcatBaseTest {
                 "/b/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95", "/c/", "param=\u5728\u7EBF\u6D4B\u8BD5");
     }
 
-    private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
-        doTestRewrite(config, request, expectedURI, null);
-    }
-
     @Test
     public void testNonAsciiPath() throws Exception {
         doTestRewrite("RewriteRule ^/b/(.*) /c/$1", "/b/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
@@ -146,8 +142,30 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
 
+
+
+    @Test
+    public void testFlagsNC() throws Exception {
+        // https://bz.apache.org/bugzilla/show_bug.cgi?id=60116
+        doTestRewrite("RewriteCond %{QUERY_STRING} a=([a-z]*) [NC]\n"
+                + "RewriteRule .* - [E=X-Test:%1]",
+                    "/c?a=aAa", "/c", null, "aAa");
+    }
+
+
+    private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
+        doTestRewrite(config, request, expectedURI, null);
+    }
+
+
     private void doTestRewrite(String config, String request, String expectedURI,
             String expectedQueryString) throws Exception {
+        doTestRewrite(config, request, expectedURI, expectedQueryString, null);
+    }
+
+
+    private void doTestRewrite(String config, String request, String expectedURI,
+            String expectedQueryString, String expectedAttributeValue) throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
 
@@ -178,6 +196,11 @@ public class TestRewriteValve extends TomcatBaseTest {
         if (expectedQueryString != null) {
             String queryString = requestDesc.getRequestInfo("REQUEST-QUERY-STRING");
             Assert.assertEquals(expectedQueryString, queryString);
+        }
+
+        if (expectedAttributeValue != null) {
+            String attrbuteValue = requestDesc.getAttribute("X-Test");
+            Assert.assertEquals(expectedAttributeValue, attrbuteValue);
         }
     }
 }
