@@ -46,8 +46,6 @@ public final class SecurityClassLoad {
 
             loader.loadClass( basePackage +
                 "runtime.JspRuntimeLibrary");
-            loader.loadClass( basePackage +
-                "runtime.JspRuntimeLibrary$PrivilegedIntrospectHelper");
             
             loader.loadClass( basePackage +
                 "runtime.ServletResponseWrapperInclude");
