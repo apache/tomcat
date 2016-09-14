@@ -64,6 +64,10 @@
         references evaluated in conditions to be forced to lower case when using
         the <code>NC</code> flag. (markt)
       </fix>
+      <fix>
+        Ensure <code>Digester.useContextClassLoader</code> is considered in
+        case the class loader is used. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
