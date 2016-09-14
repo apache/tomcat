@@ -78,46 +78,26 @@ import org.xml.sax.helpers.AttributesImpl;
  */
 public class Digester extends DefaultHandler2 {
 
-    
-    // ---------------------------------------------------------- Static Fields    
-    private static class SystemPropertySource 
-        implements IntrospectionUtils.PropertySource {
-        @Override
-        public String getProperty( String key ) {
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            if (cl instanceof PermissionCheck) {
-                Permission p = new PropertyPermission(key, "read");
-                if (!((PermissionCheck) cl).check(p)) {
-                    return null;
-                }
-            }
-            return System.getProperty(key);
-        }
-    }
 
-    protected static IntrospectionUtils.PropertySource source[] = 
-        new IntrospectionUtils.PropertySource[] { new SystemPropertySource() };
-    
+    // ---------------------------------------------------------- Static Fields
+
+    protected static IntrospectionUtils.PropertySource propertySource = null;
+
     static {
         String className = System.getProperty("org.apache.tomcat.util.digester.PROPERTY_SOURCE");
         if (className!=null) {
-            IntrospectionUtils.PropertySource[] sources = new IntrospectionUtils.PropertySource[2];
-            sources[1] = source[0];
             ClassLoader[] cls = new ClassLoader[] {Digester.class.getClassLoader(),Thread.currentThread().getContextClassLoader()};
-            boolean initialized = false;
-            for (int i=0; i<cls.length && (!initialized); i++) {
+            for (int i = 0; i < cls.length; i++) {
                 try {
-                    Class<?> clazz = Class.forName(className,true,cls[i]);
-                    IntrospectionUtils.PropertySource src = (IntrospectionUtils.PropertySource)clazz.newInstance();
-                    sources[0] = src;
-                    initialized = true;
+                    Class<?> clazz = Class.forName(className, true, cls[i]);
+                    propertySource = (IntrospectionUtils.PropertySource) clazz.newInstance();
+                    break;
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     LogFactory.getLog("org.apache.tomcat.util.digester.Digester").
                         error("Unable to load property source["+className+"].",t);
                 }
             }
-            if (initialized) source = sources;
         }
     }
 
@@ -131,6 +111,10 @@ public class Digester extends DefaultHandler2 {
     public Digester() {
 
         super();
+
+        if (propertySource != null) {
+            source = new IntrospectionUtils.PropertySource[] { propertySource, source[0] };
+        }
 
     }
 
@@ -148,6 +132,10 @@ public class Digester extends DefaultHandler2 {
 
         this.parser = parser;
 
+        if (propertySource != null) {
+            source = new IntrospectionUtils.PropertySource[] { propertySource, source[0] };
+        }
+
     }
 
 
@@ -164,10 +152,33 @@ public class Digester extends DefaultHandler2 {
 
         this.reader = reader;
 
+        if (propertySource != null) {
+            source = new IntrospectionUtils.PropertySource[] { propertySource, source[0] };
+        }
+
     }
 
 
     // --------------------------------------------------- Instance Variables
+
+
+    private class SystemPropertySource implements IntrospectionUtils.PropertySource {
+        @Override
+        public String getProperty(String key) {
+            ClassLoader cl = getClassLoader();
+            if (cl instanceof PermissionCheck) {
+                Permission p = new PropertyPermission(key, "read");
+                if (!((PermissionCheck) cl).check(p)) {
+                    return null;
+                }
+            }
+            return System.getProperty(key);
+        }
+    }
+
+
+    protected IntrospectionUtils.PropertySource source[] = new IntrospectionUtils.PropertySource[] {
+            new SystemPropertySource() };
 
 
     /**

@@ -58,6 +58,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.72 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Ensure <code>Digester.useContextClassLoader</code> is considered in
+        case the class loader is used. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
