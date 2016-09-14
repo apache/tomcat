@@ -78,10 +78,36 @@ public class Digester extends DefaultHandler2 {
 
 
     // ---------------------------------------------------------- Static Fields
-    private static class SystemPropertySource implements IntrospectionUtils.PropertySource {
+
+    protected static IntrospectionUtils.PropertySource propertySource = null;
+
+    static {
+        String className = System.getProperty("org.apache.tomcat.util.digester.PROPERTY_SOURCE");
+        if (className != null) {
+            ClassLoader[] cls = new ClassLoader[] { Digester.class.getClassLoader(),
+                    Thread.currentThread().getContextClassLoader() };
+            for (int i = 0; i < cls.length; i++) {
+                try {
+                    Class<?> clazz = Class.forName(className, true, cls[i]);
+                    propertySource = (IntrospectionUtils.PropertySource) clazz.newInstance();
+                    break;
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    LogFactory.getLog("org.apache.tomcat.util.digester.Digester")
+                            .error("Unable to load property source[" + className + "].", t);
+                }
+            }
+        }
+    }
+
+
+    // --------------------------------------------------- Instance Variables
+
+
+    private class SystemPropertySource implements IntrospectionUtils.PropertySource {
         @Override
         public String getProperty(String key) {
-            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            ClassLoader cl = getClassLoader();
             if (cl instanceof PermissionCheck) {
                 Permission p = new PropertyPermission(key, "read");
                 if (!((PermissionCheck) cl).check(p)) {
@@ -92,37 +118,9 @@ public class Digester extends DefaultHandler2 {
         }
     }
 
-    protected static IntrospectionUtils.PropertySource source[] = new IntrospectionUtils.PropertySource[] {
+
+    protected IntrospectionUtils.PropertySource source[] = new IntrospectionUtils.PropertySource[] {
             new SystemPropertySource() };
-
-    static {
-        String className = System.getProperty("org.apache.tomcat.util.digester.PROPERTY_SOURCE");
-        if (className != null) {
-            IntrospectionUtils.PropertySource[] sources = new IntrospectionUtils.PropertySource[2];
-            sources[1] = source[0];
-            ClassLoader[] cls = new ClassLoader[] { Digester.class.getClassLoader(),
-                    Thread.currentThread().getContextClassLoader() };
-            boolean initialized = false;
-            for (int i = 0; i < cls.length && (!initialized); i++) {
-                try {
-                    Class<?> clazz = Class.forName(className, true, cls[i]);
-                    IntrospectionUtils.PropertySource src = (IntrospectionUtils.PropertySource) clazz
-                            .newInstance();
-                    sources[0] = src;
-                    initialized = true;
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    LogFactory.getLog("org.apache.tomcat.util.digester.Digester")
-                            .error("Unable to load property source[" + className + "].", t);
-                }
-            }
-            if (initialized)
-                source = sources;
-        }
-    }
-
-
-    // --------------------------------------------------- Instance Variables
 
 
     /**
@@ -298,6 +296,13 @@ public class Digester extends DefaultHandler2 {
      * The Log to which all SAX event related logging calls will be made.
      */
     protected Log saxLog = LogFactory.getLog("org.apache.tomcat.util.digester.Digester.sax");
+
+
+    public Digester() {
+        if (propertySource != null) {
+            source = new IntrospectionUtils.PropertySource[] { propertySource, source[0] };
+        }
+    }
 
 
     // ------------------------------------------------------------- Properties
