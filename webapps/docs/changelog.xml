@@ -58,6 +58,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.73 (violetagg)">
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        Correct Javadocs for
+        <code>PoolConfiguration.getValidationInterval</code> and
+        <code>setValidationInterval</code>. Reported by Phillip Webb. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.72 (violetagg)">
   <subsection name="Catalina">

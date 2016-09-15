@@ -567,7 +567,7 @@ public interface PoolConfiguration {
      * avoid excess validation, only run validation at most at this frequency - time in milliseconds.
      * If a connection is due for validation, but has been validated previously
      * within this interval, it will not be validated again.
-     * The default value is 30000 (30 seconds).
+     * The default value is 3000 (3 seconds).
      * @return the validation interval in milliseconds
      */
     public long getValidationInterval();
@@ -576,7 +576,7 @@ public interface PoolConfiguration {
      * avoid excess validation, only run validation at most at this frequency - time in milliseconds.
      * If a connection is due for validation, but has been validated previously
      * within this interval, it will not be validated again.
-     * The default value is 30000 (30 seconds).
+     * The default value is 3000 (3 seconds).
      * @param validationInterval the validation interval in milliseconds
      */
     public void setValidationInterval(long validationInterval);
