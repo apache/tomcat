@@ -185,13 +185,6 @@ public class StatementCache extends StatementDecoratorInterceptor {
         }
     }
 
-    public CachedStatement isCached(String sql) {
-        @SuppressWarnings("unchecked")
-        ConcurrentHashMap<CacheKey,CachedStatement> cache =
-            (ConcurrentHashMap<CacheKey,CachedStatement>)pcon.getAttributes().get(STATEMENT_CACHE_ATTR);
-        return cache.get(sql);
-    }
-
     public CachedStatement isCached(Method method, Object[] args) {
         @SuppressWarnings("unchecked")
         ConcurrentHashMap<CacheKey,CachedStatement> cache =
