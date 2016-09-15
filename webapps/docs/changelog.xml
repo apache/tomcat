@@ -117,6 +117,10 @@
         Ensure that the <code>POOL_EMPTY</code> notification has been added to
         the jmx notification types. (kfujino)
       </fix>
+      <fix>
+        <bug>60099</bug>: Ensure that use all method arguments as a cache key
+        when using <code>StatementCache</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
