@@ -126,7 +126,7 @@ public class OneLineFormatter extends Formatter {
 
         // Severity
         sb.append(' ');
-        sb.append(record.getLevel());
+        sb.append(record.getLevel().getLocalizedName());
 
         // Thread
         sb.append(' ');

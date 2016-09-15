@@ -68,6 +68,11 @@
         Ensure <code>Digester.useContextClassLoader</code> is considered in
         case the class loader is used. (violetagg)
       </fix>
+      <fix>
+        <bug>60117</bug>: Ensure that the name of <code>LogLevel</code> is
+        localized when using <code>OneLineFormatter</code>. Patch provided by
+        Tatsuya Bessho. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
