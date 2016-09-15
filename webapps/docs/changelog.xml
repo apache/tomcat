@@ -106,7 +106,7 @@
         the jmx notification types. (kfujino)
       </fix>
       <fix>
-        Correct Javadocs for
+        <bug>60139</bug>: Correct Javadocs for
         <code>PoolConfiguration.getValidationInterval</code> and
         <code>setValidationInterval</code>. Reported by Phillip Webb. (kfujino)
       </fix>
