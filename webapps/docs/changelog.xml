@@ -111,6 +111,10 @@
         the jmx notification types. (kfujino)
       </fix>
       <fix>
+        <bug>60099</bug>: Ensure that use all method arguments as a cache key
+        when using <code>StatementCache</code>. (kfujino)
+      </fix>
+      <fix>
         <bug>60139</bug>: Correct Javadocs for
         <code>PoolConfiguration.getValidationInterval</code> and
         <code>setValidationInterval</code>. Reported by Phillip Webb. (kfujino)
