@@ -184,6 +184,10 @@ public class StatementCache extends StatementDecoratorInterceptor {
         }
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 9
+     */
+    @Deprecated
     public CachedStatement isCached(String sql) {
         @SuppressWarnings("unchecked")
         ConcurrentHashMap<CacheKey,CachedStatement> cache =
