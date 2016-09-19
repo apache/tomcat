@@ -27,6 +27,15 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
+/*
+ * Implementation note:
+ *
+ * A number of these tests involve the rewrite valve returning a HTTP Location
+ * header that include un-encoded UTF-8 bytes. How the HTTP client handles these
+ * depends on the default character encoding configured for the JVM running the
+ * test. The tests expect the client to be configured with UTF-8 as the default
+ * encoding. Use of any other encoding is likely to lead to test failures.
+ */
 public class TestRewriteValve extends TomcatBaseTest {
 
     @Test
