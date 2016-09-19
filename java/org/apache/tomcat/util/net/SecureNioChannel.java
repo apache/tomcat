@@ -148,14 +148,19 @@ public class SecureNioChannel extends NioChannel  {
     }
 
     /**
-     * Performs SSL handshake, non blocking, but performs NEED_TASK on the same thread.<br>
-     * Hence, you should never call this method using your Acceptor thread, as you would slow down
-     * your system significantly.<br>
-     * The return for this operation is 0 if the handshake is complete and a positive value if it is not complete.
-     * In the event of a positive value coming back, reregister the selection key for the return values interestOps.
+     * Performs SSL handshake, non blocking, but performs NEED_TASK on the same
+     * thread. Hence, you should never call this method using your Acceptor
+     * thread, as you would slow down your system significantly. If the return
+     * value from this method is positive, the selection key should be
+     * registered interestOps given by the return value.
+     *
      * @param read boolean - true if the underlying channel is readable
      * @param write boolean - true if the underlying channel is writable
-     * @return int - 0 if hand shake is complete, otherwise it returns a SelectionKey interestOps value
+     *
+     * @return 0 if hand shake is complete, -1 if an error (other than an
+     *         IOException) occurred, otherwise it returns a SelectionKey
+     *         interestOps value
+     *
      * @throws IOException If an I/O error occurs during the handshake or if the
      *                     handshake fails during wrapping or unwrapping
      */
@@ -254,14 +259,19 @@ public class SecureNioChannel extends NioChannel  {
      * Peeks at the initial network bytes to determine if the SNI extension is
      * present and, if it is, what host name has been requested. Based on the
      * provided host name, configure the SSLEngine for this connection.
+     *
+     * @return 0 if SNI processing is complete, -1 if an error (other than an
+     *         IOException) occurred, otherwise it returns a SelectionKey
+     *         interestOps value
+     *
+     * @throws IOException If an I/O error occurs during the SNI processing
      */
     private int processSNI() throws IOException {
         // Read some data into the network input buffer so we can peek at it.
         int bytesRead = sc.read(netInBuffer);
         if (bytesRead == -1) {
-            // Reached end of stream before SNI could be processed. Treat this
-            // as if no SNI was present.
-            return 0;
+            // Reached end of stream before SNI could be processed.
+            return -1;
         }
         TLSClientHelloExtractor extractor = new TLSClientHelloExtractor(netInBuffer);
 
