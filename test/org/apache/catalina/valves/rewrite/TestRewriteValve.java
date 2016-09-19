@@ -465,6 +465,15 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testHostRewrite() throws Exception {
+        // Based on report from users list that ':' was encoded and breaking
+        // the redirect
+        doTestRewrite("RewriteRule ^/b(.*) http://%{HTTP_HOST}:%{SERVER_PORT}/a$1 [R]",
+                "/b/%255A", "/a/%255A");
+    }
+
+
     private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
         doTestRewrite(config, request, expectedURI, null);
     }
