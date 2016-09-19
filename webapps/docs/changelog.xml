@@ -87,6 +87,10 @@
         track this. This removes the possibility that blocking the non-container
         thread could trigger a deadlock. (markt)
       </add>
+      <fix>
+        Fail earlier if the client closes the connection during SNI processing.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
