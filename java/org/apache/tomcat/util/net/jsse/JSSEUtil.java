@@ -49,8 +49,6 @@ import javax.net.ssl.CertPathTrustManagerParameters;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.ManagerFactoryParameters;
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
@@ -95,29 +93,22 @@ public class JSSEUtil extends SSLUtilBase {
             throw new IllegalArgumentException(e);
         }
 
-        // There is no standard way to determine the default protocols and
-        // cipher suites so create a server socket to see what the defaults are
-        SSLServerSocketFactory ssf = context.getServerSocketFactory();
-        implementedProtocols = new HashSet<>();
-        try (SSLServerSocket socket = (SSLServerSocket) ssf.createServerSocket()) {
-            // Filter out all the SSL protocols (SSLv2 and SSLv3) from the
-            // defaults since they are no longer considered secure but allow
-            // SSLv2Hello
-            for (String protocol : socket.getEnabledProtocols()) {
-                String protocolUpper = protocol.toUpperCase(Locale.ENGLISH);
-                if (!"SSLV2HELLO".equals(protocolUpper)) {
-                    if (protocolUpper.contains("SSL")) {
-                        log.debug(sm.getString("jsse.excludeDefaultProtocol", protocol));
-                        continue;
-                    }
-                }
-                implementedProtocols.add(protocol);
-            }
-        } catch (IOException e) {
-            // This is very likely to be fatal but there is a slim chance that
-            // the JSSE implementation just doesn't like creating unbound
-            // sockets so allow the code to proceed.
+        String[] implementedProtocolsArray = context.getSupportedSSLParameters().getProtocols();
+        implementedProtocols = new HashSet<>(implementedProtocolsArray.length);
 
+        // Filter out all the SSL protocols (SSLv2 and SSLv3) from the list of
+        // implemented protocols since they are no longer considered secure but
+        // allow SSLv2Hello. This has the effect of making it impossible to use
+        // SSLv2 or SSLv3 without source code changes.
+        for (String protocol : implementedProtocolsArray) {
+            String protocolUpper = protocol.toUpperCase(Locale.ENGLISH);
+            if (!"SSLV2HELLO".equals(protocolUpper)) {
+                if (protocolUpper.contains("SSL")) {
+                    log.debug(sm.getString("jsse.excludeProtocol", protocol));
+                    continue;
+                }
+            }
+            implementedProtocols.add(protocol);
         }
 
         if (implementedProtocols.size() == 0) {
