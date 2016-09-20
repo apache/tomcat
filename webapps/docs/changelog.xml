@@ -67,6 +67,12 @@
         Tatsuya Bessho. (kfujino)
       </fix>
       <fix>
+        <bug>60138</bug>: Fix the <code>SSLHostConfig</code> so that the 
+        <code>protocols</code> attribute is limited to the protocols supported
+        by the current JSSE implementation rather than the default protocols
+        used by the implementation. (markt)
+      </fix>
+      <fix>
         <bug>60146</bug>: Improve performance for resource retrieval by making
         calls to WebResource.getInputStream() trigger caching if the resource is
         small enough. Patch provided by mohitchugh. (markt)
