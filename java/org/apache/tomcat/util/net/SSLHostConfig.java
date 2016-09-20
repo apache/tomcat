@@ -51,7 +51,7 @@ public class SSLHostConfig implements Serializable {
     private static final String DEFAULT_CIPHERS = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
 
     protected static final String DEFAULT_SSL_HOST_NAME = "_default_";
-    protected static final Set<String> SSL_PROTO_ALL = new HashSet<>();
+    protected static final Set<String> SSL_PROTO_ALL_SET = new HashSet<>();
 
     static {
         /* Default used if protocols is not configured, also
@@ -60,10 +60,10 @@ public class SSLHostConfig implements Serializable {
            value comes from
            org.apache.tomcat.util.net.jsse.JSSESocketFactory.defaultServerProtocols
            (JSSE) resp. org.apache.tomcat.jni.SSL.SSL_PROTOCOL_ALL (OpenSSL)*/
-        SSL_PROTO_ALL.add(Constants.SSL_PROTO_SSLv2Hello);
-        SSL_PROTO_ALL.add(Constants.SSL_PROTO_TLSv1);
-        SSL_PROTO_ALL.add(Constants.SSL_PROTO_TLSv1_1);
-        SSL_PROTO_ALL.add(Constants.SSL_PROTO_TLSv1_2);
+        SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_SSLv2Hello);
+        SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_TLSv1);
+        SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_TLSv1_1);
+        SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_TLSv1_2);
     }
 
     private Type configType = null;
@@ -405,14 +405,14 @@ public class SSLHostConfig implements Serializable {
                 if (trimmed.charAt(0) == '+') {
                     trimmed = trimmed.substring(1).trim();
                     if (trimmed.equalsIgnoreCase(Constants.SSL_PROTO_ALL)) {
-                        protocols.addAll(SSL_PROTO_ALL);
+                        protocols.addAll(SSL_PROTO_ALL_SET);
                     } else {
                         protocols.add(trimmed);
                     }
                 } else if (trimmed.charAt(0) == '-') {
                     trimmed = trimmed.substring(1).trim();
                     if (trimmed.equalsIgnoreCase(Constants.SSL_PROTO_ALL)) {
-                        protocols.removeAll(SSL_PROTO_ALL);
+                        protocols.removeAll(SSL_PROTO_ALL_SET);
                     } else {
                         protocols.remove(trimmed);
                     }
@@ -425,7 +425,7 @@ public class SSLHostConfig implements Serializable {
                                  trimmed, getHostName()));
                     }
                     if (trimmed.equalsIgnoreCase(Constants.SSL_PROTO_ALL)) {
-                        protocols.addAll(SSL_PROTO_ALL);
+                        protocols.addAll(SSL_PROTO_ALL_SET);
                     } else {
                         protocols.add(trimmed);
                     }
