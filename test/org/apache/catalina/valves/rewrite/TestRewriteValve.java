@@ -529,8 +529,8 @@ public class TestRewriteValve extends TomcatBaseTest {
         }
 
         if (expectedAttributeValue != null) {
-            String attrbuteValue = requestDesc.getAttribute("X-Test");
-            Assert.assertEquals(expectedAttributeValue, attrbuteValue);
+            String attributeValue = requestDesc.getAttribute("X-Test");
+            Assert.assertEquals(expectedAttributeValue, attributeValue);
         }
     }
 }
