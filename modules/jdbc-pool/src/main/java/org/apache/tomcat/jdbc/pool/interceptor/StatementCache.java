@@ -186,6 +186,10 @@ public class StatementCache extends StatementDecoratorInterceptor {
     }
 
     /**
+     * @param sql The SQL to attempt to match to entires in the statement cache
+     *
+     * @return The CachedStatement for the given SQL
+     *
      * @deprecated Unused. Will be removed in Tomcat 9
      */
     @Deprecated
@@ -307,7 +311,7 @@ public class StatementCache extends StatementDecoratorInterceptor {
         }
         return key;
     }
-    
+
 
     private static final class CacheKey {
         private final String stmtType;
