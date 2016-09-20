@@ -102,6 +102,11 @@
         Fail earlier if the client closes the connection during SNI processing.
         (markt)
       </fix>
+      <fix>
+        <bug>60123</bug>: Avoid potential threading issues that could cause
+        excessively large vales to be returned for the processing time of
+        a current request. (markt)  
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
