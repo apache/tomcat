@@ -532,7 +532,8 @@ public class RewriteValve extends ValveBase {
                         chunk = request.getCoyoteRequest().queryString().getCharChunk();
                         chunk.recycle();
                         chunk.append(ENCODER.encode(queryStringDecoded, uriEncoding));
-                        if (qsa) {
+                        if (qsa && originalQueryStringEncoded != null &&
+                                originalQueryStringEncoded.length() > 0) {
                             chunk.append('&');
                             chunk.append(originalQueryStringEncoded);
                         }

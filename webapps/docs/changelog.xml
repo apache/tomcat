@@ -57,7 +57,7 @@
         the Rewrite Valve with mod_rewite. As part of this, provide an
         implementation for the <code>B</code> and <code>NE</code> flags and
         improve the handling for the <code>QSA</code> flag. Includes multiple
-        test cases by Santhana Preethi. (markt)
+        test cases by Santhana Preethiand a patch by Tiago Oliveira. (markt)
       </fix>
       <fix>
         <bug>60116</bug>: Fix a problem with the rewrite valve that caused back

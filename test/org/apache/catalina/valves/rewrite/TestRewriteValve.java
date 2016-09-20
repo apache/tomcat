@@ -409,6 +409,15 @@ public class TestRewriteValve extends TomcatBaseTest {
 
 
     @Test
+    public void testUtf8WithRewriteQsFlagsQSA() throws Exception {
+        // Note %C2%A1 == \u00A1
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [QSA]",
+                "/b/%C2%A1/id=%C2%A1", "/c/%C2%A1%C2%A1",
+                "id=%C2%A1");
+    }
+
+
+    @Test
     public void testUtf8FlagsNone() throws Exception {
         // Note %C2%A1 == \u00A1
         doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1", "/b/%C2%A1", "/c/%C2%A1%C2%A1");
