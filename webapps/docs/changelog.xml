@@ -67,6 +67,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>60123</bug>: Avoid potential threading issues that could cause
+        excessively large vales to be returned for the processing time of
+        a current request. (markt)  
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <fix>

@@ -123,8 +123,14 @@ public class RequestInfo  {
     }
 
     public long getRequestProcessingTime() {
-        if ( getStage() == org.apache.coyote.Constants.STAGE_ENDED ) return 0;
-        else return (System.currentTimeMillis() - req.getStartTime());
+        // Not perfect, but good enough to avoid returning strange values due to
+        // concurrent updates.
+        long startTime = req.getStartTime();
+        if (getStage() == org.apache.coyote.Constants.STAGE_ENDED || startTime < 0) {
+            return 0;
+        } else {
+            return System.currentTimeMillis() - startTime;
+        }
     }
 
     // -------------------- Statistical data  --------------------
