@@ -264,7 +264,7 @@ public class CachedResource implements WebResource {
 
     @Override
     public InputStream getInputStream() {
-        byte[] content = cachedContent;
+        byte[] content = getContent();
         if (content == null) {
             // Can't cache InputStreams
             return webResource.getInputStream();

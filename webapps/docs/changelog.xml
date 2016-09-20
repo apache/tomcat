@@ -73,6 +73,11 @@
         localized when using <code>OneLineFormatter</code>. Patch provided by
         Tatsuya Bessho. (kfujino)
       </fix>
+      <fix>
+        <bug>60146</bug>: Improve performance for resource retrieval by making
+        calls to WebResource.getInputStream() trigger caching if the resource is
+        small enough. Patch provided by mohitchugh. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
