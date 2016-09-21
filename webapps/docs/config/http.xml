@@ -1444,7 +1444,7 @@
       intending to use the APR connector, and Tomcat will automatically enable it
       and the default value of this attribute becomes
       <code>org.apache.tomcat.util.net.openssl.OpenSSLImplementation</code>.
-      In that case, the attributes from either from either JSSE and OpenSSL
+      In that case, the attributes from either JSSE and OpenSSL
       configuration styles can be used, as long as the two types are not mixed
       (for example, it is not allowed to define use of a Java keystore and
       specify a separate pem private key using the OpenSSL attribute).</p>
