@@ -74,7 +74,7 @@
         Tatsuya Bessho. (kfujino)
       </fix>
       <fix>
-        <bug>60138</bug>: Fix the <code>SSLHostConfig</code> so that the 
+        <bug>60138</bug>: Fix the <code>SSLHostConfig</code> so that the
         <code>protocols</code> attribute is limited to the protocols supported
         by the current JSSE implementation rather than the default protocols
         used by the implementation. (markt)
@@ -105,7 +105,7 @@
       <fix>
         <bug>60123</bug>: Avoid potential threading issues that could cause
         excessively large vales to be returned for the processing time of
-        a current request. (markt)  
+        a current request. (markt)
       </fix>
     </changelog>
   </subsection>
