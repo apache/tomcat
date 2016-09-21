@@ -33,4 +33,6 @@ public abstract class Resolver {
     public abstract String resolveHttp(String key);
 
     public abstract boolean resolveResource(int type, String name);
+
+    public abstract String getUriEncoding();
 }

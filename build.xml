@@ -1414,6 +1414,7 @@
         threads="${test.threads}" >
 
         <jvmarg value="${test.jvmarg.egd}"/>
+        <jvmarg value="-Dfile.encoding=UTF-8"/>
         <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
         <jvmarg value="${test.formatter}"/>
         <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>

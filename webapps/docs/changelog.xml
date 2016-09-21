@@ -53,6 +53,13 @@
         class path entries. (markt)
       </add>
       <fix>
+        <bug>60013</bug>: Refactor the previous fix to align the behaviour of
+        the Rewrite Valve with mod_rewite. As part of this, provide an
+        implementation for the <code>B</code> and <code>NE</code> flags and
+        improve the handling for the <code>QSA</code> flag. Includes multiple
+        test cases by Santhana Preethiand a patch by Tiago Oliveira. (markt)
+      </fix>
+      <fix>
         <bug>60116</bug>: Fix a problem with the rewrite valve that caused back
         references evaluated in conditions to be forced to lower case when using
         the <code>NC</code> flag. (markt)

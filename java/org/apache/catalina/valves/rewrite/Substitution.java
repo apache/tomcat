@@ -40,7 +40,15 @@ public class Substitution {
         public int n;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
-            return rule.group(n);
+            if (escapeBackReferences) {
+                // Note: This should be consistent with the way httpd behaves.
+                //       We might want to consider providing a dedicated decoder
+                //       with an option to add additional safe characters to
+                //       provide users with more flexibility
+                return RewriteValve.ENCODER.encode(rule.group(n), resolver.getUriEncoding());
+            } else {
+                return rule.group(n);
+            }
         }
     }
 
@@ -104,6 +112,11 @@ public class Substitution {
     protected String sub = null;
     public String getSub() { return sub; }
     public void setSub(String sub) { this.sub = sub; }
+
+    private boolean escapeBackReferences;
+    void setEscapeBackReferences(boolean escapeBackReferences) {
+        this.escapeBackReferences = escapeBackReferences;
+    }
 
     public void parse(Map<String, RewriteMap> maps) {
 
