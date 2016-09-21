@@ -52,8 +52,8 @@ public class StringManager {
     /**
      * The ResourceBundle for this StringManager.
      */
-    private ResourceBundle bundle;
-    private Locale locale;
+    private final ResourceBundle bundle;
+    private final Locale locale;
 
     /**
      * Creates a new StringManager for a given package. This is a
@@ -65,8 +65,9 @@ public class StringManager {
      */
     private StringManager(String packageName) {
         String bundleName = packageName + ".LocalStrings";
+        ResourceBundle tempBundle = null;
         try {
-            bundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
+            tempBundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
         } catch( MissingResourceException ex ) {
             // Try from the current loader (that's the case for trusted apps)
             // Should only be required if using a TC5 style classloader structure
@@ -74,7 +75,7 @@ public class StringManager {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             if( cl != null ) {
                 try {
-                    bundle = ResourceBundle.getBundle(
+                    tempBundle = ResourceBundle.getBundle(
                             bundleName, Locale.getDefault(), cl);
                 } catch(MissingResourceException ex2) {
                     // Ignore
@@ -82,19 +83,22 @@ public class StringManager {
             }
         }
         // Get the actual locale, which may be different from the requested one
-        if (bundle != null) {
-            locale = bundle.getLocale();
+        if (tempBundle != null) {
+            locale = tempBundle.getLocale();
+        } else {
+            locale = null;
         }
+        bundle = tempBundle;
     }
 
     /**
         Get a string from the underlying resource bundle or return
         null if the String is not found.
-     
+
         @param key to desired resource String
         @return resource String matching <i>key</i> from underlying
                 bundle or null if not found.
-        @throws IllegalArgumentException if <i>key</i> is null.        
+        @throws IllegalArgumentException if <i>key</i> is null.
      */
     public String getString(String key) {
         if(key == null){
@@ -128,8 +132,11 @@ public class StringManager {
      * Get a string from the underlying resource bundle and format
      * it with the given set of arguments.
      *
-     * @param key
-     * @param args
+     * @param key  The key for the required message
+     * @param args The values to insert into the message
+     *
+     * @return The request string formatted with the provided arguments or the
+     *         key if the key was not found.
      */
     public String getString(final String key, final Object... args) {
         String value = getString(key);
@@ -146,8 +153,8 @@ public class StringManager {
     // STATIC SUPPORT METHODS
     // --------------------------------------------------------------
 
-    private static Hashtable<String, StringManager> managers =
-        new Hashtable<String, StringManager>();
+    private static final Hashtable<String, StringManager> managers =
+            new Hashtable<String, StringManager>();
 
     /**
      * Get the StringManager for a particular package. If a manager for
@@ -155,6 +162,8 @@ public class StringManager {
      * StringManager will be created and returned.
      *
      * @param packageName The package name
+     *
+     * @return The instance associated with the given package
      */
     public static final synchronized StringManager getManager(String packageName) {
         StringManager mgr = managers.get(packageName);
@@ -165,4 +174,8 @@ public class StringManager {
         return mgr;
     }
 
+
+    public static final StringManager getManager(Class<?> clazz) {
+        return getManager(clazz.getPackage().getName());
+    }
 }
