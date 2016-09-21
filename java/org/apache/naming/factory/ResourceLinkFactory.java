@@ -29,6 +29,7 @@ import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
 import org.apache.naming.ResourceLinkRef;
+import org.apache.naming.StringManager;
 
 /**
  * <p>Object factory for resource links.</p>
@@ -38,6 +39,8 @@ import org.apache.naming.ResourceLinkRef;
 public class ResourceLinkFactory implements ObjectFactory {
 
     // ------------------------------------------------------- Static Variables
+
+    private static final StringManager sm = StringManager.getManager(ResourceLinkFactory.class);
 
     /**
      * Global naming context.
@@ -146,14 +149,20 @@ public class ResourceLinkFactory implements ObjectFactory {
             result = globalContext.lookup(globalName);
             // Check the expected type
             String expectedClassName = ref.getClassName();
+            if (expectedClassName == null) {
+                throw new IllegalArgumentException(
+                        sm.getString("resourceLinkFactory.nullType", name, globalName));
+            }
             try {
                 Class<?> expectedClazz = Class.forName(
                         expectedClassName, true, Thread.currentThread().getContextClassLoader());
                 if (!expectedClazz.isAssignableFrom(result.getClass())) {
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException(sm.getString("resourceLinkFactory.wrongType",
+                            name, globalName, expectedClassName, result.getClass().getName()));
                 }
             } catch (ClassNotFoundException e) {
-                throw new IllegalStateException(e);
+                throw new IllegalArgumentException(sm.getString("resourceLinkFactory.unknownType",
+                        name, globalName, expectedClassName), e);
             }
             return result;
         }
