@@ -84,6 +84,11 @@
         calls to WebResource.getInputStream() trigger caching if the resource is
         small enough. Patch provided by mohitchugh. (markt)
       </fix>
+      <add>
+        <bug>60151</bug>: Improve the exception error messages when a
+        <code>ResourceLink</code> fails to specify the type, specifies an
+        unknown type or specifies the wrong type. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
