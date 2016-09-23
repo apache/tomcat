@@ -641,7 +641,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             try {
                 socketWrapper.write(true, header, 0, header.length);
                 int orgLimit = data.limit();
-                data.limit(len);
+                data.limit(data.position() + len);
                 socketWrapper.write(true, data);
                 data.limit(orgLimit);
                 socketWrapper.flush(true);
