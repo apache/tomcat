@@ -197,7 +197,7 @@ public class Http11Processor extends AbstractProcessor {
 
     /*
      * Should application provider values for the HTTP Server header be removed.
-     * Note that if {@link #server} is set, any application provided vale will
+     * Note that if {@link #server} is set, any application provided value will
      * be over-ridden.
      */
     private boolean serverRemoveAppProvidedValues = false;
