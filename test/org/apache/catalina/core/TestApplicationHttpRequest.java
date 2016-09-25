@@ -77,7 +77,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
 
     @Test
     public void testForwardQueryString05() throws Exception {
-        // Parameters with no value are assigned a vale of the empty string
+        // Parameters with no value are assigned a value of the empty string
         Map<String,String[]> expected = new HashMap<String, String[]>();
         expected.put("a", new String[] { "b", "e" });
         expected.put("c", new String[] { "" });
@@ -121,7 +121,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
 
     @Test
     public void testOriginalQueryString05() throws Exception {
-        // Parameters with no value are assigned a vale of the empty string
+        // Parameters with no value are assigned a value of the empty string
         Map<String,String[]> expected = new HashMap<String, String[]>();
         expected.put("a", new String[] { "b", "e" });
         expected.put("c", new String[] { "" });
