@@ -1150,7 +1150,7 @@
       </fix>
       <fix>
         Fix a regression caused by the connector refactoring and ensure that the
-        thread context class loader is set to the to the web application
+        thread context class loader is set to the web application
         classloader when processing WebSocket messages on the server. (markt)
       </fix>
       <fix>

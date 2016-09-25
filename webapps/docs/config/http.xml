@@ -545,7 +545,7 @@
     </attribute>
 
     <attribute name="serverRemoveAppProvidedValues" required="false">
-      <p>If <code>true</code>, any Server header Server header set by a web
+      <p>If <code>true</code>, any Server header set by a web
       application will be removed. Note that if <strong>server</strong> is set,
       this attribute is effectively ignored. If not set, the default value of
       <code>false</code> will be used.</p>
