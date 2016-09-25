@@ -1155,7 +1155,7 @@ public class ContextConfig implements LifecycleListener {
                 }
             }
 
-            // Step 5. Process JARs for annotations for annotations and
+            // Step 5. Process JARs for annotations and
             // @HandlesTypes matches - only need to process those fragments we
             // are going to use (remember orderedFragments includes any
             // container fragments)
