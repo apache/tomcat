@@ -3977,7 +3977,7 @@
       </fix>
       <add>
         Add a work around for validating XML documents (often TLDs) that use
-        just the file name to refer to refer to the JavaEE schema on which they
+        just the file name to refer to the JavaEE schema on which they
         are based. (markt)
       </add>
       <fix>
@@ -9006,7 +9006,7 @@
       <fix>
         When unloading JSPs due to configuration of the
         <code>maxLoadedJsps</code> initialisation parameter, the unloading code
-        was retaining a reference to the to the unloaded JSP preventing the
+        was retaining a reference to the unloaded JSP preventing the
         associated class from being unloaded until the JSP that replaced it was
         itself unloaded. (markt) 
       </fix>
