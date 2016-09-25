@@ -66,6 +66,7 @@ output/deployer/deployer-howto.html
 output/dist/webapps/docs/*/package-list
 output/dist/webapps/docs/*/script.js
 
+output/dist/src/test/webapp/index.html.br
 output/dist/src/test/webapp/bug53257/*.txt
 output/dist/src/test/webapp/bug53257/foo bar/foobar.txt
 output/dist/src/test/webapp-fragments/WEB-INF/classes/*.txt
