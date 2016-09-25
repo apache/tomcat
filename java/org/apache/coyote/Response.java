@@ -495,6 +495,9 @@ public final class Response {
      * @param chunk The bytes to write
      *
      * @throws IOException If an I/O error occurs during the write
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9. Use
+     *             {@link #doWrite(ByteBuffer)}
      */
     public void doWrite(ByteChunk chunk) throws IOException {
         outputBuffer.doWrite(chunk);

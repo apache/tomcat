@@ -1306,6 +1306,10 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 9. Use
+     *             {@link #doWrite(ByteBuffer)}
+     */
     private void writeData(ByteChunk chunk) throws IOException {
         boolean blocking = (response.getWriteListener() == null);
 
@@ -1403,6 +1407,10 @@ public class AjpProcessor extends AbstractProcessor {
      */
     protected class SocketOutputBuffer implements OutputBuffer {
 
+        /**
+         * @deprecated Unused. Will be removed in Tomcat 9. Use
+         *             {@link #doWrite(ByteBuffer)}
+         */
         @Override
         public int doWrite(ByteChunk chunk) throws IOException {
 
