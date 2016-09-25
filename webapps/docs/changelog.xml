@@ -644,7 +644,7 @@
         connection is borrowed. (kfujino)
       </fix>
       <fix>
-        <bug>59774</bug>: Correct the <code>prefix</code> values in the the
+        <bug>59774</bug>: Correct the <code>prefix</code> values in the
         documented examples for configuring the <code>AccessLogValve</code>.
         Patch provided by Mike Noordermeer. (markt)
       </fix>
@@ -962,7 +962,7 @@
         session count below <code>maxActiveSessions</code>. (markt)
       </fix>
       <update>
-        Update the implementation of the the proposed Servlet 4.0 API to provide
+        Update the implementation of the proposed Servlet 4.0 API to provide
         mapping type information for the current request to reflect discussions
         within the EG. (markt)
       </update>
@@ -1455,7 +1455,7 @@
         <bug>57583</bug>: Improve the performance of
         <code>javax.servlet.jsp.el.ScopedAttributeELResolver</code> when
         resolving attributes that do not exist. This improvement only works when
-        Jasper is used with with Tomcat's EL implementation. (markt)
+        Jasper is used with Tomcat's EL implementation. (markt)
       </fix>
     </changelog>
   </subsection>
