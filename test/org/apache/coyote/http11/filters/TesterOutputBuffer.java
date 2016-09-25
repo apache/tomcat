@@ -112,7 +112,10 @@ public class TesterOutputBuffer extends Http11OutputBuffer {
 
         @Override
         public int doWrite(ByteBuffer chunk) throws IOException {
-            throw new UnsupportedOperationException();
+            int length = chunk.remaining();
+            outputStream.write(chunk.array(), chunk.arrayOffset() + chunk.position(), length);
+            byteCount += length;
+            return length;
         }
 
         @Override
