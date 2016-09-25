@@ -191,28 +191,6 @@ public class Http11OutputBuffer implements OutputBuffer {
 
     // --------------------------------------------------- OutputBuffer Methods
 
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 9. Use
-     *             {@link #doWrite(ByteBuffer)}
-     */
-    @Override
-    public int doWrite(ByteChunk chunk) throws IOException {
-
-        if (!response.isCommitted()) {
-            // Send the connector a request for commit. The connector should
-            // then validate the headers, send them (using sendHeaders) and
-            // set the filters accordingly.
-            response.action(ActionCode.COMMIT, null);
-        }
-
-        if (lastActiveFilter == -1) {
-            return outputStreamOutputBuffer.doWrite(chunk);
-        } else {
-            return activeFilters[lastActiveFilter].doWrite(chunk);
-        }
-    }
-
-
     @Override
     public int doWrite(ByteBuffer chunk) throws IOException {
 
@@ -572,22 +550,6 @@ public class Http11OutputBuffer implements OutputBuffer {
      * This class is an output buffer which will write data to a socket.
      */
     protected class SocketOutputBuffer implements OutputBuffer {
-
-        /**
-         * Write chunk.
-         *
-         * @deprecated Unused. Will be removed in Tomcat 9. Use
-         *             {@link #doWrite(ByteBuffer)}
-         */
-        @Override
-        public int doWrite(ByteChunk chunk) throws IOException {
-            int len = chunk.getLength();
-            int start = chunk.getStart();
-            byte[] b = chunk.getBuffer();
-            socketWrapper.write(isBlocking(), b, start, len);
-            byteCount += len;
-            return len;
-        }
 
         /**
          * Write chunk.

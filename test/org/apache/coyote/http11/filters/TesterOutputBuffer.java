@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.Http11OutputBuffer;
-import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
@@ -101,14 +100,6 @@ public class TesterOutputBuffer extends Http11OutputBuffer {
      * stream.
      */
     protected class OutputStreamOutputBuffer implements OutputBuffer {
-
-        @Override
-        public int doWrite(ByteChunk chunk) throws IOException {
-            int length = chunk.getLength();
-            outputStream.write(chunk.getBuffer(), chunk.getStart(), length);
-            byteCount += chunk.getLength();
-            return chunk.getLength();
-        }
 
         @Override
         public int doWrite(ByteBuffer chunk) throws IOException {

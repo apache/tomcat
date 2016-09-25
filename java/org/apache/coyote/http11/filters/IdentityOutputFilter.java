@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.OutputFilter;
-import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Identity output filter.
@@ -55,47 +54,6 @@ public class IdentityOutputFilter implements OutputFilter {
 
 
     // --------------------------------------------------- OutputBuffer Methods
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 9. Use
-     *             {@link #doWrite(ByteBuffer)}
-     */
-    @Override
-    public int doWrite(ByteChunk chunk) throws IOException {
-
-        int result = -1;
-
-        if (contentLength >= 0) {
-            if (remaining > 0) {
-                result = chunk.getLength();
-                if (result > remaining) {
-                    // The chunk is longer than the number of bytes remaining
-                    // in the body; changing the chunk length to the number
-                    // of bytes remaining
-                    chunk.setBytes(chunk.getBytes(), chunk.getStart(),
-                                   (int) remaining);
-                    result = (int) remaining;
-                    remaining = 0;
-                } else {
-                    remaining = remaining - result;
-                }
-                buffer.doWrite(chunk);
-            } else {
-                // No more bytes left to be written : return -1 and clear the
-                // buffer
-                chunk.recycle();
-                result = -1;
-            }
-        } else {
-            // If no content length was set, just write the bytes
-            buffer.doWrite(chunk);
-            result = chunk.getLength();
-        }
-
-        return result;
-
-    }
-
 
     @Override
     public int doWrite(ByteBuffer chunk) throws IOException {

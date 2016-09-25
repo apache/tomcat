@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.OutputFilter;
-import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 
 /**
@@ -76,34 +75,6 @@ public class ChunkedOutputFilter implements OutputFilter {
 
 
     // --------------------------------------------------- OutputBuffer Methods
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 9. Use
-     *             {@link #doWrite(ByteBuffer)}
-     */
-    @Override
-    public int doWrite(ByteChunk chunk) throws IOException {
-
-        int result = chunk.getLength();
-
-        if (result <= 0) {
-            return 0;
-        }
-
-        int pos = calculateChunkHeader(result);
-
-        chunkHeader.position(pos + 1).limit(chunkHeader.position() + 9 - pos);
-        buffer.doWrite(chunkHeader);
-
-        buffer.doWrite(chunk);
-
-        chunkHeader.position(8).limit(10);
-        buffer.doWrite(chunkHeader);
-
-        return result;
-
-    }
-
 
     @Override
     public int doWrite(ByteBuffer chunk) throws IOException {
