@@ -33,7 +33,7 @@ public class TestCookieRFC6265Validator {
         TestCookie.checkCharInName(validator, TestCookie.TOKEN);
     }
 
-    @Test()
+    @Test
     public void leadingDollar() {
         validator.validate("$Version");
     }
