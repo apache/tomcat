@@ -121,6 +121,10 @@
         excessively large vales to be returned for the processing time of
         a current request. (markt)
       </fix>
+      <fix>
+        <bug>60174</bug>: Log instances of <code>HeadersTooLargeException</code>
+        during request processing. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
