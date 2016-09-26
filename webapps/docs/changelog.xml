@@ -65,6 +65,10 @@
         localized when using <code>OneLineFormatter</code>. Patch provided by
         Tatsuya Bessho. (kfujino)
       </fix>
+      <fix>
+        <bug>60167</bug>: Ignore empty lines in <code>/etc/passwd</code> files
+        when using the <code>PasswdUserDatabase</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -100,48 +100,18 @@ public final class PasswdUserDatabase implements UserDatabase {
      * Initialize our set of users and home directories.
      */
     private void init() {
-
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(PASSWORD_FILE));
-            while (true) {
-                // Accumulate the next line
-                StringBuilder buffer = new StringBuilder();
-                while (true) {
-                    int ch = reader.read();
-                    if ((ch < 0) || (ch == '\n')) {
-                        break;
-                    }
-                    buffer.append((char) ch);
-                }
-                String line = buffer.toString();
-                if (line.length() < 1) {
-                    break;
-                }
-
-                // Parse the line into constituent elements
-                int n = 0;
-                String tokens[] = new String[7];
-                for (int i = 0; i < tokens.length; i++) {
-                    tokens[i] = null;
-                }
-                while (n < tokens.length) {
-                    String token = null;
-                    int colon = line.indexOf(':');
-                    if (colon >= 0) {
-                        token = line.substring(0, colon);
-                        line = line.substring(colon + 1);
-                    } else {
-                        token = line;
-                        line = "";
-                    }
-                    tokens[n++] = token;
-                }
-
-                // Add this user and corresponding directory
-                if ((tokens[0] != null) && (tokens[5] != null)) {
+            String line = reader.readLine();
+            while (line != null) {
+                String tokens[] = line.split(":");
+                // Need non-zero 1st and 6th tokens
+                if (tokens.length > 5 && tokens[0].length() > 0 && tokens[5].length() > 0) {
+                    // Add this user and corresponding directory
                     homes.put(tokens[0], tokens[5]);
                 }
+                line = reader.readLine();
             }
         } catch (Exception e) {
             log.warn(sm.getString("passwdUserDatabase.readFail"), e);
