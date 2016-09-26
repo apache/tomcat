@@ -38,6 +38,15 @@
     <property name="cacheFile"
               value="${tomcat.output}/res/checkstyle/cachefile-checkstyle.xml"/>
 
+    <!-- Annotations -->
+    <module name="AnnotationLocation"/>
+    <!-- 1 false positive, fixed in later Checkstyle release but can't upgrade
+         as it requires Java 7.
+    <module name="AnnotationUseStyle"/>
+    -->
+    <module name="MissingOverride"/>
+    <module name="PackageAnnotation"/>
+
     <!-- Block Checks -->
     <!--  ~60 errors
     <module name="AvoidNestedBlocks"/>

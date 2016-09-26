@@ -57,7 +57,7 @@ import javax.servlet.DispatcherType;
  * @since Servlet 3.0 (Section 8.1.2)
  * 
  */
-@Target({ElementType.TYPE})
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface WebFilter {

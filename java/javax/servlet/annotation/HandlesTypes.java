@@ -27,7 +27,7 @@ import java.lang.annotation.Target;
  * 
  * @since Servlet 3.0
  */
-@Target({ElementType.TYPE})
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SuppressWarnings("rawtypes") // Spec API does not use generics
 public @interface HandlesTypes {

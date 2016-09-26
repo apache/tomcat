@@ -215,6 +215,7 @@ objenesis.loc=https://bintray.com/easymock/distributions/download_file?file_path
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 
 # ----- Checkstyle, version 6.0 or later -----
+# Limited to 6.1.1 since that is the latest release that supports Java 6
 checkstyle.version=6.1.1
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle/${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar

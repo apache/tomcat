@@ -53,7 +53,7 @@ import java.lang.annotation.Target;
  * @since Servlet 3.0 (Section 8.1.1)
  * 
  */
-@Target({ElementType.TYPE})
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface WebServlet {
