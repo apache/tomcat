@@ -47,7 +47,7 @@ public abstract class WsFrameBase {
 
     // Connection level attributes
     protected final WsSession wsSession;
-    protected final byte[] inputBuffer;
+    protected final ByteBuffer inputBuffer;
     private final Transformation transformation;
 
     // Attributes for control messages
@@ -84,11 +84,10 @@ public abstract class WsFrameBase {
     // Attributes tracking state
     private volatile State state = State.NEW_FRAME;
     private volatile boolean open = true;
-    private volatile int readPos = 0;
-    protected volatile int writePos = 0;
 
     public WsFrameBase(WsSession wsSession, Transformation transformation) {
-        inputBuffer = new byte[Constants.DEFAULT_BUFFER_SIZE];
+        inputBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
+        inputBuffer.position(0).limit(0);
         messageBufferBinary =
                 ByteBuffer.allocate(wsSession.getMaxBinaryMessageBufferSize());
         messageBufferText =
@@ -142,10 +141,10 @@ public abstract class WsFrameBase {
      */
     private boolean processInitialHeader() throws IOException {
         // Need at least two bytes of data to do this
-        if (writePos - readPos < 2) {
+        if (inputBuffer.remaining() < 2) {
             return false;
         }
-        int b = inputBuffer[readPos++];
+        int b = inputBuffer.get();
         fin = (b & 0x80) > 0;
         rsv = (b & 0x70) >>> 4;
         opCode = (byte) (b & 0x0F);
@@ -212,7 +211,7 @@ public abstract class WsFrameBase {
             }
             continuationExpected = !fin;
         }
-        b = inputBuffer[readPos++];
+        b = inputBuffer.get();
         // Client data must be masked
         if ((b & 0x80) == 0 && isMasked()) {
             throw new WsIOException(new CloseReason(
@@ -251,16 +250,18 @@ public abstract class WsFrameBase {
         } else if (payloadLength == 127) {
             headerLength += 8;
         }
-        if (writePos - readPos < headerLength) {
+        if (inputBuffer.remaining() < headerLength) {
             return false;
         }
         // Calculate new payload length if necessary
         if (payloadLength == 126) {
-            payloadLength = byteArrayToLong(inputBuffer, readPos, 2);
-            readPos += 2;
+            payloadLength = byteArrayToLong(inputBuffer.array(),
+                    inputBuffer.arrayOffset() + inputBuffer.position(), 2);
+            inputBuffer.position(inputBuffer.position() + 2);
         } else if (payloadLength == 127) {
-            payloadLength = byteArrayToLong(inputBuffer, readPos, 8);
-            readPos += 8;
+            payloadLength = byteArrayToLong(inputBuffer.array(),
+                    inputBuffer.arrayOffset() + inputBuffer.position(), 8);
+            inputBuffer.position(inputBuffer.position() + 8);
         }
         if (Util.isControl(opCode)) {
             if (payloadLength > 125) {
@@ -276,8 +277,7 @@ public abstract class WsFrameBase {
             }
         }
         if (isMasked()) {
-            System.arraycopy(inputBuffer, readPos, mask, 0, 4);
-            readPos += 4;
+            inputBuffer.get(mask, 0, 4);
         }
         state = State.DATA;
         return true;
@@ -607,9 +607,8 @@ public abstract class WsFrameBase {
 
 
     private void newFrame() {
-        if (readPos == writePos) {
-            readPos = 0;
-            writePos = 0;
+        if (inputBuffer.remaining() == 0) {
+            inputBuffer.position(0).limit(0);
         }
 
         maskIndex = 0;
@@ -626,7 +625,7 @@ public abstract class WsFrameBase {
     private void checkRoomHeaders() {
         // Is the start of the current frame too near the end of the input
         // buffer?
-        if (inputBuffer.length - readPos < 131) {
+        if (inputBuffer.capacity() - inputBuffer.position() < 131) {
             // Limit based on a control frame with a full payload
             makeRoom();
         }
@@ -634,17 +633,15 @@ public abstract class WsFrameBase {
 
 
     private void checkRoomPayload() {
-        if (inputBuffer.length - readPos - payloadLength + payloadWritten < 0) {
+        if (inputBuffer.capacity() - inputBuffer.position() - payloadLength + payloadWritten < 0) {
             makeRoom();
         }
     }
 
 
     private void makeRoom() {
-        System.arraycopy(inputBuffer, readPos, inputBuffer, 0,
-                writePos - readPos);
-        writePos = writePos - readPos;
-        readPos = 0;
+        inputBuffer.compact();
+        inputBuffer.flip();
     }
 
 
@@ -661,8 +658,8 @@ public abstract class WsFrameBase {
 
 
     private boolean swallowInput() {
-        long toSkip = Math.min(payloadLength - payloadWritten, writePos - readPos);
-        readPos += toSkip;
+        long toSkip = Math.min(payloadLength - payloadWritten, inputBuffer.remaining());
+        inputBuffer.position(inputBuffer.position() + (int) toSkip);
         payloadWritten += toSkip;
         if (payloadWritten == payloadLength) {
             if (continuationExpected) {
@@ -758,16 +755,18 @@ public abstract class WsFrameBase {
             // opCodes
             // rsv is ignored as it known to be zero at this point
             long toWrite = Math.min(
-                    payloadLength - payloadWritten, writePos - readPos);
+                    payloadLength - payloadWritten, inputBuffer.remaining());
             toWrite = Math.min(toWrite, dest.remaining());
 
-            dest.put(inputBuffer, readPos, (int) toWrite);
-            readPos += toWrite;
+            int orgLimit = inputBuffer.limit();
+            inputBuffer.limit(inputBuffer.position() + (int) toWrite);
+            dest.put(inputBuffer);
+            inputBuffer.limit(orgLimit);
             payloadWritten += toWrite;
 
             if (payloadWritten == payloadLength) {
                 return TransformationResult.END_OF_FRAME;
-            } else if (readPos == writePos) {
+            } else if (inputBuffer.remaining() == 0) {
                 return TransformationResult.UNDERFLOW;
             } else {
                 // !dest.hasRemaining()
@@ -797,20 +796,19 @@ public abstract class WsFrameBase {
             // opCode is ignored as the transformation is the same for all
             // opCodes
             // rsv is ignored as it known to be zero at this point
-            while (payloadWritten < payloadLength && readPos < writePos &&
+            while (payloadWritten < payloadLength && inputBuffer.remaining() > 0 &&
                     dest.hasRemaining()) {
-                byte b = (byte) ((inputBuffer[readPos] ^ mask[maskIndex]) & 0xFF);
+                byte b = (byte) ((inputBuffer.get() ^ mask[maskIndex]) & 0xFF);
                 maskIndex++;
                 if (maskIndex == 4) {
                     maskIndex = 0;
                 }
-                readPos++;
                 payloadWritten++;
                 dest.put(b);
             }
             if (payloadWritten == payloadLength) {
                 return TransformationResult.END_OF_FRAME;
-            } else if (readPos == writePos) {
+            } else if (inputBuffer.remaining() == 0) {
                 return TransformationResult.UNDERFLOW;
             } else {
                 // !dest.hasRemaining()
