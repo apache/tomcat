@@ -92,7 +92,7 @@
       <fix>
         <bug>60170</bug>: Exclude the compressed test file
         <code>index.html.br</code> from RAT analysis. Patch provided by Gavin
-        McDonald. (markt) 
+        McDonald. (markt)
       </fix>
     </changelog>
   </subsection>
