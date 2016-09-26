@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,6 +22,10 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.naming.StringManager;
+
 /**
  * Concrete implementation of the <strong>UserDatabase</code> interface
  * that processes the <code>/etc/passwd</code> file on a Unix system.
@@ -29,6 +33,9 @@ import java.util.Hashtable;
  * @author Craig R. McClanahan
  */
 public final class PasswdUserDatabase implements UserDatabase {
+
+    private static final Log log = LogFactory.getLog(PasswdUserDatabase.class);
+    private static final StringManager sm = StringManager.getManager(PasswdUserDatabase.class);
 
     /**
      * The pathname of the Unix password file.
@@ -97,7 +104,6 @@ public final class PasswdUserDatabase implements UserDatabase {
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(PASSWORD_FILE));
-
             while (true) {
                 // Accumulate the next line
                 StringBuilder buffer = new StringBuilder();
@@ -137,18 +143,15 @@ public final class PasswdUserDatabase implements UserDatabase {
                     homes.put(tokens[0], tokens[5]);
                 }
             }
-
-            reader.close();
-            reader = null;
-
         } catch (Exception e) {
+            log.warn(sm.getString("passwdUserDatabase.readFail"), e);
+        } finally {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (IOException f) {
+                } catch (IOException e) {
                     // Ignore
                 }
-                reader = null;
             }
         }
     }
