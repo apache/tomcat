@@ -30,8 +30,8 @@
   - package-list and script.js files in API documentation (javadoc) are
     generated
 
-  - other trivial test files, such as textual files containing only "OK' string,
-    are also excluded.
+  - other test files, such as trivial textual files containing only "OK' string
+    or compressed files are also excluded.
 
   - JSON files (RFC7159) are data and cannot contain comments
 
@@ -52,6 +52,7 @@
     ones, so no explicit configuration is needed)
 
 output/build/logs/*
+output/test-tmp/**
 
 output/build/webapps/docs/**/*.html
 output/dist/webapps/docs/**/*.html
@@ -73,6 +74,7 @@ output/dist/src/test/webapp-fragments/WEB-INF/classes/*.txt
 output/dist/src/test/webresources/dir1/d1/d1-f1.txt
 output/dist/src/test/webresources/dir1/d2/d2-f1.txt
 output/dist/src/test/webresources/dir1/*.txt
+test/webapp/index.html.br
 test/webapp/bug53257/*.txt
 test/webapp/bug53257/foo bar/foobar.txt
 test/webapp-fragments/WEB-INF/classes/*.txt
