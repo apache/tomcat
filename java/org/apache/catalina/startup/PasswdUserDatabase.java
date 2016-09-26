@@ -18,9 +18,12 @@ package org.apache.catalina.startup;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.naming.StringManager;
 
 /**
  * Concrete implementation of the <code>UserDatabase</code> interface
@@ -29,6 +32,9 @@ import java.util.Hashtable;
  * @author Craig R. McClanahan
  */
 public final class PasswdUserDatabase implements UserDatabase {
+
+    private static final Log log = LogFactory.getLog(PasswdUserDatabase.class);
+    private static final StringManager sm = StringManager.getManager(PasswdUserDatabase.class);
 
     /**
      * The pathname of the Unix password file.
@@ -94,10 +100,7 @@ public final class PasswdUserDatabase implements UserDatabase {
      */
     private void init() {
 
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new FileReader(PASSWORD_FILE));
-
+        try (BufferedReader reader = new BufferedReader(new FileReader(PASSWORD_FILE))) {
             while (true) {
                 // Accumulate the next line
                 StringBuilder buffer = new StringBuilder();
@@ -137,19 +140,8 @@ public final class PasswdUserDatabase implements UserDatabase {
                     homes.put(tokens[0], tokens[5]);
                 }
             }
-
-            reader.close();
-            reader = null;
-
         } catch (Exception e) {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException f) {
-                    // Ignore
-                }
-                reader = null;
-            }
+            log.warn(sm.getString("passwdUserDatabase.readFail"), e);
         }
     }
 }
