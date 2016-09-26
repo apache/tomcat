@@ -90,6 +90,10 @@
         unknown type or specifies the wrong type. (markt)
       </add>
       <fix>
+        <bug>60167</bug>: Ignore empty lines in <code>/etc/passwd</code> files
+        when using the <code>PasswdUserDatabase</code>. (markt)
+      </fix>
+      <fix>
         <bug>60170</bug>: Exclude the compressed test file
         <code>index.html.br</code> from RAT analysis. Patch provided by Gavin
         McDonald. (markt)
