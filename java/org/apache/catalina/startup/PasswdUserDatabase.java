@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.startup;
-
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -25,32 +22,13 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-
 /**
  * Concrete implementation of the <strong>UserDatabase</code> interface
  * that processes the <code>/etc/passwd</code> file on a Unix system.
  *
  * @author Craig R. McClanahan
  */
-public final class PasswdUserDatabase
-    implements UserDatabase {
-
-
-    // --------------------------------------------------------- Constructors
-
-
-    /**
-     * Initialize a new instance of this user database component.
-     */
-    public PasswdUserDatabase() {
-
-        super();
-
-    }
-
-
-    // --------------------------------------------------- Instance Variables
-
+public final class PasswdUserDatabase implements UserDatabase {
 
     /**
      * The pathname of the Unix password file.
@@ -70,17 +48,12 @@ public final class PasswdUserDatabase
     private UserConfig userConfig = null;
 
 
-    // ----------------------------------------------------------- Properties
-
-
     /**
      * Return the UserConfig listener with which we are associated.
      */
     @Override
     public UserConfig getUserConfig() {
-
-        return (this.userConfig);
-
+        return userConfig;
     }
 
 
@@ -91,14 +64,9 @@ public final class PasswdUserDatabase
      */
     @Override
     public void setUserConfig(UserConfig userConfig) {
-
         this.userConfig = userConfig;
         init();
-
     }
-
-
-    // ------------------------------------------------------- Public Methods
 
 
     /**
@@ -108,9 +76,7 @@ public final class PasswdUserDatabase
      */
     @Override
     public String getHome(String user) {
-
         return homes.get(user);
-
     }
 
 
@@ -119,13 +85,8 @@ public final class PasswdUserDatabase
      */
     @Override
     public Enumeration<String> getUsers() {
-
-        return (homes.keys());
-
+        return homes.keys();
     }
-
-
-    // ------------------------------------------------------ Private Methods
 
 
     /**
@@ -135,28 +96,29 @@ public final class PasswdUserDatabase
 
         BufferedReader reader = null;
         try {
-
             reader = new BufferedReader(new FileReader(PASSWORD_FILE));
 
             while (true) {
-
                 // Accumulate the next line
                 StringBuilder buffer = new StringBuilder();
                 while (true) {
                     int ch = reader.read();
-                    if ((ch < 0) || (ch == '\n'))
+                    if ((ch < 0) || (ch == '\n')) {
                         break;
+                    }
                     buffer.append((char) ch);
                 }
                 String line = buffer.toString();
-                if (line.length() < 1)
+                if (line.length() < 1) {
                     break;
+                }
 
                 // Parse the line into constituent elements
                 int n = 0;
                 String tokens[] = new String[7];
-                for (int i = 0; i < tokens.length; i++)
+                for (int i = 0; i < tokens.length; i++) {
                     tokens[i] = null;
+                }
                 while (n < tokens.length) {
                     String token = null;
                     int colon = line.indexOf(':');
@@ -171,9 +133,9 @@ public final class PasswdUserDatabase
                 }
 
                 // Add this user and corresponding directory
-                if ((tokens[0] != null) && (tokens[5] != null))
+                if ((tokens[0] != null) && (tokens[5] != null)) {
                     homes.put(tokens[0], tokens[5]);
-
+                }
             }
 
             reader.close();
@@ -189,8 +151,5 @@ public final class PasswdUserDatabase
                 reader = null;
             }
         }
-
     }
-
-
 }
