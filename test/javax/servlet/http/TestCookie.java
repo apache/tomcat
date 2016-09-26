@@ -66,7 +66,7 @@ public class TestCookie {
         Assert.assertEquals(0, cookie.getVersion());
     }
 
-    @Test()
+    @Test
     public void defaultImpliesNetscape() {
         // $Foo is allowed by Netscape but not by RFC2109
         Cookie cookie = new Cookie("$Foo", null);
