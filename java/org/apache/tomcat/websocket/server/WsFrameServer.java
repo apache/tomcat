@@ -55,7 +55,7 @@ public class WsFrameServer extends WsFrameBase {
         if (log.isDebugEnabled()) {
             log.debug("wsFrameServer.onDataAvailable");
         }
-        while (isOpen() && socketWrapper.isReadyForRead()) {
+        while (isOpen()) {
             // Fill up the input buffer with as much data as we can
             inputBuffer.mark();
             inputBuffer.position(inputBuffer.limit()).limit(inputBuffer.capacity());
