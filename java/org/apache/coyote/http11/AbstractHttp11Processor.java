@@ -255,7 +255,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     /**
      * Listener to which data available events are passed once the associated
      * connection has completed the proprietary Tomcat HTTP upgrade process.
-     * 
+     *
      * @deprecated  Will be removed in Tomcat 8.0.x.
      */
     @Deprecated
@@ -267,8 +267,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      * upgraded using the Servlet 3.1 based upgrade process.
      */
     protected HttpUpgradeHandler httpUpgradeHandler = null;
-    
-    
+
+
     public AbstractHttp11Processor(AbstractEndpoint<S> endpoint) {
         super(endpoint);
         userDataHelper = new UserDataHelper(getLog());
@@ -1096,6 +1096,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                 } catch (InterruptedIOException e) {
                     setErrorState(ErrorState.CLOSE_NOW, e);
                 } catch (HeadersTooLargeException e) {
+                    getLog().error(sm.getString("http11processor.request.process"), e);
                     // The response should not have been committed but check it
                     // anyway to be safe
                     if (response.isCommitted()) {
@@ -1108,8 +1109,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
                     }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    getLog().error(sm.getString(
-                            "http11processor.request.process"), t);
+                    getLog().error(sm.getString("http11processor.request.process"), t);
                     // 500 - Internal Server Error
                     response.setStatus(500);
                     setErrorState(ErrorState.CLOSE_CLEAN, t);
@@ -1739,8 +1739,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     public boolean isUpgrade() {
         return httpUpgradeHandler != null;
     }
-    
-    
+
+
     @Override
     public SocketState upgradeDispatch(SocketStatus status) throws IOException {
         // Should never reach this code but in case we do...
@@ -1753,8 +1753,8 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     public HttpUpgradeHandler getHttpUpgradeHandler() {
         return httpUpgradeHandler;
     }
-    
-    
+
+
     /**
      * Provides a mechanism for those connector implementations (currently only
      * NIO) that need to reset timeouts from Async timeouts to standard HTTP
