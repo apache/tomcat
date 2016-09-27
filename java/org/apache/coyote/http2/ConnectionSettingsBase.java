@@ -176,7 +176,7 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
 
     private void validateHeaderTableSize(long headerTableSize) throws T {
         // Need to put a sensible limit on this. Start with 16k (default is 4k)
-        if (headerTableSize > (16 * 1024)) {
+        if (headerTableSize > (64 * 1024)) {
             String msg = sm.getString("connectionSettings.headerTableSizeLimit",
                     connectionId, Long.toString(headerTableSize));
             throwException(msg, Http2Error.PROTOCOL_ERROR);
