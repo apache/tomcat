@@ -69,13 +69,7 @@ public class Http11OutputBuffer implements OutputBuffer {
     /**
      * The buffer used for header composition.
      */
-    protected final byte[] headerBuffer;
-
-
-    /**
-     * Position in the header buffer.
-     */
-    protected int pos;
+    protected final ByteBuffer headerBuffer;
 
 
     /**
@@ -118,7 +112,7 @@ public class Http11OutputBuffer implements OutputBuffer {
 
         this.response = response;
 
-        headerBuffer = new byte[headerBufferSize];
+        headerBuffer = ByteBuffer.allocate(headerBufferSize);
 
         filterLibrary = new OutputFilter[0];
         activeFilters = new OutputFilter[0];
@@ -250,7 +244,7 @@ public class Http11OutputBuffer implements OutputBuffer {
      * headers so the error response can be written.
      */
     void resetHeaderBuffer() {
-        pos = 0;
+        headerBuffer.position(0);
     }
 
 
@@ -278,7 +272,7 @@ public class Http11OutputBuffer implements OutputBuffer {
         // Recycle response object
         response.recycle();
         // Reset pointers
-        pos = 0;
+        headerBuffer.position(0);
         lastActiveFilter = -1;
         responseFinished = false;
         byteCount = 0;
@@ -328,9 +322,11 @@ public class Http11OutputBuffer implements OutputBuffer {
     protected void commit() throws IOException {
         response.setCommitted(true);
 
-        if (pos > 0) {
+        if (headerBuffer.position() > 0) {
             // Sending the response header buffer
-            socketWrapper.write(isBlocking(), headerBuffer, 0, pos);
+            headerBuffer.flip();
+            socketWrapper.write(isBlocking(), headerBuffer);
+            headerBuffer.position(0).limit(headerBuffer.capacity());
         }
     }
 
@@ -341,7 +337,7 @@ public class Http11OutputBuffer implements OutputBuffer {
     public void sendStatus() {
         // Write protocol name
         write(Constants.HTTP_11_BYTES);
-        headerBuffer[pos++] = Constants.SP;
+        headerBuffer.put(Constants.SP);
 
         // Write status code
         int status = response.getStatus();
@@ -359,14 +355,13 @@ public class Http11OutputBuffer implements OutputBuffer {
             write(String.valueOf(status));
         }
 
-        headerBuffer[pos++] = Constants.SP;
+        headerBuffer.put(Constants.SP);
 
         // The reason phrase is optional but the space before it is not. Skip
         // sending the reason phrase. Clients should ignore it (RFC 7230) and it
         // just wastes bytes.
 
-        headerBuffer[pos++] = Constants.CR;
-        headerBuffer[pos++] = Constants.LF;
+        headerBuffer.put(Constants.CR).put(Constants.LF);
     }
 
 
@@ -378,11 +373,9 @@ public class Http11OutputBuffer implements OutputBuffer {
      */
     public void sendHeader(MessageBytes name, MessageBytes value) {
         write(name);
-        headerBuffer[pos++] = Constants.COLON;
-        headerBuffer[pos++] = Constants.SP;
+        headerBuffer.put(Constants.COLON).put(Constants.SP);
         write(value);
-        headerBuffer[pos++] = Constants.CR;
-        headerBuffer[pos++] = Constants.LF;
+        headerBuffer.put(Constants.CR).put(Constants.LF);
     }
 
 
@@ -390,8 +383,7 @@ public class Http11OutputBuffer implements OutputBuffer {
      * End the header block.
      */
     public void endHeaders() {
-        headerBuffer[pos++] = Constants.CR;
-        headerBuffer[pos++] = Constants.LF;
+        headerBuffer.put(Constants.CR).put(Constants.LF);
     }
 
 
@@ -437,8 +429,7 @@ public class Http11OutputBuffer implements OutputBuffer {
         // Writing the byte chunk to the output buffer
         int length = bc.getLength();
         checkLengthBeforeWrite(length);
-        System.arraycopy(bc.getBytes(), bc.getStart(), headerBuffer, pos, length);
-        pos = pos + length;
+        headerBuffer.put(bc.getBytes(), bc.getStart(), length);
     }
 
 
@@ -453,8 +444,7 @@ public class Http11OutputBuffer implements OutputBuffer {
         checkLengthBeforeWrite(b.length);
 
         // Writing the byte chunk to the output buffer
-        System.arraycopy(b, 0, headerBuffer, pos, b.length);
-        pos = pos + b.length;
+        headerBuffer.put(b);
     }
 
 
@@ -482,7 +472,7 @@ public class Http11OutputBuffer implements OutputBuffer {
             if (((c <= 31) && (c != 9)) || c == 127 || c > 255) {
                 c = ' ';
             }
-            headerBuffer[pos++] = (byte) c;
+            headerBuffer.put((byte) c);
         }
     }
 
@@ -494,7 +484,7 @@ public class Http11OutputBuffer implements OutputBuffer {
     private void checkLengthBeforeWrite(int length) {
         // "+ 4": BZ 57509. Reserve space for CR/LF/COLON/SP characters that
         // are put directly into the buffer following this write operation.
-        if (pos + length + 4 > headerBuffer.length) {
+        if (headerBuffer.position() + length + 4 > headerBuffer.capacity()) {
             throw new HeadersTooLargeException(
                     sm.getString("iob.responseheadertoolarge.error"));
         }
