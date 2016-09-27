@@ -125,6 +125,9 @@
         <bug>60174</bug>: Log instances of <code>HeadersTooLargeException</code>
         during request processing. (markt)
       </fix>
+      <fix>
+        <bug>60173</bug>: Allow up to 64kB HTTP/2 header table size limit. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
