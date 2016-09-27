@@ -35,6 +35,7 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
     protected static final int MIN_MAX_FRAME_SIZE = 1 << 14;
     protected static final int MAX_MAX_FRAME_SIZE = (1 << 24) - 1;
     protected static final long UNLIMITED = ((long)1 << 32); // Use the maximum possible
+    protected static final int MAX_HEADER_TABLE_SIZE = 1 << 16;
 
     // Defaults
     protected static final int DEFAULT_HEADER_TABLE_SIZE = 4096;
@@ -175,8 +176,7 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
 
 
     private void validateHeaderTableSize(long headerTableSize) throws T {
-        // Need to put a sensible limit on this. Start with 16k (default is 4k)
-        if (headerTableSize > (64 * 1024)) {
+        if (headerTableSize > MAX_HEADER_TABLE_SIZE) {
             String msg = sm.getString("connectionSettings.headerTableSizeLimit",
                     connectionId, Long.toString(headerTableSize));
             throwException(msg, Http2Error.PROTOCOL_ERROR);
