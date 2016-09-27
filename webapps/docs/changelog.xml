@@ -169,6 +169,11 @@
       <fix>
         Update the download location for Objenesis. (violetagg)
       </fix>
+      <fix>
+        <bug>60164</bug>: Replace <code>log4j-core*.jar</code> with
+        <code>log4j-web*.jar</code> since it is <code>log4j-web*.jar</code> that
+        contains the <code>ServletContainerInitializer</code>. (markt) 
+      </fix>
     </changelog>
   </subsection>
 </section>
