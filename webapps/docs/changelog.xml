@@ -97,6 +97,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Add documentation to the bin/catalina.bat script to remind users that
+        environment variables don't affect the configuration of Tomcat when
+        run as a Windows Service. Based upon a documentation patch by
+        James H.H. Lampert. (schultz)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.72 (violetagg)" rtext="released 2016-09-19">
   <subsection name="Catalina">
