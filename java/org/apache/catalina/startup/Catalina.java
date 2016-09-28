@@ -605,7 +605,7 @@ public class Catalina {
         try {
             getServer().init();
         } catch (LifecycleException e) {
-            if (Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE")) {
+            if (Boolean.getBoolean(System.getProperty("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"))) {
                 throw new java.lang.Error(e);
             } else {
                 log.error("Catalina.start", e);
