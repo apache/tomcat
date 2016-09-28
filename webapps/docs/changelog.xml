@@ -174,6 +174,12 @@
         <code>log4j-web*.jar</code> since it is <code>log4j-web*.jar</code> that
         contains the <code>ServletContainerInitializer</code>. (markt)
       </fix>
+      <add>
+        Add documentation to the bin/catalina.bat script to remind users that
+        environment variables don't affect the configuration of Tomcat when
+        run as a Windows Service. Based upon a documentation patch by
+        James H.H. Lampert. (schultz)
+      </add>
     </changelog>
   </subsection>
 </section>
