@@ -20,23 +20,41 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
+
 public class ByteBufferUtils {
+
+    private static final StringManager sm =
+            StringManager.getManager(Constants.Package);
+    private static final Log log = LogFactory.getLog(ByteBufferUtils.class);
 
     private static final Method cleanerMethod;
     private static final Method cleanMethod;
 
     static {
+        ByteBuffer tempBuffer = ByteBuffer.allocateDirect(0);
+        Method cleanerMethodLocal = null;
+        Method cleanMethodLocal = null;
         try {
-            ByteBuffer tempBuffer = ByteBuffer.allocateDirect(0);
-            cleanerMethod = tempBuffer.getClass().getMethod("cleaner");
-            cleanerMethod.setAccessible(true);
-            Object cleanerObject = cleanerMethod.invoke(tempBuffer);
-            cleanMethod = cleanerObject.getClass().getMethod("clean");
-            cleanMethod.invoke(cleanerObject);
+            cleanerMethodLocal = tempBuffer.getClass().getMethod("cleaner");
+            cleanerMethodLocal.setAccessible(true);
+            Object cleanerObject = cleanerMethodLocal.invoke(tempBuffer);
+            if (cleanerObject instanceof Runnable) {
+                cleanMethodLocal = Runnable.class.getMethod("run");
+            } else {
+                cleanMethodLocal = cleanerObject.getClass().getMethod("clean");
+            }
+            cleanMethodLocal.invoke(cleanerObject);
         } catch (IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            throw new ExceptionInInitializerError(e);
+            log.warn(sm.getString("byteBufferUtils.cleaner"), e);
+            cleanerMethodLocal = null;
+            cleanMethodLocal = null;
         }
+        cleanerMethod = cleanerMethodLocal;
+        cleanMethod = cleanMethodLocal;
     }
 
     private ByteBufferUtils() {
@@ -81,11 +99,13 @@ public class ByteBufferUtils {
     }
 
     public static void cleanDirectBuffer(ByteBuffer buf) {
-        try {
-            cleanMethod.invoke(cleanerMethod.invoke(buf));
-        } catch (IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException | SecurityException e) {
-            // Ignore
+        if (cleanMethod != null) {
+            try {
+                cleanMethod.invoke(cleanerMethod.invoke(buf));
+            } catch (IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | SecurityException e) {
+                // Ignore
+            }
         }
     }
 
