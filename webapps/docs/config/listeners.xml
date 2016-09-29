@@ -300,6 +300,22 @@
 
     </attributes>
 
+    <subsection name="JreMemoryLeakPreventionListener Examples">
+
+      <p>The following is an example of how to configure the
+      <code>classesToInitialize</code> attribute of this listener.</p>
+
+      <p>If this listener was configured in server.xml as:</p>
+
+      <source><![CDATA[  <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener"
+            classesToInitialize="oracle.jdbc.driver.OracleTimeoutThreadPerVM" />]]></source>
+
+      <p>then the <code>OracleTimeoutThreadPerVM</code> class would be loaded
+      and initialized during listener startup instead of during request
+      processing.</p>
+
+    </subsection>
+
   </subsection>
 
   <subsection name="Security Lifecycle Listener - org.apache.catalina.security.SecurityListener">
