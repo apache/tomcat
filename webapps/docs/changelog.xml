@@ -153,6 +153,11 @@
         configuration options with respect to the order in which resources are
         searched. (markt)
       </add>
+      <add>
+        Add an example of using the <code>classesToInitialize</code> attribute
+        of the <code>JreMemoryLeakPreventionListener</code> to the documentation
+        web application. Based on a patch by Cris Berneburg. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
