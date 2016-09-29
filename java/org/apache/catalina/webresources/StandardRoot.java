@@ -692,8 +692,11 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         mainResources.add(main);
 
         for (List<WebResourceSet> list : allResources) {
-            for (WebResourceSet webResourceSet : list) {
-                webResourceSet.start();
+            // Skip class resources since they are started below
+            if (list != classResources) {
+                for (WebResourceSet webResourceSet : list) {
+                    webResourceSet.start();
+                }
             }
         }
 

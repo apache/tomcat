@@ -98,6 +98,10 @@
         <code>index.html.br</code> from RAT analysis. Patch provided by Gavin
         McDonald. (markt)
       </fix>
+      <fix>
+        When starting web resources, ensure that class resources are only
+        started once. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
