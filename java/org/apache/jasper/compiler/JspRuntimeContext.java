@@ -507,35 +507,6 @@ public final class JspRuntimeContext {
                 // Allow the JSP to access org.apache.jasper.runtime.HttpJspBase
                 permissions.add( new RuntimePermission(
                     "accessClassInPackage.org.apache.jasper.runtime") );
-
-                if (parentClassLoader instanceof URLClassLoader) {
-                    URL [] urls = ((URLClassLoader)parentClassLoader).getURLs();
-                    String jarUrl = null;
-                    String jndiUrl = null;
-                    for (int i=0; i<urls.length; i++) {
-                        if (jndiUrl == null
-                                && urls[i].toString().startsWith("jndi:") ) {
-                            jndiUrl = urls[i].toString() + "-";
-                        }
-                        if (jarUrl == null
-                                && urls[i].toString().startsWith("jar:jndi:")
-                                ) {
-                            jarUrl = urls[i].toString();
-                            jarUrl = jarUrl.substring(0,jarUrl.length() - 2);
-                            jarUrl = jarUrl.substring(0,
-                                     jarUrl.lastIndexOf('/')) + "/-";
-                        }
-                    }
-                    if (jarUrl != null) {
-                        permissions.add(
-                                new FilePermission(jarUrl,"read"));
-                        permissions.add(
-                                new FilePermission(jarUrl.substring(4),"read"));
-                    }
-                    if (jndiUrl != null)
-                        permissions.add(
-                                new FilePermission(jndiUrl,"read") );
-                }
             } catch(Exception e) {
                 context.log("Security Init for context failed",e);
             }
