@@ -333,7 +333,6 @@
     <include name="org/apache/catalina/startup/ClassLoaderFactory$*.*" />
     <include name="org/apache/catalina/startup/Tool.*" />
     <include name="org/apache/catalina/security/SecurityClassLoad.*" />
-    <include name="org/apache/naming/JndiPermission.*" />
   </patternset>
 
   <patternset id="files.tomcat-juli">
