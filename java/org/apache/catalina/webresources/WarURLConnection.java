@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.Permission;
 
 
 public class WarURLConnection extends URLConnection {
@@ -45,5 +46,10 @@ public class WarURLConnection extends URLConnection {
     public InputStream getInputStream() throws IOException {
         connect();
         return innerJarUrlConnection.getInputStream();
+    }
+
+    @Override
+    public Permission getPermission() throws IOException {
+        return innerJarUrlConnection.getPermission();
     }
 }
