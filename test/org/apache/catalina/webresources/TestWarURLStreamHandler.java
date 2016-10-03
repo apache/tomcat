@@ -33,6 +33,35 @@ public class TestWarURLStreamHandler {
 
 
     @Test
+    public void testUrlFileInJarInWar() throws Exception {
+        doTestUrl("jar:war:", "*/WEB-INF/lib/test.jar!/META-INF/resources/index.html");
+    }
+
+
+    @Test
+    public void testUrlJarInWar() throws Exception {
+        doTestUrl("war:", "*/WEB-INF/lib/test.jar");
+    }
+
+
+    @Test
+    public void testUrlWar() throws Exception {
+        doTestUrl("", "");
+    }
+
+
+    private void doTestUrl(String prefix, String suffix) throws Exception {
+        File f = new File("test/webresources/war-url-connection.war");
+        String fileUrl = f.toURI().toURL().toString();
+
+        String urlString = prefix + fileUrl + suffix;
+        URL url = new URL(urlString);
+
+        Assert.assertEquals(urlString, url.toExternalForm());
+    }
+
+
+    @Test
     public void testOldFormat() throws Exception {
         File f = new File("test/webresources/war-url-connection.war");
         String fileUrl = f.toURI().toURL().toString();

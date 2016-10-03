@@ -24,23 +24,6 @@ import java.net.URLStreamHandler;
 public class WarURLStreamHandler extends URLStreamHandler {
 
     @Override
-    protected void parseURL(URL u, String spec, int start, int limit) {
-        // Need to make this look like a JAR URL for the WAR file
-        // Assumes that the spec is absolute and starts war:file:/...
-
-        // Only the path needs to be changed
-        String path = "jar:" + spec.substring(4);
-        if (path.contains("*/")) {
-            path = path.replaceFirst("\\*/", "!/");
-        } else {
-            path = path.replaceFirst("\\^/", "!/");
-        }
-
-        setURL(u, u.getProtocol(), "", -1, null, null,
-                path, null, null);
-    }
-
-    @Override
     protected URLConnection openConnection(URL u) throws IOException {
         return new WarURLConnection(u);
     }
