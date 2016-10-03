@@ -105,40 +105,6 @@
 
   </subsection>
 
-
-  <subsection name="Tomcat Custom Permissions">
-
-    <p>Tomcat utilizes a custom permission class called
-    <strong>org.apache.naming.JndiPermission</strong>.  This permission
-    controls read access to JNDI named file based resources.  The permission
-    name is the JNDI name and there are no actions.  A trailing "*" can be
-    used to do wild card matching for a JNDI named file resource when
-    granting permission.  For example, you might include the following
-    in your policy file:</p>
-<source>permission  org.apache.naming.JndiPermission  "jndi://localhost/examples/*";</source>
-
-    <p>A Permission entry like this is generated dynamically for each web
-    application that is deployed, to allow it to read its own static resources
-    but disallow it from using file access to read any other files (unless
-    permissions for those files are explicitly granted).</p>
-
-    <p>Also, Tomcat always dynamically creates the following file permissions:</p>
-<source>
-permission java.io.FilePermission "** your application context**", "read";
-
-permission java.io.FilePermission
-  "** application working directory**", "read,write";
-permission java.io.FilePermission
-  "** application working directory**/-", "read,write,delete";
-</source>
-    <p>Where **your application context** equals the folder (or WAR file) under which
-    your application has been deployed and **application working directory** is the
-    temporary directory provided to your application as required by the
-    Servlet Specification.</p>
-
-  </subsection>
-
-
 </section>
 
 
