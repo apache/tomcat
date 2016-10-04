@@ -69,6 +69,11 @@
         <bug>60167</bug>: Ignore empty lines in <code>/etc/passwd</code> files
         when using the <code>PasswdUserDatabase</code>. (markt)
       </fix>
+      <fix>
+        Improve the access checks for linked global resources to handle the case
+        where the current class loader is a child of the web application class
+        loader. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
