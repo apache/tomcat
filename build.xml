@@ -375,9 +375,14 @@
     <include name="org/apache/tomcat/util/scan/**" />
   </patternset>
 
+  <!-- Avoid duplication of files in bootstrap.jar -->
   <patternset id="files.catalina">
     <include name="org/apache/catalina/**" />
     <include name="org/apache/naming/**" />
+    <!-- Exclude classes included in bootstrap.jar -->
+  	<invert>
+	  <patternset refid="files.bootstrap"/>
+  	</invert>
     <!-- Modules -->
     <exclude name="org/apache/catalina/ant/**" />
     <exclude name="org/apache/catalina/ha/**" />
