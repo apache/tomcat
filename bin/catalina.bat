@@ -202,7 +202,7 @@ set JSSE_OPTS="-Djdk.tls.ephemeralDHKeySize=2048"
 set "JAVA_OPTS=%JAVA_OPTS% %JSSE_OPTS%"
 
 rem Register custom URL handlers
-rem Do this here so they can be used in the security policy 
+rem Do this here so they can be used in the security policy
 set "JAVA_OPTS=%JAVA_OPTS% -Djava.protocol.handler.pkgs=org.apache.catalina.webresources"
 
 if not "%LOGGING_CONFIG%" == "" goto noJuliConfig
