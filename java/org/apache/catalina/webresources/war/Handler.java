@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.webresources;
+package org.apache.catalina.webresources.war;
 
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
-public class WarURLStreamHandler extends URLStreamHandler {
+public class Handler extends URLStreamHandler {
 
     @Override
     protected URLConnection openConnection(URL u) throws IOException {

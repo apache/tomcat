@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.webresources;
+package org.apache.catalina.webresources.war;
 
 import java.io.File;
 import java.net.URL;
@@ -24,7 +24,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestWarURLStreamHandler {
+import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
+
+public class TestHandler {
 
     @Before
     public void register() {

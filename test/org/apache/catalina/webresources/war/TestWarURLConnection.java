@@ -14,39 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.webresources;
+package org.apache.catalina.webresources.war;
 
 import java.io.File;
 import java.net.URL;
+import java.net.URLConnection;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
-import org.apache.catalina.Context;
-import org.apache.catalina.core.StandardHost;
-import org.apache.catalina.startup.Tomcat;
-import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 
-public class TestWarURLStreamHandlerIntegration extends TomcatBaseTest {
+public class TestWarURLConnection {
+
+    @Before
+    public void register() {
+        TomcatURLStreamHandlerFactory.register();
+    }
+
 
     @Test
-    public void testToURI() throws Exception {
-        Tomcat tomcat = getTomcatInstance();
+    public void testContentLength() throws Exception {
+        File f = new File("test/webresources/war-url-connection.war");
+        String fileUrl = f.toURI().toURL().toString();
 
-        File docBase = new File("test/webresources/war-url-connection.war");
-        Context ctx = tomcat.addWebapp("/test", docBase.getAbsolutePath());
-        skipTldsForResourceJars(ctx);
+        URL indexHtmlUrl = new URL("jar:war:" + fileUrl +
+                "*/WEB-INF/lib/test.jar!/META-INF/resources/index.html");
 
-        ((StandardHost) tomcat.getHost()).setUnpackWARs(false);
+        URLConnection urlConn = indexHtmlUrl.openConnection();
+        urlConn.connect();
 
-        tomcat.start();
+        int size = urlConn.getContentLength();
 
-        URL url = ctx.getServletContext().getResource("/index.html");
-        try {
-            url.toURI();
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
+        Assert.assertEquals(137, size);
     }
 }
