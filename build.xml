@@ -379,9 +379,9 @@
     <include name="org/apache/catalina/**" />
     <include name="org/apache/naming/**" />
     <!-- Exclude classes included in bootstrap.jar -->
-  	<invert>
-	  <patternset refid="files.bootstrap"/>
-  	</invert>
+    <invert>
+      <patternset refid="files.bootstrap"/>
+    </invert>
     <!-- Modules -->
     <exclude name="org/apache/catalina/ant/**" />
     <exclude name="org/apache/catalina/ha/**" />
