@@ -25,31 +25,45 @@ import java.security.Permission;
 
 public class WarURLConnection extends URLConnection {
 
-    private final URLConnection innerJarUrlConnection;
+    private final URLConnection wrappedJarUrlConnection;
     private boolean connected;
 
     protected WarURLConnection(URL url) throws IOException {
         super(url);
-        URL innerJarUrl = new URL(url.getFile());
-        innerJarUrlConnection = innerJarUrl.openConnection();
+
+        // Need to make this look like a JAR URL for the WAR file
+        // Assumes that the spec is absolute and starts war:file:/...
+        String file = url.getFile();
+        if (file.contains("*/")) {
+            file = file.replaceFirst("\\*/", "!/");
+        } else {
+            file = file.replaceFirst("\\^/", "!/");
+        }
+
+        URL innerJarUrl = new URL("jar", url.getHost(), url.getPort(), file);
+
+        wrappedJarUrlConnection = innerJarUrl.openConnection();
     }
+
 
     @Override
     public void connect() throws IOException {
         if (!connected) {
-            innerJarUrlConnection.connect();
+            wrappedJarUrlConnection.connect();
             connected = true;
         }
     }
 
+
     @Override
     public InputStream getInputStream() throws IOException {
         connect();
-        return innerJarUrlConnection.getInputStream();
+        return wrappedJarUrlConnection.getInputStream();
     }
+
 
     @Override
     public Permission getPermission() throws IOException {
-        return innerJarUrlConnection.getPermission();
+        return wrappedJarUrlConnection.getPermission();
     }
 }
