@@ -375,7 +375,6 @@
     <include name="org/apache/tomcat/util/scan/**" />
   </patternset>
 
-  <!-- Avoid duplication of files in bootstrap.jar -->
   <patternset id="files.catalina">
     <include name="org/apache/catalina/**" />
     <include name="org/apache/naming/**" />
