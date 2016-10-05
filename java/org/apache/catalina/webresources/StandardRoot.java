@@ -727,7 +727,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             if (f.isDirectory()) {
                 mainResourceSet = new DirResourceSet(this, "/", f.getAbsolutePath(), "/");
             } else if(f.isFile() && docBase.endsWith(".war")) {
-                mainResourceSet = new JarResourceSet(this, "/", f.getAbsolutePath(), "/");
+                mainResourceSet = new WarResourceSet(this, "/", f.getAbsolutePath());
             } else {
                 throw new IllegalArgumentException(
                         sm.getString("standardRoot.startInvalidMain",
@@ -800,9 +800,14 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         BaseLocation(URL url) {
             File f = null;
 
-            if ("jar".equals(url.getProtocol())) {
+            if ("jar".equals(url.getProtocol()) || "war".equals(url.getProtocol())) {
                 String jarUrl = url.toString();
-                int endOfFileUrl = jarUrl.indexOf("!/");
+                int endOfFileUrl = -1;
+                if ("jar".equals(url.getProtocol())) {
+                    endOfFileUrl = jarUrl.indexOf("!/");
+                } else {
+                    endOfFileUrl = jarUrl.indexOf("*/");
+                }
                 String fileUrl = jarUrl.substring(4, endOfFileUrl);
                 try {
                     f = new File(new URL(fileUrl).toURI());

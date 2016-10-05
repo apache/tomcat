@@ -249,3 +249,13 @@ grant codeBase "file:${catalina.home}/webapps/manager/-" {
 //      permission java.net.SocketPermission "*.noaa.gov:80", "connect";
 // };
 
+// To grant permissions for web applications using packed WAR files, use the
+// Tomcat specific WAR url scheme.
+//
+// The permissions granted to the entire web application
+// grant codeBase "war:file:${catalina.base}/webapps/examples.war*/-" {
+// };
+//
+// The permissions granted to a specific JAR
+// grant codeBase "war:file:${catalina.base}/webapps/examples.war*/WEB-INF/lib/foo.jar" {
+// };

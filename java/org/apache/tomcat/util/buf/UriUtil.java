@@ -128,4 +128,27 @@ public final class UriUtil {
         tmp = PATTERN_CARET.matcher(tmp).replaceAll("%5e/");
         return PATTERN_ASTERISK.matcher(tmp).replaceAll("%2a/");
     }
+
+
+    /**
+     * Convert a URL of the form <code>war:file:...</code> to
+     * <code>war:file:...</code>.
+     *
+     * @param warUrl The WAR URL to convert
+     *
+     * @return The equivalent JAR URL
+     *
+     * @throws MalformedURLException If the conversion fails
+     */
+    public static URL warToJar(URL warUrl) throws MalformedURLException {
+        // Assumes that the spec is absolute and starts war:file:/...
+        String file = warUrl.getFile();
+        if (file.contains("*/")) {
+            file = file.replaceFirst("\\*/", "!/");
+        } else {
+            file = file.replaceFirst("\\^/", "!/");
+        }
+
+        return new URL("jar", warUrl.getHost(), warUrl.getPort(), file);
+    }
 }

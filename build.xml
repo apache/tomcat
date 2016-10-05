@@ -325,6 +325,11 @@
     <include name="org/apache/tomcat/websocket/**" />
   </patternset>
 
+  <!-- This duplicates some classes in files.catalina                        -->
+  <!-- Duplicating a few classes in bootstrap.jar is simpler than excluding  -->
+  <!-- them from files.catalina and having to manually add them to           -->
+  <!-- files.tomcat-embed-core because of an include/exclude conflict        -->
+  <!-- between files.catalina and files.bootstrap.                           -->
   <patternset id="files.bootstrap">
     <include name="org/apache/catalina/startup/Bootstrap.*" />
     <include name="org/apache/catalina/startup/catalina.properties" />
@@ -333,6 +338,8 @@
     <include name="org/apache/catalina/startup/ClassLoaderFactory$*.*" />
     <include name="org/apache/catalina/startup/Tool.*" />
     <include name="org/apache/catalina/security/SecurityClassLoad.*" />
+    <include name="org/apache/catalina/webresources/war/**" />
+    <include name="org/apache/tomcat/util/buf/UriUtil.*" />
   </patternset>
 
   <patternset id="files.tomcat-juli">
@@ -433,7 +440,6 @@
   <!-- Every standard pattern set above should be included in an embedded JAR -->
   <patternset id="files.tomcat-embed-core" >
     <patternset refid="files.annotations-api" />
-    <patternset refid="files.bootstrap" />
     <patternset refid="files.catalina" />
     <patternset refid="files.servlet-api" />
     <patternset refid="files.jaspic-api" />
