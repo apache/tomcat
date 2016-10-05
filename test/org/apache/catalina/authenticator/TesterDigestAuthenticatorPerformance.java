@@ -27,8 +27,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
+import org.apache.catalina.Host;
+import org.apache.catalina.Service;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.core.StandardEngine;
+import org.apache.catalina.core.StandardHost;
+import org.apache.catalina.core.StandardService;
 import org.apache.catalina.filters.TesterHttpServletResponse;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
@@ -116,6 +122,15 @@ public class TesterDigestAuthenticatorPerformance {
         Context context = new StandardContext();
         context.setName(CONTEXT_PATH);
         context.setRealm(realm);
+
+        Host host = new StandardHost();
+        context.setParent(host);
+
+        Engine engine = new StandardEngine();
+        host.setParent(engine);
+
+        Service service = new StandardService();
+        engine.setService(service);
 
         // Configure the Login config
         LoginConfig config = new LoginConfig();
