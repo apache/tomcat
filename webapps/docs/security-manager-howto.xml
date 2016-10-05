@@ -154,7 +154,33 @@ grant [signedBy <signer>,] [codeBase <code source>] {
 <source>$CATALINA_HOME/bin/catalina.sh start -security    (Unix)
 %CATALINA_HOME%\bin\catalina start -security      (Windows)</source>
 
+  <subsection name="Permissions for packed WAR files">
+
+    <p>When using packed WAR files, it is necessary to use Tomcat's custom war
+    URL protocol to asisgn permissions to web application code.</p>
+
+    <p>To assign permissions to the entire web application the entry in the
+    policy file would look like this:</p>
+
+<source><![CDATA[// Example policy file entry
+grant codeBase "war:file:${catalina.base}/webapps/examples.war*/-" {
+    ...
+};
+]]></source>
+
+    <p>To assign permissions to a single JAR within the web application the
+    entry in the policy file would look like this:</p>
+
+<source><![CDATA[// Example policy file entry
+grant codeBase "war:file:${catalina.base}/webapps/examples.war*/WEB-INF/lib/foo.jar" {
+    ...
+};
+]]></source>
+
+  </subsection>
+
 </section>
+
 <section name="Configuring Package Protection in Tomcat">
   <p>Starting with Tomcat 5, it is now possible to configure which Tomcat
   internal package are protected against package definition and access. See

@@ -60,6 +60,16 @@
         test cases by Santhana Preethiand a patch by Tiago Oliveira. (markt)
       </fix>
       <fix>
+        <bug>60087</bug>: Refactor the web resources handling to use the Tomcat
+        specific <code>war:file:...</code> URL protocol to refer to WAR files
+        and their contents rather than the standard <code>jar:file:...</code>
+        form since some components of the JRE, such as JAR verification, give
+        unexpected results when the standard form is used. A side-effect of the
+        refactoring is that when using packed WARs, it is now possible to
+        reference a WAR and/or specific JARs within a WAR in the security policy
+        file used when running under a <code>SecurityManager</code>. (markt)
+      </fix>
+      <fix>
         <bug>60116</bug>: Fix a problem with the rewrite valve that caused back
         references evaluated in conditions to be forced to lower case when using
         the <code>NC</code> flag. (markt)
