@@ -339,6 +339,7 @@
     <include name="org/apache/catalina/startup/Tool.*" />
     <include name="org/apache/catalina/security/SecurityClassLoad.*" />
     <include name="org/apache/catalina/webresources/war/**" />
+    <include name="org/apache/tomcat/util/buf/UriUtil.*" />
   </patternset>
 
   <patternset id="files.tomcat-juli">

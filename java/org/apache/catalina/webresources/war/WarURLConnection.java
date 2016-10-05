@@ -22,6 +22,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.Permission;
 
+import org.apache.tomcat.util.buf.UriUtil;
+
 
 public class WarURLConnection extends URLConnection {
 
@@ -30,18 +32,7 @@ public class WarURLConnection extends URLConnection {
 
     protected WarURLConnection(URL url) throws IOException {
         super(url);
-
-        // Need to make this look like a JAR URL for the WAR file
-        // Assumes that the spec is absolute and starts war:file:/...
-        String file = url.getFile();
-        if (file.contains("*/")) {
-            file = file.replaceFirst("\\*/", "!/");
-        } else {
-            file = file.replaceFirst("\\^/", "!/");
-        }
-
-        URL innerJarUrl = new URL("jar", url.getHost(), url.getPort(), file);
-
+        URL innerJarUrl = UriUtil.warToJar(url);
         wrappedJarUrlConnection = innerJarUrl.openConnection();
     }
 
