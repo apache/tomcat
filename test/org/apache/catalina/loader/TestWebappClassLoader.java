@@ -36,8 +36,8 @@ public class TestWebappClassLoader extends TomcatBaseTest {
 
         String[] expected = new String[2];
         String warUrl = f.toURI().toURL().toExternalForm();
-        expected[0] = "jar:" + warUrl + "!/WEB-INF/classes/";
-        expected[1] = "jar:" + warUrl + "!/WEB-INF/lib/test.jar";
+        expected[0] = "war:" + warUrl + "*/WEB-INF/classes/";
+        expected[1] = "war:" + warUrl + "*/WEB-INF/lib/test.jar";
 
         Tomcat tomcat = getTomcatInstance();
 
