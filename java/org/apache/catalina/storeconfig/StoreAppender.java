@@ -41,7 +41,7 @@ public class StoreAppender {
             Float.class, Float.TYPE, Long.class, Long.TYPE, Short.class,
             Short.TYPE, InetAddress.class };
 
-    private static int pos = 0;
+    private int pos = 0;
 
     /**
      * Print the closing tag.
