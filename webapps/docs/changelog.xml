@@ -117,6 +117,10 @@
         where the current class loader is a child of the web application class
         loader. (markt)
       </fix>
+      <fix>
+        <bug>60196</bug>: Ensure that the <code>isMandatory</code> flag is
+        correctly set when using JASPIC authentication. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
