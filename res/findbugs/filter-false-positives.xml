@@ -172,6 +172,12 @@
     <Bug code="SWL" />
   </Match>
   <Match>
+    <!-- null return value is documented -->
+    <Class name="org.apache.catalina.core.StandardWrapper" />
+    <Method name="isSingleThreadModel" />
+    <Bug pattern="NP_BOOLEAN_RETURN_NULL" />
+  </Match>
+  <Match>
     <!-- The code is adding HTTP request headers, not parameters and the
          header parsing on input will have removed any CR or LF characters. -->
     <Class name="org.apache.catalina.filters.CorsFilter" />
