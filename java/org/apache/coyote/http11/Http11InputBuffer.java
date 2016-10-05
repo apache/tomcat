@@ -731,13 +731,13 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
             byteBuffer.limit(end).position(end);
         }
 
-        int oldPosition = byteBuffer.position();
+        byteBuffer.mark();
         if (byteBuffer.position() < byteBuffer.limit()) {
             byteBuffer.position(byteBuffer.limit());
         }
         byteBuffer.limit(byteBuffer.capacity());
         int nRead = wrapper.read(block, byteBuffer);
-        byteBuffer.limit(byteBuffer.position()).position(oldPosition);
+        byteBuffer.limit(byteBuffer.position()).reset();
         if (nRead > 0) {
             return true;
         } else if (nRead == -1) {
@@ -1090,6 +1090,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         ByteBuffer temp = ByteBuffer.allocate(size);
         temp.put(byteBuffer);
         byteBuffer = temp;
+        byteBuffer.mark();
         temp = null;
     }
 }
