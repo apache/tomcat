@@ -506,21 +506,24 @@ public abstract class AuthenticatorBase extends ValveBase
 
         // Since authenticate modifies the response on failure,
         // we have to check for allow-from-all first.
-        if (!authRequired && constraints != null) {
-            authRequired = true;
-            for (int i = 0; i < constraints.length && authRequired; i++) {
+        boolean hasAuthConstraint = false;
+        if (constraints != null) {
+            hasAuthConstraint = true;
+            for (int i = 0; i < constraints.length && hasAuthConstraint; i++) {
                 if (!constraints[i].getAuthConstraint()) {
-                    authRequired = false;
-                    break;
+                    hasAuthConstraint = false;
                 } else if (!constraints[i].getAllRoles() &&
                         !constraints[i].getAuthenticatedUsers()) {
                     String[] roles = constraints[i].findAuthRoles();
                     if (roles == null || roles.length == 0) {
-                        authRequired = false;
-                        break;
+                        hasAuthConstraint = false;
                     }
                 }
             }
+        }
+
+        if (!authRequired && hasAuthConstraint) {
+            authRequired = true;
         }
 
         if (!authRequired && context.getPreemptiveAuthentication()) {
@@ -542,7 +545,7 @@ public abstract class AuthenticatorBase extends ValveBase
             }
 
             if (jaspicProvider != null) {
-                jaspicState = getJaspicState(jaspicProvider, request, response);
+                jaspicState = getJaspicState(jaspicProvider, request, response, hasAuthConstraint);
                 if (jaspicState == null) {
                     return;
                 }
@@ -601,7 +604,7 @@ public abstract class AuthenticatorBase extends ValveBase
             return doAuthenticate(request, httpResponse);
         } else {
             Response response = request.getResponse();
-            JaspicState jaspicState = getJaspicState(jaspicProvider, request, response);
+            JaspicState jaspicState = getJaspicState(jaspicProvider, request, response, true);
             if (jaspicState == null) {
                 return false;
             }
@@ -627,11 +630,11 @@ public abstract class AuthenticatorBase extends ValveBase
 
 
     private JaspicState getJaspicState(AuthConfigProvider jaspicProvider, Request request,
-            Response response) throws IOException {
+            Response response, boolean authMandatory) throws IOException {
         JaspicState jaspicState = new JaspicState();
 
         jaspicState.messageInfo =
-                new MessageInfoImpl(request.getRequest(), response.getResponse(), true);
+                new MessageInfoImpl(request.getRequest(), response.getResponse(), authMandatory);
 
         try {
             ServerAuthConfig serverAuthConfig = jaspicProvider.getServerAuthConfig(
