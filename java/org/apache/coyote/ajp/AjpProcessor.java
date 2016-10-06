@@ -1352,27 +1352,6 @@ public class AjpProcessor extends AbstractProcessor {
      */
     protected class SocketInputBuffer implements InputBuffer {
 
-        /**
-         * @deprecated Unused. Will be removed in Tomcat 9. Use
-         *             {@link #doRead(ApplicationBufferHandler)}
-         */
-        @Override
-        public int doRead(ByteChunk chunk) throws IOException {
-
-            if (endOfStream) {
-                return -1;
-            }
-            if (empty) {
-                if (!refillReadBuffer(true)) {
-                    return -1;
-                }
-            }
-            ByteChunk bc = bodyBytes.getByteChunk();
-            chunk.setBytes(bc.getBuffer(), bc.getStart(), bc.getLength());
-            empty = true;
-            return chunk.getLength();
-        }
-
         @Override
         public int doRead(ApplicationBufferHandler handler) throws IOException {
 

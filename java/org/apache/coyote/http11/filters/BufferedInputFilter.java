@@ -97,24 +97,6 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
     }
 
     /**
-     * Fills the given ByteChunk with the buffered request body.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 9. Use
-     *             {@link #doRead(ApplicationBufferHandler)}
-     */
-    @Override
-    public int doRead(ByteChunk chunk) throws IOException {
-        if (isFinished()) {
-            return -1;
-        }
-
-        chunk.setBytes(buffered.array(), buffered.arrayOffset() + buffered.position(),
-                buffered.remaining());
-        hasRead = true;
-        return chunk.getLength();
-    }
-
-    /**
      * Fills the given ByteBuffer with the buffered request body.
      */
     @Override

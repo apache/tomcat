@@ -25,7 +25,6 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
@@ -281,20 +280,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
 
     // ---------------------------------------------------- InputBuffer Methods
-
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 9. Use
-     *             {@link #doRead(ApplicationBufferHandler)}
-     */
-    @Override
-    public int doRead(ByteChunk chunk) throws IOException {
-
-        if (lastActiveFilter == -1)
-            return inputStreamInputBuffer.doRead(chunk);
-        else
-            return activeFilters[lastActiveFilter].doRead(chunk);
-
-    }
 
     @Override
     public int doRead(ApplicationBufferHandler handler) throws IOException {
@@ -1070,28 +1055,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
      * stream.
      */
     private class SocketInputBuffer implements InputBuffer {
-
-        /**
-         *
-         * @deprecated Unused. Will be removed in Tomcat 9. Use
-         *             {@link #doRead(ApplicationBufferHandler)}
-         */
-        @Override
-        public int doRead(ByteChunk chunk) throws IOException {
-
-            if (byteBuffer.position() >= byteBuffer.limit()) {
-                // The application is reading the HTTP request body which is
-                // always a blocking operation.
-                if (!fill(true))
-                    return -1;
-            }
-
-            int length = byteBuffer.remaining();
-            chunk.setBytes(byteBuffer.array(), byteBuffer.position(), length);
-            byteBuffer.position(byteBuffer.limit());
-
-            return length;
-        }
 
         @Override
         public int doRead(ApplicationBufferHandler handler) throws IOException {

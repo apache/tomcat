@@ -92,43 +92,6 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
 
     // ---------------------------------------------------- InputBuffer Methods
 
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 9. Use
-     *             {@link #doRead(ApplicationBufferHandler)}
-     */
-    @Override
-    public int doRead(ByteChunk chunk) throws IOException {
-
-        int result = -1;
-
-        if (contentLength >= 0) {
-            if (remaining > 0) {
-                int nRead = buffer.doRead(chunk);
-                if (nRead > remaining) {
-                    // The chunk is longer than the number of bytes remaining
-                    // in the body; changing the chunk length to the number
-                    // of bytes remaining
-                    chunk.setBytes(chunk.getBytes(), chunk.getStart(),
-                                   (int) remaining);
-                    result = (int) remaining;
-                } else {
-                    result = nRead;
-                }
-                if (nRead > 0) {
-                    remaining = remaining - nRead;
-                }
-            } else {
-                // No more bytes left to be read : return -1 and clear the
-                // buffer
-                chunk.recycle();
-                result = -1;
-            }
-        }
-
-        return result;
-
-    }
-
     @Override
     public int doRead(ApplicationBufferHandler handler) throws IOException {
 

@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.ReadListener;
 
-import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.MimeHeaders;
@@ -489,34 +488,6 @@ public final class Request {
 
     public void setInputBuffer(InputBuffer inputBuffer) {
         this.inputBuffer = inputBuffer;
-    }
-
-
-    /**
-     * Read data from the input buffer and put it into a byte chunk.
-     *
-     * The buffer is owned by the protocol implementation - it will be reused on
-     * the next read. The Adapter must either process the data in place or copy
-     * it to a separate buffer if it needs to hold it. In most cases this is
-     * done during byte-&gt;char conversions or via InputStream. Unlike
-     * InputStream, this interface allows the app to process data in place,
-     * without copy.
-     *
-     * @param chunk The destination to which to copy the data
-     *
-     * @return The number of bytes copied
-     *
-     * @throws IOException If an I/O error occurs during the copy
-     *
-     * @deprecated Unused. Will be removed in Tomcat 9. Use
-     *             {@link #doRead(ApplicationBufferHandler)}
-     */
-    public int doRead(ByteChunk chunk) throws IOException {
-        int n = inputBuffer.doRead(chunk);
-        if (n > 0) {
-            bytesRead+=n;
-        }
-        return n;
     }
 
 
