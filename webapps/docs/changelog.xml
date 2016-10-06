@@ -121,6 +121,10 @@
         <bug>60196</bug>: Ensure that the <code>isMandatory</code> flag is
         correctly set when using JASPIC authentication. (markt)
       </fix>
+      <fix>
+        <bug>60199</bug>: Log a warning if deserialization issues prevent a
+        session attribute from being loaded. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
