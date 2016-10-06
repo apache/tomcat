@@ -150,7 +150,7 @@
       </fix>
       <fix>
         <bug>60123</bug>: Avoid potential threading issues that could cause
-        excessively large vales to be returned for the processing time of
+        excessively large values to be returned for the processing time of
         a current request. (markt)
       </fix>
       <fix>
