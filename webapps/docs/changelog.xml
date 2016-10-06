@@ -229,6 +229,10 @@
         run as a Windows Service. Based upon a documentation patch by
         James H.H. Lampert. (schultz)
       </add>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.10 to
+        pick up the latest Windows binaries built with OpenSSL 1.0.2j. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
