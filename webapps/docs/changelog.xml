@@ -162,6 +162,10 @@
         <code>ResourceLink</code> fails to specify the type, specifies an
         unknown type or specifies the wrong type. (markt)
       </add>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.10 to
+        pick up the latest Windows binaries built with OpenSSL 1.0.2j. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
