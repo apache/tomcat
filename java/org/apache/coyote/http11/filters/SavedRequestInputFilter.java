@@ -45,6 +45,10 @@ public class SavedRequestInputFilter implements InputFilter {
         this.input = input;
     }
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 9. Use
+     *             {@link #doRead(ApplicationBufferHandler)}
+     */
     @Override
     public int doRead(ByteChunk chunk) throws IOException {
         if(input.getOffset()>= input.getEnd())

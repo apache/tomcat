@@ -507,6 +507,9 @@ public final class Request {
      * @return The number of bytes copied
      *
      * @throws IOException If an I/O error occurs during the copy
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9. Use
+     *             {@link #doRead(ApplicationBufferHandler)}
      */
     public int doRead(ByteChunk chunk) throws IOException {
         int n = inputBuffer.doRead(chunk);

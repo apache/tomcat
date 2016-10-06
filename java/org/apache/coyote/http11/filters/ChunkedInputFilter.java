@@ -148,6 +148,10 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
     // ---------------------------------------------------- InputBuffer Methods
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 9. Use
+     *             {@link #doRead(ApplicationBufferHandler)}
+     */
     @Override
     public int doRead(ByteChunk chunk) throws IOException {
         if (endChunk) {

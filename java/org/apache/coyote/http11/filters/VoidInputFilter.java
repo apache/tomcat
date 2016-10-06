@@ -50,6 +50,10 @@ public class VoidInputFilter implements InputFilter {
 
     // ---------------------------------------------------- InputBuffer Methods
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 9. Use
+     *             {@link #doRead(ApplicationBufferHandler)}
+     */
     @Override
     public int doRead(ByteChunk chunk) throws IOException {
         return -1;
