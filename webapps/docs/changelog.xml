@@ -125,6 +125,11 @@
         <bug>60199</bug>: Log a warning if deserialization issues prevent a
         session attribute from being loaded. (markt)
       </fix>
+      <fix>
+        <bug>60208</bug>: When using RFC6265 compliant cookies, the
+        <code>/</code> character should not be allowed in a cookie name since
+        the RFC6265 will drop such cookies as invalid. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
