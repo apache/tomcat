@@ -74,6 +74,10 @@
         where the current class loader is a child of the web application class
         loader. (markt)
       </fix>
+      <fix>
+        <bug>60199</bug>: Log a warning if deserialization issues prevent a
+        session attribute from being loaded. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

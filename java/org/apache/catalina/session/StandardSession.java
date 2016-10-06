@@ -1609,6 +1609,12 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 value = stream.readObject();
             } catch (WriteAbortedException wae) {
                 if (wae.getCause() instanceof NotSerializableException) {
+                    String msg = sm.getString("standardSession.notDeserializable", name, id);
+                    if (manager.getContext().getLogger().isDebugEnabled()) {
+                        manager.getContext().getLogger().debug(msg, wae);
+                    } else {
+                        manager.getContext().getLogger().warn(msg);
+                    }
                     // Skip non serializable attributes
                     continue;
                 }
