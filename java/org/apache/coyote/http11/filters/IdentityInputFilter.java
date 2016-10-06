@@ -24,6 +24,7 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.http11.InputFilter;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -115,6 +116,40 @@ public class IdentityInputFilter implements InputFilter {
                 // No more bytes left to be read : return -1 and clear the
                 // buffer
                 chunk.recycle();
+                result = -1;
+            }
+        }
+
+        return result;
+
+    }
+
+    @Override
+    public int doRead(ApplicationBufferHandler handler) throws IOException {
+
+        int result = -1;
+
+        if (contentLength >= 0) {
+            if (remaining > 0) {
+                int nRead = buffer.doRead(handler);
+                if (nRead > remaining) {
+                    // The chunk is longer than the number of bytes remaining
+                    // in the body; changing the chunk length to the number
+                    // of bytes remaining
+                    handler.getByteBuffer().limit(handler.getByteBuffer().position() + (int) remaining);
+                    result = (int) remaining;
+                } else {
+                    result = nRead;
+                }
+                if (nRead > 0) {
+                    remaining = remaining - nRead;
+                }
+            } else {
+                // No more bytes left to be read : return -1 and clear the
+                // buffer
+                if (handler.getByteBuffer() != null) {
+                    handler.getByteBuffer().position(0).limit(0);
+                }
                 result = -1;
             }
         }

@@ -29,6 +29,7 @@ import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.http.ServerCookies;
+import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -509,6 +510,31 @@ public final class Request {
      */
     public int doRead(ByteChunk chunk) throws IOException {
         int n = inputBuffer.doRead(chunk);
+        if (n > 0) {
+            bytesRead+=n;
+        }
+        return n;
+    }
+
+
+    /**
+     * Read data from the input buffer and put it into ApplicationBufferHandler.
+     *
+     * The buffer is owned by the protocol implementation - it will be reused on
+     * the next read. The Adapter must either process the data in place or copy
+     * it to a separate buffer if it needs to hold it. In most cases this is
+     * done during byte-&gt;char conversions or via InputStream. Unlike
+     * InputStream, this interface allows the app to process data in place,
+     * without copy.
+     *
+     * @param handler The destination to which to copy the data
+     *
+     * @return The number of bytes copied
+     *
+     * @throws IOException If an I/O error occurs during the copy
+     */
+    public int doRead(ApplicationBufferHandler handler) throws IOException {
+        int n = inputBuffer.doRead(handler);
         if (n > 0) {
             bytesRead+=n;
         }
