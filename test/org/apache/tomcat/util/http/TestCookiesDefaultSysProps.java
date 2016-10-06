@@ -53,7 +53,7 @@ public class TestCookiesDefaultSysProps extends CookiesBaseTest {
         res = getUrl("http://localhost:" + getPort() + "/blank");
         assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/invalidFwd");
-        assertEquals("Cookie name ok", res.toString());
+        assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/invalidStrict");
         assertEquals("Cookie name ok", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/valid");
