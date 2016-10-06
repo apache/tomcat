@@ -424,7 +424,11 @@ class RFC6265Validator extends CookieNameValidator {
 
     RFC6265Validator() {
         super(RFC2616_SEPARATORS);
+    }
+}
 
+class RFC2109Validator extends RFC6265Validator {
+    RFC2109Validator() {
         // special treatment to allow for FWD_SLASH_IS_SEPARATOR property
         boolean allowSlash;
         String prop = System.getProperty("org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
@@ -436,11 +440,6 @@ class RFC6265Validator extends CookieNameValidator {
         if (allowSlash) {
             allowed.set('/');
         }
-    }
-}
-
-class RFC2109Validator extends RFC6265Validator {
-    RFC2109Validator() {
     }
 
     @Override
