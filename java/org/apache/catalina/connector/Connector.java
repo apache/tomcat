@@ -62,12 +62,34 @@ public class Connector extends LifecycleMBeanBase  {
 
     // ------------------------------------------------------------ Constructor
 
+    /**
+     * Defaults to using HTTP/1.1 NIO implementation.
+     */
     public Connector() {
-        this(null);
+        this("org.apache.coyote.http11.Http11NioProtocol");
     }
 
+
     public Connector(String protocol) {
-        setProtocol(protocol);
+        boolean aprConnector = AprLifecycleListener.isAprAvailable() &&
+                AprLifecycleListener.getUseAprConnector();
+
+        if ("HTTP/1.1".equals(protocol) || protocol == null) {
+            if (aprConnector) {
+                protocolHandlerClassName = "org.apache.coyote.http11.Http11AprProtocol";
+            } else {
+                protocolHandlerClassName = "org.apache.coyote.http11.Http11NioProtocol";
+            }
+        } else if ("AJP/1.3".equals(protocol)) {
+            if (aprConnector) {
+                protocolHandlerClassName = "org.apache.coyote.ajp.AjpAprProtocol";
+            } else {
+                protocolHandlerClassName = "org.apache.coyote.ajp.AjpNioProtocol";
+            }
+        } else {
+            protocolHandlerClassName = protocol;
+        }
+
         // Instantiate protocol handler
         ProtocolHandler p = null;
         try {
@@ -210,10 +232,9 @@ public class Connector extends LifecycleMBeanBase  {
 
     /**
      * Coyote Protocol handler class name.
-     * Defaults to the Coyote HTTP/1.1 protocolHandler.
+     * See {@link #Connector()} for current default.
      */
-    protected String protocolHandlerClassName =
-        "org.apache.coyote.http11.Http11NioProtocol";
+    protected final String protocolHandlerClassName;
 
 
     /**
@@ -536,49 +557,10 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * Set the Coyote protocol which will be used by the connector.
-     *
-     * @param protocol The Coyote protocol name
-     */
-    public void setProtocol(String protocol) {
-
-        boolean aprConnector = AprLifecycleListener.isAprAvailable() &&
-                AprLifecycleListener.getUseAprConnector();
-
-        if ("HTTP/1.1".equals(protocol) || protocol == null) {
-            if (aprConnector) {
-                setProtocolHandlerClassName("org.apache.coyote.http11.Http11AprProtocol");
-            } else {
-                setProtocolHandlerClassName("org.apache.coyote.http11.Http11NioProtocol");
-            }
-        } else if ("AJP/1.3".equals(protocol)) {
-            if (aprConnector) {
-                setProtocolHandlerClassName("org.apache.coyote.ajp.AjpAprProtocol");
-            } else {
-                setProtocolHandlerClassName("org.apache.coyote.ajp.AjpNioProtocol");
-            }
-        } else {
-            setProtocolHandlerClassName(protocol);
-        }
-    }
-
-
-    /**
      * @return the class name of the Coyote protocol handler in use.
      */
     public String getProtocolHandlerClassName() {
         return this.protocolHandlerClassName;
-    }
-
-
-    /**
-     * Set the class name of the Coyote protocol handler which will be used
-     * by the connector.
-     *
-     * @param protocolHandlerClassName The new class name
-     */
-    public void setProtocolHandlerClassName(String protocolHandlerClassName) {
-        this.protocolHandlerClassName = protocolHandlerClassName;
     }
 
 

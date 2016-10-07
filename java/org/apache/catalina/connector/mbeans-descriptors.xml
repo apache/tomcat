@@ -140,7 +140,8 @@
 
     <attribute   name="protocol"
           description="Coyote protocol handler in use"
-                 type="java.lang.String"/>
+                 type="java.lang.String"
+            writeable="false"/>
 
     <attribute   name="protocolHandlerClassName"
           description="Coyote Protocol handler class name"

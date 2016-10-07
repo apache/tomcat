@@ -272,14 +272,14 @@ public class MBeanFactory {
      */
     private String createConnector(String parent, String address, int port, boolean isAjp, boolean isSSL)
         throws Exception {
-        Connector retobj = new Connector();
+        // Set the protocol in the constructor
+        String protocol = isAjp ? "AJP/1.3" : "HTTP/1.1";
+        Connector retobj = new Connector(protocol);
         if ((address!=null) && (address.length()>0)) {
             retobj.setProperty("address", address);
         }
         // Set port number
         retobj.setPort(port);
-        // Set the protocol
-        retobj.setProtocol(isAjp ? "AJP/1.3" : "HTTP/1.1");
         // Set SSL
         retobj.setSecure(isSSL);
         retobj.setScheme(isSSL ? "https" : "http");
