@@ -539,7 +539,11 @@ public class Connector extends LifecycleMBeanBase  {
      * Set the Coyote protocol which will be used by the connector.
      *
      * @param protocol The Coyote protocol name
+     *
+     * @deprecated Will be removed in Tomcat 9. Protocol must be configured via
+     *             the constructor
      */
+    @Deprecated
     public void setProtocol(String protocol) {
 
         boolean aprConnector = AprLifecycleListener.isAprAvailable() &&
@@ -576,7 +580,11 @@ public class Connector extends LifecycleMBeanBase  {
      * by the connector.
      *
      * @param protocolHandlerClassName The new class name
+     *
+     * @deprecated Will be removed in Tomcat 9. Protocol must be configured via
+     *             the constructor
      */
+    @Deprecated
     public void setProtocolHandlerClassName(String protocolHandlerClassName) {
         this.protocolHandlerClassName = protocolHandlerClassName;
     }
