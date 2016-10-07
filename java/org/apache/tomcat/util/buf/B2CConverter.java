@@ -199,6 +199,82 @@ public class B2CConverter {
         }
     }
 
+    /**
+     * Convert the given bytes to characters.
+     *
+     * @param bc byte input
+     * @param cc char output
+     * @param ic byte input channel
+     * @param endOfInput    Is this all of the available data
+     *
+     * @throws IOException If the conversion can not be completed
+     */
+    public void convert(ByteBuffer bc, CharBuffer cc, ByteChunk.ByteInputChannel ic, boolean endOfInput)
+            throws IOException {
+        if ((bb == null) || (bb.array() != bc.array())) {
+            // Create a new byte buffer if anything changed
+            bb = ByteBuffer.wrap(bc.array(), bc.arrayOffset() + bc.position(), bc.remaining());
+        } else {
+            // Initialize the byte buffer
+            bb.limit(bc.limit());
+            bb.position(bc.position());
+        }
+        if ((cb == null) || (cb.array() != cc.array())) {
+            // Create a new char buffer if anything changed
+            cb = CharBuffer.wrap(cc.array(), cc.limit(), cc.capacity() - cc.limit());
+        } else {
+            // Initialize the char buffer
+            cb.limit(cc.capacity());
+            cb.position(cc.limit());
+        }
+        CoderResult result = null;
+        // Parse leftover if any are present
+        if (leftovers.position() > 0) {
+            int pos = cb.position();
+            // Loop until one char is decoded or there is a decoder error
+            do {
+                byte chr;
+                if (bc.remaining() == 0) {
+                    int n = ic.realReadBytes();
+                    chr = n < 0 ? -1 : bc.get();
+                } else {
+                    chr = bc.get();
+                }
+                leftovers.put(chr);
+                leftovers.flip();
+                result = decoder.decode(leftovers, cb, endOfInput);
+                leftovers.position(leftovers.limit());
+                leftovers.limit(leftovers.array().length);
+            } while (result.isUnderflow() && (cb.position() == pos));
+            if (result.isError() || result.isMalformed()) {
+                result.throwException();
+            }
+            bb.position(bc.position());
+            leftovers.position(0);
+        }
+        // Do the decoding and get the results into the byte chunk and the char
+        // chunk
+        result = decoder.decode(bb, cb, endOfInput);
+        if (result.isError() || result.isMalformed()) {
+            result.throwException();
+        } else if (result.isOverflow()) {
+            // Propagate current positions to the byte chunk and char chunk, if
+            // this continues the char buffer will get resized
+            bc.position(bb.position());
+            cc.limit(cb.position());
+        } else if (result.isUnderflow()) {
+            // Propagate current positions to the byte chunk and char chunk
+            bc.position(bb.position());
+            cc.limit(cb.position());
+            // Put leftovers in the leftovers byte buffer
+            if (bc.remaining() > 0) {
+                leftovers.limit(leftovers.array().length);
+                leftovers.position(bc.remaining());
+                bc.get(leftovers.array(), 0, bc.remaining());
+            }
+        }
+    }
+
 
     public Charset getCharset() {
         return decoder.charset();
