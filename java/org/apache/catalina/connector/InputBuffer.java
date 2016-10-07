@@ -385,6 +385,11 @@ public class InputBuffer extends Reader
      * be removed from the buffer for "writing". Since the chars have already
      * been read before, they are ignored. If a mark was set, then the
      * mark is lost.
+     *
+     * @param c characters that will be written
+     * @param off offset in the characters array
+     * @param len length that will be written
+     * @throws IOException If an I/O occurs while writing the characters
      */
     public void realWriteChars(char c[], int off, int len) throws IOException {
         markPos = -1;
