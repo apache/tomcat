@@ -45,6 +45,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M12" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        When creating a new Connector via JMX, ensure that both HTTP/1.1 and
+        AJP/1.3 connectors can be created. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M11" rtext="release in progress">
   <subsection name="Catalina">
