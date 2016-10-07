@@ -97,15 +97,13 @@ public class Cache {
                     // efficiency (younger entries may be evicted before older
                     // ones) for speed since this is on the critical path for
                     // request processing
-                    long targetSize =
-                            maxSize * (100 - TARGET_FREE_PERCENT_GET) / 100;
-                    long newSize = evict(
-                            targetSize, resourceCache.values().iterator());
+                    long targetSize = maxSize * (100 - TARGET_FREE_PERCENT_GET) / 100;
+                    long newSize = evict(targetSize, resourceCache.values().iterator());
                     if (newSize > maxSize) {
                         // Unable to create sufficient space for this resource
                         // Remove it from the cache
                         removeCacheEntry(path);
-                        log.warn(sm.getString("cache.addFail", path));
+                        log.warn(sm.getString("cache.addFail", path, root.getContext().getName()));
                     }
                 }
             } else {
@@ -157,10 +155,8 @@ public class Cache {
                     // efficiency (younger entries may be evicted before older
                     // ones) for speed since this is on the critical path for
                     // request processing
-                    long targetSize =
-                            maxSize * (100 - TARGET_FREE_PERCENT_GET) / 100;
-                    long newSize = evict(
-                            targetSize, resourceCache.values().iterator());
+                    long targetSize = maxSize * (100 - TARGET_FREE_PERCENT_GET) / 100;
+                    long newSize = evict(targetSize, resourceCache.values().iterator());
                     if (newSize > maxSize) {
                         // Unable to create sufficient space for this resource
                         // Remove it from the cache
