@@ -188,20 +188,6 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     @Override
-    protected synchronized void doNotifyAll() {
-        if (coyoteResponse.getWriteListener() == null) {
-            // Blocking IO so thread will be waiting. Release it.
-            // Use notifyAll() to be safe (should be unnecessary)
-            this.notifyAll();
-        } else {
-            if (outputBuffer.isRegisteredForWrite()) {
-                coyoteResponse.action(ActionCode.DISPATCH_WRITE, null);
-            }
-        }
-    }
-
-
-    @Override
     public void emitHeader(String name, String value, boolean neverIndex) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.header.debug", getConnectionId(), getIdentifier(),

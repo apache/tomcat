@@ -821,13 +821,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-
-    @Override
-    protected synchronized void doNotifyAll() {
-        this.notifyAll();
-    }
-
-
     private int allocate(AbstractStream stream, int allocation) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.allocate.debug", getConnectionId(),
