@@ -538,34 +538,29 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     @Override
     public void init() throws Exception {
-        if (getLog().isInfoEnabled())
-            getLog().info(sm.getString("abstractProtocolHandler.init",
-                    getName()));
+        if (getLog().isInfoEnabled()) {
+            getLog().info(sm.getString("abstractProtocolHandler.init", getName()));
+        }
 
         if (oname == null) {
             // Component not pre-registered so register it
             oname = createObjectName();
             if (oname != null) {
-                Registry.getRegistry(null, null).registerComponent(this, oname,
-                    null);
+                Registry.getRegistry(null, null).registerComponent(this, oname, null);
             }
         }
 
         if (this.domain != null) {
             try {
-                tpOname = new ObjectName(domain + ":" +
-                        "type=ThreadPool,name=" + getName());
-                Registry.getRegistry(null, null).registerComponent(endpoint,
-                        tpOname, null);
+                tpOname = new ObjectName(domain + ":" + "type=ThreadPool,name=" + getName());
+                Registry.getRegistry(null, null).registerComponent(endpoint, tpOname, null);
             } catch (Exception e) {
-                getLog().error(sm.getString(
-                        "abstractProtocolHandler.mbeanRegistrationFailed",
+                getLog().error(sm.getString( "abstractProtocolHandler.mbeanRegistrationFailed",
                         tpOname, getName()), e);
             }
-            rgOname=new ObjectName(domain +
-                    ":type=GlobalRequestProcessor,name=" + getName());
+            rgOname = new ObjectName(domain + ":type=GlobalRequestProcessor,name=" + getName());
             Registry.getRegistry(null, null).registerComponent(
-                    getHandler().getGlobal(), rgOname, null );
+                    getHandler().getGlobal(), rgOname, null);
         }
 
         String endpointName = getName();
@@ -577,9 +572,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     @Override
     public void start() throws Exception {
-        if (getLog().isInfoEnabled())
-            getLog().info(sm.getString("abstractProtocolHandler.start",
-                    getNameInternal()));
+        if (getLog().isInfoEnabled()) {
+            getLog().info(sm.getString("abstractProtocolHandler.start", getNameInternal()));
+        }
 
         endpoint.start();
 
@@ -594,18 +589,19 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     @Override
     public void pause() throws Exception {
-        if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("abstractProtocolHandler.pause",
-                    getName()));
+        if (getLog().isInfoEnabled()) {
+            getLog().info(sm.getString("abstractProtocolHandler.pause", getName()));
+        }
 
         endpoint.pause();
     }
 
+
     @Override
     public void resume() throws Exception {
-        if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("abstractProtocolHandler.resume",
-                    getName()));
+        if(getLog().isInfoEnabled()) {
+            getLog().info(sm.getString("abstractProtocolHandler.resume", getName()));
+        }
 
         endpoint.resume();
     }
@@ -613,9 +609,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     @Override
     public void stop() throws Exception {
-        if(getLog().isInfoEnabled())
-            getLog().info(sm.getString("abstractProtocolHandler.stop",
-                    getName()));
+        if(getLog().isInfoEnabled()) {
+            getLog().info(sm.getString("abstractProtocolHandler.stop", getName()));
+        }
 
         if (asyncTimeout != null) {
             asyncTimeout.stop();
@@ -628,9 +624,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     @Override
     public void destroy() throws Exception {
         if(getLog().isInfoEnabled()) {
-            getLog().info(sm.getString("abstractProtocolHandler.destroy",
-                    getName()));
+            getLog().info(sm.getString("abstractProtocolHandler.destroy", getName()));
         }
+
         try {
             endpoint.destroy();
         } finally {
@@ -641,19 +637,19 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     // Possibly registered with a different MBeanServer
                     try {
                         mserver.unregisterMBean(oname);
-                    } catch (MBeanRegistrationException |
-                            InstanceNotFoundException e) {
-                        getLog().info(sm.getString(
-                                "abstractProtocol.mbeanDeregistrationFailed",
+                    } catch (MBeanRegistrationException | InstanceNotFoundException e) {
+                        getLog().info(sm.getString("abstractProtocol.mbeanDeregistrationFailed",
                                 oname, mserver));
                     }
                 }
             }
 
-            if (tpOname != null)
+            if (tpOname != null) {
                 Registry.getRegistry(null, null).unregisterComponent(tpOname);
-            if (rgOname != null)
+            }
+            if (rgOname != null) {
                 Registry.getRegistry(null, null).unregisterComponent(rgOname);
+            }
         }
     }
 
