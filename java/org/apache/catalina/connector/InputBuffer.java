@@ -380,23 +380,6 @@ public class InputBuffer extends Reader
     // ------------------------------------------------- Chars Handling Methods
 
 
-    /**
-     * Since the converter will use append, it is possible to get chars to
-     * be removed from the buffer for "writing". Since the chars have already
-     * been read before, they are ignored. If a mark was set, then the
-     * mark is lost.
-     *
-     * @param c characters that will be written
-     * @param off offset in the characters array
-     * @param len length that will be written
-     * @throws IOException If an I/O occurs while writing the characters
-     */
-    public void realWriteChars(char c[], int off, int len) throws IOException {
-        markPos = -1;
-        clear(cb);
-    }
-
-
     public void setEncoding(String s) {
         enc = s;
     }
@@ -639,7 +622,7 @@ public class InputBuffer extends Reader
     }
 
 
-    public boolean checkByteBufferEof() throws IOException {
+    private boolean checkByteBufferEof() throws IOException {
         if (bb.remaining() == 0) {
             int n = realReadBytes();
             if (n < 0) {
