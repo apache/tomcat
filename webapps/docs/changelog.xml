@@ -60,6 +60,10 @@
         to be re-thrown rather than logged. This is controlled by the new
         <code>throwOnFailure</code> attribute of the Connector. (markt)
       </fix>
+      <fix>
+        Include the Context name in the log message when an item cannot be
+        added to the cache. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
