@@ -53,6 +53,37 @@ public abstract class LifecycleBase implements Lifecycle {
     private volatile LifecycleState state = LifecycleState.NEW;
 
 
+    private boolean throwOnFailure = true;
+
+
+    /**
+     * Will a {@link LifecycleException} thrown by a sub-class during
+     * {@link #initInternal()}, {@link #startInternal()},
+     * {@link #stopInternal()} or {@link #destroyInternal()} be re-thrown for
+     * the caller to handle or will it be logged instead?
+     *
+     * @return {@code true} if the exception will be re-thrown, otherwise
+     *         {@code false}
+     */
+    public boolean getThrowOnFailure() {
+        return throwOnFailure;
+    }
+
+
+    /**
+     * Configure if a {@link LifecycleException} thrown by a sub-class during
+     * {@link #initInternal()}, {@link #startInternal()},
+     * {@link #stopInternal()} or {@link #destroyInternal()} will be re-thrown
+     * for the caller to handle or if it will be logged instead.
+     *
+     * @param throwOnFailure {@code true} if the exception should be re-thrown,
+     *                       otherwise {@code false}
+     */
+    public void setThrowOnFailure(boolean throwOnFailure) {
+        this.throwOnFailure = throwOnFailure;
+    }
+
+
     /**
      * {@inheritDoc}
      */
@@ -105,9 +136,7 @@ public abstract class LifecycleBase implements Lifecycle {
             initInternal();
             setStateInternal(LifecycleState.INITIALIZED, null, false);
         } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            setStateInternal(LifecycleState.FAILED, null, false);
-            throw new LifecycleException(sm.getString("lifecycleBase.initFail",toString()), t);
+            handleSubClassException(t, "lifecycleBase.initFail", toString());
         }
     }
 
@@ -166,9 +195,7 @@ public abstract class LifecycleBase implements Lifecycle {
         } catch (Throwable t) {
             // This is an 'uncontrolled' failure so put the component into the
             // FAILED state and throw an exception.
-            ExceptionUtils.handleThrowable(t);
-            setStateInternal(LifecycleState.FAILED, null, false);
-            throw new LifecycleException(sm.getString("lifecycleBase.startFail", toString()), t);
+            handleSubClassException(t, "lifecycleBase.startFail", toString());
         }
     }
 
@@ -237,9 +264,7 @@ public abstract class LifecycleBase implements Lifecycle {
 
             setStateInternal(LifecycleState.STOPPED, null, false);
         } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            setStateInternal(LifecycleState.FAILED, null, false);
-            throw new LifecycleException(sm.getString("lifecycleBase.stopFail",toString()), t);
+            handleSubClassException(t, "lifecycleBase.stopFail", toString());
         } finally {
             if (this instanceof Lifecycle.SingleUse) {
                 // Complete stop process first
@@ -297,9 +322,7 @@ public abstract class LifecycleBase implements Lifecycle {
             destroyInternal();
             setStateInternal(LifecycleState.DESTROYED, null, false);
         } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            setStateInternal(LifecycleState.FAILED, null, false);
-            throw new LifecycleException(sm.getString("lifecycleBase.destroyFail",toString()), t);
+            handleSubClassException(t, "lifecycleBase.destroyFail", toString());
         }
     }
 
@@ -406,5 +429,20 @@ public abstract class LifecycleBase implements Lifecycle {
     private void invalidTransition(String type) throws LifecycleException {
         String msg = sm.getString("lifecycleBase.invalidTransition", type, toString(), state);
         throw new LifecycleException(msg);
+    }
+
+
+    private void handleSubClassException(Throwable t, String key, Object... args) throws LifecycleException {
+        ExceptionUtils.handleThrowable(t);
+        setStateInternal(LifecycleState.FAILED, null, false);
+        String msg = sm.getString(key, args);
+        if (getThrowOnFailure()) {
+            if (!(t instanceof LifecycleException)) {
+                t = new LifecycleException(msg, t);
+            }
+            throw (LifecycleException) t;
+        } else {
+            log.error(msg, t);
+        }
     }
 }
