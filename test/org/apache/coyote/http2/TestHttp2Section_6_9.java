@@ -81,7 +81,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
 
         byte[] zeroLengthWindowFrame = new byte[9];
         // Length zero
-        ByteUtil.setOneBytes(zeroLengthWindowFrame, 3, FrameType.WINDOW_UPDATE.getIdByte());
+        setOneBytes(zeroLengthWindowFrame, 3, FrameType.WINDOW_UPDATE.getIdByte());
         // No flags
         // Stream 1
         ByteUtil.set31Bits(zeroLengthWindowFrame, 5, 1);
