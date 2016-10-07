@@ -463,13 +463,7 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         // Pause connectors first
         synchronized (connectorsLock) {
             for (Connector connector: connectors) {
-                try {
-                    connector.pause();
-                } catch (Exception e) {
-                    log.error(sm.getString(
-                            "standardService.connector.pauseFailed",
-                            connector), e);
-                }
+                connector.pause();
             }
         }
 
