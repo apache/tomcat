@@ -311,21 +311,6 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    /**
-     * Marks the stream as reset. This method will not change the stream state
-     * if:
-     * <ul>
-     * <li>The stream is already reset</li>
-     * <li>The stream is already closed</li>
-     *
-     * @throws IllegalStateException If the stream is in a state that does not
-     *         permit resets
-     */
-    void sendReset() {
-        state.sendReset();
-    }
-
-
     void sentPushPromise() {
         state.sentPushPromise();
     }
@@ -441,7 +426,6 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         private volatile long written = 0;
         private volatile boolean closed = false;
         private volatile boolean endOfStreamSent = false;
-        private volatile boolean writeInterest = false;
 
         /* The write methods are synchronized to ensure that only one thread at
          * a time is able to access the buffer. Without this protection, a
@@ -522,16 +506,6 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
         synchronized boolean isReady() {
             if (getWindowSize() > 0 && handler.getWindowSize() > 0) {
-                return true;
-            } else {
-                writeInterest = true;
-                return false;
-            }
-        }
-
-        synchronized boolean isRegisteredForWrite() {
-            if (writeInterest) {
-                writeInterest = false;
                 return true;
             } else {
                 return false;
