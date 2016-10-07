@@ -280,6 +280,9 @@ public class Connector extends LifecycleMBeanBase  {
      * @return the property value
      */
     public Object getProperty(String name) {
+        if (protocolHandler == null) {
+            return null;
+        }
         String repl = name;
         if (replacements.get(name) != null) {
             repl = replacements.get(name);
@@ -296,6 +299,9 @@ public class Connector extends LifecycleMBeanBase  {
      * @return <code>true</code> if the property was successfully set
      */
     public boolean setProperty(String name, String value) {
+        if (protocolHandler == null) {
+            return false;
+        }
         String repl = name;
         if (replacements.get(name) != null) {
             repl = replacements.get(name);
@@ -870,7 +876,9 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void pause() {
         try {
-            protocolHandler.pause();
+            if (protocolHandler != null) {
+                protocolHandler.pause();
+            }
         } catch (Exception e) {
             log.error(sm.getString
                       ("coyoteConnector.protocolHandlerPauseFailed"), e);
@@ -883,7 +891,9 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public void resume() {
         try {
-            protocolHandler.resume();
+            if (protocolHandler != null) {
+                protocolHandler.resume();
+            }
         } catch (Exception e) {
             log.error(sm.getString
                       ("coyoteConnector.protocolHandlerResumeFailed"), e);
@@ -895,6 +905,11 @@ public class Connector extends LifecycleMBeanBase  {
     protected void initInternal() throws LifecycleException {
 
         super.initInternal();
+
+        if (protocolHandler == null) {
+            throw new LifecycleException(
+                    sm.getString("coyoteConnector.protocolHandlerInstantiationFailed"));
+        }
 
         // Initialize adapter
         adapter = new CoyoteAdapter(this);
@@ -973,7 +988,9 @@ public class Connector extends LifecycleMBeanBase  {
         setState(LifecycleState.STOPPING);
 
         try {
-            protocolHandler.stop();
+            if (protocolHandler != null) {
+                protocolHandler.stop();
+            }
         } catch (Exception e) {
             throw new LifecycleException
                 (sm.getString
@@ -985,7 +1002,9 @@ public class Connector extends LifecycleMBeanBase  {
     @Override
     protected void destroyInternal() throws LifecycleException {
         try {
-            protocolHandler.destroy();
+            if (protocolHandler != null) {
+                protocolHandler.destroy();
+            }
         } catch (Exception e) {
             throw new LifecycleException
                 (sm.getString
