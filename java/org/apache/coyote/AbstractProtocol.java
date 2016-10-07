@@ -571,13 +571,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         String endpointName = getName();
         endpoint.setName(endpointName.substring(1, endpointName.length()-1));
 
-        try {
-            endpoint.init();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("abstractProtocolHandler.initError",
-                    getName()), ex);
-            throw ex;
-        }
+        endpoint.init();
     }
 
 
@@ -586,13 +580,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         if (getLog().isInfoEnabled())
             getLog().info(sm.getString("abstractProtocolHandler.start",
                     getNameInternal()));
-        try {
-            endpoint.start();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("abstractProtocolHandler.startError",
-                    getNameInternal()), ex);
-            throw ex;
-        }
+
+        endpoint.start();
 
         // Start async timeout thread
         asyncTimeout = new AsyncTimeout();
@@ -608,13 +597,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         if(getLog().isInfoEnabled())
             getLog().info(sm.getString("abstractProtocolHandler.pause",
                     getName()));
-        try {
-            endpoint.pause();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("abstractProtocolHandler.pauseError",
-                    getName()), ex);
-            throw ex;
-        }
+
+        endpoint.pause();
     }
 
     @Override
@@ -622,13 +606,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         if(getLog().isInfoEnabled())
             getLog().info(sm.getString("abstractProtocolHandler.resume",
                     getName()));
-        try {
-            endpoint.resume();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("abstractProtocolHandler.resumeError",
-                    getName()), ex);
-            throw ex;
-        }
+
+        endpoint.resume();
     }
 
 
@@ -642,49 +621,40 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             asyncTimeout.stop();
         }
 
-        try {
-            endpoint.stop();
-        } catch (Exception ex) {
-            getLog().error(sm.getString("abstractProtocolHandler.stopError",
-                    getName()), ex);
-            throw ex;
-        }
+        endpoint.stop();
     }
 
 
     @Override
-    public void destroy() {
+    public void destroy() throws Exception {
         if(getLog().isInfoEnabled()) {
             getLog().info(sm.getString("abstractProtocolHandler.destroy",
                     getName()));
         }
         try {
             endpoint.destroy();
-        } catch (Exception e) {
-            getLog().error(sm.getString("abstractProtocolHandler.destroyError",
-                    getName()), e);
-        }
-
-        if (oname != null) {
-            if (mserver == null) {
-                Registry.getRegistry(null, null).unregisterComponent(oname);
-            } else {
-                // Possibly registered with a different MBeanServer
-                try {
-                    mserver.unregisterMBean(oname);
-                } catch (MBeanRegistrationException |
-                        InstanceNotFoundException e) {
-                    getLog().info(sm.getString(
-                            "abstractProtocol.mbeanDeregistrationFailed",
-                            oname, mserver));
+        } finally {
+            if (oname != null) {
+                if (mserver == null) {
+                    Registry.getRegistry(null, null).unregisterComponent(oname);
+                } else {
+                    // Possibly registered with a different MBeanServer
+                    try {
+                        mserver.unregisterMBean(oname);
+                    } catch (MBeanRegistrationException |
+                            InstanceNotFoundException e) {
+                        getLog().info(sm.getString(
+                                "abstractProtocol.mbeanDeregistrationFailed",
+                                oname, mserver));
+                    }
                 }
             }
-        }
 
-        if (tpOname != null)
-            Registry.getRegistry(null, null).unregisterComponent(tpOname);
-        if (rgOname != null)
-            Registry.getRegistry(null, null).unregisterComponent(rgOname);
+            if (tpOname != null)
+                Registry.getRegistry(null, null).unregisterComponent(tpOname);
+            if (rgOname != null)
+                Registry.getRegistry(null, null).unregisterComponent(rgOname);
+        }
     }
 
 
