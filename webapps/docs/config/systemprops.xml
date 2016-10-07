@@ -623,8 +623,11 @@
 
     <property name="org.apache.catalina.startup. EXIT_ON_INIT_FAILURE">
       <p>If <code>true</code>, the server will exit if an exception happens
-         during the server initialization phase.</p>
-      <p>If not specified, the default value of <code>false</code> will be used.</p>
+      during the server initialization phase. To support this feature, this
+      system property is used as the default for the
+      <strong>throwOnFailure</strong> attribute of a Connector.</p>
+      <p>If not specified, the default value of <code>false</code> will be
+      used.</p>
     </property>
 
     <property name="org.apache.catalina.startup. RealmRuleSet.MAX_NESTED_REALM_LEVELS">

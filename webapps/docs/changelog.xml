@@ -55,6 +55,11 @@
         Reduce multiple error messages when Connector fails to instantiate the
         associated ProtocolHandler. (markt)
       </fix>
+      <fix>
+        <bug>60152</bug>: Provide an option for Connector Lifecycle exceptions
+        to be re-thrown rather than logged. This is controlled by the new
+        <code>throwOnFailure</code> attribute of the Connector. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

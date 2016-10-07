@@ -446,6 +446,14 @@
       </p>
     </attribute>
 
+    <attribute name="throwOnFailure" required="false">
+      <p>If the Connector expereinces an Exception during a Lifecycle transition
+      should the Exception be rethrown or logged? If not specified, the default
+      of <code>false</code> will be used. Note that the default can be changed
+      by the <code>org.apache.catalina.startup.EXIT_ON_INIT_FAILURE</code>
+      system property.</p>
+    </attribute>
+
     <attribute name="tomcatAuthentication" required="false">
       <p>If set to <code>true</code>, the authentication will be done in Tomcat.
       Otherwise, the authenticated principal will be propagated from the native

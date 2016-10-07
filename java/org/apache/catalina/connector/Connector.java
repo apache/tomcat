@@ -106,6 +106,9 @@ public class Connector extends LifecycleMBeanBase  {
             URIEncoding = "UTF-8";
             URIEncodingLower = URIEncoding.toLowerCase(Locale.ENGLISH);
         }
+
+        // Default for Connector depends on this system property
+        setThrowOnFailure(Boolean.getBoolean("org.apache.catalina.startup.EXIT_ON_INIT_FAILURE"));
     }
 
 

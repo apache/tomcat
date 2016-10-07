@@ -24,6 +24,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
@@ -91,5 +92,51 @@ public class TestConnector extends TomcatBaseTest {
 
         assertTrue(localPort1 > 0);
         assertTrue(localPort2 > 0);
+    }
+
+
+    @Test(expected=LifecycleException.class)
+    public void testInvalidProtocolThrows() throws Exception {
+        doTestInvalidProtocol(true);
+    }
+
+
+    @Test
+    public void testInvalidProtocolNoThrows() throws Exception {
+        doTestInvalidProtocol(false);
+    }
+
+
+    private void doTestInvalidProtocol(boolean throwOnFailure) throws Exception {
+        Connector c = new Connector("foo.Bar");
+        c.setThrowOnFailure(throwOnFailure);
+
+        c.start();
+    }
+
+
+    @Test(expected=LifecycleException.class)
+    public void testDuplicatePortThrows() throws Exception {
+        doTestDuplicatePort(true);
+    }
+
+
+    @Test
+    public void testDuplicatePortNoThrows() throws Exception {
+        doTestDuplicatePort(false);
+    }
+
+
+    private void doTestDuplicatePort(boolean throwOnFailure) throws Exception {
+        Connector c1 = new Connector();
+        c1.setThrowOnFailure(throwOnFailure);
+        c1.setPort(0);
+        c1.start();
+
+        Connector c2 = new Connector();
+        c2.setThrowOnFailure(throwOnFailure);
+        c2.setPort(c1.getLocalPort());
+
+        c2.start();
     }
 }
