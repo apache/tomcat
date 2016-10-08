@@ -76,7 +76,7 @@ import java.util.Set;
  * including:
  * - which ResourceSet to write to
  * - unexpected behaviour when deleting a resource from one ResourceSet since
- *   that may unmask a resource in a lower priority ResouceSet so what was a
+ *   that may unmask a resource in a lower priority ResourceSet so what was a
  *   delete looks like a replace with the user having no idea where the 'new'
  *   resource came from
  * - how to handle PUT when the target is read-only but it could be written to
