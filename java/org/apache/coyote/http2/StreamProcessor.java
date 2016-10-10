@@ -32,7 +32,7 @@ import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
-public class StreamProcessor extends AbstractProcessor implements Runnable {
+class StreamProcessor extends AbstractProcessor implements Runnable {
 
     private static final Log log = LogFactory.getLog(StreamProcessor.class);
     private static final StringManager sm = StringManager.getManager(StreamProcessor.class);
@@ -41,7 +41,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     private final Stream stream;
 
 
-    public StreamProcessor(Http2UpgradeHandler handler, Stream stream, Adapter adapter, SocketWrapperBase<?> socketWrapper) {
+    StreamProcessor(Http2UpgradeHandler handler, Stream stream, Adapter adapter, SocketWrapperBase<?> socketWrapper) {
         super(stream.getCoyoteRequest(), stream.getCoyoteResponse());
         this.handler = handler;
         this.stream = stream;
@@ -51,7 +51,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
-    public void run() {
+    public final void run() {
         try {
             // FIXME: the regular processor syncs on socketWrapper, but here this deadlocks
             synchronized (this) {
@@ -192,7 +192,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
-    public void recycle() {
+    public final void recycle() {
         // StreamProcessor instances are not re-used.
         // Clear fields that can be cleared to aid GC and trigger NPEs if this
         // is reused
@@ -202,19 +202,19 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
-    protected Log getLog() {
+    protected final Log getLog() {
         return log;
     }
 
 
     @Override
-    public void pause() {
+    public final void pause() {
         // NO-OP. Handled by the Http2UpgradeHandler
     }
 
 
     @Override
-    public SocketState service(SocketWrapperBase<?> socket) throws IOException {
+    public final SocketState service(SocketWrapperBase<?> socket) throws IOException {
         try {
             adapter.service(request, response);
         } catch (Exception e) {
@@ -239,7 +239,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
-    protected boolean flushBufferedWrite() throws IOException {
+    protected final boolean flushBufferedWrite() throws IOException {
         if (stream.getOutputBuffer().flush(false)) {
             // The buffer wasn't fully flushed so re-register the
             // stream for write. Note this does not go via the
@@ -259,7 +259,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
 
     @Override
-    protected SocketState dispatchEndRequest() {
+    protected final SocketState dispatchEndRequest() {
         return SocketState.CLOSED;
     }
 }

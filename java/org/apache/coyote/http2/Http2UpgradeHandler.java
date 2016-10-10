@@ -71,7 +71,7 @@ import org.apache.tomcat.util.res.StringManager;
  *     </li>
  * </ul>
  */
-public class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeHandler,
+class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeHandler,
         Input, Output {
 
     private static final Log log = LogFactory.getLog(Http2UpgradeHandler.class);
@@ -144,7 +144,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private AtomicInteger streamConcurrency = null;
     private Queue<StreamProcessor> queuedProcessors = null;
 
-    public Http2UpgradeHandler(Adapter adapter, Request coyoteRequest) {
+    Http2UpgradeHandler(Adapter adapter, Request coyoteRequest) {
         super (STREAM_ID_ZERO);
         this.adapter = adapter;
         this.connectionId = Integer.toString(connectionIdGenerator.getAndIncrement());
@@ -573,7 +573,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    void writePushHeaders(Stream stream, int pushedStreamId, Request coyoteRequest, int payloadSize)
+    private void writePushHeaders(Stream stream, int pushedStreamId, Request coyoteRequest, int payloadSize)
             throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writePushHeaders", connectionId,

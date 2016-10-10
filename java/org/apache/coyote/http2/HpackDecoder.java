@@ -63,12 +63,12 @@ public class HpackDecoder {
 
     private final StringBuilder stringBuilder = new StringBuilder();
 
-    public HpackDecoder(int maxMemorySize) {
+    HpackDecoder(int maxMemorySize) {
         this.maxMemorySize = maxMemorySize;
         headerTable = new Hpack.HeaderField[DEFAULT_RING_BUFFER_SIZE];
     }
 
-    public HpackDecoder() {
+    HpackDecoder() {
         this(Hpack.DEFAULT_TABLE_SIZE);
     }
 
@@ -81,7 +81,7 @@ public class HpackDecoder {
      *
      * @throws HpackException If the packed data is not valid
      */
-    public void decode(ByteBuffer buffer) throws HpackException {
+    void decode(ByteBuffer buffer) throws HpackException {
         while (buffer.hasRemaining()) {
             int originalPos = buffer.position();
             byte b = buffer.get();
@@ -326,16 +326,16 @@ public class HpackDecoder {
     /**
      * Interface that can be used to immediately validate headers (ex: uppercase detection).
      */
-    public interface HeaderEmitter {
+    interface HeaderEmitter {
         void emitHeader(String name, String value, boolean neverIndex);
     }
 
 
-    public HeaderEmitter getHeaderEmitter() {
+    HeaderEmitter getHeaderEmitter() {
         return headerEmitter;
     }
 
-    public void setHeaderEmitter(HeaderEmitter headerEmitter) {
+    void setHeaderEmitter(HeaderEmitter headerEmitter) {
         this.headerEmitter = headerEmitter;
     }
 

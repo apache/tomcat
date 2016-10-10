@@ -16,7 +16,7 @@
  */
 package org.apache.coyote.http2;
 
-public enum Setting {
+enum Setting {
     HEADER_TABLE_SIZE(1),
     ENABLE_PUSH(2),
     MAX_CONCURRENT_STREAMS(3),
@@ -31,16 +31,16 @@ public enum Setting {
         this.id = id;
     }
 
-    public int getId() {
+    final int getId() {
         return id;
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return Integer.toString(id);
     }
 
-    public static Setting valueOf(int i) {
+    static final Setting valueOf(int i) {
         switch(i) {
         case 1: {
             return HEADER_TABLE_SIZE;

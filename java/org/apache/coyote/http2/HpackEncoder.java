@@ -34,12 +34,12 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Encoder for HPACK frames.
  */
-public class HpackEncoder {
+class HpackEncoder {
 
     private static final Log log = LogFactory.getLog(HpackEncoder.class);
     private static final StringManager sm = StringManager.getManager(HpackEncoder.class);
 
-    public static final HpackHeaderFunction DEFAULT_HEADER_FUNCTION = new HpackHeaderFunction() {
+    private static final HpackHeaderFunction DEFAULT_HEADER_FUNCTION = new HpackHeaderFunction() {
         @Override
         public boolean shouldUseIndexing(String headerName, String value) {
             //content length and date change all the time
@@ -104,13 +104,9 @@ public class HpackEncoder {
 
     private final HpackHeaderFunction hpackHeaderFunction;
 
-    public HpackEncoder(int maxTableSize, HpackHeaderFunction headerFunction) {
+    HpackEncoder(int maxTableSize) {
         this.maxTableSize = maxTableSize;
-        this.hpackHeaderFunction = headerFunction;
-    }
-
-    public HpackEncoder(int maxTableSize) {
-        this(maxTableSize, DEFAULT_HEADER_FUNCTION);
+        this.hpackHeaderFunction = DEFAULT_HEADER_FUNCTION;
     }
 
     /**
@@ -121,7 +117,7 @@ public class HpackEncoder {
      *
      * @return The state of the encoding process
      */
-    public State encode(MimeHeaders headers, ByteBuffer target) {
+    State encode(MimeHeaders headers, ByteBuffer target) {
         int it = headersIterator;
         if (headersIterator == -1) {
             handleTableSizeChange(target);
@@ -250,7 +246,7 @@ public class HpackEncoder {
         }
         existing.add(d);
         evictionQueue.add(d);
-        currentTableSize += d.size;
+        currentTableSize += d.getSize();
         runEvictionIfRequired();
         if (entryPositionCounter == Integer.MAX_VALUE) {
             //prevent rollover
@@ -335,19 +331,19 @@ public class HpackEncoder {
         minNewMaxHeaderSize = -1;
     }
 
-    public enum State {
+    enum State {
         COMPLETE,
         UNDERFLOW,
 
     }
 
-    static class TableEntry {
-        final String name;
-        final String value;
-        final int size;
-        int position;
+    private static class TableEntry {
+        private final String name;
+        private final String value;
+        private final int size;
+        private int position;
 
-        TableEntry(String name, String value, int position) {
+        private TableEntry(String name, String value, int position) {
             this.name = name;
             this.value = value;
             this.position = position;
@@ -358,24 +354,28 @@ public class HpackEncoder {
             }
         }
 
-        public int getPosition() {
+        int getPosition() {
             return position;
+        }
+
+        int getSize() {
+            return size;
         }
     }
 
-    class DynamicTableEntry extends TableEntry {
+    private class DynamicTableEntry extends TableEntry {
 
-        DynamicTableEntry(String name, String value, int position) {
+        private DynamicTableEntry(String name, String value, int position) {
             super(name, value, position);
         }
 
         @Override
-        public int getPosition() {
+        int getPosition() {
             return super.getPosition() + entryPositionCounter + Hpack.STATIC_TABLE_LENGTH;
         }
     }
 
-    public interface HpackHeaderFunction {
+    private interface HpackHeaderFunction {
         boolean shouldUseIndexing(String header, String value);
 
         /**

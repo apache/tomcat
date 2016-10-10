@@ -20,7 +20,7 @@ import java.util.function.IntPredicate;
 
 import org.apache.tomcat.util.res.StringManager;
 
-public enum FrameType {
+enum FrameType {
 
     DATA          (0,   false,  true, null,              false),
     HEADERS       (1,   false,  true, null,               true),
@@ -53,12 +53,12 @@ public enum FrameType {
     }
 
 
-    public byte getIdByte() {
+    byte getIdByte() {
         return (byte) id;
     }
 
 
-    public void check(int streamId, int payloadSize) throws Http2Exception {
+    void check(int streamId, int payloadSize) throws Http2Exception {
         // Is FrameType valid for the given stream?
         if (streamId == 0 && !streamZero || streamId != 0 && !streamNonZero) {
             throw new ConnectionException(sm.getString("frameType.checkStream", this),
@@ -80,7 +80,7 @@ public enum FrameType {
     }
 
 
-    public static FrameType valueOf(int i) {
+    static FrameType valueOf(int i) {
         switch(i) {
         case 0:
             return DATA;
