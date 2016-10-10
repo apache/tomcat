@@ -64,6 +64,10 @@
         Include the Context name in the log message when an item cannot be
         added to the cache. (markt)
       </fix>
+      <fix>
+        Exclude JAR files in <code>/WEB-INF/lib</code> from the static resource
+        cache. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
