@@ -615,7 +615,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     private HpackEncoder getHpackEncoder() {
         if (hpackEncoder == null) {
-            hpackEncoder = new HpackEncoder(localSettings.getHeaderTableSize());
+
+            hpackEncoder = new HpackEncoder(remoteSettings.getHeaderTableSize());
         }
         return hpackEncoder;
     }
@@ -1143,7 +1144,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     @Override
     public HpackDecoder getHpackDecoder() {
         if (hpackDecoder == null) {
-            hpackDecoder = new HpackDecoder(remoteSettings.getHeaderTableSize());
+            hpackDecoder = new HpackDecoder(localSettings.getHeaderTableSize());
         }
         return hpackDecoder;
     }
