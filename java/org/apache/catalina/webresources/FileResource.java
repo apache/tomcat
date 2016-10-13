@@ -130,7 +130,11 @@ public class FileResource extends AbstractResource {
 
     @Override
     public long getContentLength() {
-        if (needConvert) {
+        return getContentLengthInternal(needConvert);
+    }
+
+    private long getContentLengthInternal(boolean convert) {
+        if (convert) {
             byte[] content = getContent();
             if (content == null) {
                 return -1;
@@ -138,6 +142,11 @@ public class FileResource extends AbstractResource {
                 return content.length;
             }
         }
+
+        if (isDirectory()) {
+            return -1;
+        }
+
         return resource.length();
     }
 
@@ -179,13 +188,19 @@ public class FileResource extends AbstractResource {
 
     @Override
     public final byte[] getContent() {
-        long len = getContentLength();
+        // Use internal version to avoid loop when needConvert is true
+        long len = getContentLengthInternal(false);
 
         if (len > Integer.MAX_VALUE) {
             // Can't create an array that big
             throw new ArrayIndexOutOfBoundsException(sm.getString(
                     "abstractResource.getContentTooLarge", getWebappPath(),
                     Long.valueOf(len)));
+        }
+
+        if (len < 0) {
+            // Content is not applicable here (e.g. is a directory)
+            return null;
         }
 
         int size = (int) len;
@@ -205,6 +220,7 @@ public class FileResource extends AbstractResource {
                 getLog().debug(sm.getString("abstractResource.getContentFail",
                         getWebappPath()), ioe);
             }
+            return null;
         }
 
         if (needConvert) {

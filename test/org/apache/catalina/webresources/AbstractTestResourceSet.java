@@ -102,6 +102,9 @@ public abstract class AbstractTestResourceSet {
         Assert.assertTrue(webResource.isDirectory());
         Assert.assertEquals("d1", webResource.getName());
         Assert.assertEquals(getMount() + "/d1/", webResource.getWebappPath());
+        Assert.assertEquals(-1, webResource.getContentLength());
+        Assert.assertNull(webResource.getContent());
+        Assert.assertNull(webResource.getInputStream());
     }
 
     @Test
@@ -110,6 +113,9 @@ public abstract class AbstractTestResourceSet {
         Assert.assertTrue(webResource.isDirectory());
         Assert.assertEquals("d1", webResource.getName());
         Assert.assertEquals(getMount() + "/d1/", webResource.getWebappPath());
+        Assert.assertEquals(-1, webResource.getContentLength());
+        Assert.assertNull(webResource.getContent());
+        Assert.assertNull(webResource.getInputStream());
     }
 
     @Test
@@ -120,6 +126,9 @@ public abstract class AbstractTestResourceSet {
         Assert.assertEquals("d1-f1.txt", webResource.getName());
         Assert.assertEquals(
                 getMount() + "/d1/d1-f1.txt", webResource.getWebappPath());
+        Assert.assertEquals(0, webResource.getContentLength());
+        Assert.assertEquals(0, webResource.getContent().length);
+        Assert.assertNotNull(webResource.getInputStream());
     }
 
     @Test

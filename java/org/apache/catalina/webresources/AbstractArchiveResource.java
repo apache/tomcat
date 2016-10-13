@@ -113,6 +113,9 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
     @Override
     public long getContentLength() {
+        if (isDirectory()) {
+            return -1;
+        }
         return resource.getSize();
     }
 
@@ -167,6 +170,11 @@ public abstract class AbstractArchiveResource extends AbstractResource {
                     Long.valueOf(len)));
         }
 
+        if (len < 0) {
+            // Content is not applicable here (e.g. is a directory)
+            return null;
+        }
+
         int size = (int) len;
         byte[] result = new byte[size];
 
@@ -215,6 +223,9 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
     @Override
     protected final InputStream doGetInputStream() {
+        if (isDirectory()) {
+            return null;
+        }
         return getJarInputStreamWrapper();
     }
 
