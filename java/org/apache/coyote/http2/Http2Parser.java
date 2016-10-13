@@ -243,7 +243,7 @@ class Http2Parser {
 
         boolean endOfHeaders = Flags.isEndOfHeaders(flags);
 
-        readHeaderBlock(payloadSize, endOfHeaders);
+        readHeaderPayload(payloadSize, endOfHeaders);
 
         swallow(streamId, padLength, true);
 
@@ -378,7 +378,7 @@ class Http2Parser {
         }
 
         boolean endOfHeaders = Flags.isEndOfHeaders(flags);
-        readHeaderBlock(payloadSize, endOfHeaders);
+        readHeaderPayload(payloadSize, endOfHeaders);
 
         if (endOfHeaders) {
             output.headersEnd(streamId);
@@ -391,7 +391,7 @@ class Http2Parser {
     }
 
 
-    private void readHeaderBlock(int payloadSize, boolean endOfHeaders)
+    private void readHeaderPayload(int payloadSize, boolean endOfHeaders)
             throws Http2Exception, IOException {
 
         while (payloadSize > 0) {
