@@ -61,6 +61,22 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Correct the HPACK header table size configuration that transposed the
+        client and server table sizes when creating the encoder and decoder.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        Update to the Eclipse JDT Compiler 4.6.1. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.6" rtext="2016-10-10">
   <subsection name="Catalina">
