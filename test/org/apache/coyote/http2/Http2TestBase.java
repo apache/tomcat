@@ -305,11 +305,31 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         ByteUtil.set31Bits(dataFrameHeader, 5, streamId);
     }
 
+
     protected void writeFrame(byte[] header, ByteBuffer payload)
             throws IOException {
+        writeFrame(header, payload, 0, payload.limit());
+    }
+
+
+    protected void writeFrame(byte[] header, ByteBuffer payload, int offset, int len)
+            throws IOException {
+        writeFrame(header, payload, offset, len, 0);
+    }
+
+
+    protected void writeFrame(byte[] header, ByteBuffer payload, int offset, int len, int delayms)
+            throws IOException {
         os.write(header);
-        os.write(payload.array(), payload.arrayOffset(), payload.limit());
+        os.write(payload.array(), payload.arrayOffset() + offset, len);
         os.flush();
+        if (delayms > 0) {
+            try {
+                Thread.sleep(delayms);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+        }
     }
 
 
@@ -893,6 +913,11 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         public String getTrace() {
             return trace.toString();
+        }
+
+
+        public int getMaxFrameSize() {
+            return remoteSettings.getMaxFrameSize();
         }
     }
 
