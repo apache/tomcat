@@ -76,7 +76,7 @@ public class TestHpack {
             this.headers = headers;
         }
         @Override
-        public void emitHeader(String name, String value, boolean neverIndex) {
+        public void emitHeader(String name, String value) {
             headers.setValue(name).setString(value);
         }
     }

@@ -109,7 +109,7 @@ public class HpackDecoder {
                     buffer.position(originalPos);
                     return;
                 }
-                headerEmitter.emitHeader(headerName, headerValue, false);
+                headerEmitter.emitHeader(headerName, headerValue);
                 addEntryToHeaderTable(new Hpack.HeaderField(headerName, headerValue));
             } else if ((b & 0b11110000) == 0) {
                 //Literal Header Field without Indexing
@@ -123,7 +123,7 @@ public class HpackDecoder {
                     buffer.position(originalPos);
                     return;
                 }
-                headerEmitter.emitHeader(headerName, headerValue, false);
+                headerEmitter.emitHeader(headerName, headerValue);
             } else if ((b & 0b11110000) == 0b00010000) {
                 //Literal Header Field never indexed
                 String headerName = readHeaderName(buffer, 4);
@@ -136,7 +136,7 @@ public class HpackDecoder {
                     buffer.position(originalPos);
                     return;
                 }
-                headerEmitter.emitHeader(headerName, headerValue, true);
+                headerEmitter.emitHeader(headerName, headerValue);
             } else if ((b & 0b11100000) == 0b00100000) {
                 //context update max table size change
                 if (!handleMaxMemorySizeChange(buffer, originalPos)) {
@@ -246,7 +246,7 @@ public class HpackDecoder {
         } else {
             int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
             Hpack.HeaderField headerField = headerTable[adjustedIndex];
-            headerEmitter.emitHeader(headerField.name, headerField.value, false);
+            headerEmitter.emitHeader(headerField.name, headerField.value);
         }
     }
 
@@ -273,7 +273,7 @@ public class HpackDecoder {
         if (entry.value == null) {
             throw new HpackException();
         }
-        headerEmitter.emitHeader(entry.name, entry.value, false);
+        headerEmitter.emitHeader(entry.name, entry.value);
     }
 
     private void addEntryToHeaderTable(Hpack.HeaderField entry) {
@@ -327,7 +327,7 @@ public class HpackDecoder {
      * Interface that can be used to immediately validate headers (ex: uppercase detection).
      */
     interface HeaderEmitter {
-        void emitHeader(String name, String value, boolean neverIndex);
+        void emitHeader(String name, String value);
     }
 
 

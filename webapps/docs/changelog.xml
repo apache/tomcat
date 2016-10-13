@@ -70,13 +70,17 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="HTTP/2">
+  <subsection name="Coyote">
     <changelog>
       <fix>
         Correct the HPACK header table size configuration that transposed the
         client and server table sizes when creating the encoder and decoder.
         (markt)
       </fix>
+      <scode>
+        Review HTTP/2 implementation removing unused code, reducing visibility
+        where possible and using final where appropriate. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">

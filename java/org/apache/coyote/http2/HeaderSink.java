@@ -26,7 +26,7 @@ import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 class HeaderSink implements HeaderEmitter {
 
     @Override
-    public void emitHeader(String name, String value, boolean neverIndex) {
+    public void emitHeader(String name, String value) {
         // NO-OP
     }
 }

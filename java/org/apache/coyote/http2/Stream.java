@@ -189,7 +189,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
 
     @Override
-    public final void emitHeader(String name, String value, boolean neverIndex) {
+    public final void emitHeader(String name, String value) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.header.debug", getConnectionId(), getIdentifier(),
                     name, value));

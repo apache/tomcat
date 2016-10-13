@@ -791,7 +791,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void emitHeader(String name, String value, boolean neverIndex) {
+        public void emitHeader(String name, String value) {
             // Date headers will always change so use a hard-coded default
             if ("date".equals(name)) {
                 value = DEFAULT_DATE;
