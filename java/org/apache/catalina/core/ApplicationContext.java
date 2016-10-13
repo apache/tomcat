@@ -532,7 +532,7 @@ public class ApplicationContext implements ServletContext {
 
     /*
      * Returns null if the input path is not valid or a path that will be
-     * acceptable to resoucres.getResource().
+     * acceptable to resources.getResource().
      */
     private String validateResourcePath(String path, boolean allowEmptyPath) {
         if (path == null) {
