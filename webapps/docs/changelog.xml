@@ -68,6 +68,10 @@
         Exclude JAR files in <code>/WEB-INF/lib</code> from the static resource
         cache. (markt)
       </fix>
+      <fix>
+        When calling <code>getResourceAsStream()</code> on a directory, ensure
+        that <code>null</code> is returned. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

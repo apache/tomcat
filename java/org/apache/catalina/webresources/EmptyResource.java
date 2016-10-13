@@ -89,7 +89,7 @@ public class EmptyResource implements WebResource {
 
     @Override
     public long getContentLength() {
-        return 0;
+        return -1;
     }
 
     @Override
