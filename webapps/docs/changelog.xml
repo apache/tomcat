@@ -63,6 +63,10 @@
         When calling <code>getResourceAsStream()</code> on a directory, ensure
         that <code>null</code> is returned. (markt)
       </fix>
+      <fix>
+        <bug>60161</bug>: Allow creating subcategories of the container logger,
+        and use it for the rewrite valve. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -47,6 +47,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UriUtil;
@@ -143,6 +144,14 @@ public class RewriteValve extends ValveBase {
         this.enabled = enabled;
     }
 
+
+    @Override
+    protected void initInternal() throws LifecycleException {
+        super.initInternal();
+        containerLog = LogFactory.getLog(getContainer().getLogName() + ".rewrite");
+    }
+
+
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
@@ -155,11 +164,11 @@ public class RewriteValve extends ValveBase {
             context = true;
             is = ((Context) getContainer()).getServletContext()
                 .getResourceAsStream("/WEB-INF/" + resourcePath);
-            if (container.getLogger().isDebugEnabled()) {
+            if (containerLog.isDebugEnabled()) {
                 if (is == null) {
-                    container.getLogger().debug("No configuration resource found: /WEB-INF/" + resourcePath);
+                    containerLog.debug("No configuration resource found: /WEB-INF/" + resourcePath);
                 } else {
-                    container.getLogger().debug("Read configuration from: /WEB-INF/" + resourcePath);
+                    containerLog.debug("Read configuration from: /WEB-INF/" + resourcePath);
                 }
             }
         } else if (getContainer() instanceof Host) {
@@ -170,21 +179,21 @@ public class RewriteValve extends ValveBase {
                     // Use getResource and getResourceAsStream
                     is = getClass().getClassLoader()
                         .getResourceAsStream(resourceName);
-                    if (is != null && container.getLogger().isDebugEnabled()) {
-                        container.getLogger().debug("Read configuration from CL at " + resourceName);
+                    if (is != null && containerLog.isDebugEnabled()) {
+                        containerLog.debug("Read configuration from CL at " + resourceName);
                     }
                 } else {
-                    if (container.getLogger().isDebugEnabled()) {
-                        container.getLogger().debug("Read configuration from " + file.getAbsolutePath());
+                    if (containerLog.isDebugEnabled()) {
+                        containerLog.debug("Read configuration from " + file.getAbsolutePath());
                     }
                     is = new FileInputStream(file);
                 }
-                if ((is == null) && (container.getLogger().isDebugEnabled())) {
-                    container.getLogger().debug("No configuration resource found: " + resourceName +
+                if ((is == null) && (containerLog.isDebugEnabled())) {
+                    containerLog.debug("No configuration resource found: " + resourceName +
                             " in " + getConfigBase() + " or in the classloader");
                 }
             } catch (Exception e) {
-                container.getLogger().error("Error opening configuration", e);
+                containerLog.error("Error opening configuration", e);
             }
         }
 
@@ -197,12 +206,12 @@ public class RewriteValve extends ValveBase {
                 BufferedReader reader = new BufferedReader(isr)) {
             parse(reader);
         } catch (IOException ioe) {
-            container.getLogger().error("Error closing configuration", ioe);
+            containerLog.error("Error closing configuration", ioe);
         } finally {
             try {
                 is.close();
             } catch (IOException e) {
-                container.getLogger().error("Error closing configuration", e);
+                containerLog.error("Error closing configuration", e);
             }
         }
 
@@ -210,6 +219,9 @@ public class RewriteValve extends ValveBase {
 
     public void setConfiguration(String configuration)
         throws Exception {
+        if (containerLog == null) {
+            containerLog = LogFactory.getLog(getContainer().getLogName() + ".rewrite");
+        }
         maps.clear();
         parse(new BufferedReader(new StringReader(configuration)));
     }
@@ -238,8 +250,8 @@ public class RewriteValve extends ValveBase {
                 Object result = parse(line);
                 if (result instanceof RewriteRule) {
                     RewriteRule rule = (RewriteRule) result;
-                    if (container.getLogger().isDebugEnabled()) {
-                        container.getLogger().debug("Add rule with pattern " + rule.getPatternString()
+                    if (containerLog.isDebugEnabled()) {
+                        containerLog.debug("Add rule with pattern " + rule.getPatternString()
                                 + " and substitution " + rule.getSubstitutionString());
                     }
                     for (int i = (conditions.size() - 1); i > 0; i--) {
@@ -248,9 +260,9 @@ public class RewriteValve extends ValveBase {
                         }
                     }
                     for (int i = 0; i < conditions.size(); i++) {
-                        if (container.getLogger().isDebugEnabled()) {
+                        if (containerLog.isDebugEnabled()) {
                             RewriteCond cond = conditions.get(i);
-                            container.getLogger().debug("Add condition " + cond.getCondPattern()
+                            containerLog.debug("Add condition " + cond.getCondPattern()
                                     + " test " + cond.getTestString() + " to rule with pattern "
                                     + rule.getPatternString() + " and substitution "
                                     + rule.getSubstitutionString() + (cond.isOrnext() ? " [OR]" : "")
@@ -271,7 +283,7 @@ public class RewriteValve extends ValveBase {
                     }
                 }
             } catch (IOException e) {
-                container.getLogger().error("Error reading configuration", e);
+                containerLog.error("Error reading configuration", e);
             }
         }
         this.rules = rules.toArray(new RewriteRule[0]);
@@ -338,8 +350,8 @@ public class RewriteValve extends ValveBase {
                 CharSequence test = (rule.isHost()) ? host : urlDecoded;
                 CharSequence newtest = rule.evaluate(test, resolver);
                 if (newtest != null && !test.equals(newtest.toString())) {
-                    if (container.getLogger().isDebugEnabled()) {
-                        container.getLogger().debug("Rewrote " + test + " as " + newtest
+                    if (containerLog.isDebugEnabled()) {
+                        containerLog.debug("Rewrote " + test + " as " + newtest
                                 + " with rule pattern " + rule.getPatternString());
                     }
                     if (rule.isHost()) {

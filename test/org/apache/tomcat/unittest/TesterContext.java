@@ -116,6 +116,11 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public String getLogName() {
+        return null;
+    }
+
+    @Override
     public ObjectName getObjectName() {
         return null;
     }

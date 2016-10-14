@@ -123,6 +123,13 @@ public interface Container extends Lifecycle {
 
 
     /**
+     * Return the logger name that the container will use.
+     * @return the abbreviated name of this container for logging messages
+     */
+    public String getLogName();
+
+
+    /**
      * Obtain the JMX name for this container.
      *
      * @return the JMX name associated with this container.
