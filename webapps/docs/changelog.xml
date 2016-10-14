@@ -76,6 +76,11 @@
         Don't continue to process an HTTP/2 stream if it is reset during header
         parsing. (markt)
       </fix>
+      <fix>
+        HTTP/2 uses separate headers for each Cookie. As required by RFC 7540,
+        merge these into a single Cookie header before processing continues.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

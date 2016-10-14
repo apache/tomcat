@@ -51,6 +51,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private final StreamStateMachine state;
     // TODO: null these when finished to reduce memory used by closed stream
     private final Request coyoteRequest;
+    private StringBuilder cookieHeader = null;
     private final Response coyoteResponse = new Response();
     private final StreamInputBuffer inputBuffer;
     private final StreamOutputBuffer outputBuffer = new StreamOutputBuffer();
@@ -240,6 +241,17 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             }
             break;
         }
+        case "cookie": {
+            // Cookie headers need to be concatenated into a single header
+            // See RFC 7540 8.1.2.5
+            if (cookieHeader == null) {
+                cookieHeader = new StringBuilder();
+            } else {
+                cookieHeader.append("; ");
+            }
+            cookieHeader.append(value);
+            break;
+        }
         default: {
             if ("expect".equals(name) && "100-continue".equals(value)) {
                 coyoteRequest.setExpectation(true);
@@ -247,6 +259,16 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             // Assume other HTTP header
             coyoteRequest.getMimeHeaders().addValue(name).setString(value);
         }
+        }
+    }
+
+
+    final void headersEnd() {
+        // Cookie headers need to be concatenated into a single header
+        // See RFC 7540 8.1.2.5
+        // Can only do this once the headers are fully received
+        if (cookieHeader != null) {
+            coyoteRequest.getMimeHeaders().addValue("cookie").setString(cookieHeader.toString());
         }
     }
 
