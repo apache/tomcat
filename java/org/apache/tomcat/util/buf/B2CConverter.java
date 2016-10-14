@@ -36,8 +36,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class B2CConverter {
 
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(B2CConverter.class);
 
     private static final Map<String, Charset> encodingToCharsetCache =
             new HashMap<>();

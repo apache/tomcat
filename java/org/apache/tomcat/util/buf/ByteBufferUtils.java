@@ -26,8 +26,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 public class ByteBufferUtils {
 
-    private static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(ByteBufferUtils.class);
     private static final Log log = LogFactory.getLog(ByteBufferUtils.class);
 
     private static final Method cleanerMethod;

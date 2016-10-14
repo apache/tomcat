@@ -35,8 +35,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class UDecoder {
 
-    private static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    private static final StringManager sm = StringManager.getManager(UDecoder.class);
 
     private static final Log log = LogFactory.getLog(UDecoder.class);
 
