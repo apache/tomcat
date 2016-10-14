@@ -241,6 +241,9 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public Log getLogger() { return null; }
 
     @Override
+    public String getLogName() { return null; }
+
+    @Override
     public Manager getManager() { return null; }
     @Override
     public void setManager(Manager manager) { /* NO-OP */ }

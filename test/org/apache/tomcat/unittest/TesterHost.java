@@ -45,6 +45,11 @@ public class TesterHost implements Host {
     }
 
     @Override
+    public String getLogName() {
+        return null;
+    }
+
+    @Override
     public ObjectName getObjectName() {
         return null;
     }
