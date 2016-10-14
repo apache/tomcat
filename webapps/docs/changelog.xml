@@ -85,6 +85,10 @@
         Review HTTP/2 implementation removing unused code, reducing visibility
         where possible and using final where appropriate. (markt)
       </scode>
+      <fix>
+        Don't continue to process an HTTP/2 stream if it is reset during header
+        parsing. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
