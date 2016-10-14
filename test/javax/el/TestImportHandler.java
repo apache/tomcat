@@ -203,11 +203,11 @@ public class TestImportHandler {
     public void testImportStatic01() {
         ImportHandler handler = new ImportHandler();
 
-        handler.importStatic("org.apache.tomcat.util.buf.Constants.Package");
+        handler.importStatic("org.apache.tomcat.util.scan.Constants.Package");
 
         Class<?> result = handler.resolveStatic("Package");
 
-        Assert.assertEquals(org.apache.tomcat.util.buf.Constants.class, result);
+        Assert.assertEquals(org.apache.tomcat.util.scan.Constants.class, result);
     }
 
 
@@ -244,10 +244,10 @@ public class TestImportHandler {
     public void testImportStatic04() {
         ImportHandler handler = new ImportHandler();
 
-        handler.importStatic("org.apache.tomcat.util.buf.Constants.Package");
+        handler.importStatic("org.apache.tomcat.util.scan.Constants.Package");
         for (int i = 1; i <= 3; i++) {
             try {
-                handler.importStatic("org.apache.tomcat.util.scan.Constants.Package");
+                handler.importStatic("org.apache.tomcat.util.threads.Constants.Package");
                 Assert.fail("Expected ELException but got none on iteration "
                         + i);
             } catch (ELException ex) {
