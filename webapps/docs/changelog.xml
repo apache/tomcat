@@ -81,6 +81,11 @@
         merge these into a single Cookie header before processing continues.
         (markt)
       </fix>
+      <fix>
+        Align the HTTP/2 implementation with the HTTP/1.1 implementation and
+        return a 500 response when an unhandled exception occurs during request
+        processing. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
