@@ -359,23 +359,35 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
     protected String getEmptyResponseTrace(int streamId) {
-        return getSingleResponseBodyFrameTrace(streamId, 0);
+        return getResponseBodyFrameTrace(streamId, "0");
     }
 
 
     protected String getSimpleResponseTrace(int streamId) {
-        return getSingleResponseBodyFrameTrace(streamId, 8192);
+        return getResponseBodyFrameTrace(streamId, "8192");
     }
 
 
-    private String getSingleResponseBodyFrameTrace(int streamId, int bodySize) {
+    protected String getCookieResponseTrace(int streamId, int cookieCount) {
+        return getResponseBodyFrameTrace(streamId, "text/plain;charset=UTF-8",
+                "Cookie count: " + cookieCount);
+    }
+
+
+    private String getResponseBodyFrameTrace(int streamId, String body) {
+        return getResponseBodyFrameTrace(streamId, "application/octet-stream", body);
+    }
+
+    private String getResponseBodyFrameTrace(int streamId, String contentType, String body) {
         StringBuilder result = new StringBuilder();
         result.append(streamId);
         result.append("-HeadersStart\n");
         result.append(streamId);
         result.append("-Header-[:status]-[200]\n");
         result.append(streamId);
-        result.append("-Header-[content-type]-[application/octet-stream]\n");
+        result.append("-Header-[content-type]-[");
+        result.append(contentType);
+        result.append("]\n");
         result.append(streamId);
         result.append("-Header-[date]-[");
         result.append(DEFAULT_DATE);
@@ -384,7 +396,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         result.append("-HeadersEnd\n");
         result.append(streamId);
         result.append("-Body-");
-        result.append(bodySize);
+        result.append(body);
         result.append("\n");
         result.append(streamId);
         result.append("-EndOfStream\n");
@@ -419,6 +431,8 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         ctxt.addServletMappingDecoded("/simple", "simple");
         Tomcat.addServlet(ctxt, "large", new LargeServlet());
         ctxt.addServletMappingDecoded("/large", "large");
+        Tomcat.addServlet(ctxt, "cookie", new CookieServlet());
+        ctxt.addServletMappingDecoded("/cookie", "cookie");
 
         tomcat.start();
     }
@@ -776,6 +790,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         private StringBuffer trace = new StringBuffer();
         private String lastStreamId = "0";
         private ConnectionSettingsRemote remoteSettings = new ConnectionSettingsRemote("-1");
+        private boolean traceBody = false;
+        private ByteBuffer bodyBuffer = null;
+
+        public void setTraceBody(boolean traceBody) {
+            this.traceBody = traceBody;
+        }
 
 
         @Override
@@ -787,14 +807,29 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         @Override
         public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize) {
             lastStreamId = Integer.toString(streamId);
-            trace.append(lastStreamId + "-Body-" + payloadSize + "\n");
-            return null;
+            if (traceBody) {
+                bodyBuffer = ByteBuffer.allocate(payloadSize);
+                return bodyBuffer;
+            } else {
+                trace.append(lastStreamId + "-Body-" + payloadSize + "\n");
+                return null;
+            }
         }
 
 
         @Override
         public void endRequestBodyFrame(int streamId) throws Http2Exception {
-            // NO-OP
+            if (bodyBuffer != null) {
+                if (bodyBuffer.limit() > 0) {
+                    trace.append(lastStreamId + "-Body-");
+                    bodyBuffer.flip();
+                    while (bodyBuffer.hasRemaining()) {
+                        trace.append((char) bodyBuffer.get());
+                    }
+                    trace.append("\n");
+                    bodyBuffer = null;
+                }
+            }
         }
 
 
@@ -1009,6 +1044,21 @@ public abstract class Http2TestBase extends TomcatBaseTest {
                 data[1] = (byte) ((i >> 8) & 0xFF);
                 os.write(data);
             }
+        }
+    }
+
+
+    private static class CookieServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+            resp.getWriter().print("Cookie count: " + req.getCookies().length);
+            resp.flushBuffer();
         }
     }
 
