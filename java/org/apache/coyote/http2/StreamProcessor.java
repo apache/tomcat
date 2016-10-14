@@ -221,6 +221,7 @@ class StreamProcessor extends AbstractProcessor implements Runnable {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("streamProcessor.service.error"), e);
             }
+            response.setStatus(500);
             setErrorState(ErrorState.CLOSE_NOW, e);
         }
 
