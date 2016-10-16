@@ -355,7 +355,7 @@ public class Http11OutputBuffer implements OutputBuffer {
             write(Constants._404_BYTES);
             break;
         default:
-            write(String.valueOf(status));
+            write(status);
         }
 
         headerBuffer[pos++] = Constants.SP;
@@ -458,29 +458,18 @@ public class Http11OutputBuffer implements OutputBuffer {
 
 
     /**
-     * This method will write the contents of the specified String to the
-     * output stream, without filtering. This method is meant to be used to
-     * write the response header.
+     * This method will write the specified integer to the output stream. This
+     * method is meant to be used to write the response header.
      *
-     * @param s data to be written
+     * @param value data to be written
      */
-    private void write(String s) {
-        if (s == null) {
-            return;
-        }
-
+    private void write(int value) {
         // From the Tomcat 3.3 HTTP/1.0 connector
+        String s = Integer.toString(value);
         int len = s.length();
         checkLengthBeforeWrite(len);
         for (int i = 0; i < len; i++) {
             char c = s.charAt (i);
-            // Note:  This is clearly incorrect for many strings,
-            // but is the only consistent approach within the current
-            // servlet framework.  It must suffice until servlet output
-            // streams properly encode their output.
-            if (((c <= 31) && (c != 9)) || c == 127 || c > 255) {
-                c = ' ';
-            }
             headerBuffer[pos++] = (byte) c;
         }
     }
