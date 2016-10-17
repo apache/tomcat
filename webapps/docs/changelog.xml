@@ -103,6 +103,10 @@
         return a 500 response when an unhandled exception occurs during request
         processing. (markt)
       </fix>
+      <fix>
+        Correct the HTTP header parser so that DEL is not treated as a valid
+        token character. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
