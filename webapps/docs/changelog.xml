@@ -76,6 +76,10 @@
         <bug>60161</bug>: Allow creating subcategories of the container logger,
         and use it for the rewrite valve. (remm)
       </fix>
+      <fix>
+        Correctly test for control characters when reading the provided shutdown
+        password. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
