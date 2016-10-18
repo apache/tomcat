@@ -114,11 +114,6 @@ class StreamStateMachine {
     }
 
 
-    final synchronized boolean canRead() {
-        return state.canRead();
-    }
-
-
     final synchronized boolean canWrite() {
         return state.canWrite();
     }
@@ -189,10 +184,6 @@ class StreamStateMachine {
 
         public boolean isActive() {
             return canWrite || canRead;
-        }
-
-        public boolean canRead() {
-            return canRead;
         }
 
         public boolean canWrite() {
