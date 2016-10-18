@@ -1167,7 +1167,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     @Override
-    public void receiveEndOfStream(int streamId) throws ConnectionException {
+    public void receivedEndOfStream(int streamId) throws ConnectionException {
         Stream stream = getStream(streamId, connectionState.get().isNewStreamAllowed());
         if (stream != null) {
             stream.receivedEndOfStream();
@@ -1247,7 +1247,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         setMaxProcessedStream(streamId);
         Stream stream = getStream(streamId, connectionState.get().isNewStreamAllowed());
         if (stream != null && stream.isActive()) {
-            stream.headersEnd();
+            stream.receivedEndOfHeaders();
             processStreamOnContainerThread(stream);
         }
     }

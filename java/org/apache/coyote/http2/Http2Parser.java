@@ -172,7 +172,7 @@ class Http2Parser {
                 swallow(streamId, padLength, true);
             }
             if (endOfStream) {
-                output.receiveEndOfStream(streamId);
+                output.receivedEndOfStream(streamId);
             }
         } else {
             synchronized (dest) {
@@ -183,7 +183,7 @@ class Http2Parser {
                     swallow(streamId, padLength, true);
                 }
                 if (endOfStream) {
-                    output.receiveEndOfStream(streamId);
+                    output.receivedEndOfStream(streamId);
                 }
                 output.endRequestBodyFrame(streamId);
             }
@@ -411,7 +411,7 @@ class Http2Parser {
         output.headersEnd(streamId);
 
         if (headersEndStream) {
-            output.receiveEndOfStream(streamId);
+            output.receivedEndOfStream(streamId);
             headersEndStream = false;
         }
     }
@@ -580,7 +580,7 @@ class Http2Parser {
         // Data frames
         ByteBuffer startRequestBodyFrame(int streamId, int payloadSize) throws Http2Exception;
         void endRequestBodyFrame(int streamId) throws Http2Exception;
-        void receiveEndOfStream(int streamId) throws ConnectionException;
+        void receivedEndOfStream(int streamId) throws ConnectionException;
         void swallowedPadding(int streamId, int paddingLength) throws ConnectionException, IOException;
 
         // Header frames
