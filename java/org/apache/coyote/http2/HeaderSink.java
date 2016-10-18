@@ -29,4 +29,9 @@ class HeaderSink implements HeaderEmitter {
     public void emitHeader(String name, String value) {
         // NO-OP
     }
+
+    @Override
+    public void validateHeaders() throws StreamException {
+        // NO-OP
+    }
 }

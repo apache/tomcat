@@ -79,6 +79,10 @@ public class TestHpack {
         public void emitHeader(String name, String value) {
             headers.setValue(name).setString(value);
         }
+        @Override
+        public void validateHeaders() throws StreamException {
+            // NO-OP
+        }
     }
 
     // TODO: Write more complete tests

@@ -40,6 +40,11 @@ class Stream extends AbstractStream implements HeaderEmitter {
     private static final Log log = LogFactory.getLog(Stream.class);
     private static final StringManager sm = StringManager.getManager(Stream.class);
 
+    private static final int HEADER_STATE_START = 0;
+    private static final int HEADER_STATE_PSEUDO = 1;
+    private static final int HEADER_STATE_REGULAR = 2;
+    private static final int HEADER_STATE_TRAILER = 3;
+
     private static final Response ACK_RESPONSE = new Response();
 
     static {
@@ -50,6 +55,9 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
     private final Http2UpgradeHandler handler;
     private final StreamStateMachine state;
+    // State machine would be too much overhead
+    private int headerState = HEADER_STATE_START;
+    private String headerStateErrorMsg = null;
     // TODO: null these when finished to reduce memory used by closed stream
     private final Request coyoteRequest;
     private StringBuilder cookieHeader = null;
@@ -196,6 +204,25 @@ class Stream extends AbstractStream implements HeaderEmitter {
                     name, value));
         }
 
+        if (headerStateErrorMsg != null) {
+            // Don't bother processing the header since the stream is going to
+            // be reset anyway
+            return;
+        }
+
+        boolean pseudoHeader = name.charAt(0) == ':';
+
+        if (pseudoHeader && headerState != HEADER_STATE_PSEUDO) {
+            headerStateErrorMsg = sm.getString("stream.header.unexpectedPseudoHeader",
+                    getConnectionId(), getIdentifier(), name);
+            // No need for further processing. The stream will be reset.
+            return;
+        }
+
+        if (headerState == HEADER_STATE_PSEUDO && !pseudoHeader) {
+            headerState = HEADER_STATE_REGULAR;
+        }
+
         switch(name) {
         case ":method": {
             coyoteRequest.method().setString(value);
@@ -244,10 +271,25 @@ class Stream extends AbstractStream implements HeaderEmitter {
             if ("expect".equals(name) && "100-continue".equals(value)) {
                 coyoteRequest.setExpectation(true);
             }
+            if (pseudoHeader) {
+                headerStateErrorMsg = sm.getString("stream.header.unknownPseudoHeader",
+                        getConnectionId(), getIdentifier(), name);
+            }
             // Assume other HTTP header
             coyoteRequest.getMimeHeaders().addValue(name).setString(value);
         }
         }
+    }
+
+
+    @Override
+    public void validateHeaders() throws StreamException {
+        if (headerStateErrorMsg == null) {
+            return;
+        }
+
+        throw new StreamException(headerStateErrorMsg, Http2Error.PROTOCOL_ERROR,
+                getIdentifier().intValue());
     }
 
 
@@ -308,6 +350,13 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
 
     final void receivedStartOfHeaders() {
+        if (headerState == HEADER_STATE_START) {
+            headerState = HEADER_STATE_PSEUDO;
+        } else if (headerState == HEADER_STATE_PSEUDO || headerState == HEADER_STATE_REGULAR) {
+            headerState = HEADER_STATE_TRAILER;
+        }
+        // Parser will catch attempt to send a headers frame after the stream
+        // has closed.
         state.receivedStartOfHeaders();
     }
 
