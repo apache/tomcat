@@ -104,6 +104,10 @@
       <add>
         Add the JASPIC API jar to the Maven Central publication script. (markt)
       </add>
+      <fix>
+        Remove classes from tomcat-util-scan.jar that are duplicates of those in
+        tomcat-util.jar. (markt)
+      </fix>
     </chnagelog>
   </subsection>
 </section>

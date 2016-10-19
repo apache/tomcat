@@ -378,7 +378,6 @@
   <patternset id="files.tomcat-util-scan">
     <include name="org/apache/tomcat/util/descriptor/**" />
     <include name="org/apache/tomcat/util/digester/**" />
-    <include name="org/apache/tomcat/util/file/**" />
     <include name="org/apache/tomcat/util/scan/**" />
   </patternset>
 
