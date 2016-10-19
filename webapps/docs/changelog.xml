@@ -99,6 +99,13 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <chnagelog>
+      <add>
+        Add the JASPIC API jar to the Maven Central publication script. (markt)
+      </add>
+    </chnagelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.6" rtext="2016-10-10">
   <subsection name="Catalina">
