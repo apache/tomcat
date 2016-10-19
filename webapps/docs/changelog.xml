@@ -112,8 +112,7 @@
         token character. (markt)
       </fix>
       <add>
-        Add addition checks around the handling of HTTP/2 pseudo headers.
-        (markt)
+        Add checks around the handling of HTTP/2 pseudo headers. (markt)
       </add>
       <add>
         Add support for trailer headers to the HTTP/2 implementation. (markt)
