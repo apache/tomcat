@@ -504,8 +504,10 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                             log.warn("StandardServer.await: read: ", e);
                             ch = -1;
                         }
-                        if (ch < 32)  // Control character or EOF terminates loop
+                        // Control character or EOF (-1) terminates loop
+                        if (ch < 32 || ch == 127) {
                             break;
+                        }
                         command.append((char) ch);
                         expected--;
                     }

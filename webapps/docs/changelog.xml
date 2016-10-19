@@ -78,6 +78,10 @@
         <bug>60199</bug>: Log a warning if deserialization issues prevent a
         session attribute from being loaded. (markt)
       </fix>
+      <fix>
+        Correctly test for control characters when reading the provided shutdown
+        password. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
