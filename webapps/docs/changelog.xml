@@ -91,6 +91,10 @@
         <bug>60174</bug>: Log instances of <code>HeadersTooLargeException</code>
         during request processing. (markt)
       </fix>
+      <fix>
+        Correct the HTTP header parser so that DEL is not treated as a valid
+        token character. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
