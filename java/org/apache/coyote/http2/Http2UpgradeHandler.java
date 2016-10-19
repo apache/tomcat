@@ -1266,8 +1266,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         setMaxProcessedStream(streamId);
         Stream stream = getStream(streamId, connectionState.get().isNewStreamAllowed());
         if (stream != null && stream.isActive()) {
-            stream.receivedEndOfHeaders();
-            processStreamOnContainerThread(stream);
+            if (stream.receivedEndOfHeaders()) {
+                processStreamOnContainerThread(stream);
+            }
         }
     }
 

@@ -305,13 +305,14 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    final void receivedEndOfHeaders() {
+    final boolean receivedEndOfHeaders() {
         // Cookie headers need to be concatenated into a single header
         // See RFC 7540 8.1.2.5
         // Can only do this once the headers are fully received
         if (cookieHeader != null) {
             coyoteRequest.getMimeHeaders().addValue("cookie").setString(cookieHeader.toString());
         }
+        return headerState == HEADER_STATE_REGULAR || headerState == HEADER_STATE_PSEUDO;
     }
 
 
@@ -375,6 +376,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     void receivedEndOfStream() {
+        synchronized (inputBuffer) {
+            inputBuffer.notifyAll();
+        }
         state.recievedEndOfStream();
     }
 

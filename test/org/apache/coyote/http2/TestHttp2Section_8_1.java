@@ -33,6 +33,44 @@ import org.junit.Test;
 public class TestHttp2Section_8_1 extends Http2TestBase {
 
     @Test
+    public void testPostWithTrailerHeaders() throws Exception {
+        http2Connect();
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        byte[] dataFrameHeader = new byte[9];
+        ByteBuffer dataPayload = ByteBuffer.allocate(256);
+        byte[] trailerFrameHeader = new byte[9];
+        ByteBuffer trailerPayload = ByteBuffer.allocate(256);
+
+        buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload,
+                null, trailerFrameHeader, trailerPayload, 3);
+
+        // Write the headers
+        writeFrame(headersFrameHeader, headersPayload);
+        // Body
+        writeFrame(dataFrameHeader, dataPayload);
+        // Trailers
+        writeFrame(trailerFrameHeader, trailerPayload);
+
+        parser.readFrame(true);
+        parser.readFrame(true);
+        parser.readFrame(true);
+        parser.readFrame(true);
+
+        Assert.assertEquals("0-WindowSize-[256]\n" +
+                "3-WindowSize-[256]\n" +
+                "3-HeadersStart\n" +
+                "3-Header-[:status]-[200]\n" +
+                "3-Header-[date]-["+ DEFAULT_DATE + "]\n" +
+                "3-HeadersEnd\n" +
+                "3-Body-260\n" +
+                "3-EndOfStream\n",
+                output.getTrace());
+    }
+
+
+    @Test
     public void testSendAck() throws Exception {
         http2Connect();
 
