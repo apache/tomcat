@@ -98,6 +98,9 @@
         Correct the HTTP header parser so that DEL is not treated as a valid
         token character. (markt) 
       </fix>
+      <add>
+        Add checks around the handling of HTTP/2 pseudo headers. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -24,6 +24,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import javax.net.SocketFactory;
@@ -170,14 +172,25 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     protected void buildGetRequest(byte[] frameHeader, ByteBuffer headersPayload, byte[] padding,
             int streamId, String url) {
+        List<Header> headers = new ArrayList<>(3);
+        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":path", url));
+        headers.add(new Header(":authority", "localhost:" + getPort()));
+
+        buildGetRequest(frameHeader, headersPayload, padding, headers, streamId);
+    }
+
+
+    protected void buildGetRequest(byte[] frameHeader, ByteBuffer headersPayload, byte[] padding,
+            List<Header> headers, int streamId) {
         if (padding != null) {
             headersPayload.put((byte) (0xFF & padding.length));
         }
-        MimeHeaders headers = new MimeHeaders();
-        headers.addValue(":method").setString("GET");
-        headers.addValue(":path").setString(url);
-        headers.addValue(":authority").setString("localhost:" + getPort());
-        hpackEncoder.encode(headers, headersPayload);
+        MimeHeaders mimeHeaders = new MimeHeaders();
+        for (Header header : headers) {
+            mimeHeaders.addValue(header.getName()).setString(header.getValue());
+        }
+        hpackEncoder.encode(mimeHeaders, headersPayload);
         if (padding != null) {
             headersPayload.put(padding);
         }
@@ -197,10 +210,21 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     protected void buildSimpleGetRequestPart1(byte[] frameHeader, ByteBuffer headersPayload,
             int streamId) {
-        MimeHeaders headers = new MimeHeaders();
-        headers.addValue(":method").setString("GET");
-        headers.addValue(":path").setString("/simple");
-        hpackEncoder.encode(headers, headersPayload);
+        List<Header> headers = new ArrayList<>(3);
+        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":path", "/simple"));
+
+        buildSimpleGetRequestPart1(frameHeader, headersPayload, headers, streamId);
+    }
+
+
+    protected void buildSimpleGetRequestPart1(byte[] frameHeader, ByteBuffer headersPayload,
+            List<Header> headers, int streamId) {
+        MimeHeaders mimeHeaders = new MimeHeaders();
+        for (Header header : headers) {
+            mimeHeaders.addValue(header.getName()).setString(header.getValue());
+        }
+        hpackEncoder.encode(mimeHeaders, headersPayload);
 
         headersPayload.flip();
 
@@ -215,9 +239,20 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     protected void buildSimpleGetRequestPart2(byte[] frameHeader, ByteBuffer headersPayload,
             int streamId) {
-        MimeHeaders headers = new MimeHeaders();
-        headers.addValue(":authority").setString("localhost:" + getPort());
-        hpackEncoder.encode(headers, headersPayload);
+        List<Header> headers = new ArrayList<>(3);
+        headers.add(new Header(":authority", "localhost:" + getPort()));
+
+        buildSimpleGetRequestPart2(frameHeader, headersPayload, headers, streamId);
+    }
+
+
+    protected void buildSimpleGetRequestPart2(byte[] frameHeader, ByteBuffer headersPayload,
+            List<Header> headers, int streamId) {
+        MimeHeaders mimeHeaders = new MimeHeaders();
+        for (Header header : headers) {
+            mimeHeaders.addValue(header.getName()).setString(header.getValue());
+        }
+        hpackEncoder.encode(mimeHeaders, headersPayload);
 
         headersPayload.flip();
 
@@ -856,12 +891,18 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void emitHeader(String name, String value, boolean neverIndex) {
+        public void emitHeader(String name, String value) {
             // Date headers will always change so use a hard-coded default
             if ("date".equals(name)) {
                 value = DEFAULT_DATE;
             }
             trace.append(lastStreamId + "-Header-[" + name + "]-[" + value + "]\n");
+        }
+
+
+        @Override
+        public void validateHeaders() {
+            // NO-OP: Accept anything the server sends for the unit tests
         }
 
 
@@ -1077,6 +1118,25 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         }
 
         public long getValue() {
+            return value;
+        }
+    }
+
+
+    static class Header {
+        private final String name;
+        private final String value;
+
+        public Header(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getValue() {
             return value;
         }
     }

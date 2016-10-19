@@ -397,6 +397,8 @@ class Http2Parser {
             headerReadBuffer.compact();
             payloadSize -= toRead;
         }
+
+        hpackDecoder.getHeaderEmitter().validateHeaders();
     }
 
 
