@@ -17,7 +17,14 @@
 package org.apache.coyote.http2;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.coyote.Adapter;
 import org.apache.coyote.Processor;
@@ -54,6 +61,9 @@ public class Http2Protocol implements UpgradeProtocol {
     // If a lower initial value is required, set it here but DO NOT change the
     // default defined above.
     private int initialWindowSize = DEFAULT_INITIAL_WINDOW_SIZE;
+    private Set<String> allowedTrailerHeaders =
+            Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+
 
     @Override
     public String getHttpUpgradeName(boolean isSSLEnabled) {
@@ -93,7 +103,7 @@ public class Http2Protocol implements UpgradeProtocol {
         result.setMaxConcurrentStreams(getMaxConcurrentStreams());
         result.setMaxConcurrentStreamExecution(getMaxConcurrentStreamExecution());
         result.setInitialWindowSize(getInitialWindowSize());
-
+        result.setAllowedTrailerHeaders(allowedTrailerHeaders);
         return result;
     }
 
@@ -177,5 +187,44 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public void setInitialWindowSize(int initialWindowSize) {
         this.initialWindowSize = initialWindowSize;
+    }
+
+
+    public void setAllowedTrailerHeaders(String commaSeparatedHeaders) {
+        // Jump through some hoops so we don't end up with an empty set while
+        // doing updates.
+        Set<String> toRemove = new HashSet<>();
+        toRemove.addAll(allowedTrailerHeaders);
+        if (commaSeparatedHeaders != null) {
+            String[] headers = commaSeparatedHeaders.split(",");
+            for (String header : headers) {
+                String trimmedHeader = header.trim().toLowerCase(Locale.ENGLISH);
+                if (toRemove.contains(trimmedHeader)) {
+                    toRemove.remove(trimmedHeader);
+                } else {
+                    allowedTrailerHeaders.add(trimmedHeader);
+                }
+            }
+            allowedTrailerHeaders.removeAll(toRemove);
+        }
+    }
+
+
+    public String getAllowedTrailerHeaders() {
+        // Chances of a size change between these lines are small enough that a
+        // sync is unnecessary.
+        List<String> copy = new ArrayList<>(allowedTrailerHeaders.size());
+        copy.addAll(allowedTrailerHeaders);
+        StringBuilder result = new StringBuilder();
+        boolean first = true;
+        for (String header : copy) {
+            if (first) {
+                first = false;
+            } else {
+                result.append(',');
+            }
+            result.append(header);
+        }
+        return result.toString();
     }
 }

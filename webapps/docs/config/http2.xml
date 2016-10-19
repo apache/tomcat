@@ -71,6 +71,12 @@
 
   <attributes>
 
+    <attribute name="allowedTrailerHeaders" required="false">
+      <p>By default Tomcat will ignore all trailer headers when processing
+      HTTP/2 connections. For a header to be processed, it must be added to this
+      comma-separated list of header names.</p>
+    </attribute>
+
     <attribute name="initialWindowSize" required="false">
       <p>Controls the initial size of the flow control window for streams that
       Tomcat advertises to clients. If not specified, the default value of
