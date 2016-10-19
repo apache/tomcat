@@ -44,7 +44,8 @@
     </menu>
 
     <menu name="Connectors">
-        <item name="HTTP"                  href="http.html"/>
+        <item name="HTTP/1.1"              href="http.html"/>
+        <item name="HTTP/2"                href="http2.html"/>
         <item name="AJP"                   href="ajp.html"/>
     </menu>
 
