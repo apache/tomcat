@@ -280,6 +280,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             break;
         }
         default: {
+            if (headerState == HEADER_STATE_TRAILER && !handler.isTrailerHeaderAllowed(name)) {
+                break;
+            }
             if ("expect".equals(name) && "100-continue".equals(value)) {
                 coyoteRequest.setExpectation(true);
             }

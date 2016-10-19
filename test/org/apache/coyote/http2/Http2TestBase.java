@@ -69,7 +69,8 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.encodeBase64String(empty) + "\r\n";
     }
 
-    private static final String TRAILER_HEADER_NAME = "X-TrailerTest";
+    protected static final String TRAILER_HEADER_NAME = "X-TrailerTest";
+    protected static final String TRAILER_HEADER_VALUE = "test";
 
     private Socket s;
     protected HpackEncoder hpackEncoder;
@@ -354,7 +355,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         // Trailers
         if (trailersPayload != null) {
             MimeHeaders trailerHeaders = new MimeHeaders();
-            trailerHeaders.addValue(TRAILER_HEADER_NAME).setString("xxxx");
+            trailerHeaders.addValue(TRAILER_HEADER_NAME).setString(TRAILER_HEADER_VALUE);
             hpackEncoder.encode(trailerHeaders, trailersPayload);
 
             trailersPayload.flip();

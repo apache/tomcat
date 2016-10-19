@@ -34,7 +34,23 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
     @Test
     public void testPostWithTrailerHeaders() throws Exception {
+        doTestPostWithTrailerHeaders(true);
+    }
+
+
+    @Test
+    public void testPostWithTrailerHeadersBlocked() throws Exception {
+        doTestPostWithTrailerHeaders(false);
+    }
+
+
+    private void doTestPostWithTrailerHeaders(boolean allowTrailerHeader) throws Exception{
         http2Connect();
+        if (allowTrailerHeader) {
+            Http2Protocol http2Protocol =
+                    (Http2Protocol) getTomcatInstance().getConnector().findUpgradeProtocols()[0];
+            http2Protocol.setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
+        }
 
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
@@ -58,13 +74,22 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         parser.readFrame(true);
         parser.readFrame(true);
 
+        String len;
+        if (allowTrailerHeader) {
+            len = Integer.toString(256 + TRAILER_HEADER_VALUE.length());
+        } else {
+            len = "256";
+        }
+
         Assert.assertEquals("0-WindowSize-[256]\n" +
                 "3-WindowSize-[256]\n" +
                 "3-HeadersStart\n" +
                 "3-Header-[:status]-[200]\n" +
                 "3-Header-[date]-["+ DEFAULT_DATE + "]\n" +
                 "3-HeadersEnd\n" +
-                "3-Body-260\n" +
+                "3-Body-" +
+                len +
+                "\n" +
                 "3-EndOfStream\n",
                 output.getTrace());
     }

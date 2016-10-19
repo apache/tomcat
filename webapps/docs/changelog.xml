@@ -101,6 +101,9 @@
       <add>
         Add checks around the handling of HTTP/2 pseudo headers. (markt)
       </add>
+      <add>
+        Add support for trailer headers to the HTTP/2 implementation. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

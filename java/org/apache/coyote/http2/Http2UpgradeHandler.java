@@ -20,6 +20,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -144,6 +145,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     private int maxConcurrentStreamExecution = Http2Protocol.DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION;
     private AtomicInteger streamConcurrency = null;
     private Queue<StreamProcessor> queuedProcessors = null;
+
+    // Limits
+    private Set<String> allowedTrailerHeaders = Collections.emptySet();
+
 
     public Http2UpgradeHandler(Adapter adapter, Request coyoteRequest) {
         super (STREAM_ID_ZERO);
@@ -1056,6 +1061,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
+    boolean isTrailerHeaderAllowed(String headerName) {
+        return allowedTrailerHeaders.contains(headerName);
+    }
+
+
     // ------------------------------------------- Configuration getters/setters
 
     public long getReadTimeout() {
@@ -1100,6 +1110,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     public void setInitialWindowSize(int initialWindowSize) {
         localSettings.set(Setting.INITIAL_WINDOW_SIZE, initialWindowSize);
+    }
+
+
+    public void setAllowedTrailerHeaders(Set<String> allowedTrailerHeaders) {
+        this.allowedTrailerHeaders = allowedTrailerHeaders;
     }
 
 
