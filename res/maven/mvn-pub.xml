@@ -321,6 +321,10 @@
                   jarFileName="websocket-api.jar"
                srcJarFileName="websocket-api-src.jar"/>
 
+    <doMavenDeploy artifactId="tomcat-jaspic-api"
+                  jarFileName="jaspic-api.jar"
+               srcJarFileName="jaspic-api-src.jar"/>
+
     <doMavenDeploy artifactId="tomcat-api"/>
     <doMavenDeploy artifactId="tomcat-jni"/>
     <doMavenDeploy artifactId="tomcat-util"/>
