@@ -69,6 +69,8 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.encodeBase64String(empty) + "\r\n";
     }
 
+    private static final String TRAILER_HEADER_NAME = "X-TrailerTest";
+
     private Socket s;
     protected HpackEncoder hpackEncoder;
     protected Input input;
@@ -294,6 +296,13 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload,
             boolean useExpectation, byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding,
             int streamId) {
+        buildPostRequest(headersFrameHeader, headersPayload, useExpectation, dataFrameHeader,
+                dataPayload, padding, null, null, streamId);
+    }
+
+    protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload,
+            boolean useExpectation, byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding,
+            byte[] trailersFrameHeader, ByteBuffer trailersPayload, int streamId) {
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString("POST");
         headers.addValue(":path").setString("/simple");
@@ -332,12 +341,31 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         ByteUtil.setThreeBytes(dataFrameHeader, 0, dataPayload.limit());
         // Data is type 0
         // Flags: End of stream 1, Padding 8
-        if (padding == null) {
+        if (trailersPayload == null) {
             dataFrameHeader[4] = 0x01;
         } else {
-            dataFrameHeader[4] = 0x09;
+            dataFrameHeader[4] = 0x00;
+        }
+        if (padding != null) {
+            dataFrameHeader[4] += 0x08;
         }
         ByteUtil.set31Bits(dataFrameHeader, 5, streamId);
+
+        // Trailers
+        if (trailersPayload != null) {
+            MimeHeaders trailerHeaders = new MimeHeaders();
+            trailerHeaders.addValue(TRAILER_HEADER_NAME).setString("xxxx");
+            hpackEncoder.encode(trailerHeaders, trailersPayload);
+
+            trailersPayload.flip();
+
+            ByteUtil.setThreeBytes(trailersFrameHeader, 0, trailersPayload.limit());
+            trailersFrameHeader[3] = FrameType.HEADERS.getIdByte();
+            // Flags. end of headers (0x04) and end of stream (0x01)
+            trailersFrameHeader[4] = 0x05;
+            // Stream id
+            ByteUtil.set31Bits(trailersFrameHeader, 5, streamId);
+        }
     }
 
 
@@ -1049,6 +1077,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
             ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
             IOTools.flow(bais, resp.getOutputStream());
+
+            // Check for trailer headers
+            String trailerValue = req.getHeader(TRAILER_HEADER_NAME);
+            if (trailerValue != null) {
+                resp.getOutputStream().write(trailerValue.getBytes(StandardCharsets.UTF_8));
+            }
         }
     }
 
