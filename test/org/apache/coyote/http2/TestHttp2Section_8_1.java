@@ -31,12 +31,6 @@ import org.junit.Test;
 public class TestHttp2Section_8_1 extends Http2TestBase {
 
     @Test
-    public void testPostWithContinuation() throws Exception {
-        http2Connect();
-
-    }
-
-    @Test
     public void testSendAck() throws Exception {
         http2Connect();
 
