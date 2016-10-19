@@ -124,7 +124,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                     Long.toString(errorCode)));
         }
         // Set the new state first since read and write both check this
-        state.receiveReset();
+        state.receivedReset();
         // Reads wait internally so need to call a method to break the wait()
         if (inputBuffer != null) {
             inputBuffer.receiveReset();
@@ -263,7 +263,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    final void headersEnd() {
+    final void receivedEndOfHeaders() {
         // Cookie headers need to be concatenated into a single header
         // See RFC 7540 8.1.2.5
         // Can only do this once the headers are fully received

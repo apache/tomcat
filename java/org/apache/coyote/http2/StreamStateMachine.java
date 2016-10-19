@@ -104,7 +104,7 @@ public class StreamStateMachine {
     }
 
 
-    public synchronized void receiveReset() {
+    final synchronized void receivedReset() {
         stateChange(state, State.CLOSED_RST_RX);
     }
 

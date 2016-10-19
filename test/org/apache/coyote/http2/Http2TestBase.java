@@ -834,7 +834,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void receiveEndOfStream(int streamId) {
+        public void receivedEndOfStream(int streamId) {
             lastStreamId = Integer.toString(streamId);
             trace.append(lastStreamId + "-EndOfStream\n");
         }
