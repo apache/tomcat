@@ -125,7 +125,7 @@
     </changelog>
   </subsection>
   <subsection name="Other">
-    <chnagelog>
+    <changelog>
       <add>
         Add the JASPIC API jar to the Maven Central publication script. (markt)
       </add>
@@ -133,7 +133,7 @@
         Remove classes from tomcat-util-scan.jar that are duplicates of those in
         tomcat-util.jar. (markt)
       </fix>
-    </chnagelog>
+    </changelog>
   </subsection>
 </section>
 <section name="Tomcat 9.0.0.M11" rtext="2016-10-10">
