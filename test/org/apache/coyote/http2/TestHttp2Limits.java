@@ -241,8 +241,15 @@ public class TestHttp2Limits extends Http2TestBase {
             break;
         }
         case 2: {
-            // Expect an IOException caused by a connection reset
-            Assert.assertNotNull(e);
+            // Behaviour depends on timing. If reset is processed fast enough,
+            // frames will be swallowed before the connection reset limit is
+            // reached
+            if (e == null) {
+                parser.readFrame(true);
+                Assert.assertEquals("3-RST-[11]\n", output.getTrace());
+                Assert.assertNull(e);
+            }
+            // Else is non-null as expected for a connection reset
             break;
         }
         default: {
