@@ -104,6 +104,11 @@
       <add>
         Add support for trailer headers to the HTTP/2 implementation. (markt)
       </add>
+      <fix>
+        <bug>60232</bug>: When processing headers for an HTTP/2 stream, ensure
+        that the read buffer is large enough for the header being processed.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
