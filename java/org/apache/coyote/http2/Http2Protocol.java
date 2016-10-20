@@ -61,8 +61,11 @@ public class Http2Protocol implements UpgradeProtocol {
     // If a lower initial value is required, set it here but DO NOT change the
     // default defined above.
     private int initialWindowSize = DEFAULT_INITIAL_WINDOW_SIZE;
+    // Limits
     private Set<String> allowedTrailerHeaders =
             Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+    private int maxHeaderCount = Constants.DEFAULT_MAX_HEADER_COUNT;
+    private int maxHeaderSize = Constants.DEFAULT_MAX_HEADER_SIZE;
 
 
     @Override
@@ -104,6 +107,8 @@ public class Http2Protocol implements UpgradeProtocol {
         result.setMaxConcurrentStreamExecution(getMaxConcurrentStreamExecution());
         result.setInitialWindowSize(getInitialWindowSize());
         result.setAllowedTrailerHeaders(allowedTrailerHeaders);
+        result.setMaxHeaderCount(getMaxHeaderCount());
+        result.setMaxHeaderSize(getMaxHeaderSize());
         return result;
     }
 
@@ -226,5 +231,25 @@ public class Http2Protocol implements UpgradeProtocol {
             result.append(header);
         }
         return result.toString();
+    }
+
+
+    public void setMaxHeaderCount(int maxHeaderCount) {
+        this.maxHeaderCount = maxHeaderCount;
+    }
+
+
+    public int getMaxHeaderCount() {
+        return maxHeaderCount;
+    }
+
+
+    public void setMaxHeaderSize(int maxHeaderSize) {
+        this.maxHeaderSize = maxHeaderSize;
+    }
+
+
+    public int getMaxHeaderSize() {
+        return maxHeaderSize;
     }
 }
