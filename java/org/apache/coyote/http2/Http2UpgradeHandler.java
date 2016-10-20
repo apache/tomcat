@@ -1113,6 +1113,16 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
+    public void setMaxHeaderCount(int maxHeaderCount) {
+        getHpackDecoder().setMaxHeaderCount(maxHeaderCount);
+    }
+
+
+    public void setMaxHeaderSize(int maxHeaderSize) {
+        getHpackDecoder().setMaxHeaderSize(maxHeaderSize);
+    }
+
+
     // ----------------------------------------------- Http2Parser.Input methods
 
     @Override

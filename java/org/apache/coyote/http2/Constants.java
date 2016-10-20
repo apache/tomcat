@@ -23,4 +23,8 @@ public class Constants {
 
     // Parsing
     static final int DEFAULT_HEADER_READ_BUFFER_SIZE = 1024;
+
+    // Limits
+    static final int DEFAULT_MAX_HEADER_COUNT = 100;
+    static final int DEFAULT_MAX_HEADER_SIZE = 8 * 1024;
 }

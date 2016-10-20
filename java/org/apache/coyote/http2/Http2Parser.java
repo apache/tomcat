@@ -45,7 +45,7 @@ class Http2Parser {
             ByteBuffer.allocate(Constants.DEFAULT_HEADER_READ_BUFFER_SIZE);
     private volatile int headersCurrentStream = -1;
     private volatile boolean headersEndStream = false;
-
+    private volatile boolean streamReset = false;
 
     Http2Parser(String connectionId, Input input, Output output) {
         this.connectionId = connectionId;
@@ -243,7 +243,7 @@ class Http2Parser {
             payloadSize -= padLength;
         }
 
-        readHeaderPayload(payloadSize);
+        readHeaderPayload(streamId, payloadSize);
 
         swallow(streamId, padLength, true);
 
@@ -371,7 +371,7 @@ class Http2Parser {
                     Integer.toString(streamId)), Http2Error.PROTOCOL_ERROR);
         }
 
-        readHeaderPayload(payloadSize);
+        readHeaderPayload(streamId, payloadSize);
 
         if (Flags.isEndOfHeaders(flags)) {
             onHeadersComplete(streamId);
@@ -380,7 +380,13 @@ class Http2Parser {
     }
 
 
-    private void readHeaderPayload(int payloadSize) throws Http2Exception, IOException {
+    private void readHeaderPayload(int streamId, int payloadSize)
+            throws Http2Exception, IOException {
+
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("http2Parser.processFrameHeaders.payload", connectionId,
+                    Integer.valueOf(streamId), Integer.valueOf(payloadSize)));
+        }
 
         int remaining = payloadSize;
 
@@ -411,9 +417,27 @@ class Http2Parser {
                         sm.getString("http2Parser.processFrameHeaders.decodingFailed"),
                         Http2Error.COMPRESSION_ERROR);
             }
+
             // switches to write mode
             headerReadBuffer.compact();
             remaining -= toRead;
+
+            if (hpackDecoder.isHeaderCountExceeded() && !streamReset) {
+                streamReset = true;
+                throw new StreamException(sm.getString("http2Parser.headerLimitCount", connectionId,
+                        Integer.valueOf(streamId)), Http2Error.ENHANCE_YOUR_CALM, streamId);
+            }
+
+            if (hpackDecoder.isHeaderSizeExceeded(headerReadBuffer.position()) && !streamReset) {
+                streamReset = true;
+                throw new StreamException(sm.getString("http2Parser.headerLimitSize", connectionId,
+                        Integer.valueOf(streamId)), Http2Error.ENHANCE_YOUR_CALM, streamId);
+            }
+
+            if (hpackDecoder.isHeaderSwallowSizeExceeded(headerReadBuffer.position())) {
+                throw new ConnectionException(sm.getString("http2Parser.headerLimitSize",
+                        connectionId, Integer.valueOf(streamId)), Http2Error.ENHANCE_YOUR_CALM);
+            }
         }
 
         hpackDecoder.getHeaderEmitter().validateHeaders();
@@ -438,6 +462,11 @@ class Http2Parser {
         // Reset size for new request if the buffer was previously expanded
         if (headerReadBuffer.capacity() > Constants.DEFAULT_HEADER_READ_BUFFER_SIZE) {
             headerReadBuffer = ByteBuffer.allocate(Constants.DEFAULT_HEADER_READ_BUFFER_SIZE);
+        }
+
+        // Clear the 'stream has been reset' flag, if set
+        if (streamReset) {
+            streamReset = false;
         }
     }
 
