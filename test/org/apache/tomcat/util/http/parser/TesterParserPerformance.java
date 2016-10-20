@@ -51,6 +51,41 @@ public class TesterParserPerformance {
         return System.nanoTime() - start;
     }
 
+
+    @Test
+    public void testExceptionVsBoundsCheck() {
+        Lookup boundsCheck = new BooleanArrayLookupBoundsCheck();
+        Lookup exceptionCheck = new BooleanArrayLookupExceptionCheck();
+
+        int count = 10000;
+        int loops = 5;
+
+        // Warm up
+        doLookupTestCheck(boundsCheck, count, 0, 127);
+        doLookupTestCheck(exceptionCheck, count, 0, 127);
+        doLookupTestCheck(boundsCheck, count, 128, 255);
+        doLookupTestCheck(exceptionCheck, count, 128, 255);
+
+        for (int i = 0; i < loops; i++) {
+            System.out.println("Bounds:Valid     : " +  doLookupTestCheck(boundsCheck, count, 0, 127) + "ns");
+            System.out.println("ExceptionValid   : " +  doLookupTestCheck(exceptionCheck, count, 0, 127) + "ns");
+            System.out.println("Bounds:Invalid   : " +  doLookupTestCheck(boundsCheck, count, 128, 255) + "ns");
+            System.out.println("ExceptionInvalid : " +  doLookupTestCheck(exceptionCheck, count, 128, 255) + "ns");
+        }
+    }
+
+
+    private long doLookupTestCheck(Lookup lookup, int iterations, int testStart, int testEnd) {
+        long start = System.nanoTime();
+        for (int i = 0; i < iterations; i++) {
+            for (int j = testStart; j < testEnd; j++) {
+                lookup.doLookup(j);
+            }
+        }
+        return System.nanoTime() - start;
+    }
+
+
     private interface Lookup {
         boolean doLookup(int i);
     }
@@ -74,6 +109,35 @@ public class TesterParserPerformance {
         @Override
         public boolean doLookup(int i) {
             return values[i];
+        }
+    }
+
+
+    private static class BooleanArrayLookupBoundsCheck implements Lookup {
+
+        private boolean[] values = new boolean[128];
+
+        @Override
+        public boolean doLookup(int i) {
+            if (i < 0 || i > 127) {
+                return false;
+            }
+            return values[i];
+        }
+    }
+
+
+    private static class BooleanArrayLookupExceptionCheck implements Lookup {
+
+        private boolean[] values = new boolean[128];
+
+        @Override
+        public boolean doLookup(int i) {
+            try {
+                return values[i];
+            } catch (ArrayIndexOutOfBoundsException aioe) {
+                return false;
+            }
         }
     }
 }
