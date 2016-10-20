@@ -96,6 +96,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
         this.coyoteResponse.setOutputBuffer(outputBuffer);
         this.coyoteRequest.setResponse(coyoteResponse);
         this.coyoteRequest.protocol().setString("HTTP/2.0");
+        // Configure HTTP/2 limits
+        this.coyoteRequest.getCookies().setLimit(handler.getMaxCookieCount());
     }
 
 

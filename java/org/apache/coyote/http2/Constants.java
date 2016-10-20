@@ -27,4 +27,5 @@ public class Constants {
     // Limits
     static final int DEFAULT_MAX_HEADER_COUNT = 100;
     static final int DEFAULT_MAX_HEADER_SIZE = 8 * 1024;
+    static final int DEFAULT_MAX_COOKIE_COUNT = 200;
 }
