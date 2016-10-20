@@ -64,6 +64,7 @@ public class Http2Protocol implements UpgradeProtocol {
     // Limits
     private Set<String> allowedTrailerHeaders =
             Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+    private int maxCookieCount = Constants.DEFAULT_MAX_COOKIE_COUNT;
     private int maxHeaderCount = Constants.DEFAULT_MAX_HEADER_COUNT;
     private int maxHeaderSize = Constants.DEFAULT_MAX_HEADER_SIZE;
 
@@ -107,6 +108,7 @@ public class Http2Protocol implements UpgradeProtocol {
         result.setMaxConcurrentStreamExecution(getMaxConcurrentStreamExecution());
         result.setInitialWindowSize(getInitialWindowSize());
         result.setAllowedTrailerHeaders(allowedTrailerHeaders);
+        result.setMaxCookieCount(getMaxCookieCount());
         result.setMaxHeaderCount(getMaxHeaderCount());
         result.setMaxHeaderSize(getMaxHeaderSize());
         return result;
@@ -251,5 +253,15 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public int getMaxHeaderSize() {
         return maxHeaderSize;
+    }
+
+
+    public void setMaxCookieCount(int maxCookieCount) {
+        this.maxCookieCount = maxCookieCount;
+    }
+
+
+    public int getMaxCookieCount() {
+        return maxCookieCount;
     }
 }

@@ -18,9 +18,8 @@ package org.apache.coyote.http2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.junit.Assert;
@@ -170,7 +169,7 @@ public class TestHttp2Limits extends Http2TestBase {
             int maxHeaderCount, int maxHeaderSize, int delayms, int failMode) throws Exception {
 
         // Build the custom headers
-        Map<String,String> customHeaders = new HashMap<>();
+        List<String[]> customHeaders = new ArrayList<>();
         StringBuilder headerValue = new StringBuilder(headerSize);
         // Does not need to be secure
         Random r = new Random();
@@ -180,7 +179,7 @@ public class TestHttp2Limits extends Http2TestBase {
         }
         String v = headerValue.toString();
         for (int i = 0; i < headerCount; i++) {
-            customHeaders.put("X-TomcatTest" + i, v);
+            customHeaders.add(new String[] {"X-TomcatTest" + i, v});
         }
 
         enableHttp2();
@@ -205,9 +204,9 @@ public class TestHttp2Limits extends Http2TestBase {
         // Assumes at least one custom header and that all headers are the same
         // length. These assumptions are valid for these tests.
         ByteBuffer headersPayload = ByteBuffer.allocate(200 + (int) (customHeaders.size() *
-                customHeaders.values().iterator().next().length() * 1.2));
+                customHeaders.iterator().next()[1].length() * 1.2));
 
-        populateHeadersPayload(headersPayload, customHeaders);
+        populateHeadersPayload(headersPayload, customHeaders, "/simple");
 
         Exception e = null;
         try {
@@ -259,14 +258,14 @@ public class TestHttp2Limits extends Http2TestBase {
     }
 
 
-    private void populateHeadersPayload(ByteBuffer headersPayload, Map<String,String> customHeaders)
-            throws Exception {
+    private void populateHeadersPayload(ByteBuffer headersPayload, List<String[]> customHeaders,
+            String path) throws Exception {
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString("GET");
-        headers.addValue(":path").setString("/simple");
+        headers.addValue(":path").setString(path);
         headers.addValue(":authority").setString("localhost:" + getPort());
-        for (Entry<String,String> customHeader : customHeaders.entrySet()) {
-            headers.addValue(customHeader.getKey()).setString(customHeader.getValue());
+        for (String[] customHeader : customHeaders) {
+            headers.addValue(customHeader[0]).setString(customHeader[1]);
         }
         State state = hpackEncoder.encode(headers, headersPayload);
         if (state != State.COMPLETE) {
@@ -295,5 +294,104 @@ public class TestHttp2Limits extends Http2TestBase {
 
         // Stream id
         ByteUtil.set31Bits(frameHeader, 5, streamId);
+    }
+
+
+    @Test
+    public void testCookieLimit1() throws Exception {
+        doTestCookieLimit(1, 0);
+    }
+
+
+    @Test
+    public void testCookieLimit2() throws Exception {
+        doTestCookieLimit(2, 0);
+    }
+
+
+    @Test
+    public void testCookieLimit100() throws Exception {
+        doTestCookieLimit(100, 0);
+    }
+
+
+    @Test
+    public void testCookieLimit100WithLimit50() throws Exception {
+        doTestCookieLimit(100, 50, 1);
+    }
+
+
+    @Test
+    public void testCookieLimit200() throws Exception {
+        doTestCookieLimit(200, 0);
+    }
+
+
+    @Test
+    public void testCookieLimit201() throws Exception {
+        doTestCookieLimit(201, 1);
+    }
+
+
+    private void doTestCookieLimit(int cookieCount, int failMode) throws Exception {
+        doTestCookieLimit(cookieCount, Constants.DEFAULT_MAX_COOKIE_COUNT, failMode);
+    }
+
+
+    private void doTestCookieLimit(int cookieCount, int maxCookieCount, int failMode)
+            throws Exception {
+
+        enableHttp2();
+
+        Http2Protocol http2Protocol =
+                (Http2Protocol) getTomcatInstance().getConnector().findUpgradeProtocols()[0];
+        http2Protocol.setMaxCookieCount(maxCookieCount);
+
+        configureAndStartWebApplication();
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        output.setTraceBody(true);
+
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(8192);
+
+        List<String[]> customHeaders = new ArrayList<>();
+        for (int i = 0; i < cookieCount; i++) {
+            customHeaders.add(new String[] {"Cookie", "a" + cookieCount + "=b" + cookieCount});
+        }
+
+        populateHeadersPayload(headersPayload, customHeaders, "/cookie");
+        populateFrameHeader(frameHeader, 0, headersPayload.limit(), headersPayload.limit(), 3);
+
+        writeFrame(frameHeader, headersPayload);
+
+        switch (failMode) {
+        case 0: {
+            parser.readFrame(true);
+            parser.readFrame(true);
+            parser.readFrame(true);
+            System.out.println(output.getTrace());
+            Assert.assertEquals(getCookieResponseTrace(3, cookieCount), output.getTrace());
+            break;
+        }
+        case 1: {
+            // Check status is 500
+            parser.readFrame(true);
+            Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
+                    "3-HeadersStart\n3-Header-[:status]-[500]"));
+            output.clearTrace();
+            // Check EOS followed by reset is next
+            parser.readFrame(true);
+            parser.readFrame(true);
+            Assert.assertEquals("3-EndOfStream\n3-RST-[2]\n", output.getTrace());
+            break;
+        }
+        default: {
+            Assert.fail("Unknown failure mode specified");
+        }
+        }
     }
 }

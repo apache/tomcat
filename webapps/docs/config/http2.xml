@@ -105,6 +105,12 @@
       If not specified, the default value of <code>200</code> will be used.</p>
     </attribute>
 
+    <attribute name="maxCookieCount" required="false">
+      <p>The maximum number of cookies that are permitted for a request. A value
+      of less than zero means no limit. If not specified, a default value of 200
+      will be used.</p>
+    </attribute>
+
     <attribute name="maxHeaderCount" required="false">
       <p>The maximum number of headers in a request that is allowed by the
       container. A request that contains more headers than the specified limit

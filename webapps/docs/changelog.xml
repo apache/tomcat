@@ -109,6 +109,11 @@
         that the read buffer is large enough for the header being processed.
         (markt)
       </fix>
+      <add>
+        Add configuration options to the HTTP/2 implementation to control the
+        maximum number of headers allowed, the maximum size of headers allowed
+        and the maximum number of cookies allowed. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
