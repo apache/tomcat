@@ -852,7 +852,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest request, HttpServletResponse response)
                 throws ServletException, IOException {
-            boolean notify = Boolean.valueOf(request.getParameter("notify"));
+            boolean notify = Boolean.parseBoolean(request.getParameter("notify"));
             AsyncContext ctx = request.startAsync();
             ctx.setTimeout(1000);
             if (!notify) {
