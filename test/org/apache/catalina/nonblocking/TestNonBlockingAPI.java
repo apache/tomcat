@@ -23,9 +23,14 @@ import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.SocketFactory;
 import javax.servlet.AsyncContext;
@@ -41,6 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -769,4 +775,135 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
         return rc;
     }
+
+
+    @Ignore
+    @Test
+    public void testDelayedNBWrite() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctx = tomcat.addContext("", null);
+        CountDownLatch latch1 = new CountDownLatch(1);
+        DelayedNBWriteServlet servlet = new DelayedNBWriteServlet(latch1);
+        String servletName = DelayedNBWriteServlet.class.getName();
+        Tomcat.addServlet(ctx, servletName, servlet);
+        ctx.addServletMappingDecoded("/", servletName);
+
+        tomcat.start();
+
+        CountDownLatch latch2 = new CountDownLatch(2);
+        List<Throwable> exceptions = new ArrayList<>();
+
+        Thread t = new Thread(
+                new RequestExecutor("http://localhost:" + getPort() + "/", latch2, exceptions));
+        t.start();
+
+        latch1.await(3000, TimeUnit.MILLISECONDS);
+
+        Thread t1 = new Thread(new RequestExecutor(
+                "http://localhost:" + getPort() + "/?notify=true", latch2, exceptions));
+        t1.start();
+
+        latch2.await(3000, TimeUnit.MILLISECONDS);
+
+        if (exceptions.size() > 0) {
+            Assert.fail();
+        }
+    }
+
+    private static final class RequestExecutor implements Runnable {
+        private final String url;
+        private final CountDownLatch latch;
+        private final List<Throwable> exceptions;
+
+        public RequestExecutor(String url, CountDownLatch latch, List<Throwable> exceptions) {
+            this.url = url;
+            this.latch = latch;
+            this.exceptions = exceptions;
+        }
+
+        @Override
+        public void run() {
+            try {
+                ByteChunk result = new ByteChunk();
+                int rc = getUrl(url, result, null);
+                Assert.assertTrue(rc == HttpServletResponse.SC_OK);
+                Assert.assertTrue(result.toString().contains("OK"));
+            } catch (Throwable e) {
+                e.printStackTrace();
+                exceptions.add(e);
+            } finally {
+                latch.countDown();
+            }
+        }
+
+    }
+
+    @WebServlet(asyncSupported = true)
+    private static final class DelayedNBWriteServlet extends TesterServlet {
+        private static final long serialVersionUID = 1L;
+        private final Set<Emitter> emitters = new HashSet<>();
+        private final CountDownLatch latch;
+
+        public DelayedNBWriteServlet(CountDownLatch latch) {
+            this.latch = latch;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException {
+            boolean notify = Boolean.valueOf(request.getParameter("notify"));
+            AsyncContext ctx = request.startAsync();
+            ctx.setTimeout(1000);
+            if (!notify) {
+                emitters.add(new Emitter(ctx));
+                latch.countDown();
+            } else {
+                for (Emitter e : emitters) {
+                    e.emit();
+                }
+                response.getOutputStream().println("OK");
+                response.getOutputStream().flush();
+                ctx.complete();
+            }
+        }
+
+    }
+
+    private static final class Emitter {
+        private final AsyncContext ctx;
+
+        Emitter(AsyncContext ctx) {
+            this.ctx = ctx;
+        }
+
+        void emit() throws IOException {
+            ctx.getResponse().getOutputStream().setWriteListener(new WriteListener() {
+                private boolean written = false;
+
+                @Override
+                public void onWritePossible() throws IOException {
+                    ServletOutputStream out = ctx.getResponse().getOutputStream();
+                    if (out.isReady() && !written) {
+                        out.println("OK");
+                        written = true;
+                    }
+                    if (out.isReady() && written) {
+                        out.flush();
+                        if (out.isReady()) {
+                            ctx.complete();
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                    t.printStackTrace();
+                }
+
+            });
+        }
+
+    }
+
 }
