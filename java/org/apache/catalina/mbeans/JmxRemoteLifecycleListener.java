@@ -66,7 +66,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
     private static final Log log = LogFactory.getLog(JmxRemoteLifecycleListener.class);
 
     protected static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+            StringManager.getManager(JmxRemoteLifecycleListener.class);
 
     protected String rmiBindAddress = null;
     protected int rmiRegistryPortPlatform = -1;
@@ -366,7 +366,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
 
         private static final String FORCED_HOST = "localhost";
 
-        private RMIClientSocketFactory factory = null;
+        private final RMIClientSocketFactory factory;
 
         public RmiClientLocalhostSocketFactory(RMIClientSocketFactory theFactory) {
             factory = theFactory;
