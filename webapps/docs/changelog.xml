@@ -101,19 +101,6 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="jdbc-pool">
-    <changelog>
-      <fix>
-        <bug>60099</bug>: Ensure that use all method arguments as a cache key
-        when using <code>StatementCache</code>. (kfujino)
-      </fix>
-      <fix>
-        <bug>60139</bug>: Correct Javadocs for
-        <code>PoolConfiguration.getValidationInterval</code> and
-        <code>setValidationInterval</code>. Reported by Phillip Webb. (kfujino)
-      </fix>
-    </changelog>
-  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
@@ -128,6 +115,19 @@
       <fix>
         Correct a typo in HTTP Connector How-To.
         Issue reported via comments.apache.org. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>60099</bug>: Ensure that use all method arguments as a cache key
+        when using <code>StatementCache</code>. (kfujino)
+      </fix>
+      <fix>
+        <bug>60139</bug>: Correct Javadocs for
+        <code>PoolConfiguration.getValidationInterval</code> and
+        <code>setValidationInterval</code>. Reported by Phillip Webb. (kfujino)
       </fix>
     </changelog>
   </subsection>
