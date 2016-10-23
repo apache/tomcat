@@ -132,7 +132,7 @@ public final class UriUtil {
 
     /**
      * Convert a URL of the form <code>war:file:...</code> to
-     * <code>war:file:...</code>.
+     * <code>jar:file:...</code>.
      *
      * @param warUrl The WAR URL to convert
      *
