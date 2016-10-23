@@ -125,6 +125,10 @@
         <bug>60192</bug>: Correct a typo in the status output of the Manager
         application. Patch provided by  Radhakrishna Pemmasani. (markt)
       </fix>
+      <fix>
+        Correct a typo in HTTP Connector How-To.
+        Issue reported via comments.apache.org. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
