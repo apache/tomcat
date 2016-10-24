@@ -65,6 +65,11 @@
         localized when using <code>OneLineFormatter</code>. Patch provided by
         Tatsuya Bessho. (kfujino)
       </fix>
+      <add>
+        <bug>60151</bug>: Improve the exception error messages when a
+        <code>ResourceLink</code> fails to specify the type, specifies an
+        unknown type or specifies the wrong type. (markt)
+      </add>
       <fix>
         <bug>60167</bug>: Ignore empty lines in <code>/etc/passwd</code> files
         when using the <code>PasswdUserDatabase</code>. (markt)
@@ -169,11 +174,10 @@
         Ensure that the <code>POOL_EMPTY</code> notification has been added to
         the jmx notification types. (kfujino)
       </fix>
-      <add>
-        <bug>60151</bug>: Improve the exception error messages when a
-        <code>ResourceLink</code> fails to specify the type, specifies an
-        unknown type or specifies the wrong type. (markt)
-      </add>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
       <update>
         Update the packaged version of the Tomcat Native Library to 1.2.10 to
         pick up the latest Windows binaries built with OpenSSL 1.0.2j. (markt)
