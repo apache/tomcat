@@ -138,7 +138,6 @@ public class Tomcat {
     protected Server server;
     protected Service service;
     protected Engine engine;
-    protected Connector connector; // for more - customize the classes
 
     // To make it a bit easier to config for the common case
     // ( one host, one context ).
@@ -417,23 +416,32 @@ public class Tomcat {
      * @return A connector object that can be customized
      */
     public Connector getConnector() {
-        getServer();
-        if (connector != null) {
-            return connector;
+        Service service = getService();
+        if (service.findConnectors().length > 0) {
+            return service.findConnectors()[0];
         }
 
         // The same as in standard Tomcat configuration.
         // This creates an APR HTTP connector if AprLifecycleListener has been
         // configured (created) and Tomcat Native library is available.
         // Otherwise it creates a NIO HTTP connector.
-        connector = new Connector("HTTP/1.1");
+        Connector connector = new Connector("HTTP/1.1");
         connector.setPort(port);
-        service.addConnector( connector );
+        service.addConnector(connector);
         return connector;
     }
 
     public void setConnector(Connector connector) {
-        this.connector = connector;
+        Service service = getService();
+        boolean found = false;
+        for (Connector serviceConnector : service.findConnectors()) {
+            if (connector == serviceConnector) {
+                found = true;
+            }
+        }
+        if (!found) {
+            service.addConnector(connector);
+        }
     }
 
     /**

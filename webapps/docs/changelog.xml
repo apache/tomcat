@@ -71,6 +71,9 @@
         Correctly test for control characters when reading the provided shutdown
         password. (markt)
       </fix>
+      <fix>
+        <bug>60297</bug>: Simplify connector creation in embedded mode. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
