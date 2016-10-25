@@ -199,11 +199,13 @@ class Http2Parser {
     private void readHeadersFrame(int streamId, int flags, int payloadSize)
             throws Http2Exception, IOException {
 
+        headersEndStream = Flags.isEndOfStream(flags);
+
         if (hpackDecoder == null) {
             hpackDecoder = output.getHpackDecoder();
         }
         try {
-            hpackDecoder.setHeaderEmitter(output.headersStart(streamId));
+            hpackDecoder.setHeaderEmitter(output.headersStart(streamId, headersEndStream));
         } catch (StreamException se) {
             swallow(streamId, payloadSize, false);
             throw se;
@@ -246,8 +248,6 @@ class Http2Parser {
         readHeaderPayload(streamId, payloadSize);
 
         swallow(streamId, padLength, true);
-
-        headersEndStream = Flags.isEndOfStream(flags);
 
         if (Flags.isEndOfHeaders(flags)) {
             onHeadersComplete(streamId);
@@ -630,7 +630,7 @@ class Http2Parser {
         void swallowedPadding(int streamId, int paddingLength) throws ConnectionException, IOException;
 
         // Header frames
-        HeaderEmitter headersStart(int streamId) throws Http2Exception;
+        HeaderEmitter headersStart(int streamId, boolean headersEndStream) throws Http2Exception;
         void headersEnd(int streamId) throws ConnectionException;
 
         // Priority frames (also headers)

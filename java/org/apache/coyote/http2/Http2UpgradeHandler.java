@@ -1290,14 +1290,14 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
-    public HeaderEmitter headersStart(int streamId) throws Http2Exception {
+    public HeaderEmitter headersStart(int streamId, boolean headersEndStream) throws Http2Exception {
         if (connectionState.get().isNewStreamAllowed()) {
             Stream stream = getStream(streamId, false);
             if (stream == null) {
                 stream = createRemoteStream(streamId);
             }
             stream.checkState(FrameType.HEADERS);
-            stream.receivedStartOfHeaders();
+            stream.receivedStartOfHeaders(headersEndStream);
             closeIdleStreams(streamId);
             if (localSettings.getMaxConcurrentStreams() < activeRemoteStreamCount.incrementAndGet()) {
                 activeRemoteStreamCount.decrementAndGet();
