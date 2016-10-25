@@ -356,15 +356,21 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    final void receivedStartOfHeaders() {
+    final void receivedStartOfHeaders(boolean headersEndStream) throws Http2Exception {
         if (headerState == HEADER_STATE_START) {
             headerState = HEADER_STATE_PSEUDO;
             handler.getHpackDecoder().setMaxHeaderCount(handler.getMaxHeaderCount());
             handler.getHpackDecoder().setMaxHeaderSize(handler.getMaxHeaderSize());
         } else if (headerState == HEADER_STATE_PSEUDO || headerState == HEADER_STATE_REGULAR) {
-            headerState = HEADER_STATE_TRAILER;
-            handler.getHpackDecoder().setMaxHeaderCount(handler.getMaxTrailerCount());
-            handler.getHpackDecoder().setMaxHeaderSize(handler.getMaxTrailerSize());
+            // Trailer headers MUST include the end of stream flag
+            if (headersEndStream) {
+                headerState = HEADER_STATE_TRAILER;
+                handler.getHpackDecoder().setMaxHeaderCount(handler.getMaxTrailerCount());
+                handler.getHpackDecoder().setMaxHeaderSize(handler.getMaxTrailerSize());
+            } else {
+                throw new ConnectionException(sm.getString("stream.trialerHeader.noEndOfStream",
+                        getConnectionId(), getIdentifier()), Http2Error.PROTOCOL_ERROR);
+            }
         }
         // Parser will catch attempt to send a headers frame after the stream
         // has closed.
