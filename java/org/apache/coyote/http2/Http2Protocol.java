@@ -67,6 +67,8 @@ public class Http2Protocol implements UpgradeProtocol {
     private int maxCookieCount = Constants.DEFAULT_MAX_COOKIE_COUNT;
     private int maxHeaderCount = Constants.DEFAULT_MAX_HEADER_COUNT;
     private int maxHeaderSize = Constants.DEFAULT_MAX_HEADER_SIZE;
+    private int maxTrailerCount = Constants.DEFAULT_MAX_TRAILER_COUNT;
+    private int maxTrailerSize = Constants.DEFAULT_MAX_TRAILER_SIZE;
 
 
     @Override
@@ -111,6 +113,8 @@ public class Http2Protocol implements UpgradeProtocol {
         result.setMaxCookieCount(getMaxCookieCount());
         result.setMaxHeaderCount(getMaxHeaderCount());
         result.setMaxHeaderSize(getMaxHeaderSize());
+        result.setMaxTrailerCount(getMaxTrailerCount());
+        result.setMaxTrailerSize(getMaxTrailerSize());
         return result;
     }
 
@@ -236,6 +240,16 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
+    public void setMaxCookieCount(int maxCookieCount) {
+        this.maxCookieCount = maxCookieCount;
+    }
+
+
+    public int getMaxCookieCount() {
+        return maxCookieCount;
+    }
+
+
     public void setMaxHeaderCount(int maxHeaderCount) {
         this.maxHeaderCount = maxHeaderCount;
     }
@@ -256,12 +270,22 @@ public class Http2Protocol implements UpgradeProtocol {
     }
 
 
-    public void setMaxCookieCount(int maxCookieCount) {
-        this.maxCookieCount = maxCookieCount;
+    public void setMaxTrailerCount(int maxTrailerCount) {
+        this.maxTrailerCount = maxTrailerCount;
     }
 
 
-    public int getMaxCookieCount() {
-        return maxCookieCount;
+    public int getMaxTrailerCount() {
+        return maxTrailerCount;
+    }
+
+
+    public void setMaxTrailerSize(int maxTrailerSize) {
+        this.maxTrailerSize = maxTrailerSize;
+    }
+
+
+    public int getMaxTrailerSize() {
+        return maxTrailerSize;
     }
 }

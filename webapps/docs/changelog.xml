@@ -114,8 +114,10 @@
       </fix>
       <add>
         Add configuration options to the HTTP/2 implementation to control the
-        maximum number of headers allowed, the maximum size of headers allowed
-        and the maximum number of cookies allowed. (markt)
+        maximum number of headers allowed, the maximum size of headers allowed,
+        the maximum number of trailer headers allowed, the maximum size of
+        trailer headers allowed and the maximum number of cookies allowed.
+        (markt)
       </add>
     </changelog>
   </subsection>
