@@ -24,6 +24,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.Iterator;
 
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.CloseNowException;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
@@ -171,8 +172,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
         long windowSize = getWindowSize();
         while (windowSize < 1) {
             if (!canWrite()) {
-                throw new IOException(sm.getString("stream.notWritable", getConnectionId(),
-                        getIdentifier()));
+                throw new CloseNowException(sm.getString("stream.notWritable",
+                        getConnectionId(), getIdentifier()));
             }
             try {
                 if (block) {
@@ -358,8 +359,12 @@ class Stream extends AbstractStream implements HeaderEmitter {
     final void receivedStartOfHeaders() {
         if (headerState == HEADER_STATE_START) {
             headerState = HEADER_STATE_PSEUDO;
+            handler.getHpackDecoder().setMaxHeaderCount(handler.getMaxHeaderCount());
+            handler.getHpackDecoder().setMaxHeaderSize(handler.getMaxHeaderSize());
         } else if (headerState == HEADER_STATE_PSEUDO || headerState == HEADER_STATE_REGULAR) {
             headerState = HEADER_STATE_TRAILER;
+            handler.getHpackDecoder().setMaxHeaderCount(handler.getMaxTrailerCount());
+            handler.getHpackDecoder().setMaxHeaderSize(handler.getMaxTrailerSize());
         }
         // Parser will catch attempt to send a headers frame after the stream
         // has closed.

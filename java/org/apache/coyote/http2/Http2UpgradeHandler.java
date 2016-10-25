@@ -37,6 +37,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.servlet.http.WebConnection;
 
 import org.apache.coyote.Adapter;
+import org.apache.coyote.CloseNowException;
 import org.apache.coyote.ProtocolException;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
@@ -148,6 +149,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     // Limits
     private Set<String> allowedTrailerHeaders = Collections.emptySet();
     private int maxCookieCount = Constants.DEFAULT_MAX_COOKIE_COUNT;
+    private int maxHeaderCount = Constants.DEFAULT_MAX_HEADER_COUNT;
+    private int maxHeaderSize = Constants.DEFAULT_MAX_HEADER_SIZE;
+    private int maxTrailerCount = Constants.DEFAULT_MAX_TRAILER_COUNT;
+    private int maxTrailerSize = Constants.DEFAULT_MAX_TRAILER_SIZE;
 
 
     Http2UpgradeHandler(Adapter adapter, Request coyoteRequest) {
@@ -513,6 +518,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     stream.getIdentifier()));
         }
 
+        if (!stream.canWrite()) {
+            return;
+        }
+
         prepareHeaders(coyoteResponse);
 
         byte[] header = new byte[9];
@@ -633,6 +642,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             log.debug(sm.getString("upgradeHandler.writeBody", connectionId, stream.getIdentifier(),
                     Integer.toString(len)));
         }
+        // Need to check this now since sending end of stream will change this.
+        boolean writeable = stream.canWrite();
         byte[] header = new byte[9];
         ByteUtil.setThreeBytes(header, 0, len);
         header[3] = FrameType.DATA.getIdByte();
@@ -643,17 +654,19 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 activeRemoteStreamCount.decrementAndGet();
             }
         }
-        ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
-        synchronized (socketWrapper) {
-            try {
-                socketWrapper.write(true, header, 0, header.length);
-                int orgLimit = data.limit();
-                data.limit(data.position() + len);
-                socketWrapper.write(true, data);
-                data.limit(orgLimit);
-                socketWrapper.flush(true);
-            } catch (IOException ioe) {
-                handleAppInitiatedIOException(ioe);
+        if (writeable) {
+            ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
+            synchronized (socketWrapper) {
+                try {
+                    socketWrapper.write(true, header, 0, header.length);
+                    int orgLimit = data.limit();
+                    data.limit(data.position() + len);
+                    socketWrapper.write(true, data);
+                    data.limit(orgLimit);
+                    socketWrapper.flush(true);
+                } catch (IOException ioe) {
+                    handleAppInitiatedIOException(ioe);
+                }
             }
         }
     }
@@ -681,6 +694,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
      */
     void writeWindowUpdate(Stream stream, int increment, boolean applicationInitiated)
             throws IOException {
+        if (!stream.canWrite()) {
+            return;
+        }
         synchronized (socketWrapper) {
             // Build window update frame for stream 0
             byte[] frame = new byte[13];
@@ -722,8 +738,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             do {
                 synchronized (this) {
                     if (!stream.canWrite()) {
-                        throw new IOException(sm.getString("upgradeHandler.stream.notWritable",
-                                stream.getConnectionId(), stream.getIdentifier()));
+                        throw new CloseNowException(
+                                sm.getString("upgradeHandler.stream.notWritable",
+                                        stream.getConnectionId(), stream.getIdentifier()));
                     }
                     long windowSize = getWindowSize();
                     if (windowSize < 1 || backLogSize > 0) {
@@ -1114,16 +1131,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    public void setMaxHeaderCount(int maxHeaderCount) {
-        getHpackDecoder().setMaxHeaderCount(maxHeaderCount);
-    }
-
-
-    public void setMaxHeaderSize(int maxHeaderSize) {
-        getHpackDecoder().setMaxHeaderSize(maxHeaderSize);
-    }
-
-
     public void setMaxCookieCount(int maxCookieCount) {
         this.maxCookieCount = maxCookieCount;
     }
@@ -1131,6 +1138,46 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     public int getMaxCookieCount() {
         return maxCookieCount;
+    }
+
+
+    public void setMaxHeaderCount(int maxHeaderCount) {
+        this.maxHeaderCount = maxHeaderCount;
+    }
+
+
+    public int getMaxHeaderCount() {
+        return maxHeaderCount;
+    }
+
+
+    public void setMaxHeaderSize(int maxHeaderSize) {
+        this.maxHeaderSize = maxHeaderSize;
+    }
+
+
+    public int getMaxHeaderSize() {
+        return maxHeaderSize;
+    }
+
+
+    public void setMaxTrailerCount(int maxTrailerCount) {
+        this.maxTrailerCount = maxTrailerCount;
+    }
+
+
+    public int getMaxTrailerCount() {
+        return maxTrailerCount;
+    }
+
+
+    public void setMaxTrailerSize(int maxTrailerSize) {
+        this.maxTrailerSize = maxTrailerSize;
+    }
+
+
+    public int getMaxTrailerSize() {
+        return maxTrailerSize;
     }
 
 

@@ -269,6 +269,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             action(ActionCode.COMMIT, null);
             try {
                 finishResponse();
+            } catch (CloseNowException cne) {
+                setErrorState(ErrorState.CLOSE_NOW, cne);
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             }

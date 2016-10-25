@@ -128,6 +128,23 @@
       a default of 8192 is used.</p>
     </attribute>
 
+    <attribute name="maxTrailerCount" required="false">
+      <p>The maximum number of trailer headers in a request that is allowed by
+      the container. A request that contains more trailer headers than the
+      specified limit will be rejected. A value of less than 0 means no limit.
+      If not specified, a default of 100 is used.</p>
+    </attribute>
+
+    <attribute name="maxTrailerSize" required="false">
+      <p>The maximum total size for all trailer headers in a request that is
+      allowed by the container. Total size for a header is calculated as the
+      uncompressed size of the header name in bytes, plus the uncompressed size
+      of the header value in bytes plus an HTTP/2 overhead of 3 bytes per
+      header. A request that contains a set of trailer headers that requires
+      more than the specified limit will be rejected. A value of less than 0
+      means no limit. If not specified, a default of 8192 is used.</p>
+    </attribute>
+
     <attribute name="readTimeout" required="false">
       <p>The time, in milliseconds, that Tomcat will wait for additional data
       when a partial HTTP/2 frame has been received. Negative values will be
