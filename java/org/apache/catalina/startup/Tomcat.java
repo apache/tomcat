@@ -437,7 +437,7 @@ public class Tomcat {
      * @return The service
      */
     public Service getService() {
-        return (Service) getServer().findServices()[0];
+        return getServer().findServices()[0];
     }
 
     /**
@@ -477,9 +477,9 @@ public class Tomcat {
      * @return The engine
      */
     public Engine getEngine() {
-        Service service = (Service) getServer().findServices()[0];
+        Service service = getServer().findServices()[0];
         if (service.getContainer() != null) {
-            return (Engine) service.getContainer();
+            return service.getContainer();
         }
         Engine engine = new StandardEngine();
         engine.setName( "Tomcat" );
