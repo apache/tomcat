@@ -133,20 +133,7 @@ public class Tomcat {
     // so that configuration is not lost.
     private final Map<String, Logger> pinnedLoggers = new HashMap<>();
 
-    // Single engine, service, server, connector - few cases need more,
-    // they can use server.xml
     protected Server server;
-    protected Service service;
-    protected Engine engine;
-
-    // To make it a bit easier to config for the common case
-    // ( one host, one context ).
-    protected Host host;
-
-    // TODO: it's easy to add support for more hosts - but is it
-    // really needed ?
-
-    // TODO: allow use of in-memory connector
 
     protected int port = 8080;
     protected String hostname = "localhost";
@@ -450,8 +437,7 @@ public class Tomcat {
      * @return The service
      */
     public Service getService() {
-        getServer();
-        return service;
+        return (Service) getServer().findServices()[0];
     }
 
     /**
@@ -462,16 +448,27 @@ public class Tomcat {
      * @param host The current host
      */
     public void setHost(Host host) {
-        this.host = host;
+        Engine engine = getEngine();
+        boolean found = false;
+        for (Container engineHost : engine.findChildren()) {
+            if (engineHost == host) {
+                found = true;
+            }
+        }
+        if (!found) {
+            engine.addChild(host);
+        }
     }
 
     public Host getHost() {
-        if (host == null) {
-            host = new StandardHost();
-            host.setName(hostname);
-
-            getEngine().addChild( host );
+        Engine engine = getEngine();
+        if (engine.findChildren().length > 0) {
+            return (Host) engine.findChildren()[0];
         }
+
+        Host host = new StandardHost();
+        host.setName(hostname);
+        getEngine().addChild(host);
         return host;
     }
 
@@ -480,14 +477,15 @@ public class Tomcat {
      * @return The engine
      */
     public Engine getEngine() {
-        if(engine == null ) {
-            getServer();
-            engine = new StandardEngine();
-            engine.setName( "Tomcat" );
-            engine.setDefaultHost(hostname);
-            engine.setRealm(createDefaultRealm());
-            service.setContainer(engine);
+        Service service = (Service) getServer().findServices()[0];
+        if (service.getContainer() != null) {
+            return (Engine) service.getContainer();
         }
+        Engine engine = new StandardEngine();
+        engine.setName( "Tomcat" );
+        engine.setDefaultHost(hostname);
+        engine.setRealm(createDefaultRealm());
+        service.setContainer(engine);
         return engine;
     }
 
@@ -510,9 +508,9 @@ public class Tomcat {
 
         server.setPort( -1 );
 
-        service = new StandardService();
+        Service service = new StandardService();
         service.setName("Tomcat");
-        server.addService( service );
+        server.addService(service);
         return server;
     }
 
