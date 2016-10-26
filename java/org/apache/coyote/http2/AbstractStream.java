@@ -56,13 +56,8 @@ abstract class AbstractStream {
 
 
     void addChild(AbstractStream child) {
-        child.setParent(this);
+        child.setParentStream(this);
         childStreams.add(child);
-    }
-
-
-    private void setParent(AbstractStream parent) {
-        this.parentStream = parent;
     }
 
 
