@@ -413,21 +413,6 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    /**
-     * Marks the stream as reset. This method will not change the stream state
-     * if:
-     * <ul>
-     * <li>The stream is already reset</li>
-     * <li>The stream is already closed</li>
-     *
-     * @throws IllegalStateException If the stream is in a state that does not
-     *         permit resets
-     */
-    void sendReset() {
-        state.sendReset();
-    }
-
-
     void sentPushPromise() {
         state.sentPushPromise();
     }
@@ -462,7 +447,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         if (http2Exception instanceof StreamException) {
             try {
                 StreamException se = (StreamException) http2Exception;
-                receiveReset(se.getError().getCode());
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("stream.reset.send", getConnectionId(), getIdentifier(),
+                            Long.toString(se.getError().getCode())));
+                }
+                state.sendReset();
                 handler.sendStreamReset(se);
             } catch (IOException ioe) {
                 ConnectionException ce = new ConnectionException(

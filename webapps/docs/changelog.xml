@@ -123,6 +123,10 @@
         trailer headers allowed and the maximum number of cookies allowed.
         (markt)
       </add>
+      <fix>
+        Correctly differentiate between sending and receiving a reset frame when
+        tracking the state of an HTTP/2 stream. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
