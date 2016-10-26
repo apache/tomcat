@@ -169,4 +169,81 @@ public class TestAbstractStream {
         Assert.assertTrue(c.getChildStreams().contains(e));
         Assert.assertEquals(0,  e.getChildStreams().size());
     }
+
+
+    @Test
+    public void testCircular01() {
+        // Setup
+        Http2UpgradeHandler handler = new Http2UpgradeHandler(null, null);
+        Stream a = new Stream(Integer.valueOf(1), handler);
+        Stream b = new Stream(Integer.valueOf(2), handler);
+        Stream c = new Stream(Integer.valueOf(3), handler);
+
+        b.rePrioritise(a, false, 16);
+        c.rePrioritise(b, false, 16);
+
+        // Action
+        a.rePrioritise(c, false, 16);
+
+        // Check parents
+        Assert.assertEquals(c, a.getParentStream());
+        Assert.assertEquals(a, b.getParentStream());
+        Assert.assertEquals(handler, c.getParentStream());
+
+        // Check children
+        Assert.assertEquals(1,  handler.getChildStreams().size());
+        Assert.assertTrue(handler.getChildStreams().contains(c));
+        Assert.assertEquals(1,  a.getChildStreams().size());
+        Assert.assertTrue(a.getChildStreams().contains(b));
+        Assert.assertEquals(0,  b.getChildStreams().size());
+        Assert.assertEquals(1,  c.getChildStreams().size());
+        Assert.assertTrue(c.getChildStreams().contains(a));
+    }
+
+
+    @Test
+    public void testCircular02() {
+        // Setup
+        Http2UpgradeHandler handler = new Http2UpgradeHandler(null, null);
+        Stream a = new Stream(Integer.valueOf(1), handler);
+        Stream b = new Stream(Integer.valueOf(2), handler);
+        Stream c = new Stream(Integer.valueOf(3), handler);
+        Stream d = new Stream(Integer.valueOf(4), handler);
+        Stream e = new Stream(Integer.valueOf(5), handler);
+        Stream f = new Stream(Integer.valueOf(6), handler);
+
+        b.rePrioritise(a, false, 16);
+        c.rePrioritise(b, false, 16);
+        e.rePrioritise(d, false, 16);
+        f.rePrioritise(e, false, 16);
+
+        // Action
+        a.rePrioritise(f, false, 16);
+        d.rePrioritise(c, false, 16);
+
+        // Check parents
+        Assert.assertEquals(f, a.getParentStream());
+        Assert.assertEquals(a, b.getParentStream());
+        Assert.assertEquals(handler, c.getParentStream());
+        Assert.assertEquals(c, d.getParentStream());
+        Assert.assertEquals(d, e.getParentStream());
+        Assert.assertEquals(e, f.getParentStream());
+
+        // Check children
+        Assert.assertEquals(1,  handler.getChildStreams().size());
+        Assert.assertTrue(handler.getChildStreams().contains(c));
+        Assert.assertEquals(1,  a.getChildStreams().size());
+        Assert.assertTrue(a.getChildStreams().contains(b));
+        Assert.assertEquals(0,  b.getChildStreams().size());
+        Assert.assertEquals(1,  c.getChildStreams().size());
+        Assert.assertTrue(c.getChildStreams().contains(d));
+        Assert.assertEquals(1,  d.getChildStreams().size());
+        Assert.assertTrue(d.getChildStreams().contains(e));
+        Assert.assertEquals(1,  e.getChildStreams().size());
+        Assert.assertTrue(e.getChildStreams().contains(f));
+        Assert.assertEquals(1,  f.getChildStreams().size());
+        Assert.assertTrue(f.getChildStreams().contains(a));
+
+    }
+
 }
