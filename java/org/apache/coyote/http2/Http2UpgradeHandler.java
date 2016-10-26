@@ -149,7 +149,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     // Limits
     private Set<String> allowedTrailerHeaders = Collections.emptySet();
-    private int maxCookieCount = Constants.DEFAULT_MAX_COOKIE_COUNT;
     private int maxHeaderCount = Constants.DEFAULT_MAX_HEADER_COUNT;
     private int maxHeaderSize = Constants.DEFAULT_MAX_HEADER_SIZE;
     private int maxTrailerCount = Constants.DEFAULT_MAX_TRAILER_COUNT;
@@ -1133,16 +1132,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     public void setAllowedTrailerHeaders(Set<String> allowedTrailerHeaders) {
         this.allowedTrailerHeaders = allowedTrailerHeaders;
-    }
-
-
-    public void setMaxCookieCount(int maxCookieCount) {
-        this.maxCookieCount = maxCookieCount;
-    }
-
-
-    public int getMaxCookieCount() {
-        return maxCookieCount;
     }
 
 

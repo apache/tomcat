@@ -25,6 +25,7 @@ import java.util.Random;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http2.HpackEncoder.State;
 import org.apache.tomcat.util.http.MimeHeaders;
 
@@ -343,9 +344,8 @@ public class TestHttp2Limits extends Http2TestBase {
 
         enableHttp2();
 
-        Http2Protocol http2Protocol =
-                (Http2Protocol) getTomcatInstance().getConnector().findUpgradeProtocols()[0];
-        http2Protocol.setMaxCookieCount(maxCookieCount);
+        Connector connector = getTomcatInstance().getConnector();
+        connector.setMaxCookieCount(maxCookieCount);
 
         configureAndStartWebApplication();
         openClientConnection();

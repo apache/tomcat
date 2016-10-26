@@ -3053,6 +3053,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
         cookiesParsed = true;
 
         ServerCookies serverCookies = coyoteRequest.getCookies();
+        serverCookies.setLimit(connector.getMaxCookieCount());
         CookieProcessor cookieProcessor = getContext().getCookieProcessor();
         cookieProcessor.parseCookieHeader(coyoteRequest.getMimeHeaders(), serverCookies);
     }

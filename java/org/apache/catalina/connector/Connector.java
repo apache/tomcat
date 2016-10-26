@@ -171,6 +171,12 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
+     * The maximum number of cookies permitted for a request. Use a value less
+     * than zero for no limit. Defaults to 200.
+     */
+    private int maxCookieCount = 200;
+
+    /**
      * The maximum number of parameters (GET plus POST) which will be
      * automatically parsed by the container. 10000 by default. A value of less
      * than 0 means no limit.
@@ -378,6 +384,16 @@ public class Connector extends LifecycleMBeanBase  {
     public void setEnableLookups(boolean enableLookups) {
         this.enableLookups = enableLookups;
         setProperty("enableLookups", String.valueOf(enableLookups));
+    }
+
+
+    public int getMaxCookieCount() {
+        return maxCookieCount;
+    }
+
+
+    public void setMaxCookieCount(int maxCookieCount) {
+        this.maxCookieCount = maxCookieCount;
     }
 
 

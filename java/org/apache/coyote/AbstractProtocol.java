@@ -103,13 +103,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     private AsyncTimeout asyncTimeout = null;
 
 
-    /**
-     * The maximum number of cookies permitted for a request. Use a value less
-     * than zero for no limit. Defaults to 200.
-     */
-    private int maxCookieCount = 200;
-
-
     public AbstractProtocol(AbstractEndpoint<S> endpoint) {
         this.endpoint = endpoint;
         setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
@@ -205,16 +198,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     public AsyncTimeout getAsyncTimeout() {
         return asyncTimeout;
-    }
-
-
-    public int getMaxCookieCount() {
-        return maxCookieCount;
-    }
-
-
-    public void setMaxCookieCount(int maxCookieCount) {
-        this.maxCookieCount = maxCookieCount;
     }
 
 
