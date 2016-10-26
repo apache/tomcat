@@ -74,6 +74,10 @@
       <fix>
         <bug>60297</bug>: Simplify connector creation in embedded mode. (remm)
       </fix>
+      <fix>
+        Refactor creation of containers in embedded mode for more consistency
+        and flexibility. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
