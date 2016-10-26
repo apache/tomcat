@@ -629,7 +629,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     private HpackEncoder getHpackEncoder() {
         if (hpackEncoder == null) {
-
             hpackEncoder = new HpackEncoder(remoteSettings.getHeaderTableSize());
         }
         return hpackEncoder;
