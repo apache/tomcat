@@ -157,7 +157,7 @@
 
   <p>The HTTP/2 upgrade protocol will also inherit the following limits from the
   <a href="http.html">HTTP Connector</a> it is nested with:</p>
-  
+
   <ul>
     <li>maxCookieCount</li>
     <li>maxParameterCount</li>
