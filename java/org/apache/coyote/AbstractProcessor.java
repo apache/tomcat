@@ -50,7 +50,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected final Response response;
     protected volatile SocketWrapperBase<?> socketWrapper = null;
     protected volatile SSLSupport sslSupport;
-    private int maxCookieCount = 200;
 
 
     /**
@@ -530,16 +529,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     public long getAsyncTimeout() {
         return asyncTimeout;
-    }
-
-
-    public int getMaxCookieCount() {
-        return maxCookieCount;
-    }
-
-
-    public void setMaxCookieCount(int maxCookieCount) {
-        this.maxCookieCount = maxCookieCount;
     }
 
 
