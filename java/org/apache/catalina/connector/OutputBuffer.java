@@ -430,6 +430,17 @@ public class OutputBuffer extends Writer
     }
 
 
+    public void write(ByteBuffer from) throws IOException {
+
+        if (suspended) {
+            return;
+        }
+
+        writeBytes(from);
+
+    }
+
+
     private void writeBytes(byte b[], int off, int len)
         throws IOException {
 
@@ -439,6 +450,24 @@ public class OutputBuffer extends Writer
 
         bb.append(b, off, len);
         bytesWritten += len;
+
+        // if called from within flush(), then immediately flush
+        // remaining bytes
+        if (doFlush) {
+            bb.flushBuffer();
+        }
+
+    }
+
+
+    private void writeBytes(ByteBuffer from) throws IOException {
+
+        if (closed) {
+            return;
+        }
+
+        bb.append(from);
+        bytesWritten += from.remaining();
 
         // if called from within flush(), then immediately flush
         // remaining bytes
