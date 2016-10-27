@@ -126,13 +126,13 @@ tomcat-native.loc.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-nativ
 tomcat-native.win.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-win32-bin.zip
 tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-native.version}/binaries/tomcat-native-${tomcat-native.version}-win32-bin.zip
 
-# ----- NSIS, version 2.0 or later -----
-nsis.version=2.51
+# ----- NSIS, version 3.0 or later -----
+nsis.version=3.0
 nsis.home=${base.path}/nsis-${nsis.version}
 nsis.exe=${nsis.home}/makensis.exe
-nsis.installoptions.dll=${nsis.home}/Plugins/InstallOptions.dll
-nsis.nsexec.dll=${nsis.home}/Plugins/nsExec.dll
-nsis.nsisdl.dll=${nsis.home}/Plugins/NSISdl.dll
+nsis.installoptions.dll=${nsis.home}/Plugins/x86-unicode/InstallOptions.dll
+nsis.nsexec.dll=${nsis.home}/Plugins/x86-unicode/nsExec.dll
+nsis.nsisdl.dll=${nsis.home}/Plugins/x86-unicode/NSISdl.dll
 nsis.loc=${base-sf.loc}/nsis/nsis-${nsis.version}.zip
 
 # ----- Commons Daemon, version 1.0-Alpha or later -----
