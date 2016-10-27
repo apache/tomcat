@@ -83,13 +83,12 @@ public abstract class SocketWrapperBase<E> {
      * the possible need to write HTTP headers, there may be more than one write
      * to the OutputBuffer.
      */
-    protected final LinkedBlockingDeque<ByteBufferHolder> bufferedWrites =
-            new LinkedBlockingDeque<>();
+    protected final LinkedBlockingDeque<ByteBufferHolder> bufferedWrites = new LinkedBlockingDeque<>();
 
     /**
      * The max size of the buffered write buffer
      */
-    protected int bufferedWriteSize = 64*1024; //64k default write buffer
+    protected int bufferedWriteSize = 64 * 1024; // 64k default write buffer
 
     public SocketWrapperBase(E socket, AbstractEndpoint<E> endpoint) {
         this.socket = socket;
@@ -455,7 +454,8 @@ public abstract class SocketWrapperBase<E> {
             while (socketBufferHandler.isWriteBufferEmpty() && bufIter.hasNext()) {
                 ByteBufferHolder buffer = bufIter.next();
                 buffer.flip();
-                while (socketBufferHandler.isWriteBufferEmpty() && buffer.getBuf().remaining()>0) {
+                while (socketBufferHandler.isWriteBufferEmpty()
+                        && buffer.getBuf().remaining() > 0) {
                     socketBufferHandler.configureWriteBufferForWrite();
                     transfer(buffer.getBuf(), socketBufferHandler.getWriteBuffer());
                     if (buffer.getBuf().remaining() == 0) {
@@ -484,7 +484,8 @@ public abstract class SocketWrapperBase<E> {
             while (socketBufferHandler.isWriteBufferEmpty() && bufIter.hasNext()) {
                 ByteBufferHolder buffer = bufIter.next();
                 buffer.flip();
-                while (socketBufferHandler.isWriteBufferEmpty() && buffer.getBuf().remaining() > 0) {
+                while (socketBufferHandler.isWriteBufferEmpty()
+                        && buffer.getBuf().remaining() > 0) {
                     socketBufferHandler.configureWriteBufferForWrite();
                     transfer(buffer.getBuf(), socketBufferHandler.getWriteBuffer());
                     if (buffer.getBuf().remaining() == 0) {
@@ -514,12 +515,12 @@ public abstract class SocketWrapperBase<E> {
 
     protected void addToBuffers(byte[] buf, int offset, int length) {
         ByteBufferHolder holder = bufferedWrites.peekLast();
-        if (holder==null || holder.isFlipped() || holder.getBuf().remaining()<length) {
-            ByteBuffer buffer = ByteBuffer.allocate(Math.max(bufferedWriteSize,length));
-            holder = new ByteBufferHolder(buffer,false);
+        if (holder == null || holder.isFlipped() || holder.getBuf().remaining() < length) {
+            ByteBuffer buffer = ByteBuffer.allocate(Math.max(bufferedWriteSize, length));
+            holder = new ByteBufferHolder(buffer, false);
             bufferedWrites.add(holder);
         }
-        holder.getBuf().put(buf,offset,length);
+        holder.getBuf().put(buf, offset, length);
     }
 
 
@@ -639,7 +640,8 @@ public abstract class SocketWrapperBase<E> {
          *
          * @return The call, if any, to make to the completion handler
          */
-        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers, int offset, int length);
+        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
+                int offset, int length);
     }
 
     /**
@@ -649,13 +651,15 @@ public abstract class SocketWrapperBase<E> {
      */
     public static final CompletionCheck COMPLETE_WRITE = new CompletionCheck() {
         @Override
-        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers, int offset, int length) {
+        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
+                int offset, int length) {
             for (int i = 0; i < offset; i++) {
                 if (buffers[i].remaining() > 0) {
                     return CompletionHandlerCall.CONTINUE;
                 }
             }
-            return (state == CompletionState.DONE) ? CompletionHandlerCall.DONE : CompletionHandlerCall.NONE;
+            return (state == CompletionState.DONE) ? CompletionHandlerCall.DONE
+                    : CompletionHandlerCall.NONE;
         }
     };
 
@@ -666,8 +670,10 @@ public abstract class SocketWrapperBase<E> {
      */
     public static final CompletionCheck READ_DATA = new CompletionCheck() {
         @Override
-        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers, int offset, int length) {
-            return (state == CompletionState.DONE) ? CompletionHandlerCall.DONE : CompletionHandlerCall.NONE;
+        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
+                int offset, int length) {
+            return (state == CompletionState.DONE) ? CompletionHandlerCall.DONE
+                    : CompletionHandlerCall.NONE;
         }
     };
 
@@ -752,8 +758,7 @@ public abstract class SocketWrapperBase<E> {
      * @return the completion state (done, done inline, or still pending)
      */
     public final <A> CompletionState read(boolean block, long timeout, TimeUnit unit, A attachment,
-            CompletionCheck check, CompletionHandler<Long, ? super A> handler,
-            ByteBuffer... dsts) {
+            CompletionCheck check, CompletionHandler<Long, ? super A> handler, ByteBuffer... dsts) {
         if (dsts == null) {
             throw new IllegalArgumentException();
         }
@@ -786,9 +791,9 @@ public abstract class SocketWrapperBase<E> {
      * @param <A> The attachment type
      * @return the completion state (done, done inline, or still pending)
      */
-    public <A> CompletionState read(ByteBuffer[] dsts, int offset, int length,
-            boolean block, long timeout, TimeUnit unit, A attachment,
-            CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
+    public <A> CompletionState read(ByteBuffer[] dsts, int offset, int length, boolean block,
+            long timeout, TimeUnit unit, A attachment, CompletionCheck check,
+            CompletionHandler<Long, ? super A> handler) {
         throw new UnsupportedOperationException();
     }
 
@@ -818,8 +823,7 @@ public abstract class SocketWrapperBase<E> {
      * @return the completion state (done, done inline, or still pending)
      */
     public final <A> CompletionState write(boolean block, long timeout, TimeUnit unit, A attachment,
-            CompletionCheck check, CompletionHandler<Long, ? super A> handler,
-            ByteBuffer... srcs) {
+            CompletionCheck check, CompletionHandler<Long, ? super A> handler, ByteBuffer... srcs) {
         if (srcs == null) {
             throw new IllegalArgumentException();
         }
@@ -853,9 +857,9 @@ public abstract class SocketWrapperBase<E> {
      * @param <A> The attachment type
      * @return the completion state (done, done inline, or still pending)
      */
-    public <A> CompletionState write(ByteBuffer[] srcs, int offset, int length,
-            boolean block, long timeout, TimeUnit unit, A attachment,
-            CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
+    public <A> CompletionState write(ByteBuffer[] srcs, int offset, int length, boolean block,
+            long timeout, TimeUnit unit, A attachment, CompletionCheck check,
+            CompletionHandler<Long, ? super A> handler) {
         throw new UnsupportedOperationException();
     }
 
