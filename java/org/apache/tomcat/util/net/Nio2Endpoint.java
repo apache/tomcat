@@ -1158,16 +1158,15 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
          *              blocking case
          */
         @Override
-        protected void doWrite(boolean block) throws IOException {
+        protected void doWrite(boolean block, ByteBuffer from) throws IOException {
             Future<Integer> integer = null;
             try {
-                socketBufferHandler.configureWriteBufferForRead();
                 do {
-                    integer = getSocket().write(socketBufferHandler.getWriteBuffer());
+                    integer = getSocket().write(from);
                     if (integer.get(getNio2WriteTimeout(), TimeUnit.MILLISECONDS).intValue() < 0) {
                         throw new EOFException(sm.getString("iob.failedwrite"));
                     }
-                } while (socketBufferHandler.getWriteBuffer().hasRemaining());
+                } while (from.hasRemaining());
             } catch (ExecutionException e) {
                 if (e.getCause() instanceof IOException) {
                     throw (IOException) e.getCause();
