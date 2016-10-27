@@ -395,7 +395,27 @@ public class OutputBuffer extends Writer
      */
     @Override
     public void realWriteBytes(ByteBuffer buf) throws IOException {
-        // To be implemented
+
+        if (closed) {
+            return;
+        }
+        if (coyoteResponse == null) {
+            return;
+        }
+
+        // If we really have something to write
+        if (buf.remaining() > 0) {
+            // real write to the adapter
+            try {
+                coyoteResponse.doWrite(buf.slice());
+            } catch (IOException e) {
+                // An IOException on a write is almost always due to
+                // the remote client aborting the request.  Wrap this
+                // so that it can be handled better by the error dispatcher.
+                throw new ClientAbortException(e);
+            }
+        }
+
     }
 
 
