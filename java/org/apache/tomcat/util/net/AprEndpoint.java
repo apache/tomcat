@@ -2313,12 +2313,15 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
 
         private int fillReadBuffer(boolean block) throws IOException {
+            socketBufferHandler.configureReadBufferForWrite();
+            return fillReadBuffer(block, socketBufferHandler.getReadBuffer());
+        }
+
+
+        private int fillReadBuffer(boolean block, ByteBuffer to) throws IOException {
             if (closed) {
                 throw new IOException(sm.getString("socket.apr.closed", getSocket()));
             }
-
-            socketBufferHandler.configureReadBufferForWrite();
-            ByteBuffer socketReadBuffer = socketBufferHandler.getReadBuffer();
 
             Lock readLock = getBlockingStatusReadLock();
             WriteLock writeLock = getBlockingStatusWriteLock();
@@ -2331,8 +2334,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     if (block) {
                         Socket.timeoutSet(getSocket().longValue(), getReadTimeout() * 1000);
                     }
-                    result = Socket.recvb(getSocket().longValue(),
-                            socketReadBuffer, socketReadBuffer.position(), socketReadBuffer.remaining());
+                    result = Socket.recvb(getSocket().longValue(), to, to.position(),
+                            to.remaining());
                     readDone = true;
                 }
             } finally {
@@ -2353,8 +2356,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     readLock.lock();
                     try {
                         writeLock.unlock();
-                        result = Socket.recvb(getSocket().longValue(),
-                                socketReadBuffer, socketReadBuffer.position(), socketReadBuffer.remaining());
+                        result = Socket.recvb(getSocket().longValue(), to, to.position(),
+                                to.remaining());
                     } finally {
                         readLock.unlock();
                     }
@@ -2368,7 +2371,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             }
 
             if (result > 0) {
-                socketReadBuffer.position(socketReadBuffer.position() + result);
+                to.position(to.position() + result);
                 return result;
             } else if (result == 0 || -result == Status.EAGAIN) {
                 return 0;
@@ -2382,8 +2385,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 return 0;
             } else if ((-result) == Status.ETIMEDOUT || (-result) == Status.TIMEUP) {
                 if (block) {
-                    throw new SocketTimeoutException(
-                            sm.getString("iib.readtimeout"));
+                    throw new SocketTimeoutException(sm.getString("iib.readtimeout"));
                 } else {
                     // Attempting to read from the socket when the poller
                     // has not signalled that there is data to read appears
