@@ -173,7 +173,7 @@
       </fix>
       <add>
         Update the NSIS Installer used to build the Windows installer to version
-        3.0. (markt) 
+        3.0. (markt)
       </add>
     </changelog>
   </subsection>
