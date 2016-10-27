@@ -278,6 +278,7 @@ public abstract class SocketWrapperBase<E> {
 
 
     public abstract int read(boolean block, byte[] b, int off, int len) throws IOException;
+    public abstract int read(boolean block, ByteBuffer to) throws IOException;
     public abstract boolean isReadyForRead() throws IOException;
 
     protected int populateReadBuffer(byte[] b, int off, int len) {
@@ -296,6 +297,19 @@ public abstract class SocketWrapperBase<E> {
             }
         }
         return remaining;
+    }
+
+
+    protected int populateReadBuffer(ByteBuffer to) {
+        // Is there enough data in the read buffer to satisfy this request?
+        // Copy what data there is in the read buffer to the byte array
+        socketBufferHandler.configureReadBufferForRead();
+        int nRead = transfer(socketBufferHandler.getReadBuffer(), to);
+
+        if (log.isDebugEnabled()) {
+            log.debug("Socket: [" + this + "], Read from buffer: [" + nRead + "]");
+        }
+        return nRead;
     }
 
 
@@ -1043,7 +1057,7 @@ public abstract class SocketWrapperBase<E> {
         return max;
     }
 
-    protected static void transfer(ByteBuffer from, ByteBuffer to) {
+    protected static int transfer(ByteBuffer from, ByteBuffer to) {
         int max = Math.min(from.remaining(), to.remaining());
         if (max > 0) {
             int fromLimit = from.limit();
@@ -1051,5 +1065,6 @@ public abstract class SocketWrapperBase<E> {
             to.put(from);
             from.limit(fromLimit);
         }
+        return max;
     }
 }

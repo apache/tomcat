@@ -871,6 +871,66 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
 
         @Override
+        public int read(boolean block, ByteBuffer to) throws IOException {
+            checkError();
+
+            if (socketBufferHandler == null) {
+                throw new IOException(sm.getString("socket.closed"));
+            }
+
+            if (block) {
+                try {
+                    readPending.acquire();
+                } catch (InterruptedException e) {
+                    throw new IOException(e);
+                }
+            } else {
+                if (!readPending.tryAcquire()) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Socket: [" + this + "], Read in progress. Returning [0]");
+                    }
+                    return 0;
+                }
+            }
+
+            int nRead = populateReadBuffer(to);
+            if (nRead > 0) {
+                // This may be sufficient to complete the request and we
+                // don't want to trigger another read since if there is no
+                // more data to read and this request takes a while to
+                // process the read will timeout triggering an error.
+                to.flip();
+                readPending.release();
+                return nRead;
+            }
+
+            synchronized (readCompletionHandler) {
+                // The socket read buffer capacity is socket.appReadBufSize
+                int limit = socketBufferHandler.getReadBuffer().capacity();
+                if (block && to.remaining() >= limit) {
+                    to.limit(to.position() + limit);
+                    nRead = fillReadBuffer(block, to);
+                    to.flip();
+                } else {
+                    // Fill the read buffer as best we can.
+                    nRead = fillReadBuffer(block);
+
+                    // Fill as much of the remaining byte array as possible with the
+                    // data that was just read
+                    if (nRead > 0) {
+                        nRead = populateReadBuffer(to);
+                        to.flip();
+                    } else if (nRead == 0 && !block) {
+                        readInterest = true;
+                    }
+                }
+
+                return nRead;
+            }
+        }
+
+
+        @Override
         public void close() throws IOException {
             getSocket().close();
         }
