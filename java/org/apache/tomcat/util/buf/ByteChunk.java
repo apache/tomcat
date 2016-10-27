@@ -98,6 +98,15 @@ public final class ByteChunk implements Cloneable, Serializable {
          */
         public void realWriteBytes(byte cbuf[], int off, int len)
             throws IOException;
+
+        /**
+         * Send the bytes ( usually the internal conversion buffer ).
+         * Expect 8k output if the buffer is full.
+         *
+         * @param from bytes that will be written
+         * @throws IOException If an I/O occurs while writing the bytes
+         */
+        public void realWriteBytes(ByteBuffer from) throws IOException;
     }
 
     // --------------------
@@ -354,6 +363,74 @@ public final class ByteChunk implements Cloneable, Serializable {
         System.arraycopy(src, (off + len) - remain, buff, end, remain);
         end += remain;
 
+    }
+
+
+    /**
+     * Add data to the buffer.
+     *
+     * @param from the ByteBuffer with the data
+     * @throws IOException Writing overflow data to the output channel failed
+     */
+    public void append(ByteBuffer from) throws IOException {
+        int len = from.remaining();
+
+        // will grow, up to limit
+        makeSpace(len);
+
+        // if we don't have limit: makeSpace can grow as it wants
+        if (limit < 0) {
+            // assert: makeSpace made enough space
+            from.get(buff, end, len);
+            end += len;
+            return;
+        }
+
+        // Optimize on a common case.
+        // If the buffer is empty and the source is going to fill up all the
+        // space in buffer, may as well write it directly to the output,
+        // and avoid an extra copy
+        if (len == limit && end == start && out != null) {
+            out.realWriteBytes(from);
+            from.position(from.limit());
+            return;
+        }
+        // if we have limit and we're below
+        if (len <= limit - end) {
+            // makeSpace will grow the buffer to the limit,
+            // so we have space
+            from.get(buff, end, len);
+            end += len;
+            return;
+        }
+
+        // need more space than we can afford, need to flush
+        // buffer
+
+        // the buffer is already at ( or bigger than ) limit
+
+        // We chunk the data into slices fitting in the buffer limit, although
+        // if the data is written directly if it doesn't fit
+
+        int avail = limit - end;
+        from.get(buff, end, avail);
+        end += avail;
+
+        flushBuffer();
+
+        int fromLimit = from.limit();
+        int remain = len - avail;
+        avail = limit - end;
+        while (remain >= avail) {
+            from.limit(from.position() + avail);
+            out.realWriteBytes(from);
+            from.position(from.limit());
+            remain = remain - avail;
+        }
+
+        from.limit(fromLimit);
+        from.get(buff, end, remain);
+        end += remain;
     }
 
 

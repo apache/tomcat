@@ -18,6 +18,7 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
@@ -381,6 +382,20 @@ public class OutputBuffer extends Writer
             }
         }
 
+    }
+
+
+    /**
+     * Sends the buffer data to the client output, checking the
+     * state of Response and calling the right interceptors.
+     *
+     * @param buf the ByteBuffer to be written to the response
+     *
+     * @throws IOException An underlying IOException occurred
+     */
+    @Override
+    public void realWriteBytes(ByteBuffer buf) throws IOException {
+        // To be implemented
     }
 
 
