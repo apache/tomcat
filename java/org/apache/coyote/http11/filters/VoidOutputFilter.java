@@ -18,6 +18,7 @@
 package org.apache.coyote.http11.filters;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
@@ -38,6 +39,12 @@ public class VoidOutputFilter implements OutputFilter {
     @Override
     public int doWrite(ByteChunk chunk) throws IOException {
         return chunk.getLength();
+    }
+
+
+    @Override
+    public int doWrite(ByteBuffer chunk) throws IOException {
+        return chunk.remaining();
     }
 
 

@@ -17,6 +17,8 @@
 
 package org.apache.coyote.ajp;
 
+import java.nio.ByteBuffer;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -220,18 +222,47 @@ public class AjpMessage {
      * @param numBytes The number of bytes to copy.
      */
     public void appendBytes(byte[] b, int off, int numBytes) {
-        if (pos + numBytes + 3 > buf.length) {
-            log.error(sm.getString("ajpmessage.overflow", "" + numBytes, "" + pos),
-                    new ArrayIndexOutOfBoundsException());
-            if (log.isDebugEnabled()) {
-                dump("Overflow/coBytes");
-            }
+        if (checkOverflow(numBytes)) {
             return;
         }
         appendInt(numBytes);
         System.arraycopy(b, off, buf, pos, numBytes);
         pos += numBytes;
         appendByte(0);
+    }
+
+
+    /**
+     * Copy a chunk of bytes into the packet, starting at the current
+     * write position.  The chunk of bytes is encoded with the length
+     * in two bytes first, then the data itself, and finally a
+     * terminating \0 (which is <B>not</B> included in the encoded
+     * length).
+     *
+     * @param b The ByteBuffer from which to copy bytes.
+     */
+    public void appendBytes(ByteBuffer b) {
+        int numBytes = b.remaining();
+        if (checkOverflow(numBytes)) {
+            return;
+        }
+        appendInt(numBytes);
+        b.get(buf, pos, numBytes);
+        pos += numBytes;
+        appendByte(0);
+    }
+
+
+    private boolean checkOverflow(int numBytes) {
+        if (pos + numBytes + 3 > buf.length) {
+            log.error(sm.getString("ajpmessage.overflow", "" + numBytes, "" + pos),
+                    new ArrayIndexOutOfBoundsException());
+            if (log.isDebugEnabled()) {
+                dump("Overflow/coBytes");
+            }
+            return true;
+        }
+        return false;
     }
 
 

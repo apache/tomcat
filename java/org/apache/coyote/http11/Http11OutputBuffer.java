@@ -17,6 +17,7 @@
 package org.apache.coyote.http11;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.OutputBuffer;
@@ -192,6 +193,24 @@ public class Http11OutputBuffer implements OutputBuffer {
 
     @Override
     public int doWrite(ByteChunk chunk) throws IOException {
+
+        if (!response.isCommitted()) {
+            // Send the connector a request for commit. The connector should
+            // then validate the headers, send them (using sendHeaders) and
+            // set the filters accordingly.
+            response.action(ActionCode.COMMIT, null);
+        }
+
+        if (lastActiveFilter == -1) {
+            return outputStreamOutputBuffer.doWrite(chunk);
+        } else {
+            return activeFilters[lastActiveFilter].doWrite(chunk);
+        }
+    }
+
+
+    @Override
+    public int doWrite(ByteBuffer chunk) throws IOException {
 
         if (!response.isCommitted()) {
             // Send the connector a request for commit. The connector should
@@ -548,6 +567,18 @@ public class Http11OutputBuffer implements OutputBuffer {
             int start = chunk.getStart();
             byte[] b = chunk.getBuffer();
             socketWrapper.write(isBlocking(), b, start, len);
+            byteCount += len;
+            return len;
+        }
+
+        /**
+         * Write chunk.
+         */
+        @Override
+        public int doWrite(ByteBuffer chunk) throws IOException {
+            int len = chunk.remaining();
+            socketWrapper.write(isBlocking(), chunk);
+            len -= chunk.remaining();
             byteCount += len;
             return len;
         }
