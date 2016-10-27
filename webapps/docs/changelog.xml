@@ -87,6 +87,11 @@
         Refactor creation of containers in embedded mode for more consistency
         and flexibility. (remm)
       </fix>
+      <add>
+        Log a warning if running on Java 9 with the ThreadLocal memory leak
+        detection enabled (the default) but without the command line option it
+        now requires. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
