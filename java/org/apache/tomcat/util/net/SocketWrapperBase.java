@@ -514,13 +514,25 @@ public abstract class SocketWrapperBase<E> {
 
 
     protected void addToBuffers(byte[] buf, int offset, int length) {
+        ByteBufferHolder holder = getByteBufferHolder(length);
+        holder.getBuf().put(buf, offset, length);
+    }
+
+
+    protected void addToBuffers(ByteBuffer from) {
+        ByteBufferHolder holder = getByteBufferHolder(from.remaining());
+        holder.getBuf().put(from);
+    }
+
+
+    private ByteBufferHolder getByteBufferHolder(int capacity) {
         ByteBufferHolder holder = bufferedWrites.peekLast();
-        if (holder == null || holder.isFlipped() || holder.getBuf().remaining() < length) {
-            ByteBuffer buffer = ByteBuffer.allocate(Math.max(bufferedWriteSize, length));
+        if (holder == null || holder.isFlipped() || holder.getBuf().remaining() < capacity) {
+            ByteBuffer buffer = ByteBuffer.allocate(Math.max(bufferedWriteSize, capacity));
             holder = new ByteBufferHolder(buffer, false);
             bufferedWrites.add(holder);
         }
-        holder.getBuf().put(buf, offset, length);
+        return holder;
     }
 
 
