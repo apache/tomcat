@@ -18,6 +18,8 @@
 package org.apache.coyote.http11.filters;
 
 import java.io.IOException;
+import java.nio.BufferOverflowException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.coyote.InputBuffer;
@@ -39,7 +41,7 @@ public class BufferedInputFilter implements InputFilter {
 
     // ----------------------------------------------------- Instance Variables
 
-    private ByteChunk buffered = null;
+    private ByteBuffer buffered;
     private final ByteChunk tempRead = new ByteChunk(1024);
     private InputBuffer buffer;
     private boolean hasRead = false;
@@ -64,8 +66,8 @@ public class BufferedInputFilter implements InputFilter {
      */
     public void setLimit(int limit) {
         if (buffered == null) {
-            buffered = new ByteChunk(4048);
-            buffered.setLimit(limit);
+            buffered = ByteBuffer.allocate(limit);
+            buffered.flip();
         }
     }
 
@@ -81,10 +83,12 @@ public class BufferedInputFilter implements InputFilter {
         // save off the Request body
         try {
             while (buffer.doRead(tempRead) >= 0) {
-                buffered.append(tempRead);
+                buffered.mark().position(buffered.limit()).limit(buffered.capacity());
+                buffered.put(tempRead.getBytes(), tempRead.getStart(), tempRead.getLength());
+                buffered.limit(buffered.position()).reset();
                 tempRead.recycle();
             }
-        } catch(IOException ioe) {
+        } catch(IOException | BufferOverflowException ioe) {
             // No need for i18n - this isn't going to get logged anywhere
             throw new IllegalStateException(
                     "Request body too large for buffer");
@@ -96,12 +100,12 @@ public class BufferedInputFilter implements InputFilter {
      */
     @Override
     public int doRead(ByteChunk chunk) throws IOException {
-        if (hasRead || buffered.getLength() <= 0) {
+        if (isFinished()) {
             return -1;
         }
 
-        chunk.setBytes(buffered.getBytes(), buffered.getStart(),
-                buffered.getLength());
+        chunk.setBytes(buffered.array(), buffered.arrayOffset() + buffered.position(),
+                buffered.remaining());
         hasRead = true;
         return chunk.getLength();
     }
@@ -114,10 +118,10 @@ public class BufferedInputFilter implements InputFilter {
     @Override
     public void recycle() {
         if (buffered != null) {
-            if (buffered.getBuffer().length > 65536) {
+            if (buffered.capacity() > 65536) {
                 buffered = null;
             } else {
-                buffered.recycle();
+                buffered.position(0).limit(0);
             }
         }
         tempRead.recycle();
@@ -137,12 +141,12 @@ public class BufferedInputFilter implements InputFilter {
 
     @Override
     public int available() {
-        return buffered.getLength();
+        return buffered.remaining();
     }
 
 
     @Override
     public boolean isFinished() {
-        return hasRead || buffered.getLength() <= 0;
+        return hasRead || buffered.remaining() <= 0;
     }
 }
