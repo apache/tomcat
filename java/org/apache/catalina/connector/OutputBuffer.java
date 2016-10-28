@@ -18,7 +18,9 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
@@ -64,13 +66,13 @@ public class OutputBuffer extends Writer
     /**
      * The byte buffer.
      */
-    private final ByteChunk bb;
+    private ByteBuffer bb;
 
 
     /**
-     * The chunk buffer.
+     * The char buffer.
      */
-    private final CharChunk cb;
+    private final CharBuffer cb;
 
 
     /**
@@ -101,18 +103,6 @@ public class OutputBuffer extends Writer
      * Do a flush on the next operation.
      */
     private boolean doFlush = false;
-
-
-    /**
-     * Byte chunk used to output bytes.
-     */
-    private final ByteChunk outputChunk = new ByteChunk();
-
-
-    /**
-     * Char chunk used to output chars.
-     */
-    private CharChunk outputCharChunk = new CharChunk();
 
 
     /**
@@ -159,13 +149,10 @@ public class OutputBuffer extends Writer
      */
     public OutputBuffer(int size) {
 
-        bb = new ByteChunk(size);
-        bb.setLimit(size);
-        bb.setByteOutputChannel(this);
-        cb = new CharChunk(size);
-        cb.setLimit(size);
-        cb.setOptimizedWrite(false);
-        cb.setCharOutputChannel(this);
+        bb = ByteBuffer.allocate(size);
+        clear(bb);
+        cb = CharBuffer.allocate(size);
+        clear(cb);
 
     }
 
@@ -224,9 +211,8 @@ public class OutputBuffer extends Writer
         bytesWritten = 0;
         charsWritten = 0;
 
-        bb.recycle();
-        cb.recycle();
-        outputCharChunk.setChars(null, 0, 0);
+        clear(bb);
+        clear(cb);
         closed = false;
         suspended = false;
         doFlush = false;
@@ -258,8 +244,8 @@ public class OutputBuffer extends Writer
 
         // If there are chars, flush all of them to the byte buffer now as bytes are used to
         // calculate the content-length (if everything fits into the byte buffer, of course).
-        if (cb.getLength() > 0) {
-            cb.flushBuffer();
+        if (cb.remaining() > 0) {
+            flushCharBuffer();
         }
 
         if ((!coyoteResponse.isCommitted()) && (coyoteResponse.getContentLengthLong() == -1)
@@ -270,7 +256,7 @@ public class OutputBuffer extends Writer
             // setting a value of zero here will result in an explicit content
             // length of zero being set on the response.
             if (!coyoteResponse.isCommitted()) {
-                coyoteResponse.setContentLength(bb.getLength());
+                coyoteResponse.setContentLength(bb.remaining());
             }
         }
 
@@ -320,11 +306,11 @@ public class OutputBuffer extends Writer
                 coyoteResponse.sendHeaders();
                 initial = false;
             }
-            if (cb.getLength() > 0) {
-                cb.flushBuffer();
+            if (cb.remaining() > 0) {
+                flushCharBuffer();
             }
-            if (bb.getLength() > 0) {
-                bb.flushBuffer();
+            if (bb.remaining() > 0) {
+                flushByteBuffer();
             }
         } finally {
             doFlush = false;
@@ -367,12 +353,11 @@ public class OutputBuffer extends Writer
         // If we really have something to write
         if (cnt > 0) {
             // real write to the adapter
-            outputChunk.setBytes(buf, off, cnt);
             try {
-                coyoteResponse.doWrite(outputChunk);
+                coyoteResponse.doWrite(ByteBuffer.wrap(buf, off, cnt));
             } catch (IOException e) {
                 // An IOException on a write is almost always due to
-                // the remote client aborting the request.  Wrap this
+                // the remote client aborting the request. Wrap this
                 // so that it can be handled better by the error dispatcher.
                 throw new ClientAbortException(e);
             }
@@ -406,7 +391,7 @@ public class OutputBuffer extends Writer
                 coyoteResponse.doWrite(buf.slice());
             } catch (IOException e) {
                 // An IOException on a write is almost always due to
-                // the remote client aborting the request.  Wrap this
+                // the remote client aborting the request. Wrap this
                 // so that it can be handled better by the error dispatcher.
                 throw new ClientAbortException(e);
             }
@@ -443,13 +428,13 @@ public class OutputBuffer extends Writer
             return;
         }
 
-        bb.append(b, off, len);
+        append(b, off, len);
         bytesWritten += len;
 
         // if called from within flush(), then immediately flush
         // remaining bytes
         if (doFlush) {
-            bb.flushBuffer();
+            flushByteBuffer();
         }
 
     }
@@ -461,13 +446,13 @@ public class OutputBuffer extends Writer
             return;
         }
 
-        bb.append(from);
+        append(from);
         bytesWritten += from.remaining();
 
         // if called from within flush(), then immediately flush
         // remaining bytes
         if (doFlush) {
-            bb.flushBuffer();
+            flushByteBuffer();
         }
 
     }
@@ -479,7 +464,11 @@ public class OutputBuffer extends Writer
             return;
         }
 
-        bb.append((byte) b);
+        if (isFull(bb)) {
+            flushByteBuffer();
+        }
+
+        transfer((byte) b, bb);
         bytesWritten++;
 
     }
@@ -500,20 +489,31 @@ public class OutputBuffer extends Writer
     @Override
     public void realWriteChars(char buf[], int off, int len) throws IOException {
 
-        outputCharChunk.setChars(buf, off, len);
-        while (outputCharChunk.getLength() > 0) {
+        CharBuffer outputCharChunk = CharBuffer.wrap(buf, off, len);
+        while (outputCharChunk.remaining() > 0) {
             conv.convert(outputCharChunk, bb);
-            if (bb.getLength() == 0) {
+            if (bb.remaining() == 0) {
                 // Break out of the loop if more chars are needed to produce any output
                 break;
             }
-            if (outputCharChunk.getLength() > 0) {
-                if (bb.getBuffer().length == bb.getEnd() && bb.getLength() < bb.getLimit()) {
-                    // Need to expand output buffer
-                    bb.makeSpace(outputCharChunk.getLength());
-                } else {
-                    bb.flushBuffer();
-                }
+            if (outputCharChunk.remaining() > 0) {
+                flushByteBuffer();
+            }
+        }
+
+    }
+
+    public void realWriteChars(CharBuffer from) throws IOException {
+
+        CharBuffer outputCharBuffer = from.slice();
+        while (outputCharBuffer.remaining() > 0) {
+            conv.convert(outputCharBuffer, bb);
+            if (bb.remaining() == 0) {
+                // Break out of the loop if more chars are needed to produce any output
+                break;
+            }
+            if (outputCharBuffer.remaining() > 0) {
+                flushByteBuffer();
             }
         }
 
@@ -526,7 +526,11 @@ public class OutputBuffer extends Writer
             return;
         }
 
-        cb.append((char) c);
+        if (isFull(cb)) {
+            flushCharBuffer();
+        }
+
+        transfer((char) c, cb);
         charsWritten++;
 
     }
@@ -551,7 +555,7 @@ public class OutputBuffer extends Writer
             return;
         }
 
-        cb.append(c, off, len);
+        append(c, off, len);
         charsWritten += len;
 
     }
@@ -570,7 +574,17 @@ public class OutputBuffer extends Writer
         if (s == null) {
             throw new NullPointerException(sm.getString("outputBuffer.writeNull"));
         }
-        cb.append(s, off, len);
+
+        int sOff = off;
+        int sEnd = off + len;
+        while (sOff < sEnd) {
+            int n = transfer(s, sOff, sEnd - sOff, cb);
+            sOff += n;
+            if (isFull(cb)) {
+                flushCharBuffer();
+            }
+        }
+
         charsWritten += len;
     }
 
@@ -585,8 +599,7 @@ public class OutputBuffer extends Writer
         if (s == null) {
             s = "null";
         }
-        cb.append(s);
-        charsWritten += s.length();
+        write(s, 0, s.length());
     }
 
 
@@ -686,8 +699,9 @@ public class OutputBuffer extends Writer
 
 
     public void setBufferSize(int size) {
-        if (size > bb.getLimit()) {// ??????
-            bb.setLimit(size);
+        if (size != bb.capacity()) {
+            bb = ByteBuffer.allocate(size);
+            clear(bb);
         }
     }
 
@@ -697,8 +711,8 @@ public class OutputBuffer extends Writer
     }
 
     public void reset(boolean resetWriterStreamFlags) {
-        bb.recycle();
-        cb.recycle();
+        clear(bb);
+        clear(cb);
         bytesWritten = 0;
         charsWritten = 0;
         if (resetWriterStreamFlags) {
@@ -713,7 +727,7 @@ public class OutputBuffer extends Writer
 
 
     public int getBufferSize() {
-        return bb.getLimit();
+        return bb.capacity();
     }
 
 
@@ -738,5 +752,198 @@ public class OutputBuffer extends Writer
 
     public void checkRegisterForWrite() {
         coyoteResponse.checkRegisterForWrite();
+    }
+
+    /**
+     * Add data to the buffer.
+     *
+     * @param src Bytes array
+     * @param off Offset
+     * @param len Length
+     * @throws IOException Writing overflow data to the output channel failed
+     */
+    public void append(byte src[], int off, int len) throws IOException {
+        if (bb.remaining() == 0) {
+            appendByteArray(src, off, len);
+        } else {
+            int n = transfer(src, off, len, bb);
+            len = len - n;
+            off = off + n;
+            if (isFull(bb)) {
+                flushByteBuffer();
+                appendByteArray(src, off, len);
+            }
+        }
+    }
+
+    /**
+     * Add data to the buffer.
+     * @param src Char array
+     * @param off Offset
+     * @param len Length
+     * @throws IOException Writing overflow data to the output channel failed
+     */
+    public void append(char src[], int off, int len) throws IOException {
+        // if we have limit and we're below
+        if(len <= cb.capacity() - cb.limit()) {
+            transfer(src, off, len, cb);
+            return;
+        }
+
+        // Optimization:
+        // If len-avail < length ( i.e. after we fill the buffer with
+        // what we can, the remaining will fit in the buffer ) we'll just
+        // copy the first part, flush, then copy the second part - 1 write
+        // and still have some space for more. We'll still have 2 writes, but
+        // we write more on the first.
+        if(len + cb.limit() < 2 * cb.capacity()) {
+            /* If the request length exceeds the size of the output buffer,
+               flush the output buffer and then write the data directly.
+               We can't avoid 2 writes, but we can write more on the second
+            */
+            int n = transfer(src, off, len, cb);
+
+            flushCharBuffer();
+
+            transfer(src, off + n, len - n, cb);
+        } else {
+            // long write - flush the buffer and write the rest
+            // directly from source
+            flushCharBuffer();
+
+            realWriteChars(src, off, len);
+        }
+    }
+
+
+    public void append(ByteBuffer from) throws IOException {
+        if (bb.remaining() == 0) {
+            appendByteBuffer(from);
+        } else {
+            transfer(from, bb);
+            if (isFull(bb)) {
+                flushByteBuffer();
+                appendByteBuffer(from);
+            }
+        }
+    }
+
+    private void appendByteArray(byte src[], int off, int len) throws IOException {
+        if (len == 0) {
+            return;
+        }
+
+        int limit = bb.capacity();
+        while (len >= limit) {
+            realWriteBytes(src, off, limit);
+            len = len - limit;
+            off = off + limit;
+        }
+
+        if (len > 0) {
+            transfer(src, off, len, bb);
+        }
+    }
+
+    private void appendByteBuffer(ByteBuffer from) throws IOException {
+        if (from.remaining() == 0) {
+            return;
+        }
+
+        int limit = bb.capacity();
+        int fromLimit = from.limit();
+        while (from.remaining() >= limit) {
+            from.limit(from.position() + limit);
+            realWriteBytes(from);
+            from.position(from.limit());
+            from.limit(fromLimit);
+        }
+
+        if (from.remaining() > 0) {
+            transfer(from, bb);
+        }
+    }
+
+    private void flushByteBuffer() throws IOException {
+        realWriteBytes(bb);
+        clear(bb);
+    }
+
+    private void flushCharBuffer() throws IOException {
+        realWriteChars(cb);
+        clear(cb);
+    }
+
+    private void transfer(byte b, ByteBuffer to) {
+        toWriteMode(to);
+        to.put(b);
+        toReadMode(to);
+    }
+
+    private void transfer(char b, CharBuffer to) {
+        toWriteMode(to);
+        to.put(b);
+        toReadMode(to);
+    }
+
+    private int transfer(byte[] buf, int off, int len, ByteBuffer to) {
+        toWriteMode(to);
+        int max = Math.min(len, to.remaining());
+        if (max > 0) {
+            to.put(buf, off, max);
+        }
+        toReadMode(to);
+        return max;
+    }
+
+    private int transfer(char[] buf, int off, int len, CharBuffer to) {
+        toWriteMode(to);
+        int max = Math.min(len, to.remaining());
+        if (max > 0) {
+            to.put(buf, off, max);
+        }
+        toReadMode(to);
+        return max;
+    }
+
+    private int transfer(String s, int off, int len, CharBuffer to) {
+        toWriteMode(to);
+        int max = Math.min(len, to.remaining());
+        if (max > 0) {
+            to.put(s, off, off + max);
+        }
+        toReadMode(to);
+        return max;
+    }
+
+    private void transfer(ByteBuffer from, ByteBuffer to) {
+        toWriteMode(to);
+        int max = Math.min(from.remaining(), to.remaining());
+        if (max > 0) {
+            int fromLimit = from.limit();
+            from.limit(from.position() + max);
+            to.put(from);
+            from.limit(fromLimit);
+        }
+        toReadMode(to);
+    }
+
+    private void clear(Buffer buffer) {
+        buffer.rewind().limit(0);
+    }
+
+    private boolean isFull(Buffer buffer) {
+        return buffer.limit() == buffer.capacity();
+    }
+
+    private void toReadMode(Buffer buffer) {
+        buffer.limit(buffer.position())
+              .reset();
+    }
+
+    private void toWriteMode(Buffer buffer) {
+        buffer.mark()
+              .position(buffer.limit())
+              .limit(buffer.capacity());
     }
 }

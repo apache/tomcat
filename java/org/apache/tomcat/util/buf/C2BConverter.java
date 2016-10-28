@@ -122,6 +122,70 @@ public final class C2BConverter {
         }
     }
 
+    /**
+     * Convert the given characters to bytes.
+     *
+     * @param cc char input
+     * @param bc byte output
+     * @throws IOException An encoding error occurred
+     */
+    public void convert(CharBuffer cc, ByteBuffer bc) throws IOException {
+        if ((bb == null) || (bb.array() != bc.array())) {
+            // Create a new byte buffer if anything changed
+            bb = ByteBuffer.wrap(bc.array(), bc.limit(), bc.capacity() - bc.limit());
+        } else {
+            // Initialize the byte buffer
+            bb.limit(bc.capacity());
+            bb.position(bc.limit());
+        }
+        if ((cb == null) || (cb.array() != cc.array())) {
+            // Create a new char buffer if anything changed
+            cb = CharBuffer.wrap(cc.array(), cc.arrayOffset() + cc.position(), cc.remaining());
+        } else {
+            // Initialize the char buffer
+            cb.limit(cc.limit());
+            cb.position(cc.position());
+        }
+        CoderResult result = null;
+        // Parse leftover if any are present
+        if (leftovers.position() > 0) {
+            int pos = bb.position();
+            // Loop until one char is encoded or there is a encoder error
+            do {
+                leftovers.put((char) cc.get());
+                leftovers.flip();
+                result = encoder.encode(leftovers, bb, false);
+                leftovers.position(leftovers.limit());
+                leftovers.limit(leftovers.array().length);
+            } while (result.isUnderflow() && (bb.position() == pos));
+            if (result.isError() || result.isMalformed()) {
+                result.throwException();
+            }
+            cb.position(cc.position());
+            leftovers.position(0);
+        }
+        // Do the decoding and get the results into the byte chunk and the char
+        // chunk
+        result = encoder.encode(cb, bb, false);
+        if (result.isError() || result.isMalformed()) {
+            result.throwException();
+        } else if (result.isOverflow()) {
+            // Propagate current positions to the byte chunk and char chunk
+            bc.limit(bb.position());
+            cc.position(cb.position());
+        } else if (result.isUnderflow()) {
+            // Propagate current positions to the byte chunk and char chunk
+            bc.limit(bb.position());
+            cc.position(cb.position());
+            // Put leftovers in the leftovers char buffer
+            if (cc.remaining() > 0) {
+                leftovers.limit(leftovers.array().length);
+                leftovers.position(cc.remaining());
+                cc.get(leftovers.array(), 0, cc.remaining());
+            }
+        }
+    }
+
     public Charset getCharset() {
         return encoder.charset();
     }
