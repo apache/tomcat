@@ -331,41 +331,6 @@ public class OutputBuffer extends Writer {
      * Sends the buffer data to the client output, checking the
      * state of Response and calling the right interceptors.
      *
-     * @param buf Byte buffer to be written to the response
-     * @param off Offset
-     * @param cnt Length
-     *
-     * @throws IOException An underlying IOException occurred
-     */
-    public void realWriteBytes(byte buf[], int off, int cnt) throws IOException {
-
-        if (closed) {
-            return;
-        }
-        if (coyoteResponse == null) {
-            return;
-        }
-
-        // If we really have something to write
-        if (cnt > 0) {
-            // real write to the adapter
-            try {
-                coyoteResponse.doWrite(ByteBuffer.wrap(buf, off, cnt));
-            } catch (IOException e) {
-                // An IOException on a write is almost always due to
-                // the remote client aborting the request. Wrap this
-                // so that it can be handled better by the error dispatcher.
-                throw new ClientAbortException(e);
-            }
-        }
-
-    }
-
-
-    /**
-     * Sends the buffer data to the client output, checking the
-     * state of Response and calling the right interceptors.
-     *
      * @param buf the ByteBuffer to be written to the response
      *
      * @throws IOException An underlying IOException occurred
@@ -383,7 +348,7 @@ public class OutputBuffer extends Writer {
         if (buf.remaining() > 0) {
             // real write to the adapter
             try {
-                coyoteResponse.doWrite(buf.slice());
+                coyoteResponse.doWrite(buf);
             } catch (IOException e) {
                 // An IOException on a write is almost always due to
                 // the remote client aborting the request. Wrap this
@@ -475,38 +440,19 @@ public class OutputBuffer extends Writer {
     /**
      * Convert the chars to bytes, then send the data to the client.
      *
-     * @param buf Char buffer to be written to the response
-     * @param off Offset
-     * @param len Length
+     * @param from Char buffer to be written to the response
      *
      * @throws IOException An underlying IOException occurred
      */
-    public void realWriteChars(char buf[], int off, int len) throws IOException {
-
-        CharBuffer outputCharChunk = CharBuffer.wrap(buf, off, len);
-        while (outputCharChunk.remaining() > 0) {
-            conv.convert(outputCharChunk, bb);
-            if (bb.remaining() == 0) {
-                // Break out of the loop if more chars are needed to produce any output
-                break;
-            }
-            if (outputCharChunk.remaining() > 0) {
-                flushByteBuffer();
-            }
-        }
-
-    }
-
     public void realWriteChars(CharBuffer from) throws IOException {
 
-        CharBuffer outputCharBuffer = from.slice();
-        while (outputCharBuffer.remaining() > 0) {
-            conv.convert(outputCharBuffer, bb);
+        while (from.remaining() > 0) {
+            conv.convert(from, bb);
             if (bb.remaining() == 0) {
                 // Break out of the loop if more chars are needed to produce any output
                 break;
             }
-            if (outputCharBuffer.remaining() > 0) {
+            if (from.remaining() > 0) {
                 flushByteBuffer();
             }
         }
@@ -805,7 +751,7 @@ public class OutputBuffer extends Writer {
             // directly from source
             flushCharBuffer();
 
-            realWriteChars(src, off, len);
+            realWriteChars(CharBuffer.wrap(src, off, len));
         }
     }
 
@@ -829,7 +775,7 @@ public class OutputBuffer extends Writer {
 
         int limit = bb.capacity();
         while (len >= limit) {
-            realWriteBytes(src, off, limit);
+            realWriteBytes(ByteBuffer.wrap(src, off, limit));
             len = len - limit;
             off = off + limit;
         }
@@ -848,7 +794,7 @@ public class OutputBuffer extends Writer {
         int fromLimit = from.limit();
         while (from.remaining() >= limit) {
             from.limit(from.position() + limit);
-            realWriteBytes(from);
+            realWriteBytes(from.slice());
             from.position(from.limit());
             from.limit(fromLimit);
         }
@@ -859,12 +805,12 @@ public class OutputBuffer extends Writer {
     }
 
     private void flushByteBuffer() throws IOException {
-        realWriteBytes(bb);
+        realWriteBytes(bb.slice());
         clear(bb);
     }
 
     private void flushCharBuffer() throws IOException {
-        realWriteChars(cb);
+        realWriteChars(cb.slice());
         clear(cb);
     }
 
