@@ -538,7 +538,8 @@ public class SecureNioChannel extends NioChannel  {
     @Override
     public int read(ByteBuffer dst) throws IOException {
         // Make sure we only use the ApplicationBufferHandler's buffers
-        if (dst != getBufHandler().getReadBuffer()) {
+        if (dst != getBufHandler().getReadBuffer() && (getAppReadBufHandler() == null
+                || dst != getAppReadBufHandler().getByteBuffer())) {
             throw new IllegalArgumentException(sm.getString("channel.nio.ssl.invalidBuffer"));
         }
         //are we in the middle of closing or closed?
@@ -587,6 +588,10 @@ public class SecureNioChannel extends NioChannel  {
                         // This is the normal case for this code
                         getBufHandler().expand(sslEngine.getSession().getApplicationBufferSize());
                         dst = getBufHandler().getReadBuffer();
+                    } else if (dst == getAppReadBufHandler().getByteBuffer()) {
+                        getAppReadBufHandler()
+                                .expand(sslEngine.getSession().getApplicationBufferSize());
+                        dst = getAppReadBufHandler().getByteBuffer();
                     } else {
                         // Can't expand the buffer as there is no way to signal
                         // to the caller that the buffer has been replaced.
@@ -660,16 +665,6 @@ public class SecureNioChannel extends NioChannel  {
         flush(netOutBuffer);
         int remaining2= netOutBuffer.remaining();
         return remaining2 < remaining;
-    }
-
-
-    /**
-     * Callback interface to be able to expand buffers
-     * when buffer overflow exceptions happen
-     */
-    public static interface ApplicationBufferHandler {
-        public ByteBuffer getReadBuffer();
-        public ByteBuffer getWriteBuffer();
     }
 
     @Override

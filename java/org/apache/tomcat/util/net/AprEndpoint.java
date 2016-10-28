@@ -2789,5 +2789,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             SSLSocket.setVerify(socket, SSL.SSL_CVERIFY_REQUIRE, -1);
             SSLSocket.renegotiate(socket);
         }
+
+
+        @Override
+        public void setAppReadBufHandler(ApplicationBufferHandler handler) {
+            // no-op
+        }
     }
 }
