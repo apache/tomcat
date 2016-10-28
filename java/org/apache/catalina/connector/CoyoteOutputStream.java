@@ -55,8 +55,7 @@ public class CoyoteOutputStream extends ServletOutputStream {
      * Prevent cloning the facade.
      */
     @Override
-    protected Object clone()
-        throws CloneNotSupportedException {
+    protected Object clone() throws CloneNotSupportedException {
         throw new CloneNotSupportedException();
     }
 
@@ -134,8 +133,7 @@ public class CoyoteOutputStream extends ServletOutputStream {
     private boolean checkNonBlockingWrite() {
         boolean nonBlocking = !ob.isBlocking();
         if (nonBlocking && !ob.isReady()) {
-            throw new IllegalStateException(
-                    sm.getString("coyoteOutputStream.nbNotready"));
+            throw new IllegalStateException(sm.getString("coyoteOutputStream.nbNotready"));
         }
         return nonBlocking;
     }
@@ -155,8 +153,7 @@ public class CoyoteOutputStream extends ServletOutputStream {
 
 
     @Override
-    public void close()
-        throws IOException {
+    public void close() throws IOException {
         ob.close();
     }
 
