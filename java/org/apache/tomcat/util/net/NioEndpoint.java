@@ -1165,7 +1165,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         public int read(boolean block, ByteBuffer to) throws IOException {
             int nRead = populateReadBuffer(to);
             if (nRead > 0) {
-                to.flip();
                 return nRead;
                 /*
                  * Since more bytes may have arrived since the buffer was last
@@ -1182,7 +1181,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 to.limit(to.position() + limit);
                 nRead = fillReadBuffer(block, to);
                 updateLastRead();
-                to.flip();
             } else {
                 // Fill the read buffer as best we can.
                 nRead = fillReadBuffer(block);
@@ -1192,7 +1190,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 // data that was just read
                 if (nRead > 0) {
                     nRead = populateReadBuffer(to);
-                    to.flip();
                 }
             }
             return nRead;
