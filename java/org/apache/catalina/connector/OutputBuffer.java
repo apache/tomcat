@@ -35,9 +35,7 @@ import org.apache.catalina.Globals;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Response;
 import org.apache.tomcat.util.buf.B2CConverter;
-import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.C2BConverter;
-import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -48,8 +46,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Costin Manolache
  * @author Remy Maucherat
  */
-public class OutputBuffer extends Writer
-    implements ByteChunk.ByteOutputChannel, CharChunk.CharOutputChannel {
+public class OutputBuffer extends Writer {
 
     private static final StringManager sm = StringManager.getManager(OutputBuffer.class);
 
@@ -340,7 +337,6 @@ public class OutputBuffer extends Writer
      *
      * @throws IOException An underlying IOException occurred
      */
-    @Override
     public void realWriteBytes(byte buf[], int off, int cnt) throws IOException {
 
         if (closed) {
@@ -374,7 +370,6 @@ public class OutputBuffer extends Writer
      *
      * @throws IOException An underlying IOException occurred
      */
-    @Override
     public void realWriteBytes(ByteBuffer buf) throws IOException {
 
         if (closed) {
@@ -486,7 +481,6 @@ public class OutputBuffer extends Writer
      *
      * @throws IOException An underlying IOException occurred
      */
-    @Override
     public void realWriteChars(char buf[], int off, int len) throws IOException {
 
         CharBuffer outputCharChunk = CharBuffer.wrap(buf, off, len);
