@@ -55,17 +55,18 @@ public class WsFrameServer extends WsFrameBase {
         if (log.isDebugEnabled()) {
             log.debug("wsFrameServer.onDataAvailable");
         }
-        while (isOpen() && socketWrapper.isReadyForRead()) {
+        while (isOpen()) {
             // Fill up the input buffer with as much data as we can
-            int read = socketWrapper.read(
-                    false, inputBuffer, writePos, inputBuffer.length - writePos);
+            inputBuffer.mark();
+            inputBuffer.position(inputBuffer.limit()).limit(inputBuffer.capacity());
+            int read = socketWrapper.read(false, inputBuffer);
+            inputBuffer.limit(inputBuffer.position()).reset();
             if (read <= 0) {
                 return;
             }
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("wsFrameServer.bytesRead", Integer.toString(read)));
             }
-            writePos += read;
             processInputBuffer();
         }
     }
