@@ -2329,7 +2329,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
             // The socket read buffer capacity is socket.appReadBufSize
             int limit = socketBufferHandler.getReadBuffer().capacity();
-            if (to.remaining() >= limit) {
+            if (to.isDirect() && to.remaining() >= limit) {
                 to.limit(to.position() + limit);
                 nRead = fillReadBuffer(block, to);
                 to.flip();
