@@ -282,6 +282,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
     // ---------------------------------------------------- InputBuffer Methods
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 9. Use
+     *             {@link #doRead(ApplicationBufferHandler)}
+     */
     @Override
     public int doRead(ByteChunk chunk) throws IOException {
 
@@ -1067,6 +1071,11 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
      */
     private class SocketInputBuffer implements InputBuffer {
 
+        /**
+         *
+         * @deprecated Unused. Will be removed in Tomcat 9. Use
+         *             {@link #doRead(ApplicationBufferHandler)}
+         */
         @Override
         public int doRead(ByteChunk chunk) throws IOException {
 

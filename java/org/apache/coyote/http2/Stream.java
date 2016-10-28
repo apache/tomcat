@@ -715,6 +715,10 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         private volatile boolean readInterest;
         private boolean reset = false;
 
+        /**
+         * @deprecated Unused. Will be removed in Tomcat 9. Use
+         *             {@link #doRead(ApplicationBufferHandler)}
+         */
         @Override
         public int doRead(ByteChunk chunk) throws IOException {
 

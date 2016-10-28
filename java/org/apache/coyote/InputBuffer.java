@@ -39,6 +39,9 @@ public interface InputBuffer {
      *         end of stream
      *
      * @throws IOException If an I/O error occurs reading from the input stream
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9. Use
+     *             {@link #doRead(ApplicationBufferHandler)}
      */
     public int doRead(ByteChunk chunk) throws IOException;
 
