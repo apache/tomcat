@@ -26,12 +26,13 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.http11.InputFilter;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.ApplicationBufferHandler;
 
 /**
  * Input filter responsible for reading and buffering the request body, so that
  * it does not interfere with client SSL handshake messages.
  */
-public class BufferedInputFilter implements InputFilter {
+public class BufferedInputFilter implements InputFilter, ApplicationBufferHandler {
 
     // -------------------------------------------------------------- Constants
 
@@ -42,7 +43,7 @@ public class BufferedInputFilter implements InputFilter {
     // ----------------------------------------------------- Instance Variables
 
     private ByteBuffer buffered;
-    private final ByteChunk tempRead = new ByteChunk(1024);
+    private ByteBuffer tempRead;
     private InputBuffer buffer;
     private boolean hasRead = false;
 
@@ -82,11 +83,11 @@ public class BufferedInputFilter implements InputFilter {
     public void setRequest(Request request) {
         // save off the Request body
         try {
-            while (buffer.doRead(tempRead) >= 0) {
+            while (buffer.doRead(this) >= 0) {
                 buffered.mark().position(buffered.limit()).limit(buffered.capacity());
-                buffered.put(tempRead.getBytes(), tempRead.getStart(), tempRead.getLength());
+                buffered.put(tempRead);
                 buffered.limit(buffered.position()).reset();
-                tempRead.recycle();
+                tempRead = null;
             }
         } catch(IOException | BufferOverflowException ioe) {
             // No need for i18n - this isn't going to get logged anywhere
@@ -110,6 +111,20 @@ public class BufferedInputFilter implements InputFilter {
         return chunk.getLength();
     }
 
+    /**
+     * Fills the given ByteBuffer with the buffered request body.
+     */
+    @Override
+    public int doRead(ApplicationBufferHandler handler) throws IOException {
+        if (isFinished()) {
+            return -1;
+        }
+
+        handler.setByteBuffer(buffered);
+        hasRead = true;
+        return buffered.remaining();
+    }
+
     @Override
     public void setBuffer(InputBuffer buffer) {
         this.buffer = buffer;
@@ -124,7 +139,6 @@ public class BufferedInputFilter implements InputFilter {
                 buffered.position(0).limit(0);
             }
         }
-        tempRead.recycle();
         hasRead = false;
         buffer = null;
     }
@@ -148,5 +162,23 @@ public class BufferedInputFilter implements InputFilter {
     @Override
     public boolean isFinished() {
         return hasRead || buffered.remaining() <= 0;
+    }
+
+
+    @Override
+    public void setByteBuffer(ByteBuffer buffer) {
+        tempRead = buffer;
+    }
+
+
+    @Override
+    public ByteBuffer getByteBuffer() {
+        return tempRead;
+    }
+
+
+    @Override
+    public void expand(int size) {
+        // no-op
     }
 }

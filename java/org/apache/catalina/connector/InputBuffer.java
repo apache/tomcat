@@ -36,6 +36,7 @@ import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.collections.SynchronizedStack;
+import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -48,7 +49,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class InputBuffer extends Reader
     implements ByteChunk.ByteInputChannel, CharChunk.CharInputChannel,
-               CharChunk.CharOutputChannel {
+               CharChunk.CharOutputChannel, ApplicationBufferHandler {
 
     /**
      * The string manager for this package.
@@ -75,6 +76,7 @@ public class InputBuffer extends Reader
      * The byte buffer.
      */
     private final ByteChunk bb;
+    private ByteBuffer tempRead;
 
 
     /**
@@ -146,6 +148,8 @@ public class InputBuffer extends Reader
     public InputBuffer(int size) {
 
         this.size = size;
+        tempRead = ByteBuffer.allocate(size);
+        tempRead.flip();
         bb = new ByteChunk(size);
         bb.setLimit(size);
         bb.setByteInputChannel(this);
@@ -314,8 +318,10 @@ public class InputBuffer extends Reader
             state = BYTE_STATE;
         }
 
-        int result = coyoteRequest.doRead(bb);
-
+        int result = coyoteRequest.doRead(this);
+        bb.setBytes(tempRead.array(), tempRead.arrayOffset() + tempRead.position(),
+                tempRead.remaining());
+        tempRead.position(0).limit(0);
         return result;
     }
 
@@ -593,5 +599,23 @@ public class InputBuffer extends Reader
             return new B2CConverter(charset);
         }
 
+    }
+
+
+    @Override
+    public void setByteBuffer(ByteBuffer buffer) {
+        tempRead = buffer;
+    }
+
+
+    @Override
+    public ByteBuffer getByteBuffer() {
+        return tempRead;
+    }
+
+
+    @Override
+    public void expand(int size) {
+        // no-op
     }
 }

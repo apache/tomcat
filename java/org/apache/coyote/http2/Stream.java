@@ -33,6 +33,7 @@ import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
 public class Stream extends AbstractStream implements HeaderEmitter {
@@ -762,6 +763,62 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             }
 
             chunk.setBytes(outBuffer, 0,  written);
+
+            // Increment client-side flow control windows by the number of bytes
+            // read
+            handler.writeWindowUpdate(Stream.this, written, true);
+
+            return written;
+        }
+
+        @Override
+        public int doRead(ApplicationBufferHandler applicationBufferHandler) throws IOException {
+
+            ensureBuffersExist();
+
+            int written = -1;
+
+            // Ensure that only one thread accesses inBuffer at a time
+            synchronized (inBuffer) {
+                while (inBuffer.position() == 0 && !isInputFinished()) {
+                    // Need to block until some data is written
+                    try {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("stream.inputBuffer.empty"));
+                        }
+                        inBuffer.wait();
+                        if (reset) {
+                            // TODO: i18n
+                            throw new IOException("HTTP/2 Stream reset");
+                        }
+                    } catch (InterruptedException e) {
+                        // Possible shutdown / rst or similar. Use an
+                        // IOException to signal to the client that further I/O
+                        // isn't possible for this Stream.
+                        throw new IOException(e);
+                    }
+                }
+
+                if (inBuffer.position() > 0) {
+                    // Data is available in the inBuffer. Copy it to the
+                    // outBuffer.
+                    inBuffer.flip();
+                    written = inBuffer.remaining();
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("stream.inputBuffer.copy",
+                                Integer.toString(written)));
+                    }
+                    inBuffer.get(outBuffer, 0, written);
+                    inBuffer.clear();
+                } else if (isInputFinished()) {
+                    return -1;
+                } else {
+                    // Should never happen
+                    throw new IllegalStateException();
+                }
+            }
+
+            applicationBufferHandler.setByteBuffer(ByteBuffer.wrap(outBuffer, 0,  written));
 
             // Increment client-side flow control windows by the number of bytes
             // read

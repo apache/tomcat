@@ -292,6 +292,16 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
     }
 
+    @Override
+    public int doRead(ApplicationBufferHandler handler) throws IOException {
+
+        if (lastActiveFilter == -1)
+            return inputStreamInputBuffer.doRead(handler);
+        else
+            return activeFilters[lastActiveFilter].doRead(handler);
+
+    }
+
 
     // ------------------------------------------------------- Protected Methods
 
@@ -1073,6 +1083,29 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
             return length;
         }
+
+        @Override
+        public int doRead(ApplicationBufferHandler handler) throws IOException {
+
+            if (byteBuffer.position() >= byteBuffer.limit()) {
+                // The application is reading the HTTP request body which is
+                // always a blocking operation.
+                if (!fill(true))
+                    return -1;
+            }
+
+            int length = byteBuffer.remaining();
+            handler.setByteBuffer(byteBuffer.duplicate());
+            byteBuffer.position(byteBuffer.limit());
+
+            return length;
+        }
+    }
+
+
+    @Override
+    public void setByteBuffer(ByteBuffer buffer) {
+        byteBuffer = buffer;
     }
 
 
