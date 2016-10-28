@@ -264,6 +264,12 @@
         <code>/</code> character should not be allowed in a cookie name since
         the RFC6265 will drop such cookies as invalid. (markt)
       </fix>
+      <add>
+        Introduce new methods <code>read(ByteBuffer)</code>/
+        <code>write(ByteBuffer)</code> in
+        <code>o.a.catalina.connector.CoyoteInputStream</code>/
+        <code>o.a.catalina.connector.CoyoteOutputStream</code>. (violetagg)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
