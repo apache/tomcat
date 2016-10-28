@@ -18,6 +18,7 @@
 package org.apache.coyote.http11.filters;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.coyote.InputBuffer;
@@ -32,7 +33,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Remy Maucherat
  */
-public class IdentityInputFilter implements InputFilter {
+public class IdentityInputFilter implements InputFilter, ApplicationBufferHandler {
 
     private static final StringManager sm = StringManager.getManager(
             IdentityInputFilter.class.getPackage().getName());
@@ -76,9 +77,9 @@ public class IdentityInputFilter implements InputFilter {
 
 
     /**
-     * Chunk used to read leftover bytes.
+     * ByteBuffer used to read leftover bytes.
      */
-    protected final ByteChunk endChunk = new ByteChunk();
+    protected ByteBuffer tempRead;
 
 
     private final int maxSwallowSize;
@@ -181,7 +182,8 @@ public class IdentityInputFilter implements InputFilter {
         // Consume extra bytes.
         while (remaining > 0) {
 
-            int nread = buffer.doRead(endChunk);
+            int nread = buffer.doRead(this);
+            tempRead = null;
             if (nread > 0 ) {
                 swallowed += nread;
                 remaining = remaining - nread;
@@ -227,7 +229,6 @@ public class IdentityInputFilter implements InputFilter {
     public void recycle() {
         contentLength = -1;
         remaining = 0;
-        endChunk.recycle();
     }
 
 
@@ -246,5 +247,23 @@ public class IdentityInputFilter implements InputFilter {
         // Only finished if a content length is defined and there is no data
         // remaining
         return contentLength > -1 && remaining <= 0;
+    }
+
+
+    @Override
+    public void setByteBuffer(ByteBuffer buffer) {
+        tempRead = buffer;
+    }
+
+
+    @Override
+    public ByteBuffer getByteBuffer() {
+        return tempRead;
+    }
+
+
+    @Override
+    public void expand(int size) {
+        // no-op
     }
 }
