@@ -466,6 +466,30 @@ public final class ByteChunk implements Cloneable, Serializable {
     }
 
 
+    /**
+     * Transfers bytes from the buffer to the specified ByteBuffer. After the
+     * operation the position of the ByteBuffer will be returned to the one
+     * before the operation, the limit will be the position incremented by
+     * the number of the transfered bytes.
+     *
+     * @param to the ByteBuffer into which bytes are to be written.
+     * @return an integer specifying the actual number of bytes read, or -1 if
+     *         the end of the stream is reached
+     * @throws IOException if an input or output exception has occurred
+     */
+    public int substract(ByteBuffer to) throws IOException {
+        if (checkEof()) {
+            return -1;
+        }
+        int n = Math.min(to.remaining(), getLength());
+        to.put(buff, start, n);
+        to.limit(to.position());
+        to.position(to.position() - n);
+        start += n;
+        return n;
+    }
+
+
     private boolean checkEof() throws IOException {
         if ((end - start) == 0) {
             if (in == null) {

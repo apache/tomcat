@@ -18,6 +18,7 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
@@ -334,6 +335,26 @@ public class InputBuffer extends Reader
         }
 
         return bb.substract(b, off, len);
+    }
+
+
+    /**
+     * Transfers bytes from the buffer to the specified ByteBuffer. After the
+     * operation the position of the ByteBuffer will be returned to the one
+     * before the operation, the limit will be the position incremented by
+     * the number of the transfered bytes.
+     *
+     * @param b the ByteBuffer into which bytes are to be written.
+     * @return an integer specifying the actual number of bytes read, or -1 if
+     *         the end of the stream is reached
+     * @throws IOException if an input or output exception has occurred
+     */
+    public int read(ByteBuffer b) throws IOException {
+        if (closed) {
+            throw new IOException(sm.getString("inputBuffer.streamClosed"));
+        }
+
+        return bb.substract(b);
     }
 
 
