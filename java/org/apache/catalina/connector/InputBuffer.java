@@ -36,7 +36,6 @@ import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
@@ -50,8 +49,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Remy Maucherat
  */
 public class InputBuffer extends Reader
-    implements ByteChunk.ByteInputChannel, CharChunk.CharInputChannel,
-               CharChunk.CharOutputChannel, ApplicationBufferHandler {
+    implements ByteChunk.ByteInputChannel, ApplicationBufferHandler {
 
     /**
      * The string manager for this package.
@@ -387,8 +385,12 @@ public class InputBuffer extends Reader
      * be removed from the buffer for "writing". Since the chars have already
      * been read before, they are ignored. If a mark was set, then the
      * mark is lost.
+     *
+     * @param c characters that will be written
+     * @param off offset in the characters array
+     * @param len length that will be written
+     * @throws IOException If an I/O occurs while writing the characters
      */
-    @Override
     public void realWriteChars(char c[], int off, int len) throws IOException {
         markPos = -1;
         clear(cb);
@@ -400,7 +402,6 @@ public class InputBuffer extends Reader
     }
 
 
-    @Override
     public int realReadChars() throws IOException {
         checkConverter();
 
