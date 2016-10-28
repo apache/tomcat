@@ -152,7 +152,7 @@ public final class C2BConverter {
             int pos = bb.position();
             // Loop until one char is encoded or there is a encoder error
             do {
-                leftovers.put((char) cc.get());
+                leftovers.put(cc.get());
                 leftovers.flip();
                 result = encoder.encode(leftovers, bb, false);
                 leftovers.position(leftovers.limit());
