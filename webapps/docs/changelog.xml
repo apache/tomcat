@@ -78,6 +78,12 @@
         Refactor creation of containers in embedded mode for more consistency
         and flexibility. (remm)
       </fix>
+      <add>
+        Introduce new methods <code>read(ByteBuffer)</code>/
+        <code>write(ByteBuffer)</code> in
+        <code>o.a.catalina.connector.CoyoteInputStream</code>/
+        <code>o.a.catalina.connector.CoyoteOutputStream</code>. (violetagg)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
