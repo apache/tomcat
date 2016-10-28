@@ -18,7 +18,9 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
@@ -75,14 +77,13 @@ public class InputBuffer extends Reader
     /**
      * The byte buffer.
      */
-    private final ByteChunk bb;
-    private ByteBuffer tempRead;
+    private ByteBuffer bb;
 
 
     /**
-     * The chunk buffer.
+     * The char buffer.
      */
-    private CharChunk cb;
+    private CharBuffer cb;
 
 
     /**
@@ -122,6 +123,12 @@ public class InputBuffer extends Reader
 
 
     /**
+     * Char buffer limit.
+     */
+    private int readLimit;
+
+
+    /**
      * Buffer size.
      */
     private final int size;
@@ -148,16 +155,11 @@ public class InputBuffer extends Reader
     public InputBuffer(int size) {
 
         this.size = size;
-        tempRead = ByteBuffer.allocate(size);
-        tempRead.flip();
-        bb = new ByteChunk(size);
-        bb.setLimit(size);
-        bb.setByteInputChannel(this);
-        cb = new CharChunk(size);
-        cb.setLimit(size);
-        cb.setOptimizedWrite(false);
-        cb.setCharInputChannel(this);
-        cb.setCharOutputChannel(this);
+        bb = ByteBuffer.allocate(size);
+        clear(bb);
+        cb = CharBuffer.allocate(size);
+        clear(cb);
+        readLimit = size;
 
     }
 
@@ -185,17 +187,15 @@ public class InputBuffer extends Reader
         state = INITIAL_STATE;
 
         // If usage of mark made the buffer too big, reallocate it
-        if (cb.getChars().length > size) {
-            cb = new CharChunk(size);
-            cb.setLimit(size);
-            cb.setOptimizedWrite(false);
-            cb.setCharInputChannel(this);
-            cb.setCharOutputChannel(this);
+        if (cb.capacity() > size) {
+            cb = CharBuffer.allocate(size);
+            clear(cb);
         } else {
-            cb.recycle();
+            clear(cb);
         }
+        readLimit = size;
         markPos = -1;
-        bb.recycle();
+        clear(bb);
         closed = false;
 
         if (conv != null) {
@@ -222,9 +222,9 @@ public class InputBuffer extends Reader
     public int available() {
         int available = 0;
         if (state == BYTE_STATE) {
-            available = bb.getLength();
+            available = bb.remaining();
         } else if (state == CHAR_STATE) {
-            available = cb.getLength();
+            available = cb.remaining();
         }
         if (available == 0) {
             coyoteRequest.action(ActionCode.AVAILABLE,
@@ -259,9 +259,9 @@ public class InputBuffer extends Reader
     public boolean isFinished() {
         int available = 0;
         if (state == BYTE_STATE) {
-            available = bb.getLength();
+            available = bb.remaining();
         } else if (state == CHAR_STATE) {
-            available = cb.getLength();
+            available = cb.remaining();
         }
         if (available > 0) {
             return false;
@@ -319,9 +319,7 @@ public class InputBuffer extends Reader
         }
 
         int result = coyoteRequest.doRead(this);
-        bb.setBytes(tempRead.array(), tempRead.arrayOffset() + tempRead.position(),
-                tempRead.remaining());
-        tempRead.position(0).limit(0);
+
         return result;
     }
 
@@ -331,7 +329,10 @@ public class InputBuffer extends Reader
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
         }
 
-        return bb.substract();
+        if (checkByteBufferEof()) {
+            return -1;
+        }
+        return bb.get() & 0xFF;
     }
 
 
@@ -340,7 +341,12 @@ public class InputBuffer extends Reader
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
         }
 
-        return bb.substract(b, off, len);
+        if (checkByteBufferEof()) {
+            return -1;
+        }
+        int n = Math.min(len, bb.remaining());
+        bb.get(b, off, n);
+        return n;
     }
 
 
@@ -350,17 +356,26 @@ public class InputBuffer extends Reader
      * before the operation, the limit will be the position incremented by
      * the number of the transfered bytes.
      *
-     * @param b the ByteBuffer into which bytes are to be written.
+     * @param to the ByteBuffer into which bytes are to be written.
      * @return an integer specifying the actual number of bytes read, or -1 if
      *         the end of the stream is reached
      * @throws IOException if an input or output exception has occurred
      */
-    public int read(ByteBuffer b) throws IOException {
+    public int read(ByteBuffer to) throws IOException {
         if (closed) {
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
         }
 
-        return bb.substract(b);
+        if (checkByteBufferEof()) {
+            return -1;
+        }
+        int n = Math.min(to.remaining(), bb.remaining());
+        int orgLimit = bb.limit();
+        bb.limit(bb.position() + n);
+        to.put(bb);
+        bb.limit(orgLimit);
+        to.limit(to.position()).position(to.position() - n);
+        return n;
     }
 
 
@@ -376,8 +391,7 @@ public class InputBuffer extends Reader
     @Override
     public void realWriteChars(char c[], int off, int len) throws IOException {
         markPos = -1;
-        cb.setOffset(0);
-        cb.setEnd(0);
+        clear(cb);
     }
 
 
@@ -392,7 +406,7 @@ public class InputBuffer extends Reader
 
         boolean eof = false;
 
-        if (bb.getLength() <= 0) {
+        if (bb.remaining() <= 0) {
             int nRead = realReadBytes();
             if (nRead < 0) {
                 eof = true;
@@ -400,26 +414,24 @@ public class InputBuffer extends Reader
         }
 
         if (markPos == -1) {
-            cb.setOffset(0);
-            cb.setEnd(0);
+            clear(cb);
         } else {
             // Make sure there's enough space in the worst case
-            cb.makeSpace(bb.getLength());
-            if ((cb.getBuffer().length - cb.getEnd()) == 0 && bb.getLength() != 0) {
+            makeSpace(bb.remaining());
+            if ((cb.capacity() - cb.limit()) == 0 && bb.remaining() != 0) {
                 // We went over the limit
-                cb.setOffset(0);
-                cb.setEnd(0);
+                clear(cb);
                 markPos = -1;
             }
         }
 
         state = CHAR_STATE;
-        conv.convert(bb, cb, eof);
+        conv.convert(bb, cb, this, eof);
 
-        if (cb.getLength() == 0 && eof) {
+        if (cb.remaining() == 0 && eof) {
             return -1;
         } else {
-            return cb.getLength();
+            return cb.remaining();
         }
     }
 
@@ -431,7 +443,10 @@ public class InputBuffer extends Reader
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
         }
 
-        return cb.substract();
+        if (checkCharBufferEof()) {
+            return -1;
+        }
+        return cb.get();
     }
 
 
@@ -453,7 +468,12 @@ public class InputBuffer extends Reader
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
         }
 
-        return cb.substract(cbuf, off, len);
+        if (checkCharBufferEof()) {
+            return -1;
+        }
+        int n = Math.min(len, cb.remaining());
+        cb.get(cbuf, off, n);
+        return n;
     }
 
 
@@ -469,12 +489,12 @@ public class InputBuffer extends Reader
 
         long nRead = 0;
         while (nRead < n) {
-            if (cb.getLength() >= n) {
-                cb.setOffset(cb.getStart() + (int) n);
+            if (cb.remaining() >= n) {
+                cb.position(cb.position() + (int) n);
                 nRead = n;
             } else {
-                nRead += cb.getLength();
-                cb.setOffset(cb.getEnd());
+                nRead += cb.remaining();
+                cb.position(cb.limit());
                 int nb = realReadChars();
                 if (nb < 0) {
                     break;
@@ -510,18 +530,16 @@ public class InputBuffer extends Reader
             throw new IOException(sm.getString("inputBuffer.streamClosed"));
         }
 
-        if (cb.getLength() <= 0) {
-            cb.setOffset(0);
-            cb.setEnd(0);
+        if (cb.remaining() <= 0) {
+            clear(cb);
         } else {
-            if ((cb.getBuffer().length > (2 * size)) && (cb.getLength()) < (cb.getStart())) {
-                System.arraycopy(cb.getBuffer(), cb.getStart(), cb.getBuffer(), 0, cb.getLength());
-                cb.setEnd(cb.getLength());
-                cb.setOffset(0);
+            if ((cb.capacity() > (2 * size)) && (cb.remaining()) < (cb.position())) {
+                cb.compact();
+                cb.flip();
             }
         }
-        cb.setLimit(cb.getStart() + readAheadLimit + size);
-        markPos = cb.getStart();
+        readLimit = cb.position() + readAheadLimit + size;
+        markPos = cb.position();
     }
 
 
@@ -534,14 +552,14 @@ public class InputBuffer extends Reader
 
         if (state == CHAR_STATE) {
             if (markPos < 0) {
-                cb.recycle();
+                clear(cb);
                 markPos = -1;
                 throw new IOException();
             } else {
-                cb.setOffset(markPos);
+                cb.position(markPos);
             }
         } else {
-            bb.recycle();
+            clear(bb);
         }
     }
 
@@ -604,18 +622,70 @@ public class InputBuffer extends Reader
 
     @Override
     public void setByteBuffer(ByteBuffer buffer) {
-        tempRead = buffer;
+        bb = buffer;
     }
 
 
     @Override
     public ByteBuffer getByteBuffer() {
-        return tempRead;
+        return bb;
     }
 
 
     @Override
     public void expand(int size) {
         // no-op
+    }
+
+
+    public boolean checkByteBufferEof() throws IOException {
+        if (bb.remaining() == 0) {
+            int n = realReadBytes();
+            if (n < 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkCharBufferEof() throws IOException {
+        if (cb.remaining() == 0) {
+            int n = realReadChars();
+            if (n < 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void clear(Buffer buffer) {
+        buffer.rewind().limit(0);
+    }
+
+    private void makeSpace(int count) {
+        int desiredSize = cb.limit() + count;
+        if(desiredSize > readLimit) {
+            desiredSize = readLimit;
+        }
+
+        if(desiredSize <= cb.capacity()) {
+            return;
+        }
+
+        int newSize = 2 * cb.capacity();
+        if(desiredSize >= newSize) {
+            newSize= 2 * cb.capacity() + count;
+        }
+
+        if (newSize > readLimit) {
+            newSize = readLimit;
+        }
+
+        CharBuffer tmp = CharBuffer.allocate(newSize);
+        cb.position(0);
+        tmp.put(cb);
+        tmp.flip();
+        cb = tmp;
+        tmp = null;
     }
 }
