@@ -633,7 +633,6 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                             !writeInProgress && closed && left == connectionReservation);
                     streamReservation -= connectionReservation;
                     left -= connectionReservation;
-                    buffer.position(buffer.position() + connectionReservation);
                 }
             }
             buffer.clear();

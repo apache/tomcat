@@ -552,7 +552,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
                 try {
                     socketWrapper.write(true, header, 0, header.length);
-                    socketWrapper.write(true, target.array(), target.arrayOffset(), target.limit());
+                    socketWrapper.write(true, target);
                     socketWrapper.flush(true);
                 } catch (IOException ioe) {
                     handleAppInitiatedIOException(ioe);
@@ -621,7 +621,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                 }
                 ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
                 socketWrapper.write(true, header, 0, header.length);
-                socketWrapper.write(true, target.array(), target.arrayOffset(), target.limit());
+                socketWrapper.write(true, target);
                 socketWrapper.flush(true);
             }
         }
@@ -658,8 +658,10 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             synchronized (socketWrapper) {
                 try {
                     socketWrapper.write(true, header, 0, header.length);
-                    socketWrapper.write(true, data.array(), data.arrayOffset() + data.position(),
-                            len);
+                    int orgLimit = data.limit();
+                    data.limit(data.position() + len);
+                    socketWrapper.write(true, data);
+                    data.limit(orgLimit);
                     socketWrapper.flush(true);
                 } catch (IOException ioe) {
                     handleAppInitiatedIOException(ioe);
