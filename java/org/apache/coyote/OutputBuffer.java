@@ -40,6 +40,9 @@ public interface OutputBuffer {
      *         the input chunk
      *
      * @throws IOException an underlying I/O error occurred
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9. Use
+     *             {@link #doWrite(ByteBuffer)}
      */
     public int doWrite(ByteChunk chunk) throws IOException;
 

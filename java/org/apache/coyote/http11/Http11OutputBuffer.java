@@ -191,6 +191,10 @@ public class Http11OutputBuffer implements OutputBuffer {
 
     // --------------------------------------------------- OutputBuffer Methods
 
+    /**
+     * @deprecated Unused. Will be removed in Tomcat 9. Use
+     *             {@link #doWrite(ByteBuffer)}
+     */
     @Override
     public int doWrite(ByteChunk chunk) throws IOException {
 
@@ -560,6 +564,9 @@ public class Http11OutputBuffer implements OutputBuffer {
 
         /**
          * Write chunk.
+         *
+         * @deprecated Unused. Will be removed in Tomcat 9. Use
+         *             {@link #doWrite(ByteBuffer)}
          */
         @Override
         public int doWrite(ByteChunk chunk) throws IOException {

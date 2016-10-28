@@ -539,6 +539,10 @@ public class Stream extends AbstractStream implements HeaderEmitter {
          * client that performed concurrent writes could corrupt the buffer.
          */
 
+        /**
+         * @deprecated Unused. Will be removed in Tomcat 9. Use
+         *             {@link #doWrite(ByteBuffer)}
+         */
         @Override
         public synchronized int doWrite(ByteChunk chunk) throws IOException {
             if (closed) {
