@@ -386,13 +386,13 @@ public abstract class AbstractEndpoint<S> {
     public void setAddress(InetAddress address) { this.address = address; }
 
     /**
-     * Allows the server developer to specify the backlog that
+     * Allows the server developer to specify the acceptCount (backlog) that
      * should be used for server sockets. By default, this value
      * is 100.
      */
-    private int backlog = 100;
-    public void setBacklog(int backlog) { if (backlog > 0) this.backlog = backlog; }
-    public int getBacklog() { return backlog; }
+    private int acceptCount = 100;
+    public void setAcceptCount(int acceptCount) { if (acceptCount > 0) this.acceptCount = acceptCount; }
+    public int getAcceptCount() { return acceptCount; }
 
     /**
      * Controls when the Endpoint binds the port. <code>true</code>, the default

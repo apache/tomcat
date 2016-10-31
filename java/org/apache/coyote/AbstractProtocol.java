@@ -233,8 +233,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
 
-    public int getBacklog() { return endpoint.getBacklog(); }
-    public void setBacklog(int backlog) { endpoint.setBacklog(backlog); }
+    public int getAcceptCount() { return endpoint.getAcceptCount(); }
+    public void setAcceptCount(int acceptCount) { endpoint.setAcceptCount(acceptCount); }
 
 
     public boolean getTcpNoDelay() { return endpoint.getTcpNoDelay(); }
