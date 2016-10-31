@@ -108,7 +108,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
 
         Context root = tomcat.addContext("", TEMP_DIR);
         Tomcat.addServlet(root, "testServlet", new TestServlet());
-        root.addServletMapping("/", "testServlet");
+        root.addServletMappingDecoded("/", "testServlet");
 
         tomcat.start();
 
