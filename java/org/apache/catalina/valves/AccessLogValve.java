@@ -218,8 +218,9 @@ public class AccessLogValve extends AbstractAccessLogValve {
 
 
     /**
-     * Should we rotate the logs.
-     * @return <code>true</code> if the logs are rotated
+     * Should we rotate the access log.
+     *
+     * @return <code>true</code> if the access log should be rotated
      */
     public boolean isRotatable() {
         return rotatable;
@@ -227,9 +228,9 @@ public class AccessLogValve extends AbstractAccessLogValve {
 
 
     /**
-     * Set the value is we should we rotate the logs
+     * Configure whether the access log should be rotated.
      *
-     * @param rotatable true is we should rotate.
+     * @param rotatable true if the log should be rotated
      */
     public void setRotatable(boolean rotatable) {
         this.rotatable = rotatable;
