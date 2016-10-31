@@ -92,6 +92,11 @@
         detection enabled (the default) but without the command line option it
         now requires. (markt)
       </add>
+      <fix>
+        When a Connector is configured to use an executor, ensure that the
+        StoreConfig component includes the executor name when writing the
+        Connector configuration. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

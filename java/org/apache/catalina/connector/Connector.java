@@ -59,6 +59,9 @@ public class Connector extends LifecycleMBeanBase  {
         Boolean.parseBoolean(System.getProperty("org.apache.catalina.connector.RECYCLE_FACADES", "false"));
 
 
+    public static final String INTERNAL_EXECUTOR_NAME = "Internal";
+
+
     // ------------------------------------------------------------ Constructor
 
     /**
@@ -788,7 +791,7 @@ public class Connector extends LifecycleMBeanBase  {
         if (obj instanceof org.apache.catalina.Executor) {
             return ((org.apache.catalina.Executor) obj).getName();
         }
-        return "Internal";
+        return INTERNAL_EXECUTOR_NAME;
     }
 
 
