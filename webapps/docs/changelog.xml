@@ -133,6 +133,15 @@
         Correctly differentiate between sending and receiving a reset frame when
         tracking the state of an HTTP/2 stream. (markt)
       </fix>
+      <fix>
+        <bug>60319</bug>: When using an Executor, disconnect it from the
+        Connector attributes <code>maxThreads</code>,
+        <code>minSpareThreads</code> and <code>threadPriority</code> to enable
+        the configuration settings to be consistently reported. These Connector
+        attributes will be reported as <code>-1</code> when an Executor is in
+        use. The values used by the executor may be set and obtained via the
+        Executor. (markt) 
+      </fix>      
     </changelog>
   </subsection>
   <subsection name="Jasper">
