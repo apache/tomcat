@@ -437,10 +437,10 @@ public abstract class AbstractEndpoint<S> {
      * @return The current socket linger time for sockets created by this
      *         endpoint
      */
-    public int getSoLinger() { return socketProperties.getSoLingerTime(); }
-    public void setSoLinger(int soLinger) {
-        socketProperties.setSoLingerTime(soLinger);
-        socketProperties.setSoLingerOn(soLinger>=0);
+    public int getConnectionLinger() { return socketProperties.getSoLingerTime(); }
+    public void setConnectionLinger(int connectionLinger) {
+        socketProperties.setSoLingerTime(connectionLinger);
+        socketProperties.setSoLingerOn(connectionLinger>=0);
     }
 
 

@@ -105,7 +105,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     public AbstractProtocol(AbstractEndpoint<S> endpoint) {
         this.endpoint = endpoint;
-        setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);
+        setConnectionLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
     }
 
@@ -243,8 +243,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
 
-    public int getSoLinger() { return endpoint.getSoLinger(); }
-    public void setSoLinger(int soLinger) { endpoint.setSoLinger(soLinger); }
+    public int getConnectionLinger() { return endpoint.getConnectionLinger(); }
+    public void setConnectionLinger(int connectionLinger) {
+        endpoint.setConnectionLinger(connectionLinger);
+    }
 
 
     public int getKeepAliveTimeout() { return endpoint.getKeepAliveTimeout(); }
