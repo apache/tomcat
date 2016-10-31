@@ -44,14 +44,10 @@ public class ConnectorStoreAppender extends StoreAppender {
 
     protected static final HashMap<String, String> replacements = new HashMap<>();
     static {
-        replacements.put("backlog", "acceptCount");
-        replacements.put("soLinger", "connectionLinger");
-        replacements.put("soTimeout", "connectionTimeout");
         replacements.put("timeout", "connectionUploadTimeout");
         replacements.put("clientauth", "clientAuth");
         replacements.put("keystore", "keystoreFile");
         replacements.put("randomfile", "randomFile");
-        replacements.put("rootfile", "rootFile");
         replacements.put("keypass", "keystorePass");
         replacements.put("keytype", "keystoreType");
         replacements.put("protocol", "sslProtocol");
