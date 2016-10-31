@@ -382,7 +382,7 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
         // Initialize maxConnections
         if (getMaxConnections() == 0) {
             // User hasn't set a value - use the default
-            setMaxConnections(getMaxThreadsExecutor(true));
+            setMaxConnections(getMaxThreadsInternal());
         }
 
         if (serverSocketFactory == null) {
@@ -602,8 +602,8 @@ public class JIoEndpoint extends AbstractEndpoint<Socket> {
     public void removeWaitingRequest(SocketWrapper<Socket> socketWrapper) {
         waitingRequests.remove(socketWrapper);
     }
-    
-    
+
+
 
     @Override
     protected Log getLog() {

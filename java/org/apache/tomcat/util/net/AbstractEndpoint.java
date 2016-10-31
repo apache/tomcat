@@ -116,7 +116,7 @@ public abstract class AbstractEndpoint<S> {
     /**
      * Are we using an internal executor
      */
-    protected volatile boolean internalExecutor = false;
+    protected volatile boolean internalExecutor = true;
 
 
     /**
@@ -312,19 +312,28 @@ public abstract class AbstractEndpoint<S> {
 
 
     private int minSpareThreads = 10;
-    public int getMinSpareThreads() {
-        return Math.min(minSpareThreads,getMaxThreads());
-    }
     public void setMinSpareThreads(int minSpareThreads) {
         this.minSpareThreads = minSpareThreads;
-        if (running && executor!=null) {
-            if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
-                ((java.util.concurrent.ThreadPoolExecutor)executor).setCorePoolSize(minSpareThreads);
-            } else if (executor instanceof ResizableExecutor) {
-                ((ResizableExecutor)executor).resizePool(minSpareThreads, maxThreads);
-            }
+        Executor executor = this.executor;
+        if (internalExecutor && executor instanceof java.util.concurrent.ThreadPoolExecutor) {
+            // The internal executor should always be an instance of
+            // j.u.c.ThreadPoolExecutor but it may be null if the endpoint is
+            // not running.
+            // This check also avoids various threading issues.
+            ((java.util.concurrent.ThreadPoolExecutor) executor).setCorePoolSize(minSpareThreads);
         }
     }
+    public int getMinSpareThreads() {
+        return Math.min(getMinSpareThreadsInternal(), getMaxThreads());
+    }
+    private int getMinSpareThreadsInternal() {
+        if (internalExecutor) {
+            return minSpareThreads;
+        } else {
+            return -1;
+        }
+    }
+
 
     /**
      * Maximum amount of worker threads.
@@ -332,30 +341,43 @@ public abstract class AbstractEndpoint<S> {
     private int maxThreads = 200;
     public void setMaxThreads(int maxThreads) {
         this.maxThreads = maxThreads;
-        if (running && executor!=null) {
-            if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
-                ((java.util.concurrent.ThreadPoolExecutor)executor).setMaximumPoolSize(maxThreads);
-            } else if (executor instanceof ResizableExecutor) {
-                ((ResizableExecutor)executor).resizePool(minSpareThreads, maxThreads);
-            }
+        Executor executor = this.executor;
+        if (internalExecutor && executor instanceof java.util.concurrent.ThreadPoolExecutor) {
+            // The internal executor should always be an instance of
+            // j.u.c.ThreadPoolExecutor but it may be null if the endpoint is
+            // not running.
+            // This check also avoids various threading issues.
+            ((java.util.concurrent.ThreadPoolExecutor) executor).setMaximumPoolSize(maxThreads);
         }
     }
     public int getMaxThreads() {
-        return getMaxThreadsExecutor(running);
-    }
-    protected int getMaxThreadsExecutor(boolean useExecutor) {
-        if (useExecutor && executor != null) {
-            if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
-                return ((java.util.concurrent.ThreadPoolExecutor)executor).getMaximumPoolSize();
-            } else if (executor instanceof ResizableExecutor) {
-                return ((ResizableExecutor)executor).getMaxThreads();
-            } else {
-                return -1;
-            }
-        } else {
+        if (internalExecutor) {
             return maxThreads;
+        } else {
+            return -1;
         }
     }
+    protected int getMaxThreadsInternal() {
+        return maxThreads;
+    }
+
+
+    /**
+     * Priority of the worker threads.
+     */
+    protected int threadPriority = Thread.NORM_PRIORITY;
+    public void setThreadPriority(int threadPriority) {
+        // Can't change this once the executor has started
+        this.threadPriority = threadPriority;
+    }
+    public int getThreadPriority() {
+        if (internalExecutor) {
+            return threadPriority;
+        } else {
+            return -1;
+        }
+    }
+
 
     /**
      * Max keep alive requests
@@ -396,13 +418,6 @@ public abstract class AbstractEndpoint<S> {
     public void setDaemon(boolean b) { daemon = b; }
     public boolean getDaemon() { return daemon; }
 
-
-    /**
-     * Priority of the worker threads.
-     */
-    protected int threadPriority = Thread.NORM_PRIORITY;
-    public void setThreadPriority(int threadPriority) { this.threadPriority = threadPriority; }
-    public int getThreadPriority() { return threadPriority; }
 
     protected abstract boolean getDeferAccept();
 
