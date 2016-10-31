@@ -145,6 +145,12 @@
         Correctly differentiate between sending and receiving a reset frame when
         tracking the state of an HTTP/2 stream. (markt)
       </fix>
+      <scode>
+        Remove the undocumented support for using the old Connector attribute
+        names <code>backlog</code>, <code>soLinger</code> and
+        <code>soTimeout</code> that were renamed several major versions ago.
+        (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -18,7 +18,6 @@ package org.apache.catalina.connector;
 
 import java.net.InetAddress;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 
@@ -271,15 +270,6 @@ public class Connector extends LifecycleMBeanBase  {
     protected boolean useBodyEncodingForURI = false;
 
 
-    protected static final HashMap<String,String> replacements = new HashMap<>();
-    static {
-        replacements.put("acceptCount", "backlog");
-        replacements.put("connectionLinger", "soLinger");
-        replacements.put("connectionTimeout", "soTimeout");
-        replacements.put("rootFile", "rootfile");
-    }
-
-
     // ------------------------------------------------------------- Properties
 
     /**
@@ -292,11 +282,7 @@ public class Connector extends LifecycleMBeanBase  {
         if (protocolHandler == null) {
             return null;
         }
-        String repl = name;
-        if (replacements.get(name) != null) {
-            repl = replacements.get(name);
-        }
-        return IntrospectionUtils.getProperty(protocolHandler, repl);
+        return IntrospectionUtils.getProperty(protocolHandler, name);
     }
 
 
@@ -311,11 +297,7 @@ public class Connector extends LifecycleMBeanBase  {
         if (protocolHandler == null) {
             return false;
         }
-        String repl = name;
-        if (replacements.get(name) != null) {
-            repl = replacements.get(name);
-        }
-        return IntrospectionUtils.setProperty(protocolHandler, repl, value);
+        return IntrospectionUtils.setProperty(protocolHandler, name, value);
     }
 
 
