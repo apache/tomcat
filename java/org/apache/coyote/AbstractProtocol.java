@@ -279,16 +279,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         endpoint.setConnectionTimeout(timeout);
     }
 
-    /*
-     * Alternative name for connectionTimeout property
-     */
-    public int getSoTimeout() {
-        return getConnectionTimeout();
-    }
-    public void setSoTimeout(int timeout) {
-        setConnectionTimeout(timeout);
-    }
-
     public int getMaxHeaderCount() {
         return endpoint.getMaxHeaderCount();
     }
