@@ -273,12 +273,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      * wait for that data to arrive before closing the connection.
      */
     public int getConnectionTimeout() {
-        // Note that the endpoint uses the alternative name
-        return endpoint.getSoTimeout();
+        return endpoint.getConnectionTimeout();
     }
     public void setConnectionTimeout(int timeout) {
-        // Note that the endpoint uses the alternative name
-        endpoint.setSoTimeout(timeout);
+        endpoint.setConnectionTimeout(timeout);
     }
 
     /*

@@ -839,9 +839,9 @@ public class Http11Processor extends AbstractProcessor {
             }
 
             if (!disableUploadTimeout) {
-                int soTimeout = endpoint.getSoTimeout();
-                if(soTimeout > 0) {
-                    socketWrapper.setReadTimeout(soTimeout);
+                int connectionTimeout = endpoint.getConnectionTimeout();
+                if(connectionTimeout > 0) {
+                    socketWrapper.setReadTimeout(connectionTimeout);
                 } else {
                     socketWrapper.setReadTimeout(0);
                 }

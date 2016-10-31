@@ -411,7 +411,7 @@ public abstract class AbstractEndpoint<S> {
     private Integer keepAliveTimeout = null;
     public int getKeepAliveTimeout() {
         if (keepAliveTimeout == null) {
-            return getSoTimeout();
+            return getConnectionTimeout();
         } else {
             return keepAliveTimeout.intValue();
         }
@@ -449,8 +449,8 @@ public abstract class AbstractEndpoint<S> {
      *
      * @return The current socket timeout for sockets created by this endpoint
      */
-    public int getSoTimeout() { return socketProperties.getSoTimeout(); }
-    public void setSoTimeout(int soTimeout) { socketProperties.setSoTimeout(soTimeout); }
+    public int getConnectionTimeout() { return socketProperties.getSoTimeout(); }
+    public void setConnectionTimeout(int soTimeout) { socketProperties.setSoTimeout(soTimeout); }
 
     /**
      * SSL engine.

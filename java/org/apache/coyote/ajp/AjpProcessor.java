@@ -392,7 +392,7 @@ public class AjpProcessor extends AbstractProcessor {
         // Setting up the socket
         this.socketWrapper = socket;
 
-        int soTimeout = endpoint.getSoTimeout();
+        int connectionTimeout = endpoint.getConnectionTimeout();
         boolean cping = false;
 
         boolean keptAlive = false;
@@ -406,7 +406,7 @@ public class AjpProcessor extends AbstractProcessor {
                 }
                 // Set back timeout if keep alive timeout is enabled
                 if (keepAliveTimeout > 0) {
-                    socketWrapper.setReadTimeout(soTimeout);
+                    socketWrapper.setReadTimeout(connectionTimeout);
                 }
                 // Check message type, process right away and break if
                 // not regular request processing
