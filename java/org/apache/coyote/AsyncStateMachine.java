@@ -69,30 +69,30 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  *
  * |----------------->------|
  * |                       \|/
- * |   |----------<-------ERROR
- * |   |      complete() /|\/|\\
- * |   |                  |  |  \
- * |   |    |----->-------|  |   \----------->----------|
- * |   |    |                |                          |dispatch()
- * |   |    |                |                         \|/
- * |   |    |                |          |--|timeout()   |
- * |   |    |     post()     |          | \|/           |     post()
- * |   |    |    |---------- | -->DISPATCHED<---------- | --------------COMPLETING<-----|
- * |   |    |    |           |   /|\/|\ |               |                | /|\ /|\      |
- * |   |    |    |    |--->- | ---|  |  |startAsync()   |       timeout()|--|   |       |
- * |   |    ^    ^    |      |       |  |               |                       |       |
- * |   |    |    |    |   |-- \ -----|  |   complete()  |                       |post() |
- * |   |    |    |    |   |    \        |     /-->----- | ---COMPLETE_PENDING->-|       |
- * |   |    |    |    |   |     \       |    /          |                               |
- * |   |    |    |    |   ^      \      |   /           |                               |
- * |  \|/   |    |    |   |       \    \|/ /   post()   |                               |
- * | MUST_COMPLETE-<- | - | --<----STARTING-->--------- | -------------|                ^
- * |         /|\      |   |  complete()  | \            |              |     complete() |
- * |          |       |   |              |  \           |    post()    |     /----------|
- * |          |       ^   |    dispatch()|   \          |    |-----|   |    /
- * |          |       |   |              |    \         |    |     |   |   /
- * |          |       |   |             \|/    \        |    |    \|/ \|/ /
- * |          |       |   |--<--MUST_DISPATCH-----<-----|    |--<--STARTED
+ * |   |----------<-------ERROR<---------------------------<-------------------------------|
+ * |   |      complete() /|\/|\\                                                           |
+ * |   |                  |  |  \                                                          |
+ * |   |    |----->-------|  |   \----------->----------|                                  |
+ * |   |    |                |                          |dispatch()                        |
+ * |   |    |                |                         \|/                                 |
+ * |   |    |                |          |--|timeout()   |                                  |
+ * |   |    |     post()     |          | \|/           |     post()                       |
+ * |   |    |    |---------- | -->DISPATCHED<---------- | --------------COMPLETING<-----|  |
+ * |   |    |    |           |   /|\/|\ |               |                | /|\ /|\      |  |
+ * |   |    |    |    |--->- | ---|  |  |startAsync()   |       timeout()|--|   |       |  |
+ * |   |    ^    ^    |      |       |  |               |                       |       |  ^
+ * |   |    |    |    |   |-- \ -----|  |   complete()  |                       |post() |  |
+ * |   |    |    |    |   |    \        |     /-->----- | ---COMPLETE_PENDING->-|       |  |
+ * |   |    |    |    |   |     \       |    /          |                               |  |
+ * |   |    |    |    |   ^      \      |   /           |                               |  |
+ * |  \|/   |    |    |   |       \    \|/ /   post()   |                               |  |
+ * | MUST_COMPLETE-<- | - | --<----STARTING-->--------- | -------------|                ^  |
+ * |         /|\      |   |  complete()  | \            |              |     complete() |  |
+ * |          |       |   |              |  \           |    post()    |     /----------|  |
+ * |          |       ^   |    dispatch()|   \          |    |-----|   |    /              |
+ * |          |       |   |              |    \         |    |     |   |   /               |
+ * |          |       |   |             \|/    \        |    |    \|/ \|/ /                |
+ * |          |       |   |--<--MUST_DISPATCH-----<-----|    |--<--STARTED--->-------------|
  * |          |       | dispatched() /|\   |     \                / |
  * |          |       |               |    |      \              /  |
  * |          |       |               |    |       \            /   |
@@ -358,6 +358,7 @@ public class AsyncStateMachine<S> {
     public synchronized boolean asyncError() {
         boolean doDispatch = false;
         if (state == AsyncState.STARTING ||
+                state == AsyncState.STARTED ||
                 state == AsyncState.DISPATCHED ||
                 state == AsyncState.TIMING_OUT ||
                 state == AsyncState.MUST_COMPLETE) {

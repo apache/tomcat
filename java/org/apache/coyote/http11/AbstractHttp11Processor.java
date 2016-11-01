@@ -903,7 +903,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         case CLOSE_NOW: {
             // Block further output
             getOutputBuffer().finished = true;
-            setErrorState(ErrorState.CLOSE_NOW, null);
+            if (param instanceof Throwable) {
+                setErrorState(ErrorState.CLOSE_NOW, (Throwable) param);
+            } else {
+                setErrorState(ErrorState.CLOSE_NOW, null);
+            }
             break;
         }
         case END_REQUEST: {

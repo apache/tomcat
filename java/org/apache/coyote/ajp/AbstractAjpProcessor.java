@@ -118,7 +118,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         pongMessage.appendByte(Constants.JK_AJP13_CPONG_REPLY);
         pongMessage.end();
         pongMessageArray = new byte[pongMessage.getLen()];
-        System.arraycopy(pongMessage.getBuffer(), 0, pongMessageArray, 
+        System.arraycopy(pongMessage.getBuffer(), 0, pongMessageArray,
                 0, pongMessage.getLen());
     }
 
@@ -248,7 +248,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
                 Constants.MAX_PACKET_SIZE);
         getBodyMessage.end();
         getBodyMessageArray = new byte[getBodyMessage.getLen()];
-        System.arraycopy(getBodyMessage.getBuffer(), 0, getBodyMessageArray, 
+        System.arraycopy(getBodyMessage.getBuffer(), 0, getBodyMessageArray,
                 0, getBodyMessage.getLen());
     }
 
@@ -320,7 +320,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      * provider is used to perform the conversion. For example it is used with
      * the AJP connectors, the HTTP APR connector and with the
      * {@link org.apache.catalina.valves.SSLValve}. If not specified, the
-     * default provider will be used. 
+     * default provider will be used.
      */
     protected String clientCertProvider = null;
     public String getClientCertProvider() { return clientCertProvider; }
@@ -526,21 +526,25 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             // NOOP
             break;
         }
-        default: {
-            actionInternal(actionCode, param);
-            break;
-        }
         case CLOSE_NOW: {
             // Prevent further writes to the response
             swallowResponse = true;
-            setErrorState(ErrorState.CLOSE_NOW, null);
+            if (param instanceof Throwable) {
+                setErrorState(ErrorState.CLOSE_NOW, (Throwable) param);
+            } else {
+                setErrorState(ErrorState.CLOSE_NOW, null);
+            }
             break;
         }
         case END_REQUEST: {
             // NO-OP for AJP
             break;
         }
-       }
+        default: {
+            actionInternal(actionCode, param);
+            break;
+        }
+        }
     }
 
 
@@ -644,7 +648,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     /**
      * Recycle the processor, ready for the next request which may be on the
      * same connection or a different connection.
-     * 
+     *
      * @param socketClosing Indicates if the socket is about to be closed
      *                      allowing the processor to perform any additional
      *                      clean-up that may be required
@@ -675,7 +679,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
     // Methods called by action()
     protected abstract void actionInternal(ActionCode actionCode, Object param);
 
-    
+
     // Methods called by asyncDispatch
     /**
      * Provides a mechanism for those connector implementations (currently only
@@ -684,12 +688,12 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      */
     protected abstract void resetTimeouts();
 
-    
+
     // Methods called by prepareResponse()
     protected abstract void output(byte[] src, int offset, int length)
             throws IOException;
 
-    
+
     // Methods used by SocketInputBuffer
     protected abstract boolean receive() throws IOException;
 
@@ -1152,7 +1156,7 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
         }
     }
 
-    
+
     /**
      * Finish AJP response.
      */

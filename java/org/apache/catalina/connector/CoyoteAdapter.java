@@ -294,6 +294,16 @@ public class CoyoteAdapter implements Adapter {
                 if (!asyncConImpl.timeout()) {
                     asyncConImpl.setErrorState(null, false);
                 }
+            } else if (status==SocketStatus.ERROR) {
+                // An I/O error occurred on a non-container thread which means
+                // that the socket needs to be closed so set success to false to
+                // trigger a close
+                success = false;
+                Throwable t = (Throwable)req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+                req.getAttributes().remove(RequestDispatcher.ERROR_EXCEPTION);
+                if (t != null) {
+                    asyncConImpl.setErrorState(t, true);
+                }
             }
             // Has an error occurred during async processing that needs to be
             // processed by the application's error page mechanism (or Tomcat's
