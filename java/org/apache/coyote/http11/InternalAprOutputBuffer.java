@@ -31,7 +31,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
  * Output buffer.
- * 
+ *
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  */
 public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
@@ -96,7 +96,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
     /**
      * Flush the response.
-     * 
+     *
      * @throws IOException an underlying I/O error occurred
      */
     @Override
@@ -111,21 +111,21 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
 
     /**
-     * Recycle the output buffer. This should be called when closing the 
+     * Recycle the output buffer. This should be called when closing the
      * connection.
      */
     @Override
     public void recycle() {
 
         super.recycle();
-        
+
         bbuf.clear();
     }
 
 
     /**
      * End request.
-     * 
+     *
      * @throws IOException an underlying I/O error occurred
      */
     @Override
@@ -135,7 +135,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
         if (!committed) {
 
             // Send the connector a request for commit. The connector should
-            // then validate the headers, send them (using sendHeader) and 
+            // then validate the headers, send them (using sendHeader) and
             // set the filters accordingly.
             response.action(ActionCode.COMMIT, null);
 
@@ -177,7 +177,7 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
 
     /**
      * Commit the response.
-     * 
+     *
      * @throws IOException an underlying I/O error occurred
      */
     @Override
@@ -223,26 +223,30 @@ public class InternalAprOutputBuffer extends AbstractOutputBuffer<Long> {
          * Write chunk.
          */
         @Override
-        public int doWrite(ByteChunk chunk, Response res) 
-            throws IOException {
-
-            int len = chunk.getLength();
-            int start = chunk.getStart();
-            byte[] b = chunk.getBuffer();
-            while (len > 0) {
-                int thisTime = len;
-                if (bbuf.position() == bbuf.capacity()) {
-                    flushBuffer();
+        public int doWrite(ByteChunk chunk, Response res) throws IOException {
+            try {
+                int len = chunk.getLength();
+                int start = chunk.getStart();
+                byte[] b = chunk.getBuffer();
+                while (len > 0) {
+                    int thisTime = len;
+                    if (bbuf.position() == bbuf.capacity()) {
+                        flushBuffer();
+                    }
+                    if (thisTime > bbuf.capacity() - bbuf.position()) {
+                        thisTime = bbuf.capacity() - bbuf.position();
+                    }
+                    bbuf.put(b, start, thisTime);
+                    len = len - thisTime;
+                    start = start + thisTime;
                 }
-                if (thisTime > bbuf.capacity() - bbuf.position()) {
-                    thisTime = bbuf.capacity() - bbuf.position();
-                }
-                bbuf.put(b, start, thisTime);
-                len = len - thisTime;
-                start = start + thisTime;
+                byteCount += chunk.getLength();
+                return chunk.getLength();
+            } catch (IOException ioe) {
+                response.action(ActionCode.CLOSE_NOW, ioe);
+                // Re-throw
+                throw ioe;
             }
-            byteCount += chunk.getLength();
-            return chunk.getLength();
         }
 
         @Override

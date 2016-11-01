@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 
+import org.apache.coyote.ActionCode;
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -34,7 +35,7 @@ import org.apache.tomcat.util.net.SocketWrapper;
 
 /**
  * Output buffer.
- * 
+ *
  * @author <a href="mailto:remm@apache.org">Remy Maucherat</a>
  * @author Filip Hanik
  */
@@ -50,7 +51,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         this.response = response;
 
         buf = new byte[headerBufferSize];
-        
+
         outputStreamOutputBuffer = new SocketOutputBuffer();
 
         filterLibrary = new OutputFilter[0];
@@ -59,7 +60,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
         committed = false;
         finished = false;
-        
+
         // Cause loading of HttpMessages
         HttpMessages.getInstance(response.getLocale()).getMessage(200);
 
@@ -70,7 +71,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      * Underlying socket.
      */
     private NioChannel socket;
-    
+
     /**
      * Selector pool, for blocking reads and blocking writes
      */
@@ -82,9 +83,9 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     /**
      * Flush the response.
-     * 
+     *
      * @throws IOException an underlying I/O error occurred
-     * 
+     *
      */
     @Override
     public void flush() throws IOException {
@@ -97,7 +98,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
 
     /**
-     * Recycle the output buffer. This should be called when closing the 
+     * Recycle the output buffer. This should be called when closing the
      * connection.
      */
     @Override
@@ -112,7 +113,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     /**
      * End request.
-     * 
+     *
      * @throws IOException an underlying I/O error occurred
      */
     @Override
@@ -124,7 +125,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
     // ------------------------------------------------ HTTP/1.1 Output Methods
 
 
-    /** 
+    /**
      * Send an acknowledgment.
      */
     @Override
@@ -132,14 +133,14 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
         if (!committed) {
             //Socket.send(socket, Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length) < 0
-            socket.getBufHandler() .getWriteBuffer().put(Constants.ACK_BYTES,0,Constants.ACK_BYTES.length);    
+            socket.getBufHandler() .getWriteBuffer().put(Constants.ACK_BYTES,0,Constants.ACK_BYTES.length);
             writeToSocket(socket.getBufHandler() .getWriteBuffer(),true,true);
         }
 
     }
 
     /**
-     * 
+     *
      * @param bytebuffer ByteBuffer
      * @param flip boolean
      * @return int
@@ -161,16 +162,16 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
         }
         try {
             written = pool.write(bytebuffer, socket, selector, writeTimeout, block);
-            //make sure we are flushed 
+            //make sure we are flushed
             do {
                 if (socket.flush(true,selector,writeTimeout)) break;
             }while ( true );
-        }finally { 
+        }finally {
             if ( selector != null ) pool.put(selector);
         }
         if ( block ) bytebuffer.clear(); //only clear
         return written;
-    } 
+    }
 
 
     // ------------------------------------------------------ Protected Methods
@@ -186,7 +187,7 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
 
     /**
      * Commit the response.
-     * 
+     *
      * @throws IOException an underlying I/O error occurred
      */
     @Override
@@ -251,23 +252,25 @@ public class InternalNioOutputBuffer extends AbstractOutputBuffer<NioChannel> {
      * This class is an output buffer which will write data to an output
      * stream.
      */
-    protected class SocketOutputBuffer 
-        implements OutputBuffer {
-
+    protected class SocketOutputBuffer implements OutputBuffer {
 
         /**
          * Write chunk.
          */
         @Override
-        public int doWrite(ByteChunk chunk, Response res) 
-            throws IOException {
-
-            int len = chunk.getLength();
-            int start = chunk.getStart();
-            byte[] b = chunk.getBuffer();
-            addToBB(b, start, len);
-            byteCount += chunk.getLength();
-            return chunk.getLength();
+        public int doWrite(ByteChunk chunk, Response res) throws IOException {
+            try {
+                int len = chunk.getLength();
+                int start = chunk.getStart();
+                byte[] b = chunk.getBuffer();
+                addToBB(b, start, len);
+                byteCount += chunk.getLength();
+                return chunk.getLength();
+            } catch (IOException ioe) {
+                response.action(ActionCode.CLOSE_NOW, ioe);
+                // Re-throw
+                throw ioe;
+            }
         }
 
         @Override

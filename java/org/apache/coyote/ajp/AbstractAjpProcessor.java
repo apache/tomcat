@@ -1256,27 +1256,33 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
             }
 
             if (!swallowResponse) {
-                int len = chunk.getLength();
-                // 4 - hardcoded, byte[] marshaling overhead
-                // Adjust allowed size if packetSize != default (Constants.MAX_PACKET_SIZE)
-                int chunkSize = Constants.MAX_SEND_SIZE + packetSize - Constants.MAX_PACKET_SIZE;
-                int off = 0;
-                while (len > 0) {
-                    int thisTime = len;
-                    if (thisTime > chunkSize) {
-                        thisTime = chunkSize;
+                try {
+                    int len = chunk.getLength();
+                    // 4 - hardcoded, byte[] marshaling overhead
+                    // Adjust allowed size if packetSize != default (Constants.MAX_PACKET_SIZE)
+                    int chunkSize = Constants.MAX_SEND_SIZE + packetSize - Constants.MAX_PACKET_SIZE;
+                    int off = 0;
+                    while (len > 0) {
+                        int thisTime = len;
+                        if (thisTime > chunkSize) {
+                            thisTime = chunkSize;
+                        }
+                        len -= thisTime;
+                        responseMessage.reset();
+                        responseMessage.appendByte(Constants.JK_AJP13_SEND_BODY_CHUNK);
+                        responseMessage.appendBytes(chunk.getBytes(), chunk.getOffset() + off, thisTime);
+                        responseMessage.end();
+                        output(responseMessage.getBuffer(), 0, responseMessage.getLen());
+
+                        off += thisTime;
                     }
-                    len -= thisTime;
-                    responseMessage.reset();
-                    responseMessage.appendByte(Constants.JK_AJP13_SEND_BODY_CHUNK);
-                    responseMessage.appendBytes(chunk.getBytes(), chunk.getOffset() + off, thisTime);
-                    responseMessage.end();
-                    output(responseMessage.getBuffer(), 0, responseMessage.getLen());
 
-                    off += thisTime;
+                    bytesWritten += chunk.getLength();
+                } catch (IOException ioe) {
+                    response.action(ActionCode.CLOSE_NOW, ioe);
+                    // Re-throw
+                    throw ioe;
                 }
-
-                bytesWritten += chunk.getLength();
             }
             return chunk.getLength();
         }
