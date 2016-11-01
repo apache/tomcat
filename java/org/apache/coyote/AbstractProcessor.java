@@ -103,6 +103,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 response.setStatus(500);
             }
             getLog().info(sm.getString("abstractProcessor.nonContainerThreadError"), t);
+            // Set the request attribute so that the async onError() event is
+            // fired when the error event is processed
+            request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
             socketWrapper.processSocket(SocketEvent.ERROR, true);
         }
     }

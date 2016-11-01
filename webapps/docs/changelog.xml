@@ -165,6 +165,11 @@
         use. The values used by the executor may be set and obtained via the
         Executor. (markt)
       </fix>
+      <fix>
+        If an I/O error occurs during async processing on a non-container
+        thread, ensure that the <code>onError()</code> event is triggered.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
