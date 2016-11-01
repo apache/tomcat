@@ -180,6 +180,10 @@
         Add HTTP/2 configuration information to the documentation web
         application. (markt)
       </add>
+      <fix>
+        Fix default value of <code>validationInterval</code> attribute in
+        jdbc-pool. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
