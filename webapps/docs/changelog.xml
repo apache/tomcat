@@ -147,6 +147,10 @@
         thread, ensure that the <code>onError()</code> event is triggered.
         (markt)
       </fix>
+      <fix>
+        Improve detection of I/O errors during async processing on non-container
+        threads and trigger async error handling when they are detected. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

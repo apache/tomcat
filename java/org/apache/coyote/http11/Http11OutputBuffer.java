@@ -573,11 +573,17 @@ public class Http11OutputBuffer implements OutputBuffer {
          */
         @Override
         public int doWrite(ByteBuffer chunk) throws IOException {
-            int len = chunk.remaining();
-            socketWrapper.write(isBlocking(), chunk);
-            len -= chunk.remaining();
-            byteCount += len;
-            return len;
+            try {
+                int len = chunk.remaining();
+                socketWrapper.write(isBlocking(), chunk);
+                len -= chunk.remaining();
+                byteCount += len;
+                return len;
+            } catch (IOException ioe) {
+                response.action(ActionCode.CLOSE_NOW, ioe);
+                // Re-throw
+                throw ioe;
+            }
         }
 
         @Override

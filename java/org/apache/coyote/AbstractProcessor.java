@@ -310,7 +310,11 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         case CLOSE_NOW: {
             // Prevent further writes to the response
             setSwallowResponse();
-            setErrorState(ErrorState.CLOSE_NOW, null);
+            if (param instanceof Throwable) {
+                setErrorState(ErrorState.CLOSE_NOW, (Throwable) param);
+            } else {
+                setErrorState(ErrorState.CLOSE_NOW, null);
+            }
             break;
         }
         case DISABLE_SWALLOW_INPUT: {
