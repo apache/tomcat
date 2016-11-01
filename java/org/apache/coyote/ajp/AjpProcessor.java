@@ -1392,9 +1392,15 @@ public class AjpProcessor extends AbstractProcessor {
 
             int len = 0;
             if (!swallowResponse) {
-                len = chunk.remaining();
-                writeData(chunk);
-                len -= chunk.remaining();
+                try {
+                    len = chunk.remaining();
+                    writeData(chunk);
+                    len -= chunk.remaining();
+                } catch (IOException ioe) {
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
+                    // Re-throw
+                    throw ioe;
+                }
             }
             return len;
         }
