@@ -437,7 +437,7 @@
     <attribute name="validationInterval" required="false">
       <p>(long) avoid excess validation, only run validation at most at this frequency - time in milliseconds.
          If a connection is due for validation, but has been validated previously within this interval, it will not be validated again.
-         The default value is <code>30000</code> (30 seconds).</p>
+         The default value is <code>3000</code> (3 seconds).</p>
     </attribute>
 
     <attribute name="jmxEnabled" required="false">
