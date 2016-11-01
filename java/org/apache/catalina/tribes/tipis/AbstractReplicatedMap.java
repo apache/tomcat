@@ -262,7 +262,6 @@ public abstract class AbstractReplicatedMap<K,V>
      * @throws ChannelException
      */
     protected void ping(long timeout) throws ChannelException {
-        //send out a map membership message, only wait for the first reply
         MapMessage msg = new MapMessage(this.mapContextName,
                                         MapMessage.MSG_PING,
                                         false,
