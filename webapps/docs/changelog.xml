@@ -136,6 +136,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        When the proxy node sends a backup retrieve message, ensure that using
+        the <code>channelSendOptions</code> that has been set rather than the
+        default <code>channelSendOptions</code>. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
