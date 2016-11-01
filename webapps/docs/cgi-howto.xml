@@ -96,7 +96,7 @@ the web application root directory + File.separator + this prefix.
 By default there is no value, which results in the web application root
 directory being used as the search path. The recommended value is
 <code>WEB-INF/cgi</code></li>
-<li><strong>executable</strong> - The of the executable to be used to
+<li><strong>executable</strong> - The name of the executable to be used to
 run the script. You may explicitly set this parameter to be an empty string
 if your script is itself executable (e.g. an exe file). Default is
 <code>perl</code>.</li>

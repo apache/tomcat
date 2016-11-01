@@ -161,6 +161,10 @@
         Fix default value of <code>validationInterval</code> attribute in
         jdbc-pool. (kfujino)
       </fix>
+      <fix>
+        Correct a typo in CGI How-To.
+        Issue reported via comments.apache.org. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
