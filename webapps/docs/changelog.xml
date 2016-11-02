@@ -97,6 +97,10 @@
         StoreConfig component includes the executor name when writing the
         Connector configuration. (markt)
       </fix>
+      <fix>
+        When configuring the JMX remote listener, specify the allowed types for
+        the credentials. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
