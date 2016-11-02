@@ -87,6 +87,10 @@
         Correctly test for control characters when reading the provided shutdown
         password. (markt)
       </fix>
+      <fix>
+        When configuring the JMX remote listener, specify the allowed types for
+        the credentials. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
