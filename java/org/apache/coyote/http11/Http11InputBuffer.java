@@ -771,7 +771,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 headerData.realPos = pos;
                 headerData.lastSignificantChar = pos;
                 break;
-            } else if (chr < 0 || !HttpParser.isToken(chr)) {
+            } else if (!HttpParser.isToken(chr)) {
                 // If a non-token header is detected, skip the line and
                 // ignore the header
                 headerData.lastSignificantChar = pos;
