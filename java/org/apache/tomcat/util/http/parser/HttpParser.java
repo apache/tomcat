@@ -40,6 +40,8 @@ public class HttpParser {
     private static final boolean[] IS_SEPARATOR = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_TOKEN = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_HEX = new boolean[ARRAY_SIZE];
+    private static final boolean[] IS_NOT_REQUEST_TARGET = new boolean[ARRAY_SIZE];
+    private static final boolean[] IS_HTTP_PROTOCOL = new boolean[ARRAY_SIZE];
 
     static {
         for (int i = 0; i < ARRAY_SIZE; i++) {
@@ -64,6 +66,21 @@ public class HttpParser {
             // Hex: 0-9, a-f, A-F
             if ((i >= '0' && i <='9') || (i >= 'a' && i <= 'f') || (i >= 'A' && i <= 'F')) {
                 IS_HEX[i] = true;
+            }
+
+            // Not valid for request target.
+            // Combination of multiple rules from RFC7230 and RFC 3986. Must be
+            // ASCII, no controls plus a few additional characters excluded
+            if (IS_CONTROL[i] || i > 127 ||
+                    i == ' ' || i == '\"' || i == '#' || i == '<' || i == '>' || i == '\\' ||
+                    i == '^' || i == '`'  || i == '{' || i == '|' || i == '}') {
+                IS_NOT_REQUEST_TARGET[i] = true;
+            }
+
+            // Not valid for HTTP protocol
+            // "HTTP/" DIGIT "." DIGIT
+            if (i == 'H' || i == 'T' || i == 'P' || i == '/' || i == '.' || (i >= '0' && i <= '9')) {
+                IS_HTTP_PROTOCOL[i] = true;
             }
         }
     }
@@ -99,6 +116,7 @@ public class HttpParser {
         return result.toString();
     }
 
+
     public static boolean isToken(int c) {
         // Fast for correct values, slower for incorrect ones
         try {
@@ -108,14 +126,38 @@ public class HttpParser {
         }
     }
 
+
     public static boolean isHex(int c) {
-        // Fast for correct values, slower for incorrect ones
+        // Fast for correct values, slower for some incorrect ones
         try {
             return IS_HEX[c];
         } catch (ArrayIndexOutOfBoundsException ex) {
             return false;
         }
     }
+
+
+    public static boolean isNotRequestTarget(int c) {
+        // Fast for valid request target characters, slower for some incorrect
+        // ones
+        try {
+            return IS_NOT_REQUEST_TARGET[c];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return true;
+        }
+    }
+
+
+    public static boolean isHttpProtocol(int c) {
+        // Fast for valid HTTP protocol characters, slower for some incorrect
+        // ones
+        try {
+            return IS_HTTP_PROTOCOL[c];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return false;
+        }
+    }
+
 
     // Skip any LWS and return the next char
     static int skipLws(StringReader input, boolean withReset) throws IOException {

@@ -232,7 +232,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
         doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,NE]",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", "/c/\u00C2\u00A1\u00C2\u00A1", "id=\u00C2\u00A1");
+                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", null);
     }
 
 
@@ -242,7 +242,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
         doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,B,NE]",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", "/c/\u00C2\u00A1%C2%A1", "id=%C2%A1");
+                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", null);
     }
 
 
@@ -279,8 +279,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
         doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,NE,QSA]",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", "/c/\u00C2\u00A1\u00C2\u00A1",
-                "id=\u00C2\u00A1&di=\u00C2\u00AE");
+                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", null);
     }
 
 
@@ -290,8 +289,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
         doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,B,NE,QSA]",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", "/c/\u00C2\u00A1%C2%A1",
-                "id=%C2%A1&di=\u00C2\u00AE");
+                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", null);
     }
 
 
@@ -333,7 +331,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
         doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R,NE]",
-                "/b/%C2%A1?id=%C2%A1", "/c/\u00C2\u00A1\u00C2\u00A1", "id=\u00C2\u00A1");
+                "/b/%C2%A1?id=%C2%A1", null);
     }
 
 
@@ -343,7 +341,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
         doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R,B,NE]",
-                "/b/%C2%A1?id=%C2%A1", "/c/\u00C2\u00A1%C2%A1", "id=\u00C2\u00A1");
+                "/b/%C2%A1?id=%C2%A1", null);
     }
 
 
@@ -394,7 +392,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
         doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,NE]",
-                "/b/%C2%A1/id=%C2%A1", "/c/\u00C2\u00A1\u00C2\u00A1", "id=\u00C2\u00A1");
+                "/b/%C2%A1/id=%C2%A1", null);
     }
 
 
@@ -404,7 +402,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
         doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,B,NE]",
-                "/b/%C2%A1/id=%C2%A1", "/c/\u00C2\u00A1%C2%A1", "id=%C2%A1");
+                "/b/%C2%A1/id=%C2%A1", null);
     }
 
 
@@ -450,8 +448,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
-        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R,NE]",
-                "/b/%C2%A1", "/c/\u00C2\u00A1\u00C2\u00A1");
+        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R,NE]", "/b/%C2%A1", null);
     }
 
 
@@ -460,8 +457,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
-        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R,B,NE]",
-                "/b/%C2%A1", "/c/\u00C2\u00A1%C2%A1");
+        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R,B,NE]", "/b/%C2%A1", null);
     }
 
 
@@ -515,22 +511,29 @@ public class TestRewriteValve extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() + request);
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + request, res, null);
         res.setCharset(StandardCharsets.UTF_8);
 
-        String body = res.toString();
-        RequestDescriptor requestDesc = SnoopResult.parse(body);
-        String requestURI = requestDesc.getRequestInfo("REQUEST-URI");
-        Assert.assertEquals(expectedURI, requestURI);
+        if (expectedURI == null) {
+            // Rewrite is expected to fail. Probably because invalid characters
+            // were written into the request target
+            Assert.assertEquals(400, rc);
+        } else {
+            String body = res.toString();
+            RequestDescriptor requestDesc = SnoopResult.parse(body);
+            String requestURI = requestDesc.getRequestInfo("REQUEST-URI");
+            Assert.assertEquals(expectedURI, requestURI);
 
-        if (expectedQueryString != null) {
-            String queryString = requestDesc.getRequestInfo("REQUEST-QUERY-STRING");
-            Assert.assertEquals(expectedQueryString, queryString);
-        }
+            if (expectedQueryString != null) {
+                String queryString = requestDesc.getRequestInfo("REQUEST-QUERY-STRING");
+                Assert.assertEquals(expectedQueryString, queryString);
+            }
 
-        if (expectedAttributeValue != null) {
-            String attributeValue = requestDesc.getAttribute("X-Test");
-            Assert.assertEquals(expectedAttributeValue, attributeValue);
+            if (expectedAttributeValue != null) {
+                String attributeValue = requestDesc.getAttribute("X-Test");
+                Assert.assertEquals(expectedAttributeValue, attributeValue);
+            }
         }
     }
 }
