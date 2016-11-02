@@ -28,6 +28,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapper;
 
@@ -69,10 +70,10 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
     }
 
-    
+
     /**
-     * Read the request line. This function is meant to be used during the 
-     * HTTP request header parsing. Do NOT attempt to read the request body 
+     * Read the request line. This function is meant to be used during the
+     * HTTP request header parsing. Do NOT attempt to read the request body
      * using it.
      *
      * @throws IOException If an exception occurs during the underlying socket
@@ -81,7 +82,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
      */
     @Override
     public boolean parseRequestLine(boolean useAvailableDataOnly)
-    
+
         throws IOException {
 
         int start = 0;
@@ -131,7 +132,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
             if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                 space = true;
                 request.method().setBytes(buf, start, pos - start);
-            } else if (!HTTP_TOKEN_CHAR[buf[pos]]) {
+            } else if (!HttpParser.isToken(buf[pos])) {
                 throw new IllegalArgumentException(sm.getString("iib.invalidmethod"));
             }
 
@@ -176,15 +177,16 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
             if (buf[pos] == Constants.SP || buf[pos] == Constants.HT) {
                 space = true;
                 end = pos;
-            } else if ((buf[pos] == Constants.CR) 
+            } else if ((buf[pos] == Constants.CR)
                        || (buf[pos] == Constants.LF)) {
                 // HTTP/0.9 style request
                 eol = true;
                 space = true;
                 end = pos;
-            } else if ((buf[pos] == Constants.QUESTION) 
-                       && (questionPos == -1)) {
+            } else if ((buf[pos] == Constants.QUESTION) && (questionPos == -1)) {
                 questionPos = pos;
+            } else if (HttpParser.isNotRequestTarget(buf[pos])) {
+                throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget"));
             }
 
             pos++;
@@ -193,7 +195,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
         request.unparsedURI().setBytes(buf, start, end - start);
         if (questionPos >= 0) {
-            request.queryString().setBytes(buf, questionPos + 1, 
+            request.queryString().setBytes(buf, questionPos + 1,
                                            end - questionPos - 1);
             request.requestURI().setBytes(buf, start, questionPos - start);
         } else {
@@ -220,9 +222,8 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
         //
         // Reading the protocol
-        // Protocol is always US-ASCII
+        // Protocol is always "HTTP/" DIGIT "." DIGIT
         //
-
         while (!eol) {
 
             // Read new bytes if needed
@@ -237,6 +238,8 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
                 if (end == 0)
                     end = pos;
                 eol = true;
+            } else if (!HttpParser.isHttpProtocol(buf[pos])) {
+                throw new IllegalArgumentException(sm.getString("iib.invalidHttpProtocol"));
             }
 
             pos++;
@@ -248,7 +251,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
         } else {
             request.protocol().setString("");
         }
-        
+
         return true;
 
     }
@@ -277,7 +280,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
     /**
      * Parse an HTTP header.
-     * 
+     *
      * @return false after reading a blank line (which indicates that the
      * HTTP header parsing is done
      */
@@ -335,7 +338,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
             if (buf[pos] == Constants.COLON) {
                 colon = true;
                 headerValue = headers.addValue(buf, start, pos - start);
-            } else if (!HTTP_TOKEN_CHAR[buf[pos]]) {
+            } else if (!HttpParser.isToken(buf[pos])) {
                 // If a non-token header is detected, skip the line and
                 // ignore the header
                 skipLine(start);
@@ -467,7 +470,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
         if (pos - 1 > start) {
             lastRealByte = pos - 1;
         }
-        
+
         while (!eol) {
 
             // Read new bytes if needed
@@ -494,7 +497,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
 
     /**
      * Fill the internal buffer using data from the underlying input stream.
-     * 
+     *
      * @return false if at end of stream
      */
     protected boolean fill() throws IOException {
@@ -521,7 +524,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
         } else {
 
             if (buf.length - end < 4500) {
-                // In this case, the request header was really large, so we allocate a 
+                // In this case, the request header was really large, so we allocate a
                 // brand new one; the old one will get GCed when subsequent requests
                 // clear all references
                 buf = new byte[buf.length];
@@ -548,7 +551,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
      * This class is an input buffer which will read its data from an input
      * stream.
      */
-    protected class InputStreamInputBuffer 
+    protected class InputStreamInputBuffer
         implements InputBuffer {
 
 
@@ -556,7 +559,7 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
          * Read bytes into the specified chunk.
          */
         @Override
-        public int doRead(ByteChunk chunk, Request req ) 
+        public int doRead(ByteChunk chunk, Request req )
             throws IOException {
 
             if (pos >= lastValid) {
