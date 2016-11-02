@@ -84,6 +84,10 @@
         <code>o.a.catalina.connector.CoyoteInputStream</code>/
         <code>o.a.catalina.connector.CoyoteOutputStream</code>. (violetagg)
       </add>
+      <fix>
+        When configuring the JMX remote listener, specify the allowed types for
+        the credentials. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
