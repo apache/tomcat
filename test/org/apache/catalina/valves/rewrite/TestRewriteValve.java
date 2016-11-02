@@ -19,6 +19,7 @@ package org.apache.catalina.valves.rewrite;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -227,6 +228,7 @@ public class TestRewriteValve extends TomcatBaseTest {
 
 
     @Test
+    @Ignore // Use of NE results in invalid characters in request-target
     public void testUtf8WithBothQsFlagsRNE() throws Exception {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
@@ -237,6 +239,7 @@ public class TestRewriteValve extends TomcatBaseTest {
 
 
     @Test
+    @Ignore // Use of NE results in invalid characters in request-target
     public void testUtf8WithBothQsFlagsRBNE() throws Exception {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
@@ -274,6 +277,7 @@ public class TestRewriteValve extends TomcatBaseTest {
 
 
     @Test
+    @Ignore // Use of NE results in invalid characters in request-target
     public void testUtf8WithBothQsFlagsRNEQSA() throws Exception {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
@@ -285,6 +289,7 @@ public class TestRewriteValve extends TomcatBaseTest {
 
 
     @Test
+    @Ignore // Use of NE results in invalid characters in request-target
     public void testUtf8WithBothQsFlagsRBNEQSA() throws Exception {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
@@ -328,6 +333,7 @@ public class TestRewriteValve extends TomcatBaseTest {
 
 
     @Test
+    @Ignore // Use of NE results in invalid characters in request-target
     public void testUtf8WithOriginalQsFlagsRNE() throws Exception {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
@@ -338,6 +344,7 @@ public class TestRewriteValve extends TomcatBaseTest {
 
 
     @Test
+    @Ignore // Use of NE results in invalid characters in request-target
     public void testUtf8WithOriginalQsFlagsRBNE() throws Exception {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
@@ -389,6 +396,7 @@ public class TestRewriteValve extends TomcatBaseTest {
 
 
     @Test
+    @Ignore // Use of NE results in invalid characters in request-target
     public void testUtf8WithRewriteQsFlagsRNE() throws Exception {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
@@ -399,6 +407,7 @@ public class TestRewriteValve extends TomcatBaseTest {
 
 
     @Test
+    @Ignore // Use of NE results in invalid characters in request-target
     public void testUtf8WithRewriteQsFlagsRBNE() throws Exception {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
@@ -446,6 +455,7 @@ public class TestRewriteValve extends TomcatBaseTest {
 
 
     @Test
+    @Ignore // Use of NE results in invalid characters in request-target
     public void testUtf8FlagsRNE() throws Exception {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
@@ -456,6 +466,7 @@ public class TestRewriteValve extends TomcatBaseTest {
 
 
     @Test
+    @Ignore // Use of NE results in invalid characters in request-target
     public void testUtf8FlagsRBNE() throws Exception {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
