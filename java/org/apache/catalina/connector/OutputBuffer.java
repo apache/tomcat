@@ -639,7 +639,7 @@ public class OutputBuffer extends Writer {
 
 
     public void setBufferSize(int size) {
-        if (size != bb.capacity()) {
+        if (size > bb.capacity()) {
             bb = ByteBuffer.allocate(size);
             clear(bb);
         }
