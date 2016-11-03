@@ -181,7 +181,7 @@ public class ChunkedOutputFilter implements OutputFilter {
 
         // Write end chunk
         buffer.doWrite(endChunk);
-        endChunk.flip();
+        endChunk.position(0).limit(endChunk.capacity());
 
         return 0;
 
