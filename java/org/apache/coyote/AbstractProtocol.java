@@ -580,7 +580,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         // Start async timeout thread
         asyncTimeout = new AsyncTimeout();
         Thread timeoutThread = new Thread(asyncTimeout, getNameInternal() + "-AsyncTimeout");
-        timeoutThread.setPriority(endpoint.getThreadPriority());
+        int priority = endpoint.getThreadPriority();
+        if (priority < Thread.MIN_PRIORITY || priority > Thread.MAX_PRIORITY) {
+            priority = Thread.NORM_PRIORITY;
+        }
+        timeoutThread.setPriority(priority);
         timeoutThread.setDaemon(true);
         timeoutThread.start();
     }
