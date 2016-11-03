@@ -44,7 +44,7 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 8.5.8" rtext="in development">
+<section name="Tomcat 8.5.8">
   <subsection name="Coyote">
     <changelog>
       <fix>
