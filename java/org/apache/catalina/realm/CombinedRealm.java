@@ -418,4 +418,15 @@ public class CombinedRealm extends RealmBase {
         throw uoe;
     }
 
+
+    @Override
+    public boolean isAvailable() {
+        for (Realm realm : realms) {
+            if (!realm.isAvailable()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

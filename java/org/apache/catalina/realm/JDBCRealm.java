@@ -414,6 +414,12 @@ public class JDBCRealm
     }
 
 
+    @Override
+    public boolean isAvailable() {
+        return (dbConnection != null);
+    }
+
+
     /**
      * Close the specified database connection.
      *
