@@ -237,7 +237,7 @@ public interface Realm {
      * Return the availability of the realm for authentication.
      * @return <code>true</code> if the realm is able to perform authentication
      */
-    default public boolean isAvailable() {
+    public default boolean isAvailable() {
         return true;
     }
 }

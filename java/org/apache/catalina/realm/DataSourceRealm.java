@@ -393,7 +393,7 @@ public class DataSourceRealm extends RealmBase {
             connectionSuccess = true;
             return connection;
         } catch (Exception e) {
-            connectionSuccess = false; 
+            connectionSuccess = false;
             // Log the problem for posterity
             containerLog.error(sm.getString("dataSourceRealm.exception"), e);
         }
