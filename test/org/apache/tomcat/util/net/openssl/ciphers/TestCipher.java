@@ -34,7 +34,8 @@ public class TestCipher {
      */
     @Test
     public void testAllOpenSSLCiphersMapped() throws Exception {
-        Set<String> openSSLCipherSuites = TesterOpenSSL.getOpenSSLCiphersAsSet("ALL:eNULL");
+        Set<String> openSSLCipherSuites =
+                TesterOpenSSL.getOpenSSLCiphersAsSet("ALL:eNULL:!TLS13-AES-128-GCM-SHA256");
 
         StringBuilder errors = new StringBuilder();
 
@@ -76,7 +77,8 @@ public class TestCipher {
         // OpenSSL does not include ECDH/ECDHE ciphers in all and there is no
         //         EC alias. Use aRSA.
         // OpenSSL 1.0.0 onwards does not include eNULL in all.
-        Set<String> availableCipherSuites = TesterOpenSSL.getOpenSSLCiphersAsSet("ALL:eNULL:aRSA");
+        Set<String> availableCipherSuites =
+                TesterOpenSSL.getOpenSSLCiphersAsSet("ALL:eNULL:aRSA:!TLS13-AES-128-GCM-SHA256");
         Set<String> expectedCipherSuites = new HashSet<>();
         for (Cipher cipher : Cipher.values()) {
             if (TesterOpenSSL.OPENSSL_UNIMPLEMENTED_CIPHERS.contains(cipher)) {
