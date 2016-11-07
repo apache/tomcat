@@ -637,7 +637,7 @@
         Refactor the JSSE client certificate validation so that the
         effectiveness of the <code>certificateVerificationDepth</code>
         configuration attribute does not depend on the presence of a certificate
-        revokation list. (markt)
+        revocation list. (markt)
       </fix>
       <fix>
         Small logging optimization in the <code>Rfc6265CookieProcessor</code>.
