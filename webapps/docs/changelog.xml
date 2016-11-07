@@ -622,7 +622,7 @@
         Refactor the JSSE client certificate validation so that the
         effectiveness of the <code>certificateVerificationDepth</code>
         configuration attribute does not depend on the presence of a certificate
-        revokation list. (markt)
+        revocation list. (markt)
       </fix>
       <add>
         Log a warning at start up if a JSSE TLS connector is configured with
