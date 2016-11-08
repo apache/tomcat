@@ -157,9 +157,10 @@ public class ExpandWar {
                 }
 
                 try (InputStream input = jarFile.getInputStream(jarEntry)) {
-                    if (null == input)
+                    if (null == input) {
                         throw new ZipException(sm.getString("expandWar.missingJarEntry",
                                 jarEntry.getName()));
+                    }
 
                     // Bugzilla 33636
                     expand(input, expandedFile);
@@ -168,12 +169,13 @@ public class ExpandWar {
                         expandedFile.setLastModified(lastModified);
                     }
                 }
-
-                // Create the warTracker file and align the last modified time
-                // with the last modified time of the WAR
-                warTracker.createNewFile();
-                warTracker.setLastModified(warLastModified);
             }
+
+            // Create the warTracker file and align the last modified time
+            // with the last modified time of the WAR
+            warTracker.createNewFile();
+            warTracker.setLastModified(warLastModified);
+
             success = true;
         } catch (IOException e) {
             throw e;

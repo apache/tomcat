@@ -52,6 +52,11 @@
         state, or the realm backend. Update lockout realm to only register
         auth failures if the realm is available. (remm)
       </update>
+      <fix>
+        <bug>60351</bug>: Delay creating <code>META-INF/war-tracker</code> file
+        until after the WAR has been expanded to address the case where the
+        Tomcat process terminates during the expansion. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
