@@ -44,7 +44,7 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 9.0.0.M14" rtext="in development">
+<section name="Tomcat 9.0.0.M14 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
       <update>
@@ -69,7 +69,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.0.M13" rtext="2016-11-08">
+<section name="Tomcat 9.0.0.M13 (markt)" rtext="2016-11-08">
   <subsection name="Coyote">
     <changelog>
       <fix>
@@ -79,7 +79,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.0.M12" rtext="not released">
+<section name="Tomcat 9.0.0.M12 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -267,7 +267,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.0.M11" rtext="2016-10-10">
+<section name="Tomcat 9.0.0.M11 (markt)" rtext="2016-10-10">
   <subsection name="Catalina">
     <changelog>
       <add>
@@ -460,7 +460,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.0.M10" rtext="2016-09-05">
+<section name="Tomcat 9.0.0.M10 (markt)" rtext="2016-09-05">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -806,7 +806,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.0.M9" rtext="2016-07-12">
+<section name="Tomcat 9.0.0.M9 (markt)" rtext="2016-07-12">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -991,7 +991,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.0.M8" rtext="2016-06-13">
+<section name="Tomcat 9.0.0.M8 (markt)" rtext="2016-06-13">
   <subsection name="Coyote">
     <changelog>
       <fix>
@@ -1000,7 +1000,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.0.M7" rtext="not released">
+<section name="Tomcat 9.0.0.M7 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -1161,7 +1161,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.0.M6" rtext="2016-05-16">
+<section name="Tomcat 9.0.0.M6 (markt)" rtext="2016-05-16">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -1171,7 +1171,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.0.M5" rtext="not released">
+<section name="Tomcat 9.0.0.M5 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -1562,7 +1562,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.0.M4" rtext="2016-03-16">
+<section name="Tomcat 9.0.0.M4 (markt)" rtext="2016-03-16">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -1841,7 +1841,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.0.M3" rtext="2016-02-05">
+<section name="Tomcat 9.0.0.M3 (markt)" rtext="2016-02-05">
   <subsection name="General">
     <changelog>
       <add>
@@ -1903,7 +1903,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.0.M2" rtext="not released">
+<section name="Tomcat 9.0.0.M2 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <scode>
@@ -2280,7 +2280,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.0.M1" rtext="2015-11-17">
+<section name="Tomcat 9.0.0.M1 (markt)" rtext="2015-11-17">
   <subsection name="General">
     <changelog>
       <add>
