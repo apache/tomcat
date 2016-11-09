@@ -2379,6 +2379,12 @@ public class JNDIRealm extends RealmBase {
 
     }
 
+    @Override
+    public boolean isAvailable() {
+        // Simple best effort check
+        return (context != null);
+    }
+
     private DirContext createDirContext(Hashtable<String, String> env) throws NamingException {
         if (useStartTls) {
             return createTlsDirContext(env);

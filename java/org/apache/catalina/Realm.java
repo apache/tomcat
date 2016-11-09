@@ -231,4 +231,12 @@ public interface Realm {
      * @return principal roles
      */
     public String[] getRoles(Principal principal);
+
+
+    /**
+     * Return the availability of the realm for authentication.
+     * @return <code>true</code> if the realm is able to perform authentication
+     */
+    public boolean isAvailable();
+
 }

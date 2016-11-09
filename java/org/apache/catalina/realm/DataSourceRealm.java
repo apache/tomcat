@@ -107,6 +107,12 @@ public class DataSourceRealm extends RealmBase {
     protected String userTable = null;
 
 
+    /**
+     * Last connection attempt.
+     */
+    private volatile boolean connectionSuccess = true;
+
+
     // ------------------------------------------------------------- Properties
 
 
@@ -270,6 +276,11 @@ public class DataSourceRealm extends RealmBase {
     }
 
 
+    @Override
+    public boolean isAvailable() {
+        return connectionSuccess;
+    }
+
     // -------------------------------------------------------- Package Methods
 
 
@@ -378,8 +389,11 @@ public class DataSourceRealm extends RealmBase {
                 context = getServer().getGlobalNamingContext();
             }
             DataSource dataSource = (DataSource)context.lookup(dataSourceName);
-        return dataSource.getConnection();
+            Connection connection = dataSource.getConnection();
+            connectionSuccess = true;
+            return connection;
         } catch (Exception e) {
+            connectionSuccess = false;
             // Log the problem for posterity
             containerLog.error(sm.getString("dataSourceRealm.exception"), e);
         }

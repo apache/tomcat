@@ -212,7 +212,7 @@ public class LockOutRealm extends CombinedRealm {
      */
     private Principal filterLockedAccounts(String username, Principal authenticatedUser) {
         // Register all failed authentications
-        if (authenticatedUser == null) {
+        if (authenticatedUser == null && isAvailable()) {
             registerAuthFailure(username);
         }
 

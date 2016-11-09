@@ -52,6 +52,11 @@
         until after the WAR has been expanded to address the case where the
         Tomcat process terminates during the expansion. (markt)
       </fix>
+      <update>
+        <bug>60202</bug>: Add an available flag to realms, to indicate the
+        state, or the realm backend. Update lockout realm to only register
+        auth failures if the realm is available. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">

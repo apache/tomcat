@@ -1052,6 +1052,11 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     @Override
+    public boolean isAvailable() {
+        return true;
+    }
+
+    @Override
     protected void initInternal() throws LifecycleException {
 
         super.initInternal();
