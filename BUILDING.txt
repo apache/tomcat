@@ -282,7 +282,7 @@ You can build them by using the following commands:
         codesigning.user=request-via-pmc
         codesigning.pwd=request-via-pmc
         codesigning.partnercode=request-via-pmc
-        codesigning.service=Microsoft Signing
+        codesigning.service=Microsoft Windows Signing
 
     Release managers will be provided with the necessary credentials by the PMC.
 
