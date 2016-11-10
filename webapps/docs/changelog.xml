@@ -57,6 +57,10 @@
         state, or the realm backend. Update lockout realm to only register
         auth failures if the realm is available. (remm)
       </update>
+      <fix>
+        Correctly generate URLs for resources located inside JARs that are
+        themselves located inside a packed WAR file. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
