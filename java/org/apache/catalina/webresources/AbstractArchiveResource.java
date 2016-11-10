@@ -136,7 +136,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
     @Override
     public URL getURL() {
-        String url = baseUrl + "!/" + resource.getName();
+        String url = baseUrl + resource.getName();
         try {
             return new URL(url);
         } catch (MalformedURLException e) {

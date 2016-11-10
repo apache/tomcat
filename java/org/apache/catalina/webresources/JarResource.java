@@ -32,7 +32,7 @@ public class JarResource extends AbstractSingleArchiveResource {
 
     public JarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
             String baseUrl, JarEntry jarEntry) {
-        super(archiveResourceSet, webAppPath, "jar:" + baseUrl, jarEntry, baseUrl);
+        super(archiveResourceSet, webAppPath, "jar:" + baseUrl + "!/", jarEntry, baseUrl);
     }
 
 

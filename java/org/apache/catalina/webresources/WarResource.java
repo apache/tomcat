@@ -16,8 +16,6 @@
  */
 package org.apache.catalina.webresources;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.jar.JarEntry;
 
 import org.apache.juli.logging.Log;
@@ -34,21 +32,7 @@ public class WarResource extends AbstractSingleArchiveResource {
 
     public WarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
             String baseUrl, JarEntry jarEntry) {
-        super(archiveResourceSet, webAppPath, "war:" + baseUrl, jarEntry, baseUrl);
-    }
-
-
-    @Override
-    public URL getURL() {
-        String url = getBaseUrl() + "*/" + getResource().getName();
-        try {
-            return new URL(url);
-        } catch (MalformedURLException e) {
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("fileResource.getUrlFail", url), e);
-            }
-            return null;
-        }
+        super(archiveResourceSet, webAppPath, "war:" + baseUrl + "*/", jarEntry, baseUrl);
     }
 
 
