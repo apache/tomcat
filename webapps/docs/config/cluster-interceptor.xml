@@ -103,6 +103,10 @@
        using ISO-8859-1 encoding.<br/>
        2. byte array in string form, for example {216,123,12,3}<br/>
      </attribute>
+     <attribute name="logInterval" required="false">
+       This value indicates the interval for logging for messages from different domains.
+       The default is 100, which means that to log  per 100 messages.
+     </attribute>
    </attributes>
   </subsection>
   <subsection name="org.apache.catalina.tribes.group.interceptors.MessageDispatch15Interceptor Attributes">
