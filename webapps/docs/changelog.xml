@@ -61,6 +61,10 @@
         Correctly generate URLs for resources located inside JARs that are
         themselves located inside a packed WAR file. (markt)
       </fix>
+      <fix>
+        Correctly handle the <code>configClass</code> attribute of a Host when
+        embedding Tomcat. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
