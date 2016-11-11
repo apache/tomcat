@@ -561,7 +561,17 @@ public class Tomcat {
      * @see #addWebapp(String, String)
      */
     public Context addWebapp(Host host, String contextPath, String docBase) {
-        return addWebapp(host,  contextPath, docBase, new ContextConfig());
+        LifecycleListener listener = null;
+        try {
+            Class<?> clazz = Class.forName(getHost().getConfigClass());
+            listener = (LifecycleListener) clazz.newInstance();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            // Wrap in IAE since we can't easily change the method signature to
+            // to throw the specific checked exceptions
+            throw new IllegalArgumentException(e);
+        }
+
+        return addWebapp(host,  contextPath, docBase, listener);
     }
 
     /**
@@ -572,8 +582,27 @@ public class Tomcat {
      * @param config Custom context configurator helper
      * @return the deployed context
      * @see #addWebapp(String, String)
+     *
+     * @deprecated Use {@link
+     *             #addWebapp(Host, String, String, LifecycleListener)} instead
      */
+    @Deprecated
     public Context addWebapp(Host host, String contextPath, String docBase, ContextConfig config) {
+        return addWebapp(host, contextPath, docBase, (LifecycleListener) config);
+    }
+
+
+    /**
+     * @param host The host in which the context will be deployed
+     * @param contextPath The context mapping to use, "" for root context.
+     * @param docBase Base directory for the context, for static files.
+     *  Must exist, relative to the server home
+     * @param config Custom context configurator helper
+     * @return the deployed context
+     * @see #addWebapp(String, String)
+     */
+    public Context addWebapp(Host host, String contextPath, String docBase,
+            LifecycleListener config) {
 
         silence(host, contextPath);
 
@@ -585,8 +614,10 @@ public class Tomcat {
 
         ctx.addLifecycleListener(config);
 
-        // prevent it from looking ( if it finds one - it'll have dup error )
-        config.setDefaultWebXml(noDefaultWebXmlPath());
+        if (config instanceof ContextConfig) {
+            // prevent it from looking ( if it finds one - it'll have dup error )
+            ((ContextConfig) config).setDefaultWebXml(noDefaultWebXmlPath());
+        }
 
         if (host == null) {
             getHost().addChild(ctx);

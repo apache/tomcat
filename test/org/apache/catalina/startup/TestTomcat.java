@@ -39,10 +39,13 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.ha.context.ReplicatedContext;
@@ -530,4 +533,33 @@ public class TestTomcat extends TomcatBaseTest {
                 .getName());
     }
 
+    @Test
+    public void testCustomContextConfig() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        tomcat.getHost().setConfigClass(CustomContextConfig.class.getName());
+
+        File docBase = new File("test/webapp");
+        tomcat.addWebapp("/test", docBase.getAbsolutePath());
+
+        tomcat.start();
+
+        Assert.assertTrue(CustomContextConfig.isUsed());
+    }
+
+    public static class CustomContextConfig implements LifecycleListener {
+
+        private static volatile boolean used = false;
+
+        public static boolean isUsed() {
+            return used;
+        }
+
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+            // Hack via a static since we can't pass an instance in the test.
+            used = true;
+        }
+    }
 }
