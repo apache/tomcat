@@ -37,7 +37,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.startup.Constants;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.Tomcat;
@@ -136,7 +135,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
 
         // app dir is relative to server home
         StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test",
-                appDir.getAbsolutePath(), (LifecycleListener) absoluteOrderConfig);
+                appDir.getAbsolutePath(), absoluteOrderConfig);
 
         Tomcat.addServlet(ctx, "getresource", new GetResourceServlet());
         ctx.addServletMappingDecoded("/getresource", "getresource");
@@ -158,7 +157,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
         absoluteOrderConfig.swap();
 
         ctx = (StandardContext) tomcat.addWebapp(null, "/test",
-                appDir.getAbsolutePath(), (LifecycleListener) absoluteOrderConfig);
+                appDir.getAbsolutePath(), absoluteOrderConfig);
         Tomcat.addServlet(ctx, "getresource", new GetResourceServlet());
         ctx.addServletMappingDecoded("/getresource", "getresource");
 

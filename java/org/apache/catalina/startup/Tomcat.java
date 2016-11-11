@@ -582,24 +582,6 @@ public class Tomcat {
      * @param config Custom context configurator helper
      * @return the deployed context
      * @see #addWebapp(String, String)
-     *
-     * @deprecated Use {@link
-     *             #addWebapp(Host, String, String, LifecycleListener)} instead
-     */
-    @Deprecated
-    public Context addWebapp(Host host, String contextPath, String docBase, ContextConfig config) {
-        return addWebapp(host, contextPath, docBase, (LifecycleListener) config);
-    }
-
-
-    /**
-     * @param host The host in which the context will be deployed
-     * @param contextPath The context mapping to use, "" for root context.
-     * @param docBase Base directory for the context, for static files.
-     *  Must exist, relative to the server home
-     * @param config Custom context configurator helper
-     * @return the deployed context
-     * @see #addWebapp(String, String)
      */
     public Context addWebapp(Host host, String contextPath, String docBase,
             LifecycleListener config) {
