@@ -66,8 +66,8 @@
         embedding Tomcat. (markt)
       </fix>
       <update>
-        <bug>60368</bug>: Stop creating a default connector in embedded mode.
-        (remm)
+        <bug>60368</bug>: Stop creating a default connector on start in
+        embedded mode. (remm)
       </update>
     </changelog>
   </subsection>

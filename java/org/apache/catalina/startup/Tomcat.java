@@ -166,8 +166,8 @@ public class Tomcat {
     }
 
     /**
-     * Set the port for the default connector. Must
-     * be called before start().
+     * Set the port for the default connector. The default connector will
+     * only be created if getConnector is called.
      * @param port The port number
      */
     public void setPort(int port) {
@@ -403,7 +403,14 @@ public class Tomcat {
         if (service.findConnectors().length > 0) {
             return service.findConnectors()[0];
         }
-        return null;
+        // The same as in standard Tomcat configuration.
+        // This creates an APR HTTP connector if AprLifecycleListener has been
+        // configured (created) and Tomcat Native library is available.
+        // Otherwise it creates a NIO HTTP connector.
+        Connector connector = new Connector("HTTP/1.1");
+        connector.setPort(port);
+        service.addConnector(connector);
+        return connector;
     }
 
     public void setConnector(Connector connector) {
