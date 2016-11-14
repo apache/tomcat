@@ -65,10 +65,10 @@
         Correctly handle the <code>configClass</code> attribute of a Host when
         embedding Tomcat. (markt)
       </fix>
-      <fix>
-        <bug>60368</bug>: Restore egde casefor embedded allowing the connector
-        to be removed. (remm)
-      </fix>
+      <update>
+        <bug>60368</bug>: Stop creating a default connector in embedded mode.
+        (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Tribes">
