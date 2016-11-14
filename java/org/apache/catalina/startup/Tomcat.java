@@ -138,7 +138,6 @@ public class Tomcat {
     protected int port = 8080;
     protected String hostname = "localhost";
     protected String basedir;
-    protected boolean defaultConnectorCreated = false;
 
     private final Map<String, String> userPass = new HashMap<>();
     private final Map<String, List<String>> userRoles = new HashMap<>();
@@ -327,7 +326,6 @@ public class Tomcat {
      */
     public void init() throws LifecycleException {
         getServer();
-        getConnector();
         server.init();
     }
 
@@ -339,7 +337,6 @@ public class Tomcat {
      */
     public void start() throws LifecycleException {
         getServer();
-        getConnector();
         server.start();
     }
 
@@ -409,9 +406,6 @@ public class Tomcat {
             return service.findConnectors()[0];
         }
 
-        if (defaultConnectorCreated) {
-            return null;
-        }
         // The same as in standard Tomcat configuration.
         // This creates an APR HTTP connector if AprLifecycleListener has been
         // configured (created) and Tomcat Native library is available.
@@ -419,7 +413,6 @@ public class Tomcat {
         Connector connector = new Connector("HTTP/1.1");
         connector.setPort(port);
         service.addConnector(connector);
-        defaultConnectorCreated = true;
         return connector;
     }
 
