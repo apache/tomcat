@@ -66,6 +66,11 @@
         embedding Tomcat. (markt)
       </fix>
       <fix>
+        <bug>60340</bug>: Readability improvements for CSS used in
+        DefaultServlet and ErrorReportValve. Patch provided by Michael
+        Osipov. (violetagg)
+      </fix>
+      <fix>
         <bug>60368</bug>: Restore egde case for embedded allowing the connector
         to be removed. (remm)
       </fix>
