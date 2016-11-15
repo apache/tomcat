@@ -69,6 +69,11 @@
         <bug>60368</bug>: Stop creating a default connector on start in
         embedded mode. (remm)
       </update>
+      <fix>
+        <bug>60340</bug>: Readability improvements for CSS used in
+        DefaultServlet and ErrorReportValve. Patch provided by Michael
+        Osipov. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
