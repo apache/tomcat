@@ -79,6 +79,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>60194</bug>: If <code>validationQuery</code> is not specified,
+        connection validation is done by calling the <code>isValid()</code>
+        method. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
