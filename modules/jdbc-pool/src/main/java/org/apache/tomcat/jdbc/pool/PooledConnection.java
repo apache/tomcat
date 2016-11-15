@@ -448,6 +448,29 @@ public class PooledConnection {
             query = poolProperties.getValidationQuery();
         }
 
+        if (query == null) {
+            int validationQueryTimeout = poolProperties.getValidationQueryTimeout();
+            if (validationQueryTimeout < 0) validationQueryTimeout = 0;
+            try {
+                if (connection.isValid(validationQueryTimeout)) {
+                    this.lastValidated = now;
+                    return true;
+                } else {
+                    if (getPoolProperties().getLogValidationErrors()) {
+                        log.error("isValid() returned false.");
+                    }
+                    return false;
+                }
+            } catch (SQLException e) {
+                if (getPoolProperties().getLogValidationErrors()) {
+                    log.error("isValid() failed.", e);
+                } else if (log.isDebugEnabled()) {
+                    log.debug("isValid() failed.", e);
+                }
+                return false;
+            }
+        }
+
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
