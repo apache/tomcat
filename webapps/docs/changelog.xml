@@ -47,16 +47,21 @@
 <section name="Tomcat 8.5.9 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
-      <fix>
-        <bug>60351</bug>: Delay creating <code>META-INF/war-tracker</code> file
-        until after the WAR has been expanded to address the case where the
-        Tomcat process terminates during the expansion. (markt)
-      </fix>
       <update>
         <bug>60202</bug>: Add an available flag to realms, to indicate the
         state, or the realm backend. Update lockout realm to only register
         auth failures if the realm is available. (remm)
       </update>
+      <fix>
+        <bug>60340</bug>: Readability improvements for CSS used in
+        DefaultServlet and ErrorReportValve. Patch provided by Michael
+        Osipov. (violetagg)
+      </fix>
+      <fix>
+        <bug>60351</bug>: Delay creating <code>META-INF/war-tracker</code> file
+        until after the WAR has been expanded to address the case where the
+        Tomcat process terminates during the expansion. (markt)
+      </fix>
       <fix>
         Correctly generate URLs for resources located inside JARs that are
         themselves located inside a packed WAR file. (markt)
@@ -64,11 +69,6 @@
       <fix>
         Correctly handle the <code>configClass</code> attribute of a Host when
         embedding Tomcat. (markt)
-      </fix>
-      <fix>
-        <bug>60340</bug>: Readability improvements for CSS used in
-        DefaultServlet and ErrorReportValve. Patch provided by Michael
-        Osipov. (violetagg)
       </fix>
       <fix>
         <bug>60368</bug>: Restore egde case for embedded allowing the connector
