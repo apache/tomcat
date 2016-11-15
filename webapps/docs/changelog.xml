@@ -53,6 +53,11 @@
         auth failures if the realm is available. (remm)
       </update>
       <fix>
+        <bug>60340</bug>: Readability improvements for CSS used in
+        DefaultServlet and ErrorReportValve. Patch provided by Michael
+        Osipov. (violetagg)
+      </fix>
+      <fix>
         <bug>60351</bug>: Delay creating <code>META-INF/war-tracker</code> file
         until after the WAR has been expanded to address the case where the
         Tomcat process terminates during the expansion. (markt)
@@ -69,11 +74,6 @@
         <bug>60368</bug>: Stop creating a default connector on start in
         embedded mode. (remm)
       </update>
-      <fix>
-        <bug>60340</bug>: Readability improvements for CSS used in
-        DefaultServlet and ErrorReportValve. Patch provided by Michael
-        Osipov. (violetagg)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
