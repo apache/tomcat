@@ -266,7 +266,7 @@ public class Http11OutputBuffer implements OutputBuffer {
      * headers so the error response can be written.
      */
     void resetHeaderBuffer() {
-        headerBuffer.position(0);
+        headerBuffer.position(0).limit(headerBuffer.capacity());
     }
 
 
@@ -294,7 +294,7 @@ public class Http11OutputBuffer implements OutputBuffer {
         // Recycle response object
         response.recycle();
         // Reset pointers
-        headerBuffer.position(0);
+        headerBuffer.position(0).limit(headerBuffer.capacity());
         lastActiveFilter = -1;
         responseFinished = false;
         byteCount = 0;
@@ -347,8 +347,11 @@ public class Http11OutputBuffer implements OutputBuffer {
         if (headerBuffer.position() > 0) {
             // Sending the response header buffer
             headerBuffer.flip();
-            socketWrapper.write(isBlocking(), headerBuffer);
-            headerBuffer.position(0).limit(headerBuffer.capacity());
+            try {
+                socketWrapper.write(isBlocking(), headerBuffer);
+            } finally {
+                headerBuffer.position(0).limit(headerBuffer.capacity());
+            }
         }
     }
 
