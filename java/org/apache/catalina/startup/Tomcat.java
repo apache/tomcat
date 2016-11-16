@@ -424,6 +424,7 @@ public class Tomcat {
     }
 
     public void setConnector(Connector connector) {
+        defaultConnectorCreated = true;
         Service service = getService();
         boolean found = false;
         for (Connector serviceConnector : service.findConnectors()) {
@@ -432,7 +433,6 @@ public class Tomcat {
             }
         }
         if (!found) {
-            defaultConnectorCreated = true;
             service.addConnector(connector);
         }
     }
