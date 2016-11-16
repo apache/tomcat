@@ -389,12 +389,14 @@ public class Tomcat {
     }
 
     // ------- Extra customization -------
-    // You can tune individual tomcat objects, using internal APIs
+    // You can tune individual Tomcat objects, using internal APIs
 
     /**
-     * Get the default http connector that is used by the embedded
+     * Get the default HTTP connector that is used by the embedded
      * Tomcat. It is first configured connector in the service.
-     * This will not create a default connector.
+     * If there's no connector defined, it will create and add a default
+     * connector using the port and address specified in this Tomcat
+     * instance, and return it for further customization.
      *
      * @return The connector object
      */
@@ -413,6 +415,11 @@ public class Tomcat {
         return connector;
     }
 
+    /**
+     * Set the specified connector in the service, if it is not already
+     * present.
+     * @param connector The connector instance to add
+     */
     public void setConnector(Connector connector) {
         Service service = getService();
         boolean found = false;
