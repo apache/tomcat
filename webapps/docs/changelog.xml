@@ -76,6 +76,15 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>60372</bug>: Ensure the response headers' buffer limit is reset to
+        the capacity of this buffer when IOException occurs while writing the
+        headers to the socket. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <fix>
