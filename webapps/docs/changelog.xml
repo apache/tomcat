@@ -109,6 +109,11 @@
         startup mode and JVM args. Patch provided by isapir via Github.
         (violetagg)
       </fix>
+      <fix>
+        <bug>60383</bug>: JASPIC API is added as a dependency to the
+        <code>org.apache.tomcat:tomcat-catalina</code> maven artifact.
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>
