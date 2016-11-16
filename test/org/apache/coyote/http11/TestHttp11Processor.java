@@ -50,6 +50,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -60,6 +61,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
@@ -553,6 +555,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
     // https://bz.apache.org/bugzilla/show_bug.cgi?id=57324
     @Test
     public void testNon2xxResponseWithExpectation() throws Exception {
+        Assume.assumeTrue("Java 8 is required for this test",
+                JreCompat.isJre8Available());
         doTestNon2xxResponseAndExpectation(true);
     }
 
