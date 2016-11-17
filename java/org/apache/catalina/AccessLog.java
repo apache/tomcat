@@ -74,11 +74,10 @@ public interface AccessLog {
     public void log(Request request, Response response, long time);
 
     /**
-     * Should this valve set request attributes for IP address, Hostname,
+     * Should this valve set request attributes for IP address, hostname,
      * protocol and port used for the request? This are typically used in
      * conjunction with the {@link org.apache.catalina.valves.AccessLogValve}
      * which will otherwise log the original values.
-     * Default is <code>true</code>.
      *
      * The attributes set are:
      * <ul>

@@ -74,6 +74,12 @@
         <bug>60368</bug>: Stop creating a default connector on start in
         embedded mode. (remm)
       </update>
+      <fix>
+        <bug>60387</bug>: Correct the javadoc for
+        <code>o.a.catalina.AccessLog.setRequestAttributesEnabled</code>.
+        The default value is different for the different implementations.
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

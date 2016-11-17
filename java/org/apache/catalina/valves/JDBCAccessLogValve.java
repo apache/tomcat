@@ -208,6 +208,9 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
     private long currentTimeMillis;
 
     /**
+     * Should this valve set request attributes for IP address, hostname,
+     * protocol and port used for the request.
+     * Default is <code>true</code>.
      * @see #setRequestAttributesEnabled(boolean)
      */
     boolean requestAttributesEnabled = true;
@@ -217,6 +220,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * {@inheritDoc}
+     * Default is <code>true</code>.
      */
     @Override
     public void setRequestAttributesEnabled(boolean requestAttributesEnabled) {
