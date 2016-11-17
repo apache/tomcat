@@ -64,6 +64,12 @@
         Correctly handle the <code>configClass</code> attribute of a Host when
         embedding Tomcat. (markt)
       </fix>
+      <fix>
+        <bug>60387</bug>: Correct the javadoc for
+        <code>o.a.catalina.AccessLog.setRequestAttributesEnabled</code>.
+        The default value is different for the different implementations.
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
