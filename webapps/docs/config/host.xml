@@ -39,7 +39,7 @@
 
   <p>The <strong>Host</strong> element represents a <em>virtual host</em>,
   which is an association of a network name for a server (such as
-  "www.mycompany.com" with the particular server on which Tomcat is running.
+  "www.mycompany.com") with the particular server on which Tomcat is running.
   For clients to be able to connect to a Tomcat server using its network name,
   this name must be registered in the <em>Domain Name Service</em> (DNS) server
   that manages the Internet domain you belong to - contact your Network
