@@ -124,6 +124,12 @@
         (violetagg)
       </fix>
       <fix>
+        <bug>60366</bug>: Change <code>catalina.bat</code> to use directly
+        <code>LOGGING_MANAGER</code> and <code>LOGGING_CONFIG</code> variables
+        in order to configure logging, instead of modifying
+        <code>JAVA_OPTS</code>. Patch provided by Petter Isberg. (violetagg)
+      </fix>
+      <fix>
         <bug>60383</bug>: JASPIC API is added as a dependency to the
         <code>org.apache.tomcat:tomcat-catalina</code> maven artifact.
         (violetagg)
