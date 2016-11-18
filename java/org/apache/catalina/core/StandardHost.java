@@ -836,24 +836,6 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * @return a String representation of this component.
-     */
-    @Override
-    public String toString() {
-
-        StringBuilder sb = new StringBuilder();
-        if (getParent() != null) {
-            sb.append(getParent().toString());
-            sb.append(".");
-        }
-        sb.append("StandardHost[");
-        sb.append(getName());
-        sb.append("]");
-        return (sb.toString());
-
-    }
-
-    /**
      * Start this component and implement the requirements
      * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *

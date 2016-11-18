@@ -1319,8 +1319,23 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     }
 
 
-    // -------------------------------------- ContainerExecuteDelay Inner Class
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        Container parent = getParent();
+        if (parent != null) {
+            sb.append(parent.toString());
+            sb.append('.');
+        }
+        sb.append(this.getClass().getSimpleName());
+        sb.append('[');
+        sb.append(getName());
+        sb.append(']');
+        return sb.toString();
+    }
 
+
+    // -------------------------------------- ContainerExecuteDelay Inner Class
 
     /**
      * Private thread class to invoke the backgroundProcess method

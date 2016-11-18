@@ -5605,27 +5605,8 @@ public class StandardContext extends ContainerBase
             log.debug("resetContext " + getObjectName());
     }
 
-    /**
-     * Return a String representation of this component.
-     */
-    @Override
-    public String toString() {
-
-        StringBuilder sb = new StringBuilder();
-        if (getParent() != null) {
-            sb.append(getParent().toString());
-            sb.append(".");
-        }
-        sb.append("StandardContext[");
-        sb.append(getName());
-        sb.append("]");
-        return (sb.toString());
-
-    }
-
 
     // ------------------------------------------------------ Protected Methods
-
 
     /**
      * Adjust the URL pattern to begin with a leading slash, if appropriate

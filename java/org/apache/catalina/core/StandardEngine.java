@@ -264,19 +264,6 @@ public class StandardEngine extends ContainerBase implements Engine {
 
 
     /**
-     * Return a String representation of this component.
-     */
-    @Override
-    public String toString() {
-
-        StringBuilder sb = new StringBuilder("StandardEngine[");
-        sb.append(getName());
-        sb.append("]");
-        return (sb.toString());
-
-    }
-
-    /**
      * Override the default implementation. If no access log is defined for the
      * Engine, look for one in the Engine's default host and then the default
      * host's ROOT context. If still none is found, return the default NoOp
