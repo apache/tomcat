@@ -1260,25 +1260,6 @@ public class StandardWrapper extends ContainerBase
 
 
     /**
-     * @return a String representation of this component.
-     */
-    @Override
-    public String toString() {
-
-        StringBuilder sb = new StringBuilder();
-        if (getParent() != null) {
-            sb.append(getParent().toString());
-            sb.append(".");
-        }
-        sb.append("StandardWrapper[");
-        sb.append(getName());
-        sb.append("]");
-        return (sb.toString());
-
-    }
-
-
-    /**
      * Process an UnavailableException, marking this servlet as unavailable
      * for the specified amount of time.
      *
