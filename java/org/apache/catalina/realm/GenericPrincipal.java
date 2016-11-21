@@ -242,6 +242,9 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
         if (loginContext != null) {
             loginContext.logout();
         }
+        if (gssCredential != null) {
+            gssCredential.dispose();
+        }
     }
 
 

@@ -75,6 +75,10 @@
         to be removed. (remm)
       </fix>
       <fix>
+        <bug>60379</bug>: Dispose of the GSS credential once it is no longer
+        required. Patch provided by Michael Osipov. (markt)
+      </fix>
+      <fix>
         <bug>60387</bug>: Correct the javadoc for
         <code>o.a.catalina.AccessLog.setRequestAttributesEnabled</code>.
         The default value is different for the different implementations.
