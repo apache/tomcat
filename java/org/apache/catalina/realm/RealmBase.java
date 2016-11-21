@@ -475,7 +475,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * {@inheritDoc}
      */
     @Override
-    public Principal authenticate(GSSContext gssContext, boolean storeCred) {
+    public Principal authenticate(GSSContext gssContext, boolean storeCreds) {
         if (gssContext.isEstablished()) {
             GSSName gssName = null;
             try {
@@ -495,7 +495,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     }
                 }
                 GSSCredential gssCredential = null;
-                if (storeCred && gssContext.getCredDelegState()) {
+                if (storeCreds && gssContext.getCredDelegState()) {
                     try {
                         gssCredential = gssContext.getDelegCred();
                     } catch (GSSException e) {

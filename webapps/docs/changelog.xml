@@ -80,6 +80,10 @@
         The default value is different for the different implementations.
         (violetagg)
       </fix>
+      <scode>
+        <bug>60393</bug>: Use consistent parameter naming in implementations of
+        <code>Realm#authenticate(GSSContext, boolean)</code>. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
