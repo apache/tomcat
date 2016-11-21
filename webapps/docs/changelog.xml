@@ -69,6 +69,12 @@
         required. Patch provided by Michael Osipov. (markt)
       </fix>
       <fix>
+        <bug>60380</bug>: Ensure that a call to
+        <code>HttpServletRequest#logout()</code> triggers a call to
+        <code>TomcatPrincipal#logout()</code>. Based on a patch by Michael
+        Osipov. (markt)
+      </fix>
+      <fix>
         <bug>60387</bug>: Correct the javadoc for
         <code>o.a.catalina.AccessLog.setRequestAttributesEnabled</code>.
         The default value is different for the different implementations.
