@@ -22,7 +22,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.Container;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -45,17 +44,6 @@ final class StandardContextValve extends ValveBase {
 
     public StandardContextValve() {
         super(true);
-    }
-
-
-    /**
-     * Cast to a StandardContext right away, as it will be needed later.
-     *
-     * @see org.apache.catalina.Contained#setContainer(org.apache.catalina.Container)
-     */
-    @Override
-    public void setContainer(Container container) {
-        super.setContainer(container);
     }
 
 
