@@ -256,6 +256,9 @@ public class GenericPrincipal implements Principal {
         if (loginContext != null) {
             loginContext.logout();
         }
+        if (gssCredential != null) {
+            gssCredential.dispose();
+        }
     }
 
 
