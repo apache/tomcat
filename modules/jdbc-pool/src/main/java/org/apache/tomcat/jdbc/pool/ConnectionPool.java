@@ -128,6 +128,14 @@ public class ConnectionPool {
 
     private AtomicLong poolVersion = new AtomicLong(Long.MIN_VALUE);
 
+    /**
+     * The counters for statistics of the pool.
+     */
+    private final AtomicLong borrowedCount = new AtomicLong(0);
+    private final AtomicLong returnedCount = new AtomicLong(0);
+    private final AtomicLong createdCount = new AtomicLong(0);
+    private final AtomicLong releasedCount = new AtomicLong(0);
+
     //===============================================================================
     //         PUBLIC METHODS
     //===============================================================================
@@ -598,6 +606,7 @@ public class ConnectionPool {
                 size.addAndGet(-1);
                 con.setHandler(null);
             }
+            releasedCount.incrementAndGet();
         } finally {
             con.unlock();
         }
@@ -633,6 +642,7 @@ public class ConnectionPool {
             if (con!=null) {
                 //configure the connection and return it
                 PooledConnection result = borrowConnection(now, con, username, password);
+                borrowedCount.incrementAndGet();
                 if (result!=null) return result;
             }
 
@@ -725,6 +735,7 @@ public class ConnectionPool {
                 if (!busy.offer(con)) {
                     log.debug("Connection doesn't fit into busy array, connection will not be traceable.");
                 }
+                createdCount.incrementAndGet();
                 return con;
             } else {
                 //validation failed, make sure we disconnect
@@ -896,6 +907,7 @@ public class ConnectionPool {
 
         if (con != null) {
             try {
+                returnedCount.incrementAndGet();
                 con.lock();
                 if (con.isSuspect()) {
                     if (poolProperties.isLogAbandoned() && log.isInfoEnabled()) {
@@ -1174,6 +1186,38 @@ public class ConnectionPool {
         } catch (Exception x) {
             log.warn("Unable to start JMX integration for connection pool. Instance["+getName()+"] can't be monitored.",x);
         }
+    }
+
+    /**
+     * The total number of connections borrowed from this pool.
+     * @return the borrowed connection count
+     */
+    public long getBorrowedCount() {
+        return borrowedCount.get();
+    }
+
+    /**
+     * The total number of connections returned to this pool.
+     * @return the returned connection count
+     */
+    public long getReturnedCount() {
+        return returnedCount.get();
+    }
+
+    /**
+     * The total number of connections created by this pool.
+     * @return the created connection count
+     */
+    public long getCreatedCount() {
+        return createdCount.get();
+    }
+
+    /**
+     * The total number of connections released from this pool.
+     * @return the released connection count
+     */
+    public long getReleasedCount() {
+        return releasedCount.get();
     }
 
     /**

@@ -330,6 +330,26 @@
                     is="true"
              writeable="false"/>
 
+    <attribute    name="borrowedCount"
+           description="The total number of connections borrowed from this pool"
+                  type="java.lang.Long"
+             writeable="false"/>
+
+    <attribute    name="createdCount"
+           description="The total number of connections created by this pool"
+                  type="java.lang.Long"
+             writeable="false"/>
+
+    <attribute    name="returnedCount"
+           description="The total number of connections returned to this pool"
+                  type="java.lang.Long"
+             writeable="false"/>
+
+    <attribute    name="releasedCount"
+           description="The total number of connections released from this pool"
+                  type="java.lang.Long"
+             writeable="false"/>
+
     <operation    name="checkIdle"
                   description="forces a check of idle connections"
                   impact="ACTION"
