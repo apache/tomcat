@@ -752,6 +752,55 @@ public class DataSourceProxy implements PoolConfiguration {
             throw new RuntimeException(x);
         }
     }
+
+    /**
+     * The total number of connections borrowed from this pool.
+     * @return the borrowed connection count
+     */
+    public long getBorrowedCount() {
+        try {
+            return createPool().getBorrowedCount();
+        } catch (SQLException x) {
+            throw new RuntimeException(x);
+        }
+    }
+
+    /**
+     * The total number of connections returned to this pool.
+     * @return the returned connection count
+     */
+    public long getReturnedCount() {
+        try {
+            return createPool().getReturnedCount();
+        } catch (SQLException x) {
+            throw new RuntimeException(x);
+        }
+    }
+
+    /**
+     * The total number of connections created by this pool.
+     * @return the created connection count
+     */
+    public long getCreatedCount() {
+        try {
+            return createPool().getCreatedCount();
+        } catch (SQLException x) {
+            throw new RuntimeException(x);
+        }
+    }
+
+    /**
+     * The total number of connections released from this pool.
+     * @return the released connection count
+     */
+    public long getReleasedCount() {
+        try {
+            return createPool().getReleasedCount();
+        } catch (SQLException x) {
+            throw new RuntimeException(x);
+        }
+    }
+
     //=========================================================
     //  PROPERTIES / CONFIGURATION
     //=========================================================

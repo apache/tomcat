@@ -109,6 +109,11 @@
   </subsection>
   <subsection name="jdbc-pool">
     <changelog>
+      <add>
+        <bug>58816</bug>: Implement the statistics of jdbc-pool. The stats infos
+        are <code>borrowedCount</code>, <code>returnedCount</code>,
+        <code>createdCount</code> and <code>releasedCount</code>. (kfujino)
+      </add>
       <fix>
         <bug>60194</bug>: If <code>validationQuery</code> is not specified,
         connection validation is done by calling the <code>isValid()</code>

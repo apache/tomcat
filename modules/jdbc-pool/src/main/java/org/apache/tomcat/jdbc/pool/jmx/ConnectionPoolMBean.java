@@ -35,6 +35,14 @@ public interface ConnectionPoolMBean extends PoolConfiguration  {
 
     public int getWaitCount();
 
+    public long getBorrowedCount();
+
+    public long getReturnedCount();
+
+    public long getCreatedCount();
+
+    public long getReleasedCount();
+
     //=================================================================
     //       POOL OPERATIONS
     //=================================================================
