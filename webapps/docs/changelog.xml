@@ -133,6 +133,10 @@
         connection validation is done by calling the <code>isValid()</code>
         method. (kfujino)
       </fix>
+      <fix>
+        <bug>60398</bug>: Fix testcase of <code>TestSlowQueryReport</code>.
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
