@@ -761,6 +761,17 @@ public class DataSourceProxy implements PoolConfiguration {
         }
     }
 
+    /**
+     * The total number of connections reconnected by this pool.
+     * @return the reconnected connection count
+     */
+    public long getReconnectedCount() {
+        try {
+            return createPool().getReconnectedCount();
+        } catch (SQLException x) {
+            throw new RuntimeException(x);
+        }
+    }
     //=========================================================
     //  PROPERTIES / CONFIGURATION
     //=========================================================

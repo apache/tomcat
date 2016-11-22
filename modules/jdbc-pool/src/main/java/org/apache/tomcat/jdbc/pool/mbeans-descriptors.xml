@@ -350,6 +350,11 @@
                   type="java.lang.Long"
              writeable="false"/>
 
+    <attribute    name="reconnectedCount"
+           description="The total number of connections reconnected by this pool."
+                  type="java.lang.Long"
+             writeable="false"/>
+
     <operation    name="checkIdle"
                   description="forces a check of idle connections"
                   impact="ACTION"

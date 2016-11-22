@@ -137,6 +137,7 @@ public class ConnectionPool {
     private final AtomicLong returnedCount = new AtomicLong(0);
     private final AtomicLong createdCount = new AtomicLong(0);
     private final AtomicLong releasedCount = new AtomicLong(0);
+    private final AtomicLong reconnectedCount = new AtomicLong(0);
 
     //===============================================================================
     //         PUBLIC METHODS
@@ -804,6 +805,7 @@ public class ConnectionPool {
             //the connection shouldn't have to poll again.
             try {
                 con.reconnect();
+                reconnectedCount.incrementAndGet();
                 int validationMode = getPoolProperties().isTestOnConnect() || getPoolProperties().getInitSQL()!=null ?
                         PooledConnection.VALIDATE_INIT :
                         PooledConnection.VALIDATE_BORROW;
@@ -1210,6 +1212,14 @@ public class ConnectionPool {
      */
     public long getReleasedCount() {
         return releasedCount.get();
+    }
+
+    /**
+     * The total number of connections reconnected by this pool.
+     * @return the reconnected connection count
+     */
+    public long getReconnectedCount() {
+        return reconnectedCount.get();
     }
 
     /**
