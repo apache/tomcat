@@ -147,7 +147,7 @@ public class TestSlowQueryReport extends DefaultTestCase {
         }
         Map<String,SlowQueryReport.QueryStats> map = SlowQueryReport.getPoolStats(datasource.getPool().getName());
         Assert.assertNotNull(map);
-        Assert.assertEquals(0,map.size());
+        Assert.assertEquals(1,map.size());
         ConnectionPool pool = datasource.getPool();
         con.close();
         tearDown();
