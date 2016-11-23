@@ -77,8 +77,12 @@
                redirectPort="8443" />
     -->
     <!-- Define a SSL/TLS HTTP/1.1 Connector on port 8443
-         This connector uses the NIO implementation with the JSSE engine. When
-         using the JSSE engine, the JSSE configuration attributes must be used.
+         This connector uses the NIO implementation. The default
+         SSLImplementation will depend on the presence of the APR/native
+         library and the useOpenSSL attribute of the
+         AprLifecycleListener.
+         Either JSSE or OpenSSL style configuration may be used regardless of
+         the SSLImplementation selected. JSSE style configuration is used below.
     -->
     <!--
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
@@ -90,9 +94,10 @@
     </Connector>
     -->
     <!-- Define a SSL/TLS HTTP/1.1 Connector on port 8443 with HTTP/2
-         This connector uses the APR/native implementation. When using the
-         APR/native implementation or the OpenSSL engine with NIO or NIO2 then
-         the OpenSSL configuration attributes must be used.
+         This connector uses the APR/native implementation which always uses
+         OpenSSL for TLS.
+         Either JSSE or OpenSSL style configuration may be used. OpenSSL style
+         configuration is used below.
     -->
     <!--
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11AprProtocol"

@@ -162,6 +162,10 @@
         <code>org.apache.tomcat:tomcat-catalina</code> maven artifact.
         (violetagg)
       </fix>
+      <fix>
+        Update the comments associated with the TLS Connector examples in
+        <code>server.xml</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
