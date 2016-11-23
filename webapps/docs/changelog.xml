@@ -103,6 +103,10 @@
         the capacity of this buffer when IOException occurs while writing the
         headers to the socket. (violetagg)
       </fix>
+      <fix>
+        Ensure that the availability of configured upgrade protocols that
+        require ALPN is correctly reported during Tomcat start. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

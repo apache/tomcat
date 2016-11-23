@@ -208,6 +208,19 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
 
     @Override
+    public boolean isAlpnSupported() {
+        // ALPN requires TLS so if there is no SSLImplementation, or if TLS is
+        // not enabled, ALPN cannot be supported
+        if (sslImplementation == null || !isSSLEnabled()) {
+            return false;
+        }
+
+        // Depends on the SSLImplementation
+        return sslImplementation.isAlpnSupported();
+    }
+
+
+    @Override
     public void init() throws Exception {
         testServerCipherSuitesOrderSupport();
         super.init();

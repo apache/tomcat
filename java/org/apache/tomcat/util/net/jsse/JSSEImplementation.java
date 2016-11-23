@@ -48,4 +48,10 @@ public class JSSEImplementation extends SSLImplementation {
     public SSLUtil getSSLUtil(SSLHostConfigCertificate certificate) {
         return new JSSEUtil(certificate);
     }
+
+    @Override
+    public boolean isAlpnSupported() {
+        // JSSE does not (yet) support ALPN
+        return false;
+    }
 }
