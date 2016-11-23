@@ -539,6 +539,16 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     }
 
 
+
+    @Override
+    public boolean isAlpnSupported() {
+        // The APR/native connector always supports ALPN if TLS is in use
+        // because OpenSSL supports ALPN. Therefore, this is equivalent to
+        // testing of SSL is enabled.
+        return isSSLEnabled();
+    }
+
+
     /**
      * Start the APR endpoint, creating acceptor, poller and sendfile threads.
      */
