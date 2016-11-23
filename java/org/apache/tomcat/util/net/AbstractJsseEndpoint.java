@@ -209,13 +209,20 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
 
     @Override
     public boolean isAlpnSupported() {
-        // ALPN requires TLS so if there is no SSLImplementation, or if TLS is
-        // not enabled, ALPN cannot be supported
-        if (sslImplementation == null || !isSSLEnabled()) {
+        // ALPN requires TLS so if TLS is not enabled, ALPN cannot be supported
+        if (!isSSLEnabled()) {
             return false;
         }
 
-        // Depends on the SSLImplementation
+        // Depends on the SSLImplementation.
+        SSLImplementation sslImplementation;
+        try {
+            sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
+        } catch (ClassNotFoundException e) {
+            // Ignore the exception. It will be logged when trying to start the
+            // end point.
+            return false;
+        }
         return sslImplementation.isAlpnSupported();
     }
 

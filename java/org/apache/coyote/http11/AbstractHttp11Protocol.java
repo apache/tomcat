@@ -58,11 +58,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     @Override
     public void init() throws Exception {
-        super.init();
-
         for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
             configureUpgradeProtocol(upgradeProtocol);
         }
+
+        super.init();
     }
 
 
