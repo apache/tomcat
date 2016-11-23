@@ -464,7 +464,7 @@ public abstract class AbstractEndpoint<S> {
      * <code>true</code> implies that {@link #isSSLEnabled()} will also return
      * <code>true</code>.
      *
-     * @return <code>true</true> if the endpoint supports ALPN in its current
+     * @return <code>true</code> if the endpoint supports ALPN in its current
      *         configuration, otherwise <code>false</code>.
      */
     public abstract boolean isAlpnSupported();
