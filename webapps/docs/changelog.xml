@@ -86,6 +86,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>60356</bug>: Fix pre-compilation of JSPs that depend on nested tag
+        files packaged in a JAR. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
