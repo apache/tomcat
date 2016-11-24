@@ -40,6 +40,8 @@ execute.test.apr=true
 test.haltonfailure=false
 # Activate AccessLog during testing
 test.accesslog=false
+# Display the tests output on the console
+test.verbose=true
 
 # Note the Cobertura code coverage tool is GPLv2 licensed
 test.cobertura=false

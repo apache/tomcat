@@ -1422,7 +1422,7 @@
 
     <sequential>
       <mkdir dir="${test.reports}" />
-      <junit printsummary="yes" fork="yes" dir="." showoutput="yes"
+      <junit printsummary="yes" fork="yes" dir="." showoutput="${test.verbose}"
         errorproperty="test.result.error"
         failureproperty="test.result.failure"
         haltonfailure="${test.haltonfailure}"

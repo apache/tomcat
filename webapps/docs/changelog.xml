@@ -129,6 +129,11 @@
         in order to configure logging, instead of modifying
         <code>JAVA_OPTS</code>. Patch provided by Petter Isberg. (violetagg)
       </fix>
+      <add>
+        New property is added <code>test.verbose</code> in order to control
+        whether the output of the tests is displayed on the console or not.
+        Patch provided by Emmanuel Bourg. (violetagg)
+      </add>
     </changelog>
   </subsection>
 </section>
