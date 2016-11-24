@@ -469,6 +469,11 @@ NOTE: Cobertura is licensed under GPL v2 with parts of it being under
 
         java.net.preferIPv4Stack=true
 
+ 10. It is possible to control whether the output of the tests is displayed
+     on the console or not. By default it is displayed and can be disabled
+     by the following property:
+
+        test.verbose=true
 
 (8) Source code checks
 
