@@ -16,8 +16,9 @@
  */
 package org.apache.coyote.http2;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -34,7 +35,7 @@ abstract class AbstractStream {
     private final Integer identifier;
 
     private volatile AbstractStream parentStream = null;
-    private final Set<AbstractStream> childStreams = new HashSet<>();
+    private final Set<Stream> childStreams = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private long windowSize = ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
 
     final Integer getIdentifier() {
@@ -55,7 +56,7 @@ abstract class AbstractStream {
     }
 
 
-    final void addChild(AbstractStream child) {
+    final void addChild(Stream child) {
         child.setParentStream(this);
         childStreams.add(child);
     }
@@ -84,7 +85,7 @@ abstract class AbstractStream {
     }
 
 
-    final Set<AbstractStream> getChildStreams() {
+    final Set<Stream> getChildStreams() {
         return childStreams;
     }
 
