@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.net.openssl.ciphers;
 
 import java.util.List;
+import java.util.TreeSet;
 
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -562,8 +563,11 @@ public class TestOpenSSLCipherConfigurationParser {
 
         // First check the lists have the same entries
         // Order is NOT important at this point. It is checked below.
-        Assert.assertEquals(jsseCipherListFromOpenSSL.size(), jsseCipherListFromParser.size());
-        Assert.assertTrue(jsseCipherListFromOpenSSL.containsAll(jsseCipherListFromParser));
+        Assert.assertEquals(
+                "Expected " + jsseCipherListFromParser.size() + " ciphers but got "
+                        + jsseCipherListFromOpenSSL.size() + " for the specification '"
+                        + specification + "'",
+                new TreeSet<>(jsseCipherListFromParser), new TreeSet<>(jsseCipherListFromOpenSSL));
 
         // OpenSSL treats many ciphers as having equal preference. The order
         // returned depends on the order they are requested. The following code

@@ -171,6 +171,11 @@
         whether the output of the tests is displayed on the console or not.
         Patch provided by Emmanuel Bourg. (violetagg)
       </add>
+      <scode>
+        <code>TestOpenSSLCipherConfigurationParser.testSpecification</code>
+        - if there are test failures, provide more detailed information. Patch
+        provided by Emmanuel Bourg. (violetagg)
+      </scode>
     </changelog>
   </subsection>
 </section>
