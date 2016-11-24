@@ -130,6 +130,22 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
+    /*
+     * Used when removing closed streams from the tree and we know there is no
+     * need to check for circular references.
+     */
+    final void rePrioritise(AbstractStream parent, int weight) {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("stream.reprioritisation.debug",
+                    getConnectionId(), getIdentifier(), Boolean.FALSE,
+                    parent.getIdentifier(), Integer.toString(weight)));
+        }
+
+        parent.addChild(this);
+        this.weight = weight;
+    }
+
+
     final void receiveReset(long errorCode) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.reset.receive", getConnectionId(), getIdentifier(),

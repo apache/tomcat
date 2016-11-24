@@ -1007,44 +1007,118 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
 
         // Need to try and close some streams.
-        // Use this Set to keep track of streams that might be part of the
-        // priority tree. Only remove these if we absolutely have to.
-        TreeSet<Integer> additionalCandidates = new TreeSet<>();
+        // Try to close streams in this order
+        // 1. Completed streams used for a request with no children
+        // 2. Completed streams used for a request with children
+        // 3. Closed final streams
+        //
+        // Steps 1 and 2 will always be completed.
+        // Step 3 will be completed to the minimum extent necessary to bring the
+        // total number of streams under the limit.
+
+        // Use these sets to track the different classes of streams
+        TreeSet<Integer> candidatesStepOne = new TreeSet<>();
+        TreeSet<Integer> candidatesStepTwo = new TreeSet<>();
+        TreeSet<Integer> candidatesStepThree = new TreeSet<>();
 
         Iterator<Entry<Integer,Stream>> entryIter = streams.entrySet().iterator();
-        while (entryIter.hasNext() && toClose > 0) {
+        while (entryIter.hasNext()) {
             Entry<Integer,Stream> entry = entryIter.next();
             Stream stream = entry.getValue();
-            // Never remove active streams or streams with children
-            if (stream.isActive() || stream.getChildStreams().size() > 0) {
+            // Never remove active streams
+            if (stream.isActive()) {
                 continue;
             }
+
             if (stream.isClosedFinal()) {
                 // This stream went from IDLE to CLOSED and is likely to have
-                // been created by the client as part of the priority tree. Keep
-                // it if possible.
-                additionalCandidates.add(entry.getKey());
+                // been created by the client as part of the priority tree.
+                candidatesStepThree.add(entry.getKey());
+            } else if (stream.getChildStreams().size() == 0) {
+                // Closed, no children
+                candidatesStepOne.add(entry.getKey());
             } else {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("upgradeHandler.pruned", connectionId, entry.getKey()));
-                }
-                entryIter.remove();
-                toClose--;
+                // Closed, with children
+                candidatesStepTwo.add(entry.getKey());
             }
         }
 
-        while (toClose > 0 && additionalCandidates.size() > 0) {
-            Integer pruned = additionalCandidates.pollLast();
+        // Process the step one list
+        Iterator<Integer> stepOneIter = candidatesStepOne.iterator();
+        while (stepOneIter.hasNext()) {
+            Integer streamIdToRemove = stepOneIter.next();
+            // Remove this childless stream
+            Stream removedStream = streams.remove(streamIdToRemove);
+            removedStream.detachFromParent();
+            toClose--;
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("upgradeHandler.prunedPriority", connectionId, pruned));
+                log.debug(sm.getString("upgradeHandler.pruned", connectionId, streamIdToRemove));
             }
-            toClose++;
+
+            // Did this make the parent childless?
+            AbstractStream parent = removedStream.getParentStream();
+            while (parent instanceof Stream && !((Stream) parent).isActive() &&
+                    !((Stream) parent).isClosedFinal() && parent.getChildStreams().size() == 0) {
+                streams.remove(parent.getIdentifier());
+                parent.detachFromParent();
+                toClose--;
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("upgradeHandler.pruned", connectionId, streamIdToRemove));
+                }
+                // Also need to remove this stream from the p2 list
+                candidatesStepTwo.remove(parent.getIdentifier());
+                parent = parent.getParentStream();
+            }
+        }
+
+        // Process the P2 list
+        Iterator<Integer> stepTwoIter = candidatesStepTwo.iterator();
+        while (stepTwoIter.hasNext()) {
+            Integer streamIdToRemove = stepTwoIter.next();
+            removeStreamFromPriorityTree(streamIdToRemove);
+            toClose--;
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgradeHandler.pruned", connectionId, streamIdToRemove));
+            }
+        }
+
+        while (toClose > 0 && candidatesStepThree.size() > 0) {
+            Integer streamIdToRemove = candidatesStepThree.pollLast();
+            removeStreamFromPriorityTree(streamIdToRemove);
+            toClose--;
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgradeHandler.prunedPriority", connectionId, streamIdToRemove));
+            }
         }
 
         if (toClose > 0) {
             log.warn(sm.getString("upgradeHandler.pruneIncomplete", connectionId,
                     Integer.toString(toClose)));
         }
+    }
+
+
+    private void removeStreamFromPriorityTree(Integer streamIdToRemove) {
+        Stream streamToRemove = streams.remove(streamIdToRemove);
+        // Move the removed Stream's children to the removed Stream's
+        // parent.
+        Set<Stream> children = streamToRemove.getChildStreams();
+        if (streamToRemove.getChildStreams().size() == 1) {
+            // Shortcut
+            streamToRemove.getChildStreams().iterator().next().rePrioritise(
+                    streamToRemove.getParentStream(), streamToRemove.getWeight());
+        } else {
+            int totalWeight = 0;
+            for (Stream child : children) {
+                totalWeight += child.getWeight();
+            }
+            for (Stream child : children) {
+                streamToRemove.getChildStreams().iterator().next().rePrioritise(
+                        streamToRemove.getParentStream(),
+                        streamToRemove.getWeight() * child.getWeight() / totalWeight);
+            }
+        }
+        streamToRemove.detachFromParent();
     }
 
 

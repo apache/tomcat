@@ -107,6 +107,11 @@
         Ensure that the availability of configured upgrade protocols that
         require ALPN is correctly reported during Tomcat start. (markt)
       </fix>
+      <fix>
+        <bug>60386</bug>: Implement a more sophisticated pruning algorithm for
+        removing closed streams from the priority tree to ensure that the tree
+        does not grow too large. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
