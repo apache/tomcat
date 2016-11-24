@@ -166,6 +166,11 @@
         Update the comments associated with the TLS Connector examples in
         <code>server.xml</code>. (markt)
       </fix>
+      <add>
+        New property is added <code>test.verbose</code> in order to control
+        whether the output of the tests is displayed on the console or not.
+        Patch provided by Emmanuel Bourg. (violetagg)
+      </add>
     </changelog>
   </subsection>
 </section>
