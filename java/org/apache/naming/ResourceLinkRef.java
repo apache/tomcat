@@ -16,8 +16,6 @@
  */
 package org.apache.naming;
 
-import javax.naming.Context;
-import javax.naming.Reference;
 import javax.naming.StringRefAddr;
 
 /**
@@ -25,7 +23,7 @@ import javax.naming.StringRefAddr;
  *
  * @author Remy Maucherat
  */
-public class ResourceLinkRef extends Reference {
+public class ResourceLinkRef extends AbstractRef {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,7 +32,7 @@ public class ResourceLinkRef extends Reference {
      * Default factory for this reference.
      */
     public static final String DEFAULT_FACTORY =
-        org.apache.naming.factory.Constants.DEFAULT_RESOURCE_LINK_FACTORY;
+            org.apache.naming.factory.Constants.DEFAULT_RESOURCE_LINK_FACTORY;
 
 
     /**
@@ -53,7 +51,7 @@ public class ResourceLinkRef extends Reference {
      *                        factory (e.g. URL)
      */
     public ResourceLinkRef(String resourceClass, String globalName,
-                           String factory, String factoryLocation) {
+            String factory, String factoryLocation) {
         super(resourceClass, factory, factoryLocation);
         StringRefAddr refAddr = null;
         if (globalName != null) {
@@ -63,22 +61,8 @@ public class ResourceLinkRef extends Reference {
     }
 
 
-    /**
-     * Retrieves the class name of the factory of the object to which this
-     * reference refers.
-     */
     @Override
-    public String getFactoryClassName() {
-        String factory = super.getFactoryClassName();
-        if (factory != null) {
-            return factory;
-        } else {
-            factory = System.getProperty(Context.OBJECT_FACTORIES);
-            if (factory != null) {
-                return null;
-            } else {
-                return DEFAULT_FACTORY;
-            }
-        }
+    protected String getDefaultFactoryClassName() {
+        return DEFAULT_FACTORY;
     }
 }

@@ -94,6 +94,10 @@
         <bug>60393</bug>: Use consistent parameter naming in implementations of
         <code>Realm#authenticate(GSSContext, boolean)</code>. (markt)
       </scode>
+      <scode>
+        Refactor the <code>org.apache.naming</code> package to reduce duplicate
+        code. Duplicate code identified by the Simian tool. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
