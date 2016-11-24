@@ -441,6 +441,12 @@ For example:
 
         java.net.preferIPv4Stack=true
 
+ 8. It is possible to control whether the output of the tests is displayed
+    on the console or not. By default it is displayed and can be disabled
+    by the following property:
+
+        test.verbose=true
+
 (8) Source code checks
 
 (8.1) Checkstyle
