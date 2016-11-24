@@ -130,6 +130,22 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
+    /*
+     * Used when removing closed streams from the tree and we know there is no
+     * need to check for circular references.
+     */
+    final void rePrioritise(AbstractStream parent, int weight) {
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("stream.reprioritisation.debug",
+                    getConnectionId(), getIdentifier(), Boolean.FALSE,
+                    parent.getIdentifier(), Integer.toString(weight)));
+        }
+
+        parent.addChild(this);
+        this.weight = weight;
+    }
+
+
     void receiveReset(long errorCode) {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.reset.debug", getConnectionId(), getIdentifier(),
@@ -546,6 +562,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
          * @deprecated Unused. Will be removed in Tomcat 9. Use
          *             {@link #doWrite(ByteBuffer)}
          */
+        @Deprecated
         @Override
         public synchronized int doWrite(ByteChunk chunk) throws IOException {
             if (closed) {
@@ -721,6 +738,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
          * @deprecated Unused. Will be removed in Tomcat 9. Use
          *             {@link #doRead(ApplicationBufferHandler)}
          */
+        @Deprecated
         @Override
         public int doRead(ByteChunk chunk) throws IOException {
 
