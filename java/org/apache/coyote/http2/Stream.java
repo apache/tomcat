@@ -329,7 +329,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
     @Override
     final String getConnectionId() {
-        return getParentStream().getConnectionId();
+        return handler.getConnectionId();
     }
 
 
