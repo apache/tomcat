@@ -98,6 +98,11 @@
         Refactor the <code>org.apache.naming</code> package to reduce duplicate
         code. Duplicate code identified by the Simian tool. (markt)
       </scode>
+      <scode>
+        Refactor the implementations of
+        <code>HttpServletRequest#getRequestURL()</code> to reduce duplicate
+        code. Duplicate code identified by the Simian tool. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
