@@ -57,7 +57,9 @@ public class MemoryRealm  extends RealmBase {
 
     /**
      * Descriptive information about this Realm implementation.
+     * @deprecated This will be removed in Tomcat 9 onwards.
      */
+    @Deprecated
     protected static final String name = "MemoryRealm";
 
 
@@ -206,14 +208,10 @@ public class MemoryRealm  extends RealmBase {
     }
 
 
-    /**
-     * @return a short name for this Realm implementation.
-     */
     @Override
+    @Deprecated
     protected String getName() {
-
-        return (name);
-
+        return name;
     }
 
 

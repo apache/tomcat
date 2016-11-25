@@ -667,6 +667,7 @@ public class Tomcat {
     protected Realm createDefaultRealm() {
         return new RealmBase() {
             @Override
+            @Deprecated
             protected String getName() {
                 return "Simple";
             }
