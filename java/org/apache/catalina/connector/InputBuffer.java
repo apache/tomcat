@@ -666,9 +666,11 @@ public class InputBuffer extends Reader
         }
 
         CharBuffer tmp = CharBuffer.allocate(newSize);
+        int oldPosition = cb.position();
         cb.position(0);
         tmp.put(cb);
         tmp.flip();
+        tmp.position(oldPosition);
         cb = tmp;
         tmp = null;
     }
