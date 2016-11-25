@@ -235,14 +235,6 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * Descriptive information about this Realm implementation.
-     * @deprecated This will be removed in Tomcat 9 onwards.
-     */
-    @Deprecated
-    protected static final String name = "JNDIRealm";
-
-
-    /**
      * The protocol that will be used in the communication with the
      * directory server.
      */
@@ -2166,13 +2158,6 @@ public class JNDIRealm extends RealmBase {
         }
         this.context = null;
 
-    }
-
-
-    @Override
-    @Deprecated
-    protected String getName() {
-        return name;
     }
 
 

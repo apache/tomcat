@@ -648,11 +648,6 @@ public class Tomcat {
 
 
     private class SimpleRealm extends RealmBase {
-        @Override
-        @Deprecated
-        protected String getName() {
-            return "Simple";
-        }
 
         @Override
         protected String getPassword(String username) {

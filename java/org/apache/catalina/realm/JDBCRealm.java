@@ -92,14 +92,6 @@ public class JDBCRealm
 
 
     /**
-     * Descriptive information about this Realm implementation.
-     * @deprecated This will be removed in Tomcat 9 onwards.
-     */
-    @Deprecated
-    protected static final String name = "JDBCRealm";
-
-
-    /**
      * The PreparedStatement to use for authenticating users.
      */
     protected PreparedStatement preparedCredentials = null;
@@ -499,13 +491,6 @@ public class JDBCRealm
         }
 
         return (preparedCredentials);
-    }
-
-
-    @Override
-    @Deprecated
-    protected String getName() {
-        return name;
     }
 
 

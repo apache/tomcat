@@ -56,14 +56,6 @@ public class MemoryRealm  extends RealmBase {
 
 
     /**
-     * Descriptive information about this Realm implementation.
-     * @deprecated This will be removed in Tomcat 9 onwards.
-     */
-    @Deprecated
-    protected static final String name = "MemoryRealm";
-
-
-    /**
      * The pathname (absolute or relative to Catalina's current working
      * directory) of the XML file containing our database information.
      */
@@ -205,13 +197,6 @@ public class MemoryRealm  extends RealmBase {
         }
         return (digester);
 
-    }
-
-
-    @Override
-    @Deprecated
-    protected String getName() {
-        return name;
     }
 
 

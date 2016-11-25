@@ -112,6 +112,11 @@
         Refactor Catalina interfaces to make wider use of the
         <code>Contained</code> interface and reduce duplication. (markt)
       </scode>
+      <scode>
+        Remove the <code>getName()</code> method from <code>RealmBase</code>
+        along with the various constants used by the sub-classes to store the
+        return value. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

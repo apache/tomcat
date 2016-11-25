@@ -1164,17 +1164,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * @return a short name for this Realm implementation, for use in
-     * log messages.
-     *
-     * @deprecated This will be removed in Tomcat 9 onwards. Use
-     *             {@link Class#getSimpleName()} instead.
-     */
-    @Deprecated
-    protected abstract String getName();
-
-
-    /**
      * Get the password for the specified user.
      * @param username The user name
      * @return the password associated with the given principal's user name.

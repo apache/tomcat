@@ -72,14 +72,6 @@ public class DataSourceRealm extends RealmBase {
 
 
     /**
-     * Descriptive information about this Realm implementation.
-     * @deprecated This will be removed in Tomcat 9 onwards.
-     */
-    @Deprecated
-    protected static final String name = "DataSourceRealm";
-
-
-    /**
      * The column in the user role table that names a role
      */
     protected String roleNameCol = null;
@@ -400,12 +392,6 @@ public class DataSourceRealm extends RealmBase {
             containerLog.error(sm.getString("dataSourceRealm.exception"), e);
         }
         return null;
-    }
-
-    @Override
-    @Deprecated
-    protected String getName() {
-        return name;
     }
 
     /**

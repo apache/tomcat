@@ -60,14 +60,6 @@ public class UserDatabaseRealm
 
 
     /**
-     * Descriptive information about this Realm implementation.
-     * @deprecated This will be removed in Tomcat 9 onwards.
-     */
-    @Deprecated
-    protected static final String name = "UserDatabaseRealm";
-
-
-    /**
      * The global JNDI name of the <code>UserDatabase</code> resource
      * we will be utilizing.
      */
@@ -154,15 +146,8 @@ public class UserDatabaseRealm
         return false;
     }
 
+
     // ------------------------------------------------------ Protected Methods
-
-
-    @Override
-    @Deprecated
-    protected String getName() {
-        return name;
-    }
-
 
     /**
      * Return the password associated with the given principal's user name.

@@ -140,14 +140,6 @@ public class JAASRealm extends RealmBase {
 
 
     /**
-     * Descriptive information about this <code>Realm</code> implementation.
-     * @deprecated This will be removed in Tomcat 9 onwards.
-     */
-    @Deprecated
-    protected static final String name = "JAASRealm";
-
-
-    /**
      * The list of role class names, split out for easy processing.
      */
     protected final List<String> roleClasses = new ArrayList<>();
@@ -468,13 +460,6 @@ public class JAASRealm extends RealmBase {
             log.error( "error ", t);
             return null;
         }
-    }
-
-
-    @Override
-    @Deprecated
-    protected String getName() {
-        return name;
     }
 
 
