@@ -118,6 +118,12 @@
         return value. (markt)
       </scode>
       <fix>
+        <bug>60395</bug>: Log when an <code>Authenticator</code> passes an
+        incomplete <code>GSSContext</code> to a Realm since it indicates a bug
+        in the <code>Authenticator</code>. Patch provided by Michael Osipov.
+        (markt)
+      </fix>
+      <fix>
         <bug>60400</bug>: When expanding the buffer used for reading the
         request body, ensure the read position will be restored to the
         original one. (violetagg)
