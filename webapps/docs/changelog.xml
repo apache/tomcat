@@ -103,6 +103,10 @@
         <code>HttpServletRequest#getRequestURL()</code> to reduce duplicate
         code. Duplicate code identified by the Simian tool. (markt)
       </scode>
+      <scode>
+        Refactor Catalina interfaces to make wider use of the
+        <code>Contained</code> interface and reduce duplication. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
