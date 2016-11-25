@@ -84,6 +84,12 @@
         <bug>60393</bug>: Use consistent parameter naming in implementations of
         <code>Realm#authenticate(GSSContext, boolean)</code>. (markt)
       </scode>
+      <fix>
+        <bug>60395</bug>: Log when an <code>Authenticator</code> passes an
+        incomplete <code>GSSContext</code> to a Realm since it indicates a bug
+        in the <code>Authenticator</code>. Patch provided by Michael Osipov.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
