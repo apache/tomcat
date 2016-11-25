@@ -28,6 +28,8 @@ import javax.management.RuntimeOperationsException;
  * MBean attribute named <code>className</code>, which reports the fully
  * qualified class name of the managed object as its value.</p>
  *
+ * @param <T> The type that this bean represents.
+ *
  * @author Craig R. McClanahan
  */
 public class ClassNameMBean<T> extends BaseCatalinaMBean<T> {
