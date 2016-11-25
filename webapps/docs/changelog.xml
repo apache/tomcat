@@ -117,6 +117,11 @@
         along with the various constants used by the sub-classes to store the
         return value. (markt)
       </scode>
+      <fix>
+        <bug>60400</bug>: When expanding the buffer used for reading the
+        request body, ensure the read position will be restored to the
+        original one. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
