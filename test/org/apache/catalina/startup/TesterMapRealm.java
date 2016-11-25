@@ -47,6 +47,7 @@ public final class TesterMapRealm extends RealmBase {
     }
 
     @Override
+    @Deprecated
     protected String getName() {
         return "MapRealm";
     }

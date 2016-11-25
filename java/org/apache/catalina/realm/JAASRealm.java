@@ -141,7 +141,9 @@ public class JAASRealm extends RealmBase {
 
     /**
      * Descriptive information about this <code>Realm</code> implementation.
+     * @deprecated This will be removed in Tomcat 9 onwards.
      */
+    @Deprecated
     protected static final String name = "JAASRealm";
 
 
@@ -468,14 +470,11 @@ public class JAASRealm extends RealmBase {
         }
     }
 
-    /**
-     * @return a short name for this <code>Realm</code> implementation.
-     */
+
     @Override
+    @Deprecated
     protected String getName() {
-
-        return (name);
-
+        return name;
     }
 
 

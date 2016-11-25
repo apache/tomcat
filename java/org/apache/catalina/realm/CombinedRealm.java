@@ -52,7 +52,9 @@ public class CombinedRealm extends RealmBase {
 
     /**
      * Descriptive information about this Realm implementation.
+     * @deprecated This will be removed in Tomcat 9 onwards.
      */
+    @Deprecated
     protected static final String name = "CombinedRealm";
 
     /**
@@ -392,6 +394,7 @@ public class CombinedRealm extends RealmBase {
     }
 
     @Override
+    @Deprecated
     protected String getName() {
         return name;
     }
