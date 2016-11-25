@@ -14,15 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.mbeans;
-
 
 import javax.management.MBeanException;
 import javax.management.RuntimeOperationsException;
-
-import org.apache.tomcat.util.modeler.BaseModelMBean;
-
 
 /**
  * <p>A convenience base class for <strong>ModelMBean</strong> implementations
@@ -35,42 +30,28 @@ import org.apache.tomcat.util.modeler.BaseModelMBean;
  *
  * @author Craig R. McClanahan
  */
-public class ClassNameMBean extends BaseModelMBean {
+public class ClassNameMBean<T> extends BaseCatalinaMBean<T> {
+
+    /**
+     * Construct a <code>ModelMBean</code> with default
+     * <code>ModelMBeanInfo</code> information.
+     *
+     * @exception MBeanException if the initialize of an object
+     *  throws an exception
+     * @exception RuntimeOperationsException if an IllegalArgumentException
+     *  occurs
+     */
+    public ClassNameMBean() throws MBeanException, RuntimeOperationsException {
+        super();
+    }
 
 
-     // ---------------------------------------------------------- Constructors
-
-
-     /**
-      * Construct a <code>ModelMBean</code> with default
-      * <code>ModelMBeanInfo</code> information.
-      *
-      * @exception MBeanException if the initialize of an object
-      *  throws an exception
-      * @exception RuntimeOperationsException if an IllegalArgumentException
-      *  occurs
-      */
-     public ClassNameMBean()
-         throws MBeanException, RuntimeOperationsException {
-
-         super();
-
-     }
-
-
-     // ------------------------------------------------------------ Properties
-
-
-     /**
-      * Return the fully qualified Java class name of the managed object
-      * for this MBean.
-      */
-     @Override
+    /**
+     * Return the fully qualified Java class name of the managed object
+     * for this MBean.
+     */
+    @Override
     public String getClassName() {
-
-         return (this.resource.getClass().getName());
-
-     }
-
-
- }
+        return this.resource.getClass().getName();
+    }
+}

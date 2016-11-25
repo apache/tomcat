@@ -18,16 +18,12 @@ package org.apache.catalina.mbeans;
 
 import javax.management.Attribute;
 import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
 import javax.management.ReflectionException;
 import javax.management.RuntimeOperationsException;
-import javax.management.modelmbean.InvalidTargetObjectTypeException;
 
 import org.apache.tomcat.util.descriptor.web.ContextResourceLink;
 import org.apache.tomcat.util.descriptor.web.NamingResources;
-import org.apache.tomcat.util.modeler.BaseModelMBean;
-
 
 /**
  * <p>A <strong>ModelMBean</strong> implementation for the
@@ -35,10 +31,7 @@ import org.apache.tomcat.util.modeler.BaseModelMBean;
  *
  * @author Amy Roh
  */
-public class ContextResourceLinkMBean extends BaseModelMBean {
-
-
-    // ----------------------------------------------------------- Constructors
+public class ContextResourceLinkMBean extends BaseCatalinaMBean<ContextResourceLink> {
 
 
     /**
@@ -50,18 +43,10 @@ public class ContextResourceLinkMBean extends BaseModelMBean {
      * @exception RuntimeOperationsException if an IllegalArgumentException
      *  occurs
      */
-    public ContextResourceLinkMBean()
-        throws MBeanException, RuntimeOperationsException {
-
+    public ContextResourceLinkMBean() throws MBeanException, RuntimeOperationsException {
         super();
-
     }
 
-
-    // ----------------------------------------------------- Instance Variables
-
-
-    // ------------------------------------------------------------- Attributes
 
     /**
      * Obtain and return the value of a specific attribute of this MBean.
@@ -76,24 +61,17 @@ public class ContextResourceLinkMBean extends BaseModelMBean {
      *  occurs when invoking the getter
      */
     @Override
-    public Object getAttribute(String name)
-        throws AttributeNotFoundException, MBeanException,
-        ReflectionException {
+    public Object getAttribute(String name) throws AttributeNotFoundException, MBeanException,
+            ReflectionException {
 
         // Validate the input parameters
-        if (name == null)
-            throw new RuntimeOperationsException
-                (new IllegalArgumentException("Attribute name is null"),
-                 "Attribute name is null");
-
-        ContextResourceLink cl = null;
-        try {
-            cl = (ContextResourceLink) getManagedResource();
-        } catch (InstanceNotFoundException e) {
-            throw new MBeanException(e);
-        } catch (InvalidTargetObjectTypeException e) {
-             throw new MBeanException(e);
+        if (name == null) {
+            throw new RuntimeOperationsException(
+                    new IllegalArgumentException("Attribute name is null"),
+                    "Attribute name is null");
         }
+
+        ContextResourceLink cl = doGetManagedResource();
 
         String value = null;
         if ("global".equals(name)) {
@@ -107,14 +85,13 @@ public class ContextResourceLinkMBean extends BaseModelMBean {
         } else {
             value = (String) cl.getProperty(name);
             if (value == null) {
-                throw new AttributeNotFoundException
-                    ("Cannot find attribute "+name);
+                throw new AttributeNotFoundException("Cannot find attribute [" + name + "]");
             }
         }
 
         return value;
-
     }
+
 
     /**
      * Set the value of a specific attribute of this MBean.
@@ -130,42 +107,36 @@ public class ContextResourceLinkMBean extends BaseModelMBean {
      *  occurs when invoking the getter
      */
      @Override
-    public void setAttribute(Attribute attribute)
-        throws AttributeNotFoundException, MBeanException,
-        ReflectionException {
+    public void setAttribute(Attribute attribute) throws AttributeNotFoundException, MBeanException,
+            ReflectionException {
 
         // Validate the input parameters
-        if (attribute == null)
-            throw new RuntimeOperationsException
-                (new IllegalArgumentException("Attribute is null"),
-                 "Attribute is null");
+        if (attribute == null) {
+            throw new RuntimeOperationsException(
+                    new IllegalArgumentException("Attribute is null"),
+                    "Attribute is null");
+        }
 
         String name = attribute.getName();
         Object value = attribute.getValue();
-        if (name == null)
-            throw new RuntimeOperationsException
-                (new IllegalArgumentException("Attribute name is null"),
-                 "Attribute name is null");
-
-        ContextResourceLink crl = null;
-        try {
-            crl = (ContextResourceLink) getManagedResource();
-        } catch (InstanceNotFoundException e) {
-            throw new MBeanException(e);
-        } catch (InvalidTargetObjectTypeException e) {
-             throw new MBeanException(e);
+        if (name == null) {
+            throw new RuntimeOperationsException(
+                    new IllegalArgumentException("Attribute name is null"),
+                    "Attribute name is null");
         }
 
+        ContextResourceLink crl = doGetManagedResource();
+
         if ("global".equals(name)) {
-            crl.setGlobal((String)value);
+            crl.setGlobal((String) value);
         } else if ("description".equals(name)) {
-            crl.setDescription((String)value);
+            crl.setDescription((String) value);
         } else if ("name".equals(name)) {
-            crl.setName((String)value);
+            crl.setName((String) value);
         } else if ("type".equals(name)) {
-            crl.setType((String)value);
+            crl.setType((String) value);
         } else {
-            crl.setProperty(name, ""+value);
+            crl.setProperty(name, "" + value);
         }
 
         // cannot use side-effects.  It's removed and added back each time
@@ -174,5 +145,4 @@ public class ContextResourceLinkMBean extends BaseModelMBean {
         nr.removeResourceLink(crl.getName());
         nr.addResourceLink(crl);
     }
-
 }

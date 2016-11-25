@@ -122,6 +122,10 @@
         request body, ensure the read position will be restored to the
         original one. (violetagg)
       </fix>
+      <scode>
+        Refactor the MBean implementations for the internal Tomcat components
+        to reduce code duplication. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

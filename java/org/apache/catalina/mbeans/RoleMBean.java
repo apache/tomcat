@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.mbeans;
-
 
 import javax.management.MBeanException;
 import javax.management.RuntimeOperationsException;
@@ -24,7 +22,6 @@ import javax.management.RuntimeOperationsException;
 import org.apache.tomcat.util.modeler.BaseModelMBean;
 import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
-
 
 /**
  * <p>A <strong>ModelMBean</strong> implementation for the
@@ -34,9 +31,7 @@ import org.apache.tomcat.util.modeler.Registry;
  */
 public class RoleMBean extends BaseModelMBean {
 
-
     // ----------------------------------------------------------- Constructors
-
 
     /**
      * Construct a <code>ModelMBean</code> with default
@@ -47,16 +42,12 @@ public class RoleMBean extends BaseModelMBean {
      * @exception RuntimeOperationsException if an IllegalArgumentException
      *  occurs
      */
-    public RoleMBean()
-        throws MBeanException, RuntimeOperationsException {
-
+    public RoleMBean() throws MBeanException, RuntimeOperationsException {
         super();
-
     }
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * The configuration information registry for our managed beans.
@@ -68,12 +59,4 @@ public class RoleMBean extends BaseModelMBean {
      * The <code>ManagedBean</code> information describing this MBean.
      */
     protected final ManagedBean managed = registry.findManagedBean("Role");
-
-
-    // ------------------------------------------------------------- Attributes
-
-
-    // ------------------------------------------------------------- Operations
-
-
 }
