@@ -73,7 +73,7 @@ public class TestInputBuffer extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         byte[] requestBody = new byte[9500];
-        Arrays.fill(requestBody, (byte) 1); 
+        Arrays.fill(requestBody, (byte) 1);
         int rc = postUrl(requestBody, "http://localhost:" + getPort() + "/", bc, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertEquals(requestBody.length, bc.getLength());
