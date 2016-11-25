@@ -55,6 +55,7 @@ import org.apache.catalina.tribes.group.GroupChannel;
 import org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor;
 import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
 import org.apache.catalina.util.LifecycleMBeanBase;
+import org.apache.catalina.util.ToStringUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -639,15 +640,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(this.getClass().getName());
-        sb.append('[');
-        if (container == null) {
-            sb.append("Container is null");
-        } else {
-            sb.append(container.getName());
-        }
-        sb.append(']');
-        return sb.toString();
+        return ToStringUtil.toString(this);
     }
 
 

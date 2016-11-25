@@ -30,6 +30,7 @@ import org.apache.catalina.Manager;
 import org.apache.catalina.Store;
 import org.apache.catalina.util.CustomObjectInputStream;
 import org.apache.catalina.util.LifecycleBase;
+import org.apache.catalina.util.ToStringUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -277,14 +278,6 @@ public abstract class StoreBase extends LifecycleBase implements Store {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(this.getClass().getName());
-        sb.append('[');
-        if (manager == null) {
-            sb.append("Manager is null");
-        } else {
-            sb.append(manager);
-        }
-        sb.append(']');
-        return sb.toString();
+        return ToStringUtil.toString(this, manager);
     }
 }

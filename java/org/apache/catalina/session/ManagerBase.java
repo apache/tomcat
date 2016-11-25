@@ -47,6 +47,7 @@ import org.apache.catalina.SessionIdGenerator;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.catalina.util.StandardSessionIdGenerator;
+import org.apache.catalina.util.ToStringUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -1213,15 +1214,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder(this.getClass().getName());
-        sb.append('[');
-        if (context == null) {
-            sb.append("Context is null");
-        } else {
-            sb.append(context.getName());
-        }
-        sb.append(']');
-        return sb.toString();
+        return ToStringUtil.toString(this, context);
     }
 
 

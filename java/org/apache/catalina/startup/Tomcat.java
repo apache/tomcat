@@ -643,33 +643,36 @@ public class Tomcat {
      * @return a realm instance
      */
     protected Realm createDefaultRealm() {
-        return new RealmBase() {
-            @Override
-            protected String getName() {
-                return "Simple";
-            }
-
-            @Override
-            protected String getPassword(String username) {
-                return userPass.get(username);
-            }
-
-            @Override
-            protected Principal getPrincipal(String username) {
-                Principal p = userPrincipals.get(username);
-                if (p == null) {
-                    String pass = userPass.get(username);
-                    if (pass != null) {
-                        p = new GenericPrincipal(username, pass,
-                                userRoles.get(username));
-                        userPrincipals.put(username, p);
-                    }
-                }
-                return p;
-            }
-
-        };
+        return new SimpleRealm();
     }
+
+
+    private class SimpleRealm extends RealmBase {
+        @Override
+        protected String getName() {
+            return "Simple";
+        }
+
+        @Override
+        protected String getPassword(String username) {
+            return userPass.get(username);
+        }
+
+        @Override
+        protected Principal getPrincipal(String username) {
+            Principal p = userPrincipals.get(username);
+            if (p == null) {
+                String pass = userPass.get(username);
+                if (pass != null) {
+                    p = new GenericPrincipal(username, pass,
+                            userRoles.get(username));
+                    userPrincipals.put(username, p);
+                }
+            }
+            return p;
+        }
+    }
+
 
     protected void initBaseDir() {
         String catalinaHome = System.getProperty(Globals.CATALINA_HOME_PROP);

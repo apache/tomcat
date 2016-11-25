@@ -85,6 +85,11 @@
         Osipov. (markt)
       </fix>
       <fix>
+        <bug>60381</bug>: Provide a standard <code>toString()</code>
+        implementation for components that implement <code>Contained</code>.
+        (markt)
+      </fix>
+      <fix>
         <bug>60387</bug>: Correct the javadoc for
         <code>o.a.catalina.AccessLog.setRequestAttributesEnabled</code>.
         The default value is different for the different implementations.

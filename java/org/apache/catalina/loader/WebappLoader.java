@@ -38,6 +38,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Loader;
 import org.apache.catalina.util.LifecycleMBeanBase;
+import org.apache.catalina.util.ToStringUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -360,11 +361,7 @@ public class WebappLoader extends LifecycleMBeanBase
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("WebappLoader[");
-        if (context != null)
-            sb.append(context.getName());
-        sb.append("]");
-        return (sb.toString());
+        return ToStringUtil.toString(this, context);
     }
 
 
