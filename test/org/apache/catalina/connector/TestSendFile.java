@@ -41,7 +41,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestSendFile extends TomcatBaseTest{
+public class TestSendFile extends TomcatBaseTest {
 
     public static final int ITERATIONS = 10;
     public static final int EXPECTED_CONTENT_LENGTH = 100000;
@@ -54,12 +54,12 @@ public class TestSendFile extends TomcatBaseTest{
         Context root = tomcat.addContext("", TEMP_DIR);
 
         File[] files = new File[ITERATIONS];
-        for (int i=0; i<ITERATIONS; i++) {
-            files[i] = generateFile(TEMP_DIR, "-"+i, EXPECTED_CONTENT_LENGTH * (i+1));
+        for (int i = 0; i < ITERATIONS; i++) {
+            files[i] = generateFile(TEMP_DIR, "-" + i, EXPECTED_CONTENT_LENGTH * (i + 1));
         }
         try {
 
-            for (int i=0; i<ITERATIONS; i++) {
+            for (int i = 0; i < ITERATIONS; i++) {
                 WritingServlet servlet = new WritingServlet(files[i]);
                 Tomcat.addServlet(root, "servlet" + i, servlet);
                 root.addServletMappingDecoded("/servlet" + i, "servlet" + i);
@@ -69,12 +69,14 @@ public class TestSendFile extends TomcatBaseTest{
 
             ByteChunk bc = new ByteChunk();
             Map<String, List<String>> respHeaders = new HashMap<>();
-            for (int i=0; i<ITERATIONS; i++) {
+            for (int i = 0; i < ITERATIONS; i++) {
                 long start = System.currentTimeMillis();
-                int rc = getUrl("http://localhost:" + getPort() + "/servlet" + i, bc, null, respHeaders);
+                int rc = getUrl("http://localhost:" + getPort() + "/servlet" + i, bc, null,
+                        respHeaders);
                 assertEquals(HttpServletResponse.SC_OK, rc);
-                System.out.println("Client received "+bc.getLength() + " bytes in "+(System.currentTimeMillis()-start)+" ms.");
-                assertEquals(EXPECTED_CONTENT_LENGTH * (i+1), bc.getLength());
+                System.out.println("Client received " + bc.getLength() + " bytes in "
+                        + (System.currentTimeMillis() - start) + " ms.");
+                assertEquals(EXPECTED_CONTENT_LENGTH * (i + 1), bc.getLength());
 
                 bc.recycle();
             }
@@ -99,8 +101,8 @@ public class TestSendFile extends TomcatBaseTest{
             }
             w.flush();
         }
-        System.out.println("Created file:" + f.getAbsolutePath() + " with " + f.length()
-                + " bytes.");
+        System.out
+                .println("Created file:" + f.getAbsolutePath() + " with " + f.length() + " bytes.");
         return f;
 
     }
@@ -129,19 +131,19 @@ public class TestSendFile extends TomcatBaseTest{
                 req.setAttribute(Globals.SENDFILE_FILE_END_ATTR, new Long(f.length()));
             } else {
                 byte[] c = new byte[8192];
-                try (BufferedInputStream in = new BufferedInputStream(
-                        new FileInputStream(f))) {
+                try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(f))) {
                     int len = 0;
                     int written = 0;
                     long start = System.currentTimeMillis();
                     do {
                         len = in.read(c);
-                        if (len>0) {
-                            resp.getOutputStream().write(c,0,len);
+                        if (len > 0) {
+                            resp.getOutputStream().write(c, 0, len);
                             written += len;
                         }
                     } while (len > 0);
-                    System.out.println("Server Wrote "+written + " bytes in "+(System.currentTimeMillis()-start)+" ms.");
+                    System.out.println("Server Wrote " + written + " bytes in "
+                            + (System.currentTimeMillis() - start) + " ms.");
                 }
             }
         }
