@@ -143,10 +143,6 @@
         redirect response to the user agent. Patch provided by Michael Osipov.
         (markt)
       </fix>
-      <fix>
-        <bug>60412</bug>: Add information on the comment sytax for the
-        <code>RewriteValve</code> configuration. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -172,6 +168,10 @@
       <fix>
         Correct a typo in Host Configuration Reference.
         Issue reported via comments.apache.org. (violetagg)
+      </fix>
+      <fix>
+        <bug>60412</bug>: Add information on the comment syntax for the
+        <code>RewriteValve</code> configuration. (markt)
       </fix>
     </changelog>
   </subsection>
