@@ -132,6 +132,11 @@
         Refactor the MBean implementations for the internal Tomcat components
         to reduce code duplication. (markt)
       </scode>
+      <fix>
+        <bug>60410</bug>: Ensure that multiple calls to
+        <code>JarInputStreamWrapper#close()</code> do not incorrectly trigger
+        the closure of the underlying JAR or WAR file. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
