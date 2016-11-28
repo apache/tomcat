@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -156,14 +157,14 @@ public class TestSendFile extends TomcatBaseTest {
     }
 
 
+    @Ignore
     @Test
     public void testBug60409() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         Context ctx = tomcat.addContext("", TEMP_DIR);
         File file = generateFile(TEMP_DIR, "", EXPECTED_CONTENT_LENGTH);
-        CountDownLatch latch = new CountDownLatch(2);
-        Tomcat.addServlet(ctx, "test", new Bug60409Servlet(file, latch));
+        Tomcat.addServlet(ctx, "test", new Bug60409Servlet(file));
         ctx.addServletMappingDecoded("/", "test");
 
         tomcat.start();
@@ -172,11 +173,14 @@ public class TestSendFile extends TomcatBaseTest {
         getUrl("http://localhost:" + getPort() + "/test/?" + Globals.SENDFILE_SUPPORTED_ATTR
                 + "=true", bc, null);
 
+        CountDownLatch latch = new CountDownLatch(2);
         List<Throwable> exceptions = new ArrayList<>();
-        new Thread(new RequestExecutor("http://localhost:" + getPort() + "/test/", exceptions))
-                .start();
-        new Thread(new RequestExecutor("http://localhost:" + getPort() + "/test/", exceptions))
-                .start();
+        new Thread(
+                new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, exceptions))
+                        .start();
+        new Thread(
+                new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, exceptions))
+                        .start();
 
         latch.await(3000, TimeUnit.MILLISECONDS);
 
@@ -188,20 +192,18 @@ public class TestSendFile extends TomcatBaseTest {
     private static final class Bug60409Servlet extends HttpServlet {
         private static final long serialVersionUID = 1L;
         private final File file;
-        private final CountDownLatch latch;
 
-        Bug60409Servlet(File file, CountDownLatch latch) {
+        Bug60409Servlet(File file) {
             this.file = file;
-            this.latch = latch;
         }
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            resp.setContentType("'application/octet-stream");
-            resp.setCharacterEncoding("ISO-8859-1");
-            resp.setContentLengthLong(file.length());
-            if (Boolean.TRUE.equals(req.getAttribute(Globals.SENDFILE_SUPPORTED_ATTR))) {
+            if (Boolean.valueOf(req.getParameter(Globals.SENDFILE_SUPPORTED_ATTR))) {
+                resp.setContentType("'application/octet-stream");
+                resp.setCharacterEncoding("ISO-8859-1");
+                resp.setContentLengthLong(file.length());
                 req.setAttribute(Globals.SENDFILE_FILENAME_ATTR, file.getAbsolutePath());
                 req.setAttribute(Globals.SENDFILE_FILE_START_ATTR, new Long(0));
                 req.setAttribute(Globals.SENDFILE_FILE_END_ATTR, new Long(file.length()));
@@ -216,7 +218,6 @@ public class TestSendFile extends TomcatBaseTest {
                     e.printStackTrace();
                 }
                 resp.getOutputStream().write(c);
-                latch.countDown();
             }
         }
 
@@ -224,10 +225,12 @@ public class TestSendFile extends TomcatBaseTest {
 
     private static final class RequestExecutor implements Runnable {
         private final String url;
+        private final CountDownLatch latch;
         private final List<Throwable> exceptions;
 
-        public RequestExecutor(String url, List<Throwable> exceptions) {
+        RequestExecutor(String url, CountDownLatch latch, List<Throwable> exceptions) {
             this.url = url;
+            this.latch = latch;
             this.exceptions = exceptions;
         }
 
@@ -236,10 +239,13 @@ public class TestSendFile extends TomcatBaseTest {
             try {
                 ByteChunk result = new ByteChunk();
                 int rc = getUrl(url, result, null);
-                Assert.assertTrue(rc == HttpServletResponse.SC_OK);
+                Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+                Assert.assertEquals(1024, result.getLength());
             } catch (Throwable e) {
                 e.printStackTrace();
                 exceptions.add(e);
+            } finally {
+                latch.countDown();
             }
         }
 
