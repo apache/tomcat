@@ -16,13 +16,18 @@
  */
 package org.apache.catalina.valves.rewrite;
 
+import java.net.HttpURLConnection;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.servlets.DefaultServlet;
+import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -479,6 +484,76 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testDefaultRedirect() throws Exception {
+         // Disable the following of redirects for this test only
+        boolean originalValue = HttpURLConnection.getFollowRedirects();
+        HttpURLConnection.setFollowRedirects(false);
+        try {
+            doTestRedirect("RewriteRule ^/from/a$ /to/b [R]", "/redirect/from/a", "/redirect/to/b",
+                302);
+        } finally {
+            HttpURLConnection.setFollowRedirects(originalValue);
+        }
+    }
+
+
+    @Test
+    public void testTempRedirect() throws Exception {
+         // Disable the following of redirects for this test only
+        boolean originalValue = HttpURLConnection.getFollowRedirects();
+        HttpURLConnection.setFollowRedirects(false);
+        try {
+            doTestRedirect("RewriteRule ^/from/a$ /to/b [R=temp]", "/redirect/from/a", "/redirect/to/b",
+                302);
+        } finally {
+            HttpURLConnection.setFollowRedirects(originalValue);
+        }
+    }
+
+
+    @Test
+    public void testPermanentRedirect() throws Exception {
+         // Disable the following of redirects for this test only
+        boolean originalValue = HttpURLConnection.getFollowRedirects();
+        HttpURLConnection.setFollowRedirects(false);
+        try {
+            doTestRedirect("RewriteRule ^/from/a$ /to/b [R=permanent]", "/redirect/from/a", "/redirect/to/b",
+                301);
+        } finally {
+            HttpURLConnection.setFollowRedirects(originalValue);
+        }
+    }
+
+
+    @Test
+    public void testSeeotherRedirect() throws Exception {
+         // Disable the following of redirects for this test only
+        boolean originalValue = HttpURLConnection.getFollowRedirects();
+        HttpURLConnection.setFollowRedirects(false);
+        try {
+            doTestRedirect("RewriteRule ^/from/a$ /to/b [R=seeother]", "/redirect/from/a", "/redirect/to/b",
+                303);
+        } finally {
+            HttpURLConnection.setFollowRedirects(originalValue);
+        }
+    }
+
+
+    @Test
+    public void test307Redirect() throws Exception {
+         // Disable the following of redirects for this test only
+        boolean originalValue = HttpURLConnection.getFollowRedirects();
+        HttpURLConnection.setFollowRedirects(false);
+        try {
+            doTestRedirect("RewriteRule ^/from/a$ /to/b [R=307]", "/redirect/from/a", "/redirect/to/b",
+                307);
+        } finally {
+            HttpURLConnection.setFollowRedirects(originalValue);
+        }
+    }
+
+
     private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
         doTestRewrite(config, request, expectedURI, null);
     }
@@ -534,6 +609,43 @@ public class TestRewriteValve extends TomcatBaseTest {
                 String attributeValue = requestDesc.getAttribute("X-Test");
                 Assert.assertEquals(expectedAttributeValue, attributeValue);
             }
+        }
+    }
+
+    private void doTestRedirect(String config, String request, String expectedURI,
+        int expectedStatusCode) throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("redirect", null);
+
+        RewriteValve rewriteValve = new RewriteValve();
+        ctx.getPipeline().addValve(rewriteValve);
+
+        rewriteValve.setConfiguration(config);
+
+        Tomcat.addServlet(ctx, "tester", new TesterServlet());
+        ctx.addServletMappingDecoded("/from/a", "tester");
+        ctx.addServletMappingDecoded("/to/b", "tester");
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        Map<String, List<String>> resHead = new HashMap<>();
+        int rc = getUrl("http://localhost:" + getPort() + request, res, null, resHead);
+        res.setCharset(StandardCharsets.UTF_8);
+
+        if (expectedURI == null) {
+            // Rewrite is expected to fail. Probably because invalid characters
+            // were written into the request target
+            Assert.assertEquals(400, rc);
+        } else {
+            List<String> locations = resHead.get("Location");
+            Assert.assertFalse(locations.isEmpty());
+            String redirectURI = locations.get(0);
+            Assert.assertEquals(expectedURI, redirectURI);
+            Assert.assertEquals(expectedStatusCode, rc);
         }
     }
 }

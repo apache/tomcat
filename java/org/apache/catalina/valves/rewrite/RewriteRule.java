@@ -294,18 +294,18 @@ public class RewriteRule {
     /**
      *  Prefix Substitution with http://thishost[:thisport]/ (which makes the
      *  new URL a URI) to force a external redirection. If no code is given
-     *  a HTTP response of 302 (MOVED TEMPORARILY) is used. If you want to
-     *  use other response codes in the range 300-400 just specify them as
-     *  a number or use one of the following symbolic names: temp (default),
-     *  permanent, seeother. Use it for rules which should canonicalize the
-     *  URL and give it back to the client, e.g., translate ``/~'' into ``/u/''
-     *  or always append a slash to /u/user, etc. Note: When you use this flag,
-     *  make sure that the substitution field is a valid URL! If not, you are
-     *  redirecting to an invalid location! And remember that this flag itself
-     *  only prefixes the URL with http://thishost[:thisport]/, rewriting
-     *  continues. Usually you also want to stop and do the redirection
-     *  immediately. To stop the rewriting you also have to provide the
-     *  'L' flag.
+     *  an HTTP response of 302 (FOUND, previously MOVED TEMPORARILY) is used.
+     *  If you want to  use other response codes in the range 300-399 just
+     *  specify them as a number or use one of the following symbolic names:
+     *  temp (default), permanent, seeother. Use it for rules which should
+     *  canonicalize the URL and give it back to the client, e.g., translate
+     *  ``/~'' into ``/u/'' or always append a slash to /u/user, etc. Note:
+     *  When you use this flag, make sure that the substitution field is a
+     *  valid URL! If not, you are redirecting to an invalid location!
+     *  And remember that this flag itself only prefixes the URL with
+     *  http://thishost[:thisport]/, rewriting continues. Usually you also
+     *  want to stop and do the redirection immediately. To stop the
+     *  rewriting you also have to provide the 'L' flag.
      */
     protected boolean redirect = false;
     protected int redirectCode = 0;

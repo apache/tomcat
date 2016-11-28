@@ -804,18 +804,30 @@ public class RewriteValve extends ValveBase {
         } else if (flag.startsWith("qsappend") || flag.startsWith("QSA")) {
             rule.setQsappend(true);
         } else if (flag.startsWith("redirect") || flag.startsWith("R")) {
-            if (flag.startsWith("redirect=")) {
-                flag = flag.substring("redirect=".length());
-                rule.setRedirect(true);
-                rule.setRedirectCode(Integer.parseInt(flag));
-            } else if (flag.startsWith("R=")) {
-                flag = flag.substring("R=".length());
-                rule.setRedirect(true);
-                rule.setRedirectCode(Integer.parseInt(flag));
-            } else {
-                rule.setRedirect(true);
-                rule.setRedirectCode(HttpServletResponse.SC_FOUND);
+            rule.setRedirect(true);
+            int redirectCode = HttpServletResponse.SC_FOUND;
+            if (flag.startsWith("redirect=") || flag.startsWith("R=")) {
+                if (flag.startsWith("redirect=")) {
+                    flag = flag.substring("redirect=".length());
+                } else if (flag.startsWith("R=")) {
+                    flag = flag.substring("R=".length());
+                }
+                switch(flag) {
+                    case "temp":
+                        redirectCode = HttpServletResponse.SC_FOUND;
+                        break;
+                    case "permanent":
+                        redirectCode = HttpServletResponse.SC_MOVED_PERMANENTLY;
+                        break;
+                    case "seeother":
+                        redirectCode = HttpServletResponse.SC_SEE_OTHER;
+                        break;
+                    default:
+                        redirectCode = Integer.parseInt(flag);
+                        break;
+                }
             }
+            rule.setRedirectCode(redirectCode);
         } else if (flag.startsWith("skip") || flag.startsWith("S")) {
             if (flag.startsWith("skip=")) {
                 flag = flag.substring("skip=".length());
