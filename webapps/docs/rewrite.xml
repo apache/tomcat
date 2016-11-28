@@ -680,9 +680,9 @@ cannot use <code>$N</code> in the substitution string!
           Prefix <em>Substitution</em> with
           <code>http://thishost[:thisport]/</code> (which makes the
           new URL a URI) to force a external redirection. If no
-          <em>code</em> is given, a HTTP response of 302 (MOVED
+          <em>code</em> is given, a HTTP response of 302 (FOUND, previously MOVED
           TEMPORARILY) will be returned. If you want to use other response
-          codes in the range 300-400, simply specify the appropriate number
+          codes in the range 300-399, simply specify the appropriate number
           or use one of the following symbolic names:
           <code>temp</code> (default), <code>permanent</code>,
           <code>seeother</code>. Use this for rules to

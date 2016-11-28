@@ -110,6 +110,12 @@
         <code>JarInputStreamWrapper#close()</code> do not incorrectly trigger
         the closure of the underlying JAR or WAR file. (markt)
       </fix>
+      <fix>
+        <bug>60411</bug>: Implement support in the <code>RewriteValve</code> for
+        symbolic names to specify the redirect code to use when returning a
+        redirect response to the user agent. Patch provided by Michael Osipov.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
