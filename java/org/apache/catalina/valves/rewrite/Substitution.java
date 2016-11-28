@@ -40,14 +40,18 @@ public class Substitution {
         public int n;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
+            String result = rule.group(n);
+            if (result == null) {
+                result = "";
+            }
             if (escapeBackReferences) {
                 // Note: This should be consistent with the way httpd behaves.
                 //       We might want to consider providing a dedicated decoder
                 //       with an option to add additional safe characters to
                 //       provide users with more flexibility
-                return RewriteValve.ENCODER.encode(rule.group(n), resolver.getUriEncoding());
+                return RewriteValve.ENCODER.encode(result, resolver.getUriEncoding());
             } else {
-                return rule.group(n);
+                return result;
             }
         }
     }
@@ -56,7 +60,7 @@ public class Substitution {
         public int n;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
-            return cond.group(n);
+            return (cond.group(n) == null ? "" : cond.group(n));
         }
     }
 
@@ -95,7 +99,7 @@ public class Substitution {
     public class MapElement extends SubstitutionElement {
         public RewriteMap map = null;
         public String key;
-        public String defaultValue = null;
+        public String defaultValue = "";
         public int n;
         @Override
         public String evaluate(Matcher rule, Matcher cond, Resolver resolver) {
