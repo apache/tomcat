@@ -554,6 +554,18 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testBackReferenceRewrite() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(rest)?$ /c/$1", "/b/rest", "/c/rest");
+    }
+
+
+    @Test
+    public void testEmptyBackReferenceRewrite() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(rest)?$ /c/$1", "/b/", "/c/");
+    }
+
+
     private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
         doTestRewrite(config, request, expectedURI, null);
     }

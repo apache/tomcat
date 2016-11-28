@@ -143,6 +143,12 @@
         redirect response to the user agent. Patch provided by Michael Osipov.
         (markt)
       </fix>
+      <fix>
+        <bug>60413</bug>: In the <code>RewriteValve</code> write empty capture
+        groups as the empty string rather than as <code>&quot;null&quot;</code>
+        when generating the re-written URL. Based on a patch by Michael Osipov.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
