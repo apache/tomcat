@@ -143,6 +143,10 @@
         redirect response to the user agent. Patch provided by Michael Osipov.
         (markt)
       </fix>
+      <fix>
+        <bug>60412</bug>: Add information on the comment sytax for the
+        <code>RewriteValve</code> configuration. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

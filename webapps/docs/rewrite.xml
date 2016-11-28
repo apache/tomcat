@@ -57,9 +57,10 @@
 
 <section name="Directives">
 
-  <p>The rewrite.config file contains a list of directives which closely resemble
-  the directives used by mod_rewrite, in particular the central RewriteRule and
-  RewriteCond directives.</p>
+  <p>The rewrite.config file contains a list of directives which closely
+  resemble the directives used by mod_rewrite, in particular the central
+  RewriteRule and RewriteCond directives. Lines that start with a
+  <code>#</code> character are treated as comments and will be ignored.</p>
 
   <p>Note: This section is a modified version of the mod_rewrite documentation,
   which is Copyright 1995-2006 The Apache Software Foundation, and licensed under the
