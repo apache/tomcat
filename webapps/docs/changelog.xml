@@ -105,6 +105,11 @@
         request body, ensure the read position will be restored to the
         original one. (violetagg)
       </fix>
+      <fix>
+        <bug>60410</bug>: Ensure that multiple calls to
+        <code>JarInputStreamWrapper#close()</code> do not incorrectly trigger
+        the closure of the underlying JAR or WAR file. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
