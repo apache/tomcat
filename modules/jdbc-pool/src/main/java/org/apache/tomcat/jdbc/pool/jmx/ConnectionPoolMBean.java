@@ -44,6 +44,11 @@ public interface ConnectionPoolMBean extends PoolConfiguration  {
     public long getReleasedCount();
 
     public long getReconnectedCount();
+
+    public long getRemoveAbandonedCount();
+
+    public long getReleasedIdleCount();
+
     //=================================================================
     //       POOL OPERATIONS
     //=================================================================
