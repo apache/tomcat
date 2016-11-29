@@ -148,7 +148,7 @@
         Ensure that the endpoint is able to unlock the acceptor thread during
         shutdown if the endpoint is configured to listen to any local address
         of a specific type such as <code>0.0.0.0</code> or <code>::</code>.
-        (markt) 
+        (markt)
       </fix>
     </changelog>
   </subsection>
