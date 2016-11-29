@@ -138,6 +138,8 @@ public class ConnectionPool {
     private final AtomicLong createdCount = new AtomicLong(0);
     private final AtomicLong releasedCount = new AtomicLong(0);
     private final AtomicLong reconnectedCount = new AtomicLong(0);
+    private final AtomicLong removeAbandonedCount = new AtomicLong(0);
+    private final AtomicLong releasedIdleCount = new AtomicLong(0);
 
     //===============================================================================
     //         PUBLIC METHODS
@@ -558,6 +560,7 @@ public class ConnectionPool {
                 jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_ABANDON, trace);
             }
             //release the connection
+            removeAbandonedCount.incrementAndGet();
             release(con);
         } finally {
             con.unlock();
@@ -1023,6 +1026,7 @@ public class ConnectionPool {
                         continue;
                     long time = con.getTimestamp();
                     if (shouldReleaseIdle(now, con, time)) {
+                        releasedIdleCount.incrementAndGet();
                         release(con);
                         idle.remove(con);
                         setToNull = true;
@@ -1220,6 +1224,22 @@ public class ConnectionPool {
      */
     public long getReconnectedCount() {
         return reconnectedCount.get();
+    }
+
+    /**
+     * The total number of connections released by remove abandoned.
+     * @return the PoolCleaner removed abandoned connection count
+     */
+    public long getRemoveAbandonedCount() {
+        return removeAbandonedCount.get();
+    }
+
+    /**
+     * The total number of connections released by eviction.
+     * @return the PoolCleaner evicted idle connection count
+     */
+    public long getReleasedIdleCount() {
+        return releasedIdleCount.get();
     }
 
     /**

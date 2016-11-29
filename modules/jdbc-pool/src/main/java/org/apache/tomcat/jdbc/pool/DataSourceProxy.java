@@ -762,6 +762,29 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
     /**
+     * The total number of connections released by remove abandoned.
+     * @return the PoolCleaner removed abandoned connection count
+     */
+    public long getRemoveAbandonedCount() {
+        try {
+            return createPool().getRemoveAbandonedCount();
+        } catch (SQLException x) {
+            throw new RuntimeException(x);
+        }
+    }
+
+    /**
+     * The total number of connections released by eviction.
+     * @return the PoolCleaner evicted idle connection count
+     */
+    public long getReleasedIdleCount() {
+        try {
+            return createPool().getReleasedIdleCount();
+        } catch (SQLException x) {
+            throw new RuntimeException(x);
+        }
+    }
+    /**
      * The total number of connections reconnected by this pool.
      * @return the reconnected connection count
      */
