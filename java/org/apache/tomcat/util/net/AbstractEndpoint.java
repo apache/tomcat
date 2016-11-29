@@ -19,7 +19,9 @@ package org.apache.tomcat.util.net;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -764,6 +766,27 @@ public abstract class AbstractEndpoint<S> {
             // Need to create a connection to unlock the accept();
             if (address == null) {
                 saddr = new InetSocketAddress("localhost", getLocalPort());
+            } else if (address.isAnyLocalAddress()) {
+                // Need a local address of the same type (IPv4 or IPV6) as the
+                // configured bind address since the connector may be configured
+                // to not map between types.
+                InetAddress localAddress = null;
+                Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+                while (localAddress == null && networkInterfaces.hasMoreElements()) {
+                    NetworkInterface networkInterface = networkInterfaces.nextElement();
+                    Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                    while (localAddress == null && inetAddresses.hasMoreElements()) {
+                        InetAddress inetAddress = inetAddresses.nextElement();
+                        if (address.getClass().isAssignableFrom(inetAddress.getClass())) {
+                            localAddress = inetAddress;
+                        }
+                    }
+                }
+                // Fall-back option
+                if (localAddress == null) {
+                    saddr = new InetSocketAddress("localhost", getLocalPort());
+                }
+                saddr = new InetSocketAddress(localAddress, getLocalPort());
             } else {
                 saddr = new InetSocketAddress(address, getLocalPort());
             }
