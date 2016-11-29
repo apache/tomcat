@@ -364,7 +364,7 @@
            description="The total number of connections released by eviction."
                   type="java.lang.Long"
              writeable="false"/>
-             
+
     <operation    name="checkIdle"
                   description="forces a check of idle connections"
                   impact="ACTION"
