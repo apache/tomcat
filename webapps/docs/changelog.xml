@@ -140,6 +140,10 @@
         removing closed streams from the priority tree to ensure that the tree
         does not grow too large. (markt)
       </fix>
+      <fix>
+        <bug>60409</bug>: When unable to complete sendfile request, ensure the
+        Processor will be added to the cache only once. (markt/violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
