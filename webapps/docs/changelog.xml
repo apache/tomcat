@@ -171,6 +171,12 @@
         <bug>60409</bug>: When unable to complete sendfile request, ensure the
         Processor will be added to the cache only once. (markt/violetagg)
       </fix>
+      <fix>
+        Ensure that the endpoint is able to unlock the acceptor thread during
+        shutdown if the endpoint is configured to listen to any local address
+        of a specific type such as <code>0.0.0.0</code> or <code>::</code>.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
