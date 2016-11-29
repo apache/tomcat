@@ -355,6 +355,16 @@
                   type="java.lang.Long"
              writeable="false"/>
 
+    <attribute    name="removeAbandonedCount"
+           description="The total number of connections released by remove abandoned."
+                  type="java.lang.Long"
+             writeable="false"/>
+
+    <attribute    name="releasedIdleCount"
+           description="The total number of connections released by eviction."
+                  type="java.lang.Long"
+             writeable="false"/>
+             
     <operation    name="checkIdle"
                   description="forces a check of idle connections"
                   impact="ACTION"

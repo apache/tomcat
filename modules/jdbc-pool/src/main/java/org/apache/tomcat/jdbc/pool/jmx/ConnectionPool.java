@@ -191,6 +191,16 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
         return pool.getReconnectedCount();
     }
 
+    @Override
+    public long getRemoveAbandonedCount() {
+        return pool.getRemoveAbandonedCount();
+    }
+
+    @Override
+    public long getReleasedIdleCount() {
+        return pool.getReleasedIdleCount();
+    }
+
     //=================================================================
     //       POOL OPERATIONS
     //=================================================================
