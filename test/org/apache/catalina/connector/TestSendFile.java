@@ -22,10 +22,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,6 +37,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -149,4 +156,98 @@ public class TestSendFile extends TomcatBaseTest {
         }
     }
 
+
+    @Ignore
+    @Test
+    public void testBug60409() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctx = tomcat.addContext("", TEMP_DIR);
+        File file = generateFile(TEMP_DIR, "", EXPECTED_CONTENT_LENGTH);
+        Tomcat.addServlet(ctx, "test", new Bug60409Servlet(file));
+        ctx.addServletMappingDecoded("/", "test");
+
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        getUrl("http://localhost:" + getPort() + "/test/?" + Globals.SENDFILE_SUPPORTED_ATTR
+                + "=true", bc, null);
+
+        CountDownLatch latch = new CountDownLatch(2);
+        List<Throwable> exceptions = new ArrayList<>();
+        new Thread(
+                new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, exceptions))
+                        .start();
+        new Thread(
+                new RequestExecutor("http://localhost:" + getPort() + "/test/", latch, exceptions))
+                        .start();
+
+        latch.await(3000, TimeUnit.MILLISECONDS);
+
+        if (exceptions.size() > 0) {
+            fail();
+        }
+    }
+
+    private static final class Bug60409Servlet extends HttpServlet {
+        private static final long serialVersionUID = 1L;
+        private final File file;
+
+        Bug60409Servlet(File file) {
+            this.file = file;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            if (Boolean.valueOf(req.getParameter(Globals.SENDFILE_SUPPORTED_ATTR))) {
+                resp.setContentType("'application/octet-stream");
+                resp.setCharacterEncoding("ISO-8859-1");
+                resp.setContentLengthLong(file.length());
+                req.setAttribute(Globals.SENDFILE_FILENAME_ATTR, file.getAbsolutePath());
+                req.setAttribute(Globals.SENDFILE_FILE_START_ATTR, new Long(0));
+                req.setAttribute(Globals.SENDFILE_FILE_END_ATTR, new Long(file.length()));
+                file.delete();
+            } else {
+                byte[] c = new byte[1024];
+                Random rd = new Random();
+                rd.nextBytes(c);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                resp.getOutputStream().write(c);
+            }
+        }
+
+    }
+
+    private static final class RequestExecutor implements Runnable {
+        private final String url;
+        private final CountDownLatch latch;
+        private final List<Throwable> exceptions;
+
+        RequestExecutor(String url, CountDownLatch latch, List<Throwable> exceptions) {
+            this.url = url;
+            this.latch = latch;
+            this.exceptions = exceptions;
+        }
+
+        @Override
+        public void run() {
+            try {
+                ByteChunk result = new ByteChunk();
+                int rc = getUrl(url, result, null);
+                assertEquals(HttpServletResponse.SC_OK, rc);
+                assertEquals(1024, result.getLength());
+            } catch (Throwable e) {
+                e.printStackTrace();
+                exceptions.add(e);
+            } finally {
+                latch.countDown();
+            }
+        }
+
+    }
 }
