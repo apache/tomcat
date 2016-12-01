@@ -60,9 +60,9 @@ public final class AstFunction extends SimpleNode {
     @Override
     public Class<?> getType(EvaluationContext ctx)
             throws ELException {
-        
+
         FunctionMapper fnMapper = ctx.getFunctionMapper();
-        
+
         // quickly validate again for this request
         if (fnMapper == null) {
             throw new ELException(MessageFactory.get("error.fnMapper.null"));
@@ -78,9 +78,9 @@ public final class AstFunction extends SimpleNode {
     @Override
     public Object getValue(EvaluationContext ctx)
             throws ELException {
-        
+
         FunctionMapper fnMapper = ctx.getFunctionMapper();
-        
+
         // quickly validate again for this request
         if (fnMapper == null) {
             throw new ELException(MessageFactory.get("error.fnMapper.null"));
@@ -94,12 +94,33 @@ public final class AstFunction extends SimpleNode {
         Class<?>[] paramTypes = m.getParameterTypes();
         Object[] params = null;
         Object result = null;
-        int numParams = this.jjtGetNumChildren();
-        if (numParams > 0) {
-            params = new Object[numParams];
+        int inputParameterCount = this.jjtGetNumChildren();
+        int methodParameterCount = paramTypes.length;
+        if (inputParameterCount == 0 && methodParameterCount == 1 && m.isVarArgs()) {
+            params = new Object[] { null };
+        } else if (inputParameterCount > 0) {
+            params = new Object[methodParameterCount];
             try {
-                for (int i = 0; i < numParams; i++) {
-                    params[i] = this.children[i].getValue(ctx);
+                for (int i = 0; i < methodParameterCount; i++) {
+                    if (m.isVarArgs() && i == methodParameterCount - 1) {
+                        if (inputParameterCount < methodParameterCount) {
+                            params[i] = new Object[] { null };
+                        } else if (inputParameterCount == methodParameterCount &&
+                                paramTypes[i].isArray()) {
+                            params[i] = this.jjtGetChild(i).getValue(ctx);
+                        } else {
+                            Object[] varargs =
+                                    new Object[inputParameterCount - methodParameterCount + 1];
+                            Class<?> target = paramTypes[i].getComponentType();
+                            for (int j = i; j < inputParameterCount; j++) {
+                                varargs[j-i] = this.jjtGetChild(j).getValue(ctx);
+                                varargs[j-i] = coerceToType(varargs[j-i], target);
+                            }
+                            params[i] = varargs;
+                        }
+                    } else {
+                        params[i] = this.jjtGetChild(i).getValue(ctx);
+                    }
                     params[i] = coerceToType(params[i], paramTypes[i]);
                 }
             } catch (ELException ele) {
@@ -133,8 +154,8 @@ public final class AstFunction extends SimpleNode {
     public void setPrefix(String prefix) {
         this.prefix = prefix;
     }
-    
-    
+
+
     @Override
     public String toString()
     {
