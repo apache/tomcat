@@ -18,6 +18,7 @@ package org.apache.tomcat.util.net;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -127,6 +128,11 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     public boolean getDeferAccept() { return deferAccept; }
 
 
+    private boolean ipv6v6only = false;
+    public void setIpv6v6only(boolean ipv6v6only) { this.ipv6v6only = ipv6v6only; }
+    public boolean getIpv6v6only() { return ipv6v6only; }
+
+
     /**
      * Size of the sendfile (= concurrent files which can be served).
      */
@@ -189,23 +195,32 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     }
 
 
-    /**
-     * Port in use.
-     */
     @Override
-    public int getLocalPort() {
+    public InetSocketAddress getLocalAddress() throws IOException {
         long s = serverSock;
         if (s == 0) {
-            return -1;
+            return null;
         } else {
             long sa;
             try {
                 sa = Address.get(Socket.APR_LOCAL, s);
-                Sockaddr addr = Address.getInfo(sa);
-                return addr.port;
+            } catch (IOException ioe) {
+                // re-throw
+                throw ioe;
             } catch (Exception e) {
-                return -1;
+                // wrap
+                throw new IOException(e);
             }
+            Sockaddr addr = Address.getInfo(sa);
+            if (addr.hostname == null) {
+                // any local address
+                if (addr.family == Socket.APR_INET6) {
+                    return new InetSocketAddress("::", addr.port);
+                } else {
+                    return new InetSocketAddress("0.0.0.0", addr.port);
+                }
+            }
+            return new InetSocketAddress(addr.hostname, addr.port);
         }
     }
 
@@ -288,8 +303,9 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         int family = Socket.APR_INET;
         if (Library.APR_HAVE_IPV6) {
             if (addressStr == null) {
-                if (!OS.IS_BSD && !OS.IS_WIN32 && !OS.IS_WIN64)
+                if (!OS.IS_BSD) {
                     family = Socket.APR_UNSPEC;
+                }
             } else if (addressStr.indexOf(':') >= 0) {
                 family = Socket.APR_UNSPEC;
             }
@@ -303,6 +319,13 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 Socket.APR_PROTO_TCP, rootPool);
         if (OS.IS_UNIX) {
             Socket.optSet(serverSock, Socket.APR_SO_REUSEADDR, 1);
+        }
+        if (Library.APR_HAVE_IPV6) {
+            if (getIpv6v6only()) {
+                Socket.optSet(serverSock, Socket.APR_IPV6_V6ONLY, 1);
+            } else {
+                Socket.optSet(serverSock, Socket.APR_IPV6_V6ONLY, 0);
+            }
         }
         // Deal with the firewalls that tend to drop the inactive sockets
         Socket.optSet(serverSock, Socket.APR_SO_KEEPALIVE, 1);

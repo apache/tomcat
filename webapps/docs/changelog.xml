@@ -150,6 +150,19 @@
         of a specific type such as <code>0.0.0.0</code> or <code>::</code>.
         (markt)
       </fix>
+      <add>
+        Add a new configuration option, <code>ipv6v6only</code> to the APR
+        connectors that allows them to be configure to only accept IPv6
+        connections when configured with an IPv6 address rather than the
+        default which is to accept IPv4 connections as well if the operating
+        system uses a dual network stack. (markt)
+      </add>
+      <fix>
+        Improve the logic that unlocks the acceptor thread so a better choice is
+        made for the address to connect to when a connector is configured for
+        any local port. This reduces the likelihood of the unlock failing.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

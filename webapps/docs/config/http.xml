@@ -311,10 +311,16 @@
     </attribute>
 
     <attribute name="address" required="false">
-      <p>For servers with more than one IP address, this attribute
-      specifies which address will be used for listening on the specified
-      port.  By default, this port will be used on all IP addresses
-      associated with the server.</p>
+      <p>For servers with more than one IP address, this attribute specifies
+      which address will be used for listening on the specified port. By
+      default, the connector will listen all local addresses. Unless the JVM is
+      configured otherwise using system properties, the Java based connectors
+      (NIO, NIO2) will listen on both IPv4 and IPv6 addresses when configured
+      with either <code>0.0.0.0</code> or <code>::</code>. The APR/native
+      connector will only listen on IPv4 addresses if configured with
+      <code>0.0.0.0</code> and will listen on IPv6 addresses (and optionally
+      IPv4 addresses depending on the setting of <strong>ipv6onlyv6</strong>) if
+      configured with <code>::</code>.</p>
     </attribute>
 
     <attribute name="allowedTrailerHeaders" required="false">
@@ -915,6 +921,13 @@
         for this connector. The default value is <code>true</code> where
         <code>TCP_DEFER_ACCEPT</code> is supported by the operating system,
         otherwise it is <code>false</code>.</p>
+      </attribute>
+
+      <attribute name="ipv6v6only" required="false">
+        <p>If listening on an IPv6 address on a dual stack system, should the
+        connector only listen on the IPv6 address? If not specified the default
+        is <code>false</code> and the connector will listen on the IPv6 address
+        and the equivalent IPv4 address if present.</p>
       </attribute>
 
       <attribute name="pollerThreadCount" required="false">
