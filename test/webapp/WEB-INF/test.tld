@@ -40,4 +40,12 @@
     </function-signature>
   </function>
 
+  <function>
+    <name>toArray</name>
+    <function-class>org.apache.el.TesterFunctions</function-class>
+    <function-signature>
+      java.lang.String toArray(java.lang.String,java.lang.String)
+    </function-signature>
+  </function>
+
 </taglib>
