@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -378,7 +379,19 @@ public abstract class AbstractEndpoint<S> {
     public int getPort() { return port; }
     public void setPort(int port ) { this.port=port; }
 
-    public abstract int getLocalPort();
+
+    public final int getLocalPort() {
+        try {
+            InetSocketAddress localAddress = getLocalAddress();
+            if (localAddress == null) {
+                return -1;
+            }
+            return localAddress.getPort();
+        } catch (IOException ioe) {
+            return -1;
+        }
+    }
+
 
     /**
      * Address for the server socket.
@@ -386,6 +399,22 @@ public abstract class AbstractEndpoint<S> {
     private InetAddress address;
     public InetAddress getAddress() { return address; }
     public void setAddress(InetAddress address) { this.address = address; }
+
+
+    /**
+     * Obtain the network address the server socket is bound to. This primarily
+     * exists to enable the correct address to be used when unlocking the server
+     * socket since it removes the guess-work involved if no address is
+     * specifically set.
+     *
+     * @return The network address that the server socket is listening on or
+     *         null if the server socket is not currently bound.
+     *
+     * @throws IOException If there is a problem determining the currently bound
+     *                     socket
+     */
+    protected abstract InetSocketAddress getLocalAddress() throws IOException;
+
 
     /**
      * Allows the server developer to specify the acceptCount (backlog) that
@@ -761,35 +790,40 @@ public abstract class AbstractEndpoint<S> {
             return;
         }
 
-        InetSocketAddress saddr = null;
+        InetSocketAddress unlockAddress = null;
+        InetSocketAddress localAddress = null;
         try {
-            // Need to create a connection to unlock the accept();
-            if (address == null) {
-                saddr = new InetSocketAddress("localhost", getLocalPort());
-            } else if (address.isAnyLocalAddress()) {
+            localAddress = getLocalAddress();
+        } catch (IOException ioe) {
+            // TODO i18n
+            getLog().debug("Unable to determine local address for " + getName(), ioe);
+        }
+        if (localAddress == null) {
+            // TODO i18n
+            getLog().warn("Failed to unlock acceptor for " + getName() + " because the local address was not available.");
+            return;
+        }
+
+        try {
+            if (localAddress.getAddress().isAnyLocalAddress()) {
                 // Need a local address of the same type (IPv4 or IPV6) as the
                 // configured bind address since the connector may be configured
                 // to not map between types.
-                InetAddress localAddress = null;
                 Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-                while (localAddress == null && networkInterfaces.hasMoreElements()) {
+                while (unlockAddress == null && networkInterfaces.hasMoreElements()) {
                     NetworkInterface networkInterface = networkInterfaces.nextElement();
                     Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-                    while (localAddress == null && inetAddresses.hasMoreElements()) {
+                    while (unlockAddress == null && inetAddresses.hasMoreElements()) {
                         InetAddress inetAddress = inetAddresses.nextElement();
-                        if (address.getClass().isAssignableFrom(inetAddress.getClass())) {
-                            localAddress = inetAddress;
+                        if (localAddress.getAddress().getClass().isAssignableFrom(inetAddress.getClass())) {
+                            unlockAddress = new InetSocketAddress(inetAddress, localAddress.getPort());
                         }
                     }
                 }
-                // Fall-back option
-                if (localAddress == null) {
-                    saddr = new InetSocketAddress("localhost", getLocalPort());
-                }
-                saddr = new InetSocketAddress(localAddress, getLocalPort());
             } else {
-                saddr = new InetSocketAddress(address, getLocalPort());
+                unlockAddress = localAddress;
             }
+
             try (java.net.Socket s = new java.net.Socket()) {
                 int stmo = 2 * 1000;
                 int utmo = 2 * 1000;
@@ -800,9 +834,9 @@ public abstract class AbstractEndpoint<S> {
                 s.setSoTimeout(stmo);
                 s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
                 if (getLog().isDebugEnabled()) {
-                    getLog().debug("About to unlock socket for:"+saddr);
+                    getLog().debug("About to unlock socket for:" + unlockAddress);
                 }
-                s.connect(saddr,utmo);
+                s.connect(unlockAddress,utmo);
                 if (getDeferAccept()) {
                     /*
                      * In the case of a deferred accept / accept filters we need to
@@ -817,7 +851,7 @@ public abstract class AbstractEndpoint<S> {
                     sw.flush();
                 }
                 if (getLog().isDebugEnabled()) {
-                    getLog().debug("Socket unlock completed for:"+saddr);
+                    getLog().debug("Socket unlock completed for:" + unlockAddress);
                 }
 
                 // Wait for upto 1000ms acceptor threads to unlock

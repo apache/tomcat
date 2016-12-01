@@ -22,12 +22,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.FileChannel;
+import java.nio.channels.NetworkChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -173,25 +173,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     public boolean getDeferAccept() {
         // Not supported
         return false;
-    }
-
-
-    /**
-     * Port in use.
-     */
-    @Override
-    public int getLocalPort() {
-        ServerSocketChannel ssc = serverSock;
-        if (ssc == null) {
-            return -1;
-        } else {
-            ServerSocket s = ssc.socket();
-            if (s == null) {
-                return -1;
-            } else {
-                return s.getLocalPort();
-            }
-        }
     }
 
 
@@ -413,6 +394,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     @Override
     protected Log getLog() {
         return log;
+    }
+
+
+    @Override
+    protected NetworkChannel getServerSocket() {
+        return serverSock;
     }
 
 
