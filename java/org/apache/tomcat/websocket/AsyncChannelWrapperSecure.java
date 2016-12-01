@@ -53,7 +53,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
     private static final StringManager sm =
             StringManager.getManager(AsyncChannelWrapperSecure.class);
 
-    private static final ByteBuffer DUMMY = ByteBuffer.allocate(8192);
+    private static final ByteBuffer DUMMY = ByteBuffer.allocate(16921);
     private final AsynchronousSocketChannel socketChannel;
     private final SSLEngine sslEngine;
     private final ByteBuffer socketReadBuffer;
