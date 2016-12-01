@@ -18,11 +18,9 @@
 package org.apache.el;
 
 import java.io.File;
-import java.lang.reflect.Method;
 import java.util.Date;
 
 import javax.el.ELException;
-import javax.el.FunctionMapper;
 import javax.el.ValueExpression;
 
 import static org.junit.Assert.assertEquals;
@@ -239,28 +237,9 @@ public class TestELEvaluation {
     private String evaluateExpression(String expression) {
         ExpressionFactoryImpl exprFactory = new ExpressionFactoryImpl();
         ELContextImpl ctx = new ELContextImpl(exprFactory);
-        ctx.setFunctionMapper(new FMapper());
+        ctx.setFunctionMapper(new TesterFunctions.FMapper());
         ValueExpression ve = exprFactory.createValueExpression(ctx, expression,
                 String.class);
         return (String) ve.getValue(ctx);
-    }
-
-    public static class FMapper extends FunctionMapper {
-
-        @Override
-        public Method resolveFunction(String prefix, String localName) {
-            if ("trim".equals(localName)) {
-                Method m;
-                try {
-                    m = TesterFunctions.class.getMethod("trim", String.class);
-                    return m;
-                } catch (SecurityException e) {
-                    // Ignore
-                } catch (NoSuchMethodException e) {
-                    // Ignore
-                }
-            }
-            return null;
-        }
     }
 }
