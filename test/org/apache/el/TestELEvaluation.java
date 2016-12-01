@@ -231,6 +231,30 @@ public class TestELEvaluation {
         Assert.assertEquals("$2", evaluateExpression("$#{1+1}"));
     }
 
+    @Test
+    public void testBug60431a() {
+        Assert.assertEquals("OK", evaluateExpression("${fn:concat('O','K')}"));
+    }
+
+    @Test
+    public void testBug60431b() {
+        Assert.assertEquals("OK", evaluateExpression("${fn:concat(fn:toArray('O','K'))}"));
+    }
+
+    @Test
+    public void testBug60431c() {
+        Assert.assertEquals("", evaluateExpression("${fn:concat()}"));
+    }
+
+    @Test
+    public void testBug60431d() {
+        Assert.assertEquals("OK", evaluateExpression("${fn:concat2('OK')}"));
+    }
+
+    @Test
+    public void testBug60431e() {
+        Assert.assertEquals("RUOK", evaluateExpression("${fn:concat2('RU', fn:toArray('O','K'))}"));
+    }
 
     // ************************************************************************
 
