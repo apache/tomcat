@@ -17,6 +17,10 @@
 
 package org.apache.el;
 
+import java.lang.reflect.Method;
+
+import javax.el.FunctionMapper;
+
 public class TesterFunctions {
     public static String trim(String input) {
         return input.trim();
@@ -39,6 +43,26 @@ public class TesterFunctions {
         public static final String RETVAL = "Return from bug49555";
         public static String bug49555() {
             return RETVAL;
+        }
+    }
+
+
+    public static class FMapper extends FunctionMapper {
+
+        @Override
+        public Method resolveFunction(String prefix, String localName) {
+            if ("trim".equals(localName)) {
+                Method m;
+                try {
+                    m = TesterFunctions.class.getMethod("trim", String.class);
+                    return m;
+                } catch (SecurityException e) {
+                    // Ignore
+                } catch (NoSuchMethodException e) {
+                    // Ignore
+                }
+            }
+            return null;
         }
     }
 }
