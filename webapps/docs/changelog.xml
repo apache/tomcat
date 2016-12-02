@@ -190,6 +190,10 @@
         any local port. This reduces the likelihood of the unlock failing.
         (markt)
       </fix>
+      <fix>
+        <bug>60436</bug>: Avoid a potential NPE when processing async timeouts.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
