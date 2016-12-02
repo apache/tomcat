@@ -505,7 +505,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void openClientConnection() throws IOException {
         // Open a connection
         s = SocketFactory.getDefault().createSocket("localhost", getPort());
-        s.setSoTimeout(30000);
+        s.setSoTimeout(300000);
 
         os = s.getOutputStream();
         InputStream is = s.getInputStream();
@@ -1042,7 +1042,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    private static class SimpleServlet extends HttpServlet {
+    protected static class SimpleServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 
