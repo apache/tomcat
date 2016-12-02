@@ -722,8 +722,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             S socket = wrapper.getSocket();
 
             Processor processor = connections.get(socket);
-            if ((status == SocketEvent.DISCONNECT || status == SocketEvent.ERROR)
-                    && processor == null) {
+            if (processor != null) {
+                // Make sure an async timeout doesn't fire
+                getProtocol().removeWaitingProcessor(processor);
+            } else if (status == SocketEvent.DISCONNECT || status == SocketEvent.ERROR) {
                 // Nothing to do. Endpoint requested a close and there is no
                 // longer a processor associated with this socket.
                 return SocketState.CLOSED;
@@ -781,8 +783,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
                 // Associate the processor with the connection
                 connections.put(socket, processor);
-                // Make sure an async timeout doesn't fire
-                getProtocol().removeWaitingProcessor(processor);
 
                 SocketState state = SocketState.CLOSED;
                 do {
