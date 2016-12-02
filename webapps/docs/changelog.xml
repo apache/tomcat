@@ -194,6 +194,11 @@
         <bug>60436</bug>: Avoid a potential NPE when processing async timeouts.
         (markt)
       </fix>
+      <fix>
+        Reduce the window in which an async request that has just started
+        processing on a container thread remains eligible for an async timeout.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
