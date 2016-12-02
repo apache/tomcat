@@ -505,7 +505,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void openClientConnection() throws IOException {
         // Open a connection
         s = SocketFactory.getDefault().createSocket("localhost", getPort());
-        s.setSoTimeout(300000);
+        s.setSoTimeout(30000);
 
         os = s.getOutputStream();
         InputStream is = s.getInputStream();
