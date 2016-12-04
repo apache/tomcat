@@ -58,7 +58,7 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
     private static final String METHOD_POST = "POST";
 
     private static final String HTTP_PREFIX = "http://localhost:";
-    private static final String CONTEXT_PATH_LOGIN = "/";
+    private static final String CONTEXT_PATH_LOGIN = "";
     private static final String URI_PROTECTED = "/services/*";
     private static final String URI_CSRF_PROTECTED = "/services/customers/*";
     private static final String LIST_CUSTOMERS = "/services/customers/";
