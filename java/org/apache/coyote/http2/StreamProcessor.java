@@ -43,8 +43,9 @@ class StreamProcessor extends AbstractProcessor {
     private final Stream stream;
 
 
-    public StreamProcessor(Http2UpgradeHandler handler, Stream stream, Adapter adapter, SocketWrapperBase<?> socketWrapper) {
-        super(stream.getCoyoteRequest(), stream.getCoyoteResponse());
+    StreamProcessor(Http2UpgradeHandler handler, Stream stream, Adapter adapter,
+            SocketWrapperBase<?> socketWrapper) {
+        super(socketWrapper.getEndpoint(), stream.getCoyoteRequest(), stream.getCoyoteResponse());
         this.handler = handler;
         this.stream = stream;
         setAdapter(adapter);
