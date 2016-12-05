@@ -424,6 +424,12 @@
     <Bug pattern="AT_OPERATION_SEQUENCE_ON_CONCURRENT_ABSTRACTION" />
   </Match>
   <Match>
+    <!-- readChunk will not be null due to previous call to readBytes() -->
+    <Class name="org.apache.coyote.http11.filters.ChunkedInputFilter" />
+    <Method name="parseHeader"/>
+    <Bug pattern="RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE" />
+  </Match>
+  <Match>
     <!-- Locks are always released. Non-standard pattern is required because -->
     <!-- of lock upgrade that is used. -->
     <Class name="org.apache.coyote.http11.upgrade.AprServletInputStream" />
@@ -456,6 +462,12 @@
     <Class name="org.apache.coyote.http11.InternalAprOutputBuffer" />
     <Method name="writeToSocket"/>
     <Bug code="UL" />
+  </Match>
+  <Match>
+    <!-- HpackDecoder is used by multiple streams but not concurrently. -->
+    <Class name="org.apache.coyote.http2.HpackDecoder" />
+    <Method name="emitHeader" />
+    <Bug pattern="VO_VOLATILE_INCREMENT" />
   </Match>
   <Match>
     <!-- Number being tested is unsigned. -->
@@ -935,6 +947,18 @@
     <Class name="org.apache.catalina.core.TestApplicationSessionCookieConfig$CustomContext" />
     <Method name="getState"/>
     <Bug code="UG" />
+  </Match>
+  <Match>
+    <!-- Return value of latch is intentionally ignored -->
+    <Class name="org.apache.catalina.connector.TestSendFile"/>
+    <Method name="testBug60409"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
+  </Match>
+  <Match>
+    <!-- Return value of latch is intentionally ignored -->
+    <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI"/>
+    <Method name="testDelayedNBWrite"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
   </Match>
   <Match>
     <Or>

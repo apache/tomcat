@@ -446,6 +446,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
             }
         }
 
+        // readBytes() above will set readChunk unless it returns a value < 0
         chr = readChunk.get(readChunk.position());
 
         // CRLF terminates the request
@@ -472,6 +473,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                 }
             }
 
+            // readBytes() above will set readChunk unless it returns a value < 0
             chr = readChunk.get(readChunk.position());
             if ((chr >= Constants.A) && (chr <= Constants.Z)) {
                 chr = (byte) (chr - Constants.LC_OFFSET);
