@@ -59,22 +59,12 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     private ErrorState errorState = ErrorState.NONE;
 
 
-    /**
-     * Used by HTTP/2.
-     * @param coyoteRequest The request
-     * @param coyoteResponse The response
-     */
-    protected AbstractProcessor(Request coyoteRequest, Response coyoteResponse) {
-        this(null, coyoteRequest, coyoteResponse);
-    }
-
-
     public AbstractProcessor(AbstractEndpoint<?> endpoint) {
         this(endpoint, new Request(), new Response());
     }
 
 
-    private AbstractProcessor(AbstractEndpoint<?> endpoint, Request coyoteRequest,
+    protected AbstractProcessor(AbstractEndpoint<?> endpoint, Request coyoteRequest,
             Response coyoteResponse) {
         this.endpoint = endpoint;
         asyncStateMachine = new AsyncStateMachine(this);
