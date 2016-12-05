@@ -1264,12 +1264,6 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
-    @Override
-    protected final void executeDispatches(SocketWrapperBase<?> wrapper) {
-        wrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
-    }
-
-
     /**
      * Read at least the specified amount of bytes, and place them
      * in the input buffer. Note that if any data is available to read then this
