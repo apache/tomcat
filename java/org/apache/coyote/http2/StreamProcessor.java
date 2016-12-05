@@ -17,6 +17,7 @@
 package org.apache.coyote.http2;
 
 import java.io.IOException;
+import java.util.Iterator;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
@@ -28,6 +29,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -150,6 +152,16 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
+    protected void processSocketEvent(SocketEvent event, boolean dispatch) {
+        if (dispatch) {
+            handler.processStreamOnContainerThread(this, event);
+        } else {
+            this.process(event);
+        }
+    }
+
+
+    @Override
     protected final boolean isRequestBodyFullyRead() {
         return stream.getInputBuffer().isRequestBodyFullyRead();
     }
@@ -169,8 +181,17 @@ class StreamProcessor extends AbstractProcessor {
 
     @Override
     protected final void executeDispatches() {
-        StreamRunnable streamRunnable = new StreamRunnable(this, SocketEvent.OPEN_READ);
-        getSocketWrapper().getEndpoint().getExecutor().execute(streamRunnable);
+        Iterator<DispatchType> dispatches = getIteratorAndClearDispatches();
+        synchronized (this) {
+            /*
+             * TODO Check if this sync is necessary.
+             *      Compare with superrclass that uses SocketWrapper
+             */
+            while (dispatches != null && dispatches.hasNext()) {
+                DispatchType dispatchType = dispatches.next();
+                processSocketEvent(dispatchType.getSocketStatus(), false);
+            }
+        }
     }
 
 
