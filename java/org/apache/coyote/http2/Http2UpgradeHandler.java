@@ -144,7 +144,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     // Stream concurrency control
     private int maxConcurrentStreamExecution = Http2Protocol.DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION;
     private AtomicInteger streamConcurrency = null;
-    private Queue<StreamProcessor> queuedProcessors = null;
+    private Queue<StreamRunnable> queuedRunnable = null;
 
     // Limits
     private Set<String> allowedTrailerHeaders = Collections.emptySet();
@@ -191,7 +191,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // Init concurrency control if needed
         if (maxConcurrentStreamExecution < localSettings.getMaxConcurrentStreams()) {
             streamConcurrency = new AtomicInteger(0);
-            queuedProcessors = new ConcurrentLinkedQueue<>();
+            queuedRunnable = new ConcurrentLinkedQueue<>();
         }
 
         parser = new Http2Parser(connectionId, this, this);
@@ -268,15 +268,16 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     private void processStreamOnContainerThread(Stream stream) {
         StreamProcessor streamProcessor = new StreamProcessor(this, stream, adapter, socketWrapper);
+        StreamRunnable streamRunnable = new StreamRunnable(streamProcessor, SocketEvent.OPEN_READ);
         streamProcessor.setSslSupport(sslSupport);
         if (streamConcurrency == null) {
-            socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
+            socketWrapper.getEndpoint().getExecutor().execute(streamRunnable);
         } else {
             if (getStreamConcurrency() < maxConcurrentStreamExecution) {
                 increaseStreamConcurrency();
-                socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
+                socketWrapper.getEndpoint().getExecutor().execute(streamRunnable);
             } else {
-                queuedProcessors.offer(streamProcessor);
+                queuedRunnable.offer(streamRunnable);
             }
         }
     }
@@ -440,10 +441,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
         decreaseStreamConcurrency();
         if (getStreamConcurrency() < maxConcurrentStreamExecution) {
-            StreamProcessor streamProcessor = queuedProcessors.poll();
-            if (streamProcessor != null) {
+            StreamRunnable streamRunnable = queuedRunnable.poll();
+            if (streamRunnable != null) {
                 increaseStreamConcurrency();
-                socketWrapper.getEndpoint().getExecutor().execute(streamProcessor);
+                socketWrapper.getEndpoint().getExecutor().execute(streamRunnable);
             }
         }
     }
