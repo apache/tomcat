@@ -152,6 +152,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
      * @deprecated Unused. Will be removed in Tomcat 9. Use
      *             {@link #doRead(ApplicationBufferHandler)}
      */
+    @Deprecated
     @Override
     public int doRead(ByteChunk chunk) throws IOException {
         if (endChunk) {
@@ -504,6 +505,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
             }
         }
 
+        // readBytes() above will set readChunk unless it returns a value < 0
         chr = readChunk.get(readChunk.position());
 
         // CRLF terminates the request
@@ -530,6 +532,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                 }
             }
 
+            // readBytes() above will set readChunk unless it returns a value < 0
             chr = readChunk.get(readChunk.position());
             if ((chr >= Constants.A) && (chr <= Constants.Z)) {
                 chr = (byte) (chr - Constants.LC_OFFSET);
