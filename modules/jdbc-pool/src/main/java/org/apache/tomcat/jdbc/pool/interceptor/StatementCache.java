@@ -186,7 +186,7 @@ public class StatementCache extends StatementDecoratorInterceptor {
     }
 
     /**
-     * @param sql The SQL to attempt to match to entires in the statement cache
+     * @param sql The SQL to attempt to match to entries in the statement cache
      *
      * @return The CachedStatement for the given SQL
      *
@@ -194,10 +194,7 @@ public class StatementCache extends StatementDecoratorInterceptor {
      */
     @Deprecated
     public CachedStatement isCached(String sql) {
-        @SuppressWarnings("unchecked")
-        ConcurrentHashMap<CacheKey,CachedStatement> cache =
-            (ConcurrentHashMap<CacheKey,CachedStatement>)pcon.getAttributes().get(STATEMENT_CACHE_ATTR);
-        return cache.get(sql);
+        return null;
     }
 
     public CachedStatement isCached(Method method, Object[] args) {
