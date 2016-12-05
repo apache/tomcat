@@ -32,7 +32,7 @@ import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
-public class StreamProcessor extends AbstractProcessor implements Runnable {
+class StreamProcessor extends AbstractProcessor {
 
     private static final Log log = LogFactory.getLog(StreamProcessor.class);
     private static final StringManager sm = StringManager.getManager(StreamProcessor.class);
@@ -50,8 +50,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
     }
 
 
-    @Override
-    public void run() {
+    final void process(SocketEvent event) {
         try {
             // FIXME: the regular processor syncs on socketWrapper, but here this deadlocks
             synchronized (this) {
@@ -60,7 +59,7 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
                 ContainerThreadMarker.set();
                 SocketState state = SocketState.CLOSED;
                 try {
-                    state = process(socketWrapper, SocketEvent.OPEN_READ);
+                    state = process(socketWrapper, event);
 
                     if (state == SocketState.CLOSED) {
                         if (!getErrorState().isConnectionIoAllowed()) {
@@ -170,7 +169,8 @@ public class StreamProcessor extends AbstractProcessor implements Runnable {
 
     @Override
     protected final void executeDispatches(SocketWrapperBase<?> wrapper) {
-        wrapper.getEndpoint().getExecutor().execute(this);
+        StreamRunnable streamRunnable = new StreamRunnable(this, SocketEvent.OPEN_READ);
+        wrapper.getEndpoint().getExecutor().execute(streamRunnable);
     }
 
 
