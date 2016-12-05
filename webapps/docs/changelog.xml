@@ -44,7 +44,18 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 9.0.0.M14 (markt)" rtext="in development">
+<section name="Tomcat 9.0.0.M15 (markt)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <scode>
+        Increment version due a local build configuration error with 9.0.0.M14
+        that wasn't caught until after digital signing had been completed
+        Signing requires unique names so a new tag was required. (markt)
+      </scode>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 9.0.0.M14 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <update>
