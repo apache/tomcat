@@ -107,7 +107,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             // Set the request attribute so that the async onError() event is
             // fired when the error event is processed
             request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, t);
-            socketWrapper.processSocket(SocketEvent.ERROR, true);
+            processSocketEvent(SocketEvent.ERROR, true);
         }
     }
 
@@ -381,13 +381,13 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         case ASYNC_COMPLETE: {
             clearDispatches();
             if (asyncStateMachine.asyncComplete()) {
-                socketWrapper.processSocket(SocketEvent.OPEN_READ, true);
+                processSocketEvent(SocketEvent.OPEN_READ, true);
             }
             break;
         }
         case ASYNC_DISPATCH: {
             if (asyncStateMachine.asyncDispatch()) {
-                socketWrapper.processSocket(SocketEvent.OPEN_READ, true);
+                processSocketEvent(SocketEvent.OPEN_READ, true);
             }
             break;
         }
@@ -523,10 +523,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     private void doTimeoutAsync() {
         // Avoid multiple timeouts
         setAsyncTimeout(-1);
-        SocketWrapperBase<?> socketWrapper = getSocketWrapper();
-        if (socketWrapper != null) {
-            socketWrapper.processSocket(SocketEvent.TIMEOUT, true);
-        }
+        processSocketEvent(SocketEvent.TIMEOUT, true);
     }
 
 
@@ -637,6 +634,14 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      */
     protected void sslReHandShake() {
         // NO-OP
+    }
+
+
+    protected void processSocketEvent(SocketEvent event, boolean dispatch) {
+        SocketWrapperBase<?> socketWrapper = getSocketWrapper();
+        if (socketWrapper != null) {
+            socketWrapper.processSocket(event, dispatch);
+        }
     }
 
 
