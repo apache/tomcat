@@ -168,9 +168,9 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
-    protected final void executeDispatches(SocketWrapperBase<?> wrapper) {
+    protected final void executeDispatches() {
         StreamRunnable streamRunnable = new StreamRunnable(this, SocketEvent.OPEN_READ);
-        wrapper.getEndpoint().getExecutor().execute(streamRunnable);
+        getSocketWrapper().getEndpoint().getExecutor().execute(streamRunnable);
     }
 
 

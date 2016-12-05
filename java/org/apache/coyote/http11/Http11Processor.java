@@ -1565,12 +1565,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
-    protected final void executeDispatches(SocketWrapperBase<?> wrapper) {
-        wrapper.executeNonBlockingDispatches(getIteratorAndClearDispatches());
-    }
-
-
-    @Override
     public UpgradeToken getUpgradeToken() {
         return upgradeToken;
     }
