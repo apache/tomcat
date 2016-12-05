@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -36,7 +35,6 @@ import org.apache.catalina.startup.Tomcat;
 
 public class TestStreamProcessor extends Http2TestBase {
 
-    @Ignore // Disabled until it passes
     @Test
     public void testAsyncComplete() throws Exception {
         enableHttp2();
@@ -65,6 +63,9 @@ public class TestStreamProcessor extends Http2TestBase {
         writeFrame(frameHeader, headersPayload);
 
         readSimpleGetResponse();
+        // Flush before startAsync means body is written in two packets so an
+        // additional frame needs to be read
+        parser.readFrame(true);
 
         Assert.assertEquals(
                 "3-HeadersStart\n" +
@@ -72,7 +73,8 @@ public class TestStreamProcessor extends Http2TestBase {
                 "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
                 "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
                 "3-HeadersEnd\n" +
-                "3-Body-25\n" +
+                "3-Body-17\n" +
+                "3-Body-8\n" +
                 "3-EndOfStream\n", output.getTrace());
 
     }
