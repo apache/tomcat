@@ -23,6 +23,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -47,6 +49,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
@@ -276,6 +279,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     alias = "tomcat";
                 }
                 X509Certificate[] chain = keyManager.getCertificateChain(alias);
+                if (chain == null) {
+                    alias = findAlias(keyManager, certificate);
+                    chain = keyManager.getCertificateChain(alias);
+                }
                 PrivateKey key = keyManager.getPrivateKey(alias);
                 StringBuilder sb = new StringBuilder(BEGIN_KEY);
                 String encoded = BASE64_ENCODER.encodeToString(key.getEncoded());
@@ -340,6 +347,33 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             log.warn(sm.getString("openssl.errorSSLCtxInit"), e);
             destroy();
         }
+    }
+
+    /*
+     * Find a valid alias when none was specified in the config.
+     */
+    private static String findAlias(X509KeyManager keyManager,
+            SSLHostConfigCertificate certificate) {
+
+        Type type = certificate.getType();
+        String result = null;
+
+        List<Type> candidiateTypes = new ArrayList<>();
+        if (Type.UNDEFINED.equals(type)) {
+            // Try all types to find an suitable alias
+            candidiateTypes.addAll(Arrays.asList(Type.values()));
+            candidiateTypes.remove(Type.UNDEFINED);
+        } else {
+            // Look for the specific type to find a suitable alias
+            candidiateTypes.add(type);
+        }
+
+        Iterator<Type> iter = candidiateTypes.iterator();
+        while (result == null && iter.hasNext()) {
+            result = keyManager.chooseServerAlias(iter.next().toString(),  null,  null);
+        }
+
+        return result;
     }
 
     private static X509KeyManager chooseKeyManager(KeyManager[] managers) throws Exception {
