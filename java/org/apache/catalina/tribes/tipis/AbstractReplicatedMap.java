@@ -411,6 +411,9 @@ public abstract class AbstractReplicatedMap<K,V>
     }
 
     public Member[] getMapMembersExcl(Member[] exclude) {
+        if (exclude == null) {
+            return null;
+        }
         synchronized (mapMembers) {
             @SuppressWarnings("unchecked") // mapMembers has the correct type
             HashMap<Member, Long> list = (HashMap<Member, Long>)mapMembers.clone();
