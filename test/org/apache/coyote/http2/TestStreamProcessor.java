@@ -76,7 +76,38 @@ public class TestStreamProcessor extends Http2TestBase {
                 "3-Body-17\n" +
                 "3-Body-8\n" +
                 "3-EndOfStream\n", output.getTrace());
+    }
 
+
+    @Test
+    public void testAsyncDispatch() throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // Map the async servlet to /simple so we can re-use the HTTP/2 handling
+        // logic from the super class.
+        Context ctxt = tomcat.addContext("", null);
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMappingDecoded("/simple", "simple");
+        Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncDispatch());
+        w.setAsyncSupported(true);
+        ctxt.addServletMappingDecoded("/async", "async");
+
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildGetRequest(frameHeader, headersPayload, null, 3, "/async");
+        writeFrame(frameHeader, headersPayload);
+
+        readSimpleGetResponse();
+        Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
     }
 
 
@@ -105,6 +136,30 @@ public class TestStreamProcessor extends Http2TestBase {
                     try {
                         asyncContext.getResponse().getWriter().print("Complete");
                         asyncContext.complete();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
+
+
+    private static final class AsyncDispatch extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException {
+
+            final AsyncContext asyncContext = request.startAsync(request, response);
+            asyncContext.start(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        asyncContext.dispatch("/simple");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
