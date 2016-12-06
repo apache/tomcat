@@ -209,7 +209,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
         serverSock.socket().bind(addr,getBacklog());
         serverSock.configureBlocking(true); //mimic APR behavior
-        serverSock.socket().setSoTimeout(getSocketProperties().getSoTimeout());
 
         // Initialize thread count defaults for acceptor, poller
         if (acceptorThreadCount == 0) {
