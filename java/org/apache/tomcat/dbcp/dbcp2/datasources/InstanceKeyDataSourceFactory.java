@@ -19,7 +19,6 @@ package org.apache.tomcat.dbcp.dbcp2.datasources;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
