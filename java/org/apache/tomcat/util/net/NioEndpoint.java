@@ -443,7 +443,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         // socket
                         socket = serverSock.accept();
                     } catch (IOException ioe) {
-                        //we didn't get a socket
+                        // We didn't get a socket
                         countDownConnection();
                         // Introduce delay if necessary
                         errorDelay = handleExceptionWithDelay(errorDelay);
@@ -477,6 +477,24 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             }
             state = AcceptorState.ENDED;
         }
+
+
+        private void closeSocket(SocketChannel socket) {
+            try {
+                socket.socket().close();
+            } catch (IOException ioe)  {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("endpoint.err.close"), ioe);
+                }
+            }
+            try {
+                socket.close();
+            } catch (IOException ioe) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("endpoint.err.close"), ioe);
+                }
+            }
+        }
     }
 
 
@@ -506,24 +524,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             log.error("",x);
         }
     }
-
-    private void closeSocket(SocketChannel socket) {
-        try {
-            socket.socket().close();
-        } catch (IOException ioe)  {
-            if (log.isDebugEnabled()) {
-                log.debug("", ioe);
-            }
-        }
-        try {
-            socket.close();
-        } catch (IOException ioe) {
-            if (log.isDebugEnabled()) {
-                log.debug("", ioe);
-            }
-        }
-    }
-
 
     // ----------------------------------------------------- Poller Inner Classes
 
