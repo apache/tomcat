@@ -964,12 +964,16 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                                     Long.valueOf(addr.port)));
                         }
                     } catch (Exception e) {
-                        //we didn't get a socket
+                        // We didn't get a socket
                         countDownConnection();
-                        // Introduce delay if necessary
-                        errorDelay = handleExceptionWithDelay(errorDelay);
-                        // re-throw
-                        throw e;
+                        if (running) {
+                            // Introduce delay if necessary
+                            errorDelay = handleExceptionWithDelay(errorDelay);
+                            // re-throw
+                            throw e;
+                        } else {
+                            break;
+                        }
                     }
                     // Successful accept, reset the error delay
                     errorDelay = 0;
@@ -988,21 +992,19 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    if (running) {
-                        String msg = sm.getString("endpoint.accept.fail");
-                        if (t instanceof Error) {
-                            Error e = (Error) t;
-                            if (e.getError() == 233) {
-                                // Not an error on HP-UX so log as a warning
-                                // so it can be filtered out on that platform
-                                // See bug 50273
-                                log.warn(msg, t);
-                            } else {
-                                log.error(msg, t);
-                            }
+                    String msg = sm.getString("endpoint.accept.fail");
+                    if (t instanceof Error) {
+                        Error e = (Error) t;
+                        if (e.getError() == 233) {
+                            // Not an error on HP-UX so log as a warning
+                            // so it can be filtered out on that platform
+                            // See bug 50273
+                            log.warn(msg, t);
                         } else {
-                                log.error(msg, t);
+                            log.error(msg, t);
                         }
+                    } else {
+                            log.error(msg, t);
                     }
                 }
                 // The processor will recycle itself when it finishes
