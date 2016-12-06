@@ -469,8 +469,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         countDownConnection();
                         closeSocket(socket);
                     }
-                } catch (SocketTimeoutException sx) {
-                    // Ignore: Normal condition
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     log.error(sm.getString("endpoint.accept.fail"), t);
