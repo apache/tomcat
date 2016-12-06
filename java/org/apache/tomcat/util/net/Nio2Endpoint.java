@@ -430,6 +430,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                         // socket
                         socket = serverSock.accept().get();
                     } catch (Exception e) {
+                        // We didn't get a socket
                         countDownConnection();
                         if (running) {
                             // Introduce delay if necessary
@@ -448,24 +449,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                         // Hand this socket off to an appropriate processor
                         if (!setSocketOptions(socket)) {
                             countDownConnection();
-                            try {
-                                socket.close();
-                            } catch (IOException ioe) {
-                                if (log.isDebugEnabled()) {
-                                    log.debug("", ioe);
-                                }
-                            }
+                            closeSocket(socket);
                        }
                     } else {
                         countDownConnection();
-                        // Close socket right away
-                        try {
-                            socket.close();
-                        } catch (IOException ioe) {
-                            if (log.isDebugEnabled()) {
-                                log.debug("", ioe);
-                            }
-                        }
+                        closeSocket(socket);
                     }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
@@ -475,6 +463,16 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             state = AcceptorState.ENDED;
         }
 
+
+        private void closeSocket(AsynchronousSocketChannel socket) {
+            try {
+                socket.close();
+            } catch (IOException ioe) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("endpoint.err.close"), ioe);
+                }
+            }
+        }
     }
 
 
