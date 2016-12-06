@@ -445,17 +445,22 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     } catch (IOException ioe) {
                         // We didn't get a socket
                         countDownConnection();
-                        // Introduce delay if necessary
-                        errorDelay = handleExceptionWithDelay(errorDelay);
-                        // re-throw
-                        throw ioe;
+                        if (running) {
+                            // Introduce delay if necessary
+                            errorDelay = handleExceptionWithDelay(errorDelay);
+                            // re-throw
+                            throw ioe;
+                        } else {
+                            break;
+                        }
                     }
                     // Successful accept, reset the error delay
                     errorDelay = 0;
 
-                    // setSocketOptions() will add channel to the poller
-                    // if successful
+                    // Configure the socket
                     if (running && !paused) {
+                        // setSocketOptions() will hand the socket off to
+                        // an appropriate processor if successful
                         if (!setSocketOptions(socket)) {
                             countDownConnection();
                             closeSocket(socket);
@@ -466,10 +471,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     }
                 } catch (SocketTimeoutException sx) {
                     // Ignore: Normal condition
-                } catch (IOException x) {
-                    if (running) {
-                        log.error(sm.getString("endpoint.accept.fail"), x);
-                    }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     log.error(sm.getString("endpoint.accept.fail"), t);
