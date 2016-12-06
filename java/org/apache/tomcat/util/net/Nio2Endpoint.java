@@ -449,11 +449,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
                         // setSocketOptions() will hand the socket off to
                         // an appropriate processor if successful
                         if (!setSocketOptions(socket)) {
-                            countDownConnection();
                             closeSocket(socket);
                        }
                     } else {
-                        countDownConnection();
                         closeSocket(socket);
                     }
                 } catch (Throwable t) {
@@ -466,6 +464,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
 
         private void closeSocket(AsynchronousSocketChannel socket) {
+            countDownConnection();
             try {
                 socket.close();
             } catch (IOException ioe) {
