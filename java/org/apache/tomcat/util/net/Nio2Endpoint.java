@@ -390,12 +390,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
 
     // --------------------------------------------------- Acceptor Inner Class
-
     /**
      * With NIO2, the main acceptor thread only initiates the initial accept
      * but periodically checks that the connector is still accepting (if not
-     * it will attempt to start again). It is also responsible for periodic
-     * checks of async timeouts, rather than use a dedicated thread for that.
+     * it will attempt to start again).
      */
     protected class Acceptor extends AbstractEndpoint.Acceptor {
 
