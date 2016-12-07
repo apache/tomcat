@@ -38,7 +38,7 @@ public abstract class SocketWrapperBase<E> {
     protected static final StringManager sm = StringManager.getManager(SocketWrapperBase.class);
 
     private final E socket;
-    private final AbstractEndpoint<E> endpoint;
+    private final AbstractEndpoint<E,?> endpoint;
 
     // Volatile because I/O and setting the timeout values occurs on a different
     // thread to the thread checking the timeout.
@@ -90,7 +90,7 @@ public abstract class SocketWrapperBase<E> {
      */
     protected int bufferedWriteSize = 64 * 1024; // 64k default write buffer
 
-    public SocketWrapperBase(E socket, AbstractEndpoint<E> endpoint) {
+    public SocketWrapperBase(E socket, AbstractEndpoint<E,?> endpoint) {
         this.socket = socket;
         this.endpoint = endpoint;
         ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
@@ -102,7 +102,7 @@ public abstract class SocketWrapperBase<E> {
         return socket;
     }
 
-    public AbstractEndpoint<E> getEndpoint() {
+    public AbstractEndpoint<E,?> getEndpoint() {
         return endpoint;
     }
 

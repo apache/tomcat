@@ -34,7 +34,7 @@ import org.apache.tomcat.util.net.SSLHostConfig.Type;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 
-public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
+public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
 
     private String sslImplementationName = null;
     private int sniParseLimit = 64 * 1024;

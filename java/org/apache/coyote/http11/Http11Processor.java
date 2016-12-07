@@ -221,7 +221,7 @@ public class Http11Processor extends AbstractProcessor {
     private final Map<String,UpgradeProtocol> httpUpgradeProtocols;
 
 
-    public Http11Processor(int maxHttpHeaderSize, AbstractEndpoint<?> endpoint,int maxTrailerSize,
+    public Http11Processor(int maxHttpHeaderSize, AbstractEndpoint<?,?> endpoint,int maxTrailerSize,
             Set<String> allowedTrailerHeaders, int maxExtensionSize, int maxSwallowSize,
             Map<String,UpgradeProtocol> httpUpgradeProtocols) {
 

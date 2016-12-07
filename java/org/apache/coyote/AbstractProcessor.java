@@ -46,7 +46,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected Adapter adapter;
     protected final AsyncStateMachine asyncStateMachine;
     private volatile long asyncTimeout = -1;
-    protected final AbstractEndpoint<?> endpoint;
+    protected final AbstractEndpoint<?,?> endpoint;
     protected final Request request;
     protected final Response response;
     protected volatile SocketWrapperBase<?> socketWrapper = null;
@@ -59,12 +59,12 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     private ErrorState errorState = ErrorState.NONE;
 
 
-    public AbstractProcessor(AbstractEndpoint<?> endpoint) {
+    public AbstractProcessor(AbstractEndpoint<?,?> endpoint) {
         this(endpoint, new Request(), new Response());
     }
 
 
-    protected AbstractProcessor(AbstractEndpoint<?> endpoint, Request coyoteRequest,
+    protected AbstractProcessor(AbstractEndpoint<?,?> endpoint, Request coyoteRequest,
             Response coyoteResponse) {
         this.endpoint = endpoint;
         asyncStateMachine = new AsyncStateMachine(this);

@@ -87,7 +87,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      * ProtocolHandler implementation (ProtocolHandler using NIO, requires NIO
      * Endpoint etc.).
      */
-    private final AbstractEndpoint<S> endpoint;
+    private final AbstractEndpoint<S,?> endpoint;
 
 
     private Handler<S> handler;
@@ -103,7 +103,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     private AsyncTimeout asyncTimeout = null;
 
 
-    public AbstractProtocol(AbstractEndpoint<S> endpoint) {
+    public AbstractProtocol(AbstractEndpoint<S,?> endpoint) {
         this.endpoint = endpoint;
         setConnectionLinger(Constants.DEFAULT_CONNECTION_LINGER);
         setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);
@@ -364,7 +364,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
     // ----------------------------------------------- Accessors for sub-classes
 
-    protected AbstractEndpoint<S> getEndpoint() {
+    protected AbstractEndpoint<S,?> getEndpoint() {
         return endpoint;
     }
 

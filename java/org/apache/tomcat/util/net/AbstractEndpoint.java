@@ -36,7 +36,7 @@ import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
-import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
+import org.apache.tomcat.util.net.Acceptor.AcceptorState;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.LimitLatch;
 import org.apache.tomcat.util.threads.ResizableExecutor;
@@ -45,12 +45,15 @@ import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 /**
- * @param <S> The type for the sockets managed by this endpoint.
+ * @param <S> The type used by the socket wrapper associated with this endpoint.
+ *            May be the same as <U>.
+ * @param <U> The type of the underlying socket used by this endpoint. May be
+ *            the same as <S>.
  *
  * @author Mladen Turk
  * @author Remy Maucherat
  */
-public abstract class AbstractEndpoint<S> {
+public abstract class AbstractEndpoint<S,U> {
 
     // -------------------------------------------------------------- Constants
 
@@ -123,29 +126,6 @@ public abstract class AbstractEndpoint<S> {
         UNBOUND, BOUND_ON_INIT, BOUND_ON_START
     }
 
-    public abstract static class Acceptor implements Runnable {
-        public enum AcceptorState {
-            NEW, RUNNING, PAUSED, ENDED
-        }
-
-        protected volatile AcceptorState state = AcceptorState.NEW;
-        public final AcceptorState getState() {
-            return state;
-        }
-
-        private String threadName;
-        protected final void setThreadName(final String threadName) {
-            this.threadName = threadName;
-        }
-        protected final String getThreadName() {
-            return threadName;
-        }
-    }
-
-
-    private static final int INITIAL_ERROR_DELAY = 50;
-    private static final int MAX_ERROR_DELAY = 1600;
-
 
     // ----------------------------------------------------------------- Fields
 
@@ -182,7 +162,7 @@ public abstract class AbstractEndpoint<S> {
     /**
      * Threads used to accept new connections and pass them to worker threads.
      */
-    protected Acceptor[] acceptors;
+    protected List<Acceptor<U>> acceptors;
 
     /**
      * Cache for SocketProcessor objects
@@ -780,7 +760,7 @@ public abstract class AbstractEndpoint<S> {
     protected void unlockAccept() {
         // Only try to unlock the acceptor if it is necessary
         boolean unlockRequired = false;
-        for (Acceptor acceptor : acceptors) {
+        for (Acceptor<U> acceptor : acceptors) {
             if (acceptor.getState() == AcceptorState.RUNNING) {
                 unlockRequired = true;
                 break;
@@ -856,7 +836,7 @@ public abstract class AbstractEndpoint<S> {
 
                 // Wait for upto 1000ms acceptor threads to unlock
                 long waitLeft = 1000;
-                for (Acceptor acceptor : acceptors) {
+                for (Acceptor<U> acceptor : acceptors) {
                     while (waitLeft > 0 &&
                             acceptor.getState() == AcceptorState.RUNNING) {
                         Thread.sleep(50);
@@ -954,13 +934,14 @@ public abstract class AbstractEndpoint<S> {
 
     protected final void startAcceptorThreads() {
         int count = getAcceptorThreadCount();
-        acceptors = new Acceptor[count];
+        acceptors = new ArrayList<>(count);
 
         for (int i = 0; i < count; i++) {
-            acceptors[i] = createAcceptor();
+            Acceptor<U> acceptor = createAcceptor();
             String threadName = getName() + "-Acceptor-" + i;
-            acceptors[i].setThreadName(threadName);
-            Thread t = new Thread(acceptors[i], threadName);
+            acceptor.setThreadName(threadName);
+            acceptors.add(acceptor);
+            Thread t = new Thread(acceptor, threadName);
             t.setPriority(getAcceptorThreadPriority());
             t.setDaemon(getDaemon());
             t.start();
@@ -972,7 +953,7 @@ public abstract class AbstractEndpoint<S> {
      * Hook to allow Endpoints to provide a specific Acceptor implementation.
      * @return the acceptor
      */
-    protected abstract Acceptor createAcceptor();
+    protected abstract Acceptor<U> createAcceptor();
 
 
     /**
@@ -1045,35 +1026,14 @@ public abstract class AbstractEndpoint<S> {
         } else return -1;
     }
 
-    /**
-     * Provides a common approach for sub-classes to handle exceptions where a
-     * delay is required to prevent a Thread from entering a tight loop which
-     * will consume CPU and may also trigger large amounts of logging. For
-     * example, this can happen with the Acceptor thread if the ulimit for open
-     * files is reached.
-     *
-     * @param currentErrorDelay The current delay being applied on failure
-     * @return  The delay to apply on the next failure
-     */
-    protected int handleExceptionWithDelay(int currentErrorDelay) {
-        // Don't delay on first exception
-        if (currentErrorDelay > 0) {
-            try {
-                Thread.sleep(currentErrorDelay);
-            } catch (InterruptedException e) {
-                // Ignore
-            }
-        }
+    protected abstract U serverSocketAccept() throws Exception;
 
-        // On subsequent exceptions, start the delay at 50ms, doubling the delay
-        // on every subsequent exception until the delay reaches 1.6 seconds.
-        if (currentErrorDelay == 0) {
-            return INITIAL_ERROR_DELAY;
-        } else if (currentErrorDelay < MAX_ERROR_DELAY) {
-            return currentErrorDelay * 2;
-        } else {
-            return MAX_ERROR_DELAY;
-        }
+    protected abstract boolean setSocketOptions(U socket);
+
+    protected abstract void closeSocket(U socket);
+
+    protected void destroySocket(U socket) {
+        closeSocket(socket);
     }
 }
 

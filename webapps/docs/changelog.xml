@@ -52,6 +52,10 @@
         with a JSSE connector and an explicit alias has not been configured.
         (markt)
       </fix>
+      <scode>
+        Extract the common Acceptor code from each Endpoint into a new Acceptor
+        class that is used by all Endpoints. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>

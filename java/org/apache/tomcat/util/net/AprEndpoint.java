@@ -52,8 +52,8 @@ import org.apache.tomcat.jni.Status;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
-import org.apache.tomcat.util.net.AbstractEndpoint.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.SSLHostConfig.Type;
 import org.apache.tomcat.util.net.openssl.OpenSSLEngine;
 
@@ -73,7 +73,7 @@ import org.apache.tomcat.util.net.openssl.OpenSSLEngine;
  * @author Mladen Turk
  * @author Remy Maucherat
  */
-public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
+public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallBack {
 
     // -------------------------------------------------------------- Constants
 
@@ -636,7 +636,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                     // Ignore
                 }
             }
-            for (AbstractEndpoint.Acceptor acceptor : acceptors) {
+            for (Acceptor<Long> acceptor : acceptors) {
                 long waitLeft = 10000;
                 while (waitLeft > 0 &&
                         acceptor.getState() != AcceptorState.ENDED &&
@@ -723,8 +723,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     // ------------------------------------------------------ Protected Methods
 
     @Override
-    protected AbstractEndpoint.Acceptor createAcceptor() {
-        return new Acceptor();
+    protected Acceptor<Long> createAcceptor() {
+        return new Acceptor<>(this);
     }
 
 
@@ -817,20 +817,20 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
      *  and processing may continue, <code>false</code> if the socket needs to be
      *  close immediately
      */
-    protected boolean processSocketWithOptions(long socket) {
+    @Override
+    protected boolean setSocketOptions(Long socket) {
         try {
             // During shutdown, executor may be null - avoid NPE
             if (running) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("endpoint.debug.socket",
-                            Long.valueOf(socket)));
+                    log.debug(sm.getString("endpoint.debug.socket", socket));
                 }
-                AprSocketWrapper wrapper = new AprSocketWrapper(Long.valueOf(socket), this);
+                AprSocketWrapper wrapper = new AprSocketWrapper(socket, this);
                 wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
                 wrapper.setSecure(isSSLEnabled());
                 wrapper.setReadTimeout(getConnectionTimeout());
                 wrapper.setWriteTimeout(getConnectionTimeout());
-                connections.put(Long.valueOf(socket), wrapper);
+                connections.put(socket, wrapper);
                 getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
             }
         } catch (RejectedExecutionException x) {
@@ -844,6 +844,20 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             return false;
         }
         return true;
+    }
+
+
+    @Override
+    protected Long serverSocketAccept() throws Exception {
+        long socket = Socket.accept(serverSock);
+        if (log.isDebugEnabled()) {
+            long sa = Address.get(Socket.APR_REMOTE, socket);
+            Sockaddr addr = Address.getInfo(sa);
+            log.debug(sm.getString("endpoint.apr.remoteport",
+                    Long.valueOf(socket),
+                    Long.valueOf(addr.port)));
+        }
+        return Long.valueOf(socket);
     }
 
 
@@ -870,6 +884,12 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     }
 
 
+    @Override
+    protected void closeSocket(Long socket) {
+        closeSocket(socket.longValue());
+    }
+
+
     private void closeSocket(long socket) {
         // Once this is called, the mapping from socket to wrapper will no
         // longer be required.
@@ -879,6 +899,17 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             ((AprSocketWrapper) wrapper).close();
         }
     }
+
+    /*
+     * This method should only be called if there is no chance that the socket
+     * is currently being used by the Poller. It is generally a bad idea to call
+     * this directly from a known error condition.
+     */
+    @Override
+    protected void destroySocket(Long socket) {
+        destroySocket(socket.longValue());
+    }
+
 
     /*
      * This method should only be called if there is no chance that the socket
@@ -910,105 +941,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
     protected Log getLog() {
         return log;
     }
-
-    // --------------------------------------------------- Acceptor Inner Class
-    /**
-     * The background thread that listens for incoming TCP/IP connections and
-     * hands them off to an appropriate processor.
-     */
-    protected class Acceptor extends AbstractEndpoint.Acceptor {
-
-        private final Log log = LogFactory.getLog(AprEndpoint.Acceptor.class);
-
-        @Override
-        public void run() {
-
-            int errorDelay = 0;
-
-            // Loop until we receive a shutdown command
-            while (running) {
-
-                // Loop if endpoint is paused
-                while (paused && running) {
-                    state = AcceptorState.PAUSED;
-                    try {
-                        Thread.sleep(50);
-                    } catch (InterruptedException e) {
-                        // Ignore
-                    }
-                }
-
-                if (!running) {
-                    break;
-                }
-                state = AcceptorState.RUNNING;
-
-                try {
-                    //if we have reached max connections, wait
-                    countUpOrAwaitConnection();
-
-                    long socket = 0;
-                    try {
-                        // Accept the next incoming connection from the server
-                        // socket
-                        socket = Socket.accept(serverSock);
-                        if (log.isDebugEnabled()) {
-                            long sa = Address.get(Socket.APR_REMOTE, socket);
-                            Sockaddr addr = Address.getInfo(sa);
-                            log.debug(sm.getString("endpoint.apr.remoteport",
-                                    Long.valueOf(socket),
-                                    Long.valueOf(addr.port)));
-                        }
-                    } catch (Exception e) {
-                        // We didn't get a socket
-                        countDownConnection();
-                        if (running) {
-                            // Introduce delay if necessary
-                            errorDelay = handleExceptionWithDelay(errorDelay);
-                            // re-throw
-                            throw e;
-                        } else {
-                            break;
-                        }
-                    }
-                    // Successful accept, reset the error delay
-                    errorDelay = 0;
-
-                    if (running && !paused) {
-                        // Hand this socket off to an appropriate processor
-                        if (!processSocketWithOptions(socket)) {
-                            // Close socket right away
-                            closeSocket(socket);
-                        }
-                    } else {
-                        // Close socket right away
-                        // No code path could have added the socket to the
-                        // Poller so use destroySocket()
-                        destroySocket(socket);
-                    }
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    String msg = sm.getString("endpoint.accept.fail");
-                    if (t instanceof Error) {
-                        Error e = (Error) t;
-                        if (e.getError() == 233) {
-                            // Not an error on HP-UX so log as a warning
-                            // so it can be filtered out on that platform
-                            // See bug 50273
-                            log.warn(msg, t);
-                        } else {
-                            log.error(msg, t);
-                        }
-                    } else {
-                            log.error(msg, t);
-                    }
-                }
-                // The processor will recycle itself when it finishes
-            }
-            state = AcceptorState.ENDED;
-        }
-    }
-
 
     // -------------------------------------------------- SocketInfo Inner Class
 
