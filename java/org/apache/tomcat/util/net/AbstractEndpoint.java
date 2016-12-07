@@ -46,9 +46,9 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
 /**
  * @param <S> The type used by the socket wrapper associated with this endpoint.
- *            May be the same as <U>.
+ *            May be the same as U.
  * @param <U> The type of the underlying socket used by this endpoint. May be
- *            the same as <S>.
+ *            the same as S.
  *
  * @author Mladen Turk
  * @author Remy Maucherat
