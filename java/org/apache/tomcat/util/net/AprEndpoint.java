@@ -722,12 +722,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
     // ------------------------------------------------------ Protected Methods
 
-    @Override
-    protected Acceptor<Long> createAcceptor() {
-        return new Acceptor<>(this);
-    }
-
-
     /**
      * Process the specified connection.
      * @param socketWrapper The socket wrapper

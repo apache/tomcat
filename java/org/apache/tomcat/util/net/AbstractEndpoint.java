@@ -932,12 +932,13 @@ public abstract class AbstractEndpoint<S,U> {
         startInternal();
     }
 
+
     protected final void startAcceptorThreads() {
         int count = getAcceptorThreadCount();
         acceptors = new ArrayList<>(count);
 
         for (int i = 0; i < count; i++) {
-            Acceptor<U> acceptor = createAcceptor();
+            Acceptor<U> acceptor = new Acceptor<>(this);
             String threadName = getName() + "-Acceptor-" + i;
             acceptor.setThreadName(threadName);
             acceptors.add(acceptor);
@@ -947,13 +948,6 @@ public abstract class AbstractEndpoint<S,U> {
             t.start();
         }
     }
-
-
-    /**
-     * Hook to allow Endpoints to provide a specific Acceptor implementation.
-     * @return the acceptor
-     */
-    protected abstract Acceptor<U> createAcceptor();
 
 
     /**

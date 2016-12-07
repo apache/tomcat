@@ -330,12 +330,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     }
 
 
-    @Override
-    protected Acceptor<SocketChannel> createAcceptor() {
-        return new Acceptor<>(this);
-    }
-
-
     /**
      * Process the specified connection.
      * @param socket The socket channel

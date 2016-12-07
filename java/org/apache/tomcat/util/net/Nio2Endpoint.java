@@ -277,11 +277,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
     // ------------------------------------------------------ Protected Methods
 
-    @Override
-    protected Acceptor<AsynchronousSocketChannel> createAcceptor() {
-        return new Acceptor<>(this);
-    }
-
     /**
      * Process the specified connection.
      * @param socket The socket channel
