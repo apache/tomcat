@@ -52,6 +52,12 @@
         with a JSSE connector and an explicit alias has not been configured.
         (markt)
       </fix>
+      <fix>
+        <bug>60451</bug>: Correctly handle HTTP/2 header values that contain
+        characters with unicode code points in the range 128 to 255. Reject
+        with a clear error message HTTP/2 header values that contain characters
+        with unicode code points above 255. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

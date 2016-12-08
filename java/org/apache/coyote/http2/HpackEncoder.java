@@ -218,7 +218,7 @@ public class HpackEncoder {
         target.put((byte) 0); //to use encodeInteger we need to place the first byte in the buffer.
         Hpack.encodeInteger(target, headerName.length(), 7);
         for (int j = 0; j < headerName.length(); ++j) {
-            target.put(Hpack.toLower((byte) headerName.charAt(j)));
+            target.put((byte) Hpack.toLower(headerName.charAt(j)));
         }
 
     }

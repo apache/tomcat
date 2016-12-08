@@ -204,11 +204,11 @@ final class Hpack {
     }
 
 
-    static byte toLower(byte b) {
-        if (b >= 'A' && b <= 'Z') {
-            return (byte) (b + LOWER_DIFF);
+    static char toLower(char c) {
+        if (c >= 'A' && c <= 'Z') {
+            return (char) (c + LOWER_DIFF);
         }
-        return b;
+        return c;
     }
 
     private Hpack() {}
