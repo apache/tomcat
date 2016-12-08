@@ -56,6 +56,12 @@
         Extract the common Acceptor code from each Endpoint into a new Acceptor
         class that is used by all Endpoints. (markt)
       </scode>
+      <fix>
+        <bug>60451</bug>: Correctly handle HTTP/2 header values that contain
+        characters with unicode code points in the range 128 to 255. Reject
+        with a clear error message HTTP/2 header values that contain characters
+        with unicode code points above 255. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

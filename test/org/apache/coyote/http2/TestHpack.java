@@ -85,6 +85,39 @@ public class TestHpack {
         }
     }
 
-    // TODO: Write more complete tests
+    @Test
+    public void testHeaderValueBug60451() throws HpackException {
+        doTestHeaderValueBug60451("fooébar");
+    }
 
+    @Test
+    public void testHeaderValueFullRange() {
+        for (int i = 0; i < 256; i++) {
+            // Skip the control characters except VTAB
+            if (i == 9 || i > 31 && i < 127 || i > 127) {
+                try {
+                    doTestHeaderValueBug60451("foo" + Character.toString((char) i)  + "bar");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Assert.fail(e.getMessage() + "[" + i + "]");
+                }
+            }
+        }
+    }
+
+    private void doTestHeaderValueBug60451(String filename) throws HpackException {
+        String headerName = "Content-Disposition";
+        String headerValue = "attachment;filename=\"" + filename + "\"";
+        MimeHeaders headers = new MimeHeaders();
+        headers.setValue(headerName).setString(headerValue);
+        ByteBuffer output = ByteBuffer.allocate(512);
+        HpackEncoder encoder = new HpackEncoder(1024);
+        encoder.encode(headers, output);
+        output.flip();
+        MimeHeaders headers2 = new MimeHeaders();
+        HpackDecoder decoder = new HpackDecoder();
+        decoder.setHeaderEmitter(new HeadersListener(headers2));
+        decoder.decode(output);
+        Assert.assertEquals(headerValue, headers2.getHeader(headerName));
+    }
 }

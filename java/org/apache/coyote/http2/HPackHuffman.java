@@ -434,7 +434,11 @@ public class HPackHuffman {
         //so we end up iterating twice
         int length = 0;
         for (int i = 0; i < toEncode.length(); ++i) {
-            byte c = (byte) toEncode.charAt(i);
+            char c = toEncode.charAt(i);
+            if (c > 255) {
+                throw new IllegalArgumentException(sm.getString("hpack.invalidCharacter",
+                        Character.toString(c), Integer.valueOf(c)));
+            }
             if(forceLowercase) {
                 c = Hpack.toLower(c);
             }
@@ -450,7 +454,7 @@ public class HPackHuffman {
         int bytePos = 0;
         byte currentBufferByte = 0;
         for (int i = 0; i < toEncode.length(); ++i) {
-            byte c = (byte) toEncode.charAt(i);
+            char c = toEncode.charAt(i);
             if(forceLowercase) {
                 c = Hpack.toLower(c);
             }
