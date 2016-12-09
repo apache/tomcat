@@ -571,11 +571,11 @@ public class SSLHostConfig implements Serializable {
 
     public String getTruststoreProvider() {
         if (truststoreProvider == null) {
-            if (defaultCertificate == null) {
-                return SSLHostConfigCertificate.DEFAULT_KEYSTORE_PROVIDER;
-            } else {
-                return defaultCertificate.getCertificateKeystoreProvider();
+            Set<SSLHostConfigCertificate> certificates = getCertificates();
+            if (certificates.size() == 1) {
+                return certificates.iterator().next().getCertificateKeystoreProvider();
             }
+            return SSLHostConfigCertificate.DEFAULT_KEYSTORE_PROVIDER;
         } else {
             return truststoreProvider;
         }
@@ -590,11 +590,16 @@ public class SSLHostConfig implements Serializable {
 
     public String getTruststoreType() {
         if (truststoreType == null) {
-            if (defaultCertificate == null) {
-                return SSLHostConfigCertificate.DEFAULT_KEYSTORE_TYPE;
-            } else {
-                return defaultCertificate.getCertificateKeystoreType();
+            Set<SSLHostConfigCertificate> certificates = getCertificates();
+            if (certificates.size() == 1) {
+                String keystoreType = certificates.iterator().next().getCertificateKeystoreType();
+                // Don't use keystore type as the default if we know it is not
+                // going to be used as a trust store type
+                if (!"PKCS12".equalsIgnoreCase(keystoreType)) {
+                    return keystoreType;
+                }
             }
+            return SSLHostConfigCertificate.DEFAULT_KEYSTORE_TYPE;
         } else {
             return truststoreType;
         }

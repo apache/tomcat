@@ -1320,8 +1320,11 @@
       <p>JSSE only.</p>
       <p>The type of key store used for the trust store. The default is the
       value of the <code>javax.net.ssl.trustStoreType</code> system property. If
-      that property is null, the value of <code>keystoreType</code> is used as
-      the default.</p>
+      that property is null, a single certificate has been configured for this
+      TLS virtual host and that certificate has a <code>keystoreType</code> that
+      is not <code>PKCS12</code> then the default will be the
+      <code>keystoreType</code> of the single certificate. If none of these
+      identify a default, the default will be <code>JKS</code>.</p>
      </attribute>
 
   </attributes>

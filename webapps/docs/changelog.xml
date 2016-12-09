@@ -53,6 +53,12 @@
         (markt)
       </fix>
       <fix>
+        <bug>60450</bug>: Improve the selection algorithm for the default trust
+        store type for a TLS Virtual Host. In particular, don't use
+        <code>PKCS12</code> as a default trust store type. Better document how
+        the default trust store type is selected for a TLS virtual host. (markt)
+      </fix>
+      <fix>
         <bug>60451</bug>: Correctly handle HTTP/2 header values that contain
         characters with unicode code points in the range 128 to 255. Reject
         with a clear error message HTTP/2 header values that contain characters
