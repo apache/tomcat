@@ -117,7 +117,7 @@
       </add>
       <fix>
         <bug>60431</bug>: Improve handling of varargs in UEL expressions. Based
-        on a patch by Ben. (markt)
+        on a patch by Ben Wolfe. (markt)
       </fix>
     </changelog>
   </subsection>
