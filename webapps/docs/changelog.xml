@@ -101,6 +101,9 @@
         (markt)
       </fix>
       <fix>
+        Ensure sendfile is enabled by default for APR. (markt)
+      </fix>
+      <fix>
         Prevent read time out when the file is deleted while serving the
         response. The issue was observed only with APR Connector and
         sendfile enabled. (violetagg)
