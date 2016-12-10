@@ -2194,7 +2194,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
          * @return true if all the data has been sent right away, and false
          *              otherwise
          */
-        public boolean add(SendfileData data) {
+        public SendfileState add(SendfileData data) {
             // Initialize fd from data given
             try {
                 data.fdpool = Socket.pool(data.socket);
@@ -2212,7 +2212,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                         if (!(-nw == Status.EAGAIN)) {
                             Pool.destroy(data.fdpool);
                             data.socket = 0;
-                            return false;
+                            return SendfileState.ERROR;
                         } else {
                             // Break the loop and add the socket to poller.
                             break;
@@ -2225,13 +2225,13 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                             // Set back socket to blocking mode
                             Socket.timeoutSet(
                                     data.socket, getSoTimeout() * 1000);
-                            return true;
+                            return SendfileState.DONE;
                         }
                     }
                 }
             } catch (Exception e) {
                 log.warn(sm.getString("endpoint.sendfile.error"), e);
-                return false;
+                return SendfileState.ERROR;
             }
             // Add socket to the list. Newly added sockets will wait
             // at most for pollTime before being polled
@@ -2239,7 +2239,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 addS.add(data);
                 this.notify();
             }
-            return false;
+            return SendfileState.PENDING;
         }
 
         /**

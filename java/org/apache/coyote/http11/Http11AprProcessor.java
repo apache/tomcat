@@ -212,21 +212,22 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
         if (sendfileData != null && !getErrorState().isError()) {
             sendfileData.socket = socketWrapper.getSocket().longValue();
             sendfileData.keepAlive = keepAlive;
-            if (!((AprEndpoint)endpoint).getSendfile().add(sendfileData)) {
-                // Didn't send all of the data to sendfile.
-                if (sendfileData.socket == 0) {
-                    // The socket is no longer set. Something went wrong.
-                    // Close the connection. Too late to set status code.
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString(
-                                "http11processor.sendfile.error"));
-                    }
-                    setErrorState(ErrorState.CLOSE_NOW, null);
-                } else {
-                    // The sendfile Poller will add the socket to the main
-                    // Poller once sendfile processing is complete
-                    sendfileInProgress = true;
+            switch (((AprEndpoint)endpoint).getSendfile().add(sendfileData)) {
+            case DONE:
+                return false;
+            case PENDING:
+                // The sendfile Poller will add the socket to the main
+                // Poller once sendfile processing is complete
+                sendfileInProgress = true;
+                return true;
+            case ERROR:
+                // Something went wrong.
+                // Close the connection. Too late to set status code.
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString(
+                            "http11processor.sendfile.error"));
                 }
+                setErrorState(ErrorState.CLOSE_NOW, null);
                 return true;
             }
         }

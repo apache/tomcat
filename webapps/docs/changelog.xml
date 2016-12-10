@@ -100,6 +100,11 @@
         of a specific type such as <code>0.0.0.0</code> or <code>::</code>.
         (markt)
       </fix>
+      <fix>
+        Prevent read time out when the file is deleted while serving the
+        response. The issue was observed only with APR Connector and
+        sendfile enabled. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

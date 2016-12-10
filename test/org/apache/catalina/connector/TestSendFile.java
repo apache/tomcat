@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -174,7 +173,6 @@ public class TestSendFile extends TomcatBaseTest {
     }
 
 
-    @Ignore
     @Test
     public void testBug60409() throws Exception {
         Tomcat tomcat = getTomcatInstance();
