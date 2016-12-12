@@ -126,6 +126,13 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
         String serverCredential = mutate(userCredential, salt, iterations);
 
+        // Failed to generate server credential from user credential. Points to
+        // a configuration issue. The root cause should have been logged in the
+        // mutate() method.
+        if (serverCredential == null) {
+            return null;
+        }
+
         if (saltLength == 0 && iterations == 1) {
             // Output the simple/old format for backwards compatibility
             return serverCredential;
@@ -155,6 +162,13 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
     protected boolean matchesSaltIterationsEncoded(String inputCredentials,
             String storedCredentials) {
 
+        if (storedCredentials == null) {
+            // Stored credentials are invalid
+            // This may be expected if nested credential handlers are being used
+            logInvalidStoredCredentials(storedCredentials);
+            return false;
+        }
+
         int sep1 = storedCredentials.indexOf('$');
         int sep2 = storedCredentials.indexOf('$', sep1 + 1);
 
@@ -178,7 +192,13 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
             return false;
         }
 
-        String inputHexEncoded = mutate(inputCredentials, salt, iterations);
+        String inputHexEncoded = mutate(inputCredentials, salt, iterations,
+                HexUtils.fromHexString(storedHexEncoded).length * Byte.SIZE);
+        if (inputHexEncoded == null) {
+            // Failed to mutate user credentials. Automatic fail.
+            // Root cause should be logged by mutate()
+            return false;
+        }
 
         return storedHexEncoded.equalsIgnoreCase(inputHexEncoded);
     }
@@ -204,7 +224,8 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
 
     /**
      * Generates the equivalent stored credentials for the given input
-     * credentials, salt and iterations.
+     * credentials, salt and iterations. If the algorithm requires a key length,
+     * the default will be used.
      *
      * @param inputCredentials  User provided credentials
      * @param salt              Salt, if any
@@ -214,9 +235,34 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
      *                          stored credentials
      *
      * @return  The equivalent stored credentials for the given input
-     *          credentials
+     *          credentials or <code>null</code> if the generation fails
      */
     protected abstract String mutate(String inputCredentials, byte[] salt, int iterations);
+
+
+    /**
+     * Generates the equivalent stored credentials for the given input
+     * credentials, salt, iterations and key length. The default implementation
+     * calls ignores the key length and calls
+     * {@link #mutate(String, byte[], int)}. Sub-classes that use the key length
+     * should override this method.
+     *
+     * @param inputCredentials  User provided credentials
+     * @param salt              Salt, if any
+     * @param iterations        Number of iterations of the algorithm associated
+     *                          with this CredentialHandler applied to the
+     *                          inputCredentials to generate the equivalent
+     *                          stored credentials
+     * @param keyLength         Length of the produced digest in bits for
+     *                          implementations where it's applicable
+     *
+     * @return  The equivalent stored credentials for the given input
+     *          credentials or <code>null</code> if the generation fails
+     */
+    protected String mutate(String inputCredentials, byte[] salt, int iterations, int keyLength) {
+        return mutate(inputCredentials, salt, iterations);
+    }
+
 
     /**
      * Set the algorithm used to convert input credentials to stored

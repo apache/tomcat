@@ -76,12 +76,17 @@ public class SecretKeyCredentialHandler extends DigestCredentialHandlerBase {
 
     @Override
     protected String mutate(String inputCredentials, byte[] salt, int iterations) {
-        KeySpec spec = new PBEKeySpec(inputCredentials.toCharArray(), salt, iterations, getKeyLength());
+        return mutate(inputCredentials, salt, iterations, getKeyLength());
+    }
 
+
+    @Override
+    protected String mutate(String inputCredentials, byte[] salt, int iterations, int keyLength) {
         try {
+            KeySpec spec = new PBEKeySpec(inputCredentials.toCharArray(), salt, iterations, keyLength);
             return HexUtils.toHexString(secretKeyFactory.generateSecret(spec).getEncoded());
-        } catch (InvalidKeySpecException e) {
-            log.warn("pbeCredentialHandler.invalidKeySpec", e);
+        } catch (InvalidKeySpecException | IllegalArgumentException e) {
+            log.warn(sm.getString("pbeCredentialHandler.invalidKeySpec"), e);
             return null;
         }
     }

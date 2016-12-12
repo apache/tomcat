@@ -49,10 +49,12 @@ public class TestMessageDigestCredentialHandler {
 
     private void doTest(String digest, int saltLength, int iterations) throws NoSuchAlgorithmException {
         MessageDigestCredentialHandler mdch = new MessageDigestCredentialHandler();
+        MessageDigestCredentialHandler verifier = new MessageDigestCredentialHandler();
         mdch.setAlgorithm(digest);
         mdch.setIterations(iterations);
         mdch.setSaltLength(saltLength);
+        verifier.setAlgorithm(digest);
         String storedCredential = mdch.mutate(PWD);
-        Assert.assertTrue(mdch.matches(PWD, storedCredential));
+        Assert.assertTrue(verifier.matches(PWD, storedCredential));
     }
 }
