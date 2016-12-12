@@ -152,12 +152,12 @@ public class JreCompat {
      * Test if the provided exception is an instance of
      * java.lang.reflect.InaccessibleObjectException.
      *
-     * @param e The exception to test
+     * @param t The exception to test
      *
      * @return {@code true} if the exception is an instance of
      *         InaccessibleObjectException, otherwise {@code false}
      */
-    public boolean isInstanceOfInaccessibleObjectException(Exception e) {
+    public boolean isInstanceOfInaccessibleObjectException(Throwable t) {
         // Exception does not exist prior to Java 9
         return false;
     }

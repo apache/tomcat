@@ -40,11 +40,11 @@ class Jre9Compat extends Jre8Compat {
 
 
     @Override
-    public boolean isInstanceOfInaccessibleObjectException(Exception e) {
-        if (e == null) {
+    public boolean isInstanceOfInaccessibleObjectException(Throwable t) {
+        if (t == null) {
             return false;
         }
 
-        return inaccessibleObjectExceptionClazz.isAssignableFrom(e.getClass());
+        return inaccessibleObjectExceptionClazz.isAssignableFrom(t.getClass());
     }
 }
