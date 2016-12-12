@@ -52,6 +52,10 @@
         a different key length than the length currently configured for the
         <code>CredentialHandler</code>. Based on a patch by Niklas Holm. (markt)
       </fix>
+      <update>
+        Update the warnings that reference required options for running on Java
+        9 to use the latest syntax for those options. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
