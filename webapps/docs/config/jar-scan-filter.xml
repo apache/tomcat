@@ -97,8 +97,8 @@
     case-sensitively. The following two special characters are supported:</p>
 
     <ul>
-      <li>'*' &#151; means zero or more characters,</li>
-      <li>'?' &#151; means one and only one character.</li>
+      <li>'*' - means zero or more characters,</li>
+      <li>'?' - means one and only one character.</li>
     </ul>
 
     <p>Note that excluding a JAR from the pluggability scan will prevent a
