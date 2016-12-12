@@ -83,6 +83,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <fix>
+        <bug>60467</bug>: remove problematic characters from XML documentation.
+        Based upon a patch by Michael Osipov. (schultz)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M15 (markt)" rtext="2016-12-08">
   <subsection name="Other">
