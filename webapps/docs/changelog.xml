@@ -90,6 +90,10 @@
         in the <code>Authenticator</code>. Patch provided by Michael Osipov.
         (markt)
       </fix>
+      <update>
+        Update the warnings that reference required options for running on Java
+        9 to use the latest syntax for those options. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
