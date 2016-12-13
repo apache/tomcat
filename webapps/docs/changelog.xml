@@ -77,6 +77,12 @@
         with a clear error message HTTP/2 header values that contain characters
         with unicode code points above 255. (markt)
       </fix>
+      <fix>
+        Improve the logic that selects an address to use to unlock the Acceptor
+        to take account of platforms what do not listen on all local addresses
+        when configured with an address of <code>0.0.0.0</code> or
+        <code>::</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
