@@ -875,7 +875,8 @@ public abstract class AbstractEndpoint<S,U> {
             if (linkLocalUnlockAddress != null) {
                 return new InetSocketAddress(linkLocalUnlockAddress, localAddress.getPort());
             }
-            return null;
+            // Fallback
+            return new InetSocketAddress("localhost", localAddress.getPort());
         } else {
             return localAddress;
         }
