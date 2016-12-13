@@ -20,6 +20,8 @@ import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -581,26 +583,7 @@ public abstract class AbstractEndpoint<S> {
             if (address == null) {
                 saddr = new InetSocketAddress("localhost", getLocalPort());
             } else if (address.isAnyLocalAddress()) {
-                // Need a local address of the same type (IPv4 or IPV6) as the
-                // configured bind address since the connector may be configured
-                // to not map between types.
-                InetAddress localAddress = null;
-                Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-                while (localAddress == null && networkInterfaces.hasMoreElements()) {
-                    NetworkInterface networkInterface = networkInterfaces.nextElement();
-                    Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-                    while (localAddress == null && inetAddresses.hasMoreElements()) {
-                        InetAddress inetAddress = inetAddresses.nextElement();
-                        if (address.getClass().isAssignableFrom(inetAddress.getClass())) {
-                            localAddress = inetAddress;
-                        }
-                    }
-                }
-                // Fall-back option
-                if (localAddress == null) {
-                    saddr = new InetSocketAddress("localhost", getLocalPort());
-                }
-                saddr = new InetSocketAddress(localAddress, getLocalPort());
+                saddr = new InetSocketAddress(getUnlockAddress(address), getLocalPort());
             } else {
                 saddr = new InetSocketAddress(address, getLocalPort());
             }
@@ -657,6 +640,50 @@ public abstract class AbstractEndpoint<S> {
                 }
             }
         }
+    }
+
+
+    private static InetAddress getUnlockAddress(InetAddress localAddress)
+            throws SocketException, UnknownHostException {
+        // Need a local address of the same type (IPv4 or IPV6) as the
+        // configured bind address since the connector may be configured
+        // to not map between types.
+        InetAddress loopbackUnlockAddress = null;
+        InetAddress linkLocalUnlockAddress = null;
+
+        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+        while (networkInterfaces.hasMoreElements()) {
+            NetworkInterface networkInterface = networkInterfaces.nextElement();
+            Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+            while (inetAddresses.hasMoreElements()) {
+                InetAddress inetAddress = inetAddresses.nextElement();
+                if (localAddress.getAddress().getClass().isAssignableFrom(inetAddress.getClass())) {
+                    if (inetAddress.isLoopbackAddress()) {
+                        if (loopbackUnlockAddress == null) {
+                            loopbackUnlockAddress = inetAddress;
+                        }
+                    } else if (inetAddress.isLinkLocalAddress()) {
+                        if (linkLocalUnlockAddress == null) {
+                            linkLocalUnlockAddress = inetAddress;
+                        }
+                    } else {
+                        // Use a non-link local, non-loop back address by default
+                        return inetAddress;
+                    }
+                }
+            }
+        }
+        // Prefer loop back over link local since on some platforms (e.g.
+        // OSX) some link local addresses are not included when listening on
+        // all local addresses.
+        if (loopbackUnlockAddress != null) {
+            return loopbackUnlockAddress;
+        }
+        if (linkLocalUnlockAddress != null) {
+            return linkLocalUnlockAddress;
+        }
+        // Fallback
+        return InetAddress.getByName("localhost");
     }
 
 
