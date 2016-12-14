@@ -117,13 +117,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public int getMaxHttpHeaderSize() { return maxHttpHeaderSize; }
     public void setMaxHttpHeaderSize(int valueI) { maxHttpHeaderSize = valueI; }
 
-    /**
-     * Maximum timeout on uploads. 5 minutes as in Apache HTTPD server.
-     */
+
     private int connectionUploadTimeout = 300000;
     /**
      * Specifies a different (usually  longer) connection timeout during data
-     * upload.
+     * upload. Default is 5 minutes as in Apache HTTPD server.
      */
     public int getConnectionUploadTimeout() { return connectionUploadTimeout; }
     /**
@@ -136,13 +134,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    /**
-     * If true, the connectionUploadTimeout will be ignored and the regular
-     * socket timeout will be used for the full duration of the connection.
-     */
     private boolean disableUploadTimeout = true;
     /**
-     * Get the flag that controls upload time-outs.
+     * Get the flag that controls upload time-outs. If true, the
+     * connectionUploadTimeout will be ignored and the regular socket timeout
+     * will be used for the full duration of the connection.
      *
      * @return {@code true} if the separate upload timeout is disabled
      */
@@ -209,11 +205,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    /**
-     * Regular expression that defines the User agents which should be
-     * restricted to HTTP/1.0 support.
-     */
     private Pattern restrictedUserAgents = null;
+    /**
+     * Get the string form of the regular expression that defines the User
+     * agents which should be restricted to HTTP/1.0 support.
+     */
     public String getRestrictedUserAgents() {
         if (restrictedUserAgents == null) {
             return null;
@@ -369,6 +365,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public UpgradeProtocol[] findUpgradeProtocols() {
         return upgradeProtocols.toArray(new UpgradeProtocol[0]);
     }
+
 
     /**
      * The protocols that are available via internal Tomcat support for access
