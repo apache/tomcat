@@ -105,9 +105,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * buffered while an SSL handshake takes place to obtain the certificate. A
      * similar buffering is required during FDORM auth.
      *
-     * @param msps The maximum size POST body to buffer in bytes
+     * @param maxSavePostSize The maximum size POST body to buffer in bytes
      */
-    public void setMaxSavePostSize(int valueI) { maxSavePostSize = valueI; }
+    public void setMaxSavePostSize(int maxSavePostSize) {
+        this.maxSavePostSize = maxSavePostSize;
+    }
 
 
     /**
@@ -120,8 +122,10 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     private int connectionUploadTimeout = 300000;
     /**
-     * Specifies a different (usually  longer) connection timeout during data
+     * Specifies a different (usually longer) connection timeout during data
      * upload. Default is 5 minutes as in Apache HTTPD server.
+     *
+     * @return The timeout in milliseconds
      */
     public int getConnectionUploadTimeout() { return connectionUploadTimeout; }
     /**
@@ -208,6 +212,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     /**
      * Obtain the String form of the regular expression that defines the user
      * agents to not use gzip with.
+     *
+     * @return The regular expression as a String
      */
     public String getNoCompressionUserAgents() {
         if (noCompressionUserAgents == null) {
@@ -280,6 +286,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     /**
      * Get the string form of the regular expression that defines the User
      * agents which should be restricted to HTTP/1.0 support.
+     *
+     * @return The regular expression as a String
      */
     public String getRestrictedUserAgents() {
         if (restrictedUserAgents == null) {
@@ -315,7 +323,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      *
      * @param server The new value to use for the server header
      */
-    public void setServer( String server ) {
+    public void setServer(String server) {
         this.server = server;
     }
 
@@ -326,8 +334,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * Note that if {@link #server} is set, any application provided value will
      * be over-ridden.
      *
-     * @return {@true} if application provided values should be removed,
-     *         otherwise {@false}
+     * @return {@code true} if application provided values should be removed,
+     *         otherwise {@code false}
      */
     public boolean getServerRemoveAppProvidedValues() { return serverRemoveAppProvidedValues; }
     public void setServerRemoveAppProvidedValues(boolean serverRemoveAppProvidedValues) {
