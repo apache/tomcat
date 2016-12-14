@@ -46,7 +46,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected Adapter adapter;
     protected final AsyncStateMachine asyncStateMachine;
     private volatile long asyncTimeout = -1;
-    protected final AbstractEndpoint<?,?> endpoint;
+    protected final Executor executor;
     protected final Request request;
     protected final Response response;
     protected volatile SocketWrapperBase<?> socketWrapper = null;
@@ -66,7 +66,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     protected AbstractProcessor(AbstractEndpoint<?,?> endpoint, Request coyoteRequest,
             Response coyoteResponse) {
-        this.endpoint = endpoint;
+        this.executor = endpoint.getExecutor();
         asyncStateMachine = new AsyncStateMachine(this);
         request = coyoteRequest;
         response = coyoteResponse;
@@ -157,10 +157,10 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * @return the Executor used by the underlying endpoint.
+     * @return the Executor used to dispatch processing to a container thread
      */
     protected Executor getExecutor() {
-        return endpoint.getExecutor();
+        return executor;
     }
 
 
