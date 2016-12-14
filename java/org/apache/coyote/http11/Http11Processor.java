@@ -129,12 +129,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Allowed compression level.
-     */
-    protected int compressionLevel = 0;
-
-
-    /**
      * Host name (used to avoid useless B2C conversion on the host name).
      */
     protected char[] hostNameC = new char[0];
@@ -192,51 +186,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Set compression level.
-     *
-     * @param compression One of <code>on</code>, <code>force</code>,
-     *                    <code>off</code> or the minimum compression size in
-     *                    bytes which implies <code>on</code>
-     */
-    public void setCompression(String compression) {
-        if (compression.equals("on")) {
-            this.compressionLevel = 1;
-        } else if (compression.equals("force")) {
-            this.compressionLevel = 2;
-        } else if (compression.equals("off")) {
-            this.compressionLevel = 0;
-        } else {
-            try {
-                // Try to parse compression as an int, which would give the
-                // minimum compression size
-                protocol.setCompressionMinSize(Integer.parseInt(compression));
-                this.compressionLevel = 1;
-            } catch (Exception e) {
-                this.compressionLevel = 0;
-            }
-        }
-    }
-
-
-    /**
-     * Return compression level.
-     *
-     * @return The current compression level in string form (off/on/force)
-     */
-    public String getCompression() {
-        switch (compressionLevel) {
-        case 0:
-            return "off";
-        case 1:
-            return "on";
-        case 2:
-            return "force";
-        }
-        return "off";
-    }
-
-
-    /**
      * Checks if any entry in the string array starts with the specified value
      *
      * @param sArray the StringArray
@@ -261,28 +210,24 @@ public class Http11Processor extends AbstractProcessor {
     private boolean isCompressable() {
 
         // Check if content is not already gzipped
-        MessageBytes contentEncodingMB =
-            response.getMimeHeaders().getValue("Content-Encoding");
+        MessageBytes contentEncodingMB = response.getMimeHeaders().getValue("Content-Encoding");
 
-        if ((contentEncodingMB != null)
-            && (contentEncodingMB.indexOf("gzip") != -1)) {
+        if ((contentEncodingMB != null) && (contentEncodingMB.indexOf("gzip") != -1)) {
             return false;
         }
 
         // If force mode, always compress (test purposes only)
-        if (compressionLevel == 2) {
+        if (protocol.getCompressionLevel() == 2) {
             return true;
         }
 
         // Check if sufficient length to trigger the compression
         long contentLength = response.getContentLengthLong();
-        if ((contentLength == -1)
-            || (contentLength > protocol.getCompressionMinSize())) {
+        if ((contentLength == -1) || (contentLength > protocol.getCompressionMinSize())) {
             // Check for compatible MIME-TYPE
             String[] compressableMimeTypes = protocol.getCompressableMimeTypes();
             if (compressableMimeTypes != null) {
-                return (startsWithStringArray(compressableMimeTypes,
-                                              response.getContentType()));
+                return (startsWithStringArray(compressableMimeTypes, response.getContentType()));
             }
         }
 
@@ -297,16 +242,14 @@ public class Http11Processor extends AbstractProcessor {
     private boolean useCompression() {
 
         // Check if browser support gzip encoding
-        MessageBytes acceptEncodingMB =
-            request.getMimeHeaders().getValue("accept-encoding");
+        MessageBytes acceptEncodingMB = request.getMimeHeaders().getValue("accept-encoding");
 
-        if ((acceptEncodingMB == null)
-            || (acceptEncodingMB.indexOf("gzip") == -1)) {
+        if ((acceptEncodingMB == null) || (acceptEncodingMB.indexOf("gzip") == -1)) {
             return false;
         }
 
         // If force mode, always compress (test purposes only)
-        if (compressionLevel == 2) {
+        if (protocol.getCompressionLevel() == 2) {
             return true;
         }
 
@@ -923,7 +866,7 @@ public class Http11Processor extends AbstractProcessor {
         // Check for compression
         boolean isCompressable = false;
         boolean useCompression = false;
-        if (entityBody && (compressionLevel > 0) && !sendingWithSendfile) {
+        if (entityBody && (protocol.getCompressionLevel() > 0) && !sendingWithSendfile) {
             isCompressable = isCompressable();
             if (isCompressable) {
                 useCompression = useCompression();

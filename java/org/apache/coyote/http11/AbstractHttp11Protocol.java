@@ -155,12 +155,53 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
+    private int compressionLevel = 0;
     /**
-     * Integrated compression support.
+     * Set compression level.
+     *
+     * @param compression One of <code>on</code>, <code>force</code>,
+     *                    <code>off</code> or the minimum compression size in
+     *                    bytes which implies <code>on</code>
      */
-    private String compression = "off";
-    public String getCompression() { return compression; }
-    public void setCompression(String valueS) { compression = valueS; }
+    public void setCompression(String compression) {
+        if (compression.equals("on")) {
+            this.compressionLevel = 1;
+        } else if (compression.equals("force")) {
+            this.compressionLevel = 2;
+        } else if (compression.equals("off")) {
+            this.compressionLevel = 0;
+        } else {
+            try {
+                // Try to parse compression as an int, which would give the
+                // minimum compression size
+                setCompressionMinSize(Integer.parseInt(compression));
+                this.compressionLevel = 1;
+            } catch (Exception e) {
+                this.compressionLevel = 0;
+            }
+        }
+    }
+
+
+    /**
+     * Return compression level.
+     *
+     * @return The current compression level in string form (off/on/force)
+     */
+    public String getCompression() {
+        switch (compressionLevel) {
+        case 0:
+            return "off";
+        case 1:
+            return "on";
+        case 2:
+            return "force";
+        }
+        return "off";
+    }
+    protected int getCompressionLevel() {
+        return compressionLevel;
+    }
 
 
     private Pattern noCompressionUserAgents = null;
@@ -737,7 +778,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     protected Processor createProcessor() {
         Http11Processor processor = new Http11Processor(this);
         processor.setAdapter(getAdapter());
-        processor.setCompression(getCompression());
         return processor;
     }
 
