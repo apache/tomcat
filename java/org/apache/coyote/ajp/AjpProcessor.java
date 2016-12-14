@@ -123,6 +123,8 @@ public class AjpProcessor extends AbstractProcessor {
 
     // ----------------------------------------------------- Instance Variables
 
+    private final AbstractAjpProtocol<?> protocol;
+
 
     /**
      * GetBody message array. Not static like the other message arrays since the
@@ -245,6 +247,7 @@ public class AjpProcessor extends AbstractProcessor {
     public AjpProcessor(AbstractAjpProtocol<?> protocol) {
 
         super(protocol);
+        this.protocol = protocol;
 
         int packetSize = protocol.getPacketSize();
         // Calculate maximum chunk size as packetSize may have been changed from
