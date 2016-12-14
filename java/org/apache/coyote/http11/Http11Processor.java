@@ -135,12 +135,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Maximum number of Keep-Alive requests to honor.
-     */
-    protected int maxKeepAliveRequests = -1;
-
-
-    /**
      * Maximum timeout on uploads. 5 minutes as in Apache HTTPD server.
      */
     protected int connectionUploadTimeout = 300000;
@@ -372,29 +366,6 @@ public class Http11Processor extends AbstractProcessor {
         } else {
             this.restrictedUserAgents = Pattern.compile(restrictedUserAgents);
         }
-    }
-
-
-    /**
-     * Set the maximum number of Keep-Alive requests to allow.
-     * This is to safeguard from DoS attacks. Setting to a negative
-     * value disables the limit.
-     *
-     * @param mkar The new maximum number of Keep-Alive requests allowed
-     */
-    public void setMaxKeepAliveRequests(int mkar) {
-        maxKeepAliveRequests = mkar;
-    }
-
-
-    /**
-     * Get the maximum number of Keep-Alive requests allowed. A negative value
-     * means there is no limit.
-     *
-     * @return the number of Keep-Alive requests that we will allow.
-     */
-    public int getMaxKeepAliveRequests() {
-        return maxKeepAliveRequests;
     }
 
 
@@ -761,6 +732,7 @@ public class Http11Processor extends AbstractProcessor {
                 }
             }
 
+            int maxKeepAliveRequests = protocol.getMaxKeepAliveRequests();
             if (maxKeepAliveRequests == 1) {
                 keepAlive = false;
             } else if (maxKeepAliveRequests > 0 &&
