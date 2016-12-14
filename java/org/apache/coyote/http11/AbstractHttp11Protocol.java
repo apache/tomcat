@@ -105,15 +105,22 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public int getMaxHttpHeaderSize() { return maxHttpHeaderSize; }
     public void setMaxHttpHeaderSize(int valueI) { maxHttpHeaderSize = valueI; }
 
-
+    /**
+     * Maximum timeout on uploads. 5 minutes as in Apache HTTPD server.
+     */
+    private int connectionUploadTimeout = 300000;
     /**
      * Specifies a different (usually  longer) connection timeout during data
      * upload.
      */
-    private int connectionUploadTimeout = 300000;
     public int getConnectionUploadTimeout() { return connectionUploadTimeout; }
-    public void setConnectionUploadTimeout(int i) {
-        connectionUploadTimeout = i;
+    /**
+     * Set the upload timeout.
+     *
+     * @param timeout Upload timeout in milliseconds
+     */
+    public void setConnectionUploadTimeout(int timeout) {
+        connectionUploadTimeout = timeout;
     }
 
 
@@ -122,7 +129,19 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * socket timeout will be used for the full duration of the connection.
      */
     private boolean disableUploadTimeout = true;
+    /**
+     * Get the flag that controls upload time-outs.
+     *
+     * @return {@code true} if the separate upload timeout is disabled
+     */
     public boolean getDisableUploadTimeout() { return disableUploadTimeout; }
+    /**
+     * Set the flag to control whether a separate connection timeout is used
+     * during upload of a request body.
+     *
+     * @param isDisabled {@code true} if the separate upload timeout should be
+     *                   disabled
+     */
     public void setDisableUploadTimeout(boolean isDisabled) {
         disableUploadTimeout = isDisabled;
     }
@@ -648,8 +667,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     protected Processor createProcessor() {
         Http11Processor processor = new Http11Processor(this);
         processor.setAdapter(getAdapter());
-        processor.setConnectionUploadTimeout(getConnectionUploadTimeout());
-        processor.setDisableUploadTimeout(getDisableUploadTimeout());
         processor.setCompressionMinSize(getCompressionMinSize());
         processor.setCompression(getCompression());
         processor.setNoCompressionUserAgents(getNoCompressionUserAgents());

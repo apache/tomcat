@@ -135,18 +135,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Maximum timeout on uploads. 5 minutes as in Apache HTTPD server.
-     */
-    protected int connectionUploadTimeout = 300000;
-
-
-    /**
-     * Flag to disable setting a different time-out on uploads.
-     */
-    protected boolean disableUploadTimeout = false;
-
-
-    /**
      * Allowed compression level.
      */
     protected int compressionLevel = 0;
@@ -393,45 +381,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Set the flag to control whether a separate connection timeout is used
-     * during upload of a request body.
-     *
-     * @param isDisabled {@code true} if the separate upload timeout should be
-     *                   disabled
-     */
-    public void setDisableUploadTimeout(boolean isDisabled) {
-        disableUploadTimeout = isDisabled;
-    }
-
-    /**
-     * Get the flag that controls upload time-outs.
-     *
-     * @return {@code true} if the separate upload timeout is disabled
-     */
-    public boolean getDisableUploadTimeout() {
-        return disableUploadTimeout;
-    }
-
-    /**
-     * Set the upload timeout.
-     *
-     * @param timeout Upload timeout in milliseconds
-     */
-    public void setConnectionUploadTimeout(int timeout) {
-        connectionUploadTimeout = timeout ;
-    }
-
-    /**
-     * Get the upload timeout.
-     *
-     * @return Upload timeout in milliseconds
-     */
-    public int getConnectionUploadTimeout() {
-        return connectionUploadTimeout;
-    }
-
-
-    /**
      * Set the server header name.
      *
      * @param server The new value to use for the server header
@@ -650,8 +599,8 @@ public class Http11Processor extends AbstractProcessor {
                         readComplete = false;
                         break;
                     }
-                    if (!disableUploadTimeout) {
-                        socketWrapper.setReadTimeout(connectionUploadTimeout);
+                    if (!protocol.getDisableUploadTimeout()) {
+                        socketWrapper.setReadTimeout(protocol.getConnectionUploadTimeout());
                     }
                 }
             } catch (IOException e) {
@@ -802,7 +751,7 @@ public class Http11Processor extends AbstractProcessor {
                 }
             }
 
-            if (!disableUploadTimeout) {
+            if (!protocol.getDisableUploadTimeout()) {
                 int connectionTimeout = endpoint.getConnectionTimeout();
                 if(connectionTimeout > 0) {
                     socketWrapper.setReadTimeout(connectionTimeout);
