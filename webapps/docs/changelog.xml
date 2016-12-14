@@ -145,6 +145,11 @@
         Correct a typo in Host Configuration Reference.
         Issue reported via comments.apache.org. (violetagg)
       </fix>
+      <add>
+        In the documentation web application, be explicit that clustering
+        requires a secure network for all of the cluster network traffic.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">

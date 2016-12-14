@@ -43,6 +43,21 @@
   making the configuration seem like a lot, but don't lose faith, instead you have a tremendous control
   over what is going on.</p>
 </section>
+<section name="Security">
+
+<p>The cluster implementation is written on the basis that a secure, trusted
+network is used for all of the cluster related network traffic. It is not safe
+to run a cluster on a insecure, untrusted network.</p>
+
+<p>There are many options for providing a secure, trusted network for use by a
+Tomcat cluster. These include:</p>
+<ul>
+  <li>private LAN</li>
+  <li>a Virtual Private Network (VPN)</li>
+  <li>IPSEC</li>
+</ul>
+
+</section>
 <section name="Engine vs Host placement">
   <p>
    You can place the <code>&lt;Cluster&gt;</code> element inside either the <code>&lt;Engine&gt;</code>
