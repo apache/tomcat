@@ -238,11 +238,13 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    /**
-     * Server header.
-     */
     private String server;
     public String getServer() { return server; }
+    /**
+     * Set the server header name.
+     *
+     * @param server The new value to use for the server header
+     */
     public void setServer( String server ) {
         this.server = server;
     }
@@ -702,7 +704,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setCompression(getCompression());
         processor.setNoCompressionUserAgents(getNoCompressionUserAgents());
         processor.setCompressableMimeTypes(getCompressableMimeTypes());
-        processor.setServer(getServer());
         processor.setServerRemoveAppProvidedValues(getServerRemoveAppProvidedValues());
         return processor;
     }

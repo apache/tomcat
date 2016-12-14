@@ -158,12 +158,6 @@ public class Http11Processor extends AbstractProcessor {
     protected char[] hostNameC = new char[0];
 
 
-    /**
-     * Allow a customized the server header for the tin-foil hat folks.
-     */
-    private String server = null;
-
-
     /*
      * Should application provider values for the HTTP Server header be removed.
      * Note that if {@link #server} is set, any application provided value will
@@ -324,20 +318,6 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
         return false;
-    }
-
-
-    /**
-     * Set the server header name.
-     *
-     * @param server The new value to use for the server header
-     */
-    public void setServer(String server) {
-        if (server == null || server.equals("")) {
-            this.server = null;
-        } else {
-            this.server = server;
-        }
     }
 
 
@@ -1119,6 +1099,7 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         // Add server header
+        String server = protocol.getServer();
         if (server == null) {
             if (serverRemoveAppProvidedValues) {
                 headers.removeHeader("server");
