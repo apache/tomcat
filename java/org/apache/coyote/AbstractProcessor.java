@@ -27,7 +27,6 @@ import javax.servlet.RequestDispatcher;
 
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -60,13 +59,13 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     public AbstractProcessor(AbstractProtocol<?> protocol) {
-        this(protocol.getEndpoint(), new Request(), new Response());
+        this(protocol.getExecutor(), new Request(), new Response());
     }
 
 
-    protected AbstractProcessor(AbstractEndpoint<?,?> endpoint, Request coyoteRequest,
+    protected AbstractProcessor(Executor executor, Request coyoteRequest,
             Response coyoteResponse) {
-        this.executor = endpoint.getExecutor();
+        this.executor = executor;
         asyncStateMachine = new AsyncStateMachine(this);
         request = coyoteRequest;
         response = coyoteResponse;
