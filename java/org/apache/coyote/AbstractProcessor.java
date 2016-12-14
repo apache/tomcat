@@ -154,6 +154,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     /**
      * Provides a mechanism to trigger processing on a container thread.
+     *
+     * @param runnable  The task representing the processing that needs to take
+     *                  place on a container thread
      */
     protected void execute(Runnable runnable) {
         SocketWrapperBase<?> socketWrapper = this.socketWrapper;
