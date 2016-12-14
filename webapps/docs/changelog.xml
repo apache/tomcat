@@ -85,6 +85,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <add>
+        In the documentation web application, be explicit that clustering
+        requires a secure network for all of the cluster network traffic.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.9 (markt)" rtext="2016-12-08">
   <subsection name="Catalina">
