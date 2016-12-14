@@ -90,12 +90,23 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     // ------------------------------------------------ HTTP specific properties
     // ------------------------------------------ managed in the ProtocolHandler
 
-    /**
-     * Maximum size of the post which will be saved when processing certain
-     * requests, such as a POST.
-     */
     private int maxSavePostSize = 4 * 1024;
+    /**
+     * Return the maximum size of the post which will be saved during FORM or
+     * CLIENT-CERT authentication.
+     *
+     * @return The size in bytes
+     */
     public int getMaxSavePostSize() { return maxSavePostSize; }
+    /**
+     * Set the maximum size of a POST which will be buffered during FORM or
+     * CLIENT-CERT authentication. When a POST is received where the security
+     * constraints require a client certificate, the POST body needs to be
+     * buffered while an SSL handshake takes place to obtain the certificate. A
+     * similar buffering is required during FDORM auth.
+     *
+     * @param msps The maximum size POST body to buffer in bytes
+     */
     public void setMaxSavePostSize(int valueI) { maxSavePostSize = valueI; }
 
 
@@ -694,7 +705,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setCompression(getCompression());
         processor.setNoCompressionUserAgents(getNoCompressionUserAgents());
         processor.setCompressableMimeTypes(getCompressableMimeTypes());
-        processor.setMaxSavePostSize(getMaxSavePostSize());
         processor.setServer(getServer());
         processor.setServerRemoveAppProvidedValues(getServerRemoveAppProvidedValues());
         return processor;

@@ -141,12 +141,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Max saved post size.
-     */
-    protected int maxSavePostSize = 4 * 1024;
-
-
-    /**
      * Regular expression that defines the user agents to not use gzip with
      */
     protected Pattern noCompressionUserAgents = null;
@@ -330,29 +324,6 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
         return false;
-    }
-
-
-    /**
-     * Set the maximum size of a POST which will be buffered in SSL mode.
-     * When a POST is received where the security constraints require a client
-     * certificate, the POST body needs to be buffered while an SSL handshake
-     * takes place to obtain the certificate.
-     *
-     * @param msps The maximum size POST body to buffer in bytes
-     */
-    public void setMaxSavePostSize(int msps) {
-        maxSavePostSize = msps;
-    }
-
-
-    /**
-     * Return the maximum size of a POST which will be buffered in SSL mode.
-     *
-     * @return The size in bytes
-     */
-    public int getMaxSavePostSize() {
-        return maxSavePostSize;
     }
 
 
@@ -1419,7 +1390,7 @@ public class Http11Processor extends AbstractProcessor {
             // interfere with the client's handshake messages
             InputFilter[] inputFilters = inputBuffer.getFilters();
             ((BufferedInputFilter) inputFilters[Constants.BUFFERED_FILTER]).setLimit(
-                    maxSavePostSize);
+                    protocol.getMaxSavePostSize());
             inputBuffer.addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
 
             try {
