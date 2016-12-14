@@ -95,6 +95,11 @@
         <bug>60467</bug>: remove problematic characters from XML documentation.
         Based upon a patch by Michael Osipov. (schultz)
       </fix>
+      <add>
+        In the documentation web application, be explicit that clustering
+        requires a secure network for all of the cluster network traffic.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
