@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.RequestDispatcher;
@@ -157,7 +158,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected void execute(Runnable runnable) {
         SocketWrapperBase<?> socketWrapper = this.socketWrapper;
         if (socketWrapper == null) {
-            getLog().warn(sm.getString("abstractProcessor.noExecute"), new Exception());
+            throw new RejectedExecutionException(sm.getString("abstractProcessor.noExecute"));
         } else {
             socketWrapper.getExecutor().execute(runnable);
         }
