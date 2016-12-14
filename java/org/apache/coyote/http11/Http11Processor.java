@@ -147,12 +147,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * List of MIMES for which compression may be enabled.
-     */
-    protected String[] compressableMimeTypes;
-
-
-    /**
      * Host name (used to avoid useless B2C conversion on the host name).
      */
     protected char[] hostNameC = new char[0];
@@ -265,19 +259,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Set compressible mime-type list (this method is best when used with
-     * a large number of connectors, where it would be better to have all of
-     * them referenced a single array).
-     *
-     * @param compressableMimeTypes MIME types for which compression should be
-     *                              enabled
-     */
-    public void setCompressableMimeTypes(String[] compressableMimeTypes) {
-        this.compressableMimeTypes = compressableMimeTypes;
-    }
-
-
-    /**
      * Return compression level.
      *
      * @return The current compression level in string form (off/on/force)
@@ -338,6 +319,7 @@ public class Http11Processor extends AbstractProcessor {
         if ((contentLength == -1)
             || (contentLength > compressionMinSize)) {
             // Check for compatible MIME-TYPE
+            String[] compressableMimeTypes = protocol.getCompressableMimeTypes();
             if (compressableMimeTypes != null) {
                 return (startsWithStringArray(compressableMimeTypes,
                                               response.getContentType()));
