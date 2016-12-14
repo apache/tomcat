@@ -34,7 +34,7 @@
   <xsl:param    name="home-href"           select="'http://tomcat.apache.org/'"/>
   <xsl:param    name="home-logo"           select="'/images/tomcat.png'"/>
   <xsl:param    name="home-stylesheet"     select="'/images/docs-stylesheet.css'"/>
-  <xsl:param    name="apache-logo"         select="'/images/asf-feather.png'"/>
+  <xsl:param    name="apache-logo"         select="'/images/asf-logo.svg'"/>
   <xsl:param    name="subdir"              select="''"/>
   <xsl:param    name="relative-path"       select="'.'"/>
   <xsl:param    name="version"             select="'9.0.x'"/>
