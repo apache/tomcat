@@ -320,10 +320,12 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
      * @throws IOException If an exception occurs during the underlying socket
      * read operations, or if the given buffer is not big enough to accommodate
      * the whole line.
+     *
      * @return true if data is properly fed; false if no data is available
      * immediately and thread should be freed
      */
-    boolean parseRequestLine(boolean keptAlive) throws IOException {
+    boolean parseRequestLine(boolean keptAlive, int connectionTimeout, int keepAliveTimeout)
+            throws IOException {
 
         // check state
         if (!parsingRequestLine) {
@@ -341,7 +343,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     if (keptAlive) {
                         // Haven't read any request data yet so use the keep-alive
                         // timeout.
-                        wrapper.setReadTimeout(wrapper.getEndpoint().getKeepAliveTimeout());
+                        wrapper.setReadTimeout(keepAliveTimeout);
                     }
                     if (!fill(false)) {
                         // A read is pending, so no longer in initial state
@@ -350,7 +352,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     }
                     // At least one byte of the request has been received.
                     // Switch to the socket timeout.
-                    wrapper.setReadTimeout(wrapper.getEndpoint().getConnectionTimeout());
+                    wrapper.setReadTimeout(connectionTimeout);
                 }
                 if (!keptAlive && byteBuffer.position() == 0 && byteBuffer.limit() >= CLIENT_PREFACE_START.length - 1) {
                     boolean prefaceMatch = true;

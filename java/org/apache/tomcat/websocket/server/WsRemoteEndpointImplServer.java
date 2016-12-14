@@ -223,7 +223,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
             if (useDispatch) {
                 OnResultRunnable r = new OnResultRunnable(sh, t);
                 AbstractEndpoint<?,?> endpoint = socketWrapper.getEndpoint();
-                Executor containerExecutor = endpoint.getExecutor();
+                Executor containerExecutor = socketWrapper.getExecutor();
                 if (endpoint.isRunning() && containerExecutor != null) {
                     containerExecutor.execute(r);
                 } else {

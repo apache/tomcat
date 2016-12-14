@@ -375,7 +375,8 @@ public class Http11Processor extends AbstractProcessor {
 
             // Parsing the request header
             try {
-                if (!inputBuffer.parseRequestLine(keptAlive)) {
+                if (!inputBuffer.parseRequestLine(keptAlive, protocol.getConnectionTimeout(),
+                        protocol.getKeepAliveTimeout())) {
                     if (inputBuffer.getParsingRequestLinePhase() == -1) {
                         return SocketState.UPGRADING;
                     } else if (handleIncompleteRequestLineRead()) {

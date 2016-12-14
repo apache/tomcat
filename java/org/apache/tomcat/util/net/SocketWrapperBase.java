@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 import java.util.Iterator;
+import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -104,6 +105,10 @@ public abstract class SocketWrapperBase<E> {
 
     public AbstractEndpoint<E,?> getEndpoint() {
         return endpoint;
+    }
+
+    public Executor getExecutor() {
+        return endpoint.getExecutor();
     }
 
     public IOException getError() { return error; }
