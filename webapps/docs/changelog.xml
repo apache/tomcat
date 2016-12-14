@@ -150,6 +150,9 @@
         requires a secure network for all of the cluster network traffic.
         (markt)
       </add>
+      <update>
+        Update the ASF logos to the new versions.
+      </update>
     </changelog>
   </subsection>
   <subsection name="Tribes">
@@ -201,6 +204,10 @@
         whether the output of the tests is displayed on the console or not.
         Patch provided by Emmanuel Bourg. (violetagg)
       </add>
+      <update>
+        Update the ASF logos used in the Apache Tomcat installer for Windows to
+        use the new versions.
+      </update>
     </changelog>
   </subsection>
 </section>
