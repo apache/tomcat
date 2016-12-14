@@ -574,6 +574,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
 
+    public boolean isPaused() {
+        return endpoint.isPaused();
+    }
+
+
     @Override
     public void resume() throws Exception {
         if(getLog().isInfoEnabled()) {

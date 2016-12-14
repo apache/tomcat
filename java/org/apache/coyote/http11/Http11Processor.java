@@ -371,7 +371,7 @@ public class Http11Processor extends AbstractProcessor {
         boolean keptAlive = false;
 
         while (!getErrorState().isError() && keepAlive && !isAsync() &&
-                upgradeToken == null && !endpoint.isPaused()) {
+                upgradeToken == null && !protocol.isPaused()) {
 
             // Parsing the request header
             try {
@@ -383,7 +383,7 @@ public class Http11Processor extends AbstractProcessor {
                     }
                 }
 
-                if (endpoint.isPaused()) {
+                if (protocol.isPaused()) {
                     // 503 - Service unavailable
                     response.setStatus(503);
                     setErrorState(ErrorState.CLOSE_CLEAN, null);
@@ -568,7 +568,7 @@ public class Http11Processor extends AbstractProcessor {
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (getErrorState().isError() || endpoint.isPaused()) {
+        if (getErrorState().isError() || protocol.isPaused()) {
             return SocketState.CLOSED;
         } else if (isAsync()) {
             return SocketState.LONG;
@@ -613,7 +613,7 @@ public class Http11Processor extends AbstractProcessor {
         // Check to see if we have read any of the request line yet
         if (inputBuffer.getParsingRequestLinePhase() > 1) {
             // Started to read request line.
-            if (endpoint.isPaused()) {
+            if (protocol.isPaused()) {
                 // Partially processed the request so need to respond
                 response.setStatus(503);
                 setErrorState(ErrorState.CLOSE_CLEAN, null);
