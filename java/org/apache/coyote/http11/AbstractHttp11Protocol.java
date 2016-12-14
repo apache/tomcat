@@ -272,6 +272,9 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
             allowedTrailerHeaders.removeAll(toRemove);
         }
     }
+    protected Set<String> getAllowedTrailerHeadersInternal() {
+        return allowedTrailerHeaders;
+    }
     public String getAllowedTrailerHeaders() {
         // Chances of a size change between these lines are small enough that a
         // sync is unnecessary.
@@ -636,9 +639,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     @Override
     protected Processor createProcessor() {
-        Http11Processor processor = new Http11Processor(getMaxHttpHeaderSize(), getEndpoint(),
-                getMaxTrailerSize(), allowedTrailerHeaders, getMaxExtensionSize(),
-                getMaxSwallowSize(), httpUpgradeProtocols);
+        Http11Processor processor = new Http11Processor(this);
         processor.setAdapter(getAdapter());
         processor.setMaxKeepAliveRequests(getMaxKeepAliveRequests());
         processor.setConnectionUploadTimeout(getConnectionUploadTimeout());

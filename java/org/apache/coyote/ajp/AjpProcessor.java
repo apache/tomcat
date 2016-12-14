@@ -41,7 +41,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -243,10 +242,11 @@ public class AjpProcessor extends AbstractProcessor {
 
     // ------------------------------------------------------------ Constructor
 
-    public AjpProcessor(int packetSize, AbstractEndpoint<?,?> endpoint) {
+    public AjpProcessor(AbstractAjpProtocol<?> protocol) {
 
-        super(endpoint);
+        super(protocol);
 
+        int packetSize = protocol.getPacketSize();
         // Calculate maximum chunk size as packetSize may have been changed from
         // the default (Constants.MAX_PACKET_SIZE)
         this.outputMaxChunkSize =

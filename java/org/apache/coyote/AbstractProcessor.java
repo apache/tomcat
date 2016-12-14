@@ -59,8 +59,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     private ErrorState errorState = ErrorState.NONE;
 
 
-    public AbstractProcessor(AbstractEndpoint<?,?> endpoint) {
-        this(endpoint, new Request(), new Response());
+    public AbstractProcessor(AbstractProtocol<?> protocol) {
+        this(protocol.getEndpoint(), new Request(), new Response());
     }
 
 

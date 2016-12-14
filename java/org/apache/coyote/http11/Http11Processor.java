@@ -21,8 +21,6 @@ import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.util.Enumeration;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
@@ -54,7 +52,6 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.log.UserDataHelper;
-import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SendfileDataBase;
@@ -70,6 +67,8 @@ public class Http11Processor extends AbstractProcessor {
      */
     private static final StringManager sm = StringManager.getManager(Http11Processor.class);
 
+
+    private final AbstractHttp11Protocol<?> protocol;
 
     private final UserDataHelper userDataHelper;
 
@@ -215,32 +214,27 @@ public class Http11Processor extends AbstractProcessor {
     protected SendfileDataBase sendfileData = null;
 
 
-    /**
-     * UpgradeProtocol information
-     */
-    private final Map<String,UpgradeProtocol> httpUpgradeProtocols;
+    public Http11Processor(AbstractHttp11Protocol<?> protocol) {
 
+        super(protocol);
+        this.protocol = protocol;
 
-    public Http11Processor(int maxHttpHeaderSize, AbstractEndpoint<?,?> endpoint,int maxTrailerSize,
-            Set<String> allowedTrailerHeaders, int maxExtensionSize, int maxSwallowSize,
-            Map<String,UpgradeProtocol> httpUpgradeProtocols) {
-
-        super(endpoint);
         userDataHelper = new UserDataHelper(log);
 
-        inputBuffer = new Http11InputBuffer(request, maxHttpHeaderSize);
+        inputBuffer = new Http11InputBuffer(request, protocol.getMaxHttpHeaderSize());
         request.setInputBuffer(inputBuffer);
 
-        outputBuffer = new Http11OutputBuffer(response, maxHttpHeaderSize);
+        outputBuffer = new Http11OutputBuffer(response, protocol.getMaxHttpHeaderSize());
         response.setOutputBuffer(outputBuffer);
 
         // Create and add the identity filters.
-        inputBuffer.addFilter(new IdentityInputFilter(maxSwallowSize));
+        inputBuffer.addFilter(new IdentityInputFilter(protocol.getMaxSwallowSize()));
         outputBuffer.addFilter(new IdentityOutputFilter());
 
         // Create and add the chunked filters.
-        inputBuffer.addFilter(new ChunkedInputFilter(maxTrailerSize, allowedTrailerHeaders,
-                maxExtensionSize, maxSwallowSize));
+        inputBuffer.addFilter(new ChunkedInputFilter(protocol.getMaxTrailerSize(),
+                protocol.getAllowedTrailerHeadersInternal(), protocol.getMaxExtensionSize(),
+                protocol.getMaxSwallowSize()));
         outputBuffer.addFilter(new ChunkedOutputFilter());
 
         // Create and add the void filters.
@@ -255,8 +249,6 @@ public class Http11Processor extends AbstractProcessor {
         outputBuffer.addFilter(new GzipOutputFilter());
 
         pluggableFilterIndex = inputBuffer.getFilters().length;
-
-        this.httpUpgradeProtocols = httpUpgradeProtocols;
     }
 
 
@@ -731,7 +723,7 @@ public class Http11Processor extends AbstractProcessor {
                 // Check the protocol
                 String requestedProtocol = request.getHeader("Upgrade");
 
-                UpgradeProtocol upgradeProtocol = httpUpgradeProtocols.get(requestedProtocol);
+                UpgradeProtocol upgradeProtocol = protocol.getUpgradeProtocol(requestedProtocol);
                 if (upgradeProtocol != null) {
                     if (upgradeProtocol.accept(request)) {
                         // TODO Figure out how to handle request bodies at this

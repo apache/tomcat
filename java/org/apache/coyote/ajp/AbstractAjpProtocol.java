@@ -184,7 +184,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
 
     @Override
     protected Processor createProcessor() {
-        AjpProcessor processor = new AjpProcessor(getPacketSize(), getEndpoint());
+        AjpProcessor processor = new AjpProcessor(this);
         processor.setAdapter(getAdapter());
         processor.setAjpFlush(getAjpFlush());
         processor.setTomcatAuthentication(getTomcatAuthentication());
