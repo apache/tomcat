@@ -87,6 +87,11 @@
         when configured with an address of <code>0.0.0.0</code> or
         <code>::</code>. (markt)
       </fix>
+      <fix>
+        Correct a regression in the refactoring to make wider use of
+        <code>ByteBuffer</code> that caused an intermittent failure in the unit
+        tests. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Applications">

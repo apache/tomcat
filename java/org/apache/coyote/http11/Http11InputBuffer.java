@@ -284,6 +284,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
         // Copy leftover bytes to the beginning of the buffer
         if (byteBuffer.remaining() > 0 && byteBuffer.position() > 0) {
             byteBuffer.compact();
+            byteBuffer.flip();
         }
         // Always reset pos to zero
         byteBuffer.limit(byteBuffer.limit() - byteBuffer.position()).position(0);
