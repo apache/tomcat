@@ -160,7 +160,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         if (socketWrapper == null) {
             throw new RejectedExecutionException(sm.getString("abstractProcessor.noExecute"));
         } else {
-            socketWrapper.getExecutor().execute(runnable);
+            socketWrapper.execute(runnable);
         }
     }
 

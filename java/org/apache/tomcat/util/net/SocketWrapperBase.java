@@ -22,6 +22,7 @@ import java.nio.channels.CompletionHandler;
 import java.util.Iterator;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -103,12 +104,23 @@ public abstract class SocketWrapperBase<E> {
         return socket;
     }
 
-    public AbstractEndpoint<E,?> getEndpoint() {
+    protected AbstractEndpoint<E,?> getEndpoint() {
         return endpoint;
     }
 
-    public Executor getExecutor() {
-        return endpoint.getExecutor();
+    /**
+     * Transfers processing to a container thread.
+     *
+     * @param runnable The actions to process on a container thread
+     *
+     * @throws RejectedExecutionException If the runnable cannot be executed
+     */
+    public void execute(Runnable runnable) {
+        Executor executor = endpoint.getExecutor();
+        if (!endpoint.isRunning() || executor == null) {
+            throw new RejectedExecutionException();
+        }
+        executor.execute(runnable);
     }
 
     public IOException getError() { return error; }

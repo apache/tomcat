@@ -276,11 +276,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     void processStreamOnContainerThread(StreamProcessor streamProcessor, SocketEvent event) {
         StreamRunnable streamRunnable = new StreamRunnable(streamProcessor, event);
         if (streamConcurrency == null) {
-            socketWrapper.getExecutor().execute(streamRunnable);
+            socketWrapper.execute(streamRunnable);
         } else {
             if (getStreamConcurrency() < maxConcurrentStreamExecution) {
                 increaseStreamConcurrency();
-                socketWrapper.getExecutor().execute(streamRunnable);
+                socketWrapper.execute(streamRunnable);
             } else {
                 queuedRunnable.offer(streamRunnable);
             }
@@ -449,7 +449,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             StreamRunnable streamRunnable = queuedRunnable.poll();
             if (streamRunnable != null) {
                 increaseStreamConcurrency();
-                socketWrapper.getExecutor().execute(streamRunnable);
+                socketWrapper.execute(streamRunnable);
             }
         }
     }
