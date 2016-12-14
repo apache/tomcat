@@ -197,7 +197,6 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     protected Processor createProcessor() {
         AjpProcessor processor = new AjpProcessor(this);
         processor.setAdapter(getAdapter());
-        processor.setClientCertProvider(getClientCertProvider());
         return processor;
     }
 
