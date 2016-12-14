@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
-import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.RequestDispatcher;
@@ -45,7 +44,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected Adapter adapter;
     protected final AsyncStateMachine asyncStateMachine;
     private volatile long asyncTimeout = -1;
-    protected final Executor executor;
     protected final Request request;
     protected final Response response;
     protected volatile SocketWrapperBase<?> socketWrapper = null;
@@ -58,14 +56,12 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     private ErrorState errorState = ErrorState.NONE;
 
 
-    public AbstractProcessor(AbstractProtocol<?> protocol) {
-        this(protocol.getExecutor(), new Request(), new Response());
+    public AbstractProcessor() {
+        this(new Request(), new Response());
     }
 
 
-    protected AbstractProcessor(Executor executor, Request coyoteRequest,
-            Response coyoteResponse) {
-        this.executor = executor;
+    protected AbstractProcessor(Request coyoteRequest, Response coyoteResponse) {
         asyncStateMachine = new AsyncStateMachine(this);
         request = coyoteRequest;
         response = coyoteResponse;
@@ -156,10 +152,15 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * @return the Executor used to dispatch processing to a container thread
+     * Provides a mechanism to trigger processing on a container thread.
      */
-    protected Executor getExecutor() {
-        return executor;
+    protected void execute(Runnable runnable) {
+        SocketWrapperBase<?> socketWrapper = this.socketWrapper;
+        if (socketWrapper == null) {
+            getLog().warn(sm.getString("abstractProcessor.noExecute"), new Exception());
+        } else {
+            socketWrapper.getExecutor().execute(runnable);
+        }
     }
 
 

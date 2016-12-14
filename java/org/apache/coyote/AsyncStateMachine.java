@@ -422,7 +422,7 @@ public class AsyncStateMachine {
                             this.getClass().getClassLoader());
                 }
 
-                processor.getExecutor().execute(runnable);
+                processor.execute(runnable);
             } finally {
                 if (Constants.IS_SECURITY_ENABLED) {
                     PrivilegedAction<Void> pa = new PrivilegedSetTccl(

@@ -245,8 +245,7 @@ public class AjpProcessor extends AbstractProcessor {
     // ------------------------------------------------------------ Constructor
 
     public AjpProcessor(AbstractAjpProtocol<?> protocol) {
-
-        super(protocol);
+        super();
         this.protocol = protocol;
 
         int packetSize = protocol.getPacketSize();

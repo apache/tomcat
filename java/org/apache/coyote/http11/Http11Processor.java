@@ -148,8 +148,7 @@ public class Http11Processor extends AbstractProcessor {
 
 
     public Http11Processor(AbstractHttp11Protocol<?> protocol) {
-
-        super(protocol);
+        super();
         this.protocol = protocol;
 
         userDataHelper = new UserDataHelper(log);
