@@ -75,13 +75,13 @@ public class Http11Processor extends AbstractProcessor {
     /**
      * Input.
      */
-    protected final Http11InputBuffer inputBuffer;
+    private final Http11InputBuffer inputBuffer;
 
 
     /**
      * Output.
      */
-    protected final Http11OutputBuffer outputBuffer;
+    private final Http11OutputBuffer outputBuffer;
 
 
     /**
@@ -94,57 +94,57 @@ public class Http11Processor extends AbstractProcessor {
     /**
      * Keep-alive.
      */
-    protected volatile boolean keepAlive = true;
+    private volatile boolean keepAlive = true;
 
 
     /**
      * Flag used to indicate that the socket should be kept open (e.g. for keep
      * alive or send file.
      */
-    protected boolean openSocket = false;
+    private boolean openSocket = false;
 
 
     /**
      * Flag that indicates if the request headers have been completely read.
      */
-    protected boolean readComplete = true;
+    private boolean readComplete = true;
 
     /**
      * HTTP/1.1 flag.
      */
-    protected boolean http11 = true;
+    private boolean http11 = true;
 
 
     /**
      * HTTP/0.9 flag.
      */
-    protected boolean http09 = false;
+    private boolean http09 = false;
 
 
     /**
      * Content delimiter for the request (if false, the connection will
      * be closed at the end of the request).
      */
-    protected boolean contentDelimitation = true;
+    private boolean contentDelimitation = true;
 
 
     /**
      * Host name (used to avoid useless B2C conversion on the host name).
      */
-    protected char[] hostNameC = new char[0];
+    private char[] hostNameC = new char[0];
 
 
     /**
      * Instance of the new protocol to use after the HTTP connection has been
      * upgraded.
      */
-    protected UpgradeToken upgradeToken = null;
+    private UpgradeToken upgradeToken = null;
 
 
     /**
      * Sendfile data.
      */
-    protected SendfileDataBase sendfileData = null;
+    private SendfileDataBase sendfileData = null;
 
 
     public Http11Processor(AbstractHttp11Protocol<?> protocol) {
@@ -390,7 +390,7 @@ public class Http11Processor extends AbstractProcessor {
                 } else {
                     keptAlive = true;
                     // Set this every time in case limit has been changed via JMX
-                    request.getMimeHeaders().setLimit(endpoint.getMaxHeaderCount());
+                    request.getMimeHeaders().setLimit(protocol.getMaxHeaderCount());
                     if (!inputBuffer.parseHeaders()) {
                         // We've read part of the request, don't recycle it
                         // instead associate it with the socket
@@ -551,7 +551,7 @@ public class Http11Processor extends AbstractProcessor {
             }
 
             if (!protocol.getDisableUploadTimeout()) {
-                int connectionTimeout = endpoint.getConnectionTimeout();
+                int connectionTimeout = protocol.getConnectionTimeout();
                 if(connectionTimeout > 0) {
                     socketWrapper.setReadTimeout(connectionTimeout);
                 } else {
@@ -653,7 +653,7 @@ public class Http11Processor extends AbstractProcessor {
         contentDelimitation = false;
         sendfileData = null;
 
-        if (endpoint.isSSLEnabled()) {
+        if (protocol.isSSLEnabled()) {
             request.scheme().setString("https");
         }
         MessageBytes protocolMB = request.protocol();
@@ -859,7 +859,7 @@ public class Http11Processor extends AbstractProcessor {
 
         // Sendfile support
         boolean sendingWithSendfile = false;
-        if (endpoint.getUseSendfile()) {
+        if (protocol.getUseSendfile()) {
             sendingWithSendfile = prepareSendfile(outputFilters);
         }
 
@@ -1036,7 +1036,7 @@ public class Http11Processor extends AbstractProcessor {
             // If no host header, use the port info from the endpoint
             // The host will be obtained lazily from the socket if required
             // using ActionCode#REQ_LOCAL_NAME_ATTRIBUTE
-            request.setServerPort(endpoint.getPort());
+            request.setServerPort(protocol.getPort());
             return;
         }
 
