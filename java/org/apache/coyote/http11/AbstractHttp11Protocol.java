@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpUpgradeHandler;
 
@@ -201,10 +202,32 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * Regular expression that defines the User agents which should be
      * restricted to HTTP/1.0 support.
      */
-    private String restrictedUserAgents = null;
-    public String getRestrictedUserAgents() { return restrictedUserAgents; }
-    public void setRestrictedUserAgents(String valueS) {
-        restrictedUserAgents = valueS;
+    private Pattern restrictedUserAgents = null;
+    public String getRestrictedUserAgents() {
+        if (restrictedUserAgents == null) {
+            return null;
+        } else {
+            return restrictedUserAgents.toString();
+        }
+    }
+    protected Pattern getRestrictedUserAgentsPattern() {
+        return restrictedUserAgents;
+    }
+    /**
+     * Set restricted user agent list (which will downgrade the connector
+     * to HTTP/1.0 mode). Regular expression as supported by {@link Pattern}.
+     *
+     * @param restrictedUserAgents The regular expression as supported by
+     *                             {@link Pattern} for the user agents e.g.
+     *                             "gorilla|desesplorer|tigrus"
+     */
+    public void setRestrictedUserAgents(String restrictedUserAgents) {
+        if (restrictedUserAgents == null ||
+                restrictedUserAgents.length() == 0) {
+            this.restrictedUserAgents = null;
+        } else {
+            this.restrictedUserAgents = Pattern.compile(restrictedUserAgents);
+        }
     }
 
 
@@ -671,7 +694,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setCompression(getCompression());
         processor.setNoCompressionUserAgents(getNoCompressionUserAgents());
         processor.setCompressableMimeTypes(getCompressableMimeTypes());
-        processor.setRestrictedUserAgents(getRestrictedUserAgents());
         processor.setMaxSavePostSize(getMaxSavePostSize());
         processor.setServer(getServer());
         processor.setServerRemoveAppProvidedValues(getServerRemoveAppProvidedValues());

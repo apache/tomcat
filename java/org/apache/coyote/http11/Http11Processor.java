@@ -129,12 +129,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Regular expression that defines the restricted user agents.
-     */
-    protected Pattern restrictedUserAgents = null;
-
-
-    /**
      * Allowed compression level.
      */
     protected int compressionLevel = 0;
@@ -336,24 +330,6 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
         return false;
-    }
-
-
-    /**
-     * Set restricted user agent list (which will downgrade the connector
-     * to HTTP/1.0 mode). Regular expression as supported by {@link Pattern}.
-     *
-     * @param restrictedUserAgents The regular expression as supported by
-     *                             {@link Pattern} for the user agents e.g.
-     *                             "gorilla|desesplorer|tigrus"
-     */
-    public void setRestrictedUserAgents(String restrictedUserAgents) {
-        if (restrictedUserAgents == null ||
-                restrictedUserAgents.length() == 0) {
-            this.restrictedUserAgents = null;
-        } else {
-            this.restrictedUserAgents = Pattern.compile(restrictedUserAgents);
-        }
     }
 
 
@@ -910,14 +886,14 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         // Check user-agent header
+        Pattern restrictedUserAgents = protocol.getRestrictedUserAgentsPattern();
         if (restrictedUserAgents != null && (http11 || keepAlive)) {
             MessageBytes userAgentValueMB = headers.getValue("user-agent");
             // Check in the restricted list, and adjust the http11
             // and keepAlive flags accordingly
             if(userAgentValueMB != null) {
                 String userAgentValue = userAgentValueMB.toString();
-                if (restrictedUserAgents != null &&
-                        restrictedUserAgents.matcher(userAgentValue).matches()) {
+                if (restrictedUserAgents.matcher(userAgentValue).matches()) {
                     http11 = false;
                     keepAlive = false;
                 }
