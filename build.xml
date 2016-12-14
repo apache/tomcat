@@ -1913,8 +1913,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <!-- Copy deployer documentation -->
     <copy todir="${tomcat.deployer}">
       <fileset dir="${tomcat.build}/webapps/docs">
-        <include name="images/asf-logo.gif" />
-        <include name="images/tomcat.gif" />
+        <include name="images/asf-feather.png" />
+        <include name="images/tomcat.png" />
+        <include name="images/docs-stylesheet.css" />
       </fileset>
     </copy>
     <copy tofile="${tomcat.deployer}/deployer-howto.html"
