@@ -125,11 +125,14 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     }
 
 
+    private boolean tomcatAuthorization = false;
     /**
      * Should authentication be done in the native web server layer and
      * authorization in the Servlet container?
+     *
+     * @return {@code true} if authorization should be performed by Tomcat,
+     *         otherwise {@code false}
      */
-    private boolean tomcatAuthorization = false;
     public boolean getTomcatAuthorization() { return tomcatAuthorization; }
     public void setTomcatAuthorization(boolean tomcatAuthorization) {
         this.tomcatAuthorization = tomcatAuthorization;
@@ -189,7 +192,6 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     protected Processor createProcessor() {
         AjpProcessor processor = new AjpProcessor(this);
         processor.setAdapter(getAdapter());
-        processor.setTomcatAuthorization(getTomcatAuthorization());
         processor.setRequiredSecret(requiredSecret);
         processor.setKeepAliveTimeout(getKeepAliveTimeout());
         processor.setClientCertProvider(getClientCertProvider());
