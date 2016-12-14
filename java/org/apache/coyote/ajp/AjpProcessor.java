@@ -280,16 +280,6 @@ public class AjpProcessor extends AbstractProcessor {
     // ------------------------------------------------------------- Properties
 
     /**
-     * The number of milliseconds Tomcat will wait for a subsequent request
-     * before closing the connection. The default is -1 which is an infinite
-     * timeout.
-     */
-    private int keepAliveTimeout = -1;
-    public int getKeepAliveTimeout() { return keepAliveTimeout; }
-    public void setKeepAliveTimeout(int timeout) { keepAliveTimeout = timeout; }
-
-
-    /**
      * When client certificate information is presented in a form other than
      * instances of {@link java.security.cert.X509Certificate} it needs to be
      * converted before it can be used and this property controls which JSSE
@@ -329,10 +319,8 @@ public class AjpProcessor extends AbstractProcessor {
 
     @Override
     protected SocketState dispatchEndRequest() {
-        // Set keep alive timeout for next request if enabled
-        if (keepAliveTimeout > 0) {
-            socketWrapper.setReadTimeout(keepAliveTimeout);
-        }
+        // Set keep alive timeout for next request
+        socketWrapper.setReadTimeout(protocol.getKeepAliveTimeout());
         recycle();
         return SocketState.OPEN;
     }
@@ -359,10 +347,11 @@ public class AjpProcessor extends AbstractProcessor {
                 if (!readMessage(requestHeaderMessage, !keptAlive)) {
                     break;
                 }
-                // Set back timeout if keep alive timeout is enabled
-                if (keepAliveTimeout > 0) {
-                    socketWrapper.setReadTimeout(connectionTimeout);
-                }
+
+                // Processing the request so make sure the connection rather
+                // than keep-alive timeout is used
+                socketWrapper.setReadTimeout(connectionTimeout);
+
                 // Check message type, process right away and break if
                 // not regular request processing
                 int type = requestHeaderMessage.getByte();
@@ -468,10 +457,9 @@ public class AjpProcessor extends AbstractProcessor {
             request.updateCounters();
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
-            // Set keep alive timeout for next request if enabled
-            if (keepAliveTimeout > 0) {
-                socketWrapper.setReadTimeout(keepAliveTimeout);
-            }
+
+            // Set keep alive timeout for next request
+            socketWrapper.setReadTimeout(protocol.getKeepAliveTimeout());
 
             recycle();
         }

@@ -249,6 +249,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
 
+    /**
+     * The time Tomcat will wait for a subsequent request before closing the
+     * connection. The default is {@link #getConnectionTimeout()}.
+     *
+     * @return The timeout in milliseconds
+     */
     public int getKeepAliveTimeout() { return endpoint.getKeepAliveTimeout(); }
     public void setKeepAliveTimeout(int keepAliveTimeout) {
         endpoint.setKeepAliveTimeout(keepAliveTimeout);
