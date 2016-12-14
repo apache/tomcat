@@ -93,19 +93,19 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     // ------------------------------------------------- AJP specific properties
     // ------------------------------------------ managed in the ProtocolHandler
 
-    /**
-     * Send AJP flush packet when flushing.
-     * An flush packet is a zero byte AJP13 SEND_BODY_CHUNK
-     * packet. mod_jk and mod_proxy_ajp interprete this as
-     * a request to flush data to the client.
-     * AJP always does flush at the and of the response, so if
-     * it is not important, that the packets get streamed up to
-     * the client, do not use extra flush packets.
-     * For compatibility and to stay on the safe side, flush
-     * packets are enabled by default.
-     */
-    protected boolean ajpFlush = true;
+    private boolean ajpFlush = true;
     public boolean getAjpFlush() { return ajpFlush; }
+    /**
+     * Configure whether to aend an AJP flush packet when flushing. A flush
+     * packet is a zero byte AJP13 SEND_BODY_CHUNK packet. mod_jk and
+     * mod_proxy_ajp interpret this as a request to flush data to the client.
+     * AJP always does flush at the and of the response, so if it is not
+     * important, that the packets get streamed up to the client, do not use
+     * extra flush packets. For compatibility and to stay on the safe side,
+     * flush packets are enabled by default.
+     *
+     * @param ajpFlush  The new flush setting
+     */
     public void setAjpFlush(boolean ajpFlush) {
         this.ajpFlush = ajpFlush;
     }
@@ -186,7 +186,6 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     protected Processor createProcessor() {
         AjpProcessor processor = new AjpProcessor(this);
         processor.setAdapter(getAdapter());
-        processor.setAjpFlush(getAjpFlush());
         processor.setTomcatAuthentication(getTomcatAuthentication());
         processor.setTomcatAuthorization(getTomcatAuthorization());
         processor.setRequiredSecret(requiredSecret);
