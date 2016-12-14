@@ -320,12 +320,10 @@ public class AjpProcessor extends AbstractProcessor {
         // Setting up the socket
         this.socketWrapper = socket;
 
-        int connectionTimeout = endpoint.getConnectionTimeout();
         boolean cping = false;
-
         boolean keptAlive = false;
 
-        while (!getErrorState().isError() && !endpoint.isPaused()) {
+        while (!getErrorState().isError() && !protocol.isPaused()) {
             // Parsing the request header
             try {
                 // Get first message of the request
@@ -335,13 +333,13 @@ public class AjpProcessor extends AbstractProcessor {
 
                 // Processing the request so make sure the connection rather
                 // than keep-alive timeout is used
-                socketWrapper.setReadTimeout(connectionTimeout);
+                socketWrapper.setReadTimeout(protocol.getConnectionTimeout());
 
                 // Check message type, process right away and break if
                 // not regular request processing
                 int type = requestHeaderMessage.getByte();
                 if (type == Constants.JK_AJP13_CPING_REQUEST) {
-                    if (endpoint.isPaused()) {
+                    if (protocol.isPaused()) {
                         recycle();
                         break;
                     }
@@ -392,7 +390,7 @@ public class AjpProcessor extends AbstractProcessor {
                 }
             }
 
-            if (!getErrorState().isError() && !cping && endpoint.isPaused()) {
+            if (!getErrorState().isError() && !cping && protocol.isPaused()) {
                 // 503 - Service unavailable
                 response.setStatus(503);
                 setErrorState(ErrorState.CLOSE_CLEAN, null);
@@ -451,7 +449,7 @@ public class AjpProcessor extends AbstractProcessor {
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
-        if (getErrorState().isError() || endpoint.isPaused()) {
+        if (getErrorState().isError() || protocol.isPaused()) {
             return SocketState.CLOSED;
         } else {
             if (isAsync()) {
@@ -649,7 +647,7 @@ public class AjpProcessor extends AbstractProcessor {
         MimeHeaders headers = request.getMimeHeaders();
 
         // Set this every time in case limit has been changed via JMX
-        headers.setLimit(endpoint.getMaxHeaderCount());
+        headers.setLimit(protocol.getMaxHeaderCount());
 
         boolean contentLengthSet = false;
         int hCount = requestHeaderMessage.getInt();
