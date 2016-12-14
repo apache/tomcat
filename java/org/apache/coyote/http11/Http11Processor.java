@@ -158,13 +158,6 @@ public class Http11Processor extends AbstractProcessor {
     protected char[] hostNameC = new char[0];
 
 
-    /*
-     * Should application provider values for the HTTP Server header be removed.
-     * Note that if {@link #server} is set, any application provided value will
-     * be over-ridden.
-     */
-    private boolean serverRemoveAppProvidedValues = false;
-
     /**
      * Instance of the new protocol to use after the HTTP connection has been
      * upgraded.
@@ -318,11 +311,6 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
         return false;
-    }
-
-
-    public void setServerRemoveAppProvidedValues(boolean serverRemoveAppProvidedValues) {
-        this.serverRemoveAppProvidedValues = serverRemoveAppProvidedValues;
     }
 
 
@@ -1101,7 +1089,7 @@ public class Http11Processor extends AbstractProcessor {
         // Add server header
         String server = protocol.getServer();
         if (server == null) {
-            if (serverRemoveAppProvidedValues) {
+            if (protocol.getServerRemoveAppProvidedValues()) {
                 headers.removeHeader("server");
             }
         } else {

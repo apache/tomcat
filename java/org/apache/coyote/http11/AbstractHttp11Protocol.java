@@ -251,6 +251,14 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
 
     private boolean serverRemoveAppProvidedValues = false;
+    /**
+     * Should application provider values for the HTTP Server header be removed.
+     * Note that if {@link #server} is set, any application provided value will
+     * be over-ridden.
+     *
+     * @return {@true} if application provided values should be removed,
+     *         otherwise {@false}
+     */
     public boolean getServerRemoveAppProvidedValues() { return serverRemoveAppProvidedValues; }
     public void setServerRemoveAppProvidedValues(boolean serverRemoveAppProvidedValues) {
         this.serverRemoveAppProvidedValues = serverRemoveAppProvidedValues;
@@ -704,7 +712,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setCompression(getCompression());
         processor.setNoCompressionUserAgents(getNoCompressionUserAgents());
         processor.setCompressableMimeTypes(getCompressableMimeTypes());
-        processor.setServerRemoveAppProvidedValues(getServerRemoveAppProvidedValues());
         return processor;
     }
 
