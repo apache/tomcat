@@ -224,8 +224,14 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     private int compressionMinSize = 2048;
     public int getCompressionMinSize() { return compressionMinSize; }
-    public void setCompressionMinSize(int valueI) {
-        compressionMinSize = valueI;
+    /**
+     * Set Minimum size to trigger compression.
+     *
+     * @param compressionMinSize The minimum content length required for
+     *                           compression in bytes
+     */
+    public void setCompressionMinSize(int compressionMinSize) {
+        this.compressionMinSize = compressionMinSize;
     }
 
 
@@ -731,7 +737,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     protected Processor createProcessor() {
         Http11Processor processor = new Http11Processor(this);
         processor.setAdapter(getAdapter());
-        processor.setCompressionMinSize(getCompressionMinSize());
         processor.setCompression(getCompression());
         return processor;
     }

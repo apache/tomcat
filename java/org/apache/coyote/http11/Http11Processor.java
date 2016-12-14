@@ -135,12 +135,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Minimum content size to make compression.
-     */
-    protected int compressionMinSize = 2048;
-
-
-    /**
      * Host name (used to avoid useless B2C conversion on the host name).
      */
     protected char[] hostNameC = new char[0];
@@ -215,22 +209,12 @@ public class Http11Processor extends AbstractProcessor {
             try {
                 // Try to parse compression as an int, which would give the
                 // minimum compression size
-                compressionMinSize = Integer.parseInt(compression);
+                protocol.setCompressionMinSize(Integer.parseInt(compression));
                 this.compressionLevel = 1;
             } catch (Exception e) {
                 this.compressionLevel = 0;
             }
         }
-    }
-
-    /**
-     * Set Minimum size to trigger compression.
-     *
-     * @param compressionMinSize The minimum content length required for
-     *                           compression in bytes
-     */
-    public void setCompressionMinSize(int compressionMinSize) {
-        this.compressionMinSize = compressionMinSize;
     }
 
 
@@ -293,7 +277,7 @@ public class Http11Processor extends AbstractProcessor {
         // Check if sufficient length to trigger the compression
         long contentLength = response.getContentLengthLong();
         if ((contentLength == -1)
-            || (contentLength > compressionMinSize)) {
+            || (contentLength > protocol.getCompressionMinSize())) {
             // Check for compatible MIME-TYPE
             String[] compressableMimeTypes = protocol.getCompressableMimeTypes();
             if (compressableMimeTypes != null) {
