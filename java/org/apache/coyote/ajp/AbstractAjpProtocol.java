@@ -139,12 +139,17 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     }
 
 
-    /**
-     * Required secret.
-     */
     private String requiredSecret = null;
+    /**
+     * Set the required secret that must be included with every request.
+     *
+     * @param requiredSecret The required secret
+     */
     public void setRequiredSecret(String requiredSecret) {
         this.requiredSecret = requiredSecret;
+    }
+    protected String getRequiredSecret() {
+        return requiredSecret;
     }
 
 
@@ -192,7 +197,6 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     protected Processor createProcessor() {
         AjpProcessor processor = new AjpProcessor(this);
         processor.setAdapter(getAdapter());
-        processor.setRequiredSecret(requiredSecret);
         processor.setKeepAliveTimeout(getKeepAliveTimeout());
         processor.setClientCertProvider(getClientCertProvider());
         return processor;

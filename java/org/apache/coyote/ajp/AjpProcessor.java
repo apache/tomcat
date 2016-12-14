@@ -290,15 +290,6 @@ public class AjpProcessor extends AbstractProcessor {
 
 
     /**
-     * Required secret.
-     */
-    private String requiredSecret = null;
-    public void setRequiredSecret(String requiredSecret) {
-        this.requiredSecret = requiredSecret;
-    }
-
-
-    /**
      * When client certificate information is presented in a form other than
      * instances of {@link java.security.cert.X509Certificate} it needs to be
      * converted before it can be used and this property controls which JSSE
@@ -742,6 +733,7 @@ public class AjpProcessor extends AbstractProcessor {
         }
 
         // Decode extra attributes
+        String requiredSecret = protocol.getRequiredSecret();
         boolean secret = false;
         byte attributeCode;
         while ((attributeCode = requestHeaderMessage.getByte())
