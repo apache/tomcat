@@ -296,12 +296,16 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     void nextRequest() {
         request.recycle();
 
-        // Copy leftover bytes to the beginning of the buffer
-        if (byteBuffer.remaining() > 0 && byteBuffer.position() > 0) {
-            byteBuffer.compact();
+        if (byteBuffer.position() > 0) {
+            if (byteBuffer.remaining() > 0) {
+                // Copy leftover bytes to the beginning of the buffer
+                byteBuffer.compact();
+                byteBuffer.flip();
+            } else {
+                // Reset position and limit to 0
+                byteBuffer.position(0).limit(0);
+            }
         }
-        // Always reset pos to zero
-        byteBuffer.limit(byteBuffer.limit() - byteBuffer.position()).position(0);
 
         // Recycle filters
         for (int i = 0; i <= lastActiveFilter; i++) {
