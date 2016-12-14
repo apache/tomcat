@@ -141,12 +141,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Regular expression that defines the user agents to not use gzip with
-     */
-    protected Pattern noCompressionUserAgents = null;
-
-
-    /**
      * Host name (used to avoid useless B2C conversion on the host name).
      */
     protected char[] hostNameC = new char[0];
@@ -237,24 +231,6 @@ public class Http11Processor extends AbstractProcessor {
      */
     public void setCompressionMinSize(int compressionMinSize) {
         this.compressionMinSize = compressionMinSize;
-    }
-
-
-    /**
-     * Set no compression user agent pattern. Regular expression as supported
-     * by {@link Pattern}. e.g.: <code>gorilla|desesplorer|tigrus</code>.
-     *
-     * @param noCompressionUserAgents The regular expression for user agent
-     *                                strings for which compression should not
-     *                                be applied
-     */
-    public void setNoCompressionUserAgents(String noCompressionUserAgents) {
-        if (noCompressionUserAgents == null || noCompressionUserAgents.length() == 0) {
-            this.noCompressionUserAgents = null;
-        } else {
-            this.noCompressionUserAgents =
-                Pattern.compile(noCompressionUserAgents);
-        }
     }
 
 
@@ -351,12 +327,11 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         // Check for incompatible Browser
+        Pattern noCompressionUserAgents = protocol.getNoCompressionUserAgentsPattern();
         if (noCompressionUserAgents != null) {
-            MessageBytes userAgentValueMB =
-                request.getMimeHeaders().getValue("user-agent");
+            MessageBytes userAgentValueMB = request.getMimeHeaders().getValue("user-agent");
             if(userAgentValueMB != null) {
                 String userAgentValue = userAgentValueMB.toString();
-
                 if (noCompressionUserAgents.matcher(userAgentValue).matches()) {
                     return false;
                 }

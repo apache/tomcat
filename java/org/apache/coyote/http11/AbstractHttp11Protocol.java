@@ -163,12 +163,36 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public void setCompression(String valueS) { compression = valueS; }
 
 
-    private String noCompressionUserAgents = null;
+    private Pattern noCompressionUserAgents = null;
+    /**
+     * Obtain the String form of the regular expression that defines the user
+     * agents to not use gzip with.
+     */
     public String getNoCompressionUserAgents() {
+        if (noCompressionUserAgents == null) {
+            return null;
+        } else {
+            return noCompressionUserAgents.toString();
+        }
+    }
+    protected Pattern getNoCompressionUserAgentsPattern() {
         return noCompressionUserAgents;
     }
-    public void setNoCompressionUserAgents(String valueS) {
-        noCompressionUserAgents = valueS;
+    /**
+     * Set no compression user agent pattern. Regular expression as supported
+     * by {@link Pattern}. e.g.: <code>gorilla|desesplorer|tigrus</code>.
+     *
+     * @param noCompressionUserAgents The regular expression for user agent
+     *                                strings for which compression should not
+     *                                be applied
+     */
+    public void setNoCompressionUserAgents(String noCompressionUserAgents) {
+        if (noCompressionUserAgents == null || noCompressionUserAgents.length() == 0) {
+            this.noCompressionUserAgents = null;
+        } else {
+            this.noCompressionUserAgents =
+                Pattern.compile(noCompressionUserAgents);
+        }
     }
 
 
@@ -229,8 +253,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      *                             "gorilla|desesplorer|tigrus"
      */
     public void setRestrictedUserAgents(String restrictedUserAgents) {
-        if (restrictedUserAgents == null ||
-                restrictedUserAgents.length() == 0) {
+        if (restrictedUserAgents == null || restrictedUserAgents.length() == 0) {
             this.restrictedUserAgents = null;
         } else {
             this.restrictedUserAgents = Pattern.compile(restrictedUserAgents);
@@ -710,7 +733,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setAdapter(getAdapter());
         processor.setCompressionMinSize(getCompressionMinSize());
         processor.setCompression(getCompression());
-        processor.setNoCompressionUserAgents(getNoCompressionUserAgents());
         return processor;
     }
 
