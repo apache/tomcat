@@ -41,7 +41,7 @@ public final class SecurityClassLoad {
         try {
             // Ensure XMLInputFactory is loaded with Tomcat's class loader
             loader.loadClass( basePackage +
-                    "comppiler.EncodingDetector");
+                    "compiler.EncodingDetector");
 
             loader.loadClass( basePackage +
                 "runtime.JspFactoryImpl$PrivilegedGetPageContext");
