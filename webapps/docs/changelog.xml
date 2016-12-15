@@ -92,6 +92,10 @@
         <code>ByteBuffer</code> that caused an intermittent failure in the unit
         tests. (markt)
       </fix>
+      <fix>
+        <bug>60482</bug>: HTTP/2 shouldn't do URL decoding on the query string.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Applications">
