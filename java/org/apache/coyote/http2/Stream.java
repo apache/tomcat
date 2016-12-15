@@ -274,7 +274,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 String query = value.substring(queryStart + 1);
                 coyoteRequest.requestURI().setString(uri);
                 coyoteRequest.decodedURI().setString(coyoteRequest.getURLDecoder().convert(uri, false));
-                coyoteRequest.queryString().setString(coyoteRequest.getURLDecoder().convert(query, true));
+                coyoteRequest.queryString().setString(query);
             }
             break;
         }
