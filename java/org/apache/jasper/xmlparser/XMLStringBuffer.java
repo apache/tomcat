@@ -43,7 +43,10 @@ package org.apache.jasper.xmlparser;
  *
  * @author Andy Clark, IBM
  * @author Eric Ye, IBM
+ *
+ * @deprecated Will be removed in Tomcat 9.0.x onwards
  */
+@Deprecated
 public class XMLStringBuffer
     extends XMLString {
 

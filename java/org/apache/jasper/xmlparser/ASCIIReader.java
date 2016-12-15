@@ -28,7 +28,10 @@ import org.apache.jasper.compiler.Localizer;
  * byte streams that only contain 7-bit ASCII characters.
  *
  * @author Andy Clark, IBM
+ *
+ * @deprecated Will be removed in Tomcat 9.0.x onwards
  */
+@Deprecated
 public class ASCIIReader extends Reader {
 
     //
