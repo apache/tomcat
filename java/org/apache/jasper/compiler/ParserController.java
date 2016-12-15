@@ -18,12 +18,12 @@ package org.apache.jasper.compiler;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Stack;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
-import org.apache.jasper.xmlparser.XMLEncodingDetector;
 import org.apache.tomcat.Jar;
 import org.xml.sax.Attributes;
 
@@ -318,16 +318,13 @@ class ParserController implements TagConstants {
             sourceEnc = "ISO-8859-1";
         } else {
             // XML syntax or unknown, (auto)detect encoding ...
-            Object[] ret = XMLEncodingDetector.getEncoding(absFileName, jar,
-                    ctxt, err);
-            sourceEnc = (String) ret[0];
-            if (((Boolean) ret[1]).booleanValue()) {
-                isEncodingSpecifiedInProlog = true;
-            }
-            if (((Boolean) ret[2]).booleanValue()) {
-                isBomPresent = true;
-            }
-            skip = ((Integer) ret[3]).intValue();
+            InputStream inStream = JspUtil.getInputStream(absFileName, jar, ctxt);
+            EncodingDetector encodingDetector = new EncodingDetector(inStream);
+
+            sourceEnc = encodingDetector.getBomEncoding();
+            isEncodingSpecifiedInProlog = (encodingDetector.getPrologEncoding() != null);
+            isBomPresent = (encodingDetector.getSkip() > 0);
+            skip = encodingDetector.getSkip();
 
             if (!isXml && sourceEnc.equals("UTF-8")) {
                 /*
