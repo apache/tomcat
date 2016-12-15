@@ -560,6 +560,8 @@
         <exclude name="test/webapp/bug53257/**/*.txt"/>
         <exclude name="test/webapp-fragments/WEB-INF/classes/*.txt"/>
         <exclude name="test/webresources/**"/>
+        <!-- Exclude test files with unusual encodings -->
+        <exclude name="test/webapp/jsp/encoding/**"/>
       </fileset>
       <fileset dir="modules/jdbc-pool" >
         <exclude name=".*/**"/>
