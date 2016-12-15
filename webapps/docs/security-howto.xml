@@ -69,6 +69,36 @@
     <p>At the network level, consider using a firewall to limit both incoming
     and outgoing connections to only those connections you  expect to be
     present.</p>
+
+    <subsection name="JMX">
+      <p>The security of the JMX connection is dependent on the implementation
+      provided by the JRE and therefore falls outside the control of Tomact.</p>
+
+      <p>Typically, access control is very limited (either read-only to
+      everything or read-write to everything). Tomcat exposes a large amount
+      of internal information and control via JMX to aid debugging, monitoring
+      and management. Give the limited access control available, JMX access
+      should be treated as equivalent to local root/admin access and restricted
+      accordingly.</p>
+
+      <p>The JMX access control provided by most (all?) JRE vendors does not
+      log failed authentication attempts, nor does it provide an account
+      lock-out feature after repeated failed authentications. This makes a
+      brute force attack easy to mount and difficult to detect.</p>
+
+      <p>Given all of the above, care should be taken to ensure that, if used,
+      the JMX interface is appropriately secured. Options you may wish to
+      consider to secure the JMX interface include:</p>
+
+      <ul>
+        <li>configuring a strong password for all JMX users;</li>
+        <li>binding the JMX listener only to an internal network;</li>
+        <li>limiting network access to the JMX port to trusted clients; and</li>
+        <li>providing an application specific health page for use by external
+            monitoring systems.</li>
+      </ul>
+    </subsection>
+
   </section>
 
   <section name="Default web applications">
