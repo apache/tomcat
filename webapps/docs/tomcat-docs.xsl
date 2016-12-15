@@ -41,7 +41,7 @@
   <xsl:param    name="majorversion"        select="'8'"/>
   <xsl:param    name="majorminorversion"   select="'8.5'"/>
   <xsl:param    name="build-date"          select="'MMM d yyyy'"/>
-  <xsl:param    name="build-date-iso-8601" select="'yyyy-dd-MM'"/>
+  <xsl:param    name="build-date-iso-8601" select="'yyyy-MM-dd'"/>
   <xsl:param    name="year"                select="'yyyy'"/>
   <xsl:param    name="buglink"             select="'http://bz.apache.org/bugzilla/show_bug.cgi?id='"/>
   <xsl:param    name="revlink"             select="'http://svn.apache.org/viewvc?view=rev&amp;rev='"/>
