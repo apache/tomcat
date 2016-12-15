@@ -108,6 +108,11 @@
       <update>
         Update the ASF logos to the new versions.
       </update>
+      <fix>
+        <bug>60468</bug>: Correct the format of the sample ISO-8601 date used
+        to report the build date for the documentation. Patch provided by
+        Michael Osipov. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
