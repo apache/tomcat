@@ -298,12 +298,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
             Nio2SocketWrapper socketWrapper = new Nio2SocketWrapper(channel, this);
             channel.reset(socket, socketWrapper);
-            socketWrapper.setReadTimeout(getSocketProperties().getSoTimeout());
-            socketWrapper.setWriteTimeout(getSocketProperties().getSoTimeout());
-            socketWrapper.setKeepAliveLeft(Nio2Endpoint.this.getMaxKeepAliveRequests());
-            socketWrapper.setSecure(isSSLEnabled());
             socketWrapper.setReadTimeout(getConnectionTimeout());
             socketWrapper.setWriteTimeout(getConnectionTimeout());
+            socketWrapper.setKeepAliveLeft(Nio2Endpoint.this.getMaxKeepAliveRequests());
+            socketWrapper.setSecure(isSSLEnabled());
             // Continue processing on another thread
             return processSocket(socketWrapper, SocketEvent.OPEN_READ, true);
         } catch (Throwable t) {
