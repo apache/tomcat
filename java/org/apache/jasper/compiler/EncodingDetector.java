@@ -55,10 +55,8 @@ class EncodingDetector {
         // Reset the stream back to the start to allow the XML prolog detection
         // to work. Skip any BoM we discovered.
         bis.reset();
-        if (bomResult != null) {
-            for (int i = 0; i < bomResult.skip; i++) {
-                is.read();
-            }
+        for (int i = 0; i < bomResult.skip; i++) {
+            is.read();
         }
 
         prologEncoding = getPrologEncoding(bis);
