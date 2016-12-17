@@ -76,7 +76,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
             // Blocking
             for (ByteBuffer buffer : buffers) {
                 long timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
-                if (timeout < 0) {
+                if (timeout <= 0) {
                     SendResult sr = new SendResult(new SocketTimeoutException());
                     handler.onResult(sr);
                     return;
@@ -85,7 +85,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 try {
                     socketWrapper.write(true, buffer);
                     timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
-                    if (timeout < 0) {
+                    if (timeout <= 0) {
                         SendResult sr = new SendResult(new SocketTimeoutException());
                         handler.onResult(sr);
                         return;
