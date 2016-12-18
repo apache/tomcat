@@ -94,6 +94,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      Implement a simpler JSP file encoding detector that delegates XML prolog
+      encoding detection to the JRE rather than using a custom XML parser.
+      (markt)
+    </changelog>
+  </subsection>
   <subseciton name="WebSocket">
     <changelog>
       <fix>

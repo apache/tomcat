@@ -29,7 +29,10 @@ import org.apache.juli.logging.LogFactory;
  * (i.e., encodings from ISO-10646-UCS-(2|4)).
  *
  * @author Neil Graham, IBM
+ *
+ * @deprecated Will be removed in Tomcat 9.0.x onwards
  */
+@Deprecated
 public class UCSReader extends Reader {
 
     private final Log log = LogFactory.getLog(UCSReader.class);

@@ -39,6 +39,10 @@ public final class SecurityClassLoad {
 
         final String basePackage = "org.apache.jasper.";
         try {
+            // Ensure XMLInputFactory is loaded with Tomcat's class loader
+            loader.loadClass( basePackage +
+                    "compiler.EncodingDetector");
+
             loader.loadClass( basePackage +
                 "runtime.JspFactoryImpl$PrivilegedGetPageContext");
             loader.loadClass( basePackage +

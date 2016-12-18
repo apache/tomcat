@@ -38,6 +38,10 @@ import org.apache.jasper.compiler.JspUtil;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.tomcat.Jar;
 
+/**
+ * @deprecated Will be removed in Tomcat 9.0.x onwards
+ */
+@Deprecated
 public class XMLEncodingDetector {
 
     private InputStream stream;
