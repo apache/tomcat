@@ -109,7 +109,7 @@
     <changelog>
       <fix>
         Correctly handle blocking WebSocket writes when the write times out just
-        before the write is attempted. (markt) 
+        before the write is attempted. (markt)
       </fix>
     </changelog>
   </subseciton>

@@ -616,9 +616,9 @@
         <exclude name="nbproject/**"/>
         <exclude name="output/**"/>
         <exclude name="modules/**"/>
-      	<!-- Exclude these since some svn clients do not seem able to handle
-      	     UTF-16 line-ending conversion -->
-      	<exclude name="test/webapp/jsp/encoding/bom-utf16*"/>
+        <!-- Exclude these since some svn clients do not seem able to handle
+             UTF-16 line-ending conversion -->
+        <exclude name="test/webapp/jsp/encoding/bom-utf16*"/>
         <exclude name="test/webapp/jsp/encoding/bom-none-prolog-utf16*"/>
       </fileset>
       <fileset dir="modules/jdbc-pool" >
