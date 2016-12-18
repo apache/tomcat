@@ -59,6 +59,10 @@ execute.findbugs=false
 # multicast tests to work
 java.net.preferIPv4Stack=false
 
+# Specify the default (true) else the empty string will be used which
+# effectively changes the setting to false
+org.apache.tomcat.util.net.NioSelectorShared=true
+
 # Location of GPG executable (used only for releases)
 gpg.exec=/path/to/gpg
 
