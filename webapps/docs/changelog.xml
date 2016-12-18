@@ -100,7 +100,7 @@
   </subsection>
   <subsection name="Jasper">
     <changelog>
-      Implment a simpler JSP file encoding detector that delegates XML prolog
+      Implement a simpler JSP file encoding detector that delegates XML prolog
       encoding detection to the JRE rather than using a custom XML parser.
       (markt)
     </changelog>
