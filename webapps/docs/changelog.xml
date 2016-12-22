@@ -100,9 +100,19 @@
   </subsection>
   <subsection name="Jasper">
     <changelog>
-      Implement a simpler JSP file encoding detector that delegates XML prolog
-      encoding detection to the JRE rather than using a custom XML parser.
-      (markt)
+      <update>
+        Implement a simpler JSP file encoding detector that delegates XML prolog
+        encoding detection to the JRE rather than using a custom XML parser.
+        (markt)
+      </update>
+      <fix>
+        <bug>60497</bug>: Restore previous tag reuse behavior following the use
+        of try/finally. (remm)
+      </fix>
+      <fix>
+        Improve the error handling for simple tags to ensure that the tag is
+        released and destroyed once used. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subseciton name="WebSocket">

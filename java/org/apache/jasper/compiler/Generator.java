@@ -2395,6 +2395,9 @@ class Generator {
                 out.print(".get(");
                 out.print(tagHandlerClassName);
                 out.println(".class);");
+                out.printin("boolean ");
+                out.print(n.getTagHandlerPoolName());
+                out.println("_reused = false;");
             } else {
                 writeNewInstance(tagHandlerVar, tagHandlerClassName);
             }
@@ -2600,19 +2603,32 @@ class Generator {
                 out.printil("}");
             }
 
-            // Ensure clean-up takes place
-            out.popIndent();
-            out.printil("} finally {");
-            out.pushIndent();
+            // Print tag reuse
             if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
                 out.printin(n.getTagHandlerPoolName());
                 out.print(".reuse(");
                 out.print(tagHandlerVar);
                 out.println(");");
-            } else {
-                out.printin(tagHandlerVar);
-                out.println(".release();");
-                writeDestroyInstance(tagHandlerVar);
+                out.printin(n.getTagHandlerPoolName());
+                out.println("_reused = true;");
+            }
+
+            // Ensure clean-up takes place
+            out.popIndent();
+            out.printil("} finally {");
+            out.pushIndent();
+            if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
+                out.printin("if (!");
+                out.print(n.getTagHandlerPoolName());
+                out.println("_reused) {");
+                out.pushIndent();
+            }
+            out.printin(tagHandlerVar);
+            out.println(".release();");
+            writeDestroyInstance(tagHandlerVar);
+            if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
+                out.popIndent();
+                out.printil("}");
             }
             out.popIndent();
             out.printil("}");
@@ -2642,6 +2658,9 @@ class Generator {
 
             String tagHandlerClassName = tagHandlerClass.getCanonicalName();
             writeNewInstance(tagHandlerVar, tagHandlerClassName);
+
+            out.printil("try {");
+            out.pushIndent();
 
             generateSetters(n, tagHandlerVar, handlerInfo, true);
 
@@ -2694,8 +2713,15 @@ class Generator {
             declareScriptingVars(n, VariableInfo.AT_END);
             syncScriptingVars(n, VariableInfo.AT_END);
 
+            out.popIndent();
+            out.printil("} finally {");
+            out.pushIndent();
+
             // Resource injection
             writeDestroyInstance(tagHandlerVar);
+
+            out.popIndent();
+            out.printil("}");
 
             n.setEndJavaLine(out.getJavaLine());
         }
