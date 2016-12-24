@@ -95,7 +95,7 @@ class HpackEncoder {
     /**
      * The maximum table size
      */
-    private int maxTableSize;
+    private int maxTableSize = Hpack.DEFAULT_TABLE_SIZE;
 
     /**
      * The current table size
@@ -104,8 +104,7 @@ class HpackEncoder {
 
     private final HpackHeaderFunction hpackHeaderFunction;
 
-    HpackEncoder(int maxTableSize) {
-        this.maxTableSize = maxTableSize;
+    HpackEncoder() {
         this.hpackHeaderFunction = DEFAULT_HEADER_FUNCTION;
     }
 

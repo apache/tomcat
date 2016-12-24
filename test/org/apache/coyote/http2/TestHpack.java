@@ -32,7 +32,7 @@ public class TestHpack {
         headers.setValue(":status").setString("200");
         headers.setValue("header2").setString("value2");
         ByteBuffer output = ByteBuffer.allocate(512);
-        HpackEncoder encoder = new HpackEncoder(1024);
+        HpackEncoder encoder = new HpackEncoder();
         encoder.encode(headers, output);
         output.flip();
         // Size is supposed to be 33 without huffman, or 27 with it
@@ -52,7 +52,7 @@ public class TestHpack {
         headers.setValue(":status").setString("200");
         headers.setValue("header2").setString("value2");
         ByteBuffer output = ByteBuffer.allocate(512);
-        HpackEncoder encoder = new HpackEncoder(1024);
+        HpackEncoder encoder = new HpackEncoder();
         encoder.encode(headers, output);
         output.flip();
         MimeHeaders headers2 = new MimeHeaders();
@@ -111,7 +111,7 @@ public class TestHpack {
         MimeHeaders headers = new MimeHeaders();
         headers.setValue(headerName).setString(headerValue);
         ByteBuffer output = ByteBuffer.allocate(512);
-        HpackEncoder encoder = new HpackEncoder(1024);
+        HpackEncoder encoder = new HpackEncoder();
         encoder.encode(headers, output);
         output.flip();
         MimeHeaders headers2 = new MimeHeaders();
