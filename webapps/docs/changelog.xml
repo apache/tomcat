@@ -96,6 +96,11 @@
         <bug>60482</bug>: HTTP/2 shouldn't do URL decoding on the query string.
         (remm)
       </fix>
+      <fix>
+        Fix an HTTP/2 compression error. Once a new size has been agreed for the
+        dynamic HPACK table, the next header block must begin with a dynamic
+        table update. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
