@@ -38,7 +38,7 @@ public abstract class ConnectionSettingsBase<T extends Throwable> {
     protected static final int MAX_HEADER_TABLE_SIZE = 1 << 16;
 
     // Defaults
-    protected static final int DEFAULT_HEADER_TABLE_SIZE = 4096;
+    protected static final int DEFAULT_HEADER_TABLE_SIZE = Hpack.DEFAULT_TABLE_SIZE;
     protected static final boolean DEFAULT_ENABLE_PUSH = true;
     protected static final long DEFAULT_MAX_CONCURRENT_STREAMS = UNLIMITED;
     protected static final int DEFAULT_INITIAL_WINDOW_SIZE = (1 << 16) - 1;
