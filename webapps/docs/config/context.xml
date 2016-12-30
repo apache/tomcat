@@ -101,7 +101,7 @@
 
   <p>If no version is specified then the <em>context name</em> is always the
   same as the <em>context path</em>. If the <em>context path</em> is the empty
-  string them the <em>base name</em> will be ROOT (always in upper case)
+  string then the <em>base name</em> will be ROOT (always in upper case)
   otherwise the <em>base name</em> will be the <em>context path</em> with the
   leading '/' removed and any remaining '/' characters replaced with '#'.</p>
 
@@ -509,7 +509,7 @@
         security risk. However, it should be noted that RFC 6265, section 8.5
         makes clear that path alone should not be view as sufficient to prevent
         untrusted applications accessing cookies from other applications. To
-        mitigate this risk, this attribute may bet ste to <code>true</code> and
+        mitigate this risk, this attribute may be set to <code>true</code> and
         Tomcat will add a trailing slash to the path associated with the session
         cookie so, in the above example, the cookie path becomes /foo/. However,
         with a cookie path of /foo/, browsers will no longer send the cookie
@@ -1229,7 +1229,7 @@
 
       <attribute name="auth" required="false">
         <p>Specify whether the web Application code signs on to the
-        corresponding resource manager programatically, or whether the
+        corresponding resource manager programmatically, or whether the
         Container will sign on to the resource manager on behalf of the
         application.  The value of this attribute must be
         <code>Application</code> or <code>Container</code>.  This
@@ -1244,7 +1244,7 @@
         it is no longer required. This is intended to speed up clean-up of
         resources that would otherwise happen as part of garbage collection.
         This attribute is ignored if the <code>singleton</code> attribute is
-        false. If not specificed, no default is defined and no close method will
+        false. If not specified, no default is defined and no close method will
         be called.</p>
         <p>For Apache Commons DBCP and Apache Tomcat JDBC connection pools
         you can use <code>closeMethod="close"</code>.</p>
