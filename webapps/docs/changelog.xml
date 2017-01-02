@@ -104,6 +104,9 @@
         dynamic HPACK table, the next header block must begin with a dynamic
         table update. (markt)
       </fix>
+      <fix>
+        <bug>60508</bug>: Set request start time for HTTP/2. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
