@@ -2077,37 +2077,39 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 return;
             }
 
-            // Iterate over the values in the table
-            if (objTable instanceof Map<?,?>) {
-                Iterator<?> iter = ((Map<?,?>) objTable).values().iterator();
-                while (iter.hasNext()) {
-                    Object obj = iter.next();
-                    Object cclObject = cclField.get(obj);
-                    if (this == cclObject) {
-                        iter.remove();
-                        Object stubObject = stubField.get(obj);
-                        log.error(sm.getString("webappClassLoader.clearRmi",
-                                stubObject.getClass().getName(), stubObject));
+            synchronized (objTable) {
+                // Iterate over the values in the table
+                if (objTable instanceof Map<?,?>) {
+                    Iterator<?> iter = ((Map<?,?>) objTable).values().iterator();
+                    while (iter.hasNext()) {
+                        Object obj = iter.next();
+                        Object cclObject = cclField.get(obj);
+                        if (this == cclObject) {
+                            iter.remove();
+                            Object stubObject = stubField.get(obj);
+                            log.error(sm.getString("webappClassLoader.clearRmi",
+                                    stubObject.getClass().getName(), stubObject));
+                        }
                     }
                 }
-            }
 
-            // Clear the implTable map
-            Field implTableField = objectTableClass.getDeclaredField("implTable");
-            implTableField.setAccessible(true);
-            Object implTable = implTableField.get(null);
-            if (implTable == null) {
-                return;
-            }
+                // Clear the implTable map
+                Field implTableField = objectTableClass.getDeclaredField("implTable");
+                implTableField.setAccessible(true);
+                Object implTable = implTableField.get(null);
+                if (implTable == null) {
+                    return;
+                }
 
-            // Iterate over the values in the table
-            if (implTable instanceof Map<?,?>) {
-                Iterator<?> iter = ((Map<?,?>) implTable).values().iterator();
-                while (iter.hasNext()) {
-                    Object obj = iter.next();
-                    Object cclObject = cclField.get(obj);
-                    if (this == cclObject) {
-                        iter.remove();
+                // Iterate over the values in the table
+                if (implTable instanceof Map<?,?>) {
+                    Iterator<?> iter = ((Map<?,?>) implTable).values().iterator();
+                    while (iter.hasNext()) {
+                        Object obj = iter.next();
+                        Object cclObject = cclField.get(obj);
+                        if (this == cclObject) {
+                            iter.remove();
+                        }
                     }
                 }
             }
