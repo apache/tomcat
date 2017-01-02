@@ -94,6 +94,9 @@
         Update the warnings that reference required options for running on Java
         9 to use the latest syntax for those options. (markt)
       </update>
+      <fix>
+        <bug>60513</bug>: Fix thread safety issue with RMI cleanup code. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
