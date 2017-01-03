@@ -138,4 +138,9 @@ public class TesterRequest extends Request {
     public Enumeration<String> getHeaderNames() {
         return Collections.enumeration(headers.keySet());
     }
+
+    @Override
+    public String getRemoteAddr() {
+        return "127.0.0.1";
+    }
 }
