@@ -249,6 +249,10 @@ public class TesterDigestAuthenticatorPerformance {
 
         private String authHeader = null;
 
+        public TesterDigestRequest() {
+            super(null);
+        }
+
         @Override
         public String getRemoteAddr() {
             return "127.0.0.1";

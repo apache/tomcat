@@ -88,13 +88,12 @@ public class TestRequestFilterValve {
         RequestFilterValve valve = null;
         Connector connector = new Connector();
         Context context = new StandardContext();
-        Request request = new Request();
+        Request request = new Request(connector);
         Response response = new MockResponse();
         StringBuilder msg = new StringBuilder();
         int expected = allowed ? OK : FORBIDDEN;
 
         connector.setPort(PORT);
-        request.setConnector(connector);
         request.getMappingData().context = context;
         request.setCoyoteRequest(new org.apache.coyote.Request());
 

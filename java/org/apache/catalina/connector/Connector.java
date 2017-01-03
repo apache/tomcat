@@ -824,11 +824,8 @@ public class Connector extends LifecycleMBeanBase  {
      * @return a new Servlet request object
      */
     public Request createRequest() {
-
-        Request request = new Request();
-        request.setConnector(this);
-        return (request);
-
+        Request request = new Request(this);
+        return request;
     }
 
 

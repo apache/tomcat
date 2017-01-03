@@ -125,10 +125,17 @@ public class Request implements HttpServletRequest {
 
     private static final Log log = LogFactory.getLog(Request.class);
 
-    // ----------------------------------------------------------- Constructors
+    /**
+     * Create a new Request object associated with the given Connector.
+     *
+     * @param connector The Connector with which this Request object will always
+     *                  be associated. In normal usage this must be non-null. In
+     *                  some test scenarios, it may be possible to use a null
+     *                  Connector without triggering an NPE.
+     */
+    public Request(Connector connector) {
+        this.connector = connector;
 
-
-    public Request() {
         formats = new SimpleDateFormat[formatsTemplate.length];
         for(int i = 0; i < formats.length; i++) {
             formats[i] = (SimpleDateFormat) formatsTemplate[i].clone();
@@ -545,22 +552,13 @@ public class Request implements HttpServletRequest {
     /**
      * Associated Catalina connector.
      */
-    protected Connector connector;
+    protected final Connector connector;
 
     /**
      * @return the Connector through which this Request was received.
      */
     public Connector getConnector() {
         return this.connector;
-    }
-
-    /**
-     * Set the Connector through which this Request was received.
-     *
-     * @param connector The new connector
-     */
-    public void setConnector(Connector connector) {
-        this.connector = connector;
     }
 
 

@@ -614,7 +614,7 @@ public class TestRealmBase {
                 new SecurityConstraint[] { constraintOne, constraintTwo };
 
         // Set up the mock request and response
-        Request request = new Request();
+        Request request = new Request(null);
         Response response = new TesterResponse();
         Context context = new TesterContext();
         for (String applicationRole : applicationRoles) {

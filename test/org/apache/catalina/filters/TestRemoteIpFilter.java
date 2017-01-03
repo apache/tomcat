@@ -115,9 +115,8 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
      */
     public static class MockHttpServletRequest extends Request {
         public MockHttpServletRequest() {
-            super();
+            super(new Connector());
             setCoyoteRequest(new org.apache.coyote.Request());
-            setConnector(new Connector());
         }
 
         public void setHeader(String name, String value) {

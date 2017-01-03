@@ -92,6 +92,11 @@ public class TestRemoteIpValve {
     }
 
     public static class MockRequest extends Request {
+
+        public MockRequest() {
+            super(null);
+        }
+
         @Override
         public void setAttribute(String name, Object value) {
             getCoyoteRequest().getAttributes().put(name, value);

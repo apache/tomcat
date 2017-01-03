@@ -603,7 +603,7 @@ public class TestResponse extends TomcatBaseTest {
         Response response = new Response();
         response.setConnector(connector);
         response.setCoyoteResponse(cResponse);
-        Request request = new Request();
+        Request request = new Request(connector);
         org.apache.coyote.Request cRequest = new org.apache.coyote.Request();
         request.setCoyoteRequest(cRequest);
         Context context = new TesterContext();
