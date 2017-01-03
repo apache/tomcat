@@ -272,7 +272,7 @@ public class Response implements HttpServletResponse {
                 writer.clear();
                 writer = null;
             }
-        } else {
+        } else if (writer != null) {
             writer.recycle();
         }
 
