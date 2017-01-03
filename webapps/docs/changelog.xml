@@ -107,6 +107,11 @@
       <fix>
         <bug>60508</bug>: Set request start time for HTTP/2. (remm)
       </fix>
+      <fix>
+        The default output buffer size for AJP connectors is now based on the
+        configured AJP packet size rather than the minimum permitted AJP packet
+        size. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
