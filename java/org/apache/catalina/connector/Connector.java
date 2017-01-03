@@ -32,6 +32,7 @@ import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.UpgradeProtocol;
+import org.apache.coyote.ajp.AbstractAjpProtocol;
 import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -824,8 +825,7 @@ public class Connector extends LifecycleMBeanBase  {
      * @return a new Servlet request object
      */
     public Request createRequest() {
-        Request request = new Request(this);
-        return request;
+        return new Request(this);
     }
 
 
@@ -836,11 +836,12 @@ public class Connector extends LifecycleMBeanBase  {
      * @return a new Servlet response object
      */
     public Response createResponse() {
-
-        Response response = new Response();
-        response.setConnector(this);
-        return (response);
-
+        if (protocolHandler instanceof AbstractAjpProtocol<?>) {
+            int packetSize = ((AbstractAjpProtocol<?>) protocolHandler).getPacketSize();
+            return new Response(packetSize - org.apache.coyote.ajp.Constants.SEND_HEAD_LEN);
+        } else {
+            return new Response();
+        }
     }
 
 

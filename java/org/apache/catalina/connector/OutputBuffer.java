@@ -128,34 +128,20 @@ public class OutputBuffer extends Writer {
 
     // ----------------------------------------------------------- Constructors
 
-
     /**
-     * Default constructor. Allocate the buffer with the default buffer size.
-     */
-    public OutputBuffer() {
-
-        this(DEFAULT_BUFFER_SIZE);
-
-    }
-
-
-    /**
-     * Alternate constructor which allows specifying the initial buffer size.
+     * Create the buffer with the specified initial size.
      *
      * @param size Buffer size to use
      */
     public OutputBuffer(int size) {
-
         bb = ByteBuffer.allocate(size);
         clear(bb);
         cb = CharBuffer.allocate(size);
         clear(cb);
-
     }
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * Associated Coyote response.
