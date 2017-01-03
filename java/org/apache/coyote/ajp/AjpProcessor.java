@@ -251,8 +251,7 @@ public class AjpProcessor extends AbstractProcessor {
         int packetSize = protocol.getPacketSize();
         // Calculate maximum chunk size as packetSize may have been changed from
         // the default (Constants.MAX_PACKET_SIZE)
-        this.outputMaxChunkSize =
-                Constants.MAX_SEND_SIZE + packetSize - Constants.MAX_PACKET_SIZE;
+        this.outputMaxChunkSize = packetSize - Constants.SEND_HEAD_LEN;
 
         request.setInputBuffer(new SocketInputBuffer());
 
