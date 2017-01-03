@@ -108,6 +108,18 @@ package.
 The location where the source has been placed will be further referred as
 ${tomcat.source}.
 
+The Tomcat local build process does not modify line-endings. The svn repository
+is configured so that all files will be checked out with the line-ending
+appropriate for the current platform. When using a source package you should
+ensure that you use the source package that has the appropriate line-ending
+for your platform:
+
+  zip    -> CRLF
+  tar.gz -> LF
+
+Note that the release build process does modify line-endings to ensure that
+each release package has the appropriate line-endings.
+
 (3.2) Building
 
  1. The build is controlled by creating a ${tomcat.source}/build.properties
