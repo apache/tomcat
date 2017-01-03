@@ -112,8 +112,6 @@ public class Response implements HttpServletResponse {
         } else {
             outputBuffer = new OutputBuffer();
         }
-        outputStream = new CoyoteOutputStream(outputBuffer);
-        writer = new CoyoteWriter(outputBuffer);
     }
 
 
