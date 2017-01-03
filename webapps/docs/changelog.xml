@@ -316,6 +316,10 @@
         Correct a typo in CGI How-To.
         Issue reported via comments.apache.org. (violetagg)
       </fix>
+      <fix>
+        <bug>60344</bug>: Add a note to BUILDING.txt regarding using the source
+        bundle with the correct line endings. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
