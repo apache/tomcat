@@ -60,6 +60,10 @@
 <section name="Tomcat 7.0.74 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>53602</bug>: Add HTTP status code 451 (RFC 7725) to the list of
+        HTTP status codes recognised by Tomcat. (markt) 
+      </add>
       <fix>
         Correctly handle the <code>configClass</code> attribute of a Host when
         embedding Tomcat. (markt)
