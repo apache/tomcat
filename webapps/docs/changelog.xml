@@ -49,7 +49,7 @@
     <changelog>
       <add>
         <bug>53602</bug>: Add HTTP status code 451 (RFC 7725) to the list of
-        HTTP status codes recognised by the ErrorReportValve. (markt) 
+        HTTP status codes recognised by the ErrorReportValve. (markt)
       </add>
       <fix>
         <bug>60446</bug>: Handle the case where the stored user credential uses
