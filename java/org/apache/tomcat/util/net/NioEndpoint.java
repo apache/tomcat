@@ -771,12 +771,12 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         return true;
     }
 
-    
+
     @Override
     public void removeWaitingRequest(SocketWrapper<NioChannel> socketWrapper) {
         // NO-OP
     }
-    
+
 
     @Override
     protected Log getLog() {
@@ -1100,7 +1100,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             else r.reset(socket,ka,OP_REGISTER);
             addEvent(r);
         }
-        
+
         public KeyAttachment cancelledKey(SelectionKey key, SocketStatus status, boolean dispatch) {
             KeyAttachment ka = null;
             try {
@@ -1388,10 +1388,10 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     // appropriate event(s) if sendfile completes.
                     if (!calledByProcessor) {
                         if ( sd.keepAlive ) {
-                                if (log.isDebugEnabled()) {
-                                    log.debug("Connection is keep alive, registering back for OP_READ");
-                                }
-                                reg(sk,attachment,SelectionKey.OP_READ);
+                            if (log.isDebugEnabled()) {
+                                log.debug("Connection is keep alive, registering back for OP_READ");
+                            }
+                            reg(sk,attachment,SelectionKey.OP_READ);
                         } else {
                             if (log.isDebugEnabled()) {
                                 log.debug("Send file connection is being closed");
