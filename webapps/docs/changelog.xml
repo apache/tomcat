@@ -125,6 +125,10 @@
         when configured with an address of <code>0.0.0.0</code> or
         <code>::</code>. (markt)
       </fix>
+      <fix>
+        <bug>60409</bug>: When unable to complete sendfile request, ensure the
+        Processor will be added to the cache only once. (markt/violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
