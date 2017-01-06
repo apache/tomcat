@@ -145,14 +145,14 @@
       </fix>
     </changelog>
   </subsection>
-  <subseciton name="WebSocket">
+  <subsection name="WebSocket">
     <changelog>
       <fix>
         Correctly handle blocking WebSocket writes when the write times out just
         before the write is attempted. (markt)
       </fix>
     </changelog>
-  </subseciton>
+  </subsection>
   <subsection name="Web Applications">
     <changelog>
       <fix>
