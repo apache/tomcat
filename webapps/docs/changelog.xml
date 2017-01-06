@@ -156,6 +156,9 @@
         <bug>60497</bug>: Follow up fix using a better variable name for the
         tag reuse flag. (remm)
       </fix>
+      <fix>
+        Revert use of try/finally for simple tags. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
