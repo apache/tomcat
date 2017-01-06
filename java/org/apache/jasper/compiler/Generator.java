@@ -2332,7 +2332,7 @@ class Generator {
                 out.print(tagHandlerClassName);
                 out.println(".class);");
                 out.printin("boolean ");
-                out.print(n.getTagHandlerPoolName());
+                out.print(tagHandlerVar);
                 out.println("_reused = false;");
             } else {
                 writeNewInstance(tagHandlerVar, tagHandlerClassName);
@@ -2545,7 +2545,7 @@ class Generator {
                 out.print(".reuse(");
                 out.print(tagHandlerVar);
                 out.println(");");
-                out.printin(n.getTagHandlerPoolName());
+                out.printin(tagHandlerVar);
                 out.println("_reused = true;");
             }
 
@@ -2555,7 +2555,7 @@ class Generator {
             out.pushIndent();
             if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
                 out.printin("if (!");
-                out.print(n.getTagHandlerPoolName());
+                out.print(tagHandlerVar);
                 out.println("_reused) {");
                 out.pushIndent();
             }

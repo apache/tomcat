@@ -152,6 +152,10 @@
         Improve the error handling for simple tags to ensure that the tag is
         released and destroyed once used. (remm)
       </fix>
+      <fix>
+        <bug>60497</bug>: Follow up fix using a better variable name for the
+        tag reuse flag. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
