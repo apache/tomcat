@@ -165,7 +165,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
 
 
     /**
-     * Start the NIO endpoint, creating acceptor, poller threads.
+     * Start the NIO2 endpoint, creating acceptor.
      */
     @Override
     public void startInternal() throws Exception {
