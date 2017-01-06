@@ -2659,9 +2659,6 @@ class Generator {
             String tagHandlerClassName = tagHandlerClass.getCanonicalName();
             writeNewInstance(tagHandlerVar, tagHandlerClassName);
 
-            out.printil("try {");
-            out.pushIndent();
-
             generateSetters(n, tagHandlerVar, handlerInfo, true);
 
             // JspIdConsumer (after context has been set)
@@ -2713,15 +2710,8 @@ class Generator {
             declareScriptingVars(n, VariableInfo.AT_END);
             syncScriptingVars(n, VariableInfo.AT_END);
 
-            out.popIndent();
-            out.printil("} finally {");
-            out.pushIndent();
-
             // Resource injection
             writeDestroyInstance(tagHandlerVar);
-
-            out.popIndent();
-            out.printil("}");
 
             n.setEndJavaLine(out.getJavaLine());
         }
