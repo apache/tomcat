@@ -53,6 +53,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Prevent potential processing loop on unexpected WebSocket connection
+        closure. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.10 (markt)" rtext="release in progress">
   <subsection name="Catalina">
