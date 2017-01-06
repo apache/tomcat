@@ -722,6 +722,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             S socket = wrapper.getSocket();
 
             Processor processor = connections.get(socket);
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("abstractConnectionHandler.connectionsGet",
+                        processor, socket));
+            }
+
             if (processor != null) {
                 // Make sure an async timeout doesn't fire
                 getProtocol().removeWaitingProcessor(processor);
@@ -772,6 +777,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 }
                 if (processor == null) {
                     processor = recycledProcessors.pop();
+                    if (getLog().isDebugEnabled()) {
+                        getLog().debug(sm.getString("abstractConnectionHandler.processorPop",
+                                processor));
+                    }
                 }
                 if (processor == null) {
                     processor = getProtocol().createProcessor();
@@ -816,6 +825,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                             release(processor);
                             // Create the upgrade processor
                             processor = getProtocol().createUpgradeProcessor(wrapper, upgradeToken);
+                            if (getLog().isDebugEnabled()) {
+                                getLog().debug(sm.getString("abstractConnectionHandler.upgradeCreate",
+                                        processor, wrapper));
+                            }
                             wrapper.unRead(leftOverInput);
                             // Mark the connection as upgraded
                             wrapper.setUpgraded(true);
@@ -969,6 +982,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                 // processors
                 if (!processor.isUpgrade()) {
                     recycledProcessors.push(processor);
+                    getLog().debug("Pushed Processor [" + processor + "]");
                 }
             }
         }
