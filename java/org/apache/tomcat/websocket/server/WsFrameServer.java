@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket.server;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -61,7 +62,9 @@ public class WsFrameServer extends WsFrameBase {
             inputBuffer.position(inputBuffer.limit()).limit(inputBuffer.capacity());
             int read = socketWrapper.read(false, inputBuffer);
             inputBuffer.limit(inputBuffer.position()).reset();
-            if (read <= 0) {
+            if (read < 0) {
+                throw new EOFException();
+            } else if (read == 0) {
                 return;
             }
             if (log.isDebugEnabled()) {
