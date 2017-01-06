@@ -167,8 +167,7 @@ public class FileHandler
 
         // Construct the timestamp we will use, if requested
         Timestamp ts = new Timestamp(System.currentTimeMillis());
-        String tsString = ts.toString().substring(0, 19);
-        String tsDate = tsString.substring(0, 10);
+        String tsDate = ts.toString().substring(0, 10);
 
         writerLock.readLock().lock();
         try {
