@@ -177,8 +177,5 @@ public class AsyncFileHandler extends FileHandler {
                 return true;
             }
         }
-
     }
-
-
 }
