@@ -635,7 +635,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             for (SocketWrapperBase<Long> socketWrapper : connections.values()) {
                 try {
                     socketWrapper.close();
-                    getHandler().release(socketWrapper);
                 } catch (IOException e) {
                     // Ignore
                 }
@@ -2493,6 +2492,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
 
         @Override
         public void close() {
+            getEndpoint().getHandler().release(this);
             synchronized (closedLock) {
                 // APR typically crashes if the same socket is closed twice so
                 // make sure that doesn't happen.
