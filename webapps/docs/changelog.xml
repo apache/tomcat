@@ -103,6 +103,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Extend the <code>JreMemoryLeakPreventionListener</code> to provide
+        protection against <code>ForkJoinPool.commonPool()</code> related memory
+        leaks. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>

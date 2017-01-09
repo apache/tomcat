@@ -54,7 +54,7 @@ import org.w3c.dom.ls.DOMImplementationLS;
  * <p>
  * Locked files usually occur when a resource inside a JAR is accessed without
  * first disabling Jar URL connection caching. The workaround is to disable this
- * caching by default. 
+ * caching by default.
  */
 public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
@@ -64,6 +64,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
         StringManager.getManager(Constants.Package);
 
     private static final boolean IS_JAVA_7_OR_LATER;
+    private static final boolean IS_JAVA_8_OR_LATER;
 
     static {
         boolean isJava7OrLater;
@@ -74,7 +75,20 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
             isJava7OrLater = false;
         }
         IS_JAVA_7_OR_LATER = isJava7OrLater;
+
+        boolean isJava8OrLater;
+        try {
+            Class.forName("javax.net.ssl.SSLParameters");
+            isJava8OrLater = true;
+        } catch (ClassNotFoundException e) {
+            isJava8OrLater = false;
+        }
+        IS_JAVA_8_OR_LATER = isJava8OrLater;
+
     }
+
+    private static final String FORK_JOIN_POOL_THREAD_FACTORY_PROPERTY =
+            "java.util.concurrent.ForkJoinPool.common.threadFactory";
 
     /**
      * Protect against the memory leak caused when the first call to
@@ -143,7 +157,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
      public void setSecurityPolicyProtection(boolean securityPolicyProtection) {
          this.securityPolicyProtection = securityPolicyProtection;
      }
-     
+
     /**
      * Protects against the memory leak caused when the first call to
      * <code>javax.security.auth.login.Configuration</code> is triggered by a
@@ -198,14 +212,14 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     public void setXmlParsingProtection(boolean xmlParsingProtection) {
         this.xmlParsingProtection = xmlParsingProtection;
     }
-    
+
     /**
      * <code>com.sun.jndi.ldap.LdapPoolManager</code> class spawns a thread when
      * it is initialized if the system property
      * <code>com.sun.jndi.ldap.connect.pool.timeout</code> is greater than 0.
      * That thread inherits the context class loader of the current thread, so
      * that there may be a web application class loader leak if the web app
-     * is the first to use <code>LdapPoolManager</code>. 
+     * is the first to use <code>LdapPoolManager</code>.
      */
     private boolean ldapPoolProtection = true;
     public boolean isLdapPoolProtection() { return ldapPoolProtection; }
@@ -217,7 +231,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
      * The first access to {@link DriverManager} will trigger the loading of
      * all {@link java.sql.Driver}s in the the current class loader. The web
      * application level memory leak protection can take care of this in most
-     * cases but triggering the loading here has fewer side-effects. 
+     * cases but triggering the loading here has fewer side-effects.
      */
     private boolean driverManagerProtection = true;
     public boolean isDriverManagerProtection() {
@@ -226,10 +240,23 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     public void setDriverManagerProtection(boolean driverManagerProtection) {
         this.driverManagerProtection = driverManagerProtection;
     }
-    
+
+    /**
+     * {@link java.util.concurrent.ForkJoinPool#commonPool()} creates a thread
+     * pool that, by default, creates threads that retain references to the
+     * thread context class loader.
+     */
+    private boolean forkJoinCommonPoolProtection = true;
+    public boolean getForkJoinCommonPoolProtection() {
+        return forkJoinCommonPoolProtection;
+    }
+    public void setForkJoinCommonPoolProtection(boolean forkJoinCommonPoolProtection) {
+        this.forkJoinCommonPoolProtection = forkJoinCommonPoolProtection;
+    }
+
     /**
      * List of comma-separated fully qualified class names to load and initialize during
-     * the startup of this Listener. This allows to pre-load classes that are known to 
+     * the startup of this Listener. This allows to pre-load classes that are known to
      * provoke classloader leaks if they are loaded during a request processing.
      */
     private String classesToInitialize = null;
@@ -239,7 +266,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     public void setClassesToInitialize(String classesToInitialize) {
         this.classesToInitialize = classesToInitialize;
     }
-    
+
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         // Initialise these classes when Tomcat starts
@@ -265,7 +292,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 /*
                  * Several components end up calling:
                  * sun.awt.AppContext.getAppContext()
-                 * 
+                 *
                  * Those libraries / components known to trigger memory leaks
                  * due to eventual calls to getAppContext() are:
                  * - Google Web Toolkit via its use of javax.imageio
@@ -280,7 +307,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                  * started named AWT-AppKit that requires a graphic environment
                  * to be available.
                  */
-                
+
                 // Trigger a call to sun.awt.AppContext.getAppContext(). This
                 // will pin the system class loader in memory but that shouldn't
                 // be an issue.
@@ -310,7 +337,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                  * Several components end up calling
                  * sun.misc.GC.requestLatency(long) which creates a daemon
                  * thread without setting the TCCL.
-                 * 
+                 *
                  * Those libraries / components known to trigger memory leaks
                  * due to eventual calls to requestLatency(long) are:
                  * - javax.management.remote.rmi.RMIConnectorServer.start()
@@ -352,9 +379,9 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                                 e);
                     }
                 }
-    
+
                 /*
-                 * Calling getPolicy retains a static reference to the context 
+                 * Calling getPolicy retains a static reference to the context
                  * class loader.
                  */
                 if (securityPolicyProtection) {
@@ -384,10 +411,10 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                                 e);
                     }
                 }
-    
-                
+
+
                 /*
-                 * Initializing javax.security.auth.login.Configuration retains a static reference to the context 
+                 * Initializing javax.security.auth.login.Configuration retains a static reference to the context
                  * class loader.
                  */
                 if (securityLoginConfigurationProtection) {
@@ -403,25 +430,25 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                  * initializes the Java Cryptography Architecture. Under certain
                  * conditions this starts a Token poller thread with TCCL equal
                  * to the web application class loader.
-                 * 
+                 *
                  * Instead we initialize JCA right now.
                  */
                 if (tokenPollerProtection) {
                     java.security.Security.getProviders();
                 }
-                
+
                 /*
                  * Several components end up opening JarURLConnections without
                  * first disabling caching. This effectively locks the file.
                  * Whilst more noticeable and harder to ignore on Windows, it
                  * affects all operating systems.
-                 * 
+                 *
                  * Those libraries/components known to trigger this issue
                  * include:
                  * - log4j versions 1.2.15 and earlier
                  * - javax.xml.bind.JAXBContext.newInstance()
                  */
-                
+
                 // Set the default URL caching policy to not to cache
                 if (urlCacheProtection) {
                     try {
@@ -438,7 +465,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                                 "jreLeakListener.jarUrlConnCacheFail"), e);
                     }
                 }
-                
+
                 /*
                  * Various leaks related to the use of XML parsing.
                  */
@@ -472,7 +499,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                                 e);
                     }
                 }
-                
+
                 if (ldapPoolProtection) {
                     try {
                         Class.forName("com.sun.jndi.ldap.LdapPoolManager");
@@ -486,7 +513,18 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                         }
                     }
                 }
-                
+
+                /*
+                 * Present in Java 8 onwards
+                 */
+                if (forkJoinCommonPoolProtection && IS_JAVA_8_OR_LATER) {
+                    // Don't override any explicitly set property
+                    if (System.getProperty(FORK_JOIN_POOL_THREAD_FACTORY_PROPERTY) == null) {
+                        System.setProperty(FORK_JOIN_POOL_THREAD_FACTORY_PROPERTY,
+                                "org.apache.catalina.startup.SafeForkJoinWorkerThreadFactory");
+                    }
+                }
+
                 if (classesToInitialize != null) {
                     StringTokenizer strTok =
                         new StringTokenizer(classesToInitialize, ", \r\n\t");

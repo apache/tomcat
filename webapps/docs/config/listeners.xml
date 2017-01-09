@@ -214,6 +214,18 @@
         default is <code>true</code>.</p>
       </attribute>
 
+      <attribute name="forkJoinCommonPoolProtection" required="false">
+        <p>Enables protection so the threads created for
+        <code>ForkJoinPool.commonPool()</code> do not result in a memory leak.
+        The protection is enabled by setting the
+        <code>java.util.concurrent.ForkJoinPool.common.threadFactory</code>
+        system property. If this property is set when Tomcat starts, Tomcat will
+        not over-ride it even if this protection is explictly enabled. The
+        default is <code>true</code>. This protection is only used when running
+        on Java 8 onwards. The common pool does not exist in earlier
+        versions.</p>
+      </attribute>
+
       <attribute name="gcDaemonProtection" required="false">
         <p>Enables protection so that calls to
         <code>sun.misc.GC.requestLatency(long)</code> triggered by a web

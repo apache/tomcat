@@ -321,6 +321,8 @@
     <include name="org/apache/catalina/startup/CatalinaProperties.*" />
     <include name="org/apache/catalina/startup/ClassLoaderFactory.*" />
     <include name="org/apache/catalina/startup/ClassLoaderFactory$*.*" />
+    <include name="org/apache/catalina/startup/SafeForkJoinWorkerThreadFactory.*" />
+    <include name="org/apache/catalina/startup/SafeForkJoinWorkerThreadFactory$*.*" />
     <include name="org/apache/catalina/startup/Tool.*" />
     <include name="org/apache/catalina/loader/Extension.*" />
     <include name="org/apache/catalina/loader/Reloader.*" />
@@ -650,6 +652,7 @@
       <classpath refid="compile.classpath" />
       <exclude name="org/apache/naming/factory/webservices/**" />
       <!-- Exclude classes that require Java 7 to compile -->
+      <exclude name="org/apache/catalina/startup/SafeForkJoinWorkerThreadFactory.java" />
       <exclude name="org/apache/tomcat/websocket/**" />
     </javac>
     <!-- Copy static resource files -->
@@ -687,6 +690,7 @@
       <compilerarg value="-Xlint:unchecked"/>
       <classpath refid="compile.classpath" />
       <!-- Only include classes that require Java 7 to compile -->
+      <include name="org/apache/catalina/startup/SafeForkJoinWorkerThreadFactory.java" />
       <include name="org/apache/tomcat/websocket/**" />
       <!-- Not required but prevents a warning being displayed -->
       <bootclasspath>
