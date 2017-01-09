@@ -25,6 +25,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.sql.DriverManager;
 import java.util.StringTokenizer;
+import java.util.concurrent.ForkJoinPool;
 
 import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
@@ -34,6 +35,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.startup.SafeForkJoinWorkerThreadFactory;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -64,6 +66,8 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
+    private static final String FORK_JOIN_POOL_THREAD_FACTORY_PROPERTY =
+            "java.util.concurrent.ForkJoinPool.common.threadFactory";
     /**
      * Protect against the memory leak caused when the first call to
      * <code>sun.awt.AppContext.getAppContext()</code> is triggered by a web
@@ -198,6 +202,19 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     }
     public void setDriverManagerProtection(boolean driverManagerProtection) {
         this.driverManagerProtection = driverManagerProtection;
+    }
+
+    /**
+     * {@link ForkJoinPool#commonPool()} creates a thread pool that, by default,
+     * creates threads that retain references to the thread context class
+     * loader.
+     */
+    private boolean forkJoinCommonPoolProtection = true;
+    public boolean getForkJoinCommonPoolProtection() {
+        return forkJoinCommonPoolProtection;
+    }
+    public void setForkJoinCommonPoolProtection(boolean forkJoinCommonPoolProtection) {
+        this.forkJoinCommonPoolProtection = forkJoinCommonPoolProtection;
     }
 
     /**
@@ -436,6 +453,17 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                             log.debug(sm.getString(
                                     "jreLeakListener.ldapPoolManagerFail"), e);
                         }
+                    }
+                }
+
+                /*
+                 * Present in Java 8 onwards
+                 */
+                if (forkJoinCommonPoolProtection && JreCompat.isJre8Available()) {
+                    // Don't override any explicitly set property
+                    if (System.getProperty(FORK_JOIN_POOL_THREAD_FACTORY_PROPERTY) == null) {
+                        System.setProperty(FORK_JOIN_POOL_THREAD_FACTORY_PROPERTY,
+                                SafeForkJoinWorkerThreadFactory.class.getName());
                     }
                 }
 
