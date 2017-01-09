@@ -51,6 +51,12 @@
         Ensure UpgradeProcessor instances associated with closed connections are
         removed from the map of current connections to Processors. (markt)
       </fix>
+      <fix>
+        Remove a workaround for a problem previously reported with WebSocket,
+        TLS and APR that treated some error conditions as not errors. The
+        original problem cannot be reproduced with the current code and the
+        work-around is now causing problems. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
