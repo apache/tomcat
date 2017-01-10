@@ -97,7 +97,7 @@ class PageInfo {
     private Vector<String> pluginDcls;      // Id's for tagplugin declarations
 
     // JSP 2.2
-    private boolean errorOnUndeclaredNamepsace = false;
+    private boolean errorOnUndeclaredNamespace = false;
 
     private boolean isTagFile = false;
 
@@ -733,11 +733,11 @@ class PageInfo {
     }
     
     public boolean isErrorOnUndeclaredNamespace() {
-        return errorOnUndeclaredNamepsace;
+        return errorOnUndeclaredNamespace;
     }
     
     public void setErrorOnUndeclaredNamespace(
             boolean errorOnUndeclaredNamespace) {
-        this.errorOnUndeclaredNamepsace = errorOnUndeclaredNamespace; 
+        this.errorOnUndeclaredNamespace = errorOnUndeclaredNamespace; 
     }
 }

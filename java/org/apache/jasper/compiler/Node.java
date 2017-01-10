@@ -235,7 +235,7 @@ abstract class Node implements TagConstants {
 
     /**
      * Get the attribute that is non request time expression, either from the
-     * attribute of the node, or from a jsp:attrbute
+     * attribute of the node, or from a jsp:attribute
      */
     public String getTextAttribute(String name) {
 

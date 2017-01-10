@@ -75,7 +75,7 @@ public class FastRemovalDequeue<T> {
 
     /**
      * Retrieve the size of the list.
-     * This method also needs to be externaly synchronized to
+     * This method also needs to be externally synchronized to
      * ensure correct publication of changes.
      *
      * @return the size of the list.
@@ -205,7 +205,7 @@ public class FastRemovalDequeue<T> {
      * Moves the element in front.
      *
      * Could also be implemented as remove() and
-     * push(), but explicitely coding might be a bit faster.
+     * push(), but explicitly coding might be a bit faster.
      *
      * @param element the entry to move in front.
      * */

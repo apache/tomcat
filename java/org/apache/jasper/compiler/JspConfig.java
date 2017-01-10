@@ -415,7 +415,7 @@ public class JspConfig {
         String isTrimDirectiveWhitespaces = defaultTrimDirectiveWhitespaces;
         String defaultContentType = defaultDefaultContentType;
         String buffer = defaultBuffer;
-        String errorOnUndelcaredNamespace = defaultErrorOnUndeclaredNamespace;
+        String errorOnUndeclaredNamespace = defaultErrorOnUndeclaredNamespace;
 
         if (isXmlMatch != null) {
             isXml = isXmlMatch.getJspProperty().isXml();
@@ -446,14 +446,14 @@ public class JspConfig {
             buffer = bufferMatch.getJspProperty().getBuffer();
         }
         if (errorOnUndeclaredNamespaceMatch != null) {
-            errorOnUndelcaredNamespace =
+            errorOnUndeclaredNamespace =
                 errorOnUndeclaredNamespaceMatch.getJspProperty().isErrorOnUndeclaredNamespace();
         }
 
         return new JspProperty(isXml, isELIgnored, isScriptingInvalid,
                 pageEncoding, includePreludes, includeCodas, 
                 isDeferedSyntaxAllowedAsLiteral, isTrimDirectiveWhitespaces,
-                defaultContentType, buffer, errorOnUndelcaredNamespace);
+                defaultContentType, buffer, errorOnUndeclaredNamespace);
     }
 
     /**

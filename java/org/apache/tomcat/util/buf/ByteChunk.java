@@ -82,7 +82,7 @@ public final class ByteChunk implements Cloneable, Serializable {
             throws IOException;
     }
 
-    /** Same as java.nio.channel.WrittableByteChannel.
+    /** Same as java.nio.channel.WritableByteChannel.
      */
     public static interface ByteOutputChannel {
         /**

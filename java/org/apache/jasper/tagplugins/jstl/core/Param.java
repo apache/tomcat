@@ -38,7 +38,7 @@ public class Param implements TagPlugin {
         //if the param tag has no parents, throw a exception
         TagPluginContext parent = ctxt.getParentContext();
         if(parent == null){
-            ctxt.generateJavaSource(" throw new JspTagExcption" +
+            ctxt.generateJavaSource(" throw new JspTagException" +
             "(\"&lt;param&gt; outside &lt;import&gt; or &lt;urlEncode&gt;\");");
             return;
         }

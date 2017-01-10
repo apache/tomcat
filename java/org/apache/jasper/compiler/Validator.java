@@ -994,7 +994,7 @@ class Validator {
             }
 
             if (doctypePublic != null && doctypeSystem == null) {
-                err.jspError(n, "jsp.error.jspoutput.doctypepulicsystem");
+                err.jspError(n, "jsp.error.jspoutput.doctypepublicsystem");
             }
 
             if (omitXmlDecl != null) {

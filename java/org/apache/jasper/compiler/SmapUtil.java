@@ -268,7 +268,7 @@ public class SmapUtil {
                 // if "SourceDebugExtension" symbol not there add it
                 writeUtf8ForSDE();
 
-                // increment the countantPoolCount
+                // increment the constantPoolCount
                 sdeIndex = constantPoolCount;
                 ++constantPoolCount;
                 randomAccessWriteU2(constantPoolCountPos, constantPoolCount);

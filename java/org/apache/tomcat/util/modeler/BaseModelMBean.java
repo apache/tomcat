@@ -62,7 +62,7 @@ import org.apache.juli.logging.LogFactory;
  *    like Object and Class. 
  *  - setModelMBean is no longer called on resources ( not used in tomcat )
  *  - no caching of Methods for now - operations and setters are not called repeatedly in most 
- *  management use cases. Getters should't be called very frequently either - and even if they
+ *  management use cases. Getters shouldn't be called very frequently either - and even if they
  *  are, the overhead of getting the method should be small compared with other JMX costs ( RMI, etc ).
  *  We can add getter cache if needed.
  *  - removed unused constructor, fields

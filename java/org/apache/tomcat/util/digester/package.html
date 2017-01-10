@@ -224,7 +224,7 @@ and pushes it on the stack when the beginning of a particular XML element is
 encountered. The object will remain there while the nested content of this
 element is processed, and it will be popped off when the end of the element
 is encountered.  As we will see, the standard "object create" processing rule
-supports exactly this functionalility in a very convenient way.</p>
+supports exactly this functionality in a very convenient way.</p>
 
 <p>Several potential issues with this design pattern are addressed by other
 features of the Digester functionality:</p>
@@ -742,7 +742,7 @@ is done by following these steps:</p>
 
 <ol>
 <li>Tell <code>Digester</code> that you will be doing namespace
-    aware parsing, by adding this statement in your initalization
+    aware parsing, by adding this statement in your initialization
     of the Digester's properties:
     <pre>
     digester.setNamespaceAware(true);
@@ -833,7 +833,7 @@ Your implementation of the <code>match()</code> method will be called when the
 processing for a particular element is started or ended, and you must return
 a <code>List</code> of the rules that are relevant for the current nesting
 pattern.  The order of the rules you return <strong>is</strong> significant,
-and should match the order in which rules were initally added.</p>
+and should match the order in which rules were initially added.</p>
 
 <p>Your policy for rule selection should generally be sensitive to whether
 <a href="#doc.Namespace">Namespace Aware Parsing</a> is taking place.  In
@@ -1005,7 +1005,7 @@ public class MyRuleSet extends RuleSetBase {
 <h3>Using Named Stacks For Inter-Rule Communication</h3>
 <p>
 <code>Digester</code> is based on <code>Rule</code> instances working together 
-to process xml. For anything other than the most trival processing, 
+to process xml. For anything other than the most trivial processing, 
 communication between <code>Rule</code> instances is necessary. Since <code>Rule</code>
 instances are processed in sequence, this usually means storing an Object 
 somewhere where later instances can retrieve it.
@@ -1061,7 +1061,7 @@ The <code><em>public-identifier</em></code> is an additional free identifier whi
 </p>
 <p>
 In practice, the weakness with a <code><em>system-identifier</em></code> is that most parsers
-will attempt to interprete this URI as an URL, try to download the resource directly
+will attempt to interpret this URI as an URL, try to download the resource directly
 from the URL and stop the parsing if this download fails. So, this means that 
 almost always the URI will have to be an URL from which the declaration
 can be downloaded.
@@ -1084,7 +1084,7 @@ The <code><em>public-identifier</em></code> is a freely defined name but (in pra
 strongly recommended that a unique, readable and open format is used (for reasons
 that should become clear later). A Formal Public Identifier (FPI) is a very
 common choice. This public identifier is often used to provide a unique and location
-independent key which can be used to subsistute local resources for remote ones 
+independent key which can be used to substitute local resources for remote ones 
 (hint: this is why ;).
 </p>
 <p>
@@ -1129,7 +1129,7 @@ Digestion throws two kinds of <code>Exception</code>:
     <li><code>org.xml.sax.SAXException</code></li>
 </ul>
 <p>
-The first is rarely thrown and indicates the kind of fundemental IO exception
+The first is rarely thrown and indicates the kind of fundamental IO exception
 that developers know all about. The second is thrown by SAX parsers when the processing
 of the XML cannot be completed. So, to diagnose the cause a certain familiarity with 
 the way that SAX error handling works is very useful. 
@@ -1234,7 +1234,7 @@ However, an <code>IllegalAccessException</code> is thrown if the method is invok
 <p><code>MethodUtils</code> contains a workaround for this situation. 
 It will attempt to call <code>setAccessible</code> on this method.
 If this call succeeds, then the method can be invoked as normal.
-This call will only succeed when the application has sufficient security privilages. 
+This call will only succeed when the application has sufficient security privileges. 
 If this call fails then a warning will be logged and the method may fail.</p>
 
 <p><code>Digester</code> uses <code>MethodUtils</code> and so there may be an issue accessing methods

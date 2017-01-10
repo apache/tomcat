@@ -61,7 +61,7 @@ public class JspApplicationContextImpl implements JspApplicationContext {
     @Override
     public void addELContextListener(ELContextListener listener) {
         if (listener == null) {
-            throw new IllegalArgumentException("ELConextListener was null");
+            throw new IllegalArgumentException("ELContextListener was null");
         }
         this.contextListeners.add(listener);
     }
