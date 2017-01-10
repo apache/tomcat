@@ -390,6 +390,11 @@
                   impact="ACTION"
                   returnType="void" />
 
+    <operation    name="resetStats"
+                  description="reset the statistics of this pool."
+                  impact="ACTION"
+                  returnType="void" />
+
   </mbean>
 
 </mbeans-descriptors>

@@ -824,6 +824,7 @@ public class DataSourceProxy implements PoolConfiguration {
             throw new RuntimeException(x);
         }
     }
+
     /**
      * The total number of connections reconnected by this pool.
      * @return the reconnected connection count
@@ -835,6 +836,18 @@ public class DataSourceProxy implements PoolConfiguration {
             throw new RuntimeException(x);
         }
     }
+
+    /**
+     * reset the statistics of this pool.
+     */
+    public void resetStats() {
+        try {
+            createPool().resetStats();
+        } catch (SQLException x) {
+            throw new RuntimeException(x);
+        }
+    }
+
     //=========================================================
     //  PROPERTIES / CONFIGURATION
     //=========================================================

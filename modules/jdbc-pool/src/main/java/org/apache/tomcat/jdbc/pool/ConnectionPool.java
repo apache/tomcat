@@ -1251,6 +1251,19 @@ public class ConnectionPool {
     }
 
     /**
+     * reset the statistics of this pool.
+     */
+    public void resetStats() {
+        borrowedCount.set(0);
+        returnedCount.set(0);
+        createdCount.set(0);
+        releasedCount.set(0);
+        reconnectedCount.set(0);
+        removeAbandonedCount.set(0);
+        releasedIdleCount.set(0);
+    }
+
+    /**
      * Tread safe wrapper around a future for the regular queue
      * This one retrieves the pooled connection object
      * and performs the initialization according to

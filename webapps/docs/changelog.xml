@@ -87,6 +87,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <add>
+        Enable reset the statistics without restarting the pool. (kfujino)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.10 (markt)" rtext="release in progress">
   <subsection name="Catalina">
