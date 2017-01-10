@@ -517,7 +517,7 @@ public class HPackHuffman {
 
     protected static class HuffmanCode {
         /**
-         * The value of the least significan't bits of the code
+         * The value of the least significant bits of the code
          */
         int value;
         /**

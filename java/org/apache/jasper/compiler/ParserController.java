@@ -157,7 +157,7 @@ class ParserController implements TagConstants {
      * @param inFileName    The name of the tag file to be parsed.
      * @param jar The location of the tag file.
      *
-     * @return The parsed tage file nodes
+     * @return The parsed tag file nodes
      *
      * @throws JasperException If an error occurs during parsing
      * @throws IOException If an I/O error occurs such as the file not being

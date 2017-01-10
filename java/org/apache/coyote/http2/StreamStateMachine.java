@@ -76,7 +76,7 @@ public class StreamStateMachine {
     }
 
 
-    public synchronized void recievedEndOfStream() {
+    public synchronized void receivedEndOfStream() {
         stateChange(State.OPEN, State.HALF_CLOSED_REMOTE);
         stateChange(State.HALF_CLOSED_LOCAL, State.CLOSED_RX);
     }

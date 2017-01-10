@@ -90,7 +90,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             // Headers have been populated by this point
             state.receivedStartOfHeaders();
             // TODO Assuming the body has been read at this point is not valid
-            state.recievedEndOfStream();
+            state.receivedEndOfStream();
         }
         // No sendfile for HTTP/2 (it is enabled by default in the request)
         this.coyoteRequest.setSendfile(false);
@@ -401,7 +401,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 handler.getHpackDecoder().setMaxHeaderCount(handler.getMaxTrailerCount());
                 handler.getHpackDecoder().setMaxHeaderSize(handler.getMaxTrailerSize());
             } else {
-                throw new ConnectionException(sm.getString("stream.trialerHeader.noEndOfStream",
+                throw new ConnectionException(sm.getString("stream.trailerHeader.noEndOfStream",
                         getConnectionId(), getIdentifier()), Http2Error.PROTOCOL_ERROR);
             }
         }
@@ -415,7 +415,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         synchronized (inputBuffer) {
             inputBuffer.notifyAll();
         }
-        state.recievedEndOfStream();
+        state.receivedEndOfStream();
     }
 
 

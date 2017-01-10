@@ -107,7 +107,7 @@ public interface TagPluginContext {
      * to getPluginAttribute and setPluginAttribute, and queries (e.g.
      * isScriptless().  There should be no calls to generate*().
      * @return The pluginContext for the parent node.
-     *         null if the parent is not a custom tag, or if the pluginConxt
+     *         null if the parent is not a custom tag, or if the pluginContext
      *         if not available (because useTagPlugin is false, e.g).
      */
     TagPluginContext getParentContext();

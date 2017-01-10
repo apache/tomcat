@@ -358,17 +358,17 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         Type type = certificate.getType();
         String result = null;
 
-        List<Type> candidiateTypes = new ArrayList<>();
+        List<Type> candidateTypes = new ArrayList<>();
         if (Type.UNDEFINED.equals(type)) {
             // Try all types to find an suitable alias
-            candidiateTypes.addAll(Arrays.asList(Type.values()));
-            candidiateTypes.remove(Type.UNDEFINED);
+            candidateTypes.addAll(Arrays.asList(Type.values()));
+            candidateTypes.remove(Type.UNDEFINED);
         } else {
             // Look for the specific type to find a suitable alias
-            candidiateTypes.add(type);
+            candidateTypes.add(type);
         }
 
-        Iterator<Type> iter = candidiateTypes.iterator();
+        Iterator<Type> iter = candidateTypes.iterator();
         while (result == null && iter.hasNext()) {
             result = keyManager.chooseServerAlias(iter.next().toString(),  null,  null);
         }

@@ -913,16 +913,16 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
         }
 
         for (ErrorPage errorPage : errorPages.values()) {
-            String exeptionType = errorPage.getExceptionType();
+            String exceptionType = errorPage.getExceptionType();
             int errorCode = errorPage.getErrorCode();
 
-            if (exeptionType == null && errorCode == 0 && getMajorVersion() == 2) {
+            if (exceptionType == null && errorCode == 0 && getMajorVersion() == 2) {
                 // Default error pages are only supported from 3.0 onwards
                 continue;
             }
             sb.append("  <error-page>\n");
             if (errorPage.getExceptionType() != null) {
-                appendElement(sb, INDENT4, "exception-type", exeptionType);
+                appendElement(sb, INDENT4, "exception-type", exceptionType);
             } else if (errorPage.getErrorCode() > 0) {
                 appendElement(sb, INDENT4, "error-code",
                         Integer.toString(errorCode));
