@@ -102,7 +102,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 8.5.10 (markt)" rtext="release in progress">
+<section name="Tomcat 8.5.10 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <add>
