@@ -261,7 +261,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         } else {
             TesterAjpMessage bodyMessage = ajpClient.createBodyMessage(new byte[bodySize]);
             responseHeaders = ajpClient.sendMessage(forwardMessage, bodyMessage);
-            // Expect back a request for more data (which will be emty and
+            // Expect back a request for more data (which will be empty and
             // trigger end of stream in Servlet)
             validateGetBody(responseHeaders);
             bodyMessage = ajpClient.createBodyMessage(new byte[0]);

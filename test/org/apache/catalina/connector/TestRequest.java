@@ -841,7 +841,7 @@ public class TestRequest extends TomcatBaseTest {
         // No file system docBase required
         Context ctx = tomcat.addContext(deployPath, null);
 
-        Tomcat.addServlet(ctx, "servlet", new Bug56501Servelet());
+        Tomcat.addServlet(ctx, "servlet", new Bug56501Servlet());
         ctx.addServletMapping("/*", "servlet");
 
         tomcat.start();
@@ -854,7 +854,7 @@ public class TestRequest extends TomcatBaseTest {
         assertEquals(expected, resultPath);
     }
 
-    private class Bug56501Servelet extends HttpServlet {
+    private class Bug56501Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 

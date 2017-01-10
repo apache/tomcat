@@ -178,7 +178,7 @@ public class CompressionFilter implements Filter {
 
         if (compressionThreshold == 0) {
             if (debug > 0) {
-                System.out.println("doFilter got called, but compressionTreshold is set to 0 - no compression");
+                System.out.println("doFilter got called, but compressionThreshold is set to 0 - no compression");
             }
             chain.doFilter(request, response);
             return;

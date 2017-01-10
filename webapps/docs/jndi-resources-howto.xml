@@ -433,7 +433,7 @@ public class MyBean2 {
     <h5>0.  Introduction</h5>
 
     <p>UserDatabase resources are typically configured as global resources for
-    use by a UserDatabase realm. Tomcat includes a UserDatabaseFactoory that
+    use by a UserDatabase realm. Tomcat includes a UserDatabaseFactory that
     creates UserDatabase resources backed by an XML file - usually
     <code>tomcat-users.xml</code></p>
 

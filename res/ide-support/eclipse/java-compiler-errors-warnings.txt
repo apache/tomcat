@@ -67,7 +67,7 @@ Eclipse IDE is documented here:
 # Java -> Code Style -> Organize Imports
 
 The following configuration of Organize Imports can be recommended for a
-quick setup. The order is enforced by checkstyle, so for the authorative
+quick setup. The order is enforced by checkstyle, so for the authoritative
 definition look at <module name="ImportOrder"> in
 res/checkstyle/checkstyle.xml
 

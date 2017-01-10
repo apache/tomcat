@@ -544,7 +544,7 @@ public class ConnectionPool {
     /**
      * thread safe way to abandon a connection
      * signals a connection to be abandoned.
-     * this will disconnect the connection, and log the stack trace if logAbanded=true
+     * this will disconnect the connection, and log the stack trace if logAbandoned=true
      * @param con PooledConnection
      */
     protected void abandon(PooledConnection con) {

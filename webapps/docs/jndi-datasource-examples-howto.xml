@@ -388,7 +388,7 @@ create you applications web.xml file.</p>
  <res-auth>Container</res-auth>
 </resource-ref>]]></source>
 <h5>3.   Code example</h5>
-<p>You can use the same example application as above (asuming you create the required DB
+<p>You can use the same example application as above (assuming you create the required DB
 instance, tables etc.) replacing the Datasource code with something like</p>
 <source><![CDATA[Context initContext = new InitialContext();
 Context envContext  = (Context)initContext.lookup("java:/comp/env");
@@ -531,7 +531,7 @@ First, the <code>UnsatisfiedLinkError</code> indicates that you have
 <li>a mismatch between your JDBC classes file and
 your Oracle client version. The giveaway here is the message stating that a needed library file cannot be
 found. For example, you may be using a classes12.zip file from Oracle Version 8.1.6 with a Version 8.1.5
-Oracle client. The classeXXXs.zip file and Oracle client software versions must match.
+Oracle client. The classesXXX.zip file and Oracle client software versions must match.
 </li>
 <li>A <code>$PATH</code>, <code>LD_LIBRARY_PATH</code> problem.</li>
 <li>It has been reported that ignoring the driver you have downloaded from otn and using

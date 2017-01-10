@@ -92,7 +92,7 @@ public class TestMediaType {
 
 
     @Test
-    public void testSimpleWithComplesQuotedString() throws IOException {
+    public void testSimpleWithComplexQuotedString() throws IOException {
         doTest(PARAM_COMPLEX_QUOTED);
     }
 

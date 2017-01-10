@@ -201,7 +201,7 @@ public final class DrawboardEndpoint extends Endpoint {
                                 DrawMessage msg = DrawMessage.parseFromString(
                                         messageContent.substring(indexOfChar + 1));
 
-                                // Don't ingore RuntimeExceptions thrown by
+                                // Don't ignore RuntimeExceptions thrown by
                                 // this method
                                 // TODO: Find a better solution than this variable
                                 dontSwallowException = true;

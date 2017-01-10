@@ -45,11 +45,11 @@ public class TestClientCert extends TomcatBaseTest {
         doTestClientCertGet(true);
     }
 
-    private void doTestClientCertGet(boolean preemtive) throws Exception {
+    private void doTestClientCertGet(boolean preemptive) throws Exception {
         Assume.assumeTrue("SSL renegotiation has to be supported for this test",
                 TesterSupport.isRenegotiationSupported(getTomcatInstance()));
 
-        if (preemtive) {
+        if (preemptive) {
             Tomcat tomcat = getTomcatInstance();
             // Only one context deployed
             Context c = (Context) tomcat.getHost().findChildren()[0];
@@ -62,7 +62,7 @@ public class TestClientCert extends TomcatBaseTest {
         // Unprotected resource
         ByteChunk res =
                 getUrl("https://localhost:" + getPort() + "/unprotected");
-        if (preemtive) {
+        if (preemptive) {
             assertEquals("OK-" + TesterSupport.ROLE, res.toString());
         } else {
             assertEquals("OK", res.toString());

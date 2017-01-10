@@ -112,7 +112,7 @@
   </Match>
   <Match>
     <!-- the platform default encoding is a fallback when calculating the
-    lenght of the string -->
+    length of the string -->
     <Class name="org.apache.catalina.connector.Request"/>
     <Method name="parseParts"/>
     <Bug code="Dm" />

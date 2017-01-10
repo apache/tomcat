@@ -144,7 +144,7 @@ HSTS header. It allows you to communicate to the browser that your site should
 always be accessed over https.</p>
 
 <p>Using name-based virtual hosts on a secured connection requires careful
-configuration of the names specfied in a single certificate or Tomcat 8.5
+configuration of the names specified in a single certificate or Tomcat 8.5
 onwards where Server Name Indication (SNI) support is available. SNI allows
 multiple certificates with different names to be associated with a single TLS
 connector.</p>

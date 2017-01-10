@@ -485,7 +485,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
     public static class BlockingPojo {
 
         private static Object monitor = new Object();
-        // Enable blockign by default
+        // Enable blocking by default
         private static boolean block = true;
 
         /**
@@ -980,30 +980,30 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
     }
 
     @Test
-    public void testPerMessageDefalteClient01() throws Exception {
-        doTestPerMessageDefalteClient(MESSAGE_STRING_1, 1);
+    public void testPerMessageDeflateClient01() throws Exception {
+        doTestPerMessageDeflateClient(MESSAGE_STRING_1, 1);
     }
 
 
     @Test
-    public void testPerMessageDefalteClient02() throws Exception {
-        doTestPerMessageDefalteClient(MESSAGE_EMPTY, 1);
+    public void testPerMessageDeflateClient02() throws Exception {
+        doTestPerMessageDeflateClient(MESSAGE_EMPTY, 1);
     }
 
 
     @Test
-    public void testPerMessageDefalteClient03() throws Exception {
-        doTestPerMessageDefalteClient(MESSAGE_STRING_1, 2);
+    public void testPerMessageDeflateClient03() throws Exception {
+        doTestPerMessageDeflateClient(MESSAGE_STRING_1, 2);
     }
 
 
     @Test
-    public void testPerMessageDefalteClient04() throws Exception {
-        doTestPerMessageDefalteClient(MESSAGE_EMPTY, 2);
+    public void testPerMessageDeflateClient04() throws Exception {
+        doTestPerMessageDeflateClient(MESSAGE_EMPTY, 2);
     }
 
 
-    private void doTestPerMessageDefalteClient(String msg, int count) throws Exception {
+    private void doTestPerMessageDeflateClient(String msg, int count) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // Must have a real docBase - just use temp
         Context ctx =
