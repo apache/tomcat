@@ -407,7 +407,7 @@
       <p>(String) A semicolon separated list of classnames extending
          <code>org.apache.tomcat.jdbc.pool.JdbcInterceptor</code> class.
          See <a href="#Configuring_JDBC_interceptors">Configuring JDBC interceptors</a>
-         below for more detailed description of syntaz and examples.
+         below for more detailed description of syntax and examples.
       </p>
       <p>
          These interceptors will be inserted as an interceptor into the chain
@@ -564,7 +564,7 @@
     </p>
     <p>Further interceptors will be added to the core of the pool as the need arises. Contributions are always welcome!</p>
     <p>Interceptors are of course not limited to just <code>java.sql.Connection</code> but can be used to wrap any
-    of the results from a method invokation as well. You could build query performance analyzer that provides JMX notifications when a
+    of the results from a method invocation as well. You could build query performance analyzer that provides JMX notifications when a
     query is running longer than the expected time.</p>
   </subsection>
   <subsection name="Configuring JDBC interceptors">
@@ -882,7 +882,7 @@
 <source><![CDATA[  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable]]></source>
     <p>
        method to get invoked. The <code>Method method</code> is the actual method invoked, and <code>Object[] args</code> are the arguments.
-       To look at a very simple example, where we demonstrate how to make the invokation to <code>java.sql.Connection.close()</code> a noop
+       To look at a very simple example, where we demonstrate how to make the invocation to <code>java.sql.Connection.close()</code> a noop
        if the connection has been closed
     </p>
 <source><![CDATA[  if (CLOSE_VAL==method.getName()) {

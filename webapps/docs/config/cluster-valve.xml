@@ -85,7 +85,7 @@
 <section name="org.apache.catalina.ha.session.JvmRouteBinderValve">
   In case of a mod_jk failover, the <code>JvmRouteBinderValve</code> will replace the
   <code>jvmWorker</code> attribute in the session Id, to make future requests stick to this
-  node. If you want failback capability, don't enable this valve, but if you want your failover to stick,
+  node. If you want fallback capability, don't enable this valve, but if you want your failover to stick,
   and for mod_jk not to have to keep probing the node that went down, you use this valve.
   <subsection name="Attributes">
     <attributes>

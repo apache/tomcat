@@ -103,7 +103,7 @@ public class TestELEvaluation {
         assertEquals("\\\\", evaluateExpression("\\\\"));
 
         /*
-         * LiteralExpresions can only contain ${ or #{ if escaped with \
+         * LiteralExpressions can only contain ${ or #{ if escaped with \
          * \ is not an escape character in any other circumstances including \\
          */
         assertEquals("\\", evaluateExpression("\\"));

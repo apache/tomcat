@@ -46,7 +46,7 @@
     application. You will need to reset this protection by returning to the
     <a href="<%=request.getContextPath()%>/html">main Host Manager page</a>.
     Once you return to this page, you will be able to continue using the Host
-    Manager appliction's HTML interface normally. If you continue to see this
+    Manager application's HTML interface normally. If you continue to see this
     access denied message, check that you have the necessary permissions to
     access this application.
    </p>
