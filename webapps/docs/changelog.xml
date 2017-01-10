@@ -94,6 +94,13 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Spelling corrections provided by Josh Soref. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.10 (markt)" rtext="release in progress">
   <subsection name="Catalina">
