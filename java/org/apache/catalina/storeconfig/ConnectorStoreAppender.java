@@ -36,9 +36,9 @@ import org.apache.tomcat.util.net.SocketProperties;
 /**
  * Store the Connector attributes. Connector has really special design. A
  * Connector is only a startup Wrapper for a ProtocolHandler. This meant that
- * ProtocolHandler get all there attribtues from the Connector attribtue map.
+ * ProtocolHandler get all there attributes from the Connector attribute map.
  * Strange is that some attributes change there name and the attribute
- * sslProtocol need a sepzial handling
+ * sslProtocol need a special handling
  */
 public class ConnectorStoreAppender extends StoreAppender {
 
@@ -252,7 +252,7 @@ public class ConnectorStoreAppender extends StoreAppender {
     }
 
     /**
-     * Print Connector Values. <ul><li> Spezial handling to default jkHome.
+     * Print Connector Values. <ul><li> Special handling to default jkHome.
      * </li><li> Don't save catalina.base path at server.xml</li><li></ul>
      *
      * @see org.apache.catalina.storeconfig.StoreAppender#isPrintValue(java.lang.Object,

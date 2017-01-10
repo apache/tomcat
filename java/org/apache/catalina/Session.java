@@ -326,7 +326,7 @@ public interface Session {
     /**
      * Remove a session event listener from this component.
      *
-     * @param listener remove the sesion listener, which will no longer be
+     * @param listener remove the session listener, which will no longer be
      *     notified
      */
     public void removeSessionListener(SessionListener listener);

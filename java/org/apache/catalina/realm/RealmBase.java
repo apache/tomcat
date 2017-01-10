@@ -420,7 +420,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         if (log.isDebugEnabled()) {
             log.debug("Digest : " + clientDigest + " Username:" + username
-                    + " ClientSigest:" + clientDigest + " nonce:" + nonce
+                    + " ClientDigest:" + clientDigest + " nonce:" + nonce
                     + " nc:" + nc + " cnonce:" + cnonce + " qop:" + qop
                     + " realm:" + realm + "md5a2:" + md5a2
                     + " Server digest:" + serverDigest);
@@ -776,7 +776,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     }
 
     /**
-     * Convert an ArrayList to a SecurityContraint [].
+     * Convert an ArrayList to a SecurityConstraint [].
      */
     private SecurityConstraint [] resultsToArray(
             ArrayList<SecurityConstraint> results) {

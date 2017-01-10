@@ -981,7 +981,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
         if (isSecure() && !sslAttributesParsed) {
             getAttribute(Globals.CERTIFICATES_ATTR);
         }
-        // Take a copy to prevent ConncurrentModificationExceptions if used to
+        // Take a copy to prevent ConcurrentModificationExceptions if used to
         // remove attributes
         Set<String> names = new HashSet<>();
         names.addAll(attributes.keySet());

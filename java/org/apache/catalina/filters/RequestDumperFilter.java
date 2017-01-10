@@ -44,7 +44,7 @@ import org.apache.juli.logging.LogFactory;
  * <p>When using this Filter, it is strongly recommended that the
  * <code>org.apache.catalina.filter.RequestDumperFilter</code> logger is
  * directed to a dedicated file and that the
- * <code>org.apache.juli.VerbatimFormmater</code> is used.</p>
+ * <code>org.apache.juli.VerbatimFormatter</code> is used.</p>
  *
  * @author Craig R. McClanahan
  */

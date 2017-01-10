@@ -28,7 +28,7 @@ import org.apache.catalina.tribes.Member;
 public interface RpcCallback {
 
     /**
-     * Allows sending a response to a recieved message.
+     * Allows sending a response to a received message.
      * @param msg The message
      * @param sender Member
      * @return Serializable object, <code>null</code> if no reply should be sent
