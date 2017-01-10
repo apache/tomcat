@@ -100,6 +100,9 @@
         Update the NSIS Installer used to build the Windows installer to version
         3.01. (markt)
       </update>
+      <fix>
+        Spelling corrections provided by Josh Soref. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>
