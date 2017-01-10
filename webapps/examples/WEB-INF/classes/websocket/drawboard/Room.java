@@ -58,7 +58,7 @@ public final class Room {
          */
         ERROR('0'),
         /**
-         * '1': DrawMesssage: contains serialized DrawMessage(s) prefixed
+         * '1': DrawMessage: contains serialized DrawMessage(s) prefixed
          *      with the current Player's {@link Player#lastReceivedMessageId}
          *      and ",".<br>
          *      Multiple draw messages are concatenated with "|" as separator.
@@ -186,7 +186,7 @@ public final class Room {
         // Add the new player to the list.
         players.add(p);
 
-        // If currently no Broacast Timer Task is scheduled, then we need to create one.
+        // If currently no Broadcast Timer Task is scheduled, then we need to create one.
         if (activeBroadcastTimerTask == null) {
             activeBroadcastTimerTask = createBroadcastTimerTask();
             drawmessageBroadcastTimer.schedule(activeBroadcastTimerTask,
@@ -227,7 +227,7 @@ public final class Room {
             // Note that it can happen that the TimerTask is just about to execute (from
             // the Timer thread) but waits until all players are gone (or even until a new
             // player is added to the list), and then executes. This is OK. To prevent it,
-            // a TimerTask subclass would need to have some boolan "cancel" instance variable and
+            // a TimerTask subclass would need to have some boolean "cancel" instance variable and
             // query it in the invocation of Room#invokeAndWait.
             activeBroadcastTimerTask.cancel();
             activeBroadcastTimerTask = null;
@@ -361,7 +361,7 @@ public final class Room {
 
             roomLock.lock();
             try {
-                // Explicitely overwrite value to ensure data consistency in
+                // Explicitly overwrite value to ensure data consistency in
                 // current thread
                 cachedRunnables = null;
 
@@ -472,7 +472,7 @@ public final class Room {
          * image and by broadcasting it to the connected players.
          *
          * @param msg   The draw message received
-         * @param msgId The ID for the draw message recieved
+         * @param msgId The ID for the draw message received
          */
         public void handleDrawMessage(DrawMessage msg, long msgId) {
             room.internalHandleDrawMessage(this, msg, msgId);

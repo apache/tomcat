@@ -25,7 +25,7 @@ ideal. These include:
 SVN
 ===
 
-For sources hosted in svn the approache is to svn copy the classes to the Tomcat
+For sources hosted in svn the approach is to svn copy the classes to the Tomcat
 source tree, modify them (always with a package rename, sometimes with
 additional changes) and then keep them in sync with the original via regular svn
 merges. This file keeps track of these copies to assist committers in keeping

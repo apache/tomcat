@@ -73,9 +73,9 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public static final String NOTIFY_ABANDON = "CONNECTION ABANDONED";
     public static final String SLOW_QUERY_NOTIFICATION = "SLOW QUERY";
     public static final String FAILED_QUERY_NOTIFICATION = "FAILED QUERY";
-    public static final String SUSPECT_ABANDONED_NOTIFICATION = "SUSPECT CONNETION ABANDONED";
+    public static final String SUSPECT_ABANDONED_NOTIFICATION = "SUSPECT CONNECTION ABANDONED";
     public static final String POOL_EMPTY = "POOL EMPTY";
-    public static final String SUSPECT_RETURNED_NOTIFICATION = "SUSPECT CONNETION RETURNED";
+    public static final String SUSPECT_RETURNED_NOTIFICATION = "SUSPECT CONNECTION RETURNED";
 
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {

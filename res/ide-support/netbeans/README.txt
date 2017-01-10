@@ -74,7 +74,7 @@ achieve a useful level of integration.
             still define this path in the nb-tomcat-project.properties file!
 
    Note: The current support for Tomcat in NetBeans does not include the
-         components in the modules directory (e.g. tomcate-lite).
+         components in the modules directory (e.g. tomcat-lite).
 
 4. Start NetBeans... once it has initialised and scanned your other open
    projects, just open an existing project and select the location of

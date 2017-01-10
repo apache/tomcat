@@ -1529,7 +1529,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     Filter, it is recommended that the
     <code>org.apache.catalina.filter.RequestDumperFilter</code> logger is
     directed to a dedicated file and that the
-    <code>org.apache.juli.VerbatimFormmater</code> is used.</p>
+    <code>org.apache.juli.VerbatimFormatter</code> is used.</p>
 
     <p><strong>WARNING: Using this filter has side-effects.</strong>  The
     output from this filter includes any parameters included with the request.

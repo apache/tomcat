@@ -22,7 +22,7 @@
 # in the top-level source directory, and customize it as needed.
 # -----------------------------------------------------------------------------
 
-# ----- Vesion Control Flags -----
+# ----- Version Control Flags -----
 version.major=1
 version.minor=1
 version.build=0

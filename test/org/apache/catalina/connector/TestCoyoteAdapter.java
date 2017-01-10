@@ -167,20 +167,20 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
 
     @Test
     public void testPathParamExtRootNoParam() throws Exception {
-        pathParamExtenionTest("/testapp/blah.txt", "none");
+        pathParamExtensionTest("/testapp/blah.txt", "none");
     }
 
     @Test
     public void testPathParamExtLevel1NoParam() throws Exception {
-        pathParamExtenionTest("/testapp/blah/blah.txt", "none");
+        pathParamExtensionTest("/testapp/blah/blah.txt", "none");
     }
 
     @Test
     public void testPathParamExtLevel1WithParam() throws Exception {
-        pathParamExtenionTest("/testapp/blah;x=y/blah.txt", "none");
+        pathParamExtensionTest("/testapp/blah;x=y/blah.txt", "none");
     }
 
-    private void pathParamExtenionTest(String path, String expected)
+    private void pathParamExtensionTest(String path, String expected)
             throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();

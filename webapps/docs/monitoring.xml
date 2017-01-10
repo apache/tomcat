@@ -827,7 +827,7 @@ Example to create remote MBean
 <p>
     <b>Warning</b>: Many Tomcat MBeans can't be linked to their parent once<br/>
     created. The Valve, Cluster and Realm MBeans are not automatically<br/>
-    connected with their parent. Use the <em>MBeanFacrory</em> create<br/>
+    connected with their parent. Use the <em>MBeanFactory</em> create<br/>
     operation instead.
 </p>
 
@@ -880,7 +880,7 @@ Example to unregister remote MBean
 
 <p>
     <b>Warning</b>: A lot of Tomcat MBeans can't be unregister.<br/>
-    The MBeans are not unlinked from their parent. Use <em>MBeanFacrory</em><br/>
+    The MBeans are not unlinked from their parent. Use <em>MBeanFactory</em><br/>
     remove operation instead.
 </p>
 
@@ -973,7 +973,7 @@ List of Attributes
   </tr>
 
   <tr>
-    <td>value (requiered)</td>
+    <td>value (required)</td>
     <td>Second arg for operation
     </td>
     <td></td>
@@ -1148,7 +1148,7 @@ Wait for server connection and that cluster backup node is accessible
 
     <ul>
       <li>You don't have to launch a full JVM and make a remote JMX connection
-      just to ask for one small piece of data from a runing server</li>
+      just to ask for one small piece of data from a running server</li>
       <li>You don't have to know how to work with JMX connections</li>
       <li>You don't need any of the complex configuration covered in the rest
       of this page</li>

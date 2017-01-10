@@ -181,7 +181,7 @@
   <property name="test.jvmarg.egd" value="" />
 
   <!-- Location of OpenSSL binary (file name, not directory) -->
-  <!-- The OpenSSL tests cases be disabled by specifing an invalid path here -->
+  <!-- The OpenSSL tests cases be disabled by specifying an invalid path here -->
   <property name="test.openssl.path" value="" />
 
   <!-- Include .gitignore in src distributions. -->
@@ -2321,7 +2321,7 @@ skip.installer property in build.properties" />
         <exclude name="bin/*.dll"/>
       </tarfileset>
       <!-- These need to be added after the bin directory is added else the  -->
-      <!-- bin diretcory will pick up the wrong permissions.                 -->
+      <!-- bin directory will pick up the wrong permissions.                 -->
       <tarfileset dir="${tomcat.dist}" dirmode="750" filemode="750" prefix="${final.name}">
         <include name="bin/catalina.sh" />
         <include name="bin/configtest.sh" />

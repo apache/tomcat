@@ -388,7 +388,7 @@
         used.</p>
       </attribute>
 
-      <attribute name="storeRegsitry" required="false">
+      <attribute name="storeRegistry" required="false">
         <p>The URL of the configuration file that configures how the
         <code>IStoreConfig</code> is to save the configuration. If not specified
         the built in resource

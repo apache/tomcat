@@ -752,9 +752,9 @@ public interface PoolConfiguration {
     public void setSuspectTimeout(int seconds);
 
     /**
-     * Returns the time in seconds to pass before a connection is marked an abanoned suspect.
+     * Returns the time in seconds to pass before a connection is marked an abandoned suspect.
      * Any value lesser than or equal to 0 means the check is disabled.
-     * @return Returns the time in seconds to pass before a connection is marked an abanoned suspect.
+     * @return Returns the time in seconds to pass before a connection is marked an abandoned suspect.
      */
     public int getSuspectTimeout();
 
