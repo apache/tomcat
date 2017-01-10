@@ -837,6 +837,17 @@ public class DataSourceProxy implements PoolConfiguration {
         }
     }
 
+    /**
+     * reset the statistics of this pool.
+     */
+    public void resetStats() {
+        try {
+            createPool().resetStats();
+        } catch (SQLException x) {
+            throw new RuntimeException(x);
+        }
+    }
+
     //=========================================================
     //  PROPERTIES / CONFIGURATION
     //=========================================================
