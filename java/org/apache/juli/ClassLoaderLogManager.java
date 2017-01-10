@@ -550,7 +550,7 @@ public class ClassLoaderLogManager extends LogManager {
                     continue;
                 }
                 // Parse and remove a prefix (prefix start with a digit, such as
-                // "10WebappFooHanlder.")
+                // "10WebappFooHandler.")
                 if (Character.isDigit(handlerClassName.charAt(0))) {
                     int pos = handlerClassName.indexOf('.');
                     if (pos >= 0) {

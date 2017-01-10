@@ -868,7 +868,7 @@ public class JspUtil {
     /**
      * Mangle the specified character to create a legal Java class name.
      * @param ch The character
-     * @return the replacement charater as a string
+     * @return the replacement character as a string
      */
     public static final String mangleChar(char ch) {
         char[] result = new char[5];

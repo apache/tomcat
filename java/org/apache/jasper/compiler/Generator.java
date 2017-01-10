@@ -1390,7 +1390,7 @@ class Generator {
                 }
             }
 
-            // JSP.5.1, Sematics, para 1 - lock not required for request or
+            // JSP.5.1, Semantics, para 1 - lock not required for request or
             // page scope
             String scopename = "javax.servlet.jsp.PageContext.PAGE_SCOPE"; // Default to page
             String lock = null;

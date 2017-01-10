@@ -133,7 +133,7 @@ final class Hpack {
     }
 
     /**
-     * Decodes an integer in the HPACK prefex format. If the return value is -1
+     * Decodes an integer in the HPACK prefix format. If the return value is -1
      * it means that there was not enough data in the buffer to complete the decoding
      * sequence.
      * <p/>

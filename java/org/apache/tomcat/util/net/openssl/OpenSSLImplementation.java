@@ -38,7 +38,7 @@ public class OpenSSLImplementation extends SSLImplementation {
 
     @Override
     public boolean isAlpnSupported() {
-        // OpenSSL supportd ALPN
+        // OpenSSL supported ALPN
         return true;
     }
 }

@@ -129,7 +129,7 @@
 
 <!-- The "descriptor" element groups a set of descriptor fields whose
      values will be included in the Descriptor for the corresponding
-     metatdata info classes.
+     metadata info classes.
 -->
 <!ELEMENT descriptor (field*)>
 <!ATTLIST descriptor        id           ID             #IMPLIED>
