@@ -157,7 +157,7 @@ grant [signedBy <signer>,] [codeBase <code source>] {
   <subsection name="Permissions for packed WAR files">
 
     <p>When using packed WAR files, it is necessary to use Tomcat's custom war
-    URL protocol to asisgn permissions to web application code.</p>
+    URL protocol to assign permissions to web application code.</p>
 
     <p>To assign permissions to the entire web application the entry in the
     policy file would look like this:</p>

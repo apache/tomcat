@@ -92,7 +92,7 @@ public abstract class JdbcInterceptor implements InvocationHandler {
     private boolean useEquals = true;
 
     /**
-     * Public constructor for instantation through reflection
+     * Public constructor for instantiation through reflection
      */
     public JdbcInterceptor() {
         // NOOP

@@ -71,7 +71,7 @@
 <!ENTITY % appinfo "%p;appinfo">
 <!ENTITY % documentation "%p;documentation">
 
-<!-- Customisation entities for the ATTLIST of each element type.
+<!-- Customization entities for the ATTLIST of each element type.
      Define one of these if your schema takes advantage of the
      anyAttribute='##other' in the schema for schemas -->
 

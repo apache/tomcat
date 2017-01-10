@@ -73,7 +73,7 @@ public class MultiCastSender
         try {
             s.send(data);
         } catch (Exception ex) {
-            log.error("Unable to send colllected load information: " + ex);
+            log.error("Unable to send collected load information: " + ex);
             s.close();
             s = null;
             return -1;

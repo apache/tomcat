@@ -398,7 +398,7 @@ described above, and accessed with username "dbuser" and password "dbpass":</p>
     (For FORM-based authentication, that means until the session times out or
     is invalidated; for BASIC authentication, that means until the user
     closes their browser).  The cached user is <strong>not</strong> saved and
-    restored across sessions serialisations. Any changes to the database
+    restored across sessions serializations. Any changes to the database
     information for an already authenticated user will <strong>not</strong> be
     reflected until the next time that user logs on again.</li>
 <li>Administering the information in the <em>users</em> and <em>user roles</em>
@@ -508,7 +508,7 @@ name "java:/comp/env/jdbc/authority".</p>
     (For FORM-based authentication, that means until the session times out or
     is invalidated; for BASIC authentication, that means until the user
     closes their browser).  The cached user is <strong>not</strong> saved and
-    restored across sessions serialisations. Any changes to the database
+    restored across sessions serializations. Any changes to the database
     information for an already authenticated user will <strong>not</strong> be
     reflected until the next time that user logs on again.</li>
 <li>Administering the information in the <em>users</em> and <em>user roles</em>
@@ -885,7 +885,7 @@ authentication is usually to be preferred.</p>
     (For FORM-based authentication, that means until the session times out or
     is invalidated; for BASIC authentication, that means until the user
     closes their browser).  The cached user is <strong>not</strong> saved and
-    restored across sessions serialisations. Any changes to the directory
+    restored across sessions serializations. Any changes to the directory
     information for an already authenticated user will <strong>not</strong> be
     reflected until the next time that user logs on again.</li>
 <li>Administering the information in the directory server
@@ -952,7 +952,7 @@ to all virtual hosts and web applications.  The default contents of the
     (For FORM-based authentication, that means until the session times out or
     is invalidated; for BASIC authentication, that means until the user
     closes their browser).  The cached user is <strong>not</strong> saved and
-    restored across sessions serialisations.</li>
+    restored across sessions serializations.</li>
 </ul>
 
 
@@ -1010,7 +1010,7 @@ valid user, consisting of the following attributes:</p>
     (For FORM-based authentication, that means until the session times out or
     is invalidated; for BASIC authentication, that means until the user
     closes their browser).  The cached user is <strong>not</strong> saved and
-    restored across sessions serialisations.</li>
+    restored across sessions serializations.</li>
 <li>Administering the information in the users file is the responsibility
     of your application.  Tomcat does not
     provide any built-in capabilities to maintain users and roles.</li>

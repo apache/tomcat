@@ -161,7 +161,7 @@ public class ConnectionPool {
      * If a connection is not retrieved, the Future must be cancelled in order for the connection to be returned
      * to the pool.
      * @return a Future containing a reference to the connection or the future connection
-     * @throws SQLException Cannot use asyncronous connect
+     * @throws SQLException Cannot use asynchronous connect
      */
     public Future<Connection> getConnectionAsync() throws SQLException {
         try {
@@ -545,7 +545,7 @@ public class ConnectionPool {
     /**
      * thread safe way to abandon a connection
      * signals a connection to be abandoned.
-     * this will disconnect the connection, and log the stack trace if logAbanded=true
+     * this will disconnect the connection, and log the stack trace if logAbandoned=true
      * @param con PooledConnection
      */
     protected void abandon(PooledConnection con) {

@@ -997,7 +997,7 @@ class Validator {
             }
 
             if (doctypePublic != null && doctypeSystem == null) {
-                err.jspError(n, "jsp.error.jspoutput.doctypepulicsystem");
+                err.jspError(n, "jsp.error.jspoutput.doctypepublicsystem");
             }
 
             if (omitXmlDecl != null) {
@@ -1718,7 +1718,7 @@ class Validator {
                 @Override
                 public void visit(ELNode.Function n) throws JasperException {
 
-                    // Lambda / ImportHandler defined fucntion
+                    // Lambda / ImportHandler defined function
                     if (n.getFunctionInfo() == null) {
                         return;
                     }

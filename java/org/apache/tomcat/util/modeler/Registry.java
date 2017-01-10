@@ -49,7 +49,7 @@ import org.apache.tomcat.util.modeler.modules.ModelerSource;
    - double check the interfaces
    - start removing the use of the experimental methods in tomcat, then remove
      the methods ( before 1.1 final )
-   - is the security enough to prevent Registry beeing used to avoid the permission
+   - is the security enough to prevent Registry being used to avoid the permission
     checks in the mbean server ?
 */
 
@@ -85,7 +85,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      */
     private static Registry registry = null;
 
-    // Per registy fields
+    // Per registry fields
 
     /**
      * The <code>MBeanServer</code> instance that we will use to register

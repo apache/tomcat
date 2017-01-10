@@ -86,7 +86,7 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
     }
 
 
-    // Need to test sending push promise when push promise suport is disabled
+    // Need to test sending push promise when push promise support is disabled
 
     @Test
     public void testSettingsFrameInvalidPushSetting() throws Exception {

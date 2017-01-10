@@ -182,7 +182,7 @@ public class SignCode extends Task {
         SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
         SOAPConnection connection = soapConnectionFactory.createConnection();
 
-        log("Sending siging request to server and waiting for response");
+        log("Sending singing request to server and waiting for response");
         SOAPMessage response = connection.call(message, SIGNING_SERVICE_URL);
 
         log("Processing response");

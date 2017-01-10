@@ -28,7 +28,7 @@ package org.apache.catalina.tribes;
 public interface ErrorHandler {
 
     /**
-     * Invoked if the message is dispatched asynch, and an error occurs
+     * Invoked if the message is dispatched async, and an error occurs
      * @param x ChannelException - the error that happened
      * @param id - the unique id for the message
      * @see Channel#send(Member[], java.io.Serializable, int, ErrorHandler)

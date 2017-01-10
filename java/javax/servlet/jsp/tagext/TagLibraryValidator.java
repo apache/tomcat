@@ -46,7 +46,7 @@ import java.util.Map;
  * tag elements themselves are checked, the prefix parameter should be
  * ignored and the actual prefix of the element should be used instead.
  * TagLibraryValidators should always use the uri to identify elements
- * as beloning to the tag library, not the prefix.
+ * as belonging to the tag library, not the prefix.
  *
  * <p>
  * A TagLibraryValidator instance

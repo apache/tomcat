@@ -293,7 +293,7 @@
 
             When specified, this element causes uncovered http methods
             to be denied. For every url-pattern that is the target of a
-            security-constrant, this element causes all HTTP methods that
+            security-constraint, this element causes all HTTP methods that
             are NOT covered (by a security constraint) at the url-pattern
             to be denied.
 

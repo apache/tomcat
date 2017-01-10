@@ -73,7 +73,7 @@ public class TestJarInputStreamWrapper {
 
 
     @Test
-    public void testMarkSupprotedAfterClose() throws Exception {
+    public void testMarkSupportedAfterClose() throws Exception {
         Method m = InputStream.class.getMethod("markSupported", (Class<?>[]) null);
         testMethodAfterClose(m, (Object[]) null);
     }

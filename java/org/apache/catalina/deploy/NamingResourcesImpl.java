@@ -120,7 +120,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
 
 
     /**
-     * The message destination referencess for this web application,
+     * The message destination references for this web application,
      * keyed by name.
      */
     private final HashMap<String, MessageDestinationRef> mdrs = new HashMap<>();

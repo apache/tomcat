@@ -599,7 +599,7 @@ should be completed:</p>
     Tomcat does not keep session instances in sync across the cluster.
     The implementation of such logic would be to much overhead and cause all
     kinds of problems. If your client accesses the same session
-    simultanously using multiple requests, then the last request
+    simultaneously using multiple requests, then the last request
     will override the other sessions in the cluster.
 </p>
 

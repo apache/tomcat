@@ -243,7 +243,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 sc.write(netOutBuffer).get(endpoint.getConnectionTimeout(),
                                         TimeUnit.MILLISECONDS);
                             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                                throw new IOException(sm.getString("channel.nio.ssl.handhakeError"));
+                                throw new IOException(sm.getString("channel.nio.ssl.handshakeError"));
                             }
                         }
                         return 1;
@@ -277,7 +277,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 sc.write(netOutBuffer).get(endpoint.getConnectionTimeout(),
                                         TimeUnit.MILLISECONDS);
                             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                                throw new IOException(sm.getString("channel.nio.ssl.handhakeError"));
+                                throw new IOException(sm.getString("channel.nio.ssl.handshakeError"));
                             }
                         }
                         return 1;
@@ -301,7 +301,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 sc.read(netInBuffer).get(endpoint.getConnectionTimeout(),
                                         TimeUnit.MILLISECONDS);
                             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                                throw new IOException(sm.getString("channel.nio.ssl.handhakeError"));
+                                throw new IOException(sm.getString("channel.nio.ssl.handshakeError"));
                             }
                         }
                         return 1;

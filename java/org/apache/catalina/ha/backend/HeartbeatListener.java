@@ -29,7 +29,7 @@ import org.apache.juli.logging.LogFactory;
 /*
  * Listener to provider informations to mod_heartbeat.c
  * *msg_format = "v=%u&ready=%u&busy=%u"; (message to send).
- * send the muticast message using the format...
+ * send the multicast message using the format...
  * what about the bind(IP. port) only IP makes sense (for the moment).
  * BTW:v  = version :-)
  */
@@ -117,7 +117,7 @@ public class HeartbeatListener implements LifecycleListener, ContainerListener {
             try {
                 sender.send(output);
             } catch (Exception ex) {
-                log.error("Unable to send colllected load information: " + ex);
+                log.error("Unable to send collected load information: " + ex);
             }
         }
     }

@@ -426,7 +426,7 @@
         <xsd:annotation>
           <xsd:documentation>
 
-            Defines the subclass of javax.serlvet.jsp.tagext.JspTag
+            Defines the subclass of javax.servlet.jsp.tagext.JspTag
             that implements the request time semantics for
             this tag. (required)
 
@@ -510,7 +510,7 @@
       <xsd:documentation>
 
         The attribute element defines an attribute for the nesting
-        tag.  The attributre element may have several subelements
+        tag.  The attribute element may have several subelements
         defining:
 
         description     a description of the attribute
@@ -901,7 +901,7 @@
         declare                  Whether the variable is declared
                                  or not.  True is the default.
 
-        scope                    The scope of the scripting varaible
+        scope                    The scope of the scripting variable
                                  defined.  NESTED is default.
 
       </xsd:documentation>

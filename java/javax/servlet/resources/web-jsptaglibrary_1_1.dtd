@@ -85,7 +85,7 @@ the taglibrary Leave it empty if it does not apply.
 <!ELEMENT uri         (#PCDATA) >
 
 <!--
-Defines an arbitrary text string descirbing the tag library
+Defines an arbitrary text string describing the tag library
 -->
 
 <!ELEMENT info        (#PCDATA) >
@@ -104,7 +104,7 @@ The tag defines a unique tag in this tag library, defining:
 <!ELEMENT tag (name, tagclass, teiclass?, bodycontent?, info?, attribute*) >
 
 <!--
-Defines the subclass of javax.serlvet.jsp.tagext.Tag that implements
+Defines the subclass of javax.servlet.jsp.tagext.Tag that implements
 the request time semantics for this tag. (required)
 
 #PCDATA ::= fully qualified Java class name
@@ -131,7 +131,7 @@ There are currently three values specified:
 
 tagdependent    The body of the tag is interpreted by the tag
                 implementation itself, and is most likely in a
-                different "langage", e.g embedded SQL statements.
+                different "language", e.g embedded SQL statements.
 
 JSP             The body of the tag contains nested JSP syntax
 
