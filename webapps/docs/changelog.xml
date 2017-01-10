@@ -242,6 +242,9 @@
         Update the ASF logos used in the Apache Tomcat installer for Windows to
         use the new versions.
       </update>
+      <fix>
+        Spelling corrections provided by Josh Soref. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>
