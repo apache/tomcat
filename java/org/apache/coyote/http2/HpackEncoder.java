@@ -163,14 +163,14 @@ class HpackEncoder {
                     if (tableEntry == null && canIndex) {
                         //add the entry to the dynamic table
                         target.put((byte) (1 << 6));
-                        writeHuffmanEncodableName(target, headerName);
-                        writeHuffmanEncodableValue(target, headerName, val);
+                        writeHuffmanEncodeableName(target, headerName);
+                        writeHuffmanEncodeableValue(target, headerName, val);
                         addToDynamicTable(headerName, val);
                     } else if (tableEntry == null) {
                         //literal never indexed
                         target.put((byte) (1 << 4));
-                        writeHuffmanEncodableName(target, headerName);
-                        writeHuffmanEncodableValue(target, headerName, val);
+                        writeHuffmanEncodeableName(target, headerName);
+                        writeHuffmanEncodeableValue(target, headerName, val);
                     } else {
                         //so we know something is already in the table
                         if (val.equals(tableEntry.value)) {
@@ -182,13 +182,13 @@ class HpackEncoder {
                                 //add the entry to the dynamic table
                                 target.put((byte) (1 << 6));
                                 Hpack.encodeInteger(target, tableEntry.getPosition(), 6);
-                                writeHuffmanEncodableValue(target, headerName, val);
+                                writeHuffmanEncodeableValue(target, headerName, val);
                                 addToDynamicTable(headerName, val);
 
                             } else {
                                 target.put((byte) (1 << 4));
                                 Hpack.encodeInteger(target, tableEntry.getPosition(), 4);
-                                writeHuffmanEncodableValue(target, headerName, val);
+                                writeHuffmanEncodeableValue(target, headerName, val);
                             }
                         }
                     }
@@ -204,7 +204,7 @@ class HpackEncoder {
         return State.COMPLETE;
     }
 
-    private void writeHuffmanEncodableName(ByteBuffer target, String headerName) {
+    private void writeHuffmanEncodeableName(ByteBuffer target, String headerName) {
         if (hpackHeaderFunction.shouldUseHuffman(headerName)) {
             if(HPackHuffman.encode(target, headerName, true)) {
                 return;
@@ -218,7 +218,7 @@ class HpackEncoder {
 
     }
 
-    private void writeHuffmanEncodableValue(ByteBuffer target, String headerName, String val) {
+    private void writeHuffmanEncodeableValue(ByteBuffer target, String headerName, String val) {
         if (hpackHeaderFunction.shouldUseHuffman(headerName, val)) {
             if (!HPackHuffman.encode(target, val, false)) {
                 writeValueString(target, val);

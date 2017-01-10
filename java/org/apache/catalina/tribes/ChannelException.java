@@ -30,7 +30,7 @@ import java.util.ArrayList;
 public class ChannelException extends Exception {
     private static final long serialVersionUID = 1L;
     /**
-     * Empty list to avoid reinstatiating lists
+     * Empty list to avoid reinstantiating lists
      */
     protected static final FaultyMember[] EMPTY_LIST = new FaultyMember[0];
     /**

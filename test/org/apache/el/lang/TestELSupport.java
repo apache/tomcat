@@ -244,7 +244,7 @@ public class TestELSupport {
     public void testCoerceToNumber01() {
         Object result = ELSupport.coerceToNumber(
                 null, (Object) null, Integer.class);
-        Assert.assertNull("Resut: " + result, result);
+        Assert.assertNull("Result: " + result, result);
     }
 
     @Test
@@ -263,7 +263,7 @@ public class TestELSupport {
     @Test
     public void testCoerceToBoolean02() {
         Object result = ELSupport.coerceToBoolean(null, null, false);
-        Assert.assertNull("Resut: " + result, result);
+        Assert.assertNull("Result: " + result, result);
     }
 
     private static void testIsSame(Object value) {

@@ -38,7 +38,7 @@ import org.apache.tomcat.util.net.SocketProperties;
 /**
  * Store the Connector attributes. Connector has really special design. A
  * Connector is only a startup Wrapper for a ProtocolHandler. This meant that
- * ProtocolHandler get all there attribtues from the Connector attribtue map.
+ * ProtocolHandler get all there attributes from the Connector attribute map.
  * Strange is that some attributes change there name and the attribute
  * sslProtocol need a sepzial handling
  */
@@ -208,7 +208,7 @@ public class ConnectorStoreAppender extends StoreAppender {
      * @param aDesc The connector description
      * @throws Exception Store error occurred
      */
-    protected void storeConnectorAttribtues(PrintWriter aWriter, int indent,
+    protected void storeConnectorAttributes(PrintWriter aWriter, int indent,
             Object bean, StoreDescription aDesc) throws Exception {
         if (aDesc.isAttributes()) {
             printAttributes(aWriter, indent, false, bean, aDesc);
@@ -227,7 +227,7 @@ public class ConnectorStoreAppender extends StoreAppender {
             StoreDescription aDesc) throws Exception {
         aWriter.print("<");
         aWriter.print(aDesc.getTag());
-        storeConnectorAttribtues(aWriter, indent, bean, aDesc);
+        storeConnectorAttributes(aWriter, indent, bean, aDesc);
         aWriter.println(">");
     }
 
@@ -243,7 +243,7 @@ public class ConnectorStoreAppender extends StoreAppender {
             StoreDescription aDesc) throws Exception {
         aWriter.print("<");
         aWriter.print(aDesc.getTag());
-        storeConnectorAttribtues(aWriter, indent, bean, aDesc);
+        storeConnectorAttributes(aWriter, indent, bean, aDesc);
         aWriter.println("/>");
     }
 
@@ -264,7 +264,7 @@ public class ConnectorStoreAppender extends StoreAppender {
     }
 
     /**
-     * Print Connector Values. <ul><li> Spezial handling to default jkHome.
+     * Print Connector Values. <ul><li> Special handling to default jkHome.
      * </li><li> Don't save catalina.base path at server.xml</li><li></ul>
      *
      * @see org.apache.catalina.storeconfig.StoreAppender#isPrintValue(java.lang.Object,

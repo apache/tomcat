@@ -63,7 +63,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
     @Override
     public AuthConfigProvider getConfigProvider(String layer, String appContext,
             RegistrationListener listener) {
-        String registrationID = getRegistrarionID(layer, appContext);
+        String registrationID = getRegistrationID(layer, appContext);
         RegistrationContextImpl registrationContext = registrations.get(registrationID);
         if (registrationContext != null) {
             registrationContext.addListener(null);
@@ -108,7 +108,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             throw new SecurityException(e);
         }
 
-        String registrationID = getRegistrarionID(layer, appContext);
+        String registrationID = getRegistrationID(layer, appContext);
         registrations.put(registrationID,
                 new RegistrationContextImpl(layer, appContext, description, true, provider, properties));
         return registrationID;
@@ -122,7 +122,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             log.debug(sm.getString("authConfigFactoryImpl.registerInstance",
                     provider.getClass().getName(), layer, appContext));
         }
-        String registrationID = getRegistrarionID(layer, appContext);
+        String registrationID = getRegistrationID(layer, appContext);
         registrations.put(registrationID,
                 new RegistrationContextImpl(layer, appContext, description, false, provider, null));
         return registrationID;
@@ -137,7 +137,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
     @Override
     public String[] detachListener(RegistrationListener listener, String layer, String appContext) {
-        String registrationID = getRegistrarionID(layer, appContext);
+        String registrationID = getRegistrationID(layer, appContext);
         RegistrationContextImpl registrationContext = registrations.get(registrationID);
         if (registrationContext.removeListener(listener)) {
             return new String[] { registrationID };
@@ -174,7 +174,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
     }
 
 
-    private String getRegistrarionID(String layer, String appContext) {
+    private String getRegistrationID(String layer, String appContext) {
         return layer + ":" + appContext;
     }
 

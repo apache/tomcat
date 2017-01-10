@@ -897,7 +897,7 @@
         Ensure that reading the <code>singleThreadModel</code> attribute of a
         <code>StandardWrapper</code> via JMX does not trigger initialisation of
         the associated servlet. With some frameworks this can trigger an
-        unexpected initialisation thread and if initilisation is not thread-safe
+        unexpected initialisation thread and if initialization is not thread-safe
         the initialisation can then fail. (markt)
       </fix>
       <fix>
@@ -1497,7 +1497,7 @@
         Modify the handling of read/write timeouts so that the appropriate error
         handling (<code>ReadListener.onError()</code>,
         <code>WriteListener.onError()</code> or
-        <code>AsycnListener.onError()</code>) is called. (markt)
+        <code>AsyncListener.onError()</code>) is called. (markt)
       </fix>
       <fix>
        If an async dispatch results in the completion of request processing,

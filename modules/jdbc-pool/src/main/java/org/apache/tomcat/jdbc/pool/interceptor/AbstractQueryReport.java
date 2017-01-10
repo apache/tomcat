@@ -128,7 +128,7 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
     /**
      * returns the query measure threshold.
      * This value is in milliseconds. If the query is faster than this threshold than it wont be accounted for
-     * @return the threshhold in milliseconds
+     * @return the threshold in milliseconds
      */
     public long getThreshold() {
         return threshold;

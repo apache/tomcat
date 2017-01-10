@@ -90,15 +90,15 @@
       will be used.</p>
     </attribute>
 
-    <attribute name="maxConccurentStreamExecution" required="false">
+    <attribute name="maxConcurrentStreamExecution" required="false">
       <p>The controls the maximum number of streams for any one connection that
       can be allocated threads from the container thread pool. If more streams
-      are active than threads are avaialble, those streams will have to wait
+      are active than threads are available, those streams will have to wait
       for a stream to become available. If not specified, the default value of
       <code>200</code> will be used.</p>
     </attribute>
 
-    <attribute name="maxConccurentStreams" required="false">
+    <attribute name="maxConcurrentStreams" required="false">
       <p>The controls the maximum number of active streams permitted for any one
       connection. If a client attempts to open more active streams than this
       limit, the stream will be reset with a <code>STREAM_REFUSED</code> error.

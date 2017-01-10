@@ -598,7 +598,7 @@
     </attribute>
 
     <attribute name="throwOnFailure" required="false">
-      <p>If the Connector expereinces an Exception during a Lifecycle transition
+      <p>If the Connector experiences an Exception during a Lifecycle transition
       should the Exception be rethrown or logged? If not specified, the default
       of <code>false</code> will be used. Note that the default can be changed
       by the <code>org.apache.catalina.startup.EXIT_ON_INIT_FAILURE</code>
@@ -1045,7 +1045,7 @@
      <strong>Connector</strong>.</p>
 
   <p>Additional configuration attributes are available. See the
-  <a href="http2.html">HTTP/2 Upgrade Protocol</a> documentaion for details.</p>
+  <a href="http2.html">HTTP/2 Upgrade Protocol</a> documentation for details.</p>
 
   </subsection>
 

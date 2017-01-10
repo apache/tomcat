@@ -35,7 +35,7 @@ public interface FilterRegistration extends Registration {
      *                        (<code>true</code>) or before?
      * @param servletNames    Requests mapped to these servlets will be
      *                        processed by this filter
-     * @throws IllegalArgumentException if the list of sevrlet names is empty
+     * @throws IllegalArgumentException if the list of servlet names is empty
      *                                  or null
      * @throws IllegalStateException if the associated ServletContext has
      *                               already been initialised

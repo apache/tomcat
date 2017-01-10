@@ -361,7 +361,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
 
 
     /**
-     * Check if the contraint applies to a URI and method.
+     * Check if the constraint applies to a URI and method.
      * @param uri Context-relative URI to check
      * @param method Request method being used
      * @return <code>true</code> if the specified context-relative URI (and

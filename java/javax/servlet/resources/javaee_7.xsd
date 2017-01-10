@@ -1666,7 +1666,7 @@
         method for any given event and that the method may not
         be overloaded.
 
-        If the lifefycle-callback-class element is missing then
+        If the lifecycle-callback-class element is missing then
         the class defining the callback is assumed to be the
         component class in scope at the place in the descriptor
         in which the callback definition appears.

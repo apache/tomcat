@@ -237,7 +237,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
      * can be normalized without stepping outside of the root.
      *
      * @param path
-     * @return  the normlized path
+     * @return  the normalized path
      */
     private String validate(String path) {
         if (!getState().isAvailable()) {

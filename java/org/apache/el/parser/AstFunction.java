@@ -153,7 +153,7 @@ public final class AstFunction extends SimpleNode {
         // single set of method parameters
         if (this.jjtGetNumChildren() != 1) {
             throw new ELException(MessageFactory.get(
-                    "error.funciton.tooManyMethodParameterSets",
+                    "error.function.tooManyMethodParameterSets",
                     getOutputName()));
         }
 

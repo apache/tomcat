@@ -605,7 +605,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         HttpServletRequest request = mockServlet.getRequest();
         Assert.assertNotNull(request);
 
-        // VALIDATE X-FOWARDED-FOR
+        // VALIDATE X-FORWARDED-FOR
         Assert.assertEquals(expectedRemoteAddr, request.getRemoteAddr());
         Assert.assertEquals(expectedRemoteAddr, request.getRemoteHost());
 

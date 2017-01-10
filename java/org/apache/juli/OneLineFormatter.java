@@ -39,7 +39,7 @@ import java.util.logging.LogRecord;
 public class OneLineFormatter extends Formatter {
 
     private static final String ST_SEP = System.lineSeparator() + " ";
-    private static final String UNKONWN_THREAD_NAME = "Unknown thread with ID ";
+    private static final String UNKNOWN_THREAD_NAME = "Unknown thread with ID ";
     private static final Object threadMxBeanLock = new Object();
     private static volatile ThreadMXBean threadMxBean = null;
     private static final int THREAD_NAME_CACHE_SIZE = 10000;
@@ -204,7 +204,7 @@ public class OneLineFormatter extends Formatter {
         }
 
         if (logRecordThreadId > Integer.MAX_VALUE / 2) {
-            result = UNKONWN_THREAD_NAME + logRecordThreadId;
+            result = UNKNOWN_THREAD_NAME + logRecordThreadId;
         } else {
             // Double checked locking OK as threadMxBean is volatile
             if (threadMxBean == null) {

@@ -35,7 +35,7 @@ public class TestImplicitTldParser {
     }
 
     @Test
-    public void testImpicitTldGood() throws Exception {
+    public void testImplicitTldGood() throws Exception {
         TaglibXml xml = parse("test/tld/implicit-good.tld");
         Assert.assertEquals("1.0", xml.getTlibVersion());
         Assert.assertEquals("2.1", xml.getJspVersion());
@@ -43,7 +43,7 @@ public class TestImplicitTldParser {
     }
 
     @Test(expected=SAXParseException.class)
-    public void testImpicitTldBad() throws Exception {
+    public void testImplicitTldBad() throws Exception {
         TaglibXml xml = parse("test/tld/implicit-bad.tld");
         Assert.assertEquals("1.0", xml.getTlibVersion());
         Assert.assertEquals("2.1", xml.getJspVersion());

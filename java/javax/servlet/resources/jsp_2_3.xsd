@@ -199,7 +199,7 @@
             or text declaration of a document in XML syntax and
             in a JSP configuration element matching the document.
             It is legal to name the same encoding through
-            mulitple mechanisms.
+            multiple mechanisms.
 
           </xsd:documentation>
         </xsd:annotation>

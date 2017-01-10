@@ -493,7 +493,7 @@
           <xsd:documentation>
 
             The jaxrpc-mapping-file element contains the name of a file that
-            describes the JAX-RPC mapping between the Java interaces used by
+            describes the JAX-RPC mapping between the Java interfaces used by
             the application and the WSDL description in the wsdl-file.  The
             file name is a relative path within the module.
 

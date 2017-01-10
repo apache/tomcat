@@ -47,7 +47,7 @@
 <!ENTITY % pattern "%p;pattern">
 
 <!--
-        Customisation entities for the ATTLIST of each element
+        Customization entities for the ATTLIST of each element
         type. Define one of these if your schema takes advantage
         of the anyAttribute='##other' in the schema for schemas
   -->

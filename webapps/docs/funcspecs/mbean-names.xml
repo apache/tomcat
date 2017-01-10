@@ -39,7 +39,7 @@
     <p>We will be using <em>JMX MBeans</em> as the technology for
     implementing manageability of Tomcat.</p>
 
-    <p>One of the key concepts of JMX is that each management bean has a uniqu
+    <p>One of the key concepts of JMX is that each management bean has a unique
     name in the MBeanServer's registry, and that management applications can
     utilize these names to retrieve the MBean of interest to them for a
     particular management operation. This document proposes a naming convention

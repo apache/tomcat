@@ -25,7 +25,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * StoreFactory saves spezial elements.
+ * StoreFactory saves special elements.
  * Output was generate with StoreAppenders.
  */
 public class StoreFactoryBase implements IStoreFactory {
@@ -47,7 +47,7 @@ public class StoreFactoryBase implements IStoreFactory {
     private static final String info = "org.apache.catalina.config.StoreFactoryBase/1.0";
 
     /**
-     * @return descriptive information about this Facotry implementation and the
+     * @return descriptive information about this Factory implementation and the
      * corresponding version number, in the format
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
@@ -192,7 +192,7 @@ public class StoreFactoryBase implements IStoreFactory {
                     storeElement(aWriter, indent, elements[i]);
                 } catch (IOException ioe) {
                     // ignore children report error them self!
-                    // see StandartContext.storeWithBackup()
+                    // see StandardContext.storeWithBackup()
                 }
             }
         }

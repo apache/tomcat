@@ -203,7 +203,7 @@ com.sun.security.jgss.krb5.accept {
   <subsection name="Web application">
   <p>The web application needs to be configured to the use Tomcat specific
   authentication method of <code>SPNEGO</code> (rather than BASIC etc.) in
-  web.xml. As with the other authenticators, behaviour can be customised by
+  web.xml. As with the other authenticators, behaviour can be customized by
   explicitly configuring the <a href="config/valve.html#SPNEGO_Valve">
   authentication valve</a> and setting attributes on the Valve.</p>
   </subsection>

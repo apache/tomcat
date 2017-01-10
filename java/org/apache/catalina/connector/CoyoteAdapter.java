@@ -1097,7 +1097,7 @@ public class CoyoteAdapter implements Adapter {
     /**
      * Character conversion of the a US-ASCII MessageBytes.
      *
-     * @param mb The MessageBytes instance contaning the bytes that should be converted to chars
+     * @param mb The MessageBytes instance containing the bytes that should be converted to chars
      */
     protected void convertMB(MessageBytes mb) {
 
