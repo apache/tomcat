@@ -829,7 +829,7 @@ Used in: web-app
 <!--
 the taglib-location element contains the location (as a resource
 relative to the root of the web application) where to find the Tag
-Libary Description file for the tag library.
+Library Description file for the tag library.
 
 Used in: taglib
 -->

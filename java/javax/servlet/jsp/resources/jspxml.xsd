@@ -359,7 +359,7 @@
   <xsd:element name = "declaration" type = "xsd:string">
     <xsd:annotation>
       <xsd:documentation>
-        The reprsentation of a declaration.
+        The representation of a declaration.
       </xsd:documentation>
     </xsd:annotation>
   </xsd:element>

@@ -47,7 +47,7 @@ public interface ServletRequest {
      * requests made using HTTPS, the attribute
      * <code>javax.servlet.request.X509Certificate</code> can be used to
      * retrieve information on the certificate of the client. Attributes can
-     * also be set programatically using {@link ServletRequest#setAttribute}.
+     * also be set programmatically using {@link ServletRequest#setAttribute}.
      * This allows information to be embedded into a request before a
      * {@link RequestDispatcher} call.
      * <p>
