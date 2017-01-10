@@ -219,6 +219,12 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
     public void testIdle() {
         pool.testAllIdle();
     }
+
+    @Override
+    public void resetStats() {
+        pool.resetStats();
+    }
+
     //=================================================================
     //       POOL PROPERTIES
     //=================================================================

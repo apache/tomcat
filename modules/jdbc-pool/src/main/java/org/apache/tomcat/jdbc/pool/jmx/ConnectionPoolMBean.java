@@ -74,6 +74,11 @@ public interface ConnectionPoolMBean extends PoolConfiguration  {
      */
     public void purgeOnReturn();
 
+    /**
+     * reset the statistics of this pool.
+     */
+    public void resetStats();
+
     //=================================================================
     //       POOL NOTIFICATIONS
     //=================================================================

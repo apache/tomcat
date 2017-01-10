@@ -220,6 +220,9 @@
         <bug>60398</bug>: Fix testcase of <code>TestSlowQueryReport</code>.
         (kfujino)
       </fix>
+      <add>
+        Enable reset the statistics without restarting the pool. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
