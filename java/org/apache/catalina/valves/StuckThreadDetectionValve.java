@@ -65,7 +65,7 @@ public class StuckThreadDetectionValve extends ValveBase {
     private final AtomicInteger stuckCount = new AtomicInteger(0);
 
     /**
-     * Keeps count of the number of stuck threads that have been interruoted
+     * Keeps count of the number of stuck threads that have been interrupted
      */
     private AtomicLong interruptedThreadsCount = new AtomicLong();
 
@@ -82,7 +82,7 @@ public class StuckThreadDetectionValve extends ValveBase {
     /**
      * The only references we keep to actual running Thread objects are in
      * this Map (which is automatically cleaned in invoke()s finally clause).
-     * That way, Threads can be GC'ed, eventhough the Valve still thinks they
+     * That way, Threads can be GC'ed, even though the Valve still thinks they
      * are stuck (caused by a long monitor interval)
      */
     private final Map<Long, MonitoredThread> activeThreads =

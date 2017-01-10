@@ -758,7 +758,7 @@ public class RemoteIpValve extends ValveBase {
 
     /**
      * <p>
-     * Header that holds the incoming protocol, usally named <code>X-Forwarded-Proto</code>. If <code>null</code>, request.scheme and
+     * Header that holds the incoming protocol, usually named <code>X-Forwarded-Proto</code>. If <code>null</code>, request.scheme and
      * request.secure will not be modified.
      * </p>
      * <p>

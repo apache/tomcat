@@ -5461,7 +5461,7 @@ public class StandardContext extends ContainerBase
         }
 
         if (!dependencyCheck) {
-            // do not make application available if depency check fails
+            // do not make application available if dependency check fails
             ok = false;
         }
 
@@ -5839,7 +5839,7 @@ public class StandardContext extends ContainerBase
                 log.debug("Processing standard container shutdown");
 
             // JNDI resources are unbound in CONFIGURE_STOP_EVENT so stop
-            // naming resoucres before they are unbound since NamingResoucres
+            // naming resources before they are unbound since NamingResources
             // does a JNDI lookup to retrieve the resource. This needs to be
             // after the application has finished with the resource 
             if (namingResources != null) {
@@ -5894,7 +5894,7 @@ public class StandardContext extends ContainerBase
         try {
             resetContext();
         } catch( Exception ex ) {
-            log.error( "Error reseting context " + this + " " + ex, ex );
+            log.error( "Error resetting context " + this + " " + ex, ex );
         }
         
         //reset the instance manager
@@ -6665,7 +6665,7 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /* Remove a JMX notficationListener 
+    /* Remove a JMX notificationListener 
      * @see javax.management.NotificationEmitter#removeNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
     @Override

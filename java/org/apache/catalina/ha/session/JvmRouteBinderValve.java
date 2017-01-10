@@ -122,7 +122,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     protected boolean enabled = true;
 
     /**
-     * number of session that no at this tomcat instanz hosted
+     * number of session that no at this tomcat instance hosted
      */
     protected long numberOfSessions = 0;
 

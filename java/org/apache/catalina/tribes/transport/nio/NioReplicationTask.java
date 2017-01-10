@@ -197,7 +197,7 @@ public class NioReplicationTask extends AbstractRxTask {
             /**
              * Use send ack here if you want to ack the request to the remote
              * server before completing the request
-             * This is considered an asynchronized request
+             * This is considered an asynchronous request
              */
             if (ChannelData.sendAckAsync(msgs[i].getOptions())) sendAck(key,(WritableByteChannel)channel,Constants.ACK_COMMAND,saddr);
             try {

@@ -249,7 +249,7 @@ public class JMXProxyServlet extends HttpServlet  {
      * @param operation The name of the operation to invoke.
      * @param parameters An array of Strings containing the parameters to the
      *                   operation. They will be converted to the appropriate
-     *                   types to call the reuested operation.
+     *                   types to call the requested operation.
      * @return The value returned by the requested operation.
      */
     private Object invokeOperationInternal(String onameStr,

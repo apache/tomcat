@@ -884,7 +884,7 @@ public class RemoteIpFilter implements Filter {
     }
 
     /**
-     * Wrap the incoming <code>request</code> in a {@link XForwardedRequest} if the http header <code>x-forwareded-for</code> is not empty.
+     * Wrap the incoming <code>request</code> in a {@link XForwardedRequest} if the http header <code>x-forwarded-for</code> is not empty.
      */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {

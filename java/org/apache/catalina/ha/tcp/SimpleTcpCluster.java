@@ -901,7 +901,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     /**
      * notify all listeners from receiving a new message is not ClusterMessage
-     * emit Failure Event to LifecylceListener
+     * emit Failure Event to LifecycleListener
      * 
      * @param msg
      *            received Message

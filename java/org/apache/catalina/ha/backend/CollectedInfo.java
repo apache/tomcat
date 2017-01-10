@@ -32,7 +32,7 @@ import org.apache.tomcat.util.modeler.Registry;
 /*
  * Listener to provider informations to mod_heartbeat.c
  * *msg_format = "v=%u&ready=%u&busy=%u"; (message to send).
- * send the muticast message using the format...
+ * send the multicast message using the format...
  * what about the bind(IP. port) only IP makes sense (for the moment).
  * BTW:v  = version :-)
  */

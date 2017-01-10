@@ -106,7 +106,7 @@ public class FarmWarDeployer extends ClusterListener
 
     /**
      * Frequency of the Farm watchDir check. Cluster wide deployment will be
-     * done once for the specified amount of backgrondProcess calls (ie, the
+     * done once for the specified amount of backgroundProcess calls (ie, the
      * lower the amount, the most often the checks will occur).
      */
     protected int processDeployFrequency = 2;
@@ -313,7 +313,7 @@ public class FarmWarDeployer extends ClusterListener
                                     contextName));
                     } else
                         log.error(sm.getString(
-                                "farmWarDeployer.servicingUneploy",
+                                "farmWarDeployer.servicingUndeploy",
                                 contextName));
                 } catch (Exception ex) {
                     log.error(ex);

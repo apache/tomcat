@@ -194,7 +194,7 @@
                type="boolean" />
                
     <attribute name="instanceManager"
-               description="Object that creates and destroys servlets, filters, and listeners. Include dependency injection and postConstruct/preDestory handling"
+               description="Object that creates and destroys servlets, filters, and listeners. Include dependency injection and postConstruct/preDestroy handling"
                type="org.apache.tomcat.InstanceManager" />
                               
     <attribute name="javaVMs"
@@ -1822,7 +1822,7 @@
                impact="ACTION"
                returnType="java.lang.String">
       <parameter name="name"
-                 description="Security role reference used within this servle"
+                 description="Security role reference used within this servlet"
                  type="java.lang.String"/>
     </operation>
     

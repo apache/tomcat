@@ -1843,7 +1843,7 @@ public class StandardWrapper extends ContainerBase
         // Shut down this component
         super.stopInternal();
 
-        // Send j2ee.state.stoppped notification 
+        // Send j2ee.state.stopped notification 
         if (this.getObjectName() != null) {
             Notification notification = 
                 new Notification("j2ee.state.stopped", this.getObjectName(), 
@@ -1924,7 +1924,7 @@ public class StandardWrapper extends ContainerBase
     }
     
 
-    /* Remove a JMX notficationListener 
+    /* Remove a JMX notificationListener 
      * @see javax.management.NotificationEmitter#removeNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
     @Override

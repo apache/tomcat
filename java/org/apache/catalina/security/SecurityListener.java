@@ -94,7 +94,7 @@ public class SecurityListener implements LifecycleListener {
      * Returns the current list of operating system users not permitted to run
      * Tomcat.
      *
-     * @return  A comma separated list of operating sytem user names.
+     * @return  A comma separated list of operating system user names.
      */
     public String getCheckedOsUsers() {
         if (checkedOsUsers.size() == 0) {

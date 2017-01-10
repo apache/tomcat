@@ -60,7 +60,7 @@ import org.apache.tools.ant.Project;
  * <li>Bind Get, Call, Query result at Ant properties</li>
  * </ul>
  * 
- * Examples: open server with reference and autorisation
+ * Examples: open server with reference and authorisation
  * 
  * <pre>
  * 

@@ -41,8 +41,8 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  * and the queue might become rather large. If this is the case, then you might want to set 
  * the value OrderInterceptor.maxQueue = 25 (meaning that we will never keep more than 25 messages in our queue)
  * <br><b>Configuration Options</b><br>
- * OrderInteceptor.expire=<milliseconds> - if a message arrives out of order, how long before we act on it <b>default=3000ms</b><br>
- * OrderInteceptor.maxQueue=<max queue size> - how much can the queue grow to ensure ordering. 
+ * OrderInterceptor.expire=<milliseconds> - if a message arrives out of order, how long before we act on it <b>default=3000ms</b><br>
+ * OrderInterceptor.maxQueue=<max queue size> - how much can the queue grow to ensure ordering. 
  *   This setting is useful to avoid OutOfMemoryErrors<b>default=Integer.MAX_VALUE</b><br>
  * OrderInterceptor.forwardExpired=<boolean> - this flag tells the interceptor what to 
  * do when a message has expired or the queue has grown larger than the maxQueue value.

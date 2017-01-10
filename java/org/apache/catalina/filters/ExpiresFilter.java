@@ -462,14 +462,14 @@ public class ExpiresFilter extends FilterBase {
         DAY(Calendar.DAY_OF_YEAR), HOUR(Calendar.HOUR), MINUTE(Calendar.MINUTE), MONTH(
                 Calendar.MONTH), SECOND(Calendar.SECOND), WEEK(
                 Calendar.WEEK_OF_YEAR), YEAR(Calendar.YEAR);
-        private final int calendardField;
+        private final int calendarField;
 
-        private DurationUnit(int calendardField) {
-            this.calendardField = calendardField;
+        private DurationUnit(int calendarField) {
+            this.calendarField = calendarField;
         }
 
         public int getCalendardField() {
-            return calendardField;
+            return calendarField;
         }
 
     }

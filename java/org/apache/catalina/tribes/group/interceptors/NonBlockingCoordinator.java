@@ -189,7 +189,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         synchronized (electionMutex) {
             MemberImpl local = (MemberImpl)getLocalMember(false);
             MemberImpl[] others = membership.getMembers();
-            fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_START_ELECT,this,"Election initated"));
+            fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_START_ELECT,this,"Election initiated"));
             if ( others.length == 0 ) {
                 this.viewId = new UniqueId(UUIDGenerator.randomUUID(false));
                 this.view = new Membership(local,AbsoluteOrder.comp, true);

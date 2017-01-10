@@ -213,7 +213,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     /**
      * Frequency of the session expiration, and related manager operations.
      * Manager operations will be done once for the specified amount of
-     * backgrondProcess calls (ie, the lower the amount, the most often the
+     * backgroundProcess calls (ie, the lower the amount, the most often the
      * checks will occur).
      */
     protected int processExpiresFrequency = 6;

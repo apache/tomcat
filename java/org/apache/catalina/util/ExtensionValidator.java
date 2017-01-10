@@ -119,7 +119,7 @@ public final class ExtensionValidator {
      * file in the /META-INF/ directory of the application and all 
      * MANIFEST.MF files in each JAR file located in the WEB-INF/lib 
      * directory and creates an <code>ArrayList</code> of 
-     * <code>ManifestResorce<code> objects. These objects are then passed 
+     * <code>ManifestResource<code> objects. These objects are then passed 
      * to the validateManifestResources method for validation.
      *
      * @param dirContext The JNDI root of the Web Application
@@ -347,7 +347,7 @@ public final class ExtensionValidator {
     * Build this list of available extensions so that we do not have to 
     * re-build this list every time we iterate through the list of required 
     * extensions. All available extensions in all of the 
-    * <code>MainfestResource</code> objects will be added to a 
+    * <code>ManifestResource</code> objects will be added to a 
     * <code>HashMap</code> which is returned on the first dependency list
     * processing pass. 
     *

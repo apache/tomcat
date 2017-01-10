@@ -57,7 +57,7 @@ import org.apache.juli.logging.LogFactory;
  * each time the object gets replicated the entire object gets serialized, hence a call to <code>replicate(true)</code>
  * will replicate all objects in this map that are using this node as primary.
  * 
- * <br><br><b>REMBER TO CALL <code>breakdown()</code> or <code>finalize()</code> when you are done with the map to 
+ * <br><br><b>REMEMBER TO CALL <code>breakdown()</code> or <code>finalize()</code> when you are done with the map to 
  * avoid memory leaks.<br><br>
  * TODO implement periodic sync/transfer thread
  * @author Filip Hanik
@@ -74,7 +74,7 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
     /**
      * Creates a new map
      * @param channel The channel to use for communication
-     * @param timeout long - timeout for RPC messags
+     * @param timeout long - timeout for RPC messages
      * @param mapContextName String - unique name for this map, to allow multiple maps per channel
      * @param initialCapacity int - the size of this map, see HashMap
      * @param loadFactor float - load factor, see HashMap
@@ -86,7 +86,7 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
     /**
      * Creates a new map
      * @param channel The channel to use for communication
-     * @param timeout long - timeout for RPC messags
+     * @param timeout long - timeout for RPC messages
      * @param mapContextName String - unique name for this map, to allow multiple maps per channel
      * @param initialCapacity int - the size of this map, see HashMap
      */
@@ -97,7 +97,7 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
     /**
      * Creates a new map
      * @param channel The channel to use for communication
-     * @param timeout long - timeout for RPC messags
+     * @param timeout long - timeout for RPC messages
      * @param mapContextName String - unique name for this map, to allow multiple maps per channel
      */
     public LazyReplicatedMap(MapOwner owner, Channel channel, long timeout, String mapContextName, ClassLoader[] cls) {
@@ -107,7 +107,7 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
     /**
      * Creates a new map
      * @param channel The channel to use for communication
-     * @param timeout long - timeout for RPC messags
+     * @param timeout long - timeout for RPC messages
      * @param mapContextName String - unique name for this map, to allow multiple maps per channel
      * @param terminate boolean - Flag for whether to terminate this map that failed to start.
      */

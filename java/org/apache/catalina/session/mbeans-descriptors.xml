@@ -134,7 +134,7 @@
             writeable="false"/>
                  
     <attribute   name="sessionAttributeNameFilter"
-          descritpion="The string pattern used for including session attributes in distribution. Null means all attributes are included."
+          description="The string pattern used for including session attributes in distribution. Null means all attributes are included."
                  type="java.lang.String"/>
 
     <attribute   name="sessionAttributeValueClassNameFilter"
@@ -334,7 +334,7 @@
             writeable="false"/>
 
     <attribute   name="sessionAttributeNameFilter"
-          descritpion="The string pattern used for including session attributes in distribution. Null means all attributes are included."
+          description="The string pattern used for including session attributes in distribution. Null means all attributes are included."
                  type="java.lang.String"/>
 
     <attribute   name="sessionAttributeValueClassNameFilter"

@@ -2261,8 +2261,8 @@ public class ContextConfig implements LifecycleListener {
 
         populateJavaClassCache(javaClass.getSuperclassName());
 
-        for (String iterface : javaClass.getInterfaceNames()) {
-            populateJavaClassCache(iterface);
+        for (String interfaceName : javaClass.getInterfaceNames()) {
+            populateJavaClassCache(interfaceName);
         }
     }
 
