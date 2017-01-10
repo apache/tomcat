@@ -1431,7 +1431,7 @@ public class ContextConfig implements LifecycleListener {
             } else {
                 if(log.isDebugEnabled()) {
                     for (String urlPattern : jspPropertyGroup.getUrlPatterns()) {
-                        log.debug("Skiping " + urlPattern + " , no servlet " +
+                        log.debug("Skipping " + urlPattern + " , no servlet " +
                                 jspServletName);
                     }
                 }
@@ -2199,8 +2199,8 @@ public class ContextConfig implements LifecycleListener {
 
         populateJavaClassCache(javaClass.getSuperclassName(), javaClassCache);
 
-        for (String iterface : javaClass.getInterfaceNames()) {
-            populateJavaClassCache(iterface, javaClassCache);
+        for (String interfaceName : javaClass.getInterfaceNames()) {
+            populateJavaClassCache(interfaceName, javaClassCache);
         }
     }
 

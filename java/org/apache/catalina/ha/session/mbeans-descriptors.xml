@@ -304,7 +304,7 @@
       type="boolean"/>
     <attribute
       name="sessionAttributeNameFilter"
-      descritpion="The string pattern used for including session attributes in replication. Null means all attributes are included."
+      description="The string pattern used for including session attributes in replication. Null means all attributes are included."
       type="java.lang.String"/>
     <attribute
       name="sessionAttributeValueClassNameFilter"

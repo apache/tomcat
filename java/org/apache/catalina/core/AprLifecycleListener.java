@@ -49,7 +49,7 @@ public class AprLifecycleListener
     private static boolean instanceCreated = false;
     /**
      * Info messages during init() are cached until Lifecycle.BEFORE_INIT_EVENT
-     * so that, in normal (non-error) cases, init() releated log messages appear
+     * so that, in normal (non-error) cases, init() related log messages appear
      * at the expected point in the lifecycle.
      */
     private static final List<String> initInfoLogMessages = new ArrayList<>(3);

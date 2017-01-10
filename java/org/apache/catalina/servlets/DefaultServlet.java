@@ -1083,7 +1083,7 @@ public class DefaultServlet extends HttpServlet {
     }
 
     /**
-     * Match the client preferred encoding formts to the available precompressed resources.
+     * Match the client preferred encoding formats to the available precompressed resources.
      *
      * @param request   The servlet request we are processing
      * @param precompressedResources   List of available precompressed resources.
@@ -1924,7 +1924,7 @@ public class DefaultServlet extends HttpServlet {
                         conditionSatisfied = true;
                 }
 
-                // If none of the given ETags match, 412 Precodition failed is
+                // If none of the given ETags match, 412 Precondition failed is
                 // sent back
                 if (!conditionSatisfied) {
                     response.sendError

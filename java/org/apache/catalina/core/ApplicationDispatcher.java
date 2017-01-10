@@ -393,7 +393,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
 
         // This is not a real close in order to support error processing
         if (wrapper.getLogger().isDebugEnabled() )
-            wrapper.getLogger().debug(" Disabling the response for futher output");
+            wrapper.getLogger().debug(" Disabling the response for further output");
 
         if  (response instanceof ResponseFacade) {
             ((ResponseFacade) response).finish();

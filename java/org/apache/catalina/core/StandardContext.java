@@ -4992,7 +4992,7 @@ public class StandardContext extends ContainerBase
         }
 
         if (!dependencyCheck) {
-            // do not make application available if depency check fails
+            // do not make application available if dependency check fails
             ok = false;
         }
 
@@ -5183,7 +5183,7 @@ public class StandardContext extends ContainerBase
             }
 
             // Check constraints for uncovered HTTP methods
-            // Needs to be after SCIs and listeners as they may programatically
+            // Needs to be after SCIs and listeners as they may programmatically
             // change constraints
             if (ok) {
                 checkConstraintsForUncoveredMethods(findConstraints());
@@ -5408,7 +5408,7 @@ public class StandardContext extends ContainerBase
                 log.debug("Processing standard container shutdown");
 
             // JNDI resources are unbound in CONFIGURE_STOP_EVENT so stop
-            // naming resources before they are unbound since NamingResoucres
+            // naming resources before they are unbound since NamingResources
             // does a JNDI lookup to retrieve the resource. This needs to be
             // after the application has finished with the resource
             if (namingResources != null) {
@@ -5465,7 +5465,7 @@ public class StandardContext extends ContainerBase
         try {
             resetContext();
         } catch( Exception ex ) {
-            log.error( "Error reseting context " + this + " " + ex, ex );
+            log.error( "Error resetting context " + this + " " + ex, ex );
         }
 
         //reset the instance manager
@@ -5685,10 +5685,10 @@ public class StandardContext extends ContainerBase
                 }
             }
 
-            // Note: For progammatically added Servlets this may not be the
+            // Note: For programmatically added Servlets this may not be the
             //       complete set of security constraints since additional
             //       URL patterns can be added after the application has called
-            //       setSecurity. For all programmatically added servilets, the
+            //       setSecurity. For all programmatically added servlets, the
             //       #dynamicServletAdded() method sets a flag that ensures that
             //       the constraints are re-evaluated before the servlet is
             //       first used
@@ -6203,7 +6203,7 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /* Remove a JMX notficationListener
+    /* Remove a JMX notificationListener
      * @see javax.management.NotificationEmitter#removeNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
     @Override

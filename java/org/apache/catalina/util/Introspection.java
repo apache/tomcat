@@ -140,7 +140,7 @@ public class Introspection {
      * Attempt to load a class using the given Container's class loader. If the
      * class cannot be loaded, a debug level log message will be written to the
      * Container's log and null will be returned.
-     * @param context The class loader of this context will be used to attemmpt
+     * @param context The class loader of this context will be used to attempt
      *  to load the class
      * @param className The class name
      * @return the loaded class or <code>null</code> if loading failed
