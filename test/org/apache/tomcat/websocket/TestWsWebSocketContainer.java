@@ -979,7 +979,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
 
 
     @Test
-    public void testPerMessageDefalteClient04() throws Exception {
+    public void testPerMessageDeflateClient04() throws Exception {
         doTestPerMessageDeflateClient(MESSAGE_EMPTY, 2);
     }
 
