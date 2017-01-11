@@ -45,6 +45,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.12 (markt)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Spelling corrections provided by Josh Soref. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.11 (markt)" rtext="release in progress">
   <subsection name="Catalina">

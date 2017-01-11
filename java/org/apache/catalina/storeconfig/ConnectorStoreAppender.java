@@ -196,11 +196,28 @@ public class ConnectorStoreAppender extends StoreAppender {
      * @param aDesc The connector description
      * @throws Exception Store error occurred
      */
-    protected void storeConnectorAttribtues(PrintWriter aWriter, int indent,
+    protected void storeConnectorAttributes(PrintWriter aWriter, int indent,
             Object bean, StoreDescription aDesc) throws Exception {
         if (aDesc.isAttributes()) {
             printAttributes(aWriter, indent, false, bean, aDesc);
         }
+    }
+
+    /**
+     * Print Attributes for the connector
+     *
+     * @param aWriter Current writer
+     * @param indent Indentation level
+     * @param bean The connector bean
+     * @param aDesc The connector description
+     * @throws Exception Store error occurred
+     *
+     * @deprecated  Use {@link #storeConnectorAttributes()}
+     */
+    @Deprecated
+    protected void storeConnectorAttribtues(PrintWriter aWriter, int indent,
+            Object bean, StoreDescription aDesc) throws Exception {
+        storeConnectorAttributes(aWriter, indent, bean, aDesc);
     }
 
     /**
@@ -215,7 +232,7 @@ public class ConnectorStoreAppender extends StoreAppender {
             StoreDescription aDesc) throws Exception {
         aWriter.print("<");
         aWriter.print(aDesc.getTag());
-        storeConnectorAttribtues(aWriter, indent, bean, aDesc);
+        storeConnectorAttributes(aWriter, indent, bean, aDesc);
         aWriter.println(">");
     }
 
@@ -231,7 +248,7 @@ public class ConnectorStoreAppender extends StoreAppender {
             StoreDescription aDesc) throws Exception {
         aWriter.print("<");
         aWriter.print(aDesc.getTag());
-        storeConnectorAttribtues(aWriter, indent, bean, aDesc);
+        storeConnectorAttributes(aWriter, indent, bean, aDesc);
         aWriter.println("/>");
     }
 
