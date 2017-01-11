@@ -216,23 +216,6 @@ public class ConnectorStoreAppender extends StoreAppender {
     }
 
     /**
-     * Print Attributes for the connector
-     *
-     * @param aWriter Current writer
-     * @param indent Indentation level
-     * @param bean The connector bean
-     * @param aDesc The connector description
-     * @throws Exception Store error occurred
-     *
-     * @deprecated  Use {@link #storeConnectorAttributes()}
-     */
-    @Deprecated
-    protected void storeConnectorAttribtues(PrintWriter aWriter, int indent,
-            Object bean, StoreDescription aDesc) throws Exception {
-        storeConnectorAttributes(aWriter, indent, bean, aDesc);
-    }
-
-    /**
      * Print the open tag for connector attributes (override).
      *
      * @see org.apache.catalina.storeconfig.StoreAppender#printOpenTag(java.io.PrintWriter,
