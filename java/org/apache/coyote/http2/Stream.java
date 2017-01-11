@@ -471,7 +471,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 StreamException se = (StreamException) http2Exception;
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("stream.reset.send", getConnectionId(), getIdentifier(),
-                            Long.toString(se.getError().getCode())));
+                            se.getError()));
                 }
                 state.sendReset();
                 handler.sendStreamReset(se);
