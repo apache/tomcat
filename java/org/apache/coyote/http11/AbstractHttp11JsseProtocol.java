@@ -41,14 +41,6 @@ public abstract class AbstractHttp11JsseProtocol<S>
         return "jsse";
     }
 
-    /*
-     * @deprecated  Use {@link #getSslImplementationShortName()}
-     */
-    @Deprecated
-    protected String getSslImplemenationShortName() {
-        return getSslImplementationShortName();
-    }
-
     public String getSslImplementationName() { return getEndpoint().getSslImplementationName(); }
     public void setSslImplementationName(String s) { getEndpoint().setSslImplementationName(s); }
 
