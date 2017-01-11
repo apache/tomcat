@@ -460,7 +460,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.rst.debug", connectionId,
-                    Integer.toString(se.getStreamId()), se.getError()));
+                    Integer.toString(se.getStreamId()), se.getError(), se.getMessage()));
         }
 
         // Write a RST frame
