@@ -625,7 +625,10 @@ public abstract class AbstractReplicatedMap<K,V>
                 Member member = mapmsg.getPrimary();
                 if (log.isInfoEnabled())
                     log.info(sm.getString("abstractReplicatedMap.leftOver.pingMsg", member));
-                memberAlive(member);
+                State state = (State) mapmsg.getValue();
+                if (state.isAvailable()) {
+                    memberAlive(member);
+                }
             } else {
                 // other messages are ignored.
                 if (log.isInfoEnabled())
