@@ -42,7 +42,7 @@ public class TestAbortedUpload extends Http2TestBase {
         http2Protocol.setAllowedTrailerHeaders(TRAILER_HEADER_NAME);
 
         int bodySize = 8192;
-        int bodyCount = 10;
+        int bodyCount = 20;
 
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
@@ -64,24 +64,24 @@ public class TestAbortedUpload extends Http2TestBase {
         // Trailers
         writeFrame(trailerFrameHeader, trailerPayload);
 
+        // The actual response depends on timing issues. Particularly how much
+        // data is transferred in StreamInputBuffer inBuffer to outBuffer on the
+        // first read.
+        while (output.getTrace().length() == 0) {
+            parser.readFrame(true);
+            if ("3-RST-[3]\n".equals(output.getTrace())) {
+                output.clearTrace();
+            }
+        }
 
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
-        parser.readFrame(true);
-
-        // Tomcat's default Window size is 8*8k (StreamInputBuffer.inBuffer)
-        // This test sends 10*8k
-        // 9th and 10th data frames trigger a RST for a flow control error
-        // Test reads input stream which copies up to 8k into
-        // StreamInputBuffer.outBuffer
-        // That leaves 8k free in inBuffer buffer which triggers a Window Update
-        Assert.assertEquals(
-                "3-RST-[3]\n" +
-                "3-RST-[3]\n" +
-                "0-WindowSize-[8192]\n" +
-                "3-WindowSize-[8192]\n",
-                output.getTrace());
+        if (output.getTrace().startsWith("0-WindowSize-[")) {
+            String trace = output.getTrace();
+            int size = Integer.parseInt(trace.substring(14, trace.length() - 2));
+            output.clearTrace();
+            // Window updates always come in pairs
+            parser.readFrame(true);
+            Assert.assertEquals("3-WindowSize-[" + size + "]\n", output.getTrace());
+        }
     }
 
 
