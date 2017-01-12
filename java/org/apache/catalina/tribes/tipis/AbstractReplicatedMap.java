@@ -621,9 +621,18 @@ public abstract class AbstractReplicatedMap<K,V>
             mapmsg.deserialize(getExternalLoaders());
             if (mapmsg.getMsgType() == MapMessage.MSG_START) {
                 mapMemberAdded(mapmsg.getPrimary());
-            } else if (mapmsg.getMsgType() == MapMessage.MSG_INIT
-                    || mapmsg.getMsgType() == MapMessage.MSG_PING) {
+            } else if (mapmsg.getMsgType() == MapMessage.MSG_INIT) {
                 memberAlive(mapmsg.getPrimary());
+            } else if (mapmsg.getMsgType() == MapMessage.MSG_PING) {
+                Member member = mapmsg.getPrimary();
+                if (log.isInfoEnabled())
+                    log.info("PING message has been received beyond the timeout period. "
+                            + "The map member[" + member
+                            + "] might have been removed from the map membership.");
+                State state = (State) mapmsg.getValue();
+                if (state.isAvailable()) {
+                    memberAlive(member);
+                }
             } else {
                 // other messages are ignored.
                 if (log.isInfoEnabled())
