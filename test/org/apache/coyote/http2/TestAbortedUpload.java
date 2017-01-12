@@ -75,6 +75,7 @@ public class TestAbortedUpload extends Http2TestBase {
                 }
             } catch (IOException ioe) {
                 // Might not be any further frames after the reset
+                break;
             }
         }
 
