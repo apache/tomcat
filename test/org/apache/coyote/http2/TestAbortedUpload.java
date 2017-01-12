@@ -68,9 +68,14 @@ public class TestAbortedUpload extends Http2TestBase {
         // data is transferred in StreamInputBuffer inBuffer to outBuffer on the
         // first read.
         while (output.getTrace().length() == 0) {
-            parser.readFrame(true);
-            if ("3-RST-[3]\n".equals(output.getTrace())) {
-                output.clearTrace();
+            try {
+                parser.readFrame(true);
+                if ("3-RST-[3]\n".equals(output.getTrace())) {
+                    output.clearTrace();
+                }
+            } catch (IOException ioe) {
+                // Might not be any further frames after the reset
+                break;
             }
         }
 
