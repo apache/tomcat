@@ -53,6 +53,18 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <add>
+        Add log message that PING message has received beyond the timeout
+        period. (kfujino)
+      </add>
+      <fix>
+        When a PING message that beyond the time-out period has been received,
+        make sure that valid member is added to the map membership. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
