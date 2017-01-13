@@ -53,7 +53,7 @@
       </fix>
       <fix>
         Improve NIO2 look-ahead parsing of TLS client hello for SNI with large
-        client hello messages. (markt) 
+        client hello messages. (markt)
       </fix>
     </changelog>
   </subsection>
