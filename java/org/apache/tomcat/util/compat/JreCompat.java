@@ -49,12 +49,12 @@ public class JreCompat {
     }
 
 
-    // Java 8 implementation of Java 9 methods
-
     public static boolean isJre9Available() {
         return jre9Available;
     }
 
+
+    // Java 8 implementation of Java 9 methods
 
     /**
      * Test if the provided exception is an instance of
