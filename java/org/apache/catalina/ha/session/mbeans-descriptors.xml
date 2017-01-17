@@ -539,7 +539,7 @@
     <attribute
       name="accessTimeout"
       description="The timeout for a ping message in replication map."
-      type="long"/>    
+      type="long"/>
     <operation
       name="expireSession"
       description="Expired the given session"
