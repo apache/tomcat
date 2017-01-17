@@ -265,6 +265,11 @@
         <code>false</code> unless a <code>SecurityManager</code> is enabled in
         which case the default will be <code>true</code>.</p>
       </attribute>
+      <attribute name="accessTimeout" required="false">
+        The timeout for a ping message. If a remote map does not respond within
+        this timeout period, its regarded as disappeared.
+        Default value is <code>5000</code> milliseconds.
+      </attribute>
     </attributes>
   </subsection>
 </section>
