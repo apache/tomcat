@@ -536,6 +536,10 @@
       name="warnOnSessionAttributeFilterFailure"
       description="Should a WARN level log message be generated if a session attribute fails to match sessionAttributeNameFilter or sessionAttributeClassNameFilter?"
       type="boolean"/>
+    <attribute
+      name="accessTimeout"
+      description="The timeout for a ping message in replication map."
+      type="long"/>    
     <operation
       name="expireSession"
       description="Expired the given session"
