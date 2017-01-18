@@ -201,7 +201,7 @@ p.notice {
             <xsl:value-of select="$relative-path"/><xsl:value-of select="$apache-logo"/>
           </xsl:variable>
           <a href="http://www.apache.org/">
-            <img src="{$src}" align="right" alt="Apache Logo" border="0"/>
+            <img src="{$src}" align="right" alt="Apache Logo" border="0" style="width: 266px;height: 83px;"/>
           </a>
         </td>
       </tr>

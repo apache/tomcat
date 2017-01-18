@@ -67,6 +67,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Ensure the ASF logo image is correctly displayed in docs and
+        host-manager applications. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.74 (violetagg)">
   <subsection name="Catalina">
