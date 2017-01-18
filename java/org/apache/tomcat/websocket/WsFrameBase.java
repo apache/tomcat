@@ -23,6 +23,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -40,7 +41,7 @@ import org.apache.tomcat.util.res.StringManager;
  * extracts the messages. WebSocket Pings received will be responded to
  * automatically without any action required by the application.
  */
-public abstract class WsFrameBase {
+public abstract class WsFrameBase implements SuspendableMessageReceiver {
 
     private static final StringManager sm = StringManager.getManager(WsFrameBase.class);
 
@@ -84,11 +85,16 @@ public abstract class WsFrameBase {
     private volatile State state = State.NEW_FRAME;
     private volatile boolean open = true;
 
+    private static final AtomicReferenceFieldUpdater<WsFrameBase, ReadState> READ_STATE_UPDATER =
+            AtomicReferenceFieldUpdater.newUpdater(WsFrameBase.class, ReadState.class, "readState");
+    private volatile ReadState readState = ReadState.READY;
+
     public WsFrameBase(WsSession wsSession, Transformation transformation) {
         inputBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
         inputBuffer.position(0).limit(0);
         messageBufferBinary = ByteBuffer.allocate(wsSession.getMaxBinaryMessageBufferSize());
         messageBufferText = CharBuffer.allocate(wsSession.getMaxTextMessageBufferSize());
+        wsSession.setSuspendableMessageReceiver(this);
         this.wsSession = wsSession;
         Transformation finalTransformation;
         if (isMasked()) {
@@ -106,7 +112,7 @@ public abstract class WsFrameBase {
 
 
     protected void processInputBuffer() throws IOException {
-        while (true) {
+        while (!isSuspended()) {
             wsSession.updateLastActive();
             if (state == State.NEW_FRAME) {
                 if (!processInitialHeader()) {
@@ -685,6 +691,146 @@ public abstract class WsFrameBase {
     private static enum State {
         NEW_FRAME, PARTIAL_HEADER, DATA
     }
+
+
+    /**
+     * READY - not suspended, waiting for notification for data available,
+     * socket registered to the poller (server case)
+     * READ - reading the available data, not suspended
+     * READ_SUSPENDING - suspended, finishing read operation
+     * READY_SUSPENDING - suspended, waiting for notification for data
+     * available, socket registered to the poller (server case)
+     * SUSPENDED - suspended, read operation finished/notification for data
+     * available received
+     * 
+     * <pre>
+     *       resume                             resume
+     *       no action     data available       no action
+     *     |-------->READY<-------------->READ<--------|
+     *     |             ^  read finished              |
+     *  suspend          |                          suspend
+     *     |          resume                           |
+     *     |    register socket to poller (server)     |
+     *     |    resume data processing (client)        |
+     *     |             |                             |
+     *     v             |                             v
+     * READY_SUSPENDING  |                  READ_SUSPENDING
+     *     |             |                             |
+     * data available    |           read finished     |
+     *     |---------->SUSPENDED<----------------------|
+     * </pre>
+     */
+    protected enum ReadState {
+        READY           (false),
+        READ            (false),
+        READY_SUSPENDING(true),
+        READ_SUSPENDING (true),
+        SUSPENDED       (true);
+
+        private final boolean isSuspended;
+
+        ReadState(boolean isSuspended) {
+            this.isSuspended = isSuspended;
+        }
+
+        public boolean isSuspended() {
+            return isSuspended;
+        }
+    }
+
+    @Override
+    public void suspend() {
+        while (true) {
+            switch (readState) {
+            case READY:
+                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.READY,
+                        ReadState.READY_SUSPENDING)) {
+                    continue;
+                }
+                return;
+            case READ:
+                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.READ,
+                        ReadState.READ_SUSPENDING)) {
+                    continue;
+                }
+                return;
+            case READY_SUSPENDING:
+                if (getLog().isWarnEnabled()) {
+                    getLog().warn(sm.getString("wsFrame.suspendRequested"));
+                }
+                return;
+            case READ_SUSPENDING:
+                if (getLog().isWarnEnabled()) {
+                    getLog().warn(sm.getString("wsFrame.suspendRequested"));
+                }
+                return;
+            case SUSPENDED:
+                if (getLog().isWarnEnabled()) {
+                    getLog().warn(sm.getString("wsFrame.alreadySuspended"));
+                }
+                return;
+            default:
+                throw new IllegalStateException(sm.getString("wsFrame.illegalReadState", state));
+            }
+        }
+    }
+
+    @Override
+    public void resume() {
+        while (true) {
+            switch (readState) {
+            case READY:
+                if (getLog().isWarnEnabled()) {
+                    getLog().warn(sm.getString("wsFrame.alreadyResumed"));
+                }
+                return;
+            case READ:
+                if (getLog().isWarnEnabled()) {
+                    getLog().warn(sm.getString("wsFrame.alreadyResumed"));
+                }
+                return;
+            case READY_SUSPENDING:
+                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.READY_SUSPENDING,
+                        ReadState.READY)) {
+                    continue;
+                }
+                return;
+            case READ_SUSPENDING:
+                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.READ_SUSPENDING,
+                        ReadState.READ)) {
+                    continue;
+                }
+                return;
+            case SUSPENDED:
+                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.SUSPENDED,
+                        ReadState.READY)) {
+                    continue;
+                }
+                resumeProcessing();
+                return;
+            default:
+                throw new IllegalStateException(sm.getString("wsFrame.illegalReadState", state));
+            }
+        }
+    }
+
+    protected boolean isSuspended() {
+        return readState.isSuspended();
+    }
+
+    protected ReadState getReadState() {
+        return readState;
+    }
+
+    protected void changeReadState(ReadState newState) {
+        READ_STATE_UPDATER.set(this, newState);
+    }
+
+    protected boolean changeReadState(ReadState oldState, ReadState newState) {
+        return READ_STATE_UPDATER.compareAndSet(this, oldState, newState);
+    }
+
+    protected abstract void resumeProcessing();
 
 
     private abstract class TerminalTransformation implements Transformation {

@@ -53,7 +53,7 @@ import org.apache.tomcat.InstanceManagerBindings;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
-public class WsSession implements Session {
+public class WsSession implements Session, SuspendableMessageReceiver {
 
     // An ellipsis is a single character that looks like three periods in a row
     // and is used to indicate a continuation.
@@ -791,5 +791,23 @@ public class WsSession implements Session {
         OPEN,
         OUTPUT_CLOSED,
         CLOSED
+    }
+
+
+    private SuspendableMessageReceiver suspendableMessageReceiver;
+    void setSuspendableMessageReceiver(SuspendableMessageReceiver suspendableMessageReceiver) {
+        this.suspendableMessageReceiver = suspendableMessageReceiver;
+    }
+
+
+    @Override
+    public void suspend() {
+        suspendableMessageReceiver.suspend();
+    }
+
+
+    @Override
+    public void resume() {
+        suspendableMessageReceiver.resume();
     }
 }

@@ -145,7 +145,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
         switch (status) {
             case OPEN_READ:
                 try {
-                    wsFrame.onDataAvailable();
+                    return wsFrame.notifyDataAvailable();
                 } catch (WsIOException ws) {
                     close(ws.getCloseReason());
                 } catch (IOException ioe) {

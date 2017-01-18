@@ -57,36 +57,60 @@ public class WsFrameClient extends WsFrameBase {
 
 
     private void processSocketRead() throws IOException {
+        while (true) {
+            switch (getReadState()) {
+            case READY:
+                if (!changeReadState(ReadState.READY, ReadState.READ)) {
+                    continue;
+                }
+                while (response.hasRemaining() && !isSuspended()) {
+                    inputBuffer.mark();
+                    inputBuffer.position(inputBuffer.limit()).limit(inputBuffer.capacity());
 
-        while (response.hasRemaining()) {
-            inputBuffer.mark();
-            inputBuffer.position(inputBuffer.limit()).limit(inputBuffer.capacity());
+                    int toCopy = Math.min(response.remaining(), inputBuffer.remaining());
 
-            int toCopy = Math.min(response.remaining(), inputBuffer.remaining());
+                    // Copy remaining bytes read in HTTP phase to input buffer used by
+                    // frame processing
 
-            // Copy remaining bytes read in HTTP phase to input buffer used by
-            // frame processing
+                    int orgLimit = response.limit();
+                    response.limit(response.position() + toCopy);
+                    inputBuffer.put(response);
+                    response.limit(orgLimit);
 
-            int orgLimit = response.limit();
-            response.limit(response.position() + toCopy);
-            inputBuffer.put(response);
-            response.limit(orgLimit);
+                    inputBuffer.limit(inputBuffer.position()).reset();
 
-            inputBuffer.limit(inputBuffer.position()).reset();
+                    // Process the data we have
+                    try {
+                        processInputBuffer();
+                    } catch (IOException e) {
+                        changeReadState(ReadState.READY);
+                        throw e;
+                    }
+                }
+                response.clear();
 
-            // Process the data we have
-            processInputBuffer();
-        }
-        response.clear();
-
-        // Get some more data
-        if (isOpen()) {
-            channel.read(response, null, handler);
+                // Get some more data
+                if (isOpen()) {
+                    channel.read(response, null, handler);
+                } else {
+                    changeReadState(ReadState.READY);
+                }
+                return;
+            case READY_SUSPENDING:
+                if (!changeReadState(ReadState.READY_SUSPENDING, ReadState.SUSPENDED)) {
+                    continue;
+                }
+                return;
+            default:
+                throw new IllegalStateException(
+                        sm.getString("wsFrameServer.illegalReadState", getReadState()));
+            }
         }
     }
 
 
     private final void close(Throwable t) {
+        changeReadState(ReadState.READY);
         CloseReason cr;
         if (t instanceof WsIOException) {
             cr = ((WsIOException) t).getCloseReason();
@@ -129,19 +153,7 @@ public class WsFrameClient extends WsFrameBase {
                 return;
             }
             response.flip();
-            try {
-                processSocketRead();
-            } catch (IOException e) {
-                // Only send a close message on an IOException if the client
-                // has not yet received a close control message from the server
-                // as the IOException may be in response to the client
-                // continuing to send a message after the server sent a close
-                // control message.
-                if (isOpen()) {
-                    log.debug(sm.getString("wsFrameClient.ioe"), e);
-                    close(e);
-                }
-            }
+            doResumeProcessing(true);
         }
 
         @Override
@@ -151,13 +163,58 @@ public class WsFrameClient extends WsFrameBase {
                 response = ByteBuffer
                         .allocate(((ReadBufferOverflowException) exc).getMinBufferSize());
                 response.flip();
-                try {
-                    processSocketRead();
-                } catch (IOException e) {
-                    close(e);
-                }
+                doResumeProcessing(false);
             } else {
                 close(exc);
+            }
+        }
+
+        private void doResumeProcessing(boolean checkOpenOnError) {
+            while (true) {
+                switch (getReadState()) {
+                case READ:
+                    if (!changeReadState(ReadState.READ, ReadState.READY)) {
+                        continue;
+                    }
+                    resumeProcessing(checkOpenOnError);
+                    return;
+                case READ_SUSPENDING:
+                    if (!changeReadState(ReadState.READ_SUSPENDING, ReadState.SUSPENDED)) {
+                        continue;
+                    }
+                    return;
+                default:
+                    throw new IllegalStateException(
+                            sm.getString("wsFrame.illegalReadState", getReadState()));
+                }
+            }
+        }
+    }
+
+
+    @Override
+    protected void resumeProcessing() {
+        resumeProcessing(true);
+    }
+
+    private void resumeProcessing(boolean checkOpenOnError) {
+        try {
+            processSocketRead();
+        } catch (IOException e) {
+            if (checkOpenOnError) {
+                // Only send a close message on an IOException if the client
+                // has not yet received a close control message from the server
+                // as the IOException may be in response to the client
+                // continuing to send a message after the server sent a close
+                // control message.
+                if (isOpen()) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("wsFrameClient.ioe"), e);
+                    }
+                    close(e);
+                } 
+            } else {
+                close(e);
             }
         }
     }

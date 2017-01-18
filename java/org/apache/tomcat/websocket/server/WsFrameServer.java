@@ -22,6 +22,8 @@ import java.nio.ByteBuffer;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
+import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.Transformation;
@@ -52,11 +54,18 @@ public class WsFrameServer extends WsFrameBase {
      * @throws IOException if an I/O error occurs while processing the available
      *                     data
      */
-    public void onDataAvailable() throws IOException {
+    private void onDataAvailable() throws IOException {
         if (log.isDebugEnabled()) {
             log.debug("wsFrameServer.onDataAvailable");
         }
-        while (isOpen()) {
+        if (isOpen() && inputBuffer.hasRemaining() && !isSuspended()) {
+            // There might be a data that was left in the buffer when
+            // the read has been suspended.
+            // Consume this data before reading from the socket.
+            processInputBuffer();
+        }
+
+        while (isOpen() && !isSuspended()) {
             // Fill up the input buffer with as much data as we can
             inputBuffer.mark();
             inputBuffer.position(inputBuffer.limit()).limit(inputBuffer.capacity());
@@ -123,5 +132,61 @@ public class WsFrameServer extends WsFrameBase {
         } finally {
             Thread.currentThread().setContextClassLoader(cl);
         }
+    }
+
+
+    @Override
+    protected void resumeProcessing() {
+        socketWrapper.processSocket(SocketEvent.OPEN_READ, true);
+    }
+
+    SocketState notifyDataAvailable() throws IOException {
+        while (isOpen()) {
+            switch (getReadState()) {
+            case READY:
+                if (!changeReadState(ReadState.READY, ReadState.READ)) {
+                    continue;
+                }
+                try {
+                    return doOnDataAvailable();
+                } catch (IOException e) {
+                    changeReadState(ReadState.READY);
+                    throw e;
+                }
+            case READY_SUSPENDING:
+                if (!changeReadState(ReadState.READY_SUSPENDING, ReadState.SUSPENDED)) {
+                    continue;
+                }
+                return SocketState.SUSPENDED;
+            default:
+                throw new IllegalStateException(
+                        sm.getString("wsFrameServer.illegalReadState", getReadState()));
+            }
+        }
+
+        return SocketState.CLOSED;
+    }
+
+    private SocketState doOnDataAvailable() throws IOException {
+        onDataAvailable();
+        while (isOpen()) {
+            switch (getReadState()) {
+            case READ:
+                if (!changeReadState(ReadState.READ, ReadState.READY)) {
+                    continue;
+                }
+                return SocketState.UPGRADED;
+            case READ_SUSPENDING:
+                if (!changeReadState(ReadState.READ_SUSPENDING, ReadState.SUSPENDED)) {
+                    continue;
+                }
+                return SocketState.SUSPENDED;
+            default:
+                throw new IllegalStateException(
+                        sm.getString("wsFrameServer.illegalReadState", getReadState()));
+            }
+        }
+
+        return SocketState.CLOSED;
     }
 }
