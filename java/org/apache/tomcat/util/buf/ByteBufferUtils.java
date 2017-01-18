@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 public class ByteBufferUtils {
@@ -46,9 +47,11 @@ public class ByteBufferUtils {
                 cleanMethodLocal = cleanerObject.getClass().getMethod("clean");
             }
             cleanMethodLocal.invoke(cleanerObject);
-        } catch (IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            log.warn(sm.getString("byteBufferUtils.cleaner"), e);
+        } catch (Throwable t) {
+            // Use throwable as when running on Java 9 we may see a Java 9
+            // specific exception (InaccessibleObjectException) here.
+            ExceptionUtils.handleThrowable(t);
+            log.warn(sm.getString("byteBufferUtils.cleaner"), t);
             cleanerMethodLocal = null;
             cleanMethodLocal = null;
         }
