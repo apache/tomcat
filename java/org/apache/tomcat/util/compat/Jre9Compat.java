@@ -29,7 +29,7 @@ class Jre9Compat extends JreCompat {
     static {
         Class<?> c1 = null;
         Method m2 = null;
-        
+
         try {
             c1 = Class.forName("java.lang.reflect.InaccessibleObjectException");
             SSLParameters.class.getMethod("setApplicationProtocolsMethod", String[].class);
@@ -56,14 +56,14 @@ class Jre9Compat extends JreCompat {
 
         return inaccessibleObjectExceptionClazz.isAssignableFrom(t.getClass());
     }
-    
-    
+
+
     @Override
-	public void setApplicationProtocols(SSLParameters sslParameters, String[] protocols) {
-    	try {
-			setApplicationProtocolsMethod.invoke(sslParameters, (Object) protocols);
-		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new UnsupportedOperationException(e);
-		}
+    public void setApplicationProtocols(SSLParameters sslParameters, String[] protocols) {
+        try {
+            setApplicationProtocolsMethod.invoke(sslParameters, (Object) protocols);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw new UnsupportedOperationException(e);
+        }
     }
 }

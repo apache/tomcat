@@ -73,16 +73,16 @@ public class JreCompat {
         // Exception does not exist prior to Java 9
         return false;
     }
-    
-    
+
+
     /**
      * Set the application protocols the server will accept for ALPN
-     * 
-     * @param sslParameters	The SSL parameters for a connection
-     * @param protocols		The application protocols to be allowed for that
-     * 						connection
+     *
+     * @param sslParameters The SSL parameters for a connection
+     * @param protocols     The application protocols to be allowed for that
+     *                      connection
      */
     public void setApplicationProtocols(SSLParameters sslParameters, String[] protocols) {
-    	throw new UnsupportedOperationException(sm.getString("jreCompat.noApplicationProtocols"));
+        throw new UnsupportedOperationException(sm.getString("jreCompat.noApplicationProtocols"));
     }
 }
