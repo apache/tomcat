@@ -75,7 +75,7 @@ class Jre9Compat extends JreCompat {
 
     @Override
     public String getApplicationProtocol(SSLEngine sslEngine) {
-    	try {
+        try {
             return (String) getApplicationProtocolMethod.invoke(sslEngine);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new UnsupportedOperationException(e);
