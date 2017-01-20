@@ -55,6 +55,11 @@
         Improve NIO2 look-ahead parsing of TLS client hello for SNI with large
         client hello messages. (markt)
       </fix>
+      <add>
+        Enable ALPN and also, therefore, HTTP/2 for the NIO and NIO2 HTTP
+        connectors when using the JSSE implementation for TLS when running on
+        Java 9. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">

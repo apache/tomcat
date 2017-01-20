@@ -18,6 +18,7 @@ package org.apache.tomcat.util.net.jsse;
 
 import javax.net.ssl.SSLSession;
 
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -51,7 +52,6 @@ public class JSSEImplementation extends SSLImplementation {
 
     @Override
     public boolean isAlpnSupported() {
-        // JSSE does not (yet) support ALPN
-        return false;
+        return JreCompat.isJre9Available();
     }
 }

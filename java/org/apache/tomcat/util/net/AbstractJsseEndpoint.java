@@ -30,6 +30,7 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSessionContext;
 
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.SSLHostConfig.Type;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
@@ -169,6 +170,20 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
 
         SSLParameters sslParameters = engine.getSSLParameters();
         sslParameters.setUseCipherSuitesOrder(sslHostConfig.getHonorCipherOrder());
+        if (JreCompat.isJre9Available() && clientRequestedApplicationProtocols.size() > 0 &&
+                negotiableProtocols.size() > 0) {
+            // Only try to negotiate if both client and server have at least
+            // one protocol in common
+            // Note: Tomcat does not explicitly negotiate http/1.1
+            // TODO: Is this correct? Should it change?
+            List<String> commonProtocols = new ArrayList<>();
+            commonProtocols.addAll(negotiableProtocols);
+            commonProtocols.retainAll(clientRequestedApplicationProtocols);
+            if (commonProtocols.size() > 0) {
+                String[] commonProtocolsArray = commonProtocols.toArray(new String[commonProtocols.size()]);
+                JreCompat.getInstance().setApplicationProtocols(sslParameters, commonProtocolsArray);
+            }
+        }
         // In case the getter returns a defensive copy
         engine.setSSLParameters(sslParameters);
 
