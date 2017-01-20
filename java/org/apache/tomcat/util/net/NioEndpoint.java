@@ -784,9 +784,6 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 if (sd.fchannel == null) {
                     // Setup the file channel
                     File f = new File(sd.fileName);
-                    if (!f.exists()) {
-                        return SendfileState.ERROR;
-                    }
                     @SuppressWarnings("resource") // Closed when channel is closed
                     FileInputStream fis = new FileInputStream(f);
                     sd.fchannel = fis.getChannel();
