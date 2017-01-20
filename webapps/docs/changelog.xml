@@ -60,6 +60,9 @@
         connectors when using the JSSE implementation for TLS when running on
         Java 9. (markt)
       </add>
+      <fix>
+        Restore Java 9 direct byte buffer compatibility. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
