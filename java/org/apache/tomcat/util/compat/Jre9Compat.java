@@ -35,7 +35,7 @@ class Jre9Compat extends JreCompat {
 
         try {
             c1 = Class.forName("java.lang.reflect.InaccessibleObjectException");
-            m2 = SSLParameters.class.getMethod("setApplicationProtocolsMethod", String[].class);
+            m2 = SSLParameters.class.getMethod("setApplicationProtocols", String[].class);
             m3 = SSLEngine.class.getMethod("getApplicationProtocol");
         } catch (SecurityException | NoSuchMethodException e) {
             // Should never happen
