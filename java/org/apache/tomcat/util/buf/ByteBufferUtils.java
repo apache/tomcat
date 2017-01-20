@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 public class ByteBufferUtils {
@@ -48,9 +49,14 @@ public class ByteBufferUtils {
             }
             cleanMethodLocal.invoke(cleanerObject);
         } catch (Throwable t) {
-            // Use throwable as when running on Java 9 we may see a Java 9
-            // specific exception (InaccessibleObjectException) here.
-            ExceptionUtils.handleThrowable(t);
+            JreCompat jreCompat = JreCompat.getInstance();
+            if (jreCompat.isInstanceOfInaccessibleObjectException(t)) {
+                // Must be running on Java 9 without the necessary command line
+                // options.
+                log.warn(sm.getString("byteBufferUtils.addExportsCleaner"));
+            } else {
+                ExceptionUtils.handleThrowable(t);
+            }
             log.warn(sm.getString("byteBufferUtils.cleaner"), t);
             cleanerMethodLocal = null;
             cleanMethodLocal = null;
