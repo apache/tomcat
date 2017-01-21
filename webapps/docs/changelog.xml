@@ -45,6 +45,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.12 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        <bug>60596</bug>: Improve performance of DefaultServlet when sendfile
+        feature is disabled on connector. (kkolinko)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
