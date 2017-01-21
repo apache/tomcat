@@ -1873,14 +1873,16 @@ public class DefaultServlet extends HttpServlet {
                                   HttpServletResponse response,
                                   WebResource resource,
                                   long length, Range range) {
+        String canonicalPath;
         if (sendfileSize > 0
-            && resource.isFile()
             && length > sendfileSize
-            && (resource.getCanonicalPath() != null)
             && (Boolean.TRUE.equals(request.getAttribute(Globals.SENDFILE_SUPPORTED_ATTR)))
             && (request.getClass().getName().equals("org.apache.catalina.connector.RequestFacade"))
-            && (response.getClass().getName().equals("org.apache.catalina.connector.ResponseFacade"))) {
-            request.setAttribute(Globals.SENDFILE_FILENAME_ATTR, resource.getCanonicalPath());
+            && (response.getClass().getName().equals("org.apache.catalina.connector.ResponseFacade"))
+            && resource.isFile()
+            && ((canonicalPath = resource.getCanonicalPath()) != null)
+            ) {
+            request.setAttribute(Globals.SENDFILE_FILENAME_ATTR, canonicalPath);
             if (range == null) {
                 request.setAttribute(Globals.SENDFILE_FILE_START_ATTR, Long.valueOf(0L));
                 request.setAttribute(Globals.SENDFILE_FILE_END_ATTR, Long.valueOf(length));
