@@ -27,6 +27,15 @@ import java.util.concurrent.ForkJoinWorkerThread;
  * <p>
  * Note: This class must be available on the boot strap class path for it to be
  * visible to {@link ForkJoinPool}.
+ * <p>
+ * Note: This a helper class that is used by memory leak protection code
+ * ({@code JreMemoryLeakPreventionListener}) to workaround a bug in
+ * Oracle Java 7 / Java 8 Java Runtime. See
+ * <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=60620">bug 60620</a>
+ * for discussion links.
+ *
+ * As {@code ForkJoinPool.ForkJoinWorkerThreadFactory} class is available since
+ * Java 7 only, compilation of this class is skipped when building Tomcat with Java 6.
  */
 public class SafeForkJoinWorkerThreadFactory implements ForkJoinWorkerThreadFactory {
 

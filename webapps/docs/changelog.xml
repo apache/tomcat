@@ -58,6 +58,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.76 (violetagg)">
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>60620</bug>: Fix configuration of Eclipse projects, broken by
+        introduction of <code>SafeForkJoinWorkerThreadFactory</code> helper
+        class. This class cannot be built with Java 6. (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.75 (violetagg)">
   <subsection name="Cluster">
@@ -127,6 +136,7 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        <bug>60620</bug>:
         Extend the <code>JreMemoryLeakPreventionListener</code> to provide
         protection against <code>ForkJoinPool.commonPool()</code> related memory
         leaks. (markt)
