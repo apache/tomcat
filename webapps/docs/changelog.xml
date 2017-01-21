@@ -98,6 +98,7 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        <bug>60620</bug>:
         Extend the <code>JreMemoryLeakPreventionListener</code> to provide
         protection against <code>ForkJoinPool.commonPool()</code> related memory
         leaks. (markt)
