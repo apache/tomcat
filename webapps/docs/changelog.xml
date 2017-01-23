@@ -47,6 +47,10 @@
 <section name="Tomcat 9.0.0.M18 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>60490</bug>: Various formatting and layout improvements for the
+        <code>ErrorReportValve</code>. Patch provided by Michael Osipov. (markt)
+      </fix>
       <update>
         <bug>60596</bug>: Improve performance of DefaultServlet when sendfile
         feature is disabled on connector. (kkolinko)
