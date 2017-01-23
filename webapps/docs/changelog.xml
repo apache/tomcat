@@ -55,6 +55,12 @@
         <bug>60596</bug>: Improve performance of DefaultServlet when sendfile
         feature is disabled on connector. (kkolinko)
       </update>
+      <scode>
+        Make it easier for sub-classes of <code>Tomcat</code> to modify the
+        default web.xml settings by over-riding
+        <code>getDefaultWebXmlListener()</code>. Patch provided by Aaron
+        Anderson. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
