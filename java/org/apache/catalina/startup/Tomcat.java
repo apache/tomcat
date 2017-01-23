@@ -615,7 +615,7 @@ public class Tomcat {
         Context ctx = createContext(host, contextPath);
         ctx.setPath(contextPath);
         ctx.setDocBase(docBase);
-        ctx.addLifecycleListener(new DefaultWebXmlListener());
+        ctx.addLifecycleListener(getDefaultWebXmlListener());
         ctx.setConfigFile(getWebappConfigFile(docBase, contextPath));
 
         ctx.addLifecycleListener(config);
