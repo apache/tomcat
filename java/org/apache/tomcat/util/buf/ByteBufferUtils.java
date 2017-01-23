@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -65,16 +64,9 @@ public class ByteBufferUtils {
                 Object cleanerObject = cleanerMethodLocal.invoke(tempBuffer);
                 cleanMethodLocal = cleanerObject.getClass().getMethod("clean");
                 cleanMethodLocal.invoke(cleanerObject);
-            } catch (Throwable t) {
-                JreCompat jreCompat = JreCompat.getInstance();
-                if (jreCompat.isInstanceOfInaccessibleObjectException(t)) {
-                    // Must be running on Java 9 without the necessary command line
-                    // options.
-                    log.warn(sm.getString("byteBufferUtils.addExportsCleaner"));
-                } else {
-                    ExceptionUtils.handleThrowable(t);
-                }
-                log.warn(sm.getString("byteBufferUtils.cleaner"), t);
+            } catch (NoSuchMethodException | SecurityException | IllegalAccessException |
+                    IllegalArgumentException | InvocationTargetException e) {
+                log.warn(sm.getString("byteBufferUtils.cleaner"), e);
                 cleanerMethodLocal = null;
                 cleanMethodLocal = null;
             }
