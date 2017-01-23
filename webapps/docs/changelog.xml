@@ -58,6 +58,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.76 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <scode>
+        Make it easier for sub-classes of <code>Tomcat</code> to modify the
+        default web.xml settings by over-riding
+        <code>getDefaultWebXmlListener()</code>. Patch provided by Aaron
+        Anderson. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
