@@ -277,18 +277,20 @@ public class WsWebSocketContainer
             }
         }
 
+        // If the port is not explicitly specified, compute it based on the
+        // scheme
+        if (port == -1) {
+            if ("ws".equalsIgnoreCase(scheme)) {
+                port = 80;
+            } else {
+                // Must be wss due to scheme validation above
+                port = 443;
+            }
+        }
+
         // If sa is null, no proxy is configured so need to create sa
         if (sa == null) {
-            if (port == -1) {
-                if ("ws".equalsIgnoreCase(scheme)) {
-                    sa = new InetSocketAddress(host, 80);
-                } else {
-                    // Must be wss due to scheme validation above
-                    sa = new InetSocketAddress(host, 443);
-                }
-            } else {
-                sa = new InetSocketAddress(host, port);
-            }
+            sa = new InetSocketAddress(host, port);
         } else {
             proxyConnect = createProxyRequest(host, port);
         }
@@ -501,16 +503,14 @@ public class WsWebSocketContainer
         StringBuilder request = new StringBuilder();
         request.append("CONNECT ");
         request.append(host);
-        if (port != -1) {
-            request.append(':');
-            request.append(port);
-        }
+        request.append(':');
+        request.append(port);
+
         request.append(" HTTP/1.1\r\nProxy-Connection: keep-alive\r\nConnection: keepalive\r\nHost: ");
         request.append(host);
-        if (port != -1) {
-            request.append(':');
-            request.append(port);
-        }
+        request.append(':');
+        request.append(port);
+
         request.append("\r\n\r\n");
 
         byte[] bytes = request.toString().getBytes(StandardCharsets.ISO_8859_1);
