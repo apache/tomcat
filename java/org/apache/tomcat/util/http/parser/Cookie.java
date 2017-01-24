@@ -118,7 +118,7 @@ public class Cookie {
 
         SkipResult skipResult = skipBytes(bb, VERSION_BYTES);
         if (skipResult != SkipResult.FOUND) {
-            // No need to reset position since skipConstant() will have done it
+            // No need to reset position since skipBytes() will have done it
             parseCookieRfc6265(bb, serverCookies);
             return;
         }
@@ -127,7 +127,7 @@ public class Cookie {
 
         skipResult = skipByte(bb, EQUALS_BYTE);
         if (skipResult != SkipResult.FOUND) {
-            // Need to reset position as skipConstant() will only have reset to
+            // Need to reset position as skipByte() will only have reset to
             // position before it was called
             bb.position(mark);
             parseCookieRfc6265(bb, serverCookies);
