@@ -92,6 +92,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>60617</bug>: Correctly create a <code>CONNECT</code> request when
+        establishing a WebSocket connection via a proxy. Patch provided by
+        Svetlin Zarev. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <add>
