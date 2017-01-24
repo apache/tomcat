@@ -78,7 +78,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.75 (violetagg)">
+<section name="Tomcat 7.0.75 (violetagg)" rtext="released 2017-01-24">
   <subsection name="Cluster">
     <changelog>
       <add>
