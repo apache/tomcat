@@ -243,7 +243,6 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
 
-    @Override
     public void backgroundProcess() {
         annotationCache.maintain();
     }
