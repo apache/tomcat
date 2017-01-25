@@ -61,6 +61,7 @@ public class TestDefaultInstanceManager extends TomcatBaseTest {
         // Spin a while until GC happens or we wait too long
         int loop = 0;
         while (loop < 10) {
+            instanceManager.backgroundProcess();
             if (instanceManager.getAnnotationCacheSize() == count) {
                 break;
             }
