@@ -66,6 +66,11 @@
         <code>getDefaultWebXmlListener()</code>. Patch provided by Aaron
         Anderson. (markt)
       </scode>
+      <fix>
+        Reduce the contention in the default <code>InstanceManager</code>
+        implementation when multiple threads are managing objects and need to
+        reference the annotation cache. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
