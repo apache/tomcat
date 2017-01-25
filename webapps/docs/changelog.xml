@@ -150,10 +150,6 @@
       <fix>
         <bug>60513</bug>: Fix thread safety issue with RMI cleanup code. (remm)
       </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Catalina">
-    <changelog>
       <add>
         <bug>60620</bug>:
         Extend the <code>JreMemoryLeakPreventionListener</code> to provide
