@@ -19,7 +19,6 @@ package org.apache.jasper.runtime;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.Tag;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Wrapper;
@@ -28,12 +27,8 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.unittest.tags.Bug53545;
 
 
-public class TestTagHandlerPool extends TomcatBaseTest {
+public class TestTagHandlerPoolPerformance extends TomcatBaseTest {
 
-    /*
-     * Performance test. Comment out @Ignore to run the test.
-     */
-    @Ignore
     @Test
     public void testConcurrency() throws Exception {
         // Create a working TagHandlerPool
