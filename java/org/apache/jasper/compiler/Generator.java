@@ -2614,21 +2614,18 @@ class Generator {
             }
 
             // Ensure clean-up takes place
+            // Use JspRuntimeLibrary to minimise code in _jspService()
             out.popIndent();
             out.printil("} finally {");
             out.pushIndent();
+            out.printin("org.apache.jasper.runtime.JspRuntimeLibrary.releaseTag(");
+            out.print(tagHandlerVar);
+            out.print(", _jsp_getInstanceManager(), ");
             if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
-                out.printin("if (!");
                 out.print(tagHandlerVar);
-                out.println("_reused) {");
-                out.pushIndent();
-            }
-            out.printin(tagHandlerVar);
-            out.println(".release();");
-            writeDestroyInstance(tagHandlerVar);
-            if (isPoolingEnabled && !(n.implementsJspIdConsumer())) {
-                out.popIndent();
-                out.printil("}");
+                out.println("_reused);");
+            } else {
+                out.println("false);");
             }
             out.popIndent();
             out.printil("}");

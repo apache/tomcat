@@ -32,9 +32,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.BodyContent;
+import javax.servlet.jsp.tagext.Tag;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.Localizer;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.InstanceManager;
 
 /**
  * Bunch of util methods that are used by code generated for useBean,
@@ -49,6 +53,8 @@ import org.apache.jasper.compiler.Localizer;
  * @author Shawn Bayern
  */
 public class JspRuntimeLibrary {
+
+    private static final Log log = LogFactory.getLog(JspRuntimeLibrary.class);
 
     /**
      * Returns the value of the javax.servlet.error.exception request
@@ -963,4 +969,31 @@ public class JspRuntimeLibrary {
         return false;
     }
 
+
+    public static void releaseTag(Tag tag, InstanceManager instanceManager, boolean reused) {
+        // Caller ensures pool is non-null if reuse is true
+        if (!reused) {
+            releaseTag(tag, instanceManager);
+        }
+    }
+
+
+    protected static void releaseTag(Tag tag, InstanceManager instanceManager) {
+        try {
+            tag.release();
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            log.warn("Error processing release on tag instance of "
+                    + tag.getClass().getName(), t);
+        }
+        try {
+            instanceManager.destroyInstance(tag);
+        } catch (Exception e) {
+            Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
+            ExceptionUtils.handleThrowable(t);
+            log.warn("Error processing preDestroy on tag instance of "
+                    + tag.getClass().getName(), t);
+        }
+
+    }
 }
