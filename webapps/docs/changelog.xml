@@ -94,6 +94,10 @@
         Refactor code generated for JSPs to reduce the size of the code required
         for tags. (markt)
       </fix>
+      <fix>
+        Improve the error handling for simple tags to ensure that the tag is
+        released and destroyed once used. (remm, violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

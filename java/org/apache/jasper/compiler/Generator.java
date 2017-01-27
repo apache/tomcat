@@ -2640,8 +2640,14 @@ class Generator {
             declareScriptingVars(n, VariableInfo.AT_BEGIN);
             saveScriptingVars(n, VariableInfo.AT_BEGIN);
 
+            // Declare AT_END scripting variables
+            declareScriptingVars(n, VariableInfo.AT_END);
+
             String tagHandlerClassName = tagHandlerClass.getCanonicalName();
             writeNewInstance(tagHandlerVar, tagHandlerClassName);
+
+            out.printil("try {");
+            out.pushIndent();
 
             generateSetters(n, tagHandlerVar, handlerInfo, true);
 
@@ -2682,12 +2688,18 @@ class Generator {
             // Synchronize AT_BEGIN scripting variables
             syncScriptingVars(n, VariableInfo.AT_BEGIN);
 
-            // Declare and synchronize AT_END scripting variables
-            declareScriptingVars(n, VariableInfo.AT_END);
+            // Synchronize AT_END scripting variables
             syncScriptingVars(n, VariableInfo.AT_END);
+
+            out.popIndent();
+            out.printil("} finally {");
+            out.pushIndent();
 
             // Resource injection
             writeDestroyInstance(tagHandlerVar);
+
+            out.popIndent();
+            out.printil("}");
 
             n.setEndJavaLine(out.getJavaLine());
         }
