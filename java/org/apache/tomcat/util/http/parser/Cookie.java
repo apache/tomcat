@@ -138,8 +138,10 @@ public class Cookie {
 
         ByteBuffer value = readCookieValue(bb);
         if (value != null && value.remaining() == 1) {
-            if (value.get() == (byte) 49) {
+            byte version = value.get();
+            if (version == (byte) 49 || version == (byte) 48) {
                 // $Version=1 -> RFC2109
+                // $Version=0 -> RFC2109
                 skipLWS(bb);
                 byte b = bb.get();
                 if (b == SEMICOLON_BYTE || b == COMMA_BYTE) {

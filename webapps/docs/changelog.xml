@@ -78,6 +78,12 @@
         Improve NIO2 look-ahead parsing of TLS client hello for SNI with large
         client hello messages. (markt)
       </fix>
+      <fix>
+        <bug>60627</bug>: Modify the <code>Rfc6265CookieProcessor</code> so that
+        in addition to cookie headers that start with an explicit RFC 2109
+        <code>$Version=1</code>, cookies that start with <code>$Version=0</code>
+        are also parsed as RFC 2109 cookies. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
