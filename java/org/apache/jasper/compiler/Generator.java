@@ -1796,7 +1796,8 @@ class Generator {
             // to a method.
             ServletWriter outSave = null;
             Node.ChildInfo ci = n.getChildInfo();
-            if (ci.isScriptless() && !ci.hasScriptingVars()) {
+            boolean hasNoScriptingElement = ci.isScriptless() && !ci.hasScriptingVars();
+            if (hasNoScriptingElement) {
                 // The tag handler and its body code can reside in a separate
                 // method if it is scriptless and does not have any scripting
                 // variable defined.
@@ -1891,14 +1892,14 @@ class Generator {
 
 
             if (n.implementsSimpleTag()) {
-                generateCustomDoTag(n, handlerInfo, tagHandlerVar);
+                generateCustomDoTag(n, handlerInfo, tagHandlerVar, hasNoScriptingElement);
             } else {
                 /*
                  * Classic tag handler: Generate code for start element, body,
                  * and end element
                  */
                 generateCustomStart(n, handlerInfo, tagHandlerVar, tagEvalVar,
-                        tagPushBodyCountVar);
+                        tagPushBodyCountVar, hasNoScriptingElement);
 
                 // visit body
                 String tmpParent = parent;
@@ -1926,7 +1927,7 @@ class Generator {
                         tagPushBodyCountVar);
             }
 
-            if (ci.isScriptless() && !ci.hasScriptingVars()) {
+            if (hasNoScriptingElement) {
                 // Generate end of method
                 if (methodNesting > 0) {
                     out.printil("return false;");
@@ -2366,10 +2367,9 @@ class Generator {
             }
         }
 
-        private void generateCustomStart(Node.CustomTag n,
-                TagHandlerInfo handlerInfo, String tagHandlerVar,
-                String tagEvalVar, String tagPushBodyCountVar)
-                throws JasperException {
+        private void generateCustomStart(Node.CustomTag n, TagHandlerInfo handlerInfo,
+                String tagHandlerVar, String tagEvalVar, String tagPushBodyCountVar,
+                boolean hasNoScriptingElement) throws JasperException {
 
             Class<?> tagHandlerClass =
                 handlerInfo.getTagHandlerClass();
@@ -2407,7 +2407,7 @@ class Generator {
             out.pushIndent();
 
             // includes setting the context
-            generateSetters(n, tagHandlerVar, handlerInfo, false);
+            generateSetters(n, tagHandlerVar, handlerInfo, false, hasNoScriptingElement);
 
             if (n.implementsTryCatchFinally()) {
                 out.printin("int[] ");
@@ -2625,9 +2625,8 @@ class Generator {
             restoreScriptingVars(n, VariableInfo.AT_BEGIN);
         }
 
-        private void generateCustomDoTag(Node.CustomTag n,
-                TagHandlerInfo handlerInfo, String tagHandlerVar)
-                throws JasperException {
+        private void generateCustomDoTag(Node.CustomTag n, TagHandlerInfo handlerInfo,
+                String tagHandlerVar, boolean hasNoScriptingElement) throws JasperException {
 
             Class<?> tagHandlerClass =
                 handlerInfo.getTagHandlerClass();
@@ -2643,7 +2642,7 @@ class Generator {
             String tagHandlerClassName = tagHandlerClass.getCanonicalName();
             writeNewInstance(tagHandlerVar, tagHandlerClassName);
 
-            generateSetters(n, tagHandlerVar, handlerInfo, true);
+            generateSetters(n, tagHandlerVar, handlerInfo, true, hasNoScriptingElement);
 
             // Set the body
             if (findJspBody(n) == null) {
@@ -3149,8 +3148,54 @@ class Generator {
         }
 
         private void generateSetters(Node.CustomTag n, String tagHandlerVar,
-                TagHandlerInfo handlerInfo, boolean simpleTag)
+                TagHandlerInfo handlerInfo, boolean simpleTag, boolean hasNoScriptingElement)
                 throws JasperException {
+
+            ServletWriter outSave = null;
+            // If the tag contains scripting elements, the setters can still be
+            // generated in a separate method. This reduces the amount of code
+            // required in the _jspService() method
+            if (!hasNoScriptingElement) {
+                outSave = out;
+
+                // Might be better to pass the baseVar
+                String tagSetterMethod = "_jspx_meth_set_" + tagHandlerVar.substring(9);
+
+                // Generate a call to the setter method
+                out.printin(tagSetterMethod);
+                out.print("(");
+                out.print(tagHandlerVar);
+                out.print(", _jspx_page_context");
+                if (parent != null) {
+                    out.print(", ");
+                    out.print(parent);
+                }
+                out.println(");");
+
+                // Setup new buffer for the method
+                GenBuffer genBuffer = new GenBuffer(n, null);
+                methodsBuffered.add(genBuffer);
+                out = genBuffer.getOut();
+
+                // Generate code for method declaration
+                out.println();
+                out.pushIndent();
+                out.printin("private void ");
+                out.print(tagSetterMethod);
+                out.print("(");
+                out.print(handlerInfo.getTagHandlerClass().getCanonicalName());
+                out.print(" ");
+                out.print(tagHandlerVar);
+                out.print(", javax.servlet.jsp.PageContext _jspx_page_context");
+                if (parent != null) {
+                    out.print(", ");
+                    out.print("javax.servlet.jsp.tagext.JspTag ");
+                    out.print(parent);
+                }
+                out.println(")");
+                out.printil("    throws java.lang.Throwable {");
+                out.pushIndent();
+            }
 
             // Set context
             if (simpleTag) {
@@ -3246,6 +3291,15 @@ class Generator {
                 out.print(".setJspId(\"");
                 out.print(createJspId());
                 out.println("\");");
+            }
+
+            if (!hasNoScriptingElement) {
+                out.popIndent();
+                out.printil("}");
+                out.popIndent();
+
+                // restore previous writer
+                out = outSave;
             }
         }
 
