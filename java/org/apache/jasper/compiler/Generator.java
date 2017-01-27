@@ -2485,24 +2485,21 @@ class Generator {
         }
 
         private void writeNewInstance(String tagHandlerVar, String tagHandlerClassName) {
+            out.printin(tagHandlerClassName);
+            out.print(" ");
+            out.print(tagHandlerVar);
+            out.print(" = ");
             if (Constants.USE_INSTANCE_MANAGER_FOR_TAGS) {
-                out.printin(tagHandlerClassName);
-                out.print(" ");
-                out.print(tagHandlerVar);
-                out.print(" = (");
+                out.print("(");
                 out.print(tagHandlerClassName);
                 out.print(")");
                 out.print("_jsp_getInstanceManager().newInstance(\"");
                 out.print(tagHandlerClassName);
                 out.println("\", this.getClass().getClassLoader());");
             } else {
-                out.printin(tagHandlerClassName);
-                out.print(" ");
-                out.print(tagHandlerVar);
-                out.print(" = (");
                 out.print("new ");
                 out.print(tagHandlerClassName);
-                out.println("());");
+                out.println("();");
                 out.printin("_jsp_getInstanceManager().newInstance(");
                 out.print(tagHandlerVar);
                 out.println(");");
