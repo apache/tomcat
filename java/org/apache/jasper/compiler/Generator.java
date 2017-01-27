@@ -2451,7 +2451,6 @@ class Generator {
                     out.println(" != javax.servlet.jsp.tagext.Tag.EVAL_BODY_INCLUDE) {");
                     // Assume EVAL_BODY_BUFFERED
                     out.pushIndent();
-                    out.printil("out = _jspx_page_context.pushBody();");
                     if (n.implementsTryCatchFinally()) {
                         out.printin(tagPushBodyCountVar);
                         out.println("[0]++;");
@@ -2459,11 +2458,10 @@ class Generator {
                         out.printin(pushBodyCountVar);
                         out.println("[0]++;");
                     }
-                    out.printin(tagHandlerVar);
-                    out.println(".setBodyContent((javax.servlet.jsp.tagext.BodyContent) out);");
-                    out.printin(tagHandlerVar);
-                    out.println(".doInitBody();");
-
+                    out.printin("out = org.apache.jasper.runtime.JspRuntimeLibrary.startBufferedBody(");
+                    out.print("_jspx_page_context, ");
+                    out.print(tagHandlerVar);
+                    out.println(");");
                     out.popIndent();
                     out.printil("}");
 

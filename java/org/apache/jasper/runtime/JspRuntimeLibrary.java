@@ -29,9 +29,11 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.BodyContent;
+import javax.servlet.jsp.tagext.BodyTag;
 import javax.servlet.jsp.tagext.Tag;
 
 import org.apache.jasper.JasperException;
@@ -967,6 +969,15 @@ public class JspRuntimeLibrary {
             return true;
         }
         return false;
+    }
+
+
+    public static JspWriter startBufferedBody(PageContext pageContext, BodyTag tag)
+            throws JspException {
+        BodyContent out = pageContext.pushBody();
+        tag.setBodyContent(out);
+        tag.doInitBody();
+        return out;
     }
 
 
