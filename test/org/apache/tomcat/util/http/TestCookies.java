@@ -384,8 +384,8 @@ public class TestCookies {
 
     @Test
     public void rfc2109Version0Rfc6265() {
-        // Neither RFC2109 nor RFc6265 allow version 0
-        test(true, "$Version=0;foo=bar");
+        // Neither RFC2109 nor RFC6265 allow version 0
+        test(true, "$Version=0;foo=bar", FOO);
     }
 
     @Test
