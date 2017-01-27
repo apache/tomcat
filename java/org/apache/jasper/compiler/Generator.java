@@ -2409,14 +2409,6 @@ class Generator {
             // includes setting the context
             generateSetters(n, tagHandlerVar, handlerInfo, false);
 
-            // JspIdConsumer (after context has been set)
-            if (n.implementsJspIdConsumer()) {
-                out.printin(tagHandlerVar);
-                out.print(".setJspId(\"");
-                out.print(createJspId());
-                out.println("\");");
-            }
-
             if (n.implementsTryCatchFinally()) {
                 out.printin("int[] ");
                 out.print(tagPushBodyCountVar);
@@ -2652,14 +2644,6 @@ class Generator {
             writeNewInstance(tagHandlerVar, tagHandlerClassName);
 
             generateSetters(n, tagHandlerVar, handlerInfo, true);
-
-            // JspIdConsumer (after context has been set)
-            if (n.implementsJspIdConsumer()) {
-                out.printin(tagHandlerVar);
-                out.print(".setJspId(\"");
-                out.print(createJspId());
-                out.println("\");");
-            }
 
             // Set the body
             if (findJspBody(n) == null) {
@@ -3254,6 +3238,14 @@ class Generator {
                     out.print(attrValue);
                     out.println(");");
                 }
+            }
+
+            // JspIdConsumer (after context has been set)
+            if (n.implementsJspIdConsumer()) {
+                out.printin(tagHandlerVar);
+                out.print(".setJspId(\"");
+                out.print(createJspId());
+                out.println("\");");
             }
         }
 
