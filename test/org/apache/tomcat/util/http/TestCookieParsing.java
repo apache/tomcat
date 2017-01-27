@@ -51,6 +51,11 @@ public class TestCookieParsing extends TomcatBaseTest {
     private static final String[] COOKIES_WITH_QUOTES = new String[] {
             "name=\"val\\\"ue\"", "name=\"value\"" };
 
+    private static final String[] COOKIES_V0 = new String[] {
+            "$Version=0;name=\"val ue\"", "$Version=0;name=\"val\tue\""};
+
+    private static final String COOKIES_V0_CONCAT = "name=\"val ue\"name=\"val\tue\"";
+
     private static final String[] COOKIES_V1 = new String[] {
             "$Version=1;name=\"val ue\"", "$Version=1;name=\"val\tue\""};
 
@@ -131,6 +136,14 @@ public class TestCookieParsing extends TomcatBaseTest {
         TestCookieParsingClient client = new TestCookieParsingClient(
                 new Rfc6265CookieProcessor(), COOKIES_WITH_NAME_ONLY,
                 COOKIES_WITH_NAME_ONLY_CONCAT);
+        client.doRequest();
+    }
+
+
+    @Test
+    public void testRfc6265V0() throws Exception {
+        TestCookieParsingClient client = new TestCookieParsingClient(
+                new Rfc6265CookieProcessor(), COOKIES_V0, COOKIES_V0_CONCAT);
         client.doRequest();
     }
 

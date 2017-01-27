@@ -86,6 +86,12 @@
       <fix>
         Restore Java 9 direct byte buffer compatibility. (remm)
       </fix>
+      <fix>
+        <bug>60627</bug>: Modify the <code>Rfc6265CookieProcessor</code> so that
+        in addition to cookie headers that start with an explicit RFC 2109
+        <code>$Version=1</code>, cookies that start with <code>$Version=0</code>
+        are also parsed as RFC 2109 cookies. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
