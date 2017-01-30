@@ -22,6 +22,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Assume;
