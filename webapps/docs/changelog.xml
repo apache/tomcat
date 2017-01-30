@@ -84,6 +84,11 @@
         <code>$Version=1</code>, cookies that start with <code>$Version=0</code>
         are also parsed as RFC 2109 cookies. (markt)
       </fix>
+      <fix>
+        Include the value of <code>SslHostConfig.truststoreAlgorithm</code> when
+        warning that the algorithm does not support the
+        <code>certificateVerificationDepth</code> configuration option. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

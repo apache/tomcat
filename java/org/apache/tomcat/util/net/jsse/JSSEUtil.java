@@ -272,7 +272,7 @@ public class JSSEUtil extends SSLUtilBase {
                 if (crlf != null && crlf.length() > 0) {
                     throw new CRLException(sm.getString("jsseUtil.noCrlSupport", algorithm));
                 }
-                log.warn(sm.getString("jsseUtil.noVerificationDepth"));
+                log.warn(sm.getString("jsseUtil.noVerificationDepth", algorithm));
             }
         }
 
