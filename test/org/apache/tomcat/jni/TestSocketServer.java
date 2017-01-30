@@ -1,0 +1,232 @@
+/*
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+package org.apache.tomcat.jni;
+
+import java.io.OutputStream;
+import java.util.concurrent.CountDownLatch;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.Test;
+
+/**
+ * Tests for server-side sockets.
+ */
+public class TestSocketServer {
+
+    private static final String HOST = "localhost";
+
+    private boolean nativeLibraryPresent = false;
+    private int port = 0;
+    private long serverSocket = 0;
+    private long clientSocket = 0;
+
+
+    @Before
+    public void init() throws Exception {
+        try {
+            Library.initialize(null);
+            nativeLibraryPresent = true;
+        } catch (LibraryNotFoundError lnfe) {
+            nativeLibraryPresent = false;
+        }
+        Assume.assumeTrue("APR Library not found", nativeLibraryPresent);
+
+        long serverPool = Pool.create(0);
+        long inetAddress = Address.info(HOST, Socket.APR_INET,
+                                        0, 0, serverPool);
+        serverSocket = Socket.create(Socket.APR_INET, Socket.SOCK_STREAM,
+                                   Socket.APR_PROTO_TCP, serverPool);
+        if (OS.IS_UNIX) {
+            Socket.optSet(serverSocket, Socket.APR_SO_REUSEADDR, 1);
+        }
+        int rc = Socket.bind(serverSocket, inetAddress);
+        Assert.assertEquals("Can't bind: " + Error.strerror(rc), 0, rc);
+        Socket.listen(serverSocket, 5);
+        if (!OS.IS_UNIX) {
+            Socket.optSet(serverSocket, Socket.APR_SO_REUSEADDR, 1);
+        }
+
+        long localAddress = Address.get(Socket.APR_LOCAL, serverSocket);
+        port = Address.getInfo(localAddress).port;
+    }
+
+
+    @After
+    public void destroy() {
+        if (clientSocket != 0) {
+            Socket.close(clientSocket);
+            Socket.destroy(clientSocket);
+        }
+        if (serverSocket != 0) {
+            Socket.close(serverSocket);
+            Socket.destroy(serverSocket);
+        }
+        if (nativeLibraryPresent) {
+            Library.terminate();
+        }
+    }
+
+
+    @Test
+    public void testPort() {
+        Assert.assertTrue(port > 0);
+    }
+
+
+    @Test
+    public void testBlockingReadFromClientWithTimeout() throws Exception {
+        /* Start the client that connects to the server */
+        Client client = new Client(port);
+        client.start();
+
+        /* Accept the client connection */
+        clientSocket = Socket.accept(serverSocket);
+
+        /* Configure a 2ms timeout for reading from client */
+        Socket.timeoutSet(clientSocket, 2000);
+        long timeout = Socket.timeoutGet(clientSocket);
+        Assert.assertEquals("Socket.timeoutGet clientSocket failed", 2000, timeout);
+
+        byte [] buf = new byte[1];
+        long start = System.nanoTime();
+        while (Socket.recv(clientSocket, buf, 0, 1) == 1) {
+        }
+        long wait = System.nanoTime() - start;
+        Assert.assertFalse("Socket.timeoutSet failed (<1.5ms)", wait < 1500000);
+        Assert.assertFalse("Socket.timeoutSet failed (>5.0ms)", wait > 5000000);
+
+        client.countDown();
+        client.join();
+    }
+
+
+    @Test
+    public void testNonBlockingReadFromClient() throws Exception {
+        /* Start the client that connects to the server */
+        Client client = new Client(port);
+        client.start();
+
+        /* Accept the client connection */
+        clientSocket = Socket.accept(serverSocket);
+
+        /* Configure the connection for non-blocking */
+        Socket.optSet(clientSocket, Socket.APR_SO_NONBLOCK, 1);
+        int val = Socket.optGet(clientSocket, Socket.APR_SO_NONBLOCK);
+        Assert.assertEquals("Socket.optGet clientSocket failed", 1, val);
+
+        byte [] buf = new byte[1];
+        long start = System.nanoTime();
+        while (Socket.recv(clientSocket, buf, 0, 1) == 1) {
+        }
+        long wait = System.nanoTime() - start;
+        Assert.assertFalse("non_blocking client Socket.APR_SO_NONBLOCK failed (>1ms)",
+                wait > 1000000);
+
+        client.countDown();
+        client.join();
+    }
+
+
+    @Test
+    public void testNonBlockingReadThenBlockingReadFromClient() throws Exception {
+        /* Start the client that connects to the server */
+        Client client = new Client(port);
+        client.start();
+
+        /* Accept the client connection */
+        clientSocket = Socket.accept(serverSocket);
+
+        /* Configure the connection for non-blocking */
+        Socket.optSet(clientSocket, Socket.APR_SO_NONBLOCK, 1);
+
+        byte [] buf = new byte[1];
+        long start = System.nanoTime();
+        while (Socket.recv(clientSocket, buf, 0, 1) == 1) {
+        }
+        long wait = System.nanoTime() - start;
+        Assert.assertFalse("non_blocking client Socket.APR_SO_NONBLOCK failed (>1ms)",
+                wait > 1000000);
+
+        /* Configure for blocking */
+        Socket.optSet(clientSocket, Socket.APR_SO_NONBLOCK, 0);
+        Socket.timeoutSet(clientSocket, 2000);
+        start = System.nanoTime();
+        while (Socket.recv(clientSocket, buf, 0, 1) == 1) {
+        }
+        wait = System.nanoTime() - start;
+        Assert.assertFalse("non_blocking client Socket.APR_SO_NONBLOCK false failed",
+                wait < 1000000);
+
+        client.countDown();
+        client.join();
+    }
+
+
+    @Test
+    public void testNonBlockingAcceptWithNoClient() throws Exception {
+        Socket.optSet(serverSocket, Socket.APR_SO_NONBLOCK, 1);
+        int val = Socket.optGet(serverSocket, Socket.APR_SO_NONBLOCK);
+        Assert.assertEquals("Socket.optGet serverSocket failed", 1, val);
+
+        long start = System.nanoTime();
+        boolean ok = false;
+        try {
+            Socket.accept(serverSocket);
+        } catch (Exception ex) {
+            ok = true;
+        }
+        long wait = System.nanoTime() - start;
+        Assert.assertTrue("Timeout failed", ok);
+        Assert.assertFalse("non_blocking accept Socket.APR_SO_NONBLOCK failed (>1ms)",
+                wait > 1000000);
+    }
+
+
+    /**
+     * Simple client that connects, sends a single byte then closes the
+     * connection.
+     */
+    private static class Client extends java.lang.Thread {
+
+        private final int port;
+        private final CountDownLatch complete = new CountDownLatch(1);
+
+        public Client(int port) throws Exception {
+            this.port = port;
+        }
+
+        public void countDown() {
+            complete.countDown();
+        }
+
+        @Override
+        public void run() {
+
+            try (java.net.Socket sock = new java.net.Socket(TestSocketServer.HOST, port)) {
+                OutputStream os = sock.getOutputStream();
+                os.write('A');
+                os.flush();
+                complete.await();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+}
