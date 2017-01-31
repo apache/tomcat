@@ -87,6 +87,12 @@
         Restore Java 9 direct byte buffer compatibility. (remm)
       </fix>
       <fix>
+        <bug>59807</bug>: Provide a better error message when there is no
+        <strong>SSLHostConfig</strong> defined with a <code>hostName</code> that
+        matches the <code>defaultSSLHostConfigName</code> for the associated
+        <strong>Connector</strong>. (markt)
+      </fix>
+      <fix>
         <bug>60627</bug>: Modify the <code>Rfc6265CookieProcessor</code> so that
         in addition to cookie headers that start with an explicit RFC 2109
         <code>$Version=1</code>, cookies that start with <code>$Version=0</code>
