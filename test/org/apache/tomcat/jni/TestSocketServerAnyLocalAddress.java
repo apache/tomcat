@@ -35,7 +35,6 @@ import org.junit.Test;
 public class TestSocketServerAnyLocalAddress {
 
     private boolean nativeLibraryPresent = false;
-    private int port = 0;
     private long serverSocket = 0;
     private long clientSocket = 0;
 
@@ -64,8 +63,6 @@ public class TestSocketServerAnyLocalAddress {
         if (!OS.IS_UNIX) {
             Socket.optSet(serverSocket, Socket.APR_SO_REUSEADDR, 1);
         }
-        long localAddress = Address.get(Socket.APR_LOCAL, serverSocket);
-        port = Address.getInfo(localAddress).port;
     }
 
 
@@ -88,7 +85,7 @@ public class TestSocketServerAnyLocalAddress {
     @Test
     public void testWithClient() throws Exception {
         /* Start the client that connects to the server */
-        Client client = new Client(serverSocket, port);
+        Client client = new Client(serverSocket);
         client.start();
 
         boolean running = true;
@@ -127,11 +124,9 @@ public class TestSocketServerAnyLocalAddress {
     private static class Client extends java.lang.Thread {
 
         private final long serverSocket;
-        private final int port;
 
-        public Client(long serverSocket, int port) throws Exception {
+        public Client(long serverSocket) throws Exception {
             this.serverSocket = serverSocket;
-            this.port = port;
         }
 
         @Override
@@ -152,8 +147,9 @@ public class TestSocketServerAnyLocalAddress {
                      throw new Exception("Read wrong data");
                 }
 
-                /* Now use localhost to write 'E' */
-                sock = new java.net.Socket("localhost", port);
+                sock = new java.net.Socket();
+                sock.connect(connectAddress, 10000);
+                sock.setSoTimeout(10000);
                 ou = sock.getOutputStream();
                 ou.write('E');
                 ou.flush();
