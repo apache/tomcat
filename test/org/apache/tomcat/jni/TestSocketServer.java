@@ -21,18 +21,16 @@ import java.util.concurrent.CountDownLatch;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Tests for server-side sockets.
  */
-public class TestSocketServer {
+public class TestSocketServer extends AbstractJniTest {
 
     private static final String HOST = "localhost";
 
-    private boolean nativeLibraryPresent = false;
     private int port = 0;
     private long serverSocket = 0;
     private long clientSocket = 0;
@@ -40,14 +38,6 @@ public class TestSocketServer {
 
     @Before
     public void init() throws Exception {
-        try {
-            Library.initialize(null);
-            nativeLibraryPresent = true;
-        } catch (LibraryNotFoundError lnfe) {
-            nativeLibraryPresent = false;
-        }
-        Assume.assumeTrue("APR Library not found", nativeLibraryPresent);
-
         long serverPool = Pool.create(0);
         long inetAddress = Address.info(HOST, Socket.APR_INET,
                                         0, 0, serverPool);
@@ -77,9 +67,6 @@ public class TestSocketServer {
         if (serverSocket != 0) {
             Socket.close(serverSocket);
             Socket.destroy(serverSocket);
-        }
-        if (nativeLibraryPresent) {
-            Library.terminate();
         }
     }
 

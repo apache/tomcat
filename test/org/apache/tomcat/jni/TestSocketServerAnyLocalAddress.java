@@ -25,30 +25,20 @@ import java.util.Enumeration;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Tests for server-side sockets using any local address (0.0.0.0 or ::).
  */
-public class TestSocketServerAnyLocalAddress {
+public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
 
-    private boolean nativeLibraryPresent = false;
     private long serverSocket = 0;
     private long clientSocket = 0;
 
 
     @Before
     public void init() throws Exception {
-        try {
-            Library.initialize(null);
-            nativeLibraryPresent = true;
-        } catch (LibraryNotFoundError lnfe) {
-            nativeLibraryPresent = false;
-        }
-        Assume.assumeTrue("APR Library not found", nativeLibraryPresent);
-
         long serverPool = Pool.create(0);
         long inetAddress = Address.info(null, Socket.APR_UNSPEC,
                                         0, 0, serverPool);
@@ -75,9 +65,6 @@ public class TestSocketServerAnyLocalAddress {
         if (serverSocket != 0) {
             Socket.close(serverSocket);
             Socket.destroy(serverSocket);
-        }
-        if (nativeLibraryPresent) {
-            Library.terminate();
         }
     }
 

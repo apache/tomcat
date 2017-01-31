@@ -20,7 +20,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
-public class TestFile {
+public class TestFile extends AbstractJniTest {
 
     @Test
     public void testInfoGet() throws Exception {
