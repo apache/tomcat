@@ -99,18 +99,18 @@ public class TestSocketServer {
         /* Accept the client connection */
         clientSocket = Socket.accept(serverSocket);
 
-        /* Configure a 2ms timeout for reading from client */
-        Socket.timeoutSet(clientSocket, 2000);
+        /* Configure a 1s timeout for reading from client */
+        Socket.timeoutSet(clientSocket, 1000000);
         long timeout = Socket.timeoutGet(clientSocket);
-        Assert.assertEquals("Socket.timeoutGet clientSocket failed", 2000, timeout);
+        Assert.assertEquals("Socket.timeoutGet clientSocket failed", 1000000, timeout);
 
         byte [] buf = new byte[1];
         long start = System.nanoTime();
         while (Socket.recv(clientSocket, buf, 0, 1) == 1) {
         }
         long wait = System.nanoTime() - start;
-        Assert.assertFalse("Socket.timeoutSet failed (<1.5ms)", wait < 1500000);
-        Assert.assertFalse("Socket.timeoutSet failed (>5.0ms)", wait > 5000000);
+        Assert.assertFalse("Socket.timeoutSet failed (<1s) [" + wait + "]", wait < 1000000000);
+        Assert.assertFalse("Socket.timeoutSet failed (>2s) [" + wait + "]", wait > 2000000000);
 
         client.countDown();
         client.join();
