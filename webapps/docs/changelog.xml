@@ -91,6 +91,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Ensure that <code>NoRpcChannelReply</code> messages are not received on
+        <code>RpcCallback</code>. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>

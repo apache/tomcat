@@ -111,7 +111,8 @@ public class RpcChannel implements ChannelListener {
         if ( rmsg.reply ) {
             RpcCollector collector = responseMap.get(key);
             if (collector == null) {
-                callback.leftOver(rmsg.message, sender);
+                if (!(rmsg instanceof RpcMessage.NoRpcChannelReply))
+                    callback.leftOver(rmsg.message, sender);
             } else {
                 synchronized (collector) {
                     //make sure it hasn't been removed
