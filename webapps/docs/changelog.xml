@@ -121,8 +121,9 @@
     <changelog>
       <add>
         Make the <code>accessTimeout</code> configurable in
-        <code>BackupManager</code>. The <code>accessTimeout</code> is used as a
-        timeout period for PING in replication map. (kfujino)
+        <code>BackupManager</code> and <code>ClusterSingleSignOn</code>. The
+        <code>accessTimeout</code> is used as a timeout period for PING in
+        replication map. (kfujino)
       </add>
     </changelog>
   </subsection>

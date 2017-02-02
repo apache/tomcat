@@ -53,5 +53,9 @@
       name="terminateOnStartFailure"
       description="Flag for whether to terminate this map that failed to start."
       type="boolean"/>
+    <attribute
+      name="accessTimeout"
+      description="The timeout for a ping message in replication map."
+      type="long"/>
   </mbean>
 </mbeans-descriptors>
