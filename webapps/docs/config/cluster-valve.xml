@@ -156,6 +156,11 @@
         part of the heartbeat process. If not specified, the default value of
         <code>false</code> is used.</p>
       </attribute>
+      <attribute name="accessTimeout" required="false">
+        The timeout for a ping message. If a remote map does not respond within
+        this timeout period, its regarded as disappeared.
+        Default value is <code>5000</code> milliseconds.
+      </attribute>
     </attributes>
   </subsection>
 </section>
