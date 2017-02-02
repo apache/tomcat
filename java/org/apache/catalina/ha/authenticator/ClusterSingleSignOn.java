@@ -95,6 +95,14 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
         this.terminateOnStartFailure = terminateOnStartFailure;
     }
 
+    private long accessTimeout = 5000;
+    public long getAccessTimeout() {
+        return accessTimeout;
+    }
+
+    public void setAccessTimeout(long accessTimeout) {
+        this.accessTimeout = accessTimeout;
+    }
 
     // ---------------------------------------------------- SingleSignOn Methods
 
@@ -163,6 +171,7 @@ public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, M
                     this, cluster.getChannel(), rpcTimeout, cluster.getClusterName() + "-SSO-cache",
                     cls, terminateOnStartFailure);
             cache.setChannelSendOptions(mapSendOptions);
+            cache.setAccessTimeout(accessTimeout);
             this.cache = cache;
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
