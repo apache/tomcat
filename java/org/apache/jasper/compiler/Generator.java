@@ -1078,9 +1078,7 @@ class Generator {
             String flush = n.getTextAttribute("flush");
             Node.JspAttribute page = n.getPage();
 
-            boolean isFlush = false; // default to false;
-            if ("true".equals(flush))
-                isFlush = true;
+            boolean isFlush = "true".equals(flush);
 
             n.setBeginJavaLine(out.getJavaLine());
 
