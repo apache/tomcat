@@ -22,8 +22,6 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.Tag;
 
 import org.apache.jasper.Constants;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 
 /**
@@ -37,8 +35,6 @@ public class TagHandlerPool {
 
     public static final String OPTION_TAGPOOL = "tagpoolClassName";
     public static final String OPTION_MAXSIZE = "tagpoolMaxSize";
-
-    private static final Log log = LogFactory.getLog(TagHandlerPool.class);
 
     // index of next available tag handler
     private int current;
@@ -143,7 +139,7 @@ public class TagHandlerPool {
             }
         }
         // There is no need for other threads to wait for us to release
-        doRelease(handler);
+        JspRuntimeLibrary.releaseTag(handler, instanceManager);
     }
 
     /**
@@ -152,26 +148,7 @@ public class TagHandlerPool {
      */
     public synchronized void release() {
         for (int i = current; i >= 0; i--) {
-            doRelease(handlers[i]);
-        }
-    }
-
-
-    private void doRelease(Tag handler) {
-        try {
-            handler.release();
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            log.warn("Error processing release on tag instance of "
-                    + handler.getClass().getName(), t);
-        }
-        try {
-            instanceManager.destroyInstance(handler);
-        } catch (Exception e) {
-            Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
-            ExceptionUtils.handleThrowable(t);
-            log.warn("Error processing preDestroy on tag instance of "
-                    + handler.getClass().getName(), t);
+            JspRuntimeLibrary.releaseTag(handlers[i], instanceManager);
         }
     }
 
