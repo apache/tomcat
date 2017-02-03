@@ -66,6 +66,10 @@
         implementation when multiple threads are managing objects and need to
         reference the annotation cache. (markt)
       </fix>
+      <fix>
+        <bug>60683</bug>: Security manager failure causing NPEs when doing IO
+        on some JVMs. (coty)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
