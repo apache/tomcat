@@ -264,6 +264,8 @@ public final class SecurityClassLoad {
         throws Exception {
         final String basePackage = "org.apache.tomcat.";
         // buf
+        loader.loadClass(basePackage + "util.buf.B2CConverter");
+        loader.loadClass(basePackage + "util.buf.C2BConverter");
         loader.loadClass(basePackage + "util.buf.HexUtils");
         loader.loadClass(basePackage + "util.buf.StringCache");
         loader.loadClass(basePackage + "util.buf.StringCache$ByteEntry");
