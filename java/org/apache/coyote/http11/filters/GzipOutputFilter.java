@@ -67,6 +67,7 @@ public class GzipOutputFilter implements OutputFilter {
      * @deprecated Unused. Will be removed in Tomcat 9. Use
      *             {@link #doWrite(ByteBuffer)}
      */
+    @Deprecated
     @Override
     public int doWrite(ByteChunk chunk) throws IOException {
         if (compressionStream == null) {

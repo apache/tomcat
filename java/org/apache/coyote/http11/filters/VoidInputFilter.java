@@ -54,6 +54,7 @@ public class VoidInputFilter implements InputFilter {
      * @deprecated Unused. Will be removed in Tomcat 9. Use
      *             {@link #doRead(ApplicationBufferHandler)}
      */
+    @Deprecated
     @Override
     public int doRead(ByteChunk chunk) throws IOException {
         return -1;

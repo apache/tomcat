@@ -1304,6 +1304,7 @@ public class AjpProcessor extends AbstractProcessor {
      * @deprecated Unused. Will be removed in Tomcat 9. Use
      *             {@link #doWrite(ByteBuffer)}
      */
+    @Deprecated
     private void writeData(ByteChunk chunk) throws IOException {
         boolean blocking = (response.getWriteListener() == null);
 
@@ -1378,6 +1379,7 @@ public class AjpProcessor extends AbstractProcessor {
          * @deprecated Unused. Will be removed in Tomcat 9. Use
          *             {@link #doRead(ApplicationBufferHandler)}
          */
+        @Deprecated
         @Override
         public int doRead(ByteChunk chunk) throws IOException {
 
@@ -1426,6 +1428,7 @@ public class AjpProcessor extends AbstractProcessor {
          * @deprecated Unused. Will be removed in Tomcat 9. Use
          *             {@link #doWrite(ByteBuffer)}
          */
+        @Deprecated
         @Override
         public int doWrite(ByteChunk chunk) throws IOException {
 

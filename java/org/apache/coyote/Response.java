@@ -499,6 +499,7 @@ public final class Response {
      * @deprecated Unused. Will be removed in Tomcat 9. Use
      *             {@link #doWrite(ByteBuffer)}
      */
+    @Deprecated
     public void doWrite(ByteChunk chunk) throws IOException {
         outputBuffer.doWrite(chunk);
         contentWritten+=chunk.getLength();

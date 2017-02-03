@@ -44,6 +44,7 @@ public interface OutputBuffer {
      * @deprecated Unused. Will be removed in Tomcat 9. Use
      *             {@link #doWrite(ByteBuffer)}
      */
+    @Deprecated
     public int doWrite(ByteChunk chunk) throws IOException;
 
 

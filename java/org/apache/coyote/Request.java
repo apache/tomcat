@@ -511,6 +511,7 @@ public final class Request {
      * @deprecated Unused. Will be removed in Tomcat 9. Use
      *             {@link #doRead(ApplicationBufferHandler)}
      */
+    @Deprecated
     public int doRead(ByteChunk chunk) throws IOException {
         int n = inputBuffer.doRead(chunk);
         if (n > 0) {
