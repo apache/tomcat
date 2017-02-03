@@ -1075,8 +1075,12 @@ class Generator {
         @Override
         public void visit(Node.IncludeAction n) throws JasperException {
 
-            Boolean flush = Boolean.valueOf(n.getTextAttribute("flush"));
+            String flush = n.getTextAttribute("flush");
             Node.JspAttribute page = n.getPage();
+
+            boolean isFlush = false; // default to false;
+            if ("true".equals(flush))
+                isFlush = true;
 
             n.setBeginJavaLine(out.getJavaLine());
 
@@ -1103,7 +1107,7 @@ class Generator {
             out.printin("org.apache.jasper.runtime.JspRuntimeLibrary.include(request, response, "
                     + pageParam);
             printParams(n, pageParam, page.isLiteral());
-            out.println(", out, " + flush + ");");
+            out.println(", out, " + isFlush + ");");
 
             n.setEndJavaLine(out.getJavaLine());
         }
