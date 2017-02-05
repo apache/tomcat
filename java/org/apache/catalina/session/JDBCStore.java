@@ -158,9 +158,11 @@ public class JDBCStore extends StoreBase {
     protected PreparedStatement preparedSizeSql = null;
 
     /**
-     * Variable to hold the <code>save()</code> prepared statement.
+     * Variables to hold the <code>save()</code> prepared statements.
      */
     protected PreparedStatement preparedSaveSql = null;
+    protected PreparedStatement preparedUpdateSql = null;
+    protected PreparedStatement preparedUpdateCheckSql = null;
 
     /**
      * Variable to hold the <code>clear()</code> prepared statement.
@@ -770,10 +772,8 @@ public class JDBCStore extends StoreBase {
                 }
 
                 try {
-                    // If sessions already exist in DB, remove and insert again.
-                    // TODO:
-                    // * Check if ID exists in database and if so use UPDATE.
-                    remove(session.getIdInternal(), _conn);
+                    // If sessions already exist in DB, update it
+                    // else, insert new session record
 
                     bos = new ByteArrayOutputStream();
                     try (ObjectOutputStream oos =
@@ -784,23 +784,65 @@ public class JDBCStore extends StoreBase {
                     int size = obs.length;
                     try (ByteArrayInputStream bis = new ByteArrayInputStream(obs, 0, size);
                             InputStream in = new BufferedInputStream(bis, size)) {
-                        if (preparedSaveSql == null) {
-                            String saveSql = "INSERT INTO " + sessionTable + " ("
-                               + sessionIdCol + ", " + sessionAppCol + ", "
-                               + sessionDataCol + ", " + sessionValidCol
-                               + ", " + sessionMaxInactiveCol + ", "
-                               + sessionLastAccessedCol
-                               + ") VALUES (?, ?, ?, ?, ?, ?)";
-                           preparedSaveSql = _conn.prepareStatement(saveSql);
+                        
+                        // Check if record exists
+                        if (preparedUpdateCheckSql == null) {
+                            String sql = "SELECT " + sessionIdCol
+                                    + " FROM " + sessionTable + " WHERE "
+                                    + sessionIdCol + " = ? ";
+                            preparedUpdateCheckSql = _conn.prepareStatement(sql);
                         }
 
-                        preparedSaveSql.setString(1, session.getIdInternal());
-                        preparedSaveSql.setString(2, getName());
-                        preparedSaveSql.setBinaryStream(3, in, size);
-                        preparedSaveSql.setString(4, session.isValid() ? "1" : "0");
-                        preparedSaveSql.setInt(5, session.getMaxInactiveInterval());
-                        preparedSaveSql.setLong(6, session.getLastAccessedTime());
-                        preparedSaveSql.execute();
+                        preparedUpdateCheckSql.setString(1, session.getIdInternal());
+                        rst = preparedUpdateCheckSql.executeQuery();
+
+                        if (rst.next()) {
+                            
+                            // Record exists.  Update it.
+                            if (preparedUpdateSql == null) {
+                                String saveSql = "UPDATE " + sessionTable + " "
+                                        + " SET "
+                                        + sessionAppCol + " = ?, "
+                                        + sessionDataCol + " = ?, "
+                                        + sessionValidCol + " = ?, "
+                                        + sessionMaxInactiveCol + " = ?, "
+                                        + sessionLastAccessedCol + " = ? "
+                                        + " WHERE "
+                                        + sessionIdCol + " = ? ";
+                                preparedUpdateSql = _conn.prepareStatement(saveSql);
+                            }
+
+                            preparedUpdateSql.setString(1, getName());
+                            preparedUpdateSql.setBinaryStream(2, in, size);
+                            preparedUpdateSql.setString(3, session.isValid() ? "1" : "0");
+                            preparedUpdateSql.setInt(4, session.getMaxInactiveInterval());
+                            preparedUpdateSql.setLong(5, session.getLastAccessedTime());
+                            preparedUpdateSql.setString(6, session.getIdInternal());
+                            preparedUpdateSql.execute();
+
+                        } else {
+                            
+                            // Create new record.
+                            if (preparedSaveSql == null) {
+                                String saveSql = "INSERT INTO " + sessionTable + " ("
+                                        + sessionIdCol + ", " + sessionAppCol + ", "
+                                        + sessionDataCol + ", " + sessionValidCol
+                                        + ", " + sessionMaxInactiveCol + ", "
+                                        + sessionLastAccessedCol
+                                        + ") VALUES (?, ?, ?, ?, ?, ?)";
+                                preparedSaveSql = _conn.prepareStatement(saveSql);
+                            }
+
+                            preparedSaveSql.setString(1, session.getIdInternal());
+                            preparedSaveSql.setString(2, getName());
+                            preparedSaveSql.setBinaryStream(3, in, size);
+                            preparedSaveSql.setString(4, session.isValid() ? "1" : "0");
+                            preparedSaveSql.setInt(5, session.getMaxInactiveInterval());
+                            preparedSaveSql.setLong(6, session.getLastAccessedTime());
+                            preparedSaveSql.execute();
+
+                        }
+                        
                         // Break out after the finally block
                         numberOfTries = 0;
                     }
