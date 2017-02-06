@@ -186,6 +186,12 @@ are responsible for installing, configuring, and operating an Apache Tomcat serv
     <a href="http://docs.oracle.com/javaee/7/api/javax/websocket/package-summary.html">
     <strong>Javadoc</strong></a>
     </li>
+<li>JASPIC 1.1
+    <a href="https://jcp.org/aboutJava/communityprocess/mrel/jsr196/index.html">
+    <strong>Specification</strong></a> and
+    <a href="http://docs.oracle.com/javaee/7/api/javax/security/auth/message/package-summary.html">
+    <strong>Javadoc</strong></a>
+    </li>
 </ul>
 
 </section>

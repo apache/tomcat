@@ -156,6 +156,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <fix>
+        Add Specification and Javadoc references for JASPIC to the Docs 
+        application. (csutherl)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
