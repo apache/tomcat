@@ -23,6 +23,9 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * HTTP header value parser implementation. Parsing HTTP headers as per RFC2616
  * is not always as simple as it first appears. For headers that only use tokens
@@ -53,6 +56,8 @@ public class HttpParser {
     private static final Map<String,Integer> fieldTypes =
             new HashMap<String,Integer>();
 
+    private static final Log log = LogFactory.getLog(HttpParser.class);
+
     private static final int ARRAY_SIZE = 128;
 
     private static final boolean[] IS_CONTROL = new boolean[ARRAY_SIZE];
@@ -61,6 +66,7 @@ public class HttpParser {
     private static final boolean[] IS_HEX = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_NOT_REQUEST_TARGET = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_HTTP_PROTOCOL = new boolean[ARRAY_SIZE];
+    private static final boolean[] REQUEST_TARGET_ALLOW = new boolean[ARRAY_SIZE];
 
     static {
         // Digest field types.
@@ -81,6 +87,19 @@ public class HttpParser {
         fieldTypes.put("qop", FIELD_TYPE_QUOTED_TOKEN);
         // RFC2617 says nc is 8LHEX. <">8LHEX<"> will also be accepted
         fieldTypes.put("nc", FIELD_TYPE_LHEX);
+
+        String prop = System.getProperty("tomcat.util.http.parser.HttpParser.requestTargetAllow");
+        if (prop != null) {
+            for (int i = 0; i < prop.length(); i++) {
+                char c = prop.charAt(i);
+                if (c == '{' || c == '}' || c == '|') {
+                    REQUEST_TARGET_ALLOW[c] = true;
+                } else {
+                    log.warn("HttpParser: Character '" + c + "' is not allowed and will continue "
+                        + "being rejected.");
+                }
+            }
+        }
 
         for (int i = 0; i < ARRAY_SIZE; i++) {
             // Control> 0-31, 127
@@ -112,7 +131,9 @@ public class HttpParser {
             if (IS_CONTROL[i] || i > 127 ||
                     i == ' ' || i == '\"' || i == '#' || i == '<' || i == '>' || i == '\\' ||
                     i == '^' || i == '`'  || i == '{' || i == '|' || i == '}') {
-                IS_NOT_REQUEST_TARGET[i] = true;
+                if (!REQUEST_TARGET_ALLOW[i]) {
+                    IS_NOT_REQUEST_TARGET[i] = true;
+                }
             }
 
             // Not valid for HTTP protocol
