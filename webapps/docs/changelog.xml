@@ -103,6 +103,12 @@
         Ensure that executor thread pools used with connectors, pre-start the
         configured minimum number of idle threads. (markt)
       </fix>
+      <add>
+        <bug>60594</bug>: Allow some invalid characters that were recently
+        restricted to be processed in requests by using the system property
+        <code>tomcat.util.http.parser.HttpParser.requestTargetAllow</code>.
+        (csutherl)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
