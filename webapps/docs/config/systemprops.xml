@@ -713,6 +713,8 @@
       These characters would normally result in a 400 status.</p>
       <p>The acceptable characters for this property are: <code>|</code>, <code>{</code>
       , and <code>}</code></p>
+      <p><strong>WARNING</strong>: Use of this option will expose the server to CVE-2016-6816.
+      </p>
       <p>If not specified, the default value of <code>null</code> will be used.</p>
     </property>
 

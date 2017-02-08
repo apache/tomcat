@@ -26,6 +26,8 @@ import java.util.Map;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
+import org.apache.tomcat.util.res.StringManager;
+
 /**
  * HTTP header value parser implementation. Parsing HTTP headers as per RFC2616
  * is not always as simple as it first appears. For headers that only use tokens
@@ -55,6 +57,8 @@ public class HttpParser {
 
     private static final Map<String,Integer> fieldTypes =
             new HashMap<String,Integer>();
+
+    private static final StringManager sm = StringManager.getManager(HttpParser.class);
 
     private static final Log log = LogFactory.getLog(HttpParser.class);
 
@@ -95,8 +99,7 @@ public class HttpParser {
                 if (c == '{' || c == '}' || c == '|') {
                     REQUEST_TARGET_ALLOW[c] = true;
                 } else {
-                    log.warn("HttpParser: Character '" + c + "' is not allowed and will continue "
-                        + "being rejected.");
+                    log.warn(sm.getString("httpparser.invalidRequestTargetCharacter", c));
                 }
             }
         }
