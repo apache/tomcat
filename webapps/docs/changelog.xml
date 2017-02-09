@@ -100,7 +100,7 @@
         <code>certificateVerificationDepth</code> configuration option. (markt)
       </fix>
       <fix>
-        Ensure that executor thread pools used with connectors, pre-start the
+        Ensure that executor thread pools used with connectors pre-start the
         configured minimum number of idle threads. (markt)
       </fix>
       <add>
