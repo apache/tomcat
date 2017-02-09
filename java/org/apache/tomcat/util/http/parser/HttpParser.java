@@ -61,7 +61,8 @@ public class HttpParser {
                 if (c == '{' || c == '}' || c == '|') {
                     REQUEST_TARGET_ALLOW[c] = true;
                 } else {
-                    log.warn(sm.getString("httpparser.invalidRequestTargetCharacter", c));
+                    log.warn(sm.getString("httpparser.invalidRequestTargetCharacter",
+                            Character.valueOf(c)));
                 }
             }
         }
