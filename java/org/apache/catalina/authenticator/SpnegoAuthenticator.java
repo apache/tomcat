@@ -56,6 +56,7 @@ import org.ietf.jgss.Oid;
 public class SpnegoAuthenticator extends AuthenticatorBase {
 
     private static final Log log = LogFactory.getLog(SpnegoAuthenticator.class);
+    private static final String AUTH_HEADER_VALUE_NEGOTIATE = "Negotiate";
 
     private String loginConfigName = Constants.DEFAULT_LOGIN_MODULE_NAME;
     public String getLoginConfigName() {
@@ -149,7 +150,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("authenticator.noAuthHeader"));
             }
-            response.setHeader(AUTH_HEADER_NAME, "Negotiate");
+            response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
@@ -162,7 +163,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                 log.debug(sm.getString(
                         "spnegoAuthenticator.authHeaderNotNego"));
             }
-            response.setHeader(AUTH_HEADER_NAME, "Negotiate");
+            response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
@@ -182,7 +183,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                 log.debug(sm.getString(
                         "spnegoAuthenticator.authHeaderNoToken"));
             }
-            response.setHeader(AUTH_HEADER_NAME, "Negotiate");
+            response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
@@ -235,7 +236,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                             "spnegoAuthenticator.ticketValidateFail"));
                 }
                 // Start again
-                response.setHeader(AUTH_HEADER_NAME, "Negotiate");
+                response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE);
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 return false;
             }
@@ -247,7 +248,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("spnegoAuthenticator.ticketValidateFail"), e);
             }
-            response.setHeader(AUTH_HEADER_NAME, "Negotiate");
+            response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         } catch (PrivilegedActionException e) {
@@ -259,7 +260,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             } else {
                 log.error(sm.getString("spnegoAuthenticator.serviceLoginFail"), e);
             }
-            response.setHeader(AUTH_HEADER_NAME, "Negotiate");
+            response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         } finally {
@@ -280,7 +281,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         }
 
         // Send response token on success and failure
-        response.setHeader(AUTH_HEADER_NAME, "Negotiate "
+        response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE + " "
                 + Base64.encodeBase64String(outToken));
 
         if (principal != null) {
