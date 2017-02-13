@@ -23,15 +23,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.message.AuthException;
 import javax.security.auth.message.AuthStatus;
 import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.config.AuthConfigFactory;
 import javax.security.auth.message.config.AuthConfigProvider;
+import javax.security.auth.message.config.ClientAuthConfig;
 import javax.security.auth.message.config.RegistrationListener;
 import javax.security.auth.message.config.ServerAuthConfig;
 import javax.security.auth.message.config.ServerAuthContext;
@@ -88,7 +89,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  */
 public abstract class AuthenticatorBase extends ValveBase
-        implements Authenticator, RegistrationListener {
+implements Authenticator, RegistrationListener {
 
     private static final Log log = LogFactory.getLog(AuthenticatorBase.class);
 
@@ -97,6 +98,8 @@ public abstract class AuthenticatorBase extends ValveBase
      */
     private static final String DATE_ONE =
             (new SimpleDateFormat(FastHttpDateFormat.RFC1123_DATE, Locale.US)).format(new Date(1));
+
+    private static final AuthConfigProvider NO_PROVIDER_AVAILABLE = new NoOpAuthConfigProvider();
 
     /**
      * The string manager for this package.
@@ -220,7 +223,7 @@ public abstract class AuthenticatorBase extends ValveBase
     protected SingleSignOn sso = null;
 
     private volatile String jaspicAppContextID = null;
-    private volatile Optional<AuthConfigProvider> jaspicProvider = null;
+    private volatile AuthConfigProvider jaspicProvider = null;
 
 
     // ------------------------------------------------------------- Properties
@@ -556,7 +559,7 @@ public abstract class AuthenticatorBase extends ValveBase
 
             if (jaspicProvider == null && !doAuthenticate(request, response) ||
                     jaspicProvider != null &&
-                            !authenticateJaspic(request, response, jaspicState, false)) {
+                    !authenticateJaspic(request, response, jaspicState, false)) {
                 if (log.isDebugEnabled()) {
                     log.debug(" Failed authenticate() test");
                 }
@@ -1187,17 +1190,22 @@ public abstract class AuthenticatorBase extends ValveBase
 
 
     private AuthConfigProvider getJaspicProvider() {
-        Optional<AuthConfigProvider> provider = jaspicProvider;
-        if (provider == null) {
+        AuthConfigProvider provider = jaspicProvider;
+        if (NO_PROVIDER_AVAILABLE == provider) {
+            return null;
+        } else if (provider == null) {
             provider = findJaspicProvider();
         }
-        return provider.orElse(null);
+        return provider;
     }
 
-    private Optional<AuthConfigProvider> findJaspicProvider() {
+    private AuthConfigProvider findJaspicProvider() {
         AuthConfigFactory factory = AuthConfigFactory.getFactory();
-        Optional<AuthConfigProvider> provider =
-                Optional.ofNullable(factory.getConfigProvider("HttpServlet", jaspicAppContextID, this));
+        AuthConfigProvider provider =
+                factory.getConfigProvider("HttpServlet", jaspicAppContextID, this);
+        if (provider == null) {
+            provider = NO_PROVIDER_AVAILABLE;
+        }
         jaspicProvider = provider;
         return provider;
     }
@@ -1211,5 +1219,25 @@ public abstract class AuthenticatorBase extends ValveBase
     private static class JaspicState {
         public MessageInfo messageInfo = null;
         public ServerAuthContext serverAuthContext = null;
+    }
+
+
+    private static class NoOpAuthConfigProvider implements AuthConfigProvider {
+
+        @Override
+        public ClientAuthConfig getClientAuthConfig(String layer, String appContext, CallbackHandler handler)
+                throws AuthException {
+            return null;
+        }
+
+        @Override
+        public ServerAuthConfig getServerAuthConfig(String layer, String appContext, CallbackHandler handler)
+                throws AuthException {
+            return null;
+        }
+
+        @Override
+        public void refresh() {
+        }
     }
 }
