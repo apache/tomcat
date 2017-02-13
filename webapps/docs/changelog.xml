@@ -75,6 +75,11 @@
         on some JVMs. (coty)
       </fix>
       <fix>
+        <bug>60688</bug>: Update the internal fork of Apache Commons BCEL to
+        r1782855 to add early access Java 9 support to the annotation scanning
+        code. (markt)
+      </fix>
+      <fix>
         <bug>60720</bug>: Replace "WWW-Authenticate" literal with static final
         AUTH_HEADER_NAME in SpnegoAuthenticator. Patch provided by Michael
         Osipov. (violetagg)
