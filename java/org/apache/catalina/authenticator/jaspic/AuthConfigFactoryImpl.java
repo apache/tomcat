@@ -22,7 +22,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,7 +51,18 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
     private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
-    private final Map<String,RegistrationContextImpl> registrations = new ConcurrentHashMap<>();
+    private static String DEFAULT_REGISTRATION_ID = getRegistrationID(null, null);
+
+    private final Map<String,RegistrationContextImpl> layerAppContextRegistrations =
+            new ConcurrentHashMap<>();
+    private final Map<String,RegistrationContextImpl> appContextRegistrations =
+            new ConcurrentHashMap<>();
+    private final Map<String,RegistrationContextImpl> layerRegistrations =
+            new ConcurrentHashMap<>();
+    // Note: Although there will only ever be a maximum of one entry in this
+    //       Map, use a ConcurrentHashMap for consistency
+    private volatile Map<String,RegistrationContextImpl> defaultRegistration =
+            new ConcurrentHashMap<>(1);
 
 
     public AuthConfigFactoryImpl() {
@@ -63,10 +73,12 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
     @Override
     public AuthConfigProvider getConfigProvider(String layer, String appContext,
             RegistrationListener listener) {
-        String registrationID = getRegistrationID(layer, appContext);
-        RegistrationContextImpl registrationContext = registrations.get(registrationID);
+        RegistrationContextImpl registrationContext =
+                findRegistrationContextImpl(layer, appContext);
         if (registrationContext != null) {
-            registrationContext.addListener(null);
+            RegistrationListenerWrapper wrapper = new RegistrationListenerWrapper(
+                    layer, appContext, listener);
+            registrationContext.addListener(wrapper);
             return registrationContext.getProvider();
         }
         return null;
@@ -109,8 +121,9 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         }
 
         String registrationID = getRegistrationID(layer, appContext);
-        registrations.put(registrationID,
-                new RegistrationContextImpl(layer, appContext, description, true, provider, properties));
+        RegistrationContextImpl registrationContextImpl = new RegistrationContextImpl(
+                layer, appContext, description, true, provider, properties);
+        addRegistrationContextImpl(layer, appContext, registrationID, registrationContextImpl);
         return registrationID;
     }
 
@@ -123,22 +136,115 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
                     provider.getClass().getName(), layer, appContext));
         }
         String registrationID = getRegistrationID(layer, appContext);
-        registrations.put(registrationID,
-                new RegistrationContextImpl(layer, appContext, description, false, provider, null));
+        RegistrationContextImpl registrationContextImpl = new RegistrationContextImpl(
+                layer, appContext, description, false, provider, null);
+        addRegistrationContextImpl(layer, appContext, registrationID, registrationContextImpl);
         return registrationID;
+    }
+
+
+    private void addRegistrationContextImpl(String layer, String appContext,
+            String registrationID, RegistrationContextImpl registrationContextImpl) {
+        RegistrationContextImpl previous = null;
+
+        // Add the registration, noting any registration it replaces
+        if (layer != null && appContext != null) {
+            previous = layerAppContextRegistrations.put(registrationID, registrationContextImpl);
+        } else if (layer == null && appContext != null) {
+            previous = appContextRegistrations.put(registrationID, registrationContextImpl);
+        } else if (layer != null && appContext == null) {
+            previous = layerRegistrations.put(registrationID, registrationContextImpl);
+        } else {
+            previous = defaultRegistration.put(registrationID, registrationContextImpl);
+        }
+
+        if (previous == null) {
+            // No match with previous registration so need to check listeners
+            // for all less specific registrations to see if they need to be
+            // notified of this new registration. That there is no exact match
+            // with a previous registration allows a few short-cuts to be taken
+            if (layer != null && appContext != null) {
+                // Need to check existing appContext registrations
+                // (and layer and default)
+                // appContext must match
+                RegistrationContextImpl registration =
+                        appContextRegistrations.get(getRegistrationID(null, appContext));
+                if (registration != null) {
+                    for (RegistrationListenerWrapper wrapper : registration.listeners) {
+                        if (layer.equals(wrapper.getMessageLayer()) &&
+                                appContext.equals(wrapper.getAppContext())) {
+                            registration.listeners.remove(wrapper);
+                            wrapper.listener.notify(wrapper.messageLayer, wrapper.appContext);
+                        }
+                    }
+                }
+            }
+            if (appContext != null) {
+                // Need to check existing layer registrations
+                // (and default)
+                // Need to check registrations for all layers
+                for (RegistrationContextImpl registration : layerRegistrations.values()) {
+                    for (RegistrationListenerWrapper wrapper : registration.listeners) {
+                        if (appContext.equals(wrapper.getAppContext())) {
+                            registration.listeners.remove(wrapper);
+                            wrapper.listener.notify(wrapper.messageLayer, wrapper.appContext);
+                        }
+                    }
+                }
+            }
+            if (layer != null || appContext != null) {
+                // Need to check default
+                for (RegistrationContextImpl registration : defaultRegistration.values()) {
+                    for (RegistrationListenerWrapper wrapper : registration.listeners) {
+                        if (appContext != null && appContext.equals(wrapper.getAppContext()) ||
+                                layer != null && layer.equals(wrapper.getMessageLayer())) {
+                            registration.listeners.remove(wrapper);
+                            wrapper.listener.notify(wrapper.messageLayer, wrapper.appContext);
+                        }
+                    }
+                }
+            }
+        } else {
+            // Replaced an existing registration so need to notify those listeners
+            for (RegistrationListenerWrapper wrapper : previous.listeners) {
+                previous.listeners.remove(wrapper);
+                wrapper.listener.notify(wrapper.messageLayer, wrapper.appContext);
+            }
+        }
     }
 
 
     @Override
     public boolean removeRegistration(String registrationID) {
-        return registrations.remove(registrationID) != null;
+        RegistrationContextImpl registration = null;
+        if (DEFAULT_REGISTRATION_ID.equals(registrationID)) {
+            registration = defaultRegistration.remove(registrationID);
+        }
+        if (registration == null) {
+            registration = layerAppContextRegistrations.remove(registrationID);
+        }
+        if (registration == null) {
+            registration =  appContextRegistrations.remove(registrationID);
+        }
+        if (registration == null) {
+            registration = layerRegistrations.remove(registrationID);
+        }
+
+        if (registration == null) {
+            return false;
+        } else {
+            for (RegistrationListenerWrapper wrapper : registration.listeners) {
+                wrapper.getListener().notify(wrapper.getMessageLayer(), wrapper.getAppContext());
+            }
+            return true;
+        }
     }
 
 
     @Override
     public String[] detachListener(RegistrationListener listener, String layer, String appContext) {
         String registrationID = getRegistrationID(layer, appContext);
-        RegistrationContextImpl registrationContext = registrations.get(registrationID);
+        RegistrationContextImpl registrationContext = findRegistrationContextImpl(layer, appContext);
         if (registrationContext.removeListener(listener)) {
             return new String[] { registrationID };
         }
@@ -148,23 +254,47 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
     @Override
     public String[] getRegistrationIDs(AuthConfigProvider provider) {
+        List<String> result = new ArrayList<>();
         if (provider == null) {
-            return registrations.keySet().toArray(EMPTY_STRING_ARRAY);
-        } else {
-            List<String> results = new ArrayList<>();
-            for (Entry<String,RegistrationContextImpl> entry : registrations.entrySet()) {
-                if (provider.equals(entry.getValue().getProvider())) {
-                    results.add(entry.getKey());
-                }
+            result.addAll(layerAppContextRegistrations.keySet());
+            result.addAll(appContextRegistrations.keySet());
+            result.addAll(layerRegistrations.keySet());
+            if (defaultRegistration != null) {
+                result.add(DEFAULT_REGISTRATION_ID);
             }
-            return results.toArray(EMPTY_STRING_ARRAY);
+        } else {
+            findProvider(provider, layerAppContextRegistrations, result);
+            findProvider(provider, appContextRegistrations, result);
+            findProvider(provider, layerRegistrations, result);
+            findProvider(provider, defaultRegistration, result);
+        }
+        return result.toArray(EMPTY_STRING_ARRAY);
+    }
+
+
+    private void findProvider(AuthConfigProvider provider,
+            Map<String,RegistrationContextImpl> registrations, List<String> result) {
+        for (Entry<String,RegistrationContextImpl> entry : registrations.entrySet()) {
+            if (provider.equals(entry.getValue().getProvider())) {
+                result.add(entry.getKey());
+            }
         }
     }
 
 
     @Override
     public RegistrationContext getRegistrationContext(String registrationID) {
-        return registrations.get(registrationID);
+        RegistrationContext result = defaultRegistration.get(registrationID);
+        if (result == null) {
+            result = layerAppContextRegistrations.get(registrationID);
+        }
+        if (result == null) {
+            result = appContextRegistrations.get(registrationID);
+        }
+        if (result == null) {
+            result = layerRegistrations.get(registrationID);
+        }
+        return result;
     }
 
 
@@ -174,8 +304,16 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
     }
 
 
-    private String getRegistrationID(String layer, String appContext) {
-        return layer + ":" + appContext;
+    private static String getRegistrationID(String layer, String appContext) {
+        if (layer != null && layer.length() == 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("authConfigFactoryImpl.zeroLengthMessageLayer"));
+        }
+        if (appContext != null && appContext.length() == 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("authConfigFactoryImpl.zeroLengthAppContext"));
+        }
+        return (layer == null ? "" : layer) + ":" + (appContext == null ? "" : appContext);
     }
 
 
@@ -200,21 +338,52 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
     private void savePersistentRegistrations() {
         synchronized (CONFIG_FILE_LOCK) {
             Providers providers = new Providers();
-            for (Entry<String,RegistrationContextImpl> entry : registrations.entrySet()) {
-                if (entry.getValue().isPersistent()) {
-                    Provider provider = new Provider();
-                    provider.setAppContext(entry.getValue().getAppContext());
-                    provider.setClassName(entry.getValue().getProvider().getClass().getName());
-                    provider.setDescription(entry.getValue().getDescription());
-                    provider.setLayer(entry.getValue().getMessageLayer());
-                    for (Entry<String,String> property : entry.getValue().getProperties().entrySet()) {
-                        provider.addProperty(property.getKey(), property.getValue());
-                    }
-                    providers.addProvider(provider);
-                }
-            }
+            savePersistentProviders(providers, layerAppContextRegistrations);
+            savePersistentProviders(providers, appContextRegistrations);
+            savePersistentProviders(providers, layerRegistrations);
+            savePersistentProviders(providers, defaultRegistration);
             PersistentProviderRegistrations.writeProviders(providers, CONFIG_FILE);
         }
+    }
+
+
+    private void savePersistentProviders(Providers providers,
+            Map<String,RegistrationContextImpl> registrations) {
+        for (Entry<String,RegistrationContextImpl> entry : registrations.entrySet()) {
+            savePersistentProvider(providers, entry.getValue());
+        }
+    }
+
+
+    private void savePersistentProvider(Providers providers,
+            RegistrationContextImpl registrationContextImpl) {
+        if (registrationContextImpl != null && registrationContextImpl.isPersistent()) {
+            Provider provider = new Provider();
+            provider.setAppContext(registrationContextImpl.getAppContext());
+            provider.setClassName(registrationContextImpl.getProvider().getClass().getName());
+            provider.setDescription(registrationContextImpl.getDescription());
+            provider.setLayer(registrationContextImpl.getMessageLayer());
+            for (Entry<String,String> property : registrationContextImpl.getProperties().entrySet()) {
+                provider.addProperty(property.getKey(), property.getValue());
+            }
+            providers.addProvider(provider);
+        }
+    }
+
+
+    private RegistrationContextImpl findRegistrationContextImpl(String layer, String appContext) {
+        RegistrationContextImpl result;
+        result = layerAppContextRegistrations.get(getRegistrationID(layer, appContext));
+        if (result == null) {
+            result = appContextRegistrations.get(getRegistrationID(null, appContext));
+        }
+        if (result == null) {
+            result = layerRegistrations.get(getRegistrationID(layer, null));
+        }
+        if (result == null) {
+            result = defaultRegistration.get(DEFAULT_REGISTRATION_ID);
+        }
+        return result;
     }
 
 
@@ -240,7 +409,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         private final boolean persistent;
         private final AuthConfigProvider provider;
         private final Map<String,String> properties;
-        private final List<RegistrationListener> listeners = new CopyOnWriteArrayList<>();
+        private final List<RegistrationListenerWrapper> listeners = new CopyOnWriteArrayList<>();
 
         @Override
         public String getMessageLayer() {
@@ -270,7 +439,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         }
 
 
-        private void addListener(RegistrationListener listener) {
+        private void addListener(RegistrationListenerWrapper listener) {
             if (listener != null) {
                 listeners.add(listener);
             }
@@ -284,13 +453,43 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
         private boolean removeListener(RegistrationListener listener) {
             boolean result = false;
-            Iterator<RegistrationListener> iter = listeners.iterator();
-            while (iter.hasNext()) {
-                if (iter.next().equals(listener)) {
-                    iter.remove();
+            for (RegistrationListenerWrapper wrapper : listeners) {
+                if (wrapper.getListener().equals(listener)) {
+                    listeners.remove(wrapper);
                 }
             }
             return result;
+        }
+    }
+
+
+    private static class RegistrationListenerWrapper {
+
+        private final String messageLayer;
+        private final String appContext;
+        private final RegistrationListener listener;
+
+
+        public RegistrationListenerWrapper(String messageLayer, String appContext,
+                RegistrationListener listener) {
+            this.messageLayer = messageLayer;
+            this.appContext = appContext;
+            this.listener = listener;
+        }
+
+
+        public String getMessageLayer() {
+            return messageLayer;
+        }
+
+
+        public String getAppContext() {
+            return appContext;
+        }
+
+
+        public RegistrationListener getListener() {
+            return listener;
         }
     }
 }
