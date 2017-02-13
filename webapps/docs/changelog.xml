@@ -124,6 +124,11 @@
         introduction of <code>SafeForkJoinWorkerThreadFactory</code> helper
         class. This class cannot be built with Java 6. (kkolinko)
       </fix>
+      <add>
+        <bug>60632</bug>: Add support for the <code>CATALINA_EXIT_DELAY</code>
+        environment variable that can be used to work around a known systemd
+        bug. Based on a patch by Jeff Turner. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
