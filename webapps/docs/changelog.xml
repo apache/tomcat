@@ -79,6 +79,11 @@
         <bug>60683</bug>: Security manager failure causing NPEs when doing IO
         on some JVMs. (coty)
       </fix>
+      <fix>
+        <bug>60688</bug>: Update the internal fork of Apache Commons BCEL to
+        r1782855 to add early access Java 9 support to the annotation scanning
+        code. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
