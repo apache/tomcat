@@ -75,6 +75,11 @@
         AUTH_HEADER_NAME in SpnegoAuthenticator. Patch provided by Michael
         Osipov. (violetagg)
       </fix>
+      <fix>
+        The default JASPIC <code>AuthConfigFactory</code> now correctly notifies
+        registered <code>RegistrationListener</code>s when a new
+        <code>AuthConfigProvider</code> is registered. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
