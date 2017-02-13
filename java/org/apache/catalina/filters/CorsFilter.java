@@ -76,7 +76,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @see <a href="http://www.w3.org/TR/cors/">CORS specification</a>
  *
  */
-public final class CorsFilter implements Filter {
+public class CorsFilter implements Filter {
 
     private static final Log log = LogFactory.getLog(CorsFilter.class);
     private static final StringManager sm = StringManager.getManager(Constants.Package);
