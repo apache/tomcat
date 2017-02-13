@@ -115,15 +115,15 @@ public final class Const {
     public static final byte CONSTANT_InvokeDynamic    = 18;
 
     /** Marks a constant pool entry as a Module Reference.
+     * Note: Early access Java 9 support- currently subject to change.
      * @see <a href="http://cr.openjdk.java.net/~mr/jigsaw/spec/lang-vm.html#jigsaw-2.6">
-     * JPMS: Modules in the Java Language and JVM</a>
-     * Note: Early access Java 9 support- currently subject to change */
+     * JPMS: Modules in the Java Language and JVM</a> */
     public static final byte CONSTANT_Module             = 19;
 
     /** Marks a constant pool entry as a Package Reference.
+     * Note: Early access Java 9 support- currently subject to change.
      * @see <a href="http://cr.openjdk.java.net/~mr/jigsaw/spec/lang-vm.html#jigsaw-2.6">
-     * JPMS: Modules in the Java Language and JVM</a>
-     * Note: Early access Java 9 support- currently subject to change */
+     * JPMS: Modules in the Java Language and JVM</a> */
     public static final byte CONSTANT_Package            = 20;
 
     /**
