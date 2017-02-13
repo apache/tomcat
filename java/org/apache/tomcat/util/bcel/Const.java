@@ -114,6 +114,18 @@ public final class Const {
      * The Constant Pool in The Java Virtual Machine Specification</a> */
     public static final byte CONSTANT_InvokeDynamic    = 18;
 
+    /** Marks a constant pool entry as a Module Reference.
+     * @see <a href="http://cr.openjdk.java.net/~mr/jigsaw/spec/lang-vm.html#jigsaw-2.6">
+     * JPMS: Modules in the Java Language and JVM</a>
+     * Note: Early access Java 9 support- currently subject to change */
+    public static final byte CONSTANT_Module             = 19;
+
+    /** Marks a constant pool entry as a Package Reference.
+     * @see <a href="http://cr.openjdk.java.net/~mr/jigsaw/spec/lang-vm.html#jigsaw-2.6">
+     * JPMS: Modules in the Java Language and JVM</a>
+     * Note: Early access Java 9 support- currently subject to change */
+    public static final byte CONSTANT_Package            = 20;
+
     /**
      * The names of the types of entries in a constant pool.
      * Use getConstantName instead
@@ -124,7 +136,8 @@ public final class Const {
     "CONSTANT_Class", "CONSTANT_String", "CONSTANT_Fieldref",
     "CONSTANT_Methodref", "CONSTANT_InterfaceMethodref",
     "CONSTANT_NameAndType", "", "", "CONSTANT_MethodHandle",
-    "CONSTANT_MethodType", "", "CONSTANT_InvokeDynamic" };
+    "CONSTANT_MethodType", "", "CONSTANT_InvokeDynamic",
+    "CONSTANT_Module", "CONSTANT_Package"};
 
     public static String getConstantName(int index) {
         return CONSTANT_NAMES[index];

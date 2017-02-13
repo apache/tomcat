@@ -81,6 +81,8 @@ public abstract class Constant {
                 return ConstantUtf8.getInstance(input);
             case Const.CONSTANT_String:
             case Const.CONSTANT_MethodType:
+            case Const.CONSTANT_Module:
+            case Const.CONSTANT_Package:
                 skipSize = 2; // unsigned short
                 break;
             case Const.CONSTANT_MethodHandle:
