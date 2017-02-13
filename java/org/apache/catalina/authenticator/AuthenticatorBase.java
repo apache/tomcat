@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.security.auth.Subject;
@@ -219,7 +220,7 @@ public abstract class AuthenticatorBase extends ValveBase
     protected SingleSignOn sso = null;
 
     private volatile String jaspicAppContextID = null;
-    private volatile AuthConfigProvider jaspicProvider = null;
+    private volatile Optional<AuthConfigProvider> jaspicProvider = null;
 
 
     // ------------------------------------------------------------- Properties
@@ -1186,24 +1187,24 @@ public abstract class AuthenticatorBase extends ValveBase
 
 
     private AuthConfigProvider getJaspicProvider() {
-        AuthConfigProvider provider = jaspicProvider;
+        Optional<AuthConfigProvider> provider = jaspicProvider;
         if (provider == null) {
-            AuthConfigFactory factory = AuthConfigFactory.getFactory();
-            provider = factory.getConfigProvider("HttpServlet", jaspicAppContextID, this);
-            if (provider != null) {
-                jaspicProvider = provider;
-            }
+            provider = findJaspicProvider();
         }
+        return provider.orElse(null);
+    }
+
+    private Optional<AuthConfigProvider> findJaspicProvider() {
+        AuthConfigFactory factory = AuthConfigFactory.getFactory();
+        Optional<AuthConfigProvider> provider =
+                Optional.ofNullable(factory.getConfigProvider("HttpServlet", jaspicAppContextID, this));
+        jaspicProvider = provider;
         return provider;
     }
 
-
     @Override
     public void notify(String layer, String appContext) {
-        AuthConfigFactory factory = AuthConfigFactory.getFactory();
-        AuthConfigProvider provider = factory.getConfigProvider("HttpServlet", jaspicAppContextID,
-                this);
-        jaspicProvider = provider;
+        findJaspicProvider();
     }
 
 
