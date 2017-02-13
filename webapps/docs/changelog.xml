@@ -80,6 +80,10 @@
         registered <code>RegistrationListener</code>s when a new
         <code>AuthConfigProvider</code> is registered. (markt)
       </fix>
+      <scode>
+        Improve the performance of <code>AuthenticatorBase</code> when there is
+        no JASPIC configuration available. (violetagg)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
