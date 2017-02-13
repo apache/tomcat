@@ -66,6 +66,10 @@
         implementation when multiple threads are managing objects and need to
         reference the annotation cache. (markt)
       </fix>
+      <scode>
+        <bug>60674</bug>: Remove <code>final</code> marker from
+        <code>CorsFilter</code> to enable sub-classing. (markt)
+      </scode>
       <fix>
         <bug>60683</bug>: Security manager failure causing NPEs when doing IO
         on some JVMs. (coty)
