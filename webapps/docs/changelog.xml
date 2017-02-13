@@ -181,6 +181,11 @@
       <fix>
         Spelling corrections provided by Josh Soref. (violetagg)
       </fix>
+      <add>
+        <bug>60632</bug>: Add support for the <code>CATALINA_EXIT_DELAY</code>
+        environment variable that can be used to work around a known systemd
+        bug. Based on a patch by Jeff Turner. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

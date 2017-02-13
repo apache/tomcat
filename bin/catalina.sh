@@ -98,6 +98,13 @@
 #                   use nohup so that the Tomcat process will ignore any hangup
 #                   signals. Default is "false" unless running on HP-UX in which
 #                   case the default is "true"
+#
+#   CATALINA_EXIT_DELAY
+#                   (Optional) If started with systemd, add
+#                   'Environment=CATALINA_EXIT_DELAY=0.1' to your service file
+#                   to prevent systemd losing the last few log messages. 
+#                   See https://github.com/systemd/systemd/issues/1347
+#
 # -----------------------------------------------------------------------------
 
 # OS specific support.  $var _must_ be set to either true or false.
@@ -278,6 +285,10 @@ fi
 unset _NOHUP
 if [ "$USE_NOHUP" = "true" ]; then
     _NOHUP=nohup
+fi
+
+if [ -n "${CATALINA_EXIT_DELAY:-}" ]; then
+    trap 'sleep ${CATALINA_EXIT_DELAY}' INT EXIT TERM
 fi
 
 # ----- Execute The Requested Command -----------------------------------------
