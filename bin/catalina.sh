@@ -102,7 +102,7 @@
 #   CATALINA_EXIT_DELAY
 #                   (Optional) If started with systemd, add
 #                   'Environment=CATALINA_EXIT_DELAY=0.1' to your service file
-#                   to prevent systemd losing the last few log messages. 
+#                   to prevent systemd losing the last few log messages.
 #                   See https://github.com/systemd/systemd/issues/1347
 #
 # -----------------------------------------------------------------------------
