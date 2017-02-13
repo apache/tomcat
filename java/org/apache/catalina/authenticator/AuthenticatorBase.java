@@ -1191,10 +1191,11 @@ implements Authenticator, RegistrationListener {
 
     private AuthConfigProvider getJaspicProvider() {
         AuthConfigProvider provider = jaspicProvider;
-        if (NO_PROVIDER_AVAILABLE == provider) {
-            return null;
-        } else if (provider == null) {
+        if (provider == null) {
             provider = findJaspicProvider();
+        }
+        if (provider == NO_PROVIDER_AVAILABLE) {
+            return null;
         }
         return provider;
     }
