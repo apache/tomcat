@@ -93,6 +93,7 @@ public class SSLHostConfig implements Serializable {
     private Set<String> protocols = new HashSet<>();
     // JSSE
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
+    private boolean revocationEnabled = false;
     private int sessionCacheSize = 0;
     private int sessionTimeout = 86400;
     private String sslProtocol = Constants.SSL_PROTO_TLS;
@@ -472,6 +473,17 @@ public class SSLHostConfig implements Serializable {
 
     public String getKeyManagerAlgorithm() {
         return keyManagerAlgorithm;
+    }
+
+
+    public void setRevocationEnabled(boolean revocationEnabled) {
+        setProperty("revocationEnabled", Type.JSSE);
+        this.revocationEnabled = revocationEnabled;
+    }
+
+
+    public boolean getRevocationEnabled() {
+        return revocationEnabled;
     }
 
 

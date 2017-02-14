@@ -258,10 +258,11 @@ public class JSSEUtil extends SSLUtilBase {
             checkTrustStoreEntries(trustStore);
             String algorithm = sslHostConfig.getTruststoreAlgorithm();
             String crlf = sslHostConfig.getCertificateRevocationListFile();
+            boolean revocationEnabled = sslHostConfig.getRevocationEnabled();
 
             if ("PKIX".equalsIgnoreCase(algorithm)) {
                 TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
-                CertPathParameters params = getParameters(crlf, trustStore);
+                CertPathParameters params = getParameters(crlf, trustStore, revocationEnabled);
                 ManagerFactoryParameters mfp = new CertPathTrustManagerParameters(params);
                 tmf.init(mfp);
                 tms = tmf.getTrustManagers();
@@ -324,10 +325,15 @@ public class JSSEUtil extends SSLUtilBase {
      *
      * @param crlf The path to the CRL file.
      * @param trustStore The configured TrustStore.
+     * @param revocationEnabled Should the JSSE provider perform revocation
+     *                          checks? Ignored if {@code crlf} is non-null.
+     *                          Configuration of revocation checks are expected
+     *                          to be via proprietary JSSE provider methods.
      * @return The parameters including the CRLs and TrustStore.
      * @throws Exception An error occurred
      */
-    protected CertPathParameters getParameters(String crlf, KeyStore trustStore) throws Exception {
+    protected CertPathParameters getParameters(String crlf, KeyStore trustStore,
+            boolean revocationEnabled) throws Exception {
 
         PKIXBuilderParameters xparams =
                 new PKIXBuilderParameters(trustStore, new X509CertSelector());
@@ -338,7 +344,7 @@ public class JSSEUtil extends SSLUtilBase {
             xparams.addCertStore(store);
             xparams.setRevocationEnabled(true);
         } else {
-            xparams.setRevocationEnabled(false);
+            xparams.setRevocationEnabled(revocationEnabled);
         }
         xparams.setMaxPathLength(sslHostConfig.getCertificateVerificationDepth());
         return xparams;

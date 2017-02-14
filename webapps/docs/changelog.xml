@@ -148,6 +148,14 @@
         Ensure that executor thread pools used with connectors pre-start the
         configured minimum number of idle threads. (markt)
       </fix>
+      <fix>
+        <bug>60716</bug>: Add a new JSSE specific attribute,
+        <code>revocationEnabled</code>, to <code>SSLHostConfig</code> to permit
+        JSSE provider revocation checks to be enabled when no
+        <code>certificateRevocationListFile</code> has been configured. The
+        expectation is that configuration will be performed via a JSSE provider
+        specific mechanisms. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
