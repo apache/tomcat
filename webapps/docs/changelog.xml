@@ -146,6 +146,14 @@
         <code>tomcat.util.http.parser.HttpParser.requestTargetAllow</code>.
         (csutherl)
       </add>
+      <fix>
+        <bug>60716</bug>: Add a new JSSE specific attribute,
+        <code>revocationEnabled</code>, to <code>SSLHostConfig</code> to permit
+        JSSE provider revocation checks to be enabled when no
+        <code>certificateRevocationListFile</code> has been configured. The
+        expectation is that configuration will be performed via a JSSE provider
+        specific mechanisms. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

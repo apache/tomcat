@@ -1241,6 +1241,16 @@
       used.</p>
     </attribute>
 
+    <attribute name="revocationEnabled" required="false">
+      <p>JSSE only.</p>
+      <p>Should the JSSE provider enable certificate revocation checks? If
+      <strong>certificateRevocationListFile</strong> is set then this attribute
+      is ignored and revocation checks are always enabled. This attribute is
+      intended to enable revocation checks that have been configured for the
+      current JSSE provider via other means. If not specified, a default of
+      <code>false</code> is used.</p>
+    </attribute>
+
     <attribute name="sessionCacheSize" required="false">
       <p>JSSE only.</p>
       <p>The number of SSL sessions to maintain in the session cache. Use 0 to
