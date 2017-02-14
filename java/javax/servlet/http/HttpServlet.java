@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Enumeration;
@@ -488,6 +489,18 @@ public abstract class HttpServlet extends GenericServlet {
         boolean ALLOW_DELETE = false;
         boolean ALLOW_TRACE = true;
         boolean ALLOW_OPTIONS = true;
+
+        // Tomcat specific hack to see if TRACE is allowed
+        Class<?> clazz = null;
+        try {
+            clazz = Class.forName("org.apache.catalina.connector.RequestFacade");
+            Method getAllowTrace = clazz.getMethod("getAllowTrace", (Class<?>[]) null);
+            ALLOW_TRACE = ((Boolean) getAllowTrace.invoke(req, (Object[]) null)).booleanValue();
+        } catch (ClassNotFoundException | NoSuchMethodException | SecurityException |
+                IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            // Ignore. Not running on Tomcat. TRACE is always allowed.
+        }
+        // End of Tomcat specific hack
 
         for (int i=0; i<methods.length; i++) {
             Method m = methods[i];
