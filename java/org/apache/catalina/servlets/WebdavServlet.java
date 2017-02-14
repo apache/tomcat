@@ -40,6 +40,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.catalina.WebResource;
+import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.ConcurrentDateFormat;
 import org.apache.catalina.util.DOMWriter;
 import org.apache.catalina.util.XMLWriter;
@@ -2303,7 +2304,12 @@ public class WebdavServlet
             return methodsAllowed;
         }
 
-        methodsAllowed.append("OPTIONS, GET, HEAD, POST, DELETE, TRACE");
+        methodsAllowed.append("OPTIONS, GET, HEAD, POST, DELETE");
+        // Trace - assume disabled unless we can prove otherwise
+        if (req instanceof RequestFacade &&
+                ((RequestFacade) req).getAllowTrace()) {
+            methodsAllowed.append(", TRACE");
+        }
         methodsAllowed.append(", PROPPATCH, COPY, MOVE, LOCK, UNLOCK");
 
         if (listings) {
