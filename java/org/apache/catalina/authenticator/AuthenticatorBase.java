@@ -1194,13 +1194,20 @@ public abstract class AuthenticatorBase extends ValveBase
         return provider.orElse(null);
     }
 
+
     private Optional<AuthConfigProvider> findJaspicProvider() {
         AuthConfigFactory factory = AuthConfigFactory.getFactory();
-        Optional<AuthConfigProvider> provider =
-                Optional.ofNullable(factory.getConfigProvider("HttpServlet", jaspicAppContextID, this));
+        Optional<AuthConfigProvider> provider;
+        if (factory == null) {
+            provider = Optional.empty();
+        } else {
+            provider = Optional.ofNullable(
+                    factory.getConfigProvider("HttpServlet", jaspicAppContextID, this));
+        }
         jaspicProvider = provider;
         return provider;
     }
+
 
     @Override
     public void notify(String layer, String appContext) {

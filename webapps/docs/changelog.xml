@@ -80,6 +80,10 @@
         code. (markt)
       </fix>
       <fix>
+        <bug>60694</bug>: Prevent NPE during authentication when no JASPIC
+        <code>AuthConfigFactory</code> is available. (markt)
+      </fix>
+      <fix>
         <bug>60720</bug>: Replace "WWW-Authenticate" literal with static final
         AUTH_HEADER_NAME in SpnegoAuthenticator. Patch provided by Michael
         Osipov. (violetagg)
