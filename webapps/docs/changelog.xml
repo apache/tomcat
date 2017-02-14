@@ -124,6 +124,11 @@
         Ensure that <code>NoRpcChannelReply</code> messages are not received on
         <code>RpcCallback</code>. (kfujino)
       </fix>
+      <fix>
+        When HTTP TRACE requests are disabled on the Connector, ensure that the
+        HTTP OPTIONS response from custom the WebDAV servlet does not include
+        TRACE in the returned Allow header. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
