@@ -1200,16 +1200,20 @@ implements Authenticator, RegistrationListener {
         return provider;
     }
 
+
     private AuthConfigProvider findJaspicProvider() {
         AuthConfigFactory factory = AuthConfigFactory.getFactory();
-        AuthConfigProvider provider =
-                factory.getConfigProvider("HttpServlet", jaspicAppContextID, this);
+        AuthConfigProvider provider = null;
+        if (factory != null) {
+            provider = factory.getConfigProvider("HttpServlet", jaspicAppContextID, this);
+        }
         if (provider == null) {
             provider = NO_PROVIDER_AVAILABLE;
         }
         jaspicProvider = provider;
         return provider;
     }
+
 
     @Override
     public void notify(String layer, String appContext) {
