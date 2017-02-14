@@ -16,16 +16,25 @@
  */
 package org.apache.catalina.connector;
 
+import java.io.File;
 import java.net.SocketTimeoutException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.Servlet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.servlets.DefaultServlet;
+import org.apache.catalina.servlets.WebdavServlet;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -138,5 +147,77 @@ public class TestConnector extends TomcatBaseTest {
         c2.setPort(c1.getLocalPort());
 
         c2.start();
+    }
+
+
+    @Test
+    public void testTraceAllowedDefault() throws Exception {
+        doTestTrace(new DefaultServlet(), true);
+    }
+
+
+    @Test
+    public void testTraceNotAllowedDefault() throws Exception {
+        doTestTrace(new DefaultServlet(), false);
+    }
+
+
+    @Test
+    public void testTraceAllowedWebDav() throws Exception {
+        doTestTrace(new WebdavServlet(), true);
+    }
+
+
+    @Test
+    public void testTraceNotAllowedWebDav() throws Exception {
+        doTestTrace(new WebdavServlet(), false);
+    }
+
+
+    @Test
+    public void testTraceAllowedCustom() throws Exception {
+        doTestTrace(new TesterServlet(), true);
+    }
+
+
+    @Test
+    public void testTraceNotAllowedCustom() throws Exception {
+        doTestTrace(new TesterServlet(), false);
+    }
+
+
+    private void doTestTrace(Servlet servlet, boolean allowTrace) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        Context root = tomcat.addContext("", appDir.getAbsolutePath());
+        Tomcat.addServlet(root, "default", servlet);
+        root.addServletMappingDecoded("/", "default");
+
+        Connector connector = tomcat.getConnector();
+        connector.setAllowTrace(allowTrace);
+
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        Map<String,List<String>> respHeaders = new HashMap<>();
+        int rc = methodUrl("http://localhost:" + getPort() + "/index.html",
+                bc, 30000, null, respHeaders, "OPTIONS");
+
+        assertEquals(200, rc);
+
+        boolean foundTrace = false;
+        for (String header : respHeaders.get("Allow")) {
+            if (header.contains("TRACE")) {
+                foundTrace = true;
+                break;
+            }
+        }
+
+        if (allowTrace) {
+            Assert.assertTrue(foundTrace);
+        } else {
+            Assert.assertFalse(foundTrace);
+        }
     }
 }

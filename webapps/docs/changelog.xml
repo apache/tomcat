@@ -84,6 +84,11 @@
         <code>AuthConfigFactory</code> is available. (markt)
       </fix>
       <fix>
+        <bug>60697</bug>: When HTTP TRACE requests are disabled on the
+        Connector, ensure that the HTTP OPTIONS response from custom servlets
+        does not include TRACE in the returned Allow header. (markt)
+      </fix>
+      <fix>
         <bug>60720</bug>: Replace "WWW-Authenticate" literal with static final
         AUTH_HEADER_NAME in SpnegoAuthenticator. Patch provided by Michael
         Osipov. (violetagg)
