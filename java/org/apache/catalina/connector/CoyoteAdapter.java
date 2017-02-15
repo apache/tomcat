@@ -290,9 +290,6 @@ public class CoyoteAdapter implements Adapter {
     }
 
 
-    /**
-     * Service method.
-     */
     @Override
     public void service(org.apache.coyote.Request req,
                         org.apache.coyote.Response res)
