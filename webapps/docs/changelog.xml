@@ -113,6 +113,12 @@
         HTTP OPTIONS response from custom the WebDAV servlet does not include
         TRACE in the returned Allow header. (markt)
       </fix>
+      <fix>
+        <bug>60722</bug>: Take account of the
+        <strong>dispatchersUseEncodedPaths</strong> setting on the current
+        <strong>Context</strong> when generating paths for dispatches triggered
+        by <code>AsyncContext.dispatch()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
