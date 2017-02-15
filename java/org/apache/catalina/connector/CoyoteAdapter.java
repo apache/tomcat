@@ -140,14 +140,7 @@ public class CoyoteAdapter implements Adapter {
         req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
         try {
             if (!request.isAsync()) {
-                // Error or timeout - need to tell listeners the request is over
-                // Have to test this first since state may change while in this
-                // method and this is only required if entering this method in
-                // this state
-                Context ctxt = request.getMappingData().context;
-                if (ctxt != null) {
-                    ctxt.fireRequestDestroyEvent(request);
-                }
+                // Error or timeout
                 // Lift any suspension (e.g. if sendError() was used by an async
                 // request) to allow the response to be written to the client
                 response.setSuspended(false);
@@ -382,6 +375,17 @@ public class CoyoteAdapter implements Adapter {
         } catch (IOException e) {
             // Ignore
         } finally {
+            AtomicBoolean error = new AtomicBoolean(false);
+            res.action(ActionCode.IS_ERROR, error);
+
+            if (request.isAsyncCompleting() && error.get()) {
+                // Connection will be forcibly closed which will prevent
+                // completion happening at the usual point. Need to trigger
+                // call to onComplete() here.
+                res.action(ActionCode.ASYNC_POST_PROCESS,  null);
+                async = false;
+            }
+
             // Access log
             if (!async && postParseSuccess) {
                 // Log only if processing was invoked.
@@ -391,11 +395,9 @@ public class CoyoteAdapter implements Adapter {
             }
 
             req.getRequestProcessor().setWorkerThreadName(null);
-            AtomicBoolean error = new AtomicBoolean(false);
-            res.action(ActionCode.IS_ERROR, error);
 
             // Recycle the wrapper request and response
-            if (!async || error.get()) {
+            if (!async) {
                 request.recycle();
                 response.recycle();
             }

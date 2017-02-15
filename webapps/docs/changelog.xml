@@ -89,6 +89,12 @@
         does not include TRACE in the returned Allow header. (markt)
       </fix>
       <fix>
+        <bug>60718</bug>: Improve error handling for asynchronous processing and
+        correct a number of cases where the <code>requestDestroyed()</code>
+        event was not being fired and an entry wasn't being made in the access
+        logs. (markt)
+      </fix>
+      <fix>
         <bug>60720</bug>: Replace "WWW-Authenticate" literal with static final
         AUTH_HEADER_NAME in SpnegoAuthenticator. Patch provided by Michael
         Osipov. (violetagg)
