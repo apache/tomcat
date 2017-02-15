@@ -69,15 +69,15 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  * ERROR            - Something went wrong.
  *
  * |-----------------»------|
- * |                       \|/ /-----------------------------------«------------------------------|
- * |   |----------«-------ERROR----------------------------«-------------------------------|      |
- * |   |      complete() /|\/|\\                                                           |      |
- * |   |                  |  |  \                                                          |      |
- * |   |    |-----»-------|  |   \-----------»----------|                                  |      |
- * |   |    |                |                          |dispatch()                        |      |
- * |   |    |                |                         \|/                                 |      |
- * |   |    |                |          |--|timeout()   |                                  |      |
- * |   |    |     post()     |          | \|/           |     post()                       |      |
+ * |                       \|/ /---«-------------------------------«------------------------------|
+ * |   |----------«-----E R R O R--«-----------------------«-------------------------------|      |
+ * |   |      complete() /|\/|\\ \-«--------------------------------«-------|              |      |
+ * |   |                  |  |  \                                           |              |      |
+ * |   |    |-----»-------|  |   \-----------»----------|                   |              |      |
+ * |   |    |                |                          |dispatch()         |              |      |
+ * |   |    |                |                         \|/                  ^              |      |
+ * |   |    |                |          |--|timeout()   |                   |              |      |
+ * |   |    |     post()     |          | \|/           |     post()        |              |      |
  * |   |    |    |---------- | --»DISPATCHED«---------- | --------------COMPLETING«-----|  |      |
  * |   |    |    |           |   /|\/|\ |               |                | /|\ /|\      |  |      |
  * |   |    |    |    |---»- | ---|  |  |startAsync()   |       timeout()|--|   |       |  |      |
@@ -390,7 +390,8 @@ public class AsyncStateMachine {
                 state == AsyncState.DISPATCHED ||
                 state == AsyncState.TIMING_OUT ||
                 state == AsyncState.MUST_COMPLETE ||
-                state == AsyncState.READ_WRITE_OP) {
+                state == AsyncState.READ_WRITE_OP ||
+                state == AsyncState.COMPLETING) {
             clearNonBlockingListeners();
             state = AsyncState.ERROR;
         } else {
