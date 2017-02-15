@@ -44,6 +44,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Request;
+import org.apache.catalina.util.URLEncoder;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.RequestInfo;
@@ -194,6 +195,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         }
         if (pathInfo != null) {
             path += pathInfo;
+        }
+        if (this.context.getDispatchersUseEncodedPaths()) {
+            path = URLEncoder.DEFAULT.encode(path, "UTF-8");
         }
         dispatch(path);
     }
