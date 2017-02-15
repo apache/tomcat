@@ -138,7 +138,9 @@ public class CoyoteAdapter implements Adapter {
 
         boolean success = true;
         AsyncContextImpl asyncConImpl = request.getAsyncContextInternal();
-        req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
+
+        req.getRequestProcessor().setWorkerThreadName(THREAD_NAME.get());
+
         try {
             if (!request.isAsync()) {
                 // Error or timeout
@@ -325,10 +327,11 @@ public class CoyoteAdapter implements Adapter {
         boolean async = false;
         boolean postParseSuccess = false;
 
+        req.getRequestProcessor().setWorkerThreadName(THREAD_NAME.get());
+
         try {
             // Parse and set Catalina and configuration specific
             // request parameters
-            req.getRequestProcessor().setWorkerThreadName(THREAD_NAME.get());
             postParseSuccess = postParseRequest(req, request, res, response);
             if (postParseSuccess) {
                 //check valves if we support async
