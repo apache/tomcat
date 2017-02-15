@@ -126,15 +126,16 @@ public class CoyoteAdapter implements Adapter {
     // -------------------------------------------------------- Adapter Methods
 
     @Override
-    public boolean asyncDispatch(org.apache.coyote.Request req,
-            org.apache.coyote.Response res, SocketEvent status) throws Exception {
+    public boolean asyncDispatch(org.apache.coyote.Request req, org.apache.coyote.Response res,
+            SocketEvent status) throws Exception {
+
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
         if (request == null) {
-            throw new IllegalStateException(
-                    "Dispatch may only happen on an existing request.");
+            throw new IllegalStateException("Dispatch may only happen on an existing request.");
         }
+
         boolean success = true;
         AsyncContextImpl asyncConImpl = request.getAsyncContextInternal();
         req.getRequestProcessor().setWorkerThreadName(Thread.currentThread().getName());
@@ -224,13 +225,14 @@ public class CoyoteAdapter implements Adapter {
             // if the application doesn't define one)?
             if (!request.isAsyncDispatching() && request.isAsync() &&
                     response.isErrorReportRequired()) {
-                connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
+                connector.getService().getContainer().getPipeline().getFirst().invoke(
+                        request, response);
             }
 
             if (request.isAsyncDispatching()) {
-                connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
-                Throwable t = (Throwable) request.getAttribute(
-                        RequestDispatcher.ERROR_EXCEPTION);
+                connector.getService().getContainer().getPipeline().getFirst().invoke(
+                        request, response);
+                Throwable t = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
                 if (t != null) {
                     asyncConImpl.setErrorState(t, true);
                 }
@@ -291,15 +293,13 @@ public class CoyoteAdapter implements Adapter {
 
 
     @Override
-    public void service(org.apache.coyote.Request req,
-                        org.apache.coyote.Response res)
-        throws Exception {
+    public void service(org.apache.coyote.Request req, org.apache.coyote.Response res)
+            throws Exception {
 
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
         if (request == null) {
-
             // Create objects
             request = connector.createRequest();
             request.setCoyoteRequest(req);
@@ -315,9 +315,7 @@ public class CoyoteAdapter implements Adapter {
             res.setNote(ADAPTER_NOTES, response);
 
             // Set query string encoding
-            req.getParameters().setQueryStringEncoding
-                (connector.getURIEncoding());
-
+            req.getParameters().setQueryStringEncoding(connector.getURIEncoding());
         }
 
         if (connector.getXpoweredBy()) {
@@ -334,9 +332,11 @@ public class CoyoteAdapter implements Adapter {
             postParseSuccess = postParseRequest(req, request, res, response);
             if (postParseSuccess) {
                 //check valves if we support async
-                request.setAsyncSupported(connector.getService().getContainer().getPipeline().isAsyncSupported());
+                request.setAsyncSupported(
+                        connector.getService().getContainer().getPipeline().isAsyncSupported());
                 // Calling the container
-                connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
+                connector.getService().getContainer().getPipeline().getFirst().invoke(
+                        request, response);
             }
             if (request.isAsync()) {
                 async = true;
