@@ -2374,6 +2374,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         EasyMock.expect(context.getApplicationEventListeners()).andReturn(null);
         EasyMock.expect(context.getLoader()).andReturn(loader);
         EasyMock.expect(loader.getClassLoader()).andReturn(null);
+        EasyMock.expect(Boolean.valueOf(context.fireRequestDestroyEvent(request))).andReturn(
+                Boolean.TRUE);
 
         EasyMock.replay(context, loader);
 

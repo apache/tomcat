@@ -69,14 +69,14 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  *
  * |----------------->------|
  * |                       \|/
- * |   |----------<-------ERROR<---------------------------<-------------------------------|
- * |   |      complete() /|\/|\\                                                           |
- * |   |                  |  |  \                                                          |
- * |   |    |----->-------|  |   \----------->----------|                                  |
- * |   |    |                |                          |dispatch()                        |
- * |   |    |                |                         \|/                                 |
- * |   |    |                |          |--|timeout()   |                                  |
- * |   |    |     post()     |          | \|/           |     post()                       |
+ * |   |----------<-----E R R O R<-------------------------<-------------------------------|
+ * |   |      complete() /|\/|\\ \--<---------------------------------<-----|              |
+ * |   |                  |  |  \                                           |              |
+ * |   |    |----->-------|  |   \----------->----------|                   |              |
+ * |   |    |                |                          |dispatch()         |              |
+ * |   |    |                |                         \|/                  ^              |
+ * |   |    |                |          |--|timeout()   |                   |              |
+ * |   |    |     post()     |          | \|/           |     post()        |              |
  * |   |    |    |---------- | -->DISPATCHED<---------- | --------------COMPLETING<-----|  |
  * |   |    |    |           |   /|\/|\ |               |                | /|\ /|\      |  |
  * |   |    |    |    |--->- | ---|  |  |startAsync()   |       timeout()|--|   |       |  |
@@ -361,7 +361,8 @@ public class AsyncStateMachine<S> {
                 state == AsyncState.STARTED ||
                 state == AsyncState.DISPATCHED ||
                 state == AsyncState.TIMING_OUT ||
-                state == AsyncState.MUST_COMPLETE) {
+                state == AsyncState.MUST_COMPLETE ||
+                state == AsyncState.COMPLETING) {
             state = AsyncState.ERROR;
         } else {
             throw new IllegalStateException(

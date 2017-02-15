@@ -207,7 +207,7 @@ final class StandardHostValve extends ValveBase {
                 }
             }
 
-            if (!request.isAsync() && (!asyncAtStart || !response.isErrorReportRequired())) {
+            if (!request.isAsync() && !asyncAtStart) {
                 context.fireRequestDestroyEvent(request);
             }
         }
