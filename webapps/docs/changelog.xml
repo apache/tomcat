@@ -230,6 +230,10 @@
       <fix>
         Spelling corrections provided by Josh Soref. (violetagg)
       </fix>
+      <scode>
+        Remove local definition of web service annotations since these are
+        provided by the JRE. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
