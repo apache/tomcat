@@ -293,7 +293,6 @@
     <include name="javax/annotation/**" />
     <include name="javax/ejb/**" />
     <include name="javax/persistence/**" />
-    <include name="javax/xml/ws/**" />
   </patternset>
 
   <patternset id="files.servlet-api">
