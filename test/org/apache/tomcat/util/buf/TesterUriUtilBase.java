@@ -23,7 +23,18 @@ import java.net.URL;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TestUriUtil {
+import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
+
+public abstract class TesterUriUtilBase {
+
+    private final String separator;
+
+    protected TesterUriUtilBase(String separator) {
+        this.separator = separator;
+        TomcatURLStreamHandlerFactory.register();
+        System.setProperty("org.apache.tomcat.util.buf.UriUtil.WAR_SEPARATOR", separator);
+    }
+
 
     @Test
     public void testBuildJarUrl01() throws MalformedURLException {
@@ -58,6 +69,44 @@ public class TestUriUtil {
 
         index = result.indexOf("^/");
         Assert.assertEquals(result, -1, index);
+    }
+
+
+    @Test
+    public void testBuildJarUrl04() throws MalformedURLException {
+        File jarFile = new File("/patha/pathb" + separator + "/pathc");
+        String result = UriUtil.buildJarUrl(jarFile).toString();
+
+        int index = result.indexOf("!/");
+        Assert.assertEquals(result, result.length() - 2, index);
+
+        index = result.indexOf(separator + "/");
+        Assert.assertEquals(result, -1, index);
+    }
+
+
+    @Test
+    public void testWarToJar01() throws MalformedURLException {
+        doTestWarToJar("^");
+    }
+
+
+    @Test
+    public void testWarToJar02() throws MalformedURLException {
+        doTestWarToJar("*");
+    }
+
+
+    @Test
+    public void testWarToJar03() throws MalformedURLException {
+        doTestWarToJar(separator);
+    }
+
+
+    private void doTestWarToJar(String separator) throws MalformedURLException {
+        URL warUrl = new URL("war:file:/external/path" + separator + "/internal/path");
+        URL jarUrl = UriUtil.warToJar(warUrl);
+        Assert.assertEquals("jar:file:/external/path!/internal/path", jarUrl.toString());
     }
 
 

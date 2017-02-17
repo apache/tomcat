@@ -19,6 +19,7 @@ package org.apache.tomcat.util.scan;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.regex.Matcher;
 
 import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.buf.UriUtil;
@@ -61,7 +62,8 @@ public class JarFactory {
             // Assume this is pointing to a JAR file within a WAR. Java doesn't
             // support jar:jar:file:... so switch to Tomcat's war:file:...
             baseExternal = baseExternal.replaceFirst("^jar:", "war:");
-            baseExternal = baseExternal.replaceFirst("!/", "*/");
+            baseExternal = baseExternal.replaceFirst("!/",
+                    Matcher.quoteReplacement(UriUtil.getWarSeparator()));
         }
 
         return new URL("jar:" + baseExternal + "!/" + entryName);
