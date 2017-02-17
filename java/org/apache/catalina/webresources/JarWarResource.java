@@ -24,6 +24,7 @@ import java.util.jar.JarInputStream;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.UriUtil;
 
 /**
  * Represents a single resource (file or directory) that is located within a
@@ -38,8 +39,9 @@ public class JarWarResource extends AbstractArchiveResource {
     public JarWarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
             String baseUrl, JarEntry jarEntry, String archivePath) {
 
-        super(archiveResourceSet, webAppPath, "jar:war:" + baseUrl + "*/" + archivePath + "!/",
-                jarEntry, "war:" + baseUrl + "*/" + archivePath);
+        super(archiveResourceSet, webAppPath,
+                "jar:war:" + baseUrl + UriUtil.getWarSeparator() + archivePath + "!/",
+                jarEntry, "war:" + baseUrl + UriUtil.getWarSeparator() + archivePath);
         this.archivePath = archivePath;
     }
 

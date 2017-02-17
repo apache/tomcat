@@ -26,9 +26,42 @@ import java.util.regex.Pattern;
  */
 public final class UriUtil {
 
-    private static Pattern PATTERN_EXCLAMATION_MARK = Pattern.compile("!/");
-    private static Pattern PATTERN_CARET = Pattern.compile("\\^/");
-    private static Pattern PATTERN_ASTERISK = Pattern.compile("\\*/");
+    private static final char[] HEX =
+        {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+    private static final Pattern PATTERN_EXCLAMATION_MARK = Pattern.compile("!/");
+    private static final Pattern PATTERN_CARET = Pattern.compile("\\^/");
+    private static final Pattern PATTERN_ASTERISK = Pattern.compile("\\*/");
+    private static final Pattern PATTERN_CUSTOM;
+    private static final String REPLACE_CUSTOM;
+
+    private static final String WAR_SEPARATOR;
+
+    static {
+        String custom = System.getProperty("org.apache.tomcat.util.buf.UriUtil.WAR_SEPARATOR");
+        if (custom == null) {
+            WAR_SEPARATOR = "*/";
+            PATTERN_CUSTOM = null;
+            REPLACE_CUSTOM = null;
+        } else {
+            WAR_SEPARATOR = custom + "/";
+            PATTERN_CUSTOM = Pattern.compile(Pattern.quote(WAR_SEPARATOR));
+            StringBuffer sb = new StringBuffer(custom.length() * 3);
+            // Deliberately use the platform's default encoding
+            byte[] ba = custom.getBytes();
+            for (int j = 0; j < ba.length; j++) {
+                // Converting each byte in the buffer
+                byte toEncode = ba[j];
+                sb.append('%');
+                int low = toEncode & 0x0f;
+                int high = (toEncode & 0xf0) >> 4;
+                sb.append(HEX[high]);
+                sb.append(HEX[low]);
+            }
+            REPLACE_CUSTOM = sb.toString();
+        }
+    }
+
 
     private UriUtil() {
         // Utility class. Hide default constructor
@@ -126,7 +159,11 @@ public final class UriUtil {
         String tmp = PATTERN_EXCLAMATION_MARK.matcher(input).replaceAll("%21/");
         // Tomcat's custom jar:war: URL handling treats */ and ^/ as special
         tmp = PATTERN_CARET.matcher(tmp).replaceAll("%5e/");
-        return PATTERN_ASTERISK.matcher(tmp).replaceAll("%2a/");
+        tmp = PATTERN_ASTERISK.matcher(tmp).replaceAll("%2a/");
+        if (PATTERN_CUSTOM != null) {
+            tmp = PATTERN_CUSTOM.matcher(tmp).replaceAll(REPLACE_CUSTOM);
+        }
+        return tmp;
     }
 
 
@@ -145,10 +182,17 @@ public final class UriUtil {
         String file = warUrl.getFile();
         if (file.contains("*/")) {
             file = file.replaceFirst("\\*/", "!/");
-        } else {
+        } else if (file.contains("^/")) {
             file = file.replaceFirst("\\^/", "!/");
+        } else if (PATTERN_CUSTOM != null) {
+            file = file.replaceFirst(PATTERN_CUSTOM.pattern(), "!/");
         }
 
         return new URL("jar", warUrl.getHost(), warUrl.getPort(), file);
+    }
+
+
+    public static String getWarSeparator() {
+        return WAR_SEPARATOR;
     }
 }

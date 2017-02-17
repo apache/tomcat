@@ -44,6 +44,7 @@ import org.apache.catalina.WebResourceSet;
 import org.apache.catalina.util.LifecycleMBeanBase;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -806,7 +807,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                 if ("jar".equals(url.getProtocol())) {
                     endOfFileUrl = jarUrl.indexOf("!/");
                 } else {
-                    endOfFileUrl = jarUrl.indexOf("*/");
+                    endOfFileUrl = jarUrl.indexOf(UriUtil.getWarSeparator());
                 }
                 String fileUrl = jarUrl.substring(4, endOfFileUrl);
                 try {

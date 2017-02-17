@@ -119,6 +119,13 @@
         <strong>Context</strong> when generating paths for dispatches triggered
         by <code>AsyncContext.dispatch()</code>. (markt)
       </fix>
+      <fix>
+        <bug>60728</bug>: Make the separator Tomcat uses in the Tomcat specific
+        <code>war:file:...</code> URL protocol customizable via a system
+        property. The separator is equivalent to the use of the <code>!</code>
+        character in <code>jar:file:...</code> URLs. The default separator of
+        <code>*</code> remains unchanged. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
