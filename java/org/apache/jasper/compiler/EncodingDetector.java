@@ -36,7 +36,7 @@ class EncodingDetector {
     }
 
     private final BomResult bomResult;
-    private final String prologEncoding;
+    private final boolean encodingSpecifiedInProlog;
 
 
     /*
@@ -59,7 +59,7 @@ class EncodingDetector {
             is.read();
         }
 
-        prologEncoding = getPrologEncoding(bis);
+        encodingSpecifiedInProlog = (getPrologEncoding(bis) != null);
     }
 
 
@@ -73,8 +73,8 @@ class EncodingDetector {
     }
 
 
-    String getPrologEncoding() {
-        return prologEncoding;
+    boolean isEncodingSpecifiedInProlog() {
+        return encodingSpecifiedInProlog;
     }
 
 

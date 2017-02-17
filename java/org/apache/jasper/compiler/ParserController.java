@@ -322,7 +322,7 @@ class ParserController implements TagConstants {
             EncodingDetector encodingDetector = new EncodingDetector(inStream);
 
             sourceEnc = encodingDetector.getBomEncoding();
-            isEncodingSpecifiedInProlog = (encodingDetector.getPrologEncoding() != null);
+            isEncodingSpecifiedInProlog = encodingDetector.isEncodingSpecifiedInProlog();
             isBomPresent = (encodingDetector.getSkip() > 0);
             skip = encodingDetector.getSkip();
 
