@@ -16,6 +16,7 @@
  */
 package org.apache.jasper.compiler;
 
+import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,6 +60,8 @@ public class JspUtil {
             "return", "short", "static", "strictfp", "super", "switch",
             "synchronized", "this", "throw", "throws", "transient", "try",
             "void", "volatile", "while" };
+
+    static final int JSP_INPUT_STREAM_BUFFER_SIZE = 1024;
 
     public static final int CHUNKSIZE = 1024;
 
@@ -660,7 +663,7 @@ public class JspUtil {
         }
     }
 
-    public static InputStream getInputStream(String fname, Jar jar,
+    public static BufferedInputStream getInputStream(String fname, Jar jar,
             JspCompilationContext ctxt) throws IOException {
 
         InputStream in = null;
@@ -677,7 +680,7 @@ public class JspUtil {
                     "jsp.error.file.not.found", fname));
         }
 
-        return in;
+        return new BufferedInputStream(in, JspUtil.JSP_INPUT_STREAM_BUFFER_SIZE);
     }
 
     public static InputSource getInputSource(String fname, Jar jar, JspCompilationContext ctxt)
