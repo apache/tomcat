@@ -18,13 +18,9 @@ package org.apache.tomcat.util.http;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
 import java.text.FieldPosition;
-import java.text.SimpleDateFormat;
 import java.util.BitSet;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import javax.servlet.http.Cookie;
 
@@ -44,7 +40,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Costin Manolache
  * @author kevin seguin
  */
-public final class LegacyCookieProcessor implements CookieProcessor {
+public final class LegacyCookieProcessor extends CookieProcessorBase {
 
     private static final Log log = LogFactory.getLog(LegacyCookieProcessor.class);
 
@@ -62,26 +58,10 @@ public final class LegacyCookieProcessor implements CookieProcessor {
             '\t', ' ', '\"', '(', ')', ',', ':', ';', '<', '=', '>', '?', '@',
             '[', '\\', ']', '{', '}' };
 
-    private static final String COOKIE_DATE_PATTERN = "EEE, dd-MMM-yyyy HH:mm:ss z";
-    private static final ThreadLocal<DateFormat> COOKIE_DATE_FORMAT =
-        new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            DateFormat df =
-                new SimpleDateFormat(COOKIE_DATE_PATTERN, Locale.US);
-            df.setTimeZone(TimeZone.getTimeZone("GMT"));
-            return df;
-        }
-    };
-
-    private static final String ANCIENT_DATE;
-
     static {
         for (char c : V0_SEPARATORS) {
             V0_SEPARATOR_FLAGS.set(c);
         }
-
-        ANCIENT_DATE = COOKIE_DATE_FORMAT.get().format(new Date(10000));
     }
 
     private final boolean STRICT_SERVLET_COMPLIANCE =

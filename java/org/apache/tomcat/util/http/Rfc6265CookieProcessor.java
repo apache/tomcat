@@ -18,7 +18,9 @@ package org.apache.tomcat.util.http;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.FieldPosition;
 import java.util.BitSet;
+import java.util.Date;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -27,7 +29,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.parser.Cookie;
 import org.apache.tomcat.util.res.StringManager;
 
-public class Rfc6265CookieProcessor implements CookieProcessor {
+public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
     private static final Log log = LogFactory.getLog(Rfc6265CookieProcessor.class);
 
@@ -98,7 +100,9 @@ public class Rfc6265CookieProcessor implements CookieProcessor {
     @Override
     public String generateHeader(javax.servlet.http.Cookie cookie) {
 
-        StringBuilder header = new StringBuilder();
+        // Can't use StringBuilder due to DateFormat
+        StringBuffer header = new StringBuffer();
+
         // TODO: Name validation takes place in Cookie and cannot be configured
         //       per Context. Moving it to here would allow per Context config
         //       but delay validation until the header is generated. However,
@@ -112,12 +116,28 @@ public class Rfc6265CookieProcessor implements CookieProcessor {
             header.append(value);
         }
 
-        // RFC 6265 prefers Max-Age to Expires so use Max-Age
+        // RFC 6265 prefers Max-Age to Expires but... (see below)
         int maxAge = cookie.getMaxAge();
         if (maxAge > -1) {
             // Negative Max-Age is equivalent to no Max-Age
             header.append(";Max-Age=");
             header.append(maxAge);
+
+            // Microsoft IE and Microsoft Edge don't understand Max-Age so send
+            // expires as well. Without this, persistent cookies fail with those
+            // browsers. See http://tomcat.markmail.org/thread/g6sipbofsjossacn
+
+            // Wdy, DD-Mon-YY HH:MM:SS GMT ( Expires Netscape format )
+            header.append ("; Expires=");
+            // To expire immediately we need to set the time in past
+            if (maxAge == 0) {
+                header.append(ANCIENT_DATE);
+            } else {
+                COOKIE_DATE_FORMAT.get().format(
+                        new Date(System.currentTimeMillis() + maxAge * 1000L),
+                        header,
+                        new FieldPosition(0));
+            }
         }
 
         String domain = cookie.getDomain();
