@@ -38,11 +38,6 @@ public interface ServletMapping {
     String getPattern();
 
     /**
-     * @return The type of match ({@link MappingMatch#UNKNOWN} if not known)
-     */
-    MappingMatch getMappingMatch();
-
-    /**
      * @return The name of the servlet (as specified in web.xml,
      *         {@link WebServlet#name()},
      *         {@link javax.servlet.ServletContext#addServlet(String, Class)} or
@@ -50,4 +45,9 @@ public interface ServletMapping {
      *         request was mapped to.
      */
     String getServletName();
+
+    /**
+     * @return The type of match ({@link MappingMatch#UNKNOWN} if not known)
+     */
+    MappingMatch getMappingMatch();
 }

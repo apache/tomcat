@@ -184,13 +184,13 @@ public interface HttpServletRequest extends ServletRequest {
             }
 
             @Override
-            public MappingMatch getMappingMatch() {
-                return MappingMatch.UNKNOWN;
+            public String getServletName() {
+                return "";
             }
 
             @Override
-            public String getServletName() {
-                return "";
+            public MappingMatch getMappingMatch() {
+                return MappingMatch.UNKNOWN;
             }
         };
     }
