@@ -128,7 +128,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
             // browsers. See http://tomcat.markmail.org/thread/g6sipbofsjossacn
 
             // Wdy, DD-Mon-YY HH:MM:SS GMT ( Expires Netscape format )
-            header.append ("; Expires=");
+            header.append (";Expires=");
             // To expire immediately we need to set the time in past
             if (maxAge == 0) {
                 header.append(ANCIENT_DATE);
