@@ -187,7 +187,7 @@ public class TestCookieProcessorGeneration {
 
     @Test
     public void v1TestMaxAgeZero() {
-        doV1TestMaxAge(0, "foo=bar; Version=1; Max-Age=0", "foo=bar;Max-Age=0");
+        doV1TestMaxAge(0, "foo=bar; Version=1; Max-Age=0", "foo=bar;Max-Age=0;Expires=Thu, 01-Jan-1970 00:00:10 GMT");
     }
 
     @Test
@@ -302,7 +302,14 @@ public class TestCookieProcessorGeneration {
             }
             Assert.assertNotNull("Failed to throw IAE", e);
         } else {
-            Assert.assertEquals(expected, cookieProcessor.generateHeader(cookie));
+            if (cookieProcessor instanceof Rfc6265CookieProcessor &&
+                    cookie.getMaxAge() > 0) {
+                // Expires attribute will depend on time cookie is generated so
+                // use a modified test
+                Assert.assertTrue(cookieProcessor.generateHeader(cookie).startsWith(expected));
+            } else {
+                Assert.assertEquals(expected, cookieProcessor.generateHeader(cookie));
+            }
         }
     }
 
