@@ -65,6 +65,17 @@ public interface RequestDispatcher {
      * request. See the chapter "Forwarded Request Parameters" in the Servlet
      * Specification for details.
      *
+     * @since Servlet 4.0
+     */
+    static final String FORWARD_MAPPING = "javax.servlet.forward.mapping";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when the {@link #forward(ServletRequest, ServletResponse)} method is
+     * called. It provides the original value of a path-related property of the
+     * request. See the chapter "Forwarded Request Parameters" in the Servlet
+     * Specification for details.
+     *
      * @since Servlet 3.0
      */
     static final String FORWARD_PATH_INFO = "javax.servlet.forward.path_info";
@@ -90,17 +101,6 @@ public interface RequestDispatcher {
      * @since Servlet 3.0
      */
     static final String FORWARD_QUERY_STRING = "javax.servlet.forward.query_string";
-
-    /**
-     * The name of the request attribute that should be set by the container
-     * when the {@link #forward(ServletRequest, ServletResponse)} method is
-     * called. It provides the original value of a path-related property of the
-     * request. See the chapter "Forwarded Request Parameters" in the Servlet
-     * Specification for details.
-     *
-     * @since Servlet 4.0
-     */
-    static final String FORWARD_MAPPING = "javax.servlet.forward.mapping";
 
     /**
      * The name of the request attribute that should be set by the container
@@ -146,6 +146,18 @@ public interface RequestDispatcher {
      * {@code RequestDispatcher} instance for this include call. See the chapter
      * "Included Request Parameters" in the Servlet Specification for details.
      *
+     * @since Servlet 4.0
+     */
+    static final String INCLUDE_MAPPING = "javax.servlet.include.mapping";
+
+    /**
+     * The name of the request attribute that should be set by the container
+     * when the {@link #include(ServletRequest, ServletResponse)} method is
+     * called on the {@code RequestDispatcher} obtained by a path and not by a
+     * name. It provides information on the path that was used to obtain the
+     * {@code RequestDispatcher} instance for this include call. See the chapter
+     * "Included Request Parameters" in the Servlet Specification for details.
+     *
      * @since Servlet 3.0
      */
     static final String INCLUDE_SERVLET_PATH = "javax.servlet.include.servlet_path";
@@ -161,18 +173,6 @@ public interface RequestDispatcher {
      * @since Servlet 3.0
      */
     static final String INCLUDE_QUERY_STRING = "javax.servlet.include.query_string";
-
-    /**
-     * The name of the request attribute that should be set by the container
-     * when the {@link #include(ServletRequest, ServletResponse)} method is
-     * called on the {@code RequestDispatcher} obtained by a path and not by a
-     * name. It provides information on the path that was used to obtain the
-     * {@code RequestDispatcher} instance for this include call. See the chapter
-     * "Included Request Parameters" in the Servlet Specification for details.
-     *
-     * @since Servlet 4.0
-     */
-    static final String INCLUDE_MAPPING = "javax.servlet.include.mapping";
 
     /**
      * The name of the request attribute that should be set by the container
