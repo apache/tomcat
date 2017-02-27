@@ -29,7 +29,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.servlet4preview.http.Mapping;
+import org.apache.catalina.servlet4preview.http.ServletMapping;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -284,13 +284,13 @@ public class TestApplicationMapping extends TomcatBaseTest {
                 throws ServletException, IOException {
             resp.setContentType("text/plain;charset=UTF-8");
             PrintWriter pw = resp.getWriter();
-            Mapping mapping = ((org.apache.catalina.servlet4preview.http.HttpServletRequest)
-                    req).getMapping();
+            ServletMapping mapping = ((org.apache.catalina.servlet4preview.http.HttpServletRequest)
+                    req).getServletMapping();
             pw.println("MatchValue=[" + mapping.getMatchValue() + "]");
             pw.println("Pattern=[" + mapping.getPattern() + "]");
             pw.println("MatchType=[" + mapping.getMappingMatch() + "]");
             pw.println("ServletName=[" + mapping.getServletName() + "]");
-            Mapping includeMapping = (Mapping) req.getAttribute(
+            ServletMapping includeMapping = (ServletMapping) req.getAttribute(
                     org.apache.catalina.servlet4preview.RequestDispatcher.INCLUDE_MAPPING);
             if (includeMapping != null) {
                 pw.println("IncludeMatchValue=[" + includeMapping.getMatchValue() + "]");
@@ -299,7 +299,7 @@ public class TestApplicationMapping extends TomcatBaseTest {
                 pw.println("IncludeServletName=[" + includeMapping.getServletName() + "]");
 
             }
-            Mapping forwardMapping = (Mapping) req.getAttribute(
+            ServletMapping forwardMapping = (ServletMapping) req.getAttribute(
                     org.apache.catalina.servlet4preview.RequestDispatcher.FORWARD_MAPPING);
             if (forwardMapping != null) {
                 pw.println("ForwardMatchValue=[" + forwardMapping.getMatchValue() + "]");

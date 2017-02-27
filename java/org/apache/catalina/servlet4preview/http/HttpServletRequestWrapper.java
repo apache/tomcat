@@ -43,13 +43,13 @@ public class HttpServletRequestWrapper extends javax.servlet.http.HttpServletReq
      * {@inheritDoc}
      * <p>
      * The default behavior of this method is to return
-     * {@link HttpServletRequest#getMapping()} on the wrapped request object.
+     * {@link HttpServletRequest#getServletMapping()} on the wrapped request object.
      *
      * @since Servlet 4.0
      */
     @Override
-    public Mapping getMapping() {
-        return this._getHttpServletRequest().getMapping();
+    public ServletMapping getServletMapping() {
+        return this._getHttpServletRequest().getServletMapping();
     }
 
     /**

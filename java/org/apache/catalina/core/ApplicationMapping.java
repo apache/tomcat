@@ -17,20 +17,20 @@
 package org.apache.catalina.core;
 
 import org.apache.catalina.mapper.MappingData;
-import org.apache.catalina.servlet4preview.http.Mapping;
 import org.apache.catalina.servlet4preview.http.MappingMatch;
+import org.apache.catalina.servlet4preview.http.ServletMapping;
 
 public class ApplicationMapping {
 
     private final MappingData mappingData;
 
-    private volatile Mapping mapping = null;
+    private volatile ServletMapping mapping = null;
 
     public ApplicationMapping(MappingData mappingData) {
         this.mappingData = mappingData;
     }
 
-    public Mapping getMapping() {
+    public ServletMapping getServletMapping() {
         if (mapping == null) {
             if (mappingData == null) {
                 mapping = new MappingImpl("", "", MappingMatch.UNKNOWN, "");
@@ -77,7 +77,7 @@ public class ApplicationMapping {
         mapping = null;
     }
 
-    private static class MappingImpl implements Mapping {
+    private static class MappingImpl implements ServletMapping {
 
         private final String matchValue;
         private final String pattern;

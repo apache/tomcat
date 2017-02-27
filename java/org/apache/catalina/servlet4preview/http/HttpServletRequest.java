@@ -21,7 +21,7 @@ package org.apache.catalina.servlet4preview.http;
  */
 public interface HttpServletRequest extends javax.servlet.http.HttpServletRequest {
 
-    public Mapping getMapping();
+    public ServletMapping getServletMapping();
 
     /**
      * Does the current request allow push requests. This will return {@code

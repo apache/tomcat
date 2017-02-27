@@ -37,8 +37,8 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
-import org.apache.catalina.servlet4preview.http.Mapping;
 import org.apache.catalina.servlet4preview.http.PushBuilder;
+import org.apache.catalina.servlet4preview.http.ServletMapping;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -189,7 +189,7 @@ class ApplicationHttpRequest
     /**
      * The mapping for this request.
      */
-    private Mapping mapping = null;
+    private ServletMapping mapping = null;
 
 
     /**
@@ -523,7 +523,7 @@ class ApplicationHttpRequest
 
 
     @Override
-    public Mapping getMapping() {
+    public ServletMapping getServletMapping() {
         return mapping;
     }
 
@@ -707,9 +707,9 @@ class ApplicationHttpRequest
         requestURI = request.getRequestURI();
         servletPath = request.getServletPath();
         if (request instanceof org.apache.catalina.servlet4preview.http.HttpServletRequest) {
-            mapping = ((org.apache.catalina.servlet4preview.http.HttpServletRequest) request).getMapping();
+            mapping = ((org.apache.catalina.servlet4preview.http.HttpServletRequest) request).getServletMapping();
         } else {
-            mapping = (new ApplicationMapping(null)).getMapping();
+            mapping = (new ApplicationMapping(null)).getServletMapping();
         }
     }
 
@@ -769,7 +769,7 @@ class ApplicationHttpRequest
     }
 
 
-    void setMapping(Mapping mapping) {
+    void setMapping(ServletMapping mapping) {
         this.mapping = mapping;
     }
 

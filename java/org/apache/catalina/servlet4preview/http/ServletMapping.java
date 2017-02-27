@@ -22,7 +22,7 @@ package org.apache.catalina.servlet4preview.http;
  *
  * @since 4.0
  */
-public interface Mapping {
+public interface ServletMapping {
 
     /**
      * @return The value that was matched or the empty String if not known.

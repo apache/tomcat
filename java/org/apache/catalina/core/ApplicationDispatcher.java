@@ -44,7 +44,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.connector.ResponseFacade;
-import org.apache.catalina.servlet4preview.http.Mapping;
+import org.apache.catalina.servlet4preview.http.ServletMapping;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -206,7 +206,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
      */
     public ApplicationDispatcher
         (Wrapper wrapper, String requestURI, String servletPath,
-         String pathInfo, String queryString, Mapping mapping, String name) {
+         String pathInfo, String queryString, ServletMapping mapping, String name) {
 
         super();
 
@@ -263,7 +263,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
     /**
      * The mapping for this RequestDispatcher.
      */
-    private final Mapping mapping;
+    private final ServletMapping mapping;
 
 
     /**
@@ -369,12 +369,12 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                                       hrequest.getPathInfo());
                 wrequest.setAttribute(RequestDispatcher.FORWARD_QUERY_STRING,
                                       hrequest.getQueryString());
-                Mapping mapping;
+                ServletMapping mapping;
                 if (hrequest instanceof org.apache.catalina.servlet4preview.http.HttpServletRequest) {
                     mapping = ((org.apache.catalina.servlet4preview.http.HttpServletRequest)
-                            hrequest).getMapping();
+                            hrequest).getServletMapping();
                 } else {
-                    mapping = (new ApplicationMapping(null)).getMapping();
+                    mapping = (new ApplicationMapping(null)).getServletMapping();
                 }
                 wrequest.setAttribute(
                         org.apache.catalina.servlet4preview.RequestDispatcher.FORWARD_MAPPING,

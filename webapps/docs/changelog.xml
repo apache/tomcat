@@ -126,6 +126,13 @@
         character in <code>jar:file:...</code> URLs. The default separator of
         <code>*</code> remains unchanged. (markt)
       </fix>
+      <update>
+        Update the <code>org.apache.catalina.servlet4preview</code> package that
+        can be used to gain early access to Servlet 4.0 features to align with
+        the latest proposals from the Servlet 4.0 expert group. Note that the
+        Servlet 4.0 API is still a work in progress and further changes are
+        likely. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
