@@ -25,6 +25,8 @@ public interface AsyncContext {
         "javax.servlet.async.request_uri";
     public static final String ASYNC_CONTEXT_PATH  =
         "javax.servlet.async.context_path";
+    public static final String ASYNC_MAPPING =
+            "javax.servlet.async.mapping";
     public static final String ASYNC_PATH_INFO =
         "javax.servlet.async.path_info";
     public static final String ASYNC_SERVLET_PATH =
