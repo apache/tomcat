@@ -54,7 +54,7 @@ import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionIdListener;
 import javax.servlet.http.HttpSessionListener;
-import javax.servlet.http.Mapping;
+import javax.servlet.http.ServletMapping;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -481,7 +481,7 @@ public class ApplicationContext implements ServletContext {
         Wrapper wrapper = mappingData.wrapper;
         String wrapperPath = mappingData.wrapperPath.toString();
         String pathInfo = mappingData.pathInfo.toString();
-        Mapping mapping = (new ApplicationMapping(mappingData)).getMapping();
+        ServletMapping mapping = (new ApplicationMapping(mappingData)).getServletMapping();
 
         mappingData.recycle();
 

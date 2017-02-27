@@ -63,9 +63,9 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.Mapping;
 import javax.servlet.http.Part;
 import javax.servlet.http.PushBuilder;
+import javax.servlet.http.ServletMapping;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -2167,8 +2167,8 @@ public class Request implements HttpServletRequest {
 
 
     @Override
-    public Mapping getMapping() {
-        return applicationMapping.getMapping();
+    public ServletMapping getServletMapping() {
+        return applicationMapping.getServletMapping();
     }
 
 

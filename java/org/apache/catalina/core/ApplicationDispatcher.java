@@ -34,7 +34,7 @@ import javax.servlet.ServletResponseWrapper;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Mapping;
+import javax.servlet.http.ServletMapping;
 
 import org.apache.catalina.AsyncDispatcher;
 import org.apache.catalina.Context;
@@ -206,7 +206,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
      */
     public ApplicationDispatcher
         (Wrapper wrapper, String requestURI, String servletPath,
-         String pathInfo, String queryString, Mapping mapping, String name) {
+         String pathInfo, String queryString, ServletMapping mapping, String name) {
 
         super();
 
@@ -263,7 +263,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
     /**
      * The mapping for this RequestDispatcher.
      */
-    private final Mapping mapping;
+    private final ServletMapping mapping;
 
 
     /**
@@ -369,7 +369,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                                       hrequest.getPathInfo());
                 wrequest.setAttribute(RequestDispatcher.FORWARD_QUERY_STRING,
                                       hrequest.getQueryString());
-                wrequest.setAttribute(RequestDispatcher.FORWARD_MAPPING, hrequest.getMapping());
+                wrequest.setAttribute(RequestDispatcher.FORWARD_MAPPING, hrequest.getServletMapping());
             }
 
             wrequest.setContextPath(contextPath);

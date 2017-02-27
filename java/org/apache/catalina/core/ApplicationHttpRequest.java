@@ -33,8 +33,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.Mapping;
 import javax.servlet.http.PushBuilder;
+import javax.servlet.http.ServletMapping;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
@@ -190,7 +190,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * The mapping for this request.
      */
-    private Mapping mapping = null;
+    private ServletMapping mapping = null;
 
 
     /**
@@ -506,7 +506,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     @Override
-    public Mapping getMapping() {
+    public ServletMapping getServletMapping() {
         return mapping;
     }
 
@@ -690,7 +690,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         queryString = request.getQueryString();
         requestURI = request.getRequestURI();
         servletPath = request.getServletPath();
-        mapping = request.getMapping();
+        mapping = request.getServletMapping();
     }
 
 
@@ -749,7 +749,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     }
 
 
-    void setMapping(Mapping mapping) {
+    void setMapping(ServletMapping mapping) {
         this.mapping = mapping;
     }
 

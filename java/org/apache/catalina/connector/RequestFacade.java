@@ -38,9 +38,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.Mapping;
 import javax.servlet.http.Part;
 import javax.servlet.http.PushBuilder;
+import javax.servlet.http.ServletMapping;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
@@ -738,14 +738,14 @@ public class RequestFacade implements HttpServletRequest {
 
 
     @Override
-    public Mapping getMapping() {
+    public ServletMapping getServletMapping() {
 
         if (request == null) {
             throw new IllegalStateException(
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        return request.getMapping();
+        return request.getServletMapping();
     }
 
 

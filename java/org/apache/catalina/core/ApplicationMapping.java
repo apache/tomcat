@@ -16,8 +16,8 @@
  */
 package org.apache.catalina.core;
 
-import javax.servlet.http.Mapping;
 import javax.servlet.http.MappingMatch;
+import javax.servlet.http.ServletMapping;
 
 import org.apache.catalina.mapper.MappingData;
 
@@ -25,13 +25,13 @@ public class ApplicationMapping {
 
     private final MappingData mappingData;
 
-    private volatile Mapping mapping = null;
+    private volatile ServletMapping mapping = null;
 
     public ApplicationMapping(MappingData mappingData) {
         this.mappingData = mappingData;
     }
 
-    public Mapping getMapping() {
+    public ServletMapping getServletMapping() {
         if (mapping == null) {
             String servletName;
             if (mappingData.wrapper == null) {
@@ -74,7 +74,7 @@ public class ApplicationMapping {
         mapping = null;
     }
 
-    private static class MappingImpl implements Mapping {
+    private static class MappingImpl implements ServletMapping {
 
         private final String matchValue;
         private final String pattern;
