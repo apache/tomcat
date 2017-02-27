@@ -615,10 +615,6 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         ApplicationHttpRequest wrequest =
             (ApplicationHttpRequest) wrapRequest(state);
 
-        if (queryString != null) {
-            wrequest.setQueryParams(queryString);
-        }
-
         wrequest.setAttribute(Globals.DISPATCHER_TYPE_ATTR,
                 DispatcherType.ASYNC);
         wrequest.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR,
