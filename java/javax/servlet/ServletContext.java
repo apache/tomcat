@@ -966,7 +966,7 @@ public interface ServletContext {
     /**
      * Get the default session timeout.
      *
-     * @return The current defauly session timeout in minutes
+     * @return The current default session timeout in minutes
      *
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
