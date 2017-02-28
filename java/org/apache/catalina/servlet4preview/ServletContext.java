@@ -32,6 +32,8 @@ public interface ServletContext extends javax.servlet.ServletContext {
      *    {@link ServletContextListener} defined in a TLD would not be able to
      *    use this method.
      *
+     * @return The current default session timeout in minutes
+     *
      * @since Servlet 4.0
      */
     public int getSessionTimeout();
@@ -40,7 +42,7 @@ public interface ServletContext extends javax.servlet.ServletContext {
      * Set the default session timeout. This method may only be called before
      * the ServletContext is initialised.
      *
-     * @param sessionTimeoutMins The new default session timeout in minutes.
+     * @param sessionTimeout The new default session timeout in minutes.
      *
      * @throws UnsupportedOperationException    If called from a
      *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
