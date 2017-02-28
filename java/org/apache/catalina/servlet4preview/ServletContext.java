@@ -18,6 +18,7 @@ package org.apache.catalina.servlet4preview;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.ServletRegistration;
 
 public interface ServletContext extends javax.servlet.ServletContext {
 
@@ -58,4 +59,17 @@ public interface ServletContext extends javax.servlet.ServletContext {
      */
     public void setSessionTimeout(int sessionTimeout);
 
+    /**
+    *
+    * @param jspName   The servlet name under which this JSP file should be
+    *                  registered
+    * @param jspFile   The path, relative to the web application root, for the
+    *                  JSP file to be used for this servlet
+    *
+    * @return  a {@link javax.servlet.ServletRegistration.Dynamic} object
+    *          that can be used to further configure the servlet
+    *
+    * @since Servlet 4.0
+    */
+   public ServletRegistration.Dynamic addJspFile(String jspName, String jspFile);
 }
