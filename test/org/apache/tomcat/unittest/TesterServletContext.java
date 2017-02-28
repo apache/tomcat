@@ -227,6 +227,11 @@ public class TesterServletContext implements ServletContext {
     }
 
     @Override
+    public Dynamic addJspFile(String jspName, String jspFile) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
     public <T extends Servlet> T createServlet(Class<T> c)
             throws ServletException {
         throw new RuntimeException("Not implemented");

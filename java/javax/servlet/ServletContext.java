@@ -613,6 +613,20 @@ public interface ServletContext {
             Class<? extends Servlet> servletClass);
 
     /**
+     *
+     * @param jspName   The servlet name under which this JSP file should be
+     *                  registered
+     * @param jspFile   The path, relative to the web application root, for the
+     *                  JSP file to be used for this servlet
+     *
+     * @return  a {@link javax.servlet.ServletRegistration.Dynamic} object
+     *          that can be used to further configure the servlet
+     *
+     * @since Servlet 4.0
+     */
+    public ServletRegistration.Dynamic addJspFile(String jspName, String jspFile);
+
+    /**
      * TODO SERVLET3 - Add comments
      * @param <T> TODO
      * @param c   TODO

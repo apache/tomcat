@@ -588,6 +588,12 @@ public class JspCServletContext implements ServletContext {
 
 
     @Override
+    public javax.servlet.ServletRegistration.Dynamic addJspFile(String jspName, String jspFile) {
+        return null;
+    }
+
+
+    @Override
     public <T extends Filter> T createFilter(Class<T> c)
             throws ServletException {
         return null;

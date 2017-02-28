@@ -41,6 +41,7 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
+import javax.servlet.ServletRegistration.Dynamic;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
@@ -533,6 +534,17 @@ public class ApplicationContextFacade implements ServletContext {
                     new Object[]{servletName, servletClass});
         } else {
             return context.addServlet(servletName, servletClass);
+        }
+    }
+
+
+    @Override
+    public Dynamic addJspFile(String jspName, String jspFile) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (ServletRegistration.Dynamic) doPrivileged("addJspFile",
+                    new Object[]{jspName, jspFile});
+        } else {
+            return context.addJspFile(jspName, jspFile);
         }
     }
 
