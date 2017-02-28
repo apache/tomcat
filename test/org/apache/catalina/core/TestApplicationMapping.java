@@ -45,22 +45,22 @@ public class TestApplicationMapping extends TomcatBaseTest {
 
     @Test
     public void testContextNonRootMappingDefault() throws Exception {
-        doTestMapping("/dummy", "/", "/foo", "/", "DEFAULT");
+        doTestMapping("/dummy", "/", "/foo", "", "DEFAULT");
     }
 
     @Test
     public void testContextNonRootMappingExtension() throws Exception {
-        doTestMapping("/dummy", "*.test", "/foo/bar.test", "/foo/bar", "EXTENSION");
+        doTestMapping("/dummy", "*.test", "/foo/bar.test", "foo/bar", "EXTENSION");
     }
 
     @Test
     public void testContextNonRootMappingExact() throws Exception {
-        doTestMapping("/dummy", "/foo/bar", "/foo/bar", "/foo/bar", "EXACT");
+        doTestMapping("/dummy", "/foo/bar", "/foo/bar", "foo/bar", "EXACT");
     }
 
     @Test
     public void testContextNonRootMappingPath() throws Exception {
-        doTestMapping("/dummy", "/foo/bar/*", "/foo/bar/foo2", "/foo2", "PATH");
+        doTestMapping("/dummy", "/foo/bar/*", "/foo/bar/foo2", "foo2", "PATH");
     }
 
     @Test
@@ -70,22 +70,22 @@ public class TestApplicationMapping extends TomcatBaseTest {
 
     @Test
     public void testContextRootMappingDefault() throws Exception {
-        doTestMapping("", "/", "/foo", "/", "DEFAULT");
+        doTestMapping("", "/", "/foo", "", "DEFAULT");
     }
 
     @Test
     public void testContextRootMappingExtension() throws Exception {
-        doTestMapping("", "*.test", "/foo/bar.test", "/foo/bar", "EXTENSION");
+        doTestMapping("", "*.test", "/foo/bar.test", "foo/bar", "EXTENSION");
     }
 
     @Test
     public void testContextRootMappingExact() throws Exception {
-        doTestMapping("", "/foo/bar", "/foo/bar", "/foo/bar", "EXACT");
+        doTestMapping("", "/foo/bar", "/foo/bar", "foo/bar", "EXACT");
     }
 
     @Test
     public void testContextRootMappingPath() throws Exception {
-        doTestMapping("", "/foo/bar/*", "/foo/bar/foo2", "/foo2", "PATH");
+        doTestMapping("", "/foo/bar/*", "/foo/bar/foo2", "foo2", "PATH");
     }
 
     private void doTestMapping(String contextPath, String mapping, String requestPath,
@@ -151,7 +151,7 @@ public class TestApplicationMapping extends TomcatBaseTest {
         Assert.assertTrue(body, body.contains("MatchType=[" + matchType + "]"));
         Assert.assertTrue(body, body.contains("ServletName=[Include]"));
 
-        Assert.assertTrue(body, body.contains("IncludeMatchValue=[/mapping]"));
+        Assert.assertTrue(body, body.contains("IncludeMatchValue=[mapping]"));
         Assert.assertTrue(body, body.contains("IncludePattern=[/mapping]"));
         Assert.assertTrue(body, body.contains("IncludeMatchType=[EXACT]"));
         Assert.assertTrue(body, body.contains("IncludeServletName=[Mapping]"));
@@ -197,7 +197,7 @@ public class TestApplicationMapping extends TomcatBaseTest {
         ByteChunk bc = getUrl("http://localhost:" + getPort() + contextPath + requestPath);
         String body = bc.toString();
 
-        Assert.assertTrue(body, body.contains("MatchValue=[/mapping]"));
+        Assert.assertTrue(body, body.contains("MatchValue=[mapping]"));
         Assert.assertTrue(body, body.contains("Pattern=[/mapping]"));
         Assert.assertTrue(body, body.contains("MatchType=[EXACT]"));
         Assert.assertTrue(body, body.contains("ServletName=[Mapping]"));
@@ -249,7 +249,7 @@ public class TestApplicationMapping extends TomcatBaseTest {
         ByteChunk bc = getUrl("http://localhost:" + getPort() + contextPath + requestPath);
         String body = bc.toString();
 
-        Assert.assertTrue(body, body.contains("MatchValue=[/mapping]"));
+        Assert.assertTrue(body, body.contains("MatchValue=[mapping]"));
         Assert.assertTrue(body, body.contains("Pattern=[/mapping]"));
         Assert.assertTrue(body, body.contains("MatchType=[EXACT]"));
         Assert.assertTrue(body, body.contains("ServletName=[Mapping]"));

@@ -44,20 +44,20 @@ public class ApplicationMapping {
                     mapping = new MappingImpl("", "", mappingData.matchType, servletName);
                     break;
                 case DEFAULT:
-                    mapping = new MappingImpl("/", "/", mappingData.matchType, servletName);
+                    mapping = new MappingImpl("", "/", mappingData.matchType, servletName);
                     break;
                 case EXACT:
-                    mapping = new MappingImpl(mappingData.wrapperPath.toString(),
+                    mapping = new MappingImpl(mappingData.wrapperPath.toString().substring(1),
                             mappingData.wrapperPath.toString(), mappingData.matchType, servletName);
                     break;
                 case EXTENSION:
                     String path = mappingData.wrapperPath.toString();
                     int extIndex = path.lastIndexOf('.');
-                    mapping = new MappingImpl(path.substring(0, extIndex),
+                    mapping = new MappingImpl(path.substring(1, extIndex),
                             "*" + path.substring(extIndex), mappingData.matchType, servletName);
                     break;
                 case PATH:
-                    mapping = new MappingImpl(mappingData.pathInfo.toString(),
+                    mapping = new MappingImpl(mappingData.pathInfo.toString().substring(1),
                             mappingData.wrapperPath.toString() + "/*",
                             mappingData.matchType, servletName);
                     break;
