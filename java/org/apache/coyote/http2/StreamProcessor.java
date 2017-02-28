@@ -24,7 +24,7 @@ import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.ErrorState;
-import org.apache.coyote.PushToken;
+import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -203,9 +203,9 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
-    protected final void doPush(PushToken pushToken) {
+    protected final void doPush(Request pushTarget) {
         try {
-            pushToken.setResult(stream.push(pushToken.getPushTarget()));
+            stream.push(pushTarget);
         } catch (IOException ioe) {
             setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
             response.setErrorException(ioe);

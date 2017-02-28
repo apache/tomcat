@@ -38,7 +38,6 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.servlet4preview.http.PushBuilder;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.PushToken;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
@@ -61,7 +60,7 @@ public class ApplicationPushBuilder implements PushBuilder {
     private final List<Cookie> cookies = new ArrayList<>();
     private String method = "GET";
     private String path;
-    private String etag;
+    private String eTag;
     private String lastModified;
     private String queryString;
     private String sessionId;
@@ -205,15 +204,15 @@ public class ApplicationPushBuilder implements PushBuilder {
 
 
     @Override
-    public ApplicationPushBuilder etag(String etag) {
-        this.etag = etag;
+    public ApplicationPushBuilder eTag(String eTag) {
+        this.eTag = eTag;
         return this;
     }
 
 
     @Override
-    public String getEtag() {
-        return etag;
+    public String getETag() {
+        return eTag;
     }
 
 
@@ -323,7 +322,7 @@ public class ApplicationPushBuilder implements PushBuilder {
 
 
     @Override
-    public boolean push() {
+    public void push() {
         if (path == null) {
             throw new IllegalStateException(sm.getString("pushBuilder.noPath"));
         }
@@ -382,8 +381,8 @@ public class ApplicationPushBuilder implements PushBuilder {
         }
 
         if (conditional) {
-            if (etag != null) {
-                setHeader("if-none-match", etag);
+            if (eTag != null) {
+                setHeader("if-none-match", eTag);
             } else if (lastModified != null) {
                 setHeader("if-modified-since", lastModified);
             }
@@ -393,18 +392,15 @@ public class ApplicationPushBuilder implements PushBuilder {
         setHeader("cookie", generateCookieHeader(cookies,
                 catalinaRequest.getContext().getCookieProcessor()));
 
-        PushToken pushToken = new PushToken(pushTarget);
-        coyoteRequest.action(ActionCode.PUSH_REQUEST, pushToken);
+        coyoteRequest.action(ActionCode.PUSH_REQUEST, pushTarget);
 
         // Reset for next call to this method
         pushTarget = null;
         path = null;
-        etag = null;
+        eTag = null;
         lastModified = null;
         headers.remove("if-none-match");
         headers.remove("if-modified-since");
-
-        return pushToken.getResult();
     }
 
 

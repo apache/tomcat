@@ -478,7 +478,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             break;
         }
         case PUSH_REQUEST: {
-            doPush((PushToken) param);
+            doPush((Request) param);
             break;
         }
         }
@@ -743,13 +743,13 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      * Process a push. Processors that support push should override this method
      * and process the provided token.
      *
-     * @param pushToken Contains all the information necessary for the Processor
-     *                  to process the push request
+     * @param pushTarget Contains all the information necessary for the Processor
+     *                   to process the push request
      *
      * @throws UnsupportedOperationException if the protocol does not support
      *         push
      */
-    protected void doPush(PushToken pushToken) {
+    protected void doPush(Request pushTarget) {
         throw new UnsupportedOperationException(
                 sm.getString("abstractProcessor.pushrequest.notsupported"));
     }
