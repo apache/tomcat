@@ -56,7 +56,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  *
  * @author Remy Maucherat
  */
-public class ApplicationContextFacade implements ServletContext {
+public class ApplicationContextFacade implements org.apache.catalina.servlet4preview.ServletContext {
 
     // ---------------------------------------------------------- Attributes
     /**
@@ -765,6 +765,26 @@ public class ApplicationContextFacade implements ServletContext {
             return (String) doPrivileged("getVirtualServerName", null);
         } else  {
             return context.getVirtualServerName();
+        }
+    }
+
+
+    @Override
+    public int getSessionTimeout() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return ((Integer) doPrivileged("getSessionTimeout", null)).intValue();
+        } else  {
+            return context.getSessionTimeout();
+        }
+    }
+
+
+    @Override
+    public void setSessionTimeout(int sessionTimeout) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("getSessionTimeout", new Object[] { Integer.valueOf(sessionTimeout) });
+        } else  {
+            context.setSessionTimeout(sessionTimeout);
         }
     }
 

@@ -6402,7 +6402,7 @@ public class StandardContext extends ContainerBase
 
 
     private static class NoPluggabilityServletContext
-            implements ServletContext {
+            implements org.apache.catalina.servlet4preview.ServletContext {
 
         private final ServletContext sc;
 
@@ -6706,6 +6706,18 @@ public class StandardContext extends ContainerBase
         @Override
         public String getVirtualServerName() {
             return sc.getVirtualServerName();
+        }
+
+        @Override
+        public int getSessionTimeout() {
+            throw new UnsupportedOperationException(
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
+        }
+
+        @Override
+        public void setSessionTimeout(int sessionTimeout) {
+            throw new UnsupportedOperationException(
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
         }
     }
 }

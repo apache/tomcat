@@ -85,7 +85,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-public class ApplicationContext implements ServletContext {
+public class ApplicationContext implements org.apache.catalina.servlet4preview.ServletContext {
 
     protected static final boolean STRICT_SERVLET_COMPLIANCE;
 
@@ -1225,6 +1225,24 @@ public class ApplicationContext implements ServletContext {
         Container host = context.getParent();
         Container engine = host.getParent();
         return engine.getName() + "/" + host.getName();
+    }
+
+
+    @Override
+    public int getSessionTimeout() {
+        return context.getSessionTimeout();
+    }
+
+
+    @Override
+    public void setSessionTimeout(int sessionTimeout) {
+        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
+            throw new IllegalStateException(
+                    sm.getString("applicationContext.setSessionTimeout.ise",
+                            getContextPath()));
+        }
+
+        context.setSessionTimeout(sessionTimeout);
     }
 
 
