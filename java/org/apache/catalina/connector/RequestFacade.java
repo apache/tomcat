@@ -1135,18 +1135,6 @@ public class RequestFacade implements HttpServletRequest {
      * removed or replaced at any time until Servlet 4.0 becomes final.
      */
     @Override
-    public boolean isPushSupported() {
-        return request.isPushSupported();
-    }
-
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Pulled forward from Servlet 4.0. The method signature may be modified,
-     * removed or replaced at any time until Servlet 4.0 becomes final.
-     */
-    @Override
     public PushBuilder getPushBuilder() {
         return request.getPushBuilder();
     }

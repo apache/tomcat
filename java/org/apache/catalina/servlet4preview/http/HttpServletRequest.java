@@ -24,23 +24,16 @@ public interface HttpServletRequest extends javax.servlet.http.HttpServletReques
     public ServletMapping getServletMapping();
 
     /**
-     * Does the current request allow push requests. This will return {@code
-     * true} only if the underlying protocol supports server push and if pushes
-     * are permitted from the current request.
-     *
-     * @return {@code true} if server push is supported for the current request
-     *         otherwise {@code false}
-     */
-    public boolean isPushSupported();
-
-    /**
      * Obtain a builder for generating push requests. {@link PushBuilder}
      * documents how this request will be used as the basis for a push request.
      * Each call to this method will return a new instance, independent of any
      * previous instance obtained.
      *
      * @return A builder that can be used to generate push requests based on
-     *         this request.
+     *         this request or {@code null} if push is not supported. Note that
+     *         even if a PushBuilder instance is returned, by the time that
+     *         {@link PushBuilder#push()} is called, it may no longer be valid
+     *         to push a request and the push request will be ignored.
      *
      * @since Servlet 4.0
      */

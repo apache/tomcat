@@ -56,20 +56,6 @@ public class HttpServletRequestWrapper extends javax.servlet.http.HttpServletReq
      * {@inheritDoc}
      * <p>
      * The default behavior of this method is to return
-     * {@link HttpServletRequest#isPushSupported()} on the wrapped request object.
-     *
-     * @since Servlet 4.0
-     */
-    @Override
-    public boolean isPushSupported() {
-        return this._getHttpServletRequest().isPushSupported();
-    }
-
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The default behavior of this method is to return
      * {@link HttpServletRequest#getPushBuilder()} on the wrapped request object.
      *
      * @since Servlet 4.0

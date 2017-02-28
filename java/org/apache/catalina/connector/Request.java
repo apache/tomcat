@@ -1911,26 +1911,19 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
      * Pulled forward from Servlet 4.0. The method signature may be modified,
      * removed or replaced at any time until Servlet 4.0 becomes final.
      *
-     * @return {@code true} If this request supports server push
-     */
-    @Override
-    public boolean isPushSupported() {
-        AtomicBoolean result = new AtomicBoolean();
-        coyoteRequest.action(ActionCode.IS_PUSH_SUPPORTED, result);
-        return result.get();
-    }
-
-
-    /**
-     * Pulled forward from Servlet 4.0. The method signature may be modified,
-     * removed or replaced at any time until Servlet 4.0 becomes final.
-     *
      * @return A builder to use to construct the push request
      */
     @Override
     public PushBuilder getPushBuilder() {
-        return new ApplicationPushBuilder(this);
+        AtomicBoolean result = new AtomicBoolean();
+        coyoteRequest.action(ActionCode.IS_PUSH_SUPPORTED, result);
+        if (result.get()) {
+            return new ApplicationPushBuilder(this);
+        } else {
+            return null;
+        }
     }
+
 
     /**
      * {@inheritDoc}
