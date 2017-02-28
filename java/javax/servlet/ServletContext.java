@@ -962,4 +962,39 @@ public interface ServletContext {
      * @since Servlet 3.1
      */
     public String getVirtualServerName();
+
+    /**
+     * Get the default session timeout.
+     *
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
+     *
+     * @since Servlet 4.0
+     */
+    public int getSessionTimeout();
+
+    /**
+     * Set the default session timeout. This method may only be called before
+     * the ServletContext is initialised.
+     *
+     * @param sessionTimeoutMins The new default session timeout in minutes.
+     *
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
+     * @throws IllegalStateException If the ServletContext has already been
+     *         initialised
+     *
+     * @since Servlet 4.0
+     */
+    public void setSessionTimeout(int sessionTimeout);
 }

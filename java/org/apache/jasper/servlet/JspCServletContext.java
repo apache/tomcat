@@ -690,4 +690,14 @@ public class JspCServletContext implements ServletContext {
     public String getVirtualServerName() {
         return null;
     }
+
+    @Override
+    public int getSessionTimeout() {
+        return 0;
+    }
+
+    @Override
+    public void setSessionTimeout(int sessionTimeout) {
+        // NO-OP
+    }
 }

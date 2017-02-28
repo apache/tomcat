@@ -1227,6 +1227,24 @@ public class ApplicationContext implements ServletContext {
     }
 
 
+    @Override
+    public int getSessionTimeout() {
+        return context.getSessionTimeout();
+    }
+
+
+    @Override
+    public void setSessionTimeout(int sessionTimeout) {
+        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
+            throw new IllegalStateException(
+                    sm.getString("applicationContext.setSessionTimeout.ise",
+                            getContextPath()));
+        }
+
+        context.setSessionTimeout(sessionTimeout);
+    }
+
+
     // -------------------------------------------------------- Package Methods
     protected StandardContext getContext() {
         return this.context;

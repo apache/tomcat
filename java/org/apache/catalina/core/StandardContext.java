@@ -6697,5 +6697,17 @@ public class StandardContext extends ContainerBase
         public String getVirtualServerName() {
             return sc.getVirtualServerName();
         }
+
+        @Override
+        public int getSessionTimeout() {
+            throw new UnsupportedOperationException(
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
+        }
+
+        @Override
+        public void setSessionTimeout(int sessionTimeout) {
+            throw new UnsupportedOperationException(
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
+        }
     }
 }

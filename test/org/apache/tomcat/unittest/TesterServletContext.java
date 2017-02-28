@@ -342,4 +342,14 @@ public class TesterServletContext implements ServletContext {
     public String getVirtualServerName() {
         return "localhost";
     }
+
+    @Override
+    public int getSessionTimeout() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public void setSessionTimeout(int sessionTimeout) {
+        throw new RuntimeException("Not implemented");
+    }
 }
