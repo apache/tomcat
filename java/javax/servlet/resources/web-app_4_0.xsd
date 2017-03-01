@@ -298,6 +298,26 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
+      <xsd:element name="request-encoding" type="javaee:string">
+        <xsd:annotation>
+          <xsd:documentation>
+
+            When specified, this element provides a default request
+            encoding of the web application.
+
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="response-encoding" type="javaee:string">
+        <xsd:annotation>
+          <xsd:documentation>
+
+            When specified, this element provides a default response
+            encoding of the web application.
+
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
       <xsd:element name="deny-uncovered-http-methods" type="javaee:emptyType">
         <xsd:annotation>
           <xsd:documentation>

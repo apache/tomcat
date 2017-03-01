@@ -807,8 +807,35 @@ public class StandardContext extends ContainerBase
 
     private boolean dispatchersUseEncodedPaths = true;
 
+    private String requestEncoding = null;
+
+    private String responseEncoding = null;
 
     // ----------------------------------------------------- Context Properties
+
+    @Override
+    public String getRequestCharacterEncoding() {
+        return requestEncoding;
+    }
+
+
+    @Override
+    public void setRequestCharacterEncoding(String requestEncoding) {
+        this.requestEncoding = requestEncoding;
+    }
+
+
+    @Override
+    public String getResponseCharacterEncoding() {
+        return responseEncoding;
+    }
+
+
+    @Override
+    public void setResponseCharacterEncoding(String responseEncoding) {
+        this.responseEncoding = responseEncoding;
+    }
+
 
     @Override
     public void setDispatchersUseEncodedPaths(boolean dispatchersUseEncodedPaths) {
@@ -6712,6 +6739,30 @@ public class StandardContext extends ContainerBase
 
         @Override
         public void setSessionTimeout(int sessionTimeout) {
+            throw new UnsupportedOperationException(
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
+        }
+
+        @Override
+        public String getRequestCharacterEncoding() {
+            throw new UnsupportedOperationException(
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
+        }
+
+        @Override
+        public void setRequestCharacterEncoding(String encoding) {
+            throw new UnsupportedOperationException(
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
+        }
+
+        @Override
+        public String getResponseCharacterEncoding() {
+            throw new UnsupportedOperationException(
+                    sm.getString("noPluggabilityServletContext.notAllowed"));
+        }
+
+        @Override
+        public void setResponseCharacterEncoding(String encoding) {
             throw new UnsupportedOperationException(
                     sm.getString("noPluggabilityServletContext.notAllowed"));
         }

@@ -1299,6 +1299,7 @@ public class ContextConfig implements LifecycleListener {
                 webxml.getMimeMappings().entrySet()) {
             context.addMimeMapping(entry.getKey(), entry.getValue());
         }
+        context.setRequestCharacterEncoding(webxml.getRequestEncoding());
         // Name is just used for ordering
         for (ContextResourceEnvRef resource :
                 webxml.getResourceEnvRefs().values()) {
@@ -1307,6 +1308,7 @@ public class ContextConfig implements LifecycleListener {
         for (ContextResource resource : webxml.getResourceRefs().values()) {
             context.getNamingResources().addResource(resource);
         }
+        context.setResponseCharacterEncoding(webxml.getResponseEncoding());
         boolean allAuthenticatedUsersIsAppRole =
                 webxml.getSecurityRoles().contains(
                         SecurityConstraint.ROLE_ALL_AUTHENTICATED_USERS);

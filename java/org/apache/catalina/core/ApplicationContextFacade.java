@@ -801,6 +801,46 @@ public class ApplicationContextFacade implements ServletContext {
     }
 
 
+    @Override
+    public String getRequestCharacterEncoding() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (String) doPrivileged("getRequestCharacterEncoding", null);
+        } else  {
+            return context.getRequestCharacterEncoding();
+        }
+    }
+
+
+    @Override
+    public void setRequestCharacterEncoding(String encoding) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("setRequestCharacterEncoding", new Object[] { encoding });
+        } else  {
+            context.setRequestCharacterEncoding(encoding);
+        }
+    }
+
+
+    @Override
+    public String getResponseCharacterEncoding() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (String) doPrivileged("getResponseCharacterEncoding", null);
+        } else  {
+            return context.getResponseCharacterEncoding();
+        }
+    }
+
+
+    @Override
+    public void setResponseCharacterEncoding(String encoding) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            doPrivileged("setResponseCharacterEncoding", new Object[] { encoding });
+        } else  {
+            context.setResponseCharacterEncoding(encoding);
+        }
+    }
+
+
     /**
      * Use reflection to invoke the requested method. Cache the method object
      * to speed up the process

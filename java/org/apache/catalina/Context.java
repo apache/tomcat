@@ -1790,4 +1790,32 @@ public interface Context extends Container, ContextBind {
      *         {@code false}
      */
     public boolean getDispatchersUseEncodedPaths();
+
+    /**
+     * Set the default request body encoding for this web application.
+     *
+     * @param encoding The default encoding
+     */
+    public void setRequestCharacterEncoding(String encoding);
+
+    /**
+     * Get the default request body encoding for this web application.
+     *
+     * @return The default request body encoding
+     */
+    public String getRequestCharacterEncoding();
+
+    /**
+     * Set the default response body encoding for this web application.
+     *
+     * @param encoding The default encoding
+     */
+    public void setResponseCharacterEncoding(String encoding);
+
+    /**
+     * Get the default response body encoding for this web application.
+     *
+     * @return The default response body encoding
+     */
+    public String getResponseCharacterEncoding();
 }

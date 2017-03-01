@@ -706,4 +706,24 @@ public class JspCServletContext implements ServletContext {
     public void setSessionTimeout(int sessionTimeout) {
         // NO-OP
     }
+
+    @Override
+    public String getRequestCharacterEncoding() {
+        return null;
+    }
+
+    @Override
+    public void setRequestCharacterEncoding(String encoding) {
+        // NO-OP
+    }
+
+    @Override
+    public String getResponseCharacterEncoding() {
+        return null;
+    }
+
+    @Override
+    public void setResponseCharacterEncoding(String encoding) {
+        // NO-OP
+    }
 }

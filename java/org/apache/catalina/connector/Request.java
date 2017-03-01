@@ -968,7 +968,14 @@ public class Request implements HttpServletRequest {
      */
     @Override
     public String getCharacterEncoding() {
-      return coyoteRequest.getCharacterEncoding();
+        String result = coyoteRequest.getCharacterEncoding();
+        if (result == null) {
+            Context context = getContext();
+            if (context != null) {
+                result =  context.getRequestCharacterEncoding();
+            }
+        }
+        return result;
     }
 
 

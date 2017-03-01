@@ -1288,6 +1288,42 @@ public class ApplicationContext implements ServletContext {
     }
 
 
+    @Override
+    public String getRequestCharacterEncoding() {
+        return context.getRequestCharacterEncoding();
+    }
+
+
+    @Override
+    public void setRequestCharacterEncoding(String encoding) {
+        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
+            throw new IllegalStateException(
+                    sm.getString("applicationContext.setRequestEncoding.ise",
+                            getContextPath()));
+        }
+
+        context.setRequestCharacterEncoding(encoding);
+    }
+
+
+    @Override
+    public String getResponseCharacterEncoding() {
+        return context.getResponseCharacterEncoding();
+    }
+
+
+    @Override
+    public void setResponseCharacterEncoding(String encoding) {
+        if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
+            throw new IllegalStateException(
+                    sm.getString("applicationContext.setResponseEncoding.ise",
+                            getContextPath()));
+        }
+
+        context.setResponseCharacterEncoding(encoding);
+    }
+
+
     // -------------------------------------------------------- Package Methods
     protected StandardContext getContext() {
         return this.context;

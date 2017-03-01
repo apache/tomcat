@@ -357,4 +357,24 @@ public class TesterServletContext implements ServletContext {
     public void setSessionTimeout(int sessionTimeout) {
         throw new RuntimeException("Not implemented");
     }
+
+    @Override
+    public String getRequestCharacterEncoding() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public void setRequestCharacterEncoding(String encoding) {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public String getResponseCharacterEncoding() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
+    public void setResponseCharacterEncoding(String encoding) {
+        throw new RuntimeException("Not implemented");
+    }
 }

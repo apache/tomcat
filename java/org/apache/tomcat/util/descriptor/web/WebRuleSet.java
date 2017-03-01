@@ -196,6 +196,8 @@ public class WebRuleSet extends RuleSetBase {
                                    "addAbsoluteOrderingOthers");
             digester.addRule(fullPrefix + "/deny-uncovered-http-methods",
                     new SetDenyUncoveredHttpMethodsRule());
+            digester.addCallMethod(fullPrefix + "/request-encoding", "setRequestEncoding", 0);
+            digester.addCallMethod(fullPrefix + "/response-encoding", "setResponseEncoding", 0);
         }
 
         digester.addCallMethod(fullPrefix + "/context-param",

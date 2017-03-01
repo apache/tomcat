@@ -128,8 +128,13 @@
       </fix>
       <update>
         Update the Servlet 4.0 API implementation to align with the latest
-        proposals from the Servlet 4.0 expert group. Note that the Servlet 4.0
-        API is still a work in progress and further changes are likely. (markt)
+        proposals from the Servlet 4.0 expert group. This includes updates to
+        the new Servlet mapping API, new methods on the
+        <code>ServletContext</code> to make the available API more equivalent to
+        the deployment descriptor, updates to the HTTP push API and the ability
+        to set default request and response character encoding per web
+        application. Note that the Servlet 4.0 API is still a work in progress
+        and further changes are likely. (markt)
       </update>
     </changelog>
   </subsection>
