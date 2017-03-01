@@ -545,7 +545,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         if (responseHeaders.length < 3) {
             return false;
         }
-        if (!responseHeaders[0].startsWith("HTTP/1.1 101")) {
+        if (!responseHeaders[0].startsWith("HTTP/1.1 101 ")) {
             return false;
         }
 
@@ -617,7 +617,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     void parseHttp11Response() throws IOException {
         String[] responseHeaders = readHttpResponseHeaders();
-        Assert.assertTrue(responseHeaders[0], responseHeaders[0].startsWith("HTTP/1.1 200"));
+        Assert.assertTrue(responseHeaders[0], responseHeaders[0].startsWith("HTTP/1.1 200 "));
 
         // Find the content length (chunked responses not handled)
         for (int i = 1; i < responseHeaders.length; i++) {
