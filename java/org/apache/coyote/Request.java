@@ -293,8 +293,8 @@ public final class Request {
         }
 
         charEncoding = getCharsetFromContentType(getContentType());
-        return charEncoding;
 
+        return charEncoding;
     }
 
 

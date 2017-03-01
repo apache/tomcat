@@ -994,7 +994,14 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
      */
     @Override
     public String getCharacterEncoding() {
-      return coyoteRequest.getCharacterEncoding();
+        String result = coyoteRequest.getCharacterEncoding();
+        if (result == null) {
+            Context context = getContext();
+            if (context != null) {
+                result =  context.getRequestCharacterEncoding();
+            }
+        }
+        return result;
     }
 
 

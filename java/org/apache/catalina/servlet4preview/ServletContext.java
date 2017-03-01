@@ -60,16 +60,94 @@ public interface ServletContext extends javax.servlet.ServletContext {
     public void setSessionTimeout(int sessionTimeout);
 
     /**
-    *
-    * @param jspName   The servlet name under which this JSP file should be
-    *                  registered
-    * @param jspFile   The path, relative to the web application root, for the
-    *                  JSP file to be used for this servlet
-    *
-    * @return  a {@link javax.servlet.ServletRegistration.Dynamic} object
-    *          that can be used to further configure the servlet
-    *
-    * @since Servlet 4.0
-    */
-   public ServletRegistration.Dynamic addJspFile(String jspName, String jspFile);
+     *
+     * @param jspName   The servlet name under which this JSP file should be
+     *                  registered
+     * @param jspFile   The path, relative to the web application root, for the
+     *                  JSP file to be used for this servlet
+     *
+     * @return  a {@link javax.servlet.ServletRegistration.Dynamic} object
+     *          that can be used to further configure the servlet
+     *
+     * @since Servlet 4.0
+     */
+    public ServletRegistration.Dynamic addJspFile(String jspName, String jspFile);
+
+    /**
+     * Get the default character encoding for reading request bodies.
+     *
+     * @return The character encoding name or {@code null} if no default has
+     *         been specified
+     *
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
+     *
+     * @since Servlet 4.0
+     */
+    public String getRequestCharacterEncoding();
+
+    /**
+     * Set the default character encoding to use for reading request bodies.
+     * Calling this method will over-ride any value set in the deployment
+     * descriptor.
+     *
+     * @param encoding The name of the character encoding to use
+     *
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
+     * @throws IllegalStateException If the ServletContext has already been
+     *         initialised
+     *
+     * @since Servlet 4.0
+     */
+    public void setRequestCharacterEncoding(String encoding);
+
+    /**
+     * Get the default character encoding for writing response bodies.
+     *
+     * @return The character encoding name or {@code null} if no default has
+     *         been specified
+     *
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
+     *
+     * @since Servlet 4.0
+     */
+    public String getResponseCharacterEncoding();
+
+    /**
+     * Set the default character encoding to use for writing response bodies.
+     * Calling this method will over-ride any value set in the deployment
+     * descriptor.
+     *
+     * @param encoding The name of the character encoding to use
+     *
+     * @throws UnsupportedOperationException    If called from a
+     *    {@link ServletContextListener#contextInitialized(ServletContextEvent)}
+     *    method of a {@link ServletContextListener} that was not defined in a
+     *    web.xml file, a web-fragment.xml file nor annotated with
+     *    {@link javax.servlet.annotation.WebListener}. For example, a
+     *    {@link ServletContextListener} defined in a TLD would not be able to
+     *    use this method.
+     * @throws IllegalStateException If the ServletContext has already been
+     *         initialised
+     *
+     * @since Servlet 4.0
+     */
+    public void setResponseCharacterEncoding(String encoding);
 }

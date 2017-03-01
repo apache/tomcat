@@ -556,7 +556,17 @@ public class Response implements HttpServletResponse {
      */
     @Override
     public String getCharacterEncoding() {
-        return (getCoyoteResponse().getCharacterEncoding());
+        String result = getCoyoteResponse().getCharacterEncoding();
+        if (result == null) {
+            Context context = getContext();
+            if (context != null) {
+                result =  context.getResponseCharacterEncoding();
+            }
+        }
+        if (result == null) {
+            result = org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
+        }
+        return result;
     }
 
 
