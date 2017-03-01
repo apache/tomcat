@@ -27,6 +27,9 @@ import javax.xml.stream.XMLStreamReader;
 /*
  * The BoM detection is derived from:
  * http://svn.us.apache.org/viewvc/tomcat/trunk/java/org/apache/jasper/xmlparser/XMLEncodingDetector.java?annotate=1742248
+ *
+ * The prolog is always at least as specific as the BOM therefore any encoding
+ * specified in the prolog should take priority over the BOM.
  */
 class EncodingDetector {
 
@@ -35,8 +38,9 @@ class EncodingDetector {
         XML_INPUT_FACTORY = XMLInputFactory.newFactory();
     }
 
-    private final BomResult bomResult;
-    private final String prologEncoding;
+    private final String encoding;
+    private final int skip;
+    private final boolean encodingSpecifiedInProlog;
 
 
     /*
@@ -50,7 +54,7 @@ class EncodingDetector {
         BufferedInputStream bis = new BufferedInputStream(is, 4);
         bis.mark(4);
 
-        bomResult = processBom(bis);
+        BomResult bomResult = processBom(bis);
 
         // Reset the stream back to the start to allow the XML prolog detection
         // to work. Skip any BoM we discovered.
@@ -59,22 +63,30 @@ class EncodingDetector {
             is.read();
         }
 
-        prologEncoding = getPrologEncoding(bis);
+        String prologEncoding = getPrologEncoding(bis);
+        if (prologEncoding == null) {
+            encodingSpecifiedInProlog = false;
+            encoding = bomResult.encoding;
+        } else {
+            encodingSpecifiedInProlog = true;
+            encoding = prologEncoding;
+        }
+        skip = bomResult.skip;
     }
 
 
-    String getBomEncoding() {
-        return bomResult.encoding;
+    String getEncoding() {
+        return encoding;
     }
 
 
     int getSkip() {
-        return bomResult.skip;
+        return skip;
     }
 
 
-    String getPrologEncoding() {
-        return prologEncoding;
+    boolean isEncodingSpecifiedInProlog() {
+        return encodingSpecifiedInProlog;
     }
 
 

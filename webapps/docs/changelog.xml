@@ -199,6 +199,12 @@
         Refactor code generated for JSPs to reduce the size of the code required
         for tags. (markt)
       </fix>
+      <fix>
+        <bug>60769</bug>: Correct a regression in the XML encoding detection
+        refactoring carried out for 8.5.10 that incorrectly always used the
+        detected BOM encoding in preference to any encoding specified in the
+        prolog. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

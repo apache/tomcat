@@ -40,7 +40,7 @@ public class TestJspCServletContext {
         Assert.assertTrue(jspConfigDescriptor.getTaglibs().isEmpty());
         Collection<JspPropertyGroupDescriptor> propertyGroups =
                 jspConfigDescriptor.getJspPropertyGroups();
-        Assert.assertEquals(2, propertyGroups.size());
+        Assert.assertEquals(4, propertyGroups.size());
         Iterator<JspPropertyGroupDescriptor> groupIterator =
                 propertyGroups.iterator();
         JspPropertyGroupDescriptor groupDescriptor;

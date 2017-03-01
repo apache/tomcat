@@ -57,6 +57,8 @@ public class TestEncodingDetector extends TomcatBaseTest {
         result.add(new Object[] { "bom-utf16le-prolog-utf16be.jspx", Integer.valueOf(500), null });
         result.add(new Object[] { "bom-utf16le-prolog-utf16le.jspx", Integer.valueOf(200), Boolean.TRUE });
         result.add(new Object[] { "bom-utf16le-prolog-utf8.jspx",    Integer.valueOf(500), null });
+        result.add(new Object[] { "bug60769a.jspx",    Integer.valueOf(500), null });
+        result.add(new Object[] { "bug60769b.jspx",    Integer.valueOf(200), Boolean.TRUE });
         return result;
     }
 
