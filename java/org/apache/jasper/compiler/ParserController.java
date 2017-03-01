@@ -321,7 +321,7 @@ class ParserController implements TagConstants {
             InputStream inStream = JspUtil.getInputStream(absFileName, jar, ctxt);
             EncodingDetector encodingDetector = new EncodingDetector(inStream);
 
-            sourceEnc = encodingDetector.getBomEncoding();
+            sourceEnc = encodingDetector.getEncoding();
             isEncodingSpecifiedInProlog = encodingDetector.isEncodingSpecifiedInProlog();
             isBomPresent = (encodingDetector.getSkip() > 0);
             skip = encodingDetector.getSkip();
