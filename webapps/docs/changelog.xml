@@ -253,6 +253,11 @@
         Update the packaged version of the Tomcat Native Library to 1.2.12 to
         pick up the latest Windows binaries built with OpenSSL 1.0.2k. (violetagg)
       </update>
+      <add>
+        <bug>60784</bug>: Update all unit tests that test the HTTP status line
+        to check for the required space after the status code. Patch provided by
+        Michael Osipov. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
