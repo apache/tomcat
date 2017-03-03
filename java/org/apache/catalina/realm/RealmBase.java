@@ -911,16 +911,12 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * Return <code>true</code> if the specified Principal has the specified
-     * security role, within the context of this Realm; otherwise return
-     * <code>false</code>.  This method or {@link #hasRoleInternal(Principal,
+     * {@inheritDoc}
+     *
+     * This method or {@link #hasRoleInternal(Principal,
      * String)} can be overridden by Realm implementations, but the default is
      * adequate when an instance of <code>GenericPrincipal</code> is used to
      * represent authenticated Principals from this Realm.
-     *
-     * @param wrapper   The servlet to which the current request is mapped
-     * @param principal Principal for whom the role is to be checked
-     * @param role      Security role to be checked
      */
     @Override
     public boolean hasRole(Wrapper wrapper, Principal principal, String role) {
@@ -952,15 +948,20 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * Return <code>true</code> if the specified Principal has the specified
-     * security role, within the context of this Realm; otherwise return
-     * <code>false</code>.  This method or {@link #hasRoleInternal(Principal,
+     * Check if the specified Principal has the specified
+     * security role, within the context of this Realm.
+     *
+     * This method or {@link #hasRoleInternal(Principal,
      * String)} can be overridden by Realm implementations, but the default is
      * adequate when an instance of <code>GenericPrincipal</code> is used to
      * represent authenticated Principals from this Realm.
      *
      * @param principal Principal for whom the role is to be checked
-     * @param role      Security role to be checked
+     * @param role Security role to be checked
+     *
+     * @return <code>true</code> if the specified Principal has the specified
+     *         security role, within the context of this Realm; otherwise return
+     *         <code>false</code>.
      */
     protected boolean hasRoleInternal(Principal principal, String role) {
         // Should be overridden in JAASRealm - to avoid pretty inefficient conversions
