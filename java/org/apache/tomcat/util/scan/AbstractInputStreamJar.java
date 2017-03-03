@@ -93,6 +93,10 @@ public abstract class AbstractInputStreamJar implements Jar {
         if (entry == null) {
             return null;
         } else {
+            // Clear the entry so that multiple calls to this method for the
+            // same entry will result in a new InputStream for each call
+            // (BZ 60798)
+            entry = null;
             return jarInputStream;
         }
     }
