@@ -49,6 +49,12 @@ public interface PushBuilder {
      * @param method The method to use for the push request
      *
      * @return This builder instance
+     *
+     * @throws IllegalArgumentException if an HTTP method is specified that is
+     *         known not to be <a
+     *         href="https://tools.ietf.org/html/rfc7540#section-8.2">cacheable
+     *         and safe</a>. POST, PUT, DELETE, CONNECT, OPTIONS and TRACE will
+     *         trigger the exception.
      */
     PushBuilder method(String method);
 
