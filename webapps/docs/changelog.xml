@@ -48,6 +48,11 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>60469</bug>: Refactor <code>RealmBase</code> for better code re-use
+        when implementing Realms that use a custom <code>Principal</code>.
+        (markt)
+      </fix>
+      <fix>
         <bug>60490</bug>: Various formatting and layout improvements for the
         <code>ErrorReportValve</code>. Patch provided by Michael Osipov. (markt)
       </fix>
