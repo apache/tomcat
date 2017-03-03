@@ -16,8 +16,12 @@
  */
 package org.apache.catalina.util;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.BiFunction;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -172,6 +176,22 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
 
 
     /**
+     * {@inheritDoc}
+     *
+     * @exception IllegalStateException if this map is currently locked
+     */
+    @Override
+    public V putIfAbsent(K key, V value) {
+
+        if (locked)
+            throw new IllegalStateException
+                (sm.getString("parameterMap.locked"));
+        return (super.putIfAbsent(key, value));
+
+    }
+
+
+    /**
      * Copy all of the mappings from the specified map to this one.  These
      * mappings replace any mappings that this map had for any of the keys
      * currently in the specified Map.
@@ -187,6 +207,22 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
             throw new IllegalStateException
                 (sm.getString("parameterMap.locked"));
         super.putAll(map);
+
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * @exception IllegalStateException if this map is currently locked
+     */
+    @Override
+    public V merge(K key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
+
+        if (locked)
+            throw new IllegalStateException
+                (sm.getString("parameterMap.locked"));
+        return super.merge(key, value, remappingFunction);
 
     }
 
@@ -212,4 +248,124 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
     }
 
 
+    /**
+     * {@inheritDoc}
+     *
+     * @exception IllegalStateException if this map is currently locked
+     */
+    @Override
+    public boolean remove(Object key, Object value) {
+
+        if (locked)
+            throw new IllegalStateException
+                (sm.getString("parameterMap.locked"));
+        return (super.remove(key, value));
+
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * @exception IllegalStateException if this map is currently locked
+     */
+    @Override
+    public V replace(K key, V value) {
+
+        if (locked)
+            throw new IllegalStateException
+                (sm.getString("parameterMap.locked"));
+        return (super.replace(key, value));
+
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * @exception IllegalStateException if this map is currently locked
+     */
+    @Override
+    public boolean replace(K key, V oldValue, V newValue) {
+
+        if (locked)
+            throw new IllegalStateException
+                (sm.getString("parameterMap.locked"));
+        return (super.replace(key, oldValue, newValue));
+
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * @exception IllegalStateException if this map is currently locked
+     */
+    @Override
+    public void replaceAll(BiFunction<? super K, ? super V, ? extends V> function) {
+
+        if (locked)
+            throw new IllegalStateException
+                (sm.getString("parameterMap.locked"));
+        super.replaceAll(function);
+
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <P>
+     * <EM>NOTE:<EM> If this map is currently locked, it returns an <STRONG>unmodifiable</STRONG> {@link Set} view
+     * of the keys instead.
+     * </P>
+     *
+     * @return a set view of the keys contained in this map
+     */
+    @Override
+    public Set<K> keySet() {
+
+        if (locked)
+            return Collections.unmodifiableSet(super.keySet());
+
+        return super.keySet();
+
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <P>
+     * <EM>NOTE:<EM> If this map is currently locked, it returns an <STRONG>unmodifiable</STRONG> {@link Collection}
+     * view of the values instead.
+     * </P>
+     *
+     * @return a collection view of the values contained in this map
+     */
+    @Override
+    public Collection<V> values() {
+
+        if (locked)
+            return Collections.unmodifiableCollection(super.values());
+
+        return super.values();
+
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <P>
+     * <EM>NOTE:<EM> If this map is currently locked, it returns an <STRONG>unmodifiable</STRONG> {@link Set} view
+     * of the mappings instead.
+     * </P>
+     */
+    @Override
+    public Set<Map.Entry<K, V>> entrySet() {
+
+        if (locked)
+            return Collections.unmodifiableSet(super.entrySet());
+
+        return super.entrySet();
+
+    }
 }
