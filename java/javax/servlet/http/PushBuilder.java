@@ -55,7 +55,6 @@ public interface PushBuilder {
      *         href="https://tools.ietf.org/html/rfc7540#section-8.2">cacheable
      *         and safe</a>. POST, PUT, DELETE, CONNECT, OPTIONS and TRACE will
      *         trigger the exception.
-     *
      */
     PushBuilder method(String method);
 
