@@ -912,30 +912,32 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     /**
      * Return <code>true</code> if the specified Principal has the specified
      * security role, within the context of this Realm; otherwise return
-     * <code>false</code>.  This method can be overridden by Realm
-     * implementations, but the default is adequate when an instance of
-     * <code>GenericPrincipal</code> is used to represent authenticated
-     * Principals from this Realm.
+     * <code>false</code>.  This method or {@link #hasRoleInternal(Principal,
+     * String)} can be overridden by Realm implementations, but the default is
+     * adequate when an instance of <code>GenericPrincipal</code> is used to
+     * represent authenticated Principals from this Realm.
      *
+     * @param wrapper   The servlet to which the current request is mapped
      * @param principal Principal for whom the role is to be checked
-     * @param role Security role to be checked
+     * @param role      Security role to be checked
      */
     @Override
     public boolean hasRole(Wrapper wrapper, Principal principal, String role) {
         // Check for a role alias defined in a <security-role-ref> element
         if (wrapper != null) {
             String realRole = wrapper.findSecurityReference(role);
-            if (realRole != null)
+            if (realRole != null) {
                 role = realRole;
+            }
         }
 
         // Should be overridden in JAASRealm - to avoid pretty inefficient conversions
-        if ((principal == null) || (role == null) ||
-            !(principal instanceof GenericPrincipal))
+        if (principal == null || role == null) {
             return false;
+        }
 
-        GenericPrincipal gp = (GenericPrincipal) principal;
-        boolean result = gp.hasRole(role);
+        boolean result = hasRoleInternal(principal, role);
+
         if (log.isDebugEnabled()) {
             String name = principal.getName();
             if (result)
@@ -943,8 +945,30 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             else
                 log.debug(sm.getString("realmBase.hasRoleFailure", name, role));
         }
-        return (result);
 
+        return result;
+    }
+
+
+    /**
+     * Return <code>true</code> if the specified Principal has the specified
+     * security role, within the context of this Realm; otherwise return
+     * <code>false</code>.  This method or {@link #hasRoleInternal(Principal,
+     * String)} can be overridden by Realm implementations, but the default is
+     * adequate when an instance of <code>GenericPrincipal</code> is used to
+     * represent authenticated Principals from this Realm.
+     *
+     * @param principal Principal for whom the role is to be checked
+     * @param role      Security role to be checked
+     */
+    protected boolean hasRoleInternal(Principal principal, String role) {
+        // Should be overridden in JAASRealm - to avoid pretty inefficient conversions
+        if (!(principal instanceof GenericPrincipal)) {
+            return false;
+        }
+
+        GenericPrincipal gp = (GenericPrincipal) principal;
+        return gp.hasRole(role);
     }
 
 
