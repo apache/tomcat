@@ -770,6 +770,10 @@ public abstract class SocketWrapperBase<E> {
          */
         PENDING,
         /**
+         * Operation was pending and non blocking.
+         */
+        NOT_DONE,
+        /**
          * The operation completed inline.
          */
         INLINE,
