@@ -90,6 +90,11 @@
         event was not being fired and an entry wasn't being made in the access
         logs. (markt)
       </fix>
+      <fix>
+        <bug>60808</bug>: Ensure that the <code>Map</code> returned by
+        <code>ServletRequest.getParameterMap()</code> is fully immutable. Based
+        on a patch provided by woosan. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
