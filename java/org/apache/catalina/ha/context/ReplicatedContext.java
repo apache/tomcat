@@ -55,10 +55,9 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
      */
     @Override
     protected synchronized void startInternal() throws LifecycleException {
-
+        super.startInternal();
         try {
             CatalinaCluster catclust = (CatalinaCluster)this.getCluster();
-            if (this.context == null) this.context = new ReplApplContext(this);
             if ( catclust != null ) {
                 ReplicatedMap<String,Object> map =
                         new ReplicatedMap<String,Object>(this,
@@ -66,9 +65,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
                                 getName(),getClassLoaders());
                 map.setChannelSendOptions(mapSendOptions);
                 ((ReplApplContext)this.context).setAttributeMap(map);
-                if (getAltDDName() != null) context.setAttribute(Globals.ALT_DD_ATTR, getAltDDName());
             }
-            super.startInternal();
         }  catch ( Exception x ) {
             log.error("Unable to start ReplicatedContext",x);
             throw new LifecycleException("Failed to start ReplicatedContext",x);
