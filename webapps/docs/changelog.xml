@@ -188,6 +188,11 @@
         Ensure the ASF logo image is correctly displayed in docs and
         host-manager applications. (violetagg)
       </fix>
+      <fix>
+        <bug>60824</bug>: Correctly cache the <code>Subject</code> in the
+        session - if there is a session - when running under a
+        <code>SecurityManager</code>. Patch provided by Jan Engehausen. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
