@@ -225,6 +225,11 @@
         <code>accessTimeout</code> is used as a timeout period for PING in
         replication map. (kfujino)
       </add>
+      <fix>
+        <bug>60806</bug>: To avoid <code>ClassNotFoundException</code>, make
+        sure that the web application class loader is passed to
+        <code>ReplicatedContext</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
