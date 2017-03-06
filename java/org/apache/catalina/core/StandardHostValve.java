@@ -123,7 +123,7 @@ final class StandardHostValve extends ValveBase {
         try {
             context.bind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
 
-            if (!asyncAtStart && !context.fireRequestInitEvent(request)) {
+            if (!asyncAtStart && !context.fireRequestInitEvent(request.getRequest())) {
                 // Don't fire listeners during async processing (the listener
                 // fired for the request that called startAsync()).
                 // If a request init listener throws an exception, the request
@@ -179,7 +179,7 @@ final class StandardHostValve extends ValveBase {
             }
 
             if (!request.isAsync() && !asyncAtStart) {
-                context.fireRequestDestroyEvent(request);
+                context.fireRequestDestroyEvent(request.getRequest());
             }
         } finally {
             // Access a session (if present) to update last accessed time, based
