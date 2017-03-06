@@ -16,13 +16,17 @@
  */
 package org.apache.catalina.util;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Extended implementation of <strong>HashMap</strong> that includes a
+ * Implementation of <strong>java.util.Map</strong> that includes a
  * <code>locked</code> property.  This class can be used to safely expose
  * Catalina internal parameter map objects to user classes without having
  * to clone them in order to avoid modifications.  When first created, a
@@ -33,20 +37,22 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
-public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
+public final class ParameterMap<K,V> implements Map<K,V>, Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
+
+    private final Map<K,V> delegatedMap;
+
+    private final Map<K,V> unmodifiableDelegatedMap;
 
 
-    // ----------------------------------------------------------- Constructors
     /**
      * Construct a new, empty map with the default initial capacity and
      * load factor.
      */
     public ParameterMap() {
-
-        super();
-
+        delegatedMap = new LinkedHashMap<>();
+        unmodifiableDelegatedMap = Collections.unmodifiableMap(delegatedMap);
     }
 
 
@@ -57,9 +63,8 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
      * @param initialCapacity The initial capacity of this map
      */
     public ParameterMap(int initialCapacity) {
-
-        super(initialCapacity);
-
+        delegatedMap = new LinkedHashMap<>(initialCapacity);
+        unmodifiableDelegatedMap = Collections.unmodifiableMap(delegatedMap);
     }
 
 
@@ -71,9 +76,8 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
      * @param loadFactor The load factor of this map
      */
     public ParameterMap(int initialCapacity, float loadFactor) {
-
-        super(initialCapacity, loadFactor);
-
+        delegatedMap = new LinkedHashMap<>(initialCapacity, loadFactor);
+        unmodifiableDelegatedMap = Collections.unmodifiableMap(delegatedMap);
     }
 
 
@@ -83,13 +87,9 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
      * @param map Map whose contents are duplicated in the new map
      */
     public ParameterMap(Map<K,V> map) {
-
-        super(map);
-
+        delegatedMap = new LinkedHashMap<>(map);
+        unmodifiableDelegatedMap = Collections.unmodifiableMap(delegatedMap);
     }
-
-
-    // ------------------------------------------------------------- Properties
 
 
     /**
@@ -102,9 +102,7 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
      * @return the locked state of this parameter map.
      */
     public boolean isLocked() {
-
-        return (this.locked);
-
+        return locked;
     }
 
 
@@ -114,102 +112,145 @@ public final class ParameterMap<K,V> extends LinkedHashMap<K,V> {
      * @param locked The new locked state
      */
     public void setLocked(boolean locked) {
-
         this.locked = locked;
-
     }
 
 
     /**
      * The string manager for this package.
      */
-    private static final StringManager sm =
-        StringManager.getManager("org.apache.catalina.util");
-
-
-    // --------------------------------------------------------- Public Methods
-
+    private static final StringManager sm = StringManager.getManager("org.apache.catalina.util");
 
 
     /**
-     * Remove all mappings from this map.
+     * {@inheritDoc}
      *
      * @exception IllegalStateException if this map is currently locked
      */
     @Override
     public void clear() {
-
-        if (locked)
-            throw new IllegalStateException
-                (sm.getString("parameterMap.locked"));
-        super.clear();
-
+        checkLocked();
+        delegatedMap.clear();
     }
 
 
     /**
-     * Associate the specified value with the specified key in this map.  If
-     * the map previously contained a mapping for this key, the old value is
-     * replaced.
-     *
-     * @param key Key with which the specified value is to be associated
-     * @param value Value to be associated with the specified key
-     *
-     * @return The previous value associated with the specified key, or
-     *  <code>null</code> if there was no mapping for key
+     * {@inheritDoc}
      *
      * @exception IllegalStateException if this map is currently locked
      */
     @Override
     public V put(K key, V value) {
-
-        if (locked)
-            throw new IllegalStateException
-                (sm.getString("parameterMap.locked"));
-        return (super.put(key, value));
-
+        checkLocked();
+        return delegatedMap.put(key, value);
     }
 
 
     /**
-     * Copy all of the mappings from the specified map to this one.  These
-     * mappings replace any mappings that this map had for any of the keys
-     * currently in the specified Map.
-     *
-     * @param map Mappings to be stored into this map
+     * {@inheritDoc}
      *
      * @exception IllegalStateException if this map is currently locked
      */
     @Override
     public void putAll(Map<? extends K,? extends V> map) {
-
-        if (locked)
-            throw new IllegalStateException
-                (sm.getString("parameterMap.locked"));
-        super.putAll(map);
-
+        checkLocked();
+        delegatedMap.putAll(map);
     }
 
 
     /**
-     * Remove the mapping for this key from the map if present.
-     *
-     * @param key Key whose mapping is to be removed from the map
-     *
-     * @return The previous value associated with the specified key, or
-     *  <code>null</code> if there was no mapping for that key
+     * {@inheritDoc}
      *
      * @exception IllegalStateException if this map is currently locked
      */
     @Override
     public V remove(Object key) {
-
-        if (locked)
-            throw new IllegalStateException
-                (sm.getString("parameterMap.locked"));
-        return (super.remove(key));
-
+        checkLocked();
+        return delegatedMap.remove(key);
     }
 
 
+    private void checkLocked() {
+        if (locked) {
+            throw new IllegalStateException(sm.getString("parameterMap.locked"));
+        }
+    }
+
+
+    @Override
+    public int size() {
+        return delegatedMap.size();
+    }
+
+
+    @Override
+    public boolean isEmpty() {
+        return delegatedMap.isEmpty();
+    }
+
+
+    @Override
+    public boolean containsKey(Object key) {
+        return delegatedMap.containsKey(key);
+    }
+
+
+    @Override
+    public boolean containsValue(Object value) {
+        return delegatedMap.containsValue(value);
+    }
+
+
+    @Override
+    public V get(Object key) {
+        return delegatedMap.get(key);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns an <strong>unmodifiable</strong> {@link Set} view of the keys
+     * contained in this map if it is locked.
+     */
+    @Override
+    public Set<K> keySet() {
+        if (locked) {
+            return unmodifiableDelegatedMap.keySet();
+        }
+
+        return delegatedMap.keySet();
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns an <strong>unmodifiable</strong> {@link Collection} view of the
+     * values contained in this map if it is locked.
+     */
+    @Override
+    public Collection<V> values() {
+        if (locked) {
+            return unmodifiableDelegatedMap.values();
+        }
+
+        return delegatedMap.values();
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns an <strong>unmodifiable</strong> {@link Set} view of the mappings
+     * contained in this map if it is locked.
+     */
+    @Override
+    public Set<java.util.Map.Entry<K, V>> entrySet() {
+        if (locked) {
+            return unmodifiableDelegatedMap.entrySet();
+        }
+
+        return delegatedMap.entrySet();
+    }
 }
