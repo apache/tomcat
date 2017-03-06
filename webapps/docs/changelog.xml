@@ -71,6 +71,12 @@
         implementation when multiple threads are managing objects and need to
         reference the annotation cache. (markt)
       </fix>
+      <fix>
+        <bug>60623</bug>: When startStopThreads is 1 (or a special value that
+        is equivalent to 1) then rather than using an
+        <code>ExecutorService</code> to start the children of the current
+        component, the children will be started on the current thread. (markt)
+      </fix>
       <scode>
         <bug>60674</bug>: Remove <code>final</code> marker from
         <code>CorsFilter</code> to enable sub-classing. (markt)

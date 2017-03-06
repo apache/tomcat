@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadFactory;
@@ -65,6 +66,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.threads.InlineExecutorService;
 
 
 /**
@@ -276,7 +278,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * children associated with this container.
      */
     private int startStopThreads = 1;
-    protected ThreadPoolExecutor startStopExecutor;
+    protected ExecutorService startStopExecutor;
 
 
     // ------------------------------------------------------------- Properties
@@ -309,14 +311,12 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     @Override
     public void setStartStopThreads(int startStopThreads) {
+        int oldStartStopThreads = this.startStopThreads;
         this.startStopThreads = startStopThreads;
 
         // Use local copies to ensure thread safety
-        ThreadPoolExecutor executor = startStopExecutor;
-        if (executor != null) {
-            int newThreads = getStartStopThreadsInternal();
-            executor.setMaximumPoolSize(newThreads);
-            executor.setCorePoolSize(newThreads);
+        if (oldStartStopThreads != startStopThreads && startStopExecutor != null) {
+            reconfigureStartStopExecutor(getStartStopThreadsInternal());
         }
     }
 
@@ -893,14 +893,34 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     @Override
     protected void initInternal() throws LifecycleException {
-        BlockingQueue<Runnable> startStopQueue = new LinkedBlockingQueue<>();
-        startStopExecutor = new ThreadPoolExecutor(
-                getStartStopThreadsInternal(),
-                getStartStopThreadsInternal(), 10, TimeUnit.SECONDS,
-                startStopQueue,
-                new StartStopThreadFactory(getName() + "-startStop-"));
-        startStopExecutor.allowCoreThreadTimeOut(true);
+        reconfigureStartStopExecutor(getStartStopThreadsInternal());
         super.initInternal();
+    }
+
+
+    /*
+     * Implementation note: If there is a demand for more control than this then
+     * it is likely that the best solution will be to reference an external
+     * executor.
+     */
+    private void reconfigureStartStopExecutor(int threads) {
+        if (threads == 1) {
+            if (!(startStopExecutor instanceof InlineExecutorService)) {
+                startStopExecutor = new InlineExecutorService();
+            }
+        } else {
+            if (startStopExecutor instanceof ThreadPoolExecutor) {
+                ((ThreadPoolExecutor) startStopExecutor).setMaximumPoolSize(threads);
+                ((ThreadPoolExecutor) startStopExecutor).setCorePoolSize(threads);
+            } else {
+                BlockingQueue<Runnable> startStopQueue = new LinkedBlockingQueue<>();
+                ThreadPoolExecutor tpe = new ThreadPoolExecutor(threads, threads, 10,
+                        TimeUnit.SECONDS, startStopQueue,
+                        new StartStopThreadFactory(getName() + "-startStop-"));
+                tpe.allowCoreThreadTimeOut(true);
+                startStopExecutor = tpe;
+            }
+        }
     }
 
 

@@ -116,7 +116,9 @@
         Negative values will result in
         <code>Runtime.getRuntime().availableProcessors() + value</code> being
         used unless this is less than 1 in which case 1 thread will be used. If
-        not specified, the default value of 1 will be used. </p>
+        not specified, the default value of 1 will be used. If 1 thread is
+        used then rather than using an <code>ExecutorService</code> the current
+        thread will be used.</p>
       </attribute>
 
     </attributes>
