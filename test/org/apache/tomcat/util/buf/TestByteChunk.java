@@ -32,7 +32,7 @@ public class TestByteChunk {
 
     @Test
     public void testConvertToBytes() throws UnsupportedEncodingException {
-        String string = "HTTP/1.1 100 Continue\r\n";
+        String string = "HTTP/1.1 100 \r\n\r\n";
         byte[] bytes = ByteChunk.convertToBytes(string);
         byte[] expected = string.getBytes("ISO-8859-1");
         assertTrue(Arrays.equals(bytes, expected));

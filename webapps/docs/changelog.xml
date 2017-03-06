@@ -56,6 +56,11 @@
         <bug>60490</bug>: Various formatting and layout improvements for the
         <code>ErrorReportValve</code>. Patch provided by Michael Osipov. (markt)
       </fix>
+      <fix>
+        <bug>60573</bug>: Remove the reason phrase when sending a
+        <code>100</code> response status for consistency with other response
+        status lines. Patch provided by Michael Osipov. (markt)
+      </fix>
       <update>
         <bug>60596</bug>: Improve performance of DefaultServlet when sendfile
         feature is disabled on connector. (kkolinko)
