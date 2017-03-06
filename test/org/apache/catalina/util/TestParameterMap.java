@@ -37,7 +37,6 @@ public class TestParameterMap {
     private static final String[] TEST_PARAM_VALUES_2 = { "value2" };
     private static final String[] TEST_PARAM_VALUES_2_UPDATED = { "value2-updated" };
     private static final String[] TEST_PARAM_VALUES_3 = { "value3" };
-    private static final String[] TEST_PARAM_VALUES_REPLACED = { "replaced" };
 
     private Map<String, String[]> paramMap;
 
@@ -98,13 +97,6 @@ public class TestParameterMap {
         }
 
         try {
-            String[] updatedParamValues22 = new String[] { "value2-updated-2" };
-            paramMap.putIfAbsent("param22", updatedParamValues22);
-            Assert.fail("ParameterMap is not locked.");
-        } catch (IllegalStateException expectedException) {
-        }
-
-        try {
             final Map<String, String[]> additionalParams = new HashMap<>();
             additionalParams.put("param4", new String[] { "value4" });
             paramMap.putAll(additionalParams);
@@ -113,39 +105,9 @@ public class TestParameterMap {
         }
 
         try {
-            paramMap.merge("param2", new String[] { "value2-merged" }, (a, b) -> (b));
-            Assert.fail("ParameterMap is not locked.");
-        } catch (IllegalStateException expectedException) {
-        }
-
-        try {
             paramMap.remove("param2");
             Assert.fail("ParameterMap is not locked.");
         } catch (IllegalStateException expectedException) {
-        }
-
-        try {
-            paramMap.remove("param2", TEST_PARAM_VALUES_2_UPDATED);
-            Assert.fail("ParameterMap is not locked.");
-        } catch (IllegalStateException expectedException) {
-        }
-
-        try {
-            paramMap.replace("param2", new String[] { "value2-replaced" });
-            Assert.fail("ParameterMap is not locked.");
-        } catch (IllegalStateException expectedException) {
-        }
-
-        try {
-            paramMap.replace("param2", TEST_PARAM_VALUES_2_UPDATED, new String[] { "value2-replaced" });
-            Assert.fail("ParameterMap is not locked.");
-        } catch (IllegalStateException expectedException) {
-        }
-
-        try {
-            paramMap.replaceAll((a, b) -> TEST_PARAM_VALUES_REPLACED);
-            Assert.fail("ParameterMap is not locked.");
-        } catch (UnsupportedOperationException expectedException) {
         }
 
         try {
@@ -169,12 +131,6 @@ public class TestParameterMap {
 
         try {
             keySet.remove("param2");
-            Assert.fail("ParameterMap is not locked.");
-        } catch (UnsupportedOperationException expectedException) {
-        }
-
-        try {
-            keySet.removeIf((a) -> "param2".equals(a));
             Assert.fail("ParameterMap is not locked.");
         } catch (UnsupportedOperationException expectedException) {
         }
@@ -220,12 +176,6 @@ public class TestParameterMap {
 
         try {
             valuesCol.remove(TEST_PARAM_VALUES_1);
-            Assert.fail("ParameterMap is not locked.");
-        } catch (UnsupportedOperationException expectedException) {
-        }
-
-        try {
-            valuesCol.removeIf((a) -> true);
             Assert.fail("ParameterMap is not locked.");
         } catch (UnsupportedOperationException expectedException) {
         }
@@ -278,12 +228,6 @@ public class TestParameterMap {
         try {
             final Map.Entry<String, String[]> entry = entrySet.iterator().next();
             entrySet.remove(entry);
-            Assert.fail("ParameterMap is not locked.");
-        } catch (UnsupportedOperationException expectedException) {
-        }
-
-        try {
-            entrySet.removeIf((a) -> true);
             Assert.fail("ParameterMap is not locked.");
         } catch (UnsupportedOperationException expectedException) {
         }
