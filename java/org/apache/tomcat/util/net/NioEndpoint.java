@@ -215,7 +215,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             //minimum one poller thread
             pollerThreadCount = 1;
         }
-        stopLatch = new CountDownLatch(pollerThreadCount);
+        setStopLatch(new CountDownLatch(pollerThreadCount));
 
         // Initialize SSL if needed
         initialiseSsl();
@@ -280,7 +280,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 pollers[i] = null;
             }
             try {
-                stopLatch.await(selectorTimeout + 100, TimeUnit.MILLISECONDS);
+                getStopLatch().await(selectorTimeout + 100, TimeUnit.MILLISECONDS);
             } catch (InterruptedException ignore) {
             }
             shutdownExecutor();
@@ -323,6 +323,16 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
     public NioSelectorPool getSelectorPool() {
         return selectorPool;
+    }
+
+
+    protected CountDownLatch getStopLatch() {
+        return stopLatch;
+    }
+
+
+    protected void setStopLatch(CountDownLatch stopLatch) {
+        this.stopLatch = stopLatch;
     }
 
 
@@ -728,7 +738,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 timeout(keyCount,hasEvents);
             }//while
 
-            stopLatch.countDown();
+            getStopLatch().countDown();
         }
 
         protected void processKey(SelectionKey sk, NioSocketWrapper attachment) {

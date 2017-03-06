@@ -213,6 +213,11 @@
         attribute to avoid problems with Microsoft browsers that do not support
         the <code>Max-Age</code> attribute. (markt)
       </fix>
+      <fix>
+        <bug>60761</bug>: Expose a protected getter and setter for
+        <code>NioEndpoint.stopLatch</code> to make the class easier to extend.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
