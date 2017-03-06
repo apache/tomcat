@@ -157,6 +157,11 @@
         that meant multiple attempts to read the same entry from a JAR in
         succession would fail for the second and subsequent attempts. (markt)
       </fix>
+      <fix>
+        <bug>60808</bug>: Ensure that the <code>Map</code> returned by
+        <code>ServletRequest.getParameterMap()</code> is fully immutable. Based
+        on a patch provided by woosan. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
