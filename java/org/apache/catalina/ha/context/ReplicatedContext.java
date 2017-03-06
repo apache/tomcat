@@ -59,14 +59,12 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         super.startInternal();
         try {
             CatalinaCluster catclust = (CatalinaCluster)this.getCluster();
-            if (this.context == null) this.context = new ReplApplContext(this);
             if ( catclust != null ) {
                 ReplicatedMap<String,Object> map = new ReplicatedMap<>(
                         this, catclust.getChannel(),DEFAULT_REPL_TIMEOUT,
                         getName(),getClassLoaders());
                 map.setChannelSendOptions(mapSendOptions);
                 ((ReplApplContext)this.context).setAttributeMap(map);
-                if (getAltDDName() != null) context.setAttribute(Globals.ALT_DD_ATTR, getAltDDName());
             }
         }  catch ( Exception x ) {
             log.error(sm.getString("replicatedContext.startUnable", getName()),x);
