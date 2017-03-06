@@ -66,7 +66,7 @@ final class StandardHostValve extends ValveBase {
 
     static {
         STRICT_SERVLET_COMPLIANCE = Globals.STRICT_SERVLET_COMPLIANCE;
-        
+
         String accessSession = System.getProperty(
                 "org.apache.catalina.core.StandardHostValve.ACCESS_SESSION");
         if (accessSession == null) {
@@ -146,7 +146,7 @@ final class StandardHostValve extends ValveBase {
             if (Globals.IS_SECURITY_ENABLED) {
                 PrivilegedAction<Void> pa = new PrivilegedSetTccl(
                         context.getLoader().getClassLoader());
-                AccessController.doPrivileged(pa);                
+                AccessController.doPrivileged(pa);
             } else {
                 Thread.currentThread().setContextClassLoader
                         (context.getLoader().getClassLoader());
@@ -156,9 +156,9 @@ final class StandardHostValve extends ValveBase {
             request.setAsyncSupported(context.getPipeline().isAsyncSupported());
         }
 
-        boolean asyncAtStart = request.isAsync(); 
+        boolean asyncAtStart = request.isAsync();
         boolean asyncDispatching = request.isAsyncDispatching();
-        if (asyncAtStart || context.fireRequestInitEvent(request)) {
+        if (asyncAtStart || context.fireRequestInitEvent(request.getRequest())) {
 
             // Ask this Context to process this request. Requests that are in
             // async mode and are not being dispatched to this resource must be
@@ -197,7 +197,7 @@ final class StandardHostValve extends ValveBase {
             if (!context.getState().isAvailable()) {
                 return;
             }
-    
+
             // Look for (and render if found) an application level error page
             if (response.isErrorReportRequired()) {
                 if (t != null) {
@@ -208,7 +208,7 @@ final class StandardHostValve extends ValveBase {
             }
 
             if (!request.isAsync() && !asyncAtStart) {
-                context.fireRequestDestroyEvent(request);
+                context.fireRequestDestroyEvent(request.getRequest());
             }
         }
 
@@ -222,7 +222,7 @@ final class StandardHostValve extends ValveBase {
         if (Globals.IS_SECURITY_ENABLED) {
             PrivilegedAction<Void> pa = new PrivilegedSetTccl(
                     StandardHostValve.class.getClassLoader());
-            AccessController.doPrivileged(pa);                
+            AccessController.doPrivileged(pa);
         } else {
             Thread.currentThread().setContextClassLoader
                     (StandardHostValve.class.getClassLoader());
@@ -258,7 +258,7 @@ final class StandardHostValve extends ValveBase {
         // Ask this Context to process this request
         context.getPipeline().getFirst().event(request, response, event);
 
-        
+
         // Error page processing
         response.setSuspended(false);
 
@@ -469,7 +469,7 @@ final class StandardHostValve extends ValveBase {
 
             if (response.isCommitted()) {
                 // Response is committed - including the error page is the
-                // best we can do 
+                // best we can do
                 rd.include(request.getRequest(), response.getResponse());
             } else {
                 // Reset the response (keeping the real error code and message)

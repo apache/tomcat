@@ -135,7 +135,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 }
             }
         } finally {
-            context.fireRequestDestroyEvent(request);
+            context.fireRequestDestroyEvent(request.getRequest());
             clearServletRequestResponse();
             if (Globals.IS_SECURITY_ENABLED) {
                 PrivilegedAction<Void> pa = new PrivilegedSetTccl(oldCL);
