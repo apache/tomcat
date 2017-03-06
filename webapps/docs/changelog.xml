@@ -167,6 +167,10 @@
         session - if there is a session - when running under a
         <code>SecurityManager</code>. Patch provided by Jan Engehausen. (markt)
       </fix>
+      <fix>
+        Ensure request and response facades are used when firing application
+        listeners. (markt/remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
