@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.el.CompositeELResolver;
+import javax.el.ELContext;
 import javax.el.ELContextEvent;
 import javax.el.ELContextListener;
 import javax.el.ELResolver;
@@ -101,12 +102,16 @@ public class JspApplicationContextImpl implements JspApplicationContext {
         ctx.putContext(JspContext.class, context);
 
         // alert all ELContextListeners
-        ELContextEvent event = new ELContextEvent(ctx);
+        fireListeners(ctx);
+
+        return ctx;
+    }
+
+    protected void fireListeners(ELContext elContext) {
+        ELContextEvent event = new ELContextEvent(elContext);
         for (int i = 0; i < this.contextListeners.size(); i++) {
             this.contextListeners.get(i).contextCreated(event);
         }
-
-        return ctx;
     }
 
     private ELResolver createELResolver() {

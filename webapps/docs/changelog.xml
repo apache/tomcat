@@ -240,6 +240,11 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
+        Follow up to the fix for <bug>58178</bug>. When creating the
+        <code>ELContext</code> for a tag file, ensure that any registered
+        <code>ELContextListener</code>s are fired. (markt)
+      </fix>
+      <fix>
         Refactor code generated for JSPs to reduce the size of the code required
         for tags. (markt)
       </fix>

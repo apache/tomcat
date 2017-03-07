@@ -41,7 +41,9 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.jsp.JspApplicationContext;
 import javax.servlet.jsp.JspContext;
+import javax.servlet.jsp.JspFactory;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.el.ELException;
@@ -508,6 +510,11 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
     public ELContext getELContext() {
         if (elContext == null) {
             elContext = new ELContextWrapper(rootJspCtxt.getELContext(), jspTag, this);
+            JspFactory factory = JspFactory.getDefaultFactory();
+            JspApplicationContext jspAppCtxt = factory.getJspApplicationContext(servletContext);
+            if (jspAppCtxt instanceof JspApplicationContextImpl) {
+                ((JspApplicationContextImpl) jspAppCtxt).fireListeners(elContext);
+            }
         }
         return elContext;
     }

@@ -66,4 +66,20 @@ public class TestJspContextWrapper extends TomcatBaseTest {
         // Class import
         Assert.assertTrue(result, result.contains("02-" + Collections.EMPTY_LIST.size()));
     }
+
+    @Test
+    public void testELTagFileELContextListener() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk out = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug58178c.jsp", out, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String result = out.toString();
+
+        Assert.assertTrue(result, result.contains("JSP count: 1"));
+        Assert.assertTrue(result, result.contains("Tag count: 1"));
+    }
 }
