@@ -470,10 +470,6 @@ class Stream extends AbstractStream implements HeaderEmitter {
         } else {
             handler.closeConnection(http2Exception);
         }
-        // Reads wait internally so need to call a method to break the wait()
-        if (inputBuffer != null) {
-            inputBuffer.receiveReset();
-        }
     }
 
 

@@ -232,9 +232,6 @@
         <code>NioEndpoint.stopLatch</code> to make the class easier to extend.
         (markt)
       </fix>
-      <fix>
-        Blocking read unlock when a stream exception occurs with HTTP/2. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
