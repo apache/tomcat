@@ -307,6 +307,10 @@
         to check for the required space after the status code. Patch provided by
         Michael Osipov. (markt)
       </add>
+      <update>
+        Update the NSIS Installer used to build the Windows installer to version
+        3.01. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
