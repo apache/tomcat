@@ -243,6 +243,9 @@
         detected BOM encoding in preference to any encoding specified in the
         prolog. (markt)
       </fix>
+      <update>
+        Update to the Eclipse JDT Compiler 4.6.1. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Cluster">
@@ -307,6 +310,10 @@
         to check for the required space after the status code. Patch provided by
         Michael Osipov. (markt)
       </add>
+      <update>
+        Update the NSIS Installer used to build the Windows installer to version
+        3.01. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
@@ -839,13 +846,6 @@
         Add additional checks for valid characters to the HTTP request line
         parsing so invalid request lines are rejected sooner. (markt)
       </add>
-    </changelog>
-  </subsection>
-  <subsection name="Jasper">
-    <changelog>
-      <update>
-        Update to the Eclipse JDT Compiler 4.6.1. (markt)
-      </update>
     </changelog>
   </subsection>
   <subsection name="Web applications">
