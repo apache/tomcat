@@ -554,7 +554,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     @Override
     public void start() throws Exception {
         if (getLog().isInfoEnabled()) {
-            getLog().info(sm.getString("abstractProtocolHandler.start", getNameInternal()));
+            getLog().info(sm.getString("abstractProtocolHandler.start", getName()));
         }
 
         endpoint.start();
