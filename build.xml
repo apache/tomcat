@@ -2000,7 +2000,6 @@ skip.installer property in build.properties" />
   </target>
 
   <target name="-installer-prep"
-      description="Prepares file structure required to build installer"
       unless="skip.installer" depends="dist-static,-installer-init">
     <copy todir="${tomcat.dist}">
       <fileset dir="res">
@@ -2023,7 +2022,6 @@ skip.installer property in build.properties" />
   </target>
 
   <target name="-installer-create-tempinstaller"
-      description="Creates the temporary installer"
       unless="skip.installer" depends="-installer-prep">
     <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
       <arg value="/DUNINSTALLONLY" />
@@ -2041,7 +2039,6 @@ skip.installer property in build.properties" />
   </target>
 
   <target name="-installer-create-uninstaller"
-      description="Execute the temporary installer to create the uninstaller"
       unless="skip.installer" depends="-installer-create-tempinstaller">
     <!-- Execute the temporary installer to create the uninstaller -->
     <exec dir="${tomcat.dist}" executable="${tomcat.dist}/tempinstaller.exe"
@@ -2053,7 +2050,6 @@ skip.installer property in build.properties" />
   </target>
 
   <target name="-installer-sign-uninstaller"
-      description="Sign the uninstaller executable"
       unless="skip.installer" depends="-installer-create-uninstaller"
       if="${do.codesigning}">
     <taskdef name="signcode"
@@ -2070,8 +2066,8 @@ skip.installer property in build.properties" />
     </signcode>
   </target>
 
-  <target name="-installer" description="Builds the installer executable"
-      unless="skip.installer" depends="-installer-sign-uninstaller">
+  <target name="-installer" unless="skip.installer"
+      depends="-installer-sign-uninstaller">
     <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
       <arg value="/DNSISDIR=${nsis.home}" />
       <arg value="/V2" />
@@ -2087,7 +2083,8 @@ skip.installer property in build.properties" />
     <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe" />
   </target>
 
-  <target name="installer-sign" description="Builds and signs the Windows installer"
+  <target name="installer-sign"
+      description="Builds and optionally signs the Windows installer"
       depends="-installer" if="${do.codesigning}" >
     <taskdef name="signcode"
         classname="org.apache.tomcat.buildutil.SignCode"
