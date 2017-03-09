@@ -572,6 +572,10 @@
         Update the packaged version of the Tomcat Native Library to 1.2.10 to
         pick up the latest Windows binaries built with OpenSSL 1.0.2j. (markt)
       </update>
+      <update>
+        Update the NSIS Installer used to build the Windows installer to version
+        3.01. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
