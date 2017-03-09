@@ -45,6 +45,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.13 (markt)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Refactor the build script and the NSIS installer script so that either
+        NSIS 2.x or NSIS 3.x can be used to build the installer. This is
+        primarily to re-enable building the installer on the Linux based CI
+        system where the combination of NSIS 3.x and wine leads to failed
+        installer builds. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.12 (markt)">
   <subsection name="Catalina">

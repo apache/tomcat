@@ -157,8 +157,8 @@ Var ServiceInstallLog
   InstType Minimum
   InstType Full
 
-  ReserveFile "${NSISDIR}\Plugins\x86-unicode\System.dll"
-  ReserveFile "${NSISDIR}\Plugins\x86-unicode\nsDialogs.dll"
+  ReserveFile System.dll
+  ReserveFile nsDialogs.dll
   ReserveFile confinstall\tomcat-users_1.xml
   ReserveFile confinstall\tomcat-users_2.xml
 
