@@ -971,9 +971,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
         @Override
         public <A> CompletionState read(ByteBuffer[] dsts, int offset, int length,
-                boolean block, long timeout, TimeUnit unit, A attachment,
+                BlockingMode block, long timeout, TimeUnit unit, A attachment,
                 CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
-            if (block) {
+            if (block != BlockingMode.NON_BLOCK) {
                 try {
                     if (!readPending.tryAcquire(timeout, unit)) {
                         handler.failed(new SocketTimeoutException(), attachment);
@@ -992,7 +992,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             Nio2Endpoint.startInline();
             getSocket().read(dsts, offset, length, timeout, unit, state, new ScatterReadCompletionHandler<>());
             Nio2Endpoint.endInline();
-            if (block && state.state == CompletionState.PENDING) {
+            if (block == BlockingMode.BLOCK && state.state == CompletionState.PENDING) {
                 if (!awaitReadComplete(timeout, unit)) {
                     handler.failed(new SocketTimeoutException(), attachment);
                     return CompletionState.ERROR;
@@ -1010,9 +1010,9 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
         @Override
         public  <A> CompletionState write(ByteBuffer[] srcs, int offset, int length,
-                boolean block, long timeout, TimeUnit unit, A attachment,
+                BlockingMode block, long timeout, TimeUnit unit, A attachment,
                 CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
-            if (block) {
+            if (block != BlockingMode.NON_BLOCK) {
                 try {
                     if (!writePending.tryAcquire(timeout, unit)) {
                         handler.failed(new SocketTimeoutException(), attachment);
@@ -1031,7 +1031,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             Nio2Endpoint.startInline();
             getSocket().write(srcs, offset, length, timeout, unit, state, new GatherWriteCompletionHandler<>());
             Nio2Endpoint.endInline();
-            if (block && state.state == CompletionState.PENDING) {
+            if (block == BlockingMode.BLOCK && state.state == CompletionState.PENDING) {
                 if (!awaitWriteComplete(timeout, unit)) {
                     handler.failed(new SocketTimeoutException(), attachment);
                     return CompletionState.ERROR;
