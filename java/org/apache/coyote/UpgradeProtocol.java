@@ -70,13 +70,14 @@ public interface UpgradeProtocol {
 
 
     /**
+     * @param socketWrapper The socket
      * @param adapter The Adapter to use to configure the new upgrade handler
      * @param request A copy (may be incomplete) of the request that triggered
      *                the upgrade
      *
      * @return An instance of the HTTP upgrade handler for this protocol
      */
-    public InternalHttpUpgradeHandler getInternalUpgradeHandler(Adapter adapter, Request request);
+    public InternalHttpUpgradeHandler getInternalUpgradeHandler(SocketWrapperBase<?> socketWrapper, Adapter adapter, Request request);
 
 
     /**

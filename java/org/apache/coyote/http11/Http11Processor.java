@@ -455,7 +455,7 @@ public class Http11Processor extends AbstractProcessor {
 
                         InternalHttpUpgradeHandler upgradeHandler =
                                 upgradeProtocol.getInternalUpgradeHandler(
-                                        getAdapter(), cloneRequest(request));
+                                        socketWrapper, getAdapter(), cloneRequest(request));
                         UpgradeToken upgradeToken = new UpgradeToken(upgradeHandler, null, null);
                         action(ActionCode.UPGRADE, upgradeToken);
                         return SocketState.UPGRADING;

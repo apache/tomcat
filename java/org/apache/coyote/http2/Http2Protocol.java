@@ -92,15 +92,17 @@ public class Http2Protocol implements UpgradeProtocol {
     @Override
     public Processor getProcessor(SocketWrapperBase<?> socketWrapper, Adapter adapter) {
         UpgradeProcessorInternal processor = new UpgradeProcessorInternal(socketWrapper,
-                new UpgradeToken(getInternalUpgradeHandler(adapter, null), null, null));
+                new UpgradeToken(getInternalUpgradeHandler(socketWrapper, adapter, null), null, null));
         return processor;
     }
 
 
     @Override
-    public InternalHttpUpgradeHandler getInternalUpgradeHandler(Adapter adapter,
-            Request coyoteRequest) {
-        Http2UpgradeHandler result = new Http2UpgradeHandler(adapter, coyoteRequest);
+    public InternalHttpUpgradeHandler getInternalUpgradeHandler(SocketWrapperBase<?> socketWrapper,
+            Adapter adapter, Request coyoteRequest) {
+        Http2UpgradeHandler result = (socketWrapper.hasAsyncIO())
+                ? new Http2AsyncUpgradeHandler(adapter, coyoteRequest)
+                : new Http2UpgradeHandler(adapter, coyoteRequest);
 
         result.setReadTimeout(getReadTimeout());
         result.setKeepAliveTimeout(getKeepAliveTimeout());
