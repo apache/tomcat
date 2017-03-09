@@ -92,20 +92,20 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     protected static final byte[] GOAWAY = { 0x07, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-    protected static final String HTTP2_SETTINGS_HEADER = "HTTP2-Settings";
+    private static final String HTTP2_SETTINGS_HEADER = "HTTP2-Settings";
 
     private static final HeaderSink HEADER_SINK = new HeaderSink();
 
     protected final String connectionId;
 
-    protected final Adapter adapter;
+    private final Adapter adapter;
     protected volatile SocketWrapperBase<?> socketWrapper;
-    protected volatile SSLSupport sslSupport;
+    private volatile SSLSupport sslSupport;
 
-    protected volatile Http2Parser parser;
+    private volatile Http2Parser parser;
 
     // Simple state machine (sequence of states)
-    protected AtomicReference<ConnectionState> connectionState =
+    private AtomicReference<ConnectionState> connectionState =
             new AtomicReference<>(ConnectionState.NEW);
     private volatile long pausedNanoTime = Long.MAX_VALUE;
 
@@ -113,7 +113,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
      * Remote settings are settings defined by the client and sent to Tomcat
      * that Tomcat must use when communicating with the client.
      */
-    protected final ConnectionSettingsRemote remoteSettings;
+    private final ConnectionSettingsRemote remoteSettings;
     /**
      * Local settings are settings defined by Tomcat and sent to the client that
      * the client must use when communicating with Tomcat.
@@ -135,16 +135,16 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private volatile int maxActiveRemoteStreamId = -1;
     private volatile int maxProcessedStreamId;
     private final AtomicInteger nextLocalStreamId = new AtomicInteger(2);
-    protected final PingManager pingManager = getPingManager();
+    private final PingManager pingManager = getPingManager();
     private volatile int newStreamsSinceLastPrune = 0;
     // Tracking for when the connection is blocked (windowSize < 1)
     private final Map<AbstractStream,int[]> backLogStreams = new ConcurrentHashMap<>();
     private long backLogSize = 0;
 
     // Stream concurrency control
-    protected int maxConcurrentStreamExecution = Http2Protocol.DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION;
-    protected AtomicInteger streamConcurrency = null;
-    protected Queue<StreamRunnable> queuedRunnable = null;
+    private int maxConcurrentStreamExecution = Http2Protocol.DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION;
+    private AtomicInteger streamConcurrency = null;
+    private Queue<StreamRunnable> queuedRunnable = null;
 
     // Limits
     private Set<String> allowedTrailerHeaders = Collections.emptySet();
@@ -238,7 +238,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         } catch (Http2Exception e) {
             String msg = sm.getString("upgradeHandler.invalidPreface", connectionId);
             if (log.isDebugEnabled()) {
-                log.debug(msg, e);
+                log.debug(msg);
             }
             throw new ProtocolException(msg);
         }
@@ -258,7 +258,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
     }
 
-    protected void processStreamOnContainerThread(Stream stream) {
+    private void processStreamOnContainerThread(Stream stream) {
         StreamProcessor streamProcessor = new StreamProcessor(this, stream, adapter, socketWrapper);
         streamProcessor.setSslSupport(sslSupport);
         processStreamOnContainerThread(streamProcessor, SocketEvent.OPEN_READ);
@@ -935,7 +935,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    protected Stream getStream(int streamId, boolean unknownIsError) throws ConnectionException {
+    private Stream getStream(int streamId, boolean unknownIsError) throws ConnectionException {
         Integer key = Integer.valueOf(streamId);
         Stream result = streams.get(key);
         if (result == null && unknownIsError) {
@@ -1565,7 +1565,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             } else {
                 // Client originated ping. Echo it back.
                 synchronized (socketWrapper) {
-                    // FIXME: extract
                     socketWrapper.write(true, PING_ACK, 0, PING_ACK.length);
                     socketWrapper.write(true, payload, 0, payload.length);
                     socketWrapper.flush(true);
@@ -1599,7 +1598,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    protected enum ConnectionState {
+    private enum ConnectionState {
 
         NEW(true),
         CONNECTED(true),
