@@ -169,6 +169,17 @@
         to check for the required space after the status code. Patch provided by
         Michael Osipov. (markt)
       </add>
+      <update>
+        Update the NSIS Installer used to build the Windows installer to version
+        3.01. (markt)
+      </update>
+      <fix>
+        Refactor the build script and the NSIS installer script so that either
+        NSIS 2.x or NSIS 3.x can be used to build the installer. This is
+        primarily to re-enable building the installer on the Linux based CI
+        system where the combination of NSIS 3.x and wine leads to failed
+        installer builds. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
@@ -571,10 +582,6 @@
       <update>
         Update the packaged version of the Tomcat Native Library to 1.2.10 to
         pick up the latest Windows binaries built with OpenSSL 1.0.2j. (markt)
-      </update>
-      <update>
-        Update the NSIS Installer used to build the Windows installer to version
-        3.01. (markt)
       </update>
     </changelog>
   </subsection>
