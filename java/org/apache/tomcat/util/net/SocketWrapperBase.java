@@ -832,8 +832,8 @@ public abstract class SocketWrapperBase<E> {
         @Override
         public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
                 int offset, int length) {
-            for (int i = 0; i < offset; i++) {
-                if (buffers[i].remaining() > 0) {
+            for (int i = 0; i < length; i++) {
+                if (buffers[offset + i].remaining() > 0) {
                     return CompletionHandlerCall.CONTINUE;
                 }
             }
