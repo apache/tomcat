@@ -52,6 +52,13 @@
         <code>HttpHeaderSecurityFilter</code> for the HSTS preload parameter.
         (markt)
       </add>
+      <fix>
+        Correct a bug in the implementation of the Servlet 4.0 feature that
+        allows specifying a default request and/or response character encoding
+        per web application. <code>null</code> values passed via the
+        programmatic interface no longer trigger a
+        <code>NullPointerException</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

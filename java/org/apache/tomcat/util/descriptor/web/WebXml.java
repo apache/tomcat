@@ -615,7 +615,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
         return requestEncoding;
     }
     public void setRequestEncoding(String requestEncoding) {
-        if (requestEncoding == null) {
+        if (requestEncoding != null) {
             try {
                 B2CConverter.getCharset(requestEncoding);
             } catch (UnsupportedEncodingException e) {
@@ -630,7 +630,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
         return responseEncoding;
     }
     public void setResponseEncoding(String responseEncoding) {
-        if (responseEncoding == null) {
+        if (responseEncoding != null) {
             try {
                 B2CConverter.getCharset(responseEncoding);
             } catch (UnsupportedEncodingException e) {
