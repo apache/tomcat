@@ -899,6 +899,13 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         be used.</p>
       </attribute>
 
+      <attribute name="hstsPreload" required="false">
+        <p>Should the preload parameter be included in the HSTS header. If not
+        specified, the default value of <code>false</code> will be used. See
+        <a href="https://hstspreload.org/">https://hstspreload.org</a> for
+        important information about this parameter.</p>
+      </attribute>
+
       <attribute name="antiClickJackingEnabled" required="false">
         <p>Should the anti click-jacking header (<code>X-Frame-Options</code>)
         be set on the response. Any anti click-jacking header already present
