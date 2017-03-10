@@ -59,7 +59,7 @@ public class InlineExecutorService extends AbstractExecutorService {
             if (terminated) {
                 return true;
             }
-            this.wait(unit.toMillis(timeout));
+            lock.wait(unit.toMillis(timeout));
             return terminated;
         }
     }
@@ -77,7 +77,7 @@ public class InlineExecutorService extends AbstractExecutorService {
             taskRunning = false;
             if (shutdown) {
                 terminated = true;
-                this.notifyAll();
+                lock.notifyAll();
             }
         }
     }

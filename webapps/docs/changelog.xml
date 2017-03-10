@@ -59,6 +59,11 @@
         programmatic interface no longer trigger a
         <code>NullPointerException</code>. (markt)
       </fix>
+      <fix>
+        Correct a potential exception during shutdown when one or more
+        Containers are configured with a value of 1 for startStopThreads.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
