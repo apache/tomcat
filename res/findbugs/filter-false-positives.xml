@@ -1061,6 +1061,12 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <!-- Concrete Map type not affected -->
+    <Class name="org.apache.catalina.util.TestParameterMap" />
+    <Method name="testEntrySetImmutabilityAfterLocked" />
+    <Bug pattern="DMI_ENTRY_SETS_MAY_REUSE_ENTRY_OBJECTS" />
+  </Match>
+  <Match>
     <!-- Code is deliberately unused -->
     <Or>
       <Class name="org.apache.catalina.webresources.AbstractTestFileResourceSet" />
