@@ -137,7 +137,7 @@
       </scode>
       <fix>
         When HTTP TRACE requests are disabled on the Connector, ensure that the
-        HTTP OPTIONS response from custom the WebDAV servlet does not include
+        HTTP OPTIONS response from the WebDAV servlet does not include
         TRACE in the returned Allow header. (markt)
       </fix>
       <fix>
