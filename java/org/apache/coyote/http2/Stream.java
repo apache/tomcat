@@ -412,10 +412,10 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     void receivedEndOfStream() {
-        synchronized (inputBuffer) {
-            inputBuffer.notifyAll();
-        }
         state.receivedEndOfStream();
+        if (inputBuffer != null) {
+            inputBuffer.notifyEof();
+        }
     }
 
 
@@ -749,8 +749,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
             // Ensure that only one thread accesses inBuffer at a time
             synchronized (inBuffer) {
-                boolean canRead = isActive() && !isInputFinished();
-                while (inBuffer.position() == 0 && canRead) {
+                boolean canRead = false;
+                while (inBuffer.position() == 0 && (canRead = isActive() && !isInputFinished())) {
                     // Need to block until some data is written
                     try {
                         if (log.isDebugEnabled()) {
@@ -806,8 +806,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
             // Ensure that only one thread accesses inBuffer at a time
             synchronized (inBuffer) {
-                boolean canRead = isActive() && !isInputFinished();
-                while (inBuffer.position() == 0 && canRead) {
+                boolean canRead = false;
+                while (inBuffer.position() == 0 && (canRead = isActive() && !isInputFinished())) {
                     // Need to block until some data is written
                     try {
                         if (log.isDebugEnabled()) {
@@ -933,6 +933,14 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             if (inBuffer != null) {
                 synchronized (inBuffer) {
                     reset = true;
+                    inBuffer.notifyAll();
+                }
+            }
+        }
+
+        private final void notifyEof() {
+            if (inBuffer != null) {
+                synchronized (inBuffer) {
                     inBuffer.notifyAll();
                 }
             }
