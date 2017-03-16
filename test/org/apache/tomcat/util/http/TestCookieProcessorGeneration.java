@@ -182,12 +182,13 @@ public class TestCookieProcessorGeneration {
 
     @Test
     public void v1TestMaxAgePositive() {
-        doV1TestMaxAge(100, "foo=bar; Version=1; Max-Age=100", "foo=bar;Max-Age=100");
+        doV1TestMaxAge(100, "foo=bar; Version=1; Max-Age=100", "foo=bar; Max-Age=100");
     }
 
     @Test
     public void v1TestMaxAgeZero() {
-        doV1TestMaxAge(0, "foo=bar; Version=1; Max-Age=0", "foo=bar;Max-Age=0;Expires=Thu, 01-Jan-1970 00:00:10 GMT");
+        doV1TestMaxAge(0, "foo=bar; Version=1; Max-Age=0",
+                "foo=bar; Max-Age=0; Expires=Thu, 01-Jan-1970 00:00:10 GMT");
     }
 
     @Test
@@ -198,13 +199,13 @@ public class TestCookieProcessorGeneration {
     @Test
     public void v1TestDomainValid01() {
         doV1TestDomain("example.com", "foo=bar; Version=1; Domain=example.com",
-                "foo=bar;domain=example.com");
+                "foo=bar; Domain=example.com");
     }
 
     @Test
     public void v1TestDomainValid02() {
         doV1TestDomain("exa-mple.com", "foo=bar; Version=1; Domain=exa-mple.com",
-                "foo=bar;domain=exa-mple.com");
+                "foo=bar; Domain=exa-mple.com");
     }
 
     @Test
@@ -245,7 +246,7 @@ public class TestCookieProcessorGeneration {
     @Test
     public void v1TestPathValid() {
         doV1TestPath("/example", "foo=bar; Version=1; Path=/example",
-                "foo=bar;path=/example");
+                "foo=bar; Path=/example");
     }
 
     @Test

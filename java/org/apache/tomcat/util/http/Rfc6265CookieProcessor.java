@@ -120,7 +120,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
         int maxAge = cookie.getMaxAge();
         if (maxAge > -1) {
             // Negative Max-Age is equivalent to no Max-Age
-            header.append(";Max-Age=");
+            header.append("; Max-Age=");
             header.append(maxAge);
 
             // Microsoft IE and Microsoft Edge don't understand Max-Age so send
@@ -128,7 +128,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
             // browsers. See http://tomcat.markmail.org/thread/g6sipbofsjossacn
 
             // Wdy, DD-Mon-YY HH:MM:SS GMT ( Expires Netscape format )
-            header.append (";Expires=");
+            header.append ("; Expires=");
             // To expire immediately we need to set the time in past
             if (maxAge == 0) {
                 header.append(ANCIENT_DATE);
@@ -143,23 +143,23 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
         String domain = cookie.getDomain();
         if (domain != null && domain.length() > 0) {
             validateDomain(domain);
-            header.append(";domain=");
+            header.append("; Domain=");
             header.append(domain);
         }
 
         String path = cookie.getPath();
         if (path != null && path.length() > 0) {
             validatePath(path);
-            header.append(";path=");
+            header.append("; Path=");
             header.append(path);
         }
 
         if (cookie.getSecure()) {
-            header.append(";Secure");
+            header.append("; Secure");
         }
 
         if (cookie.isHttpOnly()) {
-            header.append(";HttpOnly");
+            header.append("; HttpOnly");
         }
 
         return header.toString();
