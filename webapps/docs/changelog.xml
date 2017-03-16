@@ -52,6 +52,11 @@
         <code>HttpHeaderSecurityFilter</code> for the HSTS preload parameter.
         (markt)
       </add>
+      <fix>
+        <bug>60876</bug>: Ensure that <code>Set-Cookie</code> headers generated
+        by the <code>Rfc6265CookieProcessor</code> are aligned with the
+        specification. Patch provided by Jim Griswold. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
