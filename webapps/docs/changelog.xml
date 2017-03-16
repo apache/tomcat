@@ -71,6 +71,9 @@
       <fix>
         Add async based IO groundwork for HTTP/2. (remm)
       </fix>
+      <fix>
+        Fix HTTP/2 incorrect input unblocking on EOF. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
