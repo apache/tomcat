@@ -57,6 +57,12 @@
         by the <code>Rfc6265CookieProcessor</code> are aligned with the
         specification. Patch provided by Jim Griswold. (markt)
       </fix>
+      <fix>
+        <bug>60882</bug>: Fix a <code>NullPointerException</code> when obtaining
+        a <code>RequestDispatcher</code> for a request that will not have any
+        pathInfo associated with it. This was a regression in the changes in
+        8.5.12 for the Servlet 4.0 API early preview changes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

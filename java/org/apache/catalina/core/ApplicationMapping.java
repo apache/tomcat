@@ -59,7 +59,13 @@ public class ApplicationMapping {
                                 "*" + path.substring(extIndex), mappingData.matchType, servletName);
                         break;
                     case PATH:
-                        mapping = new MappingImpl(mappingData.pathInfo.toString().substring(1),
+                        String matchValue;
+                        if (mappingData.pathInfo.isNull()) {
+                            matchValue = null;
+                        } else {
+                            matchValue = mappingData.pathInfo.toString().substring(1);
+                        }
+                        mapping = new MappingImpl(matchValue,
                                 mappingData.wrapperPath.toString() + "/*",
                                 mappingData.matchType, servletName);
                         break;

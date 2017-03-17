@@ -59,6 +59,16 @@ public class TestApplicationMapping extends TomcatBaseTest {
     }
 
     @Test
+    public void testContextNonRootMappingPathNone() throws Exception {
+        doTestMapping("/dummy", "/foo/bar/*", "/foo/bar", null, "PATH");
+    }
+
+    @Test
+    public void testContextNonRootMappingPathSeparatorOnly() throws Exception {
+        doTestMapping("/dummy", "/foo/bar/*", "/foo/bar/", "", "PATH");
+    }
+
+    @Test
     public void testContextNonRootMappingPath() throws Exception {
         doTestMapping("/dummy", "/foo/bar/*", "/foo/bar/foo2", "foo2", "PATH");
     }
