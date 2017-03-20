@@ -75,6 +75,10 @@
         pathInfo associated with it. This was a regression in the changes in
         9.0.0.M18 for the Servlet 4.0 API changes. (markt)
       </fix>
+      <update>
+        Align <code>PushBuilder</code> API with changes from Servlet expert
+        group. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
