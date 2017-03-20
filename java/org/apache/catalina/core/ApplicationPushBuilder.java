@@ -72,11 +72,8 @@ public class ApplicationPushBuilder implements PushBuilder {
     private final List<Cookie> cookies = new ArrayList<>();
     private String method = "GET";
     private String path;
-    private String eTag;
-    private String lastModified;
     private String queryString;
     private String sessionId;
-    private boolean conditional;
 
 
     public ApplicationPushBuilder(HttpServletRequest request) {
@@ -108,12 +105,8 @@ public class ApplicationPushBuilder implements PushBuilder {
 
         // Remove the headers
         headers.remove("if-match");
-        if (headers.remove("if-none-match") != null) {
-            conditional = true;
-        }
-        if (headers.remove("if-modified-since") != null) {
-            conditional = true;
-        }
+        headers.remove("if-none-match");
+        headers.remove("if-modified-since");
         headers.remove("if-unmodified-since");
         headers.remove("if-range");
         headers.remove("range");
@@ -228,32 +221,6 @@ public class ApplicationPushBuilder implements PushBuilder {
 
 
     @Override
-    public ApplicationPushBuilder eTag(String eTag) {
-        this.eTag = eTag;
-        return this;
-    }
-
-
-    @Override
-    public String getETag() {
-        return eTag;
-    }
-
-
-    @Override
-    public ApplicationPushBuilder lastModified(String lastModified) {
-        this.lastModified = lastModified;
-        return this;
-    }
-
-
-    @Override
-    public String getLastModified() {
-        return lastModified;
-    }
-
-
-    @Override
     public ApplicationPushBuilder queryString(String queryString) {
         this.queryString = queryString;
         return this;
@@ -276,19 +243,6 @@ public class ApplicationPushBuilder implements PushBuilder {
     @Override
     public String getSessionId() {
         return sessionId;
-    }
-
-
-    @Override
-    public ApplicationPushBuilder conditional(boolean conditional) {
-        this.conditional = conditional;
-        return this;
-    }
-
-
-    @Override
-    public boolean isConditional() {
-        return conditional;
     }
 
 
@@ -404,14 +358,6 @@ public class ApplicationPushBuilder implements PushBuilder {
             pushTarget.queryString().setString(pushQueryString + "&" +queryString);
         }
 
-        if (conditional) {
-            if (eTag != null) {
-                setHeader("if-none-match", eTag);
-            } else if (lastModified != null) {
-                setHeader("if-modified-since", lastModified);
-            }
-        }
-
         // Cookies
         setHeader("cookie", generateCookieHeader(cookies,
                 catalinaRequest.getContext().getCookieProcessor()));
@@ -421,8 +367,6 @@ public class ApplicationPushBuilder implements PushBuilder {
         // Reset for next call to this method
         pushTarget = null;
         path = null;
-        eTag = null;
-        lastModified = null;
         headers.remove("if-none-match");
         headers.remove("if-modified-since");
     }
