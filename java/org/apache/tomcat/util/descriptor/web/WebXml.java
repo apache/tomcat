@@ -610,34 +610,34 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
         return new JspConfigDescriptorImpl(descriptors, tlds);
     }
 
-    private String requestEncoding;
-    public String getRequestEncoding() {
-        return requestEncoding;
+    private String requestCharacterEncoding;
+    public String getRequestCharacterEncoding() {
+        return requestCharacterEncoding;
     }
-    public void setRequestEncoding(String requestEncoding) {
-        if (requestEncoding != null) {
+    public void setRequestCharacterEncoding(String requestCharacterEncoding) {
+        if (requestCharacterEncoding != null) {
             try {
-                B2CConverter.getCharset(requestEncoding);
+                B2CConverter.getCharset(requestCharacterEncoding);
             } catch (UnsupportedEncodingException e) {
                 throw new IllegalArgumentException(e);
             }
         }
-        this.requestEncoding = requestEncoding;
+        this.requestCharacterEncoding = requestCharacterEncoding;
     }
 
-    private String responseEncoding;
-    public String getResponseEncoding() {
-        return responseEncoding;
+    private String responseCharacterEncoding;
+    public String getResponseCharacterEncoding() {
+        return responseCharacterEncoding;
     }
-    public void setResponseEncoding(String responseEncoding) {
-        if (responseEncoding != null) {
+    public void setResponseCharacterEncoding(String responseCharacterEncoding) {
+        if (responseCharacterEncoding != null) {
             try {
-                B2CConverter.getCharset(responseEncoding);
+                B2CConverter.getCharset(responseCharacterEncoding);
             } catch (UnsupportedEncodingException e) {
                 throw new IllegalArgumentException(e);
             }
         }
-        this.responseEncoding = responseEncoding;
+        this.responseCharacterEncoding = responseCharacterEncoding;
     }
 
     // Attributes not defined in web.xml or web-fragment.xml
@@ -1353,8 +1353,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
 
         // request-encoding and response-encoding was introduced in Servlet 4.0
         if (getMajorVersion() >= 4) {
-            appendElement(sb, INDENT2, "request-encoding", requestEncoding);
-            appendElement(sb, INDENT2, "response-encoding", responseEncoding);
+            appendElement(sb, INDENT2, "request-character-encoding", requestCharacterEncoding);
+            appendElement(sb, INDENT2, "response-character-encoding", responseCharacterEncoding);
         }
         sb.append("</web-app>");
         return sb.toString();
@@ -1478,17 +1478,17 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
                 }
             }
         }
-        if (requestEncoding == null) {
+        if (requestCharacterEncoding == null) {
             for (WebXml fragment : fragments) {
-                if (fragment.getRequestEncoding() != null) {
-                    requestEncoding = fragment.getRequestEncoding();
+                if (fragment.getRequestCharacterEncoding() != null) {
+                    requestCharacterEncoding = fragment.getRequestCharacterEncoding();
                 }
             }
         }
-        if (responseEncoding == null) {
+        if (responseCharacterEncoding == null) {
             for (WebXml fragment : fragments) {
-                if (fragment.getResponseEncoding() != null) {
-                    responseEncoding = fragment.getResponseEncoding();
+                if (fragment.getResponseCharacterEncoding() != null) {
+                    responseCharacterEncoding = fragment.getResponseCharacterEncoding();
                 }
             }
         }

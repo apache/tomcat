@@ -76,8 +76,13 @@
         9.0.0.M18 for the Servlet 4.0 API changes. (markt)
       </fix>
       <update>
-        Align <code>PushBuilder</code> API with changes from Servlet expert
+        Align <code>PushBuilder</code> API with changes from the Servlet expert
         group. (markt)
+      </update>
+      <update>
+        Align web.xml parsing rules with changes from the Servlet expert group
+        for <code>&lt;request-character-encoding&gt;</code> and
+        <code>&lt;response-character-encoding&gt;</code>. (markt)
       </update>
     </changelog>
   </subsection>
