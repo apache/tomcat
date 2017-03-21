@@ -67,6 +67,7 @@ import javax.websocket.WebSocketContainer;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.res.StringManager;
@@ -628,21 +629,13 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
 
     private static void addHeader(ByteBuffer result, String key, List<String> values) {
-        StringBuilder sb = new StringBuilder();
-
-        Iterator<String> iter = values.iterator();
-        if (!iter.hasNext()) {
+        if (values.isEmpty()) {
             return;
-        }
-        sb.append(iter.next());
-        while (iter.hasNext()) {
-            sb.append(',');
-            sb.append(iter.next());
         }
 
         result.put(key.getBytes(StandardCharsets.ISO_8859_1));
         result.put(": ".getBytes(StandardCharsets.ISO_8859_1));
-        result.put(sb.toString().getBytes(StandardCharsets.ISO_8859_1));
+        result.put(StringUtils.join(values).getBytes(StandardCharsets.ISO_8859_1));
         result.put(crlf);
     }
 

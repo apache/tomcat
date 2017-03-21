@@ -115,6 +115,7 @@ import org.apache.tomcat.InstanceManagerBindings;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
 import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
@@ -1031,17 +1032,7 @@ public class StandardContext extends ContainerBase
 
     @Override
     public String getResourceOnlyServlets() {
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-        for (String servletName : resourceOnlyServlets) {
-            if (first) {
-                first = false;
-            } else {
-                result.append(',');
-            }
-            result.append(servletName);
-        }
-        return result.toString();
+        return StringUtils.join(resourceOnlyServlets);
     }
 
 

@@ -26,6 +26,8 @@ import org.apache.catalina.Group;
 import org.apache.catalina.Role;
 import org.apache.catalina.UserDatabase;
 import org.apache.catalina.util.RequestUtil;
+import org.apache.tomcat.util.buf.StringUtils;
+import org.apache.tomcat.util.buf.StringUtils.Function;
 
 /**
  * <p>Concrete implementation of {@link org.apache.catalina.User} for the
@@ -271,37 +273,29 @@ public class MemoryUser extends AbstractUser {
         synchronized (groups) {
             if (groups.size() > 0) {
                 sb.append(" groups=\"");
-                int n = 0;
-                Iterator<Group> values = groups.iterator();
-                while (values.hasNext()) {
-                    if (n > 0) {
-                        sb.append(',');
+                StringUtils.join(groups, ',', new Function<Group>() {
+                    @Override public String apply(Group t) {
+                        return RequestUtil.filter(t.getGroupname());
                     }
-                    n++;
-                    sb.append(RequestUtil.filter(values.next().getGroupname()));
-                }
+                }, sb);
                 sb.append("\"");
             }
         }
         synchronized (roles) {
             if (roles.size() > 0) {
                 sb.append(" roles=\"");
-                int n = 0;
-                Iterator<Role> values = roles.iterator();
-                while (values.hasNext()) {
-                    if (n > 0) {
-                        sb.append(',');
+                StringUtils.join(roles, ',', new Function<Role>() {
+                    @Override public String apply(Role t) {
+                        return RequestUtil.filter(t.getRolename());
                     }
-                    n++;
-                    sb.append(RequestUtil.filter(values.next().getRolename()));
-                }
+                }, sb);
                 sb.append("\"");
             }
         }
         sb.append("/>");
-        return (sb.toString());
-
+        return sb.toString();
     }
+
 
     /**
      * <p>Return a String representation of this user.</p>
@@ -320,35 +314,25 @@ public class MemoryUser extends AbstractUser {
         synchronized (groups) {
             if (groups.size() > 0) {
                 sb.append(", groups=\"");
-                int n = 0;
-                Iterator<Group> values = groups.iterator();
-                while (values.hasNext()) {
-                    if (n > 0) {
-                        sb.append(',');
+                StringUtils.join(groups, ',', new Function<Group>() {
+                    @Override public String apply(Group t) {
+                        return RequestUtil.filter(t.getGroupname());
                     }
-                    n++;
-                    sb.append(RequestUtil.filter(values.next().getGroupname()));
-                }
+                }, sb);
                 sb.append("\"");
             }
         }
         synchronized (roles) {
             if (roles.size() > 0) {
                 sb.append(", roles=\"");
-                int n = 0;
-                Iterator<Role> values = roles.iterator();
-                while (values.hasNext()) {
-                    if (n > 0) {
-                        sb.append(',');
+                StringUtils.join(roles, ',', new Function<Role>() {
+                    @Override public String apply(Role t) {
+                        return RequestUtil.filter(t.getRolename());
                     }
-                    n++;
-                    sb.append(RequestUtil.filter(values.next().getRolename()));
-                }
+                }, sb);
                 sb.append("\"");
             }
         }
-        return (sb.toString());
+        return sb.toString();
     }
-
-
 }

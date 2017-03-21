@@ -67,6 +67,11 @@
         Align <code>PushBuilder</code> API with changes from Servlet expert
         group. (markt)
       </update>
+      <scode>
+        Refactor the various implementations of X to comma separated list to a
+        single utility class and update the code to use the new utility class.
+        (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
