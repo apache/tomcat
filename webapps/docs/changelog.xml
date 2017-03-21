@@ -65,6 +65,10 @@
         (markt)
       </fix>
       <fix>
+        <bug>60853</bug>: Expose the <code>SSLHostConfig</code> and
+        <code>SSLHostConfigCertificate</code> objects via JMX. (markt)
+      </fix>
+      <fix>
         <bug>60876</bug>: Ensure that <code>Set-Cookie</code> headers generated
         by the <code>Rfc6265CookieProcessor</code> are aligned with the
         specification. Patch provided by Jim Griswold. (markt)

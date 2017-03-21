@@ -19,6 +19,7 @@ package org.apache.coyote;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,6 +43,8 @@ import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler;
+import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -72,6 +75,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      * Name of MBean for the ThreadPool.
      */
     protected ObjectName tpOname = null;
+
+
+    private Set<ObjectName> sslOnames = new HashSet<>();
+    private Set<ObjectName> sslCertOnames = new HashSet<>();
 
 
     /**
@@ -533,7 +540,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
         if (this.domain != null) {
             try {
-                tpOname = new ObjectName(domain + ":" + "type=ThreadPool,name=" + getName());
+                tpOname = new ObjectName(domain + ":type=ThreadPool,name=" + getName());
                 Registry.getRegistry(null, null).registerComponent(endpoint, tpOname, null);
             } catch (Exception e) {
                 getLog().error(sm.getString( "abstractProtocolHandler.mbeanRegistrationFailed",
@@ -542,6 +549,22 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             rgOname = new ObjectName(domain + ":type=GlobalRequestProcessor,name=" + getName());
             Registry.getRegistry(null, null).registerComponent(
                     getHandler().getGlobal(), rgOname, null);
+
+            for (SSLHostConfig sslHostConfig : getEndpoint().findSslHostConfigs()) {
+                ObjectName sslOname = new ObjectName(domain + ":type=SSLHostConfig,ThreadPool=" +
+                        getName() + ",name=" + sslHostConfig.getHostName());
+                Registry.getRegistry(null, null).registerComponent(sslHostConfig, sslOname, null);
+                sslOnames.add(sslOname);
+                for (SSLHostConfigCertificate sslHostConfigCert : sslHostConfig.getCertificates()) {
+                    ObjectName sslCertOname = new ObjectName(domain +
+                            ":type=SSLHostConfigCertificate,ThreadPool=" + getName() +
+                            ",Host=" + sslHostConfig.getHostName() +
+                            ",name=" + sslHostConfigCert.getType());
+                    Registry.getRegistry(null, null).registerComponent(
+                            sslHostConfigCert, sslCertOname, null);
+                    sslCertOnames.add(sslCertOname);
+                }
+            }
         }
 
         String endpointName = getName();
@@ -639,6 +662,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             }
             if (rgOname != null) {
                 Registry.getRegistry(null, null).unregisterComponent(rgOname);
+            }
+            for (ObjectName oname : sslOnames) {
+                Registry.getRegistry(null, null).unregisterComponent(oname);
+            }
+            for (ObjectName oname : sslCertOnames) {
+                Registry.getRegistry(null, null).unregisterComponent(oname);
             }
         }
     }
