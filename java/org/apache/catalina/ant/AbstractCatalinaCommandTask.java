@@ -21,8 +21,7 @@ import java.net.URLEncoder;
 
 import org.apache.tools.ant.BuildException;
 
-public abstract class AbstractCatalinaCommandTask extends
-        AbstractCatalinaTask {
+public abstract class AbstractCatalinaCommandTask extends AbstractCatalinaTask {
 
     /**
      * The context path of the web application we are managing.
@@ -30,7 +29,7 @@ public abstract class AbstractCatalinaCommandTask extends
     protected String path = null;
 
     public String getPath() {
-        return (this.path);
+        return this.path;
     }
 
     public void setPath(String path) {
@@ -43,12 +42,13 @@ public abstract class AbstractCatalinaCommandTask extends
     protected String version = null;
 
     public String getVersion() {
-        return (this.version);
+        return this.version;
     }
 
     public void setVersion(String version) {
         this.version = version;
     }
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -77,10 +77,8 @@ public abstract class AbstractCatalinaCommandTask extends
                 }
             }
         } catch (UnsupportedEncodingException e) {
-            throw new BuildException
-                ("Invalid 'charset' attribute: " + getCharset());
+            throw new BuildException("Invalid 'charset' attribute: " + getCharset());
         }
         return buffer;
     }
-
 }
