@@ -131,6 +131,10 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    // Expose in String form for JMX
+    public String getConfigType() {
+        return configType.name();
+    }
     public void setConfigType(Type configType) {
         this.configType = configType;
         if (configType == Type.EITHER) {
