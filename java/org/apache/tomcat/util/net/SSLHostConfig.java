@@ -250,6 +250,10 @@ public class SSLHostConfig implements Serializable {
     // TODO: This certificate setter can be removed once it is no longer
     // necessary to support the old configuration attributes (Tomcat 10?).
 
+    public String getCertificateKeyPassword() {
+        registerDefaultCertificate();
+        return defaultCertificate.getCertificateKeyPassword();
+    }
     public void setCertificateKeyPassword(String certificateKeyPassword) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeyPassword(certificateKeyPassword);
@@ -435,30 +439,50 @@ public class SSLHostConfig implements Serializable {
     // TODO: These certificate setters can be removed once it is no longer
     // necessary to support the old configuration attributes (Tomcat 10?).
 
+    public String getCertificateKeyAlias() {
+        registerDefaultCertificate();
+        return defaultCertificate.getCertificateKeyAlias();
+    }
     public void setCertificateKeyAlias(String certificateKeyAlias) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeyAlias(certificateKeyAlias);
     }
 
 
+    public String getCertificateKeystoreFile() {
+        registerDefaultCertificate();
+        return defaultCertificate.getCertificateKeystoreFile();
+    }
     public void setCertificateKeystoreFile(String certificateKeystoreFile) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeystoreFile(certificateKeystoreFile);
     }
 
 
+    public String getCertificateKeystorePassword() {
+        registerDefaultCertificate();
+        return defaultCertificate.getCertificateKeystorePassword();
+    }
     public void setCertificateKeystorePassword(String certificateKeystorePassword) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeystorePassword(certificateKeystorePassword);
     }
 
 
+    public String getCertificateKeystoreProvider() {
+        registerDefaultCertificate();
+        return defaultCertificate.getCertificateKeystoreProvider();
+    }
     public void setCertificateKeystoreProvider(String certificateKeystoreProvider) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeystoreProvider(certificateKeystoreProvider);
     }
 
 
+    public String getCertificateKeystoreType() {
+        registerDefaultCertificate();
+        return defaultCertificate.getCertificateKeystoreType();
+    }
     public void setCertificateKeystoreType(String certificateKeystoreType) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeystoreType(certificateKeystoreType);
@@ -644,18 +668,30 @@ public class SSLHostConfig implements Serializable {
     // TODO: These certificate setters can be removed once it is no longer
     // necessary to support the old configuration attributes (Tomcat 10?).
 
+    public String getCertificateChainFile() {
+        registerDefaultCertificate();
+        return defaultCertificate.getCertificateChainFile();
+    }
     public void setCertificateChainFile(String certificateChainFile) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateChainFile(certificateChainFile);
     }
 
 
+    public String getCertificateFile() {
+        registerDefaultCertificate();
+        return defaultCertificate.getCertificateFile();
+    }
     public void setCertificateFile(String certificateFile) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateFile(certificateFile);
     }
 
 
+    public String getCertificateKeyFile() {
+        registerDefaultCertificate();
+        return defaultCertificate.getCertificateKeyFile();
+    }
     public void setCertificateKeyFile(String certificateKeyFile) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeyFile(certificateKeyFile);
