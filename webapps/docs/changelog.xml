@@ -136,6 +136,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Refactor code generated for JSPs to reduce the size of the code required
+        for tags. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <add>
@@ -329,10 +337,6 @@
       </fix>
       <fix>
         Revert use of try/finally for simple tags. (remm)
-      </fix>
-      <fix>
-        Refactor code generated for JSPs to reduce the size of the code required
-        for tags. (markt)
       </fix>
     </changelog>
   </subsection>
