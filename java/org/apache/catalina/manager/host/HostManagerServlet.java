@@ -44,6 +44,7 @@ import org.apache.catalina.core.ContainerBase;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.HostConfig;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -519,15 +520,8 @@ public class HostManagerServlet
             Host host = (Host) hosts[i];
             String name = host.getName();
             String[] aliases = host.findAliases();
-            StringBuilder buf = new StringBuilder();
-            if (aliases.length > 0) {
-                buf.append(aliases[0]);
-                for (int j = 1; j < aliases.length; j++) {
-                    buf.append(',').append(aliases[j]);
-                }
-            }
             writer.println(smClient.getString("hostManagerServlet.listitem",
-                                        name, buf.toString()));
+                    name, StringUtils.join(aliases)));
         }
     }
 

@@ -31,6 +31,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.res.StringManager;
@@ -513,10 +514,7 @@ public final class Parameters {
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, ArrayList<String>> e : paramHashValues.entrySet()) {
             sb.append(e.getKey()).append('=');
-            ArrayList<String> values = e.getValue();
-            for (String value : values) {
-                sb.append(value).append(',');
-            }
+            StringUtils.join(e.getValue(), ',', sb);
             sb.append('\n');
         }
         return sb.toString();

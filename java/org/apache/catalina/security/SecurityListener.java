@@ -17,7 +17,6 @@
 package org.apache.catalina.security;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 
@@ -26,6 +25,7 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 public class SecurityListener implements LifecycleListener {
@@ -97,18 +97,7 @@ public class SecurityListener implements LifecycleListener {
      * @return  A comma separated list of operating system user names.
      */
     public String getCheckedOsUsers() {
-        if (checkedOsUsers.size() == 0) {
-            return "";
-        }
-
-        StringBuilder result = new StringBuilder();
-        Iterator<String> iter = checkedOsUsers.iterator();
-        result.append(iter.next());
-        while (iter.hasNext()) {
-            result.append(',');
-            result.append(iter.next());
-        }
-        return result.toString();
+        return StringUtils.join(checkedOsUsers);
     }
 
 

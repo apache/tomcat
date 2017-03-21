@@ -84,6 +84,11 @@
         for <code>&lt;request-character-encoding&gt;</code> and
         <code>&lt;response-character-encoding&gt;</code>. (markt)
       </update>
+      <scode>
+        Refactor the various implementations of X to comma separated list to a
+        single utility class and update the code to use the new utility class.
+        (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -38,6 +38,8 @@ import javax.management.ReflectionException;
 import javax.management.RuntimeOperationsException;
 import javax.management.ServiceNotFoundException;
 
+import org.apache.tomcat.util.buf.StringUtils;
+
 
 /**
  * <p>Internal configuration information for a managed bean (MBean)
@@ -565,26 +567,17 @@ public class ManagedBean implements java.io.Serializable {
     private String createOperationKey(OperationInfo operation) {
         StringBuilder key = new StringBuilder(operation.getName());
         key.append('(');
-        for (ParameterInfo parameterInfo: operation.getSignature()) {
-            key.append(parameterInfo.getType());
-            // Note: A trailing ',' does not matter in this case
-            key.append(',');
-        }
+        StringUtils.join(operation.getSignature(), ',', (x) -> x.getType(), key);
         key.append(')');
 
         return key.toString();
     }
 
 
-    private String createOperationKey(String methodName,
-            String[] parameterTypes) {
+    private String createOperationKey(String methodName, String[] parameterTypes) {
         StringBuilder key = new StringBuilder(methodName);
         key.append('(');
-        for (String parameter: parameterTypes) {
-            key.append(parameter);
-            // Note: A trailing ',' does not matter in this case
-            key.append(',');
-        }
+        StringUtils.join(parameterTypes);
         key.append(')');
 
         return key.toString();

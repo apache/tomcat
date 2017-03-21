@@ -25,6 +25,7 @@ import java.util.Iterator;
 import org.apache.catalina.Role;
 import org.apache.catalina.User;
 import org.apache.catalina.UserDatabase;
+import org.apache.tomcat.util.buf.StringUtils;
 
 
 /**
@@ -200,22 +201,11 @@ public class MemoryGroup extends AbstractGroup {
         synchronized (roles) {
             if (roles.size() > 0) {
                 sb.append(" roles=\"");
-                int n = 0;
-                Iterator<Role> values = roles.iterator();
-                while (values.hasNext()) {
-                    if (n > 0) {
-                        sb.append(',');
-                    }
-                    n++;
-                    sb.append((values.next()).getRolename());
-                }
+                StringUtils.join(roles, ',', (x) -> x.getRolename(), sb);
                 sb.append("\"");
             }
         }
         sb.append("/>");
         return (sb.toString());
-
     }
-
-
 }

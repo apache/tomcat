@@ -33,6 +33,7 @@ import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.UpgradeToken;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 public class Http2Protocol implements UpgradeProtocol {
@@ -226,17 +227,7 @@ public class Http2Protocol implements UpgradeProtocol {
         // sync is unnecessary.
         List<String> copy = new ArrayList<>(allowedTrailerHeaders.size());
         copy.addAll(allowedTrailerHeaders);
-        StringBuilder result = new StringBuilder();
-        boolean first = true;
-        for (String header : copy) {
-            if (first) {
-                first = false;
-            } else {
-                result.append(',');
-            }
-            result.append(header);
-        }
-        return result.toString();
+        return StringUtils.join(copy);
     }
 
 

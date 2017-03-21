@@ -41,6 +41,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
 
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
@@ -172,7 +173,7 @@ public class SignCode extends Task {
 
         SOAPElement commaDelimitedFileNames =
                 requestSigningRequest.addChildElement("commaDelimitedFileNames", NS);
-        commaDelimitedFileNames.addTextNode(listToString(fileNames));
+        commaDelimitedFileNames.addTextNode(StringUtils.join(fileNames));
 
         SOAPElement application =
                 requestSigningRequest.addChildElement("application", NS);
@@ -211,21 +212,6 @@ public class SignCode extends Task {
         }
 
         return signingSetID;
-    }
-
-
-    private String listToString(List<String> list) {
-        StringBuilder sb = new StringBuilder(list.size() * 6);
-        boolean doneFirst = false;
-        for (String s : list) {
-            if (doneFirst) {
-                sb.append(',');
-            } else {
-                doneFirst = true;
-            }
-            sb.append(s);
-        }
-        return sb.toString();
     }
 
 
