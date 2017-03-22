@@ -26,3 +26,6 @@
     <bugs:Bug48616b />
   </bugs:Bug46816a>
 </tags:bug42390>
+<%
+  out.println(X);
+%>

@@ -85,6 +85,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Improve the error handling for simple tags to ensure that the tag is
+        released and destroyed once used. (remm, violetagg)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
