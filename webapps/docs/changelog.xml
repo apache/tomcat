@@ -119,6 +119,11 @@
         where there are multiple threads. (markt)
       </fix>
       <fix>
+        <bug>60851</bug>: Add <code>application/xml</code> and
+        <code>application/json</code> to the default list of compressible MIME
+        types. Patch by Michael Osipov. (markt)
+      </fix>
+      <fix>
         <bug>60852</bug>: Correctly spell compressible when used in
         configuration attributes and internal code. Based on a pacth by Michael
         Osipov. (markt)

@@ -352,7 +352,7 @@
       compression may be used.
       The default value is
       <code>
-      text/html,text/xml,text/plain,text/css,text/javascript,application/javascript
+      text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
       </code>.
       </p>
     </attribute>
