@@ -106,6 +106,11 @@
         the code that unlocks the acceptor threads correctly handles the case
         where there are multiple threads. (markt)
       </fix>
+      <fix>
+        <bug>60852</bug>: Correctly spell compressible when used in
+        configuration attributes and internal code. Based on a pacth by Michael
+        Osipov. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">

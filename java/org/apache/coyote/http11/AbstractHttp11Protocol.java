@@ -143,20 +143,44 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    private String compressableMimeType = "text/html,text/xml,text/plain,text/css,text/javascript,application/javascript";
-    private String[] compressableMimeTypes = null;
-    public String getCompressableMimeType() { return compressableMimeType; }
-    public void setCompressableMimeType(String valueS) {
-        compressableMimeType = valueS;
-        compressableMimeTypes = null;
+    /**
+     * @return See {@link #getCompressibleMimeType()}
+     * @deprecated Use {@link #getCompressibleMimeType()}
+     */
+    @Deprecated
+    public String getCompressableMimeType() {
+        return getCompressibleMimeType();
     }
+    /**
+     * @param valueS See {@link #setCompressibleMimeType(String)}
+     * @deprecated Use {@link #setCompressibleMimeType(String)}
+     */
+    @Deprecated
+    public void setCompressableMimeType(String valueS) {
+        setCompressibleMimeType(valueS);
+    }
+    /**
+     * @return See {@link #getCompressibleMimeTypes()}
+     * @deprecated Use {@link #getCompressibleMimeTypes()}
+     */
+    @Deprecated
     public String[] getCompressableMimeTypes() {
-        String[] result = compressableMimeTypes;
+        return getCompressibleMimeTypes();
+    }
+    private String compressibleMimeType = "text/html,text/xml,text/plain,text/css,text/javascript,application/javascript";
+    private String[] compressibleMimeTypes = null;
+    public String getCompressibleMimeType() { return compressibleMimeType; }
+    public void setCompressibleMimeType(String valueS) {
+        compressibleMimeType = valueS;
+        compressibleMimeTypes = null;
+    }
+    public String[] getCompressibleMimeTypes() {
+        String[] result = compressibleMimeTypes;
         if (result != null) {
             return result;
         }
         List<String> values = new ArrayList<>();
-        StringTokenizer tokens = new StringTokenizer(compressableMimeType, ",");
+        StringTokenizer tokens = new StringTokenizer(compressibleMimeType, ",");
         while (tokens.hasMoreTokens()) {
             String token = tokens.nextToken().trim();
             if (token.length() > 0) {
@@ -164,7 +188,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
             }
         }
         result = values.toArray(new String[values.size()]);
-        compressableMimeTypes = result;
+        compressibleMimeTypes = result;
         return result;
     }
 
@@ -784,7 +808,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setCompressionMinSize(getCompressionMinSize());
         processor.setCompression(getCompression());
         processor.setNoCompressionUserAgents(getNoCompressionUserAgents());
-        processor.setCompressableMimeTypes(getCompressableMimeTypes());
+        processor.setCompressibleMimeTypes(getCompressibleMimeTypes());
         processor.setRestrictedUserAgents(getRestrictedUserAgents());
         processor.setMaxSavePostSize(getMaxSavePostSize());
         processor.setServer(getServer());

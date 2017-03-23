@@ -179,6 +179,8 @@ public class Http11Processor extends AbstractProcessor {
 
     /**
      * List of MIMES for which compression may be enabled.
+     * Note: This is not spelled correctly but can't be changed without breaking
+     *       compatibility
      */
     protected String[] compressableMimeTypes;
 
@@ -316,15 +318,27 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
+     * @param compressibleMimeTypes See
+     *        {@link Http11Processor#setCompressibleMimeTypes(String[])}
+     * @deprecated Use
+     *             {@link Http11Processor#setCompressibleMimeTypes(String[])}
+     */
+    @Deprecated
+    public void setCompressableMimeTypes(String[] compressibleMimeTypes) {
+        setCompressibleMimeTypes(compressibleMimeTypes);
+    }
+
+
+    /**
      * Set compressible mime-type list (this method is best when used with
      * a large number of connectors, where it would be better to have all of
      * them referenced a single array).
      *
-     * @param compressableMimeTypes MIME types for which compression should be
+     * @param compressibleMimeTypes MIME types for which compression should be
      *                              enabled
      */
-    public void setCompressableMimeTypes(String[] compressableMimeTypes) {
-        this.compressableMimeTypes = compressableMimeTypes;
+    public void setCompressibleMimeTypes(String[] compressibleMimeTypes) {
+        this.compressableMimeTypes = compressibleMimeTypes;
     }
 
 
@@ -490,7 +504,7 @@ public class Http11Processor extends AbstractProcessor {
     /**
      * Check if the resource could be compressed, if the client supports it.
      */
-    private boolean isCompressable() {
+    private boolean isCompressible() {
 
         // Check if content is not already gzipped
         MessageBytes contentEncodingMB =
@@ -512,8 +526,7 @@ public class Http11Processor extends AbstractProcessor {
             || (contentLength > compressionMinSize)) {
             // Check for compatible MIME-TYPE
             if (compressableMimeTypes != null) {
-                return (startsWithStringArray(compressableMimeTypes,
-                                              response.getContentType()));
+                return (startsWithStringArray(compressableMimeTypes, response.getContentType()));
             }
         }
 
@@ -1152,11 +1165,11 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         // Check for compression
-        boolean isCompressable = false;
+        boolean isCompressible = false;
         boolean useCompression = false;
         if (entityBody && (compressionLevel > 0) && !sendingWithSendfile) {
-            isCompressable = isCompressable();
-            if (isCompressable) {
+            isCompressible = isCompressible();
+            if (isCompressible) {
                 useCompression = useCompression();
             }
             // Change content-length to -1 to force chunking
@@ -1209,7 +1222,7 @@ public class Http11Processor extends AbstractProcessor {
             headers.setValue("Content-Encoding").setString("gzip");
         }
         // If it might be compressed, set the Vary header
-        if (isCompressable) {
+        if (isCompressible) {
             // Make Proxies happy via Vary (from mod_deflate)
             MessageBytes vary = headers.getValue("Vary");
             if (vary == null) {
