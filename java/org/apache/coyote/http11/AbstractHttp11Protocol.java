@@ -245,24 +245,24 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
 
     /**
-     * @return See {@link #getCompressableMimeType()}
-     * @deprecated Use {@link #getCompressableMimeType()}
+     * @return See {@link #getCompressibleMimeType()}
+     * @deprecated Use {@link #getCompressibleMimeType()}
      */
     @Deprecated
     public String getCompressableMimeType() {
         return getCompressibleMimeType();
     }
     /**
-     * @param valueS See {@link #setCompressableMimeType(String)}
-     * @deprecated Use {@link #setCompressableMimeType(String)}
+     * @param valueS See {@link #setCompressibleMimeType(String)}
+     * @deprecated Use {@link #setCompressibleMimeType(String)}
      */
     @Deprecated
     public void setCompressableMimeType(String valueS) {
         setCompressibleMimeType(valueS);
     }
     /**
-     * @return See {@link #getCompressableMimeTypes()}
-     * @deprecated Use {@link #getCompressableMimeTypes()}
+     * @return See {@link #getCompressibleMimeTypes()}
+     * @deprecated Use {@link #getCompressibleMimeTypes()}
      */
     @Deprecated
     public String[] getCompressableMimeTypes() {
