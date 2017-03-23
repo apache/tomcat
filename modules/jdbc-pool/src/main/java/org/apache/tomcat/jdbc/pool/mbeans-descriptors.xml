@@ -330,6 +330,12 @@
                     is="true"
              writeable="false"/>
 
+    <attribute    name="useStatementFacade"
+           description="If true, connection pool is configured to wrap statements."
+                  type="java.lang.Boolean"
+                    is="false"
+             writeable="false"/>
+
     <attribute    name="borrowedCount"
            description="The total number of connections borrowed from this pool"
                   type="java.lang.Long"

@@ -919,6 +919,22 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
      * {@inheritDoc}
      */
     @Override
+    public boolean getUseStatementFacade() {
+        return getPoolProperties().getUseStatementFacade();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setUseStatementFacade(boolean useStatementFacade) {
+        getPoolProperties().setUseStatementFacade(useStatementFacade);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void purge() {
         pool.purge();
 

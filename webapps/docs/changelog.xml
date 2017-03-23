@@ -105,6 +105,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>60764</bug>: Implement <code>equals()</code> and
+        <code>hashCode()</code> in the <code>StatementFacade</code> in order to
+        enable these methods to be called on the closed statements if any
+        statement proxy is set. This behavior can be changed with
+        <code>useStatementFacade</code> attribute. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
