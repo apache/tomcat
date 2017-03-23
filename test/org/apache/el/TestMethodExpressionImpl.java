@@ -543,4 +543,11 @@ public class TestMethodExpressionImpl {
         assertEquals("aaa, bbb", r.toString());
     }
 
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testBug60844() {
+        MethodExpression me2 = factory.createMethodExpression(context,
+                "${beanC.sayHello}", null , new Class[]{ TesterBeanA.class, TesterBeanB.class});
+        me2.invoke(context, new Object[] { new Object() });
+    }
 }

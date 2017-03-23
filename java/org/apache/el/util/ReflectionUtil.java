@@ -176,7 +176,7 @@ public class ReflectionUtil {
                         if (isAssignableFrom(paramTypes[j], varType)) {
                             assignableMatch++;
                         } else {
-                            if (paramValues == null) {
+                            if (paramValues == null || j >= paramValues.length) {
                                 noMatch = true;
                                 break;
                             } else {
@@ -195,7 +195,7 @@ public class ReflectionUtil {
                 } else if (isAssignableFrom(paramTypes[i], mParamTypes[i])) {
                     assignableMatch++;
                 } else {
-                    if (paramValues == null) {
+                    if (paramValues == null || i >= paramValues.length) {
                         noMatch = true;
                         break;
                     } else {
