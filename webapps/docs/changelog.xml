@@ -108,6 +108,11 @@
         that is not consistent with the current state of that connection.
         (markt)
       </fix>
+      <fix>
+        <bug>60900</bug>: Avoid a <code>NullPointerException</code> in the APR
+        Poller if a connection is closed at the same time as new data arrives on
+        that connection. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
