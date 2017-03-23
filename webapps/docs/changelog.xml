@@ -111,7 +111,7 @@
       <fix>
         <bug>60900</bug>: Avoid a <code>NullPointerException</code> in the APR
         Poller if a connection is closed at the same time as new data arrives on
-        that connection. (markt) 
+        that connection. (markt)
       </fix>
     </changelog>
   </subsection>
