@@ -169,7 +169,7 @@
       </scode>
       <fix>
         <bug>60683</bug>: Security manager failure causing NPEs when doing IO
-        on some JVMs. (coty)
+        on some JVMs. (csutherl)
       </fix>
       <fix>
         <bug>60688</bug>: Update the internal fork of Apache Commons BCEL to
