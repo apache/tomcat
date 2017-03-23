@@ -780,14 +780,13 @@ public abstract class AbstractEndpoint<S> {
      */
     protected void unlockAccept() {
         // Only try to unlock the acceptor if it is necessary
-        boolean unlockRequired = false;
+        int unlocksRequired = 0;
         for (Acceptor acceptor : acceptors) {
             if (acceptor.getState() == AcceptorState.RUNNING) {
-                unlockRequired = true;
-                break;
+                unlocksRequired++;
             }
         }
-        if (!unlockRequired) {
+        if (unlocksRequired == 0) {
             return;
         }
 
@@ -796,61 +795,60 @@ public abstract class AbstractEndpoint<S> {
         try {
             localAddress = getLocalAddress();
         } catch (IOException ioe) {
-            // TODO i18n
-            getLog().debug("Unable to determine local address for " + getName(), ioe);
+            getLog().debug(sm.getString("endpoint.debug.unlock.localFail", getName()), ioe);
         }
         if (localAddress == null) {
-            // TODO i18n
-            getLog().warn("Failed to unlock acceptor for " + getName() + " because the local address was not available.");
+            getLog().warn(sm.getString("endpoint.debug.unlock.localNone", getName()));
             return;
         }
 
         try {
             unlockAddress = getUnlockAddress(localAddress);
 
-            try (java.net.Socket s = new java.net.Socket()) {
-                int stmo = 2 * 1000;
-                int utmo = 2 * 1000;
-                if (getSocketProperties().getSoTimeout() > stmo)
-                    stmo = getSocketProperties().getSoTimeout();
-                if (getSocketProperties().getUnlockTimeout() > utmo)
-                    utmo = getSocketProperties().getUnlockTimeout();
-                s.setSoTimeout(stmo);
-                s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug("About to unlock socket for:" + unlockAddress);
-                }
-                s.connect(unlockAddress,utmo);
-                if (getDeferAccept()) {
-                    /*
-                     * In the case of a deferred accept / accept filters we need to
-                     * send data to wake up the accept. Send OPTIONS * to bypass
-                     * even BSD accept filters. The Acceptor will discard it.
-                     */
-                    OutputStreamWriter sw;
-
-                    sw = new OutputStreamWriter(s.getOutputStream(), "ISO-8859-1");
-                    sw.write("OPTIONS * HTTP/1.0\r\n" +
-                             "User-Agent: Tomcat wakeup connection\r\n\r\n");
-                    sw.flush();
-                }
-                if (getLog().isDebugEnabled()) {
-                    getLog().debug("Socket unlock completed for:" + unlockAddress);
-                }
-
-                // Wait for upto 1000ms acceptor threads to unlock
-                long waitLeft = 1000;
-                for (Acceptor acceptor : acceptors) {
-                    while (waitLeft > 0 &&
-                            acceptor.getState() == AcceptorState.RUNNING) {
-                        Thread.sleep(50);
-                        waitLeft -= 50;
+            for (int i = 0; i < unlocksRequired; i++) {
+                try (java.net.Socket s = new java.net.Socket()) {
+                    int stmo = 2 * 1000;
+                    int utmo = 2 * 1000;
+                    if (getSocketProperties().getSoTimeout() > stmo)
+                        stmo = getSocketProperties().getSoTimeout();
+                    if (getSocketProperties().getUnlockTimeout() > utmo)
+                        utmo = getSocketProperties().getUnlockTimeout();
+                    s.setSoTimeout(stmo);
+                    s.setSoLinger(getSocketProperties().getSoLingerOn(),getSocketProperties().getSoLingerTime());
+                    if (getLog().isDebugEnabled()) {
+                        getLog().debug("About to unlock socket for:" + unlockAddress);
                     }
+                    s.connect(unlockAddress,utmo);
+                    if (getDeferAccept()) {
+                        /*
+                         * In the case of a deferred accept / accept filters we need to
+                         * send data to wake up the accept. Send OPTIONS * to bypass
+                         * even BSD accept filters. The Acceptor will discard it.
+                         */
+                        OutputStreamWriter sw;
+
+                        sw = new OutputStreamWriter(s.getOutputStream(), "ISO-8859-1");
+                        sw.write("OPTIONS * HTTP/1.0\r\n" +
+                                 "User-Agent: Tomcat wakeup connection\r\n\r\n");
+                        sw.flush();
+                    }
+                    if (getLog().isDebugEnabled()) {
+                        getLog().debug("Socket unlock completed for:" + unlockAddress);
+                    }
+                }
+            }
+            // Wait for upto 1000ms acceptor threads to unlock
+            long waitLeft = 1000;
+            for (Acceptor acceptor : acceptors) {
+                while (waitLeft > 0 &&
+                        acceptor.getState() == AcceptorState.RUNNING) {
+                    Thread.sleep(50);
+                    waitLeft -= 50;
                 }
             }
         } catch(Exception e) {
             if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("endpoint.debug.unlock", "" + getPort()), e);
+                getLog().debug(sm.getString("endpoint.debug.unlock.fail", "" + getPort()), e);
             }
         }
     }

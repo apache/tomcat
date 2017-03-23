@@ -101,6 +101,11 @@
         Poller if a connection is closed at the same time as new data arrives on
         that connection. (markt)
       </fix>
+      <fix>
+        Speed up shutdown when using multiple acceptor threads by ensuring that
+        the code that unlocks the acceptor threads correctly handles the case
+        where there are multiple threads. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
