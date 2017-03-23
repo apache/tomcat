@@ -103,6 +103,11 @@
       <fix>
         Fix HTTP/2 incorrect input unblocking on EOF. (remm)
       </fix>
+      <fix>
+        Close the connection sooner if an event occurs for a current connection
+        that is not consistent with the current state of that connection.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
