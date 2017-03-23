@@ -130,6 +130,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>60844</bug>: Correctly handle the error when fewer parameter values
+        than required by the method are used to invoke an EL method expression.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
