@@ -125,6 +125,8 @@ public class DataSourceFactory implements ObjectFactory {
 
     protected static final String PROP_IGNOREEXCEPTIONONPRELOAD = "ignoreExceptionOnPreLoad";
 
+    protected static final String PROP_USESTATEMENTFACADE = "useStatementFacade";
+
     public static final int UNKNOWN_TRANSACTIONISOLATION = -1;
 
     public static final String OBJECT_NAME = "object_name";
@@ -180,7 +182,8 @@ public class DataSourceFactory implements ObjectFactory {
         PROP_USEDISPOSABLECONNECTIONFACADE,
         PROP_LOGVALIDATIONERRORS,
         PROP_PROPAGATEINTERRUPTSTATE,
-        PROP_IGNOREEXCEPTIONONPRELOAD
+        PROP_IGNOREEXCEPTIONONPRELOAD,
+        PROP_USESTATEMENTFACADE
     };
 
     // -------------------------------------------------- ObjectFactory Methods
@@ -528,7 +531,10 @@ public class DataSourceFactory implements ObjectFactory {
         if (value != null) {
             poolProperties.setIgnoreExceptionOnPreLoad(Boolean.parseBoolean(value));
         }
-
+        value = properties.getProperty(PROP_USESTATEMENTFACADE);
+        if (value != null) {
+            poolProperties.setUseStatementFacade(Boolean.parseBoolean(value));
+        }
         return poolProperties;
     }
 

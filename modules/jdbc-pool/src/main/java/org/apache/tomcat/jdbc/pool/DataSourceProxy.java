@@ -1418,6 +1418,22 @@ public class DataSourceProxy implements PoolConfiguration {
         getPoolProperties().setIgnoreExceptionOnPreLoad(ignoreExceptionOnPreLoad);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean getUseStatementFacade() {
+        return getPoolProperties().getUseStatementFacade();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setUseStatementFacade(boolean useStatementFacade) {
+        getPoolProperties().setUseStatementFacade(useStatementFacade);
+    }
+
     public void purge()  {
         try {
             createPool().purge();

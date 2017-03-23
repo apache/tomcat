@@ -28,6 +28,7 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -94,7 +95,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private volatile boolean logValidationErrors = false;
     private volatile boolean propagateInterruptState = false;
     private volatile boolean ignoreExceptionOnPreLoad = false;
-
+    private volatile boolean useStatementFacade = true;
 
     /**
      * {@inheritDoc}
@@ -1288,6 +1289,22 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     @Override
     public void setIgnoreExceptionOnPreLoad(boolean ignoreExceptionOnPreLoad) {
         this.ignoreExceptionOnPreLoad = ignoreExceptionOnPreLoad;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean getUseStatementFacade() {
+        return useStatementFacade;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setUseStatementFacade(boolean useStatementFacade) {
+        this.useStatementFacade = useStatementFacade;
     }
 
     @Override
