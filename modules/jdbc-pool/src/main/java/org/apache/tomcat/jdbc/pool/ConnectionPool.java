@@ -327,7 +327,10 @@ public class ConnectionPool {
                 next = next.getNext();
             }
         }
-
+        // setup statement proxy
+        if (getPoolProperties().getUseStatementFacade()) {
+            handler = new StatementFacade(handler);
+        }
         try {
             getProxyConstructor(con.getXAConnection() != null);
             //create the proxy
