@@ -83,14 +83,6 @@
       <fix>
         Fix HTTP/2 incorrect input unblocking on EOF. (remm)
       </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Jasper">
-    <changelog>
-      <fix>
-        Improve the error handling for simple tags to ensure that the tag is
-        released and destroyed once used. (remm, violetagg)
-      </fix>
       <fix>
         Close the connection sooner if an event occurs for a current connection
         that is not consistent with the current state of that connection.
@@ -110,6 +102,14 @@
         <bug>60852</bug>: Correctly spell compressible when used in
         configuration attributes and internal code. Based on a pacth by Michael
         Osipov. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Improve the error handling for simple tags to ensure that the tag is
+        released and destroyed once used. (remm, violetagg)
       </fix>
     </changelog>
   </subsection>
