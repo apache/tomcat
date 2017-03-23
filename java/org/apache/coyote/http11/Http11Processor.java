@@ -206,7 +206,7 @@ public class Http11Processor extends AbstractProcessor {
     /**
      * Check if the resource could be compressed, if the client supports it.
      */
-    private boolean isCompressable() {
+    private boolean isCompressible() {
 
         // Check if content is not already gzipped
         MessageBytes contentEncodingMB = response.getMimeHeaders().getValue("Content-Encoding");
@@ -224,9 +224,9 @@ public class Http11Processor extends AbstractProcessor {
         long contentLength = response.getContentLengthLong();
         if ((contentLength == -1) || (contentLength > protocol.getCompressionMinSize())) {
             // Check for compatible MIME-TYPE
-            String[] compressableMimeTypes = protocol.getCompressableMimeTypes();
-            if (compressableMimeTypes != null) {
-                return (startsWithStringArray(compressableMimeTypes, response.getContentType()));
+            String[] compressibleMimeTypes = protocol.getCompressibleMimeTypes();
+            if (compressibleMimeTypes != null) {
+                return (startsWithStringArray(compressibleMimeTypes, response.getContentType()));
             }
         }
 
@@ -864,11 +864,11 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         // Check for compression
-        boolean isCompressable = false;
+        boolean isCompressible = false;
         boolean useCompression = false;
         if (entityBody && (protocol.getCompressionLevel() > 0) && !sendingWithSendfile) {
-            isCompressable = isCompressable();
-            if (isCompressable) {
+            isCompressible = isCompressible();
+            if (isCompressible) {
                 useCompression = useCompression();
             }
             // Change content-length to -1 to force chunking
@@ -921,7 +921,7 @@ public class Http11Processor extends AbstractProcessor {
             headers.setValue("Content-Encoding").setString("gzip");
         }
         // If it might be compressed, set the Vary header
-        if (isCompressable) {
+        if (isCompressible) {
             // Make Proxies happy via Vary (from mod_deflate)
             MessageBytes vary = headers.getValue("Vary");
             if (vary == null) {
