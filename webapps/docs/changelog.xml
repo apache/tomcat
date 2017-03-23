@@ -67,6 +67,20 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        When using the NIO2 connector, ensure a WebSocket close frame is
+        processed before the end of stream is processed to ensure that the end
+        of stream is processed correctly. (markt)
+      </fix>
+      <fix>
+        <bug>60852</bug>: Correctly spell compressible when used in
+        configuration attributes and internal code. Based on a pacth by Michael
+        Osipov. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>

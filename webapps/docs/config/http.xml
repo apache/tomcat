@@ -316,7 +316,7 @@
       connector is started and unbound when it is stopped.</p>
     </attribute>
 
-    <attribute name="compressableMimeType" required="false">
+    <attribute name="compressibleMimeType" required="false">
       <p>The value is a comma separated list of MIME types for which HTTP
       compression may be used.
       The default value is

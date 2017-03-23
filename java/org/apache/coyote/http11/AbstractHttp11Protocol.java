@@ -51,7 +51,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         this.socketBuffer = socketBuffer;
     }
 
-    
+
     /**
      * Maximum size of the post which will be saved when processing certain
      * requests, such as a POST.
@@ -59,7 +59,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     private int maxSavePostSize = 4 * 1024;
     public int getMaxSavePostSize() { return maxSavePostSize; }
     public void setMaxSavePostSize(int valueI) { maxSavePostSize = valueI; }
-    
+
 
     /**
      * Maximum size of the HTTP message header.
@@ -68,10 +68,10 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public int getMaxHttpHeaderSize() { return maxHttpHeaderSize; }
     public void setMaxHttpHeaderSize(int valueI) { maxHttpHeaderSize = valueI; }
 
-    
+
     /**
      * Specifies a different (usually  longer) connection timeout during data
-     * upload. 
+     * upload.
      */
     private int connectionUploadTimeout = 300000;
     public int getConnectionUploadTimeout() { return connectionUploadTimeout; }
@@ -108,17 +108,26 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    private String compressableMimeTypes = "text/html,text/xml,text/plain,text/css,"
-            + "text/javascript,application/javascript";
-    public String getCompressableMimeType() { return compressableMimeTypes; }
+    private String compressibleMimeTypes = "text/html,text/xml,text/plain,text/css,text/javascript,application/javascript";
+    @Deprecated
+    public String getCompressableMimeType() {
+        return getCompressibleMimeType();
+    }
+    @Deprecated
     public void setCompressableMimeType(String valueS) {
-        compressableMimeTypes = valueS;
+        setCompressibleMimeType(valueS);
     }
+    @Deprecated
     public String getCompressableMimeTypes() {
-        return getCompressableMimeType();
+        return getCompressibleMimeType();
     }
+    @Deprecated
     public void setCompressableMimeTypes(String valueS) {
-        setCompressableMimeType(valueS);
+        setCompressibleMimeType(valueS);
+    }
+    public String getCompressibleMimeType() { return compressibleMimeTypes; }
+    public void setCompressibleMimeType(String valueS) {
+        compressibleMimeTypes = valueS;
     }
 
 
@@ -187,10 +196,10 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      */
     private boolean secure;
     public boolean getSecure() { return secure; }
-    public void setSecure(boolean b) { 
-        secure = b;         
+    public void setSecure(boolean b) {
+        secure = b;
     }
-    
+
 
     /**
      * The size of the buffer used by the ServletOutputStream when performing
@@ -261,21 +270,40 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     // ------------------------------------------------ HTTP specific properties
     // ------------------------------------------ passed through to the EndPoint
-    
+
     public boolean isSSLEnabled() { return endpoint.isSSLEnabled();}
     public void setSSLEnabled(boolean SSLEnabled) {
         endpoint.setSSLEnabled(SSLEnabled);
-    }    
+    }
 
 
     /**
-     * Maximum number of requests which can be performed over a keepalive 
+     * Maximum number of requests which can be performed over a keepalive
      * connection. The default is the same as for Apache HTTP Server.
      */
-    public int getMaxKeepAliveRequests() { 
+    public int getMaxKeepAliveRequests() {
         return endpoint.getMaxKeepAliveRequests();
     }
     public void setMaxKeepAliveRequests(int mkar) {
         endpoint.setMaxKeepAliveRequests(mkar);
+    }
+    // ------------------------------------------------------------- Common code
+
+    // Common configuration required for all new HTTP11 processors
+    protected void configureProcessor(AbstractHttp11Processor<S> processor) {
+        processor.setAdapter(getAdapter());
+        processor.setMaxKeepAliveRequests(getMaxKeepAliveRequests());
+        processor.setKeepAliveTimeout(getKeepAliveTimeout());
+        processor.setConnectionUploadTimeout(getConnectionUploadTimeout());
+        processor.setDisableUploadTimeout(getDisableUploadTimeout());
+        processor.setCompressionMinSize(getCompressionMinSize());
+        processor.setCompression(getCompression());
+        processor.setNoCompressionUserAgents(getNoCompressionUserAgents());
+        processor.setCompressibleMimeTypes(getCompressibleMimeType());
+        processor.setRestrictedUserAgents(getRestrictedUserAgents());
+        processor.setSocketBuffer(getSocketBuffer());
+        processor.setMaxSavePostSize(getMaxSavePostSize());
+        processor.setServer(getServer());
+        processor.setMaxCookieCount(getMaxCookieCount());
     }
 }
