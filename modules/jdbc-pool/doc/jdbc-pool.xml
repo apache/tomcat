@@ -671,8 +671,6 @@
   <subsection name="org.apache.tomcat.jdbc.pool.interceptor.StatementDecoratorInterceptor">
     <p>See <bug>48392</bug>. Interceptor to wrap statements and result sets in order to prevent access to the actual connection
        using the methods <code>ResultSet.getStatement().getConnection()</code> and <code>Statement.getConnection()</code>
-       Note: This interceptor is enabled by default, so no explicit
-             configuration is required. (See <code>useStatementProxy</code>)
     </p>
     <attributes>
     </attributes>
