@@ -62,8 +62,12 @@ public abstract class AbstractProcessorLight implements Processor {
             } else if (status == SocketEvent.OPEN_WRITE) {
                 // Extra write event likely after async, ignore
                 state = SocketState.LONG;
-            } else {
+            } else if (status == SocketEvent.OPEN_READ){
                 state = service(socketWrapper);
+            } else {
+                // Default to closing the socket if the SocketEvent passed in
+                // is not consistent with the current state of the Processor
+                state = SocketState.CLOSED;
             }
 
             if (state != SocketState.CLOSED && isAsync()) {
