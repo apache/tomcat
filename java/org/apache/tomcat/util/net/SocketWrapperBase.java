@@ -721,9 +721,9 @@ public abstract class SocketWrapperBase<E> {
 
     /**
      * Starts the sendfile process. It is expected that if the sendfile process
-     * does not complete during this call that the caller <b>will not</b> add
-     * the socket to the poller (or equivalent). That is the responsibility of
-     * this method.
+     * does not complete during this call and does not report an error, that the
+     * caller <b>will not</b> add the socket to the poller (or equivalent). That
+     * is the responsibility of this method.
      *
      * @param sendfileData Data representing the file to send
      *
