@@ -58,6 +58,7 @@ import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SendfileDataBase;
+import org.apache.tomcat.util.net.SendfileState;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -671,9 +672,10 @@ public class Http11Processor extends AbstractProcessor {
         openSocket = false;
         readComplete = true;
         boolean keptAlive = false;
+        SendfileState sendfileState = SendfileState.DONE;
 
-        while (!getErrorState().isError() && keepAlive && !isAsync() &&
-                upgradeToken == null && !endpoint.isPaused()) {
+        while (!getErrorState().isError() && keepAlive && !isAsync() && upgradeToken == null &&
+                sendfileState == SendfileState.DONE && !endpoint.isPaused()) {
 
             // Parsing the request header
             try {
@@ -862,9 +864,7 @@ public class Http11Processor extends AbstractProcessor {
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
 
-            if (breakKeepAliveLoop(socketWrapper)) {
-                break;
-            }
+            sendfileState = processSendfile(socketWrapper);
         }
 
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
@@ -876,7 +876,7 @@ public class Http11Processor extends AbstractProcessor {
         } else if (isUpgrade()) {
             return SocketState.UPGRADING;
         } else {
-            if (sendfileData != null) {
+            if (sendfileState == SendfileState.PENDING) {
                 return SocketState.SENDFILE;
             } else {
                 if (openSocket) {
@@ -952,7 +952,6 @@ public class Http11Processor extends AbstractProcessor {
         http11 = true;
         http09 = false;
         contentDelimitation = false;
-        sendfileData = null;
 
         if (endpoint.isSSLEnabled()) {
             request.scheme().setString("https");
@@ -1159,15 +1158,14 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         // Sendfile support
-        boolean sendingWithSendfile = false;
         if (endpoint.getUseSendfile()) {
-            sendingWithSendfile = prepareSendfile(outputFilters);
+            prepareSendfile(outputFilters);
         }
 
         // Check for compression
         boolean isCompressible = false;
         boolean useCompression = false;
-        if (entityBody && (compressionLevel > 0) && !sendingWithSendfile) {
+        if (entityBody && (compressionLevel > 0) && sendfileData == null) {
             isCompressible = isCompressible();
             if (isCompressible) {
                 useCompression = useCompression();
@@ -1309,10 +1307,12 @@ public class Http11Processor extends AbstractProcessor {
         return connection.equals(Constants.CLOSE);
     }
 
-    private boolean prepareSendfile(OutputFilter[] outputFilters) {
+    private void prepareSendfile(OutputFilter[] outputFilters) {
         String fileName = (String) request.getAttribute(
                 org.apache.coyote.Constants.SENDFILE_FILENAME_ATTR);
-        if (fileName != null) {
+        if (fileName == null) {
+            sendfileData = null;
+        } else {
             // No entity body sent here
             outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
             contentDelimitation = true;
@@ -1321,9 +1321,7 @@ public class Http11Processor extends AbstractProcessor {
             long end = ((Long) request.getAttribute(
                     org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR)).longValue();
             sendfileData = socketWrapper.createSendfileData(fileName, pos, end - pos);
-            return true;
         }
-        return false;
     }
 
     /**
@@ -1604,34 +1602,31 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Checks to see if the keep-alive loop should be broken, performing any
-     * processing (e.g. sendfile handling) that may have an impact on whether
-     * or not the keep-alive loop should be broken.
+     * Trigger sendfile processing if required.
      *
-     * @return true if the keep-alive loop should be broken
+     * @return The state of send file processing
      */
-    private boolean breakKeepAliveLoop(SocketWrapperBase<?> socketWrapper) {
+    private SendfileState processSendfile(SocketWrapperBase<?> socketWrapper) {
         openSocket = keepAlive;
+        // Done is equivalent to sendfile not being used
+        SendfileState result = SendfileState.DONE;
         // Do sendfile as needed: add socket to sendfile and end
         if (sendfileData != null && !getErrorState().isError()) {
             sendfileData.keepAlive = keepAlive;
-            switch (socketWrapper.processSendfile(sendfileData)) {
-            case DONE:
-                // If sendfile is complete, no need to break keep-alive loop
-                sendfileData = null;
-                return false;
-            case PENDING:
-                return true;
+            result = socketWrapper.processSendfile(sendfileData);
+            switch (result) {
             case ERROR:
                 // Write failed
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("http11processor.sendfile.error"));
                 }
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, null);
-                return true;
+                //$FALL-THROUGH$
+            default:
+                sendfileData = null;
             }
         }
-        return false;
+        return result;
     }
 
 
