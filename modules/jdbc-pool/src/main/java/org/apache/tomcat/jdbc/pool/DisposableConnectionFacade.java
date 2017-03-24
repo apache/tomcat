@@ -22,7 +22,7 @@ import java.sql.SQLException;
 
 /**
  * A DisposableConnectionFacade object is the top most interceptor that wraps an
- * object of type {@link PooledConnection}. The ProxyCutOffConnection intercepts
+ * object of type {@link PooledConnection}. The DisposableConnectionFacade intercepts
  * two methods:
  * <ul>
  *   <li>{@link java.sql.Connection#close()} - returns the connection to the
