@@ -132,6 +132,11 @@
         Improve HPACK specification compliance by fixing some test failures
         reported by the h2spec tool written by Moto Ishizawa. (markt)
       </fix>
+      <fix>
+        <bug>60918</bug>: Fix sendfile processing error that could lead to
+        subsequent requests experiencing and <code>IllegalStateException</code>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
