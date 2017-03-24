@@ -353,7 +353,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     break;
                 }
 
-                result = SocketState.UPGRADED;
+                if (connectionState.get() != ConnectionState.CLOSED) {
+                    result = SocketState.UPGRADED;
+                }
                 break;
 
             case OPEN_WRITE:
@@ -1507,6 +1509,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
             log.debug(sm.getString("upgradeHandler.goaway.debug", connectionId,
                     Integer.toString(lastStreamId), Long.toHexString(errorCode), debugData));
         }
+        close();
     }
 
 
