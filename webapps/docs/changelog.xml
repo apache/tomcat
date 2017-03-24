@@ -109,7 +109,7 @@
       </fix>
       <fix>
         <bug>60918</bug>: Fix sendfile processing error that could lead to
-        subsequent requests experiencing and <code>IllegalStateException</code>.
+        subsequent requests experiencing an <code>IllegalStateException</code>.
         (markt)
       </fix>
     </changelog>
