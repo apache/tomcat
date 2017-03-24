@@ -1264,6 +1264,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
+    public void setInitiatePingDisabled(boolean initiatePingDisabled) {
+        pingManager.initiateDisabled = initiatePingDisabled;
+    }
+
+
     // ----------------------------------------------- Http2Parser.Input methods
 
     @Override
@@ -1526,6 +1531,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private class PingManager {
 
+        protected boolean initiateDisabled = false;
+
         // 10 seconds
         private final long pingIntervalNano = 10000000000L;
 
@@ -1543,6 +1550,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
          * @throws IOException If an I/O issue prevents the ping from being sent
          */
         public void sendPing(boolean force) throws IOException {
+            if (initiateDisabled) {
+                return;
+            }
             long now = System.nanoTime();
             if (force || now - lastPingNanoTime > pingIntervalNano) {
                 lastPingNanoTime = now;
