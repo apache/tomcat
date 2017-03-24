@@ -285,23 +285,26 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             break;
         }
         case ":path": {
-            if (coyoteRequest.requestURI().isNull()) {
-                int queryStart = value.indexOf('?');
-                if (queryStart == -1) {
-                    coyoteRequest.requestURI().setString(value);
-                    coyoteRequest.decodedURI().setString(
-                            coyoteRequest.getURLDecoder().convert(value, false));
-                } else {
-                    String uri = value.substring(0, queryStart);
-                    String query = value.substring(queryStart + 1);
-                    coyoteRequest.requestURI().setString(uri);
-                    coyoteRequest.decodedURI().setString(
-                            coyoteRequest.getURLDecoder().convert(uri, false));
-                    coyoteRequest.queryString().setString(query);
-                }
-            } else {
+            if (!coyoteRequest.requestURI().isNull()) {
                 throw new HpackException(sm.getString("stream.header.duplicate",
                         getConnectionId(), getIdentifier(), ":path" ));
+            }
+            if (value.length() == 0) {
+                throw new HpackException(sm.getString("stream.header.noPath",
+                        getConnectionId(), getIdentifier()));
+            }
+            int queryStart = value.indexOf('?');
+            if (queryStart == -1) {
+                coyoteRequest.requestURI().setString(value);
+                coyoteRequest.decodedURI().setString(
+                        coyoteRequest.getURLDecoder().convert(value, false));
+            } else {
+                String uri = value.substring(0, queryStart);
+                String query = value.substring(queryStart + 1);
+                coyoteRequest.requestURI().setString(uri);
+                coyoteRequest.decodedURI().setString(
+                        coyoteRequest.getURLDecoder().convert(uri, false));
+                coyoteRequest.queryString().setString(query);
             }
             break;
         }
