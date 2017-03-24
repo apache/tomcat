@@ -22,6 +22,7 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.CloseNowException;
@@ -224,6 +225,12 @@ class Stream extends AbstractStream implements HeaderEmitter {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.header.debug", getConnectionId(), getIdentifier(),
                     name, value));
+        }
+
+        // Header names must be lower case
+        if (!name.toLowerCase(Locale.US).equals(name)) {
+            throw new HpackException(sm.getString("stream.header.case",
+                    getConnectionId(), getIdentifier(), name));
         }
 
         if (headerStateErrorMsg != null) {
