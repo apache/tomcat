@@ -129,7 +129,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
                 if (delegate == null) return null;
             }
             if (compare(ISCLOSED_VAL, method)) {
-                if (delegate == null) return Boolean.TRUE;;
+                if (delegate == null) return Boolean.TRUE;
             }
 
             Object result =  null;
