@@ -308,6 +308,9 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     protected class AsyncPingManager extends PingManager {
         @Override
         public void sendPing(boolean force) throws IOException {
+            if (initiateDisabled) {
+                return;
+            }
             long now = System.nanoTime();
             if (force || now - lastPingNanoTime > pingIntervalNano) {
                 lastPingNanoTime = now;

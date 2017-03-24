@@ -69,7 +69,7 @@ public class Http2Protocol implements UpgradeProtocol {
     private int maxHeaderSize = Constants.DEFAULT_MAX_HEADER_SIZE;
     private int maxTrailerCount = Constants.DEFAULT_MAX_TRAILER_COUNT;
     private int maxTrailerSize = Constants.DEFAULT_MAX_TRAILER_SIZE;
-
+    private boolean initiatePingDisabled = false;
 
     @Override
     public String getHttpUpgradeName(boolean isSSLEnabled) {
@@ -116,6 +116,7 @@ public class Http2Protocol implements UpgradeProtocol {
         result.setMaxHeaderSize(getMaxHeaderSize());
         result.setMaxTrailerCount(getMaxTrailerCount());
         result.setMaxTrailerSize(getMaxTrailerSize());
+        result.setInitiatePingDisabled(initiatePingDisabled);
         return result;
     }
 
@@ -268,5 +269,10 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public int getMaxTrailerSize() {
         return maxTrailerSize;
+    }
+
+
+    public void setInitiatePingDisabled(boolean initiatePingDisabled) {
+        this.initiatePingDisabled = initiatePingDisabled;
     }
 }
