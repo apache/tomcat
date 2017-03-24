@@ -406,9 +406,6 @@ public class HPackHuffman {
                 }
                 bitPos--;
             }
-            if (bitPos < 0) {
-                throw new HpackException(sm.getString("hpackhuffman.stringLiteralTooMuchPadding"));
-            }
         }
         if (!eosBits) {
             throw new HpackException(sm.getString(
