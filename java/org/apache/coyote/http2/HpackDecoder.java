@@ -156,6 +156,9 @@ public class HpackDecoder {
     }
 
     private boolean handleMaxMemorySizeChange(ByteBuffer buffer, int originalPos) throws HpackException {
+        if (headerCount != 0) {
+            throw new HpackException(sm.getString("hpackdecoder.tableSizeUpdateNotAtStart"));
+        }
         buffer.position(buffer.position() - 1); //unget the byte
         int size = Hpack.decodeInteger(buffer, 5);
         if (size == -1) {

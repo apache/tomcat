@@ -128,6 +128,10 @@
         configuration attributes and internal code. Based on a pacth by Michael
         Osipov. (markt)
       </fix>
+      <fix>
+        Improve HPACK specification compliance by fixing some test failures
+        reported by the h2spec tool written by Moto Ishizawa. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
