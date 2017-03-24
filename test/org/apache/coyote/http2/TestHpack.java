@@ -105,6 +105,25 @@ public class TestHpack {
         }
     }
 
+    @Test(expected=HpackException.class)
+    public void testExcessiveStringLiteralPadding() throws Exception {
+        MimeHeaders headers = new MimeHeaders();
+        headers.setValue("X-test").setString("foobar");
+        ByteBuffer output = ByteBuffer.allocate(512);
+        HpackEncoder encoder = new HpackEncoder();
+        encoder.encode(headers, output);
+        // Hack the output buffer to extend the EOS marker for the header value
+        // by another byte
+        output.array()[7] = (byte) -122;
+        output.put((byte) -1);
+        output.flip();
+        MimeHeaders headers2 = new MimeHeaders();
+        HpackDecoder decoder = new HpackDecoder();
+        decoder.setHeaderEmitter(new HeadersListener(headers2));
+        decoder.decode(output);
+    }
+
+
     private void doTestHeaderValueBug60451(String filename) throws HpackException {
         String headerName = "Content-Disposition";
         String headerValue = "attachment;filename=\"" + filename + "\"";
