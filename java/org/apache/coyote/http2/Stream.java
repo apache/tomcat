@@ -220,7 +220,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
 
     @Override
-    public final void emitHeader(String name, String value) {
+    public final void emitHeader(String name, String value) throws HpackException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("stream.header.debug", getConnectionId(), getIdentifier(),
                     name, value));
@@ -247,34 +247,56 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
         switch(name) {
         case ":method": {
-            coyoteRequest.method().setString(value);
+            if (coyoteRequest.method().isNull()) {
+                coyoteRequest.method().setString(value);
+            } else {
+                throw new HpackException(sm.getString("stream.header.duplicate",
+                        getConnectionId(), getIdentifier(), ":method" ));
+            }
             break;
         }
         case ":scheme": {
-            coyoteRequest.scheme().setString(value);
+            if (coyoteRequest.scheme().isNull()) {
+                coyoteRequest.scheme().setString(value);
+            } else {
+                throw new HpackException(sm.getString("stream.header.duplicate",
+                        getConnectionId(), getIdentifier(), ":scheme" ));
+            }
             break;
         }
         case ":path": {
-            int queryStart = value.indexOf('?');
-            if (queryStart == -1) {
-                coyoteRequest.requestURI().setString(value);
-                coyoteRequest.decodedURI().setString(coyoteRequest.getURLDecoder().convert(value, false));
+            if (coyoteRequest.requestURI().isNull()) {
+                int queryStart = value.indexOf('?');
+                if (queryStart == -1) {
+                    coyoteRequest.requestURI().setString(value);
+                    coyoteRequest.decodedURI().setString(
+                            coyoteRequest.getURLDecoder().convert(value, false));
+                } else {
+                    String uri = value.substring(0, queryStart);
+                    String query = value.substring(queryStart + 1);
+                    coyoteRequest.requestURI().setString(uri);
+                    coyoteRequest.decodedURI().setString(
+                            coyoteRequest.getURLDecoder().convert(uri, false));
+                    coyoteRequest.queryString().setString(query);
+                }
             } else {
-                String uri = value.substring(0, queryStart);
-                String query = value.substring(queryStart + 1);
-                coyoteRequest.requestURI().setString(uri);
-                coyoteRequest.decodedURI().setString(coyoteRequest.getURLDecoder().convert(uri, false));
-                coyoteRequest.queryString().setString(query);
+                throw new HpackException(sm.getString("stream.header.duplicate",
+                        getConnectionId(), getIdentifier(), ":path" ));
             }
             break;
         }
         case ":authority": {
-            int i = value.lastIndexOf(':');
-            if (i > -1) {
-                coyoteRequest.serverName().setString(value.substring(0, i));
-                coyoteRequest.setServerPort(Integer.parseInt(value.substring(i + 1)));
+            if (coyoteRequest.serverName().isNull()) {
+                int i = value.lastIndexOf(':');
+                if (i > -1) {
+                    coyoteRequest.serverName().setString(value.substring(0, i));
+                    coyoteRequest.setServerPort(Integer.parseInt(value.substring(i + 1)));
+                } else {
+                    coyoteRequest.serverName().setString(value);
+                }
             } else {
-                coyoteRequest.serverName().setString(value);
+                throw new HpackException(sm.getString("stream.header.duplicate",
+                        getConnectionId(), getIdentifier(), ":authority" ));
             }
             break;
         }

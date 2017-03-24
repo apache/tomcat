@@ -342,8 +342,10 @@ public class HpackDecoder {
          *
          * @param name  Header name
          * @param value Header value
+         * @throws HpackException If a header is received that is not compliant
+         *                        with the HTTP/2 specification
          */
-        void emitHeader(String name, String value);
+        void emitHeader(String name, String value) throws HpackException;
 
         /**
          * Are the headers pass to the recipient so far valid? The decoder needs
@@ -384,7 +386,7 @@ public class HpackDecoder {
     }
 
 
-    private void emitHeader(String name, String value) {
+    private void emitHeader(String name, String value) throws HpackException {
         // Header names are forced to lower case
         if ("cookie".equals(name)) {
             // Only count the cookie header once since HTTP/2 splits it into
