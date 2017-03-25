@@ -350,7 +350,12 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    final boolean receivedEndOfHeaders() {
+    final boolean receivedEndOfHeaders() throws ConnectionException {
+        if (coyoteRequest.method().isNull() || coyoteRequest.scheme().isNull() ||
+                coyoteRequest.requestURI().isNull()) {
+            throw new ConnectionException(sm.getString("stream.header.required",
+                    getConnectionId(), getIdentifier()), Http2Error.PROTOCOL_ERROR);
+        }
         // Cookie headers need to be concatenated into a single header
         // See RFC 7540 8.1.2.5
         // Can only do this once the headers are fully received
