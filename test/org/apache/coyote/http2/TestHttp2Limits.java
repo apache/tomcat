@@ -41,15 +41,15 @@ public class TestHttp2Limits extends Http2TestBase {
     @Test
     public void testHeaderLimits100x32() throws Exception {
         // Just within default maxHeaderCount
-        // Note request has 3 standard headers
-        doTestHeaderLimits(97, 32, 0);
+        // Note request has 4 standard headers
+        doTestHeaderLimits(96, 32, 0);
     }
 
 
     @Test
     public void testHeaderLimits101x32() throws Exception {
         // Just above default maxHeaderCount
-        doTestHeaderLimits(98, 32, 1);
+        doTestHeaderLimits(97, 32, 1);
     }
 
 
@@ -61,17 +61,17 @@ public class TestHttp2Limits extends Http2TestBase {
 
 
     @Test
-    public void testHeaderLimits8x1001() throws Exception {
+    public void testHeaderLimits8x1144() throws Exception {
         // Just within default maxHttpHeaderSize
-        // per header overhead plus standard 2 headers
-        doTestHeaderLimits(8, 1001, 0);
+        // per header overhead plus standard 3 headers
+        doTestHeaderLimits(7, 1144, 0);
     }
 
 
     @Test
-    public void testHeaderLimits8x1002() throws Exception {
+    public void testHeaderLimits8x1145() throws Exception {
         // Just above default maxHttpHeaderSize
-        doTestHeaderLimits(8, 1002, 1);
+        doTestHeaderLimits(7, 1145, 1);
     }
 
 
@@ -263,6 +263,7 @@ public class TestHttp2Limits extends Http2TestBase {
             String path) throws Exception {
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString("GET");
+        headers.addValue(":scheme").setString("http");
         headers.addValue(":path").setString(path);
         headers.addValue(":authority").setString("localhost:" + getPort());
         for (String[] customHeader : customHeaders) {

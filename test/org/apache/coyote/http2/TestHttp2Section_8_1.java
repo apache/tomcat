@@ -141,8 +141,9 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
     @Test
     public void testUndefinedPseudoHeader() throws Exception {
-        List<Header> headers = new ArrayList<>(3);
+        List<Header> headers = new ArrayList<>(5);
         headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/simple"));
         headers.add(new Header(":authority", "localhost:" + getPort()));
         headers.add(new Header(":foo", "bar"));
@@ -153,8 +154,9 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
     @Test
     public void testInvalidPseudoHeader() throws Exception {
-        List<Header> headers = new ArrayList<>(3);
+        List<Header> headers = new ArrayList<>(5);
         headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/simple"));
         headers.add(new Header(":authority", "localhost:" + getPort()));
         headers.add(new Header(":status", "200"));
@@ -170,8 +172,9 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
         http2Connect();
 
-        List<Header> headers = new ArrayList<>(3);
+        List<Header> headers = new ArrayList<>(4);
         headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/simple"));
         headers.add(new Header("x-test", "test"));
 

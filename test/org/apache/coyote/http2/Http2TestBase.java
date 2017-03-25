@@ -177,6 +177,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             int streamId, String url) {
         List<Header> headers = new ArrayList<>(3);
         headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", url));
         headers.add(new Header(":authority", "localhost:" + getPort()));
 
@@ -215,6 +216,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             int streamId) {
         List<Header> headers = new ArrayList<>(3);
         headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/simple"));
 
         buildSimpleGetRequestPart1(frameHeader, headersPayload, headers, streamId);
@@ -306,6 +308,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             byte[] trailersFrameHeader, ByteBuffer trailersPayload, int streamId) {
         MimeHeaders headers = new MimeHeaders();
         headers.addValue(":method").setString("POST");
+        headers.addValue(":scheme").setString("http");
         headers.addValue(":path").setString("/simple");
         headers.addValue(":authority").setString("localhost:" + getPort());
         if (useExpectation) {
