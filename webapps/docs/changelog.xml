@@ -76,6 +76,10 @@
         single utility class and update the code to use the new utility class.
         (markt)
       </scode>
+      <fix>
+        <bug>60911</bug>: Ensure NPE will not be thrown when looking for SSL
+        session ID. Based on a pacth by Didier Gutacker. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
