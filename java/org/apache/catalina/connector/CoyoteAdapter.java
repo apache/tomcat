@@ -666,7 +666,7 @@ public class CoyoteAdapter implements Adapter {
             throws Exception {
 
         // XXX the processor may have set a correct scheme and port prior to this point,
-        // in ajp13 protocols dont make sense to get the port from the connector...
+        // in ajp13 protocols don't make sense to get the port from the connector...
         // otherwise, use connector configuration
         if (! req.scheme().isNull()) {
             // use processor specified scheme to determine secure state
@@ -678,7 +678,7 @@ public class CoyoteAdapter implements Adapter {
             request.setSecure(connector.getSecure());
         }
 
-        // FIXME: the code below doesnt belongs to here,
+        // FIXME: the code below doesn't belongs to here,
         // this is only have sense
         // in Http11, not in ajp13..
         // At this point the Host header has been processed.
@@ -1058,7 +1058,7 @@ public class CoyoteAdapter implements Adapter {
                 SSL_ONLY.equals(request.getServletContext()
                         .getEffectiveSessionTrackingModes()) &&
                         request.connector.secure) {
-            // TODO Is there a better way to map SSL sessions to our sesison ID?
+            // TODO Is there a better way to map SSL sessions to our session ID?
             // TODO The request.getAttribute() will cause a number of other SSL
             //      attribute to be populated. Is this a performance concern?
             request.setRequestedSessionId(
