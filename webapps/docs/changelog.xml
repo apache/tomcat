@@ -65,6 +65,10 @@
         <code>HttpHeaderSecurityFilter</code> for the HSTS preload parameter.
         (markt)
       </add>
+      <fix>
+        <bug>60911</bug>: Ensure NPE will not be thrown when looking for SSL
+        session ID. Based on a patch by Didier Gutacker. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
