@@ -1063,7 +1063,7 @@ public class CoyoteAdapter implements Adapter {
             //      attribute to be populated. Is this a performance concern?
             String sessionId = (String) request.getAttribute(SSLSupport.SESSION_ID_KEY);
             if (sessionId != null) {
-                request.setRequestedSessionId(sessionId.toString());
+                request.setRequestedSessionId(sessionId);
                 request.setRequestedSessionSSL(true);
             }
         }
