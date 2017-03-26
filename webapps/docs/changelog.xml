@@ -80,7 +80,7 @@
       </fix>
       <fix>
         <bug>60852</bug>: Correctly spell compressible when used in
-        configuration attributes and internal code. Based on a pacth by Michael
+        configuration attributes and internal code. Based on a patch by Michael
         Osipov. (markt)
       </fix>
     </changelog>
