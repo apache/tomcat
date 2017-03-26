@@ -973,7 +973,7 @@ public class CoyoteAdapter implements Adapter {
      * Look for SSL session ID if required. Only look for SSL Session ID if it
      * is the only tracking method enabled.
      *
-     * @param request The Servlet request obejct
+     * @param request The Servlet request object
      */
     protected void parseSessionSslId(Request request) {
         if (request.getRequestedSessionId() == null &&
@@ -990,7 +990,7 @@ public class CoyoteAdapter implements Adapter {
     /**
      * Parse session id in URL.
      *
-     * @param request The Servlet request obejct
+     * @param request The Servlet request object
      */
     protected void parseSessionCookiesId(Request request) {
 
@@ -1047,7 +1047,7 @@ public class CoyoteAdapter implements Adapter {
      * Character conversion of the URI.
      *
      * @param uri MessageBytes object containing the URI
-     * @param request The Servlet request obejct
+     * @param request The Servlet request object
      * @throws IOException if a IO exception occurs sending an error to the client
      */
     protected void convertURI(MessageBytes uri, Request request) throws IOException {
