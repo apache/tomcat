@@ -982,7 +982,7 @@ public class CoyoteAdapter implements Adapter {
                         request.connector.secure) {
             String sessionId = (String) request.getAttribute(SSLSupport.SESSION_ID_KEY);
             if (sessionId != null) {
-                request.setRequestedSessionId(sessionId.toString());
+                request.setRequestedSessionId(sessionId);
                 request.setRequestedSessionSSL(true);
             }
         }
