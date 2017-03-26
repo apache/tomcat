@@ -130,7 +130,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     private final Map<Integer,Stream> streams = new HashMap<>();
     protected final AtomicInteger activeRemoteStreamCount = new AtomicInteger(0);
-    private volatile int maxRemoteStreamId = 0;
     // Start at -1 so the 'add 2' logic in closeIdleStreams() works
     private volatile int maxActiveRemoteStreamId = -1;
     private volatile int maxProcessedStreamId;
@@ -170,7 +169,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             Integer key = Integer.valueOf(1);
             Stream stream = new Stream(key, this, coyoteRequest);
             streams.put(key, stream);
-            maxRemoteStreamId = 1;
             maxActiveRemoteStreamId = 1;
             activeRemoteStreamCount.set(1);
             maxProcessedStreamId = 1;
@@ -957,16 +955,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     sm.getString("upgradeHandler.stream.even", key), Http2Error.PROTOCOL_ERROR);
         }
 
-        if (streamId <= maxRemoteStreamId) {
-            throw new ConnectionException(sm.getString("upgradeHandler.stream.old", key,
-                    Integer.valueOf(maxRemoteStreamId)), Http2Error.PROTOCOL_ERROR);
-        }
-
         pruneClosedStreams();
 
         Stream result = new Stream(key, this);
         streams.put(key, result);
-        maxRemoteStreamId = streamId;
         return result;
     }
 
@@ -978,7 +970,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         Stream result = new Stream(key, this, request);
         streams.put(key, result);
-        maxRemoteStreamId = streamId;
         return result;
     }
 
@@ -1366,6 +1357,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             Stream stream = getStream(streamId, false);
             if (stream == null) {
                 stream = createRemoteStream(streamId);
+            }
+            if (streamId < maxActiveRemoteStreamId) {
+                throw new ConnectionException(sm.getString("upgradeHandler.stream.old",
+                        Integer.valueOf(streamId), Integer.valueOf(maxActiveRemoteStreamId)),
+                        Http2Error.PROTOCOL_ERROR);
             }
             stream.checkState(FrameType.HEADERS);
             stream.receivedStartOfHeaders(headersEndStream);
