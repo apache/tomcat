@@ -78,7 +78,7 @@
       </scode>
       <fix>
         <bug>60911</bug>: Ensure NPE will not be thrown when looking for SSL
-        session ID. Based on a pacth by Didier Gutacker. (violetagg)
+        session ID. Based on a patch by Didier Gutacker. (violetagg)
       </fix>
     </changelog>
   </subsection>
@@ -104,7 +104,7 @@
       </fix>
       <fix>
         <bug>60852</bug>: Correctly spell compressible when used in
-        configuration attributes and internal code. Based on a pacth by Michael
+        configuration attributes and internal code. Based on a patch by Michael
         Osipov. (markt)
       </fix>
       <fix>
