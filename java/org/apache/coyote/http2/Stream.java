@@ -233,6 +233,18 @@ class Stream extends AbstractStream implements HeaderEmitter {
                     getConnectionId(), getIdentifier(), name));
         }
 
+        if ("connection".equals(name)) {
+            throw new HpackException(sm.getString("stream.header.connection",
+                    getConnectionId(), getIdentifier()));
+        }
+
+        if ("te".equals(name)) {
+            if (!"trailers".equals(value)) {
+                throw new HpackException(sm.getString("stream.header.te",
+                        getConnectionId(), getIdentifier(), value));
+            }
+        }
+
         if (headerStateErrorMsg != null) {
             // Don't bother processing the header since the stream is going to
             // be reset anyway
