@@ -420,7 +420,7 @@ class Http2Parser {
             } catch (HpackException hpe) {
                 throw new ConnectionException(
                         sm.getString("http2Parser.processFrameHeaders.decodingFailed"),
-                        Http2Error.COMPRESSION_ERROR);
+                        Http2Error.COMPRESSION_ERROR, hpe);
             }
 
             // switches to write mode
