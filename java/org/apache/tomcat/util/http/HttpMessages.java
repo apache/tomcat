@@ -48,6 +48,7 @@ public class HttpMessages {
     private String st_302 = null;
     private String st_400 = null;
     private String st_404 = null;
+    private String st_500 = null;
 
     private HttpMessages(StringManager sm) {
         this.sm = sm;
@@ -88,6 +89,11 @@ public class HttpMessages {
                 st_404 = sm.getString("sc.404");
             }
             return st_404;
+        case 500:
+            if (st_500 == null) {
+                st_500 = sm.getString("sc.500");
+            }
+            return st_500;
         }
         return sm.getString("sc."+ status);
     }
