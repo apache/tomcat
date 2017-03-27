@@ -57,9 +57,13 @@ public class HpackDecoder {
     private int currentMemorySize = 0;
 
     /**
-     * The maximum allowed memory size
+     * The maximum allowed memory size set by the container.
      */
-    private int maxMemorySize;
+    private int maxMemorySizeHard;
+    /**
+     * The maximum memory size currently in use. May be less than the hard limit.
+     */
+    private int maxMemorySizeSoft;
 
     private int maxHeaderCount = Constants.DEFAULT_MAX_HEADER_COUNT;
     private int maxHeaderSize = Constants.DEFAULT_MAX_HEADER_SIZE;
@@ -71,7 +75,8 @@ public class HpackDecoder {
     private final StringBuilder stringBuilder = new StringBuilder();
 
     public HpackDecoder(int maxMemorySize) {
-        this.maxMemorySize = maxMemorySize;
+        this.maxMemorySizeHard = maxMemorySize;
+        this.maxMemorySizeSoft = maxMemorySize;
         headerTable = new Hpack.HeaderField[DEFAULT_RING_BUFFER_SIZE];
     }
 
@@ -165,12 +170,15 @@ public class HpackDecoder {
             buffer.position(originalPos);
             return false;
         }
-        maxMemorySize = size;
-        if (currentMemorySize > maxMemorySize) {
+        if (size > maxMemorySizeHard) {
+            throw new HpackException();
+        }
+        maxMemorySizeSoft = size;
+        if (currentMemorySize > maxMemorySizeSoft) {
             int newTableSlots = filledTableSlots;
             int tableLength = headerTable.length;
             int newSize = currentMemorySize;
-            while (newSize > maxMemorySize) {
+            while (newSize > maxMemorySizeSoft) {
                 int clearIndex = firstSlotPosition;
                 firstSlotPosition++;
                 if (firstSlotPosition == tableLength) {
@@ -287,7 +295,7 @@ public class HpackDecoder {
     }
 
     private void addEntryToHeaderTable(Hpack.HeaderField entry) {
-        if (entry.size > maxMemorySize) {
+        if (entry.size > maxMemorySizeSoft) {
             //it is to big to fit, so we just completely clear the table.
             while (filledTableSlots > 0) {
                 headerTable[firstSlotPosition] = null;
@@ -306,7 +314,7 @@ public class HpackDecoder {
         int index = (firstSlotPosition + filledTableSlots) % tableLength;
         headerTable[index] = entry;
         int newSize = currentMemorySize + entry.size;
-        while (newSize > maxMemorySize) {
+        while (newSize > maxMemorySizeSoft) {
             int clearIndex = firstSlotPosition;
             firstSlotPosition++;
             if (firstSlotPosition == tableLength) {
@@ -452,7 +460,7 @@ public class HpackDecoder {
         return currentMemorySize;
     }
 
-    int getMaxMemorySize() {
-        return maxMemorySize;
+    int getMaxMemorySizeSoft() {
+        return maxMemorySizeSoft;
     }
 }
