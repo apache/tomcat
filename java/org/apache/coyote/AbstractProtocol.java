@@ -210,7 +210,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     /**
      * Specifies whether the reason phrase will be sent in the response.
      * By default a reason phrase will not be sent in the response.
-     * 
+     *
      * @deprecated This option will be removed in Tomcat 9. Reason phrase will
      *             not be sent.
      */
