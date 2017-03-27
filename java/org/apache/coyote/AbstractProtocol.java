@@ -933,10 +933,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     wrapper.registerReadInterest();
                 } else if (state == SocketState.SENDFILE) {
                     // Sendfile in progress. If it fails, the socket will be
-                    // closed. If it works, the socket will be re-added to the
-                    // poller
-                    connections.remove(socket);
-                    release(processor);
+                    // closed. If it works, the socket either be added to the
+                    // poller (or equivalent) to await more data or processed
+                    // if there are any pipe-lined requests remaining.
                 } else if (state == SocketState.UPGRADED) {
                     // Don't add sockets back to the poller if this was a
                     // non-blocking write otherwise the poller may trigger
