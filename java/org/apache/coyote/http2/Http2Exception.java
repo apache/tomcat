@@ -29,6 +29,12 @@ abstract class Http2Exception extends Exception {
     }
 
 
+    Http2Exception(String msg, Http2Error error, Throwable cause) {
+        super(msg, cause);
+        this.error = error;
+    }
+
+
     Http2Error getError() {
         return error;
     }

@@ -26,4 +26,9 @@ class ConnectionException extends Http2Exception {
     ConnectionException(String msg, Http2Error error) {
         super(msg, error);
     }
+
+
+    ConnectionException(String msg, Http2Error error, Throwable cause) {
+        super(msg, error, cause);
+    }
 }
