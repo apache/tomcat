@@ -38,7 +38,7 @@ public class TesterOutputBuffer extends Http11OutputBuffer {
 
 
     public TesterOutputBuffer(Response response, int headerBufferSize) {
-        super(response, headerBufferSize);
+        super(response, headerBufferSize, false);
         outputStreamOutputBuffer = new OutputStreamOutputBuffer();
     }
 

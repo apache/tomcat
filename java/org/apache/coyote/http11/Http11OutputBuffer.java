@@ -27,6 +27,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -108,9 +109,14 @@ public class Http11OutputBuffer implements OutputBuffer {
     protected long byteCount = 0;
 
 
-    protected Http11OutputBuffer(Response response, int headerBufferSize) {
+    @Deprecated
+    private boolean sendReasonPhrase = false;
+
+
+    protected Http11OutputBuffer(Response response, int headerBufferSize, boolean sendReasonPhrase) {
 
         this.response = response;
+        this.sendReasonPhrase = sendReasonPhrase;
 
         headerBuffer = ByteBuffer.allocate(headerBufferSize);
 
@@ -121,6 +127,11 @@ public class Http11OutputBuffer implements OutputBuffer {
         responseFinished = false;
 
         outputStreamOutputBuffer = new SocketOutputBuffer();
+
+        if (sendReasonPhrase) {
+            // Cause loading of HttpMessages
+            HttpMessages.getInstance(response.getLocale()).getMessage(200);
+        }
     }
 
 
@@ -327,9 +338,14 @@ public class Http11OutputBuffer implements OutputBuffer {
     }
 
 
+    @SuppressWarnings("deprecation")
     public void sendAck() throws IOException {
         if (!response.isCommitted()) {
-            socketWrapper.write(isBlocking(), Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
+            if (sendReasonPhrase) {
+                socketWrapper.write(isBlocking(), Constants.ACK_BYTES_REASON, 0, Constants.ACK_BYTES_REASON.length);
+            } else {
+                socketWrapper.write(isBlocking(), Constants.ACK_BYTES, 0, Constants.ACK_BYTES.length);
+            }
             if (flushBuffer(true)) {
                 throw new IOException(sm.getString("iob.failedwrite.ack"));
             }
@@ -360,6 +376,7 @@ public class Http11OutputBuffer implements OutputBuffer {
     /**
      * Send the response status line.
      */
+    @SuppressWarnings("deprecation")
     public void sendStatus() {
         // Write protocol name
         write(Constants.HTTP_11_BYTES);
@@ -383,9 +400,24 @@ public class Http11OutputBuffer implements OutputBuffer {
 
         headerBuffer.put(Constants.SP);
 
-        // The reason phrase is optional but the space before it is not. Skip
-        // sending the reason phrase. Clients should ignore it (RFC 7230) and it
-        // just wastes bytes.
+        if (sendReasonPhrase) {
+            // Write message
+            String message = null;
+            if (org.apache.coyote.Constants.USE_CUSTOM_STATUS_MSG_IN_HEADER &&
+                    HttpMessages.isSafeInHttpHeader(response.getMessage())) {
+                message = response.getMessage();
+            }
+            if (message == null) {
+                write(HttpMessages.getInstance(
+                        response.getLocale()).getMessage(status));
+            } else {
+                write(message);
+            }
+        } else {
+            // The reason phrase is optional but the space before it is not. Skip
+            // sending the reason phrase. Clients should ignore it (RFC 7230) and it
+            // just wastes bytes.
+        }
 
         headerBuffer.put(Constants.CR).put(Constants.LF);
     }
@@ -471,6 +503,35 @@ public class Http11OutputBuffer implements OutputBuffer {
 
         // Writing the byte chunk to the output buffer
         headerBuffer.put(b);
+    }
+
+
+    /**
+     * This method will write the contents of the specified String to the
+     * output stream, without filtering. This method is meant to be used to
+     * write the response header.
+     *
+     * @param s data to be written
+     */
+    private void write(String s) {
+        if (s == null) {
+            return;
+        }
+
+        // From the Tomcat 3.3 HTTP/1.0 connector
+        int len = s.length();
+        checkLengthBeforeWrite(len);
+        for (int i = 0; i < len; i++) {
+            char c = s.charAt (i);
+            // Note: This is clearly incorrect for many strings,
+            // but is the only consistent approach within the current
+            // servlet framework. It must suffice until servlet output
+            // streams properly encode their output.
+            if (((c <= 31) && (c != 9)) || c == 127 || c > 255) {
+                c = ' ';
+            }
+            headerBuffer.put((byte) c);
+        }
     }
 
 

@@ -796,11 +796,12 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     // ------------------------------------------------------------- Common code
 
+    @SuppressWarnings("deprecation")
     @Override
     protected Processor createProcessor() {
         Http11Processor processor = new Http11Processor(getMaxHttpHeaderSize(), getEndpoint(),
                 getMaxTrailerSize(), allowedTrailerHeaders, getMaxExtensionSize(),
-                getMaxSwallowSize(), httpUpgradeProtocols);
+                getMaxSwallowSize(), httpUpgradeProtocols, getSendReasonPhrase());
         processor.setAdapter(getAdapter());
         processor.setMaxKeepAliveRequests(getMaxKeepAliveRequests());
         processor.setConnectionUploadTimeout(getConnectionUploadTimeout());

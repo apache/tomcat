@@ -207,6 +207,40 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         return asyncTimeout;
     }
 
+    /**
+     * Specifies whether the reason phrase will be sent in the response.
+     * By default a reason phrase will not be sent in the response.
+     * 
+     * @deprecated This option will be removed in Tomcat 9. Reason phrase will
+     *             not be sent.
+     */
+    @Deprecated
+    private boolean sendReasonPhrase = false;
+    /**
+     * Returns whether the reason phrase will be sent in the response.
+     * By default a reason phrase will not be sent in the response.
+     *
+     * @return whether the reason phrase will be sent
+     * @deprecated This option will be removed in Tomcat 9. Reason phrase will
+     *             not be sent.
+     */
+    @Deprecated
+    public boolean getSendReasonPhrase() {
+        return sendReasonPhrase;
+    }
+    /**
+     * Specifies whether the reason phrase will be sent in the response.
+     * By default a reason phrase will not be sent in the response.
+     *
+     * @param sendReasonPhrase specifies whether the reason phrase will be sent
+     * @deprecated This option will be removed in Tomcat 9. Reason phrase will
+     *             not be sent.
+     */
+    @Deprecated
+    public void setSendReasonPhrase(boolean sendReasonPhrase) {
+        this.sendReasonPhrase = sendReasonPhrase;
+    }
+
 
     // ---------------------- Properties that are passed through to the EndPoint
 

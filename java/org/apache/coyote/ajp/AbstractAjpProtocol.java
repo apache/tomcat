@@ -182,6 +182,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     protected Processor createProcessor() {
         AjpProcessor processor = new AjpProcessor(getPacketSize(), getEndpoint());
@@ -192,6 +193,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
         processor.setRequiredSecret(requiredSecret);
         processor.setKeepAliveTimeout(getKeepAliveTimeout());
         processor.setClientCertProvider(getClientCertProvider());
+        processor.setSendReasonPhrase(getSendReasonPhrase());
         return processor;
     }
 

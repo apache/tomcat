@@ -84,6 +84,13 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <add>
+        <bug>60362</bug>: Add a new Connector configuration
+        <code>sendReasonPhrase</code>. When this attribute is set to
+        <code>true</code>, a reason phrase will be sent with the response.
+        By default a reason phrase will not be sent. This option is deprecated
+        and is not available in Tomcat 9. (violetagg)
+      </add>
       <fix>
         Fix HTTP/2 incorrect input unblocking on EOF. (remm)
       </fix>

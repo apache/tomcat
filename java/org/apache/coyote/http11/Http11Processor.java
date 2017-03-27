@@ -226,7 +226,7 @@ public class Http11Processor extends AbstractProcessor {
 
     public Http11Processor(int maxHttpHeaderSize, AbstractEndpoint<?> endpoint,int maxTrailerSize,
             Set<String> allowedTrailerHeaders, int maxExtensionSize, int maxSwallowSize,
-            Map<String,UpgradeProtocol> httpUpgradeProtocols) {
+            Map<String,UpgradeProtocol> httpUpgradeProtocols, boolean sendReasonPhrase) {
 
         super(endpoint);
         userDataHelper = new UserDataHelper(log);
@@ -234,7 +234,7 @@ public class Http11Processor extends AbstractProcessor {
         inputBuffer = new Http11InputBuffer(request, maxHttpHeaderSize);
         request.setInputBuffer(inputBuffer);
 
-        outputBuffer = new Http11OutputBuffer(response, maxHttpHeaderSize);
+        outputBuffer = new Http11OutputBuffer(response, maxHttpHeaderSize, sendReasonPhrase);
         response.setOutputBuffer(outputBuffer);
 
         // Create and add the identity filters.

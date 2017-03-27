@@ -236,6 +236,14 @@
       The default value is <code>false</code>.</p>
     </attribute>
 
+    <attribute name="sendReasonPhrase" required="false">
+      <p>Set this attribute to <code>true</code> if you wish to have
+      a reason phrase in the response.
+      The default value is <code>false</code>.</p>
+      <p><strong>Note:</strong> This option is deprecated and will be removed
+      in Tomcat 9. The reason phrase will not be sent.</p>
+    </attribute>
+
     <attribute name="URIEncoding" required="false">
       <p>This specifies the character encoding used to decode the URI bytes,
       after %xx decoding the URL. If not specified, UTF-8 will be used unless
