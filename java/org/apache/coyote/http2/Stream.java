@@ -54,6 +54,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
     private volatile int weight = Constants.DEFAULT_WEIGHT;
+    private volatile long contentLengthReceived = 0;
 
     private final Http2UpgradeHandler handler;
     private final StreamStateMachine state;
@@ -446,7 +447,24 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    final void receivedEndOfStream() {
+    final void receivedData(int payloadSize) throws ConnectionException {
+        contentLengthReceived += payloadSize;
+        long contentLengthHeader = coyoteRequest.getContentLengthLong();
+        if (contentLengthHeader > -1 && contentLengthReceived > contentLengthHeader) {
+            throw new ConnectionException(sm.getString("stream.header.contentLength",
+                    getConnectionId(), getIdentifier(), Long.valueOf(contentLengthHeader),
+                    Long.valueOf(contentLengthReceived)), Http2Error.PROTOCOL_ERROR);
+        }
+    }
+
+
+    final void receivedEndOfStream() throws ConnectionException {
+        long contentLengthHeader = coyoteRequest.getContentLengthLong();
+        if (contentLengthHeader > -1 && contentLengthReceived != contentLengthHeader) {
+            throw new ConnectionException(sm.getString("stream.header.contentLength",
+                    getConnectionId(), getIdentifier(), Long.valueOf(contentLengthHeader),
+                    Long.valueOf(contentLengthReceived)), Http2Error.PROTOCOL_ERROR);
+        }
         state.receivedEndOfStream();
         if (inputBuffer != null) {
             inputBuffer.notifyEof();
