@@ -1383,16 +1383,30 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     // responsible for registering the socket for the
                     // appropriate event(s) if sendfile completes.
                     if (!calledByProcessor) {
-                        if ( sd.keepAlive ) {
-                            if (log.isDebugEnabled()) {
-                                log.debug("Connection is keep alive, registering back for OP_READ");
-                            }
-                            reg(sk,attachment,SelectionKey.OP_READ);
-                        } else {
+                        switch (sd.keepAliveState) {
+                        case NONE: {
                             if (log.isDebugEnabled()) {
                                 log.debug("Send file connection is being closed");
                             }
                             cancelledKey(sk,SocketStatus.STOP,false);
+                            break;
+                        }
+                        case PIPELINED: {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Connection is keep alive, processing pipe-lined data");
+                            }
+                            if (!processSocket(sc, SocketStatus.OPEN_READ, true)) {
+                                cancelledKey(sk, SocketStatus.DISCONNECT, false);
+                            }
+                            break;
+                        }
+                        case OPEN: {
+                            if (log.isDebugEnabled()) {
+                                log.debug("Connection is keep alive, registering back for OP_READ");
+                            }
+                            reg(sk, attachment, SelectionKey.OP_READ);
+                            break;
+                        }
                         }
                     }
                     return SendfileState.DONE;
@@ -1836,6 +1850,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         public volatile long pos;
         public volatile long length;
         // KeepAlive flag
-        public volatile boolean keepAlive;
+        public SendfileKeepAliveState keepAliveState = SendfileKeepAliveState.NONE;
     }
 }

@@ -83,6 +83,9 @@
         configuration attributes and internal code. Based on a patch by Michael
         Osipov. (markt)
       </fix>
+      <fix>
+        Improve sendfile handling when requests are pipelined. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
