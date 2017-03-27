@@ -100,11 +100,6 @@
         (markt)
       </fix>
       <fix>
-        <bug>60900</bug>: Avoid a <code>NullPointerException</code> in the APR
-        Poller if a connection is closed at the same time as new data arrives on
-        that connection. (markt)
-      </fix>
-      <fix>
         Speed up shutdown when using multiple acceptor threads by ensuring that
         the code that unlocks the acceptor threads correctly handles the case
         where there are multiple threads. (markt)
@@ -113,6 +108,11 @@
         <bug>60852</bug>: Correctly spell compressible when used in
         configuration attributes and internal code. Based on a patch by Michael
         Osipov. (markt)
+      </fix>
+      <fix>
+        <bug>60900</bug>: Avoid a <code>NullPointerException</code> in the APR
+        Poller if a connection is closed at the same time as new data arrives on
+        that connection. (markt)
       </fix>
       <fix>
         Improve HPACK specification compliance by fixing some test failures
@@ -301,12 +301,6 @@
         <strong>Connector</strong>. (markt)
       </fix>
       <fix>
-        <bug>60627</bug>: Modify the <code>Rfc6265CookieProcessor</code> so that
-        in addition to cookie headers that start with an explicit RFC 2109
-        <code>$Version=1</code>, cookies that start with <code>$Version=0</code>
-        are also parsed as RFC 2109 cookies. (markt)
-      </fix>
-      <fix>
         Include the value of <code>SslHostConfig.truststoreAlgorithm</code> when
         warning that the algorithm does not support the
         <code>certificateVerificationDepth</code> configuration option. (markt)
@@ -321,6 +315,12 @@
         <code>tomcat.util.http.parser.HttpParser.requestTargetAllow</code>.
         (csutherl)
       </add>
+      <fix>
+        <bug>60627</bug>: Modify the <code>Rfc6265CookieProcessor</code> so that
+        in addition to cookie headers that start with an explicit RFC 2109
+        <code>$Version=1</code>, cookies that start with <code>$Version=0</code>
+        are also parsed as RFC 2109 cookies. (markt)
+      </fix>
       <fix>
         <bug>60716</bug>: Add a new JSSE specific attribute,
         <code>revocationEnabled</code>, to <code>SSLHostConfig</code> to permit
