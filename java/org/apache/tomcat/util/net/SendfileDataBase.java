@@ -21,10 +21,10 @@ public abstract class SendfileDataBase {
     /**
      * Is the current request being processed on a keep-alive connection? This
      * determines if the socket is closed once the send file completes or if
-     * processing continues with the next request on the connection (or waiting
-     * for that next request to arrive).
+     * processing continues with the next request on the connection or waiting
+     * for that next request to arrive.
      */
-    public boolean keepAlive;
+    public SendfileKeepAliveState keepAliveState = SendfileKeepAliveState.NONE;
 
     /**
      * The full path to the file that contains the data to be written to the

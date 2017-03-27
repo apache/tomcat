@@ -145,6 +145,9 @@
         subsequent requests experiencing an <code>IllegalStateException</code>.
         (markt)
       </fix>
+      <fix>
+        Improve sendfile handling when requests are pipelined. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
