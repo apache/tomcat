@@ -134,7 +134,11 @@ class StreamProcessor extends AbstractProcessor {
     @Override
     protected final void setRequestBody(ByteChunk body) {
         stream.getInputBuffer().insertReplayedBody(body);
-        stream.receivedEndOfStream();
+        try {
+            stream.receivedEndOfStream();
+        } catch (ConnectionException e) {
+            // Exception will not be thrown in this case
+        }
     }
 
 

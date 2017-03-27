@@ -1332,6 +1332,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize) throws Http2Exception {
         Stream stream = getStream(streamId, true);
         stream.checkState(FrameType.DATA);
+        stream.receivedData(payloadSize);
         return stream.getInputByteBuffer();
     }
 
