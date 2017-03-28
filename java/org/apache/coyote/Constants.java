@@ -55,9 +55,7 @@ public final class Constants {
      */
     @Deprecated
     public static final boolean USE_CUSTOM_STATUS_MSG_IN_HEADER =
-        Boolean.valueOf(System.getProperty(
-                "org.apache.coyote.USE_CUSTOM_STATUS_MSG_IN_HEADER",
-                "false")).booleanValue();
+            Boolean.getBoolean("org.apache.coyote.USE_CUSTOM_STATUS_MSG_IN_HEADER");
 
     /**
      * The request attribute that is set to the value of {@code Boolean.TRUE}
