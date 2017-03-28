@@ -617,7 +617,7 @@
       <p>If not specified, the default value of <code>200</code> will be used.</p>
     </property>
 
-    <property name="org.apache.tomcat.util.buf.UriUtil.WAR_SEPARATOR">
+    <property name="org.apache.tomcat.util.buf.UriUtil. WAR_SEPARATOR">
       <p>The character to use to separate the WAR file and WAR content parts of
       a WAR URL using the custom WAR scheme provided by Tomcat. This is
       equivalent to how <code>!</code> is used in JAR URLs.</p>
@@ -657,7 +657,7 @@
       <p>If not specified, the default value of <code>3</code> will be used.</p>
     </property>
 
-    <property name="tomcat.util.http.parser.HttpParser.requestTargetAllow">
+    <property name="tomcat.util.http.parser.HttpParser. requestTargetAllow">
       <p>A string comprised of characters the server should allow even when they are not encoded.
       These characters would normally result in a 400 status.</p>
       <p>The acceptable characters for this property are: <code>|</code>, <code>{</code>
