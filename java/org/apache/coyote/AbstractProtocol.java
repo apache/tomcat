@@ -696,6 +696,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     // closed. If it works, the socket either be added to the
                     // poller (or equivalent) to await more data or processed
                     // if there are any pipe-lined requests remaining.
+                    connections.put(socket, processor);
                 } else if (state == SocketState.UPGRADED) {
                     // Need to keep the connection associated with the processor
                     connections.put(socket, processor);
