@@ -53,6 +53,11 @@
         invoke the correct method when running Tomcat with security manager.
         (markt)
       </fix>
+      <update>
+        Update the early access Servlet 4.0 API implementation to reflect the
+        change in method name from <code>getPushBuilder()</code> to
+        <code>newPushBuilder()</code>. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

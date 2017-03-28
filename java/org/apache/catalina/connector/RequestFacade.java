@@ -1135,7 +1135,7 @@ public class RequestFacade implements HttpServletRequest {
      * removed or replaced at any time until Servlet 4.0 becomes final.
      */
     @Override
-    public PushBuilder getPushBuilder() {
-        return request.getPushBuilder();
+    public PushBuilder newPushBuilder() {
+        return request.newPushBuilder();
     }
 }

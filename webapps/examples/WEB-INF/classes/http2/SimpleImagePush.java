@@ -39,7 +39,7 @@ public class SimpleImagePush extends HttpServlet {
         PrintWriter pw = resp.getWriter();
 
         PushBuilder pb = ((org.apache.catalina.servlet4preview.http.HttpServletRequest)
-                req).getPushBuilder();
+                req).newPushBuilder();
 
         if (pb != null) {
             pb.path("servlets/images/code.gif");

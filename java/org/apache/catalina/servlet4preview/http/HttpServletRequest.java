@@ -37,5 +37,5 @@ public interface HttpServletRequest extends javax.servlet.http.HttpServletReques
      *
      * @since Servlet 4.0
      */
-    public PushBuilder getPushBuilder();
+    public PushBuilder newPushBuilder();
 }

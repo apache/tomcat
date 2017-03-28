@@ -1932,7 +1932,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
      * @return A builder to use to construct the push request
      */
     @Override
-    public PushBuilder getPushBuilder() {
+    public PushBuilder newPushBuilder() {
         AtomicBoolean result = new AtomicBoolean();
         coyoteRequest.action(ActionCode.IS_PUSH_SUPPORTED, result);
         if (result.get()) {
