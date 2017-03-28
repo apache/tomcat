@@ -794,7 +794,7 @@ public class ApplicationContextFacade implements org.apache.catalina.servlet4pre
     @Override
     public void setSessionTimeout(int sessionTimeout) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            doPrivileged("getSessionTimeout", new Object[] { Integer.valueOf(sessionTimeout) });
+            doPrivileged("setSessionTimeout", new Object[] { Integer.valueOf(sessionTimeout) });
         } else  {
             context.setSessionTimeout(sessionTimeout);
         }

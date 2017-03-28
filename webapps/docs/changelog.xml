@@ -45,6 +45,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.14 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>60926</bug>: Ensure
+        <code>o.a.c.core.ApplicationContextFacade#setSessionTimeout</code> will
+        invoke the correct method when running Tomcat with security manager.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.13 (markt)" rtext="release in progress">
   <subsection name="Catalina">
