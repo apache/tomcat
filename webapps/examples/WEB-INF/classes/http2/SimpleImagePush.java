@@ -37,7 +37,7 @@ public class SimpleImagePush extends HttpServlet {
         resp.setContentType("text/html");
         PrintWriter pw = resp.getWriter();
 
-        PushBuilder pb = req.getPushBuilder();
+        PushBuilder pb = req.newPushBuilder();
         if (pb != null) {
             pb.path("servlets/images/code.gif");
             pb.push();

@@ -626,7 +626,7 @@ public class RemoteIpFilter extends GenericFilter {
         }
 
         @Override
-        public PushBuilder getPushBuilder() {
+        public PushBuilder newPushBuilder() {
             return new ApplicationPushBuilder(this);
         }
     }

@@ -253,7 +253,7 @@ public interface HttpServletRequest extends ServletRequest {
      *
      * @since Servlet 4.0
      */
-    public default PushBuilder getPushBuilder() {
+    public default PushBuilder newPushBuilder() {
         return null;
     }
 

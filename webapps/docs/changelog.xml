@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M20 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Update the Servlet 4.0 API implementation to reflect the change in
+        method name from <code>getPushBuilder()</code> to
+        <code>newPushBuilder()</code>. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M19 (markt)" rtext="release in progress">
   <subsection name="Catalina">

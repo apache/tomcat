@@ -443,7 +443,7 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public PushBuilder getPushBuilder() {
+    public PushBuilder newPushBuilder() {
         throw new RuntimeException("Not implemented");
     }
 }

@@ -1905,7 +1905,7 @@ public class Request implements HttpServletRequest {
      * @since Servlet 4.0
      */
     @Override
-    public PushBuilder getPushBuilder() {
+    public PushBuilder newPushBuilder() {
         AtomicBoolean result = new AtomicBoolean();
         coyoteRequest.action(ActionCode.IS_PUSH_SUPPORTED, result);
         if (result.get()) {

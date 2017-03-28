@@ -388,12 +388,12 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
      * {@inheritDoc}
      * <p>
      * The default behavior of this method is to return
-     * {@link HttpServletRequest#getPushBuilder()} on the wrapped request object.
+     * {@link HttpServletRequest#newPushBuilder()} on the wrapped request object.
      *
      * @since Servlet 4.0
      */
     @Override
-    public PushBuilder getPushBuilder() {
-        return this._getHttpServletRequest().getPushBuilder();
+    public PushBuilder newPushBuilder() {
+        return this._getHttpServletRequest().newPushBuilder();
     }
 }
