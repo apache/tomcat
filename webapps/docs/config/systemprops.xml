@@ -606,7 +606,7 @@
       <p>If not specified, the default value of <code>200</code> will be used.</p>
     </property>
 
-    <property name="org.apache.tomcat.util.buf.UriUtil.WAR_SEPARATOR">
+    <property name="org.apache.tomcat.util.buf.UriUtil. WAR_SEPARATOR">
       <p>The character to use to separate the WAR file and WAR content parts of
       a WAR URL using the custom WAR scheme provided by Tomcat. This is
       equivalent to how <code>!</code> is used in JAR URLs.</p>
