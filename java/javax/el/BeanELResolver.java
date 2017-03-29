@@ -245,6 +245,7 @@ public class BeanELResolver extends ELResolver {
                                     this.type, pd));
                         }
                     }
+                    populateFromInterfaces(ifs);
                 }
             }
             Class<?> superclass = aClass.getSuperclass();

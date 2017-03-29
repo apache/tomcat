@@ -54,6 +54,15 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>60925</bug>: Improve the handling of access to properties defined
+        by interfaces when a <code>BeanELResolver</code> is used under a
+        <code>SecurityManager</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M19 (markt)" rtext="release in progress">
   <subsection name="Catalina">
