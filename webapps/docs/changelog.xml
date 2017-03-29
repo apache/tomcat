@@ -63,6 +63,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>60932</bug>: Correctly escape single quotes when used in i18n
+        messages. Based on a patch by Michael Osipov. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M19 (markt)" rtext="release in progress">
   <subsection name="Catalina">
