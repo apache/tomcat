@@ -30,8 +30,9 @@ class Jre8Compat extends JreCompat {
     static {
         Method m1 = null;
         try {
-            // Get this class first since it is Java 8+ only
+            // The class is Java6+...
             Class<?> c1 = Class.forName("javax.net.ssl.SSLParameters");
+            // ...but this method is Java8+
             m1 = c1.getMethod("setUseCipherSuitesOrder", boolean.class);
         } catch (SecurityException e) {
             // Should never happen
