@@ -78,7 +78,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
         boolean isJava8OrLater;
         try {
-            Class.forName("javax.net.ssl.SSLParameters");
+            Class.forName("java.util.Optional");
             isJava8OrLater = true;
         } catch (ClassNotFoundException e) {
             isJava8OrLater = false;

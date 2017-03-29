@@ -58,6 +58,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.78 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix Java8 detection in <code>JreMemoryLeakPreventionListener</code>
+        Patch provided by fibbers via Github. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
