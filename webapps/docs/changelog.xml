@@ -58,6 +58,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.78 (violetagg)">
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Correct comments about Java 8 in <code>Jre8Compat</code>.
+        Patch provided by fibbers via Github. (violetagg)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.77 (violetagg)">
   <subsection name="Catalina">
