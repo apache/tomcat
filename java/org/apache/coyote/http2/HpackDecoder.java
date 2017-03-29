@@ -244,11 +244,11 @@ public class HpackDecoder {
                 throw new HpackException();
             }
             int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
-            Hpack.HeaderField res = headerTable[adjustedIndex];
-            if (res == null) {
+            Hpack.HeaderField headerField = headerTable[adjustedIndex];
+            if (headerField == null) {
                 throw new HpackException();
             }
-            return res.name;
+            return headerField.name;
         }
     }
 
@@ -262,8 +262,14 @@ public class HpackDecoder {
         if (index <= Hpack.STATIC_TABLE_LENGTH) {
             addStaticTableEntry(index);
         } else {
+            if (index >= Hpack.STATIC_TABLE_LENGTH + filledTableSlots) {
+                throw new HpackException();
+            }
             int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
             Hpack.HeaderField headerField = headerTable[adjustedIndex];
+            if (headerField == null) {
+                throw new HpackException();
+            }
             emitHeader(headerField.name, headerField.value);
         }
     }

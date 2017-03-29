@@ -54,6 +54,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Cleanup possible index out of bounds exception processing an invalid
+        index in HPACK. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M19 (markt)" rtext="release in progress">
   <subsection name="Catalina">
