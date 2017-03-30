@@ -16,7 +16,10 @@
  */
 package org.apache.tomcat.jdbc.pool.interceptor;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
@@ -46,6 +49,12 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
 
     protected static final String[] EXECUTE_TYPES = {EXECUTE, EXECUTE_QUERY, EXECUTE_UPDATE, EXECUTE_BATCH};
 
+    /**
+     * the constructors that are used to create statement proxies
+     */
+    protected static final Constructor<?>[] constructors =
+            new Constructor[AbstractCreateStatementInterceptor.STATEMENT_TYPE_COUNT];
+
     public  AbstractCreateStatementInterceptor() {
         super();
     }
@@ -70,6 +79,25 @@ public abstract class  AbstractCreateStatementInterceptor extends JdbcIntercepto
                 return super.invoke(proxy,method,args);
             }
         }
+    }
+
+    /**
+     * Creates a constructor for a proxy class, if one doesn't already exist
+     *
+     * @param idx
+     *            - the index of the constructor
+     * @param clazz
+     *            - the interface that the proxy will implement
+     * @return - returns a constructor used to create new instances
+     * @throws NoSuchMethodException Constructor not found
+     */
+    protected Constructor<?> getConstructor(int idx, Class<?> clazz) throws NoSuchMethodException {
+        if (constructors[idx] == null) {
+            Class<?> proxyClass = Proxy.getProxyClass(AbstractCreateStatementInterceptor.class.getClassLoader(),
+                    new Class[] { clazz });
+            constructors[idx] = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
+        }
+        return constructors[idx];
     }
 
     /**

@@ -21,7 +21,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -42,13 +41,6 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      * The threshold in milliseconds. If the query is faster than this, we don't measure it
      */
     protected long threshold = 1000; //don't report queries less than this
-
-    /**
-     * the constructors that are used to create statement proxies
-     */
-    protected static final Constructor<?>[] constructors =
-        new Constructor[AbstractCreateStatementInterceptor.STATEMENT_TYPE_COUNT];
-
 
     public AbstractQueryReport() {
         super();
@@ -141,21 +133,6 @@ public abstract class AbstractQueryReport extends AbstractCreateStatementInterce
      */
     public void setThreshold(long threshold) {
         this.threshold = threshold;
-    }
-
-    /**
-     * Creates a constructor for a proxy class, if one doesn't already exist
-     * @param idx - the index of the constructor
-     * @param clazz - the interface that the proxy will implement
-     * @return - returns a constructor used to create new instances
-     * @throws NoSuchMethodException Constructor not found
-     */
-    protected Constructor<?> getConstructor(int idx, Class<?> clazz) throws NoSuchMethodException {
-        if (constructors[idx]==null) {
-            Class<?> proxyClass = Proxy.getProxyClass(SlowQueryReport.class.getClassLoader(), new Class[] {clazz});
-            constructors[idx] = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
-        }
-        return constructors[idx];
     }
 
     /**
