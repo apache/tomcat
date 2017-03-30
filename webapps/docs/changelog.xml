@@ -75,6 +75,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <scode>
+        Refactor the creating a constructor for a proxy class to reduce
+        duplicate code. (kfujino)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>

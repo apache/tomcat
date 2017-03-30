@@ -47,11 +47,6 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     protected static final String[] RESULTSET_TYPES = {EXECUTE_QUERY, GET_GENERATED_KEYS, GET_RESULTSET};
 
     /**
-     * the constructors that are used to create statement proxies
-     */
-    protected static final Constructor<?>[] constructors = new Constructor[AbstractCreateStatementInterceptor.STATEMENT_TYPE_COUNT];
-
-    /**
      * the constructor to create the resultSet proxies
      */
     protected static Constructor<?> resultSetConstructor = null;
@@ -59,25 +54,6 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     @Override
     public void closeInvoked() {
         // nothing to do
-    }
-
-    /**
-     * Creates a constructor for a proxy class, if one doesn't already exist
-     *
-     * @param idx
-     *            - the index of the constructor
-     * @param clazz
-     *            - the interface that the proxy will implement
-     * @return - returns a constructor used to create new instances
-     * @throws NoSuchMethodException
-     */
-    protected Constructor<?> getConstructor(int idx, Class<?> clazz) throws NoSuchMethodException {
-        if (constructors[idx] == null) {
-            Class<?> proxyClass = Proxy.getProxyClass(StatementDecoratorInterceptor.class.getClassLoader(),
-                    new Class[] { clazz });
-            constructors[idx] = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
-        }
-        return constructors[idx];
     }
 
     protected Constructor<?> getResultSetConstructor() throws NoSuchMethodException {
