@@ -77,6 +77,10 @@
         <bug>60932</bug>: Correctly escape single quotes when used in i18n
         messages. Based on a patch by Michael Osipov. (markt)
       </fix>
+      <scode>
+        Review i18n property files, remove unencessary escaping and consistently
+        use <code>[...]</code> to delimit inserted values. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
