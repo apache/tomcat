@@ -121,6 +121,7 @@ public class TestHttpParserHost {
         result.add(new Object[] { TestType.IPv6, "[0:0:0:0:0:0:127.0.0.1]", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv6, "[0:0:0:0:0:0:127.0.0.1]:8080",
                 Integer.valueOf(23), null} );
+        result.add(new Object[] { TestType.IPv6, "[::1.2.3.4]", Integer.valueOf(-1), null} );
         // IPv6 - invalid
         result.add(new Object[] { TestType.IPv6, "[1234:5678:90AB:CDEF:1234:127.0.0.1]",
                 Integer.valueOf(-1), IAE} );

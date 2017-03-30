@@ -566,7 +566,6 @@ public class HttpParser {
                     // Start of a new h16 block
                     precedingColonsCount = 0;
                     h16Count++;
-                    reader.mark(4);
                 }
                 h16Size++;
                 if (h16Size > 4) {
@@ -588,6 +587,8 @@ public class HttpParser {
                         h16Count++;
                     }
                     precedingColonsCount++;
+                    // mark if the next symbol is hex before the actual read
+                    reader.mark(4); 
                 } 
                 h16Size = 0;
             } else if (c == ']') {
@@ -595,6 +596,7 @@ public class HttpParser {
                     // Can't end on a single ':'
                     throw new IllegalArgumentException();
                 }
+                pos++;
                 break;
             } else if (c == '.') {
                 if (h16Count == 7 || h16Count < 7 && parsedDoubleColon) {
@@ -620,7 +622,7 @@ public class HttpParser {
 
         c = reader.read();
         if (c == ':') {
-            return pos + 1;
+            return pos;
         } else {
             if(c == -1) {
                 return -1;
