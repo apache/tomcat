@@ -179,6 +179,7 @@ public class TestHttpParserHost {
         if (expectedException == null) {
             Assert.assertNull(input, exceptionClass);
         } else {
+            Assert.assertNotNull(exceptionClass);
             Assert.assertTrue(input, expectedException.isAssignableFrom(exceptionClass));
         }
     }
