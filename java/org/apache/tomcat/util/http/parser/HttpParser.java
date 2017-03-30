@@ -619,7 +619,10 @@ public class HttpParser {
         if (c == ':') {
             return pos + 1;
         } else {
-            return -1;
+            if(c == -1) {
+                return -1;
+            }
+            throw new IllegalArgumentException();
         }
     }
 

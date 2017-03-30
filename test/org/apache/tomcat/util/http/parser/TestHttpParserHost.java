@@ -136,6 +136,7 @@ public class TestHttpParserHost {
         result.add(new Object[] { TestType.IPv6, "[0::0::127.0.0.1]", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv6, "[0:0:G:0:0:0:127.0.0.1]", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv6, "[00000:0:0:0:0:0:127.0.0.1]", Integer.valueOf(-1), IAE} );
+        result.add(new Object[] { TestType.IPv6, "[::1]'", Integer.valueOf(-1), IAE} );
         return result;
     }
 
