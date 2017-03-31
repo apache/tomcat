@@ -25,12 +25,14 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.xml.soap.MessageFactory;
+import javax.xml.soap.MimeHeader;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPConnectionFactory;
@@ -201,6 +203,13 @@ public class SignCode extends Task {
 
         log("Sending singing request to server and waiting for response");
         SOAPMessage response = connection.call(message, SIGNING_SERVICE_URL);
+
+        // Temporary debug code
+        Iterator<?> iter = response.getMimeHeaders().getAllHeaders();
+        while (iter.hasNext()) {
+            MimeHeader mh = (MimeHeader) iter.next();
+            log("Response header: Name: [" + mh.getName() + "], Value: [" + mh.getValue() + "]");
+        }
 
         log("Processing response");
         SOAPElement responseBody = response.getSOAPBody();
