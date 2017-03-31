@@ -87,6 +87,11 @@
         <bug>60932</bug>: Correctly escape single quotes when used in i18n
         messages. Based on a patch by Michael Osipov. (markt)
       </fix>
+      <fix>
+        Update the custom Ant task that integrates with the Symantec code
+        signing service to use the now mandatory 2-factor authentication.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
