@@ -66,6 +66,7 @@ public class TestHttpParserHost {
         result.add(new Object[] { TestType.IPv4, "0.0.0.256", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "0.a.0.0", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "0..0.0", Integer.valueOf(-1), IAE} );
+        result.add(new Object[] { TestType.IPv4, "0]", Integer.valueOf(-1), IAE} );
         // Domain Name - valid
         result.add(new Object[] { TestType.DOMAIN_NAME, "localhost", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.DOMAIN_NAME, "localhost:8080", Integer.valueOf(9), null} );
@@ -121,6 +122,7 @@ public class TestHttpParserHost {
         result.add(new Object[] { TestType.IPv6, "[0:0:0:0:0:0:127.0.0.1]", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv6, "[0:0:0:0:0:0:127.0.0.1]:8080",
                 Integer.valueOf(23), null} );
+        result.add(new Object[] { TestType.IPv6, "[::1.2.3.4]", Integer.valueOf(-1), null} );
         // IPv6 - invalid
         result.add(new Object[] { TestType.IPv6, "[1234:5678:90AB:CDEF:1234:127.0.0.1]",
                 Integer.valueOf(-1), IAE} );
@@ -136,6 +138,18 @@ public class TestHttpParserHost {
         result.add(new Object[] { TestType.IPv6, "[0::0::127.0.0.1]", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv6, "[0:0:G:0:0:0:127.0.0.1]", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv6, "[00000:0:0:0:0:0:127.0.0.1]", Integer.valueOf(-1), IAE} );
+        result.add(new Object[] { TestType.IPv6, "[::1]'", Integer.valueOf(-1), IAE} );
+        result.add(new Object[] { TestType.IPv6, "[:2222:3333:4444:5555:6666:7777:8888]",
+                Integer.valueOf(-1), IAE} );
+        result.add(new Object[] { TestType.IPv6, "[1111:::3333:4444:5555:6666:7777:8888]",
+                Integer.valueOf(-1), IAE} );
+        result.add(new Object[] { TestType.IPv6, "::1]", Integer.valueOf(-1), IAE} );
+        result.add(new Object[] { TestType.IPv6, "[1111:2222:3333:4444:5555:6666:7777:8888:9999]",
+                Integer.valueOf(-1), IAE} );
+        result.add(new Object[] { TestType.IPv6, "[1111:2222:3333:4444:5555:6666:7777:1.2.3.4]",
+            Integer.valueOf(-1), IAE} );
+        result.add(new Object[] { TestType.IPv6, "[1111:2222:3333]",
+            Integer.valueOf(-1), IAE} );
         return result;
     }
 
@@ -165,6 +179,7 @@ public class TestHttpParserHost {
         if (expectedException == null) {
             Assert.assertNull(input, exceptionClass);
         } else {
+            Assert.assertNotNull(exceptionClass);
             Assert.assertTrue(input, expectedException.isAssignableFrom(exceptionClass));
         }
     }
