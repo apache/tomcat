@@ -2095,6 +2095,8 @@ skip.installer property in build.properties" />
         classpath="${tomcat.classes}" />
     <signcode userName="${codesigning.user}" password="${codesigning.pwd}"
               partnerCode="${codesigning.partnercode}"
+              keyStore="${codesigning.keyStore}"
+              keyStorePassword="${codesigning.keyStorePassword}"
               applicationName="Apache Tomcat ${version.major.minor}"
               applicationversion="${version}"
               signingService="${codesigning.service}">
