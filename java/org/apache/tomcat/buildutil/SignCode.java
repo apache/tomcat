@@ -25,14 +25,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.xml.soap.MessageFactory;
-import javax.xml.soap.MimeHeader;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPConnectionFactory;
@@ -65,7 +63,8 @@ public class SignCode extends Task {
 
     static {
         try {
-            SIGNING_SERVICE_URL = new URL("https://api.ws.symantec.com/webtrust/SigningService");
+            SIGNING_SERVICE_URL = new URL(
+                    "https://api-appsec-cws.ws.symantec.com/webtrust/SigningService");
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(e);
         }
@@ -85,6 +84,7 @@ public class SignCode extends Task {
     private String applicationName;
     private String applicationVersion;
     private String signingService;
+    private boolean debug;
 
     public void addFileset(FileSet fileset) {
         filesets.add(fileset);
@@ -128,6 +128,11 @@ public class SignCode extends Task {
 
     public void setSigningService(String signingService) {
         this.signingService = signingService;
+    }
+
+
+    public void setDebug(String debug) {
+        this.debug = Boolean.parseBoolean(debug);
     }
 
 
@@ -204,11 +209,10 @@ public class SignCode extends Task {
         log("Sending singing request to server and waiting for response");
         SOAPMessage response = connection.call(message, SIGNING_SERVICE_URL);
 
-        // Temporary debug code
-        Iterator<?> iter = response.getMimeHeaders().getAllHeaders();
-        while (iter.hasNext()) {
-            MimeHeader mh = (MimeHeader) iter.next();
-            log("Response header: Name: [" + mh.getName() + "], Value: [" + mh.getValue() + "]");
+        if (debug) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(2 * 1024);
+            response.writeTo(baos);
+            log(baos.toString("UTF-8"));
         }
 
         log("Processing response");

@@ -85,6 +85,11 @@
         Review i18n property files, remove unencessary escaping and consistently
         use <code>[...]</code> to delimit inserted values. (markt)
       </scode>
+      <fix>
+        Update the custom Ant task that integrates with the Symantec code
+        signing service to use the now mandatory 2-factor authentication.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
