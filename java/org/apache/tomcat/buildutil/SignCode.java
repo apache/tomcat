@@ -78,6 +78,8 @@ public class SignCode extends Task {
     private String userName;
     private String password;
     private String partnerCode;
+    private String keyStore;
+    private String keyStorePassword;
     private String applicationName;
     private String applicationVersion;
     private String signingService;
@@ -99,6 +101,16 @@ public class SignCode extends Task {
 
     public void setPartnerCode(String partnerCode) {
         this.partnerCode = partnerCode;
+    }
+
+
+    public void setKeyStore(String keyStore) {
+        this.keyStore = keyStore;
+    }
+
+
+    public void setKeyStorePassword(String keyStorePassword) {
+        this.keyStorePassword = keyStorePassword;
     }
 
 
@@ -135,6 +147,10 @@ public class SignCode extends Task {
                 }
             }
         }
+
+        // Set up the TLS client
+        System.setProperty("javax.net.ssl.keyStore", keyStore);
+        System.setProperty("javax.net.ssl.keyStorePassword", keyStorePassword);
 
         try {
             String signingSetID = makeSigningRequest(filesToSign);
