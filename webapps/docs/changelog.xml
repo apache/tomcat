@@ -52,6 +52,10 @@
         method name from <code>getPushBuilder()</code> to
         <code>newPushBuilder()</code>. (markt)
       </update>
+      <fix>
+        Correct various edge cases in the new HTTP Host header validation
+        parser. Patch provided by Katya Todorova. (martk)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

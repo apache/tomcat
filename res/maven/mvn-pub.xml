@@ -49,35 +49,18 @@
     </copy>
 
     <!--sign the jar, the source and the pom -->
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--batch"/>
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="${file}"/>
-    </exec>
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--batch"/>
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="${src}"/>
-    </exec>
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--batch"/>
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="-o"/>
-      <arg value="${pom}.asc"/>
-      <arg value="${pom}.tmp"/>
-    </exec>
+    <antcall target="-sign" >
+      <param name="file.in" value="@{file}" />
+      <param name="file.out" value="@{file}.asc" />
+    </antcall>
+    <antcall target="-sign" >
+      <param name="file.in" value="@{src}" />
+      <param name="file.out" value="@{src}.asc" />
+    </antcall>
+    <antcall target="-sign" >
+      <param name="file.in" value="@{pom}.tmp" />
+      <param name="file.out" value="@{pom}.asc" />
+    </antcall>
 
     <artifact:deploy file="${file}">
         <pom file="${pom}.tmp"/>
@@ -131,26 +114,14 @@
     </copy>
 
     <!--sign the file and pom -->
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--batch"/>
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="${file}"/>
-    </exec>
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--batch"/>
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="-o"/>
-      <arg value="${pom}.asc"/>
-      <arg value="${pom}.tmp"/>
-    </exec>
+    <antcall target="-sign" >
+      <param name="file.in" value="@{file}" />
+      <param name="file.out" value="@{file}.asc" />
+    </antcall>
+    <antcall target="-sign" >
+      <param name="file.in" value="@{pom}.tmp" />
+      <param name="file.out" value="@{pom}.asc" />
+    </antcall>
 
     <artifact:deploy file="${file}">
       <pom file="${pom}.tmp"/>
@@ -198,35 +169,18 @@
     </copy>
 
     <!--sign the zip, the tar.gz and the pom -->
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--batch"/>
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="${file}.zip"/>
-    </exec>
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--batch"/>
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="${file}.tar.gz"/>
-    </exec>
-    <exec executable="${gpg.exec}" failonerror="true"
-          inputstring="${gpg.passphrase}">
-      <arg value="--batch"/>
-      <arg value="--passphrase-fd"/>
-      <arg value="0"/>
-      <arg value="-a"/>
-      <arg value="-b"/>
-      <arg value="-o"/>
-      <arg value="${pom}.asc"/>
-      <arg value="${pom}.tmp"/>
-    </exec>
+    <antcall target="-sign" >
+      <param name="file.in" value="@{file}" />
+      <param name="file.out" value="@{file}.asc" />
+    </antcall>
+    <antcall target="-sign" >
+      <param name="file.in" value="@{file}.tar.gz" />
+      <param name="file.out" value="@{file}.tar.gz.asc" />
+    </antcall>
+    <antcall target="-sign" >
+      <param name="file.in" value="@{pom}.tmp" />
+      <param name="file.out" value="@{pom}.asc" />
+    </antcall>
 
     <artifact:deploy file="${pom}">
         <pom file="${pom}.tmp"/>
@@ -262,7 +216,7 @@
     </sequential>
   </macrodef>
 
-  <target name="generic-deploy" depends="init-maven,init-gpg,init-ldap">
+  <target name="generic-deploy" depends="init-maven,init-gpg-1,init-gpg-2,init-ldap">
     <!-- Standard jars in bin directory -->
     <!-- Skip bootstrap.jar - it is just a subset of catalina.jar -->
     <doMavenDeploy artifactId="tomcat-juli"
@@ -399,7 +353,11 @@
     </antcall>
   </target>
 
-  <target name="init-gpg">
+  <target name="init-gpg-1">
+    <available file="${gpg.exec}" property="gpg.exec.available"/>
+  </target>
+
+  <target name="init-gpg-2" if="${gpg.exec.available}">
     <input message="Enter GPG pass-phrase" addproperty="gpg.passphrase" >
       <handler type="secure"/>
     </input>
@@ -410,6 +368,21 @@
            addproperty="asf.ldap.password" >
       <handler type="secure"/>
     </input>
+  </target>
+
+  <target name="-sign" if="gpg.passphrase">
+    <fail unless="file" />
+    <exec executable="${gpg.exec}" failonerror="true"
+          inputstring="${gpg.passphrase}">
+      <arg value="--batch"/>
+      <arg value="--passphrase-fd"/>
+      <arg value="0"/>
+      <arg value="-a"/>
+      <arg value="-b"/>
+      <arg value="-o"/>
+      <arg value="${file.out}"/>
+      <arg value="${file.in}"/>
+    </exec>
   </target>
 
 </project>
