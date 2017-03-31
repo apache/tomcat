@@ -488,6 +488,7 @@ public class HttpParser {
         int octectCount = 1;
         int c;
         int pos = 0;
+        boolean octectLeadingZero = false;
 
         do {
             c = reader.read();
@@ -496,13 +497,20 @@ public class HttpParser {
                     // Valid
                     octectCount++;
                     octect = -1;
+                    octectLeadingZero = false;
                 } else {
                     throw new IllegalArgumentException();
                 }
             } else if (isNumeric(c)) {
                 if (octect == -1) {
                     octect = c - '0';
+                    if(c == '0') {
+                        octectLeadingZero = true;
+                    }
                 } else {
+                    if(octectLeadingZero && inIPv6) {
+                        throw new IllegalArgumentException();
+                    }
                     octect = octect * 10 + c - '0';
                 }
             } else if (c == ':') {
