@@ -54,6 +54,7 @@ public class TestHttpParserHost {
         result.add(new Object[] { TestType.IPv4, "127.0.0.1:8080", Integer.valueOf(9), null} );
         result.add(new Object[] { TestType.IPv4, "0.0.0.0", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv4, "0.0.0.0:8080", Integer.valueOf(7), null} );
+        result.add(new Object[] { TestType.IPv4, "01.02.03.04", Integer.valueOf(-1), null} );
         // IPv4 - invalid
         result.add(new Object[] { TestType.IPv4, "0", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "0.0", Integer.valueOf(-1), IAE} );
@@ -136,6 +137,7 @@ public class TestHttpParserHost {
         result.add(new Object[] { TestType.IPv6, "[0::0::127.0.0.1]", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv6, "[0:0:G:0:0:0:127.0.0.1]", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv6, "[00000:0:0:0:0:0:127.0.0.1]", Integer.valueOf(-1), IAE} );
+        result.add(new Object[] { TestType.IPv6, "[a::01.02.03.04]", Integer.valueOf(-1), IAE} );
         return result;
     }
 
