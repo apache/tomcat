@@ -29,6 +29,7 @@ import org.apache.tomcat.util.codec.EncoderException;
  * This class is thread-safe.
  * </p>
  */
+@SuppressWarnings("deprecation")
 public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
 
     /**
@@ -321,8 +322,10 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
      * @return An object (of type byte[]) containing the Base-N encoded data which corresponds to the byte[] supplied.
      * @throws EncoderException
      *             if the parameter supplied is not of type byte[]
+     * @deprecated This unused method will be removed in Tomcat 9
      */
     @Override
+    @Deprecated
     public Object encode(final Object obj) throws EncoderException {
         if (!(obj instanceof byte[])) {
             throw new EncoderException("Parameter supplied to Base-N encode is not a byte[]");
@@ -363,8 +366,10 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
      *         supplied.
      * @throws DecoderException
      *             if the parameter supplied is not of type byte[]
+     * @deprecated This unused method will be removed in Tomcat 9
      */
     @Override
+    @Deprecated
     public Object decode(final Object obj) throws DecoderException {
         if (obj instanceof byte[]) {
             return decode((byte[]) obj);

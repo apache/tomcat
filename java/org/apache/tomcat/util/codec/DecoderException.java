@@ -19,7 +19,10 @@ package org.apache.tomcat.util.codec;
 /**
  * Thrown when there is a failure condition during the decoding process. This exception is thrown when a {@link Decoder}
  * encounters a decoding specific exception such as invalid data, or characters outside of the expected range.
+ *
+ * @deprecated This exception is unused and will be removed in Tomcat 9
  */
+@Deprecated
 public class DecoderException extends Exception {
 
     /**

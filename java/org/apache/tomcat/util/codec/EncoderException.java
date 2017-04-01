@@ -20,7 +20,10 @@ package org.apache.tomcat.util.codec;
  * Thrown when there is a failure condition during the encoding process. This exception is thrown when an
  * {@link Encoder} encounters a encoding specific exception such as invalid data, inability to calculate a checksum,
  * characters outside of the expected range.
+ *
+ * @deprecated This exception is unused and will be removed in Tomcat 9
  */
+@Deprecated
 public class EncoderException extends Exception {
 
     /**

@@ -18,7 +18,10 @@ package org.apache.tomcat.util.codec;
 
 /**
  * Defines common decoding methods for byte array decoders.
+ *
+ * @deprecated This interface is unused and will be removed in Tomcat 9
  */
+@Deprecated
 public interface BinaryDecoder extends Decoder {
 
     /**
