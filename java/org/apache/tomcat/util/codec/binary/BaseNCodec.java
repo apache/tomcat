@@ -17,10 +17,6 @@
 package org.apache.tomcat.util.codec.binary;
 
 import org.apache.tomcat.util.buf.HexUtils;
-import org.apache.tomcat.util.codec.BinaryDecoder;
-import org.apache.tomcat.util.codec.BinaryEncoder;
-import org.apache.tomcat.util.codec.DecoderException;
-import org.apache.tomcat.util.codec.EncoderException;
 
 /**
  * Abstract superclass for Base-N encoders and decoders.
@@ -29,7 +25,7 @@ import org.apache.tomcat.util.codec.EncoderException;
  * This class is thread-safe.
  * </p>
  */
-public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
+public abstract class BaseNCodec {
 
     /**
      * Holds thread context so classes can be thread-safe.
@@ -313,24 +309,6 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
     }
 
     /**
-     * Encodes an Object using the Base-N algorithm. This method is provided in order to satisfy the requirements of
-     * the Encoder interface, and will throw an EncoderException if the supplied object is not of type byte[].
-     *
-     * @param obj
-     *            Object to encode
-     * @return An object (of type byte[]) containing the Base-N encoded data which corresponds to the byte[] supplied.
-     * @throws EncoderException
-     *             if the parameter supplied is not of type byte[]
-     */
-    @Override
-    public Object encode(final Object obj) throws EncoderException {
-        if (!(obj instanceof byte[])) {
-            throw new EncoderException("Parameter supplied to Base-N encode is not a byte[]");
-        }
-        return encode((byte[]) obj);
-    }
-
-    /**
      * Encodes a byte[] containing binary data, into a String containing characters in the Base-N alphabet.
      * Uses UTF8 encoding.
      *
@@ -354,28 +332,6 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
     }
 
     /**
-     * Decodes an Object using the Base-N algorithm. This method is provided in order to satisfy the requirements of
-     * the Decoder interface, and will throw a DecoderException if the supplied object is not of type byte[] or String.
-     *
-     * @param obj
-     *            Object to decode
-     * @return An object (of type byte[]) containing the binary data which corresponds to the byte[] or String
-     *         supplied.
-     * @throws DecoderException
-     *             if the parameter supplied is not of type byte[]
-     */
-    @Override
-    public Object decode(final Object obj) throws DecoderException {
-        if (obj instanceof byte[]) {
-            return decode((byte[]) obj);
-        } else if (obj instanceof String) {
-            return decode((String) obj);
-        } else {
-            throw new DecoderException("Parameter supplied to Base-N decode is not a byte[] or a String");
-        }
-    }
-
-    /**
      * Decodes a String containing characters in the Base-N alphabet.
      *
      * @param pArray
@@ -393,7 +349,6 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
      *            A byte array containing Base-N character data
      * @return a byte array containing binary data
      */
-    @Override
     public byte[] decode(final byte[] pArray) {
         return decode(pArray, 0, pArray.length);
     }
@@ -417,7 +372,6 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
      *            a byte array containing binary data
      * @return A byte array containing only the base N alphabetic character data
      */
-    @Override
     public byte[] encode(final byte[] pArray) {
         if (pArray == null || pArray.length == 0) {
             return pArray;
