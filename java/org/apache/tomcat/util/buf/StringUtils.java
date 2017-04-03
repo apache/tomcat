@@ -38,6 +38,11 @@ public final class StringUtils {
     }
 
 
+    public static void join(String[] array, char separator, StringBuilder sb) {
+        join(Arrays.asList(array), separator, sb);
+    }
+
+
     public static String join(Collection<String> collection) {
         return join(collection, ',');
     }

@@ -578,7 +578,7 @@ public class ManagedBean implements java.io.Serializable {
     private String createOperationKey(String methodName, String[] parameterTypes) {
         StringBuilder key = new StringBuilder(methodName);
         key.append('(');
-        StringUtils.join(parameterTypes);
+        StringUtils.join(parameterTypes, ',', key);
         key.append(')');
 
         return key.toString();
