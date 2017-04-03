@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.juli.logging.Log;
@@ -106,7 +107,7 @@ public class StatementFacade extends AbstractCreateStatementInterceptor {
             if (compare(ISCLOSED_VAL, method)) {
                 if (delegate == null) return Boolean.TRUE;
             }
-
+            if (delegate == null) throw new SQLException("Statement closed.");
             Object result =  null;
             try {
                 //invoke next

@@ -75,6 +75,11 @@
         Refactor the creating a constructor for a proxy class to reduce
         duplicate code. (kfujino)
       </scode>
+      <fix>
+        In <code>StatementFacade</code>, the method call on the statements that
+        have been closed throw <code>SQLException</code> rather than
+        <code>NullPointerException</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
