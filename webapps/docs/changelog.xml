@@ -56,6 +56,10 @@
         Correct various edge cases in the new HTTP Host header validation
         parser. Patch provided by Katya Todorova. (martk)
       </fix>
+      <fix>
+        Correct a regression in the X to comma refactoring that broke JMX
+        operations that take parameters. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
