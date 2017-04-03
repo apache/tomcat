@@ -60,6 +60,10 @@
         Correct a regression in the X to comma refactoring that broke JMX
         operations that take parameters. (markt)
       </fix>
+      <fix>
+        Avoid a <code>NullPointerException</code> when reading attributes for a
+        running HTTP connector where TLS is not enabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
