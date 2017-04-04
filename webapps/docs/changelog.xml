@@ -66,6 +66,12 @@
         Avoid a <code>NullPointerException</code> when reading attributes for a
         running HTTP connector where TLS is not enabled. (markt)
       </fix>
+      <fix>
+        <bug>60940</bug>: Improve the handling of the <code>META-INF/</code> and
+        <code>META-INF/MANIFEST.MF</code> entries for Jar files located in
+        <code>/WEB-INF/lib</code> when running a web application from a packed
+        WAR file. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
