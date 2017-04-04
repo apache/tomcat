@@ -764,11 +764,7 @@ public class JDBCStore extends StoreBase {
      */
     @Override
     public void save(Session session) throws IOException {
-        ObjectOutputStream oos = null;
-        ByteArrayOutputStream bos = null;
-        ByteArrayInputStream bis = null;
-        InputStream in = null;
-
+    	
         synchronized (this) {
             int numberOfTries = 2;
             while (numberOfTries > 0) {
@@ -778,7 +774,7 @@ public class JDBCStore extends StoreBase {
                 }
 
                 try {
-                    bos = new ByteArrayOutputStream();
+                	ByteArrayOutputStream bos = new ByteArrayOutputStream();
                     try (ObjectOutputStream oos =
                             new ObjectOutputStream(new BufferedOutputStream(bos))) {
                         ((StandardSession) session).writeObjectData(oos);
@@ -787,15 +783,15 @@ public class JDBCStore extends StoreBase {
                     int size = obs.length;
                     try (ByteArrayInputStream bis = new ByteArrayInputStream(obs, 0, size);
                             InputStream in = new BufferedInputStream(bis, size)) {
-                        if (preparedSaveSql == null) 
-	                    String updateSql = "UPDATE " + sessionTable + " SET "
-	                       + sessionAppCol + "=?, "
-	                       + sessionDataCol + "=?, "
-	                       + sessionValidCol + "=?, "
-	                       + sessionMaxInactiveCol + "=?, "
-	                       + sessionLastAccessedCol + "=? "
-	                       + "WHERE " + sessionIdCol +"=?" ;
-		                    preparedUpdateSql = _conn.prepareStatement(updateSql);
+                        if (preparedSaveSql == null) {
+                        	String updateSql = "UPDATE " + sessionTable + " SET "
+		                       + sessionAppCol + "=?, "
+		                       + sessionDataCol + "=?, "
+		                       + sessionValidCol + "=?, "
+		                       + sessionMaxInactiveCol + "=?, "
+		                       + sessionLastAccessedCol + "=? "
+		                       + "WHERE " + sessionIdCol +"=?" ;
+			                    preparedUpdateSql = _conn.prepareStatement(updateSql);
 		                }
 		
 		                preparedUpdateSql.setString(1, getName());
