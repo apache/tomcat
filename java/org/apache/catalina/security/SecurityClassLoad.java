@@ -233,10 +233,10 @@ public final class SecurityClassLoad {
              "ResponseFacade$FlushBufferPrivilegedAction");
         loader.loadClass
             (basePackage +
-             "OutputBuffer$1");
+             "OutputBuffer$PrivilegedCreateConverter");
         loader.loadClass
             (basePackage +
-             "OutputBuffer$2");
+             "OutputBuffer$PrivilegedGetCharset");
         loader.loadClass
             (basePackage +
              "CoyoteInputStream$1");

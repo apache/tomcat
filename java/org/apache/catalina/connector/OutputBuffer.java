@@ -564,12 +564,7 @@ public class OutputBuffer extends Writer {
     private static Charset getCharset(final String encoding) throws IOException {
         if (Globals.IS_SECURITY_ENABLED) {
             try {
-                return AccessController.doPrivileged(new PrivilegedExceptionAction<Charset>() {
-                    @Override
-                    public Charset run() throws IOException {
-                        return B2CConverter.getCharset(encoding);
-                    }
-                });
+                return AccessController.doPrivileged(new PrivilegedGetCharset(encoding));
             } catch (PrivilegedActionException ex) {
                 Exception e = ex.getException();
                 if (e instanceof IOException) {
@@ -587,12 +582,7 @@ public class OutputBuffer extends Writer {
     private static C2BConverter createConverter(final Charset charset) throws IOException {
         if (Globals.IS_SECURITY_ENABLED) {
             try {
-                return AccessController.doPrivileged(new PrivilegedExceptionAction<C2BConverter>() {
-                    @Override
-                    public C2BConverter run() throws IOException {
-                        return new C2BConverter(charset);
-                    }
-                });
+                return AccessController.doPrivileged(new PrivilegedCreateConverter(charset));
             } catch (PrivilegedActionException ex) {
                 Exception e = ex.getException();
                 if (e instanceof IOException) {
@@ -871,5 +861,36 @@ public class OutputBuffer extends Writer {
         buffer.mark()
               .position(buffer.limit())
               .limit(buffer.capacity());
+    }
+
+
+    private static class PrivilegedCreateConverter
+            implements PrivilegedExceptionAction<C2BConverter> {
+
+        private final Charset charset;
+
+        public PrivilegedCreateConverter(Charset charset) {
+            this.charset = charset;
+        }
+
+        @Override
+        public C2BConverter run() throws IOException {
+            return new C2BConverter(charset);
+        }
+    }
+
+
+    private static class PrivilegedGetCharset implements PrivilegedExceptionAction<Charset> {
+
+        private final String encoding;
+
+        public PrivilegedGetCharset(String encoding) {
+            this.encoding = encoding;
+        }
+
+        @Override
+        public Charset run() throws IOException {
+            return B2CConverter.getCharset(encoding);
+        }
     }
 }
