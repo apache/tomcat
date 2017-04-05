@@ -226,12 +226,6 @@ public class CoyoteInputStream extends ServletInputStream {
     }
 
 
-    @Override
-    public int readLine(byte[] b, int off, int len) throws IOException {
-        return super.readLine(b, off, len);
-    }
-
-
     /**
      * Close the stream
      * Since we re-cycle, we can't allow the call to super.close()
