@@ -239,19 +239,19 @@ public final class SecurityClassLoad {
              "OutputBuffer$PrivilegedGetCharset");
         loader.loadClass
             (basePackage +
-             "CoyoteInputStream$1");
+             "CoyoteInputStream$PrivilegedAvailable");
         loader.loadClass
             (basePackage +
-             "CoyoteInputStream$2");
+             "CoyoteInputStream$PrivilegedClose");
         loader.loadClass
             (basePackage +
-             "CoyoteInputStream$3");
+             "CoyoteInputStream$PrivilegedRead");
         loader.loadClass
             (basePackage +
-             "CoyoteInputStream$4");
+             "CoyoteInputStream$PrivilegedReadArray");
         loader.loadClass
             (basePackage +
-             "CoyoteInputStream$5");
+             "CoyoteInputStream$PrivilegedReadBuffer");
         loader.loadClass
             (basePackage +
              "InputBuffer$1");
