@@ -257,13 +257,13 @@ public final class SecurityClassLoad {
              "InputBuffer$PrivilegedCreateConverter");
         loader.loadClass
             (basePackage +
-             "Response$1");
+             "Response$PrivilegedDoIsEncodable");
         loader.loadClass
             (basePackage +
-             "Response$2");
+             "Response$PrivilegedGenerateCookieString");
         loader.loadClass
             (basePackage +
-             "Response$3");
+             "Response$PrivilgedEncodeUrl");
     }
 
     private static final void loadTomcatPackage(ClassLoader loader)
