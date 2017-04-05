@@ -230,7 +230,7 @@ public final class SecurityClassLoad {
              "RequestFacade$GetSessionPrivilegedAction");
         loader.loadClass
             (basePackage +
-             "ResponseFacade$1");
+             "ResponseFacade$FlushBufferPrivilegedAction");
         loader.loadClass
             (basePackage +
              "OutputBuffer$1");
