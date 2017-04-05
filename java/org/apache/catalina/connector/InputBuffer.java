@@ -582,13 +582,7 @@ public class InputBuffer extends Reader
     private static B2CConverter createConverter(Charset charset) throws IOException {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             try {
-                return AccessController.doPrivileged(new PrivilegedExceptionAction<B2CConverter>() {
-
-                    @Override
-                    public B2CConverter run() throws IOException {
-                        return new B2CConverter(charset);
-                    }
-                });
+                return AccessController.doPrivileged(new PrivilegedCreateConverter(charset));
             } catch (PrivilegedActionException ex) {
                 Exception e = ex.getException();
                 if (e instanceof IOException) {
@@ -673,5 +667,21 @@ public class InputBuffer extends Reader
         tmp.position(oldPosition);
         cb = tmp;
         tmp = null;
+    }
+
+
+    private static class PrivilegedCreateConverter
+            implements PrivilegedExceptionAction<B2CConverter> {
+
+        private final Charset charset;
+
+        public PrivilegedCreateConverter(Charset charset) {
+            this.charset = charset;
+        }
+
+        @Override
+        public B2CConverter run() throws IOException {
+            return new B2CConverter(charset);
+        }
     }
 }

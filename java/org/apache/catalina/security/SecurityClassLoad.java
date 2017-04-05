@@ -254,7 +254,7 @@ public final class SecurityClassLoad {
              "CoyoteInputStream$PrivilegedReadBuffer");
         loader.loadClass
             (basePackage +
-             "InputBuffer$1");
+             "InputBuffer$PrivilegedCreateConverter");
         loader.loadClass
             (basePackage +
              "Response$1");
