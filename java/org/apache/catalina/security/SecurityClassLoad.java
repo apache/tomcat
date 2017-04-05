@@ -58,19 +58,19 @@ public final class SecurityClassLoad {
         final String basePackage = "org.apache.catalina.core.";
         loader.loadClass
             (basePackage +
-             "AccessLogAdapter");
+            "AccessLogAdapter");
         loader.loadClass
             (basePackage +
-             "ApplicationContextFacade$PrivilegedExecuteMethod");
+            "ApplicationContextFacade$PrivilegedExecuteMethod");
         loader.loadClass
             (basePackage +
-             "ApplicationDispatcher$PrivilegedForward");
+            "ApplicationDispatcher$PrivilegedForward");
         loader.loadClass
             (basePackage +
-             "ApplicationDispatcher$PrivilegedInclude");
+            "ApplicationDispatcher$PrivilegedInclude");
         loader.loadClass
             (basePackage +
-             "ApplicationPushBuilder");
+            "ApplicationPushBuilder");
         loader.loadClass
             (basePackage +
             "AsyncContextImpl");
@@ -85,25 +85,25 @@ public final class SecurityClassLoad {
             "AsyncListenerWrapper");
         loader.loadClass
             (basePackage +
-             "ContainerBase$PrivilegedAddChild");
+            "ContainerBase$PrivilegedAddChild");
         loader.loadClass
             (basePackage +
-             "DefaultInstanceManager$1");
+            "DefaultInstanceManager$AnnotationCacheEntry");
         loader.loadClass
             (basePackage +
-             "DefaultInstanceManager$2");
+            "DefaultInstanceManager$AnnotationCacheEntryType");
         loader.loadClass
             (basePackage +
-             "DefaultInstanceManager$3");
+            "DefaultInstanceManager$PrivilegedGetField");
         loader.loadClass
             (basePackage +
-             "DefaultInstanceManager$AnnotationCacheEntry");
+            "DefaultInstanceManager$PrivilegedGetMethod");
         loader.loadClass
             (basePackage +
-             "DefaultInstanceManager$AnnotationCacheEntryType");
+            "DefaultInstanceManager$PrivilegedLoadClass");
         loader.loadClass
             (basePackage +
-             "ApplicationHttpRequest$AttributeNamesEnumerator");
+            "ApplicationHttpRequest$AttributeNamesEnumerator");
     }
 
 
