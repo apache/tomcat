@@ -142,7 +142,7 @@ public final class SecurityClassLoad {
         loader.loadClass
             (basePackage + "StandardSession");
         loader.loadClass
-            (basePackage + "StandardSession$1");
+            (basePackage + "StandardSession$PrivilegedNewSessionFacade");
         loader.loadClass
             (basePackage + "StandardManager$PrivilegedDoUnload");
     }
