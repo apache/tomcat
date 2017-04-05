@@ -125,32 +125,7 @@ public class CoyoteInputStream extends ServletInputStream {
 
     @Override
     public int read(final byte[] b) throws IOException {
-        checkNonBlockingRead();
-
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            try {
-                Integer result = AccessController
-                        .doPrivileged(new PrivilegedExceptionAction<Integer>() {
-
-                            @Override
-                            public Integer run() throws IOException {
-                                Integer integer = Integer.valueOf(ib.read(b, 0, b.length));
-                                return integer;
-                            }
-
-                        });
-                return result.intValue();
-            } catch (PrivilegedActionException pae) {
-                Exception e = pae.getException();
-                if (e instanceof IOException) {
-                    throw (IOException) e;
-                } else {
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }
-        } else {
-            return ib.read(b, 0, b.length);
-        }
+        return read(b, 0, b.length);
     }
 
 
