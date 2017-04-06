@@ -70,6 +70,12 @@
         <code>/WEB-INF/lib</code> when running a web application from a packed
         WAR file. (markt)
       </fix>
+      <fix>
+        Pre-load the <code>ExceptionUtils</code> class. Since the class is used
+        extensively in error handling, it is prudent to pre-load it to avoid any
+        failure to load this class masking the true problem during error
+        handling. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
