@@ -58,8 +58,6 @@ public final class SecurityClassLoad {
             SecurityUtil.isPackageProtectionEnabled();
 
             loader.loadClass( basePackage + "servlet.JspServletWrapper");
-
-            loader.loadClass( basePackage + "runtime.JspWriterImpl$1");
         } catch (ClassNotFoundException ex) {
             log.error("SecurityClassLoad", ex);
         }
