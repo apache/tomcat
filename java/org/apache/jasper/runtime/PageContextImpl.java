@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -544,33 +542,7 @@ public class PageContextImpl extends PageContext {
     @Override
     public void include(final String relativeUrlPath, final boolean flush)
             throws ServletException, IOException {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            try {
-                AccessController.doPrivileged(
-                        new PrivilegedExceptionAction<Void>() {
-                    @Override
-                    public Void run() throws Exception {
-                        doInclude(relativeUrlPath, flush);
-                        return null;
-                    }
-                });
-            } catch (PrivilegedActionException e) {
-                Exception ex = e.getException();
-                if (ex instanceof IOException) {
-                    throw (IOException) ex;
-                } else {
-                    throw (ServletException) ex;
-                }
-            }
-        } else {
-            doInclude(relativeUrlPath, flush);
-        }
-    }
-
-    private void doInclude(String relativeUrlPath, boolean flush)
-            throws ServletException, IOException {
-        JspRuntimeLibrary.include(request, response, relativeUrlPath, out,
-                flush);
+        JspRuntimeLibrary.include(request, response, relativeUrlPath, out, flush);
     }
 
     @Override
