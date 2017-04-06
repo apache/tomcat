@@ -278,31 +278,7 @@ public class PageContextImpl extends PageContext {
 
     @Override
     public void setAttribute(final String name, final Object attribute) {
-
-        if (name == null) {
-            throw new NullPointerException(Localizer
-                    .getMessage("jsp.error.attribute.null_name"));
-        }
-
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                @Override
-                public Void run() {
-                    doSetAttribute(name, attribute);
-                    return null;
-                }
-            });
-        } else {
-            doSetAttribute(name, attribute);
-        }
-    }
-
-    private void doSetAttribute(String name, Object attribute) {
-        if (attribute != null) {
-            attributes.put(name, attribute);
-        } else {
-            removeAttribute(name, PAGE_SCOPE);
-        }
+        setAttribute(name, attribute, PAGE_SCOPE);
     }
 
     @Override
