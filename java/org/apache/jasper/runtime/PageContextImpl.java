@@ -608,41 +608,14 @@ public class PageContextImpl extends PageContext {
     }
 
     @Override
-    public void forward(final String relativeUrlPath) throws ServletException,
-            IOException {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            try {
-                AccessController.doPrivileged(
-                        new PrivilegedExceptionAction<Void>() {
-                    @Override
-                    public Void run() throws Exception {
-                        doForward(relativeUrlPath);
-                        return null;
-                    }
-                });
-            } catch (PrivilegedActionException e) {
-                Exception ex = e.getException();
-                if (ex instanceof IOException) {
-                    throw (IOException) ex;
-                } else {
-                    throw (ServletException) ex;
-                }
-            }
-        } else {
-            doForward(relativeUrlPath);
-        }
-    }
-
-    private void doForward(String relativeUrlPath) throws ServletException,
-            IOException {
-
+    public void forward(final String relativeUrlPath) throws ServletException, IOException {
         // JSP.4.5 If the buffer was flushed, throw IllegalStateException
         try {
             out.clear();
             baseOut.clear();
         } catch (IOException ex) {
-            IllegalStateException ise = new IllegalStateException(Localizer
-                    .getMessage("jsp.error.attempt_to_clear_flushed_buffer"));
+            IllegalStateException ise = new IllegalStateException(Localizer.getMessage(
+                    "jsp.error.attempt_to_clear_flushed_buffer"));
             ise.initCause(ex);
             throw ise;
         }
@@ -653,17 +626,16 @@ public class PageContextImpl extends PageContext {
         }
 
         final String path = getAbsolutePathRelativeToContext(relativeUrlPath);
-        String includeUri = (String) request.getAttribute(
-                RequestDispatcher.INCLUDE_SERVLET_PATH);
+        String includeUri = (String) request.getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
 
         if (includeUri != null)
             request.removeAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
         try {
             context.getRequestDispatcher(path).forward(request, response);
         } finally {
-            if (includeUri != null)
-                request.setAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH,
-                        includeUri);
+            if (includeUri != null) {
+                request.setAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH, includeUri);
+            }
         }
     }
 
