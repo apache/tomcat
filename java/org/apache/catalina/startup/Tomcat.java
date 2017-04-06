@@ -61,6 +61,7 @@ import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.UriUtil;
 
 // TODO: lazy init for the temp dir - only when a JSP is compiled or
@@ -165,7 +166,7 @@ public class Tomcat {
         new HashMap<String, Principal>();
 
     public Tomcat() {
-        // NOOP
+        ExceptionUtils.preload();
     }
 
     /**

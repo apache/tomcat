@@ -64,6 +64,12 @@
         Fix Java8 detection in <code>JreMemoryLeakPreventionListener</code>
         Patch provided by fibbers via Github. (violetagg)
       </fix>
+      <fix>
+        Pre-load the <code>ExceptionUtils</code> class. Since the class is used
+        extensively in error handling, it is prudent to pre-load it to avoid any
+        failure to load this class masking the true problem during error
+        handling. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
