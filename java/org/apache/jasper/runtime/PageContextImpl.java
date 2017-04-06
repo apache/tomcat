@@ -390,32 +390,18 @@ public class PageContextImpl extends PageContext {
     @Override
     public Object findAttribute(final String name) {
         if (name == null) {
-            throw new NullPointerException(Localizer
-                    .getMessage("jsp.error.attribute.null_name"));
+            throw new NullPointerException(Localizer.getMessage("jsp.error.attribute.null_name"));
         }
-
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return AccessController.doPrivileged(
-                    new PrivilegedAction<Object>() {
-                @Override
-                public Object run() {
-                    return doFindAttribute(name);
-                }
-            });
-        } else {
-            return doFindAttribute(name);
-        }
-    }
-
-    private Object doFindAttribute(String name) {
 
         Object o = attributes.get(name);
-        if (o != null)
+        if (o != null) {
             return o;
+        }
 
         o = request.getAttribute(name);
-        if (o != null)
+        if (o != null) {
             return o;
+        }
 
         if (session != null) {
             try {
@@ -424,8 +410,9 @@ public class PageContextImpl extends PageContext {
                 // Session has been invalidated.
                 // Ignore and fall through to application scope.
             }
-            if (o != null)
+            if (o != null) {
                 return o;
+            }
         }
 
         return context.getAttribute(name);

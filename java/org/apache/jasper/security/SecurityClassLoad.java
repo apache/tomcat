@@ -59,7 +59,6 @@ public final class SecurityClassLoad {
             loader.loadClass( basePackage + "runtime.PageContextImpl$6");
             loader.loadClass( basePackage + "runtime.PageContextImpl$7");
             loader.loadClass( basePackage + "runtime.PageContextImpl$8");
-            loader.loadClass( basePackage + "runtime.PageContextImpl$9");
 
             loader.loadClass( basePackage + "runtime.JspContextWrapper");
 
