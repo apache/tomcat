@@ -19,8 +19,6 @@ package org.apache.jasper.runtime;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -51,7 +49,6 @@ import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.el.ELContextImpl;
 import org.apache.jasper.runtime.JspContextWrapper.ELContextWrapper;
-import org.apache.jasper.security.SecurityUtil;
 
 /**
  * Implementation of the PageContext class from the JSP spec. Also doubles as a
@@ -245,26 +242,12 @@ public class PageContextImpl extends PageContext {
     public void setAttribute(final String name, final Object o, final int scope) {
 
         if (name == null) {
-            throw new NullPointerException(Localizer
-                    .getMessage("jsp.error.attribute.null_name"));
+            throw new NullPointerException(Localizer.getMessage("jsp.error.attribute.null_name"));
         }
 
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                @Override
-                public Void run() {
-                    doSetAttribute(name, o, scope);
-                    return null;
-                }
-            });
+        if (o == null) {
+            removeAttribute(name, scope);
         } else {
-            doSetAttribute(name, o, scope);
-        }
-
-    }
-
-    private void doSetAttribute(String name, Object o, int scope) {
-        if (o != null) {
             switch (scope) {
             case PAGE_SCOPE:
                 attributes.put(name, o);
@@ -289,8 +272,6 @@ public class PageContextImpl extends PageContext {
             default:
                 throw new IllegalArgumentException("Invalid scope");
             }
-        } else {
-            removeAttribute(name, scope);
         }
     }
 
