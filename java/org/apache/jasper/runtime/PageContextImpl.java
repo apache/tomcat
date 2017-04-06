@@ -431,24 +431,9 @@ public class PageContextImpl extends PageContext {
     public void removeAttribute(final String name) {
 
         if (name == null) {
-            throw new NullPointerException(Localizer
-                    .getMessage("jsp.error.attribute.null_name"));
+            throw new NullPointerException(Localizer.getMessage("jsp.error.attribute.null_name"));
         }
 
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                @Override
-                public Void run() {
-                    doRemoveAttribute(name);
-                    return null;
-                }
-            });
-        } else {
-            doRemoveAttribute(name);
-        }
-    }
-
-    private void doRemoveAttribute(String name) {
         removeAttribute(name, PAGE_SCOPE);
         removeAttribute(name, REQUEST_SCOPE);
         if( session != null ) {
