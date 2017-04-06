@@ -420,20 +420,6 @@ public class PageContextImpl extends PageContext {
 
     @Override
     public Enumeration<String> getAttributeNamesInScope(final int scope) {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return AccessController.doPrivileged(
-                    new PrivilegedAction<Enumeration<String>>() {
-                        @Override
-                        public Enumeration<String> run() {
-                            return doGetAttributeNamesInScope(scope);
-                        }
-                    });
-        } else {
-            return doGetAttributeNamesInScope(scope);
-        }
-    }
-
-    private Enumeration<String> doGetAttributeNamesInScope(int scope) {
         switch (scope) {
         case PAGE_SCOPE:
             return Collections.enumeration(attributes.keySet());
@@ -443,8 +429,7 @@ public class PageContextImpl extends PageContext {
 
         case SESSION_SCOPE:
             if (session == null) {
-                throw new IllegalStateException(Localizer
-                        .getMessage("jsp.error.page.noSession"));
+                throw new IllegalStateException(Localizer.getMessage("jsp.error.page.noSession"));
             }
             return session.getAttributeNames();
 
