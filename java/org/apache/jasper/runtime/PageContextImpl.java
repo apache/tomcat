@@ -214,25 +214,9 @@ public class PageContextImpl extends PageContext {
     public Object getAttribute(final String name, final int scope) {
 
         if (name == null) {
-            throw new NullPointerException(Localizer
-                    .getMessage("jsp.error.attribute.null_name"));
+            throw new NullPointerException(Localizer.getMessage("jsp.error.attribute.null_name"));
         }
 
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return AccessController.doPrivileged(
-                    new PrivilegedAction<Object>() {
-                @Override
-                public Object run() {
-                    return doGetAttribute(name, scope);
-                }
-            });
-        } else {
-            return doGetAttribute(name, scope);
-        }
-
-    }
-
-    private Object doGetAttribute(String name, int scope) {
         switch (scope) {
         case PAGE_SCOPE:
             return attributes.get(name);
@@ -242,8 +226,7 @@ public class PageContextImpl extends PageContext {
 
         case SESSION_SCOPE:
             if (session == null) {
-                throw new IllegalStateException(Localizer
-                        .getMessage("jsp.error.page.noSession"));
+                throw new IllegalStateException(Localizer.getMessage("jsp.error.page.noSession"));
             }
             return session.getAttribute(name);
 
