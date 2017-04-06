@@ -347,29 +347,16 @@ public class PageContextImpl extends PageContext {
     public int getAttributesScope(final String name) {
 
         if (name == null) {
-            throw new NullPointerException(Localizer
-                    .getMessage("jsp.error.attribute.null_name"));
+            throw new NullPointerException(Localizer.getMessage("jsp.error.attribute.null_name"));
         }
 
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (AccessController
-                    .doPrivileged(new PrivilegedAction<Integer>() {
-                        @Override
-                        public Integer run() {
-                            return Integer.valueOf(doGetAttributeScope(name));
-                        }
-                    })).intValue();
-        } else {
-            return doGetAttributeScope(name);
-        }
-    }
-
-    private int doGetAttributeScope(String name) {
-        if (attributes.get(name) != null)
+        if (attributes.get(name) != null) {
             return PAGE_SCOPE;
+        }
 
-        if (request.getAttribute(name) != null)
+        if (request.getAttribute(name) != null) {
             return REQUEST_SCOPE;
+        }
 
         if (session != null) {
             try {
@@ -381,8 +368,9 @@ public class PageContextImpl extends PageContext {
             }
         }
 
-        if (context.getAttribute(name) != null)
+        if (context.getAttribute(name) != null) {
             return APPLICATION_SCOPE;
+        }
 
         return 0;
     }
