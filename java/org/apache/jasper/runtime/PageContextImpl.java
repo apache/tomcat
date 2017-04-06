@@ -298,23 +298,9 @@ public class PageContextImpl extends PageContext {
     public void removeAttribute(final String name, final int scope) {
 
         if (name == null) {
-            throw new NullPointerException(Localizer
-                    .getMessage("jsp.error.attribute.null_name"));
+            throw new NullPointerException(Localizer.getMessage("jsp.error.attribute.null_name"));
         }
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            AccessController.doPrivileged(new PrivilegedAction<Void>() {
-                @Override
-                public Void run() {
-                    doRemoveAttribute(name, scope);
-                    return null;
-                }
-            });
-        } else {
-            doRemoveAttribute(name, scope);
-        }
-    }
 
-    private void doRemoveAttribute(String name, int scope) {
         switch (scope) {
         case PAGE_SCOPE:
             attributes.remove(name);
@@ -326,8 +312,7 @@ public class PageContextImpl extends PageContext {
 
         case SESSION_SCOPE:
             if (session == null) {
-                throw new IllegalStateException(Localizer
-                        .getMessage("jsp.error.page.noSession"));
+                throw new IllegalStateException(Localizer.getMessage("jsp.error.page.noSession"));
             }
             session.removeAttribute(name);
             break;
