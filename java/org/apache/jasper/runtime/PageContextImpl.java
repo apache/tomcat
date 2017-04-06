@@ -676,38 +676,11 @@ public class PageContextImpl extends PageContext {
     }
 
     @Override
-    public void handlePageException(final Throwable t) throws IOException,
-            ServletException {
-        if (t == null)
-            throw new NullPointerException("null Throwable");
-
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            try {
-                AccessController.doPrivileged(
-                        new PrivilegedExceptionAction<Void>() {
-                    @Override
-                    public Void run() throws Exception {
-                        doHandlePageException(t);
-                        return null;
-                    }
-                });
-            } catch (PrivilegedActionException e) {
-                Exception ex = e.getException();
-                if (ex instanceof IOException) {
-                    throw (IOException) ex;
-                } else {
-                    throw (ServletException) ex;
-                }
-            }
-        } else {
-            doHandlePageException(t);
-        }
-
-    }
-
     @SuppressWarnings("deprecation") // Still jave to support old JSP EL
-    private void doHandlePageException(Throwable t) throws IOException,
-            ServletException {
+    public void handlePageException(final Throwable t) throws IOException, ServletException {
+        if (t == null) {
+            throw new NullPointerException("null Throwable");
+        }
 
         if (errorPageURL != null && !errorPageURL.equals("")) {
 
@@ -735,8 +708,7 @@ public class PageContextImpl extends PageContext {
 
             // The error page could be inside an include.
 
-            Object newException =
-                    request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+            Object newException = request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
 
             // t==null means the attribute was not set.
             if ((newException != null) && (newException == t)) {
@@ -763,12 +735,12 @@ public class PageContextImpl extends PageContext {
             Throwable rootCause = null;
             if (t instanceof JspException || t instanceof ELException ||
                     t instanceof javax.servlet.jsp.el.ELException) {
-                rootCause =t.getCause();
+                rootCause = t.getCause();
             }
 
             if (rootCause != null) {
-                throw new ServletException(t.getClass().getName() + ": "
-                        + t.getMessage(), rootCause);
+                throw new ServletException(
+                        t.getClass().getName() + ": " + t.getMessage(), rootCause);
             }
 
             throw new ServletException(t);
