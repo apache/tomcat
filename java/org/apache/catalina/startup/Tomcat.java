@@ -61,6 +61,7 @@ import org.apache.catalina.core.StandardService;
 import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.catalina.realm.RealmBase;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 
@@ -145,7 +146,7 @@ public class Tomcat {
     private final Map<String, Principal> userPrincipals = new HashMap<>();
 
     public Tomcat() {
-        // NOOP
+        ExceptionUtils.preload();
     }
 
     /**
