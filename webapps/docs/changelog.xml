@@ -56,10 +56,38 @@
         Correct various edge cases in the new HTTP Host header validation
         parser. Patch provided by Katya Todorova. (martk)
       </fix>
+      <fix>
+        Correct a regression in the X to comma refactoring that broke JMX
+        operations that take parameters. (markt)
+      </fix>
+      <fix>
+        Avoid a <code>NullPointerException</code> when reading attributes for a
+        running HTTP connector where TLS is not enabled. (markt)
+      </fix>
+      <fix>
+        <bug>47214</bug>: Refactor code so that explicitly referenced inner
+        classes are given explit names rather than being anonymous. (markt)
+      </fix>
+      <fix>
+        <bug>60940</bug>: Improve the handling of the <code>META-INF/</code> and
+        <code>META-INF/MANIFEST.MF</code> entries for Jar files located in
+        <code>/WEB-INF/lib</code> when running a web application from a packed
+        WAR file. (markt)
+      </fix>
+      <fix>
+        Pre-load the <code>ExceptionUtils</code> class. Since the class is used
+        extensively in error handling, it is prudent to pre-load it to avoid any
+        failure to load this class masking the true problem during error
+        handling. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
     <changelog>
+      <fix>
+        <bug>47214</bug>: Refactor code so that explicitly referenced inner
+        classes are given explit names rather than being anonymous. (markt)
+      </fix>
       <fix>
         <bug>60925</bug>: Improve the handling of access to properties defined
         by interfaces when a <code>BeanELResolver</code> is used under a
@@ -73,6 +101,11 @@
         Refactor the creating a constructor for a proxy class to reduce
         duplicate code. (kfujino)
       </scode>
+      <fix>
+        In <code>StatementFacade</code>, the method call on the statements that
+        have been closed throw <code>SQLException</code> rather than
+        <code>NullPointerException</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

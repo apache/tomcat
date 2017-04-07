@@ -50,24 +50,6 @@ public class JasperInitializer implements ServletContainerInitializer {
     static {
         JspFactoryImpl factory = new JspFactoryImpl();
         SecurityClassLoad.securityClassLoad(factory.getClass().getClassLoader());
-        if( System.getSecurityManager() != null ) {
-            String basePackage = "org.apache.jasper.";
-            try {
-                factory.getClass().getClassLoader().loadClass( basePackage +
-                        "runtime.JspFactoryImpl$PrivilegedGetPageContext");
-                factory.getClass().getClassLoader().loadClass( basePackage +
-                        "runtime.JspFactoryImpl$PrivilegedReleasePageContext");
-                factory.getClass().getClassLoader().loadClass( basePackage +
-                        "runtime.JspRuntimeLibrary");
-                factory.getClass().getClassLoader().loadClass( basePackage +
-                        "runtime.ServletResponseWrapperInclude");
-                factory.getClass().getClassLoader().loadClass( basePackage +
-                        "servlet.JspServletWrapper");
-            } catch (ClassNotFoundException ex) {
-                throw new IllegalStateException(ex);
-            }
-        }
-
         if (JspFactory.getDefaultFactory() == null) {
             JspFactory.setDefaultFactory(factory);
         }

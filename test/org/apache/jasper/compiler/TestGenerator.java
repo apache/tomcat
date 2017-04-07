@@ -281,4 +281,17 @@ public class TestGenerator extends TomcatBaseTest {
         assertTrue(result.startsWith("0 Hello world!\n"));
         assertTrue(result.endsWith("999 Hello world!\n"));
     }
+
+
+    // https://bz.apache.org/bugzilla/show_bug.cgi?id=43400
+    @Test
+    public void testTagsWithEnums() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug43nnn/bug43400.jsp");
+
+        String result = res.toString();
+        System.out.println(result);
+        assertEcho(result, "ASYNC");
+    }
 }

@@ -107,11 +107,28 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
 
                     try (JarInputStream jarIs = new JarInputStream(jarFileIs)) {
                         JarEntry entry = jarIs.getNextJarEntry();
+                        boolean hasMetaInf = false;
                         while (entry != null) {
+                            if (!hasMetaInf && entry.getName().startsWith("META-INF/")) {
+                                hasMetaInf = true;
+                            }
                             archiveEntries.put(entry.getName(), entry);
                             entry = jarIs.getNextJarEntry();
                         }
                         setManifest(jarIs.getManifest());
+                        // Hacks to work-around JarInputStream swallowing these
+                        // entries. The attributes for these entries will be
+                        // incomplete. Making the attributes available would
+                        // require (re-)reading the stream as a ZipInputStream
+                        // and creating JarEntry objects from the ZipEntries.
+                        if (hasMetaInf) {
+                            JarEntry metaInfDir = new JarEntry("META-INF/");
+                            archiveEntries.put(metaInfDir.getName(), metaInfDir);
+                        }
+                        if (jarIs.getManifest() != null) {
+                            JarEntry manifest = new JarEntry("META-INF/MANIFEST.MF");
+                            archiveEntries.put(manifest.getName(), manifest);
+                        }
                     }
                 } catch (IOException ioe) {
                     // Should never happen

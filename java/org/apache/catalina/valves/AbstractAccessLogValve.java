@@ -1010,17 +1010,22 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             if (usesBegin) {
                 timestamp -= time;
             }
-            switch (type) {
-            case CLF:
+            /*  Implementation note: This is deliberately not implemented using
+             *  switch. If a switch is used the compiler (at least the Oracle
+             *  one) will use a synthetic class to implement the switch. The
+             *  problem is that this class needs to be pre-loaded when using a
+             *  SecurityManager and the name of that class will depend on any
+             *  anonymous inner classes and any other synthetic classes. As such
+             *  the name is not constant and keeping the pre-loading up to date
+             *  as the name changes is error prone.
+             */
+            if (type == FormatType.CLF) {
                 buf.append(localDateCache.get().getFormat(timestamp));
-                break;
-            case SEC:
+            } else if (type == FormatType.SEC) {
                 buf.append(Long.toString(timestamp / 1000));
-                break;
-            case MSEC:
+            } else if (type == FormatType.MSEC) {
                 buf.append(Long.toString(timestamp));
-                break;
-            case MSEC_FRAC:
+            } else if (type == FormatType.MSEC_FRAC) {
                 frac = timestamp % 1000;
                 if (frac < 100) {
                     if (frac < 10) {
@@ -1031,8 +1036,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     }
                 }
                 buf.append(Long.toString(frac));
-                break;
-            case SDF:
+            } else {
+                // FormatType.SDF
                 String temp = localDateCache.get().getFormat(format, locale, timestamp);
                 if (usesMsecs) {
                     frac = timestamp % 1000;
@@ -1050,7 +1055,6 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     temp = temp.replace(msecPattern, Long.toString(frac));
                 }
                 buf.append(temp);
-                break;
             }
         }
     }

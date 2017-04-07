@@ -40,9 +40,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Remy Maucherat
  */
 @SuppressWarnings("deprecation")
-public class ResponseFacade
-    implements HttpServletResponse {
-
+public class ResponseFacade implements HttpServletResponse {
 
     // ----------------------------------------------------------- DoPrivileged
 
@@ -86,8 +84,24 @@ public class ResponseFacade
         }
     }
 
-    // ----------------------------------------------------------- Constructors
+    private static class FlushBufferPrivilegedAction implements PrivilegedExceptionAction<Void> {
 
+        private final Response response;
+
+        public FlushBufferPrivilegedAction(Response response) {
+            this.response = response;
+        }
+
+        @Override
+        public Void run() throws IOException {
+            response.setAppCommitted(true);
+            response.flushBuffer();
+            return null;
+        }
+    }
+
+
+    // ----------------------------------------------------------- Constructors
 
     /**
      * Construct a wrapper for the specified response.
@@ -276,40 +290,25 @@ public class ResponseFacade
 
 
     @Override
-    public void flushBuffer()
-        throws IOException {
+    public void flushBuffer() throws IOException {
 
         if (isFinished()) {
-            //            throw new IllegalStateException
-            //                (/*sm.getString("responseFacade.finished")*/);
             return;
         }
 
-        if (SecurityUtil.isPackageProtectionEnabled()){
+        if (SecurityUtil.isPackageProtectionEnabled()) {
             try{
-                AccessController.doPrivileged(
-                        new PrivilegedExceptionAction<Void>(){
-
-                    @Override
-                    public Void run() throws IOException{
-                        response.setAppCommitted(true);
-
-                        response.flushBuffer();
-                        return null;
-                    }
-                });
-            } catch(PrivilegedActionException e){
+                AccessController.doPrivileged(new FlushBufferPrivilegedAction(response));
+            } catch(PrivilegedActionException e) {
                 Exception ex = e.getException();
-                if (ex instanceof IOException){
+                if (ex instanceof IOException) {
                     throw (IOException)ex;
                 }
             }
         } else {
             response.setAppCommitted(true);
-
             response.flushBuffer();
         }
-
     }
 
 

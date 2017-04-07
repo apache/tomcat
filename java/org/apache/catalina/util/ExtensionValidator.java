@@ -150,9 +150,8 @@ public final class ExtensionValidator {
             if (manifestResource.isFile()) {
                 // Primarily used for error reporting
                 String jarName = manifestResource.getURL().toExternalForm();
-                Manifest jmanifest = null;
-                try (InputStream is = manifestResource.getInputStream()) {
-                    jmanifest = new Manifest(is);
+                Manifest jmanifest = manifestResource.getManifest();
+                if (jmanifest != null) {
                     ManifestResource mre = new ManifestResource(jarName,
                             jmanifest, ManifestResource.APPLICATION);
                     appManifestResources.add(mre);
