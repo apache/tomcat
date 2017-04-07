@@ -69,6 +69,11 @@
         classes are given explit names rather than being anonymous. (markt)
       </fix>
       <fix>
+        <bug>59825</bug>: Log a message that lists the components in the
+        processing chain that do not support async processing when a call to
+        <code>ServletRequest.startAsync()</code> fails. (markt)
+      </fix>
+      <fix>
         <bug>60940</bug>: Improve the handling of the <code>META-INF/</code> and
         <code>META-INF/MANIFEST.MF</code> entries for Jar files located in
         <code>/WEB-INF/lib</code> when running a web application from a packed

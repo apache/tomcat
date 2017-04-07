@@ -20,6 +20,7 @@ package org.apache.catalina.core;
 
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import javax.management.ObjectName;
 
@@ -117,8 +118,19 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
     }
 
 
-    // ------------------------------------------------------ Contained Methods
+    @Override
+    public void findNonAsyncValves(Set<String> result) {
+        Valve valve = (first!=null) ? first : basic;
+        while (valve != null) {
+            if (!valve.isAsyncSupported()) {
+                result.add(valve.getClass().getName());
+            }
+            valve = valve.getNext();
+        }
+    }
 
+
+    // ------------------------------------------------------ Contained Methods
 
     /**
      * Return the Container with which this Pipeline is associated.

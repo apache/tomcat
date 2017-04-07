@@ -76,6 +76,7 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.TomcatPrincipal;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.core.ApplicationFilterChain;
 import org.apache.catalina.core.ApplicationMapping;
 import org.apache.catalina.core.ApplicationPart;
 import org.apache.catalina.core.ApplicationPushBuilder;
@@ -95,6 +96,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.CookieProcessor;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
@@ -1617,7 +1619,11 @@ public class Request implements HttpServletRequest {
     public AsyncContext startAsync(ServletRequest request,
             ServletResponse response) {
         if (!isAsyncSupported()) {
-            throw new IllegalStateException(sm.getString("request.asyncNotSupported"));
+            IllegalStateException ise =
+                    new IllegalStateException(sm.getString("request.asyncNotSupported"));
+            log.warn(sm.getString("coyoteRequest.noAsync",
+                    StringUtils.join(getNonAsyncClassNames())), ise);
+            throw ise;
         }
 
         if (asyncContext == null) {
@@ -1629,6 +1635,31 @@ public class Request implements HttpServletRequest {
         asyncContext.setTimeout(getConnector().getAsyncTimeout());
 
         return asyncContext;
+    }
+
+
+    private Set<String> getNonAsyncClassNames() {
+        Set<String> result = new HashSet<>();
+
+        Wrapper wrapper = getWrapper();
+        if (!wrapper.isAsyncSupported()) {
+            result.add(wrapper.getServletClass());
+        }
+
+        FilterChain filterChain = getFilterChain();
+        if (filterChain instanceof ApplicationFilterChain) {
+            ((ApplicationFilterChain) filterChain).findNonAsyncFilters(result);
+        } else {
+            result.add(sm.getString("coyoteRequest.filterAsyncSupportUnknown"));
+        }
+
+        Container c = wrapper;
+        while (c != null) {
+            c.getPipeline().findNonAsyncValves(result);
+            c = c.getParent();
+        }
+
+        return result;
     }
 
     @Override
