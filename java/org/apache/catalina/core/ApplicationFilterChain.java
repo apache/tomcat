@@ -19,6 +19,7 @@ package org.apache.catalina.core;
 import java.io.IOException;
 import java.security.Principal;
 import java.security.PrivilegedActionException;
+import java.util.Set;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -43,7 +44,7 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Craig R. McClanahan
  */
-final class ApplicationFilterChain implements FilterChain {
+public final class ApplicationFilterChain implements FilterChain {
 
     // Used to enforce requirements of SRV.8.2 / SRV.14.2.5.1
     private static final ThreadLocal<ServletRequest> lastServicedRequest;
@@ -325,5 +326,23 @@ final class ApplicationFilterChain implements FilterChain {
 
     void setServletSupportsAsync(boolean servletSupportsAsync) {
         this.servletSupportsAsync = servletSupportsAsync;
+    }
+
+
+    /**
+     * Identifies the Filters, if any, in this FilterChain that do not support
+     * async.
+     *
+     * @param result The Set to which the fully qualified class names of each
+     *               Filter in this FilterChain that does not support async will
+     *               be added
+     */
+    public void findNonAsyncFilters(Set<String> result) {
+        for (int i = 0; i < n ; i++) {
+            ApplicationFilterConfig filter = filters[i];
+            if ("false".equalsIgnoreCase(filter.getFilterDef().getAsyncSupported())) {
+                result.add(filter.getFilterClass());
+            }
+        }
     }
 }

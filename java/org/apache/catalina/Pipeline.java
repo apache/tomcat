@@ -18,6 +18,7 @@
 
 package org.apache.catalina;
 
+import java.util.Set;
 
 /**
  * <p>Interface describing a collection of Valves that should be executed
@@ -143,4 +144,14 @@ public interface Pipeline {
      */
     public void setContainer(Container container);
 
+
+    /**
+     * Identifies the Valves, if any, in this Pipeline that do not support
+     * async.
+     *
+     * @param result The Set to which the fully qualified class names of each
+     *               Valve in this Pipeline that does not support async will be
+     *               added
+     */
+    public void findNonAsyncValves(Set<String> result);
 }
