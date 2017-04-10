@@ -133,7 +133,7 @@ public class GroupChannel extends ChannelInterceptorBase
     private boolean jmxEnabled = true;
 
     /**
-     * the ObjectName of this channel. 
+     * the ObjectName of this channel.
      */
     private ObjectName oname = null;
 

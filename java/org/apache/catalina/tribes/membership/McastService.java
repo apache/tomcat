@@ -85,7 +85,7 @@ public class McastService
     private Channel channel;
 
     /**
-     * the ObjectName of this McastService. 
+     * the ObjectName of this McastService.
      */
     private ObjectName oname = null;
 

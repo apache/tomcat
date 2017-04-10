@@ -45,6 +45,9 @@ public class JmxRegistry {
     }
 
     public static JmxRegistry getRegistry(Channel channel) {
+        if (channel == null || channel.getName() == null) {
+            return null;
+        }
         JmxRegistry registry = registryCache.get(channel.getName());
         if (registry != null) return registry;
 
@@ -88,7 +91,7 @@ public class JmxRegistry {
         }
         return on;
     }
-    
+
     public ObjectName registerJmx(String keyprop, Object bean) {
         String oNameStr = baseOname.toString() + keyprop;
         ObjectName oName = null;
