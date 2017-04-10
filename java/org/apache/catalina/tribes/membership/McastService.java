@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.util.Properties;
 
+import javax.management.ObjectName;
+
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
@@ -30,6 +32,7 @@ import org.apache.catalina.tribes.MembershipService;
 import org.apache.catalina.tribes.MessageListener;
 import org.apache.catalina.tribes.io.ChannelData;
 import org.apache.catalina.tribes.io.XByteBuffer;
+import org.apache.catalina.tribes.jmx.JmxRegistry;
 import org.apache.catalina.tribes.util.Arrays;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.catalina.tribes.util.UUIDGenerator;
@@ -42,7 +45,8 @@ import org.apache.juli.logging.LogFactory;
  * This class is responsible for maintaining a list of active cluster nodes in the cluster.
  * If a node fails to send out a heartbeat, the node will be dismissed.
  */
-public class McastService implements MembershipService,MembershipListener,MessageListener {
+public class McastService
+        implements MembershipService,MembershipListener,MessageListener, McastServiceMBean {
 
     private static final Log log = LogFactory.getLog(McastService.class);
 
@@ -79,6 +83,11 @@ public class McastService implements MembershipService,MembershipListener,Messag
     protected byte[] domain;
 
     private Channel channel;
+
+    /**
+     * the ObjectName of this McastService. 
+     */
+    private ObjectName oname = null;
 
     /**
      * Create a membership service.
@@ -363,7 +372,11 @@ public class McastService implements MembershipService,MembershipListener,Messag
         impl.setChannel(channel);
 
         impl.start(level);
-
+        // register jmx
+        JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+        if (jmxRegistry != null) {
+            this.oname = jmxRegistry.registerJmx(",component=Membership", this);
+        }
 
     }
 
@@ -375,6 +388,10 @@ public class McastService implements MembershipService,MembershipListener,Messag
     public void stop(int svc) {
         try  {
             if ( impl != null && impl.stop(svc) ) {
+                if (oname != null) {
+                    JmxRegistry.getRegistry(channel).unregisterJmx(oname);
+                    oname = null;
+                }
                 impl.setChannel(null);
                 impl = null;
                 channel = null;
