@@ -1,0 +1,112 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.catalina.tribes.jmx;
+
+import java.lang.management.ManagementFactory;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanServer;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
+
+import org.apache.catalina.tribes.Channel;
+import org.apache.catalina.tribes.JmxChannel;
+import org.apache.catalina.tribes.util.StringManager;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
+public class JmxRegistry {
+
+    private static final Log log = LogFactory.getLog(JmxRegistry.class);
+    protected static final StringManager sm = StringManager.getManager(JmxRegistry.class);
+    private static ConcurrentHashMap<String, JmxRegistry> registryCache = new ConcurrentHashMap<>();
+
+    private MBeanServer mbserver = ManagementFactory.getPlatformMBeanServer();
+    private ObjectName baseOname = null;
+
+    private JmxRegistry() {
+    }
+
+    public static JmxRegistry getRegistry(Channel channel) {
+        JmxRegistry registry = registryCache.get(channel.getName());
+        if (registry != null) return registry;
+
+        if (!(channel instanceof JmxChannel)) return null;
+        JmxChannel jmxChannel = (JmxChannel) channel;
+        if (!jmxChannel.isJmxEnabled()) return null;
+        ObjectName baseOn = createBaseObjectName(jmxChannel.getJmxDomain(),
+                jmxChannel.getJmxPrefix(), channel.getName());
+        if (baseOn == null) return null;
+        // create registry
+        registry = new JmxRegistry();
+        registry.baseOname = baseOn;
+        registryCache.putIfAbsent(channel.getName(), registry);
+        return registry;
+    }
+
+    private static ObjectName createBaseObjectName(String domain, String prefix, String name) {
+        if (domain == null) {
+            log.warn(sm.getString("jmxRegistry.no.domain"));
+            return null;
+        }
+        ObjectName on = null;
+        StringBuilder sb = new StringBuilder(domain);
+        sb.append(':');
+        sb.append(prefix);
+        sb.append("type=Channel,channel=");
+        sb.append(name);
+        try {
+            on = new ObjectName(sb.toString());
+        } catch (MalformedObjectNameException e) {
+            log.error(sm.getString("jmxRegistry.objectName.failed", sb.toString()), e);
+        }
+        return on;
+    }
+    
+    public ObjectName registerJmx(String keyprop, Object bean) {
+        String oNameStr = baseOname.toString() + keyprop;
+        ObjectName oName = null;
+        try {
+            oName = new ObjectName(oNameStr);
+            mbserver.registerMBean(bean, oName);
+        } catch (NotCompliantMBeanException e) {
+            log.warn(sm.getString("jmxRegistry.registerJmx.notCompliant", bean), e);
+            return null;
+        } catch (MalformedObjectNameException e) {
+            log.error(sm.getString("jmxRegistry.objectName.failed", oNameStr), e);
+            return null;
+        } catch (Exception e) {
+            log.error(sm.getString("jmxRegistry.registerJmx.failed", bean, oNameStr), e);
+            return null;
+        }
+        return oName;
+    }
+
+    public void unregisterJmx(ObjectName oname) {
+        if (oname ==null) return;
+        try {
+            mbserver.unregisterMBean(oname);
+        } catch (InstanceNotFoundException e) {
+            log.warn(sm.getString("jmxRegistry.unregisterJmx.notFound", oname), e);
+        } catch (Exception e) {
+            log.warn(sm.getString("jmxRegistry.unregisterJmx.failed", oname), e);
+        }
+    }
+
+}

@@ -100,6 +100,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <add>
+        Add JMX support for Tribes components. (kfujino)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <scode>
