@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.apache.catalina.tribes.ByteMessage;
@@ -701,6 +702,28 @@ public class GroupChannel extends ChannelInterceptorBase
     @Override
     public void setJmxPrefix(String jmxPrefix) {
         this.jmxPrefix = jmxPrefix;
+    }
+
+    @Override
+    public ObjectName preRegister(MBeanServer server, ObjectName name)
+            throws Exception {
+        // NOOP
+        return null;
+    }
+
+    @Override
+    public void postRegister(Boolean registrationDone) {
+        // NOOP
+    }
+
+    @Override
+    public void preDeregister() throws Exception {
+        // NOOP
+    }
+
+    @Override
+    public void postDeregister() {
+        JmxRegistry.removeRegistry(this, true);
     }
 
     /**

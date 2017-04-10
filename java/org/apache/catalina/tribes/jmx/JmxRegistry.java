@@ -17,6 +17,7 @@
 package org.apache.catalina.tribes.jmx;
 
 import java.lang.management.ManagementFactory;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.InstanceNotFoundException;
@@ -58,6 +59,15 @@ public class JmxRegistry {
         registry.baseOname = baseOn;
         registryCache.putIfAbsent(channel.getName(), registry);
         return registry;
+    }
+
+    public static void removeRegistry(Channel channel, boolean clear) {
+        JmxRegistry registry = registryCache.get(channel.getName());
+        if (registry == null) return;
+        if (clear) {
+            registry.clearMBeans();
+        }
+        registryCache.remove(channel.getName());
     }
 
     private static ObjectName createBaseObjectName(String domain, String prefix, String name) {
@@ -106,6 +116,19 @@ public class JmxRegistry {
             log.warn(sm.getString("jmxRegistry.unregisterJmx.notFound", oname), e);
         } catch (Exception e) {
             log.warn(sm.getString("jmxRegistry.unregisterJmx.failed", oname), e);
+        }
+    }
+
+    private void clearMBeans() {
+        String query = baseOname.toString() + ",*";
+        try {
+            ObjectName name = new ObjectName(query);
+            Set<ObjectName> onames = mbserver.queryNames(name, null);
+            for (ObjectName objectName : onames) {
+                unregisterJmx(objectName);
+            }
+        } catch (MalformedObjectNameException e) {
+            log.error(sm.getString("jmxRegistry.objectName.failed", query), e);
         }
     }
 
