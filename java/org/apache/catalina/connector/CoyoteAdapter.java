@@ -276,8 +276,9 @@ public class CoyoteAdapter implements Adapter {
                 if (req.getStartTime() != -1) {
                     time = System.currentTimeMillis() - req.getStartTime();
                 }
-                if (request.getMappingData().context != null) {
-                    request.getMappingData().context.logAccess(request, response, time, false);
+                Context context = request.getContext();
+                if (context != null) {
+                    context.logAccess(request, response, time, false);
                 } else {
                     log(req, res, time);
                 }
@@ -390,8 +391,16 @@ public class CoyoteAdapter implements Adapter {
             if (!async && postParseSuccess) {
                 // Log only if processing was invoked.
                 // If postParseRequest() failed, it has already logged it.
-                request.getMappingData().context.logAccess(request, response,
-                        System.currentTimeMillis() - req.getStartTime(), false);
+                Context context = request.getContext();
+                // If the context is null, it is likely that the endpoint was
+                // shutdown, this connection closed and the request recycled in
+                // a different thread. That thread will have updated the access
+                // log so it is OK not to update the access log here in that
+                // case.
+                if (context != null) {
+                    context.logAccess(request, response,
+                            System.currentTimeMillis() - req.getStartTime(), false);
+                }
             }
 
             req.getRequestProcessor().setWorkerThreadName(null);
@@ -446,18 +455,17 @@ public class CoyoteAdapter implements Adapter {
             // Log at the lowest level available. logAccess() will be
             // automatically called on parent containers.
             boolean logged = false;
-            if (request.mappingData.context != null) {
+            Context context = request.mappingData.context;
+            Host host = request.mappingData.host;
+            if (context != null) {
                 logged = true;
-                request.mappingData.context.logAccess(
-                        request, response, time, true);
-            } else if (request.mappingData.host != null) {
+                context.logAccess(request, response, time, true);
+            } else if (host != null) {
                 logged = true;
-                request.mappingData.host.logAccess(
-                        request, response, time, true);
+                host.logAccess(request, response, time, true);
             }
             if (!logged) {
-                connector.getService().getContainer().logAccess(
-                        request, response, time, true);
+                connector.getService().getContainer().logAccess(request, response, time, true);
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
