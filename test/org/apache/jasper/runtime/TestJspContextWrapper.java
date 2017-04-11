@@ -16,7 +16,7 @@
  */
 package org.apache.jasper.runtime;
 
-import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collections;
 
 import javax.servlet.DispatcherType;
@@ -62,7 +62,7 @@ public class TestJspContextWrapper extends TomcatBaseTest {
         // Could hack something with HttpUtils...
         // No obvious status fields for javax.servlet.jsp
         // Wild card (package) import
-        Assert.assertTrue(result, result.contains("01-" + BigDecimal.ROUND_UP));
+        Assert.assertTrue(result, result.contains("01-" + RoundingMode.HALF_UP));
         // Class import
         Assert.assertTrue(result, result.contains("02-" + Collections.EMPTY_LIST.size()));
     }

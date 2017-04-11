@@ -16,5 +16,5 @@
 --%>
 <%@tag import="java.math.*, java.util.Collections" %>
 <p>00-${DispatcherType.ASYNC}</p>
-<p>01-${BigDecimal.ROUND_UP}</p>
+<p>01-${RoundingMode.HALF_UP}</p>
 <p>02-${Collections.EMPTY_LIST.stream().count()}</p>
