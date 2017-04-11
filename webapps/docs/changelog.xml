@@ -85,6 +85,11 @@
         failure to load this class masking the true problem during error
         handling. (markt)
       </fix>
+      <fix>
+        Avoid potential <code>NullPointerException</code>s related to access
+        logging during shutdown, some of which have been observed when running
+        the unit tests. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
