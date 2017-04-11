@@ -140,6 +140,10 @@
         signing service to use the now mandatory 2-factor authentication.
         (markt)
       </fix>
+      <scode>
+        Refactoring in preparation for Java 9. Refactor to avoid using some
+        methods that will be deprecated in Java 9 onwards. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>

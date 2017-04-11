@@ -331,7 +331,7 @@ public class TestBeanELResolver {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        resolver.isReadOnly(context, new TesterBean(BEAN_NAME), new Integer(0));
+        resolver.isReadOnly(context, new TesterBean(BEAN_NAME), Integer.valueOf(0));
     }
 
     /**
