@@ -136,6 +136,7 @@ public class McastService
     /**
      * @return the local member name
      */
+    @Override
     public String getLocalMemberName() {
         return localMember.toString() ;
     }
@@ -181,6 +182,7 @@ public class McastService
         properties.setProperty("mcastAddress", addr);
     }
 
+    @Override
     public String getAddress() {
         return properties.getProperty("mcastAddress");
     }
@@ -193,6 +195,7 @@ public class McastService
         properties.setProperty("mcastBindAddress", bindaddr);
     }
 
+    @Override
     public String getBind() {
         return properties.getProperty("mcastBindAddress");
     }
@@ -205,6 +208,7 @@ public class McastService
         properties.setProperty("recoveryCounter", String.valueOf(recoveryCounter));
     }
 
+    @Override
     public int getRecoveryCounter(){
         String p = properties.getProperty("recoveryCounter");
         if(p != null){
@@ -217,6 +221,7 @@ public class McastService
         properties.setProperty("recoveryEnabled", String.valueOf(recoveryEnabled));
     }
 
+    @Override
     public boolean getRecoveryEnabled() {
         String p = properties.getProperty("recoveryEnabled");
         if(p != null){
@@ -229,6 +234,7 @@ public class McastService
         properties.setProperty("recoverySleepTime", String.valueOf(recoverySleepTime));
     }
 
+    @Override
     public long getRecoverySleepTime(){
         String p = properties.getProperty("recoverySleepTime");
         if(p != null){
@@ -241,6 +247,7 @@ public class McastService
         properties.setProperty("localLoopbackDisabled",String.valueOf(localLoopbackDisabled));
     }
 
+    @Override
     public boolean getLocalLoopbackDisabled() {
         String p = properties.getProperty("localLoopbackDisabled");
         if(p != null){
@@ -249,6 +256,7 @@ public class McastService
         return false;
     }
 
+    @Override
     public int getPort() {
         String p = properties.getProperty("mcastPort");
         return Integer.parseInt(p);
@@ -258,6 +266,7 @@ public class McastService
         properties.setProperty("mcastFrequency", String.valueOf(time));
     }
 
+    @Override
     public long getFrequency() {
         String p = properties.getProperty("mcastFrequency");
         return Long.parseLong(p);
@@ -270,6 +279,7 @@ public class McastService
         properties.setProperty("memberDropTime", String.valueOf(time));
     }
 
+    @Override
     public long getDropTime() {
         String p = properties.getProperty("memberDropTime");
         return Long.parseLong(p);
@@ -530,6 +540,7 @@ public class McastService
         }
     }
 
+    @Override
     public int getSoTimeout() {
         return mcastSoTimeout;
     }
@@ -539,6 +550,7 @@ public class McastService
         properties.setProperty("mcastSoTimeout", String.valueOf(mcastSoTimeout));
     }
 
+    @Override
     public int getTtl() {
         return mcastTTL;
     }
@@ -547,6 +559,7 @@ public class McastService
         return payload;
     }
 
+    @Override
     public byte[] getDomain() {
         return domain;
     }
