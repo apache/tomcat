@@ -1351,7 +1351,7 @@ public class StandardContext extends ContainerBase
         if (this.charsetMapper == null) {
             try {
                 Class<?> clazz = Class.forName(charsetMapperClass);
-                this.charsetMapper = (CharsetMapper) clazz.newInstance();
+                this.charsetMapper = (CharsetMapper) clazz.getDeclaredConstructor().newInstance();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 this.charsetMapper = new CharsetMapper();
@@ -3264,11 +3264,11 @@ public class StandardContext extends ContainerBase
         Wrapper wrapper = null;
         if (wrapperClass != null) {
             try {
-                wrapper = (Wrapper) wrapperClass.newInstance();
+                wrapper = (Wrapper) wrapperClass.getDeclaredConstructor().newInstance();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 log.error("createWrapper", t);
-                return (null);
+                return null;
             }
         } else {
             wrapper = new StandardWrapper();
@@ -3279,12 +3279,12 @@ public class StandardContext extends ContainerBase
                 try {
                     Class<?> clazz = Class.forName(wrapperLifecycles[i]);
                     LifecycleListener listener =
-                        (LifecycleListener) clazz.newInstance();
+                        (LifecycleListener) clazz.getDeclaredConstructor().newInstance();
                     wrapper.addLifecycleListener(listener);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     log.error("createWrapper", t);
-                    return (null);
+                    return null;
                 }
             }
         }
@@ -3294,18 +3294,17 @@ public class StandardContext extends ContainerBase
                 try {
                     Class<?> clazz = Class.forName(wrapperListeners[i]);
                     ContainerListener listener =
-                      (ContainerListener) clazz.newInstance();
+                            (ContainerListener) clazz.getDeclaredConstructor().newInstance();
                     wrapper.addContainerListener(listener);
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
                     log.error("createWrapper", t);
-                    return (null);
+                    return null;
                 }
             }
         }
 
-        return (wrapper);
-
+        return wrapper;
     }
 
 

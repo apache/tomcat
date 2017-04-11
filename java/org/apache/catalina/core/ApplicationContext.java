@@ -812,7 +812,7 @@ public class ApplicationContext implements ServletContext {
             ExceptionUtils.handleThrowable(e.getCause());
             throw new ServletException(e);
         } catch (IllegalAccessException | NamingException | InstantiationException |
-                ClassNotFoundException e) {
+                ClassNotFoundException | NoSuchMethodException e) {
             throw new ServletException(e);
         }
     }
@@ -946,7 +946,7 @@ public class ApplicationContext implements ServletContext {
             ExceptionUtils.handleThrowable(e.getCause());
             throw new ServletException(e);
         } catch (IllegalAccessException | NamingException | InstantiationException |
-                ClassNotFoundException e) {
+                ClassNotFoundException | NoSuchMethodException e) {
             throw new ServletException(e);
         }
     }
@@ -1087,7 +1087,7 @@ public class ApplicationContext implements ServletContext {
                     "applicationContext.addListener.iae.cnfe", className),
                     e);
         } catch (IllegalAccessException | NamingException | InstantiationException |
-                ClassNotFoundException e) {
+                ClassNotFoundException | NoSuchMethodException e) {
             throw new IllegalArgumentException(sm.getString(
                     "applicationContext.addListener.iae.cnfe", className),
                     e);
@@ -1159,7 +1159,8 @@ public class ApplicationContext implements ServletContext {
         } catch (InvocationTargetException e) {
             ExceptionUtils.handleThrowable(e.getCause());
             throw new ServletException(e);
-        } catch (IllegalAccessException | NamingException | InstantiationException e) {
+        } catch (IllegalAccessException | NamingException | InstantiationException |
+                NoSuchMethodException e) {
             throw new ServletException(e);
         }
     }

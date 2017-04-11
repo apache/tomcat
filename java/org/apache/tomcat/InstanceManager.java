@@ -22,30 +22,30 @@ import javax.naming.NamingException;
 
 public interface InstanceManager {
 
-    public Object newInstance(Class<?> clazz)
-            throws IllegalAccessException, InvocationTargetException, NamingException,
-                InstantiationException;
+    Object newInstance(Class<?> clazz) throws IllegalAccessException, InvocationTargetException,
+            NamingException, InstantiationException, IllegalArgumentException,
+            NoSuchMethodException, SecurityException;
 
-    public Object newInstance(String className)
-        throws IllegalAccessException, InvocationTargetException, NamingException,
-            InstantiationException, ClassNotFoundException;
+    Object newInstance(String className) throws IllegalAccessException, InvocationTargetException,
+            NamingException, InstantiationException, ClassNotFoundException,
+            IllegalArgumentException, NoSuchMethodException, SecurityException;
 
-    public Object newInstance(String fqcn, ClassLoader classLoader)
-        throws IllegalAccessException, InvocationTargetException, NamingException,
-            InstantiationException, ClassNotFoundException;
+    Object newInstance(String fqcn, ClassLoader classLoader) throws IllegalAccessException,
+            InvocationTargetException, NamingException, InstantiationException,
+            ClassNotFoundException, IllegalArgumentException, NoSuchMethodException,
+            SecurityException;
 
-    public void newInstance(Object o)
-        throws IllegalAccessException, InvocationTargetException, NamingException;
+    void newInstance(Object o)
+            throws IllegalAccessException, InvocationTargetException, NamingException;
 
-    public void destroyInstance(Object o)
-        throws IllegalAccessException, InvocationTargetException;
+    void destroyInstance(Object o) throws IllegalAccessException, InvocationTargetException;
 
     /**
      * Called by the component using the InstanceManager periodically to perform
      * any regular maintenance that might be required. By default, this method
      * is a NO-OP.
      */
-    public default void backgroundProcess() {
+    default void backgroundProcess() {
         // NO-OP by default
     }
 }
