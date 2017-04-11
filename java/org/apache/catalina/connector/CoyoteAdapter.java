@@ -446,16 +446,14 @@ public class CoyoteAdapter implements Adapter {
             // Log at the lowest level available. logAccess() will be
             // automatically called on parent containers.
             boolean logged = false;
-            if (request.mappingData != null) {
-                if (request.mappingData.context != null) {
-                    logged = true;
-                    request.mappingData.context.logAccess(
-                            request, response, time, true);
-                } else if (request.mappingData.host != null) {
-                    logged = true;
-                    request.mappingData.host.logAccess(
-                            request, response, time, true);
-                }
+            if (request.mappingData.context != null) {
+                logged = true;
+                request.mappingData.context.logAccess(
+                        request, response, time, true);
+            } else if (request.mappingData.host != null) {
+                logged = true;
+                request.mappingData.host.logAccess(
+                        request, response, time, true);
             }
             if (!logged) {
                 connector.getService().getContainer().logAccess(
