@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import javax.net.SocketFactory;
 import javax.servlet.ServletException;
@@ -58,6 +59,8 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     // test that demonstrated that most HTTP/2 tests were failing because the
     // response now included a date header
     protected static final String DEFAULT_DATE = "Wed, 11 Nov 2015 19:18:42 GMT";
+
+    private static final String HEADER_IGNORED = "x-ignore";
 
     static final String DEFAULT_CONNECTION_HEADER_VALUE = "Upgrade, HTTP2-Settings";
     private static final byte[] EMPTY_SETTINGS_FRAME =
@@ -918,7 +921,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             if ("date".equals(name)) {
                 value = DEFAULT_DATE;
             }
-            trace.append(lastStreamId + "-Header-[" + name + "]-[" + value + "]\n");
+            // Some header values vary so ignore them
+            if (HEADER_IGNORED.equals(name)) {
+                trace.append(lastStreamId + "-Header-[" + name + "]-[...]\n");
+            } else {
+                trace.append(lastStreamId + "-Header-[" + name + "]-[" + value + "]\n");
+            }
         }
 
 
@@ -1128,6 +1136,26 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             resp.setCharacterEncoding("UTF-8");
             resp.getWriter().print("Cookie count: " + req.getCookies().length);
             resp.flushBuffer();
+        }
+    }
+
+
+    static class LargeHeaderServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+            StringBuilder headerValue = new StringBuilder();
+            Random random = new Random();
+            while (headerValue.length() < 2048) {
+                headerValue.append(Long.toString(random.nextLong()));
+            }
+            resp.setHeader(HEADER_IGNORED, headerValue.toString());
+            resp.getWriter().print("OK");
         }
     }
 

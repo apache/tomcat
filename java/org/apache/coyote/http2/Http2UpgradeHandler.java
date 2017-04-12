@@ -546,29 +546,36 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             while (state != State.COMPLETE) {
                 state = getHpackEncoder().encode(coyoteResponse.getMimeHeaders(), target);
                 target.flip();
-                ByteUtil.setThreeBytes(header, 0, target.limit());
-                if (first) {
-                    first = false;
-                    header[3] = FrameType.HEADERS.getIdByte();
-                    if (stream.getOutputBuffer().hasNoBody()) {
-                        header[4] = FLAG_END_OF_STREAM;
+                if (state == State.COMPLETE || target.limit() > 0) {
+                    ByteUtil.setThreeBytes(header, 0, target.limit());
+                    if (first) {
+                        first = false;
+                        header[3] = FrameType.HEADERS.getIdByte();
+                        if (stream.getOutputBuffer().hasNoBody()) {
+                            header[4] = FLAG_END_OF_STREAM;
+                        }
+                    } else {
+                        header[3] = FrameType.CONTINUATION.getIdByte();
                     }
+                    if (state == State.COMPLETE) {
+                        header[4] += FLAG_END_OF_HEADERS;
+                    }
+                    if (log.isDebugEnabled()) {
+                        log.debug(target.limit() + " bytes");
+                    }
+                    ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
+                    try {
+                        socketWrapper.write(true, header, 0, header.length);
+                        socketWrapper.write(true, target);
+                        socketWrapper.flush(true);
+                    } catch (IOException ioe) {
+                        handleAppInitiatedIOException(ioe);
+                    }
+                }
+                if (state == State.UNDERFLOW) {
+                    target = ByteBuffer.allocate(target.capacity() * 2);
                 } else {
-                    header[3] = FrameType.CONTINUATION.getIdByte();
-                }
-                if (state == State.COMPLETE) {
-                    header[4] += FLAG_END_OF_HEADERS;
-                }
-                if (log.isDebugEnabled()) {
-                    log.debug(target.limit() + " bytes");
-                }
-                ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
-                try {
-                    socketWrapper.write(true, header, 0, header.length);
-                    socketWrapper.write(true, target);
-                    socketWrapper.flush(true);
-                } catch (IOException ioe) {
-                    handleAppInitiatedIOException(ioe);
+                    target.clear();
                 }
             }
         }

@@ -97,6 +97,10 @@
       <fix>
         Align cipher configuration parsing with current OpenSSL master. (markt)
       </fix>
+      <fix>
+        <bug>60970</bug>: Fix infinite loop if application tries to write a
+        large header to the response when using HTTP/2. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
