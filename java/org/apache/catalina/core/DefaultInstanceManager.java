@@ -109,7 +109,7 @@ public class DefaultInstanceManager implements InstanceManager {
     public Object newInstance(Class<?> clazz) throws IllegalAccessException,
             InvocationTargetException, NamingException, InstantiationException,
             IllegalArgumentException, NoSuchMethodException, SecurityException {
-        return newInstance(clazz.getDeclaredConstructor().newInstance(), clazz);
+        return newInstance(clazz.getConstructor().newInstance(), clazz);
     }
 
     @Override
@@ -117,7 +117,7 @@ public class DefaultInstanceManager implements InstanceManager {
             InvocationTargetException, NamingException, InstantiationException,
             ClassNotFoundException, IllegalArgumentException, NoSuchMethodException, SecurityException {
         Class<?> clazz = loadClassMaybePrivileged(className, classLoader);
-        return newInstance(clazz.getDeclaredConstructor().newInstance(), clazz);
+        return newInstance(clazz.getConstructor().newInstance(), clazz);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class DefaultInstanceManager implements InstanceManager {
             InstantiationException, ClassNotFoundException, IllegalArgumentException,
             NoSuchMethodException, SecurityException {
         Class<?> clazz = classLoader.loadClass(className);
-        return newInstance(clazz.getDeclaredConstructor().newInstance(), clazz);
+        return newInstance(clazz.getConstructor().newInstance(), clazz);
     }
 
     @Override

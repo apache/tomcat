@@ -169,7 +169,7 @@ public abstract class ExpressionFactory {
                 }
             }
             if (constructor == null) {
-                result = (ExpressionFactory) clazz.getDeclaredConstructor().newInstance();
+                result = (ExpressionFactory) clazz.getConstructor().newInstance();
             } else {
                 result =
                     (ExpressionFactory) constructor.newInstance(properties);

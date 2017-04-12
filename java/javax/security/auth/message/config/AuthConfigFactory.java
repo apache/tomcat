@@ -73,7 +73,7 @@ public abstract class AuthConfigFactory {
                     // should not be used since that would trigger a memory leak
                     // in container environments.
                     Class<?> clazz = Class.forName(className);
-                    return (AuthConfigFactory) clazz.getDeclaredConstructor().newInstance();
+                    return (AuthConfigFactory) clazz.getConstructor().newInstance();
                 }
             });
         } catch (PrivilegedActionException e) {

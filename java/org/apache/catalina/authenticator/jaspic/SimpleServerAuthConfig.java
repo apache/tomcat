@@ -115,7 +115,7 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                         try {
                             Class<?> clazz = Class.forName(moduleClassName);
                             ServerAuthModule module =
-                                    (ServerAuthModule) clazz.getDeclaredConstructor().newInstance();
+                                    (ServerAuthModule) clazz.getConstructor().newInstance();
                             module.initialize(null, null, handler, mergedProperties);
                             modules.add(module);
                         } catch (ClassNotFoundException | InstantiationException |

@@ -1962,7 +1962,7 @@ public class Request implements HttpServletRequest {
             // Do not go through the instance manager for internal Tomcat classes since they don't
             // need injection
             if (InternalHttpUpgradeHandler.class.isAssignableFrom(httpUpgradeHandlerClass)) {
-                handler = httpUpgradeHandlerClass.getDeclaredConstructor().newInstance();
+                handler = httpUpgradeHandlerClass.getConstructor().newInstance();
             } else {
                 instanceManager = getContext().getInstanceManager();
                 handler = (T) instanceManager.newInstance(httpUpgradeHandlerClass);
