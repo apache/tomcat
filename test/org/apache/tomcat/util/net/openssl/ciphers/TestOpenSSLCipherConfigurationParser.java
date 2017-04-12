@@ -306,7 +306,11 @@ public class TestOpenSSLCipherConfigurationParser {
 
     @Test
     public void testSSLv3() throws Exception {
-        testSpecification("SSLv3");
+        // In OpenSSL 1.1.0-dev, TLSv1 refers to those ciphers that require
+        // TLSv1 rather than being an alias for SSLv3
+        if (TesterOpenSSL.VERSION < 10100) {
+            testSpecification("SSLv3:TLSv1");
+        }
     }
 
 
