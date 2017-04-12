@@ -66,7 +66,7 @@
       </fix>
       <fix>
         <bug>47214</bug>: Refactor code so that explicitly referenced inner
-        classes are given explit names rather than being anonymous. (markt)
+        classes are given explicit names rather than being anonymous. (markt)
       </fix>
       <fix>
         <bug>59825</bug>: Log a message that lists the components in the
@@ -113,7 +113,7 @@
     <changelog>
       <fix>
         <bug>47214</bug>: Refactor code so that explicitly referenced inner
-        classes are given explit names rather than being anonymous. (markt)
+        classes are given explicit names rather than being anonymous. (markt)
       </fix>
       <fix>
         <bug>60925</bug>: Improve the handling of access to properties defined
@@ -149,7 +149,7 @@
         messages. Based on a patch by Michael Osipov. (markt)
       </fix>
       <scode>
-        Review i18n property files, remove unencessary escaping and consistently
+        Review i18n property files, remove unnecessary escaping and consistently
         use <code>[...]</code> to delimit inserted values. (markt)
       </scode>
       <fix>
