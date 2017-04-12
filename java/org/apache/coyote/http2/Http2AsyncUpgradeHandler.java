@@ -155,25 +155,29 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             ByteBuffer target = ByteBuffer.allocate(payloadSize);
             state = getHpackEncoder().encode(coyoteResponse.getMimeHeaders(), target);
             target.flip();
-            ByteUtil.setThreeBytes(header, 0, target.limit());
-            if (first) {
-                first = false;
-                header[3] = FrameType.HEADERS.getIdByte();
-                if (stream.getOutputBuffer().hasNoBody()) {
-                    header[4] = FLAG_END_OF_STREAM;
+            if (state == State.COMPLETE || target.limit() > 0) {
+                ByteUtil.setThreeBytes(header, 0, target.limit());
+                if (first) {
+                    first = false;
+                    header[3] = FrameType.HEADERS.getIdByte();
+                    if (stream.getOutputBuffer().hasNoBody()) {
+                        header[4] = FLAG_END_OF_STREAM;
+                    }
+                } else {
+                    header[3] = FrameType.CONTINUATION.getIdByte();
                 }
-            } else {
-                header[3] = FrameType.CONTINUATION.getIdByte();
+                if (state == State.COMPLETE) {
+                    header[4] += FLAG_END_OF_HEADERS;
+                }
+                if (log.isDebugEnabled()) {
+                    log.debug(target.limit() + " bytes");
+                }
+                ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
+                bufs.add(ByteBuffer.wrap(header));
+                bufs.add(target);
+            } else if (state == State.UNDERFLOW) {
+                payloadSize = payloadSize * 2;
             }
-            if (state == State.COMPLETE) {
-                header[4] += FLAG_END_OF_HEADERS;
-            }
-            if (log.isDebugEnabled()) {
-                log.debug(target.limit() + " bytes");
-            }
-            ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
-            bufs.add(ByteBuffer.wrap(header));
-            bufs.add(target);
         }
         socketWrapper.write(BlockingMode.SEMI_BLOCK, getWriteTimeout(), TimeUnit.MILLISECONDS,
                 null, SocketWrapperBase.COMPLETE_WRITE, applicationErrorCompletion,

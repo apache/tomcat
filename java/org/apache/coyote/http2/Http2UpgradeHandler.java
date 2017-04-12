@@ -572,7 +572,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                         handleAppInitiatedIOException(ioe);
                     }
                 }
-                if (state == State.UNDERFLOW) {
+                if (state == State.UNDERFLOW && target.limit() == 0) {
                     target = ByteBuffer.allocate(target.capacity() * 2);
                 } else {
                     target.clear();
