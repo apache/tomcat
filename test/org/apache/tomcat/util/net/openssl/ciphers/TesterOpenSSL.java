@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,6 +33,8 @@ public class TesterOpenSSL {
     public static final int VERSION;
 
     public static final Set<Cipher> OPENSSL_UNIMPLEMENTED_CIPHERS;
+
+    public static final Map<String,String> OPENSSL_RENAMED_CIPHERS;
 
     static {
         // Note: The following lists are intended to be aligned with the most
@@ -299,6 +302,29 @@ public class TesterOpenSSL {
             unimplemented.add(Cipher.TLS_SRP_SHA_RSA_WITH_3DES_EDE_CBC_SHA);
         }
         OPENSSL_UNIMPLEMENTED_CIPHERS = Collections.unmodifiableSet(unimplemented);
+
+        Map<String,String> renamed = new HashMap<>();
+        renamed.put("ECDH-ECDSA-RC4-SHA+SSLv3", "ECDH-ECDSA-RC4-SHA+TLSv1");
+        renamed.put("ECDHE-ECDSA-NULL-SHA+SSLv3", "ECDHE-ECDSA-NULL-SHA+TLSv1");
+        renamed.put("ECDHE-ECDSA-DES-CBC3-SHA+SSLv3", "ECDHE-ECDSA-DES-CBC3-SHA+TLSv1");
+        renamed.put("ECDHE-ECDSA-AES128-SHA+SSLv3", "ECDHE-ECDSA-AES128-SHA+TLSv1");
+        renamed.put("ECDHE-ECDSA-AES256-SHA+SSLv3", "ECDHE-ECDSA-AES256-SHA+TLSv1");
+        renamed.put("ECDHE-RSA-NULL-SHA+SSLv3", "ECDHE-RSA-NULL-SHA+TLSv1");
+        renamed.put("ECDHE-RSA-RC4-SHA+SSLv3", "ECDHE-RSA-RC4-SHA+TLSv1");
+        renamed.put("ECDHE-RSA-DES-CBC3-SHA+SSLv3", "ECDHE-RSA-DES-CBC3-SHA+TLSv1");
+        renamed.put("ECDHE-RSA-AES128-SHA+SSLv3", "ECDHE-RSA-AES128-SHA+TLSv1");
+        renamed.put("ECDHE-RSA-AES256-SHA+SSLv3", "ECDHE-RSA-AES256-SHA+TLSv1");
+        renamed.put("AECDH-NULL-SHA+SSLv3", "AECDH-NULL-SHA+TLSv1");
+        renamed.put("AECDH-RC4-SHA+SSLv3", "AECDH-RC4-SHA+TLSv1");
+        renamed.put("AECDH-DES-CBC3-SHA+SSLv3", "AECDH-DES-CBC3-SHA+TLSv1");
+        renamed.put("AECDH-AES128-SHA+SSLv3", "AECDH-AES128-SHA+TLSv1");
+        renamed.put("AECDH-AES256-SHA+SSLv3", "AECDH-AES256-SHA+TLSv1");
+        renamed.put("ECDHE-PSK-RC4-SHA+SSLv3", "ECDHE-PSK-RC4-SHA+TLSv1");
+        renamed.put("ECDHE-PSK-3DES-EDE-CBC-SHA+SSLv3", "ECDHE-PSK-3DES-EDE-CBC-SHA+TLSv1");
+        renamed.put("ECDHE-PSK-AES128-CBC-SHA+SSLv3", "ECDHE-PSK-AES128-CBC-SHA+TLSv1");
+        renamed.put("ECDHE-PSK-AES256-CBC-SHA+SSLv3", "ECDHE-PSK-AES256-CBC-SHA+TLSv1");
+        renamed.put("ECDHE-PSK-NULL-SHA+SSLv3", "ECDHE-PSK-NULL-SHA+TLSv1");
+        OPENSSL_RENAMED_CIPHERS = Collections.unmodifiableMap(renamed);
     }
 
 
@@ -343,9 +369,11 @@ public class TesterOpenSSL {
             } else {
                 output.append(':');
             }
+            StringBuilder name = new StringBuilder();
+
             // Name is first part
             int i = cipher.indexOf(' ');
-            output.append(cipher.substring(0, i));
+            name.append(cipher.substring(0, i));
 
             // Advance i past the space
             while (Character.isWhitespace(cipher.charAt(i))) {
@@ -354,8 +382,15 @@ public class TesterOpenSSL {
 
             // Protocol is the second
             int j = cipher.indexOf(' ', i);
-            output.append('+');
-            output.append(cipher.substring(i, j));
+            name.append('+');
+            name.append(cipher.substring(i, j));
+
+            // More renames
+            if (OPENSSL_RENAMED_CIPHERS.containsKey(name.toString())) {
+                output.append(OPENSSL_RENAMED_CIPHERS.get(name.toString()));
+            } else {
+                output.append(name.toString());
+            }
         }
         return output.toString();
     }
