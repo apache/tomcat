@@ -325,7 +325,7 @@ public class TesterOpenSSL {
         renamed.put("ECDHE-PSK-AES128-CBC-SHA+SSLv3", "ECDHE-PSK-AES128-CBC-SHA+TLSv1");
         renamed.put("ECDHE-PSK-AES256-CBC-SHA+SSLv3", "ECDHE-PSK-AES256-CBC-SHA+TLSv1");
         renamed.put("ECDHE-PSK-NULL-SHA+SSLv3", "ECDHE-PSK-NULL-SHA+TLSv1");
-        OPENSSL_RENAMED_CIPHERS = renamed;
+        OPENSSL_RENAMED_CIPHERS = Collections.unmodifiableMap(renamed);
     }
 
 
@@ -365,18 +365,16 @@ public class TesterOpenSSL {
         for (String cipher : ciphers) {
             // Handle rename for 1.1.0 onwards
             cipher = cipher.replaceAll("EDH", "DHE");
-            // More renames
-            if (OPENSSL_RENAMED_CIPHERS.containsKey(cipher)) {
-                cipher = OPENSSL_RENAMED_CIPHERS.get(cipher);
-            }
             if (first) {
                 first = false;
             } else {
                 output.append(':');
             }
+            StringBuilder name = new StringBuilder();
+
             // Name is first part
             int i = cipher.indexOf(' ');
-            output.append(cipher.substring(0, i));
+            name.append(cipher.substring(0, i));
 
             // Advance i past the space
             while (Character.isWhitespace(cipher.charAt(i))) {
@@ -385,8 +383,15 @@ public class TesterOpenSSL {
 
             // Protocol is the second
             int j = cipher.indexOf(' ', i);
-            output.append('+');
-            output.append(cipher.substring(i, j));
+            name.append('+');
+            name.append(cipher.substring(i, j));
+
+            // More renames
+            if (OPENSSL_RENAMED_CIPHERS.containsKey(name.toString())) {
+                output.append(OPENSSL_RENAMED_CIPHERS.get(name.toString()));
+            } else {
+                output.append(name.toString());
+            }
         }
         return output.toString();
     }
