@@ -96,6 +96,12 @@
         will return <code>false</code> instead of throwing
         <code>IllegalStateException</code>. (violetagg)
       </fix>
+      <fix>
+        When there is no <code>javax.servlet.ReadListener</code> registered
+        then a call to <code>javax.servlet.ServletInputStream#isReady</code>
+        will return <code>false</code> instead of throwing
+        <code>IllegalStateException</code>. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

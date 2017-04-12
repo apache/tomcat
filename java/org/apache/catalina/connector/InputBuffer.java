@@ -34,6 +34,8 @@ import org.apache.catalina.security.SecurityUtil;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.Request;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.SynchronizedStack;
@@ -55,6 +57,8 @@ public class InputBuffer extends Reader
      * The string manager for this package.
      */
     protected static final StringManager sm = StringManager.getManager(InputBuffer.class);
+
+    private static final Log log = LogFactory.getLog(InputBuffer.class);
 
     public static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
 
@@ -271,7 +275,10 @@ public class InputBuffer extends Reader
 
     public boolean isReady() {
         if (coyoteRequest.getReadListener() == null) {
-            throw new IllegalStateException(sm.getString("inputBuffer.requiresNonBlocking"));
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("inputBuffer.requiresNonBlocking"));
+            }
+            return false;
         }
         if (isFinished()) {
             // If this is a non-container thread, need to trigger a read
