@@ -25,6 +25,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.WriteListener;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.MediaType;
@@ -43,6 +45,8 @@ import org.apache.tomcat.util.res.StringManager;
 public final class Response {
 
     private static final StringManager sm = StringManager.getManager(Response.class);
+
+    private static final Log log = LogFactory.getLog(Response.class);
 
     // ----------------------------------------------------- Class Variables
 
@@ -614,7 +618,10 @@ public final class Response {
 
     public boolean isReady() {
         if (listener == null) {
-            throw new IllegalStateException(sm.getString("response.notNonBlocking"));
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("response.notNonBlocking"));
+            }
+            return false;
         }
         // Assume write is not possible
         boolean ready = false;

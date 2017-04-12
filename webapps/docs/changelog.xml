@@ -90,6 +90,12 @@
         logging during shutdown, some of which have been observed when running
         the unit tests. (markt)
       </fix>
+      <fix>
+        When there is no <code>javax.servlet.WriteListener</code> registered
+        then a call to <code>javax.servlet.ServletOutputStream#isReady</code>
+        will return <code>false</code> instead of throwing
+        <code>IllegalStateException</code>. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
