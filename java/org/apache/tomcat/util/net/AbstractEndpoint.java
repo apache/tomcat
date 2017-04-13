@@ -756,9 +756,9 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
     /**
-     * Unlock the server socket accept using a bogus connection.
+     * Unlock the server socket acceptor threads using bogus connections.
      */
-    protected void unlockAccept() {
+    private void unlockAccept() {
         // Only try to unlock the acceptor if it is necessary
         int unlocksRequired = 0;
         for (Acceptor<U> acceptor : acceptors) {
@@ -980,7 +980,8 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     /**
-     * Pause the endpoint, which will stop it accepting new connections.
+     * Pause the endpoint, which will stop it accepting new connections and
+     * unlock the acceptor.
      */
     public void pause() {
         if (running && !paused) {
