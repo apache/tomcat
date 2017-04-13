@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M21 (markt)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        When no BOM is present and an encoding is detected, do not skip the
+        bytes used to detect the encoding since they are not part of a BOM.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M20 (markt)" rtext="release in progress">
   <subsection name="Catalina">
