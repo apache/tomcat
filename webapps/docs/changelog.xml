@@ -48,6 +48,11 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>59825</bug>: Log a message that lists the components in the
+        processing chain that do not support async processing when a call to
+        <code>ServletRequest.startAsync()</code> fails. (markt)
+      </fix>
+      <fix>
         <bug>60926</bug>: Ensure
         <code>o.a.c.core.ApplicationContextFacade#setSessionTimeout</code> will
         invoke the correct method when running Tomcat with security manager.
@@ -65,11 +70,6 @@
       <fix>
         Avoid a <code>NullPointerException</code> when reading attributes for a
         running HTTP connector where TLS is not enabled. (markt)
-      </fix>
-      <fix>
-        <bug>59825</bug>: Log a message that lists the components in the
-        processing chain that do not support async processing when a call to
-        <code>ServletRequest.startAsync()</code> fails. (markt)
       </fix>
       <fix>
         <bug>60940</bug>: Improve the handling of the <code>META-INF/</code> and
