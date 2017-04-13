@@ -625,7 +625,6 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
      */
     @Override
     public void stopInternal() {
-        releaseConnectionLatch();
         if (!paused) {
             pause();
         }

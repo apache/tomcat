@@ -986,6 +986,7 @@ public abstract class AbstractEndpoint<S,U> {
     public void pause() {
         if (running && !paused) {
             paused = true;
+            releaseConnectionLatch();
             unlockAccept();
             getHandler().pause();
         }
@@ -1026,7 +1027,7 @@ public abstract class AbstractEndpoint<S,U> {
         return connectionLimitLatch;
     }
 
-    protected void releaseConnectionLatch() {
+    private void releaseConnectionLatch() {
         LimitLatch latch = connectionLimitLatch;
         if (latch!=null) latch.releaseAll();
         connectionLimitLatch = null;

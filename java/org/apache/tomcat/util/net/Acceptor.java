@@ -82,6 +82,12 @@ public class Acceptor<U> implements Runnable {
                 //if we have reached max connections, wait
                 endpoint.countUpOrAwaitConnection();
 
+                // Endpoint might have been paused while waiting for latch
+                // If that is the case, don't accept new connections
+                if (endpoint.isPaused()) {
+                    continue;
+                }
+
                 U socket = null;
                 try {
                     // Accept the next incoming connection from the server
