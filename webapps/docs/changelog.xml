@@ -54,6 +54,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <add>
+        Add features to get the statistics of the thread pool of the
+        <code>Receiver</code> component. These statistics information can be
+        acquired via JMX. (kfujino)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M20 (markt)" rtext="release in progress">
   <subsection name="Catalina">

@@ -64,4 +64,14 @@ public interface NioReceiverMBean {
     public boolean getUseBufferPool();
 
     public boolean isListening();
+
+    // pool stats
+    public int getPoolSize();
+
+    public int getActiveCount();
+
+    public long getTaskCount();
+
+    public long getCompletedTaskCount();
+
 }
