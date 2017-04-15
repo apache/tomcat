@@ -61,6 +61,10 @@
   <subsection name="General">
     <changelog>
       <add>
+        Document the property <code>test.excludePerformance</code>
+        in BUILDING.txt. (rjung)
+      </add>
+      <add>
         Allow to exclude JUnit test classes using the build property
         <code>test.exclude</code> and document the property in
         BUILDING.txt. (rjung)

@@ -321,7 +321,6 @@ directory:
 
     output/build/logs
 
-
 By default the testsuite is run three times to test 3 different
 implementations of Tomcat connectors: BIO, NIO and APR. (If you are not
 familiar with Tomcat connectors, see config/http.html in documentation for
@@ -446,19 +445,29 @@ as for the property "test.name".
 
         output/coverage
 
- 6. Some tests include checks that the access log valve entries are as expected.
+ 6. The performance tests are written to run reasonably powerful machines (such
+    as a developer may use day to day) assuming no other resource hungry
+    processes are running.
+
+    These assumptions are not always true (e.g. on CI systems running in a
+    virtual machine) so the performance tests may be disabled by using the
+    following property:
+
+        test.excludePerformance=true
+
+ 7. Some tests include checks that the access log valve entries are as expected.
     These checks include timings. On slower / loaded systems these checks will
     often fail. The checks may be relaxed by using the following property:
 
         test.relaxTiming=true
 
- 7. It is known that some platforms (e.g. OSX El Capitan) require IPv4 to
+ 8. It is known that some platforms (e.g. OSX El Capitan) require IPv4 to
     be the default for the multicast tests to work. This is configured by
     the following property:
 
         java.net.preferIPv4Stack=true
 
- 8. It is possible to control whether the output of the tests is displayed
+ 9. It is possible to control whether the output of the tests is displayed
     on the console or not. By default it is displayed and can be disabled
     by the following property:
 
@@ -470,6 +479,8 @@ as for the property "test.name".
 
 * NOTE: Checkstyle is licensed under LGPL. Using Checkstyle during Tomcat
   build is optional and is off by default.
+
+      See http://checkstyle.sourceforge.net/ for more information.
 
 Tomcat comes with a Checkstyle configuration that tests its source code
 for certain conventions, like presence of the license header.
@@ -486,7 +497,7 @@ is located in the following directory:
 
     output/res/checkstyle
 
-It is possible to run the check separately by invoking the "validate"
+It is possible to run the check separately by calling the "validate"
 target. The command is:
 
     cd ${tomcat.source}
