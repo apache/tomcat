@@ -890,6 +890,9 @@
   <subsection name="Web applications">
     <changelog>
       <fix>
+        Fix JDK version number documented in BUILDING.txt. (rjung)
+      </fix>
+      <fix>
         Correct a typo in Host Configuration Reference.
         Issue reported via comments.apache.org. (violetagg)
       </fix>
