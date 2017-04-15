@@ -391,6 +391,12 @@ For example:
 
     test.name=**/TestSsl.java,**/TestWebSocketFrameClientSSL.java
 
+You can exclude specific JUnit test classes by adding the "test.exclude"
+property to the build.properties file. The property specifies an Ant
+excludes pattern for the fileset of test class files to exclude form the run.
+The default value is empty, so no classes are excluded. The syntax is the same
+as for the property "test.name".
+
 
 (7.4) Other configuration options
 
