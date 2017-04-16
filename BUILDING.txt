@@ -438,7 +438,7 @@ as for the property "test.name".
   during Tomcat build is optional and is off by default.
 
  Cobertura can be enabled using the following property:
- 
+
         test.cobertura=true
 
  The report files by default are written to

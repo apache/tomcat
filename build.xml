@@ -35,7 +35,7 @@
 
   <!-- Project Name -->
   <property name="project"               value="apache-tomcat" />
-    
+
   <!-- Version numbers -->
   <property name="version"               value="${version.major}.${version.minor}.${version.build}${version.suffix}" />
   <property name="version.number"        value="${version.major}.${version.minor}.${version.build}.${version.patch}" />
@@ -73,7 +73,7 @@
   <property name="test.temp"             value="${tomcat.output}/test-tmp"/>
   <property name="test.reports"          value="${tomcat.build}/logs"/>
   <property name="test.apr.loc"          value="${tomcat.build}/bin/native"/>
-  <!-- base directory for jdbc-pool --> 
+  <!-- base directory for jdbc-pool -->
   <property name="tomcat.jdbc.dir"       value="${basedir}/modules/jdbc-pool"/>
   <!-- build output directory for jdbc-pool -->
   <property name="tomcat.pool"           value="${tomcat.output}/jdbc-pool"/>
@@ -171,7 +171,7 @@
   <property name="test.name" value="**/Test*.java"/>
   <property name="test.formatter" value="-Dorg.apache.juli.formatter=java.util.logging.SimpleFormatter"/>
   <property name="test.relaxTiming" value="false"/>
-  
+
   <!-- Cobertura code coverage settings -->
   <property name="cobertura.out" value="${tomcat.output}/coverage"/>
   <property name="cobertura.datafile" value="${cobertura.out}/cobertura.ser"/>
@@ -517,7 +517,7 @@
         <include name="*.notice" />
       </srcfiles>
     </uptodate>
-    
+
   </target>
 
   <target name="validate" if="${execute.validate}"
@@ -701,7 +701,7 @@
       </bootclasspath>
     </javac>
   </target>
-  
+
 
   <target name="build-manifests" unless="manifests.uptodate"
           depends="build-prepare">
@@ -1120,7 +1120,7 @@
       <property name="skip.download" value="set"/>
     </ant>
   </target>
-  
+
   <target name="examples-sources" description="Create examples sources"
           unless="examples.sources.skip" >
     <taskdef name="txt2html"
@@ -1382,26 +1382,26 @@
     <fail if="test.result.error" message='Some tests completed with an Error. See ${tomcat.build}/logs for details, search for "ERROR".' />
     <fail if="test.result.failure" message='Some tests completed with a Failure. See ${tomcat.build}/logs for details, search for "FAILED".' />
   </target>
-  
+
   <target name="test-bio" description="Runs the JUnit test cases for BIO. Does not stop on errors."
           depends="test-init,test-compile,deploy,cobertura-instrument" if="${execute.test.bio}">
     <runtests protocol="org.apache.coyote.http11.Http11Protocol"
               extension=".BIO" />
   </target>
-  
+
   <target name="test-nio" description="Runs the JUnit test cases for NIO. Does not stop on errors."
           depends="test-init,test-compile,deploy,cobertura-instrument" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
   </target>
-  
+
   <target name="test-apr" description="Runs the JUnit test cases for APR. Does not stop on errors."
           depends="test-init,test-compile,deploy,test-apr-exists,cobertura-instrument"
           if="${apr.exists}">
     <runtests protocol="org.apache.coyote.http11.Http11AprProtocol"
               extension=".APR" />
   </target>
-  
+
   <target name="test-apr-exists" description="Checks for APR lib"
           if="${execute.test.apr}">
     <available file="${test.apr.loc}" property="apr.exists" />
@@ -1477,7 +1477,7 @@
             <!-- Exclude performance tests. E.g. on systems with slow/inconsistent timing -->
             <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
             <!-- Exclude a configurable list of tests -->
-            <exclude name="${test.exclude}" /> 
+            <exclude name="${test.exclude}" />
           </fileset>
         </batchtest>
       </junit>
@@ -1658,7 +1658,7 @@
       filesDir="${tomcat.extras}/logging/commons-logging-${commons-logging.version}-src/target/classes"
       filesId="files.tomcat-extras-juli-adapters" />
     <hashAndSign file="${tomcat-juli-adapters.jar}" />
-    
+
     <!-- Source JARs -->
     <jar jarfile="${tomcat-juli-extras-src.jar}"
          manifest="${tomcat.manifests}/default.manifest"
@@ -1733,7 +1733,7 @@
       filesId="files.tomcat-extras-ws" />
 
     <hashAndSign file="${catalina-ws.jar}" />
-    
+
     <jarIt jarfile="${catalina-ws-src.jar}"
       filesDir="java"
       filesId="files.tomcat-extras-ws" />
@@ -1785,7 +1785,7 @@
       <zipfileset file="${tomcat.manifests}/default.license"
         fullpath="META-INF/LICENSE" />
     </jar>
-    
+
     <jar jarfile="${tomcat-embed-log4j-src.jar}"
          manifest="${tomcat.manifests}/default.manifest"
          filesonly="true">
@@ -1885,7 +1885,7 @@
     <echo append="false" file="${tomcat.dist}/bin/x64/README">
 Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </echo>
-    
+
   </target>
 
   <target name="javadoc" depends="dist-source,extras-webservices-prepare"
@@ -2605,7 +2605,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <delete file="webapps/docs/jdbc-pool.xml"/>
   </target>
 
-    
+
   <!-- ================ Download and dependency building =================== -->
 
   <target name="download-validate"
