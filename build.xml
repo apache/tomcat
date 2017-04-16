@@ -1470,7 +1470,7 @@
             <!-- Exclude performance tests. E.g. on systems with slow/inconsistent timing -->
             <exclude name="**/*Performance.java" if="${test.excludePerformance}" />
             <!-- Exclude a configurable list of tests -->
-            <exclude name="${test.exclude}" /> 
+            <exclude name="${test.exclude}" />
           </fileset>
         </batchtest>
       </junit>
