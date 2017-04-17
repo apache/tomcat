@@ -39,6 +39,8 @@ public interface NioReceiverMBean {
 
     public int getMinThreads();
 
+    public long getMaxIdleTime();
+
     public boolean getOoBInline();
 
     public int getRxBufSize();

@@ -78,6 +78,10 @@
         <code>Receiver</code> component. These statistics information can be
         acquired via JMX. (kfujino)
       </add>
+      <add>
+        Add <code>maxIdleTime</code> attribute to <code>NioReceiverMBean</code>
+        in order to expose to JMX. (kfujino)
+      </add>
     </changelog>
   </subsection>
 </section>
