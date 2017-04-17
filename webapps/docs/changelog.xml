@@ -63,6 +63,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <add>
+        Add documents for <code>maxIdleTime</code> attribute to Channel Receiver
+        docs. (kfujino)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.14 (markt)" rtext="release in progress">
   <subsection name="Catalina">
