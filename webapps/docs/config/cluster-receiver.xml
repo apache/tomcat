@@ -111,6 +111,9 @@
     <attribute name="minThreads" required="false">
       Minimum number of threads to be created when the receiver is started up. Default value is <code>6</code>
     </attribute>
+    <attribute name="maxIdleTime" required="false">
+      Maximum number of milliseconds of until Idle thread terminates. Default value is <code>60000</code> milliseconds.
+    </attribute>
     <attribute name="ooBInline" required="false">
       Boolean value for the socket OOBINLINE option. Possible values are <code>true</code> or <code>false</code>.
     </attribute>
