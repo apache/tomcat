@@ -96,6 +96,10 @@
         Document the property <code>test.excludePerformance</code>
         in BUILDING.txt. (rjung)
       </add>
+      <add>
+        Add documents for <code>maxIdleTime</code> attribute to Channel Receiver
+        docs. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
