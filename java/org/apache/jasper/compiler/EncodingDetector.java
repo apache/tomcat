@@ -60,7 +60,7 @@ class EncodingDetector {
         // to work. Skip any BoM we discovered.
         bis.reset();
         for (int i = 0; i < bomResult.skip; i++) {
-            is.read();
+            bis.read();
         }
 
         String prologEncoding = getPrologEncoding(bis);
