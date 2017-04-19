@@ -40,7 +40,7 @@ import org.apache.juli.logging.LogFactory;
  * @version 1.0
  */
 
-public class TcpPingInterceptor extends ChannelInterceptorBase {
+public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPingInterceptorMBean {
 
     private static final Log log = LogFactory.getLog(TcpPingInterceptor.class);
     protected static final StringManager sm = StringManager.getManager(TcpPingInterceptor.class);
