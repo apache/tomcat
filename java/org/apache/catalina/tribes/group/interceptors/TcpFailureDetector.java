@@ -59,7 +59,7 @@ import org.apache.juli.logging.LogFactory;
  *
  * @version 1.0
  */
-public class TcpFailureDetector extends ChannelInterceptorBase {
+public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFailureDetectorMBean {
 
     private static final Log log = LogFactory.getLog(TcpFailureDetector.class);
     protected static final StringManager sm = StringManager.getManager(TcpFailureDetector.class);
