@@ -38,7 +38,9 @@ import org.apache.juli.logging.LogFactory;
  *
  * @version 1.0
  */
-public class ThroughputInterceptor extends ChannelInterceptorBase {
+public class ThroughputInterceptor extends ChannelInterceptorBase
+        implements ThroughputInterceptorMBean {
+
     private static final Log log = LogFactory.getLog(ThroughputInterceptor.class);
     protected static final StringManager sm = StringManager.getManager(ThroughputInterceptor.class);
 
