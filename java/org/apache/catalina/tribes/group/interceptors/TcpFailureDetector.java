@@ -218,6 +218,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
         checkMembers(false);
     }
 
+    @Override
     public void checkMembers(boolean checkAll) {
         try {
             if (membership == null) setupMembership();
@@ -360,42 +361,52 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
         return false;
     }
 
+    @Override
     public long getReadTestTimeout() {
         return readTestTimeout;
     }
 
+    @Override
     public boolean getPerformSendTest() {
         return performSendTest;
     }
 
+    @Override
     public boolean getPerformReadTest() {
         return performReadTest;
     }
 
+    @Override
     public long getConnectTimeout() {
         return connectTimeout;
     }
 
+    @Override
     public int getRemoveSuspectsTimeout() {
         return removeSuspectsTimeout;
     }
 
+    @Override
     public void setPerformReadTest(boolean performReadTest) {
         this.performReadTest = performReadTest;
     }
 
+    @Override
     public void setPerformSendTest(boolean performSendTest) {
         this.performSendTest = performSendTest;
     }
 
+    @Override
     public void setReadTestTimeout(long readTestTimeout) {
         this.readTestTimeout = readTestTimeout;
     }
 
+    @Override
     public void setConnectTimeout(long connectTimeout) {
         this.connectTimeout = connectTimeout;
     }
 
+    @Override
     public void setRemoveSuspectsTimeout(int removeSuspectsTimeout) {
         this.removeSuspectsTimeout = removeSuspectsTimeout;
     }

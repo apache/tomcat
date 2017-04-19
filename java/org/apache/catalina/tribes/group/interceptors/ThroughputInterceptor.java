@@ -94,6 +94,7 @@ public class ThroughputInterceptor extends ChannelInterceptorBase
 
     }
 
+    @Override
     public void report(double timeTx) {
         if ( log.isInfoEnabled() )
             log.info(sm.getString("throughputInterceptor.report",
@@ -102,6 +103,7 @@ public class ThroughputInterceptor extends ChannelInterceptorBase
                     df.format(mbRx)));
     }
 
+    @Override
     public void setInterval(int interval) {
         this.interval = interval;
     }
@@ -110,42 +112,52 @@ public class ThroughputInterceptor extends ChannelInterceptorBase
         return interval;
     }
 
+    @Override
     public double getLastCnt() {
         return lastCnt;
     }
 
+    @Override
     public double getMbAppTx() {
         return mbAppTx;
     }
 
+    @Override
     public double getMbRx() {
         return mbRx;
     }
 
+    @Override
     public double getMbTx() {
         return mbTx;
     }
 
+    @Override
     public AtomicLong getMsgRxCnt() {
         return msgRxCnt;
     }
 
+    @Override
     public AtomicLong getMsgTxCnt() {
         return msgTxCnt;
     }
 
+    @Override
     public AtomicLong getMsgTxErr() {
         return msgTxErr;
     }
 
+    @Override
     public long getRxStart() {
         return rxStart;
     }
 
+    @Override
     public double getTimeTx() {
         return timeTx;
     }
 
+    @Override
     public long getTxStart() {
         return txStart;
     }

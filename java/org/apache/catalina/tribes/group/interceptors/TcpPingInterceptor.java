@@ -103,6 +103,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
         if (!getUseThread()) sendPing();
     }
 
+    @Override
     public long getInterval() {
         return interval;
     }
@@ -119,6 +120,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
         this.staticOnly = staticOnly;
     }
 
+    @Override
     public boolean getUseThread() {
         return useThread;
     }
