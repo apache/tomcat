@@ -77,12 +77,12 @@
 
     <subsection name="JMX">
       <p>The security of the JMX connection is dependent on the implementation
-      provided by the JRE and therefore falls outside the control of Tomact.</p>
+      provided by the JRE and therefore falls outside the control of Tomcat.</p>
 
       <p>Typically, access control is very limited (either read-only to
       everything or read-write to everything). Tomcat exposes a large amount
       of internal information and control via JMX to aid debugging, monitoring
-      and management. Give the limited access control available, JMX access
+      and management. Given the limited access control available, JMX access
       should be treated as equivalent to local root/admin access and restricted
       accordingly.</p>
 
