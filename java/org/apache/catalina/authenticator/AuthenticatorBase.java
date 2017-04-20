@@ -89,7 +89,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  */
 public abstract class AuthenticatorBase extends ValveBase
-implements Authenticator, RegistrationListener {
+        implements Authenticator, RegistrationListener {
 
     private static final Log log = LogFactory.getLog(AuthenticatorBase.class);
 
@@ -457,7 +457,7 @@ implements Authenticator, RegistrationListener {
 
         // The Servlet may specify security constraints through annotations.
         // Ensure that they have been processed before constraints are checked
-        Wrapper wrapper = request.getMappingData().wrapper;
+        Wrapper wrapper = request.getWrapper();
         if (wrapper != null) {
             wrapper.servletSecurityAnnotationScan();
         }
@@ -559,7 +559,7 @@ implements Authenticator, RegistrationListener {
 
             if (jaspicProvider == null && !doAuthenticate(request, response) ||
                     jaspicProvider != null &&
-                    !authenticateJaspic(request, response, jaspicState, false)) {
+                            !authenticateJaspic(request, response, jaspicState, false)) {
                 if (log.isDebugEnabled()) {
                     log.debug(" Failed authenticate() test");
                 }
