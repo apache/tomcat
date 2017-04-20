@@ -1986,14 +1986,17 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
         T handler;
         InstanceManager instanceManager = null;
         try {
-            // Do not go through the instance manager for internal Tomcat classes since they don't need injection
+            // Do not go through the instance manager for internal Tomcat classes since they don't
+            // need injection
             if (InternalHttpUpgradeHandler.class.isAssignableFrom(httpUpgradeHandlerClass)) {
-                handler = httpUpgradeHandlerClass.newInstance();
+                handler = httpUpgradeHandlerClass.getConstructor().newInstance();
             } else {
                 instanceManager = getContext().getInstanceManager();
                 handler = (T) instanceManager.newInstance(httpUpgradeHandlerClass);
             }
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NamingException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                NamingException | IllegalArgumentException | NoSuchMethodException |
+                SecurityException e) {
             throw new ServletException(e);
         }
         UpgradeToken upgradeToken = new UpgradeToken(handler,

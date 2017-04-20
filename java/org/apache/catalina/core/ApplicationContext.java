@@ -813,7 +813,7 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
             ExceptionUtils.handleThrowable(e.getCause());
             throw new ServletException(e);
         } catch (IllegalAccessException | NamingException | InstantiationException |
-                ClassNotFoundException e) {
+                ClassNotFoundException | NoSuchMethodException e) {
             throw new ServletException(e);
         }
     }
@@ -947,7 +947,7 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
             ExceptionUtils.handleThrowable(e.getCause());
             throw new ServletException(e);
         } catch (IllegalAccessException | NamingException | InstantiationException |
-                ClassNotFoundException e) {
+                ClassNotFoundException | NoSuchMethodException e) {
             throw new ServletException(e);
         }
     }
@@ -1088,7 +1088,7 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
                     "applicationContext.addListener.iae.cnfe", className),
                     e);
         } catch (IllegalAccessException | NamingException | InstantiationException |
-                ClassNotFoundException e) {
+                ClassNotFoundException | NoSuchMethodException e) {
             throw new IllegalArgumentException(sm.getString(
                     "applicationContext.addListener.iae.cnfe", className),
                     e);
@@ -1160,7 +1160,8 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
         } catch (InvocationTargetException e) {
             ExceptionUtils.handleThrowable(e.getCause());
             throw new ServletException(e);
-        } catch (IllegalAccessException | NamingException | InstantiationException e) {
+        } catch (IllegalAccessException | NamingException | InstantiationException |
+                NoSuchMethodException e) {
             throw new ServletException(e);
         }
     }

@@ -111,8 +111,7 @@ public class TestSlowQueryComparator {
             SecurityException, NoSuchMethodException {
         Class<?> comparatorClass = Class
                 .forName("org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport$QueryStatsComparator");
-        Constructor<?> comparatorConstructor = comparatorClass
-                .getDeclaredConstructor();
+        Constructor<?> comparatorConstructor = comparatorClass.getConstructor();
         comparatorConstructor.setAccessible(true);
         @SuppressWarnings("unchecked")
         Comparator<QueryStats> queryStatsComparator = (Comparator<QueryStats>) comparatorConstructor
