@@ -79,6 +79,10 @@
         possible for the CI system to upload snapshot builds to the ASF Maven
         repository. (markt)
       </add>
+      <scode>
+        Review i18n property files, remove unencessary escaping and consistently
+        use <code>[...]</code> to delimit inserted values. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
