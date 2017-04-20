@@ -24,15 +24,19 @@
 #        running this script
 asf.ldap.username=<!-- YOUR APACHE LDAP USERNAME -->
 gpg.exec=C:/software/GNU/GnuPG/gpg.exe
+# Set this property to use the user name and password from the Maven
+# settings.xml file rather than from asf.ldap.username and prompting for the
+# associated password 
+# maven.auth.useSettings=Anything
 
 # ASF Snapshot Repository (hosted on Nexus)
 maven.snapshot.repo.url=https://repository.apache.org/content/repositories/snapshots
-maven.snapshot.repo.repositoryId=apache.snapshots
+maven.snapshot.repo.repositoryId=apache.snapshots.https
 
 # ASF Release Repository (hosted on Nexus)
 # Note: Also used for staging releases prior to voting
 maven.asf.release.repo.url=https://repository.apache.org/service/local/staging/deploy/maven2
-maven.asf.release.repo.repositoryId=apache.releases
+maven.asf.release.repo.repositoryId=apache.releases.https
 
 # Release version info
 maven.asf.release.deploy.version=9.0.0.M21

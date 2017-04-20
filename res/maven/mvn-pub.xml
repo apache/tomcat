@@ -17,7 +17,8 @@
 -->
 <project name="Tomcat 9.0 Maven Deployment" default="" basedir="."
          xmlns:artifact="urn:maven-artifact-ant"
-         xmlns:if="ant:if">
+         xmlns:if="ant:if"
+         xmlns:unless="ant:unless">
   <!--
     Built for using Maven Ant Tasks (version 2.1.0 is known to work)
   -->
@@ -64,15 +65,16 @@
     </antcall>
 
     <artifact:deploy file="${file}">
-        <pom file="${pom}.tmp"/>
-        <remoteRepository url="${maven.repo.url}" layout="default">
-          <authentication username="${asf.ldap.username}"
-                          password="${asf.ldap.password}"/>
-        </remoteRepository>
-        <attach file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
-        <attach file="${src}" classifier="sources" type="jar"/>
-        <attach file="${src}.asc" classifier="sources" type="jar.asc" if:set="gpg.passphrase"/>
-        <attach file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
+      <pom file="${pom}.tmp"/>
+      <remoteRepository id="${maven.repo.repositoryId}" url="${maven.repo.url}">
+        <authentication username="${asf.ldap.username}"
+                        password="${asf.ldap.password}"
+                        unless:set="maven.auth.useSettings" />
+      </remoteRepository>
+      <attach file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
+      <attach file="${src}" classifier="sources" type="jar"/>
+      <attach file="${src}.asc" classifier="sources" type="jar.asc" if:set="gpg.passphrase"/>
+      <attach file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
     </artifact:deploy>
 
     <delete file="${pom}.tmp"/>
@@ -126,9 +128,10 @@
 
     <artifact:deploy file="${file}">
       <pom file="${pom}.tmp"/>
-      <remoteRepository url="${maven.repo.url}" layout="default" >
+      <remoteRepository id="${maven.repo.repositoryId}" url="${maven.repo.url}">
         <authentication username="${asf.ldap.username}"
-                        password="${asf.ldap.password}"/>
+                        password="${asf.ldap.password}"
+                        unless:set="maven.auth.useSettings"/>
       </remoteRepository>
       <attach file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
       <attach file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
@@ -184,16 +187,17 @@
     </antcall>
 
     <artifact:deploy file="${pom}">
-        <pom file="${pom}.tmp"/>
-        <remoteRepository url="${maven.repo.url}" layout="default">
-          <authentication username="${asf.ldap.username}"
-                          password="${asf.ldap.password}"/>
-        </remoteRepository>
-        <attach file="${file}.zip" type="zip"/>
-        <attach file="${file}.zip.asc" type="zip.asc" if:set="gpg.passphrase"/>
-        <attach file="${file}.tar.gz" type="tar.gz"/>
-        <attach file="${file}.tar.gz.asc" type="tar.gz.asc" if:set="gpg.passphrase"/>
-        <attach file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
+      <pom file="${pom}.tmp"/>
+        <remoteRepository id="${maven.repo.repositoryId}" url="${maven.repo.url}">
+        <authentication username="${asf.ldap.username}"
+                        password="${asf.ldap.password}"
+                        unless:set="maven.auth.useSettings"/>
+      </remoteRepository>
+      <attach file="${file}.zip" type="zip"/>
+      <attach file="${file}.zip.asc" type="zip.asc" if:set="gpg.passphrase"/>
+      <attach file="${file}.tar.gz" type="tar.gz"/>
+      <attach file="${file}.tar.gz.asc" type="tar.gz.asc" if:set="gpg.passphrase"/>
+      <attach file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
     </artifact:deploy>
 
     <delete file="${pom}.tmp"/>
@@ -364,7 +368,7 @@
     </input>
   </target>
 
-  <target name="init-ldap">
+  <target name="init-ldap" unless="maven.auth.useSettings">
     <input message="Enter ASF LDAP (same as svn) password"
            addproperty="asf.ldap.password" >
       <handler type="secure"/>
