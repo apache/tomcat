@@ -97,6 +97,9 @@ public class JmxRegistry {
         ObjectName oName = null;
         try {
             oName = new ObjectName(oNameStr);
+            if (mbserver.isRegistered(oName)) {
+                mbserver.unregisterMBean(oName);
+            }
             mbserver.registerMBean(bean, oName);
         } catch (NotCompliantMBeanException e) {
             log.warn(sm.getString("jmxRegistry.registerJmx.notCompliant", bean), e);
