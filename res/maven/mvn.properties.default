@@ -26,7 +26,7 @@ asf.ldap.username=<!-- YOUR APACHE LDAP USERNAME -->
 gpg.exec=C:/software/GNU/GnuPG/gpg.exe
 # Set this property to use the user name and password from the Maven
 # settings.xml file rather than from asf.ldap.username and prompting for the
-# associated password 
+# associated password
 # maven.auth.useSettings=Anything
 
 # ASF Snapshot Repository (hosted on Nexus)
