@@ -47,6 +47,7 @@ public class FindLeaksTask extends AbstractCatalinaTask {
         return statusLine;
     }
 
+
     /**
      * Execute the requested operation.
      *
@@ -54,9 +55,7 @@ public class FindLeaksTask extends AbstractCatalinaTask {
      */
     @Override
     public void execute() throws BuildException {
-
         super.execute();
         execute("/findleaks?statusLine=" + Boolean.toString(statusLine));
     }
-
 }
