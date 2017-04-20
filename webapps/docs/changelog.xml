@@ -85,8 +85,8 @@
       <add>
         Add JMX support for <code>Channel Interceptors</code>.　The Interceptors
         that implement jmx support are <code>TcpFailureDetector</code>,
-        <code>ThroughputInterceptor</code> and <code>TcpPingInterceptor</code>.
-        (kfujino)
+        <code>ThroughputInterceptor</code>, <code>TcpPingInterceptor</code> and
+        <code>StaticMembershipInterceptor</code>. (kfujino)
       </add>
     </changelog>
   </subsection>
