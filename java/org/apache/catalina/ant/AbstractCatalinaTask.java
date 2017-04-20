@@ -14,10 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.ant;
-
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -32,7 +29,6 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
-
 /**
  * Abstract base class for Ant tasks that interact with the
  * <em>Manager</em> web application for dynamically deploying and
@@ -43,9 +39,7 @@ import org.apache.tools.ant.Project;
  */
 public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
-
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * manager webapp's encoding.
@@ -54,7 +48,6 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * The charset used during URL encoding.
