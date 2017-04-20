@@ -108,6 +108,7 @@ public class ThroughputInterceptor extends ChannelInterceptorBase
         this.interval = interval;
     }
 
+    @Override
     public int getInterval() {
         return interval;
     }

@@ -23,6 +23,8 @@ public interface ThroughputInterceptorMBean {
     public int getOptionFlag();
 
     // Attributes
+    public int getInterval();
+
     public void setInterval(int interval);
 
     // stats
