@@ -55,12 +55,13 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
     protected String charset = "ISO-8859-1";
 
     public String getCharset() {
-        return this.charset;
+        return charset;
     }
 
     public void setCharset(String charset) {
         this.charset = charset;
     }
+
 
     /**
      * The login password for the <code>Manager</code> application.
@@ -75,6 +76,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
         this.password = password;
     }
 
+
     /**
      * The URL of the <code>Manager</code> application to be used.
      */
@@ -87,6 +89,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
     public void setUrl(String url) {
         this.url = url;
     }
+
 
     /**
      * The login username for the <code>Manager</code> application.

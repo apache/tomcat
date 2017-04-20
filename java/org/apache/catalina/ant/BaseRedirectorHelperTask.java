@@ -29,7 +29,8 @@ import org.apache.tools.ant.types.RedirectorElement;
 
 /**
  * Abstract base class to add output redirection support for Catalina Ant tasks.
- * These tasks require Ant 1.5 or later. <br>
+ * These tasks require Ant 1.5 or later.
+ * <br>
  * <strong>WARNING:</strong> due to depends chain, Ant could call a Task more
  * than once and this can affect the output redirection when configured. If you
  * are collecting the output in a property, it will collect the output of only
@@ -73,8 +74,8 @@ public abstract class BaseRedirectorHelperTask extends Task {
     protected boolean failOnError = true;
 
     /**
-     * <code>true</code> true when output redirection is requested for this task
-     * . Default is to log on Ant log.
+     * <code>true</code> true when output redirection is requested for this task.
+     * Default is to log on Ant log.
      */
     protected boolean redirectOutput = false;
 
@@ -163,7 +164,7 @@ public abstract class BaseRedirectorHelperTask extends Task {
 
 
     /**
-     * Property name whose value should be set to the error of the task..
+     * Property name whose value should be set to the error of the task.
      *
      * @param errorProperty property name
      *
@@ -189,7 +190,8 @@ public abstract class BaseRedirectorHelperTask extends Task {
     /**
      * If true, (error and non-error) output will be redirected as specified
      * while being sent to Ant's logging mechanism as if no redirection had
-     * taken place. Defaults to false. <br>
+     * taken place. Defaults to false.
+     * <br>
      * Actually handled internally, with Ant 1.6.3 it will be handled by the
      * <code>Redirector</code> itself.
      *
