@@ -90,6 +90,16 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Modify the Ant build script used to publish to a Maven repository so
+        that it no longer requires artifacts to be GPG signed. This is make it
+        possible for the CI system to upload snapshot builds to the ASF Maven
+        repository. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M20 (markt)" rtext="2017-04-18">
   <subsection name="Catalina">
