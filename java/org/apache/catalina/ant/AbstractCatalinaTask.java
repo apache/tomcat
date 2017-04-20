@@ -55,7 +55,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
     protected String charset = "ISO-8859-1";
 
     public String getCharset() {
-        return (this.charset);
+        return charset;
     }
 
     public void setCharset(String charset) {
