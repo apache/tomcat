@@ -75,8 +75,9 @@
     <changelog>
       <add>
         Add features to get the statistics of the thread pool of the
-        <code>Receiver</code> component. These statistics information can be
-        acquired via JMX. (kfujino)
+        <code>Receiver</code> component and
+        <code>MessageDispatchInterceptor</code>. These statistics information
+        can be acquired via JMX. (kfujino)
       </add>
       <add>
         Add <code>maxIdleTime</code> attribute to <code>NioReceiverMBean</code>

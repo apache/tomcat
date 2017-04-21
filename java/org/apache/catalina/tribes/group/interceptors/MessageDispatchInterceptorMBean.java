@@ -34,4 +34,13 @@ public interface MessageDispatchInterceptorMBean {
 
     public int getMaxThreads();
 
+    // pool stats
+    public int getPoolSize();
+
+    public int getActiveCount();
+
+    public long getTaskCount();
+
+    public long getCompletedTaskCount();
+
 }
