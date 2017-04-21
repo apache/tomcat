@@ -40,7 +40,8 @@ import org.apache.juli.logging.LogFactory;
  * <code>Channel.SEND_OPTIONS_ASYNCHRONOUS</code> flag to be set, if it is, it
  * will queue the message for delivery and immediately return to the sender.
  */
-public class MessageDispatchInterceptor extends ChannelInterceptorBase {
+public class MessageDispatchInterceptor extends ChannelInterceptorBase
+        implements MessageDispatchInterceptorMBean {
 
     private static final Log log = LogFactory.getLog(MessageDispatchInterceptor.class);
     protected static final StringManager sm =
@@ -144,7 +145,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase {
         this.useDeepClone = useDeepClone;
     }
 
-
+    @Override
     public long getMaxQueueSize() {
         return maxQueueSize;
     }
@@ -154,7 +155,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase {
         return useDeepClone;
     }
 
-
+    @Override
     public long getCurrentSize() {
         return currentSize.get();
     }
@@ -170,16 +171,17 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase {
         return value;
     }
 
-
+    @Override
     public long getKeepAliveTime() {
         return keepAliveTime;
     }
 
-
+    @Override
     public int getMaxSpareThreads() {
         return maxSpareThreads;
     }
 
+    @Override
     public int getMaxThreads() {
         return maxThreads;
     }
@@ -199,7 +201,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase {
         this.maxThreads = maxThreads;
     }
 
-
+    @Override
     public boolean isAlwaysSend() {
         return alwaysSend;
     }
