@@ -208,6 +208,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase
     }
 
 
+    @Override
     public void setAlwaysSend(boolean alwaysSend) {
         this.alwaysSend = alwaysSend;
     }
@@ -285,6 +286,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase
      * Return the current number of threads that are managed by the pool.
      * @return the current number of threads that are managed by the pool
      */
+    @Override
     public int getPoolSize() {
         if (executor instanceof ThreadPoolExecutor) {
             return ((ThreadPoolExecutor) executor).getPoolSize();
@@ -297,6 +299,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase
      * Return the current number of threads that are in use.
      * @return the current number of threads that are in use
      */
+    @Override
     public int getActiveCount() {
         if (executor instanceof ThreadPoolExecutor) {
             return ((ThreadPoolExecutor) executor).getActiveCount();
@@ -309,6 +312,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase
      * Return the total number of tasks that have ever been scheduled for execution by the pool.
      * @return the total number of tasks that have ever been scheduled for execution by the pool
      */
+    @Override
     public long getTaskCount() {
         if (executor instanceof ThreadPoolExecutor) {
             return ((ThreadPoolExecutor) executor).getTaskCount();
@@ -321,6 +325,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase
      * Return the total number of tasks that have completed execution by the pool.
      * @return the total number of tasks that have completed execution by the pool
      */
+    @Override
     public long getCompletedTaskCount() {
         if (executor instanceof ThreadPoolExecutor) {
             return ((ThreadPoolExecutor) executor).getCompletedTaskCount();
