@@ -2226,7 +2226,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     // https://bz.apache.org/bugzilla/show_bug.cgi?id=57559
     @Test
     public void testAsyncRequestURI_24() throws Exception {
-        doTestAsyncRequestURI("/foo/%24/bar");
+        // '$' is permitted in a path
+        doTestAsyncRequestURI("/foo/$/bar");
     }
 
 
