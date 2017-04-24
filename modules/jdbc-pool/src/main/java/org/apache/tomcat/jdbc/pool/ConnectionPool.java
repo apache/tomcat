@@ -620,7 +620,8 @@ public class ConnectionPool {
         // we've asynchronously reduced the number of connections
         // we could have threads stuck in idle.poll(timeout) that will never be
         // notified
-        if (waitcount.get() > 0) {
+        // we also want to respect the minimum number of idle connections
+        if (idle.size() + busy.size() < getPoolProperties().getMinIdle() || waitcount.get() > 0) {
             idle.offer(create(true));
         }
     }
