@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Matcher;
 
+import org.apache.catalina.util.URLEncoder;
+
 public class Substitution {
 
     public abstract class SubstitutionElement {
@@ -49,7 +51,7 @@ public class Substitution {
                 //       We might want to consider providing a dedicated decoder
                 //       with an option to add additional safe characters to
                 //       provide users with more flexibility
-                return RewriteValve.ENCODER.encode(result, resolver.getUriEncoding());
+                return URLEncoder.DEFAULT.encode(result, resolver.getUriEncoding());
             } else {
                 return result;
             }

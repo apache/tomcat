@@ -55,45 +55,6 @@ import org.apache.tomcat.util.http.RequestUtil;
 
 public class RewriteValve extends ValveBase {
 
-    static URLEncoder ENCODER = new URLEncoder();
-    static {
-        /*
-         * Replicates httpd's encoding
-         * Primarily aimed at encoding URI paths, so from the spec:
-         *
-         * pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
-         *
-         * unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
-         *
-         * sub-delims = "!" / "$" / "&" / "'" / "(" / ")"
-         *              / "*" / "+" / "," / ";" / "="
-         */
-        // ALPHA and DIGIT are always treated as safe characters
-        // Add the remaining unreserved characters
-        ENCODER.addSafeCharacter('-');
-        ENCODER.addSafeCharacter('.');
-        ENCODER.addSafeCharacter('_');
-        ENCODER.addSafeCharacter('~');
-        // Add the sub-delims
-        ENCODER.addSafeCharacter('!');
-        ENCODER.addSafeCharacter('$');
-        ENCODER.addSafeCharacter('&');
-        ENCODER.addSafeCharacter('\'');
-        ENCODER.addSafeCharacter('(');
-        ENCODER.addSafeCharacter(')');
-        ENCODER.addSafeCharacter('*');
-        ENCODER.addSafeCharacter('+');
-        ENCODER.addSafeCharacter(',');
-        ENCODER.addSafeCharacter(';');
-        ENCODER.addSafeCharacter('=');
-        // Add the remaining literals
-        ENCODER.addSafeCharacter(':');
-        ENCODER.addSafeCharacter('@');
-        // Add '/' so it isn't encoded when we encode a path
-        ENCODER.addSafeCharacter('/');
-    }
-
-
     /**
      * The rewrite rules that the valve will use.
      */
@@ -399,7 +360,7 @@ public class RewriteValve extends ValveBase {
                     }
 
                     StringBuffer urlStringEncoded =
-                            new StringBuffer(ENCODER.encode(urlStringDecoded, uriEncoding));
+                            new StringBuffer(URLEncoder.DEFAULT.encode(urlStringDecoded, uriEncoding));
                     if (originalQueryStringEncoded != null &&
                             originalQueryStringEncoded.length() > 0) {
                         if (rewrittenQueryStringDecoded == null) {
@@ -409,8 +370,8 @@ public class RewriteValve extends ValveBase {
                             if (qsa) {
                                 // if qsa is specified append the query
                                 urlStringEncoded.append('?');
-                                urlStringEncoded.append(
-                                        ENCODER.encode(rewrittenQueryStringDecoded, uriEncoding));
+                                urlStringEncoded.append(URLEncoder.QUERY.encode(
+                                        rewrittenQueryStringDecoded, uriEncoding));
                                 urlStringEncoded.append('&');
                                 urlStringEncoded.append(originalQueryStringEncoded);
                             } else if (index == urlStringEncoded.length() - 1) {
@@ -419,14 +380,14 @@ public class RewriteValve extends ValveBase {
                                 urlStringEncoded.deleteCharAt(index);
                             } else {
                                 urlStringEncoded.append('?');
-                                urlStringEncoded.append(
-                                        ENCODER.encode(rewrittenQueryStringDecoded, uriEncoding));
+                                urlStringEncoded.append(URLEncoder.QUERY.encode(
+                                        rewrittenQueryStringDecoded, uriEncoding));
                             }
                         }
                     } else if (rewrittenQueryStringDecoded != null) {
                         urlStringEncoded.append('?');
                         urlStringEncoded.append(
-                                ENCODER.encode(rewrittenQueryStringDecoded, uriEncoding));
+                                URLEncoder.QUERY.encode(rewrittenQueryStringDecoded, uriEncoding));
                     }
 
                     // Insert the context if
@@ -524,7 +485,7 @@ public class RewriteValve extends ValveBase {
                         // This is neither decoded nor normalized
                         chunk.append(contextPath);
                     }
-                    chunk.append(ENCODER.encode(urlStringDecoded, uriEncoding));
+                    chunk.append(URLEncoder.DEFAULT.encode(urlStringDecoded, uriEncoding));
                     request.getCoyoteRequest().requestURI().toChars();
                     // Decoded and normalized URI
                     // Rewriting may have denormalized the URL
@@ -543,7 +504,7 @@ public class RewriteValve extends ValveBase {
                         request.getCoyoteRequest().queryString().setString(null);
                         chunk = request.getCoyoteRequest().queryString().getCharChunk();
                         chunk.recycle();
-                        chunk.append(ENCODER.encode(queryStringDecoded, uriEncoding));
+                        chunk.append(URLEncoder.QUERY.encode(queryStringDecoded, uriEncoding));
                         if (qsa && originalQueryStringEncoded != null &&
                                 originalQueryStringEncoded.length() > 0) {
                             chunk.append('&');

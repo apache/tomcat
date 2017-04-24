@@ -78,19 +78,12 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
     private static final long serialVersionUID = 1L;
 
-    static final URLEncoder URL_ENCODER;
     static final String APPLICATION_MESSAGE = "message";
     static final String APPLICATION_ERROR = "error";
 
     static final String sessionsListJspPath = "/WEB-INF/jsp/sessionsList.jsp";
     static final String sessionDetailJspPath = "/WEB-INF/jsp/sessionDetail.jsp";
     static final String connectorCiphersJspPath = "/WEB-INF/jsp/connectorCiphers.jsp";
-
-    static {
-        URL_ENCODER = new URLEncoder();
-        // '/' should not be encoded in context paths
-        URL_ENCODER.addSafeCharacter('/');
-    }
 
     private boolean showProxySessions = false;
 
@@ -430,10 +423,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
                 StringBuilder tmp = new StringBuilder();
                 tmp.append("path=");
-                tmp.append(URL_ENCODER.encode(displayPath, "UTF-8"));
+                tmp.append(URLEncoder.DEFAULT.encode(displayPath, "UTF-8"));
                 if (ctxt.getWebappVersion().length() > 0) {
                     tmp.append("&version=");
-                    tmp.append(URL_ENCODER.encode(ctxt.getWebappVersion(), "UTF-8"));
+                    tmp.append(URLEncoder.DEFAULT.encode(ctxt.getWebappVersion(), "UTF-8"));
                 }
                 String pathVersion = tmp.toString();
 
@@ -445,8 +438,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 }
 
                 args = new Object[7];
-                args[0] = "<a href=\"" + URL_ENCODER.encode(contextPath + "/", "UTF-8")
-                        + "\">" + RequestUtil.filter(displayPath) + "</a>";
+                args[0] = "<a href=\"" + URLEncoder.DEFAULT.encode(contextPath + "/", "UTF-8") +
+                        "\">" + RequestUtil.filter(displayPath) + "</a>";
                 if ("".equals(ctxt.getWebappVersion())) {
                     args[1] = noVersion;
                 } else {

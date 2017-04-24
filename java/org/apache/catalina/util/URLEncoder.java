@@ -39,17 +39,69 @@ public class URLEncoder {
      'A', 'B', 'C', 'D', 'E', 'F'};
 
     public static final URLEncoder DEFAULT = new URLEncoder();
+    public static final URLEncoder QUERY = new URLEncoder();
+
     static {
-        DEFAULT.addSafeCharacter('~');
+        /*
+         * Encoder for URI paths, so from the spec:
+         *
+         * pchar = unreserved / pct-encoded / sub-delims / ":" / "@"
+         *
+         * unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
+         *
+         * sub-delims = "!" / "$" / "&" / "'" / "(" / ")"
+         *              / "*" / "+" / "," / ";" / "="
+         */
+        // ALPHA and DIGIT are always treated as safe characters
+        // Add the remaining unreserved characters
         DEFAULT.addSafeCharacter('-');
-        DEFAULT.addSafeCharacter('_');
         DEFAULT.addSafeCharacter('.');
+        DEFAULT.addSafeCharacter('_');
+        DEFAULT.addSafeCharacter('~');
+        // Add the sub-delims
+        DEFAULT.addSafeCharacter('!');
+        DEFAULT.addSafeCharacter('$');
+        DEFAULT.addSafeCharacter('&');
+        DEFAULT.addSafeCharacter('\'');
+        DEFAULT.addSafeCharacter('(');
+        DEFAULT.addSafeCharacter(')');
         DEFAULT.addSafeCharacter('*');
+        DEFAULT.addSafeCharacter('+');
+        DEFAULT.addSafeCharacter(',');
+        DEFAULT.addSafeCharacter(';');
+        DEFAULT.addSafeCharacter('=');
+        // Add the remaining literals
+        DEFAULT.addSafeCharacter(':');
+        DEFAULT.addSafeCharacter('@');
+        // Add '/' so it isn't encoded when we encode a path
         DEFAULT.addSafeCharacter('/');
+
+        /*
+         * Encoder for query strings
+         * https://www.w3.org/TR/html5/forms.html#application/x-www-form-urlencoded-encoding-algorithm
+         * 0x20 ' ' -> '+'
+         * 0x2A, 0x2D, 0x2E, 0x30 to 0x39, 0x41 to 0x5A, 0x5F, 0x61 to 0x7A as-is
+         * '*',  '-',  '.',  '0'  to '9',  'A'  to 'Z',  '_',  'a'  to 'z'
+         * Also '=' and '&' are not encoded
+         * Everything else %nn encoded
+         */
+        // Special encoding for space
+        QUERY.setEncodeSpaceAsPlus(true);
+        // Alpha and digit are safe by default
+        // Add the other permitted characters
+        QUERY.addSafeCharacter('*');
+        QUERY.addSafeCharacter('-');
+        QUERY.addSafeCharacter('.');
+        QUERY.addSafeCharacter('_');
+        QUERY.addSafeCharacter('=');
+        QUERY.addSafeCharacter('&');
     }
 
     //Array containing the safe characters set.
-    protected final BitSet safeCharacters = new BitSet(256);
+    private final BitSet safeCharacters = new BitSet(256);
+
+    private boolean encodeSpaceAsPlus = false;
+
 
     public URLEncoder() {
         for (char i = 'a'; i <= 'z'; i++) {
@@ -63,8 +115,14 @@ public class URLEncoder {
         }
     }
 
+
     public void addSafeCharacter( char c ) {
         safeCharacters.set( c );
+    }
+
+
+    public void setEncodeSpaceAsPlus(boolean encodeSpaceAsPlus) {
+        this.encodeSpaceAsPlus = encodeSpaceAsPlus;
     }
 
 
@@ -92,6 +150,8 @@ public class URLEncoder {
             int c = path.charAt(i);
             if (safeCharacters.get(c)) {
                 rewrittenPath.append((char)c);
+            } else if (encodeSpaceAsPlus && c == ' ') {
+                rewrittenPath.append('+');
             } else {
                 // convert to external encoding before hex conversion
                 try {
