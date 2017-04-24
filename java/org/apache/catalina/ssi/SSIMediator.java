@@ -32,7 +32,7 @@ import org.apache.tomcat.util.http.HttpMessages;
 /**
  * Allows the different SSICommand implementations to share data/talk to each
  * other
- * 
+ *
  * @author Bip Thelin
  * @author Amy Roh
  * @author Paul Speed
@@ -43,7 +43,6 @@ public class SSIMediator {
     protected static final String DEFAULT_CONFIG_ERR_MSG = "[an error occurred while processing this directive]";
     protected static final String DEFAULT_CONFIG_TIME_FMT = "%A, %d-%b-%Y %T %Z";
     protected static final String DEFAULT_CONFIG_SIZE_FMT = "abbrev";
-    protected static URLEncoder urlEncoder;
     protected String configErrMsg = DEFAULT_CONFIG_ERR_MSG;
     protected String configTimeFmt = DEFAULT_CONFIG_TIME_FMT;
     protected String configSizeFmt = DEFAULT_CONFIG_SIZE_FMT;
@@ -53,22 +52,6 @@ public class SSIMediator {
     protected int debug;
     protected Strftime strftime;
     protected SSIConditionalState conditionalState = new SSIConditionalState();
-    static {
-        //We try to encode only the same characters that apache does
-        urlEncoder = new URLEncoder();
-        urlEncoder.addSafeCharacter(',');
-        urlEncoder.addSafeCharacter(':');
-        urlEncoder.addSafeCharacter('-');
-        urlEncoder.addSafeCharacter('_');
-        urlEncoder.addSafeCharacter('.');
-        urlEncoder.addSafeCharacter('*');
-        urlEncoder.addSafeCharacter('/');
-        urlEncoder.addSafeCharacter('!');
-        urlEncoder.addSafeCharacter('~');
-        urlEncoder.addSafeCharacter('\'');
-        urlEncoder.addSafeCharacter('(');
-        urlEncoder.addSafeCharacter(')');
-    }
 
 
     public SSIMediator(SSIExternalResolver ssiExternalResolver,
@@ -208,7 +191,7 @@ public class SSIMediator {
         // If it has no references or HTML entities then no work
         // need to be done
         if (val.indexOf('$') < 0 && val.indexOf('&') < 0) return val;
-        
+
         // HTML decoding
         val = val.replace("&lt;", "<");
         val = val.replace("&gt;", ">");
@@ -296,7 +279,7 @@ public class SSIMediator {
     protected String encode(String value, String encoding) {
         String retVal = null;
         if (encoding.equalsIgnoreCase("url")) {
-            retVal = urlEncoder.encode(value, "UTF-8");
+            retVal = URLEncoder.DEFAULT.encode(value, "UTF-8");
         } else if (encoding.equalsIgnoreCase("none")) {
             retVal = value;
         } else if (encoding.equalsIgnoreCase("entity")) {

@@ -70,14 +70,9 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        Fix Java8 detection in <code>JreMemoryLeakPreventionListener</code>
-        Patch provided by fibbers via Github. (violetagg)
-      </fix>
-      <fix>
-        Pre-load the <code>ExceptionUtils</code> class. Since the class is used
-        extensively in error handling, it is prudent to pre-load it to avoid any
-        failure to load this class masking the true problem during error
-        handling. (markt)
+        Review those places where Tomcat re-encodes a URI or URI component and
+        ensure that that correct encoding (path differs from query string) is
+        applied and that the encoding is applied consistently. (markt)
       </fix>
     </changelog>
   </subsection>
