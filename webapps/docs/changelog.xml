@@ -54,6 +54,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Review those places where Tomcat re-encodes a URI or URI component and
+        ensure that that correct encoding (path differs from query string) is
+        applied and that the encoding is applied consistently. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
