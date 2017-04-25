@@ -850,6 +850,13 @@ public abstract class WsFrameBase implements SuspendableMessageReceiver {
         return READ_STATE_UPDATER.compareAndSet(this, oldState, newState);
     }
 
+    /**
+     * This method will be invoked when the read operation is resumed.
+     * As the suspend of the read operation can be invoked at any time, when
+     * implementing this method one should consider that there might still be
+     * data remaining into the internal buffers that needs to be processed
+     * before reading again from the socket.
+     */
     protected abstract void resumeProcessing();
 
 
