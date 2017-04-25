@@ -63,7 +63,19 @@ public class WsFrameClient extends WsFrameBase {
                 if (!changeReadState(ReadState.READY, ReadState.READ)) {
                     continue;
                 }
-                while (response.hasRemaining() && !isSuspended()) {
+                while (response.hasRemaining()) {
+                    if (isSuspended()) {
+                        if (!changeReadState(ReadState.READ_SUSPENDING, ReadState.SUSPENDED)) {
+                            continue;
+                        }
+                        // There is still data available in the response buffer
+                        // Return here so that the response buffer will not be
+                        // cleared and there will be no data read from the
+                        // socket. Thus when the read operation is resumed first
+                        // the data left in the response buffer will be consumed
+                        // and then a new socket read will be performed
+                        return;
+                    }
                     inputBuffer.mark();
                     inputBuffer.position(inputBuffer.limit()).limit(inputBuffer.capacity());
 
