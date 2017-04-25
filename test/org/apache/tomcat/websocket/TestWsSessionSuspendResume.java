@@ -130,9 +130,9 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
 
         void addMessage(String message) {
             if (messages.size() == count) {
-                ((SuspendableMessageReceiver) session).suspend();
+                ((WsSession) session).suspend();
                 session.getAsyncRemote().sendText(messages.toString(), result -> {
-                    ((SuspendableMessageReceiver) session).resume();
+                    ((WsSession) session).resume();
                     Assert.assertTrue(result.isOK());
                 });
                 messages.clear();

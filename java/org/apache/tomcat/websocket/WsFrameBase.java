@@ -41,7 +41,7 @@ import org.apache.tomcat.util.res.StringManager;
  * extracts the messages. WebSocket Pings received will be responded to
  * automatically without any action required by the application.
  */
-public abstract class WsFrameBase implements SuspendableMessageReceiver {
+public abstract class WsFrameBase {
 
     private static final StringManager sm = StringManager.getManager(WsFrameBase.class);
 
@@ -94,7 +94,7 @@ public abstract class WsFrameBase implements SuspendableMessageReceiver {
         inputBuffer.position(0).limit(0);
         messageBufferBinary = ByteBuffer.allocate(wsSession.getMaxBinaryMessageBufferSize());
         messageBufferText = CharBuffer.allocate(wsSession.getMaxTextMessageBufferSize());
-        wsSession.setSuspendableMessageReceiver(this);
+        wsSession.setWsFrame(this);
         this.wsSession = wsSession;
         Transformation finalTransformation;
         if (isMasked()) {
@@ -738,7 +738,6 @@ public abstract class WsFrameBase implements SuspendableMessageReceiver {
         }
     }
 
-    @Override
     public void suspend() {
         while (true) {
             switch (readState) {
@@ -787,7 +786,6 @@ public abstract class WsFrameBase implements SuspendableMessageReceiver {
         }
     }
 
-    @Override
     public void resume() {
         while (true) {
             switch (readState) {
