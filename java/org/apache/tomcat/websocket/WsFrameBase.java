@@ -755,18 +755,30 @@ public abstract class WsFrameBase implements SuspendableMessageReceiver {
                 }
                 return;
             case READY_SUSPENDING:
-                if (getLog().isWarnEnabled()) {
-                    getLog().warn(sm.getString("wsFrame.suspendRequested"));
+                if (readState != ReadState.READY_SUSPENDING) {
+                    continue;
+                } else {
+                    if (getLog().isWarnEnabled()) {
+                        getLog().warn(sm.getString("wsFrame.suspendRequested"));
+                    }
                 }
                 return;
             case READ_SUSPENDING:
-                if (getLog().isWarnEnabled()) {
-                    getLog().warn(sm.getString("wsFrame.suspendRequested"));
+                if (readState != ReadState.READ_SUSPENDING) {
+                    continue;
+                } else {
+                    if (getLog().isWarnEnabled()) {
+                        getLog().warn(sm.getString("wsFrame.suspendRequested"));
+                    }
                 }
                 return;
             case SUSPENDED:
-                if (getLog().isWarnEnabled()) {
-                    getLog().warn(sm.getString("wsFrame.alreadySuspended"));
+                if (readState != ReadState.SUSPENDED) {
+                    continue;
+                } else {
+                    if (getLog().isWarnEnabled()) {
+                        getLog().warn(sm.getString("wsFrame.alreadySuspended"));
+                    }
                 }
                 return;
             default:
@@ -780,13 +792,21 @@ public abstract class WsFrameBase implements SuspendableMessageReceiver {
         while (true) {
             switch (readState) {
             case READY:
-                if (getLog().isWarnEnabled()) {
-                    getLog().warn(sm.getString("wsFrame.alreadyResumed"));
+                if (readState != ReadState.READY) {
+                    continue;
+                } else {
+                    if (getLog().isWarnEnabled()) {
+                        getLog().warn(sm.getString("wsFrame.alreadyResumed"));
+                    }
                 }
                 return;
             case READ:
-                if (getLog().isWarnEnabled()) {
-                    getLog().warn(sm.getString("wsFrame.alreadyResumed"));
+                if (readState != ReadState.READ) {
+                    continue;
+                } else {
+                    if (getLog().isWarnEnabled()) {
+                        getLog().warn(sm.getString("wsFrame.alreadyResumed"));
+                    }
                 }
                 return;
             case READY_SUSPENDING:
