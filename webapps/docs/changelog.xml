@@ -61,6 +61,10 @@
         ensure that that correct encoding (path differs from query string) is
         applied and that the encoding is applied consistently. (markt)
       </fix>
+      <fix>
+        Avoid a <code>NullPointerException</code> when reading attributes for a
+        initialised HTTP connector where TLS is enabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
