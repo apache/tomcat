@@ -224,7 +224,7 @@ public class WsFrameClient extends WsFrameBase {
                         log.debug(sm.getString("wsFrameClient.ioe"), e);
                     }
                     close(e);
-                } 
+                }
             } else {
                 close(e);
             }

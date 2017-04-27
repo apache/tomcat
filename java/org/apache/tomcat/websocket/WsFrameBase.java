@@ -702,7 +702,7 @@ public abstract class WsFrameBase {
      * available, socket registered to the poller (server case)
      * SUSPENDED - suspended, read operation finished/notification for data
      * available received
-     * 
+     *
      * <pre>
      *       resume                             resume
      *       no action     data available       no action
