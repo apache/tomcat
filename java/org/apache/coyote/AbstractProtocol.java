@@ -552,13 +552,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
             for (SSLHostConfig sslHostConfig : getEndpoint().findSslHostConfigs()) {
                 ObjectName sslOname = new ObjectName(domain + ":type=SSLHostConfig,ThreadPool=" +
-                        getName() + ",name=" + sslHostConfig.getHostName());
+                        getName() + ",name=" + ObjectName.quote(sslHostConfig.getHostName()));
                 Registry.getRegistry(null, null).registerComponent(sslHostConfig, sslOname, null);
                 sslOnames.add(sslOname);
                 for (SSLHostConfigCertificate sslHostConfigCert : sslHostConfig.getCertificates()) {
                     ObjectName sslCertOname = new ObjectName(domain +
                             ":type=SSLHostConfigCertificate,ThreadPool=" + getName() +
-                            ",Host=" + sslHostConfig.getHostName() +
+                            ",Host=" + ObjectName.quote(sslHostConfig.getHostName()) +
                             ",name=" + sslHostConfigCert.getType());
                     Registry.getRegistry(null, null).registerComponent(
                             sslHostConfigCert, sslCertOname, null);

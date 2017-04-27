@@ -65,6 +65,12 @@
         Avoid a <code>NullPointerException</code> when reading attributes for a
         initialised HTTP connector where TLS is enabled. (markt)
       </fix>
+      <fix>
+        If a wild card <code>hostName</code> is configured for a
+        <code>SSLHostConfig</code> element, quote the host name when using it as
+        part of a JMX object name to avoid errors that prevent the associated
+        TLS connector from starting. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
