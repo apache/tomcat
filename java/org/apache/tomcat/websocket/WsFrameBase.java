@@ -704,16 +704,20 @@ public abstract class WsFrameBase {
      * available received
      *
      * <pre>
-     *       resume                             resume
-     *       no action     data available       no action
-     *     |-------->READY<-------------->READ<--------|
-     *     |             ^  read finished              |
-     *  suspend          |                          suspend
-     *     |          resume                           |
-     *     |    register socket to poller (server)     |
-     *     |    resume data processing (client)        |
-     *     |             |                             |
-     *     v             |                             v
+     *     resume                             resume
+     *     no action        data available    no action
+     *  |---------------|  |--------------| |----------|
+     *  |               v  |              v v          |
+     *  |  |-----------READY<-------------READ------|  |
+     *  |  |             ^   read finished          |  |
+     *  |  |             |                          |  |
+     *  | suspend        |                     suspend |
+     *  |  |             |                          |  |
+     *  |  |          resume                        |  |
+     *  |  |    register socket to poller (server)  |  |
+     *  |  |    resume data processing (client)     |  |
+     *  |  |             |                          |  |
+     *  |  v             |                          v  |
      * READY_SUSPENDING  |                  READ_SUSPENDING
      *     |             |                             |
      * data available    |           read finished     |
