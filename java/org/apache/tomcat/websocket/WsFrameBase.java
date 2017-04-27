@@ -694,20 +694,40 @@ public abstract class WsFrameBase {
 
 
     /**
-     * READY - not suspended, waiting for notification for data available,
-     * socket registered to the poller (server case)
-     * READ - reading the available data, not suspended
-     * READ_SUSPENDING - suspended, finishing read operation
-     * READY_SUSPENDING - suspended, waiting for notification for data
-     * available, socket registered to the poller (server case)
-     * SUSPENDED - suspended, read operation finished/notification for data
-     * available received
+     * READY            - not suspended
+     *                    Server case: waiting for a notification that data is
+     *                    ready to be read from the socket, socket registered
+     *                    to the poller
+     *                    Client case: data has been read from the socket and
+     *                    is available for processing
+     * READ             - not suspended
+     *                    Server case: reading from the socket and processing
+     *                    data
+     *                    Client case: processing the data if such has already
+     *                    been read and more data will be read from the socket
+     * READ_SUSPENDING  - suspended, a call to suspend() was made while in READ
+     *                    state. A call to resume() will do nothing and will
+     *                    transition to READ state.
+     * READY_SUSPENDING - suspended, a call to suspend() was made while in READY
+     *                    state. A call to resume() will do nothing and will
+     *                    transition to READY state.
+     * SUSPENDED        - suspended
+     *                    Server case: read finished (READ_SUSPENDING) /
+     *                    a notification was received that data is ready to be
+     *                    read from the socket (READY_SUSPENDING), socket is
+     *                    not registered to the poller
+     *                    Client case: read finished (READ_SUSPENDING) / data
+     *                    has been read from the socket and is available for
+     *                    processing (READY_SUSPENDING)
+     *                    A call to resume() will:
+     *                    Server case: register the socket to the poller
+     *                    Client case: resume data processing
      *
      * <pre>
-     *     resume                             resume
-     *     no action        data available    no action
-     *  |---------------|  |--------------| |----------|
-     *  |               v  |              v v          |
+     *     resume           data to be        resume
+     *     no action        processed         no action
+     *  |---------------| |---------------| |----------|
+     *  |               v |               v v          |
      *  |  |-----------READY<-------------READ------|  |
      *  |  |             ^   read finished          |  |
      *  |  |             |                          |  |
@@ -719,9 +739,9 @@ public abstract class WsFrameBase {
      *  |  |             |                          |  |
      *  |  v             |                          v  |
      * READY_SUSPENDING  |                  READ_SUSPENDING
-     *     |             |                             |
-     * data available    |           read finished     |
-     *     |---------->SUSPENDED<----------------------|
+     *  |                |                             |
+     *  | data available |           read finished     |
+     *  |------------->SUSPENDED<----------------------|
      * </pre>
      */
     protected enum ReadState {
