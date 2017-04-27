@@ -92,12 +92,7 @@ public class WsFrameClient extends WsFrameBase {
                     inputBuffer.limit(inputBuffer.position()).reset();
 
                     // Process the data we have
-                    try {
-                        processInputBuffer();
-                    } catch (IOException e) {
-                        changeReadState(ReadState.READY);
-                        throw e;
-                    }
+                    processInputBuffer();
                 }
                 response.clear();
 
