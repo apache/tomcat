@@ -343,11 +343,6 @@ public final class UDecoder {
         // URLs are always in US-ASCII
         byte[] bytes = str.getBytes(StandardCharsets.US_ASCII);
 
-        // If an encoding is not specified, use ISO-8859-1
-        if (enc == null) {
-            enc = "ISO-8859-1";
-        }
-
         return URLDecode(bytes, enc, isQuery);
     }
 
@@ -356,7 +351,7 @@ public final class UDecoder {
      * Decode and return the specified URL-encoded byte array.
      *
      * @param bytes The url-encoded byte array
-     * @param enc The encoding to use; if null, the default encoding is used. If
+     * @param enc The encoding to use; if null, ISO-8859-1 is used. If
      * an unsupported encoding is specified null will be returned
      * @param isQuery Is this a query string being processed
      * @return the decoded string
@@ -395,7 +390,7 @@ public final class UDecoder {
                 return null;
             }
         }
-        return new String(bytes, 0, ox);
+        return new String(bytes, 0, ox, StandardCharsets.ISO_8859_1);
 
     }
 
