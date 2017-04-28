@@ -55,6 +55,17 @@ public class B2CConverter {
         }
     }
 
+
+    /**
+     * Obtain the Charset for the given encoding
+     *
+     * @param enc The name of the encoding for the required charset
+     *
+     * @return The Charset corresponding to the requested encoding
+     *
+     * @throws UnsupportedEncodingException If the requested Charset is not
+     *                                      available
+     */
     public static Charset getCharset(String enc)
             throws UnsupportedEncodingException {
 
@@ -63,6 +74,7 @@ public class B2CConverter {
 
         return getCharsetLower(lowerCaseEnc);
     }
+
 
     /**
      * Only to be used when it is known that the encoding name is in lower case.
@@ -73,7 +85,10 @@ public class B2CConverter {
      *
      * @throws UnsupportedEncodingException If the requested Charset is not
      *                                      available
+     *
+     * @deprecated Will be removed in Tomcat 9.0.x
      */
+    @Deprecated
     public static Charset getCharsetLower(String lowerCaseEnc)
             throws UnsupportedEncodingException {
 
@@ -86,6 +101,7 @@ public class B2CConverter {
         }
         return charset;
     }
+
 
     private final CharsetDecoder decoder;
     private ByteBuffer bb = null;
