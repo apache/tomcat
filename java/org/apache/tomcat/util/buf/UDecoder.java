@@ -328,7 +328,7 @@ public final class UDecoder {
      * Decode and return the specified URL-encoded String.
      *
      * @param str The url-encoded string
-     * @param enc The encoding to use; if null, ISO-8859-1 is used. If
+     * @param enc The encoding to use; if null, UTF-8 is used. If
      * an unsupported encoding is specified null will be returned
      * @param isQuery Is this a query string being processed
      * @return the decoded string
@@ -351,7 +351,7 @@ public final class UDecoder {
      * Decode and return the specified URL-encoded byte array.
      *
      * @param bytes The url-encoded byte array
-     * @param enc The encoding to use; if null, ISO-8859-1 is used. If
+     * @param enc The encoding to use; if null, UTF-8 is used. If
      * an unsupported encoding is specified null will be returned
      * @param isQuery Is this a query string being processed
      * @return the decoded string
@@ -390,7 +390,7 @@ public final class UDecoder {
                 return null;
             }
         }
-        return new String(bytes, 0, ox, StandardCharsets.ISO_8859_1);
+        return new String(bytes, 0, ox, StandardCharsets.UTF_8);
 
     }
 
