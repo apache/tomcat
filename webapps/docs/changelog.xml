@@ -77,6 +77,12 @@
         to <code>UTF-8</code> as required by the Servlet 4.0 specification.
         (markt)
       </update>
+      <scode>
+        Start to switch to using <code>Charset</code> rather than
+        <code>String</code> to store encoding configuration settings to reduce
+        the number of places the associated <code>Charset</code> needs to be
+        looked up. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
