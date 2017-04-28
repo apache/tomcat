@@ -66,10 +66,11 @@
         initialised HTTP connector where TLS is enabled. (markt)
       </fix>
       <fix>
-        If a wild card <code>hostName</code> is configured for a
-        <code>SSLHostConfig</code> element, quote the host name when using it as
-        part of a JMX object name to avoid errors that prevent the associated
-        TLS connector from starting. (markt)
+        Always quote the <code>hostName</code> of an <code>SSLHostConfig</code>
+        element when using it as part of the JMX object name to avoid errors that
+        prevent the associated TLS connector from starting if a wild card
+        <code>hostName</code> is configured (because <code>*</code> is a
+        reserved character for JMX object names). (markt)
       </fix>
     </changelog>
   </subsection>
