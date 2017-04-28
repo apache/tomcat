@@ -313,7 +313,7 @@ public final class UDecoder {
      * string is not a query string.
      *
      * @param str The url-encoded string
-     * @param enc The encoding to use; if null, the default encoding is used. If
+     * @param enc The encoding to use; if null, UTF-8 is used. If
      * an unsupported encoding is specified null will be returned
      * @return the decoded string
      * @exception IllegalArgumentException if a '%' character is not followed
