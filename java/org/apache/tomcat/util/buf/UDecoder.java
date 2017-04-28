@@ -294,9 +294,9 @@ public final class UDecoder {
 
     /**
      * Decode and return the specified URL-encoded String.
-     * When the byte array is converted to a string, the system default
-     * character encoding is used...  This may be different than some other
-     * servers. It is assumed the string is not a query string.
+     * When the byte array is converted to a string, the UTF-8 is used. This may
+     * be different than some other servers. It is assumed the string is not a
+     * query string.
      *
      * @param str The url-encoded string
      * @return the decoded string
