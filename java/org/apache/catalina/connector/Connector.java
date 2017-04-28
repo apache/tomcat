@@ -717,7 +717,6 @@ public class Connector extends LifecycleMBeanBase  {
         } else {
             this.URIEncodingLower = URIEncoding.toLowerCase(Locale.ENGLISH);
         }
-        setProperty("uRIEncoding", URIEncoding);
     }
 
 
