@@ -880,6 +880,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     if (status != SocketEvent.OPEN_WRITE) {
                         longPoll(wrapper, processor);
                     }
+                } else if (state == SocketState.SUSPENDED) {
+                    // Don't add sockets back to the poller.
+                    // The resumeProcessing() method will add this socket
+                    // to the poller.
                 } else {
                     // Connection closed. OK to recycle the processor. Upgrade
                     // processors are not recycled.
