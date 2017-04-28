@@ -22,7 +22,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Locale;
 
 import javax.management.ObjectName;
 
@@ -257,22 +256,6 @@ public class Connector extends LifecycleMBeanBase  {
      * Coyote adapter.
      */
     protected Adapter adapter = null;
-
-
-    /**
-     * URI encoding.
-     *
-     * @deprecated This will be removed in 9.0.x onwards
-     */
-    @Deprecated
-    protected String URIEncoding = null;
-
-
-    /**
-     * @deprecated This will be removed in 9.0.x onwards
-     */
-    @Deprecated
-    protected String URIEncodingLower = null;
 
 
     private Charset uriCharset = StandardCharsets.UTF_8;
@@ -704,17 +687,6 @@ public class Connector extends LifecycleMBeanBase  {
      */
     public String getURIEncoding() {
         return uriCharset.name();
-    }
-
-
-    /**
-     * @return the character encoding to be used for the URI using lower case.
-     *
-     * @deprecated This will be removed in 9.0.x onwards
-     */
-    @Deprecated
-    public String getURIEncodingLower() {
-        return uriCharset.name().toLowerCase(Locale.ENGLISH);
     }
 
 
