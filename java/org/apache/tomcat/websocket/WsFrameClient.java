@@ -100,7 +100,7 @@ public class WsFrameClient extends WsFrameBase {
                 if (isOpen()) {
                     channel.read(response, null, handler);
                 } else {
-                    changeReadState(ReadState.READY);
+                    changeReadState(ReadState.CLOSING);
                 }
                 return;
             case READY_SUSPENDING:
@@ -117,7 +117,7 @@ public class WsFrameClient extends WsFrameBase {
 
 
     private final void close(Throwable t) {
-        changeReadState(ReadState.READY);
+        changeReadState(ReadState.CLOSING);
         CloseReason cr;
         if (t instanceof WsIOException) {
             cr = ((WsIOException) t).getCloseReason();

@@ -722,6 +722,7 @@ public abstract class WsFrameBase {
      *                    A call to resume() will:
      *                    Server case: register the socket to the poller
      *                    Client case: resume data processing
+     * CLOSING          - not suspended, a close will be send
      *
      * <pre>
      *     resume           data to be        resume
@@ -749,7 +750,8 @@ public abstract class WsFrameBase {
         READ            (false),
         READY_SUSPENDING(true),
         READ_SUSPENDING (true),
-        SUSPENDED       (true);
+        SUSPENDED       (true),
+        CLOSING         (false);
 
         private final boolean isSuspended;
 
@@ -804,6 +806,8 @@ public abstract class WsFrameBase {
                     }
                 }
                 return;
+            case CLOSING:
+                return;
             default:
                 throw new IllegalStateException(sm.getString("wsFrame.illegalReadState", state));
             }
@@ -849,6 +853,8 @@ public abstract class WsFrameBase {
                     continue;
                 }
                 resumeProcessing();
+                return;
+            case CLOSING:
                 return;
             default:
                 throw new IllegalStateException(sm.getString("wsFrame.illegalReadState", state));
