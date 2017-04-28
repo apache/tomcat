@@ -328,7 +328,7 @@ public final class UDecoder {
      * Decode and return the specified URL-encoded String.
      *
      * @param str The url-encoded string
-     * @param enc The encoding to use; if null, the default encoding is used. If
+     * @param enc The encoding to use; if null, ISO-8859-1 is used. If
      * an unsupported encoding is specified null will be returned
      * @param isQuery Is this a query string being processed
      * @return the decoded string
@@ -336,28 +336,19 @@ public final class UDecoder {
      * by a valid 2-digit hexadecimal number
      */
     public static String URLDecode(String str, String enc, boolean isQuery) {
-        if (str == null)
-            return (null);
+        if (str == null) {
+            return null;
+        }
 
-        // use the specified encoding to extract bytes out of the
-        // given string so that the encoding is not lost. If an
-        // encoding is not specified, use ISO-8859-1
-        byte[] bytes = null;
-        try {
-            if (enc == null) {
-                bytes = str.getBytes(StandardCharsets.ISO_8859_1);
-                enc = "ISO-8859-1";
-            } else {
-                bytes = str.getBytes(B2CConverter.getCharset(enc));
-            }
-        } catch (UnsupportedEncodingException uee) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("uDecoder.urlDecode.uee", enc), uee);
-            }
+        // URLs are always in US-ASCII
+        byte[] bytes = str.getBytes(StandardCharsets.US_ASCII);
+
+        // If an encoding is not specified, use ISO-8859-1
+        if (enc == null) {
+            enc = "ISO-8859-1";
         }
 
         return URLDecode(bytes, enc, isQuery);
-
     }
 
 
