@@ -792,4 +792,26 @@ public class WsSession implements Session {
         OUTPUT_CLOSED,
         CLOSED
     }
+
+
+    private WsFrameBase wsFrame;
+    void setWsFrame(WsFrameBase wsFrame) {
+        this.wsFrame = wsFrame;
+    }
+
+
+    /**
+     * Suspends the reading of the incoming messages.
+     */
+    public void suspend() {
+        wsFrame.suspend();
+    }
+
+
+    /**
+     * Resumes the reading of the incoming messages.
+     */
+    public void resume() {
+        wsFrame.resume();
+    }
 }

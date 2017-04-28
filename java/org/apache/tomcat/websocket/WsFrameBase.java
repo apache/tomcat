@@ -23,6 +23,7 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.CodingErrorAction;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 import javax.websocket.CloseReason;
 import javax.websocket.CloseReason.CloseCodes;
@@ -84,11 +85,16 @@ public abstract class WsFrameBase {
     private volatile State state = State.NEW_FRAME;
     private volatile boolean open = true;
 
+    private static final AtomicReferenceFieldUpdater<WsFrameBase, ReadState> READ_STATE_UPDATER =
+            AtomicReferenceFieldUpdater.newUpdater(WsFrameBase.class, ReadState.class, "readState");
+    private volatile ReadState readState = ReadState.WAITING;
+
     public WsFrameBase(WsSession wsSession, Transformation transformation) {
         inputBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
         inputBuffer.position(0).limit(0);
         messageBufferBinary = ByteBuffer.allocate(wsSession.getMaxBinaryMessageBufferSize());
         messageBufferText = CharBuffer.allocate(wsSession.getMaxTextMessageBufferSize());
+        wsSession.setWsFrame(this);
         this.wsSession = wsSession;
         Transformation finalTransformation;
         if (isMasked()) {
@@ -106,7 +112,7 @@ public abstract class WsFrameBase {
 
 
     protected void processInputBuffer() throws IOException {
-        while (true) {
+        while (!isSuspended()) {
             wsSession.updateLastActive();
             if (state == State.NEW_FRAME) {
                 if (!processInitialHeader()) {
@@ -685,6 +691,205 @@ public abstract class WsFrameBase {
     private static enum State {
         NEW_FRAME, PARTIAL_HEADER, DATA
     }
+
+
+    /**
+     * WAITING            - not suspended
+     *                      Server case: waiting for a notification that data
+     *                      is ready to be read from the socket, the socket is
+     *                      registered to the poller
+     *                      Client case: data has been read from the socket and
+     *                      is waiting for data to be processed
+     * PROCESSING         - not suspended
+     *                      Server case: reading from the socket and processing
+     *                      the data
+     *                      Client case: processing the data if such has
+     *                      already been read and more data will be read from
+     *                      the socket
+     * SUSPENDING_WAIT    - suspended, a call to suspend() was made while in
+     *                      WAITING state. A call to resume() will do nothing
+     *                      and will transition to WAITING state
+     * SUSPENDING_PROCESS - suspended, a call to suspend() was made while in
+     *                      PROCESSING state. A call to resume() will do
+     *                      nothing and will transition to PROCESSING state
+     * SUSPENDED          - suspended
+     *                      Server case: processing data finished
+     *                      (SUSPENDING_PROCESS) / a notification was received
+     *                      that data is ready to be read from the socket
+     *                      (SUSPENDING_WAIT), socket is not registered to the
+     *                      poller
+     *                      Client case: processing data finished
+     *                      (SUSPENDING_PROCESS) / data has been read from the
+     *                      socket and is available for processing
+     *                      (SUSPENDING_WAIT)
+     *                      A call to resume() will:
+     *                      Server case: register the socket to the poller
+     *                      Client case: resume data processing
+     * CLOSING            - not suspended, a close will be send
+     *
+     * <pre>
+     *     resume           data to be        resume
+     *     no action        processed         no action
+     *  |---------------| |---------------| |----------|
+     *  |               v |               v v          |
+     *  |  |----------WAITING«--------PROCESSING----|  |
+     *  |  |             ^   processing             |  |
+     *  |  |             |   finished               |  |
+     *  |  |             |                          |  |
+     *  | suspend        |                     suspend |
+     *  |  |             |                          |  |
+     *  |  |          resume                        |  |
+     *  |  |    register socket to poller (server)  |  |
+     *  |  |    resume data processing (client)     |  |
+     *  |  |             |                          |  |
+     *  |  v             |                          v  |
+     * SUSPENDING_WAIT   |                  SUSPENDING_PROCESS
+     *  |                |                             |
+     *  | data available |        processing finished  |
+     *  |-------------»SUSPENDED«----------------------|
+     * </pre>
+     */
+    protected enum ReadState {
+        WAITING           (false),
+        PROCESSING        (false),
+        SUSPENDING_WAIT   (true),
+        SUSPENDING_PROCESS(true),
+        SUSPENDED         (true),
+        CLOSING           (false);
+
+        private final boolean isSuspended;
+
+        ReadState(boolean isSuspended) {
+            this.isSuspended = isSuspended;
+        }
+
+        public boolean isSuspended() {
+            return isSuspended;
+        }
+    }
+
+    public void suspend() {
+        while (true) {
+            switch (readState) {
+            case WAITING:
+                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.WAITING,
+                        ReadState.SUSPENDING_WAIT)) {
+                    continue;
+                }
+                return;
+            case PROCESSING:
+                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.PROCESSING,
+                        ReadState.SUSPENDING_PROCESS)) {
+                    continue;
+                }
+                return;
+            case SUSPENDING_WAIT:
+                if (readState != ReadState.SUSPENDING_WAIT) {
+                    continue;
+                } else {
+                    if (getLog().isWarnEnabled()) {
+                        getLog().warn(sm.getString("wsFrame.suspendRequested"));
+                    }
+                }
+                return;
+            case SUSPENDING_PROCESS:
+                if (readState != ReadState.SUSPENDING_PROCESS) {
+                    continue;
+                } else {
+                    if (getLog().isWarnEnabled()) {
+                        getLog().warn(sm.getString("wsFrame.suspendRequested"));
+                    }
+                }
+                return;
+            case SUSPENDED:
+                if (readState != ReadState.SUSPENDED) {
+                    continue;
+                } else {
+                    if (getLog().isWarnEnabled()) {
+                        getLog().warn(sm.getString("wsFrame.alreadySuspended"));
+                    }
+                }
+                return;
+            case CLOSING:
+                return;
+            default:
+                throw new IllegalStateException(sm.getString("wsFrame.illegalReadState", state));
+            }
+        }
+    }
+
+    public void resume() {
+        while (true) {
+            switch (readState) {
+            case WAITING:
+                if (readState != ReadState.WAITING) {
+                    continue;
+                } else {
+                    if (getLog().isWarnEnabled()) {
+                        getLog().warn(sm.getString("wsFrame.alreadyResumed"));
+                    }
+                }
+                return;
+            case PROCESSING:
+                if (readState != ReadState.PROCESSING) {
+                    continue;
+                } else {
+                    if (getLog().isWarnEnabled()) {
+                        getLog().warn(sm.getString("wsFrame.alreadyResumed"));
+                    }
+                }
+                return;
+            case SUSPENDING_WAIT:
+                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.SUSPENDING_WAIT,
+                        ReadState.WAITING)) {
+                    continue;
+                }
+                return;
+            case SUSPENDING_PROCESS:
+                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.SUSPENDING_PROCESS,
+                        ReadState.PROCESSING)) {
+                    continue;
+                }
+                return;
+            case SUSPENDED:
+                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.SUSPENDED,
+                        ReadState.WAITING)) {
+                    continue;
+                }
+                resumeProcessing();
+                return;
+            case CLOSING:
+                return;
+            default:
+                throw new IllegalStateException(sm.getString("wsFrame.illegalReadState", state));
+            }
+        }
+    }
+
+    protected boolean isSuspended() {
+        return readState.isSuspended();
+    }
+
+    protected ReadState getReadState() {
+        return readState;
+    }
+
+    protected void changeReadState(ReadState newState) {
+        READ_STATE_UPDATER.set(this, newState);
+    }
+
+    protected boolean changeReadState(ReadState oldState, ReadState newState) {
+        return READ_STATE_UPDATER.compareAndSet(this, oldState, newState);
+    }
+
+    /**
+     * This method will be invoked when the read operation is resumed.
+     * As the suspend of the read operation can be invoked at any time, when
+     * implementing this method one should consider that there might still be
+     * data remaining into the internal buffers that needs to be processed
+     * before reading again from the socket.
+     */
+    protected abstract void resumeProcessing();
 
 
     private abstract class TerminalTransformation implements Transformation {
