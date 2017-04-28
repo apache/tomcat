@@ -72,6 +72,11 @@
         <code>hostName</code> is configured (because <code>*</code> is a
         reserved character for JMX object names). (markt)
       </fix>
+      <update>
+        Update the default <code>URIEncoding</code> for a <code>Connector</code>
+        to <code>UTF-8</code> as required by the Servlet 4.0 specification.
+        (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">

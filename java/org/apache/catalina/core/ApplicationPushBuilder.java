@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.core;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +38,6 @@ import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.http.CookieProcessor;
@@ -347,7 +345,7 @@ public class ApplicationPushBuilder implements PushBuilder {
         // Undecoded path - just %nn encoded
         pushTarget.requestURI().setString(pushPath);
         pushTarget.decodedURI().setString(decode(pushPath,
-                catalinaRequest.getConnector().getURIEncodingLower()));
+                catalinaRequest.getConnector().getURICharset()));
 
         // Query string
         if (pushQueryString == null && queryString != null) {
@@ -373,22 +371,13 @@ public class ApplicationPushBuilder implements PushBuilder {
 
 
     // Package private so it can be tested. charsetName must be in lower case.
-    static String decode(String input, String charsetName) {
+    static String decode(String input, Charset charset) {
         int start = input.indexOf('%');
         int end = 0;
 
         // Shortcut
         if (start == -1) {
             return input;
-        }
-
-        Charset charset;
-        try {
-            charset = B2CConverter.getCharsetLower(charsetName);
-        } catch (UnsupportedEncodingException uee) {
-            // Impossible since original request would have triggered an error
-            // before reaching here
-            throw new IllegalStateException(uee);
         }
 
         StringBuilder result = new StringBuilder(input.length());
@@ -401,7 +390,7 @@ public class ApplicationPushBuilder implements PushBuilder {
             while (end <input.length() && input.charAt(end) == '%') {
                 end += 3;
             }
-            result.append(decode(input.substring(start, end), charset));
+            result.append(decodePercentSequence(input.substring(start, end), charset));
             start = input.indexOf('%', end);
         }
         // Append the remaining text
@@ -411,11 +400,11 @@ public class ApplicationPushBuilder implements PushBuilder {
     }
 
 
-    private static String decode(String percentSequence, Charset charset) {
-        byte[] bytes = new byte[percentSequence.length()/3];
+    private static String decodePercentSequence(String sequence, Charset charset) {
+        byte[] bytes = new byte[sequence.length()/3];
         for (int i = 0; i < bytes.length; i += 3) {
-            bytes[i] = (byte) (HexUtils.getDec(percentSequence.charAt(1 + 3 * i)) << 4 +
-                    HexUtils.getDec(percentSequence.charAt(2 + 3 * i)));
+            bytes[i] = (byte) (HexUtils.getDec(sequence.charAt(1 + 3 * i)) << 4 +
+                    HexUtils.getDec(sequence.charAt(2 + 3 * i)));
         }
 
         return new String(bytes, charset);

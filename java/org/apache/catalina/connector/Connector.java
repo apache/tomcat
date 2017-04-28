@@ -16,14 +16,16 @@
  */
 package org.apache.catalina.connector;
 
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
 
 import javax.management.ObjectName;
 
-import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Service;
@@ -37,6 +39,7 @@ import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import org.apache.tomcat.util.res.StringManager;
@@ -103,11 +106,6 @@ public class Connector extends LifecycleMBeanBase  {
                     "coyoteConnector.protocolHandlerInstantiationFailed"), e);
         } finally {
             this.protocolHandler = p;
-        }
-
-        if (!Globals.STRICT_SERVLET_COMPLIANCE) {
-            URIEncoding = "UTF-8";
-            URIEncodingLower = URIEncoding.toLowerCase(Locale.ENGLISH);
         }
 
         // Default for Connector depends on this system property
@@ -263,9 +261,21 @@ public class Connector extends LifecycleMBeanBase  {
 
     /**
      * URI encoding.
+     *
+     * @deprecated This will be removed in 9.0.x onwards
      */
+    @Deprecated
     protected String URIEncoding = null;
+
+
+    /**
+     * @deprecated This will be removed in 9.0.x onwards
+     */
+    @Deprecated
     protected String URIEncodingLower = null;
+
+
+    private Charset uriCharset = StandardCharsets.UTF_8;
 
 
     /**
@@ -689,21 +699,33 @@ public class Connector extends LifecycleMBeanBase  {
 
 
     /**
-     * @return the character encoding to be used for the URI using the original
-     * case.
+     * @return the name of character encoding to be used for the URI using the
+     * original case.
      */
     public String getURIEncoding() {
-        return this.URIEncoding;
+        return uriCharset.name();
     }
 
 
     /**
      * @return the character encoding to be used for the URI using lower case.
+     *
+     * @deprecated This will be removed in 9.0.x onwards
      */
+    @Deprecated
     public String getURIEncodingLower() {
-        return this.URIEncodingLower;
+        return uriCharset.name().toLowerCase(Locale.ENGLISH);
     }
 
+
+    /**
+     *
+     * @return The Charset to use to convert raw URI bytes (after %nn decoding)
+     *         to characters. This will never be null
+     */
+    public Charset getURICharset() {
+        return uriCharset;
+    }
 
     /**
      * Set the URI encoding to be used for the URI.
@@ -711,11 +733,11 @@ public class Connector extends LifecycleMBeanBase  {
      * @param URIEncoding The new URI character encoding.
      */
     public void setURIEncoding(String URIEncoding) {
-        this.URIEncoding = URIEncoding;
-        if (URIEncoding == null) {
-            URIEncodingLower = null;
-        } else {
-            this.URIEncodingLower = URIEncoding.toLowerCase(Locale.ENGLISH);
+        try {
+            uriCharset = B2CConverter.getCharset(URIEncoding);
+        } catch (UnsupportedEncodingException e) {
+            log.warn(sm.getString("coyoteConnector.invalidEncoding",
+                    URIEncoding, uriCharset.name()), e);
         }
     }
 
