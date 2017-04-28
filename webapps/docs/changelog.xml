@@ -72,6 +72,12 @@
         <code>hostName</code> is configured (because <code>*</code> is a
         reserved character for JMX object names). (markt)
       </fix>
+      <scode>
+        Start to switch to using <code>Charset</code> rather than
+        <code>String</code> to store encoding configuration settings to reduce
+        the number of places the associated <code>Charset</code> needs to be
+        looked up. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">

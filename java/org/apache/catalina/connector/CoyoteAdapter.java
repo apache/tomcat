@@ -17,7 +17,6 @@
 package org.apache.catalina.connector;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.EnumSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -892,24 +891,14 @@ public class CoyoteAdapter implements Adapter {
 
         // What encoding to use? Some platforms, eg z/os, use a default
         // encoding that doesn't give the expected result so be explicit
-        String enc = connector.getURIEncodingLower();
-        if (enc == null) {
-            enc = "iso-8859-1";
-        }
-        Charset charset = null;
-        try {
-            charset = B2CConverter.getCharsetLower(enc);
-        } catch (UnsupportedEncodingException e1) {
-            log.warn(sm.getString("coyoteAdapter.parsePathParam",
-                    enc));
-        }
+        Charset charset = connector.getURICharset();
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("coyoteAdapter.debug", "uriBC",
                     uriBC.toString()));
             log.debug(sm.getString("coyoteAdapter.debug", "semicolon",
                     String.valueOf(semicolon)));
-            log.debug(sm.getString("coyoteAdapter.debug", "enc", enc));
+            log.debug(sm.getString("coyoteAdapter.debug", "enc", charset.name()));
         }
 
         while (semicolon > -1) {
