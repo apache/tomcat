@@ -87,7 +87,7 @@ public abstract class WsFrameBase {
 
     private static final AtomicReferenceFieldUpdater<WsFrameBase, ReadState> READ_STATE_UPDATER =
             AtomicReferenceFieldUpdater.newUpdater(WsFrameBase.class, ReadState.class, "readState");
-    private volatile ReadState readState = ReadState.READY;
+    private volatile ReadState readState = ReadState.WAITING;
 
     public WsFrameBase(WsSession wsSession, Transformation transformation) {
         inputBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
@@ -694,43 +694,47 @@ public abstract class WsFrameBase {
 
 
     /**
-     * READY            - not suspended
-     *                    Server case: waiting for a notification that data is
-     *                    ready to be read from the socket, socket registered
-     *                    to the poller
-     *                    Client case: data has been read from the socket and
-     *                    is available for processing
-     * READ             - not suspended
-     *                    Server case: reading from the socket and processing
-     *                    data
-     *                    Client case: processing the data if such has already
-     *                    been read and more data will be read from the socket
-     * READ_SUSPENDING  - suspended, a call to suspend() was made while in READ
-     *                    state. A call to resume() will do nothing and will
-     *                    transition to READ state.
-     * READY_SUSPENDING - suspended, a call to suspend() was made while in READY
-     *                    state. A call to resume() will do nothing and will
-     *                    transition to READY state.
-     * SUSPENDED        - suspended
-     *                    Server case: read finished (READ_SUSPENDING) /
-     *                    a notification was received that data is ready to be
-     *                    read from the socket (READY_SUSPENDING), socket is
-     *                    not registered to the poller
-     *                    Client case: read finished (READ_SUSPENDING) / data
-     *                    has been read from the socket and is available for
-     *                    processing (READY_SUSPENDING)
-     *                    A call to resume() will:
-     *                    Server case: register the socket to the poller
-     *                    Client case: resume data processing
-     * CLOSING          - not suspended, a close will be send
+     * WAITING            - not suspended
+     *                      Server case: waiting for a notification that data
+     *                      is ready to be read from the socket, the socket is
+     *                      registered to the poller
+     *                      Client case: data has been read from the socket and
+     *                      is waiting for data to be processed
+     * PROCESSING         - not suspended
+     *                      Server case: reading from the socket and processing
+     *                      the data
+     *                      Client case: processing the data if such has
+     *                      already been read and more data will be read from
+     *                      the socket
+     * SUSPENDING_WAIT    - suspended, a call to suspend() was made while in
+     *                      WAITING state. A call to resume() will do nothing
+     *                      and will transition to WAITING state
+     * SUSPENDING_PROCESS - suspended, a call to suspend() was made while in
+     *                      PROCESSING state. A call to resume() will do
+     *                      nothing and will transition to PROCESSING state
+     * SUSPENDED          - suspended
+     *                      Server case: processing data finished
+     *                      (SUSPENDING_PROCESS) / a notification was received
+     *                      that data is ready to be read from the socket
+     *                      (SUSPENDING_WAIT), socket is not registered to the
+     *                      poller
+     *                      Client case: processing data finished
+     *                      (SUSPENDING_PROCESS) / data has been read from the
+     *                      socket and is available for processing
+     *                      (SUSPENDING_WAIT)
+     *                      A call to resume() will:
+     *                      Server case: register the socket to the poller
+     *                      Client case: resume data processing
+     * CLOSING            - not suspended, a close will be send
      *
      * <pre>
      *     resume           data to be        resume
      *     no action        processed         no action
      *  |---------------| |---------------| |----------|
      *  |               v |               v v          |
-     *  |  |-----------READY<-------------READ------|  |
-     *  |  |             ^   read finished          |  |
+     *  |  |----------WAITING<--------PROCESSING----|  |
+     *  |  |             ^   processing             |  |
+     *  |  |             |   finished               |  |
      *  |  |             |                          |  |
      *  | suspend        |                     suspend |
      *  |  |             |                          |  |
@@ -739,19 +743,19 @@ public abstract class WsFrameBase {
      *  |  |    resume data processing (client)     |  |
      *  |  |             |                          |  |
      *  |  v             |                          v  |
-     * READY_SUSPENDING  |                  READ_SUSPENDING
+     * SUSPENDING_WAIT   |                  SUSPENDING_PROCESS
      *  |                |                             |
-     *  | data available |           read finished     |
+     *  | data available |        processing finished  |
      *  |------------->SUSPENDED<----------------------|
      * </pre>
      */
     protected enum ReadState {
-        READY           (false),
-        READ            (false),
-        READY_SUSPENDING(true),
-        READ_SUSPENDING (true),
-        SUSPENDED       (true),
-        CLOSING         (false);
+        WAITING           (false),
+        PROCESSING        (false),
+        SUSPENDING_WAIT   (true),
+        SUSPENDING_PROCESS(true),
+        SUSPENDED         (true),
+        CLOSING           (false);
 
         private final boolean isSuspended;
 
@@ -767,20 +771,20 @@ public abstract class WsFrameBase {
     public void suspend() {
         while (true) {
             switch (readState) {
-            case READY:
-                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.READY,
-                        ReadState.READY_SUSPENDING)) {
+            case WAITING:
+                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.WAITING,
+                        ReadState.SUSPENDING_WAIT)) {
                     continue;
                 }
                 return;
-            case READ:
-                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.READ,
-                        ReadState.READ_SUSPENDING)) {
+            case PROCESSING:
+                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.PROCESSING,
+                        ReadState.SUSPENDING_PROCESS)) {
                     continue;
                 }
                 return;
-            case READY_SUSPENDING:
-                if (readState != ReadState.READY_SUSPENDING) {
+            case SUSPENDING_WAIT:
+                if (readState != ReadState.SUSPENDING_WAIT) {
                     continue;
                 } else {
                     if (getLog().isWarnEnabled()) {
@@ -788,8 +792,8 @@ public abstract class WsFrameBase {
                     }
                 }
                 return;
-            case READ_SUSPENDING:
-                if (readState != ReadState.READ_SUSPENDING) {
+            case SUSPENDING_PROCESS:
+                if (readState != ReadState.SUSPENDING_PROCESS) {
                     continue;
                 } else {
                     if (getLog().isWarnEnabled()) {
@@ -817,8 +821,8 @@ public abstract class WsFrameBase {
     public void resume() {
         while (true) {
             switch (readState) {
-            case READY:
-                if (readState != ReadState.READY) {
+            case WAITING:
+                if (readState != ReadState.WAITING) {
                     continue;
                 } else {
                     if (getLog().isWarnEnabled()) {
@@ -826,8 +830,8 @@ public abstract class WsFrameBase {
                     }
                 }
                 return;
-            case READ:
-                if (readState != ReadState.READ) {
+            case PROCESSING:
+                if (readState != ReadState.PROCESSING) {
                     continue;
                 } else {
                     if (getLog().isWarnEnabled()) {
@@ -835,21 +839,21 @@ public abstract class WsFrameBase {
                     }
                 }
                 return;
-            case READY_SUSPENDING:
-                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.READY_SUSPENDING,
-                        ReadState.READY)) {
+            case SUSPENDING_WAIT:
+                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.SUSPENDING_WAIT,
+                        ReadState.WAITING)) {
                     continue;
                 }
                 return;
-            case READ_SUSPENDING:
-                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.READ_SUSPENDING,
-                        ReadState.READ)) {
+            case SUSPENDING_PROCESS:
+                if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.SUSPENDING_PROCESS,
+                        ReadState.PROCESSING)) {
                     continue;
                 }
                 return;
             case SUSPENDED:
                 if (!READ_STATE_UPDATER.compareAndSet(this, ReadState.SUSPENDED,
-                        ReadState.READY)) {
+                        ReadState.WAITING)) {
                     continue;
                 }
                 resumeProcessing();

@@ -143,8 +143,8 @@ public class WsFrameServer extends WsFrameBase {
     SocketState notifyDataAvailable() throws IOException {
         while (isOpen()) {
             switch (getReadState()) {
-            case READY:
-                if (!changeReadState(ReadState.READY, ReadState.READ)) {
+            case WAITING:
+                if (!changeReadState(ReadState.WAITING, ReadState.PROCESSING)) {
                     continue;
                 }
                 try {
@@ -153,8 +153,8 @@ public class WsFrameServer extends WsFrameBase {
                     changeReadState(ReadState.CLOSING);
                     throw e;
                 }
-            case READY_SUSPENDING:
-                if (!changeReadState(ReadState.READY_SUSPENDING, ReadState.SUSPENDED)) {
+            case SUSPENDING_WAIT:
+                if (!changeReadState(ReadState.SUSPENDING_WAIT, ReadState.SUSPENDED)) {
                     continue;
                 }
                 return SocketState.SUSPENDED;
@@ -171,13 +171,13 @@ public class WsFrameServer extends WsFrameBase {
         onDataAvailable();
         while (isOpen()) {
             switch (getReadState()) {
-            case READ:
-                if (!changeReadState(ReadState.READ, ReadState.READY)) {
+            case PROCESSING:
+                if (!changeReadState(ReadState.PROCESSING, ReadState.WAITING)) {
                     continue;
                 }
                 return SocketState.UPGRADED;
-            case READ_SUSPENDING:
-                if (!changeReadState(ReadState.READ_SUSPENDING, ReadState.SUSPENDED)) {
+            case SUSPENDING_PROCESS:
+                if (!changeReadState(ReadState.SUSPENDING_PROCESS, ReadState.SUSPENDED)) {
                     continue;
                 }
                 return SocketState.SUSPENDED;

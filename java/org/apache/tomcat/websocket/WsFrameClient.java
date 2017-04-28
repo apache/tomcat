@@ -59,13 +59,13 @@ public class WsFrameClient extends WsFrameBase {
     private void processSocketRead() throws IOException {
         while (true) {
             switch (getReadState()) {
-            case READY:
-                if (!changeReadState(ReadState.READY, ReadState.READ)) {
+            case WAITING:
+                if (!changeReadState(ReadState.WAITING, ReadState.PROCESSING)) {
                     continue;
                 }
                 while (response.hasRemaining()) {
                     if (isSuspended()) {
-                        if (!changeReadState(ReadState.READ_SUSPENDING, ReadState.SUSPENDED)) {
+                        if (!changeReadState(ReadState.SUSPENDING_PROCESS, ReadState.SUSPENDED)) {
                             continue;
                         }
                         // There is still data available in the response buffer
@@ -103,8 +103,8 @@ public class WsFrameClient extends WsFrameBase {
                     changeReadState(ReadState.CLOSING);
                 }
                 return;
-            case READY_SUSPENDING:
-                if (!changeReadState(ReadState.READY_SUSPENDING, ReadState.SUSPENDED)) {
+            case SUSPENDING_WAIT:
+                if (!changeReadState(ReadState.SUSPENDING_WAIT, ReadState.SUSPENDED)) {
                     continue;
                 }
                 return;
@@ -179,14 +179,14 @@ public class WsFrameClient extends WsFrameBase {
         private void doResumeProcessing(boolean checkOpenOnError) {
             while (true) {
                 switch (getReadState()) {
-                case READ:
-                    if (!changeReadState(ReadState.READ, ReadState.READY)) {
+                case PROCESSING:
+                    if (!changeReadState(ReadState.PROCESSING, ReadState.WAITING)) {
                         continue;
                     }
                     resumeProcessing(checkOpenOnError);
                     return;
-                case READ_SUSPENDING:
-                    if (!changeReadState(ReadState.READ_SUSPENDING, ReadState.SUSPENDED)) {
+                case SUSPENDING_PROCESS:
+                    if (!changeReadState(ReadState.SUSPENDING_PROCESS, ReadState.SUSPENDED)) {
                         continue;
                     }
                     return;
