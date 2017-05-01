@@ -1,7 +1,6 @@
 package org.apache.tomcat.jdbc.bugs;
 
 import org.apache.tomcat.jdbc.test.DefaultTestCase;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,34 +28,11 @@ public class Bug61032 extends DefaultTestCase {
         this.datasource.setLogValidationErrors(true);
     }
 
-    @After
-    @Override
-    public void tearDown() {
-        System.out.println("START TEAR DOWN!");
-        try {
-            datasource.close();
-        } catch (Exception ignore){
-            // Ignore
-        }
-        try {
-            tDatasource.close();
-        } catch (Exception ignore){
-            // Ignore
-        }
-        //try {((ComboPooledDataSource)c3p0Datasource).close(true);}catch(Exception ignore){}
-        datasource = null;
-        tDatasource = null;
-        System.gc();
-        org.apache.tomcat.jdbc.test.driver.Driver.reset();
-        System.out.println("FINISHED TEAR DOWN!");
-    }
-
     @Test
     public void testSizeAfterMutlipleAbandonedConnections() throws Exception {
         assertThat(this.datasource.getPool().getSize(), is(CONNECTION_POOL_SIZE));
         runLongRunningConnections(CONNECTION_POOL_SIZE);
         assertThat(this.datasource.getPool().getSize(), is(CONNECTION_POOL_SIZE));
-        System.out.println("FINISHED!!");
     }
 
     private void runLongRunningConnections(int numberOfLongRunningConnections) {
