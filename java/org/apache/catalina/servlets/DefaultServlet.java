@@ -850,8 +850,12 @@ public class DefaultServlet
                     requestUri));
             }
 
-            response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                               requestUri);
+            if (DispatcherType.ERROR == request.getDispatcherType()) {
+                response.sendError(((Integer) request.getAttribute(
+                        RequestDispatcher.ERROR_STATUS_CODE)).intValue());
+            } else {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, requestUri);
+            }
             return;
         }
 

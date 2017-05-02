@@ -79,6 +79,17 @@
         determining if the current request is for custom error page or not.
         (markt)
       </fix>
+      <fix>
+        Ensure that when the Default or WebDAV servlets process an error
+        dispatch that the error resource is processed via the
+        <code>doGet()</code> method irrespective of the method used for the
+        original request that triggered the error. (markt)
+      </fix>
+      <fix>
+        If a static custom error page is specified that does not exist or cannot
+        be read, ensure that the intended error status is returned rather than a
+        404. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -139,12 +150,6 @@
       <fix>
         <bug>60911</bug>: Ensure NPE will not be thrown when looking for SSL
         session ID. Based on a patch by Didier Gutacker. (violetagg)
-      </fix>
-      <fix>
-        Ensure that when the Default or WebDAV servlets process an error
-        dispatch that the error resource is processed via the
-        <code>doGet()</code> method irrespective of the method used for the
-        original request that triggered the error. (markt)
       </fix>
     </changelog>
   </subsection>
