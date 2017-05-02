@@ -85,6 +85,16 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        When a <code>TrustManager</code> is configured that does not support
+        <code>certificateVerificationDepth</code> only log a warning about that
+        lack of support when <code>certificateVerificationDepth</code> has been
+        explicitly set. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>

@@ -86,6 +86,8 @@ public class SSLHostConfig implements Serializable {
     private String certificateRevocationListFile;
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
     private int certificateVerificationDepth = 10;
+    // Used to track if certificateVerificationDepth has been explicitly set
+    private boolean certificateVerificationDepthConfigured = false;
     private String ciphers = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
     private LinkedHashSet<Cipher> cipherList = null;
     private List<String> jsseCipherNames = null;
@@ -286,11 +288,17 @@ public class SSLHostConfig implements Serializable {
 
     public void setCertificateVerificationDepth(int certificateVerificationDepth) {
         this.certificateVerificationDepth = certificateVerificationDepth;
+        certificateVerificationDepthConfigured = true;
     }
 
 
     public int getCertificateVerificationDepth() {
         return certificateVerificationDepth;
+    }
+
+
+    public boolean isCertificateVerificationDepthConfigured() {
+        return certificateVerificationDepthConfigured;
     }
 
 
