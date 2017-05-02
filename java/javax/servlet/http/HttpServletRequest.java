@@ -584,6 +584,8 @@ public interface HttpServletRequest extends ServletRequest {
      *
      * @return A Map of the received trailer fields with all keys lower case
      *         or an empty Map if no trailers are present
+     *
+     * @since Servlet 4.0
      */
     public default Map<String,String> getTrailerFields() {
         return Collections.emptyMap();
