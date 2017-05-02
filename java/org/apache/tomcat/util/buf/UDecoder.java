@@ -18,12 +18,9 @@ package org.apache.tomcat.util.buf;
 
 import java.io.CharConversionException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -37,8 +34,6 @@ import org.apache.tomcat.util.res.StringManager;
 public final class UDecoder {
 
     private static final StringManager sm = StringManager.getManager(UDecoder.class);
-
-    private static final Log log = LogFactory.getLog(UDecoder.class);
 
     public static final boolean ALLOW_ENCODED_SLASH =
         Boolean.parseBoolean(System.getProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "false"));
@@ -314,25 +309,6 @@ public final class UDecoder {
      * string is not a query string.
      *
      * @param str The url-encoded string
-     * @param enc The encoding to use; if null, UTF-8 is used. If
-     * an unsupported encoding is specified null will be returned
-     * @return the decoded string
-     * @exception IllegalArgumentException if a '%' character is not followed
-     * by a valid 2-digit hexadecimal number
-     *
-     * @deprecated This method will be removed in Tomcat 9
-     */
-    @Deprecated
-    public static String URLDecode(String str, String enc) {
-        return URLDecode(str, enc, false);
-    }
-
-
-    /**
-     * Decode and return the specified URL-encoded String. It is assumed the
-     * string is not a query string.
-     *
-     * @param str The url-encoded string
      * @param charset The character encoding to use; if null, UTF-8 is used.
      * @return the decoded string
      * @exception IllegalArgumentException if a '%' character is not followed
@@ -342,72 +318,8 @@ public final class UDecoder {
         if (str == null) {
             return null;
         }
-        return URLDecode(str.getBytes(StandardCharsets.US_ASCII), charset, false);
-    }
 
-
-    /**
-     * Decode and return the specified URL-encoded String.
-     *
-     * @param str The url-encoded string
-     * @param enc The encoding to use; if null, UTF-8 is used. If
-     * an unsupported encoding is specified null will be returned
-     * @param isQuery Is this a query string being processed
-     * @return the decoded string
-     * @exception IllegalArgumentException if a '%' character is not followed
-     * by a valid 2-digit hexadecimal number
-     *
-     * @deprecated This method will be removed in Tomcat 9
-     */
-    @Deprecated
-    public static String URLDecode(String str, String enc, boolean isQuery) {
-        if (str == null) {
-            return null;
-        }
-
-        // URLs are always in US-ASCII
         byte[] bytes = str.getBytes(StandardCharsets.US_ASCII);
-
-        return URLDecode(bytes, enc, isQuery);
-    }
-
-
-    /**
-     * Decode and return the specified URL-encoded byte array.
-     *
-     * @param bytes The url-encoded byte array
-     * @param enc The encoding to use; if null, UTF-8 is used. If
-     * an unsupported encoding is specified null will be returned
-     * @param isQuery Is this a query string being processed
-     * @return the decoded string
-     * @exception IllegalArgumentException if a '%' character is not followed
-     * by a valid 2-digit hexadecimal number
-     *
-     * @deprecated This method will be removed in Tomcat 9
-     */
-    @Deprecated
-    public static String URLDecode(byte[] bytes, String enc, boolean isQuery) {
-        Charset charset = null;
-
-        if (enc != null) {
-            try {
-                charset = B2CConverter.getCharset(enc);
-            } catch (UnsupportedEncodingException uee) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("uDecoder.urlDecode.uee", enc), uee);
-                }
-            }
-        }
-
-        return URLDecode(bytes, charset, isQuery);
-    }
-
-
-    private static String URLDecode(byte[] bytes, Charset charset, boolean isQuery) {
-
-        if (bytes == null) {
-            return null;
-        }
 
         if (charset == null) {
             charset = StandardCharsets.UTF_8;
@@ -418,9 +330,7 @@ public final class UDecoder {
         int ox = 0;
         while (ix < len) {
             byte b = bytes[ix++];     // Get byte to test
-            if (b == '+' && isQuery) {
-                b = (byte)' ';
-            } else if (b == '%') {
+            if (b == '%') {
                 if (ix + 2 > len) {
                     throw new IllegalArgumentException(
                             sm.getString("uDecoder.urlDecode.missingDigit"));

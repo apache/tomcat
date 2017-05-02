@@ -685,6 +685,7 @@ public class Connector extends LifecycleMBeanBase  {
      * @return the name of character encoding to be used for the URI using the
      * original case.
      */
+    //@Deprecated
     public String getURIEncoding() {
         return uriCharset.name();
     }
