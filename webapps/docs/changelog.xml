@@ -74,6 +74,11 @@
         ensure that that correct encoding (path differs from query string) is
         applied and that the encoding is applied consistently. (markt)
       </fix>
+      <fix>
+        Use a more reliable mechanism for the <code>DefaultServlet</code> when
+        determining if the current request is for custom error page or not.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -245,7 +245,7 @@ public class DefaultServlet
         urlEncoder.addSafeCharacter('.');
         urlEncoder.addSafeCharacter('*');
         urlEncoder.addSafeCharacter('/');
-        
+
         if (Globals.IS_SECURITY_ENABLED) {
             factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
@@ -860,8 +860,7 @@ public class DefaultServlet
             }
         }
 
-        boolean isError =
-            response.getStatus() >= HttpServletResponse.SC_BAD_REQUEST;
+        boolean isError = DispatcherType.ERROR == request.getDispatcherType();
 
         // Check if the conditions specified in the optional If headers are
         // satisfied.
@@ -1326,7 +1325,7 @@ public class DefaultServlet
 
     }
 
-    
+
     /**
      * Return an InputStream to an HTML representation of the contents
      * of this directory.
@@ -1767,15 +1766,15 @@ public class DefaultServlet
 
 
     private File validateGlobalXsltFile() {
-        
+
         File result = null;
         String base = System.getProperty(Globals.CATALINA_BASE_PROP);
-        
+
         if (base != null) {
             File baseConf = new File(base, "conf");
             result = validateGlobalXsltFile(baseConf);
         }
-        
+
         if (result == null) {
             String home = System.getProperty(Globals.CATALINA_HOME_PROP);
             if (home != null && !home.equals(base)) {
@@ -2364,6 +2363,8 @@ public class DefaultServlet
 
         /**
          * Validate range.
+         *
+         * @return true if the range is valid, otherwise false
          */
         public boolean validate() {
             if (end >= length)
