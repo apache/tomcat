@@ -402,7 +402,7 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
      * {@inheritDoc}
      * <p>
      * The default behavior of this method is to return
-     * {@link HttpServletRequest#newPushBuilder()} on the wrapped request object.
+     * {@link HttpServletRequest#getTrailerFields()} on the wrapped request object.
      *
      * @since Servlet 4.0
      */
