@@ -55,9 +55,7 @@ import org.apache.tomcat.util.res.StringManager;
  * This class checks for invalid duplicates (eg filter/servlet names)
  * StandardContext will check validity of values (eg URL formats etc)
  */
-@SuppressWarnings("deprecation")
-public class WebXml extends XmlEncodingBase implements DocumentProperties.Encoding,
-        DocumentProperties.Charset {
+public class WebXml extends XmlEncodingBase implements DocumentProperties.Charset {
 
     protected static final String ORDER_OTHERS =
         "org.apache.catalina.order.others";

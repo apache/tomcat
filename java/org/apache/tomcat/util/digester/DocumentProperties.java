@@ -26,16 +26,6 @@ package org.apache.tomcat.util.digester;
 public interface DocumentProperties {
 
     /**
-     * The encoding used by the source XML document.
-     *
-     * @deprecated This method will be removed in Tomcat 9
-     */
-    @Deprecated
-    public interface Encoding {
-        public void setEncoding(String encoding);
-    }
-
-    /**
      * The character encoding used by the source XML document.
      */
     public interface Charset {

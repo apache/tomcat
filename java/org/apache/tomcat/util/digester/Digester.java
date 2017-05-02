@@ -1114,7 +1114,6 @@ public class Digester extends DefaultHandler2 {
      *
      * @exception SAXException if a parsing error is to be reported
      */
-    @SuppressWarnings("deprecation")
     @Override
     public void startDocument() throws SAXException {
 
@@ -1130,8 +1129,6 @@ public class Digester extends DefaultHandler2 {
                 } catch (UnsupportedEncodingException e) {
                     log.warn(sm.getString("disgester.encodingInvalid", enc), e);
                 }
-            } else if (root instanceof DocumentProperties.Encoding) {
-                ((DocumentProperties.Encoding) root).setEncoding(((Locator2) locator).getEncoding());
             }
         }
 
