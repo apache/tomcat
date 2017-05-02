@@ -834,6 +834,7 @@ public class DefaultServlet
         }
 
         CacheEntry cacheEntry = resources.lookupCache(path);
+        boolean isError = DispatcherType.ERROR == request.getDispatcherType();
 
         if (!cacheEntry.exists) {
             // Check if we're included so we can return the appropriate
@@ -850,7 +851,7 @@ public class DefaultServlet
                     requestUri));
             }
 
-            if (DispatcherType.ERROR == request.getDispatcherType()) {
+            if (isError) {
                 response.sendError(((Integer) request.getAttribute(
                         RequestDispatcher.ERROR_STATUS_CODE)).intValue());
             } else {
@@ -875,8 +876,6 @@ public class DefaultServlet
                 return;
             }
         }
-
-        boolean isError = DispatcherType.ERROR == request.getDispatcherType();
 
         // Check if the conditions specified in the optional If headers are
         // satisfied.
