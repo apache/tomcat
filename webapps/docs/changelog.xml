@@ -88,6 +88,12 @@
         determining if the current request is for custom error page or not.
         (markt)
       </fix>
+      <fix>
+        Ensure that when the Default or WebDAV servlets process an error
+        dispatch that the error resource is processed via the
+        <code>doGet()</code> method irrespective of the method used for the
+        original request that triggered the error. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
