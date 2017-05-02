@@ -40,6 +40,7 @@ import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -351,6 +352,11 @@ public class WebdavServlet
         // necessary on all methods (including GET).
         if (isSpecialPath(path)) {
             resp.sendError(WebdavStatus.SC_NOT_FOUND);
+            return;
+        }
+
+        if (req.getDispatcherType() == DispatcherType.ERROR) {
+            doGet(req, resp);
             return;
         }
 

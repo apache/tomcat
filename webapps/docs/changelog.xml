@@ -140,6 +140,12 @@
         <bug>60911</bug>: Ensure NPE will not be thrown when looking for SSL
         session ID. Based on a patch by Didier Gutacker. (violetagg)
       </fix>
+      <fix>
+        Ensure that when the Default or WebDAV servlets process an error
+        dispatch that the error resource is processed via the
+        <code>doGet()</code> method irrespective of the method used for the
+        original request that triggered the error. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
