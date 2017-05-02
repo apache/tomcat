@@ -94,6 +94,11 @@
         <code>doGet()</code> method irrespective of the method used for the
         original request that triggered the error. (markt)
       </fix>
+      <fix>
+        If a static custom error page is specified that does not exist or cannot
+        be read, ensure that the intended error status is returned rather than a
+        404 or 403. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
