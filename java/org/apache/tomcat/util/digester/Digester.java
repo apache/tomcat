@@ -1124,10 +1124,12 @@ public class Digester extends DefaultHandler2 {
         if (locator instanceof Locator2) {
             if (root instanceof DocumentProperties.Charset) {
                 String enc = ((Locator2) locator).getEncoding();
-                try {
-                    ((DocumentProperties.Charset) root).setCharset(B2CConverter.getCharset(enc));
-                } catch (UnsupportedEncodingException e) {
-                    log.warn(sm.getString("disgester.encodingInvalid", enc), e);
+                if (enc != null) {
+                    try {
+                        ((DocumentProperties.Charset) root).setCharset(B2CConverter.getCharset(enc));
+                    } catch (UnsupportedEncodingException e) {
+                        log.warn(sm.getString("disgester.encodingInvalid", enc), e);
+                    }
                 }
             }
         }
