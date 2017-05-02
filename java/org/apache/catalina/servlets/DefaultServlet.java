@@ -747,6 +747,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         WebResource resource = resources.getResource(path);
+        boolean isError = DispatcherType.ERROR == request.getDispatcherType();
 
         if (!resource.exists()) {
             // Check if we're included so we can return the appropriate
@@ -762,7 +763,7 @@ public class DefaultServlet extends HttpServlet {
                         "defaultServlet.missingResource", requestUri));
             }
 
-            if (DispatcherType.ERROR == request.getDispatcherType()) {
+            if (isError) {
                 response.sendError(((Integer) request.getAttribute(
                         RequestDispatcher.ERROR_STATUS_CODE)).intValue());
             } else {
@@ -786,7 +787,7 @@ public class DefaultServlet extends HttpServlet {
                         "defaultServlet.missingResource", requestUri));
             }
 
-            if (DispatcherType.ERROR == request.getDispatcherType()) {
+            if (isError) {
                 response.sendError(((Integer) request.getAttribute(
                         RequestDispatcher.ERROR_STATUS_CODE)).intValue());
             } else {
@@ -808,8 +809,6 @@ public class DefaultServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, requestUri);
             return;
         }
-
-        boolean isError = DispatcherType.ERROR == request.getDispatcherType();
 
         boolean included = false;
         // Check if the conditions specified in the optional If headers are
