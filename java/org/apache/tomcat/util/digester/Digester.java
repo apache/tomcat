@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -39,6 +40,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.PermissionCheck;
 import org.xml.sax.Attributes;
 import org.xml.sax.EntityResolver;
@@ -75,7 +78,6 @@ import org.xml.sax.helpers.AttributesImpl;
  * this class working with XML schema</p>
  */
 public class Digester extends DefaultHandler2 {
-
 
     // ---------------------------------------------------------- Static Fields
 
@@ -289,8 +291,8 @@ public class Digester extends DefaultHandler2 {
     /**
      * The Log to which most logging calls will be made.
      */
-    protected Log log = LogFactory.getLog("org.apache.tomcat.util.digester.Digester");
-
+    protected Log log = LogFactory.getLog(Digester.class);
+    protected StringManager sm = StringManager.getManager(Digester.class);
 
     /**
      * The Log to which all SAX event related logging calls will be made.
@@ -1112,6 +1114,7 @@ public class Digester extends DefaultHandler2 {
      *
      * @exception SAXException if a parsing error is to be reported
      */
+    @SuppressWarnings("deprecation")
     @Override
     public void startDocument() throws SAXException {
 
@@ -1119,8 +1122,17 @@ public class Digester extends DefaultHandler2 {
             saxLog.debug("startDocument()");
         }
 
-        if (locator instanceof Locator2 && root instanceof DocumentProperties.Encoding) {
-            ((DocumentProperties.Encoding) root).setEncoding(((Locator2) locator).getEncoding());
+        if (locator instanceof Locator2) {
+            if (root instanceof DocumentProperties.Charset) {
+                String enc = ((Locator2) locator).getEncoding();
+                try {
+                    ((DocumentProperties.Charset) root).setCharset(B2CConverter.getCharset(enc));
+                } catch (UnsupportedEncodingException e) {
+                    log.warn(sm.getString("disgester.encodingInvalid", enc), e);
+                }
+            } else if (root instanceof DocumentProperties.Encoding) {
+                ((DocumentProperties.Encoding) root).setEncoding(((Locator2) locator).getEncoding());
+            }
         }
 
         // ensure that the digester is properly configured, as

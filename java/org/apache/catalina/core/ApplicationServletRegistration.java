@@ -17,6 +17,7 @@
 
 package org.apache.catalina.core;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -191,7 +192,7 @@ public class ApplicationServletRegistration
 
         for (String urlPattern : urlPatterns) {
             context.addServletMappingDecoded(
-                    UDecoder.URLDecode(urlPattern, "UTF-8"), wrapper.getName());
+                    UDecoder.URLDecode(urlPattern, StandardCharsets.UTF_8), wrapper.getName());
         }
         return Collections.emptySet();
     }

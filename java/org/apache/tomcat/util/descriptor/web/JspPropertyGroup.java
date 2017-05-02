@@ -78,7 +78,7 @@ public class JspPropertyGroup extends XmlEncodingBase {
 
     private LinkedHashSet<String> urlPattern = new LinkedHashSet<>();
     public void addUrlPattern(String urlPattern) {
-        addUrlPatternDecoded(UDecoder.URLDecode(urlPattern, getEncoding()));
+        addUrlPatternDecoded(UDecoder.URLDecode(urlPattern, getCharset()));
     }
     public void addUrlPatternDecoded(String urlPattern) {
         this.urlPattern.add(urlPattern);
