@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.coyote.InputBuffer;
@@ -29,8 +30,6 @@ import org.apache.coyote.http11.Constants;
 import org.apache.coyote.http11.InputFilter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
-import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -435,7 +434,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
     private boolean parseHeader() throws IOException {
 
-        MimeHeaders headers = request.getMimeHeaders();
+        Map<String,String> headers = request.getTrailerFields();
 
         byte chr = 0;
 
@@ -579,12 +578,14 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
         String headerName = new String(trailingHeaders.getBytes(), startPos,
                 colonPos - startPos, StandardCharsets.ISO_8859_1);
 
-        if (allowedTrailerHeaders.contains(headerName.toLowerCase(Locale.ENGLISH))) {
-            MessageBytes headerValue = headers.addValue(headerName);
+        headerName = headerName.toLowerCase(Locale.ENGLISH);
 
-            // Set the header value
-            headerValue.setBytes(trailingHeaders.getBytes(), colonPos,
-                    lastSignificantChar - colonPos);
+        if (allowedTrailerHeaders.contains(headerName)) {
+
+            String value = new String(trailingHeaders.getBytes(), colonPos,
+                    lastSignificantChar - colonPos, StandardCharsets.ISO_8859_1);
+
+            headers.put(headerName, value);
         }
 
         return true;

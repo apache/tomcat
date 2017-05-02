@@ -105,7 +105,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         Context ctx = tomcat.addContext("", null);
 
         // Configure allowed trailer headers
-        tomcat.getConnector().setProperty("allowedTrailerHeaders", "X-Trailer1,X-Trailer2");
+        tomcat.getConnector().setProperty("allowedTrailerHeaders", "x-trailer1,x-trailer2");
 
         EchoHeaderServlet servlet = new EchoHeaderServlet(expectPass);
         Tomcat.addServlet(ctx, "servlet", servlet);
@@ -478,7 +478,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         private void dumpHeader(String headerName, HttpServletRequest req,
                 PrintWriter pw) {
-            String value = req.getHeader(headerName);
+            String value = req.getTrailerFields().get(headerName);
             if (value == null) {
                 value = "null";
             }

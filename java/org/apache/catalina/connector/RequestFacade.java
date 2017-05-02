@@ -1137,4 +1137,15 @@ public class RequestFacade implements HttpServletRequest {
     public PushBuilder newPushBuilder() {
         return request.newPushBuilder();
     }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since Servlet 4.0
+     */
+    @Override
+    public Map<String, String> getTrailerFields() {
+        return request.getTrailerFields();
+    }
 }

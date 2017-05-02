@@ -96,6 +96,7 @@ public final class Request {
     private final MessageBytes localAddrMB = MessageBytes.newInstance();
 
     private final MimeHeaders headers = new MimeHeaders();
+    private final Map<String,String> trailerFields = new HashMap<>();
 
 
     /**
@@ -193,12 +194,17 @@ public final class Request {
     }
 
 
+    public Map<String,String> getTrailerFields() {
+        return trailerFields;
+    }
+
+
     public UDecoder getURLDecoder() {
         return urlDecoder;
     }
 
-    // -------------------- Request data --------------------
 
+    // -------------------- Request data --------------------
 
     public MessageBytes scheme() {
         return schemeMB;

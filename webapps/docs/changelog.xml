@@ -104,6 +104,10 @@
         custom error page located below <code>WEB-INF</code>, ensure that the
         target error page is displayed rather than a 404 response. (markt)
       </fix>
+      <update>
+        Update the Servlet 4.0 implementation to add support for obtaining
+        trailer fields from chunked HTTP requests. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

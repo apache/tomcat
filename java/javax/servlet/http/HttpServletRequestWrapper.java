@@ -19,6 +19,7 @@ package javax.servlet.http;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequestWrapper;
@@ -395,5 +396,18 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
     @Override
     public PushBuilder newPushBuilder() {
         return this._getHttpServletRequest().newPushBuilder();
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The default behavior of this method is to return
+     * {@link HttpServletRequest#newPushBuilder()} on the wrapped request object.
+     *
+     * @since Servlet 4.0
+     */
+    @Override
+    public Map<String,String> getTrailerFields() {
+        return this._getHttpServletRequest().getTrailerFields();
     }
 }

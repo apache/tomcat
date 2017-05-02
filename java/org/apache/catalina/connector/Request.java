@@ -1930,6 +1930,14 @@ public class Request implements HttpServletRequest {
 
     // --------------------------------------------- HttpServletRequest Methods
 
+    @Override
+    public Map<String, String> getTrailerFields() {
+        Map<String,String> result = new HashMap<>();
+        result.putAll(coyoteRequest.getTrailerFields());
+        return result;
+    }
+
+
     /**
      * {@inheritDoc}
      *

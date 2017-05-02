@@ -72,7 +72,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.encodeBase64String(empty) + "\r\n";
     }
 
-    protected static final String TRAILER_HEADER_NAME = "X-TrailerTest";
+    protected static final String TRAILER_HEADER_NAME = "x-trailertest";
     protected static final String TRAILER_HEADER_VALUE = "test";
 
     private Socket s;
@@ -1091,7 +1091,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             IOTools.flow(bais, resp.getOutputStream());
 
             // Check for trailer headers
-            String trailerValue = req.getHeader(TRAILER_HEADER_NAME);
+            String trailerValue = req.getTrailerFields().get(TRAILER_HEADER_NAME);
             if (trailerValue != null) {
                 resp.getOutputStream().write(trailerValue.getBytes(StandardCharsets.UTF_8));
             }

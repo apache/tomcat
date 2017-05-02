@@ -345,8 +345,13 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 headerStateErrorMsg = sm.getString("stream.header.unknownPseudoHeader",
                         getConnectionId(), getIdentifier(), name);
             }
-            // Assume other HTTP header
-            coyoteRequest.getMimeHeaders().addValue(name).setString(value);
+
+            if (headerState == HEADER_STATE_TRAILER) {
+                // HTTP/2 headers are already always lower case
+                coyoteRequest.getTrailerFields().put(name, value);
+            } else {
+                coyoteRequest.getMimeHeaders().addValue(name).setString(value);
+            }
         }
         }
     }

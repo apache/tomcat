@@ -20,6 +20,7 @@ package javax.servlet.http;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -575,4 +576,13 @@ public interface HttpServletRequest extends ServletRequest {
      */
     public <T extends HttpUpgradeHandler> T upgrade(
             Class<T> httpUpgradeHandlerClass) throws java.io.IOException, ServletException;
+
+    /**
+     * Obtain a Map of the trailer fields that is not backed by the request
+     * object.
+     *
+     * @return A Map of the received trailer fields with all keys lower case
+     *         or an empty Map if no trailers are present
+     */
+    public Map<String,String> getTrailerFields();
 }

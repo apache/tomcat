@@ -446,4 +446,9 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     public PushBuilder newPushBuilder() {
         throw new RuntimeException("Not implemented");
     }
+
+    @Override
+    public Map<String, String> getTrailerFields() {
+        throw new RuntimeException("Not implemented");
+    }
 }
