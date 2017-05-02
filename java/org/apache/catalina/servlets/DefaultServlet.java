@@ -787,7 +787,7 @@ public class DefaultServlet extends HttpServlet {
             return;
         }
 
-        boolean isError = response.getStatus() >= HttpServletResponse.SC_BAD_REQUEST;
+        boolean isError = DispatcherType.ERROR == request.getDispatcherType();
 
         boolean included = false;
         // Check if the conditions specified in the optional If headers are

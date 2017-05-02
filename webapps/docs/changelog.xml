@@ -83,6 +83,11 @@
         the number of places the associated <code>Charset</code> needs to be
         looked up. (markt)
       </scode>
+      <fix>
+        Use a more reliable mechanism for the <code>DefaultServlet</code> when
+        determining if the current request is for custom error page or not.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
