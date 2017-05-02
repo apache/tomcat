@@ -579,6 +579,7 @@ public final class Request {
         charEncoding = null;
         expectation = false;
         headers.recycle();
+        trailerFields.clear();
         serverNameMB.recycle();
         serverPort=-1;
         localAddrMB.recycle();
