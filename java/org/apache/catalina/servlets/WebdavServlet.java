@@ -1524,7 +1524,7 @@ public class WebdavServlet
         }
 
         // Remove url encoding from destination
-        destinationPath = UDecoder.URLDecode(destinationPath, "UTF8");
+        destinationPath = UDecoder.URLDecode(destinationPath, StandardCharsets.UTF_8);
 
         int protocolIndex = destinationPath.indexOf("://");
         if (protocolIndex >= 0) {

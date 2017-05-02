@@ -127,7 +127,7 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
     }
 
     public void addURLPattern(String urlPattern) {
-        addURLPatternDecoded(UDecoder.URLDecode(urlPattern, getEncoding()));
+        addURLPatternDecoded(UDecoder.URLDecode(urlPattern, getCharset()));
     }
     public void addURLPatternDecoded(String urlPattern) {
         if ("*".equals(urlPattern)) {

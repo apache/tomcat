@@ -55,7 +55,9 @@ import org.apache.tomcat.util.res.StringManager;
  * This class checks for invalid duplicates (eg filter/servlet names)
  * StandardContext will check validity of values (eg URL formats etc)
  */
-public class WebXml extends XmlEncodingBase implements DocumentProperties.Encoding {
+@SuppressWarnings("deprecation")
+public class WebXml extends XmlEncodingBase implements DocumentProperties.Encoding,
+        DocumentProperties.Charset {
 
     protected static final String ORDER_OTHERS =
         "org.apache.catalina.order.others";
@@ -318,7 +320,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
     private final Map<String,String> servletMappings = new HashMap<>();
     private final Set<String> servletMappingNames = new HashSet<>();
     public void addServletMapping(String urlPattern, String servletName) {
-        addServletMappingDecoded(UDecoder.URLDecode(urlPattern, getEncoding()), servletName);
+        addServletMappingDecoded(UDecoder.URLDecode(urlPattern, getCharset()), servletName);
     }
     public void addServletMappingDecoded(String urlPattern, String servletName) {
         String oldServletName = servletMappings.put(urlPattern, servletName);
@@ -403,7 +405,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
     // jsp-config/jsp-property-group
     private final Set<JspPropertyGroup> jspPropertyGroups = new LinkedHashSet<>();
     public void addJspPropertyGroup(JspPropertyGroup propertyGroup) {
-        propertyGroup.setEncoding(getEncoding());
+        propertyGroup.setCharset(getCharset());
         jspPropertyGroups.add(propertyGroup);
     }
     public Set<JspPropertyGroup> getJspPropertyGroups() {
@@ -415,7 +417,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
     // TODO: Should support multiple description elements with language
     private final Set<SecurityConstraint> securityConstraints = new HashSet<>();
     public void addSecurityConstraint(SecurityConstraint securityConstraint) {
-        securityConstraint.setEncoding(getEncoding());
+        securityConstraint.setCharset(getCharset());
         securityConstraints.add(securityConstraint);
     }
     public Set<SecurityConstraint> getSecurityConstraints() {

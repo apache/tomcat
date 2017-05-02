@@ -2027,7 +2027,7 @@ public class Request implements HttpServletRequest {
             candidate = uri.substring(0, pos);
         }
         candidate = removePathParameters(candidate);
-        candidate = UDecoder.URLDecode(candidate, connector.getURIEncoding());
+        candidate = UDecoder.URLDecode(candidate, connector.getURICharset());
         candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
         boolean match = canonicalContextPath.equals(candidate);
         while (!match && pos != -1) {
@@ -2038,7 +2038,7 @@ public class Request implements HttpServletRequest {
                 candidate = uri.substring(0, pos);
             }
             candidate = removePathParameters(candidate);
-            candidate = UDecoder.URLDecode(candidate, connector.getURIEncoding());
+            candidate = UDecoder.URLDecode(candidate, connector.getURICharset());
             candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
             match = canonicalContextPath.equals(candidate);
         }

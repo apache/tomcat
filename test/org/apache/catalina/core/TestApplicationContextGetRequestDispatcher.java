@@ -17,6 +17,7 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -369,7 +370,8 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
 
         // Add a target servlet to dispatch to
         Tomcat.addServlet(ctx, "target", new TargetServlet());
-        ctx.addServletMappingDecoded(UDecoder.URLDecode(targetPath, "UTF-8"), "target");
+        ctx.addServletMappingDecoded(
+                UDecoder.URLDecode(targetPath, StandardCharsets.UTF_8), "target");
 
         if (useAsync) {
             Wrapper w = Tomcat.addServlet(
@@ -378,7 +380,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
         } else {
             Tomcat.addServlet(ctx, "rd", new DispatcherServlet(dispatchPath));
         }
-        ctx.addServletMappingDecoded(UDecoder.URLDecode(startPath, "UTF-8"), "rd");
+        ctx.addServletMappingDecoded(UDecoder.URLDecode(startPath, StandardCharsets.UTF_8), "rd");
 
         tomcat.start();
 

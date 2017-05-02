@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.descriptor.web;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.tomcat.util.buf.UDecoder;
 
@@ -209,7 +210,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
      * @param pattern The pattern
      */
     public void addPattern(String pattern) {
-        addPatternDecoded(UDecoder.URLDecode(pattern, "UTF-8"));
+        addPatternDecoded(UDecoder.URLDecode(pattern, StandardCharsets.UTF_8));
     }
     public void addPatternDecoded(String pattern) {
 

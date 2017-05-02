@@ -281,7 +281,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
         if (collection == null)
             return;
 
-        collection.setEncoding(getEncoding());
+        collection.setCharset(getCharset());
 
         SecurityCollection results[] =
             new SecurityCollection[collections.length + 1];
