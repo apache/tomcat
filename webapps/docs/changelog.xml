@@ -99,6 +99,11 @@
         be read, ensure that the intended error status is returned rather than a
         404 or 403. (markt)
       </fix>
+      <fix>
+        When the WebDAV servlet is configured and an error dispatch is made to a
+        custom error page located below <code>WEB-INF</code>, ensure that the
+        target error page is displayed rather than a 404 response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

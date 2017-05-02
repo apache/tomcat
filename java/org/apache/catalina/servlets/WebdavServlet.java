@@ -306,6 +306,14 @@ public class WebdavServlet
 
         final String path = getRelativePath(req);
 
+        // Error page check needs to come before special path check since
+        // custom error pages are often located below WEB-INF so they are
+        // not directly accessible.
+        if (req.getDispatcherType() == DispatcherType.ERROR) {
+            doGet(req, resp);
+            return;
+        }
+
         // Block access to special subdirectories.
         // DefaultServlet assumes it services resources from the root of the web app
         // and doesn't add any special path protection
@@ -313,11 +321,6 @@ public class WebdavServlet
         // necessary on all methods (including GET).
         if (isSpecialPath(path)) {
             resp.sendError(WebdavStatus.SC_NOT_FOUND);
-            return;
-        }
-
-        if (req.getDispatcherType() == DispatcherType.ERROR) {
-            doGet(req, resp);
             return;
         }
 
