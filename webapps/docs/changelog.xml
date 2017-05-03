@@ -118,6 +118,10 @@
         lack of support when <code>certificateVerificationDepth</code> has been
         explicitly set. (markt)
       </fix>
+      <fix>
+        <bug>60970</bug>: Extend the fix for large headers to push requests.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
