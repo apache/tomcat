@@ -114,7 +114,6 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
         Assert.assertEquals("3-HeadersStart\n" +
                 "3-Header-[:status]-[100]\n" +
-                "3-Header-[date]-["+ DEFAULT_DATE + "]\n" +
                 "3-HeadersEnd\n",
                 output.getTrace());
         output.clearTrace();
