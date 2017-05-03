@@ -152,7 +152,7 @@ public class ImportHandler {
         if (className != null) {
             Class<?> clazz = findClass(className, true);
             if (clazz != null) {
-                clazzes.put(className, clazz);
+                clazzes.put(name, clazz);
                 return clazz;
             }
         }
