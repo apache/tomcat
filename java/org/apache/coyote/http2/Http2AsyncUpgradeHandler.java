@@ -133,7 +133,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
 
     @Override
-    void writeHeaders(Stream stream, Response coyoteResponse, int payloadSize)
+    void writeHeaders(Stream stream, Response coyoteResponse, boolean endOfStream, int payloadSize)
             throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId,
@@ -143,8 +143,6 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         if (!stream.canWrite()) {
             return;
         }
-
-        prepareHeaders(coyoteResponse);
 
         boolean first = true;
         State state = null;
@@ -160,7 +158,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 if (first) {
                     first = false;
                     header[3] = FrameType.HEADERS.getIdByte();
-                    if (stream.getOutputBuffer().hasNoBody()) {
+                    if (endOfStream) {
                         header[4] = FLAG_END_OF_STREAM;
                     }
                 } else {
@@ -192,6 +190,10 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writePushHeaders", connectionId,
                     stream.getIdentifier(), Integer.toString(pushedStreamId)));
+        }
+
+        if (!stream.canWrite()) {
+            return;
         }
 
         boolean first = true;
