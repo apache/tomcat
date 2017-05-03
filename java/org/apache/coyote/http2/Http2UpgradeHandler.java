@@ -635,9 +635,13 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                         log.debug(target.limit() + " bytes");
                     }
                     ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
-                    socketWrapper.write(true, header, 0, header.length);
-                    socketWrapper.write(true, target);
-                    socketWrapper.flush(true);
+                    try {
+                        socketWrapper.write(true, header, 0, header.length);
+                        socketWrapper.write(true, target);
+                        socketWrapper.flush(true);
+                    } catch (IOException ioe) {
+                        handleAppInitiatedIOException(ioe);
+                    }
                 }
                 if (state == State.UNDERFLOW && target.limit() == 0) {
                     target = ByteBuffer.allocate(target.capacity() * 2);
