@@ -122,6 +122,10 @@
         <bug>60970</bug>: Extend the fix for large headers to push requests.
         (markt)
       </fix>
+      <fix>
+        Do not include a <code>Date</code> header in HTTP/2 reponses with status
+        codes less than 200. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
