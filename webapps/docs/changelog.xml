@@ -161,6 +161,11 @@
         <code>o.a.tomcat.websocket.WsSession#resume</code> that can be used to
         suspend/resume reading of the incoming messages. (violetagg)
       </add>
+      <fix>
+        <bug>61003</bug>: Ensure the flags for reading/writing in
+        <code>o.a.t.websocket.AsyncChannelWrapperSecure</code> are correctly
+        reset even if some exceptions occurred during processing. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web Applications">
