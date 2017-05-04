@@ -2880,8 +2880,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
                         String name = part.getName();
                         String value = null;
                         try {
-                            Charset paramCharset = parameters.getCharset();
-                            value = part.getString(paramCharset.name());
+                            value = part.getString(charset.name());
                         } catch (UnsupportedEncodingException uee) {
                             // Not possible
                         }

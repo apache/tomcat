@@ -161,7 +161,7 @@ public final class Parameters {
         parameterCount = 0;
         paramHashValues.clear();
         didQueryParameters = false;
-        charset = null;
+        charset = DEFAULT_BODY_CHARSET;
         decodedQuery.recycle();
         parseFailedReason = null;
     }
