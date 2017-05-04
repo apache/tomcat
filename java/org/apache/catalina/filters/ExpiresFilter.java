@@ -1267,6 +1267,9 @@ public class ExpiresFilter extends FilterBase {
      */
     protected Date getExpirationDate(XHttpServletResponse response) {
         String contentType = response.getContentType();
+        if (contentType != null) {
+            contentType = contentType.toLowerCase(Locale.ENGLISH);
+        }
 
         // lookup exact content-type match (e.g.
         // "text/html; charset=iso-8859-1")
@@ -1396,7 +1399,7 @@ public class ExpiresFilter extends FilterBase {
             try {
                 if (name.startsWith(PARAMETER_EXPIRES_BY_TYPE)) {
                     String contentType = name.substring(
-                            PARAMETER_EXPIRES_BY_TYPE.length()).trim();
+                            PARAMETER_EXPIRES_BY_TYPE.length()).trim().toLowerCase(Locale.ENGLISH);
                     ExpiresConfiguration expiresConfiguration = parseExpiresConfiguration(value);
                     this.expiresConfigurationByContentType.put(contentType,
                             expiresConfiguration);

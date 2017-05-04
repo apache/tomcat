@@ -118,6 +118,10 @@
         <code>useBodyEncodingForURI</code> attribute of the
         <code>Connector</code> is correctly taken into account. (markt)
       </fix>
+      <fix>
+        Within the Expires filter, make the content type value specified with the
+        <code>ExpiresByType</code> parameter, case insensitive. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
