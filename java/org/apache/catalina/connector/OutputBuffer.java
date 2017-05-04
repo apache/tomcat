@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Globals;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Response;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -526,40 +525,21 @@ public class OutputBuffer extends Writer {
             return;
         }
 
-        String enc = null;
+        Charset charset = null;
 
         if (coyoteResponse != null) {
-            enc = coyoteResponse.getCharacterEncoding();
+            charset = coyoteResponse.getCharset();
         }
 
-        if (enc == null) {
-            enc = org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
+        if (charset == null) {
+            charset = org.apache.coyote.Constants.DEFAULT_BODY_CHARSET;
         }
 
-        final Charset charset = getCharset(enc);
         conv = encoders.get(charset);
 
         if (conv == null) {
             conv = createConverter(charset);
             encoders.put(charset, conv);
-        }
-    }
-
-
-    private static Charset getCharset(final String encoding) throws IOException {
-        if (Globals.IS_SECURITY_ENABLED) {
-            try {
-                return AccessController.doPrivileged(new PrivilegedGetCharset(encoding));
-            } catch (PrivilegedActionException ex) {
-                Exception e = ex.getException();
-                if (e instanceof IOException) {
-                    throw (IOException) e;
-                } else {
-                    throw new IOException(ex);
-                }
-            }
-        } else {
-            return B2CConverter.getCharset(encoding);
         }
     }
 
@@ -860,21 +840,6 @@ public class OutputBuffer extends Writer {
         @Override
         public C2BConverter run() throws IOException {
             return new C2BConverter(charset);
-        }
-    }
-
-
-    private static class PrivilegedGetCharset implements PrivilegedExceptionAction<Charset> {
-
-        private final String encoding;
-
-        public PrivilegedGetCharset(String encoding) {
-            this.encoding = encoding;
-        }
-
-        @Override
-        public Charset run() throws IOException {
-            return B2CConverter.getCharset(encoding);
         }
     }
 }

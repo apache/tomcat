@@ -143,7 +143,6 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "RequestFacade$GetSessionPrivilegedAction");
         loader.loadClass(basePackage + "ResponseFacade$FlushBufferPrivilegedAction");
         loader.loadClass(basePackage + "OutputBuffer$PrivilegedCreateConverter");
-        loader.loadClass(basePackage + "OutputBuffer$PrivilegedGetCharset");
         loader.loadClass(basePackage + "CoyoteInputStream$PrivilegedAvailable");
         loader.loadClass(basePackage + "CoyoteInputStream$PrivilegedClose");
         loader.loadClass(basePackage + "CoyoteInputStream$PrivilegedRead");

@@ -17,12 +17,15 @@
 package org.apache.coyote;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.ReadListener;
 
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.MimeHeaders;
@@ -127,7 +130,7 @@ public final class Request {
      */
     private long contentLength = -1;
     private MessageBytes contentTypeMB = null;
-    private String charEncoding = null;
+    private Charset charset = null;
     /**
      * Is there an expectation ?
      */
@@ -290,23 +293,53 @@ public final class Request {
      * @return The value set via {@link #setCharacterEncoding(String)} or if no
      *         call has been made to that method try to obtain if from the
      *         content type.
+     *
+     * @deprecated This method will be removed in Tomcat 9.0.x
      */
+    @Deprecated
     public String getCharacterEncoding() {
+        Charset charset = getCharset();
+        if (charset == null) {
+            return null;
+        }
+        return charset.name();
+    }
 
-        if (charEncoding != null) {
-            return charEncoding;
+
+    /**
+     * Get the character encoding used for this request.
+     *
+     * @return The value set via {@link #setCharacterEncoding(String)} or if no
+     *         call has been made to that method try to obtain if from the
+     *         content type.
+     */
+    public Charset getCharset() {
+        if (charset != null) {
+            return charset;
         }
 
-        charEncoding = getCharsetFromContentType(getContentType());
+        charset = getCharsetFromContentType(getContentType());
 
-        return charEncoding;
+        return charset;
     }
 
 
-    public void setCharacterEncoding(String enc) {
-        this.charEncoding = enc;
+    /**
+     * @param enc The new encoding
+     *
+     * @throws UnsupportedEncodingException If the encoding is invalid
+     *
+     * @deprecated This method will be removed in Tomcat 9.0.x
+     */
+    @Deprecated
+    public void setCharacterEncoding(String enc) throws UnsupportedEncodingException {
+        setCharset(B2CConverter.getCharset(enc));
     }
 
+
+    public void setCharset(Charset charset) {
+        this.charset = charset;
+    }
 
     public void setContentLength(long len) {
         this.contentLength = len;
@@ -576,7 +609,7 @@ public final class Request {
 
         contentLength = -1;
         contentTypeMB = null;
-        charEncoding = null;
+        charset = null;
         expectation = false;
         headers.recycle();
         trailerFields.clear();
@@ -638,14 +671,14 @@ public final class Request {
      *
      * @param contentType a content type header
      */
-    private static String getCharsetFromContentType(String contentType) {
+    private static Charset getCharsetFromContentType(String contentType) {
 
         if (contentType == null) {
-            return (null);
+            return null;
         }
         int start = contentType.indexOf("charset=");
         if (start < 0) {
-            return (null);
+            return null;
         }
         String encoding = contentType.substring(start + 8);
         int end = encoding.indexOf(';');
@@ -657,8 +690,16 @@ public final class Request {
             && (encoding.endsWith("\""))) {
             encoding = encoding.substring(1, encoding.length() - 1);
         }
-        return (encoding.trim());
 
+        Charset result = null;
+
+        try {
+            result = B2CConverter.getCharset(encoding.trim());
+        } catch (UnsupportedEncodingException e) {
+            // Ignore
+        }
+
+        return result;
     }
 
 }

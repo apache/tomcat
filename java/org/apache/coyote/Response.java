@@ -18,6 +18,7 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Locale;
@@ -27,6 +28,7 @@ import javax.servlet.WriteListener;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.MediaType;
@@ -105,7 +107,7 @@ public final class Response {
      */
     String contentType = null;
     String contentLanguage = null;
-    String characterEncoding = null;
+    Charset charset = null;
     long contentLength = -1;
     private Locale locale = DEFAULT_LOCALE;
 
@@ -393,27 +395,67 @@ public final class Response {
         return contentLanguage;
     }
 
-    /*
+    /**
      * Overrides the name of the character encoding used in the body
      * of the response. This method must be called prior to writing output
      * using getWriter().
      *
      * @param charset String containing the name of the character encoding.
+     *
+     * @deprecated This method will be removed in Tomcat 9.0.x
      */
+    @Deprecated
     public void setCharacterEncoding(String charset) {
-
-        if (isCommitted())
+        if (charset == null) {
             return;
-        if (charset == null)
-            return;
+        }
 
-        characterEncoding = charset;
-        charsetSet=true;
+        try {
+            setCharset(B2CConverter.getCharset(charset));
+        } catch (UnsupportedEncodingException e) {
+            log.warn(sm.getString("response.encoding.invalid", charset), e);
+        }
     }
 
+
+    /**
+     * Overrides the character encoding used in the body of the response. This
+     * method must be called prior to writing output using getWriter().
+     *
+     * @param charset The character encoding.
+     */
+    public void setCharset(Charset charset) {
+        if (isCommitted()) {
+            return;
+        }
+        if (charset == null) {
+            return;
+        }
+
+        this.charset = charset;
+        charsetSet = true;
+    }
+
+
+    /**
+     * @return The name of the current encoding
+     *
+     * @deprecated This method will be removed in Tomcat 9.0.x
+     */
+    @Deprecated
     public String getCharacterEncoding() {
-        return characterEncoding;
+        Charset charset = getCharset();
+        if (charset == null) {
+            return null;
+        }
+        return charset.name();
     }
+
+
+    public Charset getCharset() {
+        return charset;
+    }
+
 
     /**
      * Sets the content type.
@@ -451,8 +493,12 @@ public final class Response {
         if (charsetValue != null) {
             charsetValue = charsetValue.trim();
             if (charsetValue.length() > 0) {
-                charsetSet = true;
-                this.characterEncoding = charsetValue;
+                try {
+                    charset = B2CConverter.getCharset(charsetValue);
+                    charsetSet = true;
+                } catch (UnsupportedEncodingException e) {
+                    log.warn(sm.getString("response.encoding.invalid", charsetValue), e);
+                }
             }
         }
     }
@@ -466,9 +512,9 @@ public final class Response {
         String ret = contentType;
 
         if (ret != null
-            && characterEncoding != null
+            && charset != null
             && charsetSet) {
-            ret = ret + ";charset=" + characterEncoding;
+            ret = ret + ";charset=" + charset.name();
         }
 
         return ret;
@@ -512,7 +558,7 @@ public final class Response {
         contentType = null;
         contentLanguage = null;
         locale = DEFAULT_LOCALE;
-        characterEncoding = null;
+        charset = null;
         charsetSet = false;
         contentLength = -1;
         status = 200;

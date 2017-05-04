@@ -18,6 +18,7 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -53,6 +54,7 @@ import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.buf.UEncoder.SafeCharsSet;
@@ -549,16 +551,21 @@ public class Response implements HttpServletResponse {
      */
     @Override
     public String getCharacterEncoding() {
-        String result = getCoyoteResponse().getCharacterEncoding();
-        if (result == null) {
-            Context context = getContext();
-            if (context != null) {
-                result =  context.getResponseCharacterEncoding();
-            }
+        Charset charset = getCoyoteResponse().getCharset();
+        if (charset != null) {
+            return charset.name();
         }
-        if (result == null) {
-            result = org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
+
+        Context context = getContext();
+        String result = null;
+        if (context != null) {
+            result =  context.getResponseCharacterEncoding();
         }
+
+        if (result == null) {
+            result = org.apache.coyote.Constants.DEFAULT_BODY_CHARSET.name();
+        }
+
         return result;
     }
 
@@ -794,7 +801,12 @@ public class Response implements HttpServletResponse {
         if (m[1] != null) {
             // Ignore charset if getWriter() has already been called
             if (!usingWriter) {
-                getCoyoteResponse().setCharacterEncoding(m[1]);
+                try {
+                    getCoyoteResponse().setCharset(B2CConverter.getCharset(m[1]));
+                } catch (UnsupportedEncodingException e) {
+                    log.warn(sm.getString("coyoteResponse.encoding.invalid", m[1]), e);
+                }
+
                 isCharacterEncodingSet = true;
             }
         }
@@ -826,7 +838,12 @@ public class Response implements HttpServletResponse {
             return;
         }
 
-        getCoyoteResponse().setCharacterEncoding(charset);
+        try {
+            getCoyoteResponse().setCharset(B2CConverter.getCharset(charset));
+        } catch (UnsupportedEncodingException e) {
+            log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
+            return;
+        }
         isCharacterEncodingSet = true;
     }
 
@@ -863,7 +880,11 @@ public class Response implements HttpServletResponse {
 
         String charset = getContext().getCharset(locale);
         if (charset != null) {
-            getCoyoteResponse().setCharacterEncoding(charset);
+            try {
+                getCoyoteResponse().setCharset(B2CConverter.getCharset(charset));
+            } catch (UnsupportedEncodingException e) {
+                log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
+            }
         }
     }
 
