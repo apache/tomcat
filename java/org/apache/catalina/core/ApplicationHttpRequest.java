@@ -891,6 +891,11 @@ class ApplicationHttpRequest
         MessageBytes queryMB = MessageBytes.newInstance();
         queryMB.setString(queryParamString);
 
+        // TODO
+        // - Should only use body encoding if useBodyEncodingForURI is true
+        // - Otherwise, should use URIEncoding
+        // - The problem is that the connector is not available...
+
         String encoding = getCharacterEncoding();
         // No need to process null value, as ISO-8859-1 is the default encoding
         // in MessageBytes.toBytes().
@@ -898,7 +903,8 @@ class ApplicationHttpRequest
             try {
                 queryMB.setCharset(B2CConverter.getCharset(encoding));
             } catch (UnsupportedEncodingException ignored) {
-                // Fall-back to ISO-8859-1
+                // Fall-back to default (ISO-8859-1)
+                encoding = null;
             }
         }
 

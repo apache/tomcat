@@ -447,8 +447,7 @@ public class CoyoteAdapter implements Adapter {
             res.setNote(ADAPTER_NOTES, response);
 
             // Set query string encoding
-            req.getParameters().setQueryStringEncoding
-                (connector.getURIEncoding());
+            req.getParameters().setQueryStringEncoding(connector.getURIEncoding());
         }
 
         try {

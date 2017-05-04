@@ -590,8 +590,6 @@ public class FormAuthenticator
         }
 
         request.getCoyoteRequest().getParameters().recycle();
-        request.getCoyoteRequest().getParameters().setQueryStringEncoding(
-                request.getConnector().getURIEncoding());
 
         ByteChunk body = saved.getBody();
 

@@ -3188,13 +3188,14 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
                     parameters.setQueryStringEncoding(enc);
                 }
             } else {
-                parameters.setEncoding
-                    (org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
+                parameters.setEncoding(org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
                 if (useBodyEncodingForURI) {
-                    parameters.setQueryStringEncoding
-                        (org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
+                    parameters.setQueryStringEncoding(
+                            org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
                 }
             }
+            // Note: If !useBodyEncodingForURI, the query string encoding is
+            //       that set towards the start of CoyoyeAdapter.service()
 
             parameters.handleQueryParameters();
 
