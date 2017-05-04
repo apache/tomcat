@@ -1020,10 +1020,12 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
         Context context = getContext();
         if (context != null) {
             String encoding = context.getRequestCharacterEncoding();
-            try {
-                return B2CConverter.getCharset(encoding);
-            } catch (UnsupportedEncodingException e) {
-                // Ignore
+            if (encoding != null) {
+                try {
+                    return B2CConverter.getCharset(encoding);
+                } catch (UnsupportedEncodingException e) {
+                    // Ignore
+                }
             }
         }
 
