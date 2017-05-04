@@ -101,12 +101,6 @@ public class InputBuffer extends Reader
 
 
     /**
-     * Encoding to use.
-     */
-    private String enc;
-
-
-    /**
      * Current byte to char converter.
      */
     protected B2CConverter conv;
@@ -205,8 +199,6 @@ public class InputBuffer extends Reader
             encoders.get(conv.getCharset()).push(conv);
             conv = null;
         }
-
-        enc = null;
     }
 
 
@@ -550,13 +542,11 @@ public class InputBuffer extends Reader
 
 
     public void checkConverter() throws IOException {
-        if (conv == null) {
-            setConverter();
+        if (conv != null) {
+            return;
         }
-    }
 
-
-    private void setConverter() throws IOException {
+        String enc = null;
         if (coyoteRequest != null) {
             enc = coyoteRequest.getCharacterEncoding();
         }
