@@ -229,11 +229,6 @@ public final class Parameters {
     private final ByteChunk tmpValue=new ByteChunk();
     private final ByteChunk origName=new ByteChunk();
     private final ByteChunk origValue=new ByteChunk();
-    /**
-     * @deprecated This will be removed in Tomcat 9.0.x
-     */
-    @Deprecated
-    public static final String DEFAULT_ENCODING = "ISO-8859-1";
     private static final Charset DEFAULT_BODY_CHARSET = StandardCharsets.ISO_8859_1;
     private static final Charset DEFAULT_URI_CHARSET = StandardCharsets.UTF_8;
 
