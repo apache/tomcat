@@ -205,7 +205,9 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         while (state != State.COMPLETE) {
             byte[] header = new byte[9];
             ByteBuffer target = ByteBuffer.allocate(payloadSize);
-            target.put(pushedStreamIdBytes);
+            if (first) {
+                target.put(pushedStreamIdBytes);
+            }
             state = getHpackEncoder().encode(coyoteRequest.getMimeHeaders(), target);
             target.flip();
             if (state == State.COMPLETE || target.limit() > 0) {

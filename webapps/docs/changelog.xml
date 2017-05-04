@@ -130,6 +130,11 @@
         Do not include a <code>Date</code> header in HTTP/2 reponses with status
         codes less than 200. (markt)
       </fix>
+      <fix>
+        When sending an HTTP/2 push promise with the NIO2 connector, the pushed
+        stream ID should only be included with the initial push promise frame
+        and not any subsequent continuation frames. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
