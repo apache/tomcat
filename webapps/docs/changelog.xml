@@ -99,6 +99,10 @@
         custom error page located below <code>WEB-INF</code>, ensure that the
         target error page is displayed rather than a 404 response. (markt)
       </fix>
+      <add>
+        <bug>61047</bug>: Add MIME mapping for woff2 fonts in the default
+        web.xml. Patch provided by Justin Williamson. (violetagg)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
