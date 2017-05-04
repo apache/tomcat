@@ -49,11 +49,13 @@ class Stream extends AbstractStream implements HeaderEmitter {
     private static final int HEADER_STATE_REGULAR = 2;
     private static final int HEADER_STATE_TRAILER = 3;
 
-    private static final Response ACK_RESPONSE = new Response();
+    private static final MimeHeaders ACK_HEADERS;
 
     static {
-        ACK_RESPONSE.setStatus(100);
-        prepareHeaders(ACK_RESPONSE);
+        Response response =  new Response();
+        response.setStatus(100);
+        prepareHeaders(response);
+        ACK_HEADERS = response.getMimeHeaders();
     }
 
     private volatile int weight = Constants.DEFAULT_WEIGHT;
@@ -391,12 +393,12 @@ class Stream extends AbstractStream implements HeaderEmitter {
         prepareHeaders(coyoteResponse);
         boolean endOfStream = getOutputBuffer().hasNoBody();
         // TODO: Is 1k the optimal value?
-        handler.writeHeaders(this, coyoteResponse, endOfStream, 1024);
+        handler.writeHeaders(this, 0, coyoteResponse.getMimeHeaders(), endOfStream, 1024);
     }
 
     final void writeAck() throws IOException {
         // TODO: Is 64 too big? Just the status header with compression
-        handler.writeHeaders(this, ACK_RESPONSE, false, 64);
+        handler.writeHeaders(this, 0, ACK_HEADERS, false, 64);
     }
 
 

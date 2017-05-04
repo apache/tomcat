@@ -25,8 +25,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolException;
 import org.apache.coyote.Request;
-import org.apache.coyote.Response;
 import org.apache.coyote.http2.HpackEncoder.State;
+import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
 
@@ -133,31 +133,46 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
 
     @Override
-    void writeHeaders(Stream stream, Response coyoteResponse, boolean endOfStream, int payloadSize)
-            throws IOException {
+    void writeHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders,
+            boolean endOfStream, int payloadSize) throws IOException {
+
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId,
-                    stream.getIdentifier()));
+                    stream.getIdentifier(), Integer.valueOf(pushedStreamId),
+                    Boolean.valueOf(endOfStream)));
         }
 
         if (!stream.canWrite()) {
             return;
         }
 
+        byte[] pushedStreamIdBytes = null;
+        if (pushedStreamId > 0) {
+            pushedStreamIdBytes = new byte[4];
+            ByteUtil.set31Bits(pushedStreamIdBytes, 0, pushedStreamId);
+        }
+
         boolean first = true;
         State state = null;
         ArrayList<ByteBuffer> bufs = new ArrayList<>();
-        // This ensures the Stream processing thread has control of the socket.
+
         while (state != State.COMPLETE) {
             byte[] header = new byte[9];
-            ByteBuffer target = ByteBuffer.allocate(payloadSize);
-            state = getHpackEncoder().encode(coyoteResponse.getMimeHeaders(), target);
-            target.flip();
-            if (state == State.COMPLETE || target.limit() > 0) {
-                ByteUtil.setThreeBytes(header, 0, target.limit());
+            ByteBuffer payload = ByteBuffer.allocate(payloadSize);
+            if (first && pushedStreamIdBytes != null) {
+                payload.put(pushedStreamIdBytes);
+            }
+            state = getHpackEncoder().encode(mimeHeaders, payload);
+            payload.flip();
+            if (state == State.COMPLETE || payload.limit() > 0) {
+                ByteUtil.setThreeBytes(header, 0, payload.limit());
                 if (first) {
                     first = false;
-                    header[3] = FrameType.HEADERS.getIdByte();
+                    if (pushedStreamIdBytes == null) {
+                        header[3] = FrameType.HEADERS.getIdByte();
+                    } else {
+                        header[3] = FrameType.PUSH_PROMISE.getIdByte();
+                    }
                     if (endOfStream) {
                         header[4] = FLAG_END_OF_STREAM;
                     }
@@ -168,65 +183,11 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                     header[4] += FLAG_END_OF_HEADERS;
                 }
                 if (log.isDebugEnabled()) {
-                    log.debug(target.limit() + " bytes");
+                    log.debug(payload.limit() + " bytes");
                 }
                 ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
                 bufs.add(ByteBuffer.wrap(header));
-                bufs.add(target);
-            } else if (state == State.UNDERFLOW) {
-                payloadSize = payloadSize * 2;
-            }
-        }
-        socketWrapper.write(BlockingMode.SEMI_BLOCK, getWriteTimeout(), TimeUnit.MILLISECONDS,
-                null, SocketWrapperBase.COMPLETE_WRITE, applicationErrorCompletion,
-                bufs.toArray(BYTEBUFFER_ARRAY));
-        handleAsyncException();
-    }
-
-
-    @Override
-    protected void writePushHeaders(Stream stream, int pushedStreamId, Request coyoteRequest, int payloadSize)
-            throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.writePushHeaders", connectionId,
-                    stream.getIdentifier(), Integer.toString(pushedStreamId)));
-        }
-
-        if (!stream.canWrite()) {
-            return;
-        }
-
-        boolean first = true;
-        State state = null;
-        ArrayList<ByteBuffer> bufs = new ArrayList<>();
-        byte[] pushedStreamIdBytes = new byte[4];
-        ByteUtil.set31Bits(pushedStreamIdBytes, 0, pushedStreamId);
-        // This ensures the Stream processing thread has control of the socket.
-        while (state != State.COMPLETE) {
-            byte[] header = new byte[9];
-            ByteBuffer target = ByteBuffer.allocate(payloadSize);
-            if (first) {
-                target.put(pushedStreamIdBytes);
-            }
-            state = getHpackEncoder().encode(coyoteRequest.getMimeHeaders(), target);
-            target.flip();
-            if (state == State.COMPLETE || target.limit() > 0) {
-                ByteUtil.setThreeBytes(header, 0, target.limit());
-                if (first) {
-                    first = false;
-                    header[3] = FrameType.PUSH_PROMISE.getIdByte();
-                } else {
-                    header[3] = FrameType.CONTINUATION.getIdByte();
-                }
-                if (state == State.COMPLETE) {
-                    header[4] += FLAG_END_OF_HEADERS;
-                }
-                if (log.isDebugEnabled()) {
-                    log.debug(target.limit() + " bytes");
-                }
-                ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
-                bufs.add(ByteBuffer.wrap(header));
-                bufs.add(target);
+                bufs.add(payload);
             } else if (state == State.UNDERFLOW) {
                 payloadSize = payloadSize * 2;
             }
