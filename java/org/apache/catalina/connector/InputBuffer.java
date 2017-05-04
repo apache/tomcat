@@ -387,6 +387,12 @@ public class InputBuffer extends Reader
     // ------------------------------------------------- Chars Handling Methods
 
 
+    /**
+     * @param s     New encoding value
+     *
+     * @deprecated This method will be removed in Tomcat 9.0.x
+     */
+    @Deprecated
     public void setEncoding(String s) {
         enc = s;
     }
