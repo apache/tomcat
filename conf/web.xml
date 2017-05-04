@@ -4304,6 +4304,10 @@
         <mime-type>application/x-font-woff</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>woff2</extension>
+        <mime-type>font/woff2</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>wpd</extension>
         <mime-type>application/vnd.wordperfect</mime-type>
     </mime-mapping>
