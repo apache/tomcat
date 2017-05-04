@@ -994,10 +994,12 @@ public class Request implements HttpServletRequest {
         Context context = getContext();
         if (context != null) {
             String encoding = context.getRequestCharacterEncoding();
-            try {
-                return B2CConverter.getCharset(encoding);
-            } catch (UnsupportedEncodingException e) {
-                // Ignore
+            if (encoding != null) {
+                try {
+                    return B2CConverter.getCharset(encoding);
+                } catch (UnsupportedEncodingException e) {
+                    // Ignore
+                }
             }
         }
 
