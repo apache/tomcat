@@ -33,6 +33,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.coyote.Constants;
 import org.apache.tomcat.util.buf.B2CConverter;
@@ -243,10 +244,6 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                 } else if (nameParts[2].equals("UNESCAPED")) {
                     requiredParts = 3;
                     if (queryString != null) {
-                        // Use default as a last resort
-                        String queryStringEncoding =
-                            Constants.DEFAULT_CHARACTER_ENCODING;
-                
                         String uriEncoding = null;
                         boolean useBodyEncodingForURI = false;
                 
@@ -254,24 +251,25 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                         // possible
                         String requestEncoding = req.getCharacterEncoding();
                         if (req instanceof Request) {
-                            uriEncoding =
-                                ((Request)req).getConnector().getURIEncoding();
-                            useBodyEncodingForURI = ((Request)req)
-                                    .getConnector().getUseBodyEncodingForURI();
+                            Connector connector =  ((Request)req).getConnector();
+                            uriEncoding = connector.getURIEncoding();
+                            useBodyEncodingForURI = connector.getUseBodyEncodingForURI();
                         }
                 
+                        String queryStringEncoding;
+
                         // If valid, apply settings from request / connector
-                        if (uriEncoding != null) {
+                        if (useBodyEncodingForURI && requestEncoding != null) {
+                            queryStringEncoding = requestEncoding;
+                        } else if (uriEncoding != null) {
                             queryStringEncoding = uriEncoding;
-                        } else if(useBodyEncodingForURI) {
-                            if (requestEncoding != null) {
-                                queryStringEncoding = requestEncoding;
-                            }
+                        } else {
+                            // Use default as a last resort
+                            queryStringEncoding = Constants.DEFAULT_CHARACTER_ENCODING;
                         }
                 
                         try {
-                            retVal = URLDecoder.decode(queryString,
-                                    queryStringEncoding);                       
+                            retVal = URLDecoder.decode(queryString, queryStringEncoding);
                         } catch (UnsupportedEncodingException e) {
                             retVal = queryString;
                         }
