@@ -153,7 +153,7 @@
         repository. (markt)
       </add>
       <scode>
-        Review i18n property files, remove unencessary escaping and consistently
+        Review i18n property files, remove unnecessary escaping and consistently
         use <code>[...]</code> to delimit inserted values. (markt)
       </scode>
     </changelog>
