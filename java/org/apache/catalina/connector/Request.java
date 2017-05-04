@@ -24,6 +24,7 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1385,9 +1386,9 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
         if (context.getDispatchersUseEncodedPaths()) {
             if (pos >= 0) {
                 relative = URLEncoder.DEFAULT.encode(
-                        requestPath.substring(0, pos + 1), "UTF-8") + path;
+                        requestPath.substring(0, pos + 1), StandardCharsets.UTF_8) + path;
             } else {
-                relative = URLEncoder.DEFAULT.encode(requestPath, "UTF-8") + path;
+                relative = URLEncoder.DEFAULT.encode(requestPath, StandardCharsets.UTF_8) + path;
             }
         } else {
             if (pos >= 0) {

@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -423,10 +424,11 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
                 StringBuilder tmp = new StringBuilder();
                 tmp.append("path=");
-                tmp.append(URLEncoder.DEFAULT.encode(displayPath, "UTF-8"));
+                tmp.append(URLEncoder.DEFAULT.encode(displayPath, StandardCharsets.UTF_8));
                 if (ctxt.getWebappVersion().length() > 0) {
                     tmp.append("&version=");
-                    tmp.append(URLEncoder.DEFAULT.encode(ctxt.getWebappVersion(), "UTF-8"));
+                    tmp.append(URLEncoder.DEFAULT.encode(
+                            ctxt.getWebappVersion(), StandardCharsets.UTF_8));
                 }
                 String pathVersion = tmp.toString();
 
@@ -438,7 +440,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 }
 
                 args = new Object[7];
-                args[0] = "<a href=\"" + URLEncoder.DEFAULT.encode(contextPath + "/", "UTF-8") +
+                args[0] = "<a href=\"" +
+                        URLEncoder.DEFAULT.encode(contextPath + "/", StandardCharsets.UTF_8) +
                         "\">" + RequestUtil.filter(displayPath) + "</a>";
                 if ("".equals(ctxt.getWebappVersion())) {
                     args[1] = noVersion;

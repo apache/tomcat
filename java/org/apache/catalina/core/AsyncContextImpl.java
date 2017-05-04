@@ -17,6 +17,7 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -164,7 +165,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             path += pathInfo;
         }
         if (this.context.getDispatchersUseEncodedPaths()) {
-            path = URLEncoder.DEFAULT.encode(path, "UTF-8");
+            path = URLEncoder.DEFAULT.encode(path, StandardCharsets.UTF_8);
         }
         dispatch(path);
     }

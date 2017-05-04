@@ -22,6 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -487,7 +488,7 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
 
         mappingData.recycle();
 
-        String encodedUri = URLEncoder.DEFAULT.encode(uriCC.toString(), "UTF-8");
+        String encodedUri = URLEncoder.DEFAULT.encode(uriCC.toString(), StandardCharsets.UTF_8);
 
         // Construct a RequestDispatcher to process this request
         return new ApplicationDispatcher(wrapper, encodedUri, wrapperPath, pathInfo,

@@ -51,7 +51,7 @@ public class Substitution {
                 //       We might want to consider providing a dedicated decoder
                 //       with an option to add additional safe characters to
                 //       provide users with more flexibility
-                return URLEncoder.DEFAULT.encode(result, resolver.getUriEncoding());
+                return URLEncoder.DEFAULT.encode(result, resolver.getUriCharset());
             } else {
                 return result;
             }

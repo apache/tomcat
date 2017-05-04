@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.valves.rewrite;
 
+import java.nio.charset.Charset;
 import java.util.Calendar;
 
 import org.apache.catalina.WebResource;
@@ -178,7 +179,13 @@ public class ResolverImpl extends Resolver {
     }
 
     @Override
+    @Deprecated
     public String getUriEncoding() {
         return request.getConnector().getURIEncoding();
+    }
+
+    @Override
+    public Charset getUriCharset() {
+        return request.getConnector().getURICharset();
     }
 }

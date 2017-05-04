@@ -17,6 +17,7 @@
 package org.apache.catalina.ssi;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -279,7 +280,7 @@ public class SSIMediator {
     protected String encode(String value, String encoding) {
         String retVal = null;
         if (encoding.equalsIgnoreCase("url")) {
-            retVal = URLEncoder.DEFAULT.encode(value, "UTF-8");
+            retVal = URLEncoder.DEFAULT.encode(value, StandardCharsets.UTF_8);
         } else if (encoding.equalsIgnoreCase("none")) {
             retVal = value;
         } else if (encoding.equalsIgnoreCase("entity")) {
