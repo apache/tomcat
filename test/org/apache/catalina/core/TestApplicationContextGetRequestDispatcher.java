@@ -488,7 +488,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
                 int lastSlash = target.lastIndexOf('/');
                 target = target.substring(0, lastSlash + 1);
                 if (encodePath) {
-                    target = URLEncoder.DEFAULT.encode(target, "UTF-8");
+                    target = URLEncoder.DEFAULT.encode(target, StandardCharsets.UTF_8);
                 }
                 target += dispatchPath;
             }

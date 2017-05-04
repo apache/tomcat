@@ -32,6 +32,7 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -704,7 +705,7 @@ public class DefaultServlet extends HttpServlet {
      * @return the rewritten path
      */
     protected String rewriteUrl(String path) {
-        return URLEncoder.DEFAULT.encode(path, "UTF-8");
+        return URLEncoder.DEFAULT.encode(path, StandardCharsets.UTF_8);
     }
 
 
