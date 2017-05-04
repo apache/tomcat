@@ -103,12 +103,6 @@ public class OutputBuffer extends Writer {
 
 
     /**
-     * Encoding to use.
-     */
-    private String enc;
-
-
-    /**
      * Current char to byte converter.
      */
     protected C2BConverter conv;
@@ -204,8 +198,6 @@ public class OutputBuffer extends Writer {
             conv.recycle();
             conv = null;
         }
-
-        enc = null;
     }
 
 
@@ -530,13 +522,11 @@ public class OutputBuffer extends Writer {
 
 
     public void checkConverter() throws IOException {
-        if (conv == null) {
-            setConverter();
+        if (conv != null) {
+            return;
         }
-    }
 
-
-    private void setConverter() throws IOException {
+        String enc = null;
 
         if (coyoteResponse != null) {
             enc = coyoteResponse.getCharacterEncoding();
@@ -631,7 +621,6 @@ public class OutputBuffer extends Writer {
                 conv.recycle();
             }
             conv = null;
-            enc = null;
         }
         initial = true;
     }
