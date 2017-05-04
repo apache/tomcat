@@ -2826,8 +2826,7 @@ public class Request implements HttpServletRequest {
                         String name = part.getName();
                         String value = null;
                         try {
-                            Charset paramCharset = parameters.getCharset();
-                            value = part.getString(paramCharset.name());
+                            value = part.getString(charset.name());
                         } catch (UnsupportedEncodingException uee) {
                             // Not possible
                         }
