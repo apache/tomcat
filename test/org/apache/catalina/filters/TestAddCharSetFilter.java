@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -119,8 +120,8 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
 
         List<String> ctHeaders = headers.get("Content-Type");
         assertEquals(1, ctHeaders.size());
-        String ct = ctHeaders.get(0);
-        assertEquals("text/plain;charset=" + expected, ct);
+        String ct = ctHeaders.get(0).toLowerCase(Locale.ENGLISH);
+        assertEquals("text/plain;charset=" + expected.toLowerCase(Locale.ENGLISH), ct);
     }
 
     private static class CharsetServlet extends HttpServlet {
