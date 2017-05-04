@@ -164,7 +164,7 @@
       <fix>
         <bug>61003</bug>: Ensure the flags for reading/writing in
         <code>o.a.t.websocket.AsyncChannelWrapperSecure</code> are correctly
-        reset even if some exceptions occurred during processing. (violetagg)
+        reset even if some exceptions occurred during processing. (markt/violetagg)
       </fix>
     </changelog>
   </subsection>
