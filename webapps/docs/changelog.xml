@@ -110,6 +110,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>61003</bug>: Ensure the flags for reading/writing in
+        <code>o.a.t.websocket.AsyncChannelWrapperSecure</code> are correctly
+        reset even if some exceptions occurred during processing. (markt/violetagg)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>

@@ -236,6 +236,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             "asyncChannelWrapperSecure.wrongStateWrite")));
                 }
             } catch (Exception e) {
+                writing.set(false);
                 future.fail(e);
             }
         }
@@ -335,6 +336,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             "asyncChannelWrapperSecure.wrongStateRead")));
                 }
             } catch (Exception e) {
+                reading.set(false);
                 future.fail(e);
             }
         }
