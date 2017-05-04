@@ -173,9 +173,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
     }
 
+
     protected PingManager getPingManager() {
         return new PingManager();
     }
+
 
     @Override
     public void init(WebConnection webConnection) {
@@ -253,6 +255,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             processStreamOnContainerThread(stream);
         }
     }
+
 
     private void processStreamOnContainerThread(Stream stream) {
         StreamProcessor streamProcessor = new StreamProcessor(this, stream, adapter, socketWrapper);
