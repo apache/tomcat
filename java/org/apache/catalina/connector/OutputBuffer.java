@@ -529,17 +529,6 @@ public class OutputBuffer extends Writer {
     }
 
 
-    /**
-     * @param s     New encoding value
-     *
-     * @deprecated This method will be removed in Tomcat 9.0.x
-     */
-    @Deprecated
-    public void setEncoding(String s) {
-        enc = s;
-    }
-
-
     public void checkConverter() throws IOException {
         if (conv == null) {
             setConverter();
