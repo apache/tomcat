@@ -21,6 +21,8 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -878,19 +880,19 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         // - To add to the fun, the URI default changed in Servlet 4.0 to UTF-8
 
         String encoding = getCharacterEncoding();
-        // No need to process null value, as ISO-8859-1 is the default encoding
-        // in MessageBytes.toBytes().
+        Charset charset = null;
         if (encoding != null) {
             try {
-                queryMB.setCharset(B2CConverter.getCharset(encoding));
-            } catch (UnsupportedEncodingException ignored) {
+                charset = B2CConverter.getCharset(encoding);
+                queryMB.setCharset(charset);
+            } catch (UnsupportedEncodingException e) {
                 // Fall-back to default (ISO-8859-1)
-                encoding = null;
+                charset = StandardCharsets.ISO_8859_1;
             }
         }
 
         paramParser.setQuery(queryMB);
-        paramParser.setQueryStringEncoding(encoding);
+        paramParser.setQueryStringCharset(charset);
         paramParser.handleQueryParameters();
 
         // Insert the additional parameters from the dispatch target

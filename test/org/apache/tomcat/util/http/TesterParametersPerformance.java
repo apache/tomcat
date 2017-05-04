@@ -53,7 +53,7 @@ public class TesterParametersPerformance {
 
         byte[] params = createParams(input, size);
         //byte[] input = createParams(8);
-        p.setEncoding("ISO-8859-1");
+        p.setCharset(StandardCharsets.ISO_8859_1);
         long start = System.nanoTime();
         p.processParameters(params, 0, params.length);
         return System.nanoTime() - start;

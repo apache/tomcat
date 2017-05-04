@@ -60,8 +60,8 @@ public final class Parameters {
     private UDecoder urlDec;
     private final MessageBytes decodedQuery = MessageBytes.newInstance();
 
-    private String encoding=null;
-    private String queryStringEncoding=null;
+    private Charset charset = StandardCharsets.ISO_8859_1;
+    private Charset queryStringCharset = StandardCharsets.UTF_8;
 
     private int limit = -1;
     private int parameterCount = 0;
@@ -84,21 +84,58 @@ public final class Parameters {
         this.limit = limit;
     }
 
+    /**
+     * @return The current encoding
+     *
+     * @deprecated This method will be removed in Tomcat 9.0.x
+     */
+    @Deprecated
     public String getEncoding() {
-        return encoding;
+        return charset.name();
     }
 
-    public void setEncoding( String s ) {
-        encoding=s;
+    public Charset getCharset() {
+        return charset;
+    }
+
+    /**
+     * @param s The new encoding
+     *
+     * @deprecated This method will be removed in Tomcat 9.0.x
+     */
+    @Deprecated
+    public void setEncoding(String s) {
+        setCharset(getCharset(s, DEFAULT_BODY_CHARSET));
+    }
+
+    public void setCharset(Charset charset) {
+        if (charset == null) {
+            charset = DEFAULT_BODY_CHARSET;
+        }
+        this.charset = charset;
         if(log.isDebugEnabled()) {
-            log.debug( "Set encoding to " + s );
+            log.debug("Set encoding to " + charset.name());
         }
     }
 
-    public void setQueryStringEncoding( String s ) {
-        queryStringEncoding=s;
+    /**
+     * @param s The new query string encoding
+     *
+     * @deprecated This method will be removed in Tomcat 9
+     */
+    @Deprecated
+    public void setQueryStringEncoding(String s) {
+        setQueryStringCharset(getCharset(s, DEFAULT_URI_CHARSET));
+    }
+
+    public void setQueryStringCharset(Charset queryStringCharset) {
+        if (queryStringCharset == null) {
+            queryStringCharset = DEFAULT_URI_CHARSET;
+        }
+        this.queryStringCharset = queryStringCharset;
+
         if(log.isDebugEnabled()) {
-            log.debug( "Set query string encoding to " + s );
+            log.debug("Set query string encoding to " + queryStringCharset.name());
         }
     }
 
@@ -123,8 +160,8 @@ public final class Parameters {
     public void recycle() {
         parameterCount = 0;
         paramHashValues.clear();
-        didQueryParameters=false;
-        encoding=null;
+        didQueryParameters = false;
+        charset = null;
         decodedQuery.recycle();
         parseFailedReason = null;
     }
@@ -165,28 +202,27 @@ public final class Parameters {
     /** Process the query string into parameters
      */
     public void handleQueryParameters() {
-        if( didQueryParameters ) {
+        if (didQueryParameters) {
             return;
         }
 
-        didQueryParameters=true;
+        didQueryParameters = true;
 
-        if( queryMB==null || queryMB.isNull() ) {
+        if (queryMB == null || queryMB.isNull()) {
             return;
         }
 
         if(log.isDebugEnabled()) {
-            log.debug("Decoding query " + decodedQuery + " " +
-                    queryStringEncoding);
+            log.debug("Decoding query " + decodedQuery + " " + queryStringCharset.name());
         }
 
         try {
-            decodedQuery.duplicate( queryMB );
+            decodedQuery.duplicate(queryMB);
         } catch (IOException e) {
             // Can't happen, as decodedQuery can't overflow
             e.printStackTrace();
         }
-        processParameters( decodedQuery, queryStringEncoding );
+        processParameters(decodedQuery, queryStringCharset);
     }
 
 
@@ -226,20 +262,19 @@ public final class Parameters {
     private final ByteChunk origName=new ByteChunk();
     private final ByteChunk origValue=new ByteChunk();
     public static final String DEFAULT_ENCODING = "ISO-8859-1";
-    private static final Charset DEFAULT_CHARSET =
-            StandardCharsets.ISO_8859_1;
+    private static final Charset DEFAULT_BODY_CHARSET = StandardCharsets.ISO_8859_1;
+    private static final Charset DEFAULT_URI_CHARSET = StandardCharsets.UTF_8;
 
 
     public void processParameters( byte bytes[], int start, int len ) {
-        processParameters(bytes, start, len, getCharset(encoding));
+        processParameters(bytes, start, len, charset);
     }
 
-    private void processParameters(byte bytes[], int start, int len,
-                                  Charset charset) {
+    private void processParameters(byte bytes[], int start, int len, Charset charset) {
 
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("parameters.bytes",
-                    new String(bytes, start, len, DEFAULT_CHARSET)));
+                    new String(bytes, start, len, DEFAULT_BODY_CHARSET)));
         }
 
         int decodeFailCount = 0;
@@ -309,8 +344,7 @@ public final class Parameters {
             if (log.isDebugEnabled() && valueStart == -1) {
                 log.debug(sm.getString("parameters.noequal",
                         Integer.valueOf(nameStart), Integer.valueOf(nameEnd),
-                        new String(bytes, nameStart, nameEnd-nameStart,
-                                DEFAULT_CHARSET)));
+                        new String(bytes, nameStart, nameEnd-nameStart, DEFAULT_BODY_CHARSET)));
             }
 
             if (nameEnd <= nameStart ) {
@@ -327,8 +361,8 @@ public final class Parameters {
                 if (logMode != null) {
                     String extract;
                     if (valueEnd > nameStart) {
-                        extract = new String(bytes, nameStart, valueEnd
-                                - nameStart, DEFAULT_CHARSET);
+                        extract = new String(bytes, nameStart, valueEnd - nameStart,
+                                DEFAULT_BODY_CHARSET);
                     } else {
                         extract = "";
                     }
@@ -482,7 +516,18 @@ public final class Parameters {
         urlDec.convert(bc, true);
     }
 
-    public void processParameters( MessageBytes data, String encoding ) {
+    /**
+     * @param data      Parameter data
+     * @param encoding  Encoding to use for encoded bytes
+     *
+     * @deprecated This method will be removed in Tomcat 9.0.x
+     */
+    @Deprecated
+    public void processParameters(MessageBytes data, String encoding) {
+        processParameters(data, getCharset(encoding, DEFAULT_BODY_CHARSET));
+    }
+
+    public void processParameters(MessageBytes data, Charset charset) {
         if( data==null || data.isNull() || data.getLength() <= 0 ) {
             return;
         }
@@ -491,18 +536,17 @@ public final class Parameters {
             data.toBytes();
         }
         ByteChunk bc=data.getByteChunk();
-        processParameters( bc.getBytes(), bc.getOffset(),
-                           bc.getLength(), getCharset(encoding));
+        processParameters(bc.getBytes(), bc.getOffset(), bc.getLength(), charset);
     }
 
-    private Charset getCharset(String encoding) {
+    private Charset getCharset(String encoding, Charset defaultCharset) {
         if (encoding == null) {
-            return DEFAULT_CHARSET;
+            return defaultCharset;
         }
         try {
             return B2CConverter.getCharset(encoding);
         } catch (UnsupportedEncodingException e) {
-            return DEFAULT_CHARSET;
+            return defaultCharset;
         }
     }
 
