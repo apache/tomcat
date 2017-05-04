@@ -566,15 +566,20 @@ public class InputBuffer extends Reader
             return;
         }
 
+        Charset charset = null;
+
         if (coyoteRequest != null) {
-            enc = coyoteRequest.getCharacterEncoding();
+            charset = coyoteRequest.getCharset();
         }
 
-        if (enc == null) {
-            enc = org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
+        if (charset == null) {
+            if (enc == null) {
+                charset = org.apache.coyote.Constants.DEFAULT_BODY_CHARSET;
+            } else {
+                charset = B2CConverter.getCharset(enc);
+            }
         }
 
-        Charset charset = B2CConverter.getCharset(enc);
         SynchronizedStack<B2CConverter> stack = encoders.get(charset);
         if (stack == null) {
             stack = new SynchronizedStack<>();

@@ -559,15 +559,20 @@ public class OutputBuffer extends Writer {
             return;
         }
 
+        Charset charset = null;
+
         if (coyoteResponse != null) {
-            enc = coyoteResponse.getCharacterEncoding();
+            charset = coyoteResponse.getCharset();
         }
 
-        if (enc == null) {
-            enc = org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING;
+        if (charset == null) {
+            if (enc == null) {
+                charset = org.apache.coyote.Constants.DEFAULT_BODY_CHARSET;
+            } else {
+                charset = getCharset(enc);
+            }
         }
 
-        final Charset charset = getCharset(enc);
         conv = encoders.get(charset);
 
         if (conv == null) {

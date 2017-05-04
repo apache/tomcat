@@ -997,14 +997,17 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
      */
     @Override
     public String getCharacterEncoding() {
-        String result = coyoteRequest.getCharacterEncoding();
-        if (result == null) {
-            Context context = getContext();
-            if (context != null) {
-                result =  context.getRequestCharacterEncoding();
-            }
+        Charset charset = coyoteRequest.getCharset();
+        if (charset != null) {
+            return charset.name();
         }
-        return result;
+
+        Context context = getContext();
+        if (context != null) {
+            return context.getRequestCharacterEncoding();
+        }
+
+        return null;
     }
 
 
@@ -1617,18 +1620,17 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
      * @since Servlet 2.3
      */
     @Override
-    public void setCharacterEncoding(String enc)
-        throws UnsupportedEncodingException {
+    public void setCharacterEncoding(String enc) throws UnsupportedEncodingException {
 
         if (usingReader) {
             return;
         }
 
         // Confirm that the encoding name is valid
-        B2CConverter.getCharset(enc);
+        Charset charset = B2CConverter.getCharset(enc);
 
         // Save the validated encoding
-        coyoteRequest.setCharacterEncoding(enc);
+        coyoteRequest.setCharset(charset);
     }
 
 
@@ -3188,10 +3190,10 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
                     parameters.setQueryStringEncoding(enc);
                 }
             } else {
-                parameters.setEncoding(org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
+                parameters.setEncoding(org.apache.coyote.Constants.DEFAULT_BODY_CHARSET.name());
                 if (useBodyEncodingForURI) {
                     parameters.setQueryStringEncoding(
-                            org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
+                            org.apache.coyote.Constants.DEFAULT_BODY_CHARSET.name());
                 }
             }
             // Note: If !useBodyEncodingForURI, the query string encoding is

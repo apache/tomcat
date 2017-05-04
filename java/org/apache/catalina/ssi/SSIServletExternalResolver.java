@@ -18,10 +18,9 @@ package org.apache.catalina.ssi;
 
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
@@ -37,6 +36,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.coyote.Constants;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.RequestUtil;
 
 /**
@@ -244,35 +244,32 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                 } else if (nameParts[2].equals("UNESCAPED")) {
                     requiredParts = 3;
                     if (queryString != null) {
-                        String uriEncoding = null;
+                        Charset uriCharset = null;
+                        Charset requestCharset = null;
                         boolean useBodyEncodingForURI = false;
 
                         // Get encoding settings from request / connector if
                         // possible
-                        String requestEncoding = req.getCharacterEncoding();
                         if (req instanceof Request) {
+                            requestCharset = ((Request)req).getCoyoteRequest().getCharset();
                             Connector connector =  ((Request)req).getConnector();
-                            uriEncoding = connector.getURIEncoding();
+                            uriCharset = connector.getURICharset();
                             useBodyEncodingForURI = connector.getUseBodyEncodingForURI();
                         }
 
-                        String queryStringEncoding;
+                        Charset queryStringCharset;
 
                         // If valid, apply settings from request / connector
-                        if (useBodyEncodingForURI && requestEncoding != null) {
-                            queryStringEncoding = requestEncoding;
-                        } else if (uriEncoding != null) {
-                            queryStringEncoding = uriEncoding;
+                        if (useBodyEncodingForURI && requestCharset != null) {
+                            queryStringCharset = requestCharset;
+                        } else if (uriCharset != null) {
+                            queryStringCharset = uriCharset;
                         } else {
                             // Use default as a last resort
-                            queryStringEncoding = Constants.DEFAULT_CHARACTER_ENCODING;
+                            queryStringCharset = Constants.DEFAULT_URI_CHARSET;
                         }
 
-                        try {
-                            retVal = URLDecoder.decode(queryString, queryStringEncoding);
-                        } catch (UnsupportedEncodingException e) {
-                            retVal = queryString;
-                        }
+                        retVal = UDecoder.URLDecode(queryString, queryStringCharset);
                     }
                 }
             }
