@@ -1011,6 +1011,26 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
     }
 
 
+    private Charset getCharset() {
+        Charset charset = coyoteRequest.getCharset();
+        if (charset != null) {
+            return charset;
+        }
+
+        Context context = getContext();
+        if (context != null) {
+            String encoding = context.getRequestCharacterEncoding();
+            try {
+                return B2CConverter.getCharset(encoding);
+            } catch (UnsupportedEncodingException e) {
+                // Ignore
+            }
+        }
+
+        return org.apache.coyote.Constants.DEFAULT_BODY_CHARSET;
+    }
+
+
     /**
      * @return the content length for this Request.
      */
@@ -2850,15 +2870,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
                         upload.parseRequest(new ServletRequestContext(this));
                 int maxPostSize = getConnector().getMaxPostSize();
                 int postSize = 0;
-                String enc = getCharacterEncoding();
-                Charset charset = null;
-                if (enc != null) {
-                    try {
-                        charset = B2CConverter.getCharset(enc);
-                    } catch (UnsupportedEncodingException e) {
-                        // Ignore
-                    }
-                }
+                Charset charset = getCharset();
                 for (FileItem item : items) {
                     ApplicationPart part = new ApplicationPart(item, location);
                     parts.add(part);
@@ -2866,31 +2878,15 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
                         String name = part.getName();
                         String value = null;
                         try {
-                            String encoding = parameters.getEncoding();
-                            if (encoding == null) {
-                                if (enc == null) {
-                                    encoding = Parameters.DEFAULT_ENCODING;
-                                } else {
-                                    encoding = enc;
-                                }
-                            }
-                            value = part.getString(encoding);
+                            Charset paramCharset = parameters.getCharset();
+                            value = part.getString(paramCharset.name());
                         } catch (UnsupportedEncodingException uee) {
-                            try {
-                                value = part.getString(Parameters.DEFAULT_ENCODING);
-                            } catch (UnsupportedEncodingException e) {
-                                // Should not be possible
-                            }
+                            // Not possible
                         }
                         if (maxPostSize >= 0) {
                             // Have to calculate equivalent size. Not completely
                             // accurate but close enough.
-                            if (charset == null) {
-                                // Name length
-                                postSize += name.getBytes().length;
-                            } else {
-                                postSize += name.getBytes(charset).length;
-                            }
+                            postSize += name.getBytes(charset).length;
                             if (value != null) {
                                 // Equals sign
                                 postSize++;
@@ -3181,20 +3177,12 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
 
             // getCharacterEncoding() may have been overridden to search for
             // hidden form field containing request encoding
-            String enc = getCharacterEncoding();
+            Charset charset = getCharset();
 
             boolean useBodyEncodingForURI = connector.getUseBodyEncodingForURI();
-            if (enc != null) {
-                parameters.setEncoding(enc);
-                if (useBodyEncodingForURI) {
-                    parameters.setQueryStringEncoding(enc);
-                }
-            } else {
-                parameters.setEncoding(org.apache.coyote.Constants.DEFAULT_BODY_CHARSET.name());
-                if (useBodyEncodingForURI) {
-                    parameters.setQueryStringEncoding(
-                            org.apache.coyote.Constants.DEFAULT_BODY_CHARSET.name());
-                }
+            parameters.setCharset(charset);
+            if (useBodyEncodingForURI) {
+                parameters.setQueryStringCharset(charset);
             }
             // Note: If !useBodyEncodingForURI, the query string encoding is
             //       that set towards the start of CoyoyeAdapter.service()
