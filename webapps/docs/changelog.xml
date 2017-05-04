@@ -108,6 +108,10 @@
         Update the Servlet 4.0 implementation to add support for obtaining
         trailer fields from chunked HTTP requests. (markt)
       </update>
+      <add>
+        <bug>61047</bug>: Add MIME mapping for woff2 fonts in the default
+        web.xml. Patch provided by Justin Williamson. (violetagg)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
