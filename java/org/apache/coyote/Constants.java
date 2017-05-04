@@ -26,12 +26,6 @@ import java.nio.charset.StandardCharsets;
  */
 public final class Constants {
 
-    /**
-     * @deprecated This will be removed in Tomcat 9.0.x onwards.
-     */
-    @Deprecated
-    public static final String DEFAULT_CHARACTER_ENCODING="ISO-8859-1";
-
     public static final Charset DEFAULT_URI_CHARSET = StandardCharsets.UTF_8;
     public static final Charset DEFAULT_BODY_CHARSET = StandardCharsets.ISO_8859_1;
 

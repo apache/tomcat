@@ -284,32 +284,13 @@ public final class Request {
         this.localPort = port;
     }
 
+
     // -------------------- encoding/type --------------------
 
-
     /**
      * Get the character encoding used for this request.
      *
-     * @return The value set via {@link #setCharacterEncoding(String)} or if no
-     *         call has been made to that method try to obtain if from the
-     *         content type.
-     *
-     * @deprecated This method will be removed in Tomcat 9.0.x
-     */
-    @Deprecated
-    public String getCharacterEncoding() {
-        Charset charset = getCharset();
-        if (charset == null) {
-            return null;
-        }
-        return charset.name();
-    }
-
-
-    /**
-     * Get the character encoding used for this request.
-     *
-     * @return The value set via {@link #setCharacterEncoding(String)} or if no
+     * @return The value set via {@link #setCharset(Charset)} or if no
      *         call has been made to that method try to obtain if from the
      *         content type.
      */
@@ -324,22 +305,10 @@ public final class Request {
     }
 
 
-    /**
-     * @param enc The new encoding
-     *
-     * @throws UnsupportedEncodingException If the encoding is invalid
-     *
-     * @deprecated This method will be removed in Tomcat 9.0.x
-     */
-    @Deprecated
-    public void setCharacterEncoding(String enc) throws UnsupportedEncodingException {
-        setCharset(B2CConverter.getCharset(enc));
-    }
-
-
     public void setCharset(Charset charset) {
         this.charset = charset;
     }
+
 
     public void setContentLength(long len) {
         this.contentLength = len;
