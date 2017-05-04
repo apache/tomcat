@@ -562,13 +562,10 @@ public class InputBuffer extends Reader
 
 
     public void checkConverter() throws IOException {
-        if (conv == null) {
-            setConverter();
+        if (conv != null) {
+            return;
         }
-    }
 
-
-    private void setConverter() throws IOException {
         if (coyoteRequest != null) {
             enc = coyoteRequest.getCharacterEncoding();
         }

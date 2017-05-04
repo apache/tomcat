@@ -555,13 +555,9 @@ public class OutputBuffer extends Writer {
 
 
     public void checkConverter() throws IOException {
-        if (conv == null) {
-            setConverter();
+        if (conv != null) {
+            return;
         }
-    }
-
-
-    private void setConverter() throws IOException {
 
         if (coyoteResponse != null) {
             enc = coyoteResponse.getCharacterEncoding();
