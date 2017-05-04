@@ -36,13 +36,5 @@ public abstract class Resolver {
 
     public abstract boolean resolveResource(int type, String name);
 
-    /**
-     * @return The name of the encoding to use to %nn encode URIs
-     *
-     * @deprecated This will be removed in Tomcat 9.0.x
-     */
-    @Deprecated
-    public abstract String getUriEncoding();
-
     public abstract Charset getUriCharset();
 }

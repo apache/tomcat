@@ -19,11 +19,8 @@ package org.apache.catalina.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.BitSet;
-
-import org.apache.tomcat.util.buf.B2CConverter;
 
 /**
  *
@@ -127,28 +124,6 @@ public class URLEncoder {
 
     public void setEncodeSpaceAsPlus(boolean encodeSpaceAsPlus) {
         this.encodeSpaceAsPlus = encodeSpaceAsPlus;
-    }
-
-
-    /**
-     * URL encodes the provided path using the given encoding.
-     *
-     * @param path      The path to encode
-     * @param encoding  The encoding to use to convert the path to bytes
-     *
-     * @return The encoded path
-     *
-     * @deprecated This will be removed in Tomcat 9.0.x
-     */
-    @Deprecated
-    public String encode(String path, String encoding) {
-        Charset charset;
-        try {
-            charset = B2CConverter.getCharset(encoding);
-        } catch (UnsupportedEncodingException e) {
-            charset = Charset.defaultCharset();
-        }
-        return encode(path, charset);
     }
 
 
