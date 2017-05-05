@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M22 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>61072</bug>: Respect the documentation statements that allow
+        using the platform default secure random for session id generation.
+        (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M21 (markt)" rtext="release in progress">
   <subsection name="General">
