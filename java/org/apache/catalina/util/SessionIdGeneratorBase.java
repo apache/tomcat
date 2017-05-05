@@ -198,6 +198,7 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase
             }
         }
 
+        boolean error = false;
         if (result == null) {
             // No secureRandomClass or creation failed. Use SecureRandom.
             try {
@@ -210,15 +211,17 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase
                     result = SecureRandom.getInstance(secureRandomAlgorithm);
                 }
             } catch (NoSuchAlgorithmException e) {
+                error = true;
                 log.error(sm.getString("sessionIdGeneratorBase.randomAlgorithm",
                         secureRandomAlgorithm), e);
             } catch (NoSuchProviderException e) {
+                error = true;
                 log.error(sm.getString("sessionIdGeneratorBase.randomProvider",
                         secureRandomProvider), e);
             }
         }
 
-        if (result == null) {
+        if (result == null && error) {
             // Invalid provider / algorithm
             try {
                 result = SecureRandom.getInstance("SHA1PRNG");
