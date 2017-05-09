@@ -79,7 +79,7 @@ public class WsHandshakeRequest implements HandshakeRequest {
         for (Entry<String,String> entry : pathParams.entrySet()) {
             newParameters.put(entry.getKey(),
                     Collections.unmodifiableList(
-                            Arrays.asList(entry.getValue())));
+                            Collections.singletonList(entry.getValue())));
         }
         parameterMap = Collections.unmodifiableMap(newParameters);
 
