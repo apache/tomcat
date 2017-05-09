@@ -57,6 +57,6 @@ public class AjpAprProtocol extends AbstractAjpProtocol<Long> {
 
     @Override
     protected String getNamePrefix() {
-        return ("ajp-apr");
+        return "ajp-apr";
     }
 }

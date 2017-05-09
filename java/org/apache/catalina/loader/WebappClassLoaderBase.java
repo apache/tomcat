@@ -461,9 +461,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      *   the parent first. The default in Tomcat is <code>false</code>.
      */
     public boolean getDelegate() {
-
-        return (this.delegate);
-
+        return this.delegate;
     }
 
 
@@ -557,7 +555,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * @return the clearReferencesStopThreads flag for this Context.
      */
     public boolean getClearReferencesStopThreads() {
-        return (this.clearReferencesStopThreads);
+        return this.clearReferencesStopThreads;
     }
 
 
@@ -576,7 +574,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * @return the clearReferencesStopTimerThreads flag for this Context.
      */
     public boolean getClearReferencesStopTimerThreads() {
-        return (this.clearReferencesStopTimerThreads);
+        return this.clearReferencesStopTimerThreads;
     }
 
 
@@ -595,7 +593,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * @return the clearReferencesLogFactoryRelease flag for this Context.
      */
     public boolean getClearReferencesLogFactoryRelease() {
-        return (this.clearReferencesLogFactoryRelease);
+        return this.clearReferencesLogFactoryRelease;
     }
 
 
@@ -616,7 +614,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * Context.
      */
     public boolean getClearReferencesHttpClientKeepAliveThread() {
-        return (this.clearReferencesHttpClientKeepAliveThread);
+        return this.clearReferencesHttpClientKeepAliveThread;
     }
 
 
@@ -799,7 +797,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 sb.append(transformer).append("\r\n");
             }
         }
-        return (sb.toString());
+        return sb.toString();
     }
 
 
@@ -905,7 +903,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
             log.debug("      Loaded by " + cl.toString());
         }
-        return (clazz);
+        return clazz;
 
     }
 
@@ -1045,7 +1043,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (url != null) {
                 if (log.isDebugEnabled())
                     log.debug("  --> Returning '" + url.toString() + "'");
-                return (url);
+                return url;
             }
         }
 
@@ -1054,7 +1052,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (url != null) {
             if (log.isDebugEnabled())
                 log.debug("  --> Returning '" + url.toString() + "'");
-            return (url);
+            return url;
         }
 
         // (3) Delegate to parent unconditionally if not already attempted
@@ -1063,14 +1061,14 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (url != null) {
                 if (log.isDebugEnabled())
                     log.debug("  --> Returning '" + url.toString() + "'");
-                return (url);
+                return url;
             }
         }
 
         // (4) Resource was not found
         if (log.isDebugEnabled())
             log.debug("  --> Resource not found, returning null");
-        return (null);
+        return null;
 
     }
 
@@ -1181,9 +1179,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      */
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
-
-        return (loadClass(name, false));
-
+        return loadClass(name, false);
     }
 
 
@@ -1230,7 +1226,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     log.debug("  Returning class from cache");
                 if (resolve)
                     resolveClass(clazz);
-                return (clazz);
+                return clazz;
             }
 
             // (0.1) Check our previously loaded class cache
@@ -1240,7 +1236,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     log.debug("  Returning class from cache");
                 if (resolve)
                     resolveClass(clazz);
-                return (clazz);
+                return clazz;
             }
 
             // (0.2) Try loading the class with the system class loader, to prevent
@@ -1284,7 +1280,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     if (clazz != null) {
                         if (resolve)
                             resolveClass(clazz);
-                        return (clazz);
+                        return clazz;
                     }
                 } catch (ClassNotFoundException e) {
                     // Ignore
@@ -1319,7 +1315,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                             log.debug("  Loading class from parent");
                         if (resolve)
                             resolveClass(clazz);
-                        return (clazz);
+                        return clazz;
                     }
                 } catch (ClassNotFoundException e) {
                     // Ignore
@@ -1336,7 +1332,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         log.debug("  Loading class from local repository");
                     if (resolve)
                         resolveClass(clazz);
-                    return (clazz);
+                    return clazz;
                 }
             } catch (ClassNotFoundException e) {
                 // Ignore
@@ -1353,7 +1349,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                             log.debug("  Loading class from parent");
                         if (resolve)
                             resolveClass(clazz);
-                        return (clazz);
+                        return clazz;
                     }
                 } catch (ClassNotFoundException e) {
                     // Ignore
@@ -1397,7 +1393,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      */
     @Override
     protected PermissionCollection getPermissions(CodeSource codeSource) {
-
         String codeUrl = codeSource.getLocation().toString();
         PermissionCollection pc;
         if ((pc = loaderPC.get(codeUrl)) == null) {
@@ -1409,8 +1404,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 loaderPC.put(codeUrl,pc);
             }
         }
-        return (pc);
-
+        return pc;
     }
 
 

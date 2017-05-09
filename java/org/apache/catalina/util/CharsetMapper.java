@@ -110,7 +110,7 @@ public class CharsetMapper {
                 charset = map.getProperty(locale.getLanguage());
             }
         }
-        return (charset);
+        return charset;
     }
 
 

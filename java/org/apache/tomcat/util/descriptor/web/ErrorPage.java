@@ -60,9 +60,7 @@ public class ErrorPage implements Serializable {
      * @return the error code.
      */
     public int getErrorCode() {
-
-        return (this.errorCode);
-
+        return this.errorCode;
     }
 
 
@@ -72,9 +70,7 @@ public class ErrorPage implements Serializable {
      * @param errorCode The new error code
      */
     public void setErrorCode(int errorCode) {
-
         this.errorCode = errorCode;
-
     }
 
 
@@ -97,9 +93,7 @@ public class ErrorPage implements Serializable {
      * @return the exception type.
      */
     public String getExceptionType() {
-
-        return (this.exceptionType);
-
+        return this.exceptionType;
     }
 
 
@@ -109,9 +103,7 @@ public class ErrorPage implements Serializable {
      * @param exceptionType The new exception type
      */
     public void setExceptionType(String exceptionType) {
-
         this.exceptionType = exceptionType;
-
     }
 
 
@@ -119,9 +111,7 @@ public class ErrorPage implements Serializable {
      * @return the location.
      */
     public String getLocation() {
-
-        return (this.location);
-
+        return this.location;
     }
 
 
@@ -148,7 +138,6 @@ public class ErrorPage implements Serializable {
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("ErrorPage[");
         if (exceptionType == null) {
             sb.append("errorCode=");
@@ -160,8 +149,7 @@ public class ErrorPage implements Serializable {
         sb.append(", location=");
         sb.append(location);
         sb.append("]");
-        return (sb.toString());
-
+        return sb.toString();
     }
 
     public String getName() {

@@ -279,9 +279,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public String getAuthType() {
-
-        return (this.authType);
-
+        return this.authType;
     }
 
 
@@ -293,11 +291,9 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public void setAuthType(String authType) {
-
         String oldAuthType = this.authType;
         this.authType = authType;
         support.firePropertyChange("authType", oldAuthType, this.authType);
-
     }
 
 
@@ -322,9 +318,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public String getId() {
-
-        return (this.id);
-
+        return this.id;
     }
 
 
@@ -333,9 +327,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public String getIdInternal() {
-
-        return (this.id);
-
+        return this.id;
     }
 
 
@@ -471,7 +463,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 (sm.getString("standardSession.getThisAccessedTime.ise"));
         }
 
-        return (this.thisAccessedTime);
+        return this.thisAccessedTime;
     }
 
     /**
@@ -480,7 +472,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public long getThisAccessedTimeInternal() {
-        return (this.thisAccessedTime);
+        return this.thisAccessedTime;
     }
 
     /**
@@ -498,7 +490,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 (sm.getString("standardSession.getLastAccessedTime.ise"));
         }
 
-        return (this.lastAccessedTime);
+        return this.lastAccessedTime;
     }
 
     /**
@@ -507,7 +499,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public long getLastAccessedTimeInternal() {
-        return (this.lastAccessedTime);
+        return this.lastAccessedTime;
     }
 
     /**
@@ -567,9 +559,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public int getMaxInactiveInterval() {
-
-        return (this.maxInactiveInterval);
-
+        return this.maxInactiveInterval;
     }
 
 
@@ -593,9 +583,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public void setNew(boolean isNew) {
-
         this.isNew = isNew;
-
     }
 
 
@@ -608,9 +596,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public Principal getPrincipal() {
-
-        return (this.principal);
-
+        return this.principal;
     }
 
 
@@ -961,9 +947,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public Object getNote(String name) {
-
-        return (notes.get(name));
-
+        return notes.get(name);
     }
 
 
@@ -973,9 +957,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public Iterator<String> getNoteNames() {
-
-        return (notes.keySet().iterator());
-
+        return notes.keySet().iterator();
     }
 
 
@@ -1048,13 +1030,11 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder();
         sb.append("StandardSession[");
         sb.append(id);
         sb.append("]");
-        return (sb.toString());
-
+        return sb.toString();
     }
 
 
@@ -1108,13 +1088,11 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public long getCreationTime() {
-
         if (!isValidInternal())
             throw new IllegalStateException
                 (sm.getString("standardSession.getCreationTime.ise"));
 
-        return (this.creationTime);
-
+        return this.creationTime;
     }
 
 
@@ -1151,11 +1129,9 @@ public class StandardSession implements HttpSession, Session, Serializable {
     @Override
     @Deprecated
     public javax.servlet.http.HttpSessionContext getSessionContext() {
-
         if (sessionContext == null)
             sessionContext = new StandardSessionContext();
-        return (sessionContext);
-
+        return sessionContext;
     }
 
 
@@ -1173,15 +1149,13 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public Object getAttribute(String name) {
-
         if (!isValidInternal())
             throw new IllegalStateException
                 (sm.getString("standardSession.getAttribute.ise"));
 
         if (name == null) return null;
 
-        return (attributes.get(name));
-
+        return attributes.get(name);
     }
 
 
@@ -1221,7 +1195,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
     @Deprecated
     public Object getValue(String name) {
 
-        return (getAttribute(name));
+        return getAttribute(name);
 
     }
 
@@ -1239,13 +1213,11 @@ public class StandardSession implements HttpSession, Session, Serializable {
     @Override
     @Deprecated
     public String[] getValueNames() {
-
         if (!isValidInternal())
             throw new IllegalStateException
                 (sm.getString("standardSession.getValueNames.ise"));
 
-        return (keys());
-
+        return keys();
     }
 
 
@@ -1280,13 +1252,11 @@ public class StandardSession implements HttpSession, Session, Serializable {
      */
     @Override
     public boolean isNew() {
-
         if (!isValidInternal())
             throw new IllegalStateException
                 (sm.getString("standardSession.isNew.ise"));
 
-        return (this.isNew);
-
+        return this.isNew;
     }
 
 
@@ -1906,6 +1876,6 @@ final class StandardSessionContext
     @Override
     @Deprecated
     public HttpSession getSession(String id) {
-        return (null);
+        return null;
     }
 }

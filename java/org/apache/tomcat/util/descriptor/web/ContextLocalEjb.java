@@ -38,7 +38,7 @@ public class ContextLocalEjb extends ResourceBase {
     private String home = null;
 
     public String getHome() {
-        return (this.home);
+        return this.home;
     }
 
     public void setHome(String home) {
@@ -52,7 +52,7 @@ public class ContextLocalEjb extends ResourceBase {
     private String link = null;
 
     public String getLink() {
-        return (this.link);
+        return this.link;
     }
 
     public void setLink(String link) {
@@ -66,7 +66,7 @@ public class ContextLocalEjb extends ResourceBase {
     private String local = null;
 
     public String getLocal() {
-        return (this.local);
+        return this.local;
     }
 
     public void setLocal(String local) {
@@ -107,7 +107,7 @@ public class ContextLocalEjb extends ResourceBase {
             sb.append(local);
         }
         sb.append("]");
-        return (sb.toString());
+        return sb.toString();
     }
 
 

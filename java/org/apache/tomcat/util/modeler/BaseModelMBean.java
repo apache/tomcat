@@ -195,7 +195,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
 
         // Return the results of this method invocation
         // FIXME - should we validate the return type?
-        return (result);
+        return result;
     }
 
 
@@ -223,7 +223,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
                 // is the indication of a getter problem
             }
         }
-        return (response);
+        return response;
 
     }
 
@@ -308,7 +308,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
 
         // Return the results of this method invocation
         // FIXME - should we validate the return type?
-        return (result);
+        return result;
 
     }
 
@@ -471,7 +471,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
             }
         }
 
-        return (getAttributes(names));
+        return getAttributes(names);
 
     }
 
@@ -822,7 +822,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
 
         // Copy remaining notifications as reported by the application
         System.arraycopy(current, 0, response, 2, current.length);
-        return (response);
+        return response;
 
     }
 

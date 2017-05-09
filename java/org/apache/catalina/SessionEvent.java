@@ -71,9 +71,7 @@ public final class SessionEvent extends EventObject {
      * @return the event data of this event.
      */
     public Object getData() {
-
-        return (this.data);
-
+        return this.data;
     }
 
 
@@ -81,9 +79,7 @@ public final class SessionEvent extends EventObject {
      * @return the Session on which this event occurred.
      */
     public Session getSession() {
-
-        return (this.session);
-
+        return this.session;
     }
 
 
@@ -91,9 +87,7 @@ public final class SessionEvent extends EventObject {
      * @return the event type of this event.
      */
     public String getType() {
-
-        return (this.type);
-
+        return this.type;
     }
 
 

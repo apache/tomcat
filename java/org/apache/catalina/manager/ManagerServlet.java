@@ -241,9 +241,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
      */
     @Override
     public Wrapper getWrapper() {
-
-        return (this.wrapper);
-
+        return this.wrapper;
     }
 
 

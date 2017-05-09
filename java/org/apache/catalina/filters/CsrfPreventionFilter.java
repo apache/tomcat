@@ -177,7 +177,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         private String addNonce(String url) {
 
             if ((url == null) || (nonce == null)) {
-                return (url);
+                return url;
             }
 
             String path = url;
@@ -204,7 +204,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             sb.append('=');
             sb.append(nonce);
             sb.append(anchor);
-            return (sb.toString());
+            return sb.toString();
         }
     }
 

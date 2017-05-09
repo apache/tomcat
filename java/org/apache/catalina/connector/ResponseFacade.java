@@ -195,7 +195,7 @@ public class ResponseFacade
         if (isFinished()) {
             response.setSuspended(true);
         }
-        return (sos);
+        return sos;
 
     }
 
@@ -212,7 +212,7 @@ public class ResponseFacade
         if (isFinished()) {
             response.setSuspended(true);
         }
-        return (writer);
+        return writer;
 
     }
 
@@ -336,7 +336,7 @@ public class ResponseFacade
                             sm.getString("responseFacade.nullResponse"));
         }
 
-        return (response.isAppCommitted());
+        return response.isAppCommitted();
     }
 
 

@@ -41,7 +41,7 @@ public class ContextHandler extends ResourceBase {
     private String handlerclass = null;
 
     public String getHandlerclass() {
-        return (this.handlerclass);
+        return this.handlerclass;
     }
 
     public void setHandlerclass(String handlerclass) {
@@ -147,7 +147,7 @@ public class ContextHandler extends ResourceBase {
             sb.append(this.listProperties());
         }
         sb.append("]");
-        return (sb.toString());
+        return sb.toString();
     }
 
 

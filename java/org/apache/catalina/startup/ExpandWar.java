@@ -100,7 +100,7 @@ public class ExpandWar {
             if (!warTracker.exists() || warTracker.lastModified() == warLastModified) {
                 // No (detectable) changes to the WAR
                 success = true;
-                return (docBase.getAbsolutePath());
+                return docBase.getAbsolutePath();
             }
 
             // WAR must have been modified. Remove expanded directory.

@@ -1404,7 +1404,7 @@ public class JNDIRealm extends RealmBase {
                             if (containerLog.isDebugEnabled()) {
                                 containerLog.debug("Found roles: " + roles.toString());
                             }
-                            return (new GenericPrincipal(username, credentials, roles));
+                            return new GenericPrincipal(username, credentials, roles);
                         }
                     } catch (InvalidNameException ine) {
                         // Log the problem for posterity

@@ -136,7 +136,7 @@ public class BaseAttributeFilter implements NotificationFilter {
             if (names.size() < 1)
                 return true;
             else
-                return (names.contains(acn.getAttributeName()));
+                return names.contains(acn.getAttributeName());
         }
 
     }

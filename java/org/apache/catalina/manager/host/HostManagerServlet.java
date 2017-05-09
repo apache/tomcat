@@ -141,9 +141,7 @@ public class HostManagerServlet
      */
     @Override
     public Wrapper getWrapper() {
-
-        return (this.wrapper);
-
+        return this.wrapper;
     }
 
 

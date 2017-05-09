@@ -212,8 +212,7 @@ public class DOMWriter {
             }
         }
 
-        return (array);
-
+        return array;
     }
 
     /**
@@ -262,6 +261,6 @@ public class DOMWriter {
             }
         }
 
-        return (str.toString());
+        return str.toString();
     }
 }

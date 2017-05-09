@@ -162,7 +162,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
      * @return the Coyote request object
      */
     public org.apache.coyote.Request getCoyoteRequest() {
-        return (this.coyoteRequest);
+        return this.coyoteRequest;
     }
 
 
@@ -1264,7 +1264,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
         }
 
         try {
-            return (servletContext.getRealPath(path));
+            return servletContext.getRealPath(path);
         } catch (IllegalArgumentException e) {
             return null;
         }
@@ -2446,7 +2446,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
      */
     @Override
     public String getServletPath() {
-        return (mappingData.wrapperPath.toString());
+        return mappingData.wrapperPath.toString();
     }
 
 
@@ -2522,7 +2522,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
     @Override
     @Deprecated
     public boolean isRequestedSessionIdFromUrl() {
-        return (isRequestedSessionIdFromURL());
+        return isRequestedSessionIdFromURL();
     }
 
 
@@ -2616,7 +2616,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
         }
 
         // Check for a role defined directly as a <security-role>
-        return (realm.hasRole(getWrapper(), userPrincipal, role));
+        return realm.hasRole(getWrapper(), userPrincipal, role);
     }
 
 
@@ -2999,7 +2999,7 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
         // There cannot be a session if no context has been assigned yet
         Context context = getContext();
         if (context == null) {
-            return (null);
+            return null;
         }
 
         // Return the current session if it exists and is valid
@@ -3007,13 +3007,13 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
             session = null;
         }
         if (session != null) {
-            return (session);
+            return session;
         }
 
         // Return the requested session if it exists and is valid
         Manager manager = context.getManager();
         if (manager == null) {
-            return (null);      // Sessions are not supported
+            return null;      // Sessions are not supported
         }
         if (requestedSessionId != null) {
             try {
@@ -3026,13 +3026,13 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
             }
             if (session != null) {
                 session.access();
-                return (session);
+                return session;
             }
         }
 
         // Create a new session if requested and the response is not committed
         if (!create) {
-            return (null);
+            return null;
         }
         if (response != null
                 && context.getServletContext()

@@ -422,14 +422,12 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public InputStream getResourceAsStream(String path) {
-
         try {
-            return (getResource(path).openStream());
+            return getResource(path).openStream();
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
-            return (null);
+            return null;
         }
-
     }
 
 
@@ -525,7 +523,7 @@ public class JspCServletContext implements ServletContext {
      */
     @Override
     public String getServletContextName() {
-        return (getServerInfo());
+        return getServerInfo();
     }
 
 
@@ -537,7 +535,7 @@ public class JspCServletContext implements ServletContext {
     @Override
     @Deprecated
     public Enumeration<String> getServletNames() {
-        return (new Vector<String>().elements());
+        return new Vector<String>().elements();
     }
 
 
@@ -549,7 +547,7 @@ public class JspCServletContext implements ServletContext {
     @Override
     @Deprecated
     public Enumeration<Servlet> getServlets() {
-        return (new Vector<Servlet>().elements());
+        return new Vector<Servlet>().elements();
     }
 
 

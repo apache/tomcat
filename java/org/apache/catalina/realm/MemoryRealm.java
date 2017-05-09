@@ -190,7 +190,6 @@ public class MemoryRealm  extends RealmBase {
      * the XML input file, creating a new one if necessary.
      */
     protected synchronized Digester getDigester() {
-
         if (digester == null) {
             digester = new Digester();
             digester.setValidating(false);
@@ -203,8 +202,7 @@ public class MemoryRealm  extends RealmBase {
             }
             digester.addRuleSet(new MemoryRuleSet());
         }
-        return (digester);
-
+        return digester;
     }
 
 
@@ -223,9 +221,9 @@ public class MemoryRealm  extends RealmBase {
 
         GenericPrincipal principal = principals.get(username);
         if (principal != null) {
-            return (principal.getPassword());
+            return principal.getPassword();
         } else {
-            return (null);
+            return null;
         }
 
     }

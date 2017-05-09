@@ -7,7 +7,7 @@ public class ELParser/*@bgen(jjtree)*/implements ELParserTreeConstants, ELParser
   protected JJTELParserState jjtree = new JJTELParserState();
     public static Node parse(String ref) throws ELException {
         try {
-            return (new ELParser(new StringReader(ref))).CompositeExpression();
+            return new ELParser(new StringReader(ref)).CompositeExpression();
         } catch (ParseException pe) {
             throw new ELException(pe.getMessage());
         }

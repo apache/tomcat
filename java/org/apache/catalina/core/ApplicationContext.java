@@ -216,7 +216,7 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
 
     @Override
     public Object getAttribute(String name) {
-        return (attributes.get(name));
+        return attributes.get(name);
     }
 
 
@@ -351,14 +351,14 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
     public String getMimeType(String file) {
 
         if (file == null)
-            return (null);
+            return null;
         int period = file.lastIndexOf('.');
         if (period < 0)
-            return (null);
+            return null;
         String extension = file.substring(period + 1);
         if (extension.length() < 1)
-            return (null);
-        return (context.findMimeMapping(extension));
+            return null;
+        return context.findMimeMapping(extension);
 
     }
 
@@ -374,12 +374,12 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
 
         // Validate the name argument
         if (name == null)
-            return (null);
+            return null;
 
         // Create and return a corresponding request dispatcher
         Wrapper wrapper = (Wrapper) context.findChild(name);
         if (wrapper == null)
-            return (null);
+            return null;
 
         return new ApplicationDispatcher(wrapper, null, null, null, null, null, name);
 
@@ -398,7 +398,7 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
 
         // Validate the path argument
         if (path == null) {
-            return (null);
+            return null;
         }
         if (!path.startsWith("/")) {
             throw new IllegalArgumentException(
@@ -424,7 +424,7 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
         // Then normalize
         String normalizedUri = RequestUtil.normalize(uriNoParams);
         if (normalizedUri == null) {
-            return (null);
+            return null;
         }
 
         // Mapping is against the normalized uri
@@ -1405,9 +1405,7 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
      * @return the facade associated with this ApplicationContext.
      */
     protected ServletContext getFacade() {
-
-        return (this.facade);
-
+        return this.facade;
     }
 
 

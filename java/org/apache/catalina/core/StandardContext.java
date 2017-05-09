@@ -1265,9 +1265,7 @@ public class StandardContext extends ContainerBase
      * @return <code>true</code> if classloading delegates to the parent classloader first
      */
     public boolean getDelegate() {
-
-        return (this.delegate);
-
+        return this.delegate;
     }
 
 
@@ -1291,9 +1289,7 @@ public class StandardContext extends ContainerBase
      * @return true if the internal naming support is used.
      */
     public boolean isUseNaming() {
-
-        return (useNaming);
-
+        return useNaming;
     }
 
 
@@ -1342,7 +1338,7 @@ public class StandardContext extends ContainerBase
 
     @Override
     public Object[] getApplicationLifecycleListeners() {
-        return (applicationLifecycleListenersObjects);
+        return applicationLifecycleListenersObjects;
     }
 
 
@@ -1378,9 +1374,7 @@ public class StandardContext extends ContainerBase
      * @return the antiResourceLocking flag for this Context.
      */
     public boolean getAntiResourceLocking() {
-
-        return (this.antiResourceLocking);
-
+        return this.antiResourceLocking;
     }
 
 
@@ -1416,7 +1410,7 @@ public class StandardContext extends ContainerBase
             }
         }
 
-        return (this.charsetMapper);
+        return this.charsetMapper;
 
     }
 
@@ -1721,9 +1715,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String getDisplayName() {
-
-        return (this.displayName);
-
+        return this.displayName;
     }
 
 
@@ -1770,9 +1762,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public boolean getDistributable() {
-
-        return (this.distributable);
-
+        return this.distributable;
     }
 
     /**
@@ -1792,17 +1782,13 @@ public class StandardContext extends ContainerBase
 
     @Override
     public String getDocBase() {
-
-        return (this.docBase);
-
+        return this.docBase;
     }
 
 
     @Override
     public void setDocBase(String docBase) {
-
         this.docBase = docBase;
-
     }
 
 
@@ -1961,9 +1947,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public LoginConfig getLoginConfig() {
-
-        return (this.loginConfig);
-
+        return this.loginConfig;
     }
 
 
@@ -2020,12 +2004,10 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public NamingResourcesImpl getNamingResources() {
-
         if (namingResources == null) {
             setNamingResources(new NamingResourcesImpl());
         }
-        return (namingResources);
-
+        return namingResources;
     }
 
 
@@ -2086,7 +2068,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String getPath() {
-        return (path);
+        return path;
     }
 
 
@@ -2128,9 +2110,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String getPublicId() {
-
-        return (this.publicId);
-
+        return this.publicId;
     }
 
 
@@ -2159,9 +2139,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public boolean getReloadable() {
-
-        return (this.reloadable);
-
+        return this.reloadable;
     }
 
 
@@ -2170,9 +2148,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public boolean getOverride() {
-
-        return (this.override);
-
+        return this.override;
     }
 
 
@@ -2182,9 +2158,7 @@ public class StandardContext extends ContainerBase
      * Is only set as deployment has change docRoot!
      */
     public String getOriginalDocBase() {
-
-        return (this.originalDocBase);
-
+        return this.originalDocBase;
     }
 
     /**
@@ -2207,13 +2181,13 @@ public class StandardContext extends ContainerBase
     @Override
     public ClassLoader getParentClassLoader() {
         if (parentClassLoader != null)
-            return (parentClassLoader);
+            return parentClassLoader;
         if (getPrivileged()) {
             return this.getClass().getClassLoader();
         } else if (parent != null) {
-            return (parent.getParentClassLoader());
+            return parent.getParentClassLoader();
         }
-        return (ClassLoader.getSystemClassLoader());
+        return ClassLoader.getSystemClassLoader();
     }
 
 
@@ -2222,9 +2196,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public boolean getPrivileged() {
-
-        return (this.privileged);
-
+        return this.privileged;
     }
 
 
@@ -2300,14 +2272,12 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public ServletContext getServletContext() {
-
         if (context == null) {
             context = new ApplicationContext(this);
             if (altDDName != null)
                 context.setAttribute(Globals.ALT_DD_ATTR,altDDName);
         }
-        return (context.getFacade());
-
+        return context.getFacade();
     }
 
 
@@ -2317,9 +2287,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public int getSessionTimeout() {
-
-        return (this.sessionTimeout);
-
+        return this.sessionTimeout;
     }
 
 
@@ -2351,9 +2319,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public boolean getSwallowOutput() {
-
-        return (this.swallowOutput);
-
+        return this.swallowOutput;
     }
 
 
@@ -2380,9 +2346,7 @@ public class StandardContext extends ContainerBase
      * @return the value of the unloadDelay flag.
      */
     public long getUnloadDelay() {
-
-        return (this.unloadDelay);
-
+        return this.unloadDelay;
     }
 
 
@@ -2409,9 +2373,7 @@ public class StandardContext extends ContainerBase
      * @return unpack WAR flag.
      */
     public boolean getUnpackWAR() {
-
-        return (unpackWAR);
-
+        return unpackWAR;
     }
 
 
@@ -2421,9 +2383,7 @@ public class StandardContext extends ContainerBase
      * @param unpackWAR <code>true</code> to unpack WARs on deployment
      */
     public void setUnpackWAR(boolean unpackWAR) {
-
         this.unpackWAR = unpackWAR;
-
     }
 
 
@@ -2456,9 +2416,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String getWrapperClass() {
-
-        return (this.wrapperClassName);
-
+        return this.wrapperClassName;
     }
 
 
@@ -2581,9 +2539,7 @@ public class StandardContext extends ContainerBase
      * @return the Locale to character set mapper class for this Context.
      */
     public String getCharsetMapperClass() {
-
-        return (this.charsetMapperClass);
-
+        return this.charsetMapperClass;
     }
 
 
@@ -2629,9 +2585,7 @@ public class StandardContext extends ContainerBase
      * @return the work directory for this Context.
      */
     public String getWorkDir() {
-
-        return (this.workDir);
-
+        return this.workDir;
     }
 
 
@@ -2667,9 +2621,7 @@ public class StandardContext extends ContainerBase
      * @return the clearReferencesStopThreads flag for this Context.
      */
     public boolean getClearReferencesStopThreads() {
-
-        return (this.clearReferencesStopThreads);
-
+        return this.clearReferencesStopThreads;
     }
 
 
@@ -2694,7 +2646,7 @@ public class StandardContext extends ContainerBase
      * @return the clearReferencesStopTimerThreads flag for this Context.
      */
     public boolean getClearReferencesStopTimerThreads() {
-        return (this.clearReferencesStopTimerThreads);
+        return this.clearReferencesStopTimerThreads;
     }
 
 
@@ -2720,7 +2672,7 @@ public class StandardContext extends ContainerBase
      * Context.
      */
     public boolean getClearReferencesHttpClientKeepAliveThread() {
-        return (this.clearReferencesHttpClientKeepAliveThread);
+        return this.clearReferencesHttpClientKeepAliveThread;
     }
 
 
@@ -3401,7 +3353,7 @@ public class StandardContext extends ContainerBase
     public ApplicationParameter[] findApplicationParameters() {
 
         synchronized (applicationParametersLock) {
-            return (applicationParameters);
+            return applicationParameters;
         }
 
     }
@@ -3413,9 +3365,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public SecurityConstraint[] findConstraints() {
-
-        return (constraints);
-
+        return constraints;
     }
 
 
@@ -3462,11 +3412,9 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public FilterDef findFilterDef(String filterName) {
-
         synchronized (filterDefs) {
-            return (filterDefs.get(filterName));
+            return filterDefs.get(filterName);
         }
-
     }
 
 
@@ -3475,12 +3423,10 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public FilterDef[] findFilterDefs() {
-
         synchronized (filterDefs) {
             FilterDef results[] = new FilterDef[filterDefs.size()];
-            return (filterDefs.values().toArray(results));
+            return filterDefs.values().toArray(results);
         }
-
     }
 
 
@@ -3500,11 +3446,9 @@ public class StandardContext extends ContainerBase
      * @param name Name of the desired message destination
      */
     public MessageDestination findMessageDestination(String name) {
-
         synchronized (messageDestinations) {
-            return (messageDestinations.get(name));
+            return messageDestinations.get(name);
         }
-
     }
 
 
@@ -3514,13 +3458,11 @@ public class StandardContext extends ContainerBase
      * is returned.
      */
     public MessageDestination[] findMessageDestinations() {
-
         synchronized (messageDestinations) {
             MessageDestination results[] =
                 new MessageDestination[messageDestinations.size()];
-            return (messageDestinations.values().toArray(results));
+            return messageDestinations.values().toArray(results);
         }
-
     }
 
 
@@ -3531,9 +3473,7 @@ public class StandardContext extends ContainerBase
      * @param name Name of the desired message destination ref
      */
     public MessageDestinationRef findMessageDestinationRef(String name) {
-
         return namingResources.findMessageDestinationRef(name);
-
     }
 
 
@@ -3543,9 +3483,7 @@ public class StandardContext extends ContainerBase
      * is returned.
      */
     public MessageDestinationRef[] findMessageDestinationRefs() {
-
         return namingResources.findMessageDestinationRefs();
-
     }
 
 
@@ -3557,9 +3495,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String findMimeMapping(String extension) {
-
-        return (mimeMappings.get(extension.toLowerCase(Locale.ENGLISH)));
-
+        return mimeMappings.get(extension.toLowerCase(Locale.ENGLISH));
     }
 
 
@@ -3569,13 +3505,10 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String[] findMimeMappings() {
-
         synchronized (mimeMappings) {
             String results[] = new String[mimeMappings.size()];
-            return
-                (mimeMappings.keySet().toArray(results));
+            return mimeMappings.keySet().toArray(results);
         }
-
     }
 
 
@@ -3614,16 +3547,14 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String findRoleMapping(String role) {
-
         String realRole = null;
         synchronized (roleMappings) {
             realRole = roleMappings.get(role);
         }
         if (realRole != null)
-            return (realRole);
+            return realRole;
         else
-            return (role);
-
+            return role;
     }
 
 
@@ -3653,11 +3584,9 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String[] findSecurityRoles() {
-
         synchronized (securityRolesLock) {
-            return (securityRoles);
+            return securityRoles;
         }
-
     }
 
 
@@ -3669,11 +3598,9 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String findServletMapping(String pattern) {
-
         synchronized (servletMappingsLock) {
-            return (servletMappings.get(pattern));
+            return servletMappings.get(pattern);
         }
-
     }
 
 
@@ -3761,11 +3688,9 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String[] findWelcomeFiles() {
-
         synchronized (welcomeFilesLock) {
-            return (welcomeFiles);
+            return welcomeFiles;
         }
-
     }
 
 
@@ -3775,11 +3700,9 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String[] findWrapperLifecycles() {
-
         synchronized (wrapperLifecyclesLock) {
-            return (wrapperLifecycles);
+            return wrapperLifecycles;
         }
-
     }
 
 
@@ -3789,11 +3712,9 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String[] findWrapperListeners() {
-
         synchronized (wrapperListenersLock) {
-            return (wrapperListeners);
+            return wrapperListeners;
         }
-
     }
 
 
@@ -4672,9 +4593,7 @@ public class StandardContext extends ContainerBase
      * @return the filter config object
      */
     public FilterConfig findFilterConfig(String name) {
-
-        return (filterConfigs.get(name));
-
+        return filterConfigs.get(name);
     }
 
 
@@ -4789,7 +4708,7 @@ public class StandardContext extends ContainerBase
                 ok = false;
             }
         }
-        return (ok);
+        return ok;
 
     }
 
@@ -5703,15 +5622,15 @@ public class StandardContext extends ContainerBase
     protected String adjustURLPattern(String urlPattern) {
 
         if (urlPattern == null)
-            return (urlPattern);
+            return urlPattern;
         if (urlPattern.startsWith("/") || urlPattern.startsWith("*."))
-            return (urlPattern);
+            return urlPattern;
         if (!isServlet22())
-            return (urlPattern);
+            return urlPattern;
         if(log.isDebugEnabled())
             log.debug(sm.getString("standardContext.urlPattern.patternWarning",
                          urlPattern));
-        return ("/" + urlPattern);
+        return "/" + urlPattern;
 
     }
 
@@ -5965,9 +5884,7 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public boolean getPaused() {
-
-        return (this.paused);
-
+        return this.paused;
     }
 
 

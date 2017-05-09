@@ -131,7 +131,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @return the name used at remote MbeanServer
      */
     public String getName() {
-        return (this.name);
+        return this.name;
     }
 
     public void setName(String objectName) {
@@ -200,7 +200,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @return The login password for the <code>Manager</code> application.
      */
     public String getPassword() {
-        return (this.password);
+        return this.password;
     }
 
     public void setPassword(String password) {
@@ -211,7 +211,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @return The login username for the <code>JMX</code> MBeanServer.
      */
     public String getUsername() {
-        return (this.username);
+        return this.username;
     }
 
     public void setUsername(String username) {
@@ -222,7 +222,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @return The URL of the <code>JMX JSR 160</code> MBeanServer to be used.
      */
     public String getUrl() {
-        return (this.url);
+        return this.url;
     }
 
     public void setUrl(String url) {
@@ -233,7 +233,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @return The Host of the <code>JMX JSR 160</code> MBeanServer to be used.
      */
     public String getHost() {
-        return (this.host);
+        return this.host;
     }
 
     public void setHost(String host) {
@@ -244,7 +244,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @return The Port of the <code>JMX JSR 160</code> MBeanServer to be used.
      */
     public String getPort() {
-        return (this.port);
+        return this.port;
     }
 
     public void setPort(String port) {

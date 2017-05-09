@@ -256,7 +256,7 @@ public class JAASRealm extends RealmBase {
     protected String roleClassNames = null;
 
     public String getRoleClassNames() {
-        return (this.roleClassNames);
+        return this.roleClassNames;
     }
 
     /**
@@ -312,7 +312,7 @@ public class JAASRealm extends RealmBase {
     protected String userClassNames = null;
 
     public String getUserClassNames() {
-        return (this.userClassNames);
+        return this.userClassNames;
     }
 
     /**
@@ -481,13 +481,13 @@ public class JAASRealm extends RealmBase {
             Principal principal = createPrincipal(username, subject, loginContext);
             if (principal == null) {
                 log.debug(sm.getString("jaasRealm.authenticateFailure", username));
-                return (null);
+                return null;
             }
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("jaasRealm.authenticateSuccess", username));
             }
 
-            return (principal);
+            return principal;
         } catch( Throwable t) {
             log.error( "error ", t);
             //JAAS throws exception different than LoginException so mark the realm as unavailable
@@ -511,9 +511,7 @@ public class JAASRealm extends RealmBase {
      */
     @Override
     protected String getPassword(String username) {
-
-        return (null);
-
+        return null;
     }
 
 

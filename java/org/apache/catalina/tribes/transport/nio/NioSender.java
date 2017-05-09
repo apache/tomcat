@@ -336,7 +336,7 @@ public class NioSender extends AbstractSender {
     }
 
     private ByteBuffer getBuffer(int size) {
-        return (getDirectBuffer()?ByteBuffer.allocateDirect(size):ByteBuffer.allocate(size));
+        return getDirectBuffer()?ByteBuffer.allocateDirect(size):ByteBuffer.allocate(size);
     }
 
     /**

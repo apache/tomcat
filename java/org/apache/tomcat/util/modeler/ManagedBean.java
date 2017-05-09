@@ -210,7 +210,7 @@ public class ManagedBean implements java.io.Serializable {
      * by this descriptor.
      */
     public String getType() {
-        return (this.type);
+        return this.type;
     }
 
     public void setType(String type) {

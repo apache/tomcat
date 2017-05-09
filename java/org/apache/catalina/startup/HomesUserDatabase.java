@@ -71,9 +71,7 @@ public final class HomesUserDatabase
      */
     @Override
     public UserConfig getUserConfig() {
-
-        return (this.userConfig);
-
+        return this.userConfig;
     }
 
 
@@ -84,10 +82,8 @@ public final class HomesUserDatabase
      */
     @Override
     public void setUserConfig(UserConfig userConfig) {
-
         this.userConfig = userConfig;
         init();
-
     }
 
 
@@ -101,9 +97,7 @@ public final class HomesUserDatabase
      */
     @Override
     public String getHome(String user) {
-
         return homes.get(user);
-
     }
 
 
@@ -112,9 +106,7 @@ public final class HomesUserDatabase
      */
     @Override
     public Enumeration<String> getUsers() {
-
-        return (homes.keys());
-
+        return homes.keys();
     }
 
 

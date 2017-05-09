@@ -390,7 +390,7 @@ public class StoreAppender {
                 filtered.append(c);
             }
         }
-        return (filtered.toString());
+        return filtered.toString();
     }
 
     /**

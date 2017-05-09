@@ -529,7 +529,7 @@ public class Http11Processor extends AbstractProcessor {
             || (contentLength > compressionMinSize)) {
             // Check for compatible MIME-TYPE
             if (compressableMimeTypes != null) {
-                return (startsWithStringArray(compressableMimeTypes, response.getContentType()));
+                return startsWithStringArray(compressableMimeTypes, response.getContentType());
             }
         }
 

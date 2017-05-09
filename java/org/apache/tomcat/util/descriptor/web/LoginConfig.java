@@ -76,7 +76,7 @@ public class LoginConfig implements Serializable {
     private String authMethod = null;
 
     public String getAuthMethod() {
-        return (this.authMethod);
+        return this.authMethod;
     }
 
     public void setAuthMethod(String authMethod) {
@@ -90,7 +90,7 @@ public class LoginConfig implements Serializable {
     private String errorPage = null;
 
     public String getErrorPage() {
-        return (this.errorPage);
+        return this.errorPage;
     }
 
     public void setErrorPage(String errorPage) {
@@ -107,7 +107,7 @@ public class LoginConfig implements Serializable {
     private String loginPage = null;
 
     public String getLoginPage() {
-        return (this.loginPage);
+        return this.loginPage;
     }
 
     public void setLoginPage(String loginPage) {
@@ -125,7 +125,7 @@ public class LoginConfig implements Serializable {
     private String realmName = null;
 
     public String getRealmName() {
-        return (this.realmName);
+        return this.realmName;
     }
 
     public void setRealmName(String realmName) {
@@ -141,7 +141,6 @@ public class LoginConfig implements Serializable {
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("LoginConfig[");
         sb.append("authMethod=");
         sb.append(authMethod);
@@ -158,8 +157,7 @@ public class LoginConfig implements Serializable {
             sb.append(errorPage);
         }
         sb.append("]");
-        return (sb.toString());
-
+        return sb.toString();
     }
 
 

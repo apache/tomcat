@@ -263,7 +263,7 @@ class ApplicationHttpRequest
      */
     @Override
     public Enumeration<String> getAttributeNames() {
-        return (new AttributeNamesEnumerator());
+        return new AttributeNamesEnumerator();
     }
 
 
@@ -317,7 +317,7 @@ class ApplicationHttpRequest
     public RequestDispatcher getRequestDispatcher(String path) {
 
         if (context == null)
-            return (null);
+            return null;
 
         if (path == null) {
             return null;
@@ -367,7 +367,7 @@ class ApplicationHttpRequest
             }
         }
 
-        return (context.getServletContext().getRequestDispatcher(relative));
+        return context.getServletContext().getRequestDispatcher(relative);
 
     }
 
@@ -391,9 +391,7 @@ class ApplicationHttpRequest
      */
     @Override
     public String getContextPath() {
-
-        return (this.contextPath);
-
+        return this.contextPath;
     }
 
 
@@ -404,7 +402,6 @@ class ApplicationHttpRequest
      */
     @Override
     public String getParameter(String name) {
-
         parseParameters();
 
         String[] value = parameters.get(name);
@@ -412,7 +409,6 @@ class ApplicationHttpRequest
             return null;
         }
         return value[0];
-
     }
 
 
@@ -422,10 +418,8 @@ class ApplicationHttpRequest
      */
     @Override
     public Map<String, String[]> getParameterMap() {
-
         parseParameters();
-        return (parameters);
-
+        return parameters;
     }
 
 
@@ -435,7 +429,6 @@ class ApplicationHttpRequest
      */
     @Override
     public Enumeration<String> getParameterNames() {
-
         parseParameters();
         return Collections.enumeration(parameters.keySet());
     }
@@ -449,10 +442,8 @@ class ApplicationHttpRequest
      */
     @Override
     public String[] getParameterValues(String name) {
-
         parseParameters();
         return parameters.get(name);
-
     }
 
 
@@ -461,9 +452,7 @@ class ApplicationHttpRequest
      */
     @Override
     public String getPathInfo() {
-
-        return (this.pathInfo);
-
+        return this.pathInfo;
     }
 
 
@@ -487,9 +476,7 @@ class ApplicationHttpRequest
      */
     @Override
     public String getQueryString() {
-
-        return (this.queryString);
-
+        return this.queryString;
     }
 
 
@@ -499,9 +486,7 @@ class ApplicationHttpRequest
      */
     @Override
     public String getRequestURI() {
-
-        return (this.requestURI);
-
+        return this.requestURI;
     }
 
 
@@ -539,9 +524,7 @@ class ApplicationHttpRequest
      */
     @Override
     public String getServletPath() {
-
-        return (this.servletPath);
-
+        return this.servletPath;
     }
 
 
@@ -557,7 +540,7 @@ class ApplicationHttpRequest
      */
     @Override
     public HttpSession getSession() {
-        return (getSession(true));
+        return getSession(true);
     }
 
 
@@ -574,11 +557,11 @@ class ApplicationHttpRequest
 
             // There cannot be a session if no context has been assigned yet
             if (context == null)
-                return (null);
+                return null;
 
             // Return the current session if it exists and is valid
             if (session != null && session.isValid()) {
-                return (session.getSession());
+                return session.getSession();
             }
 
             HttpSession other = super.getSession(false);
@@ -833,10 +816,10 @@ class ApplicationHttpRequest
     protected int getSpecial(String name) {
         for (int i = 0; i < specials.length; i++) {
             if (specials[i].equals(name)) {
-                return (i);
+                return i;
             }
         }
-        return (-1);
+        return -1;
     }
 
 
@@ -996,7 +979,7 @@ class ApplicationHttpRequest
                 for (int i = pos + 1; i <= last; i++) {
                     if (getAttribute(specials[i]) != null) {
                         pos = i;
-                        return (specials[i]);
+                        return specials[i];
                     }
                 }
             }

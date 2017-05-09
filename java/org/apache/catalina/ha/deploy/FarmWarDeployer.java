@@ -700,9 +700,7 @@ public class FarmWarDeployer extends ClusterListener
      * @return the frequency of watcher checks.
      */
     public int getProcessDeployFrequency() {
-
-        return (this.processDeployFrequency);
-
+        return this.processDeployFrequency;
     }
 
     /**

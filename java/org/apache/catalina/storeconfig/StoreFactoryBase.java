@@ -52,9 +52,7 @@ public class StoreFactoryBase implements IStoreFactory {
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
     public String getInfo() {
-
-        return (info);
-
+        return info;
     }
 
     /**

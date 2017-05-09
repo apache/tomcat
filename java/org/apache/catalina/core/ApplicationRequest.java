@@ -102,7 +102,7 @@ class ApplicationRequest extends ServletRequestWrapper {
     public Object getAttribute(String name) {
 
         synchronized (attributes) {
-            return (attributes.get(name));
+            return attributes.get(name);
         }
 
     }

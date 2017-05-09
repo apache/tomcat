@@ -455,7 +455,6 @@ public class CallMethodRule extends Rule {
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("CallMethodRule[");
         sb.append("methodName=");
         sb.append(methodName);
@@ -472,8 +471,7 @@ public class CallMethodRule extends Rule {
         }
         sb.append("}");
         sb.append("]");
-        return (sb.toString());
-
+        return sb.toString();
     }
 
 

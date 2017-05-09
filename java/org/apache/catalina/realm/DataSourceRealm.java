@@ -472,9 +472,9 @@ public class DataSourceRealm extends RealmBase {
             return new GenericPrincipal(username, null, null);
         }
         try {
-            return (new GenericPrincipal(username,
+            return new GenericPrincipal(username,
                     getPassword(dbConnection, username),
-                    getRoles(dbConnection, username)));
+                    getRoles(dbConnection, username));
         } finally {
             close(dbConnection);
         }

@@ -151,6 +151,6 @@ public class NotificationInfo extends FeatureInfo {
             readLock.unlock();
         }
         sb.append("]");
-        return (sb.toString());
+        return sb.toString();
     }
 }

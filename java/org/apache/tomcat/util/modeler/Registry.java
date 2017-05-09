@@ -169,7 +169,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
                 registry.guard != guard ) {
             return null;
         }
-        return (registry);
+        return registry;
     }
 
     // -------------------- Generic methods  --------------------

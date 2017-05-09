@@ -173,14 +173,14 @@ public final class FileStore extends StoreBase {
         // Acquire the list of files in our storage directory
         File file = directory();
         if (file == null) {
-            return (new String[0]);
+            return new String[0];
         }
 
         String files[] = file.list();
 
         // Bugzilla 32130
         if((files == null) || (files.length < 1)) {
-            return (new String[0]);
+            return new String[0];
         }
 
         // Build and return the list of session identifiers

@@ -41,7 +41,7 @@ public class SSIServletRequestUtil {
                 result = (String)request.getAttribute(
                         RequestDispatcher.INCLUDE_SERVLET_PATH);
             if ((result == null) || (result.equals(""))) result = "/";
-            return (result);
+            return result;
         }
         // No, extract the desired path directly from the request
         String result = request.getPathInfo();

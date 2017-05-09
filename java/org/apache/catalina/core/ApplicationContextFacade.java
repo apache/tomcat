@@ -146,7 +146,7 @@ public class ApplicationContextFacade implements org.apache.catalina.servlet4pre
             (theContext instanceof ApplicationContext)){
             theContext = ((ApplicationContext)theContext).getFacade();
         }
-        return (theContext);
+        return theContext;
     }
 
 

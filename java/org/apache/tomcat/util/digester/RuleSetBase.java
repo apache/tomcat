@@ -50,7 +50,7 @@ public abstract class RuleSetBase implements RuleSet {
     @Deprecated
     @Override
     public String getNamespaceURI() {
-        return (this.namespaceURI);
+        return this.namespaceURI;
     }
 
 

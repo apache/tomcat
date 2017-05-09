@@ -50,8 +50,8 @@ public class AttributeParser {
     public static String getUnquoted(String input, char quote,
             boolean isELIgnored, boolean isDeferredSyntaxAllowedAsLiteral,
             boolean strict, boolean quoteAttributeEL) {
-        return (new AttributeParser(input, quote, isELIgnored,
-                isDeferredSyntaxAllowedAsLiteral, strict, quoteAttributeEL)).getUnquoted();
+        return new AttributeParser(input, quote, isELIgnored,
+                isDeferredSyntaxAllowedAsLiteral, strict, quoteAttributeEL).getUnquoted();
     }
 
     /* The quoted input string. */

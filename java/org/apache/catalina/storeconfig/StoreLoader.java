@@ -135,7 +135,7 @@ public class StoreLoader {
         long t2 = System.currentTimeMillis();
         if (log.isDebugEnabled())
             log.debug("Digester for server-registry.xml created " + (t2 - t1));
-        return (digester);
+        return digester;
 
     }
 
@@ -159,7 +159,7 @@ public class StoreLoader {
         } catch (IOException e) {
             log.error(e);
         }
-        return (file);
+        return file;
     }
 
     /**

@@ -142,7 +142,7 @@ public class Response implements HttpServletResponse {
      * @return the Context within which this Request is being processed.
      */
     public Context getContext() {
-        return (request.getContext());
+        return request.getContext();
     }
 
 
@@ -301,9 +301,9 @@ public class Response implements HttpServletResponse {
      * @return <code>true</code> if the application has committed the response
      */
     public boolean isAppCommitted() {
-        return (this.appCommitted || isCommitted() || isSuspended()
+        return this.appCommitted || isCommitted() || isSuspended()
                 || ((getContentLength() > 0)
-                    && (getContentWritten() >= getContentLength())));
+                    && (getContentWritten() >= getContentLength()));
     }
 
 
@@ -316,7 +316,7 @@ public class Response implements HttpServletResponse {
      * @return the Request with which this Response is associated.
      */
     public org.apache.catalina.connector.Request getRequest() {
-        return (this.request);
+        return this.request;
     }
 
     /**
@@ -564,7 +564,7 @@ public class Response implements HttpServletResponse {
      */
     @Override
     public Locale getLocale() {
-        return (getCoyoteResponse().getLocale());
+        return getCoyoteResponse().getLocale();
     }
 
 
@@ -1135,13 +1135,11 @@ public class Response implements HttpServletResponse {
      */
     @Override
     public String encodeRedirectURL(String url) {
-
         if (isEncodeable(toAbsolute(url))) {
-            return (toEncoded(url, request.getSessionInternal().getIdInternal()));
+            return toEncoded(url, request.getSessionInternal().getIdInternal());
         } else {
-            return (url);
+            return url;
         }
-
     }
 
 
@@ -1158,7 +1156,7 @@ public class Response implements HttpServletResponse {
     @Override
     @Deprecated
     public String encodeRedirectUrl(String url) {
-        return (encodeRedirectURL(url));
+        return encodeRedirectURL(url);
     }
 
 
@@ -1187,9 +1185,9 @@ public class Response implements HttpServletResponse {
             } else if (url.equals(absolute) && !hasPath(url)) {
                 url += '/';
             }
-            return (toEncoded(url, request.getSessionInternal().getIdInternal()));
+            return toEncoded(url, request.getSessionInternal().getIdInternal());
         } else {
-            return (url);
+            return url;
         }
 
     }
@@ -1208,7 +1206,7 @@ public class Response implements HttpServletResponse {
     @Override
     @Deprecated
     public String encodeUrl(String url) {
-        return (encodeURL(url));
+        return encodeURL(url);
     }
 
 
@@ -1610,7 +1608,7 @@ public class Response implements HttpServletResponse {
     protected String toAbsolute(String location) {
 
         if (location == null) {
-            return (location);
+            return location;
         }
 
         boolean leadingSlash = location.startsWith("/");
@@ -1692,7 +1690,7 @@ public class Response implements HttpServletResponse {
 
         } else {
 
-            return (location);
+            return location;
 
         }
 
@@ -1821,9 +1819,8 @@ public class Response implements HttpServletResponse {
      * @return the encoded URL
      */
     protected String toEncoded(String url, String sessionId) {
-
         if ((url == null) || (sessionId == null)) {
-            return (url);
+            return url;
         }
 
         String path = url;
@@ -1849,7 +1846,6 @@ public class Response implements HttpServletResponse {
         }
         sb.append(anchor);
         sb.append(query);
-        return (sb.toString());
-
+        return sb.toString();
     }
 }

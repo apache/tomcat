@@ -46,7 +46,7 @@ public class ServletDef implements Serializable {
     private String description = null;
 
     public String getDescription() {
-        return (this.description);
+        return this.description;
     }
 
     public void setDescription(String description) {
@@ -60,7 +60,7 @@ public class ServletDef implements Serializable {
     private String displayName = null;
 
     public String getDisplayName() {
-        return (this.displayName);
+        return this.displayName;
     }
 
     public void setDisplayName(String displayName) {
@@ -74,7 +74,7 @@ public class ServletDef implements Serializable {
     private String smallIcon = null;
 
     public String getSmallIcon() {
-        return (this.smallIcon);
+        return this.smallIcon;
     }
 
     public void setSmallIcon(String smallIcon) {
@@ -87,7 +87,7 @@ public class ServletDef implements Serializable {
     private String largeIcon = null;
 
     public String getLargeIcon() {
-        return (this.largeIcon);
+        return this.largeIcon;
     }
 
     public void setLargeIcon(String largeIcon) {
@@ -102,7 +102,7 @@ public class ServletDef implements Serializable {
     private String servletName = null;
 
     public String getServletName() {
-        return (this.servletName);
+        return this.servletName;
     }
 
     public void setServletName(String servletName) {
@@ -120,7 +120,7 @@ public class ServletDef implements Serializable {
     private String servletClass = null;
 
     public String getServletClass() {
-        return (this.servletClass);
+        return this.servletClass;
     }
 
     public void setServletClass(String servletClass) {
@@ -134,7 +134,7 @@ public class ServletDef implements Serializable {
     private String jspFile = null;
 
     public String getJspFile() {
-        return (this.jspFile);
+        return this.jspFile;
     }
 
     public void setJspFile(String jspFile) {
@@ -149,9 +149,7 @@ public class ServletDef implements Serializable {
     private final Map<String, String> parameters = new HashMap<>();
 
     public Map<String, String> getParameterMap() {
-
-        return (this.parameters);
-
+        return this.parameters;
     }
 
     /**
@@ -178,7 +176,7 @@ public class ServletDef implements Serializable {
     private Integer loadOnStartup = null;
 
     public Integer getLoadOnStartup() {
-        return (this.loadOnStartup);
+        return this.loadOnStartup;
     }
 
     public void setLoadOnStartup(String loadOnStartup) {
@@ -192,7 +190,7 @@ public class ServletDef implements Serializable {
     private String runAs = null;
 
     public String getRunAs() {
-        return (this.runAs);
+        return this.runAs;
     }
 
     public void setRunAs(String runAs) {
@@ -206,7 +204,7 @@ public class ServletDef implements Serializable {
     private final Set<SecurityRoleRef> securityRoleRefs = new HashSet<>();
 
     public Set<SecurityRoleRef> getSecurityRoleRefs() {
-        return (this.securityRoleRefs);
+        return this.securityRoleRefs;
     }
 
     /**
