@@ -45,7 +45,7 @@ public class ResourcesTask extends AbstractCatalinaTask {
     protected String type = null;
 
     public String getType() {
-        return (this.type);
+        return this.type;
     }
 
     public void setType(String type) {

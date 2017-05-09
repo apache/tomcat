@@ -922,7 +922,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         else
             ((ServletRequestWrapper) previous).setRequest(wrapper);
         state.wrapRequest = wrapper;
-        return (wrapper);
+        return wrapper;
 
     }
 
@@ -967,7 +967,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         else
             ((ServletResponseWrapper) previous).setResponse(wrapper);
         state.wrapResponse = wrapper;
-        return (wrapper);
+        return wrapper;
 
     }
 

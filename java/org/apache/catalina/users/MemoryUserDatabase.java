@@ -143,11 +143,9 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public Iterator<Group> getGroups() {
-
         synchronized (groups) {
-            return (groups.values().iterator());
+            return groups.values().iterator();
         }
-
     }
 
 
@@ -156,9 +154,7 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public String getId() {
-
-        return (this.id);
-
+        return this.id;
     }
 
 
@@ -166,9 +162,7 @@ public class MemoryUserDatabase implements UserDatabase {
      * @return the relative or absolute pathname to the persistent storage file.
      */
     public String getPathname() {
-
-        return (this.pathname);
-
+        return this.pathname;
     }
 
 
@@ -190,9 +184,7 @@ public class MemoryUserDatabase implements UserDatabase {
      * @return the readonly status of the user database
      */
     public boolean getReadonly() {
-
-        return (this.readonly);
-
+        return this.readonly;
     }
 
 
@@ -213,11 +205,9 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public Iterator<Role> getRoles() {
-
         synchronized (roles) {
-            return (roles.values().iterator());
+            return roles.values().iterator();
         }
-
     }
 
 
@@ -226,11 +216,9 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public Iterator<User> getUsers() {
-
         synchronized (users) {
-            return (users.values().iterator());
+            return users.values().iterator();
         }
-
     }
 
 
@@ -266,7 +254,6 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public Group createGroup(String groupname, String description) {
-
         if (groupname == null || groupname.length() == 0) {
             String msg = sm.getString("memoryUserDatabase.nullGroup");
             log.warn(msg);
@@ -277,8 +264,7 @@ public class MemoryUserDatabase implements UserDatabase {
         synchronized (groups) {
             groups.put(group.getGroupname(), group);
         }
-        return (group);
-
+        return group;
     }
 
 
@@ -290,7 +276,6 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public Role createRole(String rolename, String description) {
-
         if (rolename == null || rolename.length() == 0) {
             String msg = sm.getString("memoryUserDatabase.nullRole");
             log.warn(msg);
@@ -301,8 +286,7 @@ public class MemoryUserDatabase implements UserDatabase {
         synchronized (roles) {
             roles.put(role.getRolename(), role);
         }
-        return (role);
-
+        return role;
     }
 
 
@@ -327,7 +311,7 @@ public class MemoryUserDatabase implements UserDatabase {
         synchronized (users) {
             users.put(user.getUsername(), user);
         }
-        return (user);
+        return user;
     }
 
 
@@ -615,7 +599,6 @@ public class MemoryUserDatabase implements UserDatabase {
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("MemoryUserDatabase[id=");
         sb.append(this.id);
         sb.append(",pathname=");
@@ -627,7 +610,7 @@ public class MemoryUserDatabase implements UserDatabase {
         sb.append(",userCount=");
         sb.append(this.users.size());
         sb.append("]");
-        return (sb.toString());
+        return sb.toString();
     }
 }
 
@@ -671,7 +654,7 @@ class MemoryGroupCreationFactory extends AbstractObjectCreationFactory {
                 }
             }
         }
-        return (group);
+        return group;
     }
 
     private final MemoryUserDatabase database;
@@ -695,7 +678,7 @@ class MemoryRoleCreationFactory extends AbstractObjectCreationFactory {
         }
         String description = attributes.getValue("description");
         Role role = database.createRole(rolename, description);
-        return (role);
+        return role;
     }
 
     private final MemoryUserDatabase database;
@@ -765,7 +748,7 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
                 }
             }
         }
-        return (user);
+        return user;
     }
 
     private final MemoryUserDatabase database;

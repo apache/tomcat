@@ -96,7 +96,7 @@ public final class ExampleFilter extends GenericFilter {
         StringBuilder sb = new StringBuilder("TimingFilter(");
         sb.append(getFilterConfig());
         sb.append(")");
-        return (sb.toString());
+        return sb.toString();
     }
 }
 

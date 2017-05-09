@@ -117,7 +117,6 @@ public class ManifestResource {
 
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("ManifestResource[");
         sb.append(resourceName);
 
@@ -133,7 +132,7 @@ public class ManifestResource {
             case APPLICATION : sb.append(", resourceType=APPLICATION"); break;
         }
         sb.append("]");
-        return (sb.toString());
+        return sb.toString();
     }
 
 

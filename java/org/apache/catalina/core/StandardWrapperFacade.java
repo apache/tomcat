@@ -81,7 +81,7 @@ public final class StandardWrapperFacade
                 context = ((ApplicationContext) context).getFacade();
             }
         }
-        return (context);
+        return context;
     }
 
 

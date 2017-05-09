@@ -116,9 +116,7 @@ public final class UserConfig
      * @return the Context configuration class name.
      */
     public String getConfigClass() {
-
-        return (this.configClass);
-
+        return this.configClass;
     }
 
 
@@ -128,9 +126,7 @@ public final class UserConfig
      * @param configClass The new Context configuration class name.
      */
     public void setConfigClass(String configClass) {
-
         this.configClass = configClass;
-
     }
 
 
@@ -138,9 +134,7 @@ public final class UserConfig
      * @return the Context implementation class name.
      */
     public String getContextClass() {
-
-        return (this.contextClass);
-
+        return this.contextClass;
     }
 
 
@@ -150,9 +144,7 @@ public final class UserConfig
      * @param contextClass The new Context implementation class name.
      */
     public void setContextClass(String contextClass) {
-
         this.contextClass = contextClass;
-
     }
 
 
@@ -160,9 +152,7 @@ public final class UserConfig
      * @return the directory name for user web applications.
      */
     public String getDirectoryName() {
-
-        return (this.directoryName);
-
+        return this.directoryName;
     }
 
 
@@ -172,9 +162,7 @@ public final class UserConfig
      * @param directoryName The new directory name
      */
     public void setDirectoryName(String directoryName) {
-
         this.directoryName = directoryName;
-
     }
 
 
@@ -182,9 +170,7 @@ public final class UserConfig
      * @return the base directory containing user home directories.
      */
     public String getHomeBase() {
-
-        return (this.homeBase);
-
+        return this.homeBase;
     }
 
 
@@ -194,9 +180,7 @@ public final class UserConfig
      * @param homeBase The new base directory
      */
     public void setHomeBase(String homeBase) {
-
         this.homeBase = homeBase;
-
     }
 
 
@@ -204,9 +188,7 @@ public final class UserConfig
      * @return the user database class name for this component.
      */
     public String getUserClass() {
-
-        return (this.userClass);
-
+        return this.userClass;
     }
 
 
@@ -215,9 +197,7 @@ public final class UserConfig
      * @param userClass The user database class name
      */
     public void setUserClass(String userClass) {
-
         this.userClass = userClass;
-
     }
 
     /**

@@ -298,9 +298,7 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public long getAvailable() {
-
-        return (this.available);
-
+        return this.available;
     }
 
 
@@ -315,7 +313,6 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public void setAvailable(long available) {
-
         long oldAvailable = this.available;
         if (available > System.currentTimeMillis())
             this.available = available;
@@ -323,7 +320,6 @@ public class StandardWrapper extends ContainerBase
             this.available = 0L;
         support.firePropertyChange("available", Long.valueOf(oldAvailable),
                                    Long.valueOf(this.available));
-
     }
 
 
@@ -352,7 +348,7 @@ public class StandardWrapper extends ContainerBase
              */
              return Integer.MAX_VALUE;
         } else {
-            return (this.loadOnStartup);
+            return this.loadOnStartup;
         }
     }
 
@@ -406,9 +402,7 @@ public class StandardWrapper extends ContainerBase
      * thread model servlet is used.
      */
     public int getMaxInstances() {
-
-        return (this.maxInstances);
-
+        return this.maxInstances;
     }
 
 
@@ -454,9 +448,7 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public String getRunAs() {
-
-        return (this.runAs);
-
+        return this.runAs;
     }
 
 
@@ -480,9 +472,7 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public String getServletClass() {
-
-        return (this.servletClass);
-
+        return this.servletClass;
     }
 
 
@@ -1435,9 +1425,7 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public String getInitParameter(String name) {
-
-        return (findInitParameter(name));
-
+        return findInitParameter(name);
     }
 
 
@@ -1463,14 +1451,12 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public ServletContext getServletContext() {
-
         if (parent == null)
-            return (null);
+            return null;
         else if (!(parent instanceof Context))
-            return (null);
+            return null;
         else
-            return (((Context) parent).getServletContext());
-
+            return ((Context) parent).getServletContext();
     }
 
 
@@ -1479,9 +1465,7 @@ public class StandardWrapper extends ContainerBase
      */
     @Override
     public String getServletName() {
-
-        return (getName());
-
+        return getName();
     }
 
     public long getProcessingTime() {

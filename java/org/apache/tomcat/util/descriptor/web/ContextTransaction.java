@@ -83,10 +83,8 @@ public class ContextTransaction implements Serializable {
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("Transaction[");
         sb.append("]");
-        return (sb.toString());
-
+        return sb.toString();
     }
 }

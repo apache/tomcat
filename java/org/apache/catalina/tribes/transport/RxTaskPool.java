@@ -86,7 +86,7 @@ public class RxTaskPool {
             }//while
             if ( worker != null ) used.add(worker);
         }
-        return (worker);
+        return worker;
     }
 
     public int available() {

@@ -261,7 +261,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     @Override
     public Enumeration<String> getAttributeNames() {
-        return (new AttributeNamesEnumerator());
+        return new AttributeNamesEnumerator();
     }
 
 
@@ -315,13 +315,13 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     public RequestDispatcher getRequestDispatcher(String path) {
 
         if (context == null)
-            return (null);
+            return null;
 
         // If the path is already context-relative, just pass it through
         if (path == null)
-            return (null);
+            return null;
         else if (path.startsWith("/"))
-            return (context.getServletContext().getRequestDispatcher(path));
+            return context.getServletContext().getRequestDispatcher(path);
 
         // Convert a request-relative path to a context-relative one
         String servletPath =
@@ -347,7 +347,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             relative = requestPath + path;
         }
 
-        return (context.getServletContext().getRequestDispatcher(relative));
+        return context.getServletContext().getRequestDispatcher(relative);
 
     }
 
@@ -371,9 +371,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     @Override
     public String getContextPath() {
-
-        return (this.contextPath);
-
+        return this.contextPath;
     }
 
 
@@ -384,7 +382,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     @Override
     public String getParameter(String name) {
-
         parseParameters();
 
         String[] value = parameters.get(name);
@@ -392,7 +389,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             return null;
         }
         return value[0];
-
     }
 
 
@@ -402,10 +398,8 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     @Override
     public Map<String, String[]> getParameterMap() {
-
         parseParameters();
-        return (parameters);
-
+        return parameters;
     }
 
 
@@ -415,7 +409,6 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     @Override
     public Enumeration<String> getParameterNames() {
-
         parseParameters();
         return Collections.enumeration(parameters.keySet());
     }
@@ -429,10 +422,8 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     @Override
     public String[] getParameterValues(String name) {
-
         parseParameters();
         return parameters.get(name);
-
     }
 
 
@@ -441,9 +432,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     @Override
     public String getPathInfo() {
-
-        return (this.pathInfo);
-
+        return this.pathInfo;
     }
 
 
@@ -467,9 +456,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     @Override
     public String getQueryString() {
-
-        return (this.queryString);
-
+        return this.queryString;
     }
 
 
@@ -479,9 +466,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     @Override
     public String getRequestURI() {
-
-        return (this.requestURI);
-
+        return this.requestURI;
     }
 
 
@@ -501,9 +486,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     @Override
     public String getServletPath() {
-
-        return (this.servletPath);
-
+        return this.servletPath;
     }
 
 
@@ -519,7 +502,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     @Override
     public HttpSession getSession() {
-        return (getSession(true));
+        return getSession(true);
     }
 
 
@@ -536,11 +519,11 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
             // There cannot be a session if no context has been assigned yet
             if (context == null)
-                return (null);
+                return null;
 
             // Return the current session if it exists and is valid
             if (session != null && session.isValid()) {
-                return (session.getSession());
+                return session.getSession();
             }
 
             HttpSession other = super.getSession(false);
@@ -784,10 +767,10 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     protected int getSpecial(String name) {
         for (int i = 0; i < specials.length; i++) {
             if (specials[i].equals(name)) {
-                return (i);
+                return i;
             }
         }
-        return (-1);
+        return -1;
     }
 
 
@@ -948,7 +931,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
                 for (int i = pos + 1; i <= last; i++) {
                     if (getAttribute(specials[i]) != null) {
                         pos = i;
-                        return (specials[i]);
+                        return specials[i];
                     }
                 }
             }

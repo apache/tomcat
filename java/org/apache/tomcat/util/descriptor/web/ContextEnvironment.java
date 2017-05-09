@@ -38,7 +38,7 @@ public class ContextEnvironment extends ResourceBase {
     private boolean override = true;
 
     public boolean getOverride() {
-        return (this.override);
+        return this.override;
     }
 
     public void setOverride(boolean override) {
@@ -52,7 +52,7 @@ public class ContextEnvironment extends ResourceBase {
     private String value = null;
 
     public String getValue() {
-        return (this.value);
+        return this.value;
     }
 
     public void setValue(String value) {
@@ -87,7 +87,7 @@ public class ContextEnvironment extends ResourceBase {
         sb.append(", override=");
         sb.append(override);
         sb.append("]");
-        return (sb.toString());
+        return sb.toString();
 
     }
 

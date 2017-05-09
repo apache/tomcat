@@ -38,7 +38,7 @@ public class ContextResourceEnvRef extends ResourceBase {
     private boolean override = true;
 
     public boolean getOverride() {
-        return (this.override);
+        return this.override;
     }
 
     public void setOverride(boolean override) {
@@ -64,7 +64,7 @@ public class ContextResourceEnvRef extends ResourceBase {
         sb.append(", override=");
         sb.append(override);
         sb.append("]");
-        return (sb.toString());
+        return sb.toString();
     }
 
 

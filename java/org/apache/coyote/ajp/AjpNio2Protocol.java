@@ -44,6 +44,6 @@ public class AjpNio2Protocol extends AbstractAjpProtocol<Nio2Channel> {
 
     @Override
     protected String getNamePrefix() {
-        return ("ajp-nio2");
+        return "ajp-nio2";
     }
 }

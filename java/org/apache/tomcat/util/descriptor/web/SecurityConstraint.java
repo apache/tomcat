@@ -321,9 +321,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
      * @return the roles array
      */
     public String[] findAuthRoles() {
-
-        return (authRoles);
-
+        return authRoles;
     }
 
 
@@ -335,15 +333,13 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
      * @return the collection
      */
     public SecurityCollection findCollection(String name) {
-
         if (name == null)
-            return (null);
+            return null;
         for (int i = 0; i < collections.length; i++) {
             if (name.equals(collections[i].getName()))
-                return (collections[i]);
+                return collections[i];
         }
-        return (null);
-
+        return null;
     }
 
 
@@ -354,9 +350,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
      * @return the collections array
      */
     public SecurityCollection[] findCollections() {
-
-        return (collections);
-
+        return collections;
     }
 
 
@@ -466,7 +460,6 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("SecurityConstraint[");
         for (int i = 0; i < collections.length; i++) {
             if (i > 0)
@@ -474,8 +467,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
             sb.append(collections[i].getName());
         }
         sb.append("]");
-        return (sb.toString());
-
+        return sb.toString();
     }
 
 

@@ -82,7 +82,7 @@ public class ApplicationPushBuilder implements PushBuilder {
             current = ((ServletRequestWrapper) current).getRequest();
         }
         if (current instanceof Request) {
-            catalinaRequest = ((Request) current);
+            catalinaRequest = (Request) current;
             coyoteRequest = catalinaRequest.getCoyoteRequest();
         } else {
             throw new UnsupportedOperationException(sm.getString(

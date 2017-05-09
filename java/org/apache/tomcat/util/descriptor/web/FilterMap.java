@@ -60,7 +60,7 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
     private String filterName = null;
 
     public String getFilterName() {
-        return (this.filterName);
+        return this.filterName;
     }
 
     public void setFilterName(String filterName) {
@@ -77,7 +77,7 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
         if (matchAllServletNames) {
             return new String[] {};
         } else {
-            return (this.servletNames);
+            return this.servletNames;
         }
     }
 
@@ -122,7 +122,7 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
         if (matchAllUrlPatterns) {
             return new String[] {};
         } else {
-            return (this.urlPatterns);
+            return this.urlPatterns;
         }
     }
 
@@ -203,7 +203,6 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("FilterMap[");
         sb.append("filterName=");
         sb.append(this.filterName);
@@ -216,8 +215,7 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
             sb.append(urlPatterns[i]);
         }
         sb.append("]");
-        return (sb.toString());
-
+        return sb.toString();
     }
 
 

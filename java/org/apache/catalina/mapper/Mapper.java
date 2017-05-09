@@ -1449,7 +1449,6 @@ public final class Mapper {
      * Find the position of the last slash in the given char chunk.
      */
     private static final int lastSlash(CharChunk name) {
-
         char[] c = name.getBuffer();
         int end = name.getEnd();
         int start = name.getStart();
@@ -1461,8 +1460,7 @@ public final class Mapper {
             }
         }
 
-        return (pos);
-
+        return pos;
     }
 
 
@@ -1470,7 +1468,6 @@ public final class Mapper {
      * Find the position of the nth slash, in the given char chunk.
      */
     private static final int nthSlash(CharChunk name, int n) {
-
         char[] c = name.getBuffer();
         int end = name.getEnd();
         int start = name.getStart();
@@ -1484,8 +1481,7 @@ public final class Mapper {
             }
         }
 
-        return (pos);
-
+        return pos;
     }
 
 

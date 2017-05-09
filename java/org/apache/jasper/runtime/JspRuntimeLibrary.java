@@ -835,9 +835,9 @@ public class JspRuntimeLibrary {
                                                 String relativePath) {
 
         if (relativePath.startsWith("/"))
-            return (relativePath);
+            return relativePath;
         if (!(request instanceof HttpServletRequest))
-            return (relativePath);
+            return relativePath;
         HttpServletRequest hrequest = (HttpServletRequest) request;
         String uri = (String) request.getAttribute(
                 RequestDispatcher.INCLUDE_SERVLET_PATH);

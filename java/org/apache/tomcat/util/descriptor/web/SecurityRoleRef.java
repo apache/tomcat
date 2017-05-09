@@ -41,7 +41,7 @@ public class SecurityRoleRef implements Serializable {
     private String name = null;
 
     public String getName() {
-        return (this.name);
+        return this.name;
     }
 
     public void setName(String name) {
@@ -55,7 +55,7 @@ public class SecurityRoleRef implements Serializable {
     private String link = null;
 
     public String getLink() {
-        return (this.link);
+        return this.link;
     }
 
     public void setLink(String link) {
@@ -72,7 +72,6 @@ public class SecurityRoleRef implements Serializable {
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("SecurityRoleRef[");
         sb.append("name=");
         sb.append(name);
@@ -81,8 +80,7 @@ public class SecurityRoleRef implements Serializable {
             sb.append(link);
         }
         sb.append("]");
-        return (sb.toString());
-
+        return sb.toString();
     }
 
 

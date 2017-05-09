@@ -42,7 +42,7 @@ public class ResourceBase implements Serializable, Injectable {
     private String description = null;
 
     public String getDescription() {
-        return (this.description);
+        return this.description;
     }
 
     public void setDescription(String description) {
@@ -58,7 +58,7 @@ public class ResourceBase implements Serializable, Injectable {
 
     @Override
     public String getName() {
-        return (this.name);
+        return this.name;
     }
 
     public void setName(String name) {
@@ -72,7 +72,7 @@ public class ResourceBase implements Serializable, Injectable {
     private String type = null;
 
     public String getType() {
-        return (this.type);
+        return this.type;
     }
 
     public void setType(String type) {
@@ -207,7 +207,7 @@ public class ResourceBase implements Serializable, Injectable {
     private NamingResources resources = null;
 
     public NamingResources getNamingResources() {
-        return (this.resources);
+        return this.resources;
     }
 
     public void setNamingResources(NamingResources resources) {

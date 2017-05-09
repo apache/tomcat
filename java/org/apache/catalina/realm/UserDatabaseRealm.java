@@ -154,15 +154,13 @@ public class UserDatabaseRealm
      */
     @Override
     protected String getPassword(String username) {
-
         User user = database.findUser(username);
 
         if (user == null) {
             return null;
         }
 
-        return (user.getPassword());
-
+        return user.getPassword();
     }
 
 

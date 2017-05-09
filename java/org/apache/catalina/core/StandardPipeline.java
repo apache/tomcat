@@ -137,9 +137,7 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
      */
     @Override
     public Container getContainer() {
-
-        return (this.container);
-
+        return this.container;
     }
 
 
@@ -150,9 +148,7 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
      */
     @Override
     public void setContainer(Container container) {
-
         this.container = container;
-
     }
 
 
@@ -239,9 +235,7 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
      */
     @Override
     public Valve getBasic() {
-
-        return (this.basic);
-
+        return this.basic;
     }
 
 

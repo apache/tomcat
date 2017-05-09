@@ -224,7 +224,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
      */
     @Override
     public Container getContainer() {
-        return (this.container);
+        return this.container;
     }
 
     /**

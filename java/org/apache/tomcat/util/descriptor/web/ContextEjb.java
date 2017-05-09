@@ -40,7 +40,7 @@ public class ContextEjb extends ResourceBase {
     private String home = null;
 
     public String getHome() {
-        return (this.home);
+        return this.home;
     }
 
     public void setHome(String home) {
@@ -54,7 +54,7 @@ public class ContextEjb extends ResourceBase {
     private String link = null;
 
     public String getLink() {
-        return (this.link);
+        return this.link;
     }
 
     public void setLink(String link) {
@@ -67,7 +67,7 @@ public class ContextEjb extends ResourceBase {
     private String remote = null;
 
     public String getRemote() {
-        return (this.remote);
+        return this.remote;
     }
 
     public void setRemote(String remote) {
@@ -108,7 +108,7 @@ public class ContextEjb extends ResourceBase {
             sb.append(link);
         }
         sb.append("]");
-        return (sb.toString());
+        return sb.toString();
 
     }
 

@@ -53,7 +53,7 @@ public final class SavedRequest {
     }
 
     public Iterator<Cookie> getCookies() {
-        return (cookies.iterator());
+        return cookies.iterator();
     }
 
 
@@ -75,15 +75,15 @@ public final class SavedRequest {
     }
 
     public Iterator<String> getHeaderNames() {
-        return (headers.keySet().iterator());
+        return headers.keySet().iterator();
     }
 
     public Iterator<String> getHeaderValues(String name) {
         ArrayList<String> values = headers.get(name);
         if (values == null)
-            return ((new ArrayList<String>()).iterator());
+            return new ArrayList<String>().iterator();
         else
-            return (values.iterator());
+            return values.iterator();
     }
 
 
@@ -97,7 +97,7 @@ public final class SavedRequest {
     }
 
     public Iterator<Locale> getLocales() {
-        return (locales.iterator());
+        return locales.iterator();
     }
 
 
@@ -107,7 +107,7 @@ public final class SavedRequest {
     private String method = null;
 
     public String getMethod() {
-        return (this.method);
+        return this.method;
     }
 
     public void setMethod(String method) {
@@ -121,7 +121,7 @@ public final class SavedRequest {
     private String queryString = null;
 
     public String getQueryString() {
-        return (this.queryString);
+        return this.queryString;
     }
 
     public void setQueryString(String queryString) {
@@ -135,7 +135,7 @@ public final class SavedRequest {
     private String requestURI = null;
 
     public String getRequestURI() {
-        return (this.requestURI);
+        return this.requestURI;
     }
 
     public void setRequestURI(String requestURI) {
@@ -150,7 +150,7 @@ public final class SavedRequest {
     private String decodedRequestURI = null;
 
     public String getDecodedRequestURI() {
-        return (this.decodedRequestURI);
+        return this.decodedRequestURI;
     }
 
     public void setDecodedRequestURI(String decodedRequestURI) {
@@ -164,7 +164,7 @@ public final class SavedRequest {
     private ByteChunk body = null;
 
     public ByteChunk getBody() {
-        return (this.body);
+        return this.body;
     }
 
     public void setBody(ByteChunk body) {
@@ -177,7 +177,7 @@ public final class SavedRequest {
     private String contentType = null;
 
     public String getContentType() {
-        return (this.contentType);
+        return this.contentType;
     }
 
     public void setContentType(String contentType) {

@@ -228,7 +228,7 @@ public class Http11Processor extends AbstractProcessor {
             // Check for compatible MIME-TYPE
             String[] compressibleMimeTypes = protocol.getCompressibleMimeTypes();
             if (compressibleMimeTypes != null) {
-                return (startsWithStringArray(compressibleMimeTypes, response.getContentType()));
+                return startsWithStringArray(compressibleMimeTypes, response.getContentType());
             }
         }
 

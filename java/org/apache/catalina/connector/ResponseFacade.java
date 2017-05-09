@@ -209,7 +209,7 @@ public class ResponseFacade implements HttpServletResponse {
         if (isFinished()) {
             response.setSuspended(true);
         }
-        return (sos);
+        return sos;
 
     }
 
@@ -226,7 +226,7 @@ public class ResponseFacade implements HttpServletResponse {
         if (isFinished()) {
             response.setSuspended(true);
         }
-        return (writer);
+        return writer;
 
     }
 
@@ -333,7 +333,7 @@ public class ResponseFacade implements HttpServletResponse {
                             sm.getString("responseFacade.nullResponse"));
         }
 
-        return (response.isAppCommitted());
+        return response.isAppCommitted();
     }
 
 

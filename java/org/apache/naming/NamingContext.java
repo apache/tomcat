@@ -832,7 +832,7 @@ public class NamingContext implements Context {
                     // Link relative to this context
                     return lookup(link.substring(1));
                 } else {
-                    return (new InitialContext(env)).lookup(link);
+                    return new InitialContext(env).lookup(link);
                 }
             } else if (entry.type == NamingEntry.REFERENCE) {
                 try {

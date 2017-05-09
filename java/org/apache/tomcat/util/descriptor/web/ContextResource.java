@@ -40,7 +40,7 @@ public class ContextResource extends ResourceBase {
     private String auth = null;
 
     public String getAuth() {
-        return (this.auth);
+        return this.auth;
     }
 
     public void setAuth(String auth) {
@@ -54,7 +54,7 @@ public class ContextResource extends ResourceBase {
     private String scope = "Shareable";
 
     public String getScope() {
-        return (this.scope);
+        return this.scope;
     }
 
     public void setScope(String scope) {
@@ -124,7 +124,7 @@ public class ContextResource extends ResourceBase {
             sb.append(scope);
         }
         sb.append("]");
-        return (sb.toString());
+        return sb.toString();
     }
 
 

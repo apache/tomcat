@@ -159,11 +159,11 @@ public class ResolverImpl extends Resolver {
         } else {
             switch (type) {
             case 0:
-                return (resource.isDirectory());
+                return resource.isDirectory();
             case 1:
-                return (resource.isFile());
+                return resource.isFile();
             case 2:
-                return (resource.isFile() && resource.getContentLength() > 0);
+                return resource.isFile() && resource.getContentLength() > 0;
             default:
                 return false;
             }

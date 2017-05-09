@@ -86,9 +86,7 @@ public class RulesBase implements Rules {
      */
     @Override
     public Digester getDigester() {
-
-        return (this.digester);
-
+        return this.digester;
     }
 
 
@@ -116,9 +114,7 @@ public class RulesBase implements Rules {
      */
     @Override
     public String getNamespaceURI() {
-
-        return (this.namespaceURI);
-
+        return this.namespaceURI;
     }
 
 
@@ -222,8 +218,7 @@ public class RulesBase implements Rules {
         if (rulesList == null) {
             rulesList = new ArrayList<>();
         }
-        return (rulesList);
-
+        return rulesList;
     }
 
 
@@ -236,9 +231,7 @@ public class RulesBase implements Rules {
      */
     @Override
     public List<Rule> rules() {
-
-        return (this.rules);
-
+        return this.rules;
     }
 
 
@@ -256,14 +249,13 @@ public class RulesBase implements Rules {
      * @return a rules list
      */
     protected List<Rule> lookup(String namespaceURI, String pattern) {
-
         // Optimize when no namespace URI is specified
         List<Rule> list = this.cache.get(pattern);
         if (list == null) {
-            return (null);
+            return null;
         }
         if ((namespaceURI == null) || (namespaceURI.length() == 0)) {
-            return (list);
+            return list;
         }
 
         // Select only Rules that match on the specified namespace URI
@@ -276,8 +268,7 @@ public class RulesBase implements Rules {
                 results.add(item);
             }
         }
-        return (results);
-
+        return results;
     }
 
 

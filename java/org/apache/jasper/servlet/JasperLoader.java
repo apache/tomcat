@@ -56,8 +56,7 @@ public class JasperLoader extends URLClassLoader {
      */
     @Override
     public Class<?> loadClass(String name) throws ClassNotFoundException {
-
-        return (loadClass(name, false));
+        return loadClass(name, false);
     }
 
     /**
@@ -96,7 +95,7 @@ public class JasperLoader extends URLClassLoader {
         if (clazz != null) {
             if (resolve)
                 resolveClass(clazz);
-            return (clazz);
+            return clazz;
         }
 
         // (.5) Permission to access this class when using a SecurityManager

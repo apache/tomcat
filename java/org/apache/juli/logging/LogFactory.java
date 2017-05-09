@@ -193,8 +193,7 @@ public class LogFactory {
      */
     public static Log getLog(Class<?> clazz)
         throws LogConfigurationException {
-        return (getFactory().getInstance(clazz));
-
+        return getFactory().getInstance(clazz);
     }
 
 
@@ -213,8 +212,7 @@ public class LogFactory {
      */
     public static Log getLog(String name)
         throws LogConfigurationException {
-        return (getFactory().getInstance(name));
-
+        return getFactory().getInstance(name);
     }
 
 

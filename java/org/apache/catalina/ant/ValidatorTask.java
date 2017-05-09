@@ -54,7 +54,7 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
     protected String path = null;
 
     public String getPath() {
-        return (this.path);
+        return this.path;
     }
 
     public void setPath(String path) {

@@ -145,15 +145,13 @@ public class ObjectCreateRule extends Rule {
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("ObjectCreateRule[");
         sb.append("className=");
         sb.append(className);
         sb.append(", attributeName=");
         sb.append(attributeName);
         sb.append("]");
-        return (sb.toString());
-
+        return sb.toString();
     }
 
 

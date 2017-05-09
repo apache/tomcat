@@ -173,7 +173,7 @@ public class BioSender extends AbstractSender {
           SenderState.getSenderState(getDestination()).setSuspect();
           if (log.isDebugEnabled())
               log.debug(sm.getString("bioSender.openSocket.failure",getAddress().getHostAddress(), Integer.valueOf(getPort()), Long.valueOf(0)), ex1);
-          throw (ex1);
+          throw ex1;
         }
 
      }

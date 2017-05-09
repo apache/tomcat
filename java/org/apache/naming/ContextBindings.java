@@ -200,7 +200,7 @@ public class ContextBindings {
      *         context, otherwise <code>false</code>
      */
     public static boolean isThreadBound() {
-        return (threadBindings.containsKey(Thread.currentThread()));
+        return threadBindings.containsKey(Thread.currentThread());
     }
 
 

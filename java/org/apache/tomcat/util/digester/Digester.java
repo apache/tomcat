@@ -318,17 +318,15 @@ public class Digester extends DefaultHandler2 {
      * @return the namespace URI
      */
     public String findNamespaceURI(String prefix) {
-
         ArrayStack<String> stack = namespaces.get(prefix);
         if (stack == null) {
-            return (null);
+            return null;
         }
         try {
             return stack.peek();
         } catch (EmptyStackException e) {
-            return (null);
+            return null;
         }
-
     }
 
 
@@ -344,18 +342,16 @@ public class Digester extends DefaultHandler2 {
      * @return the classloader
      */
     public ClassLoader getClassLoader() {
-
         if (this.classLoader != null) {
-            return (this.classLoader);
+            return this.classLoader;
         }
         if (this.useContextClassLoader) {
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             if (classLoader != null) {
-                return (classLoader);
+                return classLoader;
             }
         }
-        return (this.getClass().getClassLoader());
-
+        return this.getClass().getClassLoader();
     }
 
 
@@ -367,9 +363,7 @@ public class Digester extends DefaultHandler2 {
      *  to revert to the standard rules
      */
     public void setClassLoader(ClassLoader classLoader) {
-
         this.classLoader = classLoader;
-
     }
 
 
@@ -377,9 +371,7 @@ public class Digester extends DefaultHandler2 {
      * @return the current depth of the element stack.
      */
     public int getCount() {
-
-        return (stack.size());
-
+        return stack.size();
     }
 
 
@@ -387,14 +379,12 @@ public class Digester extends DefaultHandler2 {
      * @return the name of the XML element that is currently being processed.
      */
     public String getCurrentElementName() {
-
         String elementName = match;
         int lastSlash = elementName.lastIndexOf('/');
         if (lastSlash >= 0) {
             elementName = elementName.substring(lastSlash + 1);
         }
-        return (elementName);
-
+        return elementName;
     }
 
 
@@ -402,9 +392,7 @@ public class Digester extends DefaultHandler2 {
      * @return the error handler for this Digester.
      */
     public ErrorHandler getErrorHandler() {
-
-        return (this.errorHandler);
-
+        return this.errorHandler;
     }
 
 
@@ -414,9 +402,7 @@ public class Digester extends DefaultHandler2 {
      * @param errorHandler The new error handler
      */
     public void setErrorHandler(ErrorHandler errorHandler) {
-
         this.errorHandler = errorHandler;
-
     }
 
 
@@ -447,8 +433,7 @@ public class Digester extends DefaultHandler2 {
                 factory.setFeature("http://apache.org/xml/features/validation/schema", true);
             }
         }
-        return (factory);
-
+        return factory;
     }
 
 
@@ -539,9 +524,7 @@ public class Digester extends DefaultHandler2 {
      * @return the "namespace aware" flag for parsers we create.
      */
     public boolean getNamespaceAware() {
-
-        return (this.namespaceAware);
-
+        return this.namespaceAware;
     }
 
 
@@ -551,9 +534,7 @@ public class Digester extends DefaultHandler2 {
      * @param namespaceAware The new "namespace aware" flag
      */
     public void setNamespaceAware(boolean namespaceAware) {
-
         this.namespaceAware = namespaceAware;
-
     }
 
 
@@ -571,9 +552,7 @@ public class Digester extends DefaultHandler2 {
      * parsing under, if any.
      */
     public String getPublicId() {
-
-        return (this.publicId);
-
+        return this.publicId;
     }
 
 
@@ -582,9 +561,7 @@ public class Digester extends DefaultHandler2 {
      * added <code>Rule</code> objects.
      */
     public String getRuleNamespaceURI() {
-
-        return (getRules().getNamespaceURI());
-
+        return getRules().getNamespaceURI();
     }
 
 
@@ -597,9 +574,7 @@ public class Digester extends DefaultHandler2 {
      *  regardless of the current namespace URI
      */
     public void setRuleNamespaceURI(String ruleNamespaceURI) {
-
         getRules().setNamespaceURI(ruleNamespaceURI);
-
     }
 
 
@@ -611,7 +586,7 @@ public class Digester extends DefaultHandler2 {
 
         // Return the parser we already created (if any)
         if (parser != null) {
-            return (parser);
+            return parser;
         }
 
         // Create a new parser
@@ -619,11 +594,10 @@ public class Digester extends DefaultHandler2 {
             parser = getFactory().newSAXParser();
         } catch (Exception e) {
             log.error("Digester.getParser: ", e);
-            return (null);
+            return null;
         }
 
-        return (parser);
-
+        return parser;
     }
 
 
@@ -644,8 +618,7 @@ public class Digester extends DefaultHandler2 {
     public Object getProperty(String property)
             throws SAXNotRecognizedException, SAXNotSupportedException {
 
-        return (getParser().getProperty(property));
-
+        return getParser().getProperty(property);
     }
 
 
@@ -656,13 +629,11 @@ public class Digester extends DefaultHandler2 {
      * @return the rules
      */
     public Rules getRules() {
-
         if (this.rules == null) {
             this.rules = new RulesBase();
             this.rules.setDigester(this);
         }
-        return (this.rules);
-
+        return this.rules;
     }
 
 
@@ -673,10 +644,8 @@ public class Digester extends DefaultHandler2 {
      * @param rules New Rules implementation
      */
     public void setRules(Rules rules) {
-
         this.rules = rules;
         this.rules.setDigester(this);
-
     }
 
 
@@ -684,9 +653,7 @@ public class Digester extends DefaultHandler2 {
      * @return the boolean as to whether the context classloader should be used.
      */
     public boolean getUseContextClassLoader() {
-
         return useContextClassLoader;
-
     }
 
 
@@ -710,9 +677,7 @@ public class Digester extends DefaultHandler2 {
      * @return the validating parser flag.
      */
     public boolean getValidating() {
-
-        return (this.validating);
-
+        return this.validating;
     }
 
 
@@ -723,9 +688,7 @@ public class Digester extends DefaultHandler2 {
      * @param validating The new validating parser flag.
      */
     public void setValidating(boolean validating) {
-
         this.validating = validating;
-
     }
 
 
@@ -733,9 +696,7 @@ public class Digester extends DefaultHandler2 {
      * @return the rules validation flag.
      */
     public boolean getRulesValidation() {
-
-        return (this.rulesValidation);
-
+        return this.rulesValidation;
     }
 
 
@@ -746,9 +707,7 @@ public class Digester extends DefaultHandler2 {
      * @param rulesValidation The new rules validation flag.
      */
     public void setRulesValidation(boolean rulesValidation) {
-
         this.rulesValidation = rulesValidation;
-
     }
 
 
@@ -756,9 +715,7 @@ public class Digester extends DefaultHandler2 {
      * @return the fake attributes list.
      */
     public Map<Class<?>, List<String>> getFakeAttributes() {
-
-        return (this.fakeAttributes);
-
+        return this.fakeAttributes;
     }
 
 
@@ -769,7 +726,6 @@ public class Digester extends DefaultHandler2 {
      * @return <code>true</code> if this is a fake attribute
      */
     public boolean isFakeAttribute(Object object, String name) {
-
         if (fakeAttributes == null) {
             return false;
         }
@@ -782,7 +738,6 @@ public class Digester extends DefaultHandler2 {
         } else {
             return result.contains(name);
         }
-
     }
 
 
@@ -1323,7 +1278,7 @@ public class Digester extends DefaultHandler2 {
                 if (log.isDebugEnabled()) {
                     log.debug(" Cannot resolve entity: '" + publicId + "'");
                 }
-                return (null);
+                return null;
 
             } else {
                 // try to resolve using system ID
@@ -1353,7 +1308,7 @@ public class Digester extends DefaultHandler2 {
         }
 
         try {
-            return (new InputSource(entityURL));
+            return new InputSource(entityURL);
         } catch (Exception e) {
             throw createSAXException(e);
         }
@@ -1444,13 +1399,11 @@ public class Digester extends DefaultHandler2 {
      * @exception SAXException if a parsing exception occurs
      */
     public Object parse(File file) throws IOException, SAXException {
-
         configure();
         InputSource input = new InputSource(new FileInputStream(file));
         input.setSystemId("file://" + file.getAbsolutePath());
         getXMLReader().parse(input);
-        return (root);
-
+        return root;
     }
 
 
@@ -1464,11 +1417,9 @@ public class Digester extends DefaultHandler2 {
      * @exception SAXException if a parsing exception occurs
      */
     public Object parse(InputSource input) throws IOException, SAXException {
-
         configure();
         getXMLReader().parse(input);
-        return (root);
-
+        return root;
     }
 
 
@@ -1482,12 +1433,10 @@ public class Digester extends DefaultHandler2 {
      * @exception SAXException if a parsing exception occurs
      */
     public Object parse(InputStream input) throws IOException, SAXException {
-
         configure();
         InputSource is = new InputSource(input);
         getXMLReader().parse(is);
-        return (root);
-
+        return root;
     }
 
 
@@ -1724,14 +1673,12 @@ public class Digester extends DefaultHandler2 {
      * @return the top object
      */
     public Object peek() {
-
         try {
-            return (stack.peek());
+            return stack.peek();
         } catch (EmptyStackException e) {
             log.warn("Empty stack (returning null)");
-            return (null);
+            return null;
         }
-
     }
 
 
@@ -1745,14 +1692,12 @@ public class Digester extends DefaultHandler2 {
      * @return the specified object
      */
     public Object peek(int n) {
-
         try {
-            return (stack.peek(n));
+            return stack.peek(n);
         } catch (EmptyStackException e) {
             log.warn("Empty stack (returning null)");
-            return (null);
+            return null;
         }
-
     }
 
 
@@ -1762,14 +1707,12 @@ public class Digester extends DefaultHandler2 {
      * @return the top object
      */
     public Object pop() {
-
         try {
-            return (stack.pop());
+            return stack.pop();
         } catch (EmptyStackException e) {
             log.warn("Empty stack (returning null)");
-            return (null);
+            return null;
         }
-
     }
 
 
@@ -1841,14 +1784,12 @@ public class Digester extends DefaultHandler2 {
      * @return the top object on the parameters stack
      */
     public Object peekParams() {
-
         try {
-            return (params.peek());
+            return params.peek();
         } catch (EmptyStackException e) {
             log.warn("Empty stack (returning null)");
-            return (null);
+            return null;
         }
-
     }
 
 
@@ -1861,17 +1802,15 @@ public class Digester extends DefaultHandler2 {
      * @return the top object on the parameters stack
      */
     public Object popParams() {
-
         try {
             if (log.isTraceEnabled()) {
                 log.trace("Popping params");
             }
-            return (params.pop());
+            return params.pop();
         } catch (EmptyStackException e) {
             log.warn("Empty stack (returning null)");
-            return (null);
+            return null;
         }
-
     }
 
 

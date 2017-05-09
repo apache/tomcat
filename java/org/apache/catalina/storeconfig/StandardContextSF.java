@@ -320,7 +320,7 @@ public class StandardContextSF extends StoreFactoryBase {
                 log.error(e);
             }
         }
-        return (file);
+        return file;
 
     }
 

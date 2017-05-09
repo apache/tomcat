@@ -47,7 +47,7 @@ public class FilterDef implements Serializable {
     private String description = null;
 
     public String getDescription() {
-        return (this.description);
+        return this.description;
     }
 
     public void setDescription(String description) {
@@ -61,7 +61,7 @@ public class FilterDef implements Serializable {
     private String displayName = null;
 
     public String getDisplayName() {
-        return (this.displayName);
+        return this.displayName;
     }
 
     public void setDisplayName(String displayName) {
@@ -89,7 +89,7 @@ public class FilterDef implements Serializable {
     private String filterClass = null;
 
     public String getFilterClass() {
-        return (this.filterClass);
+        return this.filterClass;
     }
 
     public void setFilterClass(String filterClass) {
@@ -104,7 +104,7 @@ public class FilterDef implements Serializable {
     private String filterName = null;
 
     public String getFilterName() {
-        return (this.filterName);
+        return this.filterName;
     }
 
     public void setFilterName(String filterName) {
@@ -122,7 +122,7 @@ public class FilterDef implements Serializable {
     private String largeIcon = null;
 
     public String getLargeIcon() {
-        return (this.largeIcon);
+        return this.largeIcon;
     }
 
     public void setLargeIcon(String largeIcon) {
@@ -137,9 +137,7 @@ public class FilterDef implements Serializable {
     private final Map<String, String> parameters = new HashMap<>();
 
     public Map<String, String> getParameterMap() {
-
-        return (this.parameters);
-
+        return this.parameters;
     }
 
 
@@ -149,7 +147,7 @@ public class FilterDef implements Serializable {
     private String smallIcon = null;
 
     public String getSmallIcon() {
-        return (this.smallIcon);
+        return this.smallIcon;
     }
 
     public void setSmallIcon(String smallIcon) {
@@ -194,15 +192,13 @@ public class FilterDef implements Serializable {
      */
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder("FilterDef[");
         sb.append("filterName=");
         sb.append(this.filterName);
         sb.append(", filterClass=");
         sb.append(this.filterClass);
         sb.append("]");
-        return (sb.toString());
-
+        return sb.toString();
     }
 
 

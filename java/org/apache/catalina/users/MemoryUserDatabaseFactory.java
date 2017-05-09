@@ -76,11 +76,11 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
         // We only know how to deal with <code>javax.naming.Reference</code>s
         // that specify a class name of "org.apache.catalina.UserDatabase"
         if ((obj == null) || !(obj instanceof Reference)) {
-            return (null);
+            return null;
         }
         Reference ref = (Reference) obj;
         if (!"org.apache.catalina.UserDatabase".equals(ref.getClassName())) {
-            return (null);
+            return null;
         }
 
         // Create and configure a MemoryUserDatabase instance based on the
@@ -103,7 +103,7 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
         // Don't try something we know won't work
         if (!database.getReadonly())
             database.save();
-        return (database);
+        return database;
 
     }
 

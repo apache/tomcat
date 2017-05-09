@@ -947,7 +947,7 @@ public class StatusTransformer {
                 result.append(content[i]);
             }
         }
-        return (result.toString());
+        return result.toString();
 
     }
 

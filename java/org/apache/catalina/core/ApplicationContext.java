@@ -213,7 +213,7 @@ public class ApplicationContext implements ServletContext {
 
     @Override
     public Object getAttribute(String name) {
-        return (attributes.get(name));
+        return attributes.get(name);
     }
 
 
@@ -348,14 +348,14 @@ public class ApplicationContext implements ServletContext {
     public String getMimeType(String file) {
 
         if (file == null)
-            return (null);
+            return null;
         int period = file.lastIndexOf('.');
         if (period < 0)
-            return (null);
+            return null;
         String extension = file.substring(period + 1);
         if (extension.length() < 1)
-            return (null);
-        return (context.findMimeMapping(extension));
+            return null;
+        return context.findMimeMapping(extension);
 
     }
 
@@ -371,12 +371,12 @@ public class ApplicationContext implements ServletContext {
 
         // Validate the name argument
         if (name == null)
-            return (null);
+            return null;
 
         // Create and return a corresponding request dispatcher
         Wrapper wrapper = (Wrapper) context.findChild(name);
         if (wrapper == null)
-            return (null);
+            return null;
 
         return new ApplicationDispatcher(wrapper, null, null, null, null, null, name);
 
@@ -395,7 +395,7 @@ public class ApplicationContext implements ServletContext {
 
         // Validate the path argument
         if (path == null)
-            return (null);
+            return null;
         if (!path.startsWith("/"))
             throw new IllegalArgumentException
                 (sm.getString
@@ -412,7 +412,7 @@ public class ApplicationContext implements ServletContext {
 
         normalizedPath = RequestUtil.normalize(normalizedPath);
         if (normalizedPath == null)
-            return (null);
+            return null;
 
         if (getContext().getDispatchersUseEncodedPaths()) {
             // Decode
@@ -464,7 +464,7 @@ public class ApplicationContext implements ServletContext {
             uriCC.append(normalizedPath, 0, semicolon > 0 ? semicolon : pos);
             service.getMapper().map(context, uriMB, mappingData);
             if (mappingData.wrapper == null) {
-                return (null);
+                return null;
             }
             /*
              * Append any trailing path params (separated by ';') that were
@@ -477,13 +477,13 @@ public class ApplicationContext implements ServletContext {
         } catch (Exception e) {
             // Should never happen
             log(sm.getString("applicationContext.mapping.error"), e);
-            return (null);
+            return null;
         }
 
         Wrapper wrapper = mappingData.wrapper;
         String wrapperPath = mappingData.wrapperPath.toString();
         String pathInfo = mappingData.pathInfo.toString();
-        ServletMapping mapping = (new ApplicationMapping(mappingData)).getServletMapping();
+        ServletMapping mapping = new ApplicationMapping(mappingData).getServletMapping();
 
         mappingData.recycle();
 
@@ -1358,9 +1358,7 @@ public class ApplicationContext implements ServletContext {
      * @return the facade associated with this ApplicationContext.
      */
     protected ServletContext getFacade() {
-
-        return (this.facade);
-
+        return this.facade;
     }
 
 

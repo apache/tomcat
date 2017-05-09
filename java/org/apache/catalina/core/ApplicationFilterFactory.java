@@ -85,7 +85,7 @@ public final class ApplicationFilterFactory {
 
         // If there are no filter mappings, we are done
         if ((filterMaps == null) || (filterMaps.length == 0))
-            return (filterChain);
+            return filterChain;
 
         // Acquire the information we will need to match filter mappings
         DispatcherType dispatcher =

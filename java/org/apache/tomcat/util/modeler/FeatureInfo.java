@@ -48,7 +48,7 @@ public class FeatureInfo implements Serializable {
      * @return the human-readable description of this feature.
      */
     public String getDescription() {
-        return (this.description);
+        return this.description;
     }
 
     public void setDescription(String description) {
@@ -61,7 +61,7 @@ public class FeatureInfo implements Serializable {
      *  in the same collection.
      */
     public String getName() {
-        return (this.name);
+        return this.name;
     }
 
     public void setName(String name) {
@@ -72,7 +72,7 @@ public class FeatureInfo implements Serializable {
      * @return the fully qualified Java class name of this element.
      */
     public String getType() {
-        return (this.type);
+        return this.type;
     }
 
     public void setType(String type) {

@@ -277,7 +277,7 @@ public class ConnectorStoreAppender extends StoreAppender {
         boolean isPrint = super.isPrintValue(bean, bean2, attrName, desc);
         if (isPrint) {
             if ("jkHome".equals(attrName)) {
-                Connector connector = ((Connector) bean);
+                Connector connector = (Connector) bean;
                 File catalinaBase = getCatalinaBase();
                 File jkHomeBase = getJkHomeBase((String) connector
                         .getProperty("jkHome"), catalinaBase);
@@ -295,7 +295,7 @@ public class ConnectorStoreAppender extends StoreAppender {
             file = file.getCanonicalFile();
         } catch (IOException e) {
         }
-        return (file);
+        return file;
     }
 
     protected File getJkHomeBase(String jkHome, File appBase) {
@@ -309,7 +309,7 @@ public class ConnectorStoreAppender extends StoreAppender {
         } catch (IOException e) {
             jkHomeBase = file;
         }
-        return (jkHomeBase);
+        return jkHomeBase;
     }
 
 }

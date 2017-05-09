@@ -131,9 +131,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      */
     @Override
     public String getDefaultHost() {
-
-        return (defaultHost);
-
+        return defaultHost;
     }
 
 
@@ -184,9 +182,7 @@ public class StandardEngine extends ContainerBase implements Engine {
      */
     @Override
     public Service getService() {
-
-        return (this.service);
-
+        return this.service;
     }
 
 
@@ -337,11 +333,11 @@ public class StandardEngine extends ContainerBase implements Engine {
     @Override
     public ClassLoader getParentClassLoader() {
         if (parentClassLoader != null)
-            return (parentClassLoader);
+            return parentClassLoader;
         if (service != null) {
-            return (service.getParentClassLoader());
+            return service.getParentClassLoader();
         }
-        return (ClassLoader.getSystemClassLoader());
+        return ClassLoader.getSystemClassLoader();
     }
 
 

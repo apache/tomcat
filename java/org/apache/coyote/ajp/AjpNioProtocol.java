@@ -43,6 +43,6 @@ public class AjpNioProtocol extends AbstractAjpProtocol<NioChannel> {
 
     @Override
     protected String getNamePrefix() {
-        return ("ajp-nio");
+        return "ajp-nio";
     }
 }

@@ -83,7 +83,7 @@ public class CollectedInfo {
                 break; /* Done port and host are the expected ones */
         }
         if (objName == null)
-            throw(new Exception("Can't find connector for " + host + ":" + port));
+            throw new Exception("Can't find connector for " + host + ":" + port);
         this.port = iport;
         this.host = shost;
 
@@ -91,7 +91,7 @@ public class CollectedInfo {
 
     public void refresh() throws Exception {
         if (mBeanServer == null || objName == null) {
-            throw(new Exception("Not initialized!!!"));
+            throw new Exception("Not initialized!!!");
         }
         Integer imax = (Integer) mBeanServer.getAttribute(objName, "maxThreads");
 

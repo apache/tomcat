@@ -401,18 +401,14 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      * @return The descriptive short name of this Manager implementation.
      */
     public String getName() {
-
-        return (name);
-
+        return name;
     }
 
     /**
      * @return The secure random number generator class name.
      */
     public String getSecureRandomClass() {
-
-        return (this.secureRandomClass);
-
+        return this.secureRandomClass;
     }
 
 
@@ -500,9 +496,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      * @return The frequency of manager checks.
      */
     public int getProcessExpiresFrequency() {
-
-        return (this.processExpiresFrequency);
-
+        return this.processExpiresFrequency;
     }
 
     /**
@@ -671,14 +665,13 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
             sessionCreationTiming.add(timing);
             sessionCreationTiming.poll();
         }
-        return (session);
-
+        return session;
     }
 
 
     @Override
     public Session createEmptySession() {
-        return (getNewSession());
+        return getNewSession();
     }
 
 
@@ -922,9 +915,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      *         limit.
      */
     public int getMaxActiveSessions() {
-
-        return (this.maxActiveSessions);
-
+        return this.maxActiveSessions;
     }
 
 

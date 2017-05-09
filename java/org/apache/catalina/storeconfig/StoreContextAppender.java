@@ -93,12 +93,11 @@ public class StoreContextAppender extends StoreAppender {
         } catch (IOException e) {
             appBase = file;
         }
-        return (appBase);
+        return appBase;
 
     }
 
     protected File getDocBase(StandardContext context, File appBase) {
-
         File docBase;
         String contextDocBase = context.getOriginalDocBase() ;
         if(contextDocBase == null)
@@ -111,8 +110,7 @@ public class StoreContextAppender extends StoreAppender {
         } catch (IOException e) {
             docBase = file;
         }
-        return (docBase);
-
+        return docBase;
     }
 
     /**

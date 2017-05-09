@@ -179,7 +179,7 @@ public class NamingContextListener
      * @return the "name" property.
      */
     public String getName() {
-        return (this.name);
+        return this.name;
     }
 
 
@@ -761,7 +761,7 @@ public class NamingContextListener
                     ",name=" + quotedResourceName);
         }
 
-        return (name);
+        return name;
 
     }
 

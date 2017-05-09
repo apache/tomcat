@@ -424,14 +424,14 @@ final class StandardHostValve extends ValveBase {
         (Context context, Throwable exception) {
 
         if (exception == null) {
-            return (null);
+            return null;
         }
         Class<?> clazz = exception.getClass();
         String name = clazz.getName();
         while (!Object.class.equals(clazz)) {
             ErrorPage errorPage = context.findErrorPage(name);
             if (errorPage != null) {
-                return (errorPage);
+                return errorPage;
             }
             clazz = clazz.getSuperclass();
             if (clazz == null) {
@@ -439,7 +439,7 @@ final class StandardHostValve extends ValveBase {
             }
             name = clazz.getName();
         }
-        return (null);
+        return null;
 
     }
 }

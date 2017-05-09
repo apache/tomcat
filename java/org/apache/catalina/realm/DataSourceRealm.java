@@ -456,9 +456,9 @@ public class DataSourceRealm extends RealmBase {
             return new GenericPrincipal(username, null, null);
         }
         try {
-            return (new GenericPrincipal(username,
+            return new GenericPrincipal(username,
                     getPassword(dbConnection, username),
-                    getRoles(dbConnection, username)));
+                    getRoles(dbConnection, username));
         } finally {
             close(dbConnection);
         }
@@ -540,7 +540,7 @@ public class DataSourceRealm extends RealmBase {
             dbConnection.prepareStatement(preparedCredentials);
 
         credentials.setString(1, username);
-        return (credentials);
+        return credentials;
 
     }
 
@@ -560,7 +560,7 @@ public class DataSourceRealm extends RealmBase {
             dbConnection.prepareStatement(preparedRoles);
 
         roles.setString(1, username);
-        return (roles);
+        return roles;
 
     }
 

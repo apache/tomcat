@@ -121,9 +121,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
      */
     @Override
     public MBeanNotificationInfo[] getNotificationInfo() {
-
-        return (new MBeanNotificationInfo[0]);
-
+        return new MBeanNotificationInfo[0];
     }
 
 

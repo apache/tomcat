@@ -160,9 +160,7 @@ public class HostConfig implements LifecycleListener {
      * @return the Context implementation class name.
      */
     public String getContextClass() {
-
-        return (this.contextClass);
-
+        return this.contextClass;
     }
 
 
@@ -188,9 +186,7 @@ public class HostConfig implements LifecycleListener {
      * @return the deploy XML config file flag for this component.
      */
     public boolean isDeployXML() {
-
-        return (this.deployXML);
-
+        return this.deployXML;
     }
 
 
@@ -200,9 +196,7 @@ public class HostConfig implements LifecycleListener {
      * @param deployXML The new deploy XML flag
      */
     public void setDeployXML(boolean deployXML) {
-
         this.deployXML= deployXML;
-
     }
 
 
@@ -210,9 +204,7 @@ public class HostConfig implements LifecycleListener {
      * @return the copy XML config file flag for this component.
      */
     public boolean isCopyXML() {
-
-        return (this.copyXML);
-
+        return this.copyXML;
     }
 
 
@@ -232,9 +224,7 @@ public class HostConfig implements LifecycleListener {
      * @return the unpack WARs flag.
      */
     public boolean isUnpackWARs() {
-
-        return (this.unpackWARs);
-
+        return this.unpackWARs;
     }
 
 
@@ -244,9 +234,7 @@ public class HostConfig implements LifecycleListener {
      * @param unpackWARs The new unpack WARs flag
      */
     public void setUnpackWARs(boolean unpackWARs) {
-
         this.unpackWARs = unpackWARs;
-
     }
 
 
@@ -303,7 +291,7 @@ public class HostConfig implements LifecycleListener {
      * @return state of the application
      */
     public synchronized boolean isServiced(String name) {
-        return (serviced.contains(name));
+        return serviced.contains(name);
     }
 
 
@@ -367,7 +355,7 @@ public class HostConfig implements LifecycleListener {
         // Set the properties on that object (it doesn't matter if extra
         // properties are set)
         digester.addSetProperties("Context");
-        return (digester);
+        return digester;
     }
 
     protected File returnCanonicalPath(String path) {

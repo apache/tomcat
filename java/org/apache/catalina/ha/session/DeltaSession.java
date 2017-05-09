@@ -401,7 +401,8 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
                 }
             }
         }
-        return (this.isValid);
+
+        return this.isValid;
     }
 
     /**
@@ -498,7 +499,7 @@ public class DeltaSession extends StandardSession implements Externalizable,Clus
         sb.append("DeltaSession[");
         sb.append(id);
         sb.append("]");
-        return (sb.toString());
+        return sb.toString();
     }
 
     @Override

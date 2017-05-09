@@ -75,13 +75,13 @@ public class ContextResourceLinkMBean extends BaseCatalinaMBean<ContextResourceL
 
         String value = null;
         if ("global".equals(name)) {
-            return (cl.getGlobal());
+            return cl.getGlobal();
         } else if ("description".equals(name)) {
-            return (cl.getDescription());
+            return cl.getDescription();
         } else if ("name".equals(name)) {
-            return (cl.getName());
+            return cl.getName();
         } else if ("type".equals(name)) {
-            return (cl.getType());
+            return cl.getType();
         } else {
             value = (String) cl.getProperty(name);
             if (value == null) {

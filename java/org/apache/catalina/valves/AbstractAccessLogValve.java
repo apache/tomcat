@@ -497,7 +497,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * @return the format pattern.
      */
     public String getPattern() {
-        return (this.pattern);
+        return this.pattern;
     }
 
 
@@ -701,7 +701,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         } else {
             for (Locale l: Locale.getAvailableLocales()) {
                 if (name.equals(l.toString())) {
-                    return(l);
+                    return l;
                 }
             }
         }

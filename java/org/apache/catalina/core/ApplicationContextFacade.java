@@ -145,7 +145,7 @@ public class ApplicationContextFacade implements ServletContext {
             (theContext instanceof ApplicationContext)){
             theContext = ((ApplicationContext)theContext).getFacade();
         }
-        return (theContext);
+        return theContext;
     }
 
 

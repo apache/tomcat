@@ -74,15 +74,15 @@ public class ContextResourceMBean extends BaseCatalinaMBean<ContextResource> {
 
         String value = null;
         if ("auth".equals(name)) {
-            return (cr.getAuth());
+            return cr.getAuth();
         } else if ("description".equals(name)) {
-            return (cr.getDescription());
+            return cr.getDescription();
         } else if ("name".equals(name)) {
-            return (cr.getName());
+            return cr.getName();
         } else if ("scope".equals(name)) {
-            return (cr.getScope());
+            return cr.getScope();
         } else if ("type".equals(name)) {
-            return (cr.getType());
+            return cr.getType();
         } else {
             value = (String) cr.getProperty(name);
             if (value == null) {
