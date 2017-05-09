@@ -4266,7 +4266,7 @@ class Generator {
         // True if the helper class should be generated.
         private boolean used = false;
 
-        private ArrayList<Fragment> fragments = new ArrayList<>();
+        private List<Fragment> fragments = new ArrayList<>();
 
         private String className;
 

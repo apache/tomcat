@@ -157,7 +157,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
 
         InputStream stream = (InputStream) source;
 
-        ArrayList<ManagedBean> loadedMbeans = new ArrayList<>();
+        List<ManagedBean> loadedMbeans = new ArrayList<>();
         synchronized(dLock) {
             if (digester == null) {
                 digester = createDigester();

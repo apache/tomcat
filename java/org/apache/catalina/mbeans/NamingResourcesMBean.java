@@ -17,6 +17,7 @@
 package org.apache.catalina.mbeans;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
@@ -78,7 +79,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
      */
     public String[] getEnvironments() {
         ContextEnvironment[] envs = ((NamingResourcesImpl)this.resource).findEnvironments();
-        ArrayList<String> results = new ArrayList<>();
+        List<String> results = new ArrayList<>();
         for (int i = 0; i < envs.length; i++) {
             try {
                 ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), envs[i]);
@@ -101,7 +102,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
      */
     public String[] getResources() {
         ContextResource[] resources = ((NamingResourcesImpl)this.resource).findResources();
-        ArrayList<String> results = new ArrayList<>();
+        List<String> results = new ArrayList<>();
         for (int i = 0; i < resources.length; i++) {
             try {
                 ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), resources[i]);
@@ -125,7 +126,7 @@ public class NamingResourcesMBean extends BaseModelMBean {
     public String[] getResourceLinks() {
         ContextResourceLink[] resourceLinks =
                 ((NamingResourcesImpl)this.resource).findResourceLinks();
-        ArrayList<String> results = new ArrayList<>();
+        List<String> results = new ArrayList<>();
         for (int i = 0; i < resourceLinks.length; i++) {
             try {
                 ObjectName oname =

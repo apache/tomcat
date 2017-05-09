@@ -243,7 +243,7 @@ public class ServiceRefFactory implements ObjectFactory {
             if (((ServiceRef) ref).getHandlersSize() > 0) {
 
                 HandlerRegistry handlerRegistry = service.getHandlerRegistry();
-                ArrayList<String> soaproles = new ArrayList<>();
+                List<String> soaproles = new ArrayList<>();
 
                 while (((ServiceRef) ref).getHandlersSize() > 0) {
                     HandlerRef handlerRef = ((ServiceRef) ref).getHandler();
@@ -262,9 +262,9 @@ public class ServiceRefFactory implements ObjectFactory {
 
                     // Load all datas relative to the handler : SOAPHeaders, config init element,
                     // portNames to be set on
-                    ArrayList<QName> headers = new ArrayList<>();
+                    List<QName> headers = new ArrayList<>();
                     Hashtable<String,String> config = new Hashtable<>();
-                    ArrayList<String> portNames = new ArrayList<>();
+                    List<String> portNames = new ArrayList<>();
                     for (int i = 0; i < handlerRef.size(); i++)
                         if (HandlerRef.HANDLER_LOCALPART.equals(handlerRef.get(i).getType())) {
                             String localpart = "";
@@ -343,7 +343,7 @@ public class ServiceRefFactory implements ObjectFactory {
 
 
     private void initHandlerChain(QName portName, HandlerRegistry handlerRegistry,
-            HandlerInfo handlerInfo, ArrayList<String> soaprolesToAdd) {
+            HandlerInfo handlerInfo, List<String> soaprolesToAdd) {
         HandlerChain handlerChain = (HandlerChain) handlerRegistry.getHandlerChain(portName);
         @SuppressWarnings("unchecked")
         Iterator<Handler> iter = handlerChain.iterator();

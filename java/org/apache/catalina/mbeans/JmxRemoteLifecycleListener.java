@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXServiceURL;
@@ -211,7 +212,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
             System.setProperty("java.rmi.server.randomIDs", "true");
 
             // Create the environment
-            HashMap<String,Object> env = new HashMap<>();
+            Map<String,Object> env = new HashMap<>();
 
             RMIClientSocketFactory registryCsf = null;
             RMIServerSocketFactory registrySsf = null;
@@ -296,7 +297,7 @@ public class JmxRemoteLifecycleListener implements LifecycleListener {
 
     private JMXConnectorServer createServer(String serverName,
             String bindAddress, int theRmiRegistryPort, int theRmiServerPort,
-            HashMap<String,Object> theEnv,
+            Map<String,Object> theEnv,
             RMIClientSocketFactory registryCsf, RMIServerSocketFactory registrySsf,
             RMIClientSocketFactory serverCsf, RMIServerSocketFactory serverSsf) {
 

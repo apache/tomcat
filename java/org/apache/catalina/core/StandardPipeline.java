@@ -20,6 +20,7 @@ package org.apache.catalina.core;
 
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.management.ObjectName;
@@ -372,7 +373,7 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
     @Override
     public Valve[] getValves() {
 
-        ArrayList<Valve> valveList = new ArrayList<>();
+        List<Valve> valveList = new ArrayList<>();
         Valve current = first;
         if (current == null) {
             current = basic;
@@ -388,7 +389,7 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
 
     public ObjectName[] getValveObjectNames() {
 
-        ArrayList<ObjectName> valveList = new ArrayList<>();
+        List<ObjectName> valveList = new ArrayList<>();
         Valve current = first;
         if (current == null) {
             current = basic;

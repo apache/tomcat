@@ -19,6 +19,8 @@ package org.apache.tomcat.util.descriptor.web;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -57,7 +59,7 @@ public class ContextHandler extends ResourceBase {
      * soapHeader[0] : namespaceURI
      * soapHeader[1] : localpart
      */
-    private final HashMap<String, String> soapHeaders = new HashMap<>();
+    private final Map<String, String> soapHeaders = new HashMap<>();
 
     public Iterator<String> getLocalparts() {
         return soapHeaders.keySet().iterator();
@@ -83,7 +85,7 @@ public class ContextHandler extends ResourceBase {
     /**
      * The soapRole.
      */
-    private final ArrayList<String> soapRoles = new ArrayList<>();
+    private final List<String> soapRoles = new ArrayList<>();
 
     public String getSoapRole(int i) {
         return this.soapRoles.get(i);
@@ -100,7 +102,7 @@ public class ContextHandler extends ResourceBase {
     /**
      * The portName.
      */
-    private final ArrayList<String> portNames = new ArrayList<>();
+    private final List<String> portNames = new ArrayList<>();
 
     public String getPortName(int i) {
         return this.portNames.get(i);

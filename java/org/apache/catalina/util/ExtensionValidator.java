@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.jar.JarInputStream;
@@ -56,9 +57,8 @@ public final class ExtensionValidator {
     private static final StringManager sm =
             StringManager.getManager("org.apache.catalina.util");
 
-    private static volatile ArrayList<Extension> containerAvailableExtensions =
-            null;
-    private static final ArrayList<ManifestResource> containerManifestResources =
+    private static volatile List<Extension> containerAvailableExtensions = null;
+    private static final List<ManifestResource> containerManifestResources =
             new ArrayList<>();
 
 
@@ -129,7 +129,7 @@ public final class ExtensionValidator {
                     throws IOException {
 
         String appName = context.getName();
-        ArrayList<ManifestResource> appManifestResources = new ArrayList<>();
+        List<ManifestResource> appManifestResources = new ArrayList<>();
 
         // Web application manifest
         WebResource resource = resources.getResource("/META-INF/MANIFEST.MF");
@@ -205,10 +205,10 @@ public final class ExtensionValidator {
      * @return true if manifest resource file requirements are met
      */
     private static boolean validateManifestResources(String appName,
-            ArrayList<ManifestResource> resources) {
+            List<ManifestResource> resources) {
         boolean passes = true;
         int failureCount = 0;
-        ArrayList<Extension> availableExtensions = null;
+        List<Extension> availableExtensions = null;
 
         Iterator<ManifestResource> it = resources.iterator();
         while (it.hasNext()) {
@@ -298,10 +298,10 @@ public final class ExtensionValidator {
     *
     * @return HashMap Map of available extensions
     */
-    private static ArrayList<Extension> buildAvailableExtensionsList(
-            ArrayList<ManifestResource> resources) {
+    private static List<Extension> buildAvailableExtensionsList(
+            List<ManifestResource> resources) {
 
-        ArrayList<Extension> availableList = null;
+        List<Extension> availableList = null;
 
         Iterator<ManifestResource> it = resources.iterator();
         while (it.hasNext()) {

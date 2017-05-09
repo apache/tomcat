@@ -259,7 +259,7 @@ public class RulesBase implements Rules {
         }
 
         // Select only Rules that match on the specified namespace URI
-        ArrayList<Rule> results = new ArrayList<>();
+        List<Rule> results = new ArrayList<>();
         Iterator<Rule> items = list.iterator();
         while (items.hasNext()) {
             Rule item = items.next();

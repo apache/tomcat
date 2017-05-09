@@ -21,6 +21,7 @@ package org.apache.tomcat.util.descriptor.web;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 
 /**
@@ -39,7 +40,7 @@ public class ContextTransaction implements Serializable {
     /**
      * Holder for our configured properties.
      */
-    private final HashMap<String, Object> properties = new HashMap<>();
+    private final Map<String, Object> properties = new HashMap<>();
 
     /**
      * @param name The property name

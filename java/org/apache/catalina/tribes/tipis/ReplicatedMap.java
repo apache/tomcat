@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.catalina.tribes.Channel;
@@ -153,7 +154,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
         } catch (ChannelException e) {
             FaultyMember[] faultyMembers = e.getFaultyMembers();
             if (faultyMembers.length == 0) throw e;
-            ArrayList<Member> faulty = new ArrayList<>();
+            List<Member> faulty = new ArrayList<>();
             for (FaultyMember faultyMember : faultyMembers) {
                 if (!(faultyMember.getCause() instanceof RemoteProcessException)) {
                     faulty.add(faultyMember.getMember());

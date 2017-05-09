@@ -18,6 +18,7 @@
 package org.apache.catalina.tribes.group.interceptors;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -55,9 +56,9 @@ import org.apache.catalina.tribes.util.StringManager;
  */
 public class OrderInterceptor extends ChannelInterceptorBase {
     protected static final StringManager sm = StringManager.getManager(OrderInterceptor.class);
-    private final HashMap<Member, Counter> outcounter = new HashMap<>();
-    private final HashMap<Member, Counter> incounter = new HashMap<>();
-    private final HashMap<Member, MessageOrder> incoming = new HashMap<>();
+    private final Map<Member, Counter> outcounter = new HashMap<>();
+    private final Map<Member, Counter> incounter = new HashMap<>();
+    private final Map<Member, MessageOrder> incoming = new HashMap<>();
     private long expire = 3000;
     private boolean forwardExpired = true;
     private int maxQueue = Integer.MAX_VALUE;

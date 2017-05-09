@@ -20,9 +20,12 @@ package org.apache.catalina.authenticator;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.Cookie;
 
@@ -42,11 +45,10 @@ import org.apache.tomcat.util.buf.ByteChunk;
  */
 public final class SavedRequest {
 
-
     /**
      * The set of Cookies associated with this Request.
      */
-    private final ArrayList<Cookie> cookies = new ArrayList<>();
+    private final List<Cookie> cookies = new ArrayList<>();
 
     public void addCookie(Cookie cookie) {
         cookies.add(cookie);
@@ -59,14 +61,14 @@ public final class SavedRequest {
 
     /**
      * The set of Headers associated with this Request.  Each key is a header
-     * name, while the value is a ArrayList containing one or more actual
+     * name, while the value is a List containing one or more actual
      * values for this header.  The values are returned as an Iterator when
      * you ask for them.
      */
-    private final HashMap<String,ArrayList<String>> headers = new HashMap<>();
+    private final Map<String, List<String>> headers = new HashMap<>();
 
     public void addHeader(String name, String value) {
-        ArrayList<String> values = headers.get(name);
+        List<String> values = headers.get(name);
         if (values == null) {
             values = new ArrayList<>();
             headers.put(name, values);
@@ -79,9 +81,9 @@ public final class SavedRequest {
     }
 
     public Iterator<String> getHeaderValues(String name) {
-        ArrayList<String> values = headers.get(name);
+        List<String> values = headers.get(name);
         if (values == null)
-            return new ArrayList<String>().iterator();
+            return Collections.emptyIterator();
         else
             return values.iterator();
     }
@@ -90,7 +92,7 @@ public final class SavedRequest {
     /**
      * The set of Locales associated with this Request.
      */
-    private final ArrayList<Locale> locales = new ArrayList<>();
+    private final List<Locale> locales = new ArrayList<>();
 
     public void addLocale(Locale locale) {
         locales.add(locale);

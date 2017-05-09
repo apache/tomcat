@@ -280,7 +280,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     protected boolean delegate = false;
 
 
-    private final HashMap<String,Long> jarModificationTimes = new HashMap<>();
+    private final Map<String,Long> jarModificationTimes = new HashMap<>();
 
 
     /**

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 
@@ -184,7 +185,7 @@ public final class FileStore extends StoreBase {
         }
 
         // Build and return the list of session identifiers
-        ArrayList<String> list = new ArrayList<>();
+        List<String> list = new ArrayList<>();
         int n = FILE_EXT.length();
         for (int i = 0; i < files.length; i++) {
             if (files[i].endsWith(FILE_EXT)) {

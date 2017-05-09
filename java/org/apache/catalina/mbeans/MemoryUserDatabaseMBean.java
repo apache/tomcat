@@ -18,6 +18,7 @@ package org.apache.catalina.mbeans;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
@@ -95,7 +96,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
      */
     public String[] getGroups() {
         UserDatabase database = (UserDatabase) this.resource;
-        ArrayList<String> results = new ArrayList<>();
+        List<String> results = new ArrayList<>();
         Iterator<Group> groups = database.getGroups();
         while (groups.hasNext()) {
             Group group = groups.next();
@@ -110,7 +111,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
      */
     public String[] getRoles() {
         UserDatabase database = (UserDatabase) this.resource;
-        ArrayList<String> results = new ArrayList<>();
+        List<String> results = new ArrayList<>();
         Iterator<Role> roles = database.getRoles();
         while (roles.hasNext()) {
             Role role = roles.next();
@@ -125,7 +126,7 @@ public class MemoryUserDatabaseMBean extends BaseModelMBean {
      */
     public String[] getUsers() {
         UserDatabase database = (UserDatabase) this.resource;
-        ArrayList<String> results = new ArrayList<>();
+        List<String> results = new ArrayList<>();
         Iterator<User> users = database.getUsers();
         while (users.hasNext()) {
             User user = users.next();

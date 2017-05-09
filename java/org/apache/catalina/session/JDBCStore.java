@@ -31,6 +31,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javax.naming.Context;
@@ -502,7 +503,7 @@ public class JDBCStore extends StoreBase {
                             preparedKeysSql.setLong(2, System.currentTimeMillis());
                         }
                         try (ResultSet rst = preparedKeysSql.executeQuery()) {
-                            ArrayList<String> tmpkeys = new ArrayList<>();
+                            List<String> tmpkeys = new ArrayList<>();
                             if (rst != null) {
                                 while (rst.next()) {
                                     tmpkeys.add(rst.getString(1));

@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
+import java.util.Map;
 
 
 /**
@@ -83,7 +83,7 @@ public class ResourceBase implements Serializable, Injectable {
     /**
      * Holder for our configured properties.
      */
-    private final HashMap<String, Object> properties = new HashMap<>();
+    private final Map<String, Object> properties = new HashMap<>();
 
     /**
      * @param name The property name

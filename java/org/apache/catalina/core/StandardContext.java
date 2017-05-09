@@ -370,22 +370,21 @@ public class StandardContext extends ContainerBase
      * The exception pages for this web application, keyed by fully qualified
      * class name of the Java exception.
      */
-    private HashMap<String, ErrorPage> exceptionPages = new HashMap<>();
+    private Map<String, ErrorPage> exceptionPages = new HashMap<>();
 
 
     /**
      * The set of filter configurations (and associated filter instances) we
      * have initialized, keyed by filter name.
      */
-    private HashMap<String, ApplicationFilterConfig> filterConfigs =
-            new HashMap<>();
+    private Map<String, ApplicationFilterConfig> filterConfigs = new HashMap<>();
 
 
     /**
      * The set of filter definitions for this application, keyed by
      * filter name.
      */
-    private HashMap<String, FilterDef> filterDefs = new HashMap<>();
+    private Map<String, FilterDef> filterDefs = new HashMap<>();
 
 
     /**
@@ -443,7 +442,7 @@ public class StandardContext extends ContainerBase
     /**
      * The MIME mappings for this web application, keyed by extension.
      */
-    private HashMap<String, String> mimeMappings = new HashMap<>();
+    private Map<String, String> mimeMappings = new HashMap<>();
 
 
     /**
@@ -517,7 +516,7 @@ public class StandardContext extends ContainerBase
      * The security role mappings for this application, keyed by role
      * name (as used within the application).
      */
-    private HashMap<String, String> roleMappings = new HashMap<>();
+    private Map<String, String> roleMappings = new HashMap<>();
 
 
     /**
@@ -532,7 +531,7 @@ public class StandardContext extends ContainerBase
      * The servlet mappings for this web application, keyed by
      * matching pattern.
      */
-    private HashMap<String, String> servletMappings = new HashMap<>();
+    private Map<String, String> servletMappings = new HashMap<>();
 
     private final Object servletMappingsLock = new Object();
 
@@ -552,7 +551,7 @@ public class StandardContext extends ContainerBase
      * HTTP status code (as an Integer). Note status code zero is used for the
      * default error page.
      */
-    private HashMap<Integer, ErrorPage> statusPages = new HashMap<>();
+    private Map<Integer, ErrorPage> statusPages = new HashMap<>();
 
 
     /**
@@ -4584,8 +4583,8 @@ public class StandardContext extends ContainerBase
         }
 
         // Sort listeners in two arrays
-        ArrayList<Object> eventListeners = new ArrayList<>();
-        ArrayList<Object> lifecycleListeners = new ArrayList<>();
+        List<Object> eventListeners = new ArrayList<>();
+        List<Object> lifecycleListeners = new ArrayList<>();
         for (int i = 0; i < results.length; i++) {
             if ((results[i] instanceof ServletContextAttributeListener)
                 || (results[i] instanceof ServletRequestAttributeListener)

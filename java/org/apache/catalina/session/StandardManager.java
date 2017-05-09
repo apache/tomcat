@@ -30,6 +30,7 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 
@@ -294,7 +295,7 @@ public class StandardManager extends ManagerBase {
         }
 
         // Keep a note of sessions that are expired
-        ArrayList<StandardSession> list = new ArrayList<>();
+        List<StandardSession> list = new ArrayList<>();
 
         try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
                 BufferedOutputStream bos = new BufferedOutputStream(fos);

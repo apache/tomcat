@@ -225,7 +225,7 @@ public class StandardContextSF extends StoreFactoryBase {
             StandardContext context = (StandardContext) aContext;
             // Store nested <Listener> elements
             LifecycleListener listeners[] = context.findLifecycleListeners();
-            ArrayList<LifecycleListener> listenersArray = new ArrayList<>();
+            List<LifecycleListener> listenersArray = new ArrayList<>();
             for (LifecycleListener listener : listeners) {
                 if (!(listener instanceof ThreadLocalLeakPreventionListener)) {
                     listenersArray.add(listener);

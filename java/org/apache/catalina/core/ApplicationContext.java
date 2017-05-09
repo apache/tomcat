@@ -1337,7 +1337,7 @@ public class ApplicationContext implements ServletContext {
     protected void clearAttributes() {
 
         // Create list of attributes to be removed
-        ArrayList<String> list = new ArrayList<>();
+        List<String> list = new ArrayList<>();
         Iterator<String> iter = attributes.keySet().iterator();
         while (iter.hasNext()) {
             list.add(iter.next());

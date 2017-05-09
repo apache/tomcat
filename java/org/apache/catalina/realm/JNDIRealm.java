@@ -1448,7 +1448,7 @@ public class JNDIRealm extends RealmBase {
         User user = null;
 
         // Get attributes to retrieve from user entry
-        ArrayList<String> list = new ArrayList<>();
+        List<String> list = new ArrayList<>();
         if (userPassword != null)
             list.add(userPassword);
         if (userRoleName != null)
@@ -1934,7 +1934,7 @@ public class JNDIRealm extends RealmBase {
         if (results == null)
             return list;  // Should never happen, but just in case ...
 
-        HashMap<String, String> groupMap = new HashMap<>();
+        Map<String, String> groupMap = new HashMap<>();
         try {
             while (results.hasMore()) {
                 SearchResult result = results.next();
@@ -2589,7 +2589,7 @@ public class JNDIRealm extends RealmBase {
     protected String[] parseUserPatternString(String userPatternString) {
 
         if (userPatternString != null) {
-            ArrayList<String> pathList = new ArrayList<>();
+            List<String> pathList = new ArrayList<>();
             int startParenLoc = userPatternString.indexOf('(');
             if (startParenLoc == -1) {
                 // no parens here; return whole thing

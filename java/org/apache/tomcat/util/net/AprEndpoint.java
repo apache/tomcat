@@ -534,7 +534,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         }
 
         if (negotiableProtocols.size() > 0) {
-            ArrayList<String> protocols = new ArrayList<>();
+            List<String> protocols = new ArrayList<>();
             protocols.addAll(negotiableProtocols);
             protocols.add("http/1.1");
             String[] protocolsArray = protocols.toArray(new String[0]);
@@ -1786,7 +1786,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
              *        are populated.
              *        The array is event, socket, event, socket etc.
              */
-            HashMap<Long,Long> merged = new HashMap<>(startCount);
+            Map<Long,Long> merged = new HashMap<>(startCount);
             for (int n = 0; n < startCount; n++) {
                 Long newValue = merged.merge(Long.valueOf(desc[2*n+1]), Long.valueOf(desc[2*n]),
                         (v1, v2) -> Long.valueOf(v1.longValue() | v2.longValue()));

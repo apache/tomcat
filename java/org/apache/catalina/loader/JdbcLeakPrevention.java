@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This class is loaded by {@link WebappClassLoaderBase} to enable it to
@@ -52,7 +53,7 @@ public class JdbcLeakPrevention {
          * ensuring that both original drivers and any loaded as a result of the
          * side-effects are all de-registered.
          */
-        HashSet<Driver> originalDrivers = new HashSet<>();
+        Set<Driver> originalDrivers = new HashSet<>();
         Enumeration<Driver> drivers = DriverManager.getDrivers();
         while (drivers.hasMoreElements()) {
             originalDrivers.add(drivers.nextElement());

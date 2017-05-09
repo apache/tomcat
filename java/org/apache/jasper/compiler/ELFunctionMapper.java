@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.jsp.tagext.FunctionInfo;
@@ -81,7 +82,7 @@ public class ELFunctionMapper {
          * Use a global name map to facilitate reuse of function maps.
          * The key used is prefix:function:uri.
          */
-        private final HashMap<String, String> gMap = new HashMap<>();
+        private final Map<String, String> gMap = new HashMap<>();
 
         @Override
         public void visit(Node.ParamAction n) throws JasperException {

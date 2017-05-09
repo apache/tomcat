@@ -142,7 +142,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         path = validate(path);
 
         // Set because we don't want duplicates
-        HashSet<String> result = new HashSet<>();
+        Set<String> result = new HashSet<>();
         for (List<WebResourceSet> list : allResources) {
             for (WebResourceSet webResourceSet : list) {
                 if (!webResourceSet.getClassLoaderOnly()) {

@@ -19,6 +19,7 @@ package org.apache.tomcat.dbcp.pool2.impl;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -1033,7 +1034,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         final long now = System.currentTimeMillis();
         final long timeout =
                 now - (ac.getRemoveAbandonedTimeout() * 1000L);
-        final ArrayList<PooledObject<T>> remove = new ArrayList<>();
+        final List<PooledObject<T>> remove = new ArrayList<>();
         final Iterator<PooledObject<T>> it = allObjects.values().iterator();
         while (it.hasNext()) {
             final PooledObject<T> pooledObject = it.next();

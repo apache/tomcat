@@ -119,7 +119,7 @@ public class ConnectorStoreAppender extends StoreAppender {
      */
     protected List<String> getPropertyKeys(Connector bean)
             throws IntrospectionException {
-        ArrayList<String> propertyKeys = new ArrayList<>();
+        List<String> propertyKeys = new ArrayList<>();
         // Acquire the list of properties for this bean
         ProtocolHandler protocolHandler = bean.getProtocolHandler();
         // Acquire the list of properties for this bean

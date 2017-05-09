@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.coyote.Adapter;
@@ -268,7 +269,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         private byte[] header;
         private ByteBuffer payload;
 
-        private final ArrayList<ByteBuffer> bufs = new ArrayList<>();
+        private final List<ByteBuffer> bufs = new ArrayList<>();
 
         public AsyncHeaderFrameBuffers(int initialPayloadSize) {
             this.payloadSize = initialPayloadSize;

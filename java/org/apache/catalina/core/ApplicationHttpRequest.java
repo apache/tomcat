@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -814,7 +815,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     private String[] mergeValues(String[] values1, String[] values2) {
 
-        ArrayList<Object> results = new ArrayList<>();
+        List<Object> results = new ArrayList<>();
 
         if (values1 == null) {
             // Skip - nothing to merge

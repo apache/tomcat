@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.management.DynamicMBean;
 import javax.management.MBeanAttributeInfo;
@@ -97,14 +98,14 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * The set of ManagedBean instances for the beans this registry
      * knows about, keyed by name.
      */
-    private HashMap<String,ManagedBean> descriptors = new HashMap<>();
+    private Map<String,ManagedBean> descriptors = new HashMap<>();
 
     /** List of managed beans, keyed by class name
      */
-    private HashMap<String,ManagedBean> descriptorsByClass = new HashMap<>();
+    private Map<String,ManagedBean> descriptorsByClass = new HashMap<>();
 
     // map to avoid duplicated searching or loading descriptors
-    private HashMap<String,URL> searchedPaths = new HashMap<>();
+    private Map<String,URL> searchedPaths = new HashMap<>();
 
     private Object guard;
 

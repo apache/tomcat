@@ -323,7 +323,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
 
             if (negotiableProtocols != null && negotiableProtocols.size() > 0) {
-                ArrayList<String> protocols = new ArrayList<>();
+                List<String> protocols = new ArrayList<>();
                 protocols.addAll(negotiableProtocols);
                 protocols.add("http/1.1");
                 String[] protocolsArray = protocols.toArray(new String[0]);

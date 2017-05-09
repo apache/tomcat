@@ -508,7 +508,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
 
     Set<Session> getOpenSessions(Endpoint endpoint) {
-        HashSet<Session> result = new HashSet<>();
+        Set<Session> result = new HashSet<>();
         synchronized (endPointSessionMapLock) {
             Set<WsSession> sessions = endpointSessionMap.get(endpoint);
             if (sessions != null) {
