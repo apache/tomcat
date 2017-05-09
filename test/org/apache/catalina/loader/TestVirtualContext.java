@@ -270,7 +270,7 @@ public class TestVirtualContext extends TomcatBaseTest {
                 MyAnnotatedServlet.class.getSimpleName() + ".class");
                 FileOutputStream annotatedServletClassOutputStream = new FileOutputStream(new File(
                         targetPackageForAnnotatedClass, MyAnnotatedServlet.class.getSimpleName()
-                                + ".class"));) {
+                                + ".class"))) {
             IOUtils.copy(annotatedServletClassInputStream, annotatedServletClassOutputStream);
         }
 

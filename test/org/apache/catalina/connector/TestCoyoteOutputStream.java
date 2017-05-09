@@ -116,7 +116,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() + "/", bc, null, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         File file = new File("test/org/apache/catalina/connector/test_content.txt");
-        try (RandomAccessFile raf = new RandomAccessFile(file, "r");) {
+        try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
             ByteChunk expected = new ByteChunk();
             expected.append(raf.getChannel().map(MapMode.READ_ONLY, 0, file.length()));
             Assert.assertTrue(expected.equals(bc));
@@ -284,7 +284,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
                 throws ServletException, IOException {
             CoyoteOutputStream os = (CoyoteOutputStream) resp.getOutputStream();
             File file = new File("test/org/apache/catalina/connector/test_content.txt");
-            try (RandomAccessFile raf = new RandomAccessFile(file, "r");) {
+            try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
                 os.write(raf.getChannel().map(MapMode.READ_ONLY, 0, file.length()));
             }
         }

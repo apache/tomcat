@@ -211,7 +211,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
             // Send the request data (if any)
             if (istream != null) {
                 try (BufferedOutputStream ostream = new BufferedOutputStream(
-                                hconn.getOutputStream(), 1024);) {
+                                hconn.getOutputStream(), 1024)) {
                     byte buffer[] = new byte[1024];
                     while (true) {
                         int n = istream.read(buffer);

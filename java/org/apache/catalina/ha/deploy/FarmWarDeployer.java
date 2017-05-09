@@ -748,7 +748,7 @@ public class FarmWarDeployer extends ClusterListener
         }
 
         try (java.io.FileInputStream is = new java.io.FileInputStream(from);
-                java.io.FileOutputStream os = new java.io.FileOutputStream(to, false);) {
+                java.io.FileOutputStream os = new java.io.FileOutputStream(to, false)) {
             byte[] buf = new byte[4096];
             while (true) {
                 int len = is.read(buf);

@@ -93,7 +93,7 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
         // SecurityManager assume that untrusted applications may be deployed.
         Digester digester = DigesterFactory.newDigester(
                 true, true, null, Globals.IS_SECURITY_ENABLED);
-        try (InputStream stream = new BufferedInputStream(new FileInputStream(file.getCanonicalFile()));) {
+        try (InputStream stream = new BufferedInputStream(new FileInputStream(file.getCanonicalFile()))) {
             InputSource is = new InputSource(file.toURI().toURL().toExternalForm());
             is.setByteStream(stream);
             digester.parse(is);

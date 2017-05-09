@@ -318,7 +318,7 @@ public class PoolableConnectionFactory
             throw new SQLException("initializeConnection: connection closed");
         }
         if(null != sqls) {
-            try (Statement stmt = conn.createStatement();) {
+            try (Statement stmt = conn.createStatement()) {
                 for (final String sql : sqls) {
                     if (sql == null) {
                         throw new NullPointerException(

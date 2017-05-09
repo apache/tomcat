@@ -456,7 +456,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
         File webxml = new File(appDir, "WEB-INF/web.xml");
         try (FileOutputStream fos = new FileOutputStream(webxml);
-                Writer w = new OutputStreamWriter(fos, "UTF-8");) {
+                Writer w = new OutputStreamWriter(fos, "UTF-8")) {
             w.write("<?xml version='1.0' encoding='UTF-8'?>\n"
                     + "<web-app xmlns='http://java.sun.com/xml/ns/j2ee' "
                     + " xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'"
@@ -538,7 +538,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
         File webxml = new File(appDir, "WEB-INF/web.xml");
         try (FileOutputStream fos = new FileOutputStream(webxml);
-                Writer w = new OutputStreamWriter(fos, "UTF-8");) {
+                Writer w = new OutputStreamWriter(fos, "UTF-8")) {
             w.write("<?xml version='1.0' encoding='UTF-8'?>\n"
                     + "<web-app xmlns='http://java.sun.com/xml/ns/j2ee' "
                     + " xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'"

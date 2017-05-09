@@ -139,7 +139,7 @@ public class TestWebRuleSet {
 
         boolean result = true;
 
-        try (InputStream is = new FileInputStream(f);) {
+        try (InputStream is = new FileInputStream(f)) {
             d.parse(is);
         } catch (Exception e) {
             if (expected) {

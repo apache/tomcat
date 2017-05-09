@@ -76,7 +76,7 @@ public class TestWsServerContainer extends WebSocketBaseTest {
         SimpleClient client = new SimpleClient();
         URI uri = new URI("ws://localhost:" + getPort() + "/echoBasic");
 
-        try (Session session = wsContainer.connectToServer(client, uri);) {
+        try (Session session = wsContainer.connectToServer(client, uri)) {
             CountDownLatch latch = new CountDownLatch(1);
             BasicText handler = new BasicText(latch);
             session.addMessageHandler(handler);

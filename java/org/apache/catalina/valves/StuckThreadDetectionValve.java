@@ -420,6 +420,6 @@ public class StuckThreadDetectionValve extends ValveBase {
     }
 
     private enum MonitoredThreadState {
-        RUNNING, STUCK, DONE;
+        RUNNING, STUCK, DONE
     }
 }

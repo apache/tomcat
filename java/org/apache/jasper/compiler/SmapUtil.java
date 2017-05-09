@@ -225,7 +225,7 @@ public class SmapUtil {
             addSDE();
 
             // write result
-            try (FileOutputStream outStream = new FileOutputStream(outClassFile);) {
+            try (FileOutputStream outStream = new FileOutputStream(outClassFile)) {
                 outStream.write(gen, 0, genPos);
             }
         }

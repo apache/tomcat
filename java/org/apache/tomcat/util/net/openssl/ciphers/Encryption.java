@@ -37,5 +37,5 @@ enum Encryption {
     FZA,
     RC4,
     RC2,
-    eNULL;
+    eNULL
 }
