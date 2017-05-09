@@ -927,12 +927,12 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
     // ----------------------------------------------------------- Inner classes
 
-    private static enum HeaderParseStatus {
+    private enum HeaderParseStatus {
         DONE, HAVE_MORE_HEADERS, NEED_MORE_DATA
     }
 
 
-    private static enum HeaderParsePosition {
+    private enum HeaderParsePosition {
         /**
          * Start of a new header. A CRLF here means that there are no more
          * headers. Any other character starts a header name.

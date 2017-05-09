@@ -688,7 +688,7 @@ public abstract class WsFrameBase {
     }
 
 
-    private static enum State {
+    private enum State {
         NEW_FRAME, PARTIAL_HEADER, DATA
     }
 

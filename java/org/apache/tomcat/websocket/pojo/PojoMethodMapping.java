@@ -722,7 +722,7 @@ public class PojoMethodMapping {
     }
 
 
-    private static enum MethodType {
+    private enum MethodType {
         ON_OPEN,
         ON_CLOSE,
         ON_ERROR

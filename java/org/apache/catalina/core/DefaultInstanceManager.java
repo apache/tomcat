@@ -736,7 +736,7 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
 
-    private static enum AnnotationCacheEntryType {
+    private enum AnnotationCacheEntryType {
         FIELD, SETTER, POST_CONSTRUCT, PRE_DESTROY
     }
 

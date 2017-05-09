@@ -279,7 +279,7 @@ public class TLSClientHelloExtractor {
     }
 
 
-    public static enum ExtractorResult {
+    public enum ExtractorResult {
         COMPLETE,
         NOT_PRESENT,
         UNDERFLOW,

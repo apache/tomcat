@@ -1582,7 +1582,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    private static enum ConnectionState {
+    private enum ConnectionState {
 
         NEW(true),
         CONNECTED(true),

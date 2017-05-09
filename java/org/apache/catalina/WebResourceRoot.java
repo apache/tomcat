@@ -430,7 +430,7 @@ public interface WebResourceRoot extends Lifecycle {
      */
     void gc();
 
-    static enum ResourceSetType {
+    enum ResourceSetType {
         PRE,
         RESOURCE_JAR,
         POST,

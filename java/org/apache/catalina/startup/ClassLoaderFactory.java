@@ -298,7 +298,7 @@ public final class ClassLoaderFactory {
     }
 
 
-    public static enum RepositoryType {
+    public enum RepositoryType {
         DIR,
         GLOB,
         JAR,

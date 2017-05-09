@@ -130,7 +130,7 @@ public class AsyncStateMachine {
      */
     private static final StringManager sm = StringManager.getManager(AsyncStateMachine.class);
 
-    private static enum AsyncState {
+    private enum AsyncState {
         DISPATCHED      (false, false, false, false),
         STARTING        (true,  true,  false, false),
         STARTED         (true,  true,  false, false),

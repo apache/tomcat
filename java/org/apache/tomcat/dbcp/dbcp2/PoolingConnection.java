@@ -430,7 +430,7 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      * The possible statement types.
      * @since 2.0
      */
-    protected static enum StatementType {
+    protected enum StatementType {
         CALLABLE_STATEMENT,
         PREPARED_STATEMENT
     }

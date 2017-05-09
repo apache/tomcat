@@ -137,14 +137,14 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     /**
      * The list of our time format types.
      */
-    private static enum FormatType {
+    private enum FormatType {
         CLF, SEC, MSEC, MSEC_FRAC, SDF
     }
 
     /**
      * The list of our port types.
      */
-    private static enum PortType {
+    private enum PortType {
         LOCAL, REMOTE
     }
 
