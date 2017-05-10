@@ -16,7 +16,7 @@
  */
 package org.apache.coyote.http2;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 import org.apache.juli.logging.Log;
@@ -45,8 +45,8 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     static final int DEFAULT_MAX_FRAME_SIZE = MIN_MAX_FRAME_SIZE;
     static final long DEFAULT_MAX_HEADER_LIST_SIZE = UNLIMITED;
 
-    Map<Setting,Long> current = new HashMap<>();
-    Map<Setting,Long> pending = new HashMap<>();
+    Map<Setting, Long> current = new EnumMap<>(Setting.class);
+    Map<Setting, Long> pending = new EnumMap<>(Setting.class);
 
 
     ConnectionSettingsBase(String connectionId) {

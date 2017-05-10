@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.KeyStore;
 import java.security.UnrecoverableKeyException;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -65,7 +65,7 @@ public class SSLHostConfig implements Serializable {
 
     private Type configType = null;
     private Type currentConfigType = null;
-    private Map<Type,Set<String>> configuredProperties = new HashMap<>();
+    private Map<Type, Set<String>> configuredProperties = new EnumMap<>(Type.class);
 
     private String hostName = DEFAULT_SSL_HOST_NAME;
 
