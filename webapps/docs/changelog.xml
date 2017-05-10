@@ -52,6 +52,11 @@
         using the platform default secure random for session id generation.
         (remm)
       </fix>
+      <fix>
+        Correct the javadoc for
+        <code>o.a.c.connector.CoyoteAdapter#parseSessionCookiesId</code>.
+        Patch provided by John Andrew (XUZHOUWANG) via Github. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>
