@@ -758,14 +758,14 @@ public class DeltaManager extends ClusterManagerBase{
                     for (SessionMessage smsg : receivedMessageQueue) {
                         if (!stateTimestampDrop) {
                             messageReceived(smsg,
-                                    smsg.getAddress() != null ? (Member) smsg.getAddress() : null);
+                                    smsg.getAddress() != null ? smsg.getAddress() : null);
                         } else {
                             if (smsg.getEventType() != SessionMessage.EVT_GET_ALL_SESSIONS &&
                                     smsg.getTimestamp() >= stateTransferCreateSendTime) {
                                 // FIXME handle EVT_GET_ALL_SESSIONS later
                                 messageReceived(smsg,
                                         smsg.getAddress() != null ?
-                                                (Member) smsg.getAddress() :
+                                                smsg.getAddress() :
                                                 null);
                             } else {
                                 if (log.isWarnEnabled()) {
@@ -917,7 +917,7 @@ public class DeltaManager extends ClusterManagerBase{
                     break;
             } //switch
 
-            messageReceived(msg, msg.getAddress() != null ? (Member) msg.getAddress() : null);
+            messageReceived(msg, msg.getAddress() != null ? msg.getAddress() : null);
         }
     }
 

@@ -2424,7 +2424,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                         HttpServletResponse response = (HttpServletResponse) event
                                 .getSuppliedResponse();
                         if (!response.isCommitted()) {
-                            ((HttpServletRequest) event.getSuppliedRequest())
+                            event.getSuppliedRequest()
                                     .setAttribute("timeout", Boolean.TRUE);
                             context.dispatch();
                         }

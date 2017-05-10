@@ -41,7 +41,7 @@ public class ObjectCreateRule extends Rule {
      */
     public ObjectCreateRule(String className) {
 
-        this(className, (String) null);
+        this(className, null);
 
     }
 

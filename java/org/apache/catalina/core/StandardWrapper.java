@@ -1711,7 +1711,7 @@ public class StandardWrapper extends ContainerBase
             keyProperties.append(hostName);
         }
 
-        String contextName = ((Context) getParent()).getName();
+        String contextName = getParent().getName();
         if (!contextName.startsWith("/")) {
             keyProperties.append('/');
         }

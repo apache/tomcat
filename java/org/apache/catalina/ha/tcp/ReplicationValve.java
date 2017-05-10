@@ -310,7 +310,7 @@ public class ReplicationValve
         Context context = request.getContext();
         boolean isCrossContext = context != null
                 && context instanceof StandardContext
-                && ((StandardContext) context).getCrossContext();
+                && context.getCrossContext();
         try {
             if(isCrossContext) {
                 if(log.isDebugEnabled()) {

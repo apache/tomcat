@@ -244,7 +244,7 @@ public class ChannelCreator {
 
 
         byte[] domain = new byte[] {1,2,3,4,5,6,7,8,9,0};
-        ((McastService)channel.getMembershipService()).setDomain(domain);
+        channel.getMembershipService().setDomain(domain);
         DomainFilterInterceptor filter = new DomainFilterInterceptor();
         filter.setDomain(domain);
         channel.addInterceptor(filter);

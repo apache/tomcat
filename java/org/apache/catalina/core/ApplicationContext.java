@@ -1253,7 +1253,7 @@ public class ApplicationContext implements ServletContext {
 
         Container[] wrappers = context.findChildren();
         for (Container wrapper : wrappers) {
-            result.put(((Wrapper) wrapper).getName(),
+            result.put(wrapper.getName(),
                     new ApplicationServletRegistration(
                             (Wrapper) wrapper, context));
         }

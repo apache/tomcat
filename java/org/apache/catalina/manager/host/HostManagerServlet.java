@@ -479,7 +479,7 @@ public class HostManagerServlet
         try {
             Container child = engine.findChild(name);
             engine.removeChild(child);
-            if ( child instanceof ContainerBase ) ((ContainerBase)child).destroy();
+            if ( child instanceof ContainerBase ) child.destroy();
         } catch (Exception e) {
             writer.println(smClient.getString("hostManagerServlet.exception",
                     e.toString()));

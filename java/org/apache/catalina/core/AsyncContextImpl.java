@@ -486,7 +486,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     private InstanceManager getInstanceManager() {
         if (instanceManager == null) {
             if (context instanceof StandardContext) {
-                instanceManager = ((StandardContext)context).getInstanceManager();
+                instanceManager = context.getInstanceManager();
             } else {
                 instanceManager = new DefaultInstanceManager(null,
                         new HashMap<String, Map<String, String>>(),

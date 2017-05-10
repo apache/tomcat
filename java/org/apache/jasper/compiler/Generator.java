@@ -330,7 +330,7 @@ class Generator {
                     }
                     for (int i = 0; i < namedAttrs.size(); i++) {
                         attrNames[attrs.getLength() + i] =
-                            ((NamedAttribute) namedAttrs.getNode(i)).getQName();
+                            namedAttrs.getNode(i).getQName();
                     }
                     Arrays.sort(attrNames, Collections.reverseOrder());
                     if (attrNames.length > 0) {
@@ -3415,8 +3415,7 @@ class Generator {
                         out.printil("java.lang.String "
                                 + varName
                                 + " = "
-                                + quote(((Node.TemplateText) bodyElement)
-                                                .getText()) + ";");
+                                + quote(bodyElement.getText()) + ";");
                     }
                 }
 

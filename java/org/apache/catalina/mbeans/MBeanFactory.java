@@ -752,7 +752,7 @@ public class MBeanFactory {
             host.removeChild(context);
             if(context instanceof StandardContext)
             try {
-                ((StandardContext)context).destroy();
+                context.destroy();
             } catch (Exception e) {
                 log.warn("Error during context [" + context.getName() + "] destroy ", e);
            }

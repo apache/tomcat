@@ -62,7 +62,7 @@ public class ApplicationPart implements Part {
     @Override
     public String getHeader(String name) {
         if (fileItem instanceof DiskFileItem) {
-            return ((DiskFileItem) fileItem).getHeaders().getHeader(name);
+            return fileItem.getHeaders().getHeader(name);
         }
         return null;
     }
@@ -72,7 +72,7 @@ public class ApplicationPart implements Part {
         if (fileItem instanceof DiskFileItem) {
             LinkedHashSet<String> headerNames = new LinkedHashSet<>();
             Iterator<String> iter =
-                ((DiskFileItem) fileItem).getHeaders().getHeaderNames();
+                fileItem.getHeaders().getHeaderNames();
             while (iter.hasNext()) {
                 headerNames.add(iter.next());
             }
@@ -86,7 +86,7 @@ public class ApplicationPart implements Part {
         if (fileItem instanceof DiskFileItem) {
             LinkedHashSet<String> headers = new LinkedHashSet<>();
             Iterator<String> iter =
-                ((DiskFileItem) fileItem).getHeaders().getHeaders(name);
+                fileItem.getHeaders().getHeaders(name);
             while (iter.hasNext()) {
                 headers.add(iter.next());
             }

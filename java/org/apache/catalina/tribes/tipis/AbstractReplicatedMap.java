@@ -510,7 +510,7 @@ public abstract class AbstractReplicatedMap<K,V>
     public void transferState() {
         try {
             Member[] members = getMapMembers();
-            Member backup = members.length > 0 ? (Member) members[0] : null;
+            Member backup = members.length > 0 ? members[0] : null;
             if (backup != null) {
                 MapMessage msg = new MapMessage(mapContextName, getStateMessageType(), false,
                                                 null, null, null, null, null);

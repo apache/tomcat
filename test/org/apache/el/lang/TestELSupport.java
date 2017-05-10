@@ -242,15 +242,13 @@ public class TestELSupport {
 
     @Test
     public void testCoerceToNumber01() {
-        Object result = ELSupport.coerceToNumber(
-                null, (Object) null, Integer.class);
+        Object result = ELSupport.coerceToNumber(null, null, Integer.class);
         Assert.assertNull("Result: " + result, result);
     }
 
     @Test
     public void testCoerceToNumber02() {
-        Object result = ELSupport.coerceToNumber(
-                null, (Object) null, int.class);
+        Object result = ELSupport.coerceToNumber(null, null, int.class);
         Assert.assertEquals(Integer.valueOf(0), result);
     }
 

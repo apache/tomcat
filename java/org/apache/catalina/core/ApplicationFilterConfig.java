@@ -322,7 +322,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
             }
             if (!context.getIgnoreAnnotations()) {
                 try {
-                    ((StandardContext) context).getInstanceManager().destroyInstance(this.filter);
+                    context.getInstanceManager().destroyInstance(this.filter);
                 } catch (Exception e) {
                     Throwable t = ExceptionUtils
                             .unwrapInvocationTargetException(e);
@@ -343,7 +343,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     private InstanceManager getInstanceManager() {
         if (instanceManager == null) {
             if (context instanceof StandardContext) {
-                instanceManager = ((StandardContext)context).getInstanceManager();
+                instanceManager = context.getInstanceManager();
             } else {
                 instanceManager = new DefaultInstanceManager(null,
                         new HashMap<String, Map<String, String>>(),

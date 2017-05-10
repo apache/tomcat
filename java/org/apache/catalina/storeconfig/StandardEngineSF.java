@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.catalina.Cluster;
 import org.apache.catalina.Container;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
@@ -54,8 +53,7 @@ public class StandardEngineSF extends StoreFactoryBase {
         if (aEngine instanceof StandardEngine) {
             StandardEngine engine = (StandardEngine) aEngine;
             // Store nested <Listener> elements
-            LifecycleListener listeners[] = ((Lifecycle) engine)
-                    .findLifecycleListeners();
+            LifecycleListener listeners[] = engine.findLifecycleListeners();
             storeElementArray(aWriter, indent, listeners);
 
             // Store nested <Realm> element

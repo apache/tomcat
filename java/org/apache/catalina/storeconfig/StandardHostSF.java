@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.catalina.Cluster;
 import org.apache.catalina.Container;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Valve;
@@ -55,8 +54,7 @@ public class StandardHostSF extends StoreFactoryBase {
         if (aHost instanceof StandardHost) {
             StandardHost host = (StandardHost) aHost;
             // Store nested <Listener> elements
-            LifecycleListener listeners[] = ((Lifecycle) host)
-                    .findLifecycleListeners();
+            LifecycleListener listeners[] = host.findLifecycleListeners();
             storeElementArray(aWriter, indent, listeners);
 
             // Store nested <Alias> elements

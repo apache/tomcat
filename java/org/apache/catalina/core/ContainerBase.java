@@ -1274,7 +1274,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         List<ObjectName> names = new ArrayList<>(children.size());
         for (Container next : children.values()) {
             if (next instanceof ContainerBase) {
-                names.add(((ContainerBase)next).getObjectName());
+                names.add(next.getObjectName());
             }
         }
         return names.toArray(new ObjectName[names.size()]);

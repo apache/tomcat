@@ -119,7 +119,7 @@ public class CallMethodRule extends Rule {
      */
     public CallMethodRule(String methodName) {
 
-        this(0, methodName, 0, (Class[]) null);
+        this(0, methodName, 0, null);
 
     }
 
