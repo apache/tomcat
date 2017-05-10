@@ -209,7 +209,6 @@ public class FileHandler
                 }
             } catch (Exception e) {
                 reportError(null, e, ErrorManager.WRITE_FAILURE);
-                return;
             }
         } finally {
             writerLock.readLock().unlock();

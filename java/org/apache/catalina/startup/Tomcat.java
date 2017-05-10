@@ -929,7 +929,6 @@ public class Tomcat {
                     context.getPipeline().addValve(new NonLoginAuthenticator());
                 }
             } catch (ClassCastException e) {
-                return;
             }
         }
 

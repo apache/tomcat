@@ -700,7 +700,6 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             }
             loadDescriptors(pkg, classLoader);
         }
-        return;
     }
 
     private ModelerSource getModelerSource( String type )

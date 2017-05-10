@@ -74,7 +74,6 @@ public class TestDataIntegrity {
                         System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
                     }catch ( Exception x ) {
                         x.printStackTrace();
-                        return;
                     }
                 }
             };
@@ -102,7 +101,6 @@ public class TestDataIntegrity {
                             System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
                         }catch ( Exception x ) {
                             x.printStackTrace();
-                            return;
                         }
                     }
                 };

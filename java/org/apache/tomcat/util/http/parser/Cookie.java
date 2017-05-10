@@ -147,7 +147,6 @@ public class Cookie {
                 if (b == SEMICOLON_BYTE || b == COMMA_BYTE) {
                     parseCookieRfc2109(bb, serverCookies, version);
                 }
-                return;
             } else {
                 // Unrecognised version.
                 // Ignore this header.

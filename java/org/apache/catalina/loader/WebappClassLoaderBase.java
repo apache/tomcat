@@ -643,9 +643,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if (this.transformers.remove(transformer)) {
             log.info(sm.getString("webappClassLoader.removeTransformer",
                     transformer, getContextName()));
-            return;
         }
-
     }
 
     protected void copyStateWithoutTransformers(WebappClassLoaderBase base) {

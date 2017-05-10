@@ -702,7 +702,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         synchronized (socketWrapper) {
             if (socketWrapper.flush(false)) {
                 socketWrapper.registerWriteInterest();
-                return;
             }
         }
     }

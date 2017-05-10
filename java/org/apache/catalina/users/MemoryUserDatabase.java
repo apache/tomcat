@@ -400,7 +400,6 @@ public class MemoryUserDatabase implements UserDatabase {
                     digester.parse(is);
                 } catch (IOException ioe) {
                     log.error(sm.getString("memoryUserDatabase.fileNotFound", pathName));
-                    return;
                 }
             }
         }

@@ -127,7 +127,6 @@ public class TestMulticastPackages {
                         System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
                     }catch ( Exception x ) {
                         x.printStackTrace();
-                        return;
                     }
                 }
             };

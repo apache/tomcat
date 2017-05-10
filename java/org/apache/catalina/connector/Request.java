@@ -1456,8 +1456,6 @@ public class Request implements HttpServletRequest {
 
             // Notify interested application event listeners
             notifyAttributeRemoved(name, value);
-        } else {
-            return;
         }
     }
 

@@ -580,9 +580,7 @@ public class HostManagerServlet
                     "hostManagerServlet.startFailed", name));
             writer.println(smClient.getString(
                     "hostManagerServlet.exception", e.toString()));
-            return;
         }
-
     }
 
 
@@ -642,9 +640,7 @@ public class HostManagerServlet
                     name));
             writer.println(smClient.getString("hostManagerServlet.exception",
                     e.toString()));
-            return;
         }
-
     }
 
 
@@ -675,7 +671,6 @@ public class HostManagerServlet
             } else {
                 writer.println(smClient.getString("hostManagerServlet.exception", e.toString()));
             }
-            return;
         }
     }
 

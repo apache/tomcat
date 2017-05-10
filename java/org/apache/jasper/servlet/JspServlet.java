@@ -414,7 +414,6 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                         jspUri));
             }
         }
-        return;
     }
 
 

@@ -400,7 +400,6 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             digester.parse(file);
         } catch (Exception e) {
             log.warn("Error processing configuration file " + file.getAbsolutePath(), e);
-            return;
         } finally {
             digester.reset();
         }

@@ -607,7 +607,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 log("managerServlet.storeConfig", e);
                 writer.println(smClient.getString("managerServlet.exception",
                         e.toString()));
-                return;
             }
         } else {
             String contextPath = path;
@@ -630,7 +629,6 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 log("managerServlet.save[" + path + "]", e);
                 writer.println(smClient.getString("managerServlet.exception",
                         e.toString()));
-                return;
             }
         }
     }

@@ -119,7 +119,6 @@ public class TestUdpPackages {
                         System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
                     }catch ( Exception x ) {
                         x.printStackTrace();
-                        return;
                     }
                 }
             };
@@ -168,7 +167,6 @@ public class TestUdpPackages {
                         System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
                     }catch ( Exception x ) {
                         x.printStackTrace();
-                        return;
                     }
                 }
             };

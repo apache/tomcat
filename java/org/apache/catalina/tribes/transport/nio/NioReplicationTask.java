@@ -232,7 +232,6 @@ public class NioReplicationTask extends AbstractRxTask {
 
         if (count < 0) {
             remoteEof(key);
-            return;
         }
     }
 

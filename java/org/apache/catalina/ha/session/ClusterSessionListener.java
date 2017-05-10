@@ -91,7 +91,6 @@ public class ClusterSessionListener extends ClusterListener {
 
             }
         }
-        return;
     }
 
     /**
