@@ -23,7 +23,6 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -617,8 +616,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             CompositeDataSupport data = (CompositeDataSupport) result;
             CompositeType compositeType = data.getCompositeType();
             Set<String> keys = compositeType.keySet();
-            for (Iterator<String> iter = keys.iterator(); iter.hasNext();) {
-                String key = iter.next();
+            for (String key : keys) {
                 Object value = data.get(key);
                 OpenType<?> type = compositeType.getType(key);
                 if (type instanceof SimpleType<?>) {
@@ -629,10 +627,8 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             }
         } else if (result instanceof TabularDataSupport) {
             TabularDataSupport data = (TabularDataSupport) result;
-            for (Iterator<Object> iter = data.keySet().iterator(); iter.hasNext();) {
-                Object key = iter.next();
-                for (Iterator<?> iter1 = ((List<?>) key).iterator(); iter1.hasNext();) {
-                    Object key1 = iter1.next();
+            for (Object key : data.keySet()) {
+                for (Object key1 : ((List<?>) key)) {
                     CompositeData valuedata = data.get(new Object[] { key1 });
                     Object value = valuedata.get("value");
                     OpenType<?> type = valuedata.getCompositeType().getType(

@@ -21,7 +21,6 @@ import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -568,8 +567,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
      */
     protected void registerClusterValve() {
         if(container != null ) {
-            for (Iterator<Valve> iter = valves.iterator(); iter.hasNext();) {
-                ClusterValve valve = (ClusterValve) iter.next();
+            for (Valve v : valves) {
+                ClusterValve valve = (ClusterValve) v;
                 if (log.isDebugEnabled())
                     log.debug("Invoking addValve on " + getContainer()
                             + " with class=" + valve.getClass().getName());
@@ -585,8 +584,8 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
      * unregister all cluster valve to host or engine
      */
     protected void unregisterClusterValve() {
-        for (Iterator<Valve> iter = valves.iterator(); iter.hasNext();) {
-            ClusterValve valve = (ClusterValve) iter.next();
+        for (Valve v : valves) {
+            ClusterValve valve = (ClusterValve) v;
             if (log.isDebugEnabled())
                 log.debug("Invoking removeValve on " + getContainer()
                         + " with class=" + valve.getClass().getName());
@@ -768,9 +767,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         //invoke all the listeners
         boolean accepted = false;
         if (message != null) {
-            for (Iterator<ClusterListener> iter = clusterListeners.iterator();
-                    iter.hasNext();) {
-                ClusterListener listener = iter.next();
+            for (ClusterListener listener : clusterListeners) {
                 if (listener.accept(message)) {
                     accepted = true;
                     listener.messageReceived(message);

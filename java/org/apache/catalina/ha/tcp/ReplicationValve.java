@@ -422,8 +422,7 @@ public class ReplicationValve
     protected void sendCrossContextSession() {
         List<DeltaSession> sessions = crossContextSessions.get();
         if(sessions != null && sessions.size() >0) {
-            for(Iterator<DeltaSession> iter = sessions.iterator(); iter.hasNext() ;) {
-                Session session = iter.next();
+            for (DeltaSession session : sessions) {
                 if(log.isDebugEnabled()) {
                     log.debug(sm.getString("ReplicationValve.crossContext.sendDelta",
                             session.getManager().getContext().getName() ));

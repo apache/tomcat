@@ -197,8 +197,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         Selector tmpsel = this.selector.get();
         Set<SelectionKey> keys =  (isListening()&&tmpsel!=null)?tmpsel.keys():null;
         if ( keys == null ) return;
-        for (Iterator<SelectionKey> iter = keys.iterator(); iter.hasNext();) {
-            SelectionKey key = iter.next();
+        for (SelectionKey key : keys) {
             try {
 //                if (key.interestOps() == SelectionKey.OP_READ) {
 //                    //only timeout sockets that we are waiting for a read from

@@ -24,7 +24,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
@@ -756,9 +755,7 @@ public class DeltaManager extends ClusterManagerBase{
                 waitForSendAllSessions(beforeSendTime);
             } finally {
                 synchronized(receivedMessageQueue) {
-                    for (Iterator<SessionMessage> iter = receivedMessageQueue.iterator();
-                            iter.hasNext();) {
-                        SessionMessage smsg = iter.next();
+                    for (SessionMessage smsg : receivedMessageQueue) {
                         if (!stateTimestampDrop) {
                             messageReceived(smsg,
                                     smsg.getAddress() != null ? (Member) smsg.getAddress() : null);
