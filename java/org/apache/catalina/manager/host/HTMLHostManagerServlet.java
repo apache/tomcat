@@ -23,7 +23,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -332,10 +331,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         String hostsRemove =
             smClient.getString("htmlHostManagerServlet.hostsRemove");
 
-        Iterator<Map.Entry<String,String>> iterator =
-            sortedHostNamesMap.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String,String> entry = iterator.next();
+        for (Map.Entry<String, String> entry : sortedHostNamesMap.entrySet()) {
             String hostName = entry.getKey();
             Host host = (Host) engine.findChild(hostName);
 

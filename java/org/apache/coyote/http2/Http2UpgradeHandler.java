@@ -999,9 +999,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         TreeSet<Integer> candidatesStepTwo = new TreeSet<>();
         TreeSet<Integer> candidatesStepThree = new TreeSet<>();
 
-        Iterator<Entry<Integer,Stream>> entryIter = streams.entrySet().iterator();
-        while (entryIter.hasNext()) {
-            Entry<Integer,Stream> entry = entryIter.next();
+        for (Entry<Integer, Stream> entry : streams.entrySet()) {
             Stream stream = entry.getValue();
             // Never remove active streams
             if (stream.isActive()) {
@@ -1022,9 +1020,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
 
         // Process the step one list
-        Iterator<Integer> stepOneIter = candidatesStepOne.iterator();
-        while (stepOneIter.hasNext()) {
-            Integer streamIdToRemove = stepOneIter.next();
+        for (Integer streamIdToRemove : candidatesStepOne) {
             // Remove this childless stream
             Stream removedStream = streams.remove(streamIdToRemove);
             removedStream.detachFromParent();
@@ -1050,9 +1046,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
 
         // Process the P2 list
-        Iterator<Integer> stepTwoIter = candidatesStepTwo.iterator();
-        while (stepTwoIter.hasNext()) {
-            Integer streamIdToRemove = stepTwoIter.next();
+        for (Integer streamIdToRemove : candidatesStepTwo) {
             removeStreamFromPriorityTree(streamIdToRemove);
             toClose--;
             if (log.isDebugEnabled()) {

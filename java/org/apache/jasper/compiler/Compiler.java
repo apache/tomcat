@@ -26,7 +26,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -491,9 +490,7 @@ public abstract class Compiler {
             return false;
         }
 
-        Iterator<Entry<String,Long>> it = depends.entrySet().iterator();
-        while (it.hasNext()) {
-            Entry<String,Long> include = it.next();
+        for (Entry<String, Long> include : depends.entrySet()) {
             try {
                 String key = include.getKey();
                 URL includeUrl;

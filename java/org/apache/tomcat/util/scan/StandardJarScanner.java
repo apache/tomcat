@@ -176,9 +176,7 @@ public class StandardJarScanner implements JarScanner {
         // Scan WEB-INF/lib
         Set<String> dirList = context.getResourcePaths(Constants.WEB_INF_LIB);
         if (dirList != null) {
-            Iterator<String> it = dirList.iterator();
-            while (it.hasNext()) {
-                String path = it.next();
+            for (String path : dirList) {
                 if (path.endsWith(Constants.JAR_EXT) &&
                         getJarScanFilter().check(scanType,
                                 path.substring(path.lastIndexOf('/')+1))) {

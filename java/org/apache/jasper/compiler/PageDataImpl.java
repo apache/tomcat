@@ -20,7 +20,6 @@ import java.io.ByteArrayInputStream;
 import java.io.CharArrayWriter;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ListIterator;
 
 import javax.servlet.jsp.tagext.PageData;
 
@@ -552,15 +551,14 @@ class PageDataImpl extends PageData implements TagConstants {
             if (n.getImports().size() > 0) {
                 // Concatenate names of imported classes/packages
                 boolean first = true;
-                ListIterator<String> iter = n.getImports().listIterator();
-                while (iter.hasNext()) {
+                for (String i : n.getImports()) {
                     if (first) {
                         first = false;
                         buf.append("  import=\"");
                     } else {
                         buf.append(",");
                     }
-                    buf.append(JspUtil.getExprInXml(iter.next()));
+                    buf.append(JspUtil.getExprInXml(i));
                 }
                 buf.append("\"\n");
             }

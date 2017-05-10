@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -550,9 +549,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
         // Add the per method constraints
         Collection<HttpMethodConstraintElement> methods =
             element.getHttpMethodConstraints();
-        Iterator<HttpMethodConstraintElement> methodIter = methods.iterator();
-        while (methodIter.hasNext()) {
-            HttpMethodConstraintElement methodElement = methodIter.next();
+        for (HttpMethodConstraintElement methodElement : methods) {
             SecurityConstraint constraint =
                 createConstraint(methodElement, urlPattern, true);
             // There will always be a single collection
@@ -566,9 +563,8 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
         if (constraint != null) {
             // There will always be a single collection
             SecurityCollection collection = constraint.findCollections()[0];
-            Iterator<String> ommittedMethod = element.getMethodNames().iterator();
-            while (ommittedMethod.hasNext()) {
-                collection.addOmittedMethod(ommittedMethod.next());
+            for (String name : element.getMethodNames()) {
+                collection.addOmittedMethod(name);
             }
 
             result.add(constraint);

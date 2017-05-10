@@ -27,7 +27,6 @@ import java.net.URISyntaxException;
 import java.security.Permission;
 import java.util.EmptyStackException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.PropertyPermission;
@@ -827,9 +826,7 @@ public class Digester extends DefaultHandler2 {
         }
 
         // Fire "finish" events for all defined rules
-        Iterator<Rule> rules = getRules().rules().iterator();
-        while (rules.hasNext()) {
-            Rule rule = rules.next();
+        for (Rule rule : getRules().rules()) {
             try {
                 rule.finish();
             } catch (Exception e) {

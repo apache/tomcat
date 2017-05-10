@@ -454,9 +454,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
      */
     private void saveNestedVariables() {
         if (nestedVars != null) {
-            Iterator<String> iter = nestedVars.iterator();
-            while (iter.hasNext()) {
-                String varName = iter.next();
+            for (String varName : nestedVars) {
                 varName = findAlias(varName);
                 Object obj = invokingJspCtxt.getAttribute(varName);
                 if (obj != null) {
@@ -471,9 +469,7 @@ public class JspContextWrapper extends PageContext implements VariableResolver {
      */
     private void restoreNestedVariables() {
         if (nestedVars != null) {
-            Iterator<String> iter = nestedVars.iterator();
-            while (iter.hasNext()) {
-                String varName = iter.next();
+            for (String varName : nestedVars) {
                 varName = findAlias(varName);
                 Object obj = originalNestedVars.get(varName);
                 if (obj != null) {

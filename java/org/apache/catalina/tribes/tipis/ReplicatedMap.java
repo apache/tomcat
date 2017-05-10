@@ -19,7 +19,6 @@ package org.apache.catalina.tribes.tipis;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -189,9 +188,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
         if (log.isInfoEnabled())
             log.info(sm.getString("replicatedMap.member.disappeared", member));
         long start = System.currentTimeMillis();
-        Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
-        while (i.hasNext()) {
-            Map.Entry<K,MapEntry<K,V>> e = i.next();
+        for (Entry<K, MapEntry<K, V>> e : innerMap.entrySet()) {
             MapEntry<K,V> entry = innerMap.get(e.getKey());
             if (entry==null) continue;
             if (entry.isPrimary()) {
@@ -254,9 +251,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
         if ( memberAdded ) {
             synchronized (stateMutex) {
                 Member[] backup = getMapMembers();
-                Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
-                while (i.hasNext()) {
-                    Map.Entry<K,MapEntry<K,V>> e = i.next();
+                for (Entry<K, MapEntry<K, V>> e : innerMap.entrySet()) {
                     MapEntry<K,V> entry = innerMap.get(e.getKey());
                     if ( entry == null ) continue;
                     if (entry.isPrimary() && !inSet(member,entry.getBackupNodes())) {

@@ -259,9 +259,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         if( mbeans==null ) {
             return;
         }
-        Iterator<ObjectName> itr = mbeans.iterator();
-        while(itr.hasNext()) {
-            ObjectName current = itr.next();
+        for (ObjectName current : mbeans) {
             try {
                 if(current == null) {
                     continue;

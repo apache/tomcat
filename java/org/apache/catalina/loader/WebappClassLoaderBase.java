@@ -1309,9 +1309,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         if ((pc = loaderPC.get(codeUrl)) == null) {
             pc = super.getPermissions(codeSource);
             if (pc != null) {
-                Iterator<Permission> perms = permissionList.iterator();
-                while (perms.hasNext()) {
-                    Permission p = perms.next();
+                for (Permission p : permissionList) {
                     pc.add(p);
                 }
                 loaderPC.put(codeUrl,pc);

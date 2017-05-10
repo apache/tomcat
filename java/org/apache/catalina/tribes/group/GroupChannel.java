@@ -186,17 +186,13 @@ public class GroupChannel extends ChannelInterceptorBase
     @Override
     public void heartbeat() {
         super.heartbeat();
-        Iterator<MembershipListener> membershipListenerIterator = membershipListeners.iterator();
-        while ( membershipListenerIterator.hasNext() ) {
-            MembershipListener listener = membershipListenerIterator.next();
-            if ( listener instanceof Heartbeat ) ((Heartbeat)listener).heartbeat();
-        }
-        Iterator<ChannelListener> channelListenerIterator = channelListeners.iterator();
-        while ( channelListenerIterator.hasNext() ) {
-            ChannelListener listener = channelListenerIterator.next();
+        for (MembershipListener listener : membershipListeners) {
             if ( listener instanceof Heartbeat ) ((Heartbeat)listener).heartbeat();
         }
 
+        for (ChannelListener listener : channelListeners) {
+            if ( listener instanceof Heartbeat ) ((Heartbeat)listener).heartbeat();
+        }
     }
 
 

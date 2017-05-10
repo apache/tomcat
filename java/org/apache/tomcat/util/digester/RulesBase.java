@@ -21,7 +21,6 @@ package org.apache.tomcat.util.digester;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -99,9 +98,7 @@ public class RulesBase implements Rules {
     public void setDigester(Digester digester) {
 
         this.digester = digester;
-        Iterator<Rule> items = rules.iterator();
-        while (items.hasNext()) {
-            Rule item = items.next();
+        for (Rule item : rules) {
             item.setDigester(digester);
         }
 
@@ -200,9 +197,7 @@ public class RulesBase implements Rules {
         if ((rulesList == null) || (rulesList.size() < 1)) {
             // Find the longest key, ie more discriminant
             String longKey = "";
-            Iterator<String> keys = this.cache.keySet().iterator();
-            while (keys.hasNext()) {
-                String key = keys.next();
+            for (String key : this.cache.keySet()) {
                 if (key.startsWith("*/")) {
                     if (pattern.equals(key.substring(2)) ||
                         pattern.endsWith(key.substring(1))) {
@@ -260,9 +255,7 @@ public class RulesBase implements Rules {
 
         // Select only Rules that match on the specified namespace URI
         List<Rule> results = new ArrayList<>();
-        Iterator<Rule> items = list.iterator();
-        while (items.hasNext()) {
-            Rule item = items.next();
+        for (Rule item : list) {
             if ((namespaceURI.equals(item.getNamespaceURI())) ||
                     (item.getNamespaceURI() == null)) {
                 results.add(item);

@@ -34,7 +34,6 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1390,9 +1389,7 @@ public class JspC extends Task implements Options {
 
             initWebXml();
 
-            Iterator<String> iter = pages.iterator();
-            while (iter.hasNext()) {
-                String nextjsp = iter.next();
+            for (String nextjsp : pages) {
                 File fjsp = new File(nextjsp);
                 if (!fjsp.isAbsolute()) {
                     fjsp = new File(uriRootF, nextjsp);

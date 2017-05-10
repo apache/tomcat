@@ -327,10 +327,8 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
     @Override
     public synchronized void clear() {
         if (null != factory) {
-            final Iterator<PooledSoftReference<T>> iter = idleReferences.iterator();
-            while (iter.hasNext()) {
+            for (PooledSoftReference<T> ref : idleReferences) {
                 try {
-                    final PooledSoftReference<T> ref = iter.next();
                     if (null != ref.getObject()) {
                         factory.destroyObject(ref);
                     }
@@ -385,9 +383,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
      * @return PooledSoftReference wrapping a soft reference to obj
      */
     private PooledSoftReference<T> findReference(final T obj) {
-        final Iterator<PooledSoftReference<T>> iterator = allReferences.iterator();
-        while (iterator.hasNext()) {
-            final PooledSoftReference<T> reference = iterator.next();
+        for (PooledSoftReference<T> reference : allReferences) {
             if (reference.getObject() != null && reference.getObject().equals(obj)) {
                 return reference;
             }

@@ -23,7 +23,6 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
@@ -1273,9 +1272,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
     public ObjectName[] getChildren() {
         List<ObjectName> names = new ArrayList<>(children.size());
-        Iterator<Container>  it = children.values().iterator();
-        while (it.hasNext()) {
-            Object next = it.next();
+        for (Container next : children.values()) {
             if (next instanceof ContainerBase) {
                 names.add(((ContainerBase)next).getObjectName());
             }

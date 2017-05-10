@@ -17,7 +17,6 @@
 package org.apache.catalina.util;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -107,9 +106,7 @@ public class ManifestResource {
         if (requiredExtensions == null) {
             return true;
         }
-        Iterator<Extension> it = requiredExtensions.iterator();
-        while (it.hasNext()) {
-            Extension ext = it.next();
+        for (Extension ext : requiredExtensions) {
             if (!ext.isFulfilled()) return false;
         }
         return true;

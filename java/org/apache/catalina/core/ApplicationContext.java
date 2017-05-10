@@ -30,7 +30,6 @@ import java.util.Enumeration;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1338,16 +1337,13 @@ public class ApplicationContext implements ServletContext {
 
         // Create list of attributes to be removed
         List<String> list = new ArrayList<>();
-        Iterator<String> iter = attributes.keySet().iterator();
-        while (iter.hasNext()) {
-            list.add(iter.next());
+        for (String s : attributes.keySet()) {
+            list.add(s);
         }
 
         // Remove application originated attributes
         // (read only attributes will be left in place)
-        Iterator<String> keys = list.iterator();
-        while (keys.hasNext()) {
-            String key = keys.next();
+        for (String key : list) {
             removeAttribute(key);
         }
 

@@ -710,9 +710,8 @@ public class StatusTransformer {
             Set<ObjectName> managersON =
                 mBeanServer.queryNames(queryManager, null);
             ObjectName managerON = null;
-            Iterator<ObjectName> iterator2 = managersON.iterator();
-            while (iterator2.hasNext()) {
-                managerON = iterator2.next();
+            for (ObjectName aManagersON : managersON) {
+                managerON = aManagersON;
             }
 
             ObjectName queryJspMonitor = new ObjectName
@@ -755,9 +754,7 @@ public class StatusTransformer {
             ObjectName servletObjectName = new ObjectName(onStr);
             Set<ObjectInstance> set =
                 mBeanServer.queryMBeans(servletObjectName, null);
-            Iterator<ObjectInstance> iterator = set.iterator();
-            while (iterator.hasNext()) {
-                ObjectInstance oi = iterator.next();
+            for (ObjectInstance oi : set) {
                 writeWrapper(writer, oi.getObjectName(), mBeanServer, mode);
             }
 
@@ -833,9 +830,7 @@ public class StatusTransformer {
         int jspCount = 0;
         int jspReloadCount = 0;
 
-        Iterator<ObjectName> iter = jspMonitorONs.iterator();
-        while (iter.hasNext()) {
-            ObjectName jspMonitorON = iter.next();
+        for (ObjectName jspMonitorON : jspMonitorONs) {
             Object obj = mBeanServer.getAttribute(jspMonitorON, "jspCount");
             jspCount += ((Integer) obj).intValue();
             obj = mBeanServer.getAttribute(jspMonitorON, "jspReloadCount");

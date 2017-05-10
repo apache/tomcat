@@ -21,7 +21,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
@@ -210,9 +209,7 @@ public final class ExtensionValidator {
         int failureCount = 0;
         List<Extension> availableExtensions = null;
 
-        Iterator<ManifestResource> it = resources.iterator();
-        while (it.hasNext()) {
-            ManifestResource mre = it.next();
+        for (ManifestResource mre : resources) {
             ArrayList<Extension> requiredList = mre.getRequiredExtensions();
             if (requiredList == null) {
                 continue;
@@ -231,15 +228,11 @@ public final class ExtensionValidator {
             }
 
             // iterate through the list of required extensions
-            Iterator<Extension> rit = requiredList.iterator();
-            while (rit.hasNext()) {
+            for (Extension requiredExt : requiredList) {
                 boolean found = false;
-                Extension requiredExt = rit.next();
                 // check the application itself for the extension
                 if (availableExtensions != null) {
-                    Iterator<Extension> ait = availableExtensions.iterator();
-                    while (ait.hasNext()) {
-                        Extension targetExt = ait.next();
+                    for (Extension targetExt : availableExtensions) {
                         if (targetExt.isCompatibleWith(requiredExt)) {
                             requiredExt.setFulfilled(true);
                             found = true;
@@ -249,10 +242,7 @@ public final class ExtensionValidator {
                 }
                 // check the container level list for the extension
                 if (!found && containerAvailableExtensions != null) {
-                    Iterator<Extension> cit =
-                        containerAvailableExtensions.iterator();
-                    while (cit.hasNext()) {
-                        Extension targetExt = cit.next();
+                    for (Extension targetExt : containerAvailableExtensions) {
                         if (targetExt.isCompatibleWith(requiredExt)) {
                             requiredExt.setFulfilled(true);
                             found = true;
@@ -303,14 +293,10 @@ public final class ExtensionValidator {
 
         List<Extension> availableList = null;
 
-        Iterator<ManifestResource> it = resources.iterator();
-        while (it.hasNext()) {
-            ManifestResource mre = it.next();
+        for (ManifestResource mre : resources) {
             ArrayList<Extension> list = mre.getAvailableExtensions();
             if (list != null) {
-                Iterator<Extension> values = list.iterator();
-                while (values.hasNext()) {
-                    Extension ext = values.next();
+                for (Extension ext : list) {
                     if (availableList == null) {
                         availableList = new ArrayList<>();
                         availableList.add(ext);

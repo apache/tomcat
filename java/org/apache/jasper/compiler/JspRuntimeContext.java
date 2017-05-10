@@ -28,7 +28,6 @@ import java.security.CodeSource;
 import java.security.PermissionCollection;
 import java.security.Policy;
 import java.security.cert.Certificate;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -283,9 +282,8 @@ public final class JspRuntimeContext {
      * Process a "destroy" event for this web application context.
      */
     public void destroy() {
-        Iterator<JspServletWrapper> servlets = jsps.values().iterator();
-        while (servlets.hasNext()) {
-            servlets.next().destroy();
+        for (JspServletWrapper jspServletWrapper : jsps.values()) {
+            jspServletWrapper.destroy();
         }
     }
 

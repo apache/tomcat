@@ -36,7 +36,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -613,9 +612,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         result.put(HTTP_VERSION_BYTES);
 
         // Headers
-        Iterator<Entry<String,List<String>>> iter = reqHeaders.entrySet().iterator();
-        while (iter.hasNext()) {
-            Entry<String,List<String>> entry = iter.next();
+        for (Entry<String, List<String>> entry : reqHeaders.entrySet()) {
             addHeader(result, entry.getKey(), entry.getValue());
         }
 

@@ -23,7 +23,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.security.auth.Subject;
@@ -511,10 +510,7 @@ public class JAASRealm extends RealmBase {
         Principal userPrincipal = null;
 
         // Scan the Principals for this Subject
-        Iterator<Principal> principals = subject.getPrincipals().iterator();
-        while (principals.hasNext()) {
-            Principal principal = principals.next();
-
+        for (Principal principal : subject.getPrincipals()) {
             String principalClass = principal.getClass().getName();
 
             if( log.isDebugEnabled() ) {

@@ -27,7 +27,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -260,9 +259,7 @@ public class RewriteValve extends ValveBase {
     @Override
     protected synchronized void stopInternal() throws LifecycleException {
         super.stopInternal();
-        Iterator<RewriteMap> values = maps.values().iterator();
-        while (values.hasNext()) {
-            RewriteMap map = values.next();
+        for (RewriteMap map : maps.values()) {
             if (map instanceof Lifecycle) {
                 ((Lifecycle) map).stop();
             }

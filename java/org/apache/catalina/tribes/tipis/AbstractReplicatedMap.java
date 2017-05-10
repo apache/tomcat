@@ -502,12 +502,9 @@ public abstract class AbstractReplicatedMap<K,V>
      * @param complete boolean
      */
     public void replicate(boolean complete) {
-        Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
-        while (i.hasNext()) {
-            Map.Entry<?,?> e = i.next();
+        for (Entry<K, MapEntry<K, V>> e : innerMap.entrySet()) {
             replicate(e.getKey(), complete);
-        } //while
-
+        }
     }
 
     public void transferState() {
@@ -575,9 +572,7 @@ public abstract class AbstractReplicatedMap<K,V>
         if (mapmsg.getMsgType() == MapMessage.MSG_STATE || mapmsg.getMsgType() == MapMessage.MSG_STATE_COPY) {
             synchronized (stateMutex) { //make sure we dont do two things at the same time
                 ArrayList<MapMessage> list = new ArrayList<>();
-                Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
-                while (i.hasNext()) {
-                    Map.Entry<?,?> e = i.next();
+                for (Entry<K, MapEntry<K, V>> e : innerMap.entrySet()) {
                     MapEntry<K,V> entry = innerMap.get(e.getKey());
                     if ( entry != null && entry.isSerializable() ) {
                         boolean copy = (mapmsg.getMsgType() == MapMessage.MSG_STATE_COPY);
@@ -795,9 +790,7 @@ public abstract class AbstractReplicatedMap<K,V>
         }
         if ( memberAdded ) {
             synchronized (stateMutex) {
-                Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
-                while (i.hasNext()) {
-                    Map.Entry<K,MapEntry<K,V>> e = i.next();
+                for (Entry<K, MapEntry<K, V>> e : innerMap.entrySet()) {
                     MapEntry<K,V> entry = innerMap.get(e.getKey());
                     if ( entry == null ) continue;
                     if (entry.isPrimary() && (entry.getBackupNodes() == null || entry.getBackupNodes().length == 0)) {
@@ -1122,9 +1115,9 @@ public abstract class AbstractReplicatedMap<K,V>
     public void clear(boolean notify) {
         if ( notify ) {
             //only delete active keys
-            Iterator<K> keys = keySet().iterator();
-            while (keys.hasNext())
-                remove(keys.next());
+            for (K k : keySet()) {
+                remove(k);
+            }
         } else {
             innerMap.clear();
         }
@@ -1133,9 +1126,7 @@ public abstract class AbstractReplicatedMap<K,V>
     @Override
     public boolean containsValue(Object value) {
         Objects.requireNonNull(value);
-        Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
-        while (i.hasNext()) {
-            Map.Entry<K,MapEntry<K,V>> e = i.next();
+        for (Entry<K, MapEntry<K, V>> e : innerMap.entrySet()) {
             MapEntry<K,V> entry = innerMap.get(e.getKey());
             if (entry!=null && entry.isActive() && value.equals(entry.getValue())) return true;
         }
@@ -1168,9 +1159,7 @@ public abstract class AbstractReplicatedMap<K,V>
     @Override
     public Set<Map.Entry<K,V>> entrySet() {
         LinkedHashSet<Map.Entry<K,V>> set = new LinkedHashSet<>(innerMap.size());
-        Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
-        while ( i.hasNext() ) {
-            Map.Entry<?,?> e = i.next();
+        for (Entry<K, MapEntry<K, V>> e : innerMap.entrySet()) {
             Object key = e.getKey();
             MapEntry<K,V> entry = innerMap.get(key);
             if ( entry != null && entry.isActive() ) {
@@ -1185,9 +1174,7 @@ public abstract class AbstractReplicatedMap<K,V>
         //todo implement
         //should only return keys where this is active.
         LinkedHashSet<K> set = new LinkedHashSet<>(innerMap.size());
-        Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
-        while ( i.hasNext() ) {
-            Map.Entry<K,MapEntry<K,V>> e = i.next();
+        for (Entry<K, MapEntry<K, V>> e : innerMap.entrySet()) {
             K key = e.getKey();
             MapEntry<K,V> entry = innerMap.get(key);
             if ( entry!=null && entry.isActive() ) set.add(key);
@@ -1221,9 +1208,7 @@ public abstract class AbstractReplicatedMap<K,V>
     @Override
     public Collection<V> values() {
         List<V> values = new ArrayList<>();
-        Iterator<Map.Entry<K,MapEntry<K,V>>> i = innerMap.entrySet().iterator();
-        while ( i.hasNext() ) {
-            Map.Entry<K,MapEntry<K,V>> e = i.next();
+        for (Entry<K, MapEntry<K, V>> e : innerMap.entrySet()) {
             MapEntry<K,V> entry = innerMap.get(e.getKey());
             if (entry!=null && entry.isActive() && entry.getValue()!=null) values.add(entry.getValue());
         }

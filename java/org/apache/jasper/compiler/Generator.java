@@ -33,7 +33,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -571,10 +570,9 @@ class Generator {
      * generation)
      */
     private void genPreambleImports() {
-        Iterator<String> iter = pageInfo.getImports().iterator();
-        while (iter.hasNext()) {
+        for (String i : pageInfo.getImports()) {
             out.printin("import ");
-            out.print(iter.next());
+            out.print(i);
             out.println(";");
         }
 
@@ -601,9 +599,7 @@ class Generator {
             out.printin("_jspx_dependants = new java.util.HashMap<java.lang.String,java.lang.Long>(");
             out.print("" + dependants.size());
             out.println(");");
-            Iterator<Entry<String,Long>> iter = dependants.entrySet().iterator();
-            while (iter.hasNext()) {
-                Entry<String,Long> entry = iter.next();
+            for (Entry<String, Long> entry : dependants.entrySet()) {
                 out.printin("_jspx_dependants.put(\"");
                 out.print(entry.getKey());
                 out.print("\", Long.valueOf(");

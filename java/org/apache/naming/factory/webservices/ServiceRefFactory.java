@@ -181,11 +181,10 @@ public class ServiceRefFactory implements ObjectFactory {
                     Method m = serviceInterfaceClass.getMethod("setEndpointAddress",
                             new Class[] { java.lang.String.class,
                             java.lang.String.class });
-                    for (Iterator<String> i = ports.keySet().iterator(); i.hasNext();) {
-                        String portName = i.next();
+                    for (String portName : ports.keySet()) {
                         Port port = wsdlservice.getPort(portName);
                         String endpoint = getSOAPLocation(port);
-                        m.invoke(service, new Object[] {port.getName(), endpoint });
+                        m.invoke(service, new Object[]{port.getName(), endpoint});
                         portComponentRef.put(endpoint, new QName(port.getName()));
                     }
                 } catch (Exception e) {
@@ -301,10 +300,10 @@ public class ServiceRefFactory implements ObjectFactory {
                     handlerInfo.setHandlerConfig(config);
 
                     if (!portNames.isEmpty()) {
-                        Iterator<String> iter = portNames.iterator();
-                        while (iter.hasNext())
-                            initHandlerChain(new QName(iter.next()), handlerRegistry,
+                        for (String portName : portNames) {
+                            initHandlerChain(new QName(portName), handlerRegistry,
                                     handlerInfo, soaproles);
+                        }
                     } else {
                         Enumeration<QName> e = portComponentRef.elements();
                         while(e.hasMoreElements())
@@ -330,9 +329,7 @@ public class ServiceRefFactory implements ObjectFactory {
         String endpoint = null;
         @SuppressWarnings("unchecked")
         List<ExtensibilityElement> extensions = port.getExtensibilityElements();
-        for (Iterator<ExtensibilityElement> i = extensions.iterator();
-                i.hasNext();) {
-            ExtensibilityElement ext = i.next();
+        for (ExtensibilityElement ext : extensions) {
             if (ext instanceof SOAPAddress) {
                 SOAPAddress addr = (SOAPAddress) ext;
                 endpoint = addr.getLocationURI();

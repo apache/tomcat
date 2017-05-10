@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -2882,10 +2881,7 @@ public class Request implements HttpServletRequest {
     @Override
     public Part getPart(String name) throws IOException, IllegalStateException,
             ServletException {
-        Collection<Part> c = getParts();
-        Iterator<Part> iterator = c.iterator();
-        while (iterator.hasNext()) {
-            Part part = iterator.next();
+        for (Part part : getParts()) {
             if (name.equals(part.getName())) {
                 return part;
             }
