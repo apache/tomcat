@@ -986,7 +986,7 @@ public class CoyoteAdapter implements Adapter {
 
 
     /**
-     * Parse session id in URL.
+     * Parse session id in Cookie.
      *
      * @param request The Servlet request object
      */
