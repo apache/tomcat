@@ -1775,8 +1775,8 @@ public class Request implements HttpServletRequest {
         }
 
         Cookie[] newCookies = new Cookie[size + 1];
-        for (int i = 0; i < size; i++) {
-            newCookies[i] = cookies[i];
+        if (cookies != null) {
+            System.arraycopy(cookies, 0, newCookies, 0, size);
         }
         newCookies[size] = cookie;
 

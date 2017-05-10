@@ -2806,10 +2806,7 @@ public class StandardContext extends ContainerBase
 
         // Add this constraint to the set for our web application
         synchronized (constraintsLock) {
-            SecurityConstraint results[] =
-                new SecurityConstraint[constraints.length + 1];
-            for (int i = 0; i < constraints.length; i++)
-                results[i] = constraints[i];
+            SecurityConstraint[] results = Arrays.copyOf(constraints, constraints.length + 1);
             results[constraints.length] = constraint;
             constraints = results;
         }
@@ -3064,9 +3061,7 @@ public class StandardContext extends ContainerBase
     public void addSecurityRole(String role) {
 
         synchronized (securityRolesLock) {
-            String results[] =new String[securityRoles.length + 1];
-            for (int i = 0; i < securityRoles.length; i++)
-                results[i] = securityRoles[i];
+            String[] results = Arrays.copyOf(securityRoles, securityRoles.length + 1);
             results[securityRoles.length] = role;
             securityRoles = results;
         }
@@ -3125,9 +3120,7 @@ public class StandardContext extends ContainerBase
     public void addWatchedResource(String name) {
 
         synchronized (watchedResourcesLock) {
-            String results[] = new String[watchedResources.length + 1];
-            for (int i = 0; i < watchedResources.length; i++)
-                results[i] = watchedResources[i];
+            String[] results = Arrays.copyOf(watchedResources, watchedResources.length + 1);
             results[watchedResources.length] = name;
             watchedResources = results;
         }
@@ -3151,9 +3144,7 @@ public class StandardContext extends ContainerBase
                 welcomeFiles = new String[0];
                 setReplaceWelcomeFiles(false);
             }
-            String results[] =new String[welcomeFiles.length + 1];
-            for (int i = 0; i < welcomeFiles.length; i++)
-                results[i] = welcomeFiles[i];
+            String[] results = Arrays.copyOf(welcomeFiles, welcomeFiles.length + 1);
             results[welcomeFiles.length] = name;
             welcomeFiles = results;
         }
@@ -3172,9 +3163,7 @@ public class StandardContext extends ContainerBase
     public void addWrapperLifecycle(String listener) {
 
         synchronized (wrapperLifecyclesLock) {
-            String results[] =new String[wrapperLifecycles.length + 1];
-            for (int i = 0; i < wrapperLifecycles.length; i++)
-                results[i] = wrapperLifecycles[i];
+            String[] results = Arrays.copyOf(wrapperLifecycles, wrapperLifecycles.length + 1);
             results[wrapperLifecycles.length] = listener;
             wrapperLifecycles = results;
         }
@@ -3193,9 +3182,7 @@ public class StandardContext extends ContainerBase
     public void addWrapperListener(String listener) {
 
         synchronized (wrapperListenersLock) {
-            String results[] =new String[wrapperListeners.length + 1];
-            for (int i = 0; i < wrapperListeners.length; i++)
-                results[i] = wrapperListeners[i];
+            String[] results = Arrays.copyOf(wrapperListeners, wrapperListeners.length + 1);
             results[wrapperListeners.length] = listener;
             wrapperListeners = results;
         }

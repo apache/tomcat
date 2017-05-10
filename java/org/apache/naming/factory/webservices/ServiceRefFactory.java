@@ -21,6 +21,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -222,15 +223,11 @@ public class ServiceRefFactory implements ObjectFactory {
             proxy.setPortComponentRef(portComponentRef);
 
             // Instantiate service with proxy class
-            Class<?>[] interfaces = null;
             Class<?>[] serviceInterfaces = serviceInterfaceClass.getInterfaces();
 
-            interfaces = new Class[serviceInterfaces.length + 1];
-            for (int i = 0; i < serviceInterfaces.length; i++) {
-                interfaces[i] = serviceInterfaces[i];
-            }
-
+            Class<?>[] interfaces = Arrays.copyOf(serviceInterfaces, serviceInterfaces.length + 1);
             interfaces[interfaces.length - 1] = javax.xml.rpc.Service.class;
+
             Object proxyInstance = null;
             try {
                 proxyInstance = Proxy.newProxyInstance(tcl, interfaces, proxy);

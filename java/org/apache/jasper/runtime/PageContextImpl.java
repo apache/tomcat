@@ -19,6 +19,7 @@ package org.apache.jasper.runtime;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -544,10 +545,7 @@ public class PageContextImpl extends PageContext {
     public JspWriter pushBody(Writer writer) {
         depth++;
         if (depth >= outs.length) {
-            BodyContentImpl[] newOuts = new BodyContentImpl[depth + 1];
-            for (int i = 0; i < outs.length; i++) {
-                newOuts[i] = outs[i];
-            }
+            BodyContentImpl[] newOuts = Arrays.copyOf(outs, depth + 1);
             newOuts[depth] = new BodyContentImpl(out);
             outs = newOuts;
         }

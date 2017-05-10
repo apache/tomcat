@@ -17,6 +17,7 @@
 package org.apache.catalina.valves.rewrite;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -67,10 +68,7 @@ public class RewriteRule {
     }
 
     public void addCondition(RewriteCond condition) {
-        RewriteCond[] conditions = new RewriteCond[this.conditions.length + 1];
-        for (int i = 0; i < this.conditions.length; i++) {
-            conditions[i] = this.conditions[i];
-        }
+        RewriteCond[] conditions = Arrays.copyOf(this.conditions, this.conditions.length + 1);
         conditions[this.conditions.length] = condition;
         this.conditions = conditions;
     }

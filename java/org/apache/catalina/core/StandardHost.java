@@ -19,6 +19,7 @@ package org.apache.catalina.core;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -675,9 +676,7 @@ public class StandardHost extends ContainerBase implements Host {
                     return;
             }
             // Add this alias to the list
-            String newAliases[] = new String[aliases.length + 1];
-            for (int i = 0; i < aliases.length; i++)
-                newAliases[i] = aliases[i];
+            String newAliases[] = Arrays.copyOf(aliases, aliases.length + 1);
             newAliases[aliases.length] = alias;
             aliases = newAliases;
         }

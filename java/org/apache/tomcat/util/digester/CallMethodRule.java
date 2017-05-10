@@ -159,9 +159,7 @@ public class CallMethodRule extends Rule {
             }
         } else {
             this.paramTypes = new Class[paramTypes.length];
-            for (int i = 0; i < this.paramTypes.length; i++) {
-                this.paramTypes[i] = paramTypes[i];
-            }
+            System.arraycopy(paramTypes, 0, this.paramTypes, 0, this.paramTypes.length);
         }
         this.paramClassNames = null;
     }

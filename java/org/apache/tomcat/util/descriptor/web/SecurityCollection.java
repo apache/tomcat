@@ -18,6 +18,7 @@ package org.apache.tomcat.util.descriptor.web;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import org.apache.tomcat.util.buf.UDecoder;
 
@@ -173,9 +174,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
         if (method == null)
             return;
-        String results[] = new String[methods.length + 1];
-        for (int i = 0; i < methods.length; i++)
-            results[i] = methods[i];
+        String[] results = Arrays.copyOf(methods, methods.length + 1);
         results[methods.length] = method;
         methods = results;
 
@@ -190,9 +189,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
     public void addOmittedMethod(String method) {
         if (method == null)
             return;
-        String results[] = new String[omittedMethods.length + 1];
-        for (int i = 0; i < omittedMethods.length; i++)
-            results[i] = omittedMethods[i];
+        String[] results = Arrays.copyOf(omittedMethods, omittedMethods.length + 1);
         results[omittedMethods.length] = method;
         omittedMethods = results;
     }
@@ -210,10 +207,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
             return;
 
         String decodedPattern = UDecoder.URLDecode(pattern);
-        String results[] = new String[patterns.length + 1];
-        for (int i = 0; i < patterns.length; i++) {
-            results[i] = patterns[i];
-        }
+        String[] results = Arrays.copyOf(patterns, patterns.length + 1);
         results[patterns.length] = decodedPattern;
         patterns = results;
     }
