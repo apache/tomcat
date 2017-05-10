@@ -229,8 +229,7 @@ public class CompressionServletResponseWrapper
             System.out.println("stream is set to "+stream+" in getOutputStream");
         }
 
-        return (stream);
-
+        return stream;
     }
 
     /**
@@ -244,7 +243,7 @@ public class CompressionServletResponseWrapper
     public PrintWriter getWriter() throws IOException {
 
         if (writer != null)
-            return (writer);
+            return writer;
 
         if (stream != null)
             throw new IllegalStateException("getOutputStream() has already been called for this response");
@@ -265,7 +264,7 @@ public class CompressionServletResponseWrapper
             writer = new PrintWriter(stream);
         }
 
-        return (writer);
+        return writer;
     }
 
     @Override

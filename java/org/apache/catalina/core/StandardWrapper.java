@@ -1557,7 +1557,7 @@ public class StandardWrapper extends ContainerBase
         try {
             Class<?> clazz =
                 this.getClass().getClassLoader().loadClass(classname);
-            return (ContainerServlet.class.isAssignableFrom(clazz));
+            return ContainerServlet.class.isAssignableFrom(clazz);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             return false;

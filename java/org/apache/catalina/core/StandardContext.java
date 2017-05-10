@@ -3551,13 +3551,10 @@ public class StandardContext extends ContainerBase
      */
     @Override
     public String[] findServletMappings() {
-
         synchronized (servletMappingsLock) {
             String results[] = new String[servletMappings.size()];
-            return
-               (servletMappings.keySet().toArray(results));
+            return servletMappings.keySet().toArray(results);
         }
-
     }
 
 

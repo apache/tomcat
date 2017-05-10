@@ -129,7 +129,7 @@ public final class FileStore extends StoreBase {
         // Acquire the list of files in our storage directory
         File file = directory();
         if (file == null) {
-            return (0);
+            return 0;
         }
         String files[] = file.list();
 

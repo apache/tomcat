@@ -63,9 +63,9 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
     @Override
     protected String getNamePrefix() {
         if (isSSLEnabled()) {
-            return ("https-openssl-apr");
+            return "https-openssl-apr";
         } else {
-            return ("http-apr");
+            return "http-apr";
         }
     }
 }

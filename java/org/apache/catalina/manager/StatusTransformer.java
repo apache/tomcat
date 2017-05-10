@@ -918,7 +918,7 @@ public class StatusTransformer {
     public static String filter(Object obj) {
 
         if (obj == null)
-            return ("?");
+            return "?";
         String message = obj.toString();
 
         char content[] = new char[message.length()];

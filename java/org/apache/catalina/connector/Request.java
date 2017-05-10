@@ -865,7 +865,7 @@ public class Request implements HttpServletRequest {
         Object attr=attributes.get(name);
 
         if(attr!=null) {
-            return(attr);
+            return attr;
         }
 
         attr =  coyoteRequest.getAttribute(name);
@@ -2174,7 +2174,7 @@ public class Request implements HttpServletRequest {
 
         String value = getHeader(name);
         if (value == null) {
-            return (-1L);
+            return -1L;
         }
 
         // Attempt to convert the date header in a variety of formats
@@ -2237,7 +2237,7 @@ public class Request implements HttpServletRequest {
 
         String value = getHeader(name);
         if (value == null) {
-            return (-1);
+            return -1;
         }
 
         return Integer.parseInt(value);

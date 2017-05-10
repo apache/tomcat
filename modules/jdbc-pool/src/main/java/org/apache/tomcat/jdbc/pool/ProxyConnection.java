@@ -71,7 +71,7 @@ public class ProxyConnection extends JdbcInterceptor {
         if (iface == XAConnection.class && connection.getXAConnection()!=null) {
             return true;
         } else {
-            return (iface.isInstance(connection.getConnection()));
+            return iface.isInstance(connection.getConnection());
         }
     }
 

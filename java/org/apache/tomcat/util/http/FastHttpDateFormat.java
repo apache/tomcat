@@ -160,7 +160,7 @@ public final class FastHttpDateFormat {
             throw new IllegalArgumentException();
         }
         if (date == null) {
-            return (-1L);
+            return -1L;
         }
 
         return date.longValue();

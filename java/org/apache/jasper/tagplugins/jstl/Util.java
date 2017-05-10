@@ -254,7 +254,7 @@ public class Util {
             (HttpServletRequest) pageContext.getRequest();
         if (context == null) {
             if (url.startsWith("/"))
-                return (request.getContextPath() + url);
+                return request.getContextPath() + url;
             else
                 return url;
         } else {
@@ -268,7 +268,7 @@ public class Util {
                 // path on same host.
                 return url;
             } else {
-                return (context + url);
+                return context + url;
             }
         }
     }

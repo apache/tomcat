@@ -1206,7 +1206,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         if(log.isDebugEnabled())
             log.debug(sm.getString("realmBase.gotX509Username", username));
 
-        return(getPrincipal(username));
+        return getPrincipal(username);
     }
 
 
@@ -1285,7 +1285,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             }
 
             // Digest the credentials and return as hexadecimal
-            return (HexUtils.toHexString(md.digest()));
+            return HexUtils.toHexString(md.digest());
         } catch(Exception ex) {
             log.error(ex);
             return credentials;

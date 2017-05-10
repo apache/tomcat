@@ -185,9 +185,13 @@ public abstract class SocketWrapperBase<E> {
         return this.writeTimeout;
     }
 
+    public void setKeepAliveLeft(int keepAliveLeft) {
+        this.keepAliveLeft = keepAliveLeft;
+    }
 
-    public void setKeepAliveLeft(int keepAliveLeft) { this.keepAliveLeft = keepAliveLeft;}
-    public int decrementKeepAlive() { return (--keepAliveLeft);}
+    public int decrementKeepAlive() {
+        return --keepAliveLeft;
+    }
 
     public String getRemoteHost() {
         if (remoteHost == null) {

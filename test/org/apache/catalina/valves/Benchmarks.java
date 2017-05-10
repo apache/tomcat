@@ -195,7 +195,7 @@ public class Benchmarks {
             } catch (Throwable t) {
                 index = 0; // cannot happen, in theory
             }
-            return (months[index]);
+            return months[index];
         }
     }
 

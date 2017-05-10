@@ -212,8 +212,8 @@ public final class ApplicationFilterFactory {
                 && (period != requestPath.length() - 1)
                 && ((requestPath.length() - period)
                     == (testPath.length() - 1))) {
-                return (testPath.regionMatches(2, requestPath, period + 1,
-                                               testPath.length() - 2));
+                return testPath.regionMatches(2, requestPath, period + 1,
+                                               testPath.length() - 2);
             }
         }
 
