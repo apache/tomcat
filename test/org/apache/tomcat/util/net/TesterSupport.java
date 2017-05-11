@@ -58,7 +58,7 @@ public final class TesterSupport {
             String keystorePass, String keyPass) {
 
         String protocol = tomcat.getConnector().getProtocolHandlerClassName();
-        if (protocol.indexOf("Apr") == -1) {
+        if (!protocol.contains("Apr")) {
             Connector connector = tomcat.getConnector();
             String sslImplementation = System.getProperty("tomcat.test.sslImplementation");
             if (sslImplementation != null && !"${test.sslImplementation}".equals(sslImplementation)) {

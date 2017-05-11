@@ -199,7 +199,7 @@ public class TestContextConfig extends TomcatBaseTest {
 
         if (expectedStatus == HttpServletResponse.SC_OK) {
             String result = res.toString();
-            Assert.assertTrue(result, result.indexOf(expectedBody) > -1);
+            Assert.assertTrue(result, result.contains(expectedBody));
         }
     }
 

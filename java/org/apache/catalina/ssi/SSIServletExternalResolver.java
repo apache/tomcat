@@ -388,7 +388,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             throw new IOException("A non-virtual path can't be absolute: "
                     + nonVirtualPath);
         }
-        if (nonVirtualPath.indexOf("../") >= 0) {
+        if (nonVirtualPath.contains("../")) {
             throw new IOException("A non-virtual path can't contain '../' : "
                     + nonVirtualPath);
         }

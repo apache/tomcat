@@ -1821,7 +1821,7 @@ class Validator {
         PageInfo pageInfo = compiler.getPageInfo();
         String contentType = pageInfo.getContentType();
 
-        if (contentType == null || contentType.indexOf("charset=") < 0) {
+        if (contentType == null || !contentType.contains("charset=")) {
             boolean isXml = page.getRoot().isXmlSyntax();
             String defaultType;
             if (contentType == null) {

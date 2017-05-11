@@ -401,7 +401,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
                 boolean methodFound = false;
                 List<String> authHeaders = respHeaders.get(SERVER_AUTH_HEADER);
                 for (String authHeader : authHeaders) {
-                    if (authHeader.indexOf(NICE_METHOD) > -1) {
+                    if (authHeader.contains(NICE_METHOD)) {
                         methodFound = true;
                         break;
                     }

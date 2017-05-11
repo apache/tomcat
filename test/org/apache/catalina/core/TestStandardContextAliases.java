@@ -67,9 +67,9 @@ public class TestStandardContextAliases extends TomcatBaseTest {
             result = "";
         }
 
-        assertTrue(result.indexOf("00-PASS") > -1);
-        assertTrue(result.indexOf("01-PASS") > -1);
-        assertTrue(result.indexOf("02-PASS") > -1);
+        assertTrue(result.contains("00-PASS"));
+        assertTrue(result.contains("01-PASS"));
+        assertTrue(result.contains("02-PASS"));
     }
 
 

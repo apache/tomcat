@@ -47,7 +47,7 @@ public class FileResource extends AbstractResource {
         boolean isEBCDIC = false;
         try {
             String encoding = System.getProperty("file.encoding");
-            if (encoding.indexOf("EBCDIC") != -1) {
+            if (encoding.contains("EBCDIC")) {
                 isEBCDIC = true;
             }
         } catch (SecurityException e) {

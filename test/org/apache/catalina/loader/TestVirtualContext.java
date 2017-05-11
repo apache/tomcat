@@ -333,7 +333,7 @@ public class TestVirtualContext extends TomcatBaseTest {
 
         if (expectedStatus == 200) {
             String result = res.toString();
-            assertTrue(result, result.indexOf(expectedBody) >= 0);
+            assertTrue(result, result.contains(expectedBody));
         }
     }
 }

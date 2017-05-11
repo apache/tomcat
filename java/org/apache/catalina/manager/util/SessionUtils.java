@@ -112,7 +112,7 @@ public class SessionUtils {
             final List<Object> tapestryArray = new ArrayList<>();
             for (Enumeration<String> enumeration = in_session.getAttributeNames(); enumeration.hasMoreElements();) {
                 String name = enumeration.nextElement();
-                if (name.indexOf("tapestry") > -1 && name.indexOf("engine") > -1 && null != in_session.getAttribute(name)) {//$NON-NLS-1$ //$NON-NLS-2$
+                if (name.contains("tapestry") && name.contains("engine") && null != in_session.getAttribute(name)) {//$NON-NLS-1$ //$NON-NLS-2$
                     tapestryArray.add(in_session.getAttribute(name));
                 }
             }

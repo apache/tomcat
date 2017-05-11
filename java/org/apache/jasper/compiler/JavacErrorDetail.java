@@ -118,7 +118,7 @@ public class JavacErrorDetail {
                         String javaLine = javaLines[javaLineNum-1].trim();
 
                         for (int i=jspBeginLineNum-1; i<jspLines.length; i++) {
-                            if (jspLines[i].indexOf(javaLine) != -1) {
+                            if (jspLines[i].contains(javaLine)) {
                                 // Update jsp line number
                                 jspBeginLineNum = i+1;
                                 break;

@@ -706,7 +706,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
             throws Exception
     {
         if( type==null ) type="MbeansDescriptorsDigesterSource";
-        if( type.indexOf( ".") < 0 ) {
+        if(!type.contains(".")) {
             type="org.apache.tomcat.util.modeler.modules." + type;
         }
 

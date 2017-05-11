@@ -1104,7 +1104,7 @@ public class ExpiresFilter extends FilterBase {
         if (str == null || searchStr == null) {
             return false;
         }
-        return str.indexOf(searchStr) >= 0;
+        return str.contains(searchStr);
     }
 
     /**
