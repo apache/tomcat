@@ -51,12 +51,9 @@ public class SSLHostConfig implements Serializable {
     protected static final Set<String> SSL_PROTO_ALL_SET = new HashSet<>();
 
     static {
-        /* Default used if protocols is not configured, also
-           used if protocols="All" */
-        /* If protocols is configured to be empty, the effective
-           value comes from
-           org.apache.tomcat.util.net.jsse.JSSESocketFactory.defaultServerProtocols
-           (JSSE) resp. org.apache.tomcat.jni.SSL.SSL_PROTOCOL_ALL (OpenSSL)*/
+        /* Default used if protocols is not configured, also used if
+         * protocols="All"
+         */
         SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_SSLv2Hello);
         SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_TLSv1);
         SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_TLSv1_1);
