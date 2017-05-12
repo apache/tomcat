@@ -115,31 +115,27 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         try {
             // SSL protocol
             int value = SSL.SSL_PROTOCOL_NONE;
-            if (sslHostConfig.getProtocols().size() == 0) {
-                value = SSL.SSL_PROTOCOL_ALL;
-            } else {
-                for (String protocol : sslHostConfig.getEnabledProtocols()) {
-                    if (Constants.SSL_PROTO_SSLv2Hello.equalsIgnoreCase(protocol)) {
-                        // NO-OP. OpenSSL always supports SSLv2Hello
-                    } else if (Constants.SSL_PROTO_SSLv2.equalsIgnoreCase(protocol)) {
-                        value |= SSL.SSL_PROTOCOL_SSLV2;
-                    } else if (Constants.SSL_PROTO_SSLv3.equalsIgnoreCase(protocol)) {
-                        value |= SSL.SSL_PROTOCOL_SSLV3;
-                    } else if (Constants.SSL_PROTO_TLSv1.equalsIgnoreCase(protocol)) {
-                        value |= SSL.SSL_PROTOCOL_TLSV1;
-                    } else if (Constants.SSL_PROTO_TLSv1_1.equalsIgnoreCase(protocol)) {
-                        value |= SSL.SSL_PROTOCOL_TLSV1_1;
-                    } else if (Constants.SSL_PROTO_TLSv1_2.equalsIgnoreCase(protocol)) {
-                        value |= SSL.SSL_PROTOCOL_TLSV1_2;
-                    } else if (Constants.SSL_PROTO_ALL.equalsIgnoreCase(protocol)) {
-                        value |= SSL.SSL_PROTOCOL_ALL;
-                    } else {
-                        // Protocol not recognized, fail to start as it is safer than
-                        // continuing with the default which might enable more than the
-                        // is required
-                        throw new Exception(netSm.getString(
-                                "endpoint.apr.invalidSslProtocol", protocol));
-                    }
+            for (String protocol : sslHostConfig.getEnabledProtocols()) {
+                if (Constants.SSL_PROTO_SSLv2Hello.equalsIgnoreCase(protocol)) {
+                    // NO-OP. OpenSSL always supports SSLv2Hello
+                } else if (Constants.SSL_PROTO_SSLv2.equalsIgnoreCase(protocol)) {
+                    value |= SSL.SSL_PROTOCOL_SSLV2;
+                } else if (Constants.SSL_PROTO_SSLv3.equalsIgnoreCase(protocol)) {
+                    value |= SSL.SSL_PROTOCOL_SSLV3;
+                } else if (Constants.SSL_PROTO_TLSv1.equalsIgnoreCase(protocol)) {
+                    value |= SSL.SSL_PROTOCOL_TLSV1;
+                } else if (Constants.SSL_PROTO_TLSv1_1.equalsIgnoreCase(protocol)) {
+                    value |= SSL.SSL_PROTOCOL_TLSV1_1;
+                } else if (Constants.SSL_PROTO_TLSv1_2.equalsIgnoreCase(protocol)) {
+                    value |= SSL.SSL_PROTOCOL_TLSV1_2;
+                } else if (Constants.SSL_PROTO_ALL.equalsIgnoreCase(protocol)) {
+                    value |= SSL.SSL_PROTOCOL_ALL;
+                } else {
+                    // Protocol not recognized, fail to start as it is safer than
+                    // continuing with the default which might enable more than the
+                    // is required
+                    throw new Exception(netSm.getString(
+                            "endpoint.apr.invalidSslProtocol", protocol));
                 }
             }
 
