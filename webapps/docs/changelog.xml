@@ -59,7 +59,7 @@
 -->
 <section name="Tomcat 7.0.79 (violetagg)">
 </section>
-<section name="Tomcat 7.0.78 (violetagg)">
+<section name="Tomcat 7.0.78 (violetagg)" rtext="released 2017-05-16">
   <subsection name="General">
     <changelog>
       <add>
