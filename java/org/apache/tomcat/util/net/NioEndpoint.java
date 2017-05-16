@@ -199,12 +199,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
      */
     @Override
     public void bind() throws Exception {
-
-        serverSock = ServerSocketChannel.open();
-        socketProperties.setProperties(serverSock.socket());
-        InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
-        serverSock.socket().bind(addr,getAcceptCount());
-        serverSock.configureBlocking(true); //mimic APR behavior
+        initServerSocket();
 
         // Initialize thread count defaults for acceptor, poller
         if (acceptorThreadCount == 0) {
@@ -222,6 +217,17 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         selectorPool.open();
     }
+
+    // Separated out to make it easier for folks that extend NioEndpoint to
+    // implement custom [server]sockets
+    protected void initServerSocket() throws Exception {
+        serverSock = ServerSocketChannel.open();
+        socketProperties.setProperties(serverSock.socket());
+        InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
+        serverSock.socket().bind(addr,getAcceptCount());
+        serverSock.configureBlocking(true); //mimic APR behavior
+    }
+
 
     /**
      * Start the NIO endpoint, creating acceptor, poller threads.
