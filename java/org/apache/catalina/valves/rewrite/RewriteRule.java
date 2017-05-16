@@ -266,14 +266,6 @@ public class RewriteRule {
     protected boolean nosubreq = false;
 
     /**
-     *  This flag forces the substitution part to be internally forced as a proxy
-     *  request and immediately (i.e., rewriting rule processing stops here) put
-     *  through the proxy module. You have to make sure that the substitution string
-     *  is a valid URI (e.g., typically starting with http://hostname) which can be
-     *  handled by the Apache proxy module. If not you get an error from the proxy
-     *  module. Use this flag to achieve a more powerful implementation of the
-     *  ProxyPass directive, to map some remote stuff into the namespace of
-     *  the local server.
      *  Note: No proxy
      */
 

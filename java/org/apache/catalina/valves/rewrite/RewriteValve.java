@@ -758,9 +758,8 @@ public class RewriteValve extends ValveBase {
             rule.setNoescape(true);
         } else if (flag.startsWith("next") || flag.startsWith("N")) {
             rule.setNext(true);
-        // FIXME: Proxy not supported, would require proxy capabilities in Tomcat
-        /* } else if (flag.startsWith("proxy") || flag.startsWith("P")) {
-            rule.setProxy(true);*/
+        // Note: Proxy is not supported as Tomcat does not have proxy
+        //       capabilities
         } else if (flag.startsWith("qsappend") || flag.startsWith("QSA")) {
             rule.setQsappend(true);
         } else if (flag.startsWith("redirect") || flag.startsWith("R")) {

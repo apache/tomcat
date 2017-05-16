@@ -81,6 +81,11 @@
   <subsection name="Other">
     <changelog>
       <fix>
+        <bug>61055</bug>: Clarify the code comments in the rewrite valve to make
+        clear that there are no plans to provide proxy support for this valve
+        since Tomcat does not have proxy capbilities. (markt)
+      </fix>
+      <fix>
         <bug>61076</bug>: Document the <code>altDDName</code> attribute for the
         <code>Context</code> element. (markt)
       </fix>
