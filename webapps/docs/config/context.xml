@@ -269,6 +269,12 @@
         The default is <code>false</code></p>
       </attribute>
 
+      <attribute name="altDDName" required="false">
+        <p>The absolute path to the alternative deployment descriptor for this
+        context. This overrides the default deployment descriptor located at
+        <code>/WEB-INF/web.xml</code>.</p>
+      </attribute>
+
       <attribute name="backgroundProcessorDelay" required="false">
         <p>This value represents the delay in seconds between the
         invocation of the backgroundProcess method on this context and
