@@ -57,6 +57,10 @@
         <code>o.a.c.connector.CoyoteAdapter#parseSessionCookiesId</code>.
         Patch provided by John Andrew (XUZHOUWANG) via Github. (violetagg)
       </fix>
+      <fix>
+        <bug>61086</bug>: Explicitly signal am empty request body for HTTP 205
+        responses. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

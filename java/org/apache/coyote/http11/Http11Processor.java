@@ -847,6 +847,11 @@ public class Http11Processor extends AbstractProcessor {
                 (outputFilters[Constants.VOID_FILTER]);
             entityBody = false;
             contentDelimitation = true;
+            if (statusCode == 205) {
+            	// RFC 7231 requires the server to explicitly signal an empty
+            	// response in this case
+            	response.setContentLength(0);
+            }
         }
 
         MessageBytes methodMB = request.method();
