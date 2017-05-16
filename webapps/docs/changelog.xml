@@ -78,6 +78,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>61076</bug>: Document the <code>altDDName</code> attribute for the
+        <code>Context</code> element. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M21 (markt)" rtext="2017-05-10">
   <subsection name="General">
