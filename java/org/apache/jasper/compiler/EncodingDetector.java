@@ -44,7 +44,7 @@ class EncodingDetector {
 
 
     EncodingDetector(BufferedInputStream bis) throws IOException {
-    	// Buffer is 1k. BOM is only 4 bytes.
+        // Buffer is 1k. BOM is only 4 bytes.
         bis.mark(4);
 
         BomResult bomResult = processBom(bis);
