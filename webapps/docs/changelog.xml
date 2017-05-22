@@ -57,6 +57,10 @@
         <code>o.a.c.connector.CoyoteAdapter#parseSessionCookiesId</code>.
         Patch provided by John Andrew (XUZHOUWANG) via Github. (violetagg)
       </fix>
+      <fix>
+        <bug>61101</bug>: CORS filter should set Vary header in response.
+        Submitted by Rick Riemer. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
