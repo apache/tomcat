@@ -52,10 +52,10 @@ import javax.servlet.ServletRequestListener;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
+import javax.servlet.http.HttpServletMapping;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionIdListener;
 import javax.servlet.http.HttpSessionListener;
-import javax.servlet.http.ServletMapping;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -482,7 +482,7 @@ public class ApplicationContext implements ServletContext {
         Wrapper wrapper = mappingData.wrapper;
         String wrapperPath = mappingData.wrapperPath.toString();
         String pathInfo = mappingData.pathInfo.toString();
-        ServletMapping mapping = new ApplicationMapping(mappingData).getServletMapping();
+        HttpServletMapping mapping = new ApplicationMapping(mappingData).getHttpServletMapping();
 
         mappingData.recycle();
 

@@ -33,9 +33,9 @@ import javax.servlet.ServletRequestWrapper;
 import javax.servlet.ServletResponse;
 import javax.servlet.ServletResponseWrapper;
 import javax.servlet.UnavailableException;
+import javax.servlet.http.HttpServletMapping;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.ServletMapping;
 
 import org.apache.catalina.AsyncDispatcher;
 import org.apache.catalina.Context;
@@ -207,7 +207,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
      */
     public ApplicationDispatcher
         (Wrapper wrapper, String requestURI, String servletPath,
-         String pathInfo, String queryString, ServletMapping mapping, String name) {
+         String pathInfo, String queryString, HttpServletMapping mapping, String name) {
 
         super();
 
@@ -264,7 +264,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
     /**
      * The mapping for this RequestDispatcher.
      */
-    private final ServletMapping mapping;
+    private final HttpServletMapping mapping;
 
 
     /**
@@ -368,7 +368,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                                       hrequest.getPathInfo());
                 wrequest.setAttribute(RequestDispatcher.FORWARD_QUERY_STRING,
                                       hrequest.getQueryString());
-                wrequest.setAttribute(RequestDispatcher.FORWARD_MAPPING, hrequest.getServletMapping());
+                wrequest.setAttribute(RequestDispatcher.FORWARD_MAPPING, hrequest.getHttpServletMapping());
             }
 
             wrequest.setContextPath(context.getPath());
@@ -616,7 +616,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
 
         wrequest.setAttribute(Globals.DISPATCHER_TYPE_ATTR, DispatcherType.ASYNC);
         wrequest.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR, getCombinedPath());
-        wrequest.setAttribute(AsyncContext.ASYNC_MAPPING, hrequest.getServletMapping());
+        wrequest.setAttribute(AsyncContext.ASYNC_MAPPING, hrequest.getHttpServletMapping());
 
         wrequest.setContextPath(context.getPath());
         wrequest.setRequestURI(requestURI);

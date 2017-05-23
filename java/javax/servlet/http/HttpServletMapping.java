@@ -24,7 +24,7 @@ import javax.servlet.annotation.WebServlet;
  *
  * @since 4.0
  */
-public interface ServletMapping {
+public interface HttpServletMapping {
 
     /**
      * @return The value that was matched or the empty String if not known.

@@ -58,6 +58,7 @@ import javax.servlet.ServletRequestAttributeListener;
 import javax.servlet.ServletResponse;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletMapping;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
@@ -65,7 +66,6 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 import javax.servlet.http.PushBuilder;
-import javax.servlet.http.ServletMapping;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -2243,8 +2243,8 @@ public class Request implements HttpServletRequest {
 
 
     @Override
-    public ServletMapping getServletMapping() {
-        return applicationMapping.getServletMapping();
+    public HttpServletMapping getHttpServletMapping() {
+        return applicationMapping.getHttpServletMapping();
     }
 
 

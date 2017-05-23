@@ -34,13 +34,13 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletMapping;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 import javax.servlet.http.PushBuilder;
-import javax.servlet.http.ServletMapping;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.security.SecurityUtil;
@@ -738,14 +738,14 @@ public class RequestFacade implements HttpServletRequest {
 
 
     @Override
-    public ServletMapping getServletMapping() {
+    public HttpServletMapping getHttpServletMapping() {
 
         if (request == null) {
             throw new IllegalStateException(
                             sm.getString("requestFacade.nullRequest"));
         }
 
-        return request.getServletMapping();
+        return request.getHttpServletMapping();
     }
 
 

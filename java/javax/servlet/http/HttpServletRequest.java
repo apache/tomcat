@@ -172,8 +172,8 @@ public interface HttpServletRequest extends ServletRequest {
      */
     public int getIntHeader(String name);
 
-    public default ServletMapping getServletMapping() {
-        return new ServletMapping() {
+    public default HttpServletMapping getHttpServletMapping() {
+        return new HttpServletMapping() {
 
             @Override
             public String getMatchValue() {

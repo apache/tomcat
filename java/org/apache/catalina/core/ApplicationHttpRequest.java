@@ -33,11 +33,11 @@ import java.util.NoSuchElementException;
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletMapping;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.PushBuilder;
-import javax.servlet.http.ServletMapping;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
@@ -193,7 +193,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     /**
      * The mapping for this request.
      */
-    private ServletMapping mapping = null;
+    private HttpServletMapping mapping = null;
 
 
     /**
@@ -492,7 +492,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
 
     @Override
-    public ServletMapping getServletMapping() {
+    public HttpServletMapping getHttpServletMapping() {
         return mapping;
     }
 
@@ -676,7 +676,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         queryString = request.getQueryString();
         requestURI = request.getRequestURI();
         servletPath = request.getServletPath();
-        mapping = request.getServletMapping();
+        mapping = request.getHttpServletMapping();
     }
 
 
@@ -735,7 +735,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     }
 
 
-    void setMapping(ServletMapping mapping) {
+    void setMapping(HttpServletMapping mapping) {
         this.mapping = mapping;
     }
 
