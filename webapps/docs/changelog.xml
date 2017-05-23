@@ -66,7 +66,7 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
-        <bug>61086</bug>: Explicitly signal am empty request body for HTTP 205
+        <bug>61086</bug>: Explicitly signal an empty request body for HTTP 205
         responses. (markt)
       </fix>
     </changelog>
