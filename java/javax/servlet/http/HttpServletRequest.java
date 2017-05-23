@@ -192,7 +192,7 @@ public interface HttpServletRequest extends ServletRequest {
 
             @Override
             public MappingMatch getMappingMatch() {
-                return MappingMatch.UNKNOWN;
+                return null;
             }
         };
     }

@@ -27,6 +27,5 @@ public enum MappingMatch {
     DEFAULT,
     EXACT,
     EXTENSION,
-    PATH,
-    UNKNOWN
+    PATH
 }

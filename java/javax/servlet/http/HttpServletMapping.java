@@ -47,7 +47,7 @@ public interface HttpServletMapping {
     String getServletName();
 
     /**
-     * @return The type of match ({@link MappingMatch#UNKNOWN} if not known)
+     * @return The type of match ({@code null} if not known)
      */
     MappingMatch getMappingMatch();
 }
