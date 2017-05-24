@@ -485,6 +485,13 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             doPush((Request) param);
             break;
         }
+
+        // Servlet 4.0 Trailers
+        case TRAILER_FIELDS_READY: {
+            AtomicBoolean result = (AtomicBoolean) param;
+            result.set(isTrailerFieldsReady());
+            break;
+        }
         }
     }
 
@@ -757,6 +764,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         throw new UnsupportedOperationException(
                 sm.getString("abstractProcessor.pushrequest.notsupported"));
     }
+
+
+    protected abstract boolean isTrailerFieldsReady();
 
 
     /**

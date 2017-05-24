@@ -1953,18 +1953,22 @@ public class Request implements HttpServletRequest {
     // --------------------------------------------- HttpServletRequest Methods
 
     @Override
+    public boolean isTrailerFieldsReady() {
+        return coyoteRequest.isTrailerFieldsReady();
+    }
+
+
+    @Override
     public Map<String, String> getTrailerFields() {
+        if (!isTrailerFieldsReady()) {
+            throw new IllegalStateException(sm.getString("coyoteRequest.trailersNotReady"));
+        }
         Map<String,String> result = new HashMap<>();
         result.putAll(coyoteRequest.getTrailerFields());
         return result;
     }
 
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since Servlet 4.0
-     */
     @Override
     public PushBuilder newPushBuilder() {
         AtomicBoolean result = new AtomicBoolean();
@@ -1977,11 +1981,6 @@ public class Request implements HttpServletRequest {
     }
 
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since Servlet 3.1
-     */
     @SuppressWarnings("unchecked")
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(

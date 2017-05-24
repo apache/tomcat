@@ -197,6 +197,13 @@ public final class Request {
     }
 
 
+    public boolean isTrailerFieldsReady() {
+        AtomicBoolean result = new AtomicBoolean(false);
+        action(ActionCode.TRAILER_FIELDS_READY, result);
+        return result.get();
+    }
+
+
     public Map<String,String> getTrailerFields() {
         return trailerFields;
     }
@@ -670,5 +677,4 @@ public final class Request {
 
         return result;
     }
-
 }

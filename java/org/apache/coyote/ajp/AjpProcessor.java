@@ -1190,6 +1190,14 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
+    @Override
+    protected boolean isTrailerFieldsReady() {
+        // AJP does not support trailers so return true so app can request the
+        // trailers and find out that there are none.
+        return true;
+    }
+
+
     /**
      * Read at least the specified amount of bytes, and place them
      * in the input buffer. Note that if any data is available to read then this

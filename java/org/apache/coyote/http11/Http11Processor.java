@@ -1307,6 +1307,16 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
+    @Override
+    protected boolean isTrailerFieldsReady() {
+        if (inputBuffer.isChunking()) {
+            return inputBuffer.isFinished();
+        } else {
+            return true;
+        }
+    }
+
+
     /**
      * Trigger sendfile processing if required.
      *

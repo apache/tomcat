@@ -656,6 +656,16 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     }
 
 
+    boolean isChunking() {
+        for (int i = 0; i < lastActiveFilter; i++) {
+            if (activeFilters[i] == filterLibrary[Constants.CHUNKED_FILTER]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     void init(SocketWrapperBase<?> socketWrapper) {
 
         wrapper = socketWrapper;

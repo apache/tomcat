@@ -218,6 +218,12 @@ class StreamProcessor extends AbstractProcessor {
 
 
     @Override
+    protected boolean isTrailerFieldsReady() {
+        return stream.isTrailerFieldsReady();
+    }
+
+
+    @Override
     public final void recycle() {
         // StreamProcessor instances are not re-used.
         // Clear fields that can be cleared to aid GC and trigger NPEs if this

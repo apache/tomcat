@@ -389,7 +389,8 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
      * {@inheritDoc}
      * <p>
      * The default behavior of this method is to return
-     * {@link HttpServletRequest#newPushBuilder()} on the wrapped request object.
+     * {@link HttpServletRequest#newPushBuilder()} on the wrapped request
+     * object.
      *
      * @since Servlet 4.0
      */
@@ -402,12 +403,28 @@ public class HttpServletRequestWrapper extends ServletRequestWrapper implements
      * {@inheritDoc}
      * <p>
      * The default behavior of this method is to return
-     * {@link HttpServletRequest#getTrailerFields()} on the wrapped request object.
+     * {@link HttpServletRequest#getTrailerFields()} on the wrapped request
+     * object.
      *
      * @since Servlet 4.0
      */
     @Override
     public Map<String,String> getTrailerFields() {
         return this._getHttpServletRequest().getTrailerFields();
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The default behavior of this method is to return
+     * {@link HttpServletRequest#isTrailerFieldsReady()} on the wrapped request
+     * object.
+     *
+     * @since Servlet 4.0
+     */
+    @Override
+    public boolean isTrailerFieldsReady() {
+        return this._getHttpServletRequest().isTrailerFieldsReady();
     }
 }

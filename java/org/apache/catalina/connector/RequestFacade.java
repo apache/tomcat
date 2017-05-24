@@ -1068,10 +1068,12 @@ public class RequestFacade implements HttpServletRequest {
         return request.getAsyncContext();
     }
 
+
     @Override
     public DispatcherType getDispatcherType() {
         return request.getDispatcherType();
     }
+
 
     @Override
     public boolean authenticate(HttpServletResponse response)
@@ -1096,31 +1098,25 @@ public class RequestFacade implements HttpServletRequest {
         return request.getParts();
     }
 
+
     @Override
     public Part getPart(String name) throws IllegalStateException, IOException,
             ServletException {
         return request.getPart(name);
     }
 
+
     public boolean getAllowTrace() {
         return request.getConnector().getAllowTrace();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since Servlet 3.1
-     */
+
     @Override
     public long getContentLengthLong() {
         return request.getContentLengthLong();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since Servlet 3.1
-     */
+
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(
             Class<T> httpUpgradeHandlerClass) throws java.io.IOException, ServletException {
@@ -1128,22 +1124,18 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since Servlet 4.0
-     */
     @Override
     public PushBuilder newPushBuilder() {
         return request.newPushBuilder();
     }
 
 
-    /**
-     * {@inheritDoc}
-     *
-     * @since Servlet 4.0
-     */
+    @Override
+    public boolean isTrailerFieldsReady() {
+        return request.isTrailerFieldsReady();
+    }
+
+
     @Override
     public Map<String, String> getTrailerFields() {
         return request.getTrailerFields();

@@ -585,6 +585,12 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
+    public boolean isTrailerFieldsReady() {
+        // Once EndOfStream has been received, canRead will be false
+        return !state.canRead();
+    }
+
+
     private static void push(final Http2UpgradeHandler handler, final Request request,
             final Stream stream) throws IOException {
         if (org.apache.coyote.Constants.IS_SECURITY_ENABLED) {

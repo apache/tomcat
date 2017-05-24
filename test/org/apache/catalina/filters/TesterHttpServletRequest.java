@@ -448,6 +448,11 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
+    public boolean isTrailerFieldsReady() {
+        throw new RuntimeException("Not implemented");
+    }
+
+    @Override
     public Map<String, String> getTrailerFields() {
         throw new RuntimeException("Not implemented");
     }

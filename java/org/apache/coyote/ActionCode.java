@@ -245,5 +245,12 @@ public enum ActionCode {
     /**
      * Push a request on behalf of the client of the current request.
      */
-    PUSH_REQUEST
+    PUSH_REQUEST,
+
+    /**
+     * Are the request trailer fields ready to be read? Note that this returns
+     * true if it is known that request trailer fields are not supported so an
+     * empty collection of trailers can then be read.
+     */
+    TRAILER_FIELDS_READY
 }
