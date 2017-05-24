@@ -18,6 +18,7 @@ package org.apache.coyote.http2;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
@@ -299,18 +300,18 @@ class Stream extends AbstractStream implements HeaderEmitter {
                         getConnectionId(), getIdentifier()));
             }
             int queryStart = value.indexOf('?');
+            String uri;
             if (queryStart == -1) {
-                coyoteRequest.requestURI().setString(value);
-                coyoteRequest.decodedURI().setString(
-                        coyoteRequest.getURLDecoder().convert(value, false));
+                uri = value;
             } else {
-                String uri = value.substring(0, queryStart);
+                uri = value.substring(0, queryStart);
                 String query = value.substring(queryStart + 1);
-                coyoteRequest.requestURI().setString(uri);
-                coyoteRequest.decodedURI().setString(
-                        coyoteRequest.getURLDecoder().convert(uri, false));
                 coyoteRequest.queryString().setString(query);
             }
+            // Bug 61120. Set the URI as bytes rather than String so any path
+            // parameters are correctly processed
+            byte[] uriBytes = uri.getBytes(StandardCharsets.ISO_8859_1);
+            coyoteRequest.requestURI().setBytes(uriBytes, 0, uriBytes.length);
             break;
         }
         case ":authority": {

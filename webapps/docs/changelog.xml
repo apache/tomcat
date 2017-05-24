@@ -69,6 +69,10 @@
         <bug>61086</bug>: Explicitly signal an empty request body for HTTP 205
         responses. (markt)
       </fix>
+      <fix>
+        <bug>61120</bug>: Do not ignore path parameters when processing HTTP/2
+        requests. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
