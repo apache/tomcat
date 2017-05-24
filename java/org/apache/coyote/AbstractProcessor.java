@@ -487,7 +487,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         }
 
         // Servlet 4.0 Trailers
-        case TRAILER_FIELDS_READY: {
+        case IS_TRAILER_FIELDS_READY: {
             AtomicBoolean result = (AtomicBoolean) param;
             result.set(isTrailerFieldsReady());
             break;

@@ -252,5 +252,5 @@ public enum ActionCode {
      * true if it is known that request trailer fields are not supported so an
      * empty collection of trailers can then be read.
      */
-    TRAILER_FIELDS_READY
+    IS_TRAILER_FIELDS_READY
 }

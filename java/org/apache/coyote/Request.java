@@ -199,7 +199,7 @@ public final class Request {
 
     public boolean isTrailerFieldsReady() {
         AtomicBoolean result = new AtomicBoolean(false);
-        action(ActionCode.TRAILER_FIELDS_READY, result);
+        action(ActionCode.IS_TRAILER_FIELDS_READY, result);
         return result.get();
     }
 
