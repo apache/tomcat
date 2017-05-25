@@ -252,5 +252,12 @@ public enum ActionCode {
      * true if it is known that request trailer fields are not supported so an
      * empty collection of trailers can then be read.
      */
-    IS_TRAILER_FIELDS_READY
+    IS_TRAILER_FIELDS_READY,
+
+    /**
+     * Are HTTP trailer fields supported for the current response? Note that
+     * once an HTTP/1.1 response has been committed, it will no longer support
+     * trailer fields.
+     */
+    IS_TRAILER_FIELDS_SUPPORTED
 }

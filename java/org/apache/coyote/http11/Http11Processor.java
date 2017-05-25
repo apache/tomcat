@@ -900,23 +900,25 @@ public class Http11Processor extends AbstractProcessor {
 
         long contentLength = response.getContentLengthLong();
         boolean connectionClosePresent = false;
-        if (contentLength != -1) {
+        if (http11 && response.getTrailerFields() != null) {
+            // If trailer fields are set, always use chunking
+            outputBuffer.addActiveFilter(outputFilters[Constants.CHUNKED_FILTER]);
+            contentDelimitation = true;
+            headers.addValue(Constants.TRANSFERENCODING).setString(Constants.CHUNKED);
+        } else if (contentLength != -1) {
             headers.setValue("Content-Length").setLong(contentLength);
-            outputBuffer.addActiveFilter
-                (outputFilters[Constants.IDENTITY_FILTER]);
+            outputBuffer.addActiveFilter(outputFilters[Constants.IDENTITY_FILTER]);
             contentDelimitation = true;
         } else {
             // If the response code supports an entity body and we're on
             // HTTP 1.1 then we chunk unless we have a Connection: close header
             connectionClosePresent = isConnectionClose(headers);
-            if (entityBody && http11 && !connectionClosePresent) {
-                outputBuffer.addActiveFilter
-                    (outputFilters[Constants.CHUNKED_FILTER]);
+            if (http11 && entityBody && !connectionClosePresent) {
+                outputBuffer.addActiveFilter(outputFilters[Constants.CHUNKED_FILTER]);
                 contentDelimitation = true;
                 headers.addValue(Constants.TRANSFERENCODING).setString(Constants.CHUNKED);
             } else {
-                outputBuffer.addActiveFilter
-                    (outputFilters[Constants.IDENTITY_FILTER]);
+                outputBuffer.addActiveFilter(outputFilters[Constants.IDENTITY_FILTER]);
             }
         }
 
@@ -1314,6 +1316,24 @@ public class Http11Processor extends AbstractProcessor {
         } else {
             return true;
         }
+    }
+
+
+    @Override
+    protected boolean isTrailerFieldsSupported() {
+        // Request must be HTTP/1.1 to support trailer fields
+        if (!http11) {
+            return false;
+        }
+
+        // If the response is not yet committed, chunked encoding can be used
+        // and the trailer fields sent
+        if (!response.isCommitted()) {
+            return true;
+        }
+
+        // Response has been committed - need to see if chunked is being used
+        return outputBuffer.isChunking();
     }
 
 

@@ -24,6 +24,8 @@ import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -639,5 +641,11 @@ public class ResponseFacade implements HttpServletResponse {
     @Override
     public Collection<String> getHeaders(String name) {
         return response.getHeaders(name);
+    }
+
+
+    @Override
+    public void setTrailerFields(Supplier<Map<String, String>> supplier) {
+        response.setTrailerFields(supplier);
     }
 }

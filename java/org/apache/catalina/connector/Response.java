@@ -33,9 +33,11 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
@@ -1149,6 +1151,12 @@ public class Response implements HttpServletResponse {
         }
 
         return getCoyoteResponse().containsHeader(name);
+    }
+
+
+    @Override
+    public void setTrailerFields(Supplier<Map<String, String>> supplier) {
+        getCoyoteResponse().setTrailerFields(supplier);
     }
 
 

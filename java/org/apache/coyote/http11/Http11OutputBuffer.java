@@ -524,6 +524,16 @@ public class Http11OutputBuffer implements OutputBuffer {
     }
 
 
+    boolean isChunking() {
+        for (int i = 0; i < lastActiveFilter; i++) {
+            if (activeFilters[i] == filterLibrary[Constants.CHUNKED_FILTER]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     // ------------------------------------------ SocketOutputBuffer Inner Class
 
     /**

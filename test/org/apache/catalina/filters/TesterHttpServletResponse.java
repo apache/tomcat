@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
@@ -247,4 +249,6 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     public void setStatus(int status, String message) {/* NOOP */}
     @Override
     public void setContentLengthLong(long length) {/* NOOP */}
+    @Override
+    public void setTrailerFields(Supplier<Map<String, String>> supplier) { /* NOOP */ }
 }

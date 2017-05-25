@@ -389,6 +389,16 @@
       <url-pattern>/servlets/serverpush/simpleimage</url-pattern>
     </servlet-mapping>
 
+    <!-- Trailer examples -->
+    <servlet>
+      <servlet-name>responsetrailer</servlet-name>
+      <servlet-class>trailers.ResponseTrailers</servlet-class>
+    </servlet>
+    <servlet-mapping>
+      <servlet-name>responsetrailer</servlet-name>
+      <url-pattern>/servlets/trailers/response</url-pattern>
+    </servlet-mapping>
+
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
         <welcome-file>index.xhtml</welcome-file>

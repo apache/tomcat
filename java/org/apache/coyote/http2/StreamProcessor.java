@@ -190,7 +190,7 @@ class StreamProcessor extends AbstractProcessor {
         synchronized (this) {
             /*
              * TODO Check if this sync is necessary.
-             *      Compare with superrclass that uses SocketWrapper
+             *      Compare with superclass that uses SocketWrapper
              */
             while (dispatches != null && dispatches.hasNext()) {
                 DispatchType dispatchType = dispatches.next();
@@ -220,6 +220,12 @@ class StreamProcessor extends AbstractProcessor {
     @Override
     protected boolean isTrailerFieldsReady() {
         return stream.isTrailerFieldsReady();
+    }
+
+
+    @Override
+    protected boolean isTrailerFieldsSupported() {
+        return stream.isTrailerFieldsSupported();
     }
 
 

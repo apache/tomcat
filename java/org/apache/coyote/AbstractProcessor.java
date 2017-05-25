@@ -492,6 +492,11 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             result.set(isTrailerFieldsReady());
             break;
         }
+        case IS_TRAILER_FIELDS_SUPPORTED: {
+            AtomicBoolean result = (AtomicBoolean) param;
+            result.set(isTrailerFieldsSupported());
+            break;
+        }
         }
     }
 
@@ -767,6 +772,18 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     protected abstract boolean isTrailerFieldsReady();
+
+
+    /**
+     * Protocols that support trailer fields should override this method and
+     * return {@code true}.
+     *
+     * @return {@code true} if trailer fields are supported by this processor,
+     *         otherwise {@code false}.
+     */
+    protected boolean isTrailerFieldsSupported() {
+        return false;
+    }
 
 
     /**

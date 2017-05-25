@@ -18,6 +18,8 @@ package javax.servlet.http;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.servlet.ServletResponse;
 
@@ -339,6 +341,25 @@ public interface HttpServletResponse extends ServletResponse {
      * @since Servlet 3.0
      */
     public Collection<String> getHeaderNames();
+
+    /**
+     * Configure the supplier of the trailer headers. The supplier will be
+     * called in the scope of the thread that completes the response.
+     * <b>
+     * Trailers that don't meet the requirements of RFC 7230, section 4.1.2 will
+     * be ignored.
+     *
+     * @param supplier The supplier for the trailer headers
+     *
+     * @throws IllegalStateException if this method is called when the
+     *         underlying protocol does not support trailer headers or if using
+     *         HTTP/1.1 and the response has already been committed
+     *
+     * @since Servlet 4.0
+     */
+    public default void setTrailerFields(Supplier<Map<String, String>> supplier) {
+        // NO-OP
+    }
 
     /*
      * Server status codes; see RFC 2068.

@@ -136,6 +136,9 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     void writeHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders,
             boolean endOfStream, int payloadSize) throws IOException {
         doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
+        if (endOfStream) {
+            stream.sentEndOfStream();
+        }
     }
 
 

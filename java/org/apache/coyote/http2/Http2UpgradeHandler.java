@@ -531,6 +531,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         synchronized (socketWrapper) {
             doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
         }
+        if (endOfStream) {
+            stream.sentEndOfStream();
+        }
     }
 
 

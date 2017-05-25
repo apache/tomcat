@@ -18,6 +18,8 @@ package javax.servlet.http;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import javax.servlet.ServletResponseWrapper;
 
@@ -265,5 +267,19 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     @Override
     public Collection<String> getHeaderNames() {
         return this._getHttpServletResponse().getHeaderNames();
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The default implementation is to call
+     * {@link HttpServletResponse#setTrailerFields(Supplier)}
+     * on the wrapper {@link HttpServletResponse}.
+     *
+     * @since Servlet 4.0
+     */
+    @Override
+    public void setTrailerFields(Supplier<Map<String, String>> supplier) {
+        this._getHttpServletResponse().setTrailerFields(supplier);
     }
 }

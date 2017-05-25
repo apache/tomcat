@@ -22,7 +22,9 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 import javax.servlet.WriteListener;
 
@@ -77,6 +79,8 @@ public final class Response {
      */
     final MimeHeaders headers = new MimeHeaders();
 
+
+    private Supplier<Map<String,String>> trailerFieldsSupplier = null;
 
     /**
      * Associated output buffer.
@@ -322,6 +326,22 @@ public final class Response {
     }
 
 
+    public void setTrailerFields(Supplier<Map<String, String>> supplier) {
+        AtomicBoolean trailerFieldsSupported = new AtomicBoolean(false);
+        action(ActionCode.IS_TRAILER_FIELDS_SUPPORTED, trailerFieldsSupported);
+        if (!trailerFieldsSupported.get()) {
+            throw new IllegalStateException(sm.getString("response.noTrailers.notSupported"));
+        }
+
+        this.trailerFieldsSupplier = supplier;
+    }
+
+
+    public Supplier<Map<String, String>> getTrailerFields() {
+        return trailerFieldsSupplier;
+    }
+
+
     /**
      * Set internal fields for special header names.
      * Called from set/addHeader.
@@ -530,6 +550,7 @@ public final class Response {
         commitTime = -1;
         errorException = null;
         headers.clear();
+        trailerFieldsSupplier = null;
         // Servlet 3.1 non-blocking write listener
         listener = null;
         fireListener = false;

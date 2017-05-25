@@ -22,8 +22,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.CloseNowException;
@@ -35,6 +38,7 @@ import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
@@ -392,10 +396,41 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
     final void writeHeaders() throws IOException {
         prepareHeaders(coyoteResponse);
-        boolean endOfStream = getOutputBuffer().hasNoBody();
+        boolean endOfStream = getOutputBuffer().hasNoBody() &&
+                coyoteResponse.getTrailerFields() == null;
         // TODO: Is 1k the optimal value?
         handler.writeHeaders(this, 0, coyoteResponse.getMimeHeaders(), endOfStream, 1024);
     }
+
+
+    final void writeTrailers() throws IOException {
+        Supplier<Map<String,String>> supplier = coyoteResponse.getTrailerFields();
+        if (supplier == null) {
+            // No supplier was set, end of stream will already have been sent
+            return;
+        }
+
+        // We can re-use the MimeHeaders from the response since they have
+        // already been processed by the encoder at this point
+        MimeHeaders mimeHeaders = coyoteResponse.getMimeHeaders();
+        mimeHeaders.recycle();
+
+        Map<String,String> headerMap = supplier.get();
+        if (headerMap == null) {
+            headerMap = Collections.emptyMap();
+        }
+
+        // Copy the contents of the Map to the MimeHeaders
+        // TODO: Is there benefit in refactoring this? Is MimeHeaders too
+        //       heavyweight? Can we reduce the copy/conversions?
+        for (Map.Entry<String, String> headerEntry : headerMap.entrySet()) {
+            MessageBytes mb = mimeHeaders.addValue(headerEntry.getKey());
+            mb.setString(headerEntry.getValue());
+        }
+
+        handler.writeHeaders(this, 0, mimeHeaders, true, 1024);
+    }
+
 
     final void writeAck() throws IOException {
         // TODO: Is 64 too big? Just the status header with compression
@@ -586,9 +621,14 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    public boolean isTrailerFieldsReady() {
+    boolean isTrailerFieldsReady() {
         // Once EndOfStream has been received, canRead will be false
         return !state.canRead();
+    }
+
+
+    boolean isTrailerFieldsSupported() {
+        return !getOutputBuffer().endOfStreamSent;
     }
 
 
@@ -716,7 +756,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 if (closed && !endOfStreamSent) {
                     // Handling this special case here is simpler than trying
                     // to modify the following code to handle it.
-                    handler.writeBody(Stream.this, buffer, 0, true);
+                    handler.writeBody(Stream.this, buffer, 0,
+                            coyoteResponse.getTrailerFields() == null);
                 }
                 // Buffer is empty. Nothing to do.
                 return false;
@@ -735,7 +776,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
                                 handler.reserveWindowSize(Stream.this, streamReservation);
                     // Do the write
                     handler.writeBody(Stream.this, buffer, connectionReservation,
-                            !writeInProgress && closed && left == connectionReservation);
+                            !writeInProgress && closed && left == connectionReservation &&
+                            coyoteResponse.getTrailerFields() == null);
                     streamReservation -= connectionReservation;
                     left -= connectionReservation;
                 }
@@ -760,6 +802,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
         final void close() throws IOException {
             closed = true;
             flushData();
+            writeTrailers();
         }
 
         /**

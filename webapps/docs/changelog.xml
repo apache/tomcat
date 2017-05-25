@@ -61,6 +61,10 @@
         <bug>61101</bug>: CORS filter should set Vary header in response.
         Submitted by Rick Riemer. (remm)
       </fix>
+      <update>
+        Update the Servlet 4.0 implementation to add support for setting
+        trailer fields for HTTP responses. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

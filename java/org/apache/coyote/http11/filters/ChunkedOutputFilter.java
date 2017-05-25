@@ -17,12 +17,20 @@
 package org.apache.coyote.http11.filters;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
 
 import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.OutputFilter;
 import org.apache.tomcat.util.buf.HexUtils;
+import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 
 /**
  * Chunked output filter.
@@ -31,9 +39,30 @@ import org.apache.tomcat.util.buf.HexUtils;
  */
 public class ChunkedOutputFilter implements OutputFilter {
 
+    private static final byte[] LAST_CHUNK_BYTES = {(byte) '0', (byte) '\r', (byte) '\n'};
+    private static final byte[] CRLF_BYTES = {(byte) '\r', (byte) '\n'};
     private static final byte[] END_CHUNK_BYTES =
         {(byte) '0', (byte) '\r', (byte) '\n', (byte) '\r', (byte) '\n'};
 
+    private static final Set<String> disallowedTrailerFieldNames = new HashSet<>();
+
+    static {
+        // Always add these in lower case
+        disallowedTrailerFieldNames.add("age");
+        disallowedTrailerFieldNames.add("cache-control");
+        disallowedTrailerFieldNames.add("content-length");
+        disallowedTrailerFieldNames.add("content-encoding");
+        disallowedTrailerFieldNames.add("content-range");
+        disallowedTrailerFieldNames.add("content-type");
+        disallowedTrailerFieldNames.add("date");
+        disallowedTrailerFieldNames.add("expires");
+        disallowedTrailerFieldNames.add("location");
+        disallowedTrailerFieldNames.add("retry-after");
+        disallowedTrailerFieldNames.add("trailer");
+        disallowedTrailerFieldNames.add("transfer-encoding");
+        disallowedTrailerFieldNames.add("vary");
+        disallowedTrailerFieldNames.add("warning");
+    }
 
     /**
      * Next buffer in the pipeline.
@@ -47,10 +76,15 @@ public class ChunkedOutputFilter implements OutputFilter {
     protected final ByteBuffer chunkHeader = ByteBuffer.allocate(10);
 
 
+    protected final ByteBuffer lastChunk = ByteBuffer.wrap(LAST_CHUNK_BYTES);
+    protected final ByteBuffer crlfChunk = ByteBuffer.wrap(CRLF_BYTES);
     /**
      * End chunk.
      */
     protected final ByteBuffer endChunk = ByteBuffer.wrap(END_CHUNK_BYTES);
+
+
+    private Response response;
 
 
     public ChunkedOutputFilter() {
@@ -112,7 +146,7 @@ public class ChunkedOutputFilter implements OutputFilter {
      */
     @Override
     public void setResponse(Response response) {
-        // NOOP: No need for parameters from response in this filter
+        this.response = response;
     }
 
 
@@ -132,9 +166,40 @@ public class ChunkedOutputFilter implements OutputFilter {
     @Override
     public long end() throws IOException {
 
-        // Write end chunk
-        buffer.doWrite(endChunk);
-        endChunk.position(0).limit(endChunk.capacity());
+        Supplier<Map<String,String>> trailerFieldsSupplier = response.getTrailerFields();
+        Map<String,String> trailerFields = null;
+
+        if (trailerFieldsSupplier != null) {
+            trailerFields = trailerFieldsSupplier.get();
+        }
+
+        if (trailerFields == null) {
+            // Write end chunk
+            buffer.doWrite(endChunk);
+            endChunk.position(0).limit(endChunk.capacity());
+        } else {
+            buffer.doWrite(lastChunk);
+            lastChunk.position(0).limit(lastChunk.capacity());
+
+           ByteArrayOutputStream baos = new ByteArrayOutputStream(1024);
+           OutputStreamWriter osw = new OutputStreamWriter(baos, StandardCharsets.ISO_8859_1);
+            for (Map.Entry<String,String> trailerField : trailerFields.entrySet()) {
+                // Ignore disallowed headers
+                if (disallowedTrailerFieldNames.contains(
+                        trailerField.getKey().toLowerCase(Locale.ENGLISH))) {
+                    continue;
+                }
+                osw.write(trailerField.getKey());
+                osw.write(':');
+                osw.write(trailerField.getValue());
+                osw.write("\r\n");
+            }
+            osw.close();
+            buffer.doWrite(ByteBuffer.wrap(baos.toByteArray()));
+
+            buffer.doWrite(crlfChunk);
+            crlfChunk.position(0).limit(crlfChunk.capacity());
+        }
 
         return 0;
     }
@@ -145,6 +210,6 @@ public class ChunkedOutputFilter implements OutputFilter {
      */
     @Override
     public void recycle() {
-        // NOOP: Nothing to recycle
+        response = null;
     }
 }
