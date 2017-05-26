@@ -65,6 +65,12 @@
         Update the Servlet 4.0 implementation to add support for setting
         trailer fields for HTTP responses. (markt)
       </update>
+      <fix>
+        <bug>61125</bug>: Ensure that <code>WarURLConnection</code> returns the
+        correct value for calls to <code>getLastModified()</code> as this is
+        required for the correct detection of JSP modifications when the JSP is
+        packaged in a WAR file. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
