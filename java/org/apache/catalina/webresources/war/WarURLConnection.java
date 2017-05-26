@@ -57,4 +57,10 @@ public class WarURLConnection extends URLConnection {
     public Permission getPermission() throws IOException {
         return wrappedJarUrlConnection.getPermission();
     }
+
+
+    @Override
+    public long getLastModified() {
+        return wrappedJarUrlConnection.getLastModified();
+    }
 }
