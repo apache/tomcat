@@ -369,4 +369,52 @@ public interface Channel {
      */
     public void setName(String name);
 
+    /**
+     * Translates the name of an option to its integer value
+     * @param opt The name of the option
+     * @return
+     */
+    public static int getOptionValue(String opt){
+
+        if ("asynchronous".equals(opt) || "async".equals(opt))
+            return SEND_OPTIONS_ASYNCHRONOUS;
+
+        if ("byte_message".equals(opt) || "byte".equals(opt))
+            return SEND_OPTIONS_BYTE_MESSAGE;
+
+        if ("multicast".equals(opt))
+            return SEND_OPTIONS_MULTICAST;
+
+        if ("secure".equals(opt))
+            return SEND_OPTIONS_SECURE;
+
+        if ("synchronized_ack".equals(opt) || "sync".equals(opt))
+            return SEND_OPTIONS_SYNCHRONIZED_ACK;
+
+        if ("udp".equals(opt))
+            return SEND_OPTIONS_UDP;
+
+        if ("use_ack".equals(opt))
+            return SEND_OPTIONS_USE_ACK;
+
+        return 0;
+    }
+
+    /**
+     * Translates a comma separated list of option names to their bitwise-ORd value
+     * @param input A comma separated list of options, e.g. "async,multicast"
+     * @return
+     */
+    public static int getOptionsFromString(String input){
+
+        int result = 0;
+
+        String[] options = input.split(",");
+
+        for (String opt : options)
+            result |= getOptionValue(opt);
+
+        return result;
+    }
+
 }
