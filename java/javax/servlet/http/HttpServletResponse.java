@@ -345,7 +345,7 @@ public interface HttpServletResponse extends ServletResponse {
     /**
      * Configure the supplier of the trailer headers. The supplier will be
      * called in the scope of the thread that completes the response.
-     * <b>
+     * <br>
      * Trailers that don't meet the requirements of RFC 7230, section 4.1.2 will
      * be ignored.
      *
