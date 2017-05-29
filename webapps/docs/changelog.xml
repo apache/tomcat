@@ -2620,7 +2620,7 @@
         (markt)
       </fix>
       <fix>
-        Work around <a herf="https://github.com/openssl/openssl/issues/188">a
+        Work around <a href="https://github.com/openssl/openssl/issues/188">a
         known issue in OpenSSL</a> that does not permit the TLS handshake to be
         failed if the ALPN negotiation fails. (markt)
       </fix>
