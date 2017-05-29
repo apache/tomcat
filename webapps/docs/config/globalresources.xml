@@ -185,7 +185,7 @@
         it is no longer required. This is intended to speed up clean-up of
         resources that would otherwise happen as part of garbage collection.
         This attribute is ignored if the <code>singleton</code> attribute is
-        false. If not specificed, no default is defined and no close method will
+        false. If not specified, no default is defined and no close method will
         be called.</p>
         <p>For Apache Commons DBCP and Apache Tomcat JDBC connection pools
         you can use <code>closeMethod="close"</code>.</p>
