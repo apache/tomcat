@@ -339,6 +339,13 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         this.channelSendOptions = channelSendOptions;
     }
 
+    public void setChannelSendOptions(String channelSendOptions) {
+
+        int value = Channel.parseChannelSendOptions(channelSendOptions);
+        if (value > 0)
+            this.setChannelSendOptions(value);
+    }
+
     /**
      * has members
      */

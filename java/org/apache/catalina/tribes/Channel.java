@@ -405,7 +405,13 @@ public interface Channel {
      * @param input A comma separated list of options, e.g. "async,multicast"
      * @return
      */
-    public static int getOptionsFromString(String input){
+    public static int parseChannelSendOptions(String input){
+
+        try {
+
+            return Integer.parseInt(input);
+        }
+        catch (NumberFormatException nfe){}
 
         int result = 0;
 
