@@ -2879,7 +2879,7 @@ Use the "ide-netbeans-replace" target if you wish to overwrite them.</echo>
 
   <target name="-ide-netbeans-create"
           unless="tomcat-nb.home.exists">
-    <!-- Unconditionally create or ovverwrite default NetBeans project files -->
+    <!-- Unconditionally create or overwrite default NetBeans project files -->
     <property name="tomcat-nb.dist" value="${tomcat.home}/res/ide-support/netbeans" />
     <mkdir dir="${tomcat-nb.home}/"/>
     <copy todir="${tomcat-nb.home}" overwrite="true">
