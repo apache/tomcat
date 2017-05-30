@@ -74,6 +74,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>44787</bug>: Improve error message when JSP compiler configuration
+        options are not valid. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
