@@ -107,6 +107,11 @@
         Ant tasks used to communicate with the Manager application. (markt)
       </add>
       <fix>
+        <bug>45879</bug>: Add the <code>RELEASE-NOTES</code> file to the root of
+        the installation created by the Tomcat installer for Windows to make it
+        easier for users to identify the installed Tomcat version. (markt)
+      </fix>
+      <fix>
         <bug>61055</bug>: Clarify the code comments in the rewrite valve to make
         clear that there are no plans to provide proxy support for this valve
         since Tomcat does not have proxy capabilities. (markt)
