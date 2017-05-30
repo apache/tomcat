@@ -194,7 +194,7 @@ com.sun.security.jgss.krb5.accept {
   changes:</p>
   <ul>
   <li>The Linux server does not have to be part of the Windows domain.</li>
-  <li>The path to the keytab file in krb5.ini and jass.conf should be updated
+  <li>The path to the keytab file in krb5.ini and jaas.conf should be updated
       to reflect the path to the keytab file on the Linux server using Linux
       style file paths (e.g. /usr/local/tomcat/...).</li>
   </ul>
