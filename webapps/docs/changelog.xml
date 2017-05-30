@@ -115,6 +115,10 @@
         <bug>61076</bug>: Document the <code>altDDName</code> attribute for the
         <code>Context</code> element. (markt)
       </fix>
+      <fix>
+        Correct typo in Jar Scan Filter Configuration Reference.
+        Issue reported via comments.apache.org. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>

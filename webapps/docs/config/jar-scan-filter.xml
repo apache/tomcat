@@ -176,13 +176,13 @@
 
 
 <section name="Nested Components">
-  <p>No components may be nested inside a <strong>Jar Scanner</strong> element.
+  <p>No components may be nested inside a <strong>Jar Scan Filter</strong> element.
   </p>
 </section>
 
 
 <section name="Special Features">
-  <p>No special features are associated with a <strong>Jar Scanner</strong>
+  <p>No special features are associated with a <strong>Jar Scan Filter</strong>
   element.</p>
 </section>
 
