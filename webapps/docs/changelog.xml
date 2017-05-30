@@ -89,6 +89,11 @@
         Ant tasks used to communicate with the Manager application. (markt)
       </add>
       <fix>
+        <bug>45879</bug>: Add the <code>RELEASE-NOTES</code> file to the root of
+        the installation created by the Tomcat installer for Windows to make it
+        easier for users to identify the installed Tomcat version. (markt)
+      </fix>
+      <fix>
         <bug>61076</bug>: Document the <code>altDDName</code> attribute for the
         <code>Context</code> element. (markt)
       </fix>
