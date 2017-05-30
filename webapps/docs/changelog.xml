@@ -84,6 +84,10 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <add>
+        <bug>45832</bug>: Add HTTP DIGEST authentication support to the Catalina
+        Ant tasks used to communicate with the Manager application. (markt)
+      </add>
       <fix>
         <bug>61076</bug>: Document the <code>altDDName</code> attribute for the
         <code>Context</code> element. (markt)
