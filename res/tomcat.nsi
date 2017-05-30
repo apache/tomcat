@@ -179,6 +179,7 @@ Section "Core" SecTomcatCore
   File tomcat.ico
   File LICENSE
   File NOTICE
+  File RELEASE-NOTES
   SetOutPath $INSTDIR\lib
   File /r lib\*.*
   ; Note: just calling 'SetOutPath' will create the empty folders for us
