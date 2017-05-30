@@ -20,12 +20,12 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.Authenticator;
 import java.net.HttpURLConnection;
+import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
@@ -200,10 +200,8 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
             }
             hconn.setRequestProperty("User-Agent", "Catalina-Ant-Task/1.0");
 
-            // Set up an authorization header with our credentials
-            String input = username + ":" + password;
-            String output = Base64.encodeBase64String(input.getBytes(StandardCharsets.ISO_8859_1));
-            hconn.setRequestProperty("Authorization", "Basic " + output);
+            // Set up authorization with our credentials
+            Authenticator.setDefault(new TaskAuthenticator(username, password));
 
             // Establish the connection with the server
             hconn.connect();
@@ -290,6 +288,23 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                     // Ignore
                 }
             }
+        }
+    }
+
+
+    private static class TaskAuthenticator extends Authenticator {
+
+        private final String user;
+        private final String password;
+
+        private TaskAuthenticator(String user, String password) {
+            this.user = user;
+            this.password = password;
+        }
+
+        @Override
+        protected PasswordAuthentication getPasswordAuthentication() {
+            return new PasswordAuthentication(user, password.toCharArray());
         }
     }
 }
