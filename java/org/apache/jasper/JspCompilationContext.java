@@ -232,7 +232,8 @@ public class JspCompilationContext {
             }
         }
         if (jspCompiler == null) {
-            throw new IllegalStateException(Localizer.getMessage("jsp.error.compiler"));
+            throw new IllegalStateException(Localizer.getMessage("jsp.error.compiler.config",
+                    options.getCompilerClassName(), options.getCompiler()));
         }
         jspCompiler.init(this, jsw);
         return jspCompiler;

@@ -88,6 +88,10 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
+        <bug>44787</bug>: Improve error message when JSP compiler configuration
+        options are not valid. (markt)
+      </fix>
+      <fix>
         <bug>53011</bug>: When pre-compiling with JspC, report all compilation
         errors rather than stopping after the first error. A new option
         <code>-failFast</code> can be used to restore the previous behaviour of
