@@ -102,6 +102,10 @@
   </subsection>
   <subsection name="Other">
     <changelog>
+      <add>
+        <bug>45832</bug>: Add HTTP DIGEST authentication support to the Catalina
+        Ant tasks used to communicate with the Manager application. (markt)
+      </add>
       <fix>
         <bug>61055</bug>: Clarify the code comments in the rewrite valve to make
         clear that there are no plans to provide proxy support for this valve
