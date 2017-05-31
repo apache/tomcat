@@ -124,6 +124,10 @@
         Correct typo in Jar Scan Filter Configuration Reference.
         Issue reported via comments.apache.org. (violetagg)
       </fix>
+      <fix>
+        Correct the requirement for the minimum Java SE version in Application
+        Developer's Guide. Issue reported via comments.apache.org. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>
