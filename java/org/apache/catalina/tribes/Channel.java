@@ -410,15 +410,15 @@ public interface Channel {
         try {
 
             return Integer.parseInt(input);
-        }
-        catch (NumberFormatException nfe){}
+        } catch (NumberFormatException nfe){}
 
         int result = 0;
 
         String[] options = input.split(",");
 
-        for (String opt : options)
+        for (String opt : options) {
             result |= getOptionValue(opt);
+        }
 
         return result;
     }

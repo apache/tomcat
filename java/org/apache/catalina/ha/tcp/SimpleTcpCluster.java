@@ -342,8 +342,9 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     public void setChannelSendOptions(String channelSendOptions) {
 
         int value = Channel.parseChannelSendOptions(channelSendOptions);
-        if (value > 0)
+        if (value > 0) {
             this.setChannelSendOptions(value);
+        }
     }
 
     /**
