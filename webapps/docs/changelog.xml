@@ -98,6 +98,11 @@
         stopping after the first error. Based on a patch provided by Marc Pompl.
         (markt)
       </fix>
+      <fix>
+        <bug>61137</bug>: <code>j.s.jsp.tagext.TagLibraryInfo#uri</code> and
+        <code>j.s.jsp.tagext.TagLibraryInfo#prefix</code> fields should not be
+        final. Patch provided by Katya Todorova. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
