@@ -221,8 +221,11 @@ should be completed:</p>
     <code>SEND_OPTIONS_ASYNCHRONOUS</code> | <code>SEND_OPTIONS_MULTICAST</code>.
 </p>
 <p>
-  You can read more on the <a href="tribes/introduction.html">send flag(overview)</a> or the <doc path="/api/org/apache/catalina/tribes/Channel.html">send flag(javadoc)</doc>.
-    During async replication, the request is returned before the data has been replicated. async replication yields shorter request times, and synchronous replication guarantees the session to be replicated before the request returns.
+  You can read more on the <a href="tribes/introduction.html">send flag(overview)</a> or the
+  <doc path="/api/org/apache/catalina/tribes/Channel.html">send flag(javadoc)</doc>.
+  During async replication, the request is returned before the data has been replicated. async
+  replication yields shorter request times, and synchronous replication guarantees the session
+  to be replicated before the request returns.
 </p>
 </section>
 
