@@ -580,7 +580,11 @@
     </property>
 
     <property name="catalina.config">
-      <p>The URL for the catalina.properties configuration file.</p>
+      <p>The location from which to load the catalina.properties configuration
+      file. This may be an absolute URL, a relative (to the current working
+      directory) URL or an alternative file name in which case Tomcat will
+      attempt to load the file from the default location of
+      <code>$CATALINA_BASE/conf/</code>.</p>
     </property>
 
     <property name="tomcat.util.buf.StringCache.byte.enabled">

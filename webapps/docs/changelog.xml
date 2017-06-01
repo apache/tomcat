@@ -48,6 +48,11 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>48543</bug>: Add the option to specify an alternative file name for
+        the <code>catalina.config</code> system property. Also document that
+        relative, as well as absolute, URLs are permitted. (markt)
+      </fix>
+      <fix>
         <bug>61072</bug>: Respect the documentation statements that allow
         using the platform default secure random for session id generation.
         (remm)
