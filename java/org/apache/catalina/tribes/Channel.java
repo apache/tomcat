@@ -16,6 +16,9 @@
  */
 package org.apache.catalina.tribes;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 import java.io.Serializable;
 
 /**
@@ -370,34 +373,41 @@ public interface Channel {
     public void setName(String name);
 
     /**
-     * Translates the name of an option to its integer value
+     * Translates the name of an option to its integer value.  Valid option names are "asynchronous" (alias "async"),
+     * "byte_message" (alias "byte"), "multicast", "secure", "synchronized_ack" (alias "sync"), "udp", "use_ack"
      * @param opt The name of the option
      * @return
      */
     public static int getOptionValue(String opt){
 
-        if ("asynchronous".equals(opt) || "async".equals(opt))
-            return SEND_OPTIONS_ASYNCHRONOUS;
+        switch (opt){
 
-        if ("byte_message".equals(opt) || "byte".equals(opt))
-            return SEND_OPTIONS_BYTE_MESSAGE;
+            case "asynchronous":
+            case "async":
+                return SEND_OPTIONS_ASYNCHRONOUS;
 
-        if ("multicast".equals(opt))
-            return SEND_OPTIONS_MULTICAST;
+            case "byte_message":
+            case "byte":
+                return SEND_OPTIONS_BYTE_MESSAGE;
 
-        if ("secure".equals(opt))
-            return SEND_OPTIONS_SECURE;
+            case "multicast":
+                return SEND_OPTIONS_MULTICAST;
 
-        if ("synchronized_ack".equals(opt) || "sync".equals(opt))
-            return SEND_OPTIONS_SYNCHRONIZED_ACK;
+            case "secure":
+                return SEND_OPTIONS_SECURE;
 
-        if ("udp".equals(opt))
-            return SEND_OPTIONS_UDP;
+            case "synchronized_ack":
+            case "sync":
+                return SEND_OPTIONS_SYNCHRONIZED_ACK;
 
-        if ("use_ack".equals(opt))
-            return SEND_OPTIONS_USE_ACK;
+            case "udp":
+                return SEND_OPTIONS_UDP;
 
-        return 0;
+            case "use_ack":
+                return SEND_OPTIONS_USE_ACK;
+        }
+
+        throw new IllegalArgumentException(String.format("[%s] is not a valid option", opt));
     }
 
     /**
@@ -408,14 +418,15 @@ public interface Channel {
     public static int parseChannelSendOptions(String input){
 
         try {
-
             return Integer.parseInt(input);
-        } catch (NumberFormatException nfe){}
+        } catch (NumberFormatException nfe){
+            final Log log = LogFactory.getLog(Channel.class);
+            log.trace(String.format("Failed to parse [%s] as integer, channelSendOptions possibly set by name(s)", input));
+        }
+
+        String[] options = input.split("\\s*,\\s*");
 
         int result = 0;
-
-        String[] options = input.split(",");
-
         for (String opt : options) {
             result |= getOptionValue(opt);
         }
