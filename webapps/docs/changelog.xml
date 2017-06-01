@@ -87,6 +87,11 @@
         <bug>44787</bug>: Improve error message when JSP compiler configuration
         options are not valid. (markt)
       </fix>
+      <fix>
+        <bug>61137</bug>: <code>j.s.jsp.tagext.TagLibraryInfo#uri</code> and
+        <code>j.s.jsp.tagext.TagLibraryInfo#prefix</code> fields should not be
+        final. Patch provided by Katya Todorova. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
