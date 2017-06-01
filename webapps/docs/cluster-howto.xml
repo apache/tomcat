@@ -218,7 +218,7 @@ should be completed:</p>
     "asynchronous" (alias "async"), "byte_message" (alias "byte"), "multicast", "secure",
     "synchronized_ack" (alias "sync"), "udp", "use_ack".  Use comma to separate multiple names,
     e.g. pass "async, multicast" for the options
-    <code>SEND_OPTIONS_ASYNCHRONOUS</code> | <code>SEND_OPTIONS_MULTICAST</code>.
+    <code>SEND_OPTIONS_ASYNCHRONOUS | SEND_OPTIONS_MULTICAST</code>.
 </p>
 <p>
   You can read more on the <a href="tribes/introduction.html">send flag(overview)</a> or the
