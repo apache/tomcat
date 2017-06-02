@@ -68,8 +68,6 @@ public abstract class Compiler {
 
     protected Node.Nodes pageNodes;
 
-    private String[] smap;
-
 
     // ------------------------------------------------------------ Constructor
 
@@ -91,20 +89,6 @@ public abstract class Compiler {
      */
     public Node.Nodes getPageNodes() {
         return this.pageNodes;
-    }
-
-
-    /**
-     * Obtain the source map for this file. This is cached on compilation. If
-     * the process has been restarted since compilation, null will be returned.
-     * TODO: Extract the SMAP from the class file if the cached copy is not
-     *       available (assumes SMAP is not suppressed)
-     *
-     * @return The source map in the format it is written to the class file or
-     *         {@code null} if not available.
-     */
-    public String[] getSmap() {
-        return smap;
     }
 
 
@@ -386,7 +370,7 @@ public abstract class Compiler {
         }
 
         try {
-            smap = generateJava();
+            String[] smap = generateJava();
             File javaFile = new File(ctxt.getServletJavaFileName());
             Long jspLastModified = ctxt.getLastModified(ctxt.getJspFile());
             javaFile.setLastModified(jspLastModified.longValue());
