@@ -97,6 +97,11 @@
         <bug>61076</bug>: Document the <code>altDDName</code> attribute for the
         <code>Context</code> element. (markt)
       </fix>
+      <fix>
+        <bug>61145</bug>: Add missing <code>@Documented</code> annotation to
+        annotations in the annotations API. Patch provided by Katya Todorova.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
