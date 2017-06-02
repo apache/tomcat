@@ -143,6 +143,11 @@
         annotations in the annotations API. Patch provided by Katya Todorova.
         (markt)
       </fix>
+      <fix>
+        <bug>61146</bug>: Add missing <code>lookup()</code> method to
+        <code>@EJB</code> annotation in the annotations API. Patch provided by
+        Katya Todorova. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
