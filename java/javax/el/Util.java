@@ -772,5 +772,29 @@ class Util {
             }
             return cmp;
         }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            return o == this
+                    || (null != o
+                    && this.getClass().equals(o.getClass())
+                    && ((MatchResult)o).getExact() == this.getExact()
+                    && ((MatchResult)o).getAssignable() == this.getAssignable()
+                    && ((MatchResult)o).getCoercible() == this.getCoercible()
+                    && ((MatchResult)o).isBridge() == this.isBridge()
+                    )
+                    ;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return (this.isBridge() ? 1 << 24 : 0)
+                    ^ this.getExact() << 16
+                    ^ this.getAssignable() << 8
+                    ^ this.getCoercible()
+                    ;
+        }
     }
 }
