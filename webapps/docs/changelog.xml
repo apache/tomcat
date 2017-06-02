@@ -138,6 +138,11 @@
         Correct the requirement for the minimum Java SE version in Application
         Developer's Guide. Issue reported via comments.apache.org. (violetagg)
       </fix>
+      <fix>
+        <bug>61145</bug>: Add missing <code>@Documented</code> annotation to
+        annotations in the annotations API. Patch provided by Katya Todorova.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
