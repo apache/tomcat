@@ -96,6 +96,11 @@
   </subsection>
   <subsection name="WebSocket">
     <changelog>
+      <fix>
+        Correct the log message when a <code>MessageHandler</code> for
+        <code>PongMessage</code> does not implement
+        <code>MessageHandler.Whole</code>. (rjung)
+      </fix>
       <add>
         Introduce new API <code>o.a.tomcat.websocket.WsSession#suspend</code>/
         <code>o.a.tomcat.websocket.WsSession#resume</code> that can be used to
