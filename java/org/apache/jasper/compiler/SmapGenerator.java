@@ -39,6 +39,10 @@ public class SmapGenerator {
      *    a logical SMAP
      *  - to serialize this logical SMAP for eventual inclusion directly
      *    into a .class file.
+     *
+     * There are aspects of the SMAP syntax that this class does not support.
+     * It provides all the features required for JSP and associated files but no
+     * more.
      */
 
 
@@ -48,7 +52,6 @@ public class SmapGenerator {
     private String outputFileName;
     private String defaultStratum = "Java";
     private final List<SmapStratum> strata = new ArrayList<>();
-    private final List<String> embedded = new ArrayList<>();
 
     //*********************************************************************
     // Methods for adding mapping data
@@ -81,22 +84,6 @@ public class SmapGenerator {
             this.defaultStratum = stratum.getStratumName();
     }
 
-    /**
-     * Adds the given string as an embedded SMAP with the given stratum name.
-     *
-     * @param smap the SMAP to embed
-     * @param stratumName the name of the stratum output by the compilation
-     *                    that produced the <tt>smap</tt> to be embedded
-     *
-     * @deprecated Unused. This will be removed in Tomcat 9.0.x
-     */
-    @Deprecated
-    public synchronized void addSmap(String smap, String stratumName) {
-        embedded.add("*O " + stratumName + "\n"
-                   + smap
-                   + "*C " + stratumName + "\n");
-    }
-
 
     //*********************************************************************
     // Methods for serializing the logical SMAP
@@ -111,12 +98,6 @@ public class SmapGenerator {
         out.append("SMAP\n");
         out.append(outputFileName + '\n');
         out.append(defaultStratum + '\n');
-
-        // include embedded SMAPs
-        int nEmbedded = embedded.size();
-        for (int i = 0; i < nEmbedded; i++) {
-            out.append(embedded.get(i));
-        }
 
         // print our StratumSections, FileSections, and LineSections
         int nStrata = strata.size();
