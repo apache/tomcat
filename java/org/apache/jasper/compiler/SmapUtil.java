@@ -80,7 +80,7 @@ public class SmapUtil {
         SmapGenerator g = new SmapGenerator();
 
         // now, assemble info about our own stratum (JSP) using JspLineMap
-        SmapStratum s = new SmapStratum("JSP");
+        SmapStratum s = new SmapStratum();
 
         g.setOutputFileName(unqualify(ctxt.getServletJavaFileName()));
 
@@ -683,7 +683,7 @@ public class SmapUtil {
         public void doVisit(Node n) {
             String inner = n.getInnerClassName();
             if (inner != null && !map.containsKey(inner)) {
-                map.put(inner, new SmapStratum("JSP"));
+                map.put(inner, new SmapStratum());
             }
         }
 

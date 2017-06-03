@@ -27,7 +27,7 @@ public class TestSmapGenerator {
 
         SmapGenerator g = new SmapGenerator();
         g.setOutputFileName("foo.java");
-        SmapStratum s = new SmapStratum("JSP");
+        SmapStratum s = new SmapStratum();
         s.addFile("foo.jsp");
         s.addFile("bar.jsp", "/foo/foo/bar.jsp");
         s.addLineData(1, "foo.jsp", 1, 1, 1);
