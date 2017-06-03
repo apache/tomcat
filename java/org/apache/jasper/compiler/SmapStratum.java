@@ -275,7 +275,10 @@ public class SmapStratum {
 
     /**
      * @return the name of the stratum.
+     *
+     * @deprecated Unused. This will be removed in Tomcat 9.0.x
      */
+    @Deprecated
     public String getStratumName() {
         return "JSP";
     }
