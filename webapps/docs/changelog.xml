@@ -110,6 +110,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Correct the log message when a <code>MessageHandler</code> for
+        <code>PongMessage</code> does not implement
+        <code>MessageHandler.Whole</code>. (rjung)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
