@@ -17,9 +17,6 @@
 
 package org.apache.jasper.compiler;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Represents a source map (SMAP), which serves to associate lines
  * of the input JSP file(s) to lines in the generated servlet in the
@@ -50,8 +47,7 @@ public class SmapGenerator {
     // Private state
 
     private String outputFileName;
-    private String defaultStratum = "Java";
-    private final List<SmapStratum> strata = new ArrayList<>();
+    private SmapStratum stratum;
 
     //*********************************************************************
     // Methods for adding mapping data
@@ -72,30 +68,7 @@ public class SmapGenerator {
      * @param stratum the SmapStratum object to add
      */
     public synchronized void setStratum(SmapStratum stratum) {
-        addStratum(stratum, true);
-    }
-
-
-    /**
-     * Adds the given SmapStratum object, representing a Stratum with
-     * logically associated FileSection and LineSection blocks, to
-     * the current SmapGenerator.  If <tt>default</tt> is true, this
-     * stratum is made the default stratum, overriding any previously
-     * set default.
-     *
-     * @param stratum the SmapStratum object to add
-     * @param defaultStratum if <tt>true</tt>, this SmapStratum is considered
-     *                to represent the default SMAP stratum unless
-     *                overwritten
-     *
-     * @deprecated Use {@link #setStratum(SmapStratum)}
-     */
-    @Deprecated
-    public synchronized void addStratum(SmapStratum stratum,
-                                        boolean defaultStratum) {
-        strata.add(stratum);
-        if (defaultStratum)
-            this.defaultStratum = stratum.getStratumName();
+        this.stratum = stratum;
     }
 
 
@@ -104,21 +77,19 @@ public class SmapGenerator {
 
     public synchronized String getString() {
         // check state and initialize buffer
-        if (outputFileName == null)
+        if (outputFileName == null) {
             throw new IllegalStateException();
+        }
+
         StringBuilder out = new StringBuilder();
 
         // start the SMAP
         out.append("SMAP\n");
         out.append(outputFileName + '\n');
-        out.append(defaultStratum + '\n');
+        out.append("JSP\n");
 
-        // print our StratumSections, FileSections, and LineSections
-        int nStrata = strata.size();
-        for (int i = 0; i < nStrata; i++) {
-            SmapStratum s = strata.get(i);
-            out.append(s.getString());
-        }
+        // print our StratumSection, FileSection, and LineSections
+        out.append(stratum.getString());
 
         // end the SMAP
         out.append("*E\n");
