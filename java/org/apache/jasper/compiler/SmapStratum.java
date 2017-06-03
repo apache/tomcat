@@ -113,7 +113,6 @@ public class SmapStratum {
     //*********************************************************************
     // Private state
 
-    private final String stratumName;
     private final List<String> fileNameList;
     private final List<String> filePathList;
     private final List<LineInfo> lineData;
@@ -126,20 +125,6 @@ public class SmapStratum {
      * Constructs a new SmapStratum object with the stratum name JSP.
      */
     public SmapStratum() {
-        this("JSP");
-    }
-
-    /**
-     * Constructs a new SmapStratum object for the given stratum name
-     * (e.g., JSP).
-     *
-     * @param stratumName the name of the stratum (e.g., JSP)
-     *
-     * @deprecated Use the no-arg constructor
-     */
-    @Deprecated
-    public SmapStratum(String stratumName) {
-        this.stratumName = stratumName;
         fileNameList = new ArrayList<>();
         filePathList = new ArrayList<>();
         lineData = new ArrayList<>();
@@ -292,7 +277,7 @@ public class SmapStratum {
      * @return the name of the stratum.
      */
     public String getStratumName() {
-        return stratumName;
+        return "JSP";
     }
 
     /**
@@ -307,7 +292,7 @@ public class SmapStratum {
         StringBuilder out = new StringBuilder();
 
         // print StratumSection
-        out.append("*S " + stratumName + "\n");
+        out.append("*S JSP\n");
 
         // print FileSection
         out.append("*F\n");
