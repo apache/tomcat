@@ -87,7 +87,10 @@ public class SmapGenerator {
      * @param smap the SMAP to embed
      * @param stratumName the name of the stratum output by the compilation
      *                    that produced the <tt>smap</tt> to be embedded
+     *
+     * @deprecated Unused. This will be removed in Tomcat 9.0.x
      */
+    @Deprecated
     public synchronized void addSmap(String smap, String stratumName) {
         embedded.add("*O " + stratumName + "\n"
                    + smap
