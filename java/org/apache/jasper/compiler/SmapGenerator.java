@@ -100,7 +100,10 @@ public class SmapGenerator {
      * SMAPs or not.  Intended for situations without an SMAP resolver.
      *
      * @param status If <tt>false</tt>, ignore any embedded SMAPs.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9.0.x
      */
+    @Deprecated
     public void setDoEmbedded(boolean status) {
         doEmbedded = status;
     }
