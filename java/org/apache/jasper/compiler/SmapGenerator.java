@@ -65,6 +65,17 @@ public class SmapGenerator {
         outputFileName = x;
     }
 
+
+    /**
+     * Sets the default and only stratum for the smap.
+     *
+     * @param stratum the SmapStratum object to add
+     */
+    public synchronized void setStratum(SmapStratum stratum) {
+        addStratum(stratum, true);
+    }
+
+
     /**
      * Adds the given SmapStratum object, representing a Stratum with
      * logically associated FileSection and LineSection blocks, to
@@ -76,7 +87,10 @@ public class SmapGenerator {
      * @param defaultStratum if <tt>true</tt>, this SmapStratum is considered
      *                to represent the default SMAP stratum unless
      *                overwritten
+     *
+     * @deprecated Use {@link #setStratum(SmapStratum)}
      */
+    @Deprecated
     public synchronized void addStratum(SmapStratum stratum,
                                         boolean defaultStratum) {
         strata.add(stratum);

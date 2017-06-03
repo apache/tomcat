@@ -87,7 +87,7 @@ public class SmapUtil {
         // Map out Node.Nodes
         evaluateNodes(pageNodes, s, map, ctxt.getOptions().getMappedFile());
         s.optimizeLineSection();
-        g.addStratum(s, true);
+        g.setStratum(s);
 
         if (ctxt.getOptions().isSmapDumped()) {
             File outSmap = new File(ctxt.getClassFileName() + ".smap");
@@ -113,7 +113,7 @@ public class SmapUtil {
             s.optimizeLineSection();
             g = new SmapGenerator();
             g.setOutputFileName(unqualify(ctxt.getServletJavaFileName()));
-            g.addStratum(s, true);
+            g.setStratum(s);
 
             String innerClassFileName =
                 classFileName.substring(0, classFileName.indexOf(".class")) +

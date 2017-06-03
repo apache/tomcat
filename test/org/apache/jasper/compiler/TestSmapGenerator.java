@@ -34,7 +34,7 @@ public class TestSmapGenerator {
         s.addLineData(2, "foo.jsp", 1, 6, 1);
         s.addLineData(3, "foo.jsp", 2, 10, 5);
         s.addLineData(20, "/foo/foo/bar.jsp", 1, 30, 1);
-        g.addStratum(s, true);
+        g.setStratum(s);
 
         Assert.assertEquals(
                 "SMAP\n" +
