@@ -80,9 +80,10 @@ public class AddDefaultCharsetFilter extends FilterBase {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
             FilterChain chain) throws IOException, ServletException {
-
+        
         // Wrap the response
         if (response instanceof HttpServletResponse) {
+            response.setCharacterEncoding(encoding);
             ResponseWrapper wrapped =
                 new ResponseWrapper((HttpServletResponse)response, encoding);
             chain.doFilter(request, wrapped);
