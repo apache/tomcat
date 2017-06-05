@@ -18,6 +18,7 @@ package org.apache.catalina.startup;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -202,6 +203,19 @@ public class Tomcat {
         return addWebapp(getHost(), contextPath, docBase);
     }
 
+    /**
+     * This is equivalent to adding a web application to Tomcat's webapps
+     * directory. The equivalent of the default web.xml will be applied to the
+     * web application and any WEB-INF/web.xml and META-INF/context.xml packaged
+     * with the application will be processed normally. Normal web fragment and
+     * {@link javax.servlet.ServletContainerInitializer} processing will be
+     * applied.
+     *
+     * @throws ServletException
+     */
+    public Context addWebapp(String contextPath, InputStream docBase) throws ServletException {
+        return addWebapp(getHost(), contextPath, docBase);
+    }
 
     /**
      * Add a context - programmatic mode, no default web.xml used. This means
@@ -603,6 +617,35 @@ public class Tomcat {
             // prevent it from looking ( if it finds one - it'll have dup error )
             ((ContextConfig) config).setDefaultWebXml(noDefaultWebXmlPath());
         }
+
+        if (host == null) {
+            getHost().addChild(ctx);
+        } else {
+            host.addChild(ctx);
+        }
+
+        return ctx;
+    }
+    
+    /**
+     * @see #addWebapp(String, InputStream)
+     */
+    public Context addWebapp(Host host, String contextPath, InputStream docBase) {
+        silence(host, contextPath);
+
+        Context ctx = createContext(host, contextPath);
+        ctx.setPath(contextPath);
+        //TODO:
+        //ctx.setDocBase(docBase);
+        ctx.addLifecycleListener(new DefaultWebXmlListener());
+        //TODO:
+        //ctx.setConfigFile(getWebappConfigFile(docBase, contextPath));
+
+        ContextConfig ctxCfg = new ContextConfig();
+        ctx.addLifecycleListener(ctxCfg);
+
+        // prevent it from looking ( if it finds one - it'll have dup error )
+        ctxCfg.setDefaultWebXml(noDefaultWebXmlPath());
 
         if (host == null) {
             getHost().addChild(ctx);
