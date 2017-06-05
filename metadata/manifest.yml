@@ -1,0 +1,23 @@
+Name: tomcat
+Cartridge-Short-Name: TOMCAT
+Display-Name: tomcat-2.5.2
+Description: The TOMCAT server community edition cartridge (http://www.firebirdsql.org/).
+Version: "2.5.2"
+Website: http://www.firebirdsql.org/
+Cartridge-Version: 0.1.0
+Cartridge-Vendor: FIREBIRD
+Categories:
+  - service
+  - database
+  - embedded
+Provides:
+  - firebirdsql-2.5.2
+  - firebirdsql
+Scaling:
+  Min: 1
+  Max: -1
+Endpoints:
+  - Private-IP-Name:   HOST
+    Private-Port-Name: PORT
+    Private-Port:      8080    
+    Public-Port-Name:  PORT
