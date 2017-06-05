@@ -18,6 +18,7 @@ package org.apache.catalina.tribes.test.channel;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.catalina.ha.session.BackupManager;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.ha.tcp.SimpleTcpCluster;
 import org.junit.Test;
@@ -48,4 +49,13 @@ public class TestChannelConfig {
         cluster.setChannelSendOptions("async, multicast");
         assertEquals(Channel.SEND_OPTIONS_ASYNCHRONOUS | Channel.SEND_OPTIONS_MULTICAST, cluster.getChannelSendOptions());
     }
+
+    @Test
+    public void testStringInputForMapSendOptions() {
+
+        BackupManager manager = new BackupManager();
+        manager.setMapSendOptions("async, multicast");
+        assertEquals(Channel.SEND_OPTIONS_ASYNCHRONOUS | Channel.SEND_OPTIONS_MULTICAST, manager.getMapSendOptions());
+    }
+
 }
