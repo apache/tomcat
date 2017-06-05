@@ -19,7 +19,6 @@ package org.apache.catalina.loader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Executor;
-import java.util.logging.LogManager;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -75,10 +74,9 @@ public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
         ((ThreadPoolExecutor) executor).setThreadRenewalDelay(-1);
 
         // Configure logging filter to check leak message appears
-        TesterLogValidationFilter f = new TesterLogValidationFilter(
-                "The web application [] created a ThreadLocal with key of");
-        LogManager.getLogManager().getLogger(
-                "org.apache.catalina.loader.WebappClassLoaderBase").setFilter(f);
+        TesterLogValidationFilter f = TesterLogValidationFilter.add(null,
+                "The web application [] created a ThreadLocal with key of", null,
+                "org.apache.catalina.loader.WebappClassLoaderBase");
 
         // Need to force loading of all web application classes via the web
         // application class loader
@@ -131,10 +129,9 @@ public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
         ((ThreadPoolExecutor) executor).setThreadRenewalDelay(-1);
 
         // Configure logging filter to check leak message appears
-        TesterLogValidationFilter f = new TesterLogValidationFilter(
-                "The web application [] created a ThreadLocal with key of");
-        LogManager.getLogManager().getLogger(
-                "org.apache.catalina.loader.WebappClassLoaderBase").setFilter(f);
+        TesterLogValidationFilter f = TesterLogValidationFilter.add(null,
+                "The web application [] created a ThreadLocal with key of", null,
+                "org.apache.catalina.loader.WebappClassLoaderBase");
 
         // Need to force loading of all web application classes via the web
         // application class loader
