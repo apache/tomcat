@@ -19,10 +19,7 @@ package org.apache.catalina.loader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Filter;
 import java.util.logging.LogManager;
-import java.util.logging.LogRecord;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,6 +32,7 @@ import org.apache.catalina.core.JreMemoryLeakPreventionListener;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.unittest.TesterLogValidationFilter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
@@ -77,7 +75,7 @@ public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
         ((ThreadPoolExecutor) executor).setThreadRenewalDelay(-1);
 
         // Configure logging filter to check leak message appears
-        LogValidationFilter f = new LogValidationFilter(
+        TesterLogValidationFilter f = new TesterLogValidationFilter(
                 "The web application [] created a ThreadLocal with key of");
         LogManager.getLogManager().getLogger(
                 "org.apache.catalina.loader.WebappClassLoaderBase").setFilter(f);
@@ -133,7 +131,7 @@ public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
         ((ThreadPoolExecutor) executor).setThreadRenewalDelay(-1);
 
         // Configure logging filter to check leak message appears
-        LogValidationFilter f = new LogValidationFilter(
+        TesterLogValidationFilter f = new TesterLogValidationFilter(
                 "The web application [] created a ThreadLocal with key of");
         LogManager.getLogManager().getLogger(
                 "org.apache.catalina.loader.WebappClassLoaderBase").setFilter(f);
@@ -214,34 +212,6 @@ public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
                     // Ignore
                 }
             }
-        }
-    }
-
-
-    private class LogValidationFilter implements Filter {
-
-        private String targetMessage;
-        private AtomicInteger messageCount = new AtomicInteger(0);
-
-
-        public LogValidationFilter(String targetMessage) {
-            this.targetMessage = targetMessage;
-        }
-
-
-        public int getMessageCount() {
-            return messageCount.get();
-        }
-
-
-        @Override
-        public boolean isLoggable(LogRecord record) {
-            String msg = record.getMessage();
-            if (msg != null && msg.contains(targetMessage)) {
-                messageCount.incrementAndGet();
-            }
-
-            return true;
         }
     }
 }
