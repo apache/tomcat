@@ -16,9 +16,6 @@
  */
 package org.apache.coyote.http2;
 
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -52,10 +49,6 @@ public class TestHttp2Section_5_3 extends Http2TestBase {
 
     @Test
     public void testWeighting() throws Exception {
-
-        // Temporary debug logging for server side code that allocates capacity
-        // to streams to debug BZ 58659
-        LogManager.getLogManager().getLogger(Http2UpgradeHandler.class.getName()).setLevel(Level.ALL);
 
         http2Connect();
 
