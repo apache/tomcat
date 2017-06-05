@@ -64,6 +64,11 @@
         <bug>61101</bug>: CORS filter should set Vary header in response.
         Submitted by Rick Riemer. (remm)
       </fix>
+      <fix>
+        Improve the <code>SSLValve</code> so it is able to handle client
+        certificate headers from Nginx. Based on a patch by Lucas Ventura Carro.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
