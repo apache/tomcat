@@ -62,6 +62,7 @@ public class NioSelectorPool {
     protected Selector getSharedSelector() throws IOException {
         if (SHARED && SHARED_SELECTOR == null) {
             synchronized ( NioSelectorPool.class ) {
+            	//SHARED_SELECTOR maybe have bean initialized by other thread
                 if ( SHARED_SELECTOR == null )  {
                     SHARED_SELECTOR = Selector.open();
                     log.info("Using a shared selector for servlet write/read");
