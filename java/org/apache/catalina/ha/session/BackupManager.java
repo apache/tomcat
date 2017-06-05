@@ -200,6 +200,14 @@ public class BackupManager extends ClusterManagerBase
         this.mapSendOptions = mapSendOptions;
     }
 
+    public void setMapSendOptions(String mapSendOptions) {
+
+        int value = Channel.parseChannelSendOptions(mapSendOptions);
+        if (value > 0) {
+            this.setMapSendOptions(value);
+        }
+    }
+
     public int getMapSendOptions() {
         return mapSendOptions;
     }
