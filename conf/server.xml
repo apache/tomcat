@@ -18,6 +18,16 @@
 <!-- Note:  A "Server" is not itself a "Container", so you may not
      define subcomponents such as "Valves" at this level.
      Documentation at /docs/config/server.html
+     Note: the "port" attribute is the TCP/IP port number on which this 
+     server waits for a shutdown command. Set to -1 to disable the 
+     shutdown port. Disabling the shutdown port works well when Tomcat 
+     is started using Apache Commons Daemon (running as a service on 
+     Windows or with jsvc on un*xes). It cannot be used when running 
+     Tomcat with the standard shell scripts though, as it will prevent 
+     shutdown.bat|.sh and catalina.bat|.sh from stopping it gracefully.
+     Note: the "shutdown" attribute is the ommand string that must be 
+     received via a TCP/IP connection to the specified port number, 
+     in order to shut down Tomcat.
  -->
 <Server port="8005" shutdown="SHUTDOWN">
   <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
