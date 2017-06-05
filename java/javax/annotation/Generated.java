@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @since Common Annotations 1.0
+ * @since Common Annotations 1.0  
  */
 @Documented
 @Target({ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR,
