@@ -378,7 +378,7 @@ public interface Channel {
      * @param opt The name of the option
      * @return
      */
-    public static int getOptionValue(String opt){
+    public static int getSendOptionValue(String opt){
 
         switch (opt){
 
@@ -415,7 +415,7 @@ public interface Channel {
      * @param input A comma separated list of options, e.g. "async,multicast"
      * @return
      */
-    public static int parseChannelSendOptions(String input){
+    public static int parseSendOptions(String input){
 
         try {
             return Integer.parseInt(input);
@@ -428,7 +428,7 @@ public interface Channel {
 
         int result = 0;
         for (String opt : options) {
-            result |= getOptionValue(opt);
+            result |= getSendOptionValue(opt);
         }
 
         return result;
