@@ -76,6 +76,11 @@
         required for the correct detection of JSP modifications when the JSP is
         packaged in a WAR file. (markt)
       </fix>
+      <fix>
+        Improve the <code>SSLValve</code> so it is able to handle client
+        certificate headers from Nginx. Based on a patch by Lucas Ventura Carro.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -119,54 +119,66 @@ public class SSLValve extends ValveBase {
         }
         return strcert0;
     }
-    @Override
-    public void invoke(Request request, Response response)
-        throws IOException, ServletException {
 
-        /* mod_header converts the '\n' into ' ' so we have to rebuild the client certificate */
-        String strcert0 = mygetHeader(request, sslClientCertHeader);
-        if (strcert0 != null && strcert0.length()>28) {
-            String strcert1 = strcert0.replace(' ', '\n');
-            String strcert2 = strcert1.substring(28, strcert1.length()-26);
-            String strcert3 = "-----BEGIN CERTIFICATE-----\n";
-            String strcert4 = strcert3.concat(strcert2);
-            String strcerts = strcert4.concat("\n-----END CERTIFICATE-----\n");
-            // ByteArrayInputStream bais = new ByteArrayInputStream(strcerts.getBytes("UTF-8"));
-            ByteArrayInputStream bais = new ByteArrayInputStream(
-                    strcerts.getBytes(StandardCharsets.ISO_8859_1));
-            X509Certificate jsseCerts[] = null;
-            String providerName = (String) request.getConnector().getProperty(
-                    "clientCertProvider");
-            try {
-                CertificateFactory cf;
-                if (providerName == null) {
-                    cf = CertificateFactory.getInstance("X.509");
-                } else {
-                    cf = CertificateFactory.getInstance("X.509", providerName);
+
+    @Override
+    public void invoke(Request request, Response response) throws IOException, ServletException {
+        /*
+         * Known behaviours of reverse proxies that are handled by the
+         * processing below:
+         * - mod_header converts the '\n' into ' '
+         * - nginx converts the '\n' into multiple ' '
+         *
+         * The code assumes that the trimmed header value starts with
+         * '-----BEGIN CERTIFICATE-----' and ends with
+         * '-----END CERTIFICATE-----'.
+         *
+         * Note: As long as the BEGIN marker and the rest of the content are on
+         *       separate lines, the CertificateFactory is tolerant of any
+         *       additional whitespace.
+         */
+        String headerValue = mygetHeader(request, sslClientCertHeader);
+        if (headerValue != null) {
+            headerValue = headerValue.trim();
+            if (headerValue.length() > 27) {
+                String body = headerValue.substring(27);
+                String header = "-----BEGIN CERTIFICATE-----\n";
+                String strcerts = header.concat(body);
+                ByteArrayInputStream bais = new ByteArrayInputStream(
+                        strcerts.getBytes(StandardCharsets.ISO_8859_1));
+                X509Certificate jsseCerts[] = null;
+                String providerName = (String) request.getConnector().getProperty(
+                        "clientCertProvider");
+                try {
+                    CertificateFactory cf;
+                    if (providerName == null) {
+                        cf = CertificateFactory.getInstance("X.509");
+                    } else {
+                        cf = CertificateFactory.getInstance("X.509", providerName);
+                    }
+                    X509Certificate cert = (X509Certificate) cf.generateCertificate(bais);
+                    jsseCerts = new X509Certificate[1];
+                    jsseCerts[0] = cert;
+                } catch (java.security.cert.CertificateException e) {
+                    log.warn(sm.getString("sslValve.certError", strcerts), e);
+                } catch (NoSuchProviderException e) {
+                    log.error(sm.getString(
+                            "sslValve.invalidProvider", providerName), e);
                 }
-                X509Certificate cert = (X509Certificate) cf.generateCertificate(bais);
-                jsseCerts = new X509Certificate[1];
-                jsseCerts[0] = cert;
-            } catch (java.security.cert.CertificateException e) {
-                log.warn(sm.getString("sslValve.certError", strcerts), e);
-            } catch (NoSuchProviderException e) {
-                log.error(sm.getString(
-                        "sslValve.invalidProvider", providerName), e);
+                request.setAttribute(Globals.CERTIFICATES_ATTR, jsseCerts);
             }
-            request.setAttribute(Globals.CERTIFICATES_ATTR, jsseCerts);
         }
-        strcert0 = mygetHeader(request, sslCipherHeader);
-        if (strcert0 != null) {
-            request.setAttribute(Globals.CIPHER_SUITE_ATTR, strcert0);
+        headerValue = mygetHeader(request, sslCipherHeader);
+        if (headerValue != null) {
+            request.setAttribute(Globals.CIPHER_SUITE_ATTR, headerValue);
         }
-        strcert0 = mygetHeader(request, sslSessionIdHeader);
-        if (strcert0 != null) {
-            request.setAttribute(Globals.SSL_SESSION_ID_ATTR, strcert0);
+        headerValue = mygetHeader(request, sslSessionIdHeader);
+        if (headerValue != null) {
+            request.setAttribute(Globals.SSL_SESSION_ID_ATTR, headerValue);
         }
-        strcert0 = mygetHeader(request, sslCipherUserKeySizeHeader);
-        if (strcert0 != null) {
-            request.setAttribute(Globals.KEY_SIZE_ATTR,
-                    Integer.valueOf(strcert0));
+        headerValue = mygetHeader(request, sslCipherUserKeySizeHeader);
+        if (headerValue != null) {
+            request.setAttribute(Globals.KEY_SIZE_ATTR, Integer.valueOf(headerValue));
         }
         getNext().invoke(request, response);
     }
