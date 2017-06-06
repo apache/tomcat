@@ -98,8 +98,8 @@ public interface Options {
     public boolean isSmapDumped();
 
     /**
-     * @return <code>true</code> to trim white spaces between
-     *  directives or actions.
+     * @return <code>true</code> to remove template text that consists entirely
+     *         of whitespace
      */
     public boolean getTrimSpaces();
 

@@ -232,8 +232,8 @@
   <!--   suppressSmap        Should the generation of SMAP info for JSR45   -->
   <!--                       debugging be suppressed?  [false]              -->
   <!--                                                                      -->
-  <!--   trimSpaces          Should white spaces in template text between   -->
-  <!--                       actions or directives be trimmed?  [false]     -->
+  <!--   trimSpaces          Should template text that consists entirely of -->
+  <!--                       whitespace be removed from the output? [false] -->
   <!--                                                                      -->
   <!--   xpoweredBy          Determines whether X-Powered-By response       -->
   <!--                       header is added by generated servlet.  [false] -->
