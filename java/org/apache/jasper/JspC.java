@@ -167,7 +167,7 @@ public class JspC extends Task implements Options {
 
     protected String classPath = null;
     protected ClassLoader loader = null;
-    protected boolean trimSpaces = false;
+    protected TrimSpacesOption trimSpaces = TrimSpacesOption.FALSE;
     protected boolean genStringAsCharArray = false;
     protected boolean validateTld;
     protected boolean validateXml;
@@ -348,7 +348,13 @@ public class JspC extends Task implements Options {
             } else if (tok.equals(SWITCH_XPOWERED_BY)) {
                 xpoweredBy = true;
             } else if (tok.equals(SWITCH_TRIM_SPACES)) {
-                setTrimSpaces(true);
+                tok = nextArg();
+                if (TrimSpacesOption.SINGLE.toString().equalsIgnoreCase(tok)) {
+                    setTrimSpaces(TrimSpacesOption.SINGLE);
+                } else {
+                    setTrimSpaces(TrimSpacesOption.TRUE);
+                    argPos--;
+                }
             } else if (tok.equals(SWITCH_CACHE)) {
                 tok = nextArg();
                 if ("false".equals(tok)) {
@@ -429,22 +435,23 @@ public class JspC extends Task implements Options {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public boolean getTrimSpaces() {
+    public TrimSpacesOption getTrimSpaces() {
         return trimSpaces;
     }
 
+    public void setTrimSpaces(TrimSpacesOption trimSpaces) {
+        this.trimSpaces = trimSpaces;
+    }
+
     /**
-     * Sets the option to remove template text that consists entirely of
-     * whitespace.
+     * Sets the option to control handling of template text that consists
+     * entirely of whitespace.
      *
      * @param ts New value
      */
-    public void setTrimSpaces(boolean ts) {
-        this.trimSpaces = ts;
+    public void setTrimSpaces(String ts) {
+        this.trimSpaces = TrimSpacesOption.valueOf(ts);
     }
 
     /**

@@ -192,8 +192,11 @@ debugging be suppressed? <code>true</code> or <code>false</code>, default
 <code>false</code>.</li>
 
 <li><strong>trimSpaces</strong> - Should template text that consists entirely of
-whitespace be removed? <code>true</code> or <code>false</code>, default
-<code>false</code>.</li>
+whitespace be removed from the output (<code>true</code>), replaced with a
+single space (<code>single</code>) or left unchanged (<code>false</code>)? Note
+that if a JSP page or tag file specifies a <code>trimDirectiveWhitespaces</code>
+value of <code>true</code>, that will take precedence over this configuration
+setting for that page/tag. Default <code>false</code>.</li>
 
 <li><strong>xpoweredBy</strong> - Determines whether X-Powered-By response
 header is added by generated servlet. <code>true</code> or <code>false</code>,

@@ -101,6 +101,12 @@
         <bug>44787</bug>: Improve error message when JSP compiler configuration
         options are not valid. (markt)
       </fix>
+      <add>
+        <bug>45931</bug>: Extend Jasper's <code>timeSpaces</code> option to add
+        support for <code>single</code> which replaces template text that
+        consists entirely of whitespace with a single space character. Based on
+        a patch by Meetesh Karia. (markt)
+      </add>
       <fix>
         <bug>53011</bug>: When pre-compiling with JspC, report all compilation
         errors rather than stopping after the first error. A new option

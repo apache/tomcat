@@ -63,9 +63,9 @@ public final class EmbeddedServletOptions implements Options {
     private boolean keepGenerated = true;
 
     /**
-     * Should template text that consists entirely of whitespace be removed?
+     * How should template text that consists entirely of whitespace be handled?
      */
-    private boolean trimSpaces = false;
+    private TrimSpacesOption trimSpaces = TrimSpacesOption.FALSE;
 
     /**
      * Determines whether tag handler pooling is enabled.
@@ -238,11 +238,8 @@ public final class EmbeddedServletOptions implements Options {
         return keepGenerated;
     }
 
-    /**
-     * Should template text that consists entirely of whitespace be removed?
-     */
     @Override
-    public boolean getTrimSpaces() {
+    public TrimSpacesOption getTrimSpaces() {
         return trimSpaces;
     }
 
@@ -499,13 +496,11 @@ public final class EmbeddedServletOptions implements Options {
 
         String trimsp = config.getInitParameter("trimSpaces");
         if (trimsp != null) {
-            if (trimsp.equalsIgnoreCase("true")) {
-                trimSpaces = true;
-            } else if (trimsp.equalsIgnoreCase("false")) {
-                trimSpaces = false;
-            } else {
+            try {
+                trimSpaces = TrimSpacesOption.valueOf(trimsp.toUpperCase());
+            } catch (IllegalArgumentException iae) {
                 if (log.isWarnEnabled()) {
-                    log.warn(Localizer.getMessage("jsp.warning.trimspaces"));
+                    log.warn(Localizer.getMessage("jsp.warning.trimspaces"), iae);
                 }
             }
         }

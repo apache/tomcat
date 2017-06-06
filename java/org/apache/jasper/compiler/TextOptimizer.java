@@ -18,6 +18,7 @@ package org.apache.jasper.compiler;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.Options;
+import org.apache.jasper.TrimSpacesOption;
 
 /**
  */
@@ -29,6 +30,7 @@ public class TextOptimizer {
     private static class TextCatVisitor extends Node.Visitor {
 
         private static final String EMPTY_TEXT = "";
+        private static final String SINGLE_SPACE = " ";
 
         private final Options options;
         private final PageInfo pageInfo;
@@ -81,10 +83,15 @@ public class TextOptimizer {
 
         @Override
         public void visit(Node.TemplateText n) throws JasperException {
-            if ((options.getTrimSpaces() || pageInfo.isTrimDirectiveWhitespaces())
-                    && n.isAllSpace()) {
-                n.setText(EMPTY_TEXT);
-                return;
+            if (n.isAllSpace()) {
+                if ((options.getTrimSpaces() == TrimSpacesOption.TRUE ||
+                        pageInfo.isTrimDirectiveWhitespaces())) {
+                    n.setText(EMPTY_TEXT);
+                    return;
+                } else if (options.getTrimSpaces() == TrimSpacesOption.SINGLE) {
+                    n.setText(SINGLE_SPACE);
+                    return;
+                }
             }
 
             if (textNodeCount++ == 0) {

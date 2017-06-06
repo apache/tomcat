@@ -233,7 +233,13 @@
   <!--                       debugging be suppressed?  [false]              -->
   <!--                                                                      -->
   <!--   trimSpaces          Should template text that consists entirely of -->
-  <!--                       whitespace be removed from the output? [false] -->
+  <!--                       whitespace be removed from the output (true),  -->
+  <!--                       replaced with a single space (single) or left  -->
+  <!--                       unchanged (false)? Note that if a JSP page or  -->
+  <!--                       tag file specifies a trimDirectiveWhitespaces  -->
+  <!--                       value of true, that will take precedence over  -->
+  <!--                       this configuration setting for that page/tag.  -->
+  <!--                       [false]                                        -->
   <!--                                                                      -->
   <!--   xpoweredBy          Determines whether X-Powered-By response       -->
   <!--                       header is added by generated servlet.  [false] -->
