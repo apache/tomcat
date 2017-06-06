@@ -118,6 +118,22 @@
         flag. The default is false.
       </attribute>
 
+      <attribute name="jmxEnabled" required="false">
+        Flag whether the channel components register with JMX or not.
+        The default value is true.
+      </attribute>
+
+      <attribute name="jmxDomain" required="false">
+        if <code>jmxEnabled</code> set to true, specifies the jmx domain which
+        this channel should be registered. The ClusterChannel is used as the
+        default value.
+      </attribute>
+
+      <attribute name="jmxPrefix" required="false">
+        if <code>jmxEnabled</code> set to true, specifies the jmx prefix which
+        will be used with channel ObjectName.
+      </attribute>
+
     </attributes>
 
   </subsection>

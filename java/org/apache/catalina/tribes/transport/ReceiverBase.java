@@ -23,14 +23,18 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.management.ObjectName;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.ChannelReceiver;
 import org.apache.catalina.tribes.MessageListener;
 import org.apache.catalina.tribes.io.ListenCallback;
+import org.apache.catalina.tribes.jmx.JmxRegistry;
 import org.apache.catalina.tribes.util.ExecutorFactory;
 import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
@@ -82,6 +86,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private ExecutorService executor;
     private Channel channel;
 
+    /**
+     * the ObjectName of this Receiver.
+     */
+    private ObjectName oname = null;
+
     public ReceiverBase() {
     }
 
@@ -94,12 +103,20 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
             TaskThreadFactory tf = new TaskThreadFactory("Tribes-Task-Receiver" + channelName + "-");
             executor = ExecutorFactory.newThreadPool(minThreads, maxThreads, maxIdleTime, TimeUnit.MILLISECONDS, tf);
         }
+        // register jmx
+        JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+        if (jmxRegistry != null) this.oname = jmxRegistry.registerJmx(",component=Receiver", this);
     }
 
     @Override
     public void stop() {
         if ( executor != null ) executor.shutdownNow();//ignore left overs
         executor = null;
+        if (oname != null) {
+            JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+            if (jmxRegistry != null) jmxRegistry.unregisterJmx(oname);
+            oname = null;
+        }
         channel = null;
     }
 
@@ -498,6 +515,55 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     @Override
     public void setChannel(Channel channel) {
         this.channel = channel;
+    }
+
+    // ---------------------------------------------- stats of the thread pool
+    /**
+     * Return the current number of threads that are managed by the pool.
+     * @return the current number of threads that are managed by the pool
+     */
+    public int getPoolSize() {
+        if (executor instanceof ThreadPoolExecutor) {
+            return ((ThreadPoolExecutor) executor).getPoolSize();
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * Return the current number of threads that are in use.
+     * @return the current number of threads that are in use
+     */
+    public int getActiveCount() {
+        if (executor instanceof ThreadPoolExecutor) {
+            return ((ThreadPoolExecutor) executor).getActiveCount();
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * Return the total number of tasks that have ever been scheduled for execution by the pool.
+     * @return the total number of tasks that have ever been scheduled for execution by the pool
+     */
+    public long getTaskCount() {
+        if (executor instanceof ThreadPoolExecutor) {
+            return ((ThreadPoolExecutor) executor).getTaskCount();
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * Return the total number of tasks that have completed execution by the pool.
+     * @return the total number of tasks that have completed execution by the pool
+     */
+    public long getCompletedTaskCount() {
+        if (executor instanceof ThreadPoolExecutor) {
+            return ((ThreadPoolExecutor) executor).getCompletedTaskCount();
+        } else {
+            return -1;
+        }
     }
 
     // ---------------------------------------------- ThreadFactory Inner Class

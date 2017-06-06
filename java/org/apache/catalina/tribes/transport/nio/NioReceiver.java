@@ -42,7 +42,7 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-public class NioReceiver extends ReceiverBase implements Runnable {
+public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMBean {
 
     private static final Log log = LogFactory.getLog(NioReceiver.class);
 

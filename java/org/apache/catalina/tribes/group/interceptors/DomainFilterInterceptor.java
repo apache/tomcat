@@ -35,7 +35,9 @@ import org.apache.juli.logging.LogFactory;
  *
  * @version 1.0
  */
-public class DomainFilterInterceptor extends ChannelInterceptorBase {
+public class DomainFilterInterceptor extends ChannelInterceptorBase
+        implements DomainFilterInterceptorMBean {
+
     private static final Log log = LogFactory.getLog(DomainFilterInterceptor.class);
     protected static final StringManager sm = StringManager.getManager(DomainFilterInterceptor.class);
     protected volatile Membership membership = null;
@@ -115,6 +117,7 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
 
     }
 
+    @Override
     public byte[] getDomain() {
         return domain;
     }
@@ -131,10 +134,12 @@ public class DomainFilterInterceptor extends ChannelInterceptorBase {
             setDomain(org.apache.catalina.tribes.util.Arrays.convert(domain));
     }
 
+    @Override
     public int getLogInterval() {
         return logInterval;
     }
 
+    @Override
     public void setLogInterval(int logInterval) {
         this.logInterval = logInterval;
     }

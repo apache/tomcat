@@ -17,6 +17,7 @@
 package org.apache.catalina.tribes.group.interceptors;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -40,7 +41,8 @@ import org.apache.juli.logging.LogFactory;
  * <code>Channel.SEND_OPTIONS_ASYNCHRONOUS</code> flag to be set, if it is, it
  * will queue the message for delivery and immediately return to the sender.
  */
-public class MessageDispatchInterceptor extends ChannelInterceptorBase {
+public class MessageDispatchInterceptor extends ChannelInterceptorBase
+        implements MessageDispatchInterceptorMBean {
 
     private static final Log log = LogFactory.getLog(MessageDispatchInterceptor.class);
     protected static final StringManager sm =
@@ -144,7 +146,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase {
         this.useDeepClone = useDeepClone;
     }
 
-
+    @Override
     public long getMaxQueueSize() {
         return maxQueueSize;
     }
@@ -154,7 +156,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase {
         return useDeepClone;
     }
 
-
+    @Override
     public long getCurrentSize() {
         return currentSize.get();
     }
@@ -170,16 +172,17 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase {
         return value;
     }
 
-
+    @Override
     public long getKeepAliveTime() {
         return keepAliveTime;
     }
 
-
+    @Override
     public int getMaxSpareThreads() {
         return maxSpareThreads;
     }
 
+    @Override
     public int getMaxThreads() {
         return maxThreads;
     }
@@ -199,12 +202,12 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase {
         this.maxThreads = maxThreads;
     }
 
-
+    @Override
     public boolean isAlwaysSend() {
         return alwaysSend;
     }
 
-
+    @Override
     public void setAlwaysSend(boolean alwaysSend) {
         this.alwaysSend = alwaysSend;
     }
@@ -274,6 +277,59 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase {
             }
         } finally {
             addAndGetCurrentSize(-msg.getMessage().getLength());
+        }
+    }
+
+    // ---------------------------------------------- stats of the thread pool
+    /**
+     * Return the current number of threads that are managed by the pool.
+     * @return the current number of threads that are managed by the pool
+     */
+    @Override
+    public int getPoolSize() {
+        if (executor instanceof ThreadPoolExecutor) {
+            return ((ThreadPoolExecutor) executor).getPoolSize();
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * Return the current number of threads that are in use.
+     * @return the current number of threads that are in use
+     */
+    @Override
+    public int getActiveCount() {
+        if (executor instanceof ThreadPoolExecutor) {
+            return ((ThreadPoolExecutor) executor).getActiveCount();
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * Return the total number of tasks that have ever been scheduled for execution by the pool.
+     * @return the total number of tasks that have ever been scheduled for execution by the pool
+     */
+    @Override
+    public long getTaskCount() {
+        if (executor instanceof ThreadPoolExecutor) {
+            return ((ThreadPoolExecutor) executor).getTaskCount();
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * Return the total number of tasks that have completed execution by the pool.
+     * @return the total number of tasks that have completed execution by the pool
+     */
+    @Override
+    public long getCompletedTaskCount() {
+        if (executor instanceof ThreadPoolExecutor) {
+            return ((ThreadPoolExecutor) executor).getCompletedTaskCount();
+        } else {
+            return -1;
         }
     }
 }

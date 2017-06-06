@@ -40,7 +40,7 @@ import org.apache.juli.logging.LogFactory;
  * @version 1.0
  */
 
-public class TcpPingInterceptor extends ChannelInterceptorBase {
+public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPingInterceptorMBean {
 
     private static final Log log = LogFactory.getLog(TcpPingInterceptor.class);
     protected static final StringManager sm = StringManager.getManager(TcpPingInterceptor.class);
@@ -103,6 +103,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
         if (!getUseThread()) sendPing();
     }
 
+    @Override
     public long getInterval() {
         return interval;
     }
@@ -119,6 +120,7 @@ public class TcpPingInterceptor extends ChannelInterceptorBase {
         this.staticOnly = staticOnly;
     }
 
+    @Override
     public boolean getUseThread() {
         return useThread;
     }

@@ -32,7 +32,8 @@ import org.apache.catalina.tribes.util.StringManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-public class StaticMembershipInterceptor extends ChannelInterceptorBase {
+public class StaticMembershipInterceptor extends ChannelInterceptorBase
+        implements StaticMembershipInterceptorMBean {
 
     private static final Log log = LogFactory.getLog(StaticMembershipInterceptor.class);
     protected static final StringManager sm =

@@ -16,11 +16,14 @@
  */
 package org.apache.catalina.tribes.transport;
 
+import javax.management.ObjectName;
+
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.ChannelSender;
 import org.apache.catalina.tribes.Member;
+import org.apache.catalina.tribes.jmx.JmxRegistry;
 import org.apache.catalina.tribes.transport.nio.PooledParallelSender;
 
 /**
@@ -31,6 +34,11 @@ import org.apache.catalina.tribes.transport.nio.PooledParallelSender;
 public class ReplicationTransmitter implements ChannelSender {
 
     private Channel channel;
+
+    /**
+     * the ObjectName of this Sender.
+     */
+    private ObjectName oname = null;
 
     public ReplicationTransmitter() {
     }
@@ -66,6 +74,9 @@ public class ReplicationTransmitter implements ChannelSender {
     @Override
     public void start() throws java.io.IOException {
         getTransport().connect();
+        // register jmx
+        JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
+        if (jmxRegistry != null) this.oname = jmxRegistry.registerJmx(",component=Sender", transport);
     }
 
     /**
@@ -76,6 +87,10 @@ public class ReplicationTransmitter implements ChannelSender {
     @Override
     public synchronized void stop() {
         getTransport().disconnect();
+        if (oname != null) {
+            JmxRegistry.getRegistry(channel).unregisterJmx(oname);
+            oname = null;
+        }
         channel = null;
     }
 

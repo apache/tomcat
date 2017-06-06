@@ -59,7 +59,7 @@ import org.apache.juli.logging.LogFactory;
  *
  * @version 1.0
  */
-public class TcpFailureDetector extends ChannelInterceptorBase {
+public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFailureDetectorMBean {
 
     private static final Log log = LogFactory.getLog(TcpFailureDetector.class);
     protected static final StringManager sm = StringManager.getManager(TcpFailureDetector.class);
@@ -218,6 +218,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         checkMembers(false);
     }
 
+    @Override
     public void checkMembers(boolean checkAll) {
         try {
             if (membership == null) setupMembership();
@@ -360,42 +361,52 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         return false;
     }
 
+    @Override
     public long getReadTestTimeout() {
         return readTestTimeout;
     }
 
+    @Override
     public boolean getPerformSendTest() {
         return performSendTest;
     }
 
+    @Override
     public boolean getPerformReadTest() {
         return performReadTest;
     }
 
+    @Override
     public long getConnectTimeout() {
         return connectTimeout;
     }
 
+    @Override
     public int getRemoveSuspectsTimeout() {
         return removeSuspectsTimeout;
     }
 
+    @Override
     public void setPerformReadTest(boolean performReadTest) {
         this.performReadTest = performReadTest;
     }
 
+    @Override
     public void setPerformSendTest(boolean performSendTest) {
         this.performSendTest = performSendTest;
     }
 
+    @Override
     public void setReadTestTimeout(long readTestTimeout) {
         this.readTestTimeout = readTestTimeout;
     }
 
+    @Override
     public void setConnectTimeout(long connectTimeout) {
         this.connectTimeout = connectTimeout;
     }
 
+    @Override
     public void setRemoveSuspectsTimeout(int removeSuspectsTimeout) {
         this.removeSuspectsTimeout = removeSuspectsTimeout;
     }
