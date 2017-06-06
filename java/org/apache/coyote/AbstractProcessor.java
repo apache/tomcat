@@ -80,7 +80,10 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected void setErrorState(ErrorState errorState, Throwable t) {
         boolean blockIo = this.errorState.isIoAllowed() && !errorState.isIoAllowed();
         this.errorState = this.errorState.getMostSevere(errorState);
-        if (response.getStatus() < 400) {
+        // Don't change the status code for IOException since that is almost
+        // certainly a client disconnect in which case it is preferable to keep
+        // the original status code http://markmail.org/message/4cxpwmxhtgnrwh7n
+        if (response.getStatus() < 400 && !(t instanceof IOException)) {
             response.setStatus(500);
         }
         if (t != null) {

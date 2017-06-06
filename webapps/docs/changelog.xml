@@ -93,6 +93,11 @@
         <bug>61120</bug>: Do not ignore path parameters when processing HTTP/2
         requests. (markt)
       </fix>
+      <fix>
+        Revert a change introduced in the fix for bug <bug>60718</bug> that
+        changed the status code recorded in the access log when the client
+        dropped the connection from 200 to 500. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
