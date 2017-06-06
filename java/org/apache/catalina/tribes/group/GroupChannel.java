@@ -643,6 +643,7 @@ public class GroupChannel extends ChannelInterceptorBase
      * @see #setOptionCheck(boolean)
      * @return boolean
      */
+    @Override
     public boolean getOptionCheck() {
         return optionCheck;
     }
@@ -651,6 +652,7 @@ public class GroupChannel extends ChannelInterceptorBase
      * @see #setHeartbeat(boolean)
      * @return boolean
      */
+    @Override
     public boolean getHeartbeat() {
         return heartbeat;
     }
@@ -660,6 +662,7 @@ public class GroupChannel extends ChannelInterceptorBase
      * sleep in between invocations of <code>Channel.heartbeat()</code>
      * @return long
      */
+    @Override
     public long getHeartbeatSleeptime() {
         return heartbeatSleeptime;
     }

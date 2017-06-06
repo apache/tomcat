@@ -136,6 +136,7 @@ public class McastService
     /**
      * @return the local member name
      */
+    @Override
     public String getLocalMemberName() {
         return localMember.toString() ;
     }
@@ -558,6 +559,7 @@ public class McastService
         return payload;
     }
 
+    @Override
     public byte[] getDomain() {
         return domain;
     }
