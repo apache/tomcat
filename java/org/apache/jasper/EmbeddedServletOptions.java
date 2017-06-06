@@ -63,7 +63,7 @@ public final class EmbeddedServletOptions implements Options {
     private boolean keepGenerated = true;
     
     /**
-     * Should white spaces between directives or actions be trimmed?
+     * Should template text that consists entirely of whitespace be removed?
      */
     private boolean trimSpaces = false;
     
@@ -233,7 +233,7 @@ public final class EmbeddedServletOptions implements Options {
     }
     
     /**
-     * Should white spaces between directives or actions be trimmed?
+     * Should template text that consists entirely of whitespace be removed?
      */
     @Override
     public boolean getTrimSpaces() {
