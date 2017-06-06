@@ -438,7 +438,9 @@ public class JspC extends Task implements Options {
     }
 
     /**
-     * Sets the option to trim white spaces between directives or actions.
+     * Sets the option to remove template text that consists entirely of
+     * whitespace.
+     *
      * @param ts New value
      */
     public void setTrimSpaces(boolean ts) {
