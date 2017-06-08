@@ -212,6 +212,14 @@ public class BackupManager extends ClusterManagerBase
         return mapSendOptions;
     }
 
+    /**
+     * returns the SendOptions as a comma separated list of names
+     * @return
+     */
+    public String getMapSendOptionsName(){
+        return Channel.getSendOptionsAsString(mapSendOptions);
+    }
+
     public void setRpcTimeout(long rpcTimeout) {
         this.rpcTimeout = rpcTimeout;
     }

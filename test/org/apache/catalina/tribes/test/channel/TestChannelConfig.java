@@ -51,6 +51,15 @@ public class TestChannelConfig {
     }
 
     @Test
+    public void testStringRepresentationOfIntValue() {
+
+        String options = "multicast, async";
+        SimpleTcpCluster cluster = new SimpleTcpCluster();
+        cluster.setChannelSendOptions(options);
+        assertEquals(options, cluster.getChannelSendOptionsName());
+    }
+
+    @Test
     public void testStringInputForMapSendOptions() {
 
         BackupManager manager = new BackupManager();

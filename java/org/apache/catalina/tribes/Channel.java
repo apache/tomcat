@@ -20,6 +20,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 import java.io.Serializable;
+import java.util.StringJoiner;
 
 /**
  * Channel interface<br>
@@ -376,7 +377,7 @@ public interface Channel {
      * Translates the name of an option to its integer value.  Valid option names are "asynchronous" (alias "async"),
      * "byte_message" (alias "byte"), "multicast", "secure", "synchronized_ack" (alias "sync"), "udp", "use_ack"
      * @param opt The name of the option
-     * @return
+     * @return the int value of the passed option name
      */
     public static int getSendOptionValue(String opt){
 
@@ -412,8 +413,8 @@ public interface Channel {
 
     /**
      * Translates a comma separated list of option names to their bitwise-ORd value
-     * @param input A comma separated list of options, e.g. "async,multicast"
-     * @return
+     * @param input A comma separated list of options, e.g. "async, multicast"
+     * @return a bitwise ORd value of the passed option names
      */
     public static int parseSendOptions(String input){
 
@@ -432,6 +433,29 @@ public interface Channel {
         }
 
         return result;
+    }
+
+
+    /**
+     * Translates an integer value of SendOptions to its human-friendly comma separated value list for use in JMX and such.
+     * @param input the int value of SendOptions
+     * @return the human-friendly string representation in a reverse order (i.e. the last option will be shown first)
+     */
+    public static String getSendOptionsAsString(int input){
+
+        // allOptionNames must be in order of the bits of the available options
+        final String[] allOptionNames = new String[]{ "byte", "use_ack", "sync", "async", "secure", "udp", "multicast" };
+
+        StringJoiner names = new StringJoiner(", ");
+        for (int bit=allOptionNames.length - 1; bit >= 0; bit--){
+
+            // if (2^bit & input) yields a positive value then the bit is set
+            if (((int)Math.pow(2, bit) & input) > 0){
+                names.add(allOptionNames[bit]);
+            }
+        }
+
+        return names.toString();
     }
 
 }
