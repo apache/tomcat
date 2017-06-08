@@ -28,6 +28,8 @@
     Manager lets you view, create and remove virtual hosts.
   </description>
 
+  <request-character-encoding>UTF-8</request-character-encoding>
+
   <servlet>
     <servlet-name>HostManager</servlet-name>
     <servlet-class>org.apache.catalina.manager.host.HostManagerServlet</servlet-class>
@@ -44,20 +46,6 @@
       <param-value>2</param-value>
     </init-param>
   </servlet>
-
-  <filter>
-    <filter-name>SetCharacterEncoding</filter-name>
-    <filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
-    <init-param>
-      <param-name>encoding</param-name>
-      <param-value>UTF-8</param-value>
-    </init-param>
-  </filter>
-
-  <filter-mapping>
-    <filter-name>SetCharacterEncoding</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
 
   <filter>
     <filter-name>CSRF</filter-name>

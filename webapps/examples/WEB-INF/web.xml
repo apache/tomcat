@@ -27,6 +27,8 @@
     </description>
     <display-name>Servlet and JSP Examples</display-name>
 
+    <request-character-encoding>UTF-8</request-character-encoding>
+
     <!-- Define example filters -->
     <filter>
         <filter-name>Timing Filter</filter-name>
@@ -40,21 +42,6 @@
     <filter>
         <filter-name>Request Dumper Filter</filter-name>
         <filter-class>org.apache.catalina.filters.RequestDumperFilter</filter-class>
-    </filter>
-
-    <!-- Example filter to set character encoding on each request -->
-    <filter>
-        <filter-name>Set Character Encoding</filter-name>
-        <filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
-        <async-supported>true</async-supported>
-        <init-param>
-            <param-name>encoding</param-name>
-            <param-value>UTF-8</param-value>
-        </init-param>
-        <init-param>
-            <param-name>ignore</param-name>
-            <param-value>false</param-value>
-        </init-param>
     </filter>
 
     <filter>
@@ -85,13 +72,6 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
     -->
-
-<!-- Example filter mapping to apply the "Set Character Encoding" filter
-     to *all* requests processed by this web application -->
-    <filter-mapping>
-        <filter-name>Set Character Encoding</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
 
 <!--
     <filter-mapping>
