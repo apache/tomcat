@@ -1072,9 +1072,9 @@ public class StandardWrapper extends ContainerBase
             processServletSecurityAnnotation(servlet.getClass());
 
             // Special handling for ContainerServlet instances
-            if ((servlet instanceof ContainerServlet) &&
-                    (isContainerProvidedServlet(servletClass) ||
-                            ((Context) getParent()).getPrivileged() )) {
+            // Note: The InstanceManager checks if the application is permitted
+            //       to load ContainerServlets
+            if (servlet instanceof ContainerServlet) {
                 ((ContainerServlet) servlet).setWrapper(this);
             }
 
@@ -1548,7 +1548,10 @@ public class StandardWrapper extends ContainerBase
      * server class loader.
      *
      * @param classname Name of the class to be checked
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9
      */
+    @Deprecated
     protected boolean isContainerProvidedServlet(String classname) {
 
         if (classname.startsWith("org.apache.catalina.")) {
