@@ -28,6 +28,8 @@
     Manager lets you view, load/unload/etc particular web applications.
   </description>
 
+  <request-character-encoding>UTF-8</request-character-encoding>
+
   <servlet>
     <servlet-name>Manager</servlet-name>
     <servlet-class>org.apache.catalina.manager.ManagerServlet</servlet-class>
@@ -88,20 +90,6 @@
     <servlet-name>HTMLManager</servlet-name>
     <url-pattern>/html/*</url-pattern>
   </servlet-mapping>
-
-  <filter>
-    <filter-name>SetCharacterEncoding</filter-name>
-    <filter-class>org.apache.catalina.filters.SetCharacterEncodingFilter</filter-class>
-    <init-param>
-      <param-name>encoding</param-name>
-      <param-value>UTF-8</param-value>
-    </init-param>
-  </filter>
-
-  <filter-mapping>
-    <filter-name>SetCharacterEncoding</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
 
   <filter>
     <filter-name>CSRF</filter-name>
