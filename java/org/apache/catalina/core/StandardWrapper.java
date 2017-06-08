@@ -1542,33 +1542,6 @@ public class StandardWrapper extends ContainerBase
     // -------------------------------------------------------- protected Methods
 
 
-    /**
-     * @return <code>true</code> if the specified class name represents a
-     * container provided servlet class that should be loaded by the
-     * server class loader.
-     *
-     * @param classname Name of the class to be checked
-     *
-     * @deprecated Unused. Will be removed in Tomcat 9
-     */
-    @Deprecated
-    protected boolean isContainerProvidedServlet(String classname) {
-
-        if (classname.startsWith("org.apache.catalina.")) {
-            return true;
-        }
-        try {
-            Class<?> clazz =
-                this.getClass().getClassLoader().loadClass(classname);
-            return ContainerServlet.class.isAssignableFrom(clazz);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            return false;
-        }
-
-    }
-
-
     protected Method[] getAllDeclaredMethods(Class<?> c) {
 
         if (c.equals(javax.servlet.http.HttpServlet.class)) {
