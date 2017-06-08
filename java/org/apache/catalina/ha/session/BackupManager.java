@@ -214,7 +214,7 @@ public class BackupManager extends ClusterManagerBase
 
     /**
      * returns the SendOptions as a comma separated list of names
-     * @return
+     * @return a comma separated list of the option names
      */
     public String getMapSendOptionsName(){
         return Channel.getSendOptionsAsString(mapSendOptions);

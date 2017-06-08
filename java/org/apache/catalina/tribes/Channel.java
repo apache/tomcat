@@ -435,7 +435,6 @@ public interface Channel {
         return result;
     }
 
-
     /**
      * Translates an integer value of SendOptions to its human-friendly comma separated value list for use in JMX and such.
      * @param input the int value of SendOptions
@@ -449,8 +448,8 @@ public interface Channel {
         StringJoiner names = new StringJoiner(", ");
         for (int bit=allOptionNames.length - 1; bit >= 0; bit--){
 
-            // if (2^bit & input) yields a positive value then the bit is set
-            if (((int)Math.pow(2, bit) & input) > 0){
+            // if the bit is set then add the name to the result
+            if (((1 << bit) & input) > 0){
                 names.add(allOptionNames[bit]);
             }
         }
