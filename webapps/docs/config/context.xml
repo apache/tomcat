@@ -763,7 +763,7 @@
         createSubContext(), destroySubContext() or close() will trigger a
         <code>javax.naming.OperationNotSupportedException</code> as required by
         section EE.5.3.4 of the Java EE specification. This exception can be
-        disabled by setting this attribute to true in which case any calls to
+        disabled by setting this attribute to false in which case any calls to
         modify the JNDI context will return <b>without</b> making any changes
         and methods that return values will return <code>null</code>. If not
         specified, the specification compliant default of <code>true</code> will
