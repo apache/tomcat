@@ -81,6 +81,11 @@
         certificate headers from Nginx. Based on a patch by Lucas Ventura Carro.
         (markt)
       </fix>
+      <fix>
+        <bug>61134</bug>: Do not use '[' and ']' symbols around substituted
+        text fragments when generating the default error pages. Patch provided
+        by Katya Todorova. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
