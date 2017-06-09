@@ -185,6 +185,10 @@
         <code>@EJB</code> annotation in the annotations API. Patch provided by
         Katya Todorova. (markt)
       </fix>
+      <fix>
+        Correct typo in Context Container Configuration Reference.
+        Patch provided by Katya Todorova. (violetagg)
+      </fix>
     </changelog>
   </subsection>
 </section>
