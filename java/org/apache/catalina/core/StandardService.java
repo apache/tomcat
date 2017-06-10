@@ -192,13 +192,22 @@ public class StandardService extends LifecycleMBeanBase implements Service {
 
 
     /**
-     * Set the <code>Server</code> with which we are associated (if any).
+     * Set the <code>Server</code> with which we are associated (if any), and updates the connectors' port numbers
+     * according to the server's <code>portOffset</code> if it is set.
      *
      * @param server The server that owns this Service
      */
     @Override
     public void setServer(Server server) {
+
         this.server = server;
+        int portOffset = server.getPortOffset();
+
+        if (portOffset > 0){
+            for (Connector connector : this.connectors){
+                connector.setPort(connector.getPort() + portOffset);
+            }
+        }
     }
 
 

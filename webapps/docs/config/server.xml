@@ -80,6 +80,18 @@
       to the specified port number, in order to shut down Tomcat.</p>
     </attribute>
 
+    <attribute name="portOffset" required="false">
+      <p>An optional integer value, which will offset the shutdown port number, as
+        well as the connectors port numbers for that server.  For example, setting
+        this option to 40000 in an instance with default port settings, i.e. 8005,
+        8009, and 8080, will offset these ports to 48005, 48009, and 48080, respectively.
+
+        <p>This is useful when running multiple instances of Tomcat, where different
+          port numbers are required for each listening address.  Setting
+          this one value will modify all of the port numbers instead of changing
+          them one by one.</p>
+    </attribute>
+
   </attributes>
 
   </subsection>

@@ -107,6 +107,10 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     private final NamingContextListener namingContextListener;
 
+    /**
+     * The base number off of which all of the port numbers are offset
+     */
+    private int portOffset = 0;
 
     /**
      * The port number on which we wait for shutdown commands.
@@ -258,16 +262,35 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
 
     /**
-     * Return the port number we listen to for shutdown commands.
+     * Returns the base number off of which all of the port numbers are offset
+     * @return the server's port offset value
      */
-    @Override
-    public int getPort() {
-        return this.port;
+    public int getPortOffset(){
+        return this.portOffset;
     }
 
 
     /**
-     * Set the port number we listen to for shutdown commands.
+     * Sets the base number off of which all of the port numbers are offset
+     * @param portOffset the new port offset value
+     */
+    public void setPortOffset(int portOffset){
+        this.portOffset = portOffset;
+    }
+
+
+    /**
+     * Return the port number we listen to for shutdown commands.
+     */
+    @Override
+    public int getPort() {
+        return this.port + this.portOffset;
+    }
+
+
+    /**
+     * Set the base port number we listen to for shutdown commands. The actual port number will be the port value plus
+     * the portBase value.
      *
      * @param port The new port number
      */

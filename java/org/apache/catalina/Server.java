@@ -71,6 +71,20 @@ public interface Server extends Lifecycle {
     public javax.naming.Context getGlobalNamingContext();
 
 
+
+    /**
+     * @return the server's port offset value
+     */
+    public int getPortOffset();
+
+
+    /**
+     * @param portOffset the new port offset value
+     */
+    public void setPortOffset(int portOffset);
+
+
+
     /**
      * @return the port number we listen to for shutdown commands.
      */
