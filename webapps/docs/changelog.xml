@@ -154,6 +154,13 @@
       <fix>
         Better document the meaning of the trimSpaces option for Jasper. (markt)
       </fix>
+      <fix>
+        <bug>61150</bug>: Configure the Manager and Host-Manager web
+        applications to permit serialization and deserialization of
+        CRSFPreventionFilter related session objects to avoid warning messages
+        and/or stack traces on web application stop and/or start when running
+        under a security manager. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
