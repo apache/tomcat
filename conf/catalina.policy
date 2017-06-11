@@ -194,7 +194,7 @@ grant {
 
 // The Manager application needs access to the following packages to support the
 // session display functionality. It also requires the custom Tomcat
-// DeployXmlPermission to enable the use of META_INF/context.xml
+// DeployXmlPermission to enable the use of META-INF/context.xml
 // These settings support the following configurations:
 // - default CATALINA_HOME == CATALINA_BASE
 // - CATALINA_HOME != CATALINA_BASE, per instance Manager in CATALINA_BASE
@@ -217,7 +217,7 @@ grant codeBase "file:${catalina.home}/webapps/manager/-" {
 };
 
 // The Host Manager application needs the custom Tomcat DeployXmlPermission to
-// enable the use of META_INF/context.xml
+// enable the use of META-INF/context.xml
 // These settings support the following configurations:
 // - default CATALINA_HOME == CATALINA_BASE
 // - CATALINA_HOME != CATALINA_BASE, per instance Host Manager in CATALINA_BASE

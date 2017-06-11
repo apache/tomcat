@@ -87,10 +87,10 @@
         by Katya Todorova. (violetagg)
       </fix>
       <fix>
-        <bug>61154</bug>: Allow the Manager and Host Manager web applciations to
+        <bug>61154</bug>: Allow the Manager and Host Manager web applications to
         start by default when running under a security manager. This was
         accomplished by adding a custom permission,
-        <code>org.apache.catalina.security.DeployXmlPermisasion</code>, that
+        <code>org.apache.catalina.security.DeployXmlPermission</code>, that
         permits an application to use a <code>META-INF/context.xml</code> file
         and then granting that permission to the Manager and Host Manager.
         (markt)
