@@ -778,7 +778,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
                     value.getClass().getName()).matches()) {
                 if (getWarnOnSessionAttributeFilterFailure() || log.isDebugEnabled()) {
                     String msg = sm.getString("managerBase.sessionAttributeValueClassNameFilter",
-                            name, value.getClass().getName(), sessionAttributeNamePattern);
+                            name, value.getClass().getName(), sessionAttributeValueClassNamePattern);
                     if (getWarnOnSessionAttributeFilterFailure()) {
                         log.warn(msg);
                     } else {
