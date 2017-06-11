@@ -74,28 +74,35 @@ import org.apache.tomcat.util.buf.UriUtil;
 /**
  * Minimal tomcat starter for embedding/unit tests.
  *
+ * <p>
  * Tomcat supports multiple styles of configuration and
  * startup - the most common and stable is server.xml-based,
  * implemented in org.apache.catalina.startup.Bootstrap.
  *
+ * <p>
  * This class is for use in apps that embed tomcat.
+ *
+ * <p>
  * Requirements:
+ * <ul>
+ *   <li>all tomcat classes and possibly servlets are in the classpath.
+ *      ( for example all is in one big jar, or in eclipse CP, or in
+ *        any other combination )</li>
  *
- * - all tomcat classes and possibly servlets are in the classpath.
- * ( for example all is in one big jar, or in eclipse CP, or in any other
- * combination )
+ *   <li>we need one temporary directory for work files</li>
  *
- * - we need one temporary directory for work files
+ *   <li>no config file is required. This class provides methods to
+ *       use if you have a webapp with a web.xml file, but it is
+ *       optional - you can use your own servlets.</li>
+ * </ul>
  *
- * - no config file is required. This class provides methods to
- * use if you have a webapp with a web.xml file, but it is
- * optional - you can use your own servlets.
- *
+ * <p>
  * There are a variety of 'add' methods to configure servlets and webapps. These
  * methods, by default, create a simple in-memory security realm and apply it.
  * If you need more complex security processing, you can define a subclass of
  * this class.
  *
+ * <p>
  * This class provides a set of convenience methods for configuring webapp
  * contexts, all overloads of the method <pre>addWebapp</pre>. These methods
  * create a webapp context, configure it, and then add it to a {@link Host}.
@@ -103,6 +110,7 @@ import org.apache.tomcat.util.buf.UriUtil;
  * listener that adds the standard DefaultServlet, JSP processing, and welcome
  * files.
  *
+ * <p>
  * In complex cases, you may prefer to use the ordinary Tomcat API to create
  * webapp contexts; for example, you might need to install a custom Loader
  * before the call to {@link Host#addChild(Container)}. To replicate the basic
@@ -110,16 +118,20 @@ import org.apache.tomcat.util.buf.UriUtil;
  * methods of this class: {@link #noDefaultWebXmlPath()} and
  * {@link #getDefaultWebXmlListener()}.
  *
+ * <p>
  * {@link #getDefaultRealm()} returns the simple security realm.
  *
+ * <p>
  * {@link #getDefaultWebXmlListener()} returns a {@link LifecycleListener} that
  * adds the standard DefaultServlet, JSP processing, and welcome files. If you
  * add this listener, you must prevent Tomcat from applying any standard global
  * web.xml with ...
  *
+ * <p>
  * {@link #noDefaultWebXmlPath()} returns a dummy pathname to configure to
  * prevent {@link ContextConfig} from trying to apply a global web.xml file.
  *
+ * <p>
  * This class provides a main() and few simple CLI arguments,
  * see setters for doc. It can be used for simple tests and
  * demo.
@@ -173,12 +185,15 @@ public class Tomcat {
      * Tomcat needs a directory for temp files. This should be the
      * first method called.
      *
+     * <p>
      * By default, if this method is not called, we use:
-     *  - system properties - catalina.base, catalina.home
-     *  - $HOME/tomcat.$PORT
+     * <ul>
+     *  <li>system properties - catalina.base, catalina.home</li>
+     *  <li>$PWD/tomcat.$PORT</li>
+     * </ul>
      * ( /tmp doesn't seem a good choice for security ).
      *
-     *
+     * <p>
      * TODO: better default ? Maybe current dir ?
      * TODO: disable work dir if not needed ( no jsp, etc ).
      */
@@ -220,24 +235,30 @@ public class Tomcat {
     /**
      * Add a context - programmatic mode, no web.xml used.
      *
+     * <p>
      * API calls equivalent with web.xml:
      *
-     * context-param
+     * <pre>{@code
+     *  // context-param
      *  ctx.addParameter("name", "value");
      *
      *
-     * error-page
-     *    ErrorPage ep = new ErrorPage();
-     *    ep.setErrorCode(500);
-     *    ep.setLocation("/error.html");
-     *    ctx.addErrorPage(ep);
+     *  // error-page
+     *  ErrorPage ep = new ErrorPage();
+     *  ep.setErrorCode(500);
+     *  ep.setLocation("/error.html");
+     *  ctx.addErrorPage(ep);
      *
-     * ctx.addMimeMapping("ext", "type");
+     *  ctx.addMimeMapping("ext", "type");
+     * }</pre>
      *
+     *
+     * <p>
      * Note: If you reload the Context, all your configuration will be lost. If
      * you need reload support, consider using a LifecycleListener to provide
      * your configuration.
      *
+     * <p>
      * TODO: add the rest
      *
      *  @param contextPath "" for root context.
@@ -252,14 +273,16 @@ public class Tomcat {
      * Equivalent with
      *  <servlet><servlet-name><servlet-class>.
      *
+     * <p>
      * In general it is better/faster to use the method that takes a
      * Servlet as param - this one can be used if the servlet is not
      * commonly used, and want to avoid loading all deps.
      * ( for example: jsp servlet )
      *
      * You can customize the returned servlet, ex:
-     *
+     *  <pre>
      *    wrapper.addInitParameter("name", "value");
+     *  </pre>
      *
      * @param contextPath   Context to add Servlet to
      * @param servletName   Servlet name (used in mappings)
@@ -398,6 +421,7 @@ public class Tomcat {
      * Get the default http connector. You can set more
      * parameters - the port is already initialized.
      *
+     * <p>
      * Alternatively, you can construct a Connector and set any params,
      * then call addConnector(Connector)
      *
@@ -918,6 +942,7 @@ public class Tomcat {
     /**
      * Fix startup sequence - required if you don't use web.xml.
      *
+     * <p>
      * The start() method in context will set 'configured' to false - and
      * expects a listener to set it back to true.
      */
