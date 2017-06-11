@@ -95,6 +95,11 @@
         and then granting that permission to the Manager and Host Manager.
         (markt)
       </fix>
+      <fix>
+        <bug>61173</bug>: Polish the javadoc for
+        <code>o.a.catalina.startup.Tomcat</code>. Patch provided by
+        peterhansson_se. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
