@@ -100,6 +100,13 @@
         <code>o.a.catalina.startup.Tomcat</code>. Patch provided by
         peterhansson_se. (violetagg)
       </fix>
+      <add>
+        A new configuration property <code>crawlerIps</code> is added to the
+        <code>o.a.catalina.valves.CrawlerSessionManagerValve</code>. Using this
+        property one can specify a regular expression that will be used to
+        identify crawlers based on their IP address. Based on a patch provided
+        by Tetradeus. (violetagg)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
