@@ -40,19 +40,14 @@ import org.apache.juli.logging.LogFactory;
  * users - regardless of whether or not they provide a session token with their
  * requests.
  */
-public class CrawlerSessionManagerValve extends ValveBase
-        implements HttpSessionBindingListener {
+public class CrawlerSessionManagerValve extends ValveBase implements HttpSessionBindingListener {
 
-    private static final Log log =
-        LogFactory.getLog(CrawlerSessionManagerValve.class);
+    private static final Log log = LogFactory.getLog(CrawlerSessionManagerValve.class);
 
-    private final Map<String,String> clientIpSessionId =
-            new ConcurrentHashMap<>();
-    private final Map<String,String> sessionIdClientIp =
-            new ConcurrentHashMap<>();
+    private final Map<String, String> clientIpSessionId = new ConcurrentHashMap<>();
+    private final Map<String, String> sessionIdClientIp = new ConcurrentHashMap<>();
 
-    private String crawlerUserAgents =
-        ".*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*";
+    private String crawlerUserAgents = ".*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*";
     private Pattern uaPattern = null;
     private int sessionInactiveInterval = 60;
 
@@ -109,7 +104,7 @@ public class CrawlerSessionManagerValve extends ValveBase
     }
 
 
-    public Map<String,String> getClientIpSessionId() {
+    public Map<String, String> getClientIpSessionId() {
         return clientIpSessionId;
     }
 
@@ -123,17 +118,15 @@ public class CrawlerSessionManagerValve extends ValveBase
 
 
     @Override
-    public void invoke(Request request, Response response) throws IOException,
-            ServletException {
+    public void invoke(Request request, Response response) throws IOException, ServletException {
 
         boolean isBot = false;
         String sessionId = null;
         String clientIp = null;
 
         if (log.isDebugEnabled()) {
-            log.debug(request.hashCode() + ": ClientIp=" +
-                    request.getRemoteAddr() + ", RequestedSessionId=" +
-                    request.getRequestedSessionId());
+            log.debug(request.hashCode() + ": ClientIp=" + request.getRemoteAddr()
+                    + ", RequestedSessionId=" + request.getRequestedSessionId());
         }
 
         // If the incoming request has a valid session ID, no action is required
@@ -157,8 +150,7 @@ public class CrawlerSessionManagerValve extends ValveBase
                     isBot = true;
 
                     if (log.isDebugEnabled()) {
-                        log.debug(request.hashCode() +
-                                ": Bot found. UserAgent=" + uaHeader);
+                        log.debug(request.hashCode() + ": Bot found. UserAgent=" + uaHeader);
                     }
                 }
             }
@@ -170,8 +162,7 @@ public class CrawlerSessionManagerValve extends ValveBase
                 if (sessionId != null) {
                     request.setRequestedSessionId(sessionId);
                     if (log.isDebugEnabled()) {
-                        log.debug(request.hashCode() + ": SessionID=" +
-                                sessionId);
+                        log.debug(request.hashCode() + ": SessionID=" + sessionId);
                     }
                 }
             }
@@ -191,14 +182,13 @@ public class CrawlerSessionManagerValve extends ValveBase
                     s.setMaxInactiveInterval(sessionInactiveInterval);
 
                     if (log.isDebugEnabled()) {
-                        log.debug(request.hashCode() +
-                                ": New bot session. SessionID=" + s.getId());
+                        log.debug(request.hashCode() + ": New bot session. SessionID=" + s.getId());
                     }
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug(request.hashCode() +
-                            ": Bot session accessed. SessionID=" + sessionId);
+                    log.debug(
+                            request.hashCode() + ": Bot session accessed. SessionID=" + sessionId);
                 }
             }
         }
