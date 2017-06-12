@@ -117,6 +117,12 @@
         changed the status code recorded in the access log when the client
         dropped the connection from 200 to 500. (markt)
       </fix>
+      <fix>
+        Make asynchronous error handling more robust. In particular ensure that
+        <code>onError()</code> is called for any registered
+        <code>AsyncListener</code>s after an I/O error on a non-container
+        thread. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
