@@ -87,7 +87,7 @@ import org.apache.tomcat.util.descriptor.web.LoginConfig;
  * Requirements:
  * <ul>
  *   <li>all tomcat classes and possibly servlets are in the classpath.
- *       (for example all is in one big jar, or in eclipse CP, or in 
+ *       (for example all is in one big jar, or in eclipse CP, or in
  *        any other combination)</li>
  *
  *   <li>we need one temporary directory for work files</li>
