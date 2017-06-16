@@ -66,6 +66,12 @@
         <bug>61101</bug>: CORS filter should set Vary header in response.
         Submitted by Rick Riemer. (remm)
       </fix>
+      <add>
+        <bug>61105</bug>: Add a new JULI FileHandler configuration for
+        specifying the maximum number of days to keep the log files. By default
+        the log files will be kept 90 days as configured in
+        <code>logging.properties</code>. (violetagg)
+      </add>
       <update>
         Update the Servlet 4.0 implementation to add support for setting
         trailer fields for HTTP responses. (markt)

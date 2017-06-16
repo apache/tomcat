@@ -26,7 +26,16 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Timestamp;
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.ErrorManager;
@@ -36,6 +45,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
+import java.util.regex.Pattern;
 
 /**
  * Implementation of <b>Handler</b> that appends log messages to a file
@@ -74,24 +84,37 @@ import java.util.logging.LogRecord;
  *   <li><code>formatter</code> - The <code>java.util.logging.Formatter</code>
  *    implementation class name for this Handler. Default value:
  *    <code>java.util.logging.SimpleFormatter</code></li>
+ *   <li><code>maxDays</code> - The maximum number of days to keep the log
+ *    files. If the specified value is <code>&lt;=0</code> then the log files
+ *    will be kept on the file system forever, otherwise they will be kept the
+ *    specified maximum days. Default value: <code>-1</code>.</li>
  * </ul>
  */
 public class FileHandler extends Handler {
+    public static final int DEFAULT_MAX_DAYS = -1;
+
+    private static final ExecutorService DELETE_FILES_SERVICE = Executors.newSingleThreadExecutor();
 
     // ------------------------------------------------------------ Constructor
 
 
     public FileHandler() {
-        this(null, null, null);
+        this(null, null, null, DEFAULT_MAX_DAYS);
     }
 
 
     public FileHandler(String directory, String prefix, String suffix) {
+        this(directory, prefix, suffix, DEFAULT_MAX_DAYS);
+    }
+
+    public FileHandler(String directory, String prefix, String suffix, int maxDays) {
         this.directory = directory;
         this.prefix = prefix;
         this.suffix = suffix;
+        this.maxDays = maxDays;
         configure();
         openWriter();
+        clean();
     }
 
 
@@ -124,9 +147,15 @@ public class FileHandler extends Handler {
 
 
     /**
-     * Determines whether the logfile is rotatable
+     * Determines whether the log file is rotatable
      */
     private boolean rotatable = true;
+
+
+    /**
+     * Maximum number of days to keep the log files
+     */
+    private int maxDays = DEFAULT_MAX_DAYS;
 
 
     /**
@@ -145,6 +174,13 @@ public class FileHandler extends Handler {
      * Log buffer size.
      */
     private int bufferSize = -1;
+
+
+    /**
+     * Represents a file name pattern of type {prefix}{date}{suffix}.
+     * The date is YYYY-MM-DD
+     */
+    private Pattern pattern;
 
 
     // --------------------------------------------------------- Public Methods
@@ -179,6 +215,7 @@ public class FileHandler extends Handler {
                         closeWriter();
                         date = tsDate;
                         openWriter();
+                        clean();
                     }
                 } finally {
                     // Downgrade to read-lock. This ensures the writer remains valid
@@ -290,6 +327,16 @@ public class FileHandler extends Handler {
         }
         if (suffix == null) {
             suffix = getProperty(className + ".suffix", ".log");
+        }
+        pattern = Pattern.compile("^(" + Pattern.quote(prefix) + ")\\d{4}-\\d{1,2}-\\d{1,2}("
+                + Pattern.quote(suffix) + ")$");
+        String sMaxDays = getProperty(className + ".maxDays", String.valueOf(DEFAULT_MAX_DAYS));
+        if (maxDays <= 0) {
+            try {
+                maxDays = Integer.parseInt(sMaxDays);
+            } catch (NumberFormatException ignore) {
+                // no-op
+            }
         }
         String sBufferSize = getProperty(className + ".bufferSize", String.valueOf(bufferSize));
         try {
@@ -406,6 +453,49 @@ public class FileHandler extends Handler {
             }
         } finally {
             writerLock.writeLock().unlock();
+        }
+    }
+
+    private void clean() {
+        if (maxDays <= 0) {
+            return;
+        }
+        DELETE_FILES_SERVICE.submit(() -> {
+            try (DirectoryStream<Path> files = streamFilesForDelete()) {
+                for (Path file : files) {
+                    Files.delete(file);
+                }
+            } catch (IOException e) {
+                reportError("Unable to delete log files older than [" + maxDays + "] days", null,
+                        ErrorManager.GENERIC_FAILURE);
+            }
+        });
+    }
+
+    private DirectoryStream<Path> streamFilesForDelete() throws IOException {
+        LocalDate maxDaysOffset = LocalDate.now().minus(maxDays, ChronoUnit.DAYS);
+        return Files.newDirectoryStream(new File(directory).toPath(), path -> {
+            boolean result = false;
+            String date = obtainDateFromPath(path);
+            if (date != null) {
+                try {
+                    LocalDate dateFromFile = LocalDate.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(date));
+                    result = dateFromFile.isBefore(maxDaysOffset);
+                } catch (DateTimeException e) {
+                    // no-op
+                }
+            }
+            return result;
+        });
+    }
+
+    private String obtainDateFromPath(Path path) {
+        String date = path.getFileName().toString();
+        if (pattern.matcher(date).matches()) {
+            date = date.substring(prefix.length());
+            return date.substring(0, date.length() - suffix.length());
+        } else {
+            return null;
         }
     }
 }

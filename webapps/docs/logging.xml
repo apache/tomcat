@@ -287,6 +287,12 @@ java.util.logging.ConsoleHandler.level=ALL</source>
       boolean value.</li>
       <li>The root logger can define its set of handlers using the
       <code>.handlers</code> property.</li>
+      <li> By default the log files will be kept on the file system
+      <code>90</code>code> days. This may be changed per handler using the
+      <code>handlerName.maxDays</code> property. If the specified value for the
+      property is <code>&lt;=0</code> then the log files will be kept on the
+      file system forever, otherwise they will be kept the specified maximum
+      days.</li>
   </ul>
   <p>
     There are several additional implementation classes, that can be used
