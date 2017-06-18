@@ -143,7 +143,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     public void setSelectorTimeout(long timeout){ this.selectorTimeout = timeout;}
     public long getSelectorTimeout(){ return this.selectorTimeout; }
     /**
-     * The socket poller.
+     * The socket pollers.
      */
     private Poller[] pollers = null;
     private AtomicInteger pollerRotater = new AtomicInteger(0);
