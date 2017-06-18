@@ -205,24 +205,16 @@ public class ApplicationContext implements ServletContext {
      */
     private boolean newServletContextListenerAllowed = true;
 
+
     // --------------------------------------------------------- Public Methods
 
-
-    /**
-     * Return the resources object that is mapped to a specified path.
-     * The path must begin with a "/" and is interpreted as relative to the
-     * current context root.
-     */
     @Deprecated
     public DirContext getResources() {
-
         return context.getResources();
-
     }
 
 
     // ------------------------------------------------- ServletContext Methods
-
 
     /**
      * Return the value of the specified context attribute, if any;
@@ -232,9 +224,7 @@ public class ApplicationContext implements ServletContext {
      */
     @Override
     public Object getAttribute(String name) {
-
-        return (attributes.get(name));
-
+        return attributes.get(name);
     }
 
 
