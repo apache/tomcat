@@ -962,6 +962,9 @@ public abstract class AbstractEndpoint<S,U> {
     }
 
 
+    /**
+     * Init and start acceptor threads
+     */
     protected final void startAcceptorThreads() {
         int count = getAcceptorThreadCount();
         acceptors = new ArrayList<>(count);
