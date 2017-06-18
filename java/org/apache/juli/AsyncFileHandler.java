@@ -47,23 +47,23 @@ public class AsyncFileHandler extends FileHandler {
     public static final int OVERFLOW_DROP_FIRST = 2;
     public static final int OVERFLOW_DROP_FLUSH = 3;
     public static final int OVERFLOW_DROP_CURRENT = 4;
-    
-    public static final int OVERFLOW_DROP_TYPE = Integer.parseInt(System.getProperty("org.apache.juli.AsyncOverflowDropType","1"));
-    public static final int DEFAULT_MAX_RECORDS = Integer.parseInt(System.getProperty("org.apache.juli.AsyncMaxRecordCount","10000"));
-    public static final int LOGGER_SLEEP_TIME = Integer.parseInt(System.getProperty("org.apache.juli.AsyncLoggerPollInterval","1000"));
-   
+
+    public static final int OVERFLOW_DROP_TYPE = Integer.parseInt(System.getProperty("org.apache.juli.AsyncOverflowDropType", "1"));
+    public static final int DEFAULT_MAX_RECORDS = Integer.parseInt(System.getProperty("org.apache.juli.AsyncMaxRecordCount", "10000"));
+    public static final int LOGGER_SLEEP_TIME = Integer.parseInt(System.getProperty("org.apache.juli.AsyncLoggerPollInterval", "1000"));
+
     protected static LinkedBlockingDeque<LogEntry> queue = new LinkedBlockingDeque<LogEntry>(DEFAULT_MAX_RECORDS);
     
     protected static LoggerThread logger = new LoggerThread();
-    
+
     static {
         logger.start();
     }
-    
+
     protected volatile boolean closed = false;
-    
+
     public AsyncFileHandler() {
-        this(null,null,null);
+        this(null, null, null);
     }
 
     public AsyncFileHandler(String directory, String prefix, String suffix) {
@@ -73,25 +73,29 @@ public class AsyncFileHandler extends FileHandler {
 
     @Override
     public void close() {
-        if (closed) return;
+        if (closed) {
+            return;
+        }
         closed = true;
         super.close();
     }
-    
+
     @Override
     protected void open() {
-        if(!closed) return;
+        if (!closed) {
+            return;
+        }
         closed = false;
         super.open();
     }
-    
+
 
     @Override
     public void publish(LogRecord record) {
         if (!isLoggable(record)) {
             return;
         }
-        LogEntry entry = new LogEntry(record,this);
+        LogEntry entry = new LogEntry(record, this);
         boolean added = false;
         try {
             while (!added && !queue.offer(entry)) {
@@ -107,7 +111,7 @@ public class AsyncFileHandler extends FileHandler {
                         break;
                     }
                     case OVERFLOW_DROP_FLUSH: {
-                        added = queue.offer(entry,1000,TimeUnit.MILLISECONDS);
+                        added = queue.offer(entry, 1000, TimeUnit.MILLISECONDS);
                         break;
                     }
                     case OVERFLOW_DROP_CURRENT: {
@@ -116,14 +120,14 @@ public class AsyncFileHandler extends FileHandler {
                     }
                 }//switch
             }//while
-        }catch (InterruptedException x) {
+        } catch (InterruptedException x) {
             //allow thread to be interrupted and back out of the publish operation
             //after this we clear the flag
             Thread.interrupted();
         }
-        
+
     }
-    
+
     protected void publishInternal(LogRecord record) {
         super.publish(record);
     }
@@ -132,24 +136,26 @@ public class AsyncFileHandler extends FileHandler {
         protected boolean run = true;
         public LoggerThread() {
             this.setDaemon(true);
-            this.setName("AsyncFileHandlerWriter-"+System.identityHashCode(this));
+            this.setName("AsyncFileHandlerWriter-" + System.identityHashCode(this));
         }
-        
+
         @Override
         public void run() {
             while (run) {
                 try {
                     LogEntry entry = queue.poll(LOGGER_SLEEP_TIME, TimeUnit.MILLISECONDS);
-                    if (entry!=null) entry.flush();
-                }catch (InterruptedException x) {
+                    if (entry != null) {
+                        entry.flush();
+                    }
+                } catch (InterruptedException x) {
                     Thread.interrupted();
-                }catch (Exception x) {
+                } catch (Exception x) {
                     x.printStackTrace();
                 }
             }//while
         }
     }
-    
+
     protected static class LogEntry {
         private LogRecord record;
         private AsyncFileHandler handler;
@@ -158,7 +164,7 @@ public class AsyncFileHandler extends FileHandler {
             this.record = record;
             this.handler = handler;
         }
-        
+
         public boolean flush() {
             if (handler.closed) {
                 return false;
@@ -167,8 +173,7 @@ public class AsyncFileHandler extends FileHandler {
                 return true;
             }
         }
-        
+
     }
-    
-    
+
 }
