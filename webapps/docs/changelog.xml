@@ -114,6 +114,12 @@
         by Tetradeus. (violetagg)
       </add>
       <fix>
+        <bug>61180</bug>: Log a warning message rather than an information
+        message if it takes more than 100ms to initialised a
+        <code>SecureRandom</code> instance for a web application to use to
+        generate session identifiers. Patch provided by Piotr Chlebda. (markt)
+      </fix>
+      <fix>
         <bug>61185</bug>: When an asynchronous request is dispatched via
         <code>AsyncContext.dispatch()</code> ensure that
         <code>getRequestURI()</code> for the dispatched request matches that of
