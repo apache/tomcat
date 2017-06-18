@@ -71,7 +71,7 @@ public class AsyncFileHandler extends FileHandler {
     protected volatile boolean closed = false;
 
     public AsyncFileHandler() {
-        this(null,null,null);
+        this(null, null, null);
     }
 
     public AsyncFileHandler(String directory, String prefix, String suffix) {
@@ -81,14 +81,18 @@ public class AsyncFileHandler extends FileHandler {
 
     @Override
     public void close() {
-        if (closed) return;
+        if (closed) {
+            return;
+        }
         closed = true;
         super.close();
     }
 
     @Override
     protected void open() {
-        if(!closed) return;
+        if (!closed) {
+            return;
+        }
         closed = false;
         super.open();
     }
@@ -102,7 +106,7 @@ public class AsyncFileHandler extends FileHandler {
         // fill source entries, before we hand the record over to another
         // thread with another class loader
         record.getSourceMethodName();
-        LogEntry entry = new LogEntry(record,this);
+        LogEntry entry = new LogEntry(record, this);
         boolean added = false;
         try {
             while (!added && !queue.offer(entry)) {
@@ -118,7 +122,7 @@ public class AsyncFileHandler extends FileHandler {
                         break;
                     }
                     case OVERFLOW_DROP_FLUSH: {
-                        added = queue.offer(entry,1000,TimeUnit.MILLISECONDS);
+                        added = queue.offer(entry, 1000, TimeUnit.MILLISECONDS);
                         break;
                     }
                     case OVERFLOW_DROP_CURRENT: {
@@ -127,7 +131,7 @@ public class AsyncFileHandler extends FileHandler {
                     }
                 }//switch
             }//while
-        }catch (InterruptedException x) {
+        } catch (InterruptedException x) {
             // Allow thread to be interrupted and back out of the publish
             // operation. No further action required.
         }
@@ -142,7 +146,7 @@ public class AsyncFileHandler extends FileHandler {
         protected final boolean run = true;
         public LoggerThread() {
             this.setDaemon(true);
-            this.setName("AsyncFileHandlerWriter-"+System.identityHashCode(this));
+            this.setName("AsyncFileHandlerWriter-" + System.identityHashCode(this));
         }
 
         @Override
@@ -150,7 +154,9 @@ public class AsyncFileHandler extends FileHandler {
             while (run) {
                 try {
                     LogEntry entry = queue.poll(LOGGER_SLEEP_TIME, TimeUnit.MILLISECONDS);
-                    if (entry!=null) entry.flush();
+                    if (entry != null) {
+                        entry.flush();
+                    }
                 } catch (InterruptedException x) {
                     // Ignore the attempt to interrupt the thread.
                 } catch (Exception x) {
