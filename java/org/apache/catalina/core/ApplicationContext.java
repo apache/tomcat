@@ -390,28 +390,35 @@ public class ApplicationContext implements ServletContext {
 
 
     @Override
-    public RequestDispatcher getRequestDispatcher(String path) {
+    public RequestDispatcher getRequestDispatcher(final String path) {
 
         // Validate the path argument
-        if (path == null)
+        if (path == null) {
             return null;
-        if (!path.startsWith("/"))
-            throw new IllegalArgumentException
-                (sm.getString
-                 ("applicationContext.requestDispatcher.iae", path));
-
-        // Get query string
-        String queryString = null;
-        String normalizedPath = path;
-        int pos = normalizedPath.indexOf('?');
-        if (pos >= 0) {
-            queryString = normalizedPath.substring(pos + 1);
-            normalizedPath = normalizedPath.substring(0, pos);
+        }
+        if (!path.startsWith("/")) {
+            throw new IllegalArgumentException(
+                    sm.getString("applicationContext.requestDispatcher.iae", path));
         }
 
-        normalizedPath = RequestUtil.normalize(normalizedPath);
-        if (normalizedPath == null)
+        // Need to separate the query string and the uri. This is required for
+        // the ApplicationDispatcher constructor. Mapping also requires the uri
+        // without the query string.
+        String uri;
+        String queryString;
+        int pos = path.indexOf('?');
+        if (pos >= 0) {
+            uri = path.substring(0, pos);
+            queryString = path.substring(pos + 1);
+        } else {
+            uri = path;
+            queryString = null;
+        }
+
+        String normalizedPath = RequestUtil.normalize(uri);
+        if (normalizedPath == null) {
             return null;
+        }
 
         if (getContext().getDispatchersUseEncodedPaths()) {
             // Decode
@@ -431,6 +438,15 @@ public class ApplicationContext implements ServletContext {
                         new IllegalArgumentException());
                 return null;
             }
+
+            // URI needs to include the context path
+            uri = URLEncoder.DEFAULT.encode(getContextPath(), StandardCharsets.UTF_8) + uri;
+        } else {
+            // uri is passed to the constructor for ApplicationDispatcher and is
+            // ultimately used as the value for getRequestURI() which returns
+            // encoded values. Therefore, since the value passed in for path
+            // was decoded, encode uri here.
+            uri = URLEncoder.DEFAULT.encode(getContextPath() + uri, StandardCharsets.UTF_8);
         }
 
         pos = normalizedPath.length();
@@ -486,10 +502,8 @@ public class ApplicationContext implements ServletContext {
 
         mappingData.recycle();
 
-        String encodedUri = URLEncoder.DEFAULT.encode(uriCC.toString(), StandardCharsets.UTF_8);
-
         // Construct a RequestDispatcher to process this request
-        return new ApplicationDispatcher(wrapper, encodedUri, wrapperPath, pathInfo,
+        return new ApplicationDispatcher(wrapper, uri, wrapperPath, pathInfo,
                 queryString, mapping, null);
     }
 
