@@ -42,7 +42,6 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.util.URLEncoder;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.AsyncContextCallback;
 import org.apache.coyote.RequestInfo;
@@ -50,6 +49,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.res.StringManager;
 
 public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
@@ -151,21 +151,21 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     public void dispatch() {
         check();
         String path;
-        String pathInfo;
+        String cpath;
         ServletRequest servletRequest = getRequest();
         if (servletRequest instanceof HttpServletRequest) {
             HttpServletRequest sr = (HttpServletRequest) servletRequest;
-            path = sr.getServletPath();
-            pathInfo = sr.getPathInfo();
+            path = sr.getRequestURI();
+            cpath = sr.getContextPath();
         } else {
-            path = request.getServletPath();
-            pathInfo = request.getPathInfo();
+            path = request.getRequestURI();
+            cpath = request.getContextPath();
         }
-        if (pathInfo != null) {
-            path += pathInfo;
+        if (cpath.length() > 1) {
+            path = path.substring(cpath.length());
         }
-        if (this.context.getDispatchersUseEncodedPaths()) {
-            path = URLEncoder.DEFAULT.encode(path, StandardCharsets.UTF_8);
+        if (!context.getDispatchersUseEncodedPaths()) {
+            path = UDecoder.URLDecode(path, StandardCharsets.UTF_8);
         }
         dispatch(path);
     }
