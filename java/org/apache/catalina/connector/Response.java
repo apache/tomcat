@@ -557,7 +557,7 @@ public class Response implements HttpServletResponse {
      */
     @Override
     public String getCharacterEncoding() {
-        String charset = getCoyoteResponse().getCharsetName();
+        String charset = getCoyoteResponse().getCharacterEncoding();
         if (charset != null) {
             return charset;
         }
