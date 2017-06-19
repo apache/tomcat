@@ -406,10 +406,6 @@ public final class Response {
      */
     @Deprecated
     public void setCharacterEncoding(String charset) {
-        if (charset == null) {
-            return;
-        }
-
         try {
             setCharset(charset);
         } catch (UnsupportedEncodingException e) {
