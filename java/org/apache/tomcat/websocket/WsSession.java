@@ -648,28 +648,48 @@ public class WsSession implements Session {
      * @param f2sh The handler
      */
     protected void registerFuture(FutureToSendHandler f2sh) {
-        boolean fail = false;
-        synchronized (stateLock) {
-            // If the session has already been closed the any registered futures
-            // will have been processed so the failure result for this future
-            // needs to be set here.
-            if (state == State.OPEN) {
-                futures.put(f2sh, f2sh);
-            } else if (f2sh.isDone()) {
-                // NO-OP. The future completed before the session closed so no
-                // need to register in case the session closes before it
-                // completes.
-            } else {
-                // Construct the exception outside of the sync block
-                fail = true;
-            }
+        // Ideally, this code should sync on stateLock so that the correct
+        // action is taken based on the current state of the connection.
+        // However, a sync on stateLock can't be used here as it will create the
+        // possibility of a dead-lock. See BZ 61183.
+        // Therefore, a slightly less efficient approach is used.
+
+        // Always register the future.
+        futures.put(f2sh, f2sh);
+
+        if (state == State.OPEN) {
+            // The session is open. The future has been registered with the open
+            // session. Normal processing continues.
+            return;
         }
 
-        if (fail) {
-            IOException ioe = new IOException(sm.getString("wsSession.messageFailed"));
-            SendResult sr = new SendResult(ioe);
-            f2sh.onResult(sr);
+        // The session is closed. The future may or may not have been registered
+        // in time for it to be processed during session closure.
+
+        if (f2sh.isDone()) {
+            // The future has completed. It is not known if the future was
+            // completed normally by the I/O layer or in error by doClose(). It
+            // doesn't matter which. There is nothing more to do here.
+            return;
         }
+
+        // The session is closed. The Future had not completed when last checked.
+        // There is a small timing window that means the Future may have been
+        // completed since the last check. There is also the possibility that
+        // the Future was not registered in time to be cleaned up during session
+        // close.
+        // Attempt to complete the Future with an error result as this ensures
+        // that the Future completes and any client code waiting on it does not
+        // hang. It is slightly inefficient since the Future may have been
+        // completed in another thread or another thread may be about to
+        // complete the Future but knowing if this is the case requires the sync
+        // on stateLock (see above).
+        // Note: If multiple attempts are made to complete the Future, the
+        //       second and subsequent attempts are ignored.
+
+        IOException ioe = new IOException(sm.getString("wsSession.messageFailed"));
+        SendResult sr = new SendResult(ioe);
+        f2sh.onResult(sr);
     }
 
 
