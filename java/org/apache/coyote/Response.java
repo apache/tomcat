@@ -115,7 +115,7 @@ public final class Response {
     // Retain the original name used to set the charset so exactly that name is
     // used in the ContentType header. Some (arguably non-specification
     // compliant) user agents are very particular
-    String charsetName = null;
+    String characterEncoding = null;
     long contentLength = -1;
     private Locale locale = DEFAULT_LOCALE;
 
@@ -419,21 +419,21 @@ public final class Response {
      * Overrides the character encoding used in the body of the response. This
      * method must be called prior to writing output using getWriter().
      *
-     * @param charsetName The name of character encoding.
+     * @param characterEncoding The name of character encoding.
      *
      * @throws UnsupportedEncodingException If the specified name is not
      *         recognised
      */
-    public void setCharset(String charsetName) throws UnsupportedEncodingException {
+    public void setCharset(String characterEncoding) throws UnsupportedEncodingException {
         if (isCommitted()) {
             return;
         }
-        if (charsetName == null) {
+        if (characterEncoding == null) {
             return;
         }
 
-        this.charset = B2CConverter.getCharset(charsetName);
-        this.charsetName = charsetName;
+        this.charset = B2CConverter.getCharset(characterEncoding);
+        this.characterEncoding = characterEncoding;
     }
 
 
@@ -442,8 +442,8 @@ public final class Response {
     }
 
 
-    public String getCharsetName() {
-        return charsetName;
+    public String getCharacterEncoding() {
+        return characterEncoding;
     }
 
 
@@ -502,7 +502,7 @@ public final class Response {
 
         if (ret != null
             && charset != null) {
-            ret = ret + ";charset=" + charsetName;
+            ret = ret + ";charset=" + characterEncoding;
         }
 
         return ret;
@@ -547,7 +547,7 @@ public final class Response {
         contentLanguage = null;
         locale = DEFAULT_LOCALE;
         charset = null;
-        charsetName = null;
+        characterEncoding = null;
         contentLength = -1;
         status = 200;
         message = null;
