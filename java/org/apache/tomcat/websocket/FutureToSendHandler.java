@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.websocket.SendHandler;
 import javax.websocket.SendResult;
@@ -38,7 +39,7 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
     private final CountDownLatch latch = new CountDownLatch(1);
     private final WsSession wsSession;
     private final boolean closeMessage;
-    private volatile SendResult result = null;
+    private volatile AtomicReference<SendResult> result = new AtomicReference<SendResult>(null);
 
     public FutureToSendHandler(WsSession wsSession) {
         this(wsSession, false);
@@ -60,8 +61,7 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
 
     @Override
     public void onResult(SendResult result) {
-
-        this.result = result;
+        this.result.compareAndSet(null, result);
         latch.countDown();
     }
 
@@ -94,8 +94,8 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
         } finally {
             wsSession.unregisterFuture(this);
         }
-        if (result.getException() != null) {
-            throw new ExecutionException(result.getException());
+        if (result.get().getException() != null) {
+            throw new ExecutionException(result.get().getException());
         }
         return null;
     }
@@ -116,12 +116,9 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
             throw new TimeoutException(sm.getString("futureToSendHandler.timeout",
                     Long.valueOf(timeout), unit.toString().toLowerCase()));
         }
-        if (result.getException() != null) {
-            throw new ExecutionException(result.getException());
+        if (result.get().getException() != null) {
+            throw new ExecutionException(result.get().getException());
         }
         return null;
     }
 }
-
-
-
