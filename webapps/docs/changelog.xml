@@ -183,6 +183,10 @@
         <code>PongMessage</code> does not implement
         <code>MessageHandler.Whole</code>. (rjung)
       </fix>
+      <fix>
+        Improve thread-safety of <code>Future</code>s used to report the result
+        of sending WebSocket messages. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
