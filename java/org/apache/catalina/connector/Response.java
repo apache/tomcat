@@ -803,7 +803,7 @@ public class Response implements HttpServletResponse {
             // Ignore charset if getWriter() has already been called
             if (!usingWriter) {
                 try {
-                    getCoyoteResponse().setCharset(m[1]);
+                    getCoyoteResponse().setCharacterEncoding(m[1]);
                 } catch (UnsupportedEncodingException e) {
                     log.warn(sm.getString("coyoteResponse.encoding.invalid", m[1]), e);
                 }
@@ -840,7 +840,7 @@ public class Response implements HttpServletResponse {
         }
 
         try {
-            getCoyoteResponse().setCharset(charset);
+            getCoyoteResponse().setCharacterEncoding(charset);
         } catch (UnsupportedEncodingException e) {
             log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
             return;
@@ -882,7 +882,7 @@ public class Response implements HttpServletResponse {
         String charset = getContext().getCharset(locale);
         if (charset != null) {
             try {
-                getCoyoteResponse().setCharset(charset);
+                getCoyoteResponse().setCharacterEncoding(charset);
             } catch (UnsupportedEncodingException e) {
                 log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
             }

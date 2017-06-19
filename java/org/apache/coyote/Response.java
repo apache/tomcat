@@ -424,7 +424,7 @@ public final class Response {
      * @throws UnsupportedEncodingException If the specified name is not
      *         recognised
      */
-    public void setCharset(String characterEncoding) throws UnsupportedEncodingException {
+    public void setCharacterEncoding(String characterEncoding) throws UnsupportedEncodingException {
         if (isCommitted()) {
             return;
         }
