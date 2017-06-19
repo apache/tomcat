@@ -64,6 +64,11 @@
         <bug>61101</bug>: CORS filter should set Vary header in response.
         Submitted by Rick Riemer. (remm)
       </fix>
+      <add>
+        <bug>61105</bug>: Add a new JULI FileHandler configuration for
+        specifying the maximum number of days to keep the log files.
+        (violetagg)
+      </add>
       <fix>
         Improve the <code>SSLValve</code> so it is able to handle client
         certificate headers from Nginx. Based on a patch by Lucas Ventura Carro.
