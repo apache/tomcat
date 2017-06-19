@@ -148,6 +148,11 @@
         <code>AsyncListener</code>s after an I/O error on a non-container
         thread. (markt)
       </fix>
+      <fix>
+        Add additional syncs to the SSL session object provided by the OpenSSL
+        engine so that a concurrent destruction cannot cause a JVM crash.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

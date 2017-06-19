@@ -1041,8 +1041,13 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         @Override
         public byte[] getId() {
-            // We don't cache that to keep memory usage to a minimum.
-            byte[] id = SSL.getSessionId(ssl);
+            byte[] id;
+            synchronized (OpenSSLEngine.this) {
+                if (destroyed) {
+                    throw new IllegalStateException(sm.getString("engine.noSession"));
+                }
+                id = SSL.getSessionId(ssl);
+            }
             if (id == null) {
                 // The id should never be null, if it was null then the SESSION itself was not valid.
                 throw new IllegalStateException(sm.getString("engine.noSession"));
@@ -1058,7 +1063,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         @Override
         public long getCreationTime() {
             // We need to multiply by 1000 as OpenSSL uses seconds and we need milliseconds.
-            return SSL.getTime(ssl) * 1000L;
+            long creationTime = 0;
+            synchronized (OpenSSLEngine.this) {
+                if (destroyed) {
+                    throw new IllegalStateException(sm.getString("engine.noSession"));
+                }
+                creationTime = SSL.getTime(ssl);
+            }
+            return creationTime * 1000L;
         }
 
         @Override
@@ -1140,19 +1152,22 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // these are lazy created to reduce memory overhead
             Certificate[] c = peerCerts;
             if (c == null) {
-                if (SSL.isInInit(ssl) != 0) {
-                    throw new SSLPeerUnverifiedException(sm.getString("engine.unverifiedPeer"));
-                }
-                byte[][] chain = SSL.getPeerCertChain(ssl);
                 byte[] clientCert;
-                if (!clientMode) {
-                    // if used on the server side SSL_get_peer_cert_chain(...) will not include the remote peer certificate.
-                    // We use SSL_get_peer_certificate to get it in this case and add it to our array later.
-                    //
-                    // See https://www.openssl.org/docs/ssl/SSL_get_peer_cert_chain.html
-                    clientCert = SSL.getPeerCertificate(ssl);
-                } else {
-                    clientCert = null;
+                byte[][] chain;
+                synchronized (OpenSSLEngine.this) {
+                    if (destroyed || SSL.isInInit(ssl) != 0) {
+                        throw new SSLPeerUnverifiedException(sm.getString("engine.unverifiedPeer"));
+                    }
+                    chain = SSL.getPeerCertChain(ssl);
+                    if (!clientMode) {
+                        // if used on the server side SSL_get_peer_cert_chain(...) will not include the remote peer certificate.
+                        // We use SSL_get_peer_certificate to get it in this case and add it to our array later.
+                        //
+                        // See https://www.openssl.org/docs/ssl/SSL_get_peer_cert_chain.html
+                        clientCert = SSL.getPeerCertificate(ssl);
+                    } else {
+                        clientCert = null;
+                    }
                 }
                 if (chain == null && clientCert == null) {
                     return null;
@@ -1193,10 +1208,13 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // these are lazy created to reduce memory overhead
             X509Certificate[] c = x509PeerCerts;
             if (c == null) {
-                if (SSL.isInInit(ssl) != 0) {
-                    throw new SSLPeerUnverifiedException(sm.getString("engine.unverifiedPeer"));
+                byte[][] chain;
+                synchronized (OpenSSLEngine.this) {
+                    if (destroyed || SSL.isInInit(ssl) != 0) {
+                        throw new SSLPeerUnverifiedException(sm.getString("engine.unverifiedPeer"));
+                    }
+                    chain = SSL.getPeerCertChain(ssl);
                 }
-                byte[][] chain = SSL.getPeerCertChain(ssl);
                 if (chain == null) {
                     throw new SSLPeerUnverifiedException(sm.getString("engine.unverifiedPeer"));
                 }
@@ -1241,7 +1259,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return INVALID_CIPHER;
             }
             if (cipher == null) {
-                String c = OpenSSLCipherConfigurationParser.openSSLToJsse(SSL.getCipherForSSL(ssl));
+                String ciphers;
+                synchronized (OpenSSLEngine.this) {
+                    if (destroyed) {
+                        return INVALID_CIPHER;
+                    }
+                    ciphers = SSL.getCipherForSSL(ssl);
+                }
+                String c = OpenSSLCipherConfigurationParser.openSSLToJsse(ciphers);
                 if (c != null) {
                     cipher = c;
                 }
@@ -1253,7 +1278,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         public String getProtocol() {
             String applicationProtocol = OpenSSLEngine.this.applicationProtocol;
             if (applicationProtocol == null) {
-                applicationProtocol = SSL.getNextProtoNegotiated(ssl);
+                synchronized (OpenSSLEngine.this) {
+                    if (destroyed) {
+                        throw new IllegalStateException(sm.getString("engine.noSession"));
+                    }
+                    applicationProtocol = SSL.getNextProtoNegotiated(ssl);
+                }
                 if (applicationProtocol == null) {
                     applicationProtocol = fallbackApplicationProtocol;
                 }
@@ -1263,7 +1293,13 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     OpenSSLEngine.this.applicationProtocol = applicationProtocol = "";
                 }
             }
-            String version = SSL.getVersion(ssl);
+            String version;
+            synchronized (OpenSSLEngine.this) {
+                if (destroyed) {
+                    throw new IllegalStateException(sm.getString("engine.noSession"));
+                }
+                version = SSL.getVersion(ssl);
+            }
             if (applicationProtocol.isEmpty()) {
                 return version;
             } else {
