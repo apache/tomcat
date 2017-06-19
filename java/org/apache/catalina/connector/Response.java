@@ -18,7 +18,6 @@ package org.apache.catalina.connector;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -808,8 +807,8 @@ public class Response implements HttpServletResponse {
             // Ignore charset if getWriter() has already been called
             if (!usingWriter) {
                 try {
-                    getCoyoteResponse().setCharset(m[1]);
-                } catch (UnsupportedEncodingException e) {
+                    getCoyoteResponse().setCharacterEncoding(m[1]);
+                } catch (IllegalArgumentException e) {
                     log.warn(sm.getString("coyoteResponse.encoding.invalid", m[1]), e);
                 }
 
@@ -824,10 +823,11 @@ public class Response implements HttpServletResponse {
      * of the request. This method must be called prior to reading
      * request parameters or reading input using getReader().
      *
-     * @param charset String containing the name of the character encoding.
+     * @param characterEncoding String containing the name of the character
+     *                          encoding.
      */
     @Override
-    public void setCharacterEncoding(String charset) {
+    public void setCharacterEncoding(String characterEncoding) {
 
         if (isCommitted()) {
             return;
@@ -845,9 +845,9 @@ public class Response implements HttpServletResponse {
         }
 
         try {
-            getCoyoteResponse().setCharset(charset);
-        } catch (UnsupportedEncodingException e) {
-            log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
+            getCoyoteResponse().setCharacterEncoding(characterEncoding);
+        } catch (IllegalArgumentException e) {
+            log.warn(sm.getString("coyoteResponse.encoding.invalid", characterEncoding), e);
             return;
         }
         isCharacterEncodingSet = true;
@@ -887,8 +887,8 @@ public class Response implements HttpServletResponse {
         String charset = getContext().getCharset(locale);
         if (charset != null) {
             try {
-                getCoyoteResponse().setCharset(charset);
-            } catch (UnsupportedEncodingException e) {
+                getCoyoteResponse().setCharacterEncoding(charset);
+            } catch (IllegalArgumentException e) {
                 log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
             }
         }

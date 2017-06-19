@@ -400,30 +400,10 @@ public final class Response {
      * of the response. This method must be called prior to writing output
      * using getWriter().
      *
-     * @param charset String containing the name of the character encoding.
-     *
-     * @deprecated This method will be removed in Tomcat 9.0.x
+     * @param characterEncoding String containing the name of the character
+     *                          encoding.
      */
-    @Deprecated
-    public void setCharacterEncoding(String charset) {
-        try {
-            setCharset(charset);
-        } catch (UnsupportedEncodingException e) {
-            log.warn(sm.getString("response.encoding.invalid", charset), e);
-        }
-    }
-
-
-    /**
-     * Overrides the character encoding used in the body of the response. This
-     * method must be called prior to writing output using getWriter().
-     *
-     * @param characterEncoding The name of character encoding.
-     *
-     * @throws UnsupportedEncodingException If the specified name is not
-     *         recognised
-     */
-    public void setCharset(String characterEncoding) throws UnsupportedEncodingException {
+    public void setCharacterEncoding(String characterEncoding) {
         if (isCommitted()) {
             return;
         }
@@ -431,7 +411,11 @@ public final class Response {
             return;
         }
 
-        this.charset = B2CConverter.getCharset(characterEncoding);
+        try {
+            this.charset = B2CConverter.getCharset(characterEncoding);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException(e);
+        }
         this.characterEncoding = characterEncoding;
     }
 
