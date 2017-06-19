@@ -644,7 +644,7 @@ public class WsSession implements Session {
         // Always register the future.
         futures.put(f2sh, f2sh);
 
-        if (state == State.OPEN) {
+        if (state == State.OPEN || f2sh.isCloseMessage()) {
             // The session is open. The future has been registered with the open
             // session. Normal processing continues.
             return;
