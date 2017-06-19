@@ -292,10 +292,10 @@
         (markt)
       </update>
       <scode>
-        Start to switch to using <code>Charset</code> rather than
-        <code>String</code> to store encoding configuration settings to reduce
-        the number of places the associated <code>Charset</code> needs to be
-        looked up. (markt)
+        Switch to using <code>Charset</code> rather than <code>String</code> to
+        store encoding settings (including for configuration and for the
+        <code>Content-Type header</code>) to reduce the number of places the
+        associated <code>Charset</code> needs to be looked up. (markt)
       </scode>
       <fix>
         Use a more reliable mechanism for the <code>DefaultServlet</code> when
