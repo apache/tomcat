@@ -411,7 +411,7 @@ public final class Response {
         }
 
         try {
-            setCharset(B2CConverter.getCharset(charset));
+            setCharset(charset);
         } catch (UnsupportedEncodingException e) {
             log.warn(sm.getString("response.encoding.invalid", charset), e);
         }
