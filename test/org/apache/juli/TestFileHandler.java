@@ -59,7 +59,7 @@ public class TestFileHandler {
 
         Calendar date = Calendar.getInstance();
         date.add(Calendar.DAY_OF_MONTH, -3);
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-ss.SSS");
         File file = new File(logsDir, PREFIX_1 + formatter.format(date.getTime()) + SUFIX_1);
         file.createNewFile();
 
