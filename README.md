@@ -38,11 +38,11 @@ http://tomcat.apache.org/tomcat-9.0-doc/.
 
 ### Installation
 
-Please see RUNNING.txt for more info.
+Please see [RUNNING.txt](RUNNING.txt) for more info.
 
 ### Licensing
 
-Please see LICENSE for more info.
+Please see [LICENSE](LICENSE) for more info.
 
 ### Support and Mailing List Information
 
@@ -66,4 +66,4 @@ instructions for reporting a bug
 
 ### Contributing
 
-Please see CONTRIBUTING for more info.
+Please see [CONTRIBUTING](CONTRIBUTING.md) for more info.
