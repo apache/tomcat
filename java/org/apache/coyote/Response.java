@@ -124,11 +124,6 @@ public final class Response {
      */
     Exception errorException = null;
 
-    /**
-     * Has the charset been explicitly set.
-     */
-    boolean charsetSet = false;
-
     Request req;
 
     // ------------------------------------------------------------- Properties
@@ -431,7 +426,6 @@ public final class Response {
         }
 
         this.charset = charset;
-        charsetSet = true;
     }
 
 
@@ -478,7 +472,6 @@ public final class Response {
             if (charsetValue.length() > 0) {
                 try {
                     charset = B2CConverter.getCharset(charsetValue);
-                    charsetSet = true;
                 } catch (UnsupportedEncodingException e) {
                     log.warn(sm.getString("response.encoding.invalid", charsetValue), e);
                 }
@@ -495,8 +488,7 @@ public final class Response {
         String ret = contentType;
 
         if (ret != null
-            && charset != null
-            && charsetSet) {
+            && charset != null) {
             ret = ret + ";charset=" + charset.name();
         }
 
@@ -542,7 +534,6 @@ public final class Response {
         contentLanguage = null;
         locale = DEFAULT_LOCALE;
         charset = null;
-        charsetSet = false;
         contentLength = -1;
         status = 200;
         message = null;
