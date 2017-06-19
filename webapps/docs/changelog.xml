@@ -132,6 +132,11 @@
         changed the status code recorded in the access log when the client
         dropped the connection from 200 to 500. (markt)
       </fix>
+      <fix>
+        Add additional syncs to the SSL session object provided by the OpenSSL
+        engine so that a concurrent destruction cannot cause a JVM crash.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
