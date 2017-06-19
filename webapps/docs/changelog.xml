@@ -141,6 +141,11 @@
         Improve thread-safety of <code>Future</code>s used to report the result
         of sending WebSocket messages. (markt)
       </fix>
+      <fix>
+        <bug>61183</bug>: Correct a regression in the previous fix for
+        <bug>58624</bug> that could trigger a deadlock depending on the locking
+        strategy employed by the client code. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
