@@ -125,6 +125,12 @@
         <code>getRequestURI()</code> for the dispatched request matches that of
         the original request. (markt)
       </fix>
+      <fix>
+        <bug>61197</bug>: Ensure that the charset name used in the
+        <code>Content-Type</code> header has exactly the same form as that
+        provided by the application. This reverts a behavioural change in
+        9.0.0.M21 that caused problems for some clients. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

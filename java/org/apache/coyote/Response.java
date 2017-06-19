@@ -112,6 +112,10 @@ public final class Response {
     String contentType = null;
     String contentLanguage = null;
     Charset charset = null;
+    // Retain the original name used to set the charset so exactly that name is
+    // used in the ContentType header. Some (arguably non-specification
+    // compliant) user agents are very particular
+    String charsetName = null;
     long contentLength = -1;
     private Locale locale = DEFAULT_LOCALE;
 
@@ -415,22 +419,31 @@ public final class Response {
      * Overrides the character encoding used in the body of the response. This
      * method must be called prior to writing output using getWriter().
      *
-     * @param charset The character encoding.
+     * @param charsetName The name of character encoding.
+     *
+     * @throws UnsupportedEncodingException If the specified name is not
+     *         recognised
      */
-    public void setCharset(Charset charset) {
+    public void setCharset(String charsetName) throws UnsupportedEncodingException {
         if (isCommitted()) {
             return;
         }
-        if (charset == null) {
+        if (charsetName == null) {
             return;
         }
 
-        this.charset = charset;
+        this.charset = B2CConverter.getCharset(charsetName);
+        this.charsetName = charsetName;
     }
 
 
     public Charset getCharset() {
         return charset;
+    }
+
+
+    public String getCharsetName() {
+        return charsetName;
     }
 
 
@@ -489,7 +502,7 @@ public final class Response {
 
         if (ret != null
             && charset != null) {
-            ret = ret + ";charset=" + charset.name();
+            ret = ret + ";charset=" + charsetName;
         }
 
         return ret;
@@ -534,6 +547,7 @@ public final class Response {
         contentLanguage = null;
         locale = DEFAULT_LOCALE;
         charset = null;
+        charsetName = null;
         contentLength = -1;
         status = 200;
         message = null;

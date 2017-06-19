@@ -56,7 +56,6 @@ import org.apache.catalina.util.SessionConfig;
 import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.buf.UEncoder.SafeCharsSet;
@@ -553,9 +552,9 @@ public class Response implements HttpServletResponse {
      */
     @Override
     public String getCharacterEncoding() {
-        Charset charset = getCoyoteResponse().getCharset();
+        String charset = getCoyoteResponse().getCharsetName();
         if (charset != null) {
-            return charset.name();
+            return charset;
         }
 
         Context context = getContext();
@@ -804,7 +803,7 @@ public class Response implements HttpServletResponse {
             // Ignore charset if getWriter() has already been called
             if (!usingWriter) {
                 try {
-                    getCoyoteResponse().setCharset(B2CConverter.getCharset(m[1]));
+                    getCoyoteResponse().setCharset(m[1]);
                 } catch (UnsupportedEncodingException e) {
                     log.warn(sm.getString("coyoteResponse.encoding.invalid", m[1]), e);
                 }
@@ -841,7 +840,7 @@ public class Response implements HttpServletResponse {
         }
 
         try {
-            getCoyoteResponse().setCharset(B2CConverter.getCharset(charset));
+            getCoyoteResponse().setCharset(charset);
         } catch (UnsupportedEncodingException e) {
             log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
             return;
@@ -883,7 +882,7 @@ public class Response implements HttpServletResponse {
         String charset = getContext().getCharset(locale);
         if (charset != null) {
             try {
-                getCoyoteResponse().setCharset(B2CConverter.getCharset(charset));
+                getCoyoteResponse().setCharset(charset);
             } catch (UnsupportedEncodingException e) {
                 log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
             }
