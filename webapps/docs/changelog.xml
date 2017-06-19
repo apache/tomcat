@@ -159,6 +159,10 @@
         <code>o.a.tomcat.websocket.WsSession#resume</code> that can be used to
         suspend/resume reading of the incoming messages. (violetagg)
       </add>
+      <fix>
+        Improve thread-safety of <code>Future</code>s used to report the result
+        of sending WebSocket messages. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
