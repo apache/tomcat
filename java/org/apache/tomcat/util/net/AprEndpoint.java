@@ -335,7 +335,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             throw new Exception(sm.getString("endpoint.init.bind", "" + ret, Error.strerror(ret)));
         }
         // Start listening on the server socket
-        ret = Socket.listen(serverSock, getBacklog());
+        ret = Socket.listen(serverSock, getAcceptCount());
         if (ret != 0) {
             throw new Exception(sm.getString("endpoint.init.listen", "" + ret, Error.strerror(ret)));
         }
@@ -835,8 +835,8 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 AprSocketWrapper wrapper = new AprSocketWrapper(Long.valueOf(socket), this);
                 wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());
                 wrapper.setSecure(isSSLEnabled());
-                wrapper.setReadTimeout(getSoTimeout());
-                wrapper.setWriteTimeout(getSoTimeout());
+                wrapper.setReadTimeout(getConnectionTimeout());
+                wrapper.setWriteTimeout(getConnectionTimeout());
                 connections.put(Long.valueOf(socket), wrapper);
                 getExecutor().execute(new SocketWithOptionsProcessor(wrapper));
             }
@@ -1564,7 +1564,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 while (pollerRunning && connectionCount.get() < 1 &&
                         addList.size() < 1 && closeList.size() < 1) {
                     try {
-                        if (getSoTimeout() > 0 && pollerRunning) {
+                        if (getConnectionTimeout() > 0 && pollerRunning) {
                             maintain();
                         }
                         synchronized (this) {
@@ -1837,7 +1837,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 }
                 try {
                     // Process socket timeouts
-                    if (getSoTimeout() > 0 && pollerRunning) {
+                    if (getConnectionTimeout() > 0 && pollerRunning) {
                         // This works and uses only one timeout mechanism for everything, but the
                         // non event poller might be a bit faster by using the old maintain.
                         maintain();
@@ -1933,14 +1933,14 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             if (size <= 0) {
                 size = (OS.IS_WIN32 || OS.IS_WIN64) ? (1 * 1024) : (16 * 1024);
             }
-            sendfilePollset = allocatePoller(size, pool, getSoTimeout());
+            sendfilePollset = allocatePoller(size, pool, getConnectionTimeout());
             if (sendfilePollset == 0 && size > 1024) {
                 size = 1024;
-                sendfilePollset = allocatePoller(size, pool, getSoTimeout());
+                sendfilePollset = allocatePoller(size, pool, getConnectionTimeout());
             }
             if (sendfilePollset == 0) {
                 size = 62;
-                sendfilePollset = allocatePoller(size, pool, getSoTimeout());
+                sendfilePollset = allocatePoller(size, pool, getConnectionTimeout());
             }
             desc = new long[size * 2];
             sendfileData = new HashMap<>(size);
@@ -2018,7 +2018,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                             // Entire file has been sent
                             Pool.destroy(data.fdpool);
                             // Set back socket to blocking mode
-                            Socket.timeoutSet(data.socket, getSoTimeout() * 1000);
+                            Socket.timeoutSet(data.socket, getConnectionTimeout() * 1000);
                             return SendfileState.DONE;
                         }
                     }
@@ -2154,7 +2154,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                                 case PIPELINED: {
                                     // Destroy file descriptor pool, which should close the file
                                     Pool.destroy(state.fdpool);
-                                    Socket.timeoutSet(state.socket, getSoTimeout() * 1000);
+                                    Socket.timeoutSet(state.socket, getConnectionTimeout() * 1000);
                                     // Process the pipelined request data
                                     if (!processSocket(state.socket, SocketEvent.OPEN_READ)) {
                                         closeSocket(state.socket);
@@ -2164,7 +2164,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                                 case OPEN: {
                                     // Destroy file descriptor pool, which should close the file
                                     Pool.destroy(state.fdpool);
-                                    Socket.timeoutSet(state.socket, getSoTimeout() * 1000);
+                                    Socket.timeoutSet(state.socket, getConnectionTimeout() * 1000);
                                     // Put the socket back in the poller for
                                     // processing of further requests
                                     getPoller().add(state.socket, getKeepAliveTimeout(),
@@ -2194,7 +2194,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                         }
                     }
                     // Call maintain for the sendfile poller
-                    if (getSoTimeout() > 0 &&
+                    if (getConnectionTimeout() > 0 &&
                             maintainTime > 1000000L && sendfileRunning) {
                         rv = Poll.maintain(sendfilePollset, desc, false);
                         maintainTime = 0;
@@ -2250,7 +2250,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                 if (!deferAccept) {
                     if (setSocketOptions(socket)) {
                         getPoller().add(socket.getSocket().longValue(),
-                                getSoTimeout(), Poll.APR_POLLIN);
+                                getConnectionTimeout(), Poll.APR_POLLIN);
                     } else {
                         // Close socket and pool
                         closeSocket(socket.getSocket().longValue());

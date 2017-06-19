@@ -422,9 +422,13 @@ public abstract class AbstractEndpoint<S> {
      * should be used for server sockets. By default, this value
      * is 100.
      */
-    private int backlog = 100;
-    public void setBacklog(int backlog) { if (backlog > 0) this.backlog = backlog; }
-    public int getBacklog() { return backlog; }
+    private int acceptCount = 100;
+    public void setAcceptCount(int acceptCount) { if (acceptCount > 0) this.acceptCount = acceptCount; }
+    public int getAcceptCount() { return acceptCount; }
+    @Deprecated
+    public void setBacklog(int backlog) { setAcceptCount(backlog); }
+    @Deprecated
+    public int getBacklog() { return getAcceptCount(); }
 
     /**
      * Controls when the Endpoint binds the port. <code>true</code>, the default
@@ -469,11 +473,15 @@ public abstract class AbstractEndpoint<S> {
      * @return The current socket linger time for sockets created by this
      *         endpoint
      */
-    public int getSoLinger() { return socketProperties.getSoLingerTime(); }
-    public void setSoLinger(int soLinger) {
-        socketProperties.setSoLingerTime(soLinger);
-        socketProperties.setSoLingerOn(soLinger>=0);
+    public int getConnectionLinger() { return socketProperties.getSoLingerTime(); }
+    public void setConnectionLinger(int connectionLinger) {
+        socketProperties.setSoLingerTime(connectionLinger);
+        socketProperties.setSoLingerOn(connectionLinger>=0);
     }
+    @Deprecated
+    public int getSoLinger() { return getConnectionLinger(); }
+    @Deprecated
+    public void setSoLinger(int soLinger) { setConnectionLinger(soLinger);}
 
 
     /**
@@ -481,8 +489,12 @@ public abstract class AbstractEndpoint<S> {
      *
      * @return The current socket timeout for sockets created by this endpoint
      */
-    public int getSoTimeout() { return socketProperties.getSoTimeout(); }
-    public void setSoTimeout(int soTimeout) { socketProperties.setSoTimeout(soTimeout); }
+    public int getConnectionTimeout() { return socketProperties.getSoTimeout(); }
+    public void setConnectionTimeout(int soTimeout) { socketProperties.setSoTimeout(soTimeout); }
+    @Deprecated
+    public int getSoTimeout() { return getConnectionTimeout(); }
+    @Deprecated
+    public void setSoTimeout(int soTimeout) { setConnectionTimeout(soTimeout); }
 
     /**
      * SSL engine.

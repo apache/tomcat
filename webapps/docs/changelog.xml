@@ -143,6 +143,11 @@
         engine so that a concurrent destruction cannot cause a JVM crash.
         (remm)
       </fix>
+      <fix>
+        <bug>61195</bug>: Backport, with deprecation where appropriate, the
+        endpoint and protocol property changes from 9.0.x to ease migration from
+        8.5.x to 9.0.x. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

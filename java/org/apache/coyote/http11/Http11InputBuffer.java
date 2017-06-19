@@ -366,7 +366,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                     }
                     // At least one byte of the request has been received.
                     // Switch to the socket timeout.
-                    wrapper.setReadTimeout(wrapper.getEndpoint().getSoTimeout());
+                    wrapper.setReadTimeout(wrapper.getEndpoint().getConnectionTimeout());
                 }
                 if (!keptAlive && byteBuffer.position() == 0 && byteBuffer.limit() >= CLIENT_PREFACE_START.length - 1) {
                     boolean prefaceMatch = true;

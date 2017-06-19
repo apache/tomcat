@@ -151,7 +151,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
         serverSock = AsynchronousServerSocketChannel.open(threadGroup);
         socketProperties.setProperties(serverSock);
         InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
-        serverSock.bind(addr,getBacklog());
+        serverSock.bind(addr,getAcceptCount());
 
         // Initialize thread count defaults for acceptor, poller
         if (acceptorThreadCount != 1) {
@@ -319,8 +319,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel> {
             socketWrapper.setWriteTimeout(getSocketProperties().getSoTimeout());
             socketWrapper.setKeepAliveLeft(Nio2Endpoint.this.getMaxKeepAliveRequests());
             socketWrapper.setSecure(isSSLEnabled());
-            socketWrapper.setReadTimeout(getSoTimeout());
-            socketWrapper.setWriteTimeout(getSoTimeout());
+            socketWrapper.setReadTimeout(getConnectionTimeout());
+            socketWrapper.setWriteTimeout(getConnectionTimeout());
             // Continue processing on another thread
             return processSocket(socketWrapper, SocketEvent.OPEN_READ, true);
         } catch (Throwable t) {

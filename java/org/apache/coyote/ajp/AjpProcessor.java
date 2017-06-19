@@ -400,7 +400,7 @@ public class AjpProcessor extends AbstractProcessor {
         // Setting up the socket
         this.socketWrapper = socket;
 
-        int soTimeout = endpoint.getSoTimeout();
+        int soTimeout = endpoint.getConnectionTimeout();
         boolean cping = false;
 
         boolean keptAlive = false;

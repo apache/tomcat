@@ -207,7 +207,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         serverSock = ServerSocketChannel.open();
         socketProperties.setProperties(serverSock.socket());
         InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
-        serverSock.socket().bind(addr,getBacklog());
+        serverSock.socket().bind(addr,getAcceptCount());
         serverSock.configureBlocking(true); //mimic APR behavior
 
         // Initialize thread count defaults for acceptor, poller
@@ -704,8 +704,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
             ka.setWriteTimeout(getSocketProperties().getSoTimeout());
             ka.setKeepAliveLeft(NioEndpoint.this.getMaxKeepAliveRequests());
             ka.setSecure(isSSLEnabled());
-            ka.setReadTimeout(getSoTimeout());
-            ka.setWriteTimeout(getSoTimeout());
+            ka.setReadTimeout(getConnectionTimeout());
+            ka.setWriteTimeout(getConnectionTimeout());
             PollerEvent r = eventCache.pop();
             ka.interestOps(SelectionKey.OP_READ);//this is what OP_REGISTER turns into.
             if ( r==null) r = new PollerEvent(socket,ka,OP_REGISTER);
@@ -1381,7 +1381,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 // Need to re-negotiate SSL connection
                 engine.setNeedClientAuth(true);
                 try {
-                    sslChannel.rehandshake(getEndpoint().getSoTimeout());
+                    sslChannel.rehandshake(getEndpoint().getConnectionTimeout());
                     ((JSSESupport) sslSupport).setSession(engine.getSession());
                 } catch (IOException ioe) {
                     log.warn(sm.getString("socket.sslreneg",ioe));

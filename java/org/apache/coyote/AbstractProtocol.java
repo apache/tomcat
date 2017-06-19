@@ -274,7 +274,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
 
+    public int getAcceptCount() { return endpoint.getAcceptCount(); }
+    public void setAcceptCount(int acceptCount) { endpoint.setAcceptCount(acceptCount); }
+    @Deprecated
     public int getBacklog() { return endpoint.getBacklog(); }
+    @Deprecated
     public void setBacklog(int backlog) { endpoint.setBacklog(backlog); }
 
 
@@ -284,7 +288,13 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
 
+    public int getConnectionLinger() { return endpoint.getConnectionLinger(); }
+    public void setConnectionLinger(int connectionLinger) {
+        endpoint.setConnectionLinger(connectionLinger);
+    }
+    @Deprecated
     public int getSoLinger() { return endpoint.getSoLinger(); }
+    @Deprecated
     public void setSoLinger(int soLinger) { endpoint.setSoLinger(soLinger); }
 
 
@@ -312,20 +322,17 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
      * wait for that data to arrive before closing the connection.
      */
     public int getConnectionTimeout() {
-        // Note that the endpoint uses the alternative name
-        return endpoint.getSoTimeout();
+        return endpoint.getConnectionTimeout();
     }
     public void setConnectionTimeout(int timeout) {
-        // Note that the endpoint uses the alternative name
-        endpoint.setSoTimeout(timeout);
+        endpoint.setConnectionTimeout(timeout);
     }
 
-    /*
-     * Alternative name for connectionTimeout property
-     */
+    @Deprecated
     public int getSoTimeout() {
         return getConnectionTimeout();
     }
+    @Deprecated
     public void setSoTimeout(int timeout) {
         setConnectionTimeout(timeout);
     }
