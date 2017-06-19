@@ -19,9 +19,6 @@ package org.apache.juli;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -46,11 +43,10 @@ public class TestFileHandler {
     @Before
     public void setUp() throws Exception {
         File logsBase = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
-        if (!logsBase.mkdirs() && !logsBase.isDirectory()) {
+        logsDir = new File(logsBase, "test-" + System.currentTimeMillis());
+        if (!logsDir.mkdirs() && !logsDir.isDirectory()) {
             fail("Unable to create logs directory.");
         }
-        Path logsBasePath = FileSystems.getDefault().getPath(logsBase.getAbsolutePath());
-        logsDir = Files.createTempDirectory(logsBasePath, "test").toFile();
 
         generateLogFiles(logsDir, PREFIX_1, SUFIX_2, 3);
         generateLogFiles(logsDir, PREFIX_2, SUFIX_1, 3);
