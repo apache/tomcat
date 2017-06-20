@@ -28,7 +28,12 @@
     <attribute
       name="channelSendOptions"
       description="This sets channel behaviour on sent messages."
-      type="int"/>
+      type="java.lang.String"/>
+    <attribute
+      name="channelSendOptionsName"
+      description="channelSendOptions name."
+      writeable="false"
+      type="java.lang.String"/>
     <attribute
       name="channelStartOptions"
       description="This sets channel start behaviour."

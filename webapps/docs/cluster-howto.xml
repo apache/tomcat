@@ -210,10 +210,22 @@ should be completed:</p>
     sent over the wire and reinstantiated on all the other cluster nodes.
     Synchronous vs. asynchronous is configured using the <code>channelSendOptions</code>
     flag and is an integer value. The default value for the <code>SimpleTcpCluster/DeltaManager</code> combo is
-    8, which is asynchronous. You can read more on the <a href="tribes/introduction.html">send flag(overview)</a> or the
-    <doc path="/api/org/apache/catalina/tribes/Channel.html">send flag(javadoc)</doc>.
-    During async replication, the request is returned before the data has been replicated. async replication yields shorter
-    request times, and synchronous replication guarantees the session to be replicated before the request returns.
+    8, which is asynchronous.
+</p>
+<p>
+    For convenience, <code>channelSendOptions</code> can be set by name(s) rather than integer,
+    which are then translated to their integer value upon startup.  The valid option names are:
+    "asynchronous" (alias "async"), "byte_message" (alias "byte"), "multicast", "secure",
+    "synchronized_ack" (alias "sync"), "udp", "use_ack".  Use comma to separate multiple names,
+    e.g. pass "async, multicast" for the options
+    <code>SEND_OPTIONS_ASYNCHRONOUS | SEND_OPTIONS_MULTICAST</code>.
+</p>
+<p>
+  You can read more on the <a href="tribes/introduction.html">send flag(overview)</a> or the
+  <doc path="/api/org/apache/catalina/tribes/Channel.html">send flag(javadoc)</doc>.
+  During async replication, the request is returned before the data has been replicated. async
+  replication yields shorter request times, and synchronous replication guarantees the session
+  to be replicated before the request returns.
 </p>
 </section>
 
