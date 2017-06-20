@@ -107,6 +107,11 @@
         <code>getRequestURI()</code> for the dispatched request matches that of
         the original request. (markt)
       </fix>
+      <fix>
+        <bug>61201</bug>: Ensure that the <code>SCRIPT_NAME</code> environment
+        variable for CGI executables is populated in a consistent way regardless
+        of how the CGI servlet is mapped to a request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
