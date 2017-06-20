@@ -131,6 +131,11 @@
         provided by the application. This reverts a behavioural change in
         9.0.0.M21 that caused problems for some clients. (markt)
       </fix>
+      <fix>
+        <bug>61201</bug>: Ensure that the <code>SCRIPT_NAME</code> environment
+        variable for CGI executables is populated in a consistent way regardless
+        of how the CGI servlet is mapped to a request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

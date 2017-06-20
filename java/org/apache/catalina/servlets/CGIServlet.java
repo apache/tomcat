@@ -799,13 +799,10 @@ public final class CGIServlet extends HttpServlet {
             path = currentLocation.getAbsolutePath();
             name = currentLocation.getName();
 
-            if (".".equals(contextPath)) {
-                scriptname = servletPath;
+            if (servletPath.startsWith(cginame)) {
+                scriptname = contextPath + cginame;
             } else {
-                scriptname = contextPath + servletPath;
-            }
-            if (!servletPath.equals(cginame)) {
-                scriptname = scriptname + cginame;
+                scriptname = contextPath + servletPath + cginame;
             }
 
             if (log.isDebugEnabled()) {
