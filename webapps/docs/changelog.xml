@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M23 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Restore the ability to configure support for SSLv3. Enabling this
+        protocol will trigger a warning in the logs since it is known to be
+        insecure. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M22 (markt)" rtext="release in progress">
   <subsection name="Catalina">

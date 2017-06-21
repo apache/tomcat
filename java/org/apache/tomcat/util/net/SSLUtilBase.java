@@ -53,6 +53,9 @@ public abstract class SSLUtilBase implements SSLUtil {
         Set<String> implementedProtocols = getImplementedProtocols();
         List<String> enabledProtocols =
                 getEnabled("protocols", getLog(), true, configuredProtocols, implementedProtocols);
+        if (enabledProtocols.contains("SSLv3")) {
+            log.warn(sm.getString("jsse.ssl3"));
+        }
         this.enabledProtocols = enabledProtocols.toArray(new String[enabledProtocols.size()]);
 
         // Calculate the enabled ciphers
