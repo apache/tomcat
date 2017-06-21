@@ -1230,8 +1230,8 @@
       <p>The names of the protocols to support when communicating with clients.
       This should be a list of any combination of the following:
       </p>
-      <ul><li>SSLv2Hello</li><li>TLSv1</li><li>TLSv1.1</li><li>TLSv1.2</li>
-          <li>all</li></ul>
+      <ul><li>SSLv2Hello</li><li>SSLv3</li><li>TLSv1</li><li>TLSv1.1</li>
+      <li>TLSv1.2</li><li>all</li></ul>
       <p>Each token in the list can be prefixed with a plus sign ("+")
       or a minus sign ("-"). A plus sign adds the protocol, a minus sign
       removes it form the current list. The list is built starting from

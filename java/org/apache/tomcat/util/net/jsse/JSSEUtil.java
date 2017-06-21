@@ -96,13 +96,14 @@ public class JSSEUtil extends SSLUtilBase {
         String[] implementedProtocolsArray = context.getSupportedSSLParameters().getProtocols();
         implementedProtocols = new HashSet<>(implementedProtocolsArray.length);
 
-        // Filter out all the SSL protocols (SSLv2 and SSLv3) from the list of
-        // implemented protocols since they are no longer considered secure but
-        // allow SSLv2Hello. This has the effect of making it impossible to use
-        // SSLv2 or SSLv3 without source code changes.
+        // Filter out SSLv2 from the list of implemented protocols (just in case
+        // we are running on a JVM that supports it) since it is no longer
+        // considered secure but allow SSLv2Hello.
+        // Note SSLv3 is allowed despite known insecurities because some users
+        // still have a requirement for it.
         for (String protocol : implementedProtocolsArray) {
             String protocolUpper = protocol.toUpperCase(Locale.ENGLISH);
-            if (!"SSLV2HELLO".equals(protocolUpper)) {
+            if (!"SSLV2HELLO".equals(protocolUpper) && !"SSLV3".equals(protocolUpper)) {
                 if (protocolUpper.contains("SSL")) {
                     log.debug(sm.getString("jsse.excludeProtocol", protocol));
                     continue;
