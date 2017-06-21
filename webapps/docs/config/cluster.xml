@@ -142,7 +142,15 @@ Tomcat cluster. These include:</p>
       <br/>
       Note that if you use ASYNC messaging it is possible for update messages
       for a session to be processed by the receiving nodes in a different order
-      to the order in which they were sent.</p>
+      to the order in which they were sent.
+      </p>
+      <p>
+      You may also set these options as a comma separated string, e.g. "async, multicast", which
+      will be translated into <code>Channel.SEND_OPTIONS_ASYNCHRONOUS | Channel.SEND_OPTIONS_MULTICAST</code>
+      <br/>
+      The valid option names are "asynchronous" (alias "async"), "byte_message" (alias "byte")
+      , "multicast", "secure", "synchronized_ack" (alias "sync"), "udp", "use_ack"
+      </p>
     </attribute>
     <attribute name="channelStartOptions" required="false">
       <p>Sets the start and stop flags for the &lt;Channel&gt; object used by the cluster.

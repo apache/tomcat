@@ -200,8 +200,24 @@ public class BackupManager extends ClusterManagerBase
         this.mapSendOptions = mapSendOptions;
     }
 
+    public void setMapSendOptions(String mapSendOptions) {
+
+        int value = Channel.parseSendOptions(mapSendOptions);
+        if (value > 0) {
+            this.setMapSendOptions(value);
+        }
+    }
+
     public int getMapSendOptions() {
         return mapSendOptions;
+    }
+
+    /**
+     * returns the SendOptions as a comma separated list of names
+     * @return a comma separated list of the option names
+     */
+    public String getMapSendOptionsName(){
+        return Channel.getSendOptionsAsString(mapSendOptions);
     }
 
     public void setRpcTimeout(long rpcTimeout) {

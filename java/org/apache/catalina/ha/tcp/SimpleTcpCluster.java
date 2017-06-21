@@ -339,6 +339,14 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         this.channelSendOptions = channelSendOptions;
     }
 
+    public void setChannelSendOptions(String channelSendOptions) {
+
+        int value = Channel.parseSendOptions(channelSendOptions);
+        if (value > 0) {
+            this.setChannelSendOptions(value);
+        }
+    }
+
     /**
      * has members
      */
@@ -389,6 +397,14 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     public int getChannelSendOptions() {
         return channelSendOptions;
+    }
+
+    /**
+     * returns the SendOptions as a comma separated list of names for use by JMX
+     * @return a comma separated list of the option names
+     */
+    public String getChannelSendOptionsName(){
+        return Channel.getSendOptionsAsString(channelSendOptions);
     }
 
     /**

@@ -454,6 +454,11 @@
       type="int"
       writeable="false"/>
     <attribute
+      name="mapSendOptionsName"
+      description="mapSendOptions name."
+      writeable="false"
+      type="java.lang.String"/>
+    <attribute
       name="maxActive"
       description="Maximum number of active sessions so far"
       type="int"/>
