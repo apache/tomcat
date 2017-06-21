@@ -222,6 +222,10 @@
         and/or stack traces on web application stop and/or start when running
         under a security manager. (markt)
       </fix>
+      <fix>
+        Correct the TLS configuration documentation to remove SSLv2 and SSLv3
+        from the list of supported protocols. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
