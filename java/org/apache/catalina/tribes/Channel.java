@@ -16,11 +16,11 @@
  */
 package org.apache.catalina.tribes;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
-
 import java.io.Serializable;
 import java.util.StringJoiner;
+
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
  * Channel interface<br>

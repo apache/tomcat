@@ -58,7 +58,8 @@ import org.apache.juli.logging.Log;
  * authentication valves, as the redirection should take place before an
  * authentication valve would save a request to a protected resource.</p>
  *
- * @see http://tomcat.apache.org/connectors-doc/generic_howto/loadbalancers.html
+ * @see <a href="http://tomcat.apache.org/connectors-doc/generic_howto/loadbalancers.html">Load
+ *      balancer documentation</a>
  */
 public class LoadBalancerDrainingValve
     extends ValveBase
@@ -114,6 +115,8 @@ public class LoadBalancerDrainingValve
      * Sets the HTTP response code that will be used to redirect the request
      * back to the load-balancer for re-balancing. Defaults to 307
      * (TEMPORARY_REDIRECT).
+     *
+     * @param code The code to use for the redirect
      */
     public void setRedirectStatusCode(int code) {
         _redirectStatusCode = code;

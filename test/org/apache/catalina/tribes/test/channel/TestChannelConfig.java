@@ -18,10 +18,11 @@ package org.apache.catalina.tribes.test.channel;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.catalina.ha.session.BackupManager;
-import org.apache.catalina.tribes.Channel;
-import org.apache.catalina.ha.tcp.SimpleTcpCluster;
 import org.junit.Test;
+
+import org.apache.catalina.ha.session.BackupManager;
+import org.apache.catalina.ha.tcp.SimpleTcpCluster;
+import org.apache.catalina.tribes.Channel;
 
 
 public class TestChannelConfig {

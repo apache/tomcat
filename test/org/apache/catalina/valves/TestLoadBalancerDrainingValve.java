@@ -44,9 +44,10 @@ public class TestLoadBalancerDrainingValve {
         public void addCookie(Cookie cookie)
         {
             if(null == cookies)
-                cookies = new ArrayList<Cookie>(1);
+                cookies = new ArrayList<>(1);
             cookies.add(cookie);
         }
+        @Override
         public List<Cookie> getCookies() {
             return cookies;
         }
@@ -122,23 +123,37 @@ public class TestLoadBalancerDrainingValve {
 
     // A Cookie subclass that knows how to compare itself to other Cookie objects
     static class MyCookie extends Cookie {
-      public MyCookie(String name, String value) { super(name, value); }
+        private static final long serialVersionUID = 1L;
 
-      @Override 
-      public boolean equals(Object o) {
-        if(null == o) return false;
-        MyCookie mc = (MyCookie)o;
+        public MyCookie(String name, String value) { super(name, value); }
 
-        return mc.getName().equals(this.getName())
-            && mc.getPath().equals(this.getPath())
-            && mc.getValue().equals(this.getValue())
-            && mc.getMaxAge() == this.getMaxAge();
-      }
+        @Override
+        public boolean equals(Object o) {
+            if(null == o) return false;
+            MyCookie mc = (MyCookie)o;
 
-      @Override
-      public String toString() {
-          return "Cookie { name=" + getName() + ", value=" + getValue() + ", path=" + getPath() + ", maxAge=" + getMaxAge() + " }";
-      }
+            return mc.getName().equals(this.getName())
+                && mc.getPath().equals(this.getPath())
+                && mc.getValue().equals(this.getValue())
+                && mc.getMaxAge() == this.getMaxAge();
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + getMaxAge();
+            result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+            result = prime * result + ((getPath() == null) ? 0 : getPath().hashCode());
+            result = prime * result + ((getValue() == null) ? 0 : getValue().hashCode());
+            return result;
+        }
+
+
+        @Override
+        public String toString() {
+            return "Cookie { name=" + getName() + ", value=" + getValue() + ", path=" + getPath() + ", maxAge=" + getMaxAge() + " }";
+        }
     }
 
     @Test
@@ -190,9 +205,9 @@ public class TestLoadBalancerDrainingValve {
 
         // Set up the actual test
         EasyMock.expect(request.getAttribute(LoadBalancerDrainingValve.ATTRIBUTE_KEY_JK_LB_ACTIVATION)).andStubReturn(jkActivation);
-        EasyMock.expect(request.isRequestedSessionIdValid()).andStubReturn(validSessionId);
+        EasyMock.expect(Boolean.valueOf(request.isRequestedSessionIdValid())).andStubReturn(Boolean.valueOf(validSessionId));
 
-        ArrayList<Cookie> cookies = new ArrayList<Cookie>();
+        ArrayList<Cookie> cookies = new ArrayList<>();
         if(enableIgnore) {
             cookies.add(new Cookie("ignore", "true"));
         }
@@ -210,7 +225,7 @@ public class TestLoadBalancerDrainingValve {
             EasyMock.expect(servletContext.getSessionCookieConfig()).andStubReturn(cookieConfig);
             EasyMock.expect(request.getServletContext()).andStubReturn(servletContext);
             EasyMock.expect(request.getContext()).andStubReturn(ctx);
-            EasyMock.expect(ctx.getSessionCookiePathUsesTrailingSlash()).andStubReturn(true);
+            EasyMock.expect(Boolean.valueOf(ctx.getSessionCookiePathUsesTrailingSlash())).andStubReturn(Boolean.TRUE);
             EasyMock.expect(servletContext.getSessionCookieConfig()).andStubReturn(cookieConfig);
             EasyMock.expect(request.getQueryString()).andStubReturn(queryString);
 
