@@ -130,7 +130,7 @@
         <bug>61197</bug>: Ensure that the charset name used in the
         <code>Content-Type</code> header has exactly the same form as that
         provided by the application. This reverts a behavioural change in
-        9.0.0.M21 that caused problems for some clients. (markt)
+        8.5.15 that caused problems for some clients. (markt)
       </fix>
       <fix>
         <bug>61201</bug>: Ensure that the <code>SCRIPT_NAME</code> environment
