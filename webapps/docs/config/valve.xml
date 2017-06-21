@@ -700,6 +700,81 @@
 
 
 <section name="Proxies Support">
+  <subsection name="Load Balancer Draining Valve">
+    <subsection name="Introduction">
+      <p>
+        When using mod_jk or mod_proxy_ajp, the client's session id is used to
+        determine which back-end server will be used to serve the request. If the
+        target node is being "drained" (in mod_jk, this is the <i>DISABLED</i>
+        state; in mod_proxy_ajp, this is the <i>Drain (N)</i> state), requests
+        for expired sessions can actually cause the draining node to fail to
+        drain.
+      </p>
+      <p>
+        Unfortunately, AJP-based load-balancers cannot prove whether the
+        client-provided session id is valid or not and therefore will send any
+        requests for a session that appears to be targeted to that node to the
+        disabled (or "draining") node, causing the "draining" process to take
+        longer than necessary.
+      </p>
+      <p>
+        This Valve detects requests for invalid sessions, strips the session
+        information from the request, and redirects back to the same URL, where
+        the load-balancer should choose a different (active)  node to handle the
+        request. This will accelerate the "draining" process for the disabled
+        node(s).
+      </p>
+
+      <p>
+        The activation state of the node is sent by the load-balancer in the
+        request, so no state change on the node being disabled is necessary. Simply
+        configure this Valve in your valve pipeline and it will take action when
+        the activation state is set to "disabled".
+      </p>
+
+      <p>
+        You should take care to register this Valve earlier in the Valve pipeline
+        than any authentication Valves, because this Valve should be able to
+        redirect a request before any authentication Valve saves a request to a
+        protected resource. If this happens, a new session will be created and
+        the draining process will stall because a new, valid session will be
+        established.
+      </p>
+    </subsection><!-- / Introduction -->
+
+    <subsection name="Attributes">
+      <p>The <strong>Load Balancer Draining Valve</strong> supports the
+      following configuration attributes:</p>
+
+      <attributes>
+        <attribute name="className" required="true">
+          <p>Java class name of the implementation to use. This MUST be set to
+          <strong>org.apache.catalina.valves.LoadBalancerDrainingValve</strong>.
+          </p>
+        </attribute>
+
+        <attribute name="redirectStatusCode" required="false">
+          <p>Allows setting a custom redirect code to be used when the client
+          is redirected to be re-balanced by the load-balancer. The default is
+          307 TEMPORARY_REDIRECT.</p>
+        </attribute>
+
+        <attribute name="ignoreCookieName" required="false">
+          <p>When used with <code>ignoreCookieValue</code>, a client can present
+          this cookie (and accompanying value) that will cause this Valve to
+          do nothing. This will allow you to probe your <i>disabled</i> node
+          before re-enabling it to make sure that it is working as expected.</p>
+        </attribute>
+
+        <attribute name="ignoreCookieValue" required="false">
+          <p>When used with <code>ignoreCookieName</code>, a client can present
+          a cookie (and accompanying value) that will cause this Valve to
+          do nothing. This will allow you to probe your <i>disabled</i> node
+          before re-enabling it to make sure that it is working as expected.</p>
+        </attribute>
+      </attributes>
+    </subsection><!-- /Attributes -->
+  </subsection><!-- /Load Balancer Draining Valve -->
 
 <subsection name="Remote IP Valve">
 
