@@ -1424,7 +1424,7 @@
         errorproperty="test.result.error"
         failureproperty="test.result.failure"
         haltonfailure="${test.haltonfailure}">
-        <!-- threads="${test.threads}" -->
+        threads="${test.threads}">
 
         <jvmarg value="${test.jvmarg.egd}"/>
         <jvmarg value="-Dfile.encoding=UTF-8"/>
