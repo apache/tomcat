@@ -1423,7 +1423,7 @@
       <junit printsummary="yes" fork="yes" dir="." showoutput="${test.verbose}"
         errorproperty="test.result.error"
         failureproperty="test.result.failure"
-        haltonfailure="${test.haltonfailure}">
+        haltonfailure="${test.haltonfailure}"
         threads="${test.threads}">
 
         <jvmarg value="${test.jvmarg.egd}"/>
