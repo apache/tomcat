@@ -115,7 +115,7 @@ public class TestStream extends Http2TestBase {
                 "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
                 "3-Header-[date]-[Wed, 11 Nov 2015 19:18:42 GMT]\n" +
                 "3-HeadersEnd\n" +
-                "3-Body-43\n" +
+                "3-Body-44\n" +
                 "3-HeadersStart\n" +
                 "3-Header-[x-trailer-2]-[Trailer value two]\n" +
                 "3-Header-[x-trailer-1]-[Trailer value one]\n" +
