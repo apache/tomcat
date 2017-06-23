@@ -68,7 +68,7 @@ public class LoadBalancerDrainingValve
      * The request attribute key where the load-balancer's activation state
      * can be found.
      */
-    static final String ATTRIBUTE_KEY_JK_LB_ACTIVATION = "JK_LB_ACTIVATION";
+    public static final String ATTRIBUTE_KEY_JK_LB_ACTIVATION = "JK_LB_ACTIVATION";
 
     /**
      * The HTTP response code that will be used to redirect the request
@@ -259,8 +259,7 @@ public class LoadBalancerDrainingValve
 
             // Re-write the URI if it contains a ;jsessionid parameter
             String uri = request.getRequestURI();
-            String sessionURIParamName = "jsessionid";
-            SessionConfig.getSessionUriParamName(request.getContext());
+            String sessionURIParamName = SessionConfig.getSessionUriParamName(request.getContext());
             if(uri.contains(";" + sessionURIParamName + "="))
                 uri = uri.replaceFirst(";" + sessionURIParamName + "=[^&?]*", "");
 
