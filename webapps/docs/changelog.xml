@@ -56,6 +56,11 @@
         Add LoadBalancerDrainingValve, a Valve designed to reduce the amount of
         time required for a node to drain its authenticated users. (schultz)
       </add>
+      <fix>
+        Do not log a warning when a <code>null</code> session is returned for an
+        OpenSSL based TLS session since this is expected when session tickets
+        are enabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
