@@ -67,6 +67,9 @@
         available to the access log valve when the connection is closing.
         (markt)
       </fix>
+      <fix>
+        <bug>60461</bug>: Sync SSL session access for the APR connector. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">

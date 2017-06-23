@@ -2761,5 +2761,44 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         public void setAppReadBufHandler(ApplicationBufferHandler handler) {
             // no-op
         }
+
+        String getSSLInfoS(int id) {
+            synchronized (closedLock) {
+                if (closed) {
+                    return null;
+                }
+                try {
+                    return SSLSocket.getInfoS(getSocket().longValue(), id);
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+        }
+
+        int getSSLInfoI(int id) {
+            synchronized (closedLock) {
+                if (closed) {
+                    return 0;
+                }
+                try {
+                    return SSLSocket.getInfoI(getSocket().longValue(), id);
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+        }
+
+        byte[] getSSLInfoB(int id) {
+            synchronized (closedLock) {
+                if (closed) {
+                    return null;
+                }
+                try {
+                    return SSLSocket.getInfoB(getSocket().longValue(), id);
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+        }
     }
 }
