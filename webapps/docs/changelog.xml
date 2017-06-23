@@ -61,6 +61,12 @@
         OpenSSL based TLS session since this is expected when session tickets
         are enabled. (markt)
       </fix>
+      <fix>
+        When the access log valve logs a TLS related request attribute and the
+        NIO2 connector is used with OpenSSL, ensure that the TLS attributes are
+        available to the access log valve when the connection is closing.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">

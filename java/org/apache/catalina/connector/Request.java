@@ -85,6 +85,7 @@ import org.apache.catalina.core.AsyncContextImpl;
 import org.apache.catalina.mapper.MappingData;
 import org.apache.catalina.util.ParameterMap;
 import org.apache.catalina.util.RequestUtil;
+import org.apache.catalina.util.TLSUtil;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.UpgradeToken;
@@ -855,48 +856,46 @@ public class Request implements HttpServletRequest {
      */
     @Override
     public Object getAttribute(String name) {
-
         // Special attributes
         SpecialAttributeAdapter adapter = specialAttributes.get(name);
         if (adapter != null) {
             return adapter.get(this, name);
         }
 
-        Object attr=attributes.get(name);
+        Object attr = attributes.get(name);
 
-        if(attr!=null) {
+        if (attr != null) {
             return attr;
         }
 
-        attr =  coyoteRequest.getAttribute(name);
-        if(attr != null) {
+        attr = coyoteRequest.getAttribute(name);
+        if (attr != null) {
             return attr;
         }
-        if( isSSLAttribute(name) || name.equals(SSLSupport.PROTOCOL_VERSION_KEY)) {
-            coyoteRequest.action(ActionCode.REQ_SSL_ATTRIBUTE,
-                                 coyoteRequest);
+        if (TLSUtil.isTLSRequestAttribute(name)) {
+            coyoteRequest.action(ActionCode.REQ_SSL_ATTRIBUTE, coyoteRequest);
             attr = coyoteRequest.getAttribute(Globals.CERTIFICATES_ATTR);
-            if( attr != null) {
+            if (attr != null) {
                 attributes.put(Globals.CERTIFICATES_ATTR, attr);
             }
             attr = coyoteRequest.getAttribute(Globals.CIPHER_SUITE_ATTR);
-            if(attr != null) {
+            if (attr != null) {
                 attributes.put(Globals.CIPHER_SUITE_ATTR, attr);
             }
             attr = coyoteRequest.getAttribute(Globals.KEY_SIZE_ATTR);
-            if(attr != null) {
+            if (attr != null) {
                 attributes.put(Globals.KEY_SIZE_ATTR, attr);
             }
             attr = coyoteRequest.getAttribute(Globals.SSL_SESSION_ID_ATTR);
-            if(attr != null) {
+            if (attr != null) {
                 attributes.put(Globals.SSL_SESSION_ID_ATTR, attr);
             }
             attr = coyoteRequest.getAttribute(Globals.SSL_SESSION_MGR_ATTR);
-            if(attr != null) {
+            if (attr != null) {
                 attributes.put(Globals.SSL_SESSION_MGR_ATTR, attr);
             }
             attr = coyoteRequest.getAttribute(SSLSupport.PROTOCOL_VERSION_KEY);
-            if(attr != null) {
+            if (attr != null) {
                 attributes.put(SSLSupport.PROTOCOL_VERSION_KEY, attr);
             }
             attr = attributes.get(name);
@@ -911,18 +910,6 @@ public class Request implements HttpServletRequest {
         return coyoteRequest.getContentLengthLong();
     }
 
-    /**
-     * Test if a given name is one of the special Servlet-spec SSL attributes.
-     *
-     * @return <code>true</code> if this is a special SSL attribute
-     */
-    static boolean isSSLAttribute(String name) {
-        return Globals.CERTIFICATES_ATTR.equals(name) ||
-            Globals.CIPHER_SUITE_ATTR.equals(name) ||
-            Globals.KEY_SIZE_ATTR.equals(name)  ||
-            Globals.SSL_SESSION_ID_ATTR.equals(name) ||
-            Globals.SSL_SESSION_MGR_ATTR.equals(name);
-    }
 
     /**
      * Return the names of all request attributes for this Request, or an

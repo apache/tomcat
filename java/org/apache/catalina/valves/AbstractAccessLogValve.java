@@ -42,6 +42,7 @@ import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.util.TLSUtil;
 import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -460,6 +461,12 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      */
     private int maxLogMessageBufferSize = 256;
 
+    /**
+     * Does the configured log pattern include a known TLS attribute?
+     */
+    private boolean tlsAttributeRequired = false;
+
+
     // ------------------------------------------------------------- Properties
 
     /**
@@ -622,6 +629,14 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     @Override
     public void invoke(Request request, Response response) throws IOException,
             ServletException {
+        if (tlsAttributeRequired) {
+            // The log pattern uses TLS attributes. Ensure these are populated
+            // before the request is processed because with NIO2 it is possible
+            // for the connection to be closed (and the TLS info lost) before
+            // the access log requests the TLS info. Requesting it now causes it
+            // to be cached in the request.
+            request.getAttribute(Globals.CERTIFICATES_ATTR);
+        }
         getNext().invoke(request, response);
     }
 
@@ -1559,6 +1574,9 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         case 'p':
             return new PortElement(name);
         case 'r':
+            if (TLSUtil.isTLSRequestAttribute(name)) {
+                tlsAttributeRequired = true;
+            }
             return new RequestAttributeElement(name);
         case 's':
             return new SessionAttributeElement(name);
