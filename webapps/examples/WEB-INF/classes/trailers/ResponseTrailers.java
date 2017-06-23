@@ -47,7 +47,7 @@ public class ResponseTrailers extends HttpServlet {
 
         PrintWriter pw  = resp.getWriter();
 
-        pw.print("This reponse should include trailer fields.");
+        pw.print("This response should include trailer fields.");
     }
 
 
