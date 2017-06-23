@@ -1048,10 +1048,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 }
                 id = SSL.getSessionId(ssl);
             }
-            if (id == null) {
-                // The id should never be null, if it was null then the SESSION itself was not valid.
-                throw new IllegalStateException(sm.getString("engine.noSession"));
-            }
+
             return id;
         }
 
