@@ -58,6 +58,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <add>
+        <bug>61127</bug>Allow human-readable names for channelSendOptions and
+        mapSendOptions. Patch provided by Igal Sapir. (schultz)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M22 (markt)" rtext="release in progress">
   <subsection name="Catalina">
@@ -241,14 +249,6 @@
         Correct the TLS configuration documentation to remove SSLv2 and SSLv3
         from the list of supported protocols. (markt)
       </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Tribes">
-    <changelog>
-      <add>
-        <bug>61127</bug>Allow human-readable names for channelSendOptions and
-        mapSendOptions. Patch provided by Igal Sapir. (schultz)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
