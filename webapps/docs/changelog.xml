@@ -52,6 +52,11 @@
         protocol will trigger a warning in the logs since it is known to be
         insecure. (markt)
       </fix>
+      <fix>
+        Do not log a warning when a <code>null</code> session is returned for an
+        OpenSSL based TLS session since this is expected when session tickets
+        are enabled. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
