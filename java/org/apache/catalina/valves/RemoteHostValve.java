@@ -37,47 +37,12 @@ public final class RemoteHostValve extends RequestFilterValve {
     private static final Log log = LogFactory.getLog(RemoteHostValve.class);
 
 
-    // ----------------------------------------------------- Instance Variables
-
-    /**
-     * Flag deciding whether we add the server connector port to the property
-     * compared in the filtering method. The port will be appended
-     * using a ";" as a separator.
-     */
-    volatile boolean addConnectorPort = false;
-
-    // ------------------------------------------------------------- Properties
-
-
-    /**
-     * Get the flag deciding whether we add the server connector port to the
-     * property compared in the filtering method. The port will be appended
-     * using a ";" as a separator.
-     * @return <code>true</code> to add the connector port
-     */
-    public boolean getAddConnectorPort() {
-        return addConnectorPort;
-    }
-
-
-    /**
-     * Set the flag deciding whether we add the server connector port to the
-     * property compared in the filtering method. The port will be appended
-     * using a ";" as a separator.
-     *
-     * @param addConnectorPort The new flag
-     */
-    public void setAddConnectorPort(boolean addConnectorPort) {
-        this.addConnectorPort = addConnectorPort;
-    }
-
-
     // --------------------------------------------------------- Public Methods
 
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
         String property;
-        if (addConnectorPort) {
+        if (getAddConnectorPort()) {
             property = request.getRequest().getRemoteHost() + ";" + request.getConnector().getPort();
         } else {
             property = request.getRequest().getRemoteHost();
