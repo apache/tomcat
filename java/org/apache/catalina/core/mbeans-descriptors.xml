@@ -264,11 +264,6 @@
                description="The J2EE Server this module is deployed on"
                type="java.lang.String"/>
 
-    <attribute name="servlets"
-               description="Deprecated. JSR77 list of servlets"
-               type="[Ljava.lang.String;"
-               writeable="false"/>
-
     <attribute name="sessionCookieName"
                description="The name to use for session cookies.'null' indicates that the name is controlled by the application."
                type="java.lang.String"/>
