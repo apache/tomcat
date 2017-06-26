@@ -51,6 +51,13 @@
         <bug>61214</bug>: Remove deleted attribute <code>servlets</code> from
         the Context MBean description. Patch provided by Alexis Hassler. (markt)
       </fix>
+      <fix>
+        <bug>61215</bug>: Correctly define <code>addConnectorPort</code> and
+        <code>invalidAuthenticationWhenDeny</code> in the
+        <code>mbean-descriptors.xml</code> file for the
+        <code>org.apache.catalina.valves</code> package so that the attributes
+        are accessible via JMX. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
