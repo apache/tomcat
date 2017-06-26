@@ -90,6 +90,10 @@
       <fix>
         <bug>60461</bug>: Sync SSL session access for the APR connector. (remm)
       </fix>
+      <fix>
+        <bug>61224</bug>: Make the <code>GlobalRequestProcessor</code> MBean
+        attributes read-only. Patch provided by Alexis Hassler. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
