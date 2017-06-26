@@ -18,12 +18,15 @@ package org.apache.catalina.mbeans;
 
 import java.lang.reflect.Array;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import javax.management.JMRuntimeException;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.TabularData;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -67,18 +70,18 @@ public class MBeanDumper {
                 MBeanAttributeInfo attrs[]=minfo.getAttributes();
                 Object value=null;
 
-                for (int i=0; i< attrs.length; i++) {
-                    if (! attrs[i].isReadable()) continue;
-                    String attName=attrs[i].getName();
+                for (MBeanAttributeInfo attr : attrs) {
+                    if (!attr.isReadable()) continue;
+                    String attName = attr.getName();
                     if ("modelerType".equals(attName)) continue;
-                    if (attName.indexOf('=') >=0 ||
-                            attName.indexOf(':') >=0 ||
-                            attName.indexOf(' ') >=0 ) {
+                    if (attName.indexOf('=') >= 0 ||
+                            attName.indexOf(':') >= 0 ||
+                            attName.indexOf(' ') >= 0) {
                         continue;
                     }
 
                     try {
-                        value=mbeanServer.getAttribute(oname, attName);
+                        value = mbeanServer.getAttribute(oname, attName);
                     } catch (JMRuntimeException rme) {
                         Throwable cause = rme.getCause();
                         if (cause instanceof UnsupportedOperationException) {
@@ -102,7 +105,7 @@ public class MBeanDumper {
                                 " " + attName, t);
                         continue;
                     }
-                    if (value==null) continue;
+                    if (value == null) continue;
                     String valueString;
                     try {
                         Class<?> c = value.getClass();
@@ -114,34 +117,33 @@ public class MBeanDumper {
                                 sb.append(CRLF);
                             }
                             for (int j = 0; j < len; j++) {
-                                sb.append("\t");
                                 Object item = Array.get(value, j);
-                                if (item == null) {
-                                    sb.append("NULL VALUE");
-                                } else {
-                                    try {
-                                        sb.append(escape(item.toString()));
-                                    }
-                                    catch (Throwable t) {
-                                        ExceptionUtils.handleThrowable(t);
-                                        sb.append("NON-STRINGABLE VALUE");
-                                    }
-                                }
+                                sb.append(tableItemToString(item));
                                 if (j < len - 1) {
                                     sb.append(CRLF);
                                 }
                             }
                             valueString = sb.toString();
                         }
+                        else if (TabularData.class.isInstance(value)) {
+                            TabularData tab = TabularData.class.cast(value);
+                            StringJoiner joiner = new StringJoiner(CRLF);
+                            joiner.add("TabularData["
+                                    + tab.getTabularType().getRowType().getTypeName()
+                                    + "] of length " + tab.size());
+                            for (Object item : tab.values()) {
+                                joiner.add(tableItemToString(item));
+                            }
+                            valueString = joiner.toString();
+                        }
                         else {
-                            valueString = escape(value.toString());
+                            valueString = valueToString(value);
                         }
                         buf.append(attName);
                         buf.append(": ");
                         buf.append(valueString);
                         buf.append(CRLF);
-                    }
-                    catch (Throwable t) {
+                    } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
                     }
                 }
@@ -188,4 +190,40 @@ public class MBeanDumper {
         sb.append( value.substring(pos,end));
     }
 
+    private static String tableItemToString(Object item) {
+        if (item == null) {
+            return "\t" + "NULL VALUE";
+        } else {
+            try {
+                return "\t" + valueToString(item);
+            }
+            catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                return "\t" + "NON-STRINGABLE VALUE";
+            }
+        }
+    }
+
+    private static String valueToString(Object value) {
+        String valueString;
+        if (CompositeData.class.isInstance(value)) {
+            StringBuilder sb = new StringBuilder("{");
+
+            String sep = "";
+            CompositeData composite = CompositeData.class.cast(value);
+            Set<String> keys = composite.getCompositeType().keySet();
+            for (String key : keys) {
+                sb.append(sep)
+                        .append(key)
+                        .append("=")
+                        .append(composite.get(key));
+                sep = ", ";
+            }
+            sb.append("}");
+            valueString = sb.toString();
+        } else {
+            valueString = value.toString();
+        }
+        return escape(valueString);
+    }
 }

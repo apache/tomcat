@@ -58,6 +58,11 @@
         <code>org.apache.catalina.valves</code> package so that the attributes
         are accessible via JMX. (markt)
       </fix>
+      <fix>
+        <bug>61216</bug>: Improve layout for <code>CompositeData</code> and
+        <code>TabularData</code> when viewing via the JMX proxy servlet. Patch
+        provided by Alexis Hassler. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
