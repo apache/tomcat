@@ -65,37 +65,44 @@ import org.apache.tomcat.util.security.PrivilegedSetTccl;
  *                    differences required to avoid race conditions during error
  *                    handling.
  * DISPATCHING      - The dispatch is being processed.
+ * MUST_ERROR       - ServletRequest.startAsync() has been called followed by an
+ *                    I/O error on a non-container thread. The main purpose of
+ *                    this state is to prevent additional async actions
+ *                    (complete(), dispatch() etc.) on the non-container thread.
+ *                    The container will perform the necessary error handling,
+ *                    including ensuring that the AsyncLister.onError() method
+ *                    is called.
  * ERROR            - Something went wrong.
  *
- * |----------------->------|
- * |                       \|/
- * |   |----------<-----E R R O R<-------------------------<-------------------------------|
- * |   |      complete() /|\/|\\ \--<---------------------------------<-----|              |
- * |   |                  |  |  \                                           |              |
- * |   |    |----->-------|  |   \----------->----------|                   |              |
- * |   |    |                |                          |dispatch()         |              |
- * |   |    |                |                         \|/                  ^              |
- * |   |    |                |          |--|timeout()   |                   |              |
- * |   |    |     post()     |          | \|/           |     post()        |              |
- * |   |    |    |---------- | -->DISPATCHED<---------- | --------------COMPLETING<-----|  |
- * |   |    |    |           |   /|\/|\ |               |                | /|\ /|\      |  |
- * |   |    |    |    |--->- | ---|  |  |startAsync()   |       timeout()|--|   |       |  |
- * |   |    ^    ^    |      |       |  |               |                       |       |  ^
- * |   |    |    |    |   |-- \ -----|  |   complete()  |                       |post() |  |
- * |   |    |    |    |   |    \        |     /-->----- | ---COMPLETE_PENDING->-|       |  |
- * |   |    |    |    |   |     \       |    /          |                               |  |
- * |   |    |    |    |   ^      \      |   /           |                               |  |
- * |  \|/   |    |    |   |       \    \|/ /   post()   |                               |  |
- * | MUST_COMPLETE-<- | - | --<----STARTING-->--------- | -------------|                ^  |
- * |         /|\      |   |  complete()  | \            |              |     complete() |  |
- * |          |       |   |              |  \           |    post()    |     /----------|  |
- * |          |       ^   |    dispatch()|   \          |    |-----|   |    /              |
- * |          |       |   |              |    \         |    |     |   |   /               |
- * |          |       |   |             \|/    \        |    |    \|/ \|/ /                |
- * |          |       |   |--<--MUST_DISPATCH-----<-----|    |--<--STARTED--->-------------|
- * |          |       | dispatched() /|\   |     \                / |
- * |          |       |               |    |      \              /  |
- * |          |       |               |    |       \            /   |
+ * |----------------->------|  |--«--------MUST_ERROR---------------«------------------------|
+ * |                       \|/\|/                                                            |
+ * |   |----------<-----E R R O R<-------------------------<-------------------------------| |
+ * |   |      complete() /|\/|\\ \--<---------------------------------<-----|              | ^
+ * |   |                  |  |  \                                           |              | |
+ * |   |    |----->-------|  |   \----------->----------|                   |              | |
+ * |   |    |                |                          |dispatch()         |              | |
+ * |   |    |                |                         \|/                  ^              | |
+ * |   |    |                |          |--|timeout()   |                   |              | |
+ * |   |    |     post()     |          | \|/           |     post()        |              | |
+ * |   |    |    |---------- | -->DISPATCHED<---------- | --------------COMPLETING<-----|  | |
+ * |   |    |    |           |   /|\/|\ |               |                | /|\ /|\      |  | |
+ * |   |    |    |    |--->- | ---|  |  |startAsync()   |       timeout()|--|   |       |  | |
+ * |   |    ^    ^    |      |       |  |               |                       |       |  ^ |
+ * |   |    |    |    |   |-- \ -----|  |   complete()  |                       |post() |  | |
+ * |   |    |    |    |   |    \        |     /-->----- | ---COMPLETE_PENDING->-|       |  | |
+ * |   |    |    |    |   |     \       |    /          |                               |  | |
+ * |   |    |    |    |   ^      \      |   /           |                               |  | |
+ * |  \|/   |    |    |   |       \    \|/ /   post()   |                               |  | |
+ * | MUST_COMPLETE-<- | - | --<----STARTING-->--------- | -------------|                ^  | |
+ * |         /|\      |   |  complete()  | \            |              |     complete() |  | |
+ * |          |       |   |              |  \           |    post()    |     /----------|  | |
+ * |          |       ^   |    dispatch()|   \          |    |-----|   |    /              | |
+ * |          |       |   |              |    \         |    |     |   |   /               | |
+ * |          |       |   |             \|/    \        |    |    \|/ \|/ /                | ^
+ * |          |       |   |--<--MUST_DISPATCH-----<-----|    |--<--STARTED--->-------------| |
+ * |          |       | dispatched() /|\   |     \                / |     \                  |
+ * |          |       |               |    |      \              /  |      \  nct-io-error   |
+ * |          |       |               |    |       \            /   |       \---->-----------|
  * |          |       |               |    |post()  \           |   |
  * ^          ^       |               |    |       \|/          |   |
  * |          |       ^               |    |  DISPATCH_PENDING  |   |
@@ -139,6 +146,7 @@ public class AsyncStateMachine<S> {
         MUST_DISPATCH   (true,  true,  false, true),
         DISPATCH_PENDING(true,  true,  false, false),
         DISPATCHING     (true,  false, false, true),
+        MUST_ERROR      (true,  true,  false, false),
         ERROR           (true,  true,  false, false);
 
         private final boolean isAsync;
@@ -355,6 +363,17 @@ public class AsyncStateMachine<S> {
     }
 
 
+    public synchronized void asyncMustError() {
+        if (state == AsyncState.STARTED) {
+            state = AsyncState.MUST_ERROR;
+        } else {
+            throw new IllegalStateException(
+                    sm.getString("asyncStateMachine.invalidAsyncState",
+                            "asyncMustError()", state));
+        }
+    }
+
+
     public synchronized boolean asyncError() {
         boolean doDispatch = false;
         if (state == AsyncState.STARTING ||
@@ -362,7 +381,8 @@ public class AsyncStateMachine<S> {
                 state == AsyncState.DISPATCHED ||
                 state == AsyncState.TIMING_OUT ||
                 state == AsyncState.MUST_COMPLETE ||
-                state == AsyncState.COMPLETING) {
+                state == AsyncState.COMPLETING ||
+                state == AsyncState.MUST_ERROR) {
             state = AsyncState.ERROR;
         } else {
             throw new IllegalStateException(

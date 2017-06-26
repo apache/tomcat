@@ -91,6 +91,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
             // have been completed. Dispatch to a container thread to do the
             // clean-up. Need to do it this way to ensure that all the necessary
             // clean-up is performed.
+            asyncStateMachine.asyncMustError();
             getLog().info(sm.getString("abstractProcessor.nonContainerThreadError"), t);
             getEndpoint().processSocketAsync(socketWrapper, SocketStatus.ERROR);
         }
