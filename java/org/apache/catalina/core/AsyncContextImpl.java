@@ -407,6 +407,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         if (result.get()) {
             // No listener called dispatch() or complete(). This is an error.
             // SRV.2.3.3.3 (search for "error dispatch")
+            // Take a local copy to avoid threading issues if another thread
+            // clears this (can happen during error handling with non-container
+            // threads)
+            ServletResponse servletResponse = this.servletResponse;
             if (servletResponse instanceof HttpServletResponse) {
                 ((HttpServletResponse) servletResponse).setStatus(
                         HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
