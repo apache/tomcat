@@ -132,6 +132,13 @@ public abstract class RequestFilterValve extends ValveBase {
      */
     private boolean invalidAuthenticationWhenDeny = false;
 
+    /**
+     * Flag deciding whether we add the server connector port to the property
+     * compared in the filtering method. The port will be appended
+     * using a ";" as a separator.
+     */
+    private volatile boolean addConnectorPort = false;
+
     // ------------------------------------------------------------- Properties
 
 
@@ -258,6 +265,28 @@ public abstract class RequestFilterValve extends ValveBase {
         invalidAuthenticationWhenDeny = value;
     }
 
+
+    /**
+     * Get the flag deciding whether we add the server connector port to the
+     * property compared in the filtering method. The port will be appended
+     * using a ";" as a separator.
+     * @return <code>true</code> to add the connector port
+     */
+    public boolean getAddConnectorPort() {
+        return addConnectorPort;
+    }
+
+
+    /**
+     * Set the flag deciding whether we add the server connector port to the
+     * property compared in the filtering method. The port will be appended
+     * using a ";" as a separator.
+     *
+     * @param addConnectorPort The new flag
+     */
+    public void setAddConnectorPort(boolean addConnectorPort) {
+        this.addConnectorPort = addConnectorPort;
+    }
 
     // --------------------------------------------------------- Public Methods
 
