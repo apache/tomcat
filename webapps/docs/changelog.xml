@@ -66,6 +66,12 @@
       <fix>
         <bug>60461</bug>: Sync SSL session access for the APR connector. (remm)
       </fix>
+      <add>
+        To ease migration from 8.0.x to 8.5.x, if the HTTP or AJP BIO connector
+        is explicitly configured, rather than failing to start the connector
+        because BIO has been removed, automatically switch to NIO and continue.
+        A warning will be logged to alert the user to the switch. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
