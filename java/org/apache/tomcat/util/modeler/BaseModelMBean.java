@@ -100,23 +100,10 @@ import org.apache.juli.logging.LogFactory;
  * @author Craig R. McClanahan
  * @author Costin Manolache
  */
-public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBeanNotificationBroadcaster {
+public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
+        ModelMBeanNotificationBroadcaster {
+
     private static final Log log = LogFactory.getLog(BaseModelMBean.class);
-
-    // ----------------------------------------------------------- Constructors
-
-    /**
-     * Construct a <code>ModelMBean</code> with default
-     * <code>ModelMBeanInfo</code> information.
-     *
-     * @exception MBeanException if the initializer of an object
-     *  throws an exception
-     * @exception RuntimeOperationsException if an IllegalArgumentException
-     *  occurs
-     */
-    protected BaseModelMBean() throws MBeanException, RuntimeOperationsException {
-        super();
-    }
 
     // ----------------------------------------------------- Instance Variables
 

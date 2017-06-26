@@ -17,18 +17,12 @@
 package org.apache.catalina.mbeans;
 
 import javax.management.MBeanException;
-import javax.management.RuntimeOperationsException;
 
 import org.apache.catalina.Executor;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
 
 public class ServiceMBean extends BaseCatalinaMBean<Service> {
-
-    public ServiceMBean() throws MBeanException, RuntimeOperationsException {
-        super();
-    }
-
 
     /**
      * Add a new Connector to the set of defined Connectors, and associate it

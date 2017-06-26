@@ -22,7 +22,6 @@ import java.util.List;
 import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.management.RuntimeOperationsException;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerListener;
@@ -37,20 +36,6 @@ import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.HostConfig;
 
 public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
-
-    /**
-     * Construct a <code>ModelMBean</code> with default
-     * <code>ModelMBeanInfo</code> information.
-     *
-     * @exception MBeanException if the initializer of an object
-     *  throws an exception
-     * @exception RuntimeOperationsException if an IllegalArgumentException
-     *  occurs
-     */
-    public ContainerMBean() throws MBeanException, RuntimeOperationsException {
-        super();
-    }
-
 
     /**
      * Add a new child Container to those associated with this Container,

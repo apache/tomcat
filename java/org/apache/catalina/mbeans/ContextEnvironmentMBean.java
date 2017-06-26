@@ -20,7 +20,6 @@ import javax.management.Attribute;
 import javax.management.AttributeNotFoundException;
 import javax.management.MBeanException;
 import javax.management.ReflectionException;
-import javax.management.RuntimeOperationsException;
 
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.descriptor.web.NamingResources;
@@ -32,20 +31,6 @@ import org.apache.tomcat.util.descriptor.web.NamingResources;
  * @author Amy Roh
  */
 public class ContextEnvironmentMBean extends BaseCatalinaMBean<ContextEnvironment> {
-
-
-    /**
-     * Construct a <code>ModelMBean</code> with default
-     * <code>ModelMBeanInfo</code> information.
-     *
-     * @exception MBeanException if the initializer of an object
-     *  throws an exception
-     * @exception RuntimeOperationsException if an IllegalArgumentException
-     *  occurs
-     */
-    public ContextEnvironmentMBean() throws MBeanException, RuntimeOperationsException {
-        super();
-    }
 
 
     /**

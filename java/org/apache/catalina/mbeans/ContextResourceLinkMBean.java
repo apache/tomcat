@@ -33,21 +33,6 @@ import org.apache.tomcat.util.descriptor.web.NamingResources;
  */
 public class ContextResourceLinkMBean extends BaseCatalinaMBean<ContextResourceLink> {
 
-
-    /**
-     * Construct a <code>ModelMBean</code> with default
-     * <code>ModelMBeanInfo</code> information.
-     *
-     * @exception MBeanException if the initializer of an object
-     *  throws an exception
-     * @exception RuntimeOperationsException if an IllegalArgumentException
-     *  occurs
-     */
-    public ContextResourceLinkMBean() throws MBeanException, RuntimeOperationsException {
-        super();
-    }
-
-
     /**
      * Obtain and return the value of a specific attribute of this MBean.
      *

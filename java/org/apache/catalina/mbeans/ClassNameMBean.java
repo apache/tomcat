@@ -16,9 +16,6 @@
  */
 package org.apache.catalina.mbeans;
 
-import javax.management.MBeanException;
-import javax.management.RuntimeOperationsException;
-
 /**
  * <p>A convenience base class for <strong>ModelMBean</strong> implementations
  * where the underlying base class (and therefore the set of supported
@@ -33,20 +30,6 @@ import javax.management.RuntimeOperationsException;
  * @author Craig R. McClanahan
  */
 public class ClassNameMBean<T> extends BaseCatalinaMBean<T> {
-
-    /**
-     * Construct a <code>ModelMBean</code> with default
-     * <code>ModelMBeanInfo</code> information.
-     *
-     * @exception MBeanException if the initialize of an object
-     *  throws an exception
-     * @exception RuntimeOperationsException if an IllegalArgumentException
-     *  occurs
-     */
-    public ClassNameMBean() throws MBeanException, RuntimeOperationsException {
-        super();
-    }
-
 
     /**
      * Return the fully qualified Java class name of the managed object

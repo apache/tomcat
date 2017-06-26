@@ -25,11 +25,6 @@ import org.apache.tomcat.util.modeler.BaseModelMBean;
 
 public abstract class BaseCatalinaMBean<T> extends BaseModelMBean {
 
-    protected BaseCatalinaMBean() throws MBeanException, RuntimeOperationsException {
-        super();
-    }
-
-
     protected T doGetManagedResource() throws MBeanException {
         try {
             @SuppressWarnings("unchecked")

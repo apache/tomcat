@@ -17,7 +17,6 @@
 package org.apache.catalina.mbeans;
 
 import javax.management.MBeanException;
-import javax.management.RuntimeOperationsException;
 
 import org.apache.catalina.Context;
 import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
@@ -27,11 +26,6 @@ import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
 public class ContextMBean extends BaseCatalinaMBean<Context> {
-
-    public ContextMBean() throws MBeanException, RuntimeOperationsException {
-        super();
-    }
-
 
      /**
      * Return the set of application parameters for this application.

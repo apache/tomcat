@@ -19,10 +19,8 @@ package org.apache.catalina.mbeans;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.management.RuntimeOperationsException;
 
 import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
@@ -39,22 +37,6 @@ import org.apache.tomcat.util.modeler.Registry;
  * @author Amy Roh
  */
 public class NamingResourcesMBean extends BaseModelMBean {
-
-    // ----------------------------------------------------------- Constructors
-
-    /**
-     * Construct a <code>ModelMBean</code> with default
-     * <code>ModelMBeanInfo</code> information.
-     *
-     * @exception MBeanException if the initializer of an object
-     *  throws an exception
-     * @exception RuntimeOperationsException if an IllegalArgumentException
-     *  occurs
-     */
-    public NamingResourcesMBean() throws MBeanException, RuntimeOperationsException {
-        super();
-    }
-
 
     // ----------------------------------------------------- Instance Variables
 

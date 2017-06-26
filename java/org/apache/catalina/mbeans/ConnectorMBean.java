@@ -34,20 +34,6 @@ import org.apache.tomcat.util.IntrospectionUtils;
 public class ConnectorMBean extends ClassNameMBean<Connector> {
 
     /**
-     * Construct a <code>ModelMBean</code> with default
-     * <code>ModelMBeanInfo</code> information.
-     *
-     * @exception MBeanException if the initializer of an object
-     *  throws an exception
-     * @exception RuntimeOperationsException if an IllegalArgumentException
-     *  occurs
-     */
-    public ConnectorMBean() throws MBeanException, RuntimeOperationsException {
-        super();
-    }
-
-
-    /**
      * Obtain and return the value of a specific attribute of this MBean.
      *
      * @param name Name of the requested attribute
