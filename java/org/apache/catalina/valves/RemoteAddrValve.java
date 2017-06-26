@@ -49,14 +49,6 @@ public final class RemoteAddrValve extends RequestFilterValve {
         "org.apache.catalina.valves.RemoteAddrValve/1.0";
 
 
-    /**
-     * Flag deciding whether we add the server connector port to the property
-     * compared in the filtering method. The port will be appended
-     * using a ";" as a separator.
-     */
-    volatile boolean addConnectorPort = false;
-
-
     // ------------------------------------------------------------- Properties
 
 
@@ -71,34 +63,12 @@ public final class RemoteAddrValve extends RequestFilterValve {
     }
 
 
-    /**
-     * Get the flag deciding whether we add the server connector port to the
-     * property compared in the filtering method. The port will be appended
-     * using a ";" as a separator.
-     */
-    public boolean getAddConnectorPort() {
-        return addConnectorPort;
-    }
-
-
-    /**
-     * Set the flag deciding whether we add the server connector port to the
-     * property compared in the filtering method. The port will be appended
-     * using a ";" as a separator.
-     *
-     * @param addConnectorPort The new flag
-     */
-    public void setAddConnectorPort(boolean addConnectorPort) {
-        this.addConnectorPort = addConnectorPort;
-    }
-
-
     // --------------------------------------------------------- Public Methods
 
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
         String property;
-        if (addConnectorPort) {
+        if (getAddConnectorPort()) {
             property = request.getRequest().getRemoteAddr() + ";" + request.getConnector().getPort();
         } else {
             property = request.getRequest().getRemoteAddr();
