@@ -16,6 +16,10 @@
  */
 package org.apache.coyote;
 
+import org.apache.tomcat.util.modeler.BaseModelMBean;
+
+import javax.management.MBeanException;
+import javax.management.RuntimeOperationsException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +27,7 @@ import java.util.List;
  *  It is currently used only as a JMX artifact, to aggregate the data
  *  collected from each RequestProcessor thread.
  */
-public class RequestGroupInfo {
+public class RequestGroupInfo extends BaseModelMBean {
     private final List<RequestInfo> processors = new ArrayList<>();
     private long deadMaxTime = 0;
     private long deadProcessingTime = 0;
@@ -31,6 +35,9 @@ public class RequestGroupInfo {
     private int deadErrorCount = 0;
     private long deadBytesReceived = 0;
     private long deadBytesSent = 0;
+
+    public RequestGroupInfo() throws MBeanException, RuntimeOperationsException {
+    }
 
     public synchronized void addRequestProcessor( RequestInfo rp ) {
         processors.add( rp );
