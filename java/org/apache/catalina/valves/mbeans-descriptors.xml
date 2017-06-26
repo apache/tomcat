@@ -366,7 +366,6 @@
 
     <attribute name="addConnectorPort"
                description="Append the server connector port to the client IP separated by a semicolon"
-               is="true"
                type="boolean"/>
 
     <attribute name="allow"
@@ -410,7 +409,6 @@
 
     <attribute name="invalidAuthenticationWhenDeny"
                description="Send an invalid authentication header instead of deny"
-               is="true"
                type="boolean"/>
 
     <attribute name="stateName"
@@ -436,7 +434,6 @@
 
     <attribute name="addConnectorPort"
                description="Append the server connector port to the client IP separated by a semicolon"
-               is="true"
                type="boolean"/>
 
     <attribute name="allow"
@@ -480,7 +477,6 @@
 
     <attribute name="invalidAuthenticationWhenDeny"
                description="Send an invalid authentication header instead of deny"
-               is="true"
                type="boolean"/>
 
     <attribute name="stateName"
