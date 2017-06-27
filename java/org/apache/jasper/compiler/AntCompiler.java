@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import java.io.ByteArrayOutputStream;
@@ -279,7 +278,7 @@ public class AntCompiler extends Compiler {
         }
 
         // JSR45 Support
-        if (! options.isSmapSuppressed()) {
+        if (!options.isSmapSuppressed()) {
             SmapUtil.installSmap(smap);
         }
     }
