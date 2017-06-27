@@ -191,6 +191,7 @@ public class ChunkedOutputFilter implements OutputFilter {
                 }
                 osw.write(trailerField.getKey());
                 osw.write(':');
+                osw.write(' ');
                 osw.write(trailerField.getValue());
                 osw.write("\r\n");
             }
