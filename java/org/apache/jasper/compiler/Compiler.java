@@ -102,6 +102,8 @@ public abstract class Compiler {
      * Compile the jsp file into equivalent servlet in .java file
      *
      * @throws Exception Error generating Java source
+     *
+     * @return A map of class names to JSR 045 source maps
      */
     protected Map<String,SmapStratum> generateJava() throws Exception {
 
