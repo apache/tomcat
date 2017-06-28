@@ -106,9 +106,13 @@ public class FileHandler extends Handler {
 
                 {
                     SecurityManager s = System.getSecurityManager();
-                    this.isSecurityEnabled = s != null;
-                    this.group = isSecurityEnabled ? s.getThreadGroup()
-                            : Thread.currentThread().getThreadGroup();
+                    if (s == null) {
+                        this.isSecurityEnabled = false;
+                        this.group = Thread.currentThread().getThreadGroup();
+                    } else {
+                        this.isSecurityEnabled = true;
+                        this.group = s.getThreadGroup();
+                    }
                 }
 
                 @Override
