@@ -29,6 +29,8 @@ import java.io.UnsupportedEncodingException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.sql.Timestamp;
 import java.time.DateTimeException;
 import java.time.LocalDate;
@@ -36,6 +38,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.ErrorManager;
@@ -93,7 +97,51 @@ import java.util.regex.Pattern;
 public class FileHandler extends Handler {
     public static final int DEFAULT_MAX_DAYS = -1;
 
-    private static final ExecutorService DELETE_FILES_SERVICE = Executors.newSingleThreadExecutor();
+    private static final ExecutorService DELETE_FILES_SERVICE =
+            Executors.newSingleThreadExecutor(new ThreadFactory() {
+                private final boolean isSecurityEnabled;
+                private final ThreadGroup group;
+                private final AtomicInteger threadNumber = new AtomicInteger(1);
+                private final String namePrefix = "FileHandlerLogFilesCleaner-";
+
+                {
+                    SecurityManager s = System.getSecurityManager();
+                    this.isSecurityEnabled = s != null;
+                    this.group = isSecurityEnabled ? s.getThreadGroup()
+                            : Thread.currentThread().getThreadGroup();
+                }
+
+                @Override
+                public Thread newThread(Runnable r) {
+                    ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                    try {
+                        // Threads should not be created by the webapp classloader
+                        if (isSecurityEnabled) {
+                            AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+                                Thread.currentThread()
+                                        .setContextClassLoader(getClass().getClassLoader());
+                                return null;
+                            });
+                        } else {
+                            Thread.currentThread()
+                                    .setContextClassLoader(getClass().getClassLoader());
+                        }
+                        Thread t = new Thread(group, r,
+                                namePrefix + threadNumber.getAndIncrement());
+                        t.setDaemon(true);
+                        return t;
+                    } finally {
+                        if (isSecurityEnabled) {
+                            AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+                                Thread.currentThread().setContextClassLoader(loader);
+                                return null;
+                            });
+                        } else {
+                            Thread.currentThread().setContextClassLoader(loader);
+                        }
+                    }
+                }
+            });
 
     // ------------------------------------------------------------ Constructor
 
