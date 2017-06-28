@@ -995,7 +995,7 @@ public class DefaultServlet extends HttpServlet {
                     }
                     copy(resource, renderResult, writer, encoding);
                 } else {
-                    // Output is via an InputStream
+                    // Output is via an OutputStream
                     if (resource.isDirectory()) {
                         renderResult = render(getPathPrefix(request), resource, encoding);
                     } else {
