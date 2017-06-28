@@ -64,6 +64,12 @@
         <code>AsyncListener</code>s after an I/O error on a non-container
         thread. (markt)
       </fix>
+      <fix>
+        Additional permission for deleting files is granted to JULI as it is
+        required by FileHandler when running under a Security Manager. The
+        thread that cleans the log files is marked as daemon thread.
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
