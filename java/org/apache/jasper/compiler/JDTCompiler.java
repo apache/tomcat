@@ -69,7 +69,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
      * Compile the servlet from .java file to .class file
      */
     @Override
-    protected void generateClass(String[] smap)
+    protected void generateClass(Map<String,SmapStratum> smaps)
         throws FileNotFoundException, JasperException, Exception {
 
         long t1 = 0;
@@ -470,7 +470,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
 
         // JSR45 Support
         if (! options.isSmapSuppressed()) {
-            SmapUtil.installSmap(smap);
+            SmapUtil.installSmap(smaps);
         }
     }
 }

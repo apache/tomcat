@@ -1252,7 +1252,7 @@ public class JspC extends Task implements Options {
                 targetClassName = null;
             }
             if (targetPackage != null) {
-                clctxt.setServletPackageName(targetPackage);
+                clctxt.setBasePackageName(targetPackage);
             }
 
             originalClassLoader = Thread.currentThread().getContextClassLoader();

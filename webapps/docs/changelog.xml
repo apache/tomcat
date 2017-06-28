@@ -102,6 +102,20 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>49176</bug>: When generating JSP runtime error messages that quote
+        the relevant JSP source code, switch from using the results of the JSP
+        page parsing process to using the JSR 045 source map data to identify
+        the correct part of the JSP source from the stack trace. This
+        significantly reduces the memory footprint of Jasper in development
+        mode, provides a small performance improvement for error page generation
+        and enables source quotes to continue to be provided after a Tomcat
+        restart. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <add>
