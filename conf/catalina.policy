@@ -72,7 +72,7 @@ grant codeBase "file:${catalina.home}/bin/tomcat-juli.jar" {
         permission java.io.FilePermission
          "${catalina.base}${file.separator}logs", "read, write";
         permission java.io.FilePermission
-         "${catalina.base}${file.separator}logs${file.separator}*", "read, write";
+         "${catalina.base}${file.separator}logs${file.separator}*", "read, write, delete";
 
         permission java.lang.RuntimePermission "shutdownHooks";
         permission java.lang.RuntimePermission "getClassLoader";
