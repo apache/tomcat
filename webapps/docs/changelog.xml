@@ -63,6 +63,12 @@
         <code>TabularData</code> when viewing via the JMX proxy servlet. Patch
         provided by Alexis Hassler. (markt)
       </fix>
+      <fix>
+        Additional permission for deleting files is granted to JULI as it is
+        required by FileHandler when running under a Security Manager. The
+        thread that cleans the log files is marked as daemon thread.
+        (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
