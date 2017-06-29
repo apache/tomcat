@@ -70,6 +70,11 @@
         thread that cleans the log files is marked as daemon thread.
         (violetagg)
       </fix>
+      <fix>
+        <bug>61229</bug>: Correct a regression in 8.5.15 that broke WebDAV
+        handling for resources with names that included a <code>&amp;</code>
+        character. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
