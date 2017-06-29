@@ -34,10 +34,10 @@ import java.util.BitSet;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-public class URLEncoder {
+public class URLEncoder implements Cloneable {
+
     private static final char[] hexadecimal =
-    {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-     'A', 'B', 'C', 'D', 'E', 'F'};
+            {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     public static final URLEncoder DEFAULT = new URLEncoder();
     public static final URLEncoder QUERY = new URLEncoder();
@@ -99,12 +99,14 @@ public class URLEncoder {
     }
 
     //Array containing the safe characters set.
-    private final BitSet safeCharacters = new BitSet(256);
+    private final BitSet safeCharacters;
 
     private boolean encodeSpaceAsPlus = false;
 
 
     public URLEncoder() {
+        this(new BitSet(256));
+
         for (char i = 'a'; i <= 'z'; i++) {
             addSafeCharacter(i);
         }
@@ -117,8 +119,18 @@ public class URLEncoder {
     }
 
 
-    public void addSafeCharacter( char c ) {
-        safeCharacters.set( c );
+    private URLEncoder(BitSet safeCharacters) {
+        this.safeCharacters = safeCharacters;
+    }
+
+
+    public void addSafeCharacter(char c) {
+        safeCharacters.set(c);
+    }
+
+
+    public void removeSafeCharacter(char c) {
+        safeCharacters.clear(c);
     }
 
 
@@ -171,5 +183,13 @@ public class URLEncoder {
             }
         }
         return rewrittenPath.toString();
+    }
+
+
+    @Override
+    public Object clone() {
+        URLEncoder result = new URLEncoder((BitSet) safeCharacters.clone());
+        result.setEncodeSpaceAsPlus(encodeSpaceAsPlus);
+        return result;
     }
 }
