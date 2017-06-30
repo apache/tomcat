@@ -971,10 +971,7 @@ public class DefaultServlet
             } catch (IllegalStateException e) {
                 // If it fails, we try to get a Writer instead if we're
                 // trying to serve a text file
-                if ( (contentType == null)
-                        || (contentType.startsWith("text"))
-                        || (contentType.endsWith("xml"))
-                        || (contentType.contains("/javascript")) ) {
+                if (isText(contentType)) {
                     writer = response.getWriter();
                     // Cannot reliably serve partial content with a Writer
                     ranges = FULL;
@@ -1053,7 +1050,7 @@ public class DefaultServlet
                 String outputEncoding = response.getCharacterEncoding();
                 Charset charset = B2CConverter.getCharset(outputEncoding);
                 if (ostream != null) {
-                    if (charset.equals(fileEncodingCharset)) {
+                    if (!isText(contentType) || charset.equals(fileEncodingCharset)) {
                         if (!checkSendfile(request, response, cacheEntry, contentLength, null)) {
                             copy(cacheEntry, renderResult, ostream);
                         }
@@ -1135,12 +1132,16 @@ public class DefaultServlet
                         throw new IllegalStateException();
                     }
                 }
-
             }
-
         }
-
     }
+
+
+    private boolean isText(String contentType) {
+        return  contentType == null || contentType.startsWith("text") ||
+                contentType.endsWith("xml") || contentType.contains("/javascript");
+    }
+
 
     private void doDirectoryRedirect(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
