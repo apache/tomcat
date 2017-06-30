@@ -106,6 +106,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Remove references to the Loader attribute
+        <code>searchExternalFirst</code> from the documentation since the
+        attribute is no longer supported. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.16 (markt)" rtext="2017-06-26">
   <subsection name="Catalina">

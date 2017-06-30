@@ -135,12 +135,6 @@
         <code>org.apache.catalina.loader.WebappClassLoader</code>.</p>
       </attribute>
 
-      <attribute name="searchExternalFirst" required="false">
-        <p>Set to <code>true</code> if you want repositories outside
-        of <code>WEB-INF/classes</code> and <code>WEB-INF/lib</code> to
-        be searched first. Default value is <code>false</code>.</p>
-      </attribute>
-
     </attributes>
 
   </subsection>
