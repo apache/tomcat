@@ -48,6 +48,11 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>49464</bug>: Improve the Default Servlet's handling of static files
+        when the file encoding is not compatible with the required response
+        encoding. (markt)
+      </fix>
+      <fix>
         <bug>61214</bug>: Remove deleted attribute <code>servlets</code> from
         the Context MBean description. Patch provided by Alexis Hassler. (markt)
       </fix>
