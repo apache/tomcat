@@ -61,6 +61,11 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>49464</bug>: Improve the Default Servlet's handling of static files
+        when the file encoding is not compatible with the required response
+        encoding. (markt)
+      </fix>
+      <fix>
         Additional permission for deleting files is granted to JULI as it is
         required by FileHandler when running under a Security Manager. The
         thread that cleans the log files is marked as daemon thread.

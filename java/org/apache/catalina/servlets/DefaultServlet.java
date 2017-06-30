@@ -32,6 +32,8 @@ import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -75,6 +77,7 @@ import org.apache.naming.resources.CacheEntry;
 import org.apache.naming.resources.ProxyDirContext;
 import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.ResourceAttributes;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
 import org.apache.tomcat.util.security.PrivilegedSetTccl;
@@ -209,6 +212,7 @@ public class DefaultServlet
      * the platform default is used.
      */
     protected String fileEncoding = null;
+    private Charset fileEncodingCharset = null;
 
 
     /**
@@ -321,6 +325,16 @@ public class DefaultServlet
                 Integer.parseInt(getServletConfig().getInitParameter("sendfileSize")) * 1024;
 
         fileEncoding = getServletConfig().getInitParameter("fileEncoding");
+        if (fileEncoding == null) {
+            fileEncodingCharset = Charset.defaultCharset();
+            fileEncoding = fileEncodingCharset.name();
+        } else {
+            try {
+                fileEncodingCharset = B2CConverter.getCharset(fileEncoding);
+            } catch (UnsupportedEncodingException e) {
+                throw new ServletException(e);
+            }
+        }
 
         globalXsltFile = getServletConfig().getInitParameter("globalXsltFile");
         contextXsltFile = getServletConfig().getInitParameter("contextXsltFile");
@@ -971,7 +985,7 @@ public class DefaultServlet
 
         }
 
-        // Check to see if a Filter, Valve of wrapper has written some content.
+        // Check to see if a Filter, Valve or wrapper has written some content.
         // If it has, disable range requests and setting of a content length
         // since neither can be done reliably.
         ServletResponse r = response;
@@ -1035,9 +1049,22 @@ public class DefaultServlet
                 } catch (IllegalStateException e) {
                     // Silent catch
                 }
+                // Check to see if conversion is required
+                String outputEncoding = response.getCharacterEncoding();
+                Charset charset = B2CConverter.getCharset(outputEncoding);
                 if (ostream != null) {
-                    if (!checkSendfile(request, response, cacheEntry, contentLength, null))
-                        copy(cacheEntry, renderResult, ostream);
+                    if (charset.equals(fileEncodingCharset)) {
+                        if (!checkSendfile(request, response, cacheEntry, contentLength, null)) {
+                            copy(cacheEntry, renderResult, ostream);
+                        }
+                    } else {
+                        // A conversion is required from fileEncoding to
+                        // response encoding
+                        OutputStreamWriter osw = new OutputStreamWriter(ostream, charset);
+                        PrintWriter pw = new PrintWriter(osw);
+                        copy(cacheEntry, renderResult, pw);
+                        pw.flush();
+                    }
                 } else {
                     copy(cacheEntry, renderResult, writer);
                 }
