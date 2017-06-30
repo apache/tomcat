@@ -121,6 +121,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Remove references to the Loader attribute
+        <code>searchExternalFirst</code> from the documentation since the
+        attribute is no longer supported. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <add>
