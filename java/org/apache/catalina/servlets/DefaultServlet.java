@@ -32,6 +32,8 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -73,6 +75,7 @@ import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
 import org.apache.tomcat.util.security.PrivilegedSetTccl;
@@ -230,6 +233,7 @@ public class DefaultServlet extends HttpServlet {
      * the platform default is used.
      */
     protected String fileEncoding = null;
+    private Charset fileEncodingCharset = null;
 
     /**
      * Minimum size for sendfile usage in bytes.
@@ -287,6 +291,16 @@ public class DefaultServlet extends HttpServlet {
                 Integer.parseInt(getServletConfig().getInitParameter("sendfileSize")) * 1024;
 
         fileEncoding = getServletConfig().getInitParameter("fileEncoding");
+        if (fileEncoding == null) {
+            fileEncodingCharset = Charset.defaultCharset();
+            fileEncoding = fileEncodingCharset.name();
+        } else {
+            try {
+                fileEncodingCharset = B2CConverter.getCharset(fileEncoding);
+            } catch (UnsupportedEncodingException e) {
+                throw new ServletException(e);
+            }
+        }
 
         globalXsltFile = getServletConfig().getInitParameter("globalXsltFile");
         contextXsltFile = getServletConfig().getInitParameter("contextXsltFile");
@@ -938,7 +952,7 @@ public class DefaultServlet extends HttpServlet {
             }
         }
 
-        // Check to see if a Filter, Valve of wrapper has written some content.
+        // Check to see if a Filter, Valve or wrapper has written some content.
         // If it has, disable range requests and setting of a content length
         // since neither can be done reliably.
         ServletResponse r = response;
@@ -1000,19 +1014,38 @@ public class DefaultServlet extends HttpServlet {
                         renderResult = render(getPathPrefix(request), resource, encoding);
                     } else {
                         // Output is content of resource
-                        if (!checkSendfile(request, response, resource,
-                                contentLength, null)) {
-                            // sendfile not possible so check if resource
-                            // content is available directly
-                            byte[] resourceBody = resource.getContent();
-                            if (resourceBody == null) {
-                                // Resource content not available, use
-                                // inputstream
-                                renderResult = resource.getInputStream();
-                            } else {
-                                // Use the resource content directly
-                                ostream.write(resourceBody);
+                        // Check to see if conversion is required
+                        String outputEncoding = response.getCharacterEncoding();
+                        Charset charset = B2CConverter.getCharset(outputEncoding);
+                        if (charset.equals(fileEncodingCharset)) {
+                            if (!checkSendfile(request, response, resource,
+                                    contentLength, null)) {
+                                // sendfile not possible so check if resource
+                                // content is available directly
+                                byte[] resourceBody = resource.getContent();
+                                if (resourceBody == null) {
+                                    // Resource content not available, use
+                                    // inputstream
+                                    renderResult = resource.getInputStream();
+                                } else {
+                                    // Use the resource content directly
+                                    ostream.write(resourceBody);
+                                }
                             }
+                        } else {
+                            // A conversion is required from fileEncoding to
+                            // response encoding
+                            byte[] resourceBody = resource.getContent();
+                            InputStream source;
+                            if (resourceBody == null) {
+                                source = resource.getInputStream();
+                            } else {
+                                source = new ByteArrayInputStream(resourceBody);
+                            }
+                            OutputStreamWriter osw = new OutputStreamWriter(ostream, charset);
+                            PrintWriter pw = new PrintWriter(osw);
+                            copy(resource, source, pw, fileEncoding);
+                            pw.flush();
                         }
                     }
                     // If a stream was configured, it needs to be copied to

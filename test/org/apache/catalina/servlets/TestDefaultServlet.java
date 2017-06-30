@@ -20,7 +20,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,6 +31,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
@@ -46,7 +52,9 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
 public class TestDefaultServlet extends TomcatBaseTest {
@@ -620,6 +628,138 @@ public class TestDefaultServlet extends TomcatBaseTest {
         @Override
         public boolean isResponseBodyOK() {
             return true;
+        }
+    }
+
+    @Test
+    public void testEncodingIncludeStreamOutIso88591() throws Exception {
+        doTestEncoding(false, "ISO-8859-1");
+    }
+
+    @Test
+    public void testEncodingIncludeWriterOutIso88591() throws Exception {
+        doTestEncoding(true, "ISO-8859-1");
+    }
+
+    @Test
+    public void testEncodingIncludeStreamOutUtf8() throws Exception {
+        doTestEncoding(false, "UTF-8");
+    }
+
+    @Test
+    public void testEncodingIncludeWriterOutUtf8() throws Exception {
+        doTestEncoding(true, "UTF-8");
+    }
+
+    @Test
+    public void testEncodingIncludeStreamOutIbm850() throws Exception {
+        doTestEncoding(false, "IBM850");
+    }
+
+    @Test
+    public void testEncodingIncludeWriterOutIbm850() throws Exception {
+        doTestEncoding(false, "IBM850");
+    }
+
+    public void doTestEncoding(boolean useWriter, String outputEncoding) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
+        defaultServlet.addInitParameter("fileEncoding", "IBM850");
+        ctxt.addServletMappingDecoded("/", "default");
+
+        Tomcat.addServlet(ctxt, "encoding",
+                new EncodingServlet(outputEncoding, "/bug49nnn/bug49464-ibm850.txt", useWriter));
+        ctxt.addServletMappingDecoded("/test", "encoding");
+
+        tomcat.start();
+
+        final ByteChunk res = new ByteChunk();
+        Map<String,List<String>> headers = new HashMap<>();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/test", res, headers);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        List<String> values = headers.get("Content-Type");
+        if (values.size() == 1) {
+            MediaType mediaType = MediaType.parseMediaType(new StringReader(values.get(0)));
+            String charset = mediaType.getCharset();
+            if (charset == null) {
+                res.setCharset(StandardCharsets.ISO_8859_1);
+            } else {
+                res.setCharset(B2CConverter.getCharset(charset));
+            }
+        } else {
+            res.setCharset(StandardCharsets.ISO_8859_1);
+        }
+        Assert.assertEquals("½", res.toString());
+    }
+
+    @Test
+    public void testEncodingDirect() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
+        defaultServlet.addInitParameter("fileEncoding", "IBM850");
+        ctxt.addServletMappingDecoded("/", "default");
+
+        tomcat.start();
+
+        final ByteChunk res = new ByteChunk();
+        Map<String,List<String>> headers = new HashMap<>();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/bug49nnn/bug49464-ibm850.txt",
+                res, headers);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        List<String> values = headers.get("Content-Type");
+        if (values != null && values.size() == 1) {
+            MediaType mediaType = MediaType.parseMediaType(new StringReader(values.get(0)));
+            String charset = mediaType.getCharset();
+            if (charset == null) {
+                res.setCharset(StandardCharsets.ISO_8859_1);
+            } else {
+                res.setCharset(B2CConverter.getCharset(charset));
+            }
+        } else {
+            res.setCharset(StandardCharsets.ISO_8859_1);
+        }
+        Assert.assertEquals("½", res.toString());
+    }
+
+    private static class EncodingServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final String outputEncoding;
+        private final String includeTarget;
+        private final boolean useWriter;
+
+        public EncodingServlet(String outputEncoding, String includeTarget, boolean useWriter) {
+            this.outputEncoding = outputEncoding;
+            this.includeTarget = includeTarget;
+            this.useWriter = useWriter;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding(outputEncoding);
+            if (useWriter) {
+                resp.getWriter();
+            }
+            resp.flushBuffer();
+            RequestDispatcher rd = req.getRequestDispatcher(includeTarget);
+            rd.include(req, resp);
         }
     }
 }
