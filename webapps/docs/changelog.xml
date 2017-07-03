@@ -150,6 +150,10 @@
         JRE provided versions are deprecated and Java 9 does not provide them by
         default. (markt)
       </scode>
+      <fix>
+        Add necessary Java 9 configuration options to the startup scripts to
+        prevent warnings being generated on web application stop. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
