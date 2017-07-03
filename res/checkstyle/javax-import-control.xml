@@ -68,4 +68,7 @@
   <subpackage name="websocket">
     <allow pkg="javax.websocket"/>
   </subpackage>
+  <subpackage name="xml.ws">
+    <allow pkg="javax.xwl.ws"/>
+  </subpackage>
 </import-control>

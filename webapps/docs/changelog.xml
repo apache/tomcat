@@ -143,6 +143,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <scode>
+        Restore the local definition of the web service annotations since the
+        JRE provided versions are deprecated and Java 9 does not provide them by
+        default. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M22 (markt)" rtext="2017-06-26">
   <subsection name="Catalina">
