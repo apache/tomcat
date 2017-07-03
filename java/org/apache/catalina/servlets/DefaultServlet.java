@@ -2126,28 +2126,6 @@ public class DefaultServlet extends HttpServlet {
      * output stream, and ensure that both streams are closed before returning
      * (even in the face of an exception).
      *
-     * @param resource  The source resource
-     * @param is        The input stream to read the source resource from
-     * @param ostream   The output stream to write to
-     *
-     * @exception IOException if an input/output error occurs
-     *
-     * @Deprecated Unused. This will be removed in Tomcat 9.
-     *             Use {@link #copy(InputStream, ServletOutputStream)}
-     */
-    @Deprecated
-    protected void copy(WebResource resource, InputStream is,
-                      ServletOutputStream ostream)
-        throws IOException {
-        copy(is, ostream);
-    }
-
-
-    /**
-     * Copy the contents of the specified input stream to the specified
-     * output stream, and ensure that both streams are closed before returning
-     * (even in the face of an exception).
-     *
      * @param is        The input stream to read the source resource from
      * @param ostream   The output stream to write to
      *
@@ -2167,28 +2145,6 @@ public class DefaultServlet extends HttpServlet {
         // Rethrow any exception that has occurred
         if (exception != null)
             throw exception;
-    }
-
-
-    /**
-     * Copy the contents of the specified input stream to the specified
-     * output stream, and ensure that both streams are closed before returning
-     * (even in the face of an exception).
-     *
-     * @param resource  The source resource
-     * @param is        The input stream to read the source resource from
-     * @param writer    The writer to write to
-     * @param encoding  The encoding to use when reading the source input stream
-     *
-     * @exception IOException if an input/output error occurs
-     *
-     * @Deprecated Unused. This will be removed in Tomcat 9.
-     *             Use {@link #copy(InputStream, PrintWriter, String)}
-     */
-    @Deprecated
-    protected void copy(WebResource resource, InputStream is, PrintWriter writer,
-            String encoding) throws IOException {
-        copy(is, writer,encoding);
     }
 
 
