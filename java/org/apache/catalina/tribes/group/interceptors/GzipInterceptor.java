@@ -20,6 +20,8 @@ package org.apache.catalina.tribes.group.interceptors;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -36,37 +38,107 @@ import org.apache.juli.logging.LogFactory;
 /**
  * @version 1.0
  */
-public class GzipInterceptor extends ChannelInterceptorBase {
+public class GzipInterceptor extends ChannelInterceptorBase implements GzipInterceptorMBean {
 
     private static final Log log = LogFactory.getLog(GzipInterceptor.class);
     protected static final StringManager sm = StringManager.getManager(GzipInterceptor.class);
 
     public static final int DEFAULT_BUFFER_SIZE = 2048;
+    public static final int DEFAULT_OPTION_COMPRESSION_ENABLE = 0x0100;
+
+    private int compressionMinSize = 0;
+    private volatile boolean statsEnabled = false;
+    private int interval = 0;
+
+    // Stats
+    private final AtomicInteger count = new AtomicInteger();
+    private final AtomicInteger countCompressedTX = new AtomicInteger();
+    private final AtomicInteger countUncompressedTX = new AtomicInteger();
+    private final AtomicInteger countCompressedRX = new AtomicInteger();
+    private final AtomicInteger countUncompressedRX = new AtomicInteger();
+    private final AtomicLong sizeTX = new AtomicLong();
+    private final AtomicLong compressedSizeTX = new AtomicLong();
+    private final AtomicLong uncompressedSizeTX = new AtomicLong();
+    private final AtomicLong sizeRX = new AtomicLong();
+    private final AtomicLong compressedSizeRX = new AtomicLong();
+    private final AtomicLong uncompressedSizeRX = new AtomicLong();
+
+
+    public GzipInterceptor() {
+        setOptionFlag(DEFAULT_OPTION_COMPRESSION_ENABLE);
+    }
+
 
     @Override
-    public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload) throws ChannelException {
+    public void sendMessage(Member[] destination, ChannelMessage msg, InterceptorPayload payload)
+            throws ChannelException {
         try {
-            byte[] data = compress(msg.getMessage().getBytes());
+            byte[] data = msg.getMessage().getBytes();
+            if (statsEnabled) {
+                sizeTX.addAndGet(data.length);
+            }
+
+            if (data.length > compressionMinSize) {
+                data = compress(data);
+                // Set the flag that indicates that the message is compressed
+                msg.setOptions(msg.getOptions() | getOptionFlag());
+                if (statsEnabled) {
+                    countCompressedTX.incrementAndGet();
+                    compressedSizeTX.addAndGet(data.length);
+                }
+            } else if (statsEnabled){
+                countUncompressedTX.incrementAndGet();
+                uncompressedSizeTX.addAndGet(data.length);
+            }
+
             msg.getMessage().trim(msg.getMessage().getLength());
             msg.getMessage().append(data,0,data.length);
             super.sendMessage(destination, msg, payload);
+
+            int currentCount = count.incrementAndGet();
+            if (statsEnabled && interval > 0 && currentCount % interval == 0) {
+                report();
+            }
         } catch ( IOException x ) {
             log.error(sm.getString("gzipInterceptor.compress.failed"));
             throw new ChannelException(x);
         }
     }
 
+
     @Override
     public void messageReceived(ChannelMessage msg) {
         try {
-            byte[] data = decompress(msg.getMessage().getBytes());
+            byte[] data = msg.getMessage().getBytes();
+            if ((msg.getOptions() & getOptionFlag()) > 0) {
+                if (statsEnabled) {
+                    countCompressedRX.incrementAndGet();
+                    compressedSizeRX.addAndGet(data.length);
+                }
+                // Message was compressed
+                data = decompress(data);
+            } else if (statsEnabled) {
+                countUncompressedRX.incrementAndGet();
+                uncompressedSizeRX.addAndGet(data.length);
+            }
+
+            if (statsEnabled) {
+                sizeRX.addAndGet(data.length);
+            }
+
             msg.getMessage().trim(msg.getMessage().getLength());
             msg.getMessage().append(data,0,data.length);
             super.messageReceived(msg);
+
+            int currentCount = count.incrementAndGet();
+            if (statsEnabled && interval > 0 && currentCount % interval == 0) {
+                report();
+            }
         } catch ( IOException x ) {
             log.error(sm.getString("gzipInterceptor.decompress.failed"),x);
         }
     }
+
 
     public static byte[] compress(byte[] data) throws IOException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -76,6 +148,7 @@ public class GzipInterceptor extends ChannelInterceptorBase {
         gout.close();
         return bout.toByteArray();
     }
+
 
     /**
      * @param data  Data to decompress
@@ -94,5 +167,135 @@ public class GzipInterceptor extends ChannelInterceptorBase {
             length = gin.read(tmp);
         }
         return bout.toByteArray();
+    }
+
+
+    @Override
+    public void report() {
+        log.info(sm.getString("gzipInterceptor.report", Integer.valueOf(getCount()),
+                Integer.valueOf(getCountCompressedTX()), Integer.valueOf(getCountUncompressedTX()),
+                Integer.valueOf(getCountCompressedRX()), Integer.valueOf(getCountUncompressedRX()),
+                Long.valueOf(getSizeTX()), Long.valueOf(getCompressedSizeTX()),
+                Long.valueOf(getUncompressedSizeTX()),
+                Long.valueOf(getSizeRX()), Long.valueOf(getCompressedSizeRX()),
+                Long.valueOf(getUncompressedSizeRX())));
+    }
+
+
+    @Override
+    public int getCompressionMinSize() {
+        return compressionMinSize;
+    }
+
+
+    @Override
+    public void setCompressionMinSize(int compressionMinSize) {
+        this.compressionMinSize = compressionMinSize;
+    }
+
+
+    @Override
+    public boolean getStatsEnabled() {
+        return statsEnabled;
+    }
+
+
+    @Override
+    public void setStatsEnabled(boolean statsEnabled) {
+        this.statsEnabled = statsEnabled;
+    }
+
+
+    @Override
+    public int getInterval() {
+        return interval;
+    }
+
+
+    @Override
+    public void setInterval(int interval) {
+        this.interval = interval;
+    }
+
+
+    @Override
+    public int getCount() {
+        return count.get();
+    }
+
+
+    @Override
+    public int getCountCompressedTX() {
+        return countCompressedTX.get();
+    }
+
+
+    @Override
+    public int getCountUncompressedTX() {
+        return countUncompressedTX.get();
+    }
+
+
+    @Override
+    public int getCountCompressedRX() {
+        return countCompressedRX.get();
+    }
+
+
+    @Override
+    public int getCountUncompressedRX() {
+        return countUncompressedRX.get();
+    }
+
+
+    @Override
+    public long getSizeTX() {
+        return sizeTX.get();
+    }
+
+
+    @Override
+    public long getCompressedSizeTX() {
+        return compressedSizeTX.get();
+    }
+
+
+    @Override
+    public long getUncompressedSizeTX() {
+        return uncompressedSizeTX.get();
+    }
+
+
+    @Override
+    public long getSizeRX() {
+        return sizeRX.get();
+    }
+
+
+    @Override
+    public long getCompressedSizeRX() {
+        return compressedSizeRX.get();
+    }
+
+
+    @Override
+    public long getUncompressedSizeRX() {
+        return uncompressedSizeRX.get();
+    }
+
+
+    @Override
+    public void reset() {
+        count.set(0);
+        countCompressedTX.set(0);
+        countUncompressedTX.set(0);
+        countCompressedRX.set(0);
+        countUncompressedRX.set(0);
+        sizeTX.set(0);
+        compressedSizeTX.set(0);
+        uncompressedSizeTX.set(0);
+        sizeRX.set(0);
+        compressedSizeRX.set(0);
+        uncompressedSizeRX.set(0);
     }
 }

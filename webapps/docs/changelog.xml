@@ -138,6 +138,12 @@
   <subsection name="Tribes">
     <changelog>
       <add>
+        <bug>51513</bug>: Add support for the <code>compressionMinSize</code>
+        attribute to the <code>GzipInterceptor</code>, add optional statistics
+        collection and expose the Interceptor over JMX. Based on a patch by
+        Christian Stöber. (markt)
+      </add>
+      <add>
         <bug>61127</bug>Allow human-readable names for channelSendOptions and
         mapSendOptions. Patch provided by Igal Sapir. (schultz)
       </add>
