@@ -1002,7 +1002,7 @@ public class DefaultServlet extends HttpServlet {
                     } else {
                         renderResult = resource.getInputStream();
                     }
-                    copy(resource, renderResult, writer, encoding);
+                    copy(renderResult, writer, encoding);
                 } else {
                     // Output is via an OutputStream
                     if (resource.isDirectory()) {
@@ -1039,14 +1039,14 @@ public class DefaultServlet extends HttpServlet {
                             }
                             OutputStreamWriter osw = new OutputStreamWriter(ostream, charset);
                             PrintWriter pw = new PrintWriter(osw);
-                            copy(resource, source, pw, fileEncoding);
+                            copy(source, pw, fileEncoding);
                             pw.flush();
                         }
                     }
                     // If a stream was configured, it needs to be copied to
                     // the output (this method closes the stream)
                     if (renderResult != null) {
-                        copy(resource, renderResult, ostream);
+                        copy(renderResult, ostream);
                     }
                 }
             }
@@ -2131,10 +2131,29 @@ public class DefaultServlet extends HttpServlet {
      * @param ostream   The output stream to write to
      *
      * @exception IOException if an input/output error occurs
+     *
+     * @Deprecated Unused. This will be removed in Tomcat 9.
+     *             Use {@link #copy(InputStream, ServletOutputStream)}
      */
+    @Deprecated
     protected void copy(WebResource resource, InputStream is,
                       ServletOutputStream ostream)
         throws IOException {
+        copy(is, ostream);
+    }
+
+
+    /**
+     * Copy the contents of the specified input stream to the specified
+     * output stream, and ensure that both streams are closed before returning
+     * (even in the face of an exception).
+     *
+     * @param is        The input stream to read the source resource from
+     * @param ostream   The output stream to write to
+     *
+     * @exception IOException if an input/output error occurs
+     */
+    protected void copy(InputStream is, ServletOutputStream ostream) throws IOException {
 
         IOException exception = null;
         InputStream istream = new BufferedInputStream(is, input);
@@ -2162,24 +2181,36 @@ public class DefaultServlet extends HttpServlet {
      * @param encoding  The encoding to use when reading the source input stream
      *
      * @exception IOException if an input/output error occurs
+     *
+     * @Deprecated Unused. This will be removed in Tomcat 9.
+     *             Use {@link #copy(InputStream, PrintWriter, String)}
      */
+    @Deprecated
     protected void copy(WebResource resource, InputStream is, PrintWriter writer,
             String encoding) throws IOException {
+        copy(is, writer,encoding);
+    }
 
+
+    /**
+     * Copy the contents of the specified input stream to the specified
+     * output stream, and ensure that both streams are closed before returning
+     * (even in the face of an exception).
+     *
+     * @param is        The input stream to read the source resource from
+     * @param writer    The writer to write to
+     * @param encoding  The encoding to use when reading the source input stream
+     *
+     * @exception IOException if an input/output error occurs
+     */
+    protected void copy(InputStream is, PrintWriter writer, String encoding) throws IOException {
         IOException exception = null;
-
-        InputStream resourceInputStream = null;
-        if (resource.isFile()) {
-            resourceInputStream = resource.getInputStream();
-        } else {
-            resourceInputStream = is;
-        }
 
         Reader reader;
         if (encoding == null) {
-            reader = new InputStreamReader(resourceInputStream);
+            reader = new InputStreamReader(is);
         } else {
-            reader = new InputStreamReader(resourceInputStream, encoding);
+            reader = new InputStreamReader(is, encoding);
         }
 
         // Copy the input stream to the output stream
@@ -2189,8 +2220,9 @@ public class DefaultServlet extends HttpServlet {
         reader.close();
 
         // Rethrow any exception that has occurred
-        if (exception != null)
+        if (exception != null) {
             throw exception;
+        }
     }
 
 
