@@ -34,7 +34,6 @@ public class TestGzipInterceptor {
 
     @Parameters(name = "{index}: bufferSize[{0}]")
     public static Collection<Object[]> inputs() {
-        /// Note: These files are saved using the encoding indicated by the BOM
         List<Object[]> result = new ArrayList<>();
         result.add(new Object[] { Integer.valueOf(GzipInterceptor.DEFAULT_BUFFER_SIZE / 2) });
         result.add(new Object[] { Integer.valueOf(GzipInterceptor.DEFAULT_BUFFER_SIZE - 1) });
