@@ -2172,7 +2172,7 @@ public class DefaultServlet extends HttpServlet {
      *
      * @exception IOException if an input/output error occurs
      *
-     * @Deprecated Unused. This will be removed in Tomcat 9.
+     * @deprecated Unused. This will be removed in Tomcat 9.
      *             Use {@link #copy(InputStream, ServletOutputStream)}
      */
     @Deprecated
@@ -2222,7 +2222,7 @@ public class DefaultServlet extends HttpServlet {
      *
      * @exception IOException if an input/output error occurs
      *
-     * @Deprecated Unused. This will be removed in Tomcat 9.
+     * @deprecated Unused. This will be removed in Tomcat 9.
      *             Use {@link #copy(InputStream, PrintWriter, String)}
      */
     @Deprecated
