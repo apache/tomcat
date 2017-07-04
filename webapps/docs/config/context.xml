@@ -618,23 +618,23 @@
 
       <attribute name="xmlBlockExternal" required="false">
         <p>If the value of this flag is <code>true</code>, the parsing of
-        <code>web.xml</code>, <code>web-fragment.xml</code>, <code>*.tld</code>,
-        <code>*.jspx</code>, <code>*.tagx</code> and <code>tagPlugins.xml</code>
-        files for this web application will not permit external entities to be
-        loaded. If not specified, the default value of <code>true</code> will
-        be used.</p>
+        <code>web.xml</code>, <code>web-fragment.xml</code>,
+        <code>tomcat-web.xml</code>, <code>*.tld</code>, <code>*.jspx</code>,
+        <code>*.tagx</code> and <code>tagPlugins.xml</code> files for this web
+        application will not permit external entities to be loaded. If not
+        specified, the default value of <code>true</code> will be used.</p>
       </attribute>
 
       <attribute name="xmlNamespaceAware" required="false">
         <p>If the value of this flag is <code>true</code>, the parsing of
-        <code>web.xml</code> and <code>web-fragment.xml</code> files for this
-        web application will be namespace-aware. Note that <code>*.tld</code>,
-        <code>*.jspx</code> and <code>*.tagx</code> files are always parsed
-        using a namespace-aware parser and that the <code>tagPlugins.xml</code>
-        file (if any) is never parsed using a namespace-aware parser. Note also
-        that if you turn this flag on, you should probably also turn
-        <code>xmlValidation</code> on. If the
-        <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
+        <code>web.xml</code>, <code>web-fragment.xml</code> and
+        <code>tomcat-web.xml</code> files for this web application will be
+        namespace-aware. Note that <code>*.tld</code>, <code>*.jspx</code> and
+        <code>*.tagx</code> files are always parsed using a namespace-aware
+        parser and that the <code>tagPlugins.xml</code> file (if any) is never
+        parsed using a namespace-aware parser. Note also that if you turn this
+        flag on, you should probably also turn <code>xmlValidation</code> on. If
+        the <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
         <a href="systemprops.html">system property</a> is set to
         <code>true</code>, the default value of this attribute will be
         <code>true</code>, else the default value will be <code>false</code>.
@@ -644,8 +644,9 @@
 
       <attribute name="xmlValidation" required="false">
         <p>If the value of this flag is <code>true</code>, the parsing of
-        <code>web.xml</code> and <code>web-fragment.xml</code> files for this
-        web application will use a validating parser. If the
+        <code>web.xml</code>, <code>web-fragment.xml</code> and
+        <code>tomcat-web.xml</code> files for this web application will use a
+        validating parser. If the
         <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
         <a href="systemprops.html">system property</a> is set to
         <code>true</code>, the default value of this attribute will be
@@ -923,6 +924,10 @@
         to establish default mappings (such as mapping the <code>*.jsp</code>
         extension to the corresponding JSP servlet), and other standard
         features that apply to all web applications.</li>
+    <li>The web application properties listed in the
+        <code>/WEB-INF/tomcat-web.xml</code> resource for this web application
+        will be processed (if this resource exists), taking precedence over the
+        defaults.</li>
     <li>The web application properties listed in the
         <code>/WEB-INF/web.xml</code> resource for this web application
         will be processed (if this resource exists).</li>

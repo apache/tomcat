@@ -68,8 +68,19 @@ By default here is it's declaration:
         <url-pattern>/</url-pattern>
     </servlet-mapping>]]></source>
 
-So by default, the default servlet is loaded at webapp startup and
-directory listings are disabled and debugging is turned off.
+<p>So by default, the default servlet is loaded at webapp startup and directory
+listings are disabled and debugging is turned off.</p>
+
+<p>If you need to change the DefaultServlet settings for an application you can
+override the default configuration by re-defining the DefaultServlet in
+<code>/WEB-INF/web.xml</code>. However, this will cause problems if you attempt
+to deploy the application on another container as the DefaultServlet class will
+not be recognised. You can work-around this problem by using the Tomact specific
+<code>/WEB-INF/tomcat-web.xml</code> deployment descriptor. The format is
+identical to <code>/WEB-INF/web.xml</code>. It will override any default
+settings but not those in <code>/WEB-INF/web.xml</code>. Since it is Tomcat
+specific, it will only be processed when the application is deployed on
+Tomcat.</p>
 </section>
 
 <section anchor="change" name="What can I change?">

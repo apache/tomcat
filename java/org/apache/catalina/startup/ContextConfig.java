@@ -1107,6 +1107,9 @@ public class ContextConfig implements LifecycleListener {
         Set<WebXml> defaults = new HashSet<>();
         defaults.add(getDefaultWebXmlFragment(webXmlParser));
 
+        Set<WebXml> tomcatWebXml = new HashSet<>();
+        tomcatWebXml.add(getTomcatWebXmlFragment(webXmlParser));
+
         WebXml webXml = createWebXml();
 
         // Parse context level web.xml
@@ -1175,7 +1178,11 @@ public class ContextConfig implements LifecycleListener {
                 ok = webXml.merge(orderedFragments);
             }
 
-            // Step 7. Apply global defaults
+            // Step 7a
+            // merge tomcat-web.xml
+            webXml.merge(tomcatWebXml);
+
+            // Step 7b. Apply global defaults
             // Have to merge defaults before JSP conversion since defaults
             // provide JSP servlet definition.
             webXml.merge(defaults);
@@ -1190,6 +1197,7 @@ public class ContextConfig implements LifecycleListener {
                 configureContext(webXml);
             }
         } else {
+            webXml.merge(tomcatWebXml);
             webXml.merge(defaults);
             convertJsps(webXml);
             configureContext(webXml);
@@ -1449,6 +1457,35 @@ public class ContextConfig implements LifecycleListener {
             webxml.getPreDestroyMethods().entrySet()) {
             context.addPreDestroyMethod(entry.getKey(), entry.getValue());
         }
+    }
+
+
+    private WebXml getTomcatWebXmlFragment(WebXmlParser webXmlParser) {
+
+        WebXml webXmlTomcatFragment = createWebXml();
+        webXmlTomcatFragment.setOverridable(true);
+
+        // Set to distributable else every app will be prevented from being
+        // distributable when the Tomcat fragment is merged with the main
+        // web.xml
+        webXmlTomcatFragment.setDistributable(true);
+        // When merging, the default welcome files are only used if the app has
+        // not defined any welcomes files.
+        webXmlTomcatFragment.setAlwaysAddWelcomeFiles(false);
+
+        WebResource resource = context.getResources().getResource("/WEB-INF/tomcat-web.xml");
+        if (resource.isFile()) {
+            try {
+                InputSource source = new InputSource(resource.getURL().toURI().toString());
+                source.setByteStream(resource.getInputStream());
+                if (!webXmlParser.parseWebXml(source, webXmlTomcatFragment, false)) {
+                    ok = false;
+                }
+            } catch (URISyntaxException e) {
+                log.error(sm.getString("contextConfig.tomcatWebXmlError"), e);
+            }
+        }
+        return webXmlTomcatFragment;
     }
 
 

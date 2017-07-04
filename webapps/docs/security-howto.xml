@@ -483,9 +483,9 @@
   </section>
 
   <section name="web.xml">
-    <p>This applies to the default <code>conf/web.xml</code> file and
-    <code>WEB-INF/web.xml</code> files in web applications if they define
-    the components mentioned here.</p>
+    <p>This applies to the default <code>conf/web.xml</code> file, the
+    <code>/WEB-INF/tomcat-web.xml</code> and the <code>/WEB-INF/web.xml</code>
+    files in web applications if they define the components mentioned here.</p>
 
     <p>The <a href="default-servlet.html">DefaultServlet</a> is configured
     with <strong>readonly</strong> set to

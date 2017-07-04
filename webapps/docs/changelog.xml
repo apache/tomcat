@@ -45,6 +45,18 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M24 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        <bug>52924</bug>: Add support for a Tomcat specific deployment
+        descriptor, <code>/WEB-INF/tomcat-web.xml</code>. This descriptor has an
+        identical format to <code>/WEB-INF/web.xml</code>. The Tomcat descriptor
+        takes precedence over any settings in <code>conf/web.xml</code> but does
+        not take precedence over any settings in <code>/WEB-INF/web.xml</code>.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
