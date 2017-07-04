@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M24 (markt)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <add>
+        <bug>52791</bug>: Add the ability to set the defaults used by the
+        Windows installer from a configuration file. Patch provided by Sandra
+        Madden. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M23 (markt)" rtext="release in progress">
   <subsection name="Catalina">
