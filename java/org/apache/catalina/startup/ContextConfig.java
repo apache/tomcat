@@ -1473,7 +1473,7 @@ public class ContextConfig implements LifecycleListener {
         // not defined any welcomes files.
         webXmlTomcatFragment.setAlwaysAddWelcomeFiles(false);
 
-        WebResource resource = context.getResources().getResource("/WEB-INF/tomcat-web.xml");
+        WebResource resource = context.getResources().getResource(Constants.TomcatWebXml);
         if (resource.isFile()) {
             try {
                 InputSource source = new InputSource(resource.getURL().toURI().toString());

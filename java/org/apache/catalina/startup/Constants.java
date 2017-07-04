@@ -27,6 +27,7 @@ public final class Constants {
 
     public static final String ApplicationContextXml = "META-INF/context.xml";
     public static final String ApplicationWebXml = "/WEB-INF/web.xml";
+    public static final String TomcatWebXml = "/WEB-INF/tomcat-web.xml";
     public static final String DefaultContextXml = "conf/context.xml";
     public static final String DefaultWebXml = "conf/web.xml";
     public static final String HostContextXml = "context.xml.default";
