@@ -57,6 +57,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        <bug>53031</bug>: Add support for the <code>fork</code> option when
+        compiling JSPs with the Jasper Ant task and javac. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
