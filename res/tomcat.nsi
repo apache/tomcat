@@ -40,6 +40,7 @@
 !include "StrFunc.nsh"
 !include "LogicLib.nsh"
 !include "FileFunc.nsh"
+!include "TextFunc.nsh"
 ${StrRep}
 
 Var JavaHome
@@ -349,6 +350,26 @@ Section -post
 
 SectionEnd
 
+!define ReadFromConfigIni "!insertmacro ReadFromConfigIni"
+!macro ReadFromConfigIni Return_Variable Key_Name Config_File
+  Push "${Config_File}"
+  Push "${Return_Variable}"
+  Push "${Key_Name}"
+  Call ReadFromConfigIni
+  IfErrors +2
+   StrCpy ${Return_Variable} $1
+!macroend
+
+Function ReadFromConfigIni
+  ClearErrors
+                             ; Stack: <Key_Name> <Return_Variable> <Config_File>
+  Pop $0                     ; <Key_Name> Stack: <Return_Variable> <Config_File>
+  Pop $1                     ; <Return_Variable> Stack: <Config_File>
+  Pop $2                     ; <Config_File> Stack: -empty-
+
+  ${ConfigRead} $2 '$0=' $1        ; <Config_File> <Key_Name> <Return_Variable>
+FunctionEnd
+
 Function .onInit
   ${GetParameters} $R0
   ClearErrors
@@ -357,6 +378,7 @@ Function .onInit
   ${IfNot} ${Errors}
     MessageBox MB_OK|MB_ICONINFORMATION 'Available options:$\r$\n\
                /S - Silent install.$\r$\n\
+               /C=config.ini - specify full path of config file to override default values.$\r$\n\
                /D=INSTDIR - Specify installation directory.'
     Abort
   ${EndIf}
@@ -379,6 +401,27 @@ Function .onInit
   StrCpy $TomcatAdminUsername ""
   StrCpy $TomcatAdminPassword ""
   StrCpy $TomcatAdminRoles ""
+
+  ;override default values in case config file was passed in
+  ${GetOptions} "$R0" "/C=" $R2
+  ${IfNot} ${Errors}
+     ${ReadFromConfigIni} $JavaHome "JavaHome" $R2
+     ${ReadFromConfigIni} $TomcatPortShutdown "TomcatPortShutdown" $R2
+     ${ReadFromConfigIni} $TomcatPortHttp "TomcatPortHttp" $R2
+     ${ReadFromConfigIni} $TomcatPortAjp "TomcatPortAjp" $R2
+     ${ReadFromConfigIni} $TomcatMenuEntriesEnable "TomcatMenuEntriesEnable" $R2
+     ${ReadFromConfigIni} $TomcatShortcutAllUsers "TomcatShortcutAllUsers" $R2
+     ${ReadFromConfigIni} $TomcatServiceDefaultName "TomcatServiceDefaultName" $R2
+     ${ReadFromConfigIni} $TomcatServiceName "TomcatServiceName" $R2
+     ${ReadFromConfigIni} $TomcatServiceFileName "TomcatServiceFileName" $R2
+     ${ReadFromConfigIni} $TomcatServiceManagerFileName "TomcatServiceManagerFileName" $R2
+     ${ReadFromConfigIni} $TomcatAdminEnable "TomcatAdminEnable" $R2
+     ${ReadFromConfigIni} $TomcatAdminUsername "TomcatAdminUsername" $R2
+     ${ReadFromConfigIni} $TomcatAdminPassword "TomcatAdminPassword" $R2
+     ${ReadFromConfigIni} $TomcatAdminRoles "TomcatAdminRoles" $R2
+  ${EndIf}
+  ClearErrors
+
 FunctionEnd
 
 Function pageChooseJVM
@@ -862,7 +905,7 @@ Function findJVMPath
   IfFileExists "$2" FoundJvmDll
 
   ClearErrors
-  ;Step tree: Read defaults from registry
+  ;Step three: Read defaults from registry
 
   ReadRegStr $1 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment" "CurrentVersion"
   ReadRegStr $2 HKLM "SOFTWARE\JavaSoft\Java Runtime Environment\$1" "RuntimeLib"

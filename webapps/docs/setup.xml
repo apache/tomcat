@@ -71,6 +71,31 @@
             will not be any tray icon present when Tomcat is running. Note that
             when choosing to run Tomcat at the end of installation, the tray
             icon will be used even if Tomcat was installed as a service.</li>
+        <li><strong>Defaults</strong>: The defaults used by the installer may be
+            overridden by use of the <code>/C=&lt;config file&gt;</code> command
+            line argument. The configuration file uses the format
+            <code>name=value</code> with each pair on a separate line. The names
+            of the available configuration options are:
+            <ul>
+            <li>JavaHome</li>
+            <li>TomcatPortShutdown</li>
+            <li>TomcatPortHttp</li>
+            <li>TomcatPortAjp</li>
+            <li>TomcatMenuEntriesEnable</li>
+            <li>TomcatShortcutAllUsers</li>
+            <li>TomcatServiceDefaultName</li>
+            <li>TomcatServiceName</li>
+            <li>TomcatServiceFileName</li>
+            <li>TomcatServiceManagerFileName</li>
+            <li>TomcatAdminEnable</li>
+            <li>TomcatAdminUsername</li>
+            <li>TomcatAdminPassword</li>
+            <li>TomcatAdminRoles</li>
+            </ul>
+            By using <code>/C=...</code> along with <code>/S</code> and
+            <code>/D=</code> it is possible to perform fully configured
+            unattended installs of Apache Tomact.
+        </li>
         <li>Refer to the
             <a href="windows-service-howto.html">Windows Service HOW-TO</a>
             for information on how to manage Tomcat as a Windows service.
