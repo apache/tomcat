@@ -216,7 +216,11 @@ public class JSSEUtil extends SSLUtilBase {
             if (keyAlias != null && !ks.isKeyEntry(keyAlias)) {
                 throw new IOException(sm.getString("jsse.alias_no_key_entry", keyAlias));
             } else if (keyAlias == null) {
-                keyAlias = "tomcat";
+                Enumeration<String> aliases = ks.aliases();
+                if (!aliases.hasMoreElements()) {
+                    throw new IOException(sm.getString("jsse.noKeys"));
+                }
+                keyAlias = aliases.nextElement();
             }
 
             inMemoryKeyStore.setKeyEntry(keyAlias, ks.getKey(keyAlias, keyPassArray), keyPassArray,
