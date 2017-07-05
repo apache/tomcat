@@ -52,7 +52,6 @@ import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509KeyManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -171,7 +170,6 @@ public class JSSEUtil extends SSLUtilBase {
 
     @Override
     public KeyManager[] getKeyManagers() throws Exception {
-        String keystoreType = certificate.getCertificateKeystoreType();
         String keyAlias = certificate.getCertificateKeyAlias();
         String algorithm = sslHostConfig.getKeyManagerAlgorithm();
         String keyPass = certificate.getCertificateKeyPassword();
@@ -180,8 +178,6 @@ public class JSSEUtil extends SSLUtilBase {
         if (keyPass == null) {
             keyPass = certificate.getCertificateKeystorePassword();
         }
-
-        KeyManager[] kms = null;
 
         KeyStore ks = certificate.getCertificateKeystore();
 
@@ -219,6 +215,8 @@ public class JSSEUtil extends SSLUtilBase {
         } else {
             if (keyAlias != null && !ks.isKeyEntry(keyAlias)) {
                 throw new IOException(sm.getString("jsse.alias_no_key_entry", keyAlias));
+            } else if (keyAlias == null) {
+                keyAlias = "tomcat";
             }
 
             inMemoryKeyStore.setKeyEntry(keyAlias, ks.getKey(keyAlias, keyPassArray), keyPassArray,
@@ -229,23 +227,7 @@ public class JSSEUtil extends SSLUtilBase {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
         kmf.init(inMemoryKeyStore, keyPassArray);
 
-        kms = kmf.getKeyManagers();
-        if (kms == null) {
-            return kms;
-        }
-
-        if (keyAlias != null) {
-            String alias = keyAlias;
-            // JKS keystores always convert the alias name to lower case
-            if ("JKS".equals(keystoreType)) {
-                alias = alias.toLowerCase(Locale.ENGLISH);
-            }
-            for(int i = 0; i < kms.length; i++) {
-                kms[i] = new JSSEKeyManager((X509KeyManager)kms[i], alias);
-            }
-        }
-
-        return kms;
+        return kmf.getKeyManagers();
     }
 
 
