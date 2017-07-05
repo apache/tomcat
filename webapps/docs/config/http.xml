@@ -1402,6 +1402,11 @@
       <p>If not specified, the default behaviour for JSSE is to use the
       <strong>certificateKeystorePassword</strong>. For OpenSSL the default
       behaviour is not to use a password.</p>
+      <p><strong>Note:</strong> While Java key stores may be configured with
+      different passwords for each key, the JRE's default provider can only use
+      the keystore if all keys have the same password. If you need to use
+      multiple keys each with a different password you must use a separate
+      keystore for each.</p>
     </attribute>
 
     <attribute name="certificateKeystoreFile" required="false">

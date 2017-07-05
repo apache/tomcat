@@ -65,6 +65,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Clarify the documentation for <code>certificateKeyPassword</code> with
+        information on the lack of support for multiple keys in a single key
+        store, each with a separate password. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
