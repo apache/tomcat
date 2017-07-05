@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
@@ -94,7 +95,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
      * returned.
      */
     @Override
-    protected HashMap<String,JarEntry> getArchiveEntries(boolean single) {
+    protected Map<String,JarEntry> getArchiveEntries(boolean single) {
         synchronized (archiveLock) {
             if (archiveEntries == null) {
                 JarFile warFile = null;
