@@ -57,6 +57,11 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
     }
 
     // --------------------
+
+    private int hashCode = 0;
+    // did we compute the hashcode ?
+    private boolean hasHashCode = false;
+
     // char[]
     private char buff[];
 
@@ -111,6 +116,7 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
     public void recycle() {
         //        buff=null;
         isSet=false; // XXX
+        hasHashCode = false;
         start=0;
         end=0;
     }
@@ -133,6 +139,7 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
         start=0;
         end=0;
         isSet=true;
+        hasHashCode = false;
     }
 
 
@@ -145,6 +152,7 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
         start=off;
         end=start + len;
         isSet=true;
+        hasHashCode = false;
     }
 
     /** Maximum amount of data in this buffer.
@@ -544,6 +552,14 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
 
     // -------------------- equals --------------------
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof CharChunk) {
+            return equals((CharChunk) obj);
+        }
+        return false;
+    }
+
     /**
      * Compares the message bytes to the specified String object.
      * @param s the String to compare
@@ -690,6 +706,19 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
     }
 
     // -------------------- Hash code  --------------------
+
+    @Override
+    public int hashCode() {
+        if (hasHashCode) {
+            return hashCode;
+        }
+        int code = 0;
+
+        code = hash();
+        hashCode = code;
+        hasHashCode = true;
+        return code;
+    }
 
     // normal hash.
     public int hash() {

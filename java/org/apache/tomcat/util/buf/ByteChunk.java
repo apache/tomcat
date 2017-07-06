@@ -101,6 +101,10 @@ public final class ByteChunk implements Cloneable, Serializable {
     */
     public static final Charset DEFAULT_CHARSET = B2CConverter.ISO_8859_1;
 
+    private int hashCode=0;
+    // did we compute the hashcode ?
+    private boolean hasHashCode = false;
+
     // byte[]
     private byte[] buff;
 
@@ -155,6 +159,7 @@ public final class ByteChunk implements Cloneable, Serializable {
         start=0;
         end=0;
         isSet=false;
+        hasHashCode = false;
     }
 
     public void reset() {
@@ -171,6 +176,7 @@ public final class ByteChunk implements Cloneable, Serializable {
         start=0;
         end=0;
         isSet=true;
+        hasHashCode = false;
     }
 
     /**
@@ -185,6 +191,7 @@ public final class ByteChunk implements Cloneable, Serializable {
         start = off;
         end = start+ len;
         isSet=true;
+        hasHashCode = false;
     }
 
     /**
@@ -574,6 +581,14 @@ public final class ByteChunk implements Cloneable, Serializable {
 
     // -------------------- equals --------------------
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ByteChunk) {
+            return equals((ByteChunk) obj);
+        }
+        return false;
+    }
+
     /**
      * Compares the message bytes to the specified String object.
      * @param s the String to compare
@@ -756,6 +771,19 @@ public final class ByteChunk implements Cloneable, Serializable {
     }
 
     // -------------------- Hash code  --------------------
+
+    @Override
+    public int hashCode() {
+        if (hasHashCode) {
+            return hashCode;
+        }
+        int code = 0;
+
+        code = hash();
+        hashCode = code;
+        hasHashCode = true;
+        return code;
+    }
 
     // normal hash.
     public int hash() {
