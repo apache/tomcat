@@ -1055,42 +1055,24 @@ public class CoyoteAdapter implements Adapter {
         CharChunk cc = uri.getCharChunk();
         cc.allocate(length, -1);
 
-        String enc = connector.getURIEncoding();
-        if (enc != null) {
-            B2CConverter conv = request.getURIConverter();
-            try {
-                if (conv == null) {
-                    conv = new B2CConverter(B2CConverter.getCharset(enc), true);
-                    request.setURIConverter(conv);
-                } else {
-                    conv.recycle();
-                }
-            } catch (IOException e) {
-                log.error(sm.getString("coyoteAdapter.invalidEncoding"));
-                connector.setURIEncoding(null);
-            }
-            if (conv != null) {
-                try {
-                    conv.convert(bc, cc, true);
-                    uri.setChars(cc.getBuffer(), cc.getStart(), cc.getLength());
-                    return;
-                } catch (IOException ioe) {
-                    // Should never happen as B2CConverter should replace
-                    // problematic characters
-                    request.getResponse().sendError(
-                            HttpServletResponse.SC_BAD_REQUEST);
-                }
-            }
+        Charset charset = connector.getURICharset();
+
+        B2CConverter conv = request.getURIConverter();
+        if (conv == null) {
+            conv = new B2CConverter(charset, true);
+            request.setURIConverter(conv);
+        } else {
+            conv.recycle();
         }
 
-        // Default encoding: fast conversion for ISO-8859-1
-        byte[] bbuf = bc.getBuffer();
-        char[] cbuf = cc.getBuffer();
-        int start = bc.getStart();
-        for (int i = 0; i < length; i++) {
-            cbuf[i] = (char) (bbuf[i + start] & 0xff);
+        try {
+            conv.convert(bc, cc, true);
+            uri.setChars(cc.getBuffer(), cc.getStart(), cc.getLength());
+        } catch (IOException ioe) {
+            // Should never happen as B2CConverter should replace
+            // problematic characters
+            request.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
-        uri.setChars(cbuf, 0, length);
     }
 
 
