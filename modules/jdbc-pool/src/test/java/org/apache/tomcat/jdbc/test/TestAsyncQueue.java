@@ -84,7 +84,9 @@ public class TestAsyncQueue {
         public void run() {
             try {
                 sleep(delay);
-            }catch (Exception ignore){}
+            } catch (Exception ignore){
+                // Ignore
+            }
             offered = true;
             TestAsyncQueue.this.queue.offer(item);
         }

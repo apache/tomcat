@@ -54,27 +54,32 @@ public class SimplePOJOAsyncExample {
 
         Connection con = null;
         try {
-          Future<Connection> future = datasource.getConnectionAsync();
-          while (!future.isDone()) {
-              System.out.println("Connection is not yet available. Do some background work");
-              try {
-                  Thread.sleep(100); //simulate work
-              }catch (InterruptedException x) {
-                  Thread.interrupted();
-              }
-          }
-          con = future.get(); //should return instantly
-          Statement st = con.createStatement();
-          ResultSet rs = st.executeQuery("select * from user");
-          int cnt = 1;
-          while (rs.next()) {
-              System.out.println((cnt++)+". Host:" +rs.getString("Host")+" User:"+rs.getString("User")+" Password:"+rs.getString("Password"));
-          }
-          rs.close();
-          st.close();
+            Future<Connection> future = datasource.getConnectionAsync();
+            while (!future.isDone()) {
+                System.out.println("Connection is not yet available. Do some background work");
+            try {
+                Thread.sleep(100); //simulate work
+                } catch (InterruptedException x) {
+                    Thread.interrupted();
+                }
+            }
+            con = future.get(); //should return instantly
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery("select * from user");
+            int cnt = 1;
+            while (rs.next()) {
+                System.out.println((cnt++)+". Host:" +rs.getString("Host")+" User:"+rs.getString("User")+" Password:"+rs.getString("Password"));
+            }
+            rs.close();
+            st.close();
         } finally {
-          if (con!=null) try {con.close();}catch (Exception ignore) {}
+            if (con!=null) {
+                try {
+                    con.close();
+                } catch (Exception ignore) {
+                    // Ignore
+                }
+            }
         }
     }
-
 }

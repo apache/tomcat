@@ -59,7 +59,9 @@ public class Bug51582
     Statement st = con.createStatement();
     try {
         st.execute("DROP ALIAS SLEEP");
-    }catch (Exception ignore) {}
+    } catch (Exception ignore) {
+        // Ignore
+    }
     st.execute("CREATE ALIAS SLEEP AS $$\nboolean sleep() {\n        try {\n            Thread.sleep(10000);\n            return true;        } catch (Exception x) {\n            return false;\n        }\n}\n$$;");
     st.close();
     con.close();
