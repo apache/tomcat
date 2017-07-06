@@ -187,7 +187,7 @@ public class StatementCache extends StatementDecoratorInterceptor {
     /**
      * @param sql  Ignored
      *
-     * @returns {@code null}
+     * @return {@code null}
      *
      * @deprecated Unused. Will be removed in Tomcat 9
      */
