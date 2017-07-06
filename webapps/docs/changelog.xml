@@ -66,6 +66,11 @@
         encoding. (markt)
       </fix>
       <fix>
+        <bug>56785</bug>: Avoid <code>NullPointerException</code> if directory
+        exists on the class path that is not readable by the Tomcat user.
+        (markt)
+      </fix>
+      <fix>
         Additional permission for deleting files is granted to JULI as it is
         required by FileHandler when running under a Security Manager. The
         thread that cleans the log files is marked as daemon thread.
