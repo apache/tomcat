@@ -281,6 +281,8 @@ public final class IntrospectionUtils {
     public static boolean setProperty(Object o, String name, String value) {
         return setProperty(o,name,value,true);
     }
+
+    @SuppressWarnings("null") // setPropertyMethodVoid is not null when used
     public static boolean setProperty(Object o, String name, String value,
             boolean invokeSetProperty) {
         if (log.isDebugEnabled())
@@ -756,6 +758,8 @@ public final class IntrospectionUtils {
         return methods;
     }
 
+    @SuppressWarnings("null") // Neither params nor methodParams can be null
+                              // when comparing their lengths
     public static Method findMethod(Class<?> c, String name,
             Class<?> params[]) {
         Method methods[] = findMethods(c);
@@ -830,9 +834,9 @@ public final class IntrospectionUtils {
     public static Object callMethod1(Object target, String methodN,
             Object param1, String typeParam1, ClassLoader cl) throws Exception {
         if (target == null || param1 == null) {
-            if (log.isDebugEnabled())
-                log.debug("IntrospectionUtils: Assert: Illegal params " +
-                        target + " " + param1);
+            throw new IllegalArgumentException(
+                    "IntrospectionUtils: Assert: Illegal params " +
+                    target + " " + param1);
         }
         if (log.isDebugEnabled())
             log.debug("IntrospectionUtils: callMethod1 " +
