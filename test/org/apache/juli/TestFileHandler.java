@@ -65,10 +65,13 @@ public class TestFileHandler {
 
     @After
     public void tearDown() {
-        for (File file : logsDir.listFiles()) {
-            file.delete();
+        File[] files = logsDir.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                file.delete();
+            }
+            logsDir.delete();
         }
-        logsDir.delete();
     }
 
     @SuppressWarnings("unused")
@@ -76,7 +79,7 @@ public class TestFileHandler {
     public void testCleanOnInitOneHandler() throws Exception {
         generateLogFiles(logsDir, PREFIX_1, SUFIX_1, 3);
 
-        FileHandler handler = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, 2);
+        new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, 2);
 
         Thread.sleep(1000);
 
@@ -88,10 +91,10 @@ public class TestFileHandler {
     public void testCleanOnInitMultipleHandlers() throws Exception {
         generateLogFiles(logsDir, PREFIX_1, SUFIX_1, 3);
 
-        FileHandler handler1 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, 2);
-        FileHandler handler2 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_2, 2);
-        FileHandler handler3 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_2, SUFIX_1, 2);
-        FileHandler handler4 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_3, SUFIX_1, 2);
+        new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, 2);
+        new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_2, 2);
+        new FileHandler(logsDir.getAbsolutePath(), PREFIX_2, SUFIX_1, 2);
+        new FileHandler(logsDir.getAbsolutePath(), PREFIX_3, SUFIX_1, 2);
 
         Thread.sleep(1000);
 
@@ -103,7 +106,7 @@ public class TestFileHandler {
     public void testCleanDisabled() throws Exception {
         generateLogFiles(logsDir, PREFIX_1, SUFIX_1, 3);
 
-        FileHandler handler = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, -1);
+        new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, -1);
 
         Thread.sleep(1000);
 
