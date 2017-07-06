@@ -142,6 +142,12 @@
     <Bug code="SWL" />
   </Match>
   <Match>
+    <!-- null return value is documented -->
+    <Class name="org.apache.catalina.core.StandardWrapper" />
+    <Method name="isSingleThreadModel" />
+    <Bug pattern="NP_BOOLEAN_RETURN_NULL" />
+  </Match>
+  <Match>
     <!-- The code is adding HTTP request headers, not parameters and the
          header parsing on input will have removed any CR or LF characters. -->
     <Class name="org.apache.catalina.filters.CorsFilter" />
@@ -470,6 +476,22 @@
     <Class name="org.apache.tomcat.jdbc.pool.ConnectionPool$ConnectionFuture" />
     <Method name="get" />
     <Bug code="RV" />
+  </Match>
+  <Match>
+    <!-- Use of == is deliberate -->
+    <Class name="org.apache.tomcat.jdbc.pool.JdbcInterceptor" />
+    <Method name="compare" />
+    <Bug code="ES" />
+  </Match>
+  <Match>
+    <!-- Lack of thread-safety is accepted in return for better performance. -->
+    <Class name="org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReport$QueryStats" />
+    <Or>
+      <Method name="add" />
+      <Method name="failure" />
+      <Method name="prepare" />
+    </Or>
+    <Bug code="VO" />
   </Match>
   <Match>
     <Class name="org.apache.tomcat.util.IntrospectionUtils" />
