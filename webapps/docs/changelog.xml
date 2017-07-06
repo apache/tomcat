@@ -81,6 +81,12 @@
         handling for resources with names that included a <code>&amp;</code>
         character. (markt)
       </fix>
+      <add>
+        If the <code>Content-Language</code> HTTP header is set directly,
+        attempt to determine the Locale from the header value and call
+        <code>ServletResponse.setLocale()</code> with the derived Locale.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -2196,6 +2202,7 @@
         clearly. When handling shutdown payload, verification completion message
         is not required. (kfujino)
       </scode>
+<<<<<<< .working
       <fix>
         When starting the <code>StaticMembershipInterceptor</code>,
         <code>StaticMembershipInterceptor</code> checks  the required

@@ -45,7 +45,7 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
 
 
     @Test
-    public void testConnectToServerEndpointSSL() throws Exception {
+    public void testConnectToServerEndpoint() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
