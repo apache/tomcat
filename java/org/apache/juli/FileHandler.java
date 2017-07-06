@@ -542,7 +542,11 @@ public class FileHandler extends Handler {
     }
 
     private String obtainDateFromPath(Path path) {
-        String date = path.getFileName().toString();
+        Path fileName = path.getFileName();
+        if (fileName == null) {
+            return null;
+        }
+        String date = fileName.toString();
         if (pattern.matcher(date).matches()) {
             date = date.substring(prefix.length());
             return date.substring(0, date.length() - suffix.length());
