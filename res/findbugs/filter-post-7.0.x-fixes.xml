@@ -45,5 +45,12 @@
     <Method name="run"/>
     <Bug code="IL"/>
   </Match>
-
+  <!-- Issues in unused deprecated code that will be removed -->
+  <Match>
+    <Class name="org.apache.tomcat.util.modeler.modules.MbeansDescriptorsDOMSource"/>
+  </Match>
+  <Match>
+    <Class name="org.apache.tomcat.util.modeler.modules.MbeansDescriptorsDOMSource"/>
+    <Field name="source"/>
+  </Match>
 </FindBugsFilter>
