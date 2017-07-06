@@ -22,11 +22,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.SessionConfig;
-import org.apache.juli.logging.Log;
 
 /**
  * <p>A Valve to detect situations where a load-balanced node receiving a
@@ -97,13 +95,7 @@ public class LoadBalancerDrainingValve
      */
     private String _ignoreCookieValue;
 
-    /**
-     * Local reference to the container log.
-     */
-    protected Log containerLog = null;
-
-    public LoadBalancerDrainingValve()
-    {
+    public LoadBalancerDrainingValve() {
         super(true); // Supports async
     }
 
@@ -179,15 +171,6 @@ public class LoadBalancerDrainingValve
      */
     public void setIgnoreCookieValue(String cookieValue) {
         _ignoreCookieValue = cookieValue;
-    }
-
-    @Override
-    public void initInternal()
-        throws LifecycleException
-    {
-        super.initInternal();
-
-        containerLog = getContainer().getLogger();
     }
 
     @Override
