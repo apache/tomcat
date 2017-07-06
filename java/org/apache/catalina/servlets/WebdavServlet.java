@@ -27,7 +27,6 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -52,6 +51,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.catalina.connector.RequestFacade;
+import org.apache.catalina.util.ConcurrentDateFormat;
 import org.apache.catalina.util.DOMWriter;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.util.XMLWriter;
@@ -208,8 +208,9 @@ public class WebdavServlet extends DefaultServlet {
     /**
      * Simple date format for the creation date ISO representation (partial).
      */
-    protected static final SimpleDateFormat creationDateFormat =
-        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+    protected static final ConcurrentDateFormat creationDateFormat =
+        new ConcurrentDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US,
+                TimeZone.getTimeZone("GMT"));
 
 
      /**
@@ -227,14 +228,7 @@ public class WebdavServlet extends DefaultServlet {
     protected static final MD5Encoder md5Encoder = new MD5Encoder();
 
 
-
-    static {
-        creationDateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-    }
-
-
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Repository of the locks put on single resources.
@@ -2650,27 +2644,7 @@ public class WebdavServlet extends DefaultServlet {
      * Get creation date in ISO format.
      */
     private String getISOCreationDate(long creationDate) {
-        StringBuilder creationDateValue = new StringBuilder
-            (creationDateFormat.format
-             (new Date(creationDate)));
-        /*
-        int offset = Calendar.getInstance().getTimeZone().getRawOffset()
-            / 3600000; // FIXME ?
-        if (offset < 0) {
-            creationDateValue.append("-");
-            offset = -offset;
-        } else if (offset > 0) {
-            creationDateValue.append("+");
-        }
-        if (offset != 0) {
-            if (offset < 10)
-                creationDateValue.append("0");
-            creationDateValue.append(offset + ":00");
-        } else {
-            creationDateValue.append("Z");
-        }
-        */
-        return creationDateValue.toString();
+        return creationDateFormat.format(new Date(creationDate));
     }
 
     /**
