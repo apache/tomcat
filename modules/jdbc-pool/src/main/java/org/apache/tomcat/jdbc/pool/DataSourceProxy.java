@@ -183,6 +183,8 @@ public class DataSourceProxy implements PoolConfiguration {
 
     /**
      * {@link javax.sql.DataSource#getConnection()}
+     * @param username unused
+     * @param password unused
      */
     public javax.sql.PooledConnection getPooledConnection(String username,
             String password) throws SQLException {
@@ -211,7 +213,7 @@ public class DataSourceProxy implements PoolConfiguration {
         }
     }
 
-    public int getPoolSize() throws SQLException{
+    public int getPoolSize() {
         final ConnectionPool p = pool;
         if (p == null) return 0;
         else return p.getSize();
@@ -1410,9 +1412,6 @@ public class DataSourceProxy implements PoolConfiguration {
         getPoolProperties().setPropagateInterruptState(propagateInterruptState);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isIgnoreExceptionOnPreLoad() {
         return getPoolProperties().isIgnoreExceptionOnPreLoad();
@@ -1457,5 +1456,4 @@ public class DataSourceProxy implements PoolConfiguration {
             log.error("Unable to purge pool.",x);
         }
     }
-
 }
