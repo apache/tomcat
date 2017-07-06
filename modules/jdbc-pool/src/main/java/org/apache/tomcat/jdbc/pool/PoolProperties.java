@@ -927,9 +927,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     }
 
 
-    public static class InterceptorDefinition {
+    public static class InterceptorDefinition implements Serializable {
+        private static final long serialVersionUID = 1L;
         protected String className;
-        protected Map<String,InterceptorProperty> properties = new HashMap<String,InterceptorProperty>();
+        protected Map<String,InterceptorProperty> properties =
+                new HashMap<String,InterceptorProperty>();
         protected volatile Class<?> clazz = null;
         public InterceptorDefinition(String className) {
             this.className = className;
@@ -975,7 +977,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
     }
 
-    public static class InterceptorProperty {
+    public static class InterceptorProperty implements Serializable {
+        private static final long serialVersionUID = 1L;
         String name;
         String value;
         public InterceptorProperty(String name, String value) {
