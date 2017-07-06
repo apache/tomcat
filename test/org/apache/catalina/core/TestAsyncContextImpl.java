@@ -2602,8 +2602,10 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     }
 
 
+    @Override
     @Before
-    public void setup() {
+    public void setUp() throws Exception {
+        super.setUp();
         // Required by testBug61185()
         // Does not impact other tests in this class
         System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
