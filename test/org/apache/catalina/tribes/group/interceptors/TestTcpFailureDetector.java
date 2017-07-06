@@ -136,9 +136,17 @@ public class TestTcpFailureDetector {
     public void tearDown() throws Exception {
         tcpFailureDetector1 = null;
         tcpFailureDetector2 = null;
-        try { channel1.stop(Channel.DEFAULT);}catch (Exception ignore){ /* Ignore */ }
+        try {
+            channel1.stop(Channel.DEFAULT);
+        } catch (Exception ignore) {
+            // Ignore
+        }
         channel1 = null;
-        try { channel2.stop(Channel.DEFAULT);}catch (Exception ignore){ /* Ignore */ }
+        try {
+            channel2.stop(Channel.DEFAULT);
+        } catch (Exception ignore) {
+            // Ignore
+        }
         channel2 = null;
     }
 
