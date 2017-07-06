@@ -609,10 +609,12 @@ public class OutputBuffer extends Writer
 
                             }
                     );
-                }catch(PrivilegedActionException ex){
+                } catch (PrivilegedActionException ex){
                     Exception e = ex.getException();
                     if (e instanceof IOException) {
                         throw (IOException)e;
+                    } else {
+                        throw new IOException(ex);
                     }
                 }
             } else {

@@ -556,10 +556,12 @@ public class InputBuffer extends Reader
 
                             }
                     );
-                }catch(PrivilegedActionException ex){
+                } catch (PrivilegedActionException ex){
                     Exception e = ex.getException();
                     if (e instanceof IOException) {
                         throw (IOException)e;
+                    } else {
+                        throw new IOException(e);
                     }
                 }
             } else {
