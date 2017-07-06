@@ -466,6 +466,12 @@
     <Bug code="CN" />
   </Match>
   <Match>
+    <!-- Return value is ignored but a null result will trigger an exception -->
+    <Class name="org.apache.tomcat.jdbc.pool.ConnectionPool$ConnectionFuture" />
+    <Method name="get" />
+    <Bug code="RV" />
+  </Match>
+  <Match>
     <Class name="org.apache.tomcat.util.IntrospectionUtils" />
     <Method name="findMethod"/>
     <Bug code="NP" />
@@ -648,6 +654,12 @@
   </Match>
 
   <!-- Test code -->
+   <Match>
+    <!-- Return value of latch is intentionally ignored -->
+    <Class name="org.apache.catalina.connector.TestSendFile"/>
+    <Method name="testBug60409"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
+  </Match>
   <Match>
     <Or>
       <Class name="org.apache.catalina.startup.TestListener$SCL" />
@@ -756,5 +768,14 @@
       <Method name="testRenegotiateWorks" />
     </Or>
     <Bug code="RR" />
+  </Match>
+  <Match>
+    <!-- Return value of latch is intentionally ignored -->
+    <Or>
+      <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClient"/>
+      <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClientSSL"/>
+    </Or>
+    <Method name="testConnectToServerEndpoint"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
   </Match>
 </FindBugsFilter>
