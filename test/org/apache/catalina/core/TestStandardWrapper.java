@@ -357,10 +357,14 @@ public class TestStandardWrapper extends TomcatBaseTest {
     public static CountDownLatch latch = null;
     public static AtomicInteger counter = new AtomicInteger(0);
 
+    public static void initLatch() {
+        latch = new CountDownLatch(BUG51445_THREAD_COUNT);
+    }
+
     @Test
     public void testBug51445AddServlet() throws Exception {
 
-        latch = new CountDownLatch(BUG51445_THREAD_COUNT);
+        initLatch();
 
         Tomcat tomcat = getTomcatInstance();
 
@@ -403,7 +407,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
     @Test
     public void testBug51445AddChild() throws Exception {
 
-        latch = new CountDownLatch(BUG51445_THREAD_COUNT);
+        initLatch();
 
         Tomcat tomcat = getTomcatInstance();
 
