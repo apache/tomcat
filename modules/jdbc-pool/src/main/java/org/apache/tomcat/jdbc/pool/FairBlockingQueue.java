@@ -134,10 +134,9 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     public E poll(long timeout, TimeUnit unit) throws InterruptedException {
         E result = null;
         final ReentrantLock lock = this.lock;
-        boolean error = true;
-        //acquire the global lock until we know what to do
-        lock.lock();
         try {
+            //acquire the global lock until we know what to do
+            lock.lock();
             //check to see if we have objects
             result = items.poll();
             if (result==null && timeout>0) {
@@ -182,9 +181,8 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 //we have an object, release
                 lock.unlock();
             }
-            error = false;
         } finally {
-            if (error && lock.isHeldByCurrentThread()) {
+            if (lock.isHeldByCurrentThread()) {
                 lock.unlock();
             }
         }
@@ -198,29 +196,23 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     public Future<E> pollAsync() {
         Future<E> result = null;
         final ReentrantLock lock = this.lock;
-        boolean error = true;
-        //grab the global lock
-        lock.lock();
         try {
+            //grab the global lock
+            lock.lock();
             //check to see if we have objects in the queue
             E item = items.poll();
             if (item==null) {
                 //queue is empty, add ourselves as waiters
                 ExchangeCountDownLatch<E> c = new ExchangeCountDownLatch<E>(1);
                 waiters.addLast(c);
-                lock.unlock();
                 //return a future that will wait for the object
                 result = new ItemFuture<E>(c);
             } else {
-                lock.unlock();
                 //return a future with the item
                 result = new ItemFuture<E>(item);
             }
-            error = false;
         } finally {
-            if (error && lock.isHeldByCurrentThread()) {
-                lock.unlock();
-            }
+            lock.unlock();
         }
         return result;
     }
