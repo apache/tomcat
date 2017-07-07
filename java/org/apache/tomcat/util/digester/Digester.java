@@ -80,17 +80,18 @@ public class Digester extends DefaultHandler2 {
 
     // ---------------------------------------------------------- Static Fields
 
-    protected static IntrospectionUtils.PropertySource propertySource = null;
+    protected static final IntrospectionUtils.PropertySource propertySource;
 
     static {
         String className = System.getProperty("org.apache.tomcat.util.digester.PROPERTY_SOURCE");
+        IntrospectionUtils.PropertySource source = null;
         if (className != null) {
             ClassLoader[] cls = new ClassLoader[] { Digester.class.getClassLoader(),
                     Thread.currentThread().getContextClassLoader() };
             for (int i = 0; i < cls.length; i++) {
                 try {
                     Class<?> clazz = Class.forName(className, true, cls[i]);
-                    propertySource = (IntrospectionUtils.PropertySource) clazz.newInstance();
+                    source = (IntrospectionUtils.PropertySource) clazz.newInstance();
                     break;
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
@@ -99,6 +100,7 @@ public class Digester extends DefaultHandler2 {
                 }
             }
         }
+        propertySource = source;
     }
 
 
