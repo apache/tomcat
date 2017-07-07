@@ -86,7 +86,7 @@ public class JspCompilationContext {
 
     protected JspRuntimeContext rctxt;
 
-    protected volatile int removed = 0;
+    protected volatile boolean removed = false;
 
     protected URLClassLoader jspLoader;
     protected URL baseUrl;
@@ -636,17 +636,14 @@ public class JspCompilationContext {
     // ==================== Removal ====================
 
     public void incrementRemoved() {
-        if (removed == 0 && rctxt != null) {
+        if (removed == false && rctxt != null) {
             rctxt.removeWrapper(jspUri);
         }
-        removed++;
+        removed = true;
     }
 
     public boolean isRemoved() {
-        if (removed > 0 ) {
-            return true;
-        }
-        return false;
+        return removed;
     }
 
     // ==================== Compile and reload ====================
@@ -700,7 +697,7 @@ public class JspCompilationContext {
             throw new JasperException(Localizer.getMessage("jsp.error.unable.compile"),
                                       ex);
         }
-        removed = 0;
+        removed = false;
         return servletClass;
     }
 
