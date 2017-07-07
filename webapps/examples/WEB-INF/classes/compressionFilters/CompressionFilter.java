@@ -18,6 +18,7 @@ package compressionFilters;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -135,7 +136,8 @@ public class CompressionFilter implements Filter {
                 }
 
                 if (debug > 0) {
-                    System.out.println("compressionMimeTypes set to " + compressionMimeTypes);
+                    System.out.println("compressionMimeTypes set to " +
+                            Arrays.toString(compressionMimeTypes));
                 }
             }
         }
