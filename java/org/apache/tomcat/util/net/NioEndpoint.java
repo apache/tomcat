@@ -1271,11 +1271,8 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                     }
                 }
             }//while
-            synchronized (this) {
-                this.notifyAll();
-            }
-            stopLatch.countDown();
 
+            stopLatch.countDown();
         }
 
         protected boolean processKey(SelectionKey sk, KeyAttachment attachment) {
