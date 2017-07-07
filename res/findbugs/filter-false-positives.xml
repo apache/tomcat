@@ -805,6 +805,14 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <Class name="org.apache.naming.resources.ResourceAttributes" />
+    <Or>
+      <Field name="format"/>
+      <Field name="formats"/>
+    </Or>
+    <Bug pattern="STCAL_STATIC_SIMPLE_DATE_FORMAT_INSTANCE" />
+  </Match>
+  <Match>
     <!-- Use of statics is unavoidable in all cases -->
     <!-- Better to use it consistently rather than only where necessary -->
     <Class name="org.apache.tomcat.jdbc.pool.interceptor.TestInterceptor" />
