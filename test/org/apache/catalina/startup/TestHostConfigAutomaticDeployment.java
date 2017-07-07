@@ -1678,9 +1678,9 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         File dir = new File(getAppBaseFile(getTomcatInstance().getHost()),
                 APP_NAME.getBaseName());
         if (withXml) {
-            recurrsiveCopy(DIR_XML_SOURCE, dir);
+            recursiveCopy(DIR_XML_SOURCE, dir);
         } else {
-            recurrsiveCopy(DIR_SOURCE, dir);
+            recursiveCopy(DIR_SOURCE, dir);
         }
         return dir;
     }
@@ -1688,16 +1688,16 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
     private File createDirXmlInAppbase() throws IOException {
         File dir = new File(getAppBaseFile(getTomcatInstance().getHost()),
                 APP_NAME.getBaseName() + "/META-INF");
-        recurrsiveCopy(DIR_XML_SOURCE_META_INF, dir);
+        recursiveCopy(DIR_XML_SOURCE_META_INF, dir);
         return dir;
     }
 
     private File createDirInExternal(boolean withXml) throws IOException {
         File ext = new File(external, "external" + ".war");
         if (withXml) {
-            recurrsiveCopy(DIR_XML_SOURCE, ext);
+            recursiveCopy(DIR_XML_SOURCE, ext);
         } else {
-            recurrsiveCopy(DIR_SOURCE, ext);
+            recursiveCopy(DIR_SOURCE, ext);
         }
         return ext;
     }
@@ -1799,7 +1799,7 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         Assert.assertTrue(ctxt instanceof TesterContext);
     }
 
-    
+
     public static class AntiResourceLockingContext extends StandardContext {
 
         @Override
@@ -1919,10 +1919,10 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
         }
     }
 
-    
+
     // Static methods to compensate for methods that are present in 8.0.x but
     // not in 7.0.x
-    
+
     private static File getConfigBaseFile(Host host) {
         String path = null;
         if (host.getXmlBase() != null) {
@@ -1938,14 +1938,14 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             xmlDir.append(host.getName());
             path = xmlDir.toString();
         }
-        
+
         return getCanonicalPath(path);
     }
-    
+
     private static File getAppBaseFile(Host host) {
         return getCanonicalPath(host.getAppBase());
     }
- 
+
     private static File getCanonicalPath(String path) {
         File file = new File(path);
         File base = new File(System.getProperty(Globals.CATALINA_BASE_PROP));
@@ -1957,8 +1957,8 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
             return file;
         }
     }
-    
-    
+
+
     // Static methods to replace the java.nio.file.Files methods used in Tomcat
     // 8 that aren't available in Tomcat 7. These methods are not intended to be
     // 100% robust - just good enough for the unit tests to pass.
@@ -1990,17 +1990,18 @@ public class TestHostConfigAutomaticDeployment extends TomcatBaseTest {
                 System.currentTimeMillis() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
     }
 
-    
-    private static void recurrsiveCopy(File src, File dest) throws IOException {
+
+    private static void recursiveCopy(File src, File dest) throws IOException {
         dest.mkdirs();
         File[] files = src.listFiles();
-        
-        for (File file : files) {
-            File newFile = new File(dest, file.getName());
-            if (file.isDirectory()) {
-                recurrsiveCopy(file, newFile);
-            } else {
-                copy(file, newFile);
+        if (files != null) {
+            for (File file : files) {
+                File newFile = new File(dest, file.getName());
+                if (file.isDirectory()) {
+                    recursiveCopy(file, newFile);
+                } else {
+                    copy(file, newFile);
+                }
             }
         }
     }
