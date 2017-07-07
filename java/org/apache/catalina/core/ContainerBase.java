@@ -189,6 +189,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * The Loader implementation with which this Container is associated.
      */
     protected Loader loader = null;
+    private final ReadWriteLock loaderLock = new ReentrantReadWriteLock();
 
 
     /**
@@ -207,12 +208,14 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * The Manager implementation with which this Container is associated.
      */
     protected Manager manager = null;
+    private final ReadWriteLock managerLock = new ReentrantReadWriteLock();
 
 
     /**
      * The cluster with which this Container is associated.
      */
     protected Cluster cluster = null;
+    private final ReadWriteLock clusterLock = new ReentrantReadWriteLock();
 
 
     /**
@@ -254,6 +257,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * The resources DirContext object with which this Container is associated.
      */
     protected DirContext resources = null;
+    private final ReadWriteLock resourcesLock = new ReentrantReadWriteLock();
 
 
     /**
@@ -389,13 +393,33 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public Loader getLoader() {
+        Lock readLock = loaderLock.readLock();
+        readLock.lock();
+        try {
+            if (loader != null)
+                return loader;
 
-        if (loader != null)
-            return (loader);
-        if (parent != null)
-            return (parent.getLoader());
-        return (null);
+            if (parent != null)
+                return parent.getLoader();
 
+            return null;
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+
+    /*
+     * Provide access to just the loader component attached to this container.
+     */
+    protected Loader getLoaderInternal() {
+        Lock readLock = loaderLock.readLock();
+        readLock.lock();
+        try {
+            return loader;
+        } finally {
+            readLock.unlock();
+        }
     }
 
 
@@ -405,38 +429,44 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * @param loader The newly associated loader
      */
     @Override
-    public synchronized void setLoader(Loader loader) {
+    public void setLoader(Loader loader) {
+        Lock writeLock = loaderLock.writeLock();
+        writeLock.lock();
+        Loader oldLoader = null;
+        try {
+            // Change components if necessary
+            oldLoader = this.loader;
+            if (oldLoader == loader)
+                return;
+            this.loader = loader;
 
-        // Change components if necessary
-        Loader oldLoader = this.loader;
-        if (oldLoader == loader)
-            return;
-        this.loader = loader;
-
-        // Stop the old component if necessary
-        if (getState().isAvailable() && (oldLoader != null) &&
-            (oldLoader instanceof Lifecycle)) {
-            try {
-                ((Lifecycle) oldLoader).stop();
-            } catch (LifecycleException e) {
-                log.error("ContainerBase.setLoader: stop: ", e);
+            // Stop the old component if necessary
+            if (getState().isAvailable() && (oldLoader != null) &&
+                    (oldLoader instanceof Lifecycle)) {
+                try {
+                    ((Lifecycle) oldLoader).stop();
+                } catch (LifecycleException e) {
+                    log.error("ContainerBase.setLoader: stop: ", e);
+                }
             }
-        }
 
-        // Start the new component if necessary
-        if (loader != null)
-            loader.setContainer(this);
-        if (getState().isAvailable() && (loader != null) &&
-            (loader instanceof Lifecycle)) {
-            try {
-                ((Lifecycle) loader).start();
-            } catch (LifecycleException e) {
-                log.error("ContainerBase.setLoader: start: ", e);
+            // Start the new component if necessary
+            if (loader != null)
+                loader.setContainer(this);
+            if (getState().isAvailable() && (loader != null) &&
+                    (loader instanceof Lifecycle)) {
+                try {
+                    ((Lifecycle) loader).start();
+                } catch (LifecycleException e) {
+                    log.error("ContainerBase.setLoader: start: ", e);
+                }
             }
+        } finally {
+            writeLock.unlock();
         }
 
         // Report this property change to interested listeners
-        support.firePropertyChange("loader", oldLoader, this.loader);
+        support.firePropertyChange("loader", oldLoader, loader);
 
     }
 
@@ -462,13 +492,33 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public Manager getManager() {
+        Lock readLock = managerLock.readLock();
+        readLock.lock();
+        try {
+            if (manager != null)
+                return manager;
 
-        if (manager != null)
-            return (manager);
-        if (parent != null)
-            return (parent.getManager());
-        return (null);
+            if (parent != null)
+                return parent.getManager();
 
+            return null;
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+
+    /*
+     * Provide access to just the manager component attached to this container.
+     */
+    protected Manager getManagerInternal() {
+        Lock readLock = managerLock.readLock();
+        readLock.lock();
+        try {
+            return manager;
+        } finally {
+            readLock.unlock();
+        }
     }
 
 
@@ -478,37 +528,43 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * @param manager The newly associated Manager
      */
     @Override
-    public synchronized void setManager(Manager manager) {
+    public void setManager(Manager manager) {
+        Lock writeLock = managerLock.writeLock();
+        writeLock.lock();
+        Manager oldManager = null;
+        try {
+            // Change components if necessary
+            oldManager = this.manager;
+            if (oldManager == manager)
+                return;
+            this.manager = manager;
 
-        // Change components if necessary
-        Manager oldManager = this.manager;
-        if (oldManager == manager)
-            return;
-        this.manager = manager;
-
-        // Stop the old component if necessary
-        if (oldManager instanceof Lifecycle) {
-            try {
-                ((Lifecycle) oldManager).stop();
-                ((Lifecycle) oldManager).destroy();
-            } catch (LifecycleException e) {
-                log.error("ContainerBase.setManager: stop-destroy: ", e);
+            // Stop the old component if necessary
+            if (oldManager instanceof Lifecycle) {
+                try {
+                    ((Lifecycle) oldManager).stop();
+                    ((Lifecycle) oldManager).destroy();
+                } catch (LifecycleException e) {
+                    log.error("ContainerBase.setManager: stop-destroy: ", e);
+                }
             }
-        }
 
-        // Start the new component if necessary
-        if (manager != null)
-            manager.setContainer(this);
-        if (getState().isAvailable() && manager instanceof Lifecycle) {
-            try {
-                ((Lifecycle) manager).start();
-            } catch (LifecycleException e) {
-                log.error("ContainerBase.setManager: start: ", e);
+            // Start the new component if necessary
+            if (manager != null)
+                manager.setContainer(this);
+            if (getState().isAvailable() && manager instanceof Lifecycle) {
+                try {
+                    ((Lifecycle) manager).start();
+                } catch (LifecycleException e) {
+                    log.error("ContainerBase.setManager: start: ", e);
+                }
             }
+        } finally {
+            writeLock.unlock();
         }
 
         // Report this property change to interested listeners
-        support.firePropertyChange("manager", oldManager, this.manager);
+        support.firePropertyChange("manager", oldManager, manager);
     }
 
 
@@ -529,13 +585,33 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public Cluster getCluster() {
-        if (cluster != null)
-            return (cluster);
+        Lock readLock = clusterLock.readLock();
+        readLock.lock();
+        try {
+            if (cluster != null)
+                return cluster;
 
-        if (parent != null)
-            return (parent.getCluster());
+            if (parent != null)
+                return parent.getCluster();
 
-        return (null);
+            return null;
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+
+    /*
+     * Provide access to just the cluster component attached to this container.
+     */
+    protected Cluster getClusterInternal() {
+        Lock readLock = clusterLock.readLock();
+        readLock.lock();
+        try {
+            return cluster;
+        } finally {
+            readLock.unlock();
+        }
     }
 
 
@@ -545,38 +621,45 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * @param cluster The newly associated Cluster
      */
     @Override
-    public synchronized void setCluster(Cluster cluster) {
-        // Change components if necessary
-        Cluster oldCluster = this.cluster;
-        if (oldCluster == cluster)
-            return;
-        this.cluster = cluster;
+    public void setCluster(Cluster cluster) {
+        Cluster oldCluster = null;
+        Lock writeLock = clusterLock.writeLock();
+        writeLock.lock();
+        try {
+            // Change components if necessary
+            oldCluster = this.cluster;
+            if (oldCluster == cluster)
+                return;
+            this.cluster = cluster;
 
-        // Stop the old component if necessary
-        if (getState().isAvailable() && (oldCluster != null) &&
-            (oldCluster instanceof Lifecycle)) {
-            try {
-                ((Lifecycle) oldCluster).stop();
-            } catch (LifecycleException e) {
-                log.error("ContainerBase.setCluster: stop: ", e);
+            // Stop the old component if necessary
+            if (getState().isAvailable() && (oldCluster != null) &&
+                    (oldCluster instanceof Lifecycle)) {
+                try {
+                    ((Lifecycle) oldCluster).stop();
+                } catch (LifecycleException e) {
+                    log.error("ContainerBase.setCluster: stop: ", e);
+                }
             }
-        }
 
-        // Start the new component if necessary
-        if (cluster != null)
-            cluster.setContainer(this);
+            // Start the new component if necessary
+            if (cluster != null)
+                cluster.setContainer(this);
 
-        if (getState().isAvailable() && (cluster != null) &&
-            (cluster instanceof Lifecycle)) {
-            try {
-                ((Lifecycle) cluster).start();
-            } catch (LifecycleException e) {
-                log.error("ContainerBase.setCluster: start: ", e);
+            if (getState().isAvailable() && (cluster != null) &&
+                (cluster instanceof Lifecycle)) {
+                try {
+                    ((Lifecycle) cluster).start();
+                } catch (LifecycleException e) {
+                    log.error("ContainerBase.setCluster: start: ", e);
+                }
             }
+        } finally {
+            writeLock.unlock();
         }
 
         // Report this property change to interested listeners
-        support.firePropertyChange("cluster", oldCluster, this.cluster);
+        support.firePropertyChange("cluster", oldCluster, cluster);
     }
 
 
@@ -809,12 +892,33 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      */
     @Override
     public DirContext getResources() {
-        if (resources != null)
-            return (resources);
-        if (parent != null)
-            return (parent.getResources());
-        return (null);
+        Lock readLock = resourcesLock.readLock();
+        readLock.lock();
+        try {
+            if (resources != null)
+                return resources;
 
+            if (parent != null)
+                return parent.getResources();
+
+            return null;
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+
+    /*
+     * Provide access to just the resources component attached to this container.
+     */
+    protected DirContext getResourcesInternal() {
+        Lock readLock = resourcesLock.readLock();
+        readLock.lock();
+        try {
+            return resources;
+        } finally {
+            readLock.unlock();
+        }
     }
 
 
@@ -825,23 +929,29 @@ public abstract class ContainerBase extends LifecycleMBeanBase
      * @param resources The newly associated DirContext
      */
     @Override
-    public synchronized void setResources(DirContext resources) {
+    public void setResources(DirContext resources) {
         // Called from StandardContext.setResources()
         //              <- StandardContext.start()
         //              <- ContainerBase.addChildInternal()
+        Lock writeLock = managerLock.writeLock();
+        writeLock.lock();
+        DirContext oldResources = null;
+        try {
+            // Change components if necessary
+            oldResources = this.resources;
+            if (oldResources == resources)
+                return;
+            Hashtable<String, String> env = new Hashtable<String, String>();
+            if (getParent() != null)
+                env.put(ProxyDirContext.HOST, getParent().getName());
+            env.put(ProxyDirContext.CONTEXT, getName());
+            this.resources = new ProxyDirContext(env, resources);
+        } finally {
+            writeLock.unlock();
+        }
 
-        // Change components if necessary
-        DirContext oldResources = this.resources;
-        if (oldResources == resources)
-            return;
-        Hashtable<String, String> env = new Hashtable<String, String>();
-        if (getParent() != null)
-            env.put(ProxyDirContext.HOST, getParent().getName());
-        env.put(ProxyDirContext.CONTEXT, getName());
-        this.resources = new ProxyDirContext(env, resources);
         // Report this property change to interested listeners
-        support.firePropertyChange("resources", oldResources, this.resources);
-
+        support.firePropertyChange("resources", oldResources, resources);
     }
 
 
@@ -1092,17 +1202,21 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     protected synchronized void startInternal() throws LifecycleException {
 
         // Start our subordinate components, if any
+        Loader loader = getLoaderInternal();
         if ((loader != null) && (loader instanceof Lifecycle))
             ((Lifecycle) loader).start();
         logger = null;
         getLogger();
+        Manager manager = getManagerInternal();
         if ((manager != null) && (manager instanceof Lifecycle))
             ((Lifecycle) manager).start();
+        Cluster cluster = getClusterInternal();
         if ((cluster != null) && (cluster instanceof Lifecycle))
             ((Lifecycle) cluster).start();
         Realm realm = getRealmInternal();
         if ((realm != null) && (realm instanceof Lifecycle))
             ((Lifecycle) realm).start();
+        DirContext resources = getResourcesInternal();
         if ((resources != null) && (resources instanceof Lifecycle))
             ((Lifecycle) resources).start();
 
@@ -1184,6 +1298,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
 
         // Stop our subordinate components, if any
+        DirContext resources = getResourcesInternal();
         if ((resources != null) && (resources instanceof Lifecycle)) {
             ((Lifecycle) resources).stop();
         }
@@ -1191,13 +1306,16 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if ((realm != null) && (realm instanceof Lifecycle)) {
             ((Lifecycle) realm).stop();
         }
+        Cluster cluster = getClusterInternal();
         if ((cluster != null) && (cluster instanceof Lifecycle)) {
             ((Lifecycle) cluster).stop();
         }
+        Manager manager = getManagerInternal();
         if ((manager != null) && (manager instanceof Lifecycle) &&
                 ((Lifecycle) manager).getState().isAvailable() ) {
             ((Lifecycle) manager).stop();
         }
+        Loader loader = getLoaderInternal();
         if ((loader != null) && (loader instanceof Lifecycle)) {
             ((Lifecycle) loader).stop();
         }
@@ -1206,6 +1324,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
     @Override
     protected void destroyInternal() throws LifecycleException {
 
+        Manager manager = getManagerInternal();
         if ((manager != null) && (manager instanceof Lifecycle)) {
             ((Lifecycle) manager).destroy();
         }
@@ -1213,9 +1332,11 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if ((realm != null) && (realm instanceof Lifecycle)) {
             ((Lifecycle) realm).destroy();
         }
+        Cluster cluster = getClusterInternal();
         if ((cluster != null) && (cluster instanceof Lifecycle)) {
             ((Lifecycle) cluster).destroy();
         }
+        Loader loader = getLoaderInternal();
         if ((loader != null) && (loader instanceof Lifecycle)) {
             ((Lifecycle) loader).destroy();
         }
@@ -1329,6 +1450,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         if (!getState().isAvailable())
             return;
 
+        Cluster cluster = getClusterInternal();
         if (cluster != null) {
             try {
                 cluster.backgroundProcess();
@@ -1336,6 +1458,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 log.warn(sm.getString("containerBase.backgroundProcess.cluster", cluster), e);
             }
         }
+        Loader loader = getLoaderInternal();
         if (loader != null) {
             try {
                 loader.backgroundProcess();
@@ -1343,6 +1466,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
                 log.warn(sm.getString("containerBase.backgroundProcess.loader", loader), e);
             }
         }
+        Manager manager = getManagerInternal();
         if (manager != null) {
             try {
                 manager.backgroundProcess();

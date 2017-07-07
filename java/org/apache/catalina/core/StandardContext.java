@@ -81,6 +81,7 @@ import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionListener;
 
 import org.apache.catalina.Authenticator;
+import org.apache.catalina.Cluster;
 import org.apache.catalina.Container;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
@@ -91,6 +92,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.Loader;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Pipeline;
 import org.apache.catalina.Realm;
@@ -2685,7 +2687,7 @@ public class StandardContext extends ContainerBase
         this.webappResources = resources;
 
         // The proxied resources will be refreshed on start
-        this.resources = null;
+        setResources(null);
 
         support.firePropertyChange("resources", oldResources,
                                    this.webappResources);
@@ -5270,7 +5272,7 @@ public class StandardContext extends ContainerBase
                 Registry.getRegistry(null, null).registerComponent
                     (proxyDirContext.getCache(), resourcesName, null);
             }
-            this.resources = proxyDirContext;
+            setResources(proxyDirContext);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("standardContext.resourcesStart"), t);
@@ -5289,6 +5291,8 @@ public class StandardContext extends ContainerBase
 
         boolean ok = true;
 
+
+        DirContext resources = getResourcesInternal();
         try {
             if (resources != null) {
                 if (resources instanceof Lifecycle) {
@@ -5318,7 +5322,7 @@ public class StandardContext extends ContainerBase
             ok = false;
         }
 
-        this.resources = null;
+        setResources(null);
 
         return (ok);
 
@@ -5485,6 +5489,7 @@ public class StandardContext extends ContainerBase
             if (ok) {
 
                 // Start our subordinate components, if any
+                Loader loader = getLoaderInternal();
                 if ((loader != null) && (loader instanceof Lifecycle))
                     ((Lifecycle) loader).start();
 
@@ -5500,11 +5505,13 @@ public class StandardContext extends ContainerBase
                 logger = null;
                 getLogger();
 
+                Cluster cluster = getClusterInternal();
                 if ((cluster != null) && (cluster instanceof Lifecycle))
                     ((Lifecycle) cluster).start();
                 Realm realm = getRealmInternal();
                 if ((realm != null) && (realm instanceof Lifecycle))
                     ((Lifecycle) realm).start();
+                DirContext resources = getResourcesInternal();
                 if ((resources != null) && (resources instanceof Lifecycle))
                     ((Lifecycle) resources).start();
 
@@ -5526,6 +5533,7 @@ public class StandardContext extends ContainerBase
 
                 // Acquire clustered manager
                 Manager contextManager = null;
+                Manager manager = getManagerInternal();
                 if (manager == null) {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("standardContext.cluster.noManager",
@@ -5542,6 +5550,7 @@ public class StandardContext extends ContainerBase
                     } else {
                         contextManager = new StandardManager();
                     }
+                    manager = contextManager;
                 }
 
                 // Configure default manager if none was specified
@@ -5576,7 +5585,7 @@ public class StandardContext extends ContainerBase
                 (Globals.RESOURCES_ATTR, getResources());
 
         // Initialize associated mapper
-        mapper.setContext(getPath(), welcomeFiles, resources);
+        mapper.setContext(getPath(), welcomeFiles, getResources());
 
         // Binding thread
         oldCCL = bindThread();
@@ -5629,6 +5638,7 @@ public class StandardContext extends ContainerBase
 
             try {
                 // Start manager
+                Manager manager = getManagerInternal();
                 if ((manager != null) && (manager instanceof Lifecycle)) {
                     ((Lifecycle) getManager()).start();
                 }
@@ -5810,6 +5820,7 @@ public class StandardContext extends ContainerBase
                 // Stop our filters
                 filterStop();
 
+                Manager manager = getManagerInternal();
                 if (manager != null && manager instanceof Lifecycle &&
                         ((Lifecycle) manager).getState().isAvailable()) {
                     ((Lifecycle) manager).stop();
@@ -5855,9 +5866,11 @@ public class StandardContext extends ContainerBase
             if ((realm != null) && (realm instanceof Lifecycle)) {
                 ((Lifecycle) realm).stop();
             }
+            Cluster cluster = getClusterInternal();
             if ((cluster != null) && (cluster instanceof Lifecycle)) {
                 ((Lifecycle) cluster).stop();
             }
+            Loader loader = getLoaderInternal();
             if ((loader != null) && (loader instanceof Lifecycle)) {
                 ((Lifecycle) loader).stop();
             }
@@ -5940,9 +5953,8 @@ public class StandardContext extends ContainerBase
             try {
                 ((DefaultInstanceManager)instanceManager).backgroundProcess();
             } catch (Exception e) {
-                log.warn(sm.getString(
-                        "standardContext.backgroundProcess.instanceManager",
-                        resources), e);
+                log.warn(sm.getString("standardContext.backgroundProcess.instanceManager",
+                        instanceManager), e);
             }
         }
         super.backgroundProcess();
