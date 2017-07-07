@@ -42,7 +42,7 @@ import org.apache.catalina.LifecycleException;
  *
  * <p>The <code>*.jar</code> suffix can be used to include all JAR files in a
  * certain directory. If a file or a directory does not exist, it will be
- * skipped. 
+ * skipped.
  * </p>
  *
  *
@@ -143,26 +143,28 @@ public class VirtualWebappLoader extends WebappLoader {
                             directory.getAbsolutePath()));
                 }
                 String filenames[] = directory.list();
-                Arrays.sort(filenames);
-                for (int j = 0; j < filenames.length; j++) {
-                    String filename = filenames[j].toLowerCase(Locale.ENGLISH);
-                    if (!filename.endsWith(".jar"))
-                        continue;
-                    File file = new File(directory, filenames[j]);
-                    if (!file.isFile()) {
+                if (filenames != null) {
+                    Arrays.sort(filenames);
+                    for (int j = 0; j < filenames.length; j++) {
+                        String filename = filenames[j].toLowerCase(Locale.ENGLISH);
+                        if (!filename.endsWith(".jar"))
+                            continue;
+                        File file = new File(directory, filenames[j]);
+                        if (!file.isFile()) {
+                            if (log.isDebugEnabled()) {
+                                log.debug(sm.getString(
+                                        "virtualWebappLoader.token.notFile",
+                                        file.getAbsolutePath()));
+                            }
+                            continue;
+                        }
                         if (log.isDebugEnabled()) {
                             log.debug(sm.getString(
-                                    "virtualWebappLoader.token.notFile",
+                                    "virtualWebappLoader.token.file",
                                     file.getAbsolutePath()));
                         }
-                        continue;
+                        set.add(file.toURI().toString());
                     }
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString(
-                                "virtualWebappLoader.token.file",
-                                file.getAbsolutePath()));
-                    }
-                    set.add(file.toURI().toString());
                 }
             } else {
                 // single file or directory
