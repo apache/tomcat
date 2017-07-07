@@ -2687,7 +2687,7 @@ public class StandardContext extends ContainerBase
         this.webappResources = resources;
 
         // The proxied resources will be refreshed on start
-        setResources(null);
+        super.setResources(null);
 
         support.firePropertyChange("resources", oldResources,
                                    this.webappResources);
@@ -5272,7 +5272,7 @@ public class StandardContext extends ContainerBase
                 Registry.getRegistry(null, null).registerComponent
                     (proxyDirContext.getCache(), resourcesName, null);
             }
-            setResources(proxyDirContext);
+            super.setResources(proxyDirContext);
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             log.error(sm.getString("standardContext.resourcesStart"), t);
@@ -5322,7 +5322,7 @@ public class StandardContext extends ContainerBase
             ok = false;
         }
 
-        setResources(null);
+        super.setResources(null);
 
         return (ok);
 
