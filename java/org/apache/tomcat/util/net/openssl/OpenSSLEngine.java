@@ -677,7 +677,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     @Override
-    public String[] getEnabledCipherSuites() {
+    public synchronized String[] getEnabledCipherSuites() {
+        if (destroyed) {
+            return new String[0];
+        }
         String[] enabled = SSL.getCiphers(ssl);
         if (enabled == null) {
             return new String[0];
@@ -693,9 +696,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     @Override
-    public void setEnabledCipherSuites(String[] cipherSuites) {
+    public synchronized void setEnabledCipherSuites(String[] cipherSuites) {
         if (cipherSuites == null) {
             throw new IllegalArgumentException(sm.getString("engine.nullCipherSuite"));
+        }
+        if (destroyed) {
+            return;
         }
         final StringBuilder buf = new StringBuilder();
         for (String cipherSuite : cipherSuites) {
@@ -733,7 +739,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     @Override
-    public String[] getEnabledProtocols() {
+    public synchronized String[] getEnabledProtocols() {
+        if (destroyed) {
+            return new String[0];
+        }
         List<String> enabled = new ArrayList<>();
         // Seems like there is no way to explicitly disable SSLv2Hello in OpenSSL so it is always enabled
         enabled.add(Constants.SSL_PROTO_SSLv2Hello);
@@ -762,10 +771,13 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     @Override
-    public void setEnabledProtocols(String[] protocols) {
+    public synchronized void setEnabledProtocols(String[] protocols) {
         if (protocols == null) {
             // This is correct from the API docs
             throw new IllegalArgumentException();
+        }
+        if (destroyed) {
+            return;
         }
         boolean sslv2 = false;
         boolean sslv3 = false;
@@ -1252,12 +1264,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         @Override
         public String getCipherSuite() {
-            if (!handshakeFinished) {
-                return INVALID_CIPHER;
-            }
             if (cipher == null) {
                 String ciphers;
                 synchronized (OpenSSLEngine.this) {
+                    if (!handshakeFinished) {
+                        return INVALID_CIPHER;
+                    }
                     if (destroyed) {
                         return INVALID_CIPHER;
                     }
