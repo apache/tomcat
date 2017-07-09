@@ -52,6 +52,13 @@
         where each key has a separate password. Based on a patch by Frank
         Taffelt. (markt)
       </fix>
+      <fix>
+        <bug>61264</bug>: Correct a regression in the refactoring to use
+        <code>Charset</code> rather than <code>String</code> to store request
+        character encoding that prevented <code>getReader()</code> throwing an
+        <code>UnsupportedEncodingException</code> if the user agent specifies
+        an unsupported character encoding. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

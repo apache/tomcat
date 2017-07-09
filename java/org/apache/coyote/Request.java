@@ -131,6 +131,10 @@ public final class Request {
     private long contentLength = -1;
     private MessageBytes contentTypeMB = null;
     private Charset charset = null;
+    // Retain the original, user specified character encoding so it can be
+    // returned even if it is invalid
+    private String characterEncoding = null;
+
     /**
      * Is there an expectation ?
      */
@@ -288,16 +292,13 @@ public final class Request {
      * @return The value set via {@link #setCharacterEncoding(String)} or if no
      *         call has been made to that method try to obtain if from the
      *         content type.
-     *
-     * @deprecated This method will be removed in Tomcat 9.0.x
      */
-    @Deprecated
     public String getCharacterEncoding() {
-        Charset charset = getCharset();
-        if (charset == null) {
-            return null;
+        if (characterEncoding == null) {
+            characterEncoding = getCharsetFromContentType(getContentType());
         }
-        return charset.name();
+
+        return characterEncoding;
     }
 
 
@@ -307,13 +308,17 @@ public final class Request {
      * @return The value set via {@link #setCharacterEncoding(String)} or if no
      *         call has been made to that method try to obtain if from the
      *         content type.
+     *
+     * @throws UnsupportedEncodingException If the user agent has specified an
+     *         invalid character encoding
      */
-    public Charset getCharset() {
-        if (charset != null) {
-            return charset;
+    public Charset getCharset() throws UnsupportedEncodingException {
+        if (charset == null) {
+            getCharacterEncoding();
+            if (characterEncoding != null) {
+                charset = B2CConverter.getCharset(characterEncoding);
+            }
         }
-
-        charset = getCharsetFromContentType(getContentType());
 
         return charset;
     }
@@ -334,7 +339,9 @@ public final class Request {
 
     public void setCharset(Charset charset) {
         this.charset = charset;
+        this.characterEncoding = charset.name();
     }
+
 
     public void setContentLength(long len) {
         this.contentLength = len;
@@ -634,6 +641,7 @@ public final class Request {
         contentLength = -1;
         contentTypeMB = null;
         charset = null;
+        characterEncoding = null;
         expectation = false;
         headers.recycle();
         serverNameMB.recycle();
@@ -694,7 +702,7 @@ public final class Request {
      *
      * @param contentType a content type header
      */
-    private static Charset getCharsetFromContentType(String contentType) {
+    private static String getCharsetFromContentType(String contentType) {
 
         if (contentType == null) {
             return null;
@@ -714,15 +722,6 @@ public final class Request {
             encoding = encoding.substring(1, encoding.length() - 1);
         }
 
-        Charset result = null;
-
-        try {
-            result = B2CConverter.getCharset(encoding.trim());
-        } catch (UnsupportedEncodingException e) {
-            // Ignore
-        }
-
-        return result;
+        return encoding.trim();
     }
-
 }

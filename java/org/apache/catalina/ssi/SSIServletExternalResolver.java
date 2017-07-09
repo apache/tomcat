@@ -18,6 +18,7 @@ package org.apache.catalina.ssi;
 
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
@@ -251,7 +252,11 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                         // Get encoding settings from request / connector if
                         // possible
                         if (req instanceof Request) {
-                            requestCharset = ((Request)req).getCoyoteRequest().getCharset();
+                            try {
+                                requestCharset = ((Request)req).getCoyoteRequest().getCharset();
+                            } catch (UnsupportedEncodingException e) {
+                                // Ignore
+                            }
                             Connector connector =  ((Request)req).getConnector();
                             uriCharset = connector.getURICharset();
                             useBodyEncodingForURI = connector.getUseBodyEncodingForURI();

@@ -984,9 +984,9 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
      */
     @Override
     public String getCharacterEncoding() {
-        Charset charset = coyoteRequest.getCharset();
-        if (charset != null) {
-            return charset.name();
+        String characterEncoding = coyoteRequest.getCharacterEncoding();
+        if (characterEncoding != null) {
+            return characterEncoding;
         }
 
         Context context = getContext();
@@ -999,7 +999,12 @@ public class Request implements org.apache.catalina.servlet4preview.http.HttpSer
 
 
     private Charset getCharset() {
-        Charset charset = coyoteRequest.getCharset();
+        Charset charset = null;
+        try {
+            charset = coyoteRequest.getCharset();
+        } catch (UnsupportedEncodingException e) {
+            // Ignore
+        }
         if (charset != null) {
             return charset;
         }
