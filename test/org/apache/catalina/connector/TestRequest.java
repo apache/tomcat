@@ -25,9 +25,12 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TreeMap;
 
 import javax.servlet.ServletException;
@@ -902,5 +905,67 @@ public class TestRequest extends TomcatBaseTest {
         long time = System.nanoTime() - start;
 
         System.out.println(time);
+    }
+
+
+    @Test
+    public void testGetReaderValidEncoding() throws Exception {
+        doTestGetReader("ISO-8859-1", true);
+    }
+
+
+    @Test
+    public void testGetReaderInvalidEbcoding() throws Exception {
+        doTestGetReader("X-Invalid", false);
+    }
+
+
+    private void doTestGetReader(String userAgentCharaceterEncoding, boolean expect200)
+            throws Exception {
+
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        Tomcat.addServlet(ctx, "servlet", new Bug61264GetReaderServlet());
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        tomcat.start();
+
+        byte[] body = "Test".getBytes();
+        ByteChunk bc = new ByteChunk();
+        Map<String,List<String>> reqHeaders = new HashMap<>();
+        reqHeaders.put("Content-Type",
+                Arrays.asList(new String[] {"text/plain;charset=" + userAgentCharaceterEncoding}));
+
+        int rc = postUrl(body, "http://localhost:" + getPort() + "/", bc, reqHeaders, null);
+
+        if (expect200) {
+            assertEquals(200, rc);
+        } else {
+            assertEquals(500, rc);
+        }
+    }
+
+
+    private class Bug61264GetReaderServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            // This is intended for POST requests
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            // Container will handle any errors
+            req.getReader();
+        }
     }
 }
