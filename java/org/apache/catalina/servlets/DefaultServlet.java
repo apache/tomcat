@@ -997,6 +997,18 @@ public class DefaultServlet
             ranges = FULL;
         }
 
+        String outputEncoding = response.getCharacterEncoding();
+        Charset charset = B2CConverter.getCharset(outputEncoding);
+        boolean conversionRequired;
+        if (isText(contentType) && !charset.equals(fileEncodingCharset)) {
+            conversionRequired = true;
+            // Conversion often results fewer/more/different bytes.
+            // That does not play nicely with range requests.
+            ranges = FULL;
+        } else {
+            conversionRequired = false;
+        }
+
         if ( (cacheEntry.context != null)
                 || isError
                 || ( ((ranges == null) || (ranges.isEmpty()))
@@ -1016,8 +1028,8 @@ public class DefaultServlet
                     log("DefaultServlet.serveFile:  contentLength=" +
                         contentLength);
                 // Don't set a content length if something else has already
-                // written to the response.
-                if (contentWritten == 0) {
+                // written to the response or if conversion will be taking place
+                if (contentWritten == 0 && !conversionRequired) {
                     if (contentLength < Integer.MAX_VALUE) {
                         response.setContentLength((int) contentLength);
                     } else {
@@ -1047,20 +1059,18 @@ public class DefaultServlet
                     // Silent catch
                 }
                 // Check to see if conversion is required
-                String outputEncoding = response.getCharacterEncoding();
-                Charset charset = B2CConverter.getCharset(outputEncoding);
                 if (ostream != null) {
-                    if (!isText(contentType) || charset.equals(fileEncodingCharset)) {
-                        if (!checkSendfile(request, response, cacheEntry, contentLength, null)) {
-                            copy(cacheEntry, renderResult, ostream);
-                        }
-                    } else {
+                    if (conversionRequired) {
                         // A conversion is required from fileEncoding to
                         // response encoding
                         OutputStreamWriter osw = new OutputStreamWriter(ostream, charset);
                         PrintWriter pw = new PrintWriter(osw);
                         copy(cacheEntry, renderResult, pw);
                         pw.flush();
+                    } else {
+                        if (!checkSendfile(request, response, cacheEntry, contentLength, null)) {
+                            copy(cacheEntry, renderResult, ostream);
+                        }
                     }
                 } else {
                     copy(cacheEntry, renderResult, writer);
