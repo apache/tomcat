@@ -48,6 +48,7 @@ import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -58,7 +59,7 @@ import org.apache.tomcat.util.http.parser.MediaType;
 
 public class TestDefaultServlet extends TomcatBaseTest {
 
-    /**
+    /*
      * Test attempting to access special paths (WEB-INF/META-INF) using
      * DefaultServlet.
      */
@@ -98,7 +99,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
     }
 
-    /**
+    /*
      * Test https://bz.apache.org/bugzilla/show_bug.cgi?id=50026
      * Verify serving of resources from context root with subpath mapping.
      */
@@ -168,46 +169,30 @@ public class TestDefaultServlet extends TomcatBaseTest {
 
     }
 
-    /**
+    /*
      * Test https://bz.apache.org/bugzilla/show_bug.cgi?id=50413 Serving a
      * custom error page
      */
     @Test
     public void testCustomErrorPage() throws Exception {
-        File appDir = new File(getTemporaryDirectory(), "MyApp");
-        File webInf = new File(appDir, "WEB-INF");
-        addDeleteOnTearDown(appDir);
-        if (!webInf.mkdirs() && !webInf.isDirectory()) {
-            fail("Unable to create directory [" + webInf + "]");
-        }
-        Writer w = new OutputStreamWriter(new FileOutputStream(new File(appDir,
-                "WEB-INF/web.xml")), "UTF-8");
-        try {
-            w.write("<?xml version='1.0' encoding='UTF-8'?>\n"
-                    + "<web-app xmlns='http://java.sun.com/xml/ns/j2ee' "
-                    + " xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'"
-                    + " xsi:schemaLocation='http://java.sun.com/xml/ns/j2ee "
-                    + " http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd'"
-                    + " version='2.4'>\n"
-                    + "<error-page>\n<error-code>404</error-code>\n"
-                    + "<location>/404.html</location>\n</error-page>\n"
-                    + "</web-app>\n");
-            w.flush();
-        } finally {
-            w.close();
-        }
-        w = new OutputStreamWriter(new FileOutputStream(new File(appDir,
-                "404.html")), "ISO-8859-1");
-        try {
-            w.write("It is 404.html");
-            w.flush();
-        } finally {
-            w.close();
-        }
 
         Tomcat tomcat = getTomcatInstance();
-        String contextPath = "/MyApp";
-        tomcat.addWebapp(null, contextPath, appDir.getAbsolutePath());
+
+        File appDir = new File("test/webapp-3.0");
+
+        // app dir is relative to server home
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
+                DefaultServlet.class.getName());
+        defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
+
+        ctxt.addServletMapping("/", "default");
+        ctxt.addMimeMapping("html", "text/html");
+        ErrorPage ep = new ErrorPage();
+        ep.setErrorCode(404);
+        ep.setLocation("/404.html");
+        ctxt.addErrorPage(ep);
+
         tomcat.start();
 
         TestCustomErrorClient client =
@@ -254,7 +239,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         assertEquals("It is 404.html", client.getResponseBody());
     }
 
-    /**
+    /*
      * Test what happens if a custom 404 page is configured,
      * but its file is actually missing.
      */
@@ -299,7 +284,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         assertTrue(client.isResponse404());
     }
 
-    /**
+    /*
      * Verifies that the same Content-Length is returned for both GET and HEAD
      * operations when a static resource served by the DefaultServlet is
      * included.
