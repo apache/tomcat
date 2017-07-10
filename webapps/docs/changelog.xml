@@ -62,6 +62,12 @@
         <code>UnsupportedEncodingException</code> if the user agent specifies
         an unsupported character encoding. (markt)
       </fix>
+      <fix>
+        Correct a regression in the fix for <bug>49464</bug> that could cause an
+        incorrect <code>Content-Length</code> header to be sent by the
+        <code>DefaultServlet</code> if the encoding of a static is not
+        consistent with the encoding of the response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

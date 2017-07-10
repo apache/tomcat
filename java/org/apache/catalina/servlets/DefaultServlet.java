@@ -962,6 +962,18 @@ public class DefaultServlet extends HttpServlet {
             ranges = FULL;
         }
 
+        String outputEncoding = response.getCharacterEncoding();
+        Charset charset = B2CConverter.getCharset(outputEncoding);
+        boolean conversionRequired;
+        if (isText(contentType) && !charset.equals(fileEncodingCharset)) {
+            conversionRequired = true;
+            // Conversion often results fewer/more/different bytes.
+            // That does not play nicely with range requests.
+            ranges = FULL;
+        } else {
+            conversionRequired = false;
+        }
+
         if (resource.isDirectory() ||
                 isError ||
                 ( (ranges == null || ranges.isEmpty())
@@ -981,8 +993,8 @@ public class DefaultServlet extends HttpServlet {
                     log("DefaultServlet.serveFile:  contentLength=" +
                         contentLength);
                 // Don't set a content length if something else has already
-                // written to the response.
-                if (contentWritten == 0) {
+                // written to the response or if conversion will be taking place
+                if (contentWritten == 0 && !conversionRequired) {
                     response.setContentLengthLong(contentLength);
                 }
             }
@@ -1010,9 +1022,21 @@ public class DefaultServlet extends HttpServlet {
                     } else {
                         // Output is content of resource
                         // Check to see if conversion is required
-                        String outputEncoding = response.getCharacterEncoding();
-                        Charset charset = B2CConverter.getCharset(outputEncoding);
-                        if (!isText(contentType) || charset.equals(fileEncodingCharset)) {
+                        if (conversionRequired) {
+                            // A conversion is required from fileEncoding to
+                            // response encoding
+                            byte[] resourceBody = resource.getContent();
+                            InputStream source;
+                            if (resourceBody == null) {
+                                source = resource.getInputStream();
+                            } else {
+                                source = new ByteArrayInputStream(resourceBody);
+                            }
+                            OutputStreamWriter osw = new OutputStreamWriter(ostream, charset);
+                            PrintWriter pw = new PrintWriter(osw);
+                            copy(source, pw, fileEncoding);
+                            pw.flush();
+                        } else {
                             if (!checkSendfile(request, response, resource,
                                     contentLength, null)) {
                                 // sendfile not possible so check if resource
@@ -1027,20 +1051,6 @@ public class DefaultServlet extends HttpServlet {
                                     ostream.write(resourceBody);
                                 }
                             }
-                        } else {
-                            // A conversion is required from fileEncoding to
-                            // response encoding
-                            byte[] resourceBody = resource.getContent();
-                            InputStream source;
-                            if (resourceBody == null) {
-                                source = resource.getInputStream();
-                            } else {
-                                source = new ByteArrayInputStream(resourceBody);
-                            }
-                            OutputStreamWriter osw = new OutputStreamWriter(ostream, charset);
-                            PrintWriter pw = new PrintWriter(osw);
-                            copy(source, pw, fileEncoding);
-                            pw.flush();
                         }
                     }
                     // If a stream was configured, it needs to be copied to
