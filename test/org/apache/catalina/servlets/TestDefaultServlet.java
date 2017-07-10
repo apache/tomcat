@@ -54,6 +54,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
@@ -120,6 +121,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
                 "org.apache.catalina.servlets.DefaultServlet");
         defaultServlet.addInitParameter("gzip", "true");
+        defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
         ctxt.addServletMappingDecoded("/", "default");
 
         ctxt.addMimeMapping("html", "text/html");
@@ -175,6 +177,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
                 "org.apache.catalina.servlets.DefaultServlet");
         defaultServlet.addInitParameter("precompressed", "true");
+        defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
 
         ctxt.addServletMappingDecoded("/", "default");
         ctxt.addMimeMapping("html", "text/html");
@@ -285,6 +288,7 @@ public class TestDefaultServlet extends TomcatBaseTest {
         Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
                 DefaultServlet.class.getName());
         defaultServlet.addInitParameter("precompressed", "br=.br,gzip=.gz");
+        defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
 
         ctxt.addServletMappingDecoded("/", "default");
         ctxt.addMimeMapping("html", "text/html");
@@ -455,36 +459,24 @@ public class TestDefaultServlet extends TomcatBaseTest {
      */
     @Test
     public void testCustomErrorPage() throws Exception {
-        File appDir = new File(getTemporaryDirectory(), "MyApp");
-        File webInf = new File(appDir, "WEB-INF");
-        addDeleteOnTearDown(appDir);
-        if (!webInf.mkdirs() && !webInf.isDirectory()) {
-            fail("Unable to create directory [" + webInf + "]");
-        }
-
-        File webxml = new File(appDir, "WEB-INF/web.xml");
-        try (FileOutputStream fos = new FileOutputStream(webxml);
-                Writer w = new OutputStreamWriter(fos, "UTF-8")) {
-            w.write("<?xml version='1.0' encoding='UTF-8'?>\n"
-                    + "<web-app xmlns='http://java.sun.com/xml/ns/j2ee' "
-                    + " xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'"
-                    + " xsi:schemaLocation='http://java.sun.com/xml/ns/j2ee "
-                    + " http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd'"
-                    + " version='2.4'>\n"
-                    + "<error-page>\n<error-code>404</error-code>\n"
-                    + "<location>/404.html</location>\n</error-page>\n"
-                    + "</web-app>\n");
-        }
-
-        File error404 = new File(appDir, "404.html");
-        try (FileOutputStream fos = new FileOutputStream(error404);
-                Writer w = new OutputStreamWriter(fos, "ISO-8859-1")) {
-            w.write("It is 404.html");
-        }
 
         Tomcat tomcat = getTomcatInstance();
-        String contextPath = "/MyApp";
-        tomcat.addWebapp(null, contextPath, appDir.getAbsolutePath());
+
+        File appDir = new File("test/webapp");
+
+        // app dir is relative to server home
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
+                DefaultServlet.class.getName());
+        defaultServlet.addInitParameter("fileEncoding", "ISO-8859-1");
+
+        ctxt.addServletMappingDecoded("/", "default");
+        ctxt.addMimeMapping("html", "text/html");
+        ErrorPage ep = new ErrorPage();
+        ep.setErrorCode(404);
+        ep.setLocation("/404.html");
+        ctxt.addErrorPage(ep);
+
         tomcat.start();
 
         TestCustomErrorClient client =

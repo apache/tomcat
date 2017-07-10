@@ -965,7 +965,8 @@ public class DefaultServlet extends HttpServlet {
         String outputEncoding = response.getCharacterEncoding();
         Charset charset = B2CConverter.getCharset(outputEncoding);
         boolean conversionRequired;
-        if (isText(contentType) && !charset.equals(fileEncodingCharset)) {
+        if (!usingPrecompressedVersion && isText(contentType) &&
+                !charset.equals(fileEncodingCharset)) {
             conversionRequired = true;
             // Conversion often results fewer/more/different bytes.
             // That does not play nicely with range requests.
