@@ -16,15 +16,16 @@
  */
 package org.apache.juli;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.net.URLDecoder;
 
-import org.apache.catalina.startup.LoggingBaseTest;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import org.apache.catalina.startup.LoggingBaseTest;
 
 public class TestFileHandlerNonRotatable extends LoggingBaseTest {
     private FileHandler testHandler;
@@ -35,7 +36,7 @@ public class TestFileHandlerNonRotatable extends LoggingBaseTest {
                 "org.apache.juli.ClassLoaderLogManager");
         String configLoggingPath = TestFileHandlerNonRotatable.class
                 .getResource("logging-non-rotatable.properties")
-                .getFile(); 
+                .getFile();
         System.setProperty("java.util.logging.config.file",
                 URLDecoder.decode(configLoggingPath, java.nio.charset.StandardCharsets.UTF_8.toString()));
     }
