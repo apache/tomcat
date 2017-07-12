@@ -41,6 +41,7 @@ public class TestFileHandlerNonRotatable extends LoggingBaseTest {
                 URLDecoder.decode(configLoggingPath, java.nio.charset.StandardCharsets.UTF_8.toString()));
     }
 
+    @Override
     @After
     public void tearDown() throws Exception {
         if (testHandler != null) {
