@@ -61,7 +61,7 @@
   <p>
    In addition to dynamic discovery, Apache Tribes also supports static membership, with membership verification.
    To achieve this add the <code>org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor</code>
-   underneath the <code>org.apache.catalina.tribes.group.interceptors.TcpFailureDetector</code> interceptor.
+   after the <code>org.apache.catalina.tribes.group.interceptors.TcpFailureDetector</code> interceptor.
    Inside the <code>StaticMembershipInterceptor</code> you can add the static members you wish to have.
    The <code>TcpFailureDetector</code> will do a health check on the static members,and also monitor them for crashes
    so they will have the same level of notification mechanism as the members that are automatically discovered.</p>
