@@ -38,7 +38,7 @@ public class TestFileHandlerNonRotatable extends LoggingBaseTest {
                 .getResource("logging-non-rotatable.properties")
                 .getFile();
         System.setProperty("java.util.logging.config.file",
-                URLDecoder.decode(configLoggingPath, java.nio.charset.StandardCharsets.UTF_8.toString()));
+                URLDecoder.decode(configLoggingPath, "UTF-8"));
     }
 
     @After
