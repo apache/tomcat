@@ -1340,6 +1340,7 @@
       <fileset dir="test">
         <include name="**/*.jks"/>
         <include name="**/*.pem"/>
+        <include name="**/logging-non-rotatable.properties"/>
       </fileset>
     </copy>
   </target>
