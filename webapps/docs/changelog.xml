@@ -55,15 +55,6 @@
         <code>catalina..log</code>. Patch provided by Katya Todorova.
         (violetagg)
       </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Coyote">
-    <changelog>
-      <fix>
-        Enable TLS connectors to use Java key stores that contain multiple keys
-        where each key has a separate password. Based on a patch by Frank
-        Taffelt. (markt)
-      </fix>
       <fix>
         <bug>61264</bug>: Correct a regression in the refactoring to use
         <code>Charset</code> rather than <code>String</code> to store request
@@ -76,6 +67,15 @@
         incorrect <code>Content-Length</code> header to be sent by the
         <code>DefaultServlet</code> if the encoding of a static is not
         consistent with the encoding of the response. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Enable TLS connectors to use Java key stores that contain multiple keys
+        where each key has a separate password. Based on a patch by Frank
+        Taffelt. (markt)
       </fix>
     </changelog>
   </subsection>
