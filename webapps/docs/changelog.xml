@@ -60,7 +60,7 @@
         be used when generating the log file name. For example if the prefix is
         <code>catalina.</code> and the suffix is <code>.log</code> then the log
         file name will be <code>catalina.log</code> instead of
-        <code>catalina..log</code>. Patch provided by Katya Todorova.
+        <code>catalina..log</code>. Patch provided by Katya Stoycheva.
         (violetagg)
       </fix>
       <fix>
