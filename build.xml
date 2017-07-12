@@ -1328,6 +1328,7 @@
         <fileset dir="test">
           <include name="META-INF/**"/>
           <include name="**/service-config.txt"/>
+          <include name="**/logging-non-rotatable.properties"/>
         </fileset>
     </copy>
   </target>
