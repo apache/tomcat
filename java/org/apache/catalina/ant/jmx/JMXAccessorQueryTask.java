@@ -39,7 +39,7 @@ import org.apache.tools.ant.BuildException;
  * <li>Show query result as Ant console log</li>
  * <li>Bind query result as Ant properties</li>
  * </ul>
- * <br/>
+ * <br>
  * Query a list of Mbeans.
  * <pre>
  *   &lt;jmxQuery

@@ -26,7 +26,7 @@ import org.apache.catalina.tribes.group.InterceptorPayload;
 
 
 /**
- * A fast queue that remover thread lock the adder thread. <br/>Limit the queue
+ * A fast queue that remover thread lock the adder thread. <br>Limit the queue
  * length when you have strange producer thread problems.
  *
  * FIXME add i18n support to log messages

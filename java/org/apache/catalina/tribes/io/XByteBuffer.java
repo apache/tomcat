@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * as they come in on a socket.
  * <br>
  * <b>THIS CLASS IS NOT THREAD SAFE</B><BR>
- * <br/>
+ * <br>
  * Transfer package:
  * <ul>
  * <li><b>START_DATA/b> - 7 bytes - <i>FLT2002</i></li>

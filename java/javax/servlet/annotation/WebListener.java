@@ -24,8 +24,8 @@ import java.lang.annotation.Target;
 
 /**
  * The annotation used to declare a listener for various types of event, in a
- * given web application context.<br />
- * <br />
+ * given web application context.<br>
+ * <br>
  * 
  * The class annotated MUST implement one, (or more), of the following
  * interfaces: {@link javax.servlet.http.HttpSessionAttributeListener},
@@ -33,11 +33,11 @@ import java.lang.annotation.Target;
  * {@link javax.servlet.ServletContextAttributeListener},
  * {@link javax.servlet.ServletContextListener},
  * {@link javax.servlet.ServletRequestAttributeListener},
- * {@link javax.servlet.ServletRequestListener} <br />
- * <br />
+ * {@link javax.servlet.ServletRequestListener} <br>
+ * <br>
  * 
- * E.g. <code>@WebListener</code><br />
- * <code>public TestListener implements ServletContextListener {</code><br />
+ * E.g. <code>@WebListener</code><br>
+ * <code>public TestListener implements ServletContextListener {</code><br>
  * 
  * @since Servlet 3.0
  */
