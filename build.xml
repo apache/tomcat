@@ -566,6 +566,9 @@
         <exclude name="test/webresources/**"/>
         <!-- Exclude test files with unusual encodings -->
         <exclude name="test/webapp/jsp/encoding/**"/>
+        <!-- Exclude developer specific local files -->
+        <exclude name="build.properties" />
+        <exclude name="res/maven/mvn.properties" />
       </fileset>
       <fileset dir="modules/jdbc-pool" >
         <exclude name=".*/**"/>
