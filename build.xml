@@ -560,6 +560,9 @@
         <exclude name="test/webapp-3.0/bug49nnn/bug49464-ibm850.txt"/>
         <exclude name="test/webapp-3.0/bug53257/**/*.txt"/>
         <exclude name="test/webapp-3.0-fragments/WEB-INF/classes/*.txt"/>
+        <!-- Exclude developer specific local files -->
+        <exclude name="build.properties" />
+        <exclude name="res/maven/mvn.properties" />
       </fileset>
       <fileset dir="modules/jdbc-pool" >
         <exclude name=".*/**"/>
