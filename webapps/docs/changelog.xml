@@ -85,6 +85,10 @@
         where each key has a separate password. Based on a patch by Frank
         Taffelt. (markt)
       </fix>
+      <fix>
+        Improve the handling of HTTP/2 stream resets due to excessive headers
+        when a continuation frame is used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

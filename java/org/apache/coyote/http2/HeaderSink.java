@@ -34,4 +34,11 @@ class HeaderSink implements HeaderEmitter {
     public void validateHeaders() throws StreamException {
         // NO-OP
     }
+
+    @Override
+    public void setHeaderException(StreamException streamException) {
+        // NO-OP
+        // The connection is already closing so no need to process additional
+        // errors
+    }
 }

@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.hamcrest.Description;
+import org.hamcrest.TypeSafeMatcher;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,7 +37,7 @@ public class TestHttp2Limits extends Http2TestBase {
     @Test
     public void testHeaderLimits1x128() throws Exception {
         // Well within limits
-        doTestHeaderLimits(1, 128, 0);
+        doTestHeaderLimits(1, 128, FailureMode.NONE);
     }
 
 
@@ -42,21 +45,22 @@ public class TestHttp2Limits extends Http2TestBase {
     public void testHeaderLimits100x32() throws Exception {
         // Just within default maxHeaderCount
         // Note request has 4 standard headers
-        doTestHeaderLimits(96, 32, 0);
+        doTestHeaderLimits(96, 32, FailureMode.NONE);
     }
 
 
     @Test
     public void testHeaderLimits101x32() throws Exception {
         // Just above default maxHeaderCount
-        doTestHeaderLimits(97, 32, 1);
+        doTestHeaderLimits(97, 32, FailureMode.STREAM_RESET);
     }
 
 
     @Test
     public void testHeaderLimits20x32WithLimit10() throws Exception {
         // Check lower count limit is enforced
-        doTestHeaderLimits(20, 32, -1, 10, Constants.DEFAULT_MAX_HEADER_SIZE, 0, 1);
+        doTestHeaderLimits(20, 32, -1, 10, Constants.DEFAULT_MAX_HEADER_SIZE, 0,
+                FailureMode.STREAM_RESET);
     }
 
 
@@ -64,42 +68,44 @@ public class TestHttp2Limits extends Http2TestBase {
     public void testHeaderLimits8x1144() throws Exception {
         // Just within default maxHttpHeaderSize
         // per header overhead plus standard 3 headers
-        doTestHeaderLimits(7, 1144, 0);
+        doTestHeaderLimits(7, 1144, FailureMode.NONE);
     }
 
 
     @Test
     public void testHeaderLimits8x1145() throws Exception {
         // Just above default maxHttpHeaderSize
-        doTestHeaderLimits(7, 1145, 1);
+        doTestHeaderLimits(7, 1145, FailureMode.STREAM_RESET);
     }
 
 
     @Test
     public void testHeaderLimits3x1024WithLimit2048() throws Exception {
         // Check lower size limit is enforced
-        doTestHeaderLimits(3, 1024, -1, Constants.DEFAULT_MAX_HEADER_COUNT, 2 * 1024, 0, 1);
+        doTestHeaderLimits(3, 1024, -1, Constants.DEFAULT_MAX_HEADER_COUNT, 2 * 1024, 0,
+                FailureMode.STREAM_RESET);
     }
 
 
     @Test
     public void testHeaderLimits1x12k() throws Exception {
         // Bug 60232
-        doTestHeaderLimits(1, 12*1024, 1);
+        doTestHeaderLimits(1, 12*1024, FailureMode.STREAM_RESET);
     }
 
 
     @Test
     public void testHeaderLimits1x12kin1kChunks() throws Exception {
         // Bug 60232
-        doTestHeaderLimits(1, 12*1024, 1024, 1);
+        doTestHeaderLimits(1, 12*1024, 1024, FailureMode.STREAM_RESET);
     }
 
 
     @Test
     public void testHeaderLimits1x12kin1kChunksThenNewRequest() throws Exception {
         // Bug 60232
-        doTestHeaderLimits(1, 12*1024, 1024, 1);
+        doTestHeaderLimits(1, 12*1024, 1024, FailureMode.STREAM_RESET);
+
 
         output.clearTrace();
         sendSimpleGetRequest(5);
@@ -112,7 +118,7 @@ public class TestHttp2Limits extends Http2TestBase {
     @Test
     public void testHeaderLimits1x32k() throws Exception {
         // Bug 60232
-        doTestHeaderLimits(1, 32*1024, 1);
+        doTestHeaderLimits(1, 32*1024, FailureMode.CONNECTION_RESET);
     }
 
 
@@ -122,44 +128,45 @@ public class TestHttp2Limits extends Http2TestBase {
         // 500ms per frame write delay to give server a chance to process the
         // stream reset and the connection reset before the request is fully
         // sent.
-        doTestHeaderLimits(1, 32*1024, 1024, 500, 2);
+        doTestHeaderLimits(1, 32*1024, 1024, 500, FailureMode.CONNECTION_RESET);
     }
 
 
     @Test
     public void testHeaderLimits1x128k() throws Exception {
         // Bug 60232
-        doTestHeaderLimits(1, 128*1024, 2);
+        doTestHeaderLimits(1, 128*1024, FailureMode.CONNECTION_RESET);
     }
 
 
     @Test
     public void testHeaderLimits1x512k() throws Exception {
         // Bug 60232
-        doTestHeaderLimits(1, 512*1024, 2);
+        doTestHeaderLimits(1, 512*1024, FailureMode.CONNECTION_RESET);
     }
 
 
     @Test
     public void testHeaderLimits10x512k() throws Exception {
         // Bug 60232
-        doTestHeaderLimits(10, 512*1024, 2);
+        doTestHeaderLimits(10, 512*1024, FailureMode.CONNECTION_RESET);
     }
 
 
-    private void doTestHeaderLimits(int headerCount, int headerSize, int failMode) throws Exception {
+    private void doTestHeaderLimits(int headerCount, int headerSize, FailureMode failMode)
+            throws Exception {
         doTestHeaderLimits(headerCount, headerSize, -1, failMode);
     }
 
 
     private void doTestHeaderLimits(int headerCount, int headerSize, int maxHeaderPayloadSize,
-            int failMode) throws Exception {
+            FailureMode failMode) throws Exception {
         doTestHeaderLimits(headerCount, headerSize, maxHeaderPayloadSize, 0, failMode);
     }
 
 
     private void doTestHeaderLimits(int headerCount, int headerSize, int maxHeaderPayloadSize,
-            int delayms, int failMode) throws Exception {
+            int delayms, FailureMode failMode) throws Exception {
         doTestHeaderLimits(headerCount, headerSize, maxHeaderPayloadSize,
                 Constants.DEFAULT_MAX_HEADER_COUNT, Constants.DEFAULT_MAX_HEADER_SIZE, delayms,
                 failMode);
@@ -167,7 +174,8 @@ public class TestHttp2Limits extends Http2TestBase {
 
 
     private void doTestHeaderLimits(int headerCount, int headerSize, int maxHeaderPayloadSize,
-            int maxHeaderCount, int maxHeaderSize, int delayms, int failMode) throws Exception {
+            int maxHeaderCount, int maxHeaderSize, int delayms, FailureMode failMode)
+            throws Exception {
 
         // Build the custom headers
         List<String[]> customHeaders = new ArrayList<>();
@@ -226,34 +234,27 @@ public class TestHttp2Limits extends Http2TestBase {
         }
 
         switch (failMode) {
-        case 0: {
+        case NONE: {
             // Expect a normal response
             readSimpleGetResponse();
             Assert.assertEquals(getSimpleResponseTrace(3), output.getTrace());
             Assert.assertNull(e);
             break;
         }
-        case 1: {
+        case STREAM_RESET: {
             // Expect a stream reset
             parser.readFrame(true);
             Assert.assertEquals("3-RST-[11]\n", output.getTrace());
             Assert.assertNull(e);
             break;
         }
-        case 2: {
-            // Behaviour depends on timing. If reset is processed fast enough,
-            // frames will be swallowed before the connection reset limit is
-            // reached
-            if (e == null) {
-                parser.readFrame(true);
-                Assert.assertEquals("3-RST-[11]\n", output.getTrace());
-                Assert.assertNull(e);
-            }
-            // Else is non-null as expected for a connection reset
+        case CONNECTION_RESET: {
+            // Connection reset. Connection ID will vary so use a pattern
+            parser.readFrame(true);
+            Assert.assertThat(output.getTrace(), RegexMatcher.matchesRegex(
+                    "0-Goaway-\\[1\\]-\\[11\\]-\\[Connection \\[\\d++\\], Stream \\[3\\], .*"));
+            // e may or may not be null here
             break;
-        }
-        default: {
-            Assert.fail("Unknown failure mode");
         }
         }
     }
@@ -400,24 +401,26 @@ public class TestHttp2Limits extends Http2TestBase {
     @Test
     public void doTestPostWithTrailerHeadersDefaultLimit() throws Exception{
         doTestPostWithTrailerHeaders(Constants.DEFAULT_MAX_TRAILER_COUNT,
-                Constants.DEFAULT_MAX_TRAILER_SIZE, true);
+                Constants.DEFAULT_MAX_TRAILER_SIZE, FailureMode.NONE);
     }
 
 
     @Test
     public void doTestPostWithTrailerHeadersCount0() throws Exception{
-        doTestPostWithTrailerHeaders(0, Constants.DEFAULT_MAX_TRAILER_SIZE, false);
+        doTestPostWithTrailerHeaders(0, Constants.DEFAULT_MAX_TRAILER_SIZE,
+                FailureMode.STREAM_RESET);
     }
 
 
     @Test
     public void doTestPostWithTrailerHeadersSize0() throws Exception{
-        doTestPostWithTrailerHeaders(Constants.DEFAULT_MAX_TRAILER_COUNT, 0, false);
+        doTestPostWithTrailerHeaders(Constants.DEFAULT_MAX_TRAILER_COUNT, 0,
+                FailureMode.CONNECTION_RESET);
     }
 
 
-    private void doTestPostWithTrailerHeaders(int maxTrailerCount, int maxTrailerSize, boolean ok)
-            throws Exception {
+    private void doTestPostWithTrailerHeaders(int maxTrailerCount, int maxTrailerSize,
+            FailureMode failMode) throws Exception {
         enableHttp2();
 
         Http2Protocol http2Protocol =
@@ -449,8 +452,9 @@ public class TestHttp2Limits extends Http2TestBase {
         // Trailers
         writeFrame(trailerFrameHeader, trailerPayload);
 
-        parser.readFrame(true);
-        if (ok) {
+        switch (failMode) {
+        case NONE: {
+            parser.readFrame(true);
             parser.readFrame(true);
             parser.readFrame(true);
             parser.readFrame(true);
@@ -468,8 +472,56 @@ public class TestHttp2Limits extends Http2TestBase {
                     "\n" +
                     "3-EndOfStream\n",
                     output.getTrace());
-        } else {
+            break;
+        }
+        case STREAM_RESET: {
+            parser.readFrame(true);
             Assert.assertEquals("3-RST-[11]\n", output.getTrace());
+            break;
+        }
+        case CONNECTION_RESET: {
+            // Connection reset. Connection ID will vary so use a pattern
+            parser.readFrame(true);
+            Assert.assertThat(output.getTrace(), RegexMatcher.matchesRegex(
+                    "0-Goaway-\\[3\\]-\\[11\\]-\\[Connection \\[\\d++\\], Stream \\[3\\], .*"));
+            break;
+        }
+        }
+    }
+
+
+    private enum FailureMode {
+        NONE,
+        STREAM_RESET,
+        CONNECTION_RESET,
+
+    }
+
+
+    private static class RegexMatcher extends TypeSafeMatcher<String> {
+
+        private final String pattern;
+
+
+        public RegexMatcher(String pattern) {
+            this.pattern = pattern;
+        }
+
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("match to regular expression pattern [" + pattern + "]");
+
+        }
+
+        @Override
+        protected boolean matchesSafely(String item) {
+            return item.matches(pattern);
+        }
+
+
+        public static RegexMatcher matchesRegex(String pattern) {
+            return new RegexMatcher(pattern);
         }
     }
 }

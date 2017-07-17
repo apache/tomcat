@@ -937,6 +937,12 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
+        public void setHeaderException(StreamException streamException) {
+            // NO-OP: Accept anything the server sends for the unit tests
+        }
+
+
+        @Override
         public void headersEnd(int streamId) {
             trace.append(streamId + "-HeadersEnd\n");
         }
