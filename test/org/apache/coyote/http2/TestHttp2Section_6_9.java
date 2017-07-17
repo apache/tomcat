@@ -36,10 +36,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
 
         sendWindowUpdate(0, 0);
 
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1);
     }
 
 
@@ -89,10 +86,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         os.write(zeroLengthWindowFrame);
         os.flush();
 
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.FRAME_SIZE_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
     }
 
 
@@ -150,10 +144,7 @@ public class TestHttp2Section_6_9 extends Http2TestBase {
         // Super size the flow control window.
         sendWindowUpdate(0, (1 << 31) - 1);
 
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1, Http2Error.FLOW_CONTROL_ERROR);
     }
 
 

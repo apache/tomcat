@@ -112,10 +112,7 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
         os.write(dataFrame);
         os.flush();
 
-        parser.readFrame(true);
-
-        String trace = output.getTrace();
-        Assert.assertTrue(trace, trace.startsWith("0-Goaway-[1]-[1]-["));
+        handleGoAwayResponse(1);
     }
 
 
@@ -139,10 +136,7 @@ public class TestHttp2Section_6_1 extends Http2TestBase {
         os.write(dataFrame);
         os.flush();
 
-        parser.readFrame(true);
-
-        String trace = output.getTrace();
-        Assert.assertTrue(trace, trace.startsWith("0-Goaway-[1]-[1]-["));
+        handleGoAwayResponse(1);
     }
 
 

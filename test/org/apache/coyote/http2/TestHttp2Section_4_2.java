@@ -16,14 +16,8 @@
  */
 package org.apache.coyote.http2;
 
-import java.net.SocketException;
-
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
-
-import org.apache.catalina.connector.Connector;
-import org.apache.catalina.startup.Tomcat;
 
 /**
  * Unit tests for Section 4.2 of
@@ -61,22 +55,7 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
 
         os.write(settings);
 
-        try {
-            // Read GOAWAY frame
-            parser.readFrame(true);
-
-            Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                    "0-Goaway-[1]-[" + Http2Error.FRAME_SIZE_ERROR.getCode() + "]-["));
-        } catch (SocketException se) {
-            // On some platform / Connector combinations (e.g. Windows / NIO2),
-            // the TCP connection close will be processed before the client gets
-            // a chance to read the connection close frame.
-            Tomcat tomcat = getTomcatInstance();
-            Connector connector = tomcat.getConnector();
-
-            Assume.assumeTrue("This test is only expected to trigger an exception with NIO2",
-                    connector.getProtocolHandlerClassName().contains("Nio2"));
-        }
+        handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
     }
 
     @Test
@@ -98,11 +77,7 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
 
         os.write(ping);
 
-        // Read GOAWAY frame
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.FRAME_SIZE_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1,  Http2Error.FRAME_SIZE_ERROR);
     }
 
 
@@ -124,11 +99,7 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
 
         os.write(ping);
 
-        // Read GOAWAY frame
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.FRAME_SIZE_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1,  Http2Error.FRAME_SIZE_ERROR);
     }
 
 
@@ -151,7 +122,7 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
 
         os.write(priority);
 
-        // Read GOAWAY frame
+        // Read Stream reset frame
         parser.readFrame(true);
 
         Assert.assertTrue(output.getTrace(),

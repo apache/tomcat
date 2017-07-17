@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Assume;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
@@ -802,6 +804,34 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
         os.write(settingFrame);
         os.flush();
+    }
+
+
+    void handleGoAwayResponse(int lastStream) throws Http2Exception, IOException {
+        handleGoAwayResponse(lastStream, Http2Error.PROTOCOL_ERROR);
+    }
+
+
+    void handleGoAwayResponse(int lastStream, Http2Error expectedError)
+            throws Http2Exception, IOException {
+        try {
+            parser.readFrame(true);
+
+            Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
+                    "0-Goaway-[" + lastStream + "]-[" + expectedError.getCode() + "]-["));
+        } catch (SocketException se) {
+            // On some platform / Connector combinations (e.g. Windows / NIO2),
+            // the TCP connection close will be processed before the client gets
+            // a chance to read the connection close frame.
+            Tomcat tomcat = getTomcatInstance();
+            Connector connector = tomcat.getConnector();
+
+            Assume.assumeTrue("This test is only expected to trigger an exception with NIO2",
+                    connector.getProtocolHandlerClassName().contains("Nio2"));
+
+            Assume.assumeTrue("This test is only expected to trigger an exception on Windo9ws",
+                    System.getProperty("os.name").startsWith("Windows"));
+        }
     }
 
 

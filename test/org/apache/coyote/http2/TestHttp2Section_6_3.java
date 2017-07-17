@@ -37,11 +37,7 @@ public class TestHttp2Section_6_3 extends Http2TestBase {
 
         sendPriority(0, 1, 15);
 
-        // Go away
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1);
     }
 
 
@@ -58,11 +54,7 @@ public class TestHttp2Section_6_3 extends Http2TestBase {
 
         sendPriority(5, 3, 15);
 
-        // Read GOAWAY frame
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.COMPRESSION_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1, Http2Error.COMPRESSION_ERROR);
     }
 
 
@@ -85,7 +77,7 @@ public class TestHttp2Section_6_3 extends Http2TestBase {
         os.write(priorityFrame);
         os.flush();
 
-        // Read GOAWAY frame
+        // Read reset frame
         parser.readFrame(true);
 
         Assert.assertEquals("3-RST-[" + Http2Error.FRAME_SIZE_ERROR.getCode() + "]\n",

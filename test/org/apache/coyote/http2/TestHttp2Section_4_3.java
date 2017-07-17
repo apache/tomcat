@@ -46,11 +46,7 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
         // Process the request
         writeFrame(frameHeader, headersPayload);
 
-        // Read GOAWAY frame
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.COMPRESSION_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1,  Http2Error.COMPRESSION_ERROR);
     }
 
 
@@ -91,10 +87,6 @@ public class TestHttp2Section_4_3 extends Http2TestBase {
 
         sendPing();
 
-        // Read GOAWAY frame
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.COMPRESSION_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1,  Http2Error.COMPRESSION_ERROR);
     }
 }
