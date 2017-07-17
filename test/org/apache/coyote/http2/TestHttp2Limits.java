@@ -251,9 +251,9 @@ public class TestHttp2Limits extends Http2TestBase {
         }
         case CONNECTION_RESET: {
             // Connection reset. Connection ID will vary so use a pattern
-            // On some platforms (e.g. Windows), the TCP connection close will
-            // be processed before the client gets a chance to read the
-            // connection close frame
+            // On some platform / Connector combinations (e.g. Windows / APR),
+            // the TCP connection close will be processed before the client gets
+            // a chance to read the connection close frame
             try {
                 parser.readFrame(true);
                 Assert.assertThat(output.getTrace(), RegexMatcher.matchesRegex(
