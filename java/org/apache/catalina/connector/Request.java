@@ -2857,6 +2857,10 @@ public class Request implements HttpServletRequest {
                 partsParseException = e;
             }
         } finally {
+            // This might look odd but is correct. setParseFailedReason() only
+            // sets the failure reason if none is currently set. This code could
+            // be more efficient but it is written this way to be robust with
+            // respect to changes in the remainder of the method.
             if (partsParseException != null || !success) {
                 parameters.setParseFailedReason(FailReason.UNKNOWN);
             }
