@@ -67,11 +67,7 @@ public class TestHttp2Section_6_7 extends Http2TestBase {
 
         sendPing(1, false, "76543210".getBytes(StandardCharsets.ISO_8859_1));
 
-        // Go away
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1);
     }
 
 
@@ -82,11 +78,6 @@ public class TestHttp2Section_6_7 extends Http2TestBase {
 
         sendPing(0, false, "6543210".getBytes(StandardCharsets.ISO_8859_1));
 
-        // Go away
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.FRAME_SIZE_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
     }
-
 }

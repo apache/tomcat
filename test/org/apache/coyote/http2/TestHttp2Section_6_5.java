@@ -36,11 +36,7 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
 
         sendSettings(0, true, new SettingValue(1,1));
 
-        // Go away
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.FRAME_SIZE_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
     }
 
 
@@ -52,11 +48,7 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
         sendPriority(3, 0, 15);
         sendSettings(3, true, new SettingValue(1,1));
 
-        // Go away
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1);
     }
 
 
@@ -78,11 +70,7 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
         os.write(resetFrame);
         os.flush();
 
-        // Read GOAWAY frame
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.FRAME_SIZE_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
     }
 
 
@@ -95,11 +83,7 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
 
         sendSettings(0, false, new SettingValue(0x2,0x2));
 
-        // Go away
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1);
     }
 
 
@@ -110,11 +94,7 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
 
         sendSettings(0, false, new SettingValue(0x4,1 << 31));
 
-        // Go away
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1, Http2Error.FLOW_CONTROL_ERROR);
     }
 
 
@@ -125,11 +105,7 @@ public class TestHttp2Section_6_5 extends Http2TestBase {
 
         sendSettings(0, false, new SettingValue(0x5,1 << 31));
 
-        // Go away
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1);
     }
 
 

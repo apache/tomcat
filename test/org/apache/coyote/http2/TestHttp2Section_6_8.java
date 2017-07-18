@@ -91,11 +91,7 @@ public class TestHttp2Section_6_8 extends Http2TestBase {
 
         sendGoaway(1, 1, Http2Error.NO_ERROR.getCode(), null);
 
-        // Go away
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1);
     }
 
 

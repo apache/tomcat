@@ -487,8 +487,15 @@ public class TestHttp2Limits extends Http2TestBase {
             break;
         }
         case CONNECTION_RESET: {
-            // Connection reset. Connection ID will vary so use a pattern
-            parser.readFrame(true);
+            // Connection reset
+            do {
+                // NIO2 can sometimes send window updates depending on the
+                // timing of the connection close
+                output.clearTrace();
+                parser.readFrame(true);
+            } while (output.getTrace().contains("WindowSize"));
+
+            // Connection ID will vary so use a pattern
             Assert.assertThat(output.getTrace(), RegexMatcher.matchesRegex(
                     "0-Goaway-\\[3\\]-\\[11\\]-\\[Connection \\[\\d++\\], Stream \\[3\\], .*"));
             break;

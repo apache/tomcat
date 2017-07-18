@@ -91,11 +91,6 @@ public class TestHttp2Section_5_5 extends Http2TestBase {
         os.write(UNKNOWN_FRAME);
         os.flush();
 
-        // Read GOAWAY frame
-        parser.readFrame(true);
-
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.COMPRESSION_ERROR.getCode() + "]-["));
+        handleGoAwayResponse(1, Http2Error.COMPRESSION_ERROR);
     }
-
 }
