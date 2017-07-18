@@ -80,6 +80,10 @@ public class TestHpack {
             headers.setValue(name).setString(value);
         }
         @Override
+        public void setHeaderException(StreamException streamException) {
+            // NO-OP
+        }
+        @Override
         public void validateHeaders() throws StreamException {
             // NO-OP
         }

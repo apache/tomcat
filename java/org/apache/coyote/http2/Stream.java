@@ -61,7 +61,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private final StreamStateMachine state;
     // State machine would be too much overhead
     private int headerState = HEADER_STATE_START;
-    private String headerStateErrorMsg = null;
+    private StreamException headerException = null;
     // TODO: null these when finished to reduce memory used by closed stream
     private final Request coyoteRequest;
     private StringBuilder cookieHeader = null;
@@ -260,7 +260,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             }
         }
 
-        if (headerStateErrorMsg != null) {
+        if (headerException != null) {
             // Don't bother processing the header since the stream is going to
             // be reset anyway
             return;
@@ -269,8 +269,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         boolean pseudoHeader = name.charAt(0) == ':';
 
         if (pseudoHeader && headerState != HEADER_STATE_PSEUDO) {
-            headerStateErrorMsg = sm.getString("stream.header.unexpectedPseudoHeader",
-                    getConnectionId(), getIdentifier(), name);
+            headerException = new StreamException(sm.getString(
+                    "stream.header.unexpectedPseudoHeader", getConnectionId(), getIdentifier(),
+                    name), Http2Error.PROTOCOL_ERROR, getIdentifier().intValue());
             // No need for further processing. The stream will be reset.
             return;
         }
@@ -356,8 +357,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
                 coyoteRequest.setExpectation(true);
             }
             if (pseudoHeader) {
-                headerStateErrorMsg = sm.getString("stream.header.unknownPseudoHeader",
-                        getConnectionId(), getIdentifier(), name);
+                headerException = new StreamException(sm.getString(
+                        "stream.header.unknownPseudoHeader", getConnectionId(), getIdentifier(),
+                        name), Http2Error.PROTOCOL_ERROR, getIdentifier().intValue());
             }
             // Assume other HTTP header
             coyoteRequest.getMimeHeaders().addValue(name).setString(value);
@@ -367,13 +369,20 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     @Override
+    public void setHeaderException(StreamException streamException) {
+        if (headerException == null) {
+            headerException = streamException;
+        }
+    }
+
+
+    @Override
     public void validateHeaders() throws StreamException {
-        if (headerStateErrorMsg == null) {
+        if (headerException == null) {
             return;
         }
 
-        throw new StreamException(headerStateErrorMsg, Http2Error.PROTOCOL_ERROR,
-                getIdentifier().intValue());
+        throw headerException;
     }
 
 

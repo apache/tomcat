@@ -356,6 +356,16 @@ public class HpackDecoder {
         void emitHeader(String name, String value) throws HpackException;
 
         /**
+         * Inform the recipient of the headers that a stream error needs to be
+         * triggered using the given message when {@link #validateHeaders()} is
+         * called. This is used when the Parser becomes aware of an error that
+         * is not visible to the recipient.
+         *
+         * @param streamException The exception to use when resetting the stream
+         */
+        void setHeaderException(StreamException streamException);
+
+        /**
          * Are the headers pass to the recipient so far valid? The decoder needs
          * to process all the headers to maintain state even if there is a
          * problem. In addition, it is easy for the the intended recipient to
