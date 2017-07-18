@@ -16,10 +16,15 @@
  */
 package org.apache.coyote.http2;
 
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
+
+import org.apache.catalina.connector.Connector;
+import org.apache.catalina.startup.Tomcat;
 
 /**
  * Unit tests for Section 5.§ of
@@ -135,11 +140,22 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
         buildSimpleGetRequestPart1(frameHeader, headersPayload, 4);
         writeFrame(frameHeader, headersPayload);
 
-        // headers
-        parser.readFrame(true);
+        try {
+            // headers
+            parser.readFrame(true);
 
-        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
-                "0-Goaway-[1]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+            Assert.assertTrue(output.getTrace(), output.getTrace().startsWith(
+                    "0-Goaway-[1]-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]-["));
+        } catch (SocketException se) {
+            // On some platform / Connector combinations (e.g. Windows / NIO2),
+            // the TCP connection close will be processed before the client gets
+            // a chance to read the connection close frame.
+            Tomcat tomcat = getTomcatInstance();
+            Connector connector = tomcat.getConnector();
+
+            Assume.assumeTrue("This test is only expected to trigger an exception with NIO2",
+                    connector.getProtocolHandlerClassName().contains("Nio2"));
+        }
     }
 
 
