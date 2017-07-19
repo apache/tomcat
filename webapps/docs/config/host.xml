@@ -295,6 +295,10 @@
         is not running. Any such change will trigger the deletion of the
         expanded directory and the deployment of the updated WAR file when
         Tomcat next starts.</p>
+        <p>Note: Running with this option set to <code>false</code> will incur
+        a performance penalty. To avoid a significant performance penalty, the
+        web application should be configured such that class scanning for
+        Servlet 3.0+ pluggability features is not required.</p>
       </attribute>
 
       <attribute name="workDir" required="false">

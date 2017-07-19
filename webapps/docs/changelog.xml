@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M25 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Performance improvements for service loader look-ups (and look-ups of
+        other class loader resources) when the web application is deployed in a
+        packed WAR file. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M24 (markt)" rtext="release in progress">
   <subsection name="Catalina">

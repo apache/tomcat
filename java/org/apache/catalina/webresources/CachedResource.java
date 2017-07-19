@@ -92,23 +92,26 @@ public class CachedResource implements WebResource {
             return true;
         }
 
-        WebResource webResourceInternal = root.getResourceInternal(
-                webAppPath, useClassLoaderResources);
-        if (!webResource.exists() && webResourceInternal.exists()) {
-            return false;
-        }
+        // Assume resources inside WARs will not change
+        if (!root.isPackedWarFile()) {
+            WebResource webResourceInternal = root.getResourceInternal(
+                    webAppPath, useClassLoaderResources);
+            if (!webResource.exists() && webResourceInternal.exists()) {
+                return false;
+            }
 
-        // If modified date or length change - resource has changed / been
-        // removed etc.
-        if (webResource.getLastModified() != getLastModified() ||
-                webResource.getContentLength() != getContentLength()) {
-            return false;
-        }
+            // If modified date or length change - resource has changed / been
+            // removed etc.
+            if (webResource.getLastModified() != getLastModified() ||
+                    webResource.getContentLength() != getContentLength()) {
+                return false;
+            }
 
-        // Has a resource been inserted / removed in a different resource set
-        if (webResource.getLastModified() != webResourceInternal.getLastModified() ||
-                webResource.getContentLength() != webResourceInternal.getContentLength()) {
-            return false;
+            // Has a resource been inserted / removed in a different resource set
+            if (webResource.getLastModified() != webResourceInternal.getLastModified() ||
+                    webResource.getContentLength() != webResourceInternal.getContentLength()) {
+                return false;
+            }
         }
 
         nextCheck = ttl + now;
@@ -133,9 +136,15 @@ public class CachedResource implements WebResource {
             return true;
         }
 
-        // At this point, always expire the entry as re-populating it is likely
-        // to be as expensive as validating it.
-        return false;
+        // Assume resources inside WARs will not change
+        if (root.isPackedWarFile()) {
+            nextCheck = ttl + now;
+            return true;
+        } else {
+            // At this point, always expire the entry and re-populating it is
+            // likely to be as expensive as validating it.
+            return false;
+        }
     }
 
     protected long getNextCheck() {
