@@ -52,6 +52,12 @@
         other class loader resources) when the web application is deployed in a
         packed WAR file. (markt)
       </fix>
+      <fix>
+        <bug>60963</bug>: Add <code>ExtractingRoot</code>, a new
+        <code>WebResourceRoot</code> implementation that extracts JARs to the
+        work directory for improved performance when deploying packed WAR files.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
