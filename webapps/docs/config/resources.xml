@@ -150,8 +150,8 @@
   <subsection name="Standard Implementation">
 
     <p>The standard implementation of <strong>Resources</strong> is
-    <strong>org.apache.catalina.webresources.StandardRoot</strong>, and
-    is configured by its parent Context element.</p>
+    <strong>org.apache.catalina.webresources.StandardRoot</strong>. It does not
+    support any additional attributes.</p>
 
   </subsection>
 
