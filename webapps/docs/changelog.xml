@@ -58,6 +58,10 @@
         work directory for improved performance when deploying packed WAR files.
         (markt)
       </fix>
+      <fix>
+        <bug>61253</bug>: Add warn message when Digester.updateAttributes
+        throws an exception instead of ignoring it. (csutherl)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
