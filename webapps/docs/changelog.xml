@@ -52,6 +52,10 @@
         other class loader resources) when the web application is deployed in a
         packed WAR file. (markt)
       </fix>
+      <fix>
+        <bug>61253</bug>: Add warn message when Digester.updateAttributes
+        throws an exception instead of ignoring it. (csutherl)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
