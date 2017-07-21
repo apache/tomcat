@@ -95,6 +95,10 @@
         <code>catalina..log</code>. Patch provided by Katya Stoycheva.
         (violetagg)
       </fix>
+      <fix>
+        <bug>61253</bug>: Add warn message when Digester.updateAttributes
+        throws an exception instead of ignoring it. (csutherl)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

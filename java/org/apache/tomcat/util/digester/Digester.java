@@ -2795,7 +2795,7 @@ public class Digester extends DefaultHandler2 {
                 }
             }
             catch (Exception e) {
-                // ignore - let the attribute have its original value
+                log.warn("Attribute [" + newAttrs.getLocalName(i) + "] failed to update and remains [" + value + "].", e);
             }
         }
 
