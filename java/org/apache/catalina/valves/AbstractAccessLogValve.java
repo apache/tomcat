@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
@@ -40,6 +41,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Session;
+import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.TLSUtil;
@@ -1506,6 +1508,38 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         }
     }
 
+    /**
+     * Write connection status when response is completed - %X
+     */
+    protected static class ConnectionStatusElement implements AccessLogElement {
+        @Override
+        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+            if (response != null && request != null) {
+                // Check for connection aborted cond
+                boolean isConnAborted = false;
+                if (response.isError()) {
+                    Throwable ex = (Throwable)request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+                    if (ex instanceof ClientAbortException) {
+                        isConnAborted = true;
+                        buf.append('X');
+                    }
+                }
+
+                // Check whether connection is keep-alive or not
+                if (!isConnAborted) {
+                    if (org.apache.coyote.http11.Constants.KEEPALIVE.equals(
+                            request.getHeader(org.apache.coyote.http11.Constants.CONNECTION))) {
+                        buf.append('+');
+                    } else {
+                        buf.append('-');
+                    }
+                }
+            } else {
+                // Unknown connection status
+                buf.append('?');
+            }
+        }
+    }
 
     /**
      * Parse pattern string and create the array of AccessLogElement.
@@ -1636,6 +1670,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             return new LocalServerNameElement();
         case 'I':
             return new ThreadNameElement();
+        case 'X':
+            return new ConnectionStatusElement();
         default:
             return new StringElement("???" + pattern + "???");
         }
