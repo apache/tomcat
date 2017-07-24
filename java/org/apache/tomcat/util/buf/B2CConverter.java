@@ -43,6 +43,8 @@ public class B2CConverter {
 
     public static final Charset ISO_8859_1;
     public static final Charset UTF_8;
+    public static final Charset UTF_16BE;
+    public static final Charset UTF_16LE;
 
     // Protected so unit tests can use it
     protected static final int LEFTOVER_SIZE = 9;
@@ -58,15 +60,21 @@ public class B2CConverter {
         }
         Charset iso88591 = null;
         Charset utf8 = null;
+        Charset utf16be = null;
+        Charset utf16le = null;
         try {
             iso88591 = getCharset("ISO-8859-1");
             utf8 = getCharset("UTF-8");
+            utf16be = getCharset("UTF-16BE");
+            utf16le = getCharset("UTF-16LE");
         } catch (UnsupportedEncodingException e) {
             // Impossible. All JVMs must support these.
             e.printStackTrace();
         }
         ISO_8859_1 = iso88591;
         UTF_8 = utf8;
+        UTF_16BE = utf16be;
+        UTF_16LE = utf16le;
     }
 
     public static Charset getCharset(String enc)
@@ -130,7 +138,7 @@ public class B2CConverter {
         decoder.onUnmappableCharacter(action);
     }
 
-    /** 
+    /**
      * Reset the decoder state.
      */
     public void recycle() {
@@ -140,7 +148,7 @@ public class B2CConverter {
 
     /**
      * Convert the given bytes to characters.
-     * 
+     *
      * @param bc byte input
      * @param cc char output
      * @param endOfInput    Is this all of the available data
@@ -157,7 +165,7 @@ public class B2CConverter {
         }
         if ((cb == null) || (cb.array() != cc.getBuffer())) {
             // Create a new char buffer if anything changed
-            cb = CharBuffer.wrap(cc.getBuffer(), cc.getEnd(), 
+            cb = CharBuffer.wrap(cc.getBuffer(), cc.getEnd(),
                     cc.getBuffer().length - cc.getEnd());
         } else {
             // Initialize the char buffer

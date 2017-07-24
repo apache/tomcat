@@ -216,6 +216,11 @@ public class DefaultServlet
 
 
     /**
+     * If a file has a BOM, should that be used in preference to fileEncoding?
+     */
+    private boolean useBomIfPresent = true;
+
+    /**
      * Minimum size for sendfile usage in bytes.
      */
     protected int sendfileSize = 48 * 1024;
@@ -335,6 +340,10 @@ public class DefaultServlet
                 throw new ServletException(e);
             }
         }
+
+        if (getServletConfig().getInitParameter("useBomIfPresent") != null)
+            useBomIfPresent = Boolean.parseBoolean(
+                    getServletConfig().getInitParameter("useBomIfPresent"));
 
         globalXsltFile = getServletConfig().getInitParameter("globalXsltFile");
         contextXsltFile = getServletConfig().getInitParameter("contextXsltFile");
@@ -893,11 +902,10 @@ public class DefaultServlet
 
         // Check if the conditions specified in the optional If headers are
         // satisfied.
+        boolean included = false;
         if (cacheEntry.context == null) {
-
             // Checking If headers
-            boolean included = (request.getAttribute(
-                    RequestDispatcher.INCLUDE_CONTEXT_PATH) != null);
+            included = (request.getAttribute(RequestDispatcher.INCLUDE_CONTEXT_PATH) != null);
             if (!included && !isError &&
                     !checkIfHeaders(request, response, cacheEntry.attributes)) {
                 return;
@@ -1060,7 +1068,7 @@ public class DefaultServlet
                 }
                 // Check to see if conversion is required
                 if (ostream != null) {
-                    if (conversionRequired) {
+                    if (conversionRequired || included) {
                         // A conversion is required from fileEncoding to
                         // response encoding
                         OutputStreamWriter osw = new OutputStreamWriter(ostream, charset);
@@ -1147,7 +1155,75 @@ public class DefaultServlet
     }
 
 
-    private boolean isText(String contentType) {
+    /*
+     * Code borrowed heavily from Jasper's EncodingDetector
+     */
+    private static Charset processBom(InputStream is) throws IOException {
+        // Java supported character sets do not use BOMs longer than 4 bytes
+        byte[] bom = new byte[4];
+        is.mark(bom.length);
+
+        int count = is.read(bom);
+
+        // BOMs are at least 2 bytes
+        if (count < 2) {
+            skip(is, 0);
+            return null;
+        }
+
+        // Look for two byte BOMs
+        int b0 = bom[0] & 0xFF;
+        int b1 = bom[1] & 0xFF;
+        if (b0 == 0xFE && b1 == 0xFF) {
+            skip(is, 2);
+            return B2CConverter.UTF_16BE;
+        }
+        if (b0 == 0xFF && b1 == 0xFE) {
+            skip(is, 2);
+            return B2CConverter.UTF_16LE;
+        }
+
+        // Remaining BOMs are at least 3 bytes
+        if (count < 3) {
+            skip(is, 0);
+            return null;
+        }
+
+        // UTF-8 is only 3-byte BOM
+        int b2 = bom[2] & 0xFF;
+        if (b0 == 0xEF && b1 == 0xBB && b2 == 0xBF) {
+            skip(is, 3);
+            return B2CConverter.UTF_8;
+        }
+
+        if (count < 4) {
+            skip(is, 0);
+            return null;
+        }
+
+        // Look for 4-bute BOMs
+        int b3 = bom[3] & 0xFF;
+        if (b0 == 0x00 && b1 == 0x00 && b2 == 0xFE && b3 == 0xFF) {
+            return Charset.forName("UTF32-BE");
+        }
+        if (b0 == 0xFF && b1 == 0xFE && b2 == 0x00 && b3 == 0x00) {
+            return Charset.forName("UTF32-LE");
+        }
+
+        skip(is, 0);
+        return null;
+    }
+
+
+    private static void skip(InputStream is, int skip) throws IOException {
+        is.reset();
+        while (skip-- > 0) {
+            is.read();
+        }
+    }
+
+
+    private static boolean isText(String contentType) {
         return  contentType == null || contentType.startsWith("text") ||
                 contentType.endsWith("xml") || contentType.contains("/javascript");
     }
@@ -2168,20 +2244,29 @@ public class DefaultServlet
         throws IOException {
 
         IOException exception = null;
-
         InputStream resourceInputStream = null;
+        Charset inputCharset= fileEncodingCharset;
+
         if (cacheEntry.resource != null) {
             resourceInputStream = cacheEntry.resource.streamContent();
+            // Need to make sure any BOM is removed
+            if (!resourceInputStream.markSupported()) {
+                resourceInputStream = new BufferedInputStream(resourceInputStream);
+            }
+            Charset bomCharset = processBom(resourceInputStream);
+            if (bomCharset != null && useBomIfPresent) {
+                inputCharset = bomCharset;
+            }
+
         } else {
             resourceInputStream = is;
         }
 
         Reader reader;
-        if (fileEncoding == null) {
+        if (inputCharset == null) {
             reader = new InputStreamReader(resourceInputStream);
         } else {
-            reader = new InputStreamReader(resourceInputStream,
-                                           fileEncoding);
+            reader = new InputStreamReader(resourceInputStream, inputCharset);
         }
 
         // Copy the input stream to the output stream
