@@ -77,6 +77,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>61316</bug>: Fix corruption of UTF-16 encoded source files in
+        released source distributions. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M24 (markt)" rtext="release in progress">
   <subsection name="Catalina">
