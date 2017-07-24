@@ -1923,7 +1923,7 @@ public class Digester extends DefaultHandler2 {
                     newAttrs.setValue(i, newValue);
                 }
             } catch (Exception e) {
-                log.warn("Attribute [" + newAttrs.getLocalName(i) + "] failed to update and remains [" + value + "].", e);
+                log.warn(sm.getString("digester.failedToUpdateAttributes", newAttrs.getLocalName(i), value), e);
             }
         }
 
