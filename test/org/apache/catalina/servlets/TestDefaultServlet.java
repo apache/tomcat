@@ -624,36 +624,112 @@ public class TestDefaultServlet extends TomcatBaseTest {
     }
 
     @Test
-    public void testEncodingIncludeStreamOutIso88591() throws Exception {
-        doTestEncoding(false, "ISO-8859-1");
+    public void testEncodingIncludeIbm850StreamOutIso88591() throws Exception {
+        doTestEncodingFileIbm850(false, "ISO-8859-1");
     }
 
     @Test
-    public void testEncodingIncludeWriterOutIso88591() throws Exception {
-        doTestEncoding(true, "ISO-8859-1");
+    public void testEncodingIncludeIbm850WriterOutIso88591() throws Exception {
+        doTestEncodingFileIbm850(true, "ISO-8859-1");
     }
 
     @Test
-    public void testEncodingIncludeStreamOutUtf8() throws Exception {
-        doTestEncoding(false, "UTF-8");
+    public void testEncodingIncludeIbm850StreamOutUtf8() throws Exception {
+        doTestEncodingFileIbm850(false, "UTF-8");
     }
 
     @Test
-    public void testEncodingIncludeWriterOutUtf8() throws Exception {
-        doTestEncoding(true, "UTF-8");
+    public void testEncodingIncludeIbm850WriterOutUtf8() throws Exception {
+        doTestEncodingFileIbm850(true, "UTF-8");
     }
 
     @Test
-    public void testEncodingIncludeStreamOutIbm850() throws Exception {
-        doTestEncoding(false, "IBM850");
+    public void testEncodingIncludeIbm850StreamOutIbm850() throws Exception {
+        doTestEncodingFileIbm850(false, "IBM850");
     }
 
     @Test
-    public void testEncodingIncludeWriterOutIbm850() throws Exception {
-        doTestEncoding(false, "IBM850");
+    public void testEncodingIncludeIbm850WriterOutIbm850() throws Exception {
+        doTestEncodingFileIbm850(false, "IBM850");
     }
 
-    public void doTestEncoding(boolean useWriter, String outputEncoding) throws Exception {
+    @Test
+    public void testEncodingIncludeUtf8BomStreamOutIso88591() throws Exception {
+        doTestEncodingFileUtf8Bom(false, "ISO-8859-1");
+    }
+
+    @Test
+    public void testEncodingIncludeUtf8BomWriterOutIso88591() throws Exception {
+        doTestEncodingFileUtf8Bom(true, "ISO-8859-1");
+    }
+
+    @Test
+    public void testEncodingIncludeUtf8BomStreamOutUtf8() throws Exception {
+        doTestEncodingFileUtf8Bom(false, "UTF-8");
+    }
+
+    @Test
+    public void testEncodingIncludeUtf8BomWriterOutUtf8() throws Exception {
+        doTestEncodingFileUtf8Bom(true, "UTF-8");
+    }
+
+    @Test
+    public void testEncodingIncludeUtf8BomStreamOutIbm850() throws Exception {
+        doTestEncodingFileUtf8Bom(false, "IBM850");
+    }
+
+    @Test
+    public void testEncodingIncludeUtf8BomWriterOutIbm850() throws Exception {
+        doTestEncodingFileUtf8Bom(false, "IBM850");
+    }
+
+    @Test
+    public void testEncodingIncludeUtf8BomOverrideStreamOutIso88591() throws Exception {
+        doTestEncodingFileUtf8BomOverride(false, "ISO-8859-1");
+    }
+
+    @Test
+    public void testEncodingIncludeUtf8BomOverrideWriterOutIso88591() throws Exception {
+        doTestEncodingFileUtf8BomOverride(true, "ISO-8859-1");
+    }
+
+    @Test
+    public void testEncodingIncludeUtf8BomOverrideStreamOutUtf8() throws Exception {
+        doTestEncodingFileUtf8BomOverride(false, "UTF-8");
+    }
+
+    @Test
+    public void testEncodingIncludeUtf8BomOverrideWriterOutUtf8() throws Exception {
+        doTestEncodingFileUtf8BomOverride(true, "UTF-8");
+    }
+
+    @Test
+    public void testEncodingIncludeUtf8BomOverrideStreamOutIbm850() throws Exception {
+        doTestEncodingFileUtf8BomOverride(false, "IBM850");
+    }
+
+    @Test
+    public void testEncodingIncludeUtf8BomOverrideWriterOutIbm850() throws Exception {
+        doTestEncodingFileUtf8BomOverride(false, "IBM850");
+    }
+
+    private void doTestEncodingFileIbm850(boolean useWriter, String outputEncoding)
+            throws Exception {
+        doTestEncoding("/bug49nnn/bug49464-ibm850.txt", "IBM850", useWriter, outputEncoding);
+    }
+
+    private void doTestEncodingFileUtf8Bom(boolean useWriter, String outputEncoding)
+            throws Exception {
+        doTestEncoding("/bug49nnn/bug49464-utf8-bom.txt", "UTF-8", useWriter, outputEncoding);
+    }
+
+    private void doTestEncodingFileUtf8BomOverride(boolean useWriter, String outputEncoding)
+            throws Exception {
+        doTestEncoding("/bug49nnn/bug49464-utf8-bom.txt", "IBM850", useWriter, outputEncoding);
+    }
+
+    private void doTestEncoding(String includePath, String inputEncoding, boolean useWriter,
+            String outputEncoding) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File("test/webapp");
@@ -661,11 +737,11 @@ public class TestDefaultServlet extends TomcatBaseTest {
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
 
         Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
-        defaultServlet.addInitParameter("fileEncoding", "IBM850");
+        defaultServlet.addInitParameter("fileEncoding", inputEncoding);
         ctxt.addServletMappingDecoded("/", "default");
 
         Tomcat.addServlet(ctxt, "encoding",
-                new EncodingServlet(outputEncoding, "/bug49nnn/bug49464-ibm850.txt", useWriter));
+                new EncodingServlet(outputEncoding, includePath, useWriter));
         ctxt.addServletMappingDecoded("/test", "encoding");
 
         tomcat.start();

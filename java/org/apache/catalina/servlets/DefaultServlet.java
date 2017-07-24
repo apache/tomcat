@@ -236,6 +236,11 @@ public class DefaultServlet extends HttpServlet {
     private Charset fileEncodingCharset = null;
 
     /**
+     * If a file has a BOM, should that be used in preference to fileEncoding?
+     */
+    private boolean useBomIfPresent = true;
+
+    /**
      * Minimum size for sendfile usage in bytes.
      */
     protected int sendfileSize = 48 * 1024;
@@ -301,6 +306,10 @@ public class DefaultServlet extends HttpServlet {
                 throw new ServletException(e);
             }
         }
+
+        if (getServletConfig().getInitParameter("useBomIfPresent") != null)
+            useBomIfPresent = Boolean.parseBoolean(
+                    getServletConfig().getInitParameter("useBomIfPresent"));
 
         globalXsltFile = getServletConfig().getInitParameter("globalXsltFile");
         contextXsltFile = getServletConfig().getInitParameter("contextXsltFile");
@@ -726,11 +735,11 @@ public class DefaultServlet extends HttpServlet {
     /**
      * Serve the specified resource, optionally including the data content.
      *
-     * @param request  The servlet request we are processing
-     * @param response The servlet response we are creating
-     * @param content  Should the content be included?
-     * @param encoding The encoding to use if it is necessary to access the
-     *                 source as characters rather than as bytes
+     * @param request       The servlet request we are processing
+     * @param response      The servlet response we are creating
+     * @param content       Should the content be included?
+     * @param inputEncoding The encoding to use if it is necessary to access the
+     *                      source as characters rather than as bytes
      *
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet-specified error occurs
@@ -738,7 +747,7 @@ public class DefaultServlet extends HttpServlet {
     protected void serveResource(HttpServletRequest request,
                                  HttpServletResponse response,
                                  boolean content,
-                                 String encoding)
+                                 String inputEncoding)
         throws IOException, ServletException {
 
         boolean serveContent = content;
@@ -1011,35 +1020,46 @@ public class DefaultServlet extends HttpServlet {
                     // Output via a writer so can't use sendfile or write
                     // content directly.
                     if (resource.isDirectory()) {
-                        renderResult = render(getPathPrefix(request), resource, encoding);
+                        renderResult = render(getPathPrefix(request), resource, inputEncoding);
                     } else {
                         renderResult = resource.getInputStream();
+                        if (included) {
+                            // Need to make sure any BOM is removed
+                            if (!renderResult.markSupported()) {
+                                renderResult = new BufferedInputStream(renderResult);
+                            }
+                            Charset bomCharset = processBom(renderResult);
+                            if (bomCharset != null && useBomIfPresent) {
+                                inputEncoding = bomCharset.name();
+                            }
+                        }
                     }
-                    copy(renderResult, writer, encoding);
+                    copy(renderResult, writer, inputEncoding);
                 } else {
                     // Output is via an OutputStream
                     if (resource.isDirectory()) {
-                        renderResult = render(getPathPrefix(request), resource, encoding);
+                        renderResult = render(getPathPrefix(request), resource, inputEncoding);
                     } else {
                         // Output is content of resource
                         // Check to see if conversion is required
-                        if (conversionRequired) {
-                            // A conversion is required from fileEncoding to
-                            // response encoding
-                            byte[] resourceBody = resource.getContent();
-                            InputStream source;
-                            if (resourceBody == null) {
-                                source = resource.getInputStream();
-                            } else {
-                                source = new ByteArrayInputStream(resourceBody);
+                        if (conversionRequired || included) {
+                            // When including a file, we need to check for a BOM
+                            // to determine if a conversion is required, so we
+                            // might as well always convert
+                            InputStream source = resource.getInputStream();
+                            if (!source.markSupported()) {
+                                source = new BufferedInputStream(source);
+                            }
+                            Charset bomCharset = processBom(source);
+                            if (bomCharset != null && useBomIfPresent) {
+                                inputEncoding = bomCharset.name();
                             }
                             OutputStreamWriter osw = new OutputStreamWriter(ostream, charset);
                             PrintWriter pw = new PrintWriter(osw);
-                            copy(source, pw, fileEncoding);
+                            copy(source, pw, inputEncoding);
                             pw.flush();
                         } else {
-                            if (!checkSendfile(request, response, resource,
-                                    contentLength, null)) {
+                            if (!checkSendfile(request, response, resource, contentLength, null)) {
                                 // sendfile not possible so check if resource
                                 // content is available directly
                                 byte[] resourceBody = resource.getContent();
@@ -1124,7 +1144,75 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-    private boolean isText(String contentType) {
+    /*
+     * Code borrowed heavily from Jasper's EncodingDetector
+     */
+    private static Charset processBom(InputStream is) throws IOException {
+        // Java supported character sets do not use BOMs longer than 4 bytes
+        byte[] bom = new byte[4];
+        is.mark(bom.length);
+
+        int count = is.read(bom);
+
+        // BOMs are at least 2 bytes
+        if (count < 2) {
+            skip(is, 0);
+            return null;
+        }
+
+        // Look for two byte BOMs
+        int b0 = bom[0] & 0xFF;
+        int b1 = bom[1] & 0xFF;
+        if (b0 == 0xFE && b1 == 0xFF) {
+            skip(is, 2);
+            return StandardCharsets.UTF_16BE;
+        }
+        if (b0 == 0xFF && b1 == 0xFE) {
+            skip(is, 2);
+            return StandardCharsets.UTF_16LE;
+        }
+
+        // Remaining BOMs are at least 3 bytes
+        if (count < 3) {
+            skip(is, 0);
+            return null;
+        }
+
+        // UTF-8 is only 3-byte BOM
+        int b2 = bom[2] & 0xFF;
+        if (b0 == 0xEF && b1 == 0xBB && b2 == 0xBF) {
+            skip(is, 3);
+            return StandardCharsets.UTF_8;
+        }
+
+        if (count < 4) {
+            skip(is, 0);
+            return null;
+        }
+
+        // Look for 4-bute BOMs
+        int b3 = bom[3] & 0xFF;
+        if (b0 == 0x00 && b1 == 0x00 && b2 == 0xFE && b3 == 0xFF) {
+            return Charset.forName("UTF32-BE");
+        }
+        if (b0 == 0xFF && b1 == 0xFE && b2 == 0x00 && b3 == 0x00) {
+            return Charset.forName("UTF32-LE");
+        }
+
+        skip(is, 0);
+        return null;
+    }
+
+
+    private static void skip(InputStream is, int skip) throws IOException {
+        is.reset();
+        while (skip-- > 0) {
+            is.read();
+        }
+    }
+
+
+    private static boolean isText(String contentType) {
         return  contentType == null || contentType.startsWith("text") ||
                 contentType.endsWith("xml") || contentType.contains("/javascript");
     }

@@ -62,6 +62,11 @@
         <bug>61253</bug>: Add warn message when Digester.updateAttributes
         throws an exception instead of ignoring it. (csutherl)
       </fix>
+      <fix>
+        Correct a further regression in the fix for <bug>49464</bug> that could
+        cause an byte order mark character to appear at the start of content
+        included by the <code>DefaultServlet</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

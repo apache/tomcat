@@ -178,6 +178,10 @@ Tomcat.</p>
         File encoding to be used when reading static resources.
         [platform default]
   </property>
+  <property name="useBomIfPresent">
+        If a static file contains a byte order mark (BOM), should this be used
+        to determine the file encoding in preference to fileEncoding. [true]
+  </property>
   <property name="sendfileSize">
         If the connector used supports sendfile, this represents the minimal
         file size in KB for which sendfile will be used. Use a negative value
