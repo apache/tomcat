@@ -284,6 +284,10 @@
     <include name="**/*.xml"/>
     <include name="**/*.xsd"/>
     <include name="**/*.xsl"/>
+    <!-- Exclude files that aren't encoding using ISO-8859-1    -->
+    <!-- This prevents fixcrlf corrupting them during a release -->
+    <exclude name="**/bom-none-prolog-utf16?e.jspx"/>
+    <exclude name="**/bom-utf16?e-prolog-*.jsp*"/>
   </patternset>
 
 
