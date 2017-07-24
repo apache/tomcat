@@ -50,7 +50,7 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
 
-        WEBAPP_DOC_BASE = System.getProperty("java.io.tmpdir") + "/TestWebappClassLoaderWeaving";
+        WEBAPP_DOC_BASE = "test/tmp/TestWebappClassLoaderWeaving";
         File classes = new File(WEBAPP_DOC_BASE + "/WEB-INF/classes/" + PACKAGE_PREFIX);
         classes.mkdirs();
 
