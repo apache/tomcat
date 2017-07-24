@@ -417,6 +417,12 @@ public class JNDIRealm extends RealmBase {
     protected String connectionTimeout = "5000";
 
     /**
+     * The timeout, in milliseconds, to use when trying to read from a connection
+     * to the directory. The default is 5000 (5 seconds).
+     */
+    protected String readTimeout = "5000";
+
+    /**
      * The sizeLimit (also known as the countLimit) to use when the realm is
      * configured with {@link #userSearch}. Zero for no limit.
      */
@@ -1037,6 +1043,27 @@ public class JNDIRealm extends RealmBase {
 
     }
 
+    /**
+     * @return the read timeout.
+     */
+    public String getReadTimeout() {
+
+        return readTimeout;
+
+    }
+
+
+    /**
+     * Set the read timeout.
+     *
+     * @param timeout The new read timeout
+     */
+    public void setReadTimeout(String timeout) {
+
+        this.readTimeout = timeout;
+
+    }
+
 
     public long getSizeLimit() {
         return sizeLimit;
@@ -1259,11 +1286,22 @@ public class JNDIRealm extends RealmBase {
                 // Authenticate the specified username if possible
                 principal = authenticate(context, username, credentials);
 
-            } catch (NullPointerException | CommunicationException
-                    | ServiceUnavailableException e) {
-                /* BZ 42449 - Catch NPE - Kludge Sun's LDAP provider
-                   with broken SSL
-                */
+            } catch (NullPointerException | NamingException e) {
+                /*
+                 * BZ 61313
+                 * NamingException may or may not indicate an error that is
+                 * recoverable via fail over. Therefore a decision needs to be
+                 * made whether to fail over or not. Generally, attempting to
+                 * fail over when it is not appropriate is better than not
+                 * failing over when it is appropriate so the code always
+                 * attempts to fail over for NamingExceptions.
+                 */
+
+                /*
+                 * BZ 42449
+                 * Catch NPE - Kludge Sun's LDAP provider with broken SSL.
+                 */
+
                 // log the exception so we know it's there.
                 containerLog.info(sm.getString("jndiRealm.exception.retry"), e);
 
@@ -2511,6 +2549,8 @@ public class JNDIRealm extends RealmBase {
             env.put(JNDIRealm.DEREF_ALIASES, derefAliases);
         if (connectionTimeout != null)
             env.put("com.sun.jndi.ldap.connect.timeout", connectionTimeout);
+        if (readTimeout != null)
+            env.put("com.sun.jndi.ldap.read.timeout", readTimeout);
 
         return env;
 

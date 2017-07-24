@@ -67,6 +67,12 @@
         cause an byte order mark character to appear at the start of content
         included by the <code>DefaultServlet</code>. (markt)
       </fix>
+      <fix>
+        <bug>61313</bug>: Make the read timeout configurable in the
+        <code>JNDIRealm</code> and ensure that a read timeout will result in an
+        attempt to fail over to the alternateURL. Based on patches by Peter
+        Maloney and Felix Schumacher. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

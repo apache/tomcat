@@ -470,6 +470,12 @@
          the providers default is used.</p>
       </attribute>
 
+      <attribute name="readTimeout" required="false">
+          <p>The timeout, in milliseconds, to use when trying to read from a
+          connection to the directory. If not specified, the default of 5000
+          (5 seconds) is used.</p>
+      </attribute>
+
       <attribute name="referrals" required="false">
         <p>How do we handle JNDI referrals? Allowed values are
         "ignore", "follow", or "throw"  (see javax.naming.Context.REFERRAL
