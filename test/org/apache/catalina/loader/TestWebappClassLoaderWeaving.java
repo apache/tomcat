@@ -50,7 +50,7 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
 
-        String webappDocBase = "test/tmp/TestWebappClassLoaderWeaving";
+        String webappDocBase = "test/tmpTestWebappClassLoaderWeaving";
         File webappDocBaseFile = new File(webappDocBase);
         WEBAPP_DOC_BASE = webappDocBaseFile.getCanonicalPath();
         File classes = new File(webappDocBaseFile, "/WEB-INF/classes/" + PACKAGE_PREFIX);
