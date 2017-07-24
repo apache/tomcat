@@ -364,6 +364,19 @@ public abstract class AbstractEndpoint<S> {
     protected int getMaxThreadsInternal() {
         return maxThreads;
     }
+    public int getMaxThreadsWithExecutor() {
+        Executor executor = this.executor;
+        if (internalExecutor) {
+            return maxThreads;
+        } else {
+            if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
+                return ((java.util.concurrent.ThreadPoolExecutor) executor).getMaximumPoolSize();
+            } else if (executor instanceof ResizableExecutor) {
+                return ((ResizableExecutor) executor).getMaxThreads();
+            }
+            return -1;
+        }
+    }
 
 
     /**

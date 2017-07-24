@@ -101,6 +101,18 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>61322</bug>: Correct two regressions caused by the fix for
+        <bug>60319</bug> when using BIO with an external Executor. Firstly, use
+        the <code>maxThreads</code> setting from the Executor as the default for
+        <code>maxConnections</code> if none is specified. Secondly, use
+        <code>maxThreads</code> from the Executor when calculating the point at
+        which to disable keep-alive. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <add>
