@@ -99,6 +99,12 @@
         <bug>61253</bug>: Add warn message when Digester.updateAttributes
         throws an exception instead of ignoring it. (csutherl)
       </fix>
+      <fix>
+        <bug>61313</bug>: Make the read timeout configurable in the
+        <code>JNDIRealm</code> and ensure that a read timeout will result in an
+        attempt to fail over to the alternateURL. Based on patches by Peter
+        Maloney and Felix Schumacher. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
