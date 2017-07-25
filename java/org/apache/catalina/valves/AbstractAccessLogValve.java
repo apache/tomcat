@@ -86,6 +86,10 @@ import java.util.TimeZone;
  * <li><b>%D</b> - Time taken to process the request, in millis
  * <li><b>%T</b> - Time taken to process the request, in seconds
  * <li><b>%I</b> - current Request thread name (can compare later with stacktraces)
+ * <li><b>%X</b> - Connection status when response is completed:
+ * <br/><code>X</code> = Connection aborted before the response completed.
+ * <br/><code>+</code> = Connection may be kept alive after the response is sent.
+ * <br/><code>-</code> = Connection will be closed after the response is sent.</li>
  * </ul>
  * <p>In addition, the caller can specify one of the following aliases for
  * commonly utilized patterns:</p>
