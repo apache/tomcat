@@ -17,25 +17,6 @@
 package org.apache.catalina.valves;
 
 
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpSession;
-
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
@@ -50,6 +31,25 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
+import org.apache.tomcat.util.http.MimeHeaders;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpSession;
+import java.io.CharArrayWriter;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
 
 /**
@@ -1525,13 +1525,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     }
                 }
 
-                // Check whether connection is keep-alive or not
+                // Check whether connection is keep-alive or close
                 if (!isConnAborted) {
-                    if (org.apache.coyote.http11.Constants.KEEPALIVE.equals(
-                            request.getHeader(org.apache.coyote.http11.Constants.CONNECTION))) {
-                        buf.append('+');
-                    } else {
+                    String connStatus = response.getHeader(org.apache.coyote.http11.Constants.CONNECTION);
+                    if (org.apache.coyote.http11.Constants.CLOSE.equals(connStatus)) {
                         buf.append('-');
+                    } else {
+                        buf.append('+');
                     }
                 }
             } else {
