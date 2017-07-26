@@ -45,6 +45,10 @@
          Required to have a public constructor with no arguments.</p>
       <p>Use this to add a property source, that will be invoked when <code>${parameter}</code>
          denoted parameters are found in the XML files that Tomcat parses.</p>
+      <p>Property replacement from the specified property source on the JVM
+         system properties can also be done by adding the
+         <code>org.apache.tomcat.util.digester.Digester$SystemPropertyReplacementListener</code>
+         listener as a Server listener in the container.</p>
     </property>
   </properties>
 

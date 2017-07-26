@@ -52,6 +52,15 @@
       decoded. Identified by FindBugs. (markt)</fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        <bug>61345</bug>: Add a server listener that can be used to do system
+         property replacement from the property source configured in the
+         digester. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M25 (markt)" rtext="release in progress">
   <subsection name="Catalina">
