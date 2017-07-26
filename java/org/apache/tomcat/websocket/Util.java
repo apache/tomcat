@@ -69,7 +69,7 @@ public class Util {
 
 
     static boolean isControl(byte opCode) {
-        return (opCode & 0x08) > 0;
+        return (opCode & 0x08) != 0;
     }
 
 

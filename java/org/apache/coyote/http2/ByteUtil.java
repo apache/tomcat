@@ -27,7 +27,7 @@ class ByteUtil {
 
 
     static boolean isBit7Set(byte input) {
-        return (input & 0x80) > 0;
+        return (input & 0x80) != 0;
     }
 
 
