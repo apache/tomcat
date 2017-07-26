@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -45,6 +46,7 @@ import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.TLSUtil;
+import org.apache.coyote.ActionCode;
 import org.apache.coyote.RequestInfo;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -1519,18 +1521,27 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
             if (response != null && request != null) {
-                // Check for connection aborted cond
-                boolean isConnAborted = false;
-                if (response.isError()) {
-                    Throwable ex = (Throwable)request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
-                    if (ex instanceof ClientAbortException) {
-                        isConnAborted = true;
-                        buf.append('X');
+                boolean statusFound = false;
+
+                // Check whether connection IO is in "not allowed" state
+                AtomicBoolean isIoAllowed = new AtomicBoolean(false);
+                request.getCoyoteRequest().action(ActionCode.IS_IO_ALLOWED, isIoAllowed);
+                if (!isIoAllowed.get()) {
+                    buf.append('X');
+                    statusFound = true;
+                } else {
+                    // Check for connection aborted cond
+                    if (response.isError()) {
+                        Throwable ex = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
+                        if (ex instanceof ClientAbortException) {
+                            buf.append('X');
+                            statusFound = true;
+                        }
                     }
                 }
 
-                // Check whether connection is keep-alive or close
-                if (!isConnAborted) {
+                // If status is not found yet, cont to check whether connection is keep-alive or close
+                if (!statusFound) {
                     String connStatus = response.getHeader(org.apache.coyote.http11.Constants.CONNECTION);
                     if (org.apache.coyote.http11.Constants.CLOSE.equals(connStatus)) {
                         buf.append('-');
