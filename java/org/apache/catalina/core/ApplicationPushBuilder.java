@@ -382,7 +382,7 @@ public class ApplicationPushBuilder implements PushBuilder {
 
         StringBuilder result = new StringBuilder(input.length());
         while (start != -1) {
-            // Found the start of a %nn sequence. Copy everything form the last
+            // Found the start of a %nn sequence. Copy everything from the last
             // end to this start to the output.
             result.append(input.substring(end, start));
             // Advance the end 3 characters: %nn
@@ -403,7 +403,7 @@ public class ApplicationPushBuilder implements PushBuilder {
     private static String decodePercentSequence(String sequence, Charset charset) {
         byte[] bytes = new byte[sequence.length()/3];
         for (int i = 0; i < bytes.length; i += 3) {
-            bytes[i] = (byte) (HexUtils.getDec(sequence.charAt(1 + 3 * i)) << 4 +
+            bytes[i] = (byte) ((HexUtils.getDec(sequence.charAt(1 + 3 * i)) << 4) +
                     HexUtils.getDec(sequence.charAt(2 + 3 * i)));
         }
 

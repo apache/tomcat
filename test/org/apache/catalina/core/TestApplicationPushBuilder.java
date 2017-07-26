@@ -49,6 +49,21 @@ public class TestApplicationPushBuilder {
         doTest("foo%20", StandardCharsets.UTF_8, "foo ");
     }
 
+    @Test
+    public void test06() {
+        doTest("%21foo", StandardCharsets.UTF_8, "!foo");
+    }
+
+    @Test
+    public void test07() {
+        doTest("fo%21o", StandardCharsets.UTF_8, "fo!o");
+    }
+
+    @Test
+    public void test08() {
+        doTest("foo%21", StandardCharsets.UTF_8, "foo!");
+    }
+
 
     private void doTest(String input, Charset charset, String expected) {
         String result = ApplicationPushBuilder.decode(input, charset);
