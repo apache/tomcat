@@ -45,6 +45,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M26 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>Correct a bug in the <code>PushBuilder</code> implementation that
+      meant push URLs containing <code>%nn</code> sequences were not correctly
+      decoded. Identified by FindBugs. (markt)</fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M25 (markt)" rtext="release in progress">
   <subsection name="Catalina">
