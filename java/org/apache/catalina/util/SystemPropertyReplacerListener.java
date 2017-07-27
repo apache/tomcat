@@ -38,7 +38,7 @@ public class SystemPropertyReplacerListener
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
-            Digester.replace();
+            Digester.replaceSystemProperties();
         }
     }
 

@@ -310,7 +310,7 @@ public class Digester extends DefaultHandler2 {
     }
 
 
-    public static void replace() {
+    public static void replaceSystemProperties() {
         Log log = LogFactory.getLog(Digester.class);
         if (propertySource != null) {
             IntrospectionUtils.PropertySource[] propertySources =
