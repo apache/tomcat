@@ -571,6 +571,15 @@
 
   </subsection>
 
+  <subsection name="System property replacement - org.apache.catalina.util.SystemPropertyReplacerListener">
+
+    <p>This listener performs system property replacement using the property
+     source configured on the digester. When <code>${parameter}</code>
+     denoted parameters are found in the values of system properties,
+     the property source will be invoked to attempt to replace it.</p>
+
+  </subsection>
+
 </section>
 
 </body>

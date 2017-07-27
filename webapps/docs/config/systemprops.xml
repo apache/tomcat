@@ -47,7 +47,7 @@
          denoted parameters are found in the XML files that Tomcat parses.</p>
       <p>Property replacement from the specified property source on the JVM
          system properties can also be done by adding the
-         <code>org.apache.tomcat.util.digester.Digester$SystemPropertyReplacementListener</code>
+         <code>org.apache.catalina.util.SystemPropertyReplacerListener</code>
          listener as a Server listener in the container.</p>
     </property>
   </properties>

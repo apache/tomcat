@@ -37,9 +37,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.apache.catalina.Lifecycle;
-import org.apache.catalina.LifecycleEvent;
-import org.apache.catalina.LifecycleListener;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -298,7 +295,7 @@ public class Digester extends DefaultHandler2 {
      * The Log to which most logging calls will be made.
      */
     protected Log log = LogFactory.getLog(Digester.class);
-    protected StringManager sm = StringManager.getManager(Digester.class);
+    protected static StringManager sm = StringManager.getManager(Digester.class);
 
     /**
      * The Log to which all SAX event related logging calls will be made.
@@ -313,28 +310,23 @@ public class Digester extends DefaultHandler2 {
     }
 
 
-    public static class SystemPropertyReplacementListener
-            implements LifecycleListener {
-        protected Log log = LogFactory.getLog(Digester.class);
-        protected StringManager sm = StringManager.getManager(Digester.class);
-        @Override
-        public void lifecycleEvent(LifecycleEvent event) {
-            if (propertySource != null && Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
-                IntrospectionUtils.PropertySource[] propertySources =
-                        new IntrospectionUtils.PropertySource[] { propertySource };
-                Properties properties = System.getProperties();
-                Set<String> names = properties.stringPropertyNames();
-                for (String name : names) {
-                    String value = System.getProperty(name);
-                    if (value != null) {
-                        try {
-                            String newValue = IntrospectionUtils.replaceProperties(value, null, propertySources);
-                            if (value != newValue) {
-                                System.setProperty(name, newValue);
-                            }
-                        } catch (Exception e) {
-                            log.warn(sm.getString("digester.failedToUpdateSystemProperty", name, value), e);
+    public static void replace() {
+        Log log = LogFactory.getLog(Digester.class);
+        if (propertySource != null) {
+            IntrospectionUtils.PropertySource[] propertySources =
+                    new IntrospectionUtils.PropertySource[] { propertySource };
+            Properties properties = System.getProperties();
+            Set<String> names = properties.stringPropertyNames();
+            for (String name : names) {
+                String value = System.getProperty(name);
+                if (value != null) {
+                    try {
+                        String newValue = IntrospectionUtils.replaceProperties(value, null, propertySources);
+                        if (value != newValue) {
+                            System.setProperty(name, newValue);
                         }
+                    } catch (Exception e) {
+                        log.warn(sm.getString("digester.failedToUpdateSystemProperty", name, value), e);
                     }
                 }
             }
