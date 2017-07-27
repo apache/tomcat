@@ -319,8 +319,7 @@ public final class UDecoder {
             return null;
         }
 
-        int index = str.indexOf('%');
-        if (index == -1) {
+        if (str.indexOf('%') == -1) {
             // No %nn sequences, so return string unchanged
             return str;
         }
