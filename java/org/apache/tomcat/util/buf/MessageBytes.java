@@ -81,6 +81,11 @@ public final class MessageBytes implements Cloneable, Serializable {
         return factory.newInstance();
     }
 
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
     public boolean isNull() {
         return byteC.isNull() && charC.isNull() && ! hasStrValue;
     }

@@ -26,7 +26,7 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  * interceptor and eventually down to the ChannelSender component
  *
  */
-public interface ChannelMessage extends Serializable {
+public interface ChannelMessage extends Serializable, Cloneable {
 
 
     /**

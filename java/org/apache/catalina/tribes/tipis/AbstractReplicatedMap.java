@@ -1133,11 +1133,6 @@ public abstract class AbstractReplicatedMap<K,V>
         return false;
     }
 
-    @Override
-    public Object clone() {
-        throw new UnsupportedOperationException(sm.getString("abstractReplicatedMap.unsupport.operation"));
-    }
-
     /**
      * Returns the entire contents of the map
      * Map.Entry.getValue() will return a LazyReplicatedMap.MapEntry object containing all the information
@@ -1376,7 +1371,7 @@ public abstract class AbstractReplicatedMap<K,V>
 //                map message to send to and from other maps
 //------------------------------------------------------------------------------
 
-    public static class MapMessage implements Serializable {
+    public static class MapMessage implements Serializable, Cloneable {
         private static final long serialVersionUID = 1L;
         public static final int MSG_BACKUP = 1;
         public static final int MSG_RETRIEVE_BACKUP = 2;
