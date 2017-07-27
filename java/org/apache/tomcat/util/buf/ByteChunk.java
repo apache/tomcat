@@ -148,6 +148,11 @@ public final class ByteChunk implements Cloneable, Serializable {
         allocate( initial, -1 );
     }
 
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
     public boolean isNull() {
         return ! isSet; // buff==null;
     }

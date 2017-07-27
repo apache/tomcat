@@ -98,6 +98,11 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
 
     // --------------------
 
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
     public boolean isNull() {
         if( end > 0 ) {
             return false;
