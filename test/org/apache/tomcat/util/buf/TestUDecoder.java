@@ -46,26 +46,27 @@ public class TestUDecoder {
         assertTrue(exception instanceof IllegalArgumentException);
     }
 
+
     @Test
     public void testURLDecodeStringValidIso88591Start() {
-
         String result = UDecoder.URLDecode("%41xxxx", StandardCharsets.ISO_8859_1);
         assertEquals("Axxxx", result);
     }
 
+
     @Test
     public void testURLDecodeStringValidIso88591Middle() {
-
         String result = UDecoder.URLDecode("xx%41xx", StandardCharsets.ISO_8859_1);
         assertEquals("xxAxx", result);
     }
 
+
     @Test
     public void testURLDecodeStringValidIso88591End() {
-
         String result = UDecoder.URLDecode("xxxx%41", StandardCharsets.ISO_8859_1);
         assertEquals("xxxxA", result);
     }
+
 
     @Test
     public void testURLDecodeStringValidUtf8Start() {
@@ -73,17 +74,31 @@ public class TestUDecoder {
         assertEquals("\u00eaxxxx", result);
     }
 
+
     @Test
     public void testURLDecodeStringValidUtf8Middle() {
-
         String result = UDecoder.URLDecode("xx%c3%aaxx", StandardCharsets.UTF_8);
         assertEquals("xx\u00eaxx", result);
     }
 
+
     @Test
     public void testURLDecodeStringValidUtf8End() {
-
         String result = UDecoder.URLDecode("xxxx%c3%aa", StandardCharsets.UTF_8);
         assertEquals("xxxx\u00ea", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringNonAsciiValidNone() {
+        String result = UDecoder.URLDecode("\u00eaxxxx", StandardCharsets.UTF_8);
+        assertEquals("\u00eaxxxx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringNonAsciiValidUtf8() {
+        String result = UDecoder.URLDecode("\u00ea%c3%aa", StandardCharsets.UTF_8);
+        assertEquals("\u00ea\u00ea", result);
     }
 }
