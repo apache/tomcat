@@ -578,8 +578,11 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
                 pollers[i] = null;
             }
             try {
-                stopLatch.await(selectorTimeout + 100, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException ignore) {
+                if (!stopLatch.await(selectorTimeout + 100, TimeUnit.MILLISECONDS)) {
+                    log.warn(sm.getString("endpoint.nio.stopLatchAwaitFail"));
+                }
+            } catch (InterruptedException e) {
+                log.warn(sm.getString("endpoint.nio.stopLatchAwaitInterrupted"), e);
             }
         }
         eventCache.clear();
@@ -587,7 +590,6 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
         nioChannels.clear();
         processorCache.clear();
         shutdownExecutor();
-
     }
 
 

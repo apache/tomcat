@@ -117,6 +117,10 @@
         <code>maxThreads</code> from the Executor when calculating the point at
         which to disable keep-alive. (markt)
       </fix>
+      <add>
+        Add additional logging to record problems that occur while waiting for
+        the NIO pollers to stop during the Connector stop process. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
