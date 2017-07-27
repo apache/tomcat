@@ -450,7 +450,6 @@ public class NioBlockingSelector {
                 log.warn("Possible key leak, cancelling key in the finalizer.");
                 try {key.cancel();}catch (Exception ignore){}
             }
-            key = null;
         }
     }
 }

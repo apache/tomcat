@@ -295,7 +295,7 @@ public class Digester extends DefaultHandler2 {
      * The Log to which most logging calls will be made.
      */
     protected Log log = LogFactory.getLog(Digester.class);
-    protected static StringManager sm = StringManager.getManager(Digester.class);
+    protected static final StringManager sm = StringManager.getManager(Digester.class);
 
     /**
      * The Log to which all SAX event related logging calls will be made.
@@ -322,7 +322,7 @@ public class Digester extends DefaultHandler2 {
                 if (value != null) {
                     try {
                         String newValue = IntrospectionUtils.replaceProperties(value, null, propertySources);
-                        if (value != newValue) {
+                        if (!value.equals(newValue)) {
                             System.setProperty(name, newValue);
                         }
                     } catch (Exception e) {
