@@ -146,7 +146,7 @@ public abstract class WsFrameBase {
             return false;
         }
         int b = inputBuffer[readPos++];
-        fin = (b & 0x80) > 0;
+        fin = (b & 0x80) != 0;
         rsv = (b & 0x70) >>> 4;
         opCode = (byte) (b & 0x0F);
         if (!transformation.validateRsv(rsv, opCode)) {
