@@ -16,8 +16,10 @@
  */
 package org.apache.tomcat.util.buf;
 
+import java.io.ByteArrayOutputStream;
 import java.io.CharConversionException;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -317,39 +319,68 @@ public final class UDecoder {
             return null;
         }
 
-        byte[] bytes = str.getBytes(StandardCharsets.US_ASCII);
+        int index = str.indexOf('%');
+        if (index == -1) {
+            // No %nn sequences, so return string unchanged
+            return str;
+        }
 
         if (charset == null) {
             charset = StandardCharsets.UTF_8;
         }
 
-        int len = bytes.length;
+        /*
+         * Decoding is required.
+         *
+         * Potential complications:
+         * - The source String may be partially decoded so it is not valid to
+         *   assume that the source String is ASCII.
+         * - Have to process as characters since there is no guarantee that the
+         *   byte sequence for '%' is going to be the same in all character
+         *   sets.
+         * - We don't know how many '%nn' sequences are required for a single
+         *   character. It varies between character sets and some use a variable
+         *   length.
+         */
+
+        // This isn't perfect but it is a reasonable guess for the size of the
+        // array required
+        ByteArrayOutputStream baos = new ByteArrayOutputStream(str.length() * 2);
+
+        OutputStreamWriter osw = new OutputStreamWriter(baos, charset);
+
+        char[] sourceChars = str.toCharArray();
+        int len = sourceChars.length;
         int ix = 0;
-        int ox = 0;
-        while (ix < len) {
-            byte b = bytes[ix++];     // Get byte to test
-            if (b == '%') {
-                if (ix + 2 > len) {
-                    throw new IllegalArgumentException(
-                            sm.getString("uDecoder.urlDecode.missingDigit"));
+
+        try {
+            while (ix < len) {
+                char c = sourceChars[ix++];
+                if (c == '%') {
+                    osw.flush();
+                    if (ix + 2 > len) {
+                        throw new IllegalArgumentException(
+                                sm.getString("uDecoder.urlDecode.missingDigit", str));
+                    }
+                    char c1 = sourceChars[ix++];
+                    char c2 = sourceChars[ix++];
+                    if (isHexDigit(c1) && isHexDigit(c2)) {
+                        baos.write(x2c(c1, c2));
+                    } else {
+                        throw new IllegalArgumentException(
+                                sm.getString("uDecoder.urlDecode.missingDigit", str));
+                    }
+                } else {
+                    osw.append(c);
                 }
-                b = (byte) ((convertHexDigit(bytes[ix++]) << 4)
-                            + convertHexDigit(bytes[ix++]));
             }
-            bytes[ox++] = b;
+            osw.flush();
+
+            return baos.toString(charset.name());
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException(
+                    sm.getString("uDecoder.urlDecode.conversionError", str, charset.name()), ioe);
         }
-
-        return new String(bytes, 0, ox, charset);
-    }
-
-
-    private static byte convertHexDigit( byte b ) {
-        if ((b >= '0') && (b <= '9')) return (byte)(b - '0');
-        if ((b >= 'a') && (b <= 'f')) return (byte)(b - 'a' + 10);
-        if ((b >= 'A') && (b <= 'F')) return (byte)(b - 'A' + 10);
-        throw new IllegalArgumentException(
-                sm.getString("uDecoder.convertHexDigit.notHex",
-                        Character.valueOf((char)b)));
     }
 
 

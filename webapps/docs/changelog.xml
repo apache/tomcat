@@ -47,9 +47,16 @@
 <section name="Tomcat 9.0.0.M26 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
-      <fix>Correct a bug in the <code>PushBuilder</code> implementation that
-      meant push URLs containing <code>%nn</code> sequences were not correctly
-      decoded. Identified by FindBugs. (markt)</fix>
+      <fix>
+        Correct a bug in the <code>PushBuilder</code> implementation that
+        meant push URLs containing <code>%nn</code> sequences were not correctly
+        decoded. Identified by FindBugs. (markt)
+      </fix>
+      <fix>
+        <bug>61351</bug>: Correctly handle %nn decoding of URL patterns in
+        web.xml and similar locations that may legitimately contain characters
+        that are not permitted by RFC 3986. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
