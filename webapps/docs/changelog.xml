@@ -56,9 +56,13 @@
     <changelog>
       <update>
         <bug>61345</bug>: Add a server listener that can be used to do system
-         property replacement from the property source configured in the
-         digester. (remm)
+        property replacement from the property source configured in the
+        digester. (remm)
       </update>
+      <add>
+        Add additional logging to record problems that occur while waiting for
+        the NIO pollers to stop during the Connector stop process. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

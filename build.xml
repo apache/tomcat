@@ -1590,6 +1590,7 @@
               excludeFilter="res/findbugs/filter-false-positives.xml" >
       <sourcePath path="${basedir}/java" />
       <class location="${tomcat.classes}" />
+      <class location="${test.classes}" />
       <auxClasspath>
         <fileset file="${jdt.jar}" />
         <fileset file="${ant.core.lib}" />
