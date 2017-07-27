@@ -27,7 +27,7 @@ import org.apache.catalina.tribes.io.XByteBuffer;
  * @author Filip Hanik
  * 
  */
-public interface ChannelMessage extends Serializable {
+public interface ChannelMessage extends Serializable, Cloneable {
 
 
     /**
