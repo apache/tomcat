@@ -14,15 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.digester;
-
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 
 /**
  * <p>Default implementation of the <code>Rules</code> interface that supports
@@ -40,12 +36,9 @@ import java.util.List;
  *      element, no matter how deeply the pair is nested.</li>
  * </ul>
  */
-
 public class RulesBase implements Rules {
 
-
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * The set of registered Rule instances, keyed by the matching pattern.
@@ -78,7 +71,6 @@ public class RulesBase implements Rules {
 
     // ------------------------------------------------------------- Properties
 
-
     /**
      * Return the Digester instance with which this Rules instance is
      * associated.
@@ -96,43 +88,14 @@ public class RulesBase implements Rules {
      */
     @Override
     public void setDigester(Digester digester) {
-
         this.digester = digester;
         for (Rule item : rules) {
             item.setDigester(digester);
         }
-
-    }
-
-
-    /**
-     * Return the namespace URI that will be applied to all subsequently
-     * added <code>Rule</code> objects.
-     */
-    @Override
-    public String getNamespaceURI() {
-        return this.namespaceURI;
-    }
-
-
-    /**
-     * Set the namespace URI that will be applied to all subsequently
-     * added <code>Rule</code> objects.
-     *
-     * @param namespaceURI Namespace URI that must match on all
-     *  subsequently added rules, or <code>null</code> for matching
-     *  regardless of the current namespace URI
-     */
-    @Override
-    public void setNamespaceURI(String namespaceURI) {
-
-        this.namespaceURI = namespaceURI;
-
     }
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Register a new Rule instance matching the specified pattern.
@@ -148,7 +111,6 @@ public class RulesBase implements Rules {
             pattern = pattern.substring(0, patternLength-1);
         }
 
-
         List<Rule> list = cache.get(pattern);
         if (list == null) {
             list = new ArrayList<>();
@@ -162,7 +124,6 @@ public class RulesBase implements Rules {
         if (this.namespaceURI != null) {
             rule.setNamespaceURI(this.namespaceURI);
         }
-
     }
 
 
@@ -171,10 +132,8 @@ public class RulesBase implements Rules {
      */
     @Override
     public void clear() {
-
         cache.clear();
         rules.clear();
-
     }
 
 
@@ -232,7 +191,6 @@ public class RulesBase implements Rules {
 
     // ------------------------------------------------------ Protected Methods
 
-
     /**
      * Return a List of Rule instances for the specified pattern that also
      * match the specified namespace URI (if any).  If there are no such
@@ -263,6 +221,4 @@ public class RulesBase implements Rules {
         }
         return results;
     }
-
-
 }

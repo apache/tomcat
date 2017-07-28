@@ -584,34 +584,6 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * @return the namespace URI that will be applied to all subsequently
-     * added <code>Rule</code> objects.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 9
-     */
-    @Deprecated
-    public String getRuleNamespaceURI() {
-        return getRules().getNamespaceURI();
-    }
-
-
-    /**
-     * Set the namespace URI that will be applied to all subsequently
-     * added <code>Rule</code> objects.
-     *
-     * @param ruleNamespaceURI Namespace URI that must match on all
-     *  subsequently added rules, or <code>null</code> for matching
-     *  regardless of the current namespace URI
-     *
-     * @deprecated Unused. Will be removed in Tomcat 9
-     */
-    @Deprecated
-    public void setRuleNamespaceURI(String ruleNamespaceURI) {
-        getRules().setNamespaceURI(ruleNamespaceURI);
-    }
-
-
-    /**
      * @return the SAXParser we will use to parse the input stream.  If there
      * is a problem creating the parser, return <code>null</code>.
      */
@@ -1526,21 +1498,7 @@ public class Digester extends DefaultHandler2 {
      * @param ruleSet The RuleSet instance to configure from
      */
     public void addRuleSet(RuleSet ruleSet) {
-
-        String oldNamespaceURI = getRuleNamespaceURI();
-        @SuppressWarnings("deprecation")
-        String newNamespaceURI = ruleSet.getNamespaceURI();
-        if (log.isDebugEnabled()) {
-            if (newNamespaceURI == null) {
-                log.debug("addRuleSet() with no namespace URI");
-            } else {
-                log.debug("addRuleSet() with namespace URI " + newNamespaceURI);
-            }
-        }
-        setRuleNamespaceURI(newNamespaceURI);
         ruleSet.addRuleInstances(this);
-        setRuleNamespaceURI(oldNamespaceURI);
-
     }
 
 
