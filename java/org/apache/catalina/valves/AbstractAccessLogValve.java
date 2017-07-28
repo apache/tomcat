@@ -1546,7 +1546,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 // If status is not found yet, cont to check whether connection is keep-alive or close
                 if (!statusFound) {
                     String connStatus = response.getHeader(org.apache.coyote.http11.Constants.CONNECTION);
-                    if (org.apache.coyote.http11.Constants.CLOSE.equals(connStatus)) {
+                    if (org.apache.coyote.http11.Constants.CLOSE.equalsIgnoreCase(connStatus)) {
                         buf.append('-');
                     } else {
                         buf.append('+');
