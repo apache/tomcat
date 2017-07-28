@@ -64,7 +64,6 @@ public class ClusterRuleSet extends RuleSetBase {
      */
     public ClusterRuleSet(String prefix) {
         super();
-        this.namespaceURI = null;
         this.prefix = prefix;
     }
 

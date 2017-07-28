@@ -34,7 +34,10 @@ public abstract class RuleSetBase implements RuleSet {
     /**
      * The namespace URI that all Rule instances created by this RuleSet
      * will be associated with.
+     *
+     * @deprecated Unused. This will be removed in Tomcat 9.
      */
+    @Deprecated
     protected String namespaceURI = null;
 
 
@@ -44,7 +47,10 @@ public abstract class RuleSetBase implements RuleSet {
     /**
      * Return the namespace URI that will be applied to all Rule instances
      * created from this RuleSet.
+     *
+     * @deprecated Unused. This will be removed in Tomcat 9.
      */
+    @Deprecated
     @Override
     public String getNamespaceURI() {
         return this.namespaceURI;

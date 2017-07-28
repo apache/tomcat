@@ -63,7 +63,6 @@ public class HostRuleSet extends RuleSetBase {
      *  trailing slash character)
      */
     public HostRuleSet(String prefix) {
-        this.namespaceURI = null;
         this.prefix = prefix;
     }
 

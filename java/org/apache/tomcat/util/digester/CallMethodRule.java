@@ -203,7 +203,10 @@ public class CallMethodRule extends Rule {
     /**
      * The names of the classes of the parameters to be collected.
      * This attribute allows creation of the classes to be postponed until the digester is set.
+     *
+     * @deprecated Unused. This will be removed in Tomcat 9.
      */
+    @Deprecated
     protected final String paramClassNames[];
 
     /**

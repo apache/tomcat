@@ -136,9 +136,7 @@ public class WebRuleSet extends RuleSetBase {
      * @param fragment <code>true</code> if this is a web fragment
      */
     public WebRuleSet(String prefix, boolean fragment) {
-
         super();
-        this.namespaceURI = null;
         this.prefix = prefix;
         this.fragment = fragment;
 
@@ -152,8 +150,8 @@ public class WebRuleSet extends RuleSetBase {
         relativeOrdering = new RelativeOrderingRule(fragment);
     }
 
-    // --------------------------------------------------------- Public Methods
 
+    // --------------------------------------------------------- Public Methods
 
     /**
      * <p>Add the set of Rule instances defined in this RuleSet to the

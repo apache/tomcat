@@ -53,7 +53,10 @@ public interface Rules {
     /**
      * @return the namespace URI that will be applied to all subsequently
      * added <code>Rule</code> objects.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9
      */
+    @Deprecated
     public String getNamespaceURI();
 
 
@@ -64,7 +67,10 @@ public interface Rules {
      * @param namespaceURI Namespace URI that must match on all
      *  subsequently added rules, or <code>null</code> for matching
      *  regardless of the current namespace URI
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9
      */
+    @Deprecated
     public void setNamespaceURI(String namespaceURI);
 
 

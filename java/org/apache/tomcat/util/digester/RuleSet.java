@@ -44,7 +44,10 @@ public interface RuleSet {
     /**
      * @return the namespace URI that will be applied to all Rule instances
      * created from this RuleSet.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9
      */
+    @Deprecated
     public String getNamespaceURI();
 
 

@@ -65,11 +65,8 @@ public class MemoryRuleSet extends RuleSetBase {
      *  trailing slash character)
      */
     public MemoryRuleSet(String prefix) {
-
         super();
-        this.namespaceURI = null;
         this.prefix = prefix;
-
     }
 
 

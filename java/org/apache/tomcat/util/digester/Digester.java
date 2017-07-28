@@ -586,7 +586,10 @@ public class Digester extends DefaultHandler2 {
     /**
      * @return the namespace URI that will be applied to all subsequently
      * added <code>Rule</code> objects.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9
      */
+    @Deprecated
     public String getRuleNamespaceURI() {
         return getRules().getNamespaceURI();
     }
@@ -599,7 +602,10 @@ public class Digester extends DefaultHandler2 {
      * @param ruleNamespaceURI Namespace URI that must match on all
      *  subsequently added rules, or <code>null</code> for matching
      *  regardless of the current namespace URI
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9
      */
+    @Deprecated
     public void setRuleNamespaceURI(String ruleNamespaceURI) {
         getRules().setNamespaceURI(ruleNamespaceURI);
     }
@@ -1522,6 +1528,7 @@ public class Digester extends DefaultHandler2 {
     public void addRuleSet(RuleSet ruleSet) {
 
         String oldNamespaceURI = getRuleNamespaceURI();
+        @SuppressWarnings("deprecation")
         String newNamespaceURI = ruleSet.getNamespaceURI();
         if (log.isDebugEnabled()) {
             if (newNamespaceURI == null) {
