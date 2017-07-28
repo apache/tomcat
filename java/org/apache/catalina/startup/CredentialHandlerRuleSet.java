@@ -17,7 +17,7 @@
 package org.apache.catalina.startup;
 
 import org.apache.tomcat.util.digester.Digester;
-import org.apache.tomcat.util.digester.RuleSetBase;
+import org.apache.tomcat.util.digester.RuleSet;
 
 /**
  * <p><strong>RuleSet</strong> for processing the contents of a
@@ -25,7 +25,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
  * CredentialHandler such as the <code>NestedCredentialHandler</code> that used
  * nested CredentialHandlers.</p>
  */
-public class CredentialHandlerRuleSet extends RuleSetBase {
+public class CredentialHandlerRuleSet implements RuleSet {
 
 
     private static final int MAX_NESTED_LEVELS = Integer.getInteger(

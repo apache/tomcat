@@ -14,14 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.ha;
 
-
 import org.apache.tomcat.util.digester.Digester;
-import org.apache.tomcat.util.digester.RuleSetBase;
-
+import org.apache.tomcat.util.digester.RuleSet;
 
 /**
  * <p><strong>RuleSet</strong> for processing the contents of a
@@ -29,7 +25,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
  *
  * @author Peter Rossbach
  */
-public class ClusterRuleSet extends RuleSetBase {
+public class ClusterRuleSet implements RuleSet {
 
 
     // ----------------------------------------------------- Instance Variables
@@ -49,9 +45,7 @@ public class ClusterRuleSet extends RuleSetBase {
      * matching pattern prefix.
      */
     public ClusterRuleSet() {
-
         this("");
-
     }
 
 
@@ -63,7 +57,6 @@ public class ClusterRuleSet extends RuleSetBase {
      *  trailing slash character)
      */
     public ClusterRuleSet(String prefix) {
-        super();
         this.prefix = prefix;
     }
 

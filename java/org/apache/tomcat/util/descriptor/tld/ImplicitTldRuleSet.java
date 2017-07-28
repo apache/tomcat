@@ -18,7 +18,7 @@ package org.apache.tomcat.util.descriptor.tld;
 
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.Rule;
-import org.apache.tomcat.util.digester.RuleSetBase;
+import org.apache.tomcat.util.digester.RuleSet;
 import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 
@@ -27,7 +27,7 @@ import org.xml.sax.Attributes;
  *
  * Only version information used and short names are allowed.
  */
-public class ImplicitTldRuleSet extends RuleSetBase {
+public class ImplicitTldRuleSet implements RuleSet {
 
     private static final StringManager sm = StringManager.getManager(ImplicitTldRuleSet.class);
 

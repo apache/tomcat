@@ -20,7 +20,10 @@ package org.apache.tomcat.util.digester;
  * <p>Convenience base class that implements the {@link RuleSet} interface.
  * Concrete implementations should list all of their actual rule creation
  * logic in the <code>addRuleSet()</code> implementation.</p>
+ *
+ * @deprecated Unnecessary. Will be removed in Tomcat 9
  */
+@Deprecated
 public abstract class RuleSetBase implements RuleSet {
 
     /**

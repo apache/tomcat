@@ -29,7 +29,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.descriptor.XmlErrorHandler;
 import org.apache.tomcat.util.digester.Digester;
-import org.apache.tomcat.util.digester.RuleSetBase;
+import org.apache.tomcat.util.digester.RuleSet;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -78,7 +78,7 @@ public class TagPluginParser {
         return plugins;
     }
 
-    private static class TagPluginRuleSet extends RuleSetBase {
+    private static class TagPluginRuleSet implements RuleSet {
         @Override
         public void addRuleInstances(Digester digester) {
             digester.addCallMethod(PREFIX, "addPlugin", 2);
