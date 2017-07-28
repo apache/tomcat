@@ -302,6 +302,10 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             ((AtomicBoolean) param).set(getErrorState().isError());
             break;
         }
+        case IS_IO_ALLOWED: {
+            ((AtomicBoolean) param).set(getErrorState().isIoAllowed());
+            break;
+        }
         case CLOSE_NOW: {
             // Prevent further writes to the response
             setSwallowResponse();
