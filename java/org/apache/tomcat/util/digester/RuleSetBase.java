@@ -14,22 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.digester;
-
 
 /**
  * <p>Convenience base class that implements the {@link RuleSet} interface.
  * Concrete implementations should list all of their actual rule creation
  * logic in the <code>addRuleSet()</code> implementation.</p>
+ *
+ * @deprecated Unnecessary once deprecated methods are removed. Will be removed
+ *             in Tomcat 9.
  */
-
+@Deprecated
 public abstract class RuleSetBase implements RuleSet {
 
-
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * The namespace URI that all Rule instances created by this RuleSet
@@ -43,7 +41,6 @@ public abstract class RuleSetBase implements RuleSet {
 
     // ------------------------------------------------------------- Properties
 
-
     /**
      * Return the namespace URI that will be applied to all Rule instances
      * created from this RuleSet.
@@ -53,14 +50,11 @@ public abstract class RuleSetBase implements RuleSet {
     @Deprecated
     @Override
     public String getNamespaceURI() {
-
         return (this.namespaceURI);
-
     }
 
 
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Add the set of Rule instances defined in this RuleSet to the
@@ -73,6 +67,4 @@ public abstract class RuleSetBase implements RuleSet {
      */
     @Override
     public abstract void addRuleInstances(Digester digester);
-
-
 }

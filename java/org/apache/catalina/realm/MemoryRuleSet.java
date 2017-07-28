@@ -31,6 +31,7 @@ import org.xml.sax.Attributes;
  *
  * @author Craig R. McClanahan
  */
+@SuppressWarnings("deprecation")
 public class MemoryRuleSet extends RuleSetBase {
 
 

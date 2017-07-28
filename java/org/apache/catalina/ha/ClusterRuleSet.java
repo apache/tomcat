@@ -29,6 +29,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
  *
  * @author Peter Rossbach
  */
+@SuppressWarnings("deprecation")
 public class ClusterRuleSet extends RuleSetBase {
 
 

@@ -36,6 +36,7 @@ import org.xml.sax.SAXException;
 /**
  * Parser for Tag Plugin descriptors.
  */
+@SuppressWarnings("deprecation")
 public class TagPluginParser {
     private static final Log log = LogFactory.getLog(TagPluginParser.class);
     private static final String PREFIX = "tag-plugins/tag-plugin";

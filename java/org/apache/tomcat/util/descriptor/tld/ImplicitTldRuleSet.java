@@ -27,6 +27,7 @@ import org.xml.sax.Attributes;
  *
  * Only version information used and short names are allowed.
  */
+@SuppressWarnings("deprecation")
 public class ImplicitTldRuleSet extends RuleSetBase {
 
     private static final StringManager sm = StringManager.getManager(ImplicitTldRuleSet.class);

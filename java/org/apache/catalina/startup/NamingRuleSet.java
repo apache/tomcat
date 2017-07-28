@@ -30,6 +30,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
+@SuppressWarnings("deprecation")
 public class NamingRuleSet extends RuleSetBase {
 
 

@@ -31,6 +31,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
  *
  * @author Craig R. McClanahan
  */
+@SuppressWarnings("deprecation")
 public class EngineRuleSet extends RuleSetBase {
 
 

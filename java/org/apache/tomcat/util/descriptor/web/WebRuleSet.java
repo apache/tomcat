@@ -36,6 +36,7 @@ import org.xml.sax.Attributes;
  *
  * @author Craig R. McClanahan
  */
+@SuppressWarnings("deprecation")
 public class WebRuleSet extends RuleSetBase {
 
     /**

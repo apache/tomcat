@@ -30,6 +30,7 @@ import org.xml.sax.Attributes;
 /**
  * RulesSet for digesting TLD files.
  */
+@SuppressWarnings("deprecation")
 public class TldRuleSet extends RuleSetBase {
     private static final String PREFIX = "taglib";
     private static final String VALIDATOR_PREFIX = PREFIX + "/validator";
