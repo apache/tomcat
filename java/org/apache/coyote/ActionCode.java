@@ -54,7 +54,8 @@ public enum ActionCode {
     IS_ERROR,
 
     /**
-     * Is connection IO allowed after processor is in error stated.
+     * The processor may have been placed into an error state and some error
+     * states do not permit any further I/O. Is I/O currently allowed?
      */
     IS_IO_ALLOWED,
 
