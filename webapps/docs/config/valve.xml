@@ -292,6 +292,13 @@
     <li><b>%T</b> - Time taken to process the request, in seconds</li>
     <li><b>%F</b> - Time taken to commit the response, in millis</li>
     <li><b>%I</b> - Current request thread name (can compare later with stacktraces)</li>
+    <li><b>%X</b> - Connection status when response is completed:
+      <ul>
+      <li><code>X</code> = Connection aborted before the response completed.</li>
+      <li><code>+</code> = Connection may be kept alive after the response is sent.</li>
+      <li><code>-</code> = Connection will be closed after the response is sent.</li>
+      </ul>
+    </li>
     </ul>
 
     <p>

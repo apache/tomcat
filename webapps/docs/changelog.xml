@@ -52,6 +52,11 @@
         meant push URLs containing <code>%nn</code> sequences were not correctly
         decoded. Identified by FindBugs. (markt)
       </fix>
+      <add>
+        <bug>61164</bug>: Add support for the <code>%X</code> pattern in the
+        <code>AccessLogValve</code> that reports the connection status at the
+        end of the request. Patch provided by Zemian Deng. (markt)
+      </add>
       <fix>
         <bug>61351</bug>: Correctly handle %nn decoding of URL patterns in
         web.xml and similar locations that may legitimately contain characters

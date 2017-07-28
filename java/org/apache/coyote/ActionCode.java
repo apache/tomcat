@@ -54,6 +54,11 @@ public enum ActionCode {
     IS_ERROR,
 
     /**
+     * Is connection IO allowed after processor is in error stated.
+     */
+    IS_IO_ALLOWED,
+
+    /**
      * Hook called if swallowing request input should be disabled.
      * Example: Cancel a large file upload.
      *
