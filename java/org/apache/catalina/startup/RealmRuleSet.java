@@ -64,7 +64,6 @@ public class RealmRuleSet extends RuleSetBase {
      *  trailing slash character)
      */
     public RealmRuleSet(String prefix) {
-        this.namespaceURI = null;
         this.prefix = prefix;
     }
 

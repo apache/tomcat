@@ -62,7 +62,6 @@ public class NamingRuleSet extends RuleSetBase {
      *  trailing slash character)
      */
     public NamingRuleSet(String prefix) {
-        this.namespaceURI = null;
         this.prefix = prefix;
     }
 

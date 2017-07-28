@@ -63,7 +63,6 @@ public class EngineRuleSet extends RuleSetBase {
      *  trailing slash character)
      */
     public EngineRuleSet(String prefix) {
-        this.namespaceURI = null;
         this.prefix = prefix;
     }
 

@@ -61,7 +61,6 @@ public class CredentialHandlerRuleSet extends RuleSetBase {
      *  trailing slash character)
      */
     public CredentialHandlerRuleSet(String prefix) {
-        this.namespaceURI = null;
         this.prefix = prefix;
     }
 
