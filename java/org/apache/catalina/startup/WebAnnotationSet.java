@@ -393,9 +393,12 @@ public class WebAnnotationSet {
 
             context.getNamingResources().addMessageDestinationRef(resource);
 
-        } else if (type.equals("javax.resource.cci.InteractionSpec") ||
-                type.equals("javax.transaction.UserTransaction") ||
-                true) {
+        } else {
+            /*
+             * General case. Also used for:
+             * - javax.resource.cci.InteractionSpec
+             * - javax.transaction.UserTransaction
+             */
 
             // resource-env-ref
             ContextResourceEnvRef resource = new ContextResourceEnvRef();
