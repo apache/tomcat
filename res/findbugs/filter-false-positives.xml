@@ -819,10 +819,27 @@
     <Bug code="ST" />
   </Match>
   <Match>
+    <!-- The call with the ignored return value is used to ensure the pool -->
+    <!-- thinks the connection is being used.                              -->
+    <Class name="org.apache.tomcat.jdbc.test.AbandonPercentageTest" />
+    <Method name="testResetConnection" />
+    <Bug pattern="RV_RETURN_VALUE_IGNORED" />
+  </Match>
+  <Match>
     <!-- Use of static is unavoidable -->
     <Class name="org.apache.tomcat.jdbc.test.TestStatementCache" />
     <Method name="tearDown" />
     <Bug code="ST" />
+  </Match>
+  <Match>
+    <Class name="org.apache.tomcat.jdbc.test.TwoDataSources" />
+    <Method name="testTwoDataSources" />
+    <Or>
+      <!-- The object creation should fail -->
+      <Bug pattern="RV_RETURN_VALUE_IGNORED" />
+      <!-- The connection should be close by the pool -->
+      <Bug pattern="ODR_OPEN_DATABASE_RESOURCE" />
+    </Or>
   </Match>
   <Match>
     <Class name="org.apache.tomcat.util.net.TestSsl" />
