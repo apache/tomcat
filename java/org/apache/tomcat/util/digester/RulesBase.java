@@ -55,17 +55,6 @@ public class RulesBase implements Rules {
 
 
     /**
-     * The namespace URI for which subsequently added <code>Rule</code>
-     * objects are relevant, or <code>null</code> for matching independent
-     * of namespaces.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 9.0.x
-     */
-    @Deprecated
-    protected String namespaceURI = null;
-
-
-    /**
      * The set of registered Rule instances, in the order that they were
      * originally registered.
      */
@@ -123,9 +112,6 @@ public class RulesBase implements Rules {
         rules.add(rule);
         if (this.digester != null) {
             rule.setDigester(this.digester);
-        }
-        if (this.namespaceURI != null) {
-            rule.setNamespaceURI(this.namespaceURI);
         }
     }
 
