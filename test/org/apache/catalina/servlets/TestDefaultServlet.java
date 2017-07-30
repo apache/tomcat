@@ -787,19 +787,12 @@ public class TestDefaultServlet extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() + "/bug49nnn/bug49464-ibm850.txt",
                 res, headers);
 
+        // This test relies on no content-type being specified in the response
+        // and the user agent correctly figuring out the content type
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         List<String> values = headers.get("Content-Type");
-        if (values != null && values.size() == 1) {
-            MediaType mediaType = MediaType.parseMediaType(new StringReader(values.get(0)));
-            String charset = mediaType.getCharset();
-            if (charset == null) {
-                res.setCharset(StandardCharsets.ISO_8859_1);
-            } else {
-                res.setCharset(B2CConverter.getCharset(charset));
-            }
-        } else {
-            res.setCharset(StandardCharsets.ISO_8859_1);
-        }
+        Assert.assertNull(values);
+        res.setCharset(B2CConverter.getCharset("IBM850"));
         Assert.assertEquals("\u00bd", res.toString());
     }
 

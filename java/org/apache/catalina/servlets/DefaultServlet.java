@@ -974,7 +974,18 @@ public class DefaultServlet extends HttpServlet {
         String outputEncoding = response.getCharacterEncoding();
         Charset charset = B2CConverter.getCharset(outputEncoding);
         boolean conversionRequired;
+        /*
+         * The test below deliberately uses != to compare two Strings. This is
+         * because the code is looking to see if the default character encoding
+         * has been returned because no explicit character encoding has been
+         * defined. There is no clean way of doing this via the Servlet API. It
+         * would be possible to add a Tomcat specific API but that would require
+         * quite a bit of code to get to the Tomcat specific request object that
+         * may have been wrapped. The != test is a (slightly hacky) quick way of
+         * doing this.
+         */
         if (!usingPrecompressedVersion && isText(contentType) &&
+                outputEncoding != org.apache.coyote.Constants.DEFAULT_BODY_CHARSET.name() &&
                 !charset.equals(fileEncodingCharset)) {
             conversionRequired = true;
             // Conversion often results fewer/more/different bytes.
