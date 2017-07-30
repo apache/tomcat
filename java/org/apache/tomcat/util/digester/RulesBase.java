@@ -58,7 +58,10 @@ public class RulesBase implements Rules {
      * The namespace URI for which subsequently added <code>Rule</code>
      * objects are relevant, or <code>null</code> for matching independent
      * of namespaces.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 9.0.x
      */
+    @Deprecated
     protected String namespaceURI = null;
 
 
