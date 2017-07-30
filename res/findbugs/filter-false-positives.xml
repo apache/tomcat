@@ -488,6 +488,12 @@
     <Bug pattern="NN_NAKED_NOTIFY" />
   </Match>
   <Match>
+    <!-- Return value is intentionally ignored. -->
+    <Class name="org.apache.coyote.http2.Http2UpgradeHandler$PingManager" />
+    <Mehtod name="receivePing" />
+    <Bug pattern="RV_RETURN_VALUE_IGNORED" />
+  </Match>
+  <Match>
     <!-- Notify is correct. Condition changed outside of this method. -->
     <Class name="org.apache.coyote.http2.Stream" />
     <Mehtod name="incrementWindowSize" />

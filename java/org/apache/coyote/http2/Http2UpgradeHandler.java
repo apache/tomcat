@@ -1534,6 +1534,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     long roundTripTime = System.nanoTime() - pingRecord.getSentNanoTime();
                     roundTripTimes.add(Long.valueOf(roundTripTime));
                     while (roundTripTimes.size() > 3) {
+                        // Ignore the returned value as we just want to reduce
+                        // the queue to 3 entries to use for the rolling average.
                         roundTripTimes.poll();
                     }
                     if (log.isDebugEnabled()) {
