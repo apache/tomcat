@@ -252,6 +252,12 @@
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- The use of != with a String is a deliberate hack  -->
+    <Class name="org.apache.catalina.servlets.DefaultServlet" />
+    <Method name="serveResource" />
+    <Bug pattern="ES_COMPARING_STRINGS_WITH_EQ" />
+  </Match>
+  <Match>
     <!-- Non-constant strings are configuration settings rather than client
          supplied -->
     <Class name="org.apache.catalina.session.JDBCStore" />
