@@ -41,6 +41,8 @@ import org.junit.Test;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.ErrorPage;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
@@ -282,12 +284,12 @@ public class TestDefaultServlet extends TomcatBaseTest {
     @Test
     public void testBug57601() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        
+
         File appDir = new File("test/webapp-3.0");
         tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         tomcat.start();
-        
+
         Map<String,List<String>> resHeaders= new HashMap<String,List<String>>();
         String path = "http://localhost:" + getPort() + "/test/bug5nnnn/bug57601.jsp";
         ByteChunk out = new ByteChunk();
