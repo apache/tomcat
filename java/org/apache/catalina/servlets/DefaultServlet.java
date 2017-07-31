@@ -32,8 +32,6 @@ import java.io.RandomAccessFile;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -77,7 +75,6 @@ import org.apache.naming.resources.CacheEntry;
 import org.apache.naming.resources.ProxyDirContext;
 import org.apache.naming.resources.Resource;
 import org.apache.naming.resources.ResourceAttributes;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
 import org.apache.tomcat.util.security.PrivilegedSetTccl;
@@ -212,13 +209,7 @@ public class DefaultServlet
      * the platform default is used.
      */
     protected String fileEncoding = null;
-    private Charset fileEncodingCharset = null;
 
-
-    /**
-     * If a file has a BOM, should that be used in preference to fileEncoding?
-     */
-    private boolean useBomIfPresent = true;
 
     /**
      * Minimum size for sendfile usage in bytes.
@@ -330,20 +321,6 @@ public class DefaultServlet
                 Integer.parseInt(getServletConfig().getInitParameter("sendfileSize")) * 1024;
 
         fileEncoding = getServletConfig().getInitParameter("fileEncoding");
-        if (fileEncoding == null) {
-            fileEncodingCharset = Charset.defaultCharset();
-            fileEncoding = fileEncodingCharset.name();
-        } else {
-            try {
-                fileEncodingCharset = B2CConverter.getCharset(fileEncoding);
-            } catch (UnsupportedEncodingException e) {
-                throw new ServletException(e);
-            }
-        }
-
-        if (getServletConfig().getInitParameter("useBomIfPresent") != null)
-            useBomIfPresent = Boolean.parseBoolean(
-                    getServletConfig().getInitParameter("useBomIfPresent"));
 
         globalXsltFile = getServletConfig().getInitParameter("globalXsltFile");
         contextXsltFile = getServletConfig().getInitParameter("contextXsltFile");
@@ -902,10 +879,11 @@ public class DefaultServlet
 
         // Check if the conditions specified in the optional If headers are
         // satisfied.
-        boolean included = false;
         if (cacheEntry.context == null) {
+
             // Checking If headers
-            included = (request.getAttribute(RequestDispatcher.INCLUDE_CONTEXT_PATH) != null);
+            boolean included = (request.getAttribute(
+                    RequestDispatcher.INCLUDE_CONTEXT_PATH) != null);
             if (!included && !isError &&
                     !checkIfHeaders(request, response, cacheEntry.attributes)) {
                 return;
@@ -979,7 +957,10 @@ public class DefaultServlet
             } catch (IllegalStateException e) {
                 // If it fails, we try to get a Writer instead if we're
                 // trying to serve a text file
-                if (isText(contentType)) {
+                if ( (contentType == null)
+                        || (contentType.startsWith("text"))
+                        || (contentType.endsWith("xml"))
+                        || (contentType.contains("/javascript")) ) {
                     writer = response.getWriter();
                     // Cannot reliably serve partial content with a Writer
                     ranges = FULL;
@@ -990,7 +971,7 @@ public class DefaultServlet
 
         }
 
-        // Check to see if a Filter, Valve or wrapper has written some content.
+        // Check to see if a Filter, Valve of wrapper has written some content.
         // If it has, disable range requests and setting of a content length
         // since neither can be done reliably.
         ServletResponse r = response;
@@ -1003,18 +984,6 @@ public class DefaultServlet
         }
         if (contentWritten > 0) {
             ranges = FULL;
-        }
-
-        String outputEncoding = response.getCharacterEncoding();
-        Charset charset = B2CConverter.getCharset(outputEncoding);
-        boolean conversionRequired;
-        if (isText(contentType) && !charset.equals(fileEncodingCharset)) {
-            conversionRequired = true;
-            // Conversion often results fewer/more/different bytes.
-            // That does not play nicely with range requests.
-            ranges = FULL;
-        } else {
-            conversionRequired = false;
         }
 
         if ( (cacheEntry.context != null)
@@ -1036,8 +1005,8 @@ public class DefaultServlet
                     log("DefaultServlet.serveFile:  contentLength=" +
                         contentLength);
                 // Don't set a content length if something else has already
-                // written to the response or if conversion will be taking place
-                if (contentWritten == 0 && !conversionRequired) {
+                // written to the response.
+                if (contentWritten == 0) {
                     if (contentLength < Integer.MAX_VALUE) {
                         response.setContentLength((int) contentLength);
                     } else {
@@ -1066,20 +1035,9 @@ public class DefaultServlet
                 } catch (IllegalStateException e) {
                     // Silent catch
                 }
-                // Check to see if conversion is required
                 if (ostream != null) {
-                    if (conversionRequired || included) {
-                        // A conversion is required from fileEncoding to
-                        // response encoding
-                        OutputStreamWriter osw = new OutputStreamWriter(ostream, charset);
-                        PrintWriter pw = new PrintWriter(osw);
-                        copy(cacheEntry, renderResult, pw);
-                        pw.flush();
-                    } else {
-                        if (!checkSendfile(request, response, cacheEntry, contentLength, null)) {
-                            copy(cacheEntry, renderResult, ostream);
-                        }
-                    }
+                    if (!checkSendfile(request, response, cacheEntry, contentLength, null))
+                        copy(cacheEntry, renderResult, ostream);
                 } else {
                     copy(cacheEntry, renderResult, writer);
                 }
@@ -1150,84 +1108,12 @@ public class DefaultServlet
                         throw new IllegalStateException();
                     }
                 }
+
             }
+
         }
+
     }
-
-
-    /*
-     * Code borrowed heavily from Jasper's EncodingDetector
-     */
-    private static Charset processBom(InputStream is) throws IOException {
-        // Java supported character sets do not use BOMs longer than 4 bytes
-        byte[] bom = new byte[4];
-        is.mark(bom.length);
-
-        int count = is.read(bom);
-
-        // BOMs are at least 2 bytes
-        if (count < 2) {
-            skip(is, 0);
-            return null;
-        }
-
-        // Look for two byte BOMs
-        int b0 = bom[0] & 0xFF;
-        int b1 = bom[1] & 0xFF;
-        if (b0 == 0xFE && b1 == 0xFF) {
-            skip(is, 2);
-            return B2CConverter.UTF_16BE;
-        }
-        if (b0 == 0xFF && b1 == 0xFE) {
-            skip(is, 2);
-            return B2CConverter.UTF_16LE;
-        }
-
-        // Remaining BOMs are at least 3 bytes
-        if (count < 3) {
-            skip(is, 0);
-            return null;
-        }
-
-        // UTF-8 is only 3-byte BOM
-        int b2 = bom[2] & 0xFF;
-        if (b0 == 0xEF && b1 == 0xBB && b2 == 0xBF) {
-            skip(is, 3);
-            return B2CConverter.UTF_8;
-        }
-
-        if (count < 4) {
-            skip(is, 0);
-            return null;
-        }
-
-        // Look for 4-bute BOMs
-        int b3 = bom[3] & 0xFF;
-        if (b0 == 0x00 && b1 == 0x00 && b2 == 0xFE && b3 == 0xFF) {
-            return Charset.forName("UTF32-BE");
-        }
-        if (b0 == 0xFF && b1 == 0xFE && b2 == 0x00 && b3 == 0x00) {
-            return Charset.forName("UTF32-LE");
-        }
-
-        skip(is, 0);
-        return null;
-    }
-
-
-    private static void skip(InputStream is, int skip) throws IOException {
-        is.reset();
-        while (skip-- > 0) {
-            is.read();
-        }
-    }
-
-
-    private static boolean isText(String contentType) {
-        return  contentType == null || contentType.startsWith("text") ||
-                contentType.endsWith("xml") || contentType.contains("/javascript");
-    }
-
 
     private void doDirectoryRedirect(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
@@ -2244,29 +2130,20 @@ public class DefaultServlet
         throws IOException {
 
         IOException exception = null;
-        InputStream resourceInputStream = null;
-        Charset inputCharset= fileEncodingCharset;
 
+        InputStream resourceInputStream = null;
         if (cacheEntry.resource != null) {
             resourceInputStream = cacheEntry.resource.streamContent();
-            // Need to make sure any BOM is removed
-            if (!resourceInputStream.markSupported()) {
-                resourceInputStream = new BufferedInputStream(resourceInputStream);
-            }
-            Charset bomCharset = processBom(resourceInputStream);
-            if (bomCharset != null && useBomIfPresent) {
-                inputCharset = bomCharset;
-            }
-
         } else {
             resourceInputStream = is;
         }
 
         Reader reader;
-        if (inputCharset == null) {
+        if (fileEncoding == null) {
             reader = new InputStreamReader(resourceInputStream);
         } else {
-            reader = new InputStreamReader(resourceInputStream, inputCharset);
+            reader = new InputStreamReader(resourceInputStream,
+                                           fileEncoding);
         }
 
         // Copy the input stream to the output stream
