@@ -32,8 +32,6 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.util.ArrayList;
@@ -75,7 +73,6 @@ import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
-import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
 import org.apache.tomcat.util.security.PrivilegedSetTccl;
@@ -240,12 +237,6 @@ public class DefaultServlet extends HttpServlet {
      * the platform default is used.
      */
     protected String fileEncoding = null;
-    private Charset fileEncodingCharset = null;
-
-    /**
-     * If a file has a BOM, should that be used in preference to fileEncoding?
-     */
-    private boolean useBomIfPresent = true;
 
     /**
      * Minimum size for sendfile usage in bytes.
@@ -303,20 +294,6 @@ public class DefaultServlet extends HttpServlet {
                 Integer.parseInt(getServletConfig().getInitParameter("sendfileSize")) * 1024;
 
         fileEncoding = getServletConfig().getInitParameter("fileEncoding");
-        if (fileEncoding == null) {
-            fileEncodingCharset = Charset.defaultCharset();
-            fileEncoding = fileEncodingCharset.name();
-        } else {
-            try {
-                fileEncodingCharset = B2CConverter.getCharset(fileEncoding);
-            } catch (UnsupportedEncodingException e) {
-                throw new ServletException(e);
-            }
-        }
-
-        if (getServletConfig().getInitParameter("useBomIfPresent") != null)
-            useBomIfPresent = Boolean.parseBoolean(
-                    getServletConfig().getInitParameter("useBomIfPresent"));
 
         globalXsltFile = getServletConfig().getInitParameter("globalXsltFile");
         contextXsltFile = getServletConfig().getInitParameter("contextXsltFile");
@@ -742,11 +719,11 @@ public class DefaultServlet extends HttpServlet {
     /**
      * Serve the specified resource, optionally including the data content.
      *
-     * @param request       The servlet request we are processing
-     * @param response      The servlet response we are creating
-     * @param content       Should the content be included?
-     * @param inputEncoding The encoding to use if it is necessary to access the
-     *                      source as characters rather than as bytes
+     * @param request  The servlet request we are processing
+     * @param response The servlet response we are creating
+     * @param content  Should the content be included?
+     * @param encoding The encoding to use if it is necessary to access the
+     *                 source as characters rather than as bytes
      *
      * @exception IOException if an input/output error occurs
      * @exception ServletException if a servlet-specified error occurs
@@ -754,7 +731,7 @@ public class DefaultServlet extends HttpServlet {
     protected void serveResource(HttpServletRequest request,
                                  HttpServletResponse response,
                                  boolean content,
-                                 String inputEncoding)
+                                 String encoding)
         throws IOException, ServletException {
 
         boolean serveContent = content;
@@ -953,7 +930,12 @@ public class DefaultServlet extends HttpServlet {
             } catch (IllegalStateException e) {
                 // If it fails, we try to get a Writer instead if we're
                 // trying to serve a text file
-                if (!usingPrecompressedVersion && isText(contentType)) {
+                if (!usingPrecompressedVersion &&
+                        ((contentType == null) ||
+                                (contentType.startsWith("text")) ||
+                                (contentType.endsWith("xml")) ||
+                                (contentType.contains("/javascript")))
+                        ) {
                     writer = response.getWriter();
                     // Cannot reliably serve partial content with a Writer
                     ranges = FULL;
@@ -963,7 +945,7 @@ public class DefaultServlet extends HttpServlet {
             }
         }
 
-        // Check to see if a Filter, Valve or wrapper has written some content.
+        // Check to see if a Filter, Valve of wrapper has written some content.
         // If it has, disable range requests and setting of a content length
         // since neither can be done reliably.
         ServletResponse r = response;
@@ -976,19 +958,6 @@ public class DefaultServlet extends HttpServlet {
         }
         if (contentWritten > 0) {
             ranges = FULL;
-        }
-
-        String outputEncoding = response.getCharacterEncoding();
-        Charset charset = B2CConverter.getCharset(outputEncoding);
-        boolean conversionRequired;
-        if (!usingPrecompressedVersion && isText(contentType) &&
-                !charset.equals(fileEncodingCharset)) {
-            conversionRequired = true;
-            // Conversion often results fewer/more/different bytes.
-            // That does not play nicely with range requests.
-            ranges = FULL;
-        } else {
-            conversionRequired = false;
         }
 
         if (resource.isDirectory() ||
@@ -1010,8 +979,8 @@ public class DefaultServlet extends HttpServlet {
                     log("DefaultServlet.serveFile:  contentLength=" +
                         contentLength);
                 // Don't set a content length if something else has already
-                // written to the response or if conversion will be taking place
-                if (contentWritten == 0 && !conversionRequired) {
+                // written to the response.
+                if (contentWritten == 0) {
                     response.setContentLengthLong(contentLength);
                 }
             }
@@ -1027,57 +996,29 @@ public class DefaultServlet extends HttpServlet {
                     // Output via a writer so can't use sendfile or write
                     // content directly.
                     if (resource.isDirectory()) {
-                        renderResult = render(getPathPrefix(request), resource, inputEncoding);
+                        renderResult = render(getPathPrefix(request), resource, encoding);
                     } else {
                         renderResult = resource.getInputStream();
-                        if (included) {
-                            // Need to make sure any BOM is removed
-                            if (!renderResult.markSupported()) {
-                                renderResult = new BufferedInputStream(renderResult);
-                            }
-                            Charset bomCharset = processBom(renderResult);
-                            if (bomCharset != null && useBomIfPresent) {
-                                inputEncoding = bomCharset.name();
-                            }
-                        }
                     }
-                    copy(renderResult, writer, inputEncoding);
+                    copy(renderResult, writer, encoding);
                 } else {
                     // Output is via an InputStream
                     if (resource.isDirectory()) {
-                        renderResult = render(getPathPrefix(request), resource, inputEncoding);
+                        renderResult = render(getPathPrefix(request), resource, encoding);
                     } else {
                         // Output is content of resource
-                        // Check to see if conversion is required
-                        if (conversionRequired || included) {
-                            // When including a file, we need to check for a BOM
-                            // to determine if a conversion is required, so we
-                            // might as well always convert
-                            InputStream source = resource.getInputStream();
-                            if (!source.markSupported()) {
-                                source = new BufferedInputStream(source);
-                            }
-                            Charset bomCharset = processBom(source);
-                            if (bomCharset != null && useBomIfPresent) {
-                                inputEncoding = bomCharset.name();
-                            }
-                            OutputStreamWriter osw = new OutputStreamWriter(ostream, charset);
-                            PrintWriter pw = new PrintWriter(osw);
-                            copy(source, pw, inputEncoding);
-                            pw.flush();
-                        } else {
-                            if (!checkSendfile(request, response, resource, contentLength, null)) {
-                                // sendfile not possible so check if resource
-                                // content is available directly
-                                byte[] resourceBody = resource.getContent();
-                                if (resourceBody == null) {
-                                    // Resource content not available, use
-                                    // inputstream
-                                    renderResult = resource.getInputStream();
-                                } else {
-                                    // Use the resource content directly
-                                    ostream.write(resourceBody);
-                                }
+                        if (!checkSendfile(request, response, resource,
+                                contentLength, null)) {
+                            // sendfile not possible so check if resource
+                            // content is available directly
+                            byte[] resourceBody = resource.getContent();
+                            if (resourceBody == null) {
+                                // Resource content not available, use
+                                // inputstream
+                                renderResult = resource.getInputStream();
+                            } else {
+                                // Use the resource content directly
+                                ostream.write(resourceBody);
                             }
                         }
                     }
@@ -1149,81 +1090,6 @@ public class DefaultServlet extends HttpServlet {
             }
         }
     }
-
-
-    /*
-     * Code borrowed heavily from Jasper's EncodingDetector
-     */
-    private static Charset processBom(InputStream is) throws IOException {
-        // Java supported character sets do not use BOMs longer than 4 bytes
-        byte[] bom = new byte[4];
-        is.mark(bom.length);
-
-        int count = is.read(bom);
-
-        // BOMs are at least 2 bytes
-        if (count < 2) {
-            skip(is, 0);
-            return null;
-        }
-
-        // Look for two byte BOMs
-        int b0 = bom[0] & 0xFF;
-        int b1 = bom[1] & 0xFF;
-        if (b0 == 0xFE && b1 == 0xFF) {
-            skip(is, 2);
-            return StandardCharsets.UTF_16BE;
-        }
-        if (b0 == 0xFF && b1 == 0xFE) {
-            skip(is, 2);
-            return StandardCharsets.UTF_16LE;
-        }
-
-        // Remaining BOMs are at least 3 bytes
-        if (count < 3) {
-            skip(is, 0);
-            return null;
-        }
-
-        // UTF-8 is only 3-byte BOM
-        int b2 = bom[2] & 0xFF;
-        if (b0 == 0xEF && b1 == 0xBB && b2 == 0xBF) {
-            skip(is, 3);
-            return StandardCharsets.UTF_8;
-        }
-
-        if (count < 4) {
-            skip(is, 0);
-            return null;
-        }
-
-        // Look for 4-bute BOMs
-        int b3 = bom[3] & 0xFF;
-        if (b0 == 0x00 && b1 == 0x00 && b2 == 0xFE && b3 == 0xFF) {
-            return Charset.forName("UTF32-BE");
-        }
-        if (b0 == 0xFF && b1 == 0xFE && b2 == 0x00 && b3 == 0x00) {
-            return Charset.forName("UTF32-LE");
-        }
-
-        skip(is, 0);
-        return null;
-    }
-
-
-    private static void skip(InputStream is, int skip) throws IOException {
-        is.reset();
-        while (skip-- > 0) {
-            is.read();
-        }
-    }
-
-
-    private static boolean isText(String contentType) {
-        return  contentType == null || contentType.startsWith("text") ||
-                contentType.endsWith("xml") || contentType.contains("/javascript");
-    }
-
 
     private boolean pathEndsWithCompressedExtension(String path) {
         for (CompressionFormat format : compressionFormats) {

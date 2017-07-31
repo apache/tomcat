@@ -48,6 +48,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        Revert the fix for <bug>49464</bug> since it continued to trigger
+        regressions. (markt)
+      </fix>
+      <fix>
         Correct a bug in the <code>PushBuilder</code> implementation that
         meant push URLs containing <code>%nn</code> sequences were not correctly
         decoded. Identified by FindBugs. (markt)
