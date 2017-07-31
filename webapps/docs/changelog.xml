@@ -48,10 +48,8 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        Correct another regression in the fix for <bug>49464</bug> that could
-        corrupt static content when no character encoding was explicitly defined
-        for the response and the <code>DefaultServlet</code> used a
-        <code>fileEncoding</code> that was not ISO-8859-1.(markt)
+        Correct multiple regressions in the fix for <bug>49464</bug> that could
+        corrupt static content served by the <code>DefaultServlet</code>.(markt)
       </fix>
       <fix>
         Correct a bug in the <code>PushBuilder</code> implementation that

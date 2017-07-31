@@ -984,8 +984,10 @@ public class DefaultServlet extends HttpServlet {
          * may have been wrapped. The != test is a (slightly hacky) quick way of
          * doing this.
          */
-        if (!usingPrecompressedVersion && isText(contentType) &&
+        boolean outputEncodingSpecified =
                 outputEncoding != org.apache.coyote.Constants.DEFAULT_BODY_CHARSET.name() &&
+                outputEncoding != resources.getContext().getResponseCharacterEncoding();
+        if (!usingPrecompressedVersion && isText(contentType) && outputEncodingSpecified &&
                 !charset.equals(fileEncodingCharset)) {
             conversionRequired = true;
             // Conversion often results fewer/more/different bytes.
@@ -1065,10 +1067,18 @@ public class DefaultServlet extends HttpServlet {
                             if (bomCharset != null && useBomIfPresent) {
                                 inputEncoding = bomCharset.name();
                             }
-                            OutputStreamWriter osw = new OutputStreamWriter(ostream, charset);
-                            PrintWriter pw = new PrintWriter(osw);
-                            copy(source, pw, inputEncoding);
-                            pw.flush();
+                            // Following test also ensures included resources
+                            // are converted if an explicit output encoding was
+                            // specified
+                            if (outputEncodingSpecified) {
+                                OutputStreamWriter osw = new OutputStreamWriter(ostream, charset);
+                                PrintWriter pw = new PrintWriter(osw);
+                                copy(source, pw, inputEncoding);
+                                pw.flush();
+                            } else {
+                                // Just included but no conversion
+                                renderResult = source;
+                            }
                         } else {
                             if (!checkSendfile(request, response, resource, contentLength, null)) {
                                 // sendfile not possible so check if resource
