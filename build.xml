@@ -566,8 +566,7 @@
         <exclude name="java/org/apache/**/parser/Token*.java" />
         <!-- Exclude simple test files -->
         <exclude name="test/webapp/bug53257/**/*.txt"/>
-        <exclude name="test/webapp/bug49nnn/bug49464-ibm850.txt"/>
-        <exclude name="test/webapp/bug49nnn/bug49464-utf8-bom.txt"/>
+        <exclude name="test/webapp/bug49nnn/bug49464*"/>
         <exclude name="test/webapp-fragments/WEB-INF/classes/*.txt"/>
         <exclude name="test/webresources/**"/>
         <!-- Exclude test files with unusual encodings -->
