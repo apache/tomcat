@@ -840,7 +840,11 @@ public class StandardContext extends ContainerBase
          * differentiate between a Response using this default encoding and one
          * that has been explicitly configured.
          */
-        this.responseEncoding = new String(responseEncoding);
+        if (responseEncoding == null) {
+            this.responseEncoding = null;
+        } else {
+            this.responseEncoding = new String(responseEncoding);
+        }
     }
 
 
