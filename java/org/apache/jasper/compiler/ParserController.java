@@ -318,8 +318,10 @@ class ParserController implements TagConstants {
             sourceEnc = "ISO-8859-1";
         } else {
             // XML syntax or unknown, (auto)detect encoding ...
-            InputStream inStream = JspUtil.getInputStream(absFileName, jar, ctxt);
-            EncodingDetector encodingDetector = new EncodingDetector(inStream);
+            EncodingDetector encodingDetector;
+            try (InputStream inStream = JspUtil.getInputStream(absFileName, jar, ctxt)) {
+                encodingDetector = new EncodingDetector(inStream);
+            }
 
             sourceEnc = encodingDetector.getEncoding();
             isEncodingSpecifiedInProlog = encodingDetector.isEncodingSpecifiedInProlog();
