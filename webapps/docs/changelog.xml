@@ -86,6 +86,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>61364</bug>: Ensure that files are closed after detecting encoding
+        of JSPs so that files do not remain locked by the file system. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M25 (markt)" rtext="2017-07-28">
   <subsection name="Catalina">
