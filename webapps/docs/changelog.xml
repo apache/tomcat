@@ -70,6 +70,11 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <fix>
+        <bug>61086</bug>: Ensure to explicitly signal an empty request body for
+        HTTP 205 responses. Additional fix to r1795278. Based on a patch
+        provided by Alexandr Saperov. (violetagg)
+      </fix>
       <update>
         <bug>61345</bug>: Add a server listener that can be used to do system
         property replacement from the property source configured in the

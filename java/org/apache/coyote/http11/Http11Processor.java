@@ -1152,6 +1152,8 @@ public class Http11Processor extends AbstractProcessor {
                 // RFC 7231 requires the server to explicitly signal an empty
                 // response in this case
                 response.setContentLength(0);
+            } else {
+                response.setContentLength(-1);
             }
         }
 
@@ -1183,9 +1185,6 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         MimeHeaders headers = response.getMimeHeaders();
-        if (!entityBody) {
-            response.setContentLength(-1);
-        }
         // A SC_NO_CONTENT response may include entity headers
         if (entityBody || statusCode == HttpServletResponse.SC_NO_CONTENT) {
             String contentType = response.getContentType();
