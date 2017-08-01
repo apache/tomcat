@@ -45,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
@@ -1045,6 +1046,40 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
             } else {
                 req.startAsync().dispatch();
             }
+        }
+    }
+
+    @Test
+    public void testBug61086() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        Bug61086Servlet servlet = new Bug61086Servlet();
+        Tomcat.addServlet(ctx, "Test", servlet);
+        ctx.addServletMapping("/test", "Test");
+
+        tomcat.start();
+
+        ByteChunk responseBody = new ByteChunk();
+        Map<String,List<String>> responseHeaders = new HashMap<String, List<String>>();
+        int rc = getUrl("http://localhost:" + getPort() + "/test", responseBody, responseHeaders);
+
+        assertEquals(HttpServletResponse.SC_RESET_CONTENT, rc);
+        assertNotNull(responseHeaders.get("Content-Length"));
+        assertTrue("0".equals(responseHeaders.get("Content-Length").get(0)));
+        assertTrue(responseBody.getLength() == 0);
+    }
+
+    private static final class Bug61086Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.setStatus(205);
         }
     }
 }
