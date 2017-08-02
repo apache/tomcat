@@ -66,6 +66,13 @@
         web.xml and similar locations that may legitimately contain characters
         that are not permitted by RFC 3986. (markt)
       </fix>
+      <add>
+        <bug>61366</bug>: Add a new attribute, <code>localDataSource</code>, to
+        the <code>JDBCStore</code> that allows the Store to be configured to use
+        a DataSource defined by the web application rather than the default of
+        using a globally defined DataSource. Patch provided by Jonathan
+        Horowitz. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
