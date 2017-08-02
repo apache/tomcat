@@ -731,8 +731,8 @@
         in order to expose to JMX. (kfujino)
       </add>
       <add>
-        Add JMX support for <code>Channel Interceptors</code>.　The Interceptors
-        that implement jmx support are <code>TcpFailureDetector</code>,
+        Add JMX support for <code>Channel Interceptors</code>. The Interceptors
+        that implement JMX support are <code>TcpFailureDetector</code>,
         <code>ThroughputInterceptor</code>, <code>TcpPingInterceptor</code>,
         <code>StaticMembershipInterceptor</code>,
         <code>MessageDispatchInterceptor</code> and
