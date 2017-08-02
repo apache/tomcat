@@ -39,7 +39,6 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
 
     @Test
     public void testConnectToServerEndpoint() throws Exception {
-
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -81,7 +80,6 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
 
     @Test
     public void testConnectToRootEndpoint() throws Exception {
-
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
@@ -97,25 +95,16 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
 
         echoTester("");
         echoTester("/");
-        // FIXME: The ws client doesn't handle any response other than the upgrade,
-        // which may or may not be allowed. In that case, the server will return
-        // a redirect to the root of the webapp to avoid possible broken relative
-        // paths.
-        // echoTester("/foo");
+        echoTester("/foo");
         echoTester("/foo/");
     }
 
     public void echoTester(String path) throws Exception {
-        WebSocketContainer wsContainer =
-                ContainerProvider.getWebSocketContainer();
-        ClientEndpointConfig clientEndpointConfig =
-                ClientEndpointConfig.Builder.create().build();
-        Session wsSession = wsContainer.connectToServer(
-                TesterProgrammaticEndpoint.class,
-                clientEndpointConfig,
-                new URI("ws://localhost:" + getPort() + path));
-        CountDownLatch latch =
-                new CountDownLatch(1);
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
+        ClientEndpointConfig clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
+                clientEndpointConfig, new URI("ws://localhost:" + getPort() + path));
+        CountDownLatch latch = new CountDownLatch(1);
         BasicText handler = new BasicText(latch);
         wsSession.addMessageHandler(handler);
         wsSession.getBasicRemote().sendText("Hello");

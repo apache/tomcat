@@ -26,6 +26,7 @@ import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.SocketAddress;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousChannelGroup;
 import java.nio.channels.AsynchronousSocketChannel;
@@ -98,6 +99,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     private volatile long defaultMaxSessionIdleTimeout = 0;
     private int backgroundProcessCount = 0;
     private int processPeriod = Constants.DEFAULT_PROCESS_PERIOD;
+    private Set<URI> redirectSet = null;
 
     private InstanceManager instanceManager;
 
@@ -276,10 +278,11 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     "wsWebSocketContainer.asynchronousSocketChannelFail"), ioe);
         }
 
+        Map<String,Object> userProperties = clientEndpointConfiguration.getUserProperties();
+
         // Get the connection timeout
         long timeout = Constants.IO_TIMEOUT_MS_DEFAULT;
-        String timeoutValue = (String) clientEndpointConfiguration.getUserProperties().get(
-                Constants.IO_TIMEOUT_MS_PROPERTY);
+        String timeoutValue = (String) userProperties.get(Constants.IO_TIMEOUT_MS_PROPERTY);
         if (timeoutValue != null) {
             timeout = Long.valueOf(timeoutValue).intValue();
         }
@@ -322,8 +325,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             // Regardless of whether a non-secure wrapper was created for a
             // proxy CONNECT, need to use TLS from this point on so wrap the
             // original AsynchronousSocketChannel
-            SSLEngine sslEngine = createSSLEngine(
-                    clientEndpointConfiguration.getUserProperties());
+            SSLEngine sslEngine = createSSLEngine(userProperties);
             channel = new AsyncChannelWrapperSecure(socketChannel, sslEngine);
         } else if (channel == null) {
             // Only need to wrap as this point if it wasn't wrapped to process a
@@ -340,8 +342,57 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             writeRequest(channel, request, timeout);
 
             HttpResponse httpResponse = processResponse(response, channel, timeout);
-            // TODO: Handle redirects
+
+            // Check maximum permitted redirects
+            int maxRedirects = Constants.MAX_REDIRECTIONS_DEFAULT;
+            String maxRedirectsValue =
+                    (String) userProperties.get(Constants.MAX_REDIRECTIONS_PROPERTY);
+            if (maxRedirectsValue != null) {
+                maxRedirects = Integer.valueOf(maxRedirectsValue).intValue();
+            }
+
             if (httpResponse.status != 101) {
+                if(isRedirectStatus(httpResponse.status)){
+                    List<String> locationHeader =
+                            httpResponse.getHandshakeResponse().getHeaders().get(
+                                    Constants.LOCATION_HEADER_NAME);
+
+                    if (locationHeader == null || locationHeader.isEmpty() ||
+                            locationHeader.get(0) == null || locationHeader.get(0).isEmpty()) {
+                        throw new DeploymentException(sm.getString(
+                                "wsWebSocketContainer.missingLocationHeader",
+                                Integer.toString(httpResponse.status)));
+                    }
+
+                    URI redirectLocation = URI.create(locationHeader.get(0)).normalize();
+
+                    if (!redirectLocation.isAbsolute()) {
+                        redirectLocation = path.resolve(redirectLocation);
+                    }
+
+                    String redirectScheme = redirectLocation.getScheme().toLowerCase();
+
+                    if (redirectScheme.startsWith("http")) {
+                        redirectLocation = new URI(redirectScheme.replace("http", "ws"),
+                                redirectLocation.getUserInfo(), redirectLocation.getHost(),
+                                redirectLocation.getPort(), redirectLocation.getPath(),
+                                redirectLocation.getQuery(), redirectLocation.getFragment());
+                    }
+
+                    if (redirectSet == null) {
+                        redirectSet = new HashSet<>(maxRedirects);
+                    }
+
+                    if (!redirectSet.add(redirectLocation) || redirectSet.size() > maxRedirects) {
+                        throw new DeploymentException(sm.getString(
+                                "wsWebSocketContainer.redirectThreshold", redirectLocation,
+                                Integer.toString(redirectSet.size()),
+                                Integer.toString(maxRedirects)));
+                    }
+
+                    return connectToServer(endpoint, clientEndpointConfiguration, redirectLocation);
+
+                }
                 throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidStatus",
                         Integer.toString(httpResponse.status)));
             }
@@ -390,7 +441,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
             success = true;
         } catch (ExecutionException | InterruptedException | SSLException |
-                EOFException | TimeoutException e) {
+                EOFException | TimeoutException | URISyntaxException e) {
             throw new DeploymentException(
                     sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
         } finally {
@@ -445,6 +496,27 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             thisWrite = fWrite.get(timeout, TimeUnit.MILLISECONDS);
             toWrite -= thisWrite.intValue();
         }
+    }
+
+
+    private static boolean isRedirectStatus(int httpResponseCode) {
+
+        boolean isRedirect = false;
+
+        switch (httpResponseCode) {
+        case Constants.MULTIPLE_CHOICES:
+        case Constants.MOVED_PERMANENTLY:
+        case Constants.FOUND:
+        case Constants.SEE_OTHER:
+        case Constants.USE_PROXY:
+        case Constants.TEMPORARY_REDIRECT:
+            isRedirect = true;
+            break;
+        default:
+            break;
+        }
+
+        return isRedirect;
     }
 
 

@@ -101,6 +101,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <add>
+        <bug>57767</bug>: Add support to the WebSocket client for following
+        redirects when attempting to establish a WebSocket connection. Patch
+        provided by J Fernandez. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M25 (markt)" rtext="2017-07-28">
   <subsection name="Catalina">
