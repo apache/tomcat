@@ -107,6 +107,11 @@ public class JDBCStore extends StoreBase {
     protected String dataSourceName = null;
 
     /**
+     * Context local datasource.
+     */
+    private boolean localDataSource = false;
+
+    /**
      * DataSource to use
      */
     protected DataSource dataSource = null;
@@ -452,6 +457,23 @@ public class JDBCStore extends StoreBase {
      */
     public String getDataSourceName() {
         return this.dataSourceName;
+    }
+
+    /**
+     * @return if the datasource will be looked up in the webapp JNDI Context.
+     */
+    public boolean getLocalDataSource() {
+        return localDataSource;
+    }
+
+    /**
+     * Set to {@code true} to cause the datasource to be looked up in the webapp
+     * JNDI Context.
+     *
+     * @param localDataSource the new flag value
+     */
+    public void setLocalDataSource(boolean localDataSource) {
+      this.localDataSource = localDataSource;
     }
 
 
@@ -867,16 +889,26 @@ public class JDBCStore extends StoreBase {
             return dbConnection;
 
         if (dataSourceName != null && dataSource == null) {
+            org.apache.catalina.Context context = getManager().getContext();
+            ClassLoader oldThreadContextCL = null;
+            if (localDataSource) {
+                oldThreadContextCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
+            }
+
             Context initCtx;
             try {
                 initCtx = new InitialContext();
                 Context envCtx = (Context) initCtx.lookup("java:comp/env");
                 this.dataSource = (DataSource) envCtx.lookup(this.dataSourceName);
             } catch (NamingException e) {
-                manager.getContext().getLogger().error(
+                context.getLogger().error(
                         sm.getString(getStoreName() + ".wrongDataSource",
                                 this.dataSourceName), e);
-           }
+            } finally {
+                if (localDataSource) {
+                    context.unbind(Globals.IS_SECURITY_ENABLED, oldThreadContextCL);
+                }
+            }
         }
 
         if (dataSource != null) {

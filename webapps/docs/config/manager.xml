@@ -422,6 +422,12 @@
       <p>Java class name of the JDBC driver to be used.</p>
     </attribute>
 
+    <attribute name="localDataSource" required="false">
+      <p>This allows the Store to use a DataSource defined for the Context
+      rather than a global DataSource. If not specified, the default is
+      <code>false</code>: use a global DataSource.</p>
+    </attribute>
+
     <attribute name="sessionAppCol" required="false">
       <p>Name of the database column, contained in the specified session table,
       that contains the Engine, Host, and Web Application Context name in the
