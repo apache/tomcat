@@ -420,7 +420,7 @@ public class WsWebSocketContainer
                     }
 
                     if (redirectSet == null) {
-                        redirectSet = new HashSet<>(maxRedirects);
+                        redirectSet = new HashSet<URI>(maxRedirects);
                     }
 
                     if (!redirectSet.add(redirectLocation) || redirectSet.size() > maxRedirects) {
