@@ -64,6 +64,7 @@ import org.apache.catalina.realm.RealmBase;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.UriUtil;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
+import org.apache.tomcat.util.res.StringManager;
 
 // TODO: lazy init for the temp dir - only when a JSP is compiled or
 // get temp dir is called we need to create it. This will avoid the
@@ -138,6 +139,9 @@ import org.apache.tomcat.util.descriptor.web.LoginConfig;
  * @author Costin Manolache
  */
 public class Tomcat {
+
+    private static final StringManager sm = StringManager.getManager(Tomcat.class);
+
     // Some logging implementations use weak references for loggers so there is
     // the possibility that logging configuration could be lost if GC runs just
     // after Loggers are configured but before they are used. The purpose of
@@ -160,22 +164,26 @@ public class Tomcat {
     }
 
     /**
-     * Tomcat needs a directory for temp files. This should be the
-     * first method called.
-     *
+     * Tomcat requires that the base directory is set because the defaults for
+     * a number of other locations, such as the work directory, are derived from
+     * the base directory. This should be the first method called.
      * <p>
-     * By default, if this method is not called, we use:
-     * <ul>
-     *  <li>system properties - catalina.base, catalina.home</li>
-     *  <li>[user.dir]/tomcat.$PORT</li>
-     * </ul>
-     * (/tmp doesn't seem a good choice for security).
-     *
+     * If this method is not called then Tomcat will attempt to use these
+     * locations in the following order:
+     * <ol>
+     *  <li>if set, the catalina.base system property</li>
+     *  <li>if set, the catalina.home system property</li>
+     *  <li>The user.dir system property (the directory where Java was run from)
+     *      where a directory named tomcat.$PORT will be created. $PORT is the
+     *      value configured via {@link #setPort(int)} which defaults to 8080 if
+     *      not set</li>
+     * </ol>
+     * The user should ensure that the file permissions for the base directory
+     * are appropriate.
      * <p>
      * TODO: disable work dir if not needed ( no jsp, etc ).
      *
-     * @param basedir The Tomcat base folder on which all others
-     *  will be derived
+     * @param basedir The Tomcat base folder on which all others will be derived
      */
     public void setBaseDir(String basedir) {
         this.basedir = basedir;
@@ -704,12 +712,27 @@ public class Tomcat {
         }
         if (basedir == null) {
             // Create a temp dir.
-            basedir = System.getProperty("user.dir") +
-                "/tomcat." + port;
+            basedir = System.getProperty("user.dir") + "/tomcat." + port;
         }
 
         File baseFile = new File(basedir);
-        baseFile.mkdirs();
+        if (baseFile.exists()) {
+            if (!baseFile.isDirectory()) {
+                throw new IllegalArgumentException(sm.getString("tomcat.baseDirNotDir", baseFile));
+            }
+        } else {
+            if (!baseFile.mkdirs()) {
+                // Failed to create base directory
+                throw new IllegalStateException(sm.getString("tomcat.baseDirMakeFail", baseFile));
+            }
+            /*
+             * If file permissions were going to be set on the newly created
+             * directory, this is the place to do it. However, even simple
+             * calls such as File.setReadable(boolean,boolean) behaves
+             * differently on different platforms. Therefore, setBaseDir
+             * documents that the user needs to do this.
+             */
+        }
         try {
             baseFile = baseFile.getCanonicalFile();
         } catch (IOException e) {
