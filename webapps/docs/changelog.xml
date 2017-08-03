@@ -45,6 +45,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M27 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        If an invalid option is specified for the
+        <code>certificateVerification</code> attribute of an
+        <code>SSLHostConfig</code> element, treat it as <code>required</code>
+        which is the most secure / restrictive option in addition to reporting
+        the configuration error. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M26 (markt)" rtext="release in progress">
   <subsection name="Catalina">

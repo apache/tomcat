@@ -274,7 +274,15 @@ public class SSLHostConfig implements Serializable {
 
 
     public void setCertificateVerification(String certificateVerification) {
-        this.certificateVerification = CertificateVerification.fromString(certificateVerification);
+        try {
+            this.certificateVerification =
+                    CertificateVerification.fromString(certificateVerification);
+        } catch (IllegalArgumentException iae) {
+            // If the specified value is not recognised, default to the
+            // strictest possible option.
+            this.certificateVerification = CertificateVerification.REQUIRED;
+            throw iae;
+        }
     }
 
 
