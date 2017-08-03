@@ -167,7 +167,7 @@ public class Tomcat {
      * By default, if this method is not called, we use:
      * <ul>
      *  <li>system properties - catalina.base, catalina.home</li>
-     *  <li>$PWD/tomcat.$PORT</li>
+     *  <li>[user.dir]/tomcat.$PORT</li>
      * </ul>
      * (/tmp doesn't seem a good choice for security).
      *
