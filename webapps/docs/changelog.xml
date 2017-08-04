@@ -45,6 +45,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M27 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Before generating an error page in the <code>ErrorReportValve</code>,
+        check to see if I/O is still permitted for the associated connection
+        before generating the error page so that the page generation can be
+        skipped if the page is never going to be sent. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
