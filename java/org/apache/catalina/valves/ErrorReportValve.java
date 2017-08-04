@@ -19,6 +19,7 @@ package org.apache.catalina.valves;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -149,6 +150,15 @@ public class ErrorReportValve extends ValveBase {
         if (statusCode < 400 || response.getContentWritten() > 0 || !response.setErrorReported()) {
             return;
         }
+
+        // If an error has occurred that prevents further I/O, don't waste time
+        // producing an error report that will never be read
+        AtomicBoolean result = new AtomicBoolean(false);
+        response.getCoyoteResponse().action(ActionCode.IS_IO_ALLOWED, result);
+        if (!result.get()) {
+            return;
+        }
+
         String message = RequestUtil.filter(response.getMessage());
         if (message == null) {
             if (throwable != null) {
