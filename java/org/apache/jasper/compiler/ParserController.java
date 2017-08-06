@@ -17,9 +17,14 @@
 package org.apache.jasper.compiler;
 
 import java.io.BufferedInputStream;
+import java.io.CharArrayReader;
+import java.io.CharArrayWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import org.apache.jasper.JasperException;
@@ -66,6 +71,10 @@ class ParserController implements TagConstants {
     private boolean isDefaultPageEncoding;
     private boolean isTagFile;
     private boolean directiveOnly;
+
+    /** Key = jsp file name, Value = cache of jsp file content as char array so we do don't have to re-open file
+     * mulitple times. */
+    private Map<String, char[]> cachedJspContentChars = new HashMap<>();
 
     /*
      * Constructor
@@ -227,29 +236,48 @@ class ParserController implements TagConstants {
             }
         }
 
+        // Use cached jsp file content if available
+        char[] jspContentChars = cachedJspContentChars.get(absFileName);
+        if (jspContentChars == null) {
+            try (InputStreamReader inStreamReader = JspUtil.getReader(
+                    absFileName, sourceEnc, jar, ctxt, err, skip)) {
+                jspContentChars = readFully(inStreamReader);
+                cachedJspContentChars.put(absFileName, jspContentChars);
+            }
+        }
+
         // Dispatch to the appropriate parser
         if (isXml) {
             // JSP document (XML syntax)
             // InputStream for jspx page is created and properly closed in
             // JspDocumentParser.
-            parsedPage = JspDocumentParser.parse(this, absFileName, jar, parent,
+            parsedPage = JspDocumentParser.parse(this, jspContentChars, absFileName, jar, parent,
                     isTagFile, directiveOnly, sourceEnc, jspConfigPageEnc,
                     isEncodingSpecifiedInProlog, isBomPresent);
         } else {
             // Standard syntax
-            try (InputStreamReader inStreamReader = JspUtil.getReader(
-                    absFileName, sourceEnc, jar, ctxt, err, skip)) {
-                JspReader jspReader = new JspReader(ctxt, absFileName,
-                        inStreamReader, err);
-                parsedPage = Parser.parse(this, jspReader, parent, isTagFile,
-                        directiveOnly, jar, sourceEnc, jspConfigPageEnc,
-                        isDefaultPageEncoding, isBomPresent);
-            }
+            // The CharArrayReader will be auto close by JspReader
+            JspReader jspReader = new JspReader(ctxt, absFileName,
+                    new CharArrayReader(jspContentChars), err);
+            parsedPage = Parser.parse(this, jspReader, parent, isTagFile,
+                    directiveOnly, jar, sourceEnc, jspConfigPageEnc,
+                    isDefaultPageEncoding, isBomPresent);
         }
 
         baseDirStack.pop();
 
         return parsedPage;
+    }
+
+    private char[] readFully(Reader reader) throws IOException {
+        CharArrayWriter writer = new CharArrayWriter();
+        int maxLen = 5 * 1024;
+        char[] buf = new char[maxLen];
+        int len;
+        while ((len = reader.read(buf, 0, maxLen)) != -1) {
+            writer.write(buf, 0, len);
+        }
+        return writer.toCharArray();
     }
 
     /*

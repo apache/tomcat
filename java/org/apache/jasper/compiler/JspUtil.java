@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.Vector;
 
@@ -683,15 +684,15 @@ public class JspUtil {
         return new BufferedInputStream(in, JspUtil.JSP_INPUT_STREAM_BUFFER_SIZE);
     }
 
-    public static InputSource getInputSource(String fname, Jar jar, JspCompilationContext ctxt)
+    /** The reader parameter is expected to contain the actual input source, while jar and ctxt parameters are only
+     * used to determine the systemId value instead of reading actual stream from them. */
+    public static InputSource getInputSource(Reader reader, String fname, Jar jar, JspCompilationContext ctxt)
         throws IOException {
-        InputSource source;
+        InputSource source = new InputSource(reader);
         if (jar != null) {
             String jarEntryName = fname.substring(1, fname.length());
-            source = new InputSource(jar.getInputStream(jarEntryName));
             source.setSystemId(jar.getURL(jarEntryName));
         } else {
-            source = new InputSource(ctxt.getResourceAsStream(fname));
             source.setSystemId(ctxt.getResource(fname).toExternalForm());
         }
         return source;

@@ -16,9 +16,11 @@
  */
 package org.apache.jasper.compiler;
 
+import java.io.CharArrayReader;
 import java.io.CharArrayWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Reader;
 import java.security.AccessController;
 import java.util.Collection;
 
@@ -149,6 +151,7 @@ class JspDocumentParser
      */
     public static Node.Nodes parse(
         ParserController pc,
+        char[] jspContentChars,
         String path,
         Jar jar,
         Node parent,
@@ -186,22 +189,20 @@ class JspDocumentParser
 
             // Parse the input
             SAXParser saxParser = getSAXParser(false, jspDocParser);
-            InputSource source = JspUtil.getInputSource(path, jar, jspDocParser.ctxt);
+            Reader jspContentReader = new CharArrayReader(jspContentChars);
+            InputSource source = JspUtil.getInputSource(jspContentReader, path, jar, jspDocParser.ctxt);
             try {
                 saxParser.parse(source, jspDocParser);
             } catch (EnableDTDValidationException e) {
                 saxParser = getSAXParser(true, jspDocParser);
                 jspDocParser.isValidating = true;
-                try {
-                    source.getByteStream().close();
-                } catch (IOException e2) {
-                    // ignore
-                }
-                source = JspUtil.getInputSource(path, jar, jspDocParser.ctxt);
+                // Reinit reader for read again.
+                jspContentReader = new CharArrayReader(jspContentChars);
+                source = JspUtil.getInputSource(jspContentReader, path, jar, jspDocParser.ctxt);
                 saxParser.parse(source, jspDocParser);
             } finally {
                 try {
-                    source.getByteStream().close();
+                    jspContentReader.close();
                 } catch (IOException e) {
                     // ignore
                 }

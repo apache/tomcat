@@ -20,6 +20,7 @@ import java.io.CharArrayWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
@@ -102,7 +103,7 @@ class JspReader {
      */
     public JspReader(JspCompilationContext ctxt,
                      String fname,
-                     InputStreamReader reader,
+                     Reader reader,
                      ErrorDispatcher err)
             throws JasperException {
 
