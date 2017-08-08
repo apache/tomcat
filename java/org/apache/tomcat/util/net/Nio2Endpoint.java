@@ -1589,18 +1589,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
 
         @Override
-        public void doClientAuth(SSLSupport sslSupport) {
+        public void doClientAuth(SSLSupport sslSupport) throws IOException {
             SecureNio2Channel sslChannel = (SecureNio2Channel) getSocket();
             SSLEngine engine = sslChannel.getSslEngine();
             if (!engine.getNeedClientAuth()) {
                 // Need to re-negotiate SSL connection
                 engine.setNeedClientAuth(true);
-                try {
-                    sslChannel.rehandshake();
-                    ((JSSESupport) sslSupport).setSession(engine.getSession());
-                } catch (IOException ioe) {
-                    log.warn(sm.getString("socket.sslreneg"), ioe);
-                }
+                sslChannel.rehandshake();
+                ((JSSESupport) sslSupport).setSession(engine.getSession());
             }
         }
 

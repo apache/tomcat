@@ -1242,7 +1242,7 @@ public class Http11Processor extends AbstractProcessor {
 
 
     @Override
-    protected final void sslReHandShake() {
+    protected final void sslReHandShake() throws IOException {
         if (sslSupport != null) {
             // Consume and buffer the request body, so that it does not
             // interfere with the client's handshake messages
@@ -1251,8 +1251,17 @@ public class Http11Processor extends AbstractProcessor {
                     protocol.getMaxSavePostSize());
             inputBuffer.addActiveFilter(inputFilters[Constants.BUFFERED_FILTER]);
 
+            /*
+             * Outside the try/catch because we want I/O errors during
+             * renegotiation to be thrown for the caller to handle since they
+             * will be fatal to the connection.
+             */
+            socketWrapper.doClientAuth(sslSupport);
             try {
-                socketWrapper.doClientAuth(sslSupport);
+                /*
+                 * Errors processing the cert chain do not affect the client
+                 * connection so they can be logged and swallowed here.
+                 */
                 Object sslO = sslSupport.getPeerCertificateChain();
                 if (sslO != null) {
                     request.setAttribute(SSLSupport.CERTIFICATE_KEY, sslO);

@@ -395,8 +395,10 @@ public class SecureNioChannel extends NioChannel  {
                 }
             }
         } catch (IOException x) {
+            closeSilently();
             throw x;
         } catch (Exception cx) {
+            closeSilently();
             IOException x = new IOException(cx);
             throw x;
         } finally {
@@ -526,14 +528,26 @@ public class SecureNioChannel extends NioChannel  {
     public void close(boolean force) throws IOException {
         try {
             close();
-        }finally {
-            if ( force || closed ) {
+        } finally {
+            if (force || closed) {
                 closed = true;
                 sc.socket().close();
                 sc.close();
             }
         }
     }
+
+
+    private void closeSilently() {
+        try {
+            close(true);
+        } catch (IOException ioe) {
+            // This is expected - swallowing the exception is the reason this
+            // method exists. Log at debug in case someone is interested.
+            log.debug(sm.getString("channel.nio.ssl.closeSilentError"), ioe);
+        }
+    }
+
 
     /**
      * Reads a sequence of bytes from this channel into the given buffer.

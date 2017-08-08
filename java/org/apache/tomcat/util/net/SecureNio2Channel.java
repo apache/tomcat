@@ -305,8 +305,11 @@ public class SecureNio2Channel extends Nio2Channel  {
                             sc.read(netInBuffer, socket, handshakeReadCompletionHandler);
                         } else {
                             try {
-                                sc.read(netInBuffer).get(endpoint.getConnectionTimeout(),
-                                        TimeUnit.MILLISECONDS);
+                                int read = sc.read(netInBuffer).get(endpoint.getConnectionTimeout(),
+                                        TimeUnit.MILLISECONDS).intValue();
+                                if (read == -1) {
+                                    throw new EOFException();
+                                }
                             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                                 throw new IOException(sm.getString("channel.nio.ssl.handshakeError"));
                             }
@@ -449,8 +452,10 @@ public class SecureNio2Channel extends Nio2Channel  {
                 }
             }
         } catch (IOException x) {
+            closeSilently();
             throw x;
         } catch (Exception cx) {
+            closeSilently();
             IOException x = new IOException(cx);
             throw x;
         }
@@ -576,17 +581,30 @@ public class SecureNio2Channel extends Nio2Channel  {
         closed = (!netOutBuffer.hasRemaining() && (handshake.getHandshakeStatus() != HandshakeStatus.NEED_WRAP));
     }
 
+
     @Override
     public void close(boolean force) throws IOException {
         try {
             close();
         } finally {
-            if ( force || closed ) {
+            if (force || closed) {
                 closed = true;
                 sc.close();
             }
         }
     }
+
+
+    private void closeSilently() {
+        try {
+            close(true);
+        } catch (IOException ioe) {
+            // This is expected - swallowing the exception is the reason this
+            // method exists. Log at debug in case someone is interested.
+            log.debug(sm.getString("channel.nio.ssl.closeSilentError"), ioe);
+        }
+    }
+
 
     private class FutureRead implements Future<Integer> {
         private ByteBuffer dst;

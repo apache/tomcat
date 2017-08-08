@@ -64,6 +64,10 @@
         which is the most secure / restrictive option in addition to reporting
         the configuration error. (markt)
       </fix>
+      <fix>
+        Improve the handling of client disconnections during the TLS
+        renegotiation handshake. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

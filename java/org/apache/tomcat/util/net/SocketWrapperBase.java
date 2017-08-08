@@ -759,8 +759,12 @@ public abstract class SocketWrapperBase<E> {
      * @param sslSupport The SSL/TLS support instance currently being used by
      *                   the connection that may need updating after the client
      *                   authentication
+     *
+     * @throws IOException If authentication is required then there will be I/O
+     *                     with the client and this exception will be thrown if
+     *                     that goes wrong
      */
-    public abstract void doClientAuth(SSLSupport sslSupport);
+    public abstract void doClientAuth(SSLSupport sslSupport) throws IOException;
 
     public abstract SSLSupport getSslSupport(String clientCertProvider);
 

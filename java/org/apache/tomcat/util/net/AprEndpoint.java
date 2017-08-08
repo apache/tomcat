@@ -2749,11 +2749,16 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
 
         @Override
-        public void doClientAuth(SSLSupport sslSupport) {
+        public void doClientAuth(SSLSupport sslSupport) throws IOException {
             long socket = getSocket().longValue();
             // Configure connection to require a certificate
-            SSLSocket.setVerify(socket, SSL.SSL_CVERIFY_REQUIRE, -1);
-            SSLSocket.renegotiate(socket);
+            try {
+                SSLSocket.setVerify(socket, SSL.SSL_CVERIFY_REQUIRE, -1);
+                SSLSocket.renegotiate(socket);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                throw new IOException(sm.getString("socket.sslreneg"), t);
+            }
         }
 
 
