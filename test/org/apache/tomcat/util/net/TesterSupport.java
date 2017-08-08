@@ -188,8 +188,10 @@ public final class TesterSupport {
 
         // Configure the Realm
         TesterMapRealm realm = new TesterMapRealm();
-        realm.addUser("CN=user1, C=US", "not used");
-        realm.addUserRole("CN=user1, C=US", ROLE);
+        String cn = "CN=user1, OU=Apache Tomcat PMC, O=The Apache Software Foundation, " +
+                "L=Wakefield, ST=WA, C=US";
+        realm.addUser(cn, "not used");
+        realm.addUserRole(cn, ROLE);
         ctx.setRealm(realm);
 
         // Configure the authenticator
