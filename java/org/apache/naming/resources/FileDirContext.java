@@ -75,6 +75,8 @@ public class FileDirContext extends BaseDirContext {
 
     /**
      * Builds a file directory context using the given environment.
+     *
+     * @param env The environment with which to build the context
      */
     public FileDirContext(Hashtable<String,Object> env) {
         super(env);
@@ -117,32 +119,33 @@ public class FileDirContext extends BaseDirContext {
      */
     @Override
     public void setDocBase(String docBase) {
+        // Validate the format of the proposed document root
+        if (docBase == null) {
+            throw new IllegalArgumentException(sm.getString("resources.null"));
+        }
 
-    // Validate the format of the proposed document root
-    if (docBase == null)
-        throw new IllegalArgumentException
-        (sm.getString("resources.null"));
-
-    // Calculate a File object referencing this document base directory
-    base = new File(docBase);
+        // Calculate a File object referencing this document base directory
+        base = new File(docBase);
         try {
             base = base.getCanonicalFile();
         } catch (IOException e) {
             // Ignore
         }
 
-    // Validate that the document base is an existing directory
-    if (!base.exists() || !base.isDirectory() || !base.canRead())
-        throw new IllegalArgumentException
-        (sm.getString("fileResources.base", docBase));
+        // Validate that the document base is an existing directory
+        if (!base.exists() || !base.isDirectory() || !base.canRead()) {
+            throw new IllegalArgumentException(sm.getString("fileResources.base", docBase));
+        }
+
         this.absoluteBase = base.getAbsolutePath();
         super.setDocBase(docBase);
-
     }
 
 
     /**
      * Set allow linking.
+     *
+     * @param allowLinking The new value for the attribute
      */
     public void setAllowLinking(boolean allowLinking) {
         this.allowLinking = allowLinking;
@@ -151,6 +154,8 @@ public class FileDirContext extends BaseDirContext {
 
     /**
      * Is linking allowed.
+     *
+     * @return {@code true} is linking is allowed, otherwise {@false}
      */
     public boolean getAllowLinking() {
         return allowLinking;
@@ -255,22 +260,22 @@ public class FileDirContext extends BaseDirContext {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public void rename(String oldName, String newName)
-        throws NamingException {
+    public void rename(String oldName, String newName) throws NamingException {
 
         File file = file(oldName);
 
-        if (file == null)
-            throw new NameNotFoundException
-                (sm.getString("resources.notFound", oldName));
-
-        File newFile = new File(base, newName);
-
-        if (!file.renameTo(newFile)) {
-            throw new NamingException(sm.getString("resources.renameFail",
-                    oldName, newName));
+        if (file == null) {
+            throw new NameNotFoundException(sm.getString("resources.notFound", oldName));
         }
 
+        File newFile = file(newName);
+        if (newName == null) {
+            throw new NamingException(sm.getString("resources.renameFail", oldName, newName));
+        }
+
+        if (!file.renameTo(newFile)) {
+            throw new NamingException(sm.getString("resources.renameFail", oldName, newName));
+        }
     }
 
 
@@ -295,7 +300,7 @@ public class FileDirContext extends BaseDirContext {
 
         if (file == null)
             return null;
-        
+
         return list(file);
 
     }
@@ -468,7 +473,10 @@ public class FileDirContext extends BaseDirContext {
 
         // Note: No custom attributes allowed
 
-        File file = new File(base, name);
+        File file = file(name);
+        if (file == null) {
+            throw new NamingException(sm.getString("resources.bindFailed", name));
+        }
         if (file.exists())
             throw new NameAlreadyBoundException
                 (sm.getString("resources.alreadyBound", name));
@@ -503,7 +511,10 @@ public class FileDirContext extends BaseDirContext {
         // Note: No custom attributes allowed
         // Check obj type
 
-        File file = new File(base, name);
+        File file = file(name);
+        if (file == null) {
+            throw new NamingException(sm.getString("resources.bindFailed", name));
+        }
 
         InputStream is = null;
         if (obj instanceof Resource) {
@@ -583,13 +594,14 @@ public class FileDirContext extends BaseDirContext {
     public DirContext createSubcontext(String name, Attributes attrs)
         throws NamingException {
 
-        File file = new File(base, name);
+        File file = file(name);
+        if (file == null) {
+            throw new NamingException(sm.getString("resources.bindFailed", name));
+        }
         if (file.exists())
-            throw new NameAlreadyBoundException
-                (sm.getString("resources.alreadyBound", name));
+            throw new NameAlreadyBoundException(sm.getString("resources.alreadyBound", name));
         if (!file.mkdir())
-            throw new NamingException
-                (sm.getString("resources.bindFailed", name));
+            throw new NamingException(sm.getString("resources.bindFailed", name));
         return (DirContext) lookup(name);
 
     }
@@ -772,7 +784,7 @@ public class FileDirContext extends BaseDirContext {
 
             if (allowLinking)
                 return file;
-            
+
             // Check that this file belongs to our root path
             String canPath = null;
             try {
@@ -1054,10 +1066,10 @@ public class FileDirContext extends BaseDirContext {
             return super.getResourceType();
         }
 
-        
+
         /**
          * Get canonical path.
-         * 
+         *
          * @return String the file's canonical path
          */
         @Override
@@ -1071,10 +1083,6 @@ public class FileDirContext extends BaseDirContext {
             }
             return canonicalPath;
         }
-        
-
     }
-
-
 }
 
