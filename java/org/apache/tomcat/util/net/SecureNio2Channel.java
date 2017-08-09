@@ -1133,10 +1133,4 @@ public class SecureNio2Channel extends Nio2Channel  {
     public ByteBuffer getEmptyBuf() {
         return emptyBuf;
     }
-
-    @Override
-    public AsynchronousSocketChannel getIOChannel() {
-        return sc;
-    }
-
 }
