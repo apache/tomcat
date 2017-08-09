@@ -68,6 +68,10 @@
         Improve the handling of client disconnections during the TLS
         renegotiation handshake. (markt)
       </fix>
+      <fix>
+        Prevent exceptions being thrown during normal shutdown of NIO
+        connections. This enables TLS connections to close cleanly. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
