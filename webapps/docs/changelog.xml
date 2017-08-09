@@ -121,6 +121,10 @@
         Add additional logging to record problems that occur while waiting for
         the NIO pollers to stop during the Connector stop process. (markt)
       </add>
+      <fix>
+        Prevent exceptions being thrown during normal shutdown of NIO
+        connections. This enables TLS connections to close cleanly. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
