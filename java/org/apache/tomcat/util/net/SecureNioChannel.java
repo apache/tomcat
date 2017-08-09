@@ -698,10 +698,4 @@ public class SecureNioChannel extends NioChannel  {
     public ByteBuffer getEmptyBuf() {
         return emptyBuf;
     }
-
-    @Override
-    public SocketChannel getIOChannel() {
-        return sc;
-    }
-
 }
