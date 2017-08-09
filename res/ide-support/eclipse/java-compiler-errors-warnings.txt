@@ -18,7 +18,7 @@
 # Java -> Compiler -> Errors/Warnings
 =======================================
 
-The following settings are for Mars (Eclipse 4.5)
+The following settings are for Oxygen (Eclipse 4.7)
 W = Warning
 I = Ignore
 E = Error
