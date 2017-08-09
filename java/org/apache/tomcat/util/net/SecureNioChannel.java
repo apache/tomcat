@@ -576,9 +576,4 @@ public class SecureNioChannel extends NioChannel  {
     public void setBufHandler(ApplicationBufferHandler bufHandler) {
         this.bufHandler = bufHandler;
     }
-
-    @Override
-    public SocketChannel getIOChannel() {
-        return sc;
-    }
 }
