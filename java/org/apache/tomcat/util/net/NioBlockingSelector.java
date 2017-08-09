@@ -328,13 +328,20 @@ public class NioBlockingSelector {
                 }
             }
             events.clear();
-            try {
-                selector.selectNow();//cancel all remaining keys
-            }catch( Exception ignore ) {
-                if (log.isDebugEnabled())log.debug("",ignore);
+            // If using a shared selector, the NioSelectorPool will also try and
+            // close the selector. Try and avoid the ClosedSelectorException
+            // although because multiple threads are involved there is always
+            // the possibility of an Exception here.
+            if (selector.isOpen()) {
+                try {
+                    // Cancels all remaining keys
+                    selector.selectNow();
+                }catch( Exception ignore ) {
+                    if (log.isDebugEnabled())log.debug("",ignore);
+                }
             }
             try {
-                selector.close();//Close the connector
+                selector.close();
             }catch( Exception ignore ) {
                 if (log.isDebugEnabled())log.debug("",ignore);
             }
