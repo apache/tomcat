@@ -155,7 +155,7 @@ public class FileDirContext extends BaseDirContext {
     /**
      * Is linking allowed.
      *
-     * @return {@code true} is linking is allowed, otherwise {@false}
+     * @return {@code true} is linking is allowed, otherwise {@code false}
      */
     public boolean getAllowLinking() {
         return allowLinking;
