@@ -198,7 +198,7 @@ public class FileDirContext extends BaseDirContext {
     @Override
     protected Object doLookup(String name) {
         Object result = null;
-        File file = file(name);
+        File file = file(name, true);
 
         if (file == null)
             return null;
@@ -235,7 +235,7 @@ public class FileDirContext extends BaseDirContext {
     public void unbind(String name)
         throws NamingException {
 
-        File file = file(name);
+        File file = file(name, true);
 
         if (file == null)
             throw new NameNotFoundException(
@@ -262,14 +262,14 @@ public class FileDirContext extends BaseDirContext {
     @Override
     public void rename(String oldName, String newName) throws NamingException {
 
-        File file = file(oldName);
+        File file = file(oldName, true);
 
         if (file == null) {
             throw new NameNotFoundException(sm.getString("resources.notFound", oldName));
         }
 
-        File newFile = file(newName);
-        if (newName == null) {
+        File newFile = file(newName, false);
+        if (newFile == null) {
             throw new NamingException(sm.getString("resources.renameFail", oldName, newName));
         }
 
@@ -296,7 +296,7 @@ public class FileDirContext extends BaseDirContext {
     protected List<NamingEntry> doListBindings(String name)
         throws NamingException {
 
-        File file = file(name);
+        File file = file(name, true);
 
         if (file == null)
             return null;
@@ -400,7 +400,7 @@ public class FileDirContext extends BaseDirContext {
         throws NamingException {
 
         // Building attribute list
-        File file = file(name);
+        File file = file(name, true);
 
         if (file == null)
             return null;
@@ -473,7 +473,7 @@ public class FileDirContext extends BaseDirContext {
 
         // Note: No custom attributes allowed
 
-        File file = file(name);
+        File file = file(name, false);
         if (file == null) {
             throw new NamingException(sm.getString("resources.bindFailed", name));
         }
@@ -511,7 +511,7 @@ public class FileDirContext extends BaseDirContext {
         // Note: No custom attributes allowed
         // Check obj type
 
-        File file = file(name);
+        File file = file(name, false);
         if (file == null) {
             throw new NamingException(sm.getString("resources.bindFailed", name));
         }
@@ -594,7 +594,7 @@ public class FileDirContext extends BaseDirContext {
     public DirContext createSubcontext(String name, Attributes attrs)
         throws NamingException {
 
-        File file = file(name);
+        File file = file(name, false);
         if (file == null) {
             throw new NamingException(sm.getString("resources.bindFailed", name));
         }
@@ -770,6 +770,7 @@ public class FileDirContext extends BaseDirContext {
 
     }
 
+
     /**
      * Return a File object representing the specified normalized
      * context-relative path if it exists and is readable.  Otherwise,
@@ -778,9 +779,27 @@ public class FileDirContext extends BaseDirContext {
      * @param name Normalized context-relative path (with leading '/')
      */
     protected File file(String name) {
+        return file(name, true);
+    }
 
+
+    /**
+     * Return a File object representing the specified normalized
+     * context-relative path if it exists and is readable.  Otherwise,
+     * return <code>null</code>.
+     *
+     * @param name      Normalized context-relative path (with leading '/')
+     * @param mustExist Must the specified resource exist?
+     */
+    protected File file(String name, boolean mustExist) {
         File file = new File(base, name);
-        if (file.exists() && file.canRead()) {
+        return validate(file, mustExist, absoluteBase);
+    }
+
+
+    protected File validate(File file, boolean mustExist, String absoluteBase) {
+
+        if (!mustExist || file.exists() && file.canRead()) {
 
             if (allowLinking)
                 return file;
