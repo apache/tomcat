@@ -313,8 +313,10 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 String query = value.substring(queryStart + 1);
                 coyoteRequest.queryString().setString(query);
             }
-            // Bug 61120. Set the URI as bytes rather than String so any path
-            // parameters are correctly processed
+            // Bug 61120. Set the URI as bytes rather than String so:
+            // - any path parameters are correctly processed
+            // - the normalization security checks are performed that prevent
+            //   directory traversal attacks
             byte[] uriBytes = uri.getBytes(StandardCharsets.ISO_8859_1);
             coyoteRequest.requestURI().setBytes(uriBytes, 0, uriBytes.length);
             break;
