@@ -72,6 +72,10 @@
         Prevent exceptions being thrown during normal shutdown of NIO
         connections. This enables TLS connections to close cleanly. (markt)
       </fix>
+      <fix>
+        Fix possible race condition when setting IO listeners on an upgraded
+        connection. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>

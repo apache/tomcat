@@ -101,6 +101,8 @@ public class UpgradeServletInputStream extends ServletInputStream {
             throw new IllegalStateException(sm.getString("upgrade.sis.read.closed"));
         }
 
+        this.listener = listener;
+
         // Container is responsible for first call to onDataAvailable().
         if (ContainerThreadMarker.isContainerThread()) {
             processor.addDispatch(DispatchType.NON_BLOCKING_READ);
@@ -108,7 +110,6 @@ public class UpgradeServletInputStream extends ServletInputStream {
             socketWrapper.registerReadInterest();
         }
 
-        this.listener = listener;
         // Switching to non-blocking. Don't know if data is available.
         ready = null;
     }

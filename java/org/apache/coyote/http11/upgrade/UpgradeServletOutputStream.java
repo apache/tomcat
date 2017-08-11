@@ -112,6 +112,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         if (closed) {
             throw new IllegalStateException(sm.getString("upgrade.sos.write.closed"));
         }
+        this.listener = listener;
         // Container is responsible for first call to onWritePossible().
         synchronized (registeredLock) {
             registered = true;
@@ -123,7 +124,6 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
             }
         }
 
-        this.listener = listener;
     }
 
 
