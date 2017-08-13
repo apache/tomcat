@@ -835,7 +835,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
                 ClientEndpointConfig.Builder.create().build();
         clientEndpointConfig.getUserProperties().put(
                 org.apache.tomcat.websocket.Constants.SSL_TRUSTSTORE_PROPERTY,
-                "test/org/apache/tomcat/util/net/ca.jks");
+                TesterSupport.CA_JKS);
         Session wsSession = wsContainer.connectToServer(
                 TesterProgrammaticEndpoint.class,
                 clientEndpointConfig,
