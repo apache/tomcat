@@ -159,6 +159,20 @@ public class TestCustomSsl extends TomcatBaseTest {
                 he.printStackTrace();
             }
         }
+
+        if (trustType.equals(TrustType.CA)) {
+            if (log.isDebugEnabled()) {
+                int count = TesterSupport.getLastClientAuthRequestedIssuerCount();
+                log.debug("Last client KeyManager usage: " + TesterSupport.getLastClientAuthKeyManagerUsage() +
+                          ", " + count + " requested Issuers, first one: " +
+                          (count > 0 ? TesterSupport.getLastClientAuthRequestedIssuer(0).getName() : "NONE"));
+                log.debug("Expected requested Issuer: " + TesterSupport.getClientAuthExpectedIssuer());
+            }
+            assertTrue("Checking requested client issuer against " +
+                       TesterSupport.getClientAuthExpectedIssuer(),
+                       TesterSupport.checkLastClientAuthRequestedIssuers());
+        }
+
         if (trustType.equals(TrustType.NONE)) {
             assertTrue(rc != 200);
             assertEquals("", res.toString());

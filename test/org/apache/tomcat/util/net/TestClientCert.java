@@ -19,6 +19,7 @@ package org.apache.tomcat.util.net;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Assume;
 import org.junit.Test;
@@ -62,6 +63,18 @@ public class TestClientCert extends TomcatBaseTest {
         // Unprotected resource
         ByteChunk res =
                 getUrl("https://localhost:" + getPort() + "/unprotected");
+
+        if (log.isDebugEnabled()) {
+            int count = TesterSupport.getLastClientAuthRequestedIssuerCount();
+            log.debug("Last client KeyManager usage: " + TesterSupport.getLastClientAuthKeyManagerUsage() +
+                      ", " + count + " requested Issuers, first one: " +
+                      (count > 0 ? TesterSupport.getLastClientAuthRequestedIssuer(0).getName() : "NONE"));
+            log.debug("Expected requested Issuer: " + TesterSupport.getClientAuthExpectedIssuer());
+        }
+        assertTrue("Checking requested client issuer against " +
+                   TesterSupport.getClientAuthExpectedIssuer(),
+                   TesterSupport.checkLastClientAuthRequestedIssuers());
+
         if (preemptive) {
             assertEquals("OK-" + TesterSupport.ROLE, res.toString());
         } else {
@@ -70,6 +83,18 @@ public class TestClientCert extends TomcatBaseTest {
 
         // Protected resource
         res = getUrl("https://localhost:" + getPort() + "/protected");
+
+        if (log.isDebugEnabled()) {
+            int count = TesterSupport.getLastClientAuthRequestedIssuerCount();
+            log.debug("Last client KeyManager usage: " + TesterSupport.getLastClientAuthKeyManagerUsage() +
+                      ", " + count + " requested Issuers, first one: " +
+                      (count > 0 ? TesterSupport.getLastClientAuthRequestedIssuer(0).getName() : "NONE"));
+            log.debug("Expected requested Issuer: " + TesterSupport.getClientAuthExpectedIssuer());
+        }
+        assertTrue("Checking requested client issuer against " +
+                   TesterSupport.getClientAuthExpectedIssuer(),
+                   TesterSupport.checkLastClientAuthRequestedIssuers());
+
         assertEquals("OK-" + TesterSupport.ROLE, res.toString());
     }
 
@@ -107,12 +132,36 @@ public class TestClientCert extends TomcatBaseTest {
         // Unprotected resource
         ByteChunk res = postUrl(body,
                 "https://localhost:" + getPort() + "/unprotected");
+
+        if (log.isDebugEnabled()) {
+            int count = TesterSupport.getLastClientAuthRequestedIssuerCount();
+            log.debug("Last client KeyManager usage: " + TesterSupport.getLastClientAuthKeyManagerUsage() +
+                      ", " + count + " requested Issuers, first one: " +
+                      (count > 0 ? TesterSupport.getLastClientAuthRequestedIssuer(0).getName() : "NONE"));
+            log.debug("Expected requested Issuer: " + TesterSupport.getClientAuthExpectedIssuer());
+        }
+        assertTrue("Checking requested client issuer against " +
+                   TesterSupport.getClientAuthExpectedIssuer(),
+                   TesterSupport.checkLastClientAuthRequestedIssuers());
+
         assertEquals("OK-" + bodySize, res.toString());
 
         // Protected resource
         res.recycle();
         int rc = postUrl(body, "https://localhost:" + getPort() + "/protected",
                 res, null);
+
+        if (log.isDebugEnabled()) {
+            int count = TesterSupport.getLastClientAuthRequestedIssuerCount();
+            log.debug("Last client KeyManager usage: " + TesterSupport.getLastClientAuthKeyManagerUsage() +
+                      ", " + count + " requested Issuers, first one: " +
+                      (count > 0 ? TesterSupport.getLastClientAuthRequestedIssuer(0).getName() : "NONE"));
+            log.debug("Expected requested Issuer: " + TesterSupport.getClientAuthExpectedIssuer());
+        }
+        assertTrue("Checking requested client issuer against " +
+                   TesterSupport.getClientAuthExpectedIssuer(),
+                   TesterSupport.checkLastClientAuthRequestedIssuers());
+
         if (expectProtectedFail) {
             assertEquals(401, rc);
         } else {
