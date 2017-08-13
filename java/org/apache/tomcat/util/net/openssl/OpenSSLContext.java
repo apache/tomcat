@@ -321,6 +321,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     // and the required version was updated to it.
                     try {
                         SSLContext.addClientCACertificateRaw(ctx, caCert.getEncoded());
+                        if (log.isDebugEnabled())
+                            log.debug(sm.getString("openssl.addedClientCaCert", caCert.toString()));
                     } catch (UnsatisfiedLinkError e) {
                         log.warn(sm.getString("openssl.incompleteClientCASupport"), e);
                     }
