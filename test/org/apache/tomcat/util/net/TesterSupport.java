@@ -198,8 +198,16 @@ public final class TesterSupport {
 
         // Configure the Realm
         TesterMapRealm realm = new TesterMapRealm();
-        String cn = "CN=user1, OU=Apache Tomcat PMC, O=The Apache Software Foundation, " +
-                "L=Wakefield, ST=WA, C=US";
+
+        String cn = "NOTFOUND";
+        try {
+            KeyStore ks = getKeyStore(CLIENT_JKS);
+            X509Certificate cert = (X509Certificate)ks.getCertificate(CLIENT_ALIAS);
+            cn = cert.getSubjectDN().getName();
+        } catch (Exception ex) {
+            // Ignore
+        }
+
         realm.addUser(cn, "not used");
         realm.addUserRole(cn, ROLE);
         ctx.setRealm(realm);
