@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Locale;
 
@@ -121,7 +122,6 @@ public final class TesterSupport {
         tmf.init(getKeyStore(CA_JKS));
         return tmf.getTrustManagers();
     }
-
 
     protected static void configureClientSsl() {
         try {
@@ -272,6 +272,83 @@ public final class TesterSupport {
         public void checkServerTrusted(X509Certificate[] certs,
                 String authType) {
             // NOOP - Trust everything
+        }
+    }
+
+    public static class SequentialTrustManager implements X509TrustManager {
+
+        private static X509TrustManager[] tms;
+        private static X509Certificate[] certs;
+
+        static {
+            try {
+                TrustManager[] managers = getTrustManagers();
+                int mcount = 0;
+                int ccount = 0;
+                for (TrustManager tm : managers) {
+                    if (tm instanceof X509TrustManager) {
+                        mcount++;
+                        ccount += ((X509TrustManager)tm).getAcceptedIssuers().length;
+                    }
+                }
+                tms = new X509TrustManager[mcount];
+                certs = new X509Certificate[ccount];
+                mcount = 0;
+                ccount = 0;
+                for (TrustManager tm : managers) {
+                    if (tm instanceof X509TrustManager) {
+                        tms[mcount] = (X509TrustManager)tm;
+                        mcount++;
+                        for (X509Certificate cert : ((X509TrustManager)tm).getAcceptedIssuers()) {
+                            certs[ccount] = cert;
+                            ccount++;
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                tms = new X509TrustManager[1];
+                tms[0] = new TrustAllCerts();
+                certs = new X509Certificate[0];
+            }
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return certs;
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] certs,
+                String authType) throws CertificateException {
+            boolean trust = false;
+            for (X509TrustManager tm : tms) {
+                try {
+                    tm.checkClientTrusted(certs, authType);
+                    trust = true;
+                } catch (CertificateException ex) {
+                    // Ignore
+                }
+            }
+            if (!trust) {
+                throw new CertificateException();
+            }
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] certs,
+                String authType) throws CertificateException {
+            boolean trust = false;
+            for (X509TrustManager tm : tms) {
+                try {
+                    tm.checkServerTrusted(certs, authType);
+                    trust = true;
+                } catch (CertificateException ex) {
+                    // Ignore
+                }
+            }
+            if (!trust) {
+                throw new CertificateException();
+            }
         }
     }
 }
