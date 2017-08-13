@@ -252,10 +252,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 // Set certificate chain file
                 SSLContext.setCertificateChainFile(ctx,
                         SSLHostConfig.adjustRelativePath(certificate.getCertificateChainFile()), false);
-                // Support Client Certificates
-                SSLContext.setCACertificate(ctx,
-                        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
-                        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
                 // Set revocation
                 SSLContext.setCARevocation(ctx,
                         SSLHostConfig.adjustRelativePath(
@@ -301,6 +297,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSLContext.setVerify(ctx, value, sslHostConfig.getCertificateVerificationDepth());
 
             if (tms != null) {
+                // Client certificate verification based on custom trust managers
                 final X509TrustManager manager = chooseTrustManager(tms);
                 SSLContext.setCertVerifyCallback(ctx, new CertificateVerifier() {
                     @Override
@@ -315,6 +312,24 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         return false;
                     }
                 });
+                // Pass along the DER encoded certificates of the accepted client
+                // certificate issuers, so that their subjects can be presented
+                // by the server during the handshake to allow the client choosing
+                // an acceptable certificate
+                for (X509Certificate caCert : manager.getAcceptedIssuers()) {
+                    // try/catch can be removed once tcnative 1.2.13 was released
+                    // and the required version was updated to it.
+                    try {
+                        SSLContext.addClientCACertificateRaw(ctx, caCert.getEncoded());
+                    } catch (UnsatisfiedLinkError e) {
+                        log.warn(sm.getString("openssl.incompleteClientCASupport"), e);
+                    }
+                }
+            } else {
+                // Client certificate verification based on trusted CA files and dirs
+                SSLContext.setCACertificate(ctx,
+                        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
+                        SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
             }
 
             if (negotiableProtocols != null && negotiableProtocols.size() > 0) {

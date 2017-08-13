@@ -58,6 +58,13 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        When using JSSE TLS configuration with the OpenSSL implementation and
+        client certificates: include client CA subjects in the TLS handshake
+        so that the client can choose an appropriate client certificate to
+        present. This fix needs at least version 1.2.13 of the Tomcat Native
+        Library. (rjung)
+      </fix>
+      <fix>
         If an invalid option is specified for the
         <code>certificateVerification</code> attribute of an
         <code>SSLHostConfig</code> element, treat it as <code>required</code>

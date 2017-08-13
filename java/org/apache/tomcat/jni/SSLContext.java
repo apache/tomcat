@@ -562,4 +562,12 @@ public final class SSLContext {
      * @return {@code true} if success, {@code false} otherwise.
      */
     public static native boolean addChainCertificateRaw(long ctx, byte[] cert);
+
+    /**
+     * Add a CA certificate we accept as issuer for peer certs
+     * @param ctx Server or Client context to use.
+     * @param subject Byte array with the certificate in DER encoding.
+     * @return {@code true} if success, {@code false} otherwise.
+     */
+    public static native boolean addClientCACertificateRaw(long ctx, byte[] cert);
 }
