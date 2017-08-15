@@ -85,6 +85,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>61419</bug>: Replace a Unix style comment in the DOS bat file
+        <code>catalina.bat</code> with the correct <code>rem</code> markup.
+        (rjung)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M26 (markt)" rtext="2017-08-08">
   <subsection name="Catalina">
