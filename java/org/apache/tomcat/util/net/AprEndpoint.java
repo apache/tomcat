@@ -43,6 +43,7 @@ import org.apache.tomcat.jni.OS;
 import org.apache.tomcat.jni.Poll;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.SSL;
+import org.apache.tomcat.jni.SSLConf;
 import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.jni.SSLContext.SNICallBack;
 import org.apache.tomcat.jni.SSLSocket;
@@ -55,6 +56,7 @@ import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.SSLHostConfig.Type;
+import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.OpenSSLEngine;
 
 
@@ -540,6 +542,51 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             String[] protocolsArray = protocols.toArray(new String[0]);
             SSLContext.setAlpnProtos(ctx, protocolsArray, SSL.SSL_SELECTOR_FAILURE_NO_ADVERTISE);
         }
+
+        long cctx;
+        OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
+        if (openSslConf != null) {
+            // Create OpenSSLConfCmd context if used
+            try {
+                log.info(sm.getString("endpoint.apr.makeConf"));
+                cctx = SSLConf.make(rootPool,
+                                    SSL.SSL_CONF_FLAG_FILE |
+                                    SSL.SSL_CONF_FLAG_SERVER |
+                                    SSL.SSL_CONF_FLAG_CERTIFICATE |
+                                    SSL.SSL_CONF_FLAG_SHOW_ERRORS);
+            } catch (UnsatisfiedLinkError e) {
+                log.warn(sm.getString("endpoint.apr.missingOpenSSLConfSupport"), e);
+                throw new Exception(sm.getString("endpoint.apr.errMakeConf"), e);
+            } catch (Exception e) {
+                throw new Exception(sm.getString("endpoint.apr.errMakeConf"), e);
+            }
+            if (cctx != 0) {
+                // Check OpenSSLConfCmd if used
+                log.info(sm.getString("endpoint.apr.checkConf"));
+                try {
+                    if (!openSslConf.check(cctx)) {
+                        log.error(sm.getString("endpoint.apr.errCheckConf"));
+                        throw new Exception(sm.getString("endpoint.apr.errCheckConf"));
+                    }
+                } catch (Exception e) {
+                    throw new Exception(sm.getString("endpoint.apr.errCheckConf"), e);
+                }
+                // Apply OpenSSLConfCmd if used
+                log.info(sm.getString("endpoint.apr.applyConf"));
+                try {
+                    if (!openSslConf.apply(cctx, ctx)) {
+                        log.error(sm.getString("endpoint.apr.errApplyConf"));
+                        throw new Exception(sm.getString("endpoint.apr.errApplyConf"));
+                    }
+                } catch (Exception e) {
+                    throw new Exception(sm.getString("endpoint.apr.errApplyConf"), e);
+                }
+            }
+        } else {
+            cctx = 0;
+        }
+
+        sslHostConfig.setOpenSslConfContext(Long.valueOf(cctx));
         sslHostConfig.setOpenSslContext(Long.valueOf(ctx));
     }
 
@@ -550,6 +597,15 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         if (ctx != null) {
             SSLContext.free(ctx.longValue());
             sslHostConfig.setOpenSslContext(null);
+        }
+        Long cctx = sslHostConfig.getOpenSslConfContext();
+        if (cctx != null) {
+            try {
+                SSLConf.free(cctx.longValue());
+            } catch (UnsatisfiedLinkError e) {
+                log.warn(sm.getString("endpoint.apr.missingOpenSSLConfSupport"), e);
+            }
+            sslHostConfig.setOpenSslConfContext(null);
         }
     }
 

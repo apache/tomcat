@@ -354,6 +354,20 @@ public class Catalina {
                             "addCertificate",
                             "org.apache.tomcat.util.net.SSLHostConfigCertificate");
 
+        digester.addObjectCreate("Server/Service/Connector/SSLHostConfig/OpenSSLConf",
+                                 "org.apache.tomcat.util.net.openssl.OpenSSLConf");
+        digester.addSetProperties("Server/Service/Connector/SSLHostConfig/OpenSSLConf");
+        digester.addSetNext("Server/Service/Connector/SSLHostConfig/OpenSSLConf",
+                            "setOpenSslConf",
+                            "org.apache.tomcat.util.net.openssl.OpenSSLConf");
+
+        digester.addObjectCreate("Server/Service/Connector/SSLHostConfig/OpenSSLConf/OpenSSLConfCmd",
+                                 "org.apache.tomcat.util.net.openssl.OpenSSLConfCmd");
+        digester.addSetProperties("Server/Service/Connector/SSLHostConfig/OpenSSLConf/OpenSSLConfCmd");
+        digester.addSetNext("Server/Service/Connector/SSLHostConfig/OpenSSLConf/OpenSSLConfCmd",
+                            "addCmd",
+                            "org.apache.tomcat.util.net.openssl.OpenSSLConfCmd");
+
         digester.addObjectCreate("Server/Service/Connector/Listener",
                                  null, // MUST be specified in the element
                                  "className");

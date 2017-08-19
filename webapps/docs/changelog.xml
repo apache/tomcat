@@ -63,6 +63,14 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <add>
+        Add support for the OpenSSL SSL_CONF API when using TLS with
+        OpenSSL implementation. This will need tcnative 1.2.13.
+        It can be used by adding <code>OpenSSLConf</code> elements
+        underneath <code>SSLHostConfig</code>. The new element contains
+        a list of <code>OpenSSLConfCmd</code> elements, each with
+        the attributes <code>name</code> and <code>value</code>.
+      </add>
       <fix>
         When using JSSE TLS configuration with the OpenSSL implementation and
         client certificates: include client CA subjects in the TLS handshake
