@@ -111,6 +111,13 @@ public final class SSLContext {
     public static native void clearOptions(long ctx, int options);
 
     /**
+     * Returns all cipher suites that are enabled for negotiation in an SSL handshake.
+     * @param ctx Server or Client context to use.
+     * @return ciphers
+     */
+    public static native String[] getCiphers(long ctx);
+
+    /**
      * Sets the "quiet shutdown" flag for <b>ctx</b> to be
      * <b>mode</b>. SSL objects created from <b>ctx</b> inherit the
      * <b>mode</b> valid at the time and may be 0 or 1.
