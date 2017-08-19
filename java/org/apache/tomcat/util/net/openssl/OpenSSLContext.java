@@ -397,6 +397,31 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 } catch (Exception e) {
                     throw new SSLException(sm.getString("openssl.errApplyConf"), e);
                 }
+                // Reconfigure the enabled protocols
+                int opts = SSLContext.getOptions(ctx);
+                List<String> enabled = new ArrayList<>();
+                // Seems like there is no way to explicitly disable SSLv2Hello
+                // in OpenSSL so it is always enabled
+                enabled.add(Constants.SSL_PROTO_SSLv2Hello);
+                if ((opts & SSL.SSL_OP_NO_TLSv1) == 0) {
+                    enabled.add(Constants.SSL_PROTO_TLSv1);
+                }
+                if ((opts & SSL.SSL_OP_NO_TLSv1_1) == 0) {
+                    enabled.add(Constants.SSL_PROTO_TLSv1_1);
+                }
+                if ((opts & SSL.SSL_OP_NO_TLSv1_2) == 0) {
+                    enabled.add(Constants.SSL_PROTO_TLSv1_2);
+                }
+                if ((opts & SSL.SSL_OP_NO_SSLv2) == 0) {
+                    enabled.add(Constants.SSL_PROTO_SSLv2);
+                }
+                if ((opts & SSL.SSL_OP_NO_SSLv3) == 0) {
+                    enabled.add(Constants.SSL_PROTO_SSLv3);
+                }
+                sslHostConfig.setEnabledProtocols(
+                        enabled.toArray(new String[enabled.size()]));
+                // Reconfigure the enabled ciphers
+                sslHostConfig.setEnabledCiphers(SSLContext.getCiphers(ctx));
             }
 
             sessionContext = new OpenSSLSessionContext(ctx);
