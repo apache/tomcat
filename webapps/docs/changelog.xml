@@ -48,6 +48,12 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        When using a Java connector in combination with the OpenSSL TLS
+        implementation, do not configure each SSL connection object via
+        the OpenSSLEngine. For OpenSSL the SSL object inherits its
+        settings from the SSL_CTX which we have already configured.
+      </fix>
+      <fix>
         Before generating an error page in the <code>ErrorReportValve</code>,
         check to see if I/O is still permitted for the associated connection
         before generating the error page so that the page generation can be

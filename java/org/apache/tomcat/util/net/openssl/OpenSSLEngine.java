@@ -164,6 +164,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private final String fallbackApplicationProtocol;
     private final OpenSSLSessionContext sessionContext;
     private final boolean alpn;
+    private final boolean initialized;
 
     private String selectedProtocol = null;
 
@@ -173,15 +174,38 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * Creates a new instance
      *
      * @param sslCtx an OpenSSL {@code SSL_CTX} object
-     * @param alloc the {@link ByteBufAllocator} that will be used by this
-     * engine
+     * @param fallbackApplicationProtocol the fallback application protocol
      * @param clientMode {@code true} if this is used for clients, {@code false}
      * otherwise
      * @param sessionContext the {@link OpenSslSessionContext} this
      * {@link SSLEngine} belongs to.
+     * @param alpn {@code true} if alpn should be used, {@code false}
+     * otherwise
      */
     OpenSSLEngine(long sslCtx, String fallbackApplicationProtocol,
-            boolean clientMode, OpenSSLSessionContext sessionContext, boolean alpn) {
+            boolean clientMode, OpenSSLSessionContext sessionContext,
+            boolean alpn) {
+        this(sslCtx, fallbackApplicationProtocol, clientMode, sessionContext,
+             alpn, false);
+    }
+
+    /**
+     * Creates a new instance
+     *
+     * @param sslCtx an OpenSSL {@code SSL_CTX} object
+     * @param fallbackApplicationProtocol the fallback application protocol
+     * @param clientMode {@code true} if this is used for clients, {@code false}
+     * otherwise
+     * @param sessionContext the {@link OpenSslSessionContext} this
+     * {@link SSLEngine} belongs to.
+     * @param alpn {@code true} if alpn should be used, {@code false}
+     * otherwise
+     * @param initialized {@code true} if this instance gets its protocol,
+     * cipher and client verification from the {@code SSL_CTX} {@code sslCtx}
+     */
+    OpenSSLEngine(long sslCtx, String fallbackApplicationProtocol,
+            boolean clientMode, OpenSSLSessionContext sessionContext, boolean alpn,
+            boolean initialized) {
         if (sslCtx == 0) {
             throw new IllegalArgumentException(sm.getString("engine.noSSLContext"));
         }
@@ -194,6 +218,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         this.clientMode = clientMode;
         this.sessionContext = sessionContext;
         this.alpn = alpn;
+        this.initialized = initialized;
     }
 
     @Override
@@ -697,6 +722,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public synchronized void setEnabledCipherSuites(String[] cipherSuites) {
+        if (initialized) {
+            return;
+        }
         if (cipherSuites == null) {
             throw new IllegalArgumentException(sm.getString("engine.nullCipherSuite"));
         }
@@ -772,6 +800,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public synchronized void setEnabledProtocols(String[] protocols) {
+        if (initialized) {
+            return;
+        }
         if (protocols == null) {
             // This is correct from the API docs
             throw new IllegalArgumentException();
@@ -970,6 +1001,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public void setUseClientMode(boolean clientMode) {
+        if (initialized) {
+            return;
+        }
         if (clientMode != this.clientMode) {
             throw new UnsupportedOperationException();
         }
@@ -1001,6 +1035,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private void setClientAuth(ClientAuthMode mode) {
+        if (initialized) {
+            return;
+        }
         if (clientMode) {
             return;
         }
