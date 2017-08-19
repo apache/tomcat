@@ -548,7 +548,8 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         if (openSslConf != null) {
             // Create OpenSSLConfCmd context if used
             try {
-                log.info(sm.getString("endpoint.apr.makeConf"));
+                if (log.isDebugEnabled())
+                    log.debug(sm.getString("endpoint.apr.makeConf"));
                 cctx = SSLConf.make(rootPool,
                                     SSL.SSL_CONF_FLAG_FILE |
                                     SSL.SSL_CONF_FLAG_SERVER |
@@ -562,7 +563,8 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             }
             if (cctx != 0) {
                 // Check OpenSSLConfCmd if used
-                log.info(sm.getString("endpoint.apr.checkConf"));
+                if (log.isDebugEnabled())
+                    log.debug(sm.getString("endpoint.apr.checkConf"));
                 try {
                     if (!openSslConf.check(cctx)) {
                         log.error(sm.getString("endpoint.apr.errCheckConf"));
@@ -572,7 +574,8 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                     throw new Exception(sm.getString("endpoint.apr.errCheckConf"), e);
                 }
                 // Apply OpenSSLConfCmd if used
-                log.info(sm.getString("endpoint.apr.applyConf"));
+                if (log.isDebugEnabled())
+                    log.debug(sm.getString("endpoint.apr.applyConf"));
                 try {
                     if (!openSslConf.apply(cctx, ctx)) {
                         log.error(sm.getString("endpoint.apr.errApplyConf"));

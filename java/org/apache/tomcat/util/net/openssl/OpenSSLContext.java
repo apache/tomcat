@@ -120,7 +120,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
             if (openSslConf != null) {
                 try {
-                    log.info(sm.getString("openssl.makeConf"));
+                    if (log.isDebugEnabled())
+                        log.debug(sm.getString("openssl.makeConf"));
                     cctx = SSLConf.make(aprPool,
                                         SSL.SSL_CONF_FLAG_FILE |
                                         SSL.SSL_CONF_FLAG_SERVER |
@@ -379,7 +380,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
             if (openSslConf != null && cctx != 0) {
                 // Check OpenSSLConfCmd if used
-                log.info(sm.getString("openssl.checkConf"));
+                if (log.isDebugEnabled())
+                    log.debug(sm.getString("openssl.checkConf"));
                 try {
                     if (!openSslConf.check(cctx)) {
                         log.error(sm.getString("openssl.errCheckConf"));
@@ -388,7 +390,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 } catch (Exception e) {
                     throw new Exception(sm.getString("openssl.errCheckConf"), e);
                 }
-                log.info(sm.getString("openssl.applyConf"));
+                if (log.isDebugEnabled())
+                    log.debug(sm.getString("openssl.applyConf"));
                 try {
                     if (!openSslConf.apply(cctx, ctx)) {
                         log.error(sm.getString("openssl.errApplyConf"));
