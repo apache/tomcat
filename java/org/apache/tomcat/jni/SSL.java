@@ -172,6 +172,18 @@ public final class SSL {
     public static final int SSL_MODE_SERVER         = 1;
     public static final int SSL_MODE_COMBINED       = 2;
 
+    public static final int SSL_CONF_FLAG_CMDLINE       = 0x0001;
+    public static final int SSL_CONF_FLAG_FILE          = 0x0002;
+    public static final int SSL_CONF_FLAG_CLIENT        = 0x0004;
+    public static final int SSL_CONF_FLAG_SERVER        = 0x0008;
+    public static final int SSL_CONF_FLAG_SHOW_ERRORS   = 0x0010;
+    public static final int SSL_CONF_FLAG_CERTIFICATE   = 0x0020;
+
+    public static final int SSL_CONF_TYPE_UNKNOWN   = 0x0000;
+    public static final int SSL_CONF_TYPE_STRING    = 0x0001;
+    public static final int SSL_CONF_TYPE_FILE      = 0x0002;
+    public static final int SSL_CONF_TYPE_DIR       = 0x0003;
+
     public static final int SSL_SHUTDOWN_TYPE_UNSET    = 0;
     public static final int SSL_SHUTDOWN_TYPE_STANDARD = 1;
     public static final int SSL_SHUTDOWN_TYPE_UNCLEAN  = 2;
