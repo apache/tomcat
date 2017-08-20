@@ -119,12 +119,29 @@
         children="true"
         storeFactoryClass="org.apache.catalina.storeconfig.SSLHostConfigSF">
         <TransientAttribute>openSslContext</TransientAttribute>
+        <TransientAttribute>openSslConfContext</TransientAttribute>
      </Description>
      <Description
         tag="Certificate"
         standard="true"
         default="true"
         tagClass="org.apache.tomcat.util.net.SSLHostConfigCertificate"
+        children="false"
+        storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
+     </Description>
+     <Description
+        tag="OpenSSLConf"
+        standard="true"
+        default="true"
+        tagClass="org.apache.tomcat.util.net.openssl.OpenSSLConf"
+        children="true"
+        storeFactoryClass="org.apache.catalina.storeconfig.OpenSSLConfSF">
+     </Description>
+     <Description
+        tag="OpenSSLConfCmd"
+        standard="true"
+        default="true"
+        tagClass="org.apache.tomcat.util.net.openssl.OpenSSLConfCmd"
         children="false"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
