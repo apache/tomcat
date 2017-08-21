@@ -2205,7 +2205,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                 data.pos = data.start;
                 // Set the socket to nonblocking mode
                 Socket.timeoutSet(data.socket, 0);
-                while (true) {
+                while (sendfileRunning) {
                     long nw = Socket.sendfilen(data.socket, data.fd,
                                                data.pos, data.end - data.pos, 0);
                     if (nw < 0) {
