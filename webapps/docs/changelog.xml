@@ -81,6 +81,12 @@
         Fix possible race condition when setting IO listeners on an upgraded
         connection. (remm)
       </fix>
+      <fix>
+        <bug>58244</bug>: Handle the case when OpenSSL resumes a TLS session
+        using a ticket and the full client certificate chain is not available.
+        In this case the client certificate without the chain will be presented
+        to the application. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
