@@ -64,6 +64,11 @@
         warning about not being able to read a logging configuration file when
         that file does not exist. (markt)
       </fix>
+      <fix>
+        <bug>61424</bug>: Avoid a possible <code>StackOverflowError</code> when
+        running under a <code>SecurityManager</code> and using
+        <code>Subject.doAs()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -1175,8 +1175,14 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 // https://bz.apache.org/bugzilla/show_bug.cgi?id=58125 for
                 // details) when running under a security manager in rare cases
                 // this call may trigger a ClassCircularityError.
+                // See https://bz.apache.org/bugzilla/show_bug.cgi?id=61424 for
+                // details of how this may trigger a StackOverflowError
+                // Given these reported errors, catch Throwable to ensure any
+                // other edge cases are also caught
                 tryLoadingFromJavaseLoader = (javaseLoader.getResource(resourceName) != null);
-            } catch (ClassCircularityError cce) {
+            } catch (Throwable t) {
+                // Swallow all exceptions apart from those that must be re-thrown
+                ExceptionUtils.handleThrowable(t);
                 // The getResource() trick won't work for this class. We have to
                 // try loading it directly and accept that we might get a
                 // ClassNotFoundException.
