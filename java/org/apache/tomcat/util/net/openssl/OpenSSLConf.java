@@ -29,7 +29,7 @@ public class OpenSSLConf {
     private static final Log log = LogFactory.getLog(OpenSSLConf.class);
     private static final StringManager sm = StringManager.getManager(OpenSSLConf.class);
 
-    private final List<OpenSSLConfCmd> commands = new ArrayList<OpenSSLConfCmd>();
+    private final List<OpenSSLConfCmd> commands = new ArrayList<>();
 
     public void addCmd(OpenSSLConfCmd cmd) {
         commands.add(cmd);
@@ -65,10 +65,12 @@ public class OpenSSLConf {
                 return false;
             }
             if (rc <= 0) {
-                log.error(sm.getString("opensslconf.failedCommand", name, value, rc));
+                log.error(sm.getString("opensslconf.failedCommand", name, value,
+                        Integer.toString(rc)));
                 result = false;
             } else if (log.isDebugEnabled()) {
-                log.debug(sm.getString("opensslconf.resultCommand", name, value, rc));
+                log.debug(sm.getString("opensslconf.resultCommand", name, value,
+                        Integer.toString(rc)));
             }
         }
         if (!result) {
@@ -110,10 +112,12 @@ public class OpenSSLConf {
                 return false;
             }
             if (rc <= 0) {
-                log.error(sm.getString("opensslconf.failedCommand", name, value, rc));
+                log.error(sm.getString("opensslconf.failedCommand", name, value,
+                        Integer.toString(rc)));
                 result = false;
             } else if (log.isDebugEnabled()) {
-                log.debug(sm.getString("opensslconf.resultCommand", name, value, rc));
+                log.debug(sm.getString("opensslconf.resultCommand", name, value,
+                        Integer.toString(rc)));
             }
         }
         try {
@@ -124,7 +128,7 @@ public class OpenSSLConf {
             return false;
         }
         if (rc <= 0) {
-            log.error(sm.getString("opensslconf.finishFailed", rc));
+            log.error(sm.getString("opensslconf.finishFailed", Integer.toString(rc)));
             result = false;
         }
         if (!result) {

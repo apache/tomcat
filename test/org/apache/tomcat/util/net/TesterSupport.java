@@ -253,8 +253,8 @@ public final class TesterSupport {
         return clientAuthExpectedIssuer;
     }
 
-    protected static void trackTrackingKeyManagers(KeyManager wrapper, KeyManager wrapped,
-                                                   String usage, Principal[] issuers) {
+    protected static void trackTrackingKeyManagers(@SuppressWarnings("unused") KeyManager wrapper,
+            @SuppressWarnings("unused") KeyManager wrapped, String usage, Principal[] issuers) {
         lastUsage = usage;
         lastRequestedIssuers = issuers;
     }
@@ -268,7 +268,7 @@ public final class TesterSupport {
     }
 
     protected static Principal getLastClientAuthRequestedIssuer(int index) {
-        return lastRequestedIssuers[0];
+        return lastRequestedIssuers[index];
     }
 
     protected static boolean checkLastClientAuthRequestedIssuers() {
