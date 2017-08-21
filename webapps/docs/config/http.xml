@@ -1192,8 +1192,12 @@
 
     <attribute name="disableSessionTickets" required="false">
       <p>OpenSSL only.</p>
-      <p>Disables use of TLS Session Tickets (RFC 4507) if set to
-      <code>true</code>. Default is <code>false</code>.</p>
+      <p>Disables use of TLS session tickets (RFC 5077) if set to
+      <code>true</code>. Default is <code>false</code>. Note that when TLS
+      session tickets are in use, the full peer certificate chain will only be
+      available on the first connection. Subsequent connections (that use a
+      ticket to estrablish the TLS session) will only have the peer certificate,
+      not the full chain.</p>
     </attribute>
 
     <attribute name="honorCipherOrder" required="false">

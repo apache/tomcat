@@ -106,6 +106,12 @@
         Ensure that the APR/native connector uses blocking I/O for TLS
         renegotiation. (markt)
       </fix>
+      <fix>
+        <bug>58244</bug>: Handle the case when OpenSSL resumes a TLS session
+        using a ticket and the full client certificate chain is not available.
+        In this case the client certificate without the chain will be presented
+        to the application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

@@ -54,11 +54,17 @@ public class AprSSLSupport implements SSLSupport {
     @Override
     public X509Certificate[] getPeerCertificateChain() throws IOException {
         try {
-            // certLength == -1 indicates an error
+            // certLength == -1 indicates an error unless TLS session tickets
+            // are in use in which case OpenSSL won't store the chain in the
+            // ticket.
             int certLength = socketWrapper.getSSLInfoI(SSL.SSL_INFO_CLIENT_CERT_CHAIN);
             byte[] clientCert = socketWrapper.getSSLInfoB(SSL.SSL_INFO_CLIENT_CERT);
             X509Certificate[] certs = null;
-            if (clientCert != null  && certLength > -1) {
+
+            if (clientCert != null) {
+                if (certLength < 0) {
+                    certLength = 0;
+                }
                 certs = new X509Certificate[certLength + 1];
                 CertificateFactory cf;
                 if (clientCertProvider == null) {
