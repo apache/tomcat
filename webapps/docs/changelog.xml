@@ -58,6 +58,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.82 (violetagg)">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>58244</bug>: Handle the case when OpenSSL resumes a TLS session
+        using a ticket and the full client certificate chain is not available.
+        In this case the client certificate without the chain will be presented
+        to the application. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.81 (violetagg)" rtext="released 2017-08-16">
   <subsection name="Catalina">

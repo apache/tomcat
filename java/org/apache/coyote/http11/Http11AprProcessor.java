@@ -371,11 +371,17 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
                         request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, sslO);
                     }
                     // Get client certificate and the certificate chain if present
-                    // certLength == -1 indicates an error
+                    // certLength == -1 indicates an error unless TLS session tickets
+                    // are in use in which case OpenSSL won't store the chain in the
+                    // ticket.
                     int certLength = SSLSocket.getInfoI(socketRef, SSL.SSL_INFO_CLIENT_CERT_CHAIN);
                     byte[] clientCert = SSLSocket.getInfoB(socketRef, SSL.SSL_INFO_CLIENT_CERT);
                     X509Certificate[] certs = null;
-                    if (clientCert != null  && certLength > -1) {
+
+                    if (clientCert != null) {
+                        if (certLength < 0) {
+                            certLength = 0;
+                        }
                         certs = new X509Certificate[certLength + 1];
                         CertificateFactory cf;
                         if (clientCertProvider == null) {
