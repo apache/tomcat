@@ -426,7 +426,11 @@ public class ClassLoaderLogManager extends LogManager {
         // Special case for URL classloaders which are used in containers:
         // only look in the local repositories to avoid redefining loggers 20 times
         try {
-            if (classLoader instanceof URLClassLoader) {
+            if (classLoader instanceof WebappProperties) {
+                if (((WebappProperties) classLoader).hasLoggingConfig()) {
+                    is = classLoader.getResourceAsStream("logging.properties");
+                }
+            } else if (classLoader instanceof URLClassLoader) {
                 URL logConfig = ((URLClassLoader)classLoader).findResource("logging.properties");
 
                 if(null != logConfig) {

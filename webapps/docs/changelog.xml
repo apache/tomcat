@@ -59,6 +59,11 @@
         before generating the error page so that the page generation can be
         skipped if the page is never going to be sent. (markt)
       </fix>
+      <fix>
+        <bug>61210</bug>: When running under a SecurityManager, do not print a
+        warning about not being able to read a logging configuration file when
+        that file does not exist. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -74,6 +74,7 @@ public final class SecurityClassLoad {
     private static final void loadLoaderPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.loader.";
         loader.loadClass(basePackage + "WebappClassLoaderBase$PrivilegedFindClassByName");
+        loader.loadClass(basePackage + "WebappClassLoaderBase$PrivilegedHasLoggingConfig");
     }
 
 
