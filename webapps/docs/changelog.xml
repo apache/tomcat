@@ -112,6 +112,11 @@
         renegotiation. (markt)
       </fix>
       <fix>
+        <bug>48655</bug>: Enable Tomcat to shutdown cleanly when using sendfile,
+        the APR/native connector and a multi-part download is in progress.
+        (markt)
+      </fix>
+      <fix>
         <bug>58244</bug>: Handle the case when OpenSSL resumes a TLS session
         using a ticket and the full client certificate chain is not available.
         In this case the client certificate without the chain will be presented
