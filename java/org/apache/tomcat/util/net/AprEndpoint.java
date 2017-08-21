@@ -2835,10 +2835,50 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         @Override
         public void doClientAuth(SSLSupport sslSupport) throws IOException {
             long socket = getSocket().longValue();
-            // Configure connection to require a certificate
+            // Configure connection to require a certificate. This requires a
+            // re-handshake and must block until the re-handshake completes.
+            // Therefore, make sure socket is in blocking mode.
+            Lock readLock = getBlockingStatusReadLock();
+            WriteLock writeLock = getBlockingStatusWriteLock();
+            boolean renegotiateDone = false;
             try {
-                SSLSocket.setVerify(socket, SSL.SSL_CVERIFY_REQUIRE, -1);
-                SSLSocket.renegotiate(socket);
+                readLock.lock();
+                try {
+                    if (getBlockingStatus()) {
+                        Socket.timeoutSet(getSocket().longValue(), getReadTimeout() * 1000);
+
+                        SSLSocket.setVerify(socket, SSL.SSL_CVERIFY_REQUIRE, -1);
+                        SSLSocket.renegotiate(socket);
+
+                        renegotiateDone = true;
+                    }
+                } finally {
+                    readLock.unlock();
+                }
+
+                if (!renegotiateDone) {
+                    writeLock.lock();
+                    try {
+                        // Set the current settings for this socket
+                        setBlockingStatus(true);
+                        Socket.timeoutSet(getSocket().longValue(), getReadTimeout() * 1000);
+                        // Downgrade the lock
+                        readLock.lock();
+                        try {
+                            writeLock.unlock();
+                            SSLSocket.setVerify(socket, SSL.SSL_CVERIFY_REQUIRE, -1);
+                            SSLSocket.renegotiate(socket);
+                        } finally {
+                            readLock.unlock();
+                        }
+                    } finally {
+                        // Should have been released above but may not have been on some
+                        // exception paths
+                        if (writeLock.isHeldByCurrentThread()) {
+                            writeLock.unlock();
+                        }
+                    }
+                }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 throw new IOException(sm.getString("socket.sslreneg"), t);
