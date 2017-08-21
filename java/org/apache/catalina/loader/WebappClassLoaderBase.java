@@ -2519,4 +2519,24 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
         return null;
     }
+
+
+    @Override
+    public boolean hasLoggingConfig() {
+        if (Globals.IS_SECURITY_ENABLED) {
+            Boolean result = AccessController.doPrivileged(new PrivilegedHasLoggingConfig());
+            return result.booleanValue();
+        } else {
+            return findResource("logging.properties") != null;
+        }
+    }
+
+
+    private class PrivilegedHasLoggingConfig implements PrivilegedAction<Boolean> {
+
+        @Override
+        public Boolean run() {
+            return Boolean.valueOf(findResource("logging.properties") != null);
+        }
+    }
 }

@@ -113,6 +113,7 @@ public final class SecurityClassLoad {
         loader.loadClass
             (basePackage +
              "WebappClassLoaderBase$PrivilegedFindClassByName");
+        loader.loadClass(basePackage + "WebappClassLoaderBase$PrivilegedHasLoggingConfig");
     }
 
 
