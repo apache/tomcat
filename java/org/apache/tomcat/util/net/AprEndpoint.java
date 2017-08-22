@@ -370,6 +370,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         // Initialize SSL if needed
         if (isSSLEnabled()) {
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
+                sslHostConfig.setConfigType(getSslConfigType());
                 createSSLContext(sslHostConfig);
             }
             SSLHostConfig defaultSSLHostConfig = sslHostConfigs.get(getDefaultSSLHostConfigName());

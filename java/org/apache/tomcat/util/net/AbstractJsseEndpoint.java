@@ -82,6 +82,7 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
             sslImplementation = SSLImplementation.getInstance(getSslImplementationName());
 
             for (SSLHostConfig sslHostConfig : sslHostConfigs.values()) {
+                sslHostConfig.setConfigType(getSslConfigType());
                 createSSLContext(sslHostConfig);
             }
 

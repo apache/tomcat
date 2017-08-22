@@ -207,8 +207,8 @@ public abstract class AbstractEndpoint<S> {
         if (key == null || key.length() == 0) {
             throw new IllegalArgumentException(sm.getString("endpoint.noSslHostName"));
         }
-        sslHostConfig.setConfigType(getSslConfigType());
         if (bindState != BindState.UNBOUND && isSSLEnabled()) {
+            sslHostConfig.setConfigType(getSslConfigType());
             try {
                 createSSLContext(sslHostConfig);
             } catch (Exception e) {
