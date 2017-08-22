@@ -130,6 +130,13 @@
         <bug>61415</bug>: Fix TLS renegotiation with OpenSSL based connections
         and session caching. (markt)
       </fix>
+      <fix>
+        Delay checking that the configured attributes for an
+        <code>SSLHostConfig</code> instance are consistent with the configured
+        SSL implementation until <code>Connector</code> start to avoid incorrect
+        warnings when the SSL implementation changes during initialisation.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
