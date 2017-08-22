@@ -359,7 +359,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase {
         } catch ( ConnectException cx) {
             //do nothing, we couldn't connect
         }catch (Exception x ) {
-            log.error("Unable to perform failure detection check, assuming member down.",x);
+            log.error("Unable to perform failure detection check, assuming member down.[" + mbr + "]",x);
         } finally {
             try {socket.close(); } catch ( Exception ignore ){}
         }
