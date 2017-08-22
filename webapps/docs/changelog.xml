@@ -122,6 +122,10 @@
         In this case the client certificate without the chain will be presented
         to the application. (markt)
       </fix>
+      <fix>
+        Improve the warning message when JSSE and OpenSSL configuration styles
+        are mixed on the same <code>SSLHostConfig</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
