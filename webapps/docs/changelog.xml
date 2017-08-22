@@ -135,6 +135,10 @@
         update the access time when receiving the map member notification
         message. (kfujino)
       </fix>
+      <fix>
+        Add member info to the log message when the failure detection check
+        fails in <code>TcpFailureDetector</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

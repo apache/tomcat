@@ -356,7 +356,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
         } catch (ConnectException cx) {
             //do nothing, we couldn't connect
         } catch (Exception x) {
-            log.error(sm.getString("tcpFailureDetector.failureDetection.failed"),x);
+            log.error(sm.getString("tcpFailureDetector.failureDetection.failed", mbr),x);
         }
         return false;
     }
