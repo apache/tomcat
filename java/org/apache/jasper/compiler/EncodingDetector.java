@@ -35,7 +35,7 @@ class EncodingDetector {
 
     private static final XMLInputFactory XML_INPUT_FACTORY;
     static {
-        XML_INPUT_FACTORY = XMLInputFactory.newFactory();
+        XML_INPUT_FACTORY = XMLInputFactory.newInstance();
     }
 
     private final String encoding;
