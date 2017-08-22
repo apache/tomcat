@@ -231,6 +231,11 @@ implementation.  For more information, see:
 http://docs.oracle.com/javase/1.5.0/docs/guide/standards/index.html</a>. For
 Java 9+, use the upgradeable modules feature.</p>
 
+<p>Note that overriding any JRE component carries risk. If the overriding
+component does not provide a 100% compatible API (e.g. the API provided by
+Xerces is not 100% compatible with the XML API provided by the JRE) then there
+is a risk that Tomcat and/or the deployed application will experience errors.</p>
+
 </section>
 
 
