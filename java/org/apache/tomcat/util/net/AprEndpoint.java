@@ -543,6 +543,11 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             SSLContext.setAlpnProtos(ctx, protocolsArray, SSL.SSL_SELECTOR_FAILURE_NO_ADVERTISE);
         }
 
+        // If client authentication is being used, OpenSSL requires that
+        // this is set so always set it in case an app is configured to require
+        // it
+        SSLContext.setSessionIdContext(ctx, SSLContext.DEFAULT_SESSION_ID_CONTEXT);
+
         long cctx;
         OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
         if (openSslConf != null) {

@@ -428,6 +428,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
 
             sessionContext = new OpenSSLSessionContext(ctx);
+            // If client authentication is being used, OpenSSL requires that
+            // this is set so always set it in case an app is configured to
+            // require it
+            sessionContext.setSessionIdContext(SSLContext.DEFAULT_SESSION_ID_CONTEXT);
             sslHostConfig.setOpenSslContext(Long.valueOf(ctx));
             initialized = true;
         } catch (Exception e) {

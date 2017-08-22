@@ -432,7 +432,7 @@ public class SecureNioChannel extends NioChannel  {
         //so we can clear it here.
         netOutBuffer.clear();
         //perform the wrap
-        getBufHandler().configureWriteBufferForWrite();
+        getBufHandler().configureWriteBufferForRead();
         SSLEngineResult result = sslEngine.wrap(getBufHandler().getWriteBuffer(), netOutBuffer);
         //prepare the results to be written
         netOutBuffer.flip();

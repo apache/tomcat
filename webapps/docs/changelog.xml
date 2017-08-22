@@ -126,6 +126,10 @@
         Improve the warning message when JSSE and OpenSSL configuration styles
         are mixed on the same <code>SSLHostConfig</code>. (markt)
       </fix>
+      <fix>
+        <bug>61415</bug>: Fix TLS renegotiation with OpenSSL based connections
+        and session caching. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
