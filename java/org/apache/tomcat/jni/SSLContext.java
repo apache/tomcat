@@ -26,6 +26,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class SSLContext {
 
+    public static final byte[] DEFAULT_SESSION_ID_CONTEXT =
+            new byte[] { 'd', 'e', 'f', 'a', 'u', 'l', 't' };
+
     /**
      * Create a new SSL context.
      *
