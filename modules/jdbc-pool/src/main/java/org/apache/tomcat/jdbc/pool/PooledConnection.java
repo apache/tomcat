@@ -541,6 +541,22 @@ public class PooledConnection {
             }
             if (stmt!=null)
                 try { stmt.close();} catch (Exception ignore2){/*NOOP*/}
+
+            try {
+                if(!connection.getAutoCommit()) {
+                    connection.rollback();
+                }
+            } catch (SQLException e) {
+                // do nothing
+            }
+        } finally {
+            try {
+                if(!connection.getAutoCommit()) {
+                    connection.commit();
+                }
+            } catch (SQLException e) {
+                // do nothing
+            }
         }
         return false;
     } //validate
