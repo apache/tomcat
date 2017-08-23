@@ -281,12 +281,21 @@ public abstract class AbstractReplicatedMap<K,V>
                     MapMessage mapMsg = (MapMessage)resp[i].getMessage();
                     try {
                         mapMsg.deserialize(getExternalLoaders());
+                        Member member = resp[i].getSource();
                         State state = (State) mapMsg.getValue();
                         if (state.isAvailable()) {
-                            memberAlive(resp[i].getSource());
+                            memberAlive(member);
+                        } else if (state == State.STATETRANSFERRED) {
+                            synchronized (mapMembers) {
+                                if (log.isInfoEnabled())
+                                    log.info("Member[" + member + "] is state transferred but not available yet.");
+                                if (mapMembers.containsKey(member) ) {
+                                    mapMembers.put(member, Long.valueOf(System.currentTimeMillis()));
+                                }
+                            }
                         } else {
                             if (log.isInfoEnabled())
-                                log.info("Member[" + resp[i].getSource() + "] is not available yet.");
+                                log.info("Member[" + member + "] is not available yet.");
                         }
                     } catch (IOException x) {
                         log.error("Unable to deserialize MapMessage.", x);
@@ -543,6 +552,7 @@ public abstract class AbstractReplicatedMap<K,V>
         } catch (ClassNotFoundException x) {
             log.error("Unable to transfer AbstractReplicatedMap state.", x);
         }
+        this.state = State.STATETRANSFERRED;
     }
 
     /**
@@ -1669,6 +1679,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
     private static enum State {
         NEW(false),
+        STATETRANSFERRED(false),
         INITIALIZED(true),
         DESTROYED(false);
 
