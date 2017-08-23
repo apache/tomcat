@@ -150,6 +150,10 @@
         Add member info to the log message when the failure detection check
         fails in <code>TcpFailureDetector</code>. (kfujino)
       </fix>
+      <fix>
+        Avoid Ping timeout until the added map member by receiving
+        <code>MSG_START</code> message is completely started. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

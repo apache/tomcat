@@ -280,13 +280,23 @@ public abstract class AbstractReplicatedMap<K,V>
                     MapMessage mapMsg = (MapMessage)resp[i].getMessage();
                     try {
                         mapMsg.deserialize(getExternalLoaders());
+                        Member member = resp[i].getSource();
                         State state = (State) mapMsg.getValue();
                         if (state.isAvailable()) {
-                            memberAlive(resp[i].getSource());
+                            memberAlive(member);
+                        } else if (state == State.STATETRANSFERRED) {
+                            synchronized (mapMembers) {
+                                if (log.isInfoEnabled())
+                                    log.info(sm.getString("abstractReplicatedMap.ping.stateTransferredMember",
+                                            member));
+                                if (mapMembers.containsKey(member) ) {
+                                    mapMembers.put(member, Long.valueOf(System.currentTimeMillis()));
+                                }
+                            }
                         } else {
                             if (log.isInfoEnabled())
                                 log.info(sm.getString("abstractReplicatedMap.mapMember.unavailable",
-                                        resp[i].getSource()));
+                                        member));
                         }
                     } catch (ClassNotFoundException | IOException e) {
                         log.error(sm.getString("abstractReplicatedMap.unable.deserialize.MapMessage"), e);
@@ -536,6 +546,7 @@ public abstract class AbstractReplicatedMap<K,V>
         } catch (ClassNotFoundException x) {
             log.error(sm.getString("abstractReplicatedMap.unable.transferState"), x);
         }
+        this.state = State.STATETRANSFERRED;
     }
 
     /**
@@ -1611,6 +1622,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
     private enum State {
         NEW(false),
+        STATETRANSFERRED(false),
         INITIALIZED(true),
         DESTROYED(false);
 
