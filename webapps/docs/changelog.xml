@@ -156,6 +156,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>61425</bug>: Ensure that transaction of idle connection has
+        terminated  when the <code>testWhileIdle</code> is set to
+        <code>true</code> and <code>defaultAutoCommit</code> is set to
+        <code>false</code>. Patch provided by WangZheng. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
