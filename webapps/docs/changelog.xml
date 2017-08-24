@@ -58,6 +58,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.82 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>61452</bug>: Fix a copy paste error that caused an
+        <code>UnsupportedEncodingException</code> when using WebDAV. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>

@@ -33,11 +33,11 @@ public class TestURLEncoder {
 
         // Ensure encode as space is not shared
         original.setEncodeSpaceAsPlus(true);
-        Assert.assertNotEquals(original.encode(SPACE, "UTF_8"), clone.encode(SPACE, "UTF_8"));
+        Assert.assertNotEquals(original.encode(SPACE, "UTF-8"), clone.encode(SPACE, "UTF-8"));
 
         // Ensure safe characters is not shared
         original.addSafeCharacter('$');
-        Assert.assertNotEquals(original.encode(DOLLAR, "UTF_8"), clone.encode(DOLLAR, "UTF_8"));
+        Assert.assertNotEquals(original.encode(DOLLAR, "UTF-8"), clone.encode(DOLLAR, "UTF-8"));
     }
 
 
@@ -45,8 +45,8 @@ public class TestURLEncoder {
     public void testRemoveSafeCharacter() {
         URLEncoder xml = (URLEncoder) URLEncoder.DEFAULT.clone();
         // This should not encode '&'
-        Assert.assertEquals(AMPERSAND, xml.encode(AMPERSAND, "UTF_8"));
+        Assert.assertEquals(AMPERSAND, xml.encode(AMPERSAND, "UTF-8"));
         xml.removeSafeCharacter('&');
-        Assert.assertEquals(AMPERSAND_ENCODED, xml.encode(AMPERSAND, "UTF_8"));
+        Assert.assertEquals(AMPERSAND_ENCODED, xml.encode(AMPERSAND, "UTF-8"));
     }
 }
