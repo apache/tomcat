@@ -488,7 +488,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private static X509Certificate[] certificates(byte[][] chain) {
         X509Certificate[] peerCerts = new X509Certificate[chain.length];
         for (int i = 0; i < peerCerts.length; i++) {
-            peerCerts[i] = new OpenSslX509Certificate(chain[i]);
+            peerCerts[i] = new OpenSSLX509Certificate(chain[i]);
         }
         return peerCerts;
     }

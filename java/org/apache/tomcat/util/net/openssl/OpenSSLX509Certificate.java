@@ -32,12 +32,12 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Set;
 
-final class OpenSslX509Certificate extends X509Certificate {
+final class OpenSSLX509Certificate extends X509Certificate {
 
     private final byte[] bytes;
     private X509Certificate wrapped;
 
-    public OpenSslX509Certificate(byte[] bytes) {
+    public OpenSSLX509Certificate(byte[] bytes) {
         this.bytes = bytes;
     }
 

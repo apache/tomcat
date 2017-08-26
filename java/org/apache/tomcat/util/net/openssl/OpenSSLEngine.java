@@ -1228,14 +1228,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 if (clientCert != null) {
                     len++;
                     certificates = new Certificate[len];
-                    certificates[i++] = new OpenSslX509Certificate(clientCert);
+                    certificates[i++] = new OpenSSLX509Certificate(clientCert);
                 } else {
                     certificates = new Certificate[len];
                 }
                 if (chain != null) {
                     int a = 0;
                     for (; i < certificates.length; i++) {
-                        certificates[i] = new OpenSslX509Certificate(chain[a++]);
+                        certificates[i] = new OpenSSLX509Certificate(chain[a++]);
                     }
                 }
                 c = peerCerts = certificates;
