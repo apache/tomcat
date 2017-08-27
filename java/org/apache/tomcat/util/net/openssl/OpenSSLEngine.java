@@ -1001,9 +1001,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public void setUseClientMode(boolean clientMode) {
-        if (initialized) {
-            return;
-        }
         if (clientMode != this.clientMode) {
             throw new UnsupportedOperationException();
         }
@@ -1035,9 +1032,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private void setClientAuth(ClientAuthMode mode) {
-        if (initialized) {
-            return;
-        }
         if (clientMode) {
             return;
         }
