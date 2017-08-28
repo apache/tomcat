@@ -112,6 +112,9 @@
         warnings when the SSL implementation changes during initialisation.
         (markt)
       </fix>
+      <fix>
+        <bug>61450</bug>: Fix default key alias algorithm. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">

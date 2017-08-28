@@ -220,7 +220,15 @@ public class JSSEUtil extends SSLUtilBase {
                 if (!aliases.hasMoreElements()) {
                     throw new IOException(sm.getString("jsse.noKeys"));
                 }
-                keyAlias = aliases.nextElement();
+                while (aliases.hasMoreElements() && keyAlias == null) {
+                    keyAlias = aliases.nextElement();
+                    if (!ks.isKeyEntry(keyAlias)) {
+                        keyAlias = null;
+                    }
+                }
+                if (keyAlias == null) {
+                    throw new IOException(sm.getString("jsse.alias_no_key_entry", keyAlias));
+                }
             }
 
             inMemoryKeyStore.setKeyEntry(keyAlias, ks.getKey(keyAlias, keyPassArray), keyPassArray,
