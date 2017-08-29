@@ -51,6 +51,7 @@ public class PooledParallelSender extends PooledSender {
             throw cx;
         } else {
             try {
+                if (!sender.isConnected()) sender.connect();
                 sender.sendMessage(destination, message);
                 sender.keepalive();
             } catch (ChannelException x) {
