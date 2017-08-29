@@ -159,6 +159,10 @@
         Avoid Ping timeout until the added map member by receiving
         <code>MSG_START</code> message is completely started. (kfujino)
       </fix>
+      <fix>
+        When sending a channel message, make sure that the Sender has connected.
+        (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
