@@ -104,9 +104,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
             QueryStats qs = this.getQueryStats(sql);
             if (qs != null) {
                 qs.failure(delta, now);
-                if (isLogFailed() && log.isWarnEnabled()) {
-                    log.warn("Failed Query Report SQL="+sql+"; time="+delta+" ms;");
-                }
+            }
+            if (isLogFailed() && log.isWarnEnabled()) {
+                log.warn("Failed Query Report SQL="+sql+"; time="+delta+" ms;");
             }
         }
         return sql;

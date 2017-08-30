@@ -172,6 +172,11 @@
   <subsection name="jdbc-pool">
     <changelog>
       <fix>
+        <bug>61391</bug>: Ensure that failed queries are logged if the
+        <code>SlowQueryReport</code> interceptor is configured to do so and the
+        connection has been abandoned. Patch provided by Craig Webb. (markt)
+      </fix>
+      <fix>
         <bug>61425</bug>: Ensure that transaction of idle connection has
         terminated  when the <code>testWhileIdle</code> is set to
         <code>true</code> and <code>defaultAutoCommit</code> is set to
