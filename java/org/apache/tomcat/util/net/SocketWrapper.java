@@ -86,7 +86,13 @@ public class SocketWrapper<E> {
         }
     }
     public void access(long access) { lastAccess = access; }
-    public void setTimeout(long timeout) {this.timeout = timeout;}
+    public void setTimeout(long timeout) {
+        if (timeout > 0) {
+            this.timeout = timeout;
+        } else {
+            this.timeout = -1;
+        }
+    }
     public long getTimeout() {return this.timeout;}
     public boolean getError() { return error; }
     public void setError(boolean error) { this.error = error; }

@@ -79,6 +79,10 @@
         In this case the client certificate without the chain will be presented
         to the application. (markt)
       </fix>
+      <fix>
+        Fix random <code>SocketTimeoutException</code>s when reading the request
+        <code>InputStream</code>. Based on a patch by Peter Major. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
