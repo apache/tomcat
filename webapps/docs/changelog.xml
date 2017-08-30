@@ -163,6 +163,10 @@
         When sending a channel message, make sure that the Sender has connected.
         (kfujino)
       </fix>
+      <fix>
+        Correct the backup node selection logic that node 0 is returned twice
+        consecutively. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
