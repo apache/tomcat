@@ -926,7 +926,7 @@ public abstract class AbstractReplicatedMap<K,V>
         int node = currentNode++;
         if (node >= size) {
             node = 0;
-            currentNode = 0;
+            currentNode = 1;
         }
         return node;
     }
