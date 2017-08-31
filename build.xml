@@ -445,7 +445,6 @@
   <!-- Pattern sets for embedded JARs -->
   <!-- Every standard pattern set above should be included in an embedded JAR -->
   <patternset id="files.tomcat-embed-core" >
-    <patternset refid="files.annotations-api" />
     <patternset refid="files.catalina" />
     <patternset refid="files.servlet-api" />
     <patternset refid="files.jaspic-api" />
@@ -460,7 +459,6 @@
     <include name="org/apache/tomcat/jni/**" />
     <include name="org/apache/jk/**" />
     <include name="org/apache/tomcat/util/**" />
-
   </patternset>
 
   <patternset id="files.tomcat-embed-jasper" >
@@ -484,6 +482,9 @@
     <!--<patternset refid="files.catalina-ha" />-->
     <!-- Ant tasks not included in embedded -->
     <!--<patternset refid="files.catalina-ant" />-->
+    <!-- Annotations API is a separate dependency to avoid JRE 9 issues -->
+    <!-- See BZ 61439 -->
+    <!--<patternset refid="files.annotations-api" />-->
 
   <!-- Pattern sets for extras JARs -->
   <patternset id="files.tomcat-extras-ws">
@@ -1228,6 +1229,7 @@
     <copy file="${tomcat-dbcp.jar}" todir="${tomcat.embed}"
       failonerror="false"/>
     <copy file="${jdt.jar}" todir="${tomcat.embed}" />
+    <copy file="${annotations-api.jar}" todir="${tomcat.embed}" />
 
     <!-- Note the meta-inf below will work as long as there is only one JAR
          that needs to add entries. If there is more than one a more complex

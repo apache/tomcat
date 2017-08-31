@@ -199,6 +199,12 @@
         <code>catalina.bat</code> with the correct <code>rem</code> markup.
         (rjung)
       </fix>
+      <fix>
+        <bug>61439</bug>: Remove the Java Annotation API classes from
+        tomcat-embed-core.jar and package them in a separate JAR in the
+        embedded distribution to provide end users with greater flexibility to
+        handle potential conflicts with the JRE and/or other JARs. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
