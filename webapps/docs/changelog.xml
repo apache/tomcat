@@ -142,6 +142,13 @@
       <fix>
         <bug>61450</bug>: Fix default key alias algorithm. (remm)
       </fix>
+      <fix>
+        <bug>61451</bug>: Correct a regression in the fix to enable the use of
+        Java key stores that contained multiple keys that did not all have the
+        same password. The regression broke support for any key store that did
+        not store keys in PKCS #8 format such as hardware key stores and Windows
+        key stores. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
