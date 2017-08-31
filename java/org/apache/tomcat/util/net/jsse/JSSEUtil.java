@@ -18,6 +18,7 @@ package org.apache.tomcat.util.net.jsse;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Key;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
@@ -180,18 +181,19 @@ public class JSSEUtil extends SSLUtilBase {
         }
 
         KeyStore ks = certificate.getCertificateKeystore();
+        KeyStore ksUsed = ks;
 
         /*
-         * Always use an in memory key store.
+         * Use an in memory key store where possible.
          * For PEM format keys and certificates, it allows them to be imported
          * into the expected format.
-         * For Java key stores, it enables Tomcat to handle the case where
-         * multiple keys exist in the key store, each with a different password.
-         * The KeyManagerFactory can't handle that so using an in memory key
-         * store with just the required key works around that.
+         * For Java key stores with PKCS8 encoded keys (e.g. JKS files), it
+         * enables Tomcat to handle the case where multiple keys exist in the
+         * key store, each with a different password. The KeyManagerFactory
+         * can't handle that so using an in memory key store with just the
+         * required key works around that.
+         * Other keys stores (hardware, MS, etc.) will be used as is.
          */
-        KeyStore inMemoryKeyStore = KeyStore.getInstance("JKS");
-        inMemoryKeyStore.load(null,  null);
 
         char[] keyPassArray = keyPass.toCharArray();
 
@@ -211,7 +213,12 @@ public class JSSEUtil extends SSLUtilBase {
             if (keyAlias == null) {
                 keyAlias = "tomcat";
             }
-            inMemoryKeyStore.setKeyEntry(keyAlias, privateKeyFile.getPrivateKey(), keyPass.toCharArray(), chain.toArray(new Certificate[chain.size()]));
+
+            // Switch to in-memory key store
+            ksUsed = KeyStore.getInstance("JKS");
+            ksUsed.load(null,  null);
+            ksUsed.setKeyEntry(keyAlias, privateKeyFile.getPrivateKey(), keyPass.toCharArray(),
+                    chain.toArray(new Certificate[chain.size()]));
         } else {
             if (keyAlias != null && !ks.isKeyEntry(keyAlias)) {
                 throw new IOException(sm.getString("jsse.alias_no_key_entry", keyAlias));
@@ -231,13 +238,19 @@ public class JSSEUtil extends SSLUtilBase {
                 }
             }
 
-            inMemoryKeyStore.setKeyEntry(keyAlias, ks.getKey(keyAlias, keyPassArray), keyPassArray,
-                    ks.getCertificateChain(keyAlias));
+            Key k = ks.getKey(keyAlias, keyPassArray);
+            if (k != null && "PKCS#8".equalsIgnoreCase(k.getFormat())) {
+                // Switch to in-memory key store
+                ksUsed = KeyStore.getInstance("JKS");
+                ksUsed.load(null,  null);
+                ksUsed.setKeyEntry(keyAlias, k, keyPassArray, ks.getCertificateChain(keyAlias));
+            }
+            // Non-PKCS#8 key stores will use the original key store
         }
 
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
-        kmf.init(inMemoryKeyStore, keyPassArray);
+        kmf.init(ksUsed, keyPassArray);
 
         return kmf.getKeyManagers();
     }
