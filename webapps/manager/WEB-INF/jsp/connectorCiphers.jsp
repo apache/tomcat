@@ -18,13 +18,13 @@
 <%@page session="false" contentType="text/html; charset=ISO-8859-1" %>
 <%@page import="java.util.Map" %>
 <%@page import="java.util.Map.Entry" %>
-<%@page import="java.util.Set" %>
+<%@page import="java.util.List" %>
 <!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<% Map<String,Set<String>> cipherList = (Map<String,Set<String>>) request.getAttribute("cipherList");
+<% Map<String,List<String>> cipherList = (Map<String,List<String>>) request.getAttribute("cipherList");
 %>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
@@ -48,7 +48,7 @@
     </thead>
     <tbody>
         <%
-        for (Map.Entry<String, Set<String>> entry : cipherList.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : cipherList.entrySet()) {
         %>
         <tr>
             <td><%=entry.getKey()%></td>

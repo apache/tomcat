@@ -22,12 +22,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -562,8 +564,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             StringManager smClient) {
         writer.println(smClient.getString(
                 "managerServlet.sslConnectorCiphers"));
-        Map<String,Set<String>> connectorCiphers = getConnectorCiphers();
-        for (Map.Entry<String,Set<String>> entry : connectorCiphers.entrySet()) {
+        Map<String,List<String>> connectorCiphers = getConnectorCiphers();
+        for (Map.Entry<String,List<String>> entry : connectorCiphers.entrySet()) {
             writer.println(entry.getKey());
             for (String cipher : entry.getValue()) {
                 writer.print("  ");
@@ -1683,8 +1685,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     }
 
 
-    protected Map<String,Set<String>> getConnectorCiphers() {
-        Map<String,Set<String>> result = new HashMap<>();
+    protected Map<String,List<String>> getConnectorCiphers() {
+        Map<String,List<String>> result = new HashMap<>();
 
         Engine e = (Engine) host.getParent();
         Service s = e.getService();
@@ -1694,15 +1696,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
                 for (SSLHostConfig sslHostConfig : sslHostConfigs) {
                     String name = connector.toString() + "-" + sslHostConfig.getHostName();
-                    Set<String> cipherList = new HashSet<>();
-                    String[] cipherNames = sslHostConfig.getEnabledCiphers();
-                    for (String cipherName : cipherNames) {
-                        cipherList.add(cipherName);
-                    }
-                result.put(name, cipherList);
+                    /* Add cipher list, keep order but remove duplicates */
+                    result.put(name, new ArrayList<>(new LinkedHashSet<>(
+                        Arrays.asList(sslHostConfig.getEnabledCiphers()))));
                 }
             } else {
-                Set<String> cipherList = new HashSet<>();
+                ArrayList cipherList = new ArrayList<String>(1);
                 cipherList.add(sm.getString("managerServlet.notSslConnector"));
                 result.put(connector.toString(), cipherList);
             }
