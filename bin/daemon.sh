@@ -94,6 +94,15 @@ test ".$TOMCAT_USER" = . && TOMCAT_USER=tomcat
 #
 if [ -z "$JAVA_HOME" ]; then
     JAVA_BIN="`which java 2>/dev/null || type java 2>&1`"
+    while [ -h "$JAVA_BIN" ]; do
+        ls=`ls -ld "$JAVA_BIN"`
+        link=`expr "$ls" : '.*-> \(.*\)$'`
+        if expr "$link" : '/.*' > /dev/null; then
+            JAVA_BIN="$link"
+        else
+            JAVA_BIN="`dirname $JAVA_BIN`/$link"
+        fi
+    done
     test -x "$JAVA_BIN" && JAVA_HOME="`dirname $JAVA_BIN`"
     test ".$JAVA_HOME" != . && JAVA_HOME=`cd "$JAVA_HOME/.." >/dev/null; pwd`
 else
