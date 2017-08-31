@@ -205,6 +205,11 @@
         embedded distribution to provide end users with greater flexibility to
         handle potential conflicts with the JRE and/or other JARs. (markt)
       </fix>
+      <fix>
+        <bug>61441</bug>: Improve the detection of <code>JAVA_HOME</code> by the
+        <code>daemon.sh</code> script when running on a platform where Java has
+        been installed from an RPM. (rjung)
+      </fix>
     </changelog>
   </subsection>
 </section>
