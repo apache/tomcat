@@ -1701,7 +1701,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         Arrays.asList(sslHostConfig.getEnabledCiphers()))));
                 }
             } else {
-                ArrayList cipherList = new ArrayList<String>(1);
+                ArrayList<String> cipherList = new ArrayList<>(1);
                 cipherList.add(sm.getString("managerServlet.notSslConnector"));
                 result.put(connector.toString(), cipherList);
             }
