@@ -34,10 +34,6 @@ public class JreCompat {
 
     static {
         // This is Tomcat 9 with a minimum Java version of Java 8.
-        // At this point there are no option features that require Java > 8 but
-        // the memory leak detection code does need to know if it is running on
-        // Java 9+ since the modularisation changes break some of the reflection
-        // used
         // Look for the highest supported JVM first
         if (Jre9Compat.isSupported()) {
             instance = new Jre9Compat();
