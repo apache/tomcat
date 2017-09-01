@@ -17,6 +17,7 @@
 package org.apache.naming.resources;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,6 +59,10 @@ import org.apache.naming.NamingEntry;
  * @author Fabrizio Giustina
  */
 public class VirtualDirContext extends FileDirContext {
+
+    private static final org.apache.juli.logging.Log log=
+            org.apache.juli.logging.LogFactory.getLog(VirtualDirContext.class);
+
     private String extraResourcePaths = "";
     private Map<String, List<String>> mappedResourcePaths;
 
@@ -113,7 +118,13 @@ public class VirtualDirContext extends FileDirContext {
                     resourcePaths = new ArrayList<String>();
                     mappedResourcePaths.put(path, resourcePaths);
                 }
-                resourcePaths.add(dir.getAbsolutePath());
+                try {
+                    resourcePaths.add(dir.getCanonicalPath());
+                } catch (IOException e) {
+                    log.warn(sm.getString("fileResources.canonical.fail", dir.getPath()));
+                    // Fall back to the absolute path
+                    resourcePaths.add(dir.getAbsolutePath());
+                }
             }
         }
         if (mappedResourcePaths.isEmpty()) {

@@ -137,7 +137,15 @@ public class FileDirContext extends BaseDirContext {
             throw new IllegalArgumentException(sm.getString("fileResources.base", docBase));
         }
 
-        this.absoluteBase = base.getAbsolutePath();
+        // absoluteBase also needs to be normalized. Using the canonical path is
+        // the simplest way of doing this.
+        try {
+            this.absoluteBase = base.getCanonicalPath();
+        } catch (IOException e) {
+            log.warn(sm.getString("fileResources.canonical.fail", base.getPath()));
+            // Fall back to the absolute path
+            this.absoluteBase = base.getAbsolutePath();
+        }
         super.setDocBase(docBase);
     }
 

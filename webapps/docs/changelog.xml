@@ -64,6 +64,11 @@
         <bug>61452</bug>: Fix a copy paste error that caused an
         <code>UnsupportedEncodingException</code> when using WebDAV. (markt)
       </fix>
+      <fix>
+        Correct regression in 7.0.80 that broke the use of relative paths with
+        the <code>extraResourcePaths</code> attribute of a
+        <code>VirtualDirContext</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
