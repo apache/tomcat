@@ -16,6 +16,10 @@
  */
 package org.apache.tomcat.util.compat;
 
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
+
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 
@@ -95,5 +99,20 @@ public class JreCompat {
      */
     public String getApplicationProtocol(SSLEngine sslEngine) {
         throw new UnsupportedOperationException(sm.getString("jreCompat.noApplicationProtocol"));
+    }
+
+
+    /**
+     * Disables caching for JAR URL connections. For Java 8 and earlier, this also disables
+     * caching for ALL URL connections.
+     *
+     * @throws IOException If a dummy JAR URLConnection can not be created
+     */
+    public void disableCachingForJarUrlConnections() throws IOException {
+        // Doesn't matter that this JAR doesn't exist - just as
+        // long as the URL is well-formed
+        URL url = new URL("jar:file://dummy.jar!/");
+        URLConnection uConn = url.openConnection();
+        uConn.setDefaultUseCaches(false);
     }
 }

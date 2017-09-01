@@ -70,6 +70,13 @@
         running under a <code>SecurityManager</code> and using
         <code>Subject.doAs()</code>. (markt)
       </fix>
+      <add>
+        When running under Java 9 or later, and the
+        <code>urlCacheProtection</code> option of the
+        <code>JreMemoryLeakPreventionListener</code> is enabled, use the API
+        added in Java 9 to only disable the caching for JAR URL connections.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

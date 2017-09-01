@@ -16,8 +16,10 @@
  */
 package org.apache.tomcat.util.compat;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URLConnection;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
@@ -27,16 +29,19 @@ class Jre9Compat extends JreCompat {
     private static final Class<?> inaccessibleObjectExceptionClazz;
     private static final Method setApplicationProtocolsMethod;
     private static final Method getApplicationProtocolMethod;
+    private static final Method setDefaultUseCaches;
 
     static {
         Class<?> c1 = null;
         Method m2 = null;
         Method m3 = null;
+        Method m4 = null;
 
         try {
             c1 = Class.forName("java.lang.reflect.InaccessibleObjectException");
             m2 = SSLParameters.class.getMethod("setApplicationProtocols", String[].class);
             m3 = SSLEngine.class.getMethod("getApplicationProtocol");
+            m4 = URLConnection.class.getMethod("setDefaultUseCaches", String.class, boolean.class);
         } catch (SecurityException | NoSuchMethodException e) {
             // Should never happen
         } catch (ClassNotFoundException e) {
@@ -45,6 +50,7 @@ class Jre9Compat extends JreCompat {
         inaccessibleObjectExceptionClazz = c1;
         setApplicationProtocolsMethod = m2;
         getApplicationProtocolMethod = m3;
+        setDefaultUseCaches = m4;
     }
 
 
@@ -77,6 +83,16 @@ class Jre9Compat extends JreCompat {
     public String getApplicationProtocol(SSLEngine sslEngine) {
         try {
             return (String) getApplicationProtocolMethod.invoke(sslEngine);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw new UnsupportedOperationException(e);
+        }
+    }
+
+
+    @Override
+    public void disableCachingForJarUrlConnections() throws IOException {
+        try {
+            setDefaultUseCaches.invoke(null, "JAR", Boolean.FALSE);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new UnsupportedOperationException(e);
         }
