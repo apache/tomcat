@@ -83,6 +83,11 @@
         Fix random <code>SocketTimeoutException</code>s when reading the request
         <code>InputStream</code>. Based on a patch by Peter Major. (markt)
       </fix>
+      <fix>
+        <bug>60900</bug>: Avoid a <code>NullPointerException</code> in the APR
+        Poller if a connection is closed at the same time as new data arrives on
+        that connection. (markt) 
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">

@@ -1894,14 +1894,20 @@ public class AprEndpoint extends AbstractEndpoint<Long> {
                             pollerSpace[i] += rv;
                             connectionCount.addAndGet(-rv);
                             for (int n = 0; n < rv; n++) {
-                                long timeout = timeouts.remove(desc[n*2+1]);
-                                AprSocketWrapper wrapper = connections.get(
-                                        Long.valueOf(desc[n*2+1]));
                                 if (getLog().isDebugEnabled()) {
                                     log.debug(sm.getString(
                                             "endpoint.debug.pollerProcess",
                                             Long.valueOf(desc[n*2+1]),
                                             Long.valueOf(desc[n*2])));
+                                }
+                                long timeout = timeouts.remove(desc[n*2+1]);
+                                AprSocketWrapper wrapper = connections.get(
+                                        Long.valueOf(desc[n*2+1]));
+                                if (wrapper == null) {
+                                    // Socket was closed in another thread while still in
+                                    // the Poller but wasn't removed from the Poller before
+                                    // new data arrived.
+                                    continue;
                                 }
                                 wrapper.pollerFlags = wrapper.pollerFlags & ~((int) desc[n*2]);
                                 // Check for failed sockets and hand this socket off to a worker
