@@ -20,7 +20,6 @@ package org.apache.catalina.core;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.DriverManager;
@@ -299,9 +298,6 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                         URL url = new URL("jar:file://dummy.jar!/");
                         URLConnection uConn = url.openConnection();
                         uConn.setDefaultUseCaches(false);
-                    } catch (MalformedURLException e) {
-                        log.error(sm.getString(
-                                "jreLeakListener.jarUrlConnCacheFail"), e);
                     } catch (IOException e) {
                         log.error(sm.getString(
                                 "jreLeakListener.jarUrlConnCacheFail"), e);
