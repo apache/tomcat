@@ -77,6 +77,10 @@
         added in Java 9 to only disable the caching for JAR URL connections.
         (markt)
       </add>
+      <add>
+        <bug>61280</bug>: Add RFC 7617 support to the
+        <code>BasicAuthenticator</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

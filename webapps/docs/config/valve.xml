@@ -1098,6 +1098,19 @@
         used.</p>
       </attribute>
 
+      <attribute name="charset" required="false">
+        <p>Controls if the <code>WWW-Authenticate</code> HTTP header includes a
+        <code>charset</code> authentication parameter as per RFC 7617. The only
+        permitted options are <code>null</code>, the empty string and
+        <code>UTF-8</code>. If <code>UTF-8</code> is specified then the
+        <code>charset</code> authentication parameter will be sent with that
+        value and the provided user name and optional password will be converted
+        from bytes to characters using UTF-8. Otherwise, no <code>charset</code>
+        authentication parameter will be sent and the provided user name and
+        optional password will be converted from bytes to characters using
+        ISO-8859-1. The default value is <code>UTF-8</code></p>
+      </attribute>
+
       <attribute name="className" required="true">
         <p>Java class name of the implementation to use.  This MUST be set to
         <strong>org.apache.catalina.authenticator.BasicAuthenticator</strong>.</p>

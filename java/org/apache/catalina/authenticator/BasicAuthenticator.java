@@ -20,6 +20,7 @@ package org.apache.catalina.authenticator;
 
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 
@@ -43,10 +44,30 @@ import org.apache.tomcat.util.codec.binary.Base64;
  * @author Craig R. McClanahan
  */
 public class BasicAuthenticator extends AuthenticatorBase {
+
     private static final Log log = LogFactory.getLog(BasicAuthenticator.class);
 
+    private Charset charset = StandardCharsets.UTF_8;
+    private String charsetString = "UTF-8";
 
-    // --------------------------------------------------------- Public Methods
+
+    public String getCharset() {
+        return charsetString;
+    }
+
+
+    public void setCharset(String charsetString) {
+        // Only acceptable options are null, "" or "UTF-8" (case insensitive)
+        if (charsetString == null || charsetString.isEmpty()) {
+            charset = StandardCharsets.ISO_8859_1;
+        } else if ("UTF-8".equalsIgnoreCase(charsetString)) {
+            charset = StandardCharsets.UTF_8;
+        } else {
+            throw new IllegalArgumentException(sm.getString("basicAuthenticator.invalidCharset"));
+        }
+        this.charsetString = charsetString;
+    }
+
 
     @Override
     protected boolean doAuthenticate(Request request, HttpServletResponse response)
@@ -66,7 +87,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
             ByteChunk authorizationBC = authorization.getByteChunk();
             BasicCredentials credentials = null;
             try {
-                credentials = new BasicCredentials(authorizationBC);
+                credentials = new BasicCredentials(authorizationBC, charset);
                 String username = credentials.getUsername();
                 String password = credentials.getPassword();
 
@@ -89,6 +110,10 @@ public class BasicAuthenticator extends AuthenticatorBase {
         value.append("Basic realm=\"");
         value.append(getRealmName(context));
         value.append('\"');
+        if (charsetString != null && !charsetString.isEmpty()) {
+            value.append(", charset=");
+            value.append(charsetString);
+        }
         response.setHeader(AUTH_HEADER_NAME, value.toString());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         return false;
@@ -112,28 +137,31 @@ public class BasicAuthenticator extends AuthenticatorBase {
         // note: we include single white space as its delimiter
         private static final String METHOD = "basic ";
 
-        private ByteChunk authorization;
-        private int initialOffset;
+        private final Charset charset;
+        private final ByteChunk authorization;
+        private final int initialOffset;
         private int base64blobOffset;
         private int base64blobLength;
 
         private String username = null;
         private String password = null;
-
         /**
          * Parse the HTTP Authorization header for BASIC authentication
          * as per RFC 2617 section 2, and the Base64 encoded credentials
          * as per RFC 2045 section 6.8.
          *
-         * @param input The header value to parse in-place
+         * @param input   The header value to parse in-place
+         * @param charset The character set to use to convert the bytes to a
+         *                string
          *
          * @throws IllegalArgumentException If the header does not conform
          *                                  to RFC 2617
          */
-        public BasicCredentials(ByteChunk input)
-                throws IllegalArgumentException {
+        public BasicCredentials(ByteChunk input, Charset charset) throws IllegalArgumentException {
             authorization = input;
             initialOffset = input.getOffset();
+            this.charset = charset;
+
             parseMethod();
             byte[] decoded = parseBase64();
             parseCredentials(decoded);
@@ -210,15 +238,12 @@ public class BasicAuthenticator extends AuthenticatorBase {
             }
 
             if (colon < 0) {
-                username = new String(decoded, StandardCharsets.ISO_8859_1);
+                username = new String(decoded, charset);
                 // password will remain null!
             }
             else {
-                username = new String(
-                            decoded, 0, colon, StandardCharsets.ISO_8859_1);
-                password = new String(
-                            decoded, colon + 1, decoded.length - colon - 1,
-                            StandardCharsets.ISO_8859_1);
+                username = new String(decoded, 0, colon, charset);
+                password = new String(decoded, colon + 1, decoded.length - colon - 1, charset);
                 // tolerate surplus white space around credentials
                 if (password.length() > 1) {
                     password = password.trim();
