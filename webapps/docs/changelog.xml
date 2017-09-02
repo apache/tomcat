@@ -68,6 +68,13 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        When using a Java connector in combination with the OpenSSL TLS
+        implementation, do not configure each SSL connection object via
+        the OpenSSLEngine. For OpenSSL the SSL object inherits its
+        settings from the SSL_CTX which we have already configured.
+        (rjung)
+      </fix>
+      <fix>
         If an invalid option is specified for the
         <code>certificateVerification</code> attribute of an
         <code>SSLHostConfig</code> element, treat it as <code>required</code>
