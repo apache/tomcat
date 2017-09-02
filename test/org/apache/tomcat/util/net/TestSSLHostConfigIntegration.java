@@ -31,8 +31,6 @@ public class TestSSLHostConfigIntegration extends TomcatBaseTest {
 
     @Test
     public void testSslHostConfigIsSerializable() throws Exception {
-        TesterSupport.configureClientSsl();
-
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File(getBuildDirectory(), "webapps/examples");
