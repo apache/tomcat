@@ -198,8 +198,18 @@ public final class TesterSupport {
 
         // Configure the Realm
         TesterMapRealm realm = new TesterMapRealm();
-        realm.addUser("CN=user1, C=US", "not used");
-        realm.addUserRole("CN=user1, C=US", ROLE);
+
+        String cn = "NOTFOUND";
+        try {
+            KeyStore ks = getKeyStore(CLIENT_JKS);
+            X509Certificate cert = (X509Certificate)ks.getCertificate(CLIENT_ALIAS);
+            cn = cert.getSubjectDN().getName();
+        } catch (Exception ex) {
+            // Ignore
+        }
+
+        realm.addUser(cn, "not used");
+        realm.addUserRole(cn, ROLE);
         ctx.setRealm(realm);
 
         // Configure the authenticator
