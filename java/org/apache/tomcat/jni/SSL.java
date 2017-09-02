@@ -646,7 +646,7 @@ public final class SSL {
     public static native int getOptions(long ssl);
 
     /**
-     * Returns all Returns the cipher suites that are available for negotiation in an SSL handshake.
+     * Returns all cipher suites that are enabled for negotiation in an SSL handshake.
      * @param ssl the SSL instance (SSL *)
      * @return ciphers
      */
