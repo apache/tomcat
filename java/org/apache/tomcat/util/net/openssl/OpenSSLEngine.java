@@ -709,11 +709,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 break;
             }
             String converted = OpenSSLCipherConfigurationParser.jsseToOpenSSL(cipherSuite);
-            if (converted != null) {
-                cipherSuite = converted;
-            }
             if (!AVAILABLE_CIPHER_SUITES.contains(cipherSuite)) {
                 logger.debug(sm.getString("engine.unsupportedCipher", cipherSuite, converted));
+            }
+            if (converted != null) {
+                cipherSuite = converted;
             }
 
             buf.append(cipherSuite);
