@@ -48,10 +48,22 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
 public final class TesterSupport {
 
+    public static final String SSL_DIR = "test/org/apache/tomcat/util/net/";
+    public static final String CA_ALIAS = "ca";
+    public static final String CA_JKS = SSL_DIR + CA_ALIAS + ".jks";
+    public static final String CLIENT_ALIAS = "user1";
+    public static final String CLIENT_JKS = SSL_DIR + CLIENT_ALIAS + ".jks";
+    public static final String LOCALHOST_JKS = SSL_DIR + "localhost.jks";
+    public static final String LOCALHOST_KEYPASS_JKS = SSL_DIR + "localhost-copy1.jks";
+    public static final String JKS_PASS = "changeit";
+    public static final String JKS_KEY_PASS = "tomcatpass";
+    public static final String LOCALHOST_CERT_PEM = SSL_DIR + "localhost-cert.pem";
+    public static final String LOCALHOST_KEY_PEM = SSL_DIR + "localhost-key.pem";
+
     public static final String ROLE = "testrole";
 
     public static void initSsl(Tomcat tomcat) {
-        initSsl(tomcat, "localhost.jks", null, null);
+        initSsl(tomcat, LOCALHOST_JKS, null, null);
     }
 
     protected static void initSsl(Tomcat tomcat, String keystore,
@@ -70,11 +82,10 @@ public final class TesterSupport {
             }
             connector.setProperty("sslProtocol", "tls");
             File keystoreFile =
-                new File("test/org/apache/tomcat/util/net/" + keystore);
+                new File(keystore);
             connector.setAttribute("keystoreFile",
                     keystoreFile.getAbsolutePath());
-            File truststoreFile = new File(
-                    "test/org/apache/tomcat/util/net/ca.jks");
+            File truststoreFile = new File(CA_JKS);
             connector.setAttribute("truststoreFile",
                     truststoreFile.getAbsolutePath());
             if (keystorePass != null) {
@@ -85,11 +96,11 @@ public final class TesterSupport {
             }
         } else {
             File keystoreFile = new File(
-                    "test/org/apache/tomcat/util/net/localhost-cert.pem");
+                    LOCALHOST_CERT_PEM);
             tomcat.getConnector().setAttribute("SSLCertificateFile",
                     keystoreFile.getAbsolutePath());
             keystoreFile = new File(
-                    "test/org/apache/tomcat/util/net/localhost-key.pem");
+                    LOCALHOST_KEY_PEM);
             tomcat.getConnector().setAttribute("SSLCertificateKeyFile",
                     keystoreFile.getAbsolutePath());
         }
@@ -100,15 +111,14 @@ public final class TesterSupport {
     protected static KeyManager[] getUser1KeyManagers() throws Exception {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(
                 KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(getKeyStore("test/org/apache/tomcat/util/net/user1.jks"),
-                "changeit".toCharArray());
+        kmf.init(getKeyStore(CLIENT_JKS), JKS_PASS.toCharArray());
         return kmf.getKeyManagers();
     }
 
     protected static TrustManager[] getTrustManagers() throws Exception {
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(
                 TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(getKeyStore("test/org/apache/tomcat/util/net/ca.jks"));
+        tmf.init(getKeyStore(CA_JKS));
         return tmf.getTrustManagers();
     }
 
@@ -129,7 +139,7 @@ public final class TesterSupport {
         File keystoreFile = new File(keystore);
         KeyStore ks = KeyStore.getInstance("JKS");
         try (InputStream is = new FileInputStream(keystoreFile)) {
-            ks.load(is, "changeit".toCharArray());
+            ks.load(is, JKS_PASS.toCharArray());
         }
         return ks;
     }
