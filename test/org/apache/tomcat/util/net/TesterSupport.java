@@ -60,6 +60,18 @@ import org.apache.tomcat.jni.SSL;
 
 public final class TesterSupport {
 
+    public static final String RESOURCE_PATH = "org/apache/tomcat/util/net/";
+    public static final String CA_ALIAS = "ca";
+    public static final String CA_JKS = RESOURCE_PATH + CA_ALIAS + ".jks";
+    public static final String CLIENT_ALIAS = "user1";
+    public static final String CLIENT_JKS = RESOURCE_PATH + CLIENT_ALIAS + ".jks";
+    public static final String LOCALHOST_JKS = RESOURCE_PATH + "localhost.jks";
+    public static final String LOCALHOST_KEYPASS_JKS = RESOURCE_PATH + "localhost-copy1.jks";
+    public static final String JKS_PASS = "changeit";
+    public static final String JKS_KEY_PASS = "tomcatpass";
+    public static final String LOCALHOST_CERT_PEM = RESOURCE_PATH + "localhost-cert.pem";
+    public static final String LOCALHOST_KEY_PEM = RESOURCE_PATH + "localhost-key.pem";
+
     public static final String ROLE = "testrole";
 
     protected static final boolean RFC_5746_SUPPORTED;
@@ -87,7 +99,7 @@ public final class TesterSupport {
     }
 
     public static void initSsl(Tomcat tomcat) {
-        initSsl(tomcat, "localhost.jks", null, null);
+        initSsl(tomcat, LOCALHOST_JKS, null, null);
     }
 
     protected static void initSsl(Tomcat tomcat, String keystore,
@@ -99,15 +111,11 @@ public final class TesterSupport {
         if (protocol.indexOf("Apr") == -1) {
             Connector connector = tomcat.getConnector();
             connector.setProperty("sslProtocol", "tls");
-            
-            java.net.URL keyStoreUrl =
-                    cl.getResource("org/apache/tomcat/util/net/" + keystore);
+            java.net.URL keyStoreUrl = cl.getResource(keystore);
             File keystoreFile = toFile(keyStoreUrl);
             connector.setAttribute("keystoreFile",
                     keystoreFile.getAbsolutePath());
-            
-            java.net.URL truststoreUrl =
-                    cl.getResource("org/apache/tomcat/util/net/ca.jks");
+            java.net.URL truststoreUrl = cl.getResource(CA_JKS);
             File truststoreFile = toFile(truststoreUrl);
             connector.setAttribute("truststoreFile",
                     truststoreFile.getAbsolutePath());
@@ -119,14 +127,12 @@ public final class TesterSupport {
                 connector.setAttribute("keyPass", keyPass);
             }
         } else {
-            java.net.URL keyStoreUrl =
-                    cl.getResource("org/apache/tomcat/util/net/localhost-cert.pem");
+            java.net.URL keyStoreUrl = cl.getResource(LOCALHOST_CERT_PEM);
             File keystoreFile = toFile(keyStoreUrl);
             tomcat.getConnector().setAttribute("SSLCertificateFile",
                     keystoreFile.getAbsolutePath());
             
-            java.net.URL sslCertificateKeyUrl =
-                    cl.getResource("org/apache/tomcat/util/net/localhost-key.pem");
+            java.net.URL sslCertificateKeyUrl = cl.getResource(LOCALHOST_KEY_PEM);
             File sslCertificateKeyFile = toFile(sslCertificateKeyUrl);
             tomcat.getConnector().setAttribute("SSLCertificateKeyFile",
                     sslCertificateKeyFile.getAbsolutePath());
@@ -156,15 +162,14 @@ public final class TesterSupport {
     protected static KeyManager[] getUser1KeyManagers() throws Exception {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(
                 KeyManagerFactory.getDefaultAlgorithm());
-        kmf.init(getKeyStore("org/apache/tomcat/util/net/user1.jks"),
-                "changeit".toCharArray());
+        kmf.init(getKeyStore(CLIENT_JKS), JKS_PASS.toCharArray());
         return kmf.getKeyManagers();
     }
 
     protected static TrustManager[] getTrustManagers() throws Exception {
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(
                 TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(getKeyStore("org/apache/tomcat/util/net/ca.jks"));
+        tmf.init(getKeyStore(CA_JKS));
         return tmf.getTrustManagers();
     }
 
@@ -191,7 +196,7 @@ public final class TesterSupport {
         InputStream is = null;
         try {
             is = new FileInputStream(keystoreFile);
-            ks.load(is, "changeit".toCharArray());
+            ks.load(is, JKS_PASS.toCharArray());
         } finally {
             if (is != null) {
                 try {

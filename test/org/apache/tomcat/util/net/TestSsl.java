@@ -73,8 +73,8 @@ public class TestSsl extends TomcatBaseTest {
         File appDir = new File(getBuildDirectory(), "webapps/examples");
         tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
-        TesterSupport.initSsl(tomcat, "localhost-copy1.jks", "changeit",
-                "tomcatpass");
+        TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS,
+                TesterSupport.JKS_PASS, TesterSupport.JKS_KEY_PASS);
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +

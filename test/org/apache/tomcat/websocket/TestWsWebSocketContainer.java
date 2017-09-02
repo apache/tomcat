@@ -850,7 +850,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
         ClientEndpointConfig clientEndpointConfig =
                 ClientEndpointConfig.Builder.create().build();
         URL truststoreUrl = this.getClass().getClassLoader().getResource(
-                "org/apache/tomcat/util/net/ca.jks");
+                TesterSupport.CA_JKS);
         File truststoreFile = new File(truststoreUrl.toURI());
         clientEndpointConfig.getUserProperties().put(
                 WsWebSocketContainer.SSL_TRUSTSTORE_PROPERTY,
