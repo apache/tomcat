@@ -20,16 +20,24 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Socket;
 import java.security.KeyStore;
+import java.security.Principal;
+import java.security.PrivateKey;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Locale;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509ExtendedKeyManager;
+import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
+import javax.security.auth.x500.X500Principal;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -61,6 +69,10 @@ public final class TesterSupport {
     public static final String LOCALHOST_KEY_PEM = SSL_DIR + "localhost-key.pem";
 
     public static final String ROLE = "testrole";
+
+    private static String clientAuthExpectedIssuer = null;
+    private static String lastUsage = "NONE";
+    private static Principal[] lastRequestedIssuers = new Principal[0];
 
     public static void initSsl(Tomcat tomcat) {
         initSsl(tomcat, LOCALHOST_JKS, null, null);
@@ -112,7 +124,17 @@ public final class TesterSupport {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(
                 KeyManagerFactory.getDefaultAlgorithm());
         kmf.init(getKeyStore(CLIENT_JKS), JKS_PASS.toCharArray());
-        return kmf.getKeyManagers();
+        KeyManager[] managers = kmf.getKeyManagers();
+        KeyManager manager;
+        for (int i=0; i < managers.length; i++) {
+            manager = managers[i];
+            if (manager instanceof X509ExtendedKeyManager) {
+                managers[i] = new TrackingExtendedKeyManager((X509ExtendedKeyManager)manager);
+            } else if (manager instanceof X509KeyManager) {
+                managers[i] = new TrackingKeyManager((X509KeyManager)manager);
+            }
+        }
+        return managers;
     }
 
     protected static TrustManager[] getTrustManagers() throws Exception {
@@ -121,7 +143,6 @@ public final class TesterSupport {
         tmf.init(getKeyStore(CA_JKS));
         return tmf.getTrustManagers();
     }
-
 
     protected static void configureClientSsl() {
         try {
@@ -199,6 +220,15 @@ public final class TesterSupport {
         // Configure the Realm
         TesterMapRealm realm = new TesterMapRealm();
 
+        // Get the CA subject the server should send us for client cert selection
+        try {
+            KeyStore ks = getKeyStore(CA_JKS);
+            X509Certificate cert = (X509Certificate)ks.getCertificate(CA_ALIAS);
+            clientAuthExpectedIssuer = cert.getSubjectDN().getName();
+        } catch (Exception ex) {
+            // Ignore
+        }
+
         String cn = "NOTFOUND";
         try {
             KeyStore ks = getKeyStore(CLIENT_JKS);
@@ -217,6 +247,35 @@ public final class TesterSupport {
         lc.setAuthMethod("CLIENT-CERT");
         ctx.setLoginConfig(lc);
         ctx.getPipeline().addValve(new SSLAuthenticator());
+    }
+
+    protected static String getClientAuthExpectedIssuer() {
+        return clientAuthExpectedIssuer;
+    }
+
+    protected static void trackTrackingKeyManagers(KeyManager wrapper, KeyManager wrapped,
+                                                   String usage, Principal[] issuers) {
+        lastUsage = usage;
+        lastRequestedIssuers = issuers;
+    }
+
+    protected static String getLastClientAuthKeyManagerUsage() {
+        return lastUsage;
+    }
+
+    protected static int getLastClientAuthRequestedIssuerCount() {
+        return lastRequestedIssuers == null ? 0 : lastRequestedIssuers.length;
+    }
+
+    protected static Principal getLastClientAuthRequestedIssuer(int index) {
+        return lastRequestedIssuers[0];
+    }
+
+    protected static boolean checkLastClientAuthRequestedIssuers() {
+        if (lastRequestedIssuers == null || lastRequestedIssuers.length != 1)
+            return false;
+        return (new X500Principal(clientAuthExpectedIssuer)).equals(
+                    new X500Principal(lastRequestedIssuers[0].getName()));
     }
 
     public static final byte DATA = (byte)33;
@@ -263,6 +322,104 @@ public final class TesterSupport {
         }
     }
 
+    public static class TrackingKeyManager implements X509KeyManager {
+
+        private X509KeyManager manager = null;
+
+        public TrackingKeyManager(X509KeyManager manager) {
+            this.manager = manager;
+        }
+
+        @Override
+        public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
+            trackTrackingKeyManagers(this, manager, "chooseClientAlias", issuers);
+            return manager.chooseClientAlias(keyType, issuers, socket);
+        }
+
+        @Override
+        public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
+            trackTrackingKeyManagers(this, manager, "chooseServerAlias", issuers);
+            return manager.chooseServerAlias(keyType, issuers, socket);
+        }
+
+        @Override
+        public X509Certificate[] getCertificateChain(String alias) {
+            return manager.getCertificateChain(alias);
+        }
+
+        @Override
+        public String[] getClientAliases(String keyType, Principal[] issuers) {
+            trackTrackingKeyManagers(this, manager, "getClientAliases", issuers);
+            return manager.getClientAliases(keyType, issuers);
+        }
+
+        @Override
+        public PrivateKey getPrivateKey(String alias) {
+            return manager.getPrivateKey(alias);
+        }
+
+        @Override
+        public String[] getServerAliases(String keyType, Principal[] issuers) {
+            trackTrackingKeyManagers(this, manager, "getServerAliases", issuers);
+            return manager.getServerAliases(keyType, issuers);
+        }
+    }
+
+    public static class TrackingExtendedKeyManager extends X509ExtendedKeyManager {
+
+        private X509ExtendedKeyManager manager = null;
+
+        public TrackingExtendedKeyManager(X509ExtendedKeyManager manager) {
+            this.manager = manager;
+        }
+
+        @Override
+        public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
+            trackTrackingKeyManagers(this, manager, "chooseClientAlias", issuers);
+            return manager.chooseClientAlias(keyType, issuers, socket);
+        }
+
+        @Override
+        public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
+            trackTrackingKeyManagers(this, manager, "chooseServerAlias", issuers);
+            return manager.chooseServerAlias(keyType, issuers, socket);
+        }
+
+        @Override
+        public X509Certificate[] getCertificateChain(String alias) {
+            return manager.getCertificateChain(alias);
+        }
+
+        @Override
+        public String[] getClientAliases(String keyType, Principal[] issuers) {
+            trackTrackingKeyManagers(this, manager, "getClientAliases", issuers);
+            return manager.getClientAliases(keyType, issuers);
+        }
+
+        @Override
+        public PrivateKey getPrivateKey(String alias) {
+            return manager.getPrivateKey(alias);
+        }
+
+        @Override
+        public String[] getServerAliases(String keyType, Principal[] issuers) {
+            trackTrackingKeyManagers(this, manager, "getServerAliases", issuers);
+            return manager.getServerAliases(keyType, issuers);
+        }
+
+        @Override
+        public String chooseEngineClientAlias(String[] keyType, Principal[] issuers, SSLEngine engine) {
+            trackTrackingKeyManagers(this, manager, "chooseEngineClientAlias", issuers);
+            return manager.chooseEngineClientAlias(keyType, issuers, engine);
+        }
+
+        @Override
+        public String chooseEngineServerAlias(String keyType, Principal[] issuers, SSLEngine engine) {
+            trackTrackingKeyManagers(this, manager, "chooseEngineServerAlias", issuers);
+            return manager.chooseEngineServerAlias(keyType, issuers, engine);
+        }
+    }
+
     public static class TrustAllCerts implements X509TrustManager {
 
         @Override
@@ -280,6 +437,83 @@ public final class TesterSupport {
         public void checkServerTrusted(X509Certificate[] certs,
                 String authType) {
             // NOOP - Trust everything
+        }
+    }
+
+    public static class SequentialTrustManager implements X509TrustManager {
+
+        private static X509TrustManager[] tms;
+        private static X509Certificate[] certs;
+
+        static {
+            try {
+                TrustManager[] managers = getTrustManagers();
+                int mcount = 0;
+                int ccount = 0;
+                for (TrustManager tm : managers) {
+                    if (tm instanceof X509TrustManager) {
+                        mcount++;
+                        ccount += ((X509TrustManager)tm).getAcceptedIssuers().length;
+                    }
+                }
+                tms = new X509TrustManager[mcount];
+                certs = new X509Certificate[ccount];
+                mcount = 0;
+                ccount = 0;
+                for (TrustManager tm : managers) {
+                    if (tm instanceof X509TrustManager) {
+                        tms[mcount] = (X509TrustManager)tm;
+                        mcount++;
+                        for (X509Certificate cert : ((X509TrustManager)tm).getAcceptedIssuers()) {
+                            certs[ccount] = cert;
+                            ccount++;
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                tms = new X509TrustManager[1];
+                tms[0] = new TrustAllCerts();
+                certs = new X509Certificate[0];
+            }
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return certs;
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] certs,
+                String authType) throws CertificateException {
+            boolean trust = false;
+            for (X509TrustManager tm : tms) {
+                try {
+                    tm.checkClientTrusted(certs, authType);
+                    trust = true;
+                } catch (CertificateException ex) {
+                    // Ignore
+                }
+            }
+            if (!trust) {
+                throw new CertificateException();
+            }
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] certs,
+                String authType) throws CertificateException {
+            boolean trust = false;
+            for (X509TrustManager tm : tms) {
+                try {
+                    tm.checkServerTrusted(certs, authType);
+                    trust = true;
+                } catch (CertificateException ex) {
+                    // Ignore
+                }
+            }
+            if (!trust) {
+                throw new CertificateException();
+            }
         }
     }
 }
