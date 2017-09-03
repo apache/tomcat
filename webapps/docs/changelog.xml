@@ -75,6 +75,12 @@
         (rjung)
       </fix>
       <fix>
+        When using JSSE TLS configuration with the OpenSSL implementation and
+        client certificates: include client CA subjects in the TLS handshake
+        so that the client can choose an appropriate client certificate to
+        present. (rjung)
+      </fix>
+      <fix>
         If an invalid option is specified for the
         <code>certificateVerification</code> attribute of an
         <code>SSLHostConfig</code> element, treat it as <code>required</code>
