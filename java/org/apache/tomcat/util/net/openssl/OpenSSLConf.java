@@ -35,6 +35,10 @@ public class OpenSSLConf {
         commands.add(cmd);
     }
 
+    public List<OpenSSLConfCmd> getCommands() {
+        return commands;
+    }
+
     public boolean check(long cctx) throws Exception {
         boolean result = true;
         OpenSSLConfCmd cmd;
