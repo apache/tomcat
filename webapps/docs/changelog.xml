@@ -60,6 +60,11 @@
 <section name="Tomcat 7.0.82 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>61280</bug>: Add RFC 7617 support to the
+        <code>BasicAuthenticator</code>. Note that the default configuration
+        does not change the existin behaviour. (markt)
+      </add>
       <fix>
         <bug>61452</bug>: Fix a copy paste error that caused an
         <code>UnsupportedEncodingException</code> when using WebDAV. (markt)

@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@
 package org.apache.catalina.authenticator;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.security.Principal;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,17 +39,14 @@ import org.apache.tomcat.util.codec.binary.Base64;
  */
 public class BasicAuthenticator extends AuthenticatorBase {
 
-   // ----------------------------------------------------- Instance Variables
-
-
     /**
      * Descriptive information about this implementation.
      */
-    protected static final String info =
-        "org.apache.catalina.authenticator.BasicAuthenticator/1.0";
+    protected static final String info = "org.apache.catalina.authenticator.BasicAuthenticator/1.0";
 
 
-    // ------------------------------------------------------------- Properties
+    private Charset charset = B2CConverter.ISO_8859_1;
+    private String charsetString = null;
 
 
     /**
@@ -56,28 +54,28 @@ public class BasicAuthenticator extends AuthenticatorBase {
      */
     @Override
     public String getInfo() {
-
-        return (info);
-
+        return info;
     }
 
 
-    // --------------------------------------------------------- Public Methods
+    public String getCharset() {
+        return charsetString;
+    }
 
 
-    /**
-     * Authenticate the user making this request, based on the specified
-     * login configuration.  Return <code>true</code> if any specified
-     * constraint has been satisfied, or <code>false</code> if we have
-     * created a response challenge already.
-     *
-     * @param request Request we are processing
-     * @param response Response we are creating
-     * @param config    Login configuration describing how authentication
-     *              should be performed
-     *
-     * @exception IOException if an input/output error occurs
-     */
+    public void setCharset(String charsetString) {
+        // Only acceptable options are null, "" or "UTF-8" (case insensitive)
+        if (charsetString == null || charsetString.isEmpty()) {
+            charset = B2CConverter.ISO_8859_1;
+        } else if ("UTF-8".equalsIgnoreCase(charsetString)) {
+            charset = B2CConverter.UTF_8;
+        } else {
+            throw new IllegalArgumentException(sm.getString("basicAuthenticator.invalidCharset"));
+        }
+        this.charsetString = charsetString;
+    }
+
+
     @Override
     public boolean authenticate(Request request,
                                 HttpServletResponse response,
@@ -92,21 +90,21 @@ public class BasicAuthenticator extends AuthenticatorBase {
         String username = null;
         String password = null;
 
-        MessageBytes authorization = 
+        MessageBytes authorization =
             request.getCoyoteRequest().getMimeHeaders()
             .getValue("authorization");
-        
+
         if (authorization != null) {
             authorization.toBytes();
             ByteChunk authorizationBC = authorization.getByteChunk();
             if (authorizationBC.startsWithIgnoreCase("basic ", 0)) {
                 authorizationBC.setOffset(authorizationBC.getOffset() + 6);
-                
+
                 byte[] decoded = Base64.decodeBase64(
                         authorizationBC.getBuffer(),
                         authorizationBC.getOffset(),
                         authorizationBC.getLength());
-                
+
                 // Get username and password
                 int colon = -1;
                 for (int i = 0; i < decoded.length; i++) {
@@ -117,15 +115,12 @@ public class BasicAuthenticator extends AuthenticatorBase {
                 }
 
                 if (colon < 0) {
-                    username = new String(decoded, B2CConverter.ISO_8859_1);
+                    username = new String(decoded, charset);
                 } else {
-                    username = new String(
-                            decoded, 0, colon, B2CConverter.ISO_8859_1);
-                    password = new String(
-                            decoded, colon + 1, decoded.length - colon - 1,
-                            B2CConverter.ISO_8859_1);
+                    username = new String(decoded, 0, colon, charset);
+                    password = new String(decoded, colon + 1, decoded.length - colon - 1, charset);
                 }
-                
+
                 authorizationBC.setOffset(authorizationBC.getOffset() - 6);
             }
 
@@ -136,7 +131,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
                 return (true);
             }
         }
-        
+
         StringBuilder value = new StringBuilder(16);
         value.append("Basic realm=\"");
         if (config.getRealmName() == null) {
@@ -144,7 +139,11 @@ public class BasicAuthenticator extends AuthenticatorBase {
         } else {
             value.append(config.getRealmName());
         }
-        value.append('\"');        
+        value.append('\"');
+        if (charsetString != null && !charsetString.isEmpty()) {
+            value.append(", charset=");
+            value.append(charsetString);
+        }
         response.setHeader(AUTH_HEADER_NAME, value.toString());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         return (false);
