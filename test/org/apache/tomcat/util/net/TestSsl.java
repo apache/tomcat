@@ -67,6 +67,8 @@ public class TestSsl extends TomcatBaseTest {
         ByteChunk res = getUrl("https://localhost:" + getPort() +
             "/examples/servlets/servlet/HelloWorldExample");
         assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
+        assertTrue("Checking no client issuer has been requested",
+                   TesterSupport.getLastClientAuthRequestedIssuerCount() == 0);
     }
 
     @Test
@@ -87,6 +89,8 @@ public class TestSsl extends TomcatBaseTest {
         ByteChunk res = getUrl("https://localhost:" + getPort() +
             "/examples/servlets/servlet/HelloWorldExample");
         assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
+        assertTrue("Checking no client issuer has been requested",
+                   TesterSupport.getLastClientAuthRequestedIssuerCount() == 0);
     }
 
 
@@ -118,6 +122,8 @@ public class TestSsl extends TomcatBaseTest {
         Reader r = new InputStreamReader(is);
 
         doRequest(os, r);
+        assertTrue("Checking no client issuer has been requested",
+                   TesterSupport.getLastClientAuthRequestedIssuerCount() == 0);
 
         TesterHandshakeListener listener = new TesterHandshakeListener();
         socket.addHandshakeCompletedListener(listener);
@@ -131,6 +137,8 @@ public class TestSsl extends TomcatBaseTest {
             while (requestCount < 10) {
                 requestCount++;
                 doRequest(os, r);
+                assertTrue("Checking no client issuer has been requested",
+                           TesterSupport.getLastClientAuthRequestedIssuerCount() == 0);
                 if (listener.isComplete() && listenerComplete == 0) {
                     listenerComplete = requestCount;
                 }
