@@ -47,8 +47,8 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
     private static final Log log = LogFactory.getLog(BasicAuthenticator.class);
 
-    private Charset charset = StandardCharsets.UTF_8;
-    private String charsetString = "UTF-8";
+    private Charset charset = StandardCharsets.ISO_8859_1;
+    private String charsetString = null;
 
 
     public String getCharset() {

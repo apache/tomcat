@@ -1108,7 +1108,7 @@
         from bytes to characters using UTF-8. Otherwise, no <code>charset</code>
         authentication parameter will be sent and the provided user name and
         optional password will be converted from bytes to characters using
-        ISO-8859-1. The default value is <code>UTF-8</code></p>
+        ISO-8859-1. The default value is <code>null</code></p>
       </attribute>
 
       <attribute name="className" required="true">
