@@ -350,15 +350,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 // by the server during the handshake to allow the client choosing
                 // an acceptable certificate
                 for (X509Certificate caCert : manager.getAcceptedIssuers()) {
-                    // try/catch can be removed once tcnative 1.2.13 was released
-                    // and the required version was updated to it.
-                    try {
-                        SSLContext.addClientCACertificateRaw(ctx, caCert.getEncoded());
-                        if (log.isDebugEnabled())
-                            log.debug(sm.getString("openssl.addedClientCaCert", caCert.toString()));
-                    } catch (UnsatisfiedLinkError e) {
-                        log.warn(sm.getString("openssl.incompleteClientCASupport"), e);
-                    }
+                    SSLContext.addClientCACertificateRaw(ctx, caCert.getEncoded());
+                    if (log.isDebugEnabled())
+                        log.debug(sm.getString("openssl.addedClientCaCert", caCert.toString()));
                 }
             } else {
                 // Client certificate verification based on trusted CA files and dirs
