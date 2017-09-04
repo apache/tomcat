@@ -201,7 +201,7 @@ public class SSLHostConfig implements Serializable {
     }
 
 
-    void setEnabledProtocols(String[] enabledProtocols) {
+    public void setEnabledProtocols(String[] enabledProtocols) {
         this.enabledProtocols = enabledProtocols;
     }
 
@@ -216,7 +216,7 @@ public class SSLHostConfig implements Serializable {
     }
 
 
-    void setEnabledCiphers(String[] enabledCiphers) {
+    public void setEnabledCiphers(String[] enabledCiphers) {
         this.enabledCiphers = enabledCiphers;
     }
 
