@@ -127,9 +127,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                                         SSL.SSL_CONF_FLAG_SERVER |
                                         SSL.SSL_CONF_FLAG_CERTIFICATE |
                                         SSL.SSL_CONF_FLAG_SHOW_ERRORS);
-                } catch (UnsatisfiedLinkError e) {
-                    log.warn(sm.getString("openssl.missingOpenSSLConfSupport"), e);
-                    throw new Exception(sm.getString("openssl.errMakeConf"), e);
                 } catch (Exception e) {
                     throw new SSLException(sm.getString("openssl.errMakeConf"), e);
                 }
@@ -195,11 +192,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 SSLContext.free(ctx);
             }
             if (cctx != 0) {
-                try {
-                    SSLConf.free(cctx);
-                } catch (UnsatisfiedLinkError e) {
-                    log.warn(sm.getString("openssl.missingOpenSSLConfSupport"), e);
-                }
+                SSLConf.free(cctx);
             }
             if (aprPool != 0) {
                 Pool.destroy(aprPool);

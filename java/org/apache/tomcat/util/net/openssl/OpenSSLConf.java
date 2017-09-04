@@ -59,8 +59,7 @@ public class OpenSSLConf {
             }
             try {
                 rc = SSLConf.check(cctx, name, value);
-            } catch (UnsatisfiedLinkError e) {
-                log.warn(sm.getString("opensslconf.missingOpenSSLConfSupport"), e);
+            } catch (Exception e) {
                 log.error(sm.getString("opensslconf.checkFailed"));
                 return false;
             }
@@ -81,13 +80,7 @@ public class OpenSSLConf {
 
     public boolean apply(long cctx, long ctx) throws Exception {
         boolean result = true;
-        try {
-            SSLConf.assign(cctx, ctx);
-        } catch (UnsatisfiedLinkError e) {
-            log.warn(sm.getString("opensslconf.missingOpenSSLConfSupport"), e);
-            log.error(sm.getString("opensslconf.applyFailed"));
-            return false;
-        }
+        SSLConf.assign(cctx, ctx);
         OpenSSLConfCmd cmd;
         String name;
         String value;
@@ -106,8 +99,7 @@ public class OpenSSLConf {
             }
             try {
                 rc = SSLConf.apply(cctx, name, value);
-            } catch (UnsatisfiedLinkError e) {
-                log.warn(sm.getString("opensslconf.missingOpenSSLConfSupport"), e);
+            } catch (Exception e) {
                 log.error(sm.getString("opensslconf.applyFailed"));
                 return false;
             }
@@ -120,13 +112,7 @@ public class OpenSSLConf {
                         Integer.toString(rc)));
             }
         }
-        try {
-            rc = SSLConf.finish(cctx);
-        } catch (UnsatisfiedLinkError e) {
-            log.warn(sm.getString("opensslconf.missingOpenSSLConfSupport"), e);
-            log.error(sm.getString("opensslconf.applyFailed"));
-            return false;
-        }
+        rc = SSLConf.finish(cctx);
         if (rc <= 0) {
             log.error(sm.getString("opensslconf.finishFailed", Integer.toString(rc)));
             result = false;
