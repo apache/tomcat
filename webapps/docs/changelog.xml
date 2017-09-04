@@ -58,6 +58,11 @@
         warning about not being able to read a logging configuration file when
         that file does not exist. (markt)
       </fix>
+      <add>
+        <bug>61280</bug>: Add RFC 7617 support to the
+        <code>BasicAuthenticator</code>. Note that the default configuration
+        does not change the existin behaviour. (markt)
+      </add>
       <fix>
         <bug>61424</bug>: Avoid a possible <code>StackOverflowError</code> when
         running under a <code>SecurityManager</code> and using
@@ -69,11 +74,6 @@
         <code>JreMemoryLeakPreventionListener</code> is enabled, use the API
         added in Java 9 to only disable the caching for JAR URL connections.
         (markt)
-      </add>
-      <add>
-        <bug>61280</bug>: Add RFC 7617 support to the
-        <code>BasicAuthenticator</code>. Note that the default configuration
-        does not change the existin behaviour. (markt)
       </add>
     </changelog>
   </subsection>
