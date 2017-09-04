@@ -193,6 +193,15 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     public void setClientCertProvider(String s) { this.clientCertProvider = s; }
 
 
+    private int maxHeaderCount = 100;
+    public int getMaxHeaderCount() {
+        return maxHeaderCount;
+    }
+    public void setMaxHeaderCount(int maxHeaderCount) {
+        this.maxHeaderCount = maxHeaderCount;
+    }
+
+
     @Override
     public boolean isAprRequired() {
         return false;
@@ -292,13 +301,6 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
     public void setConnectionTimeout(int timeout) {
         endpoint.setConnectionTimeout(timeout);
-    }
-
-    public int getMaxHeaderCount() {
-        return endpoint.getMaxHeaderCount();
-    }
-    public void setMaxHeaderCount(int maxHeaderCount) {
-        endpoint.setMaxHeaderCount(maxHeaderCount);
     }
 
     public long getConnectionCount() {
