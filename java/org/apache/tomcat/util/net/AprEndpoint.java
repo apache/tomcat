@@ -565,9 +565,6 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
                                     SSL.SSL_CONF_FLAG_SERVER |
                                     SSL.SSL_CONF_FLAG_CERTIFICATE |
                                     SSL.SSL_CONF_FLAG_SHOW_ERRORS);
-            } catch (UnsatisfiedLinkError e) {
-                log.warn(sm.getString("endpoint.apr.missingOpenSSLConfSupport"), e);
-                throw new Exception(sm.getString("endpoint.apr.errMakeConf"), e);
             } catch (Exception e) {
                 throw new Exception(sm.getString("endpoint.apr.errMakeConf"), e);
             }
@@ -638,11 +635,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
         }
         Long cctx = sslHostConfig.getOpenSslConfContext();
         if (cctx != null) {
-            try {
-                SSLConf.free(cctx.longValue());
-            } catch (UnsatisfiedLinkError e) {
-                log.warn(sm.getString("endpoint.apr.missingOpenSSLConfSupport"), e);
-            }
+            SSLConf.free(cctx.longValue());
             sslHostConfig.setOpenSslConfContext(null);
         }
     }
