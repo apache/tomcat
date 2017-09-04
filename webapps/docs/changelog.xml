@@ -167,6 +167,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>60523</bug>: Reduce the number of packets used to send WebSocket
+        messages by not flushing between the header and the payload when the
+        two are written together. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>

@@ -74,7 +74,17 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
             onWritePossible(true);
         } else {
             // Blocking
-            for (ByteBuffer buffer : buffers) {
+            try {
+                for (ByteBuffer buffer : buffers) {
+                    long timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
+                    if (timeout <= 0) {
+                        SendResult sr = new SendResult(new SocketTimeoutException());
+                        handler.onResult(sr);
+                        return;
+                    }
+                    socketWrapper.setWriteTimeout(timeout);
+                    socketWrapper.write(true, buffer);
+                }
                 long timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
                 if (timeout <= 0) {
                     SendResult sr = new SendResult(new SocketTimeoutException());
@@ -82,21 +92,11 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     return;
                 }
                 socketWrapper.setWriteTimeout(timeout);
-                try {
-                    socketWrapper.write(true, buffer);
-                    timeout = blockingWriteTimeoutExpiry - System.currentTimeMillis();
-                    if (timeout <= 0) {
-                        SendResult sr = new SendResult(new SocketTimeoutException());
-                        handler.onResult(sr);
-                        return;
-                    }
-                    socketWrapper.setWriteTimeout(timeout);
-                    socketWrapper.flush(true);
-                    handler.onResult(SENDRESULT_OK);
-                } catch (IOException e) {
-                    SendResult sr = new SendResult(e);
-                    handler.onResult(sr);
-                }
+                socketWrapper.flush(true);
+                handler.onResult(SENDRESULT_OK);
+            } catch (IOException e) {
+                SendResult sr = new SendResult(e);
+                handler.onResult(sr);
             }
         }
     }
