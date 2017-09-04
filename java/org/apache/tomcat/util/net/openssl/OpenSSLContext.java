@@ -43,6 +43,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.CertificateVerifier;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.SSL;
+import org.apache.tomcat.jni.SSLConf;
 import org.apache.tomcat.jni.SSLContext;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -90,6 +91,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private final long aprPool;
     private final AtomicInteger aprPoolDestroyed = new AtomicInteger(0);
 
+    // OpenSSLConfCmd context
+    protected final long cctx;
+    // SSL context
     protected final long ctx;
 
     static final CertificateFactory X509_CERT_FACTORY;
@@ -114,6 +118,28 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         aprPool = Pool.create(0);
         boolean success = false;
         try {
+            // Create OpenSSLConfCmd context if used
+            OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
+            if (openSslConf != null) {
+                try {
+                    if (log.isDebugEnabled())
+                        log.debug(sm.getString("openssl.makeConf"));
+                    cctx = SSLConf.make(aprPool,
+                                        SSL.SSL_CONF_FLAG_FILE |
+                                        SSL.SSL_CONF_FLAG_SERVER |
+                                        SSL.SSL_CONF_FLAG_CERTIFICATE |
+                                        SSL.SSL_CONF_FLAG_SHOW_ERRORS);
+                } catch (UnsatisfiedLinkError e) {
+                    log.warn(sm.getString("openssl.missingOpenSSLConfSupport"), e);
+                    throw new Exception(sm.getString("openssl.errMakeConf"), e);
+                } catch (Exception e) {
+                    throw new SSLException(sm.getString("openssl.errMakeConf"), e);
+                }
+            } else {
+                cctx = 0;
+            }
+            sslHostConfig.setOpenSslConfContext(Long.valueOf(cctx));
+
             // SSL protocol
             int value = SSL.SSL_PROTOCOL_NONE;
             for (String protocol : sslHostConfig.getEnabledProtocols()) {
@@ -169,6 +195,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         if (aprPoolDestroyed.compareAndSet(0, 1)) {
             if (ctx != 0) {
                 SSLContext.free(ctx);
+            }
+            if (cctx != 0) {
+                try {
+                    SSLConf.free(cctx);
+                } catch (UnsatisfiedLinkError e) {
+                    log.warn(sm.getString("openssl.missingOpenSSLConfSupport"), e);
+                }
             }
             if (aprPool != 0) {
                 Pool.destroy(aprPool);
@@ -344,6 +377,32 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 String[] protocolsArray = protocols.toArray(new String[0]);
                 SSLContext.setAlpnProtos(ctx, protocolsArray, SSL.SSL_SELECTOR_FAILURE_NO_ADVERTISE);
                 SSLContext.setNpnProtos(ctx, protocolsArray, SSL.SSL_SELECTOR_FAILURE_NO_ADVERTISE);
+            }
+
+            // Apply OpenSSLConfCmd if used
+            OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
+            if (openSslConf != null && cctx != 0) {
+                // Check OpenSSLConfCmd if used
+                if (log.isDebugEnabled())
+                    log.debug(sm.getString("openssl.checkConf"));
+                try {
+                    if (!openSslConf.check(cctx)) {
+                        log.error(sm.getString("openssl.errCheckConf"));
+                        throw new Exception(sm.getString("openssl.errCheckConf"));
+                    }
+                } catch (Exception e) {
+                    throw new Exception(sm.getString("openssl.errCheckConf"), e);
+                }
+                if (log.isDebugEnabled())
+                    log.debug(sm.getString("openssl.applyConf"));
+                try {
+                    if (!openSslConf.apply(cctx, ctx)) {
+                        log.error(sm.getString("openssl.errApplyConf"));
+                        throw new SSLException(sm.getString("openssl.errApplyConf"));
+                    }
+                } catch (Exception e) {
+                    throw new SSLException(sm.getString("openssl.errApplyConf"), e);
+                }
             }
 
             sessionContext = new OpenSSLSessionContext(ctx);
