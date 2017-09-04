@@ -72,6 +72,12 @@
   </subsection>
   <subsection name="Coyote">
     <changelog>
+      <update>
+        The minimum required Tomcat Native version has been increased to 1.2.14.
+        This version includes a new API needed for correct client certificate
+        support when using a Java connector with OpenSSL TLS implementation and
+        support for the <code>SSL_CONF</code> OpenSSL API. (rjung)
+      </update>
       <fix>
         When using a Java connector in combination with the OpenSSL TLS
         implementation, do not configure each SSL connection object via
