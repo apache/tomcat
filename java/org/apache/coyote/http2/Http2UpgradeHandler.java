@@ -156,6 +156,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         remoteSettings = new ConnectionSettingsRemote(connectionId);
         localSettings = new ConnectionSettingsLocal(connectionId);
 
+        localSettings.set(Setting.MAX_CONCURRENT_STREAMS, protocol.getMaxConcurrentStreams());
+        localSettings.set(Setting.INITIAL_WINDOW_SIZE, protocol.getInitialWindowSize());
+
         // Initial HTTP request becomes stream 1.
         if (coyoteRequest != null) {
             if (log.isDebugEnabled()) {
@@ -1125,18 +1128,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     // ------------------------------------------- Configuration getters/setters
 
-    public void setMaxConcurrentStreams(long maxConcurrentStreams) {
-        localSettings.set(Setting.MAX_CONCURRENT_STREAMS, maxConcurrentStreams);
-    }
-
-
     public void setMaxConcurrentStreamExecution(int maxConcurrentStreamExecution) {
         this.maxConcurrentStreamExecution = maxConcurrentStreamExecution;
-    }
-
-
-    public void setInitialWindowSize(int initialWindowSize) {
-        localSettings.set(Setting.INITIAL_WINDOW_SIZE, initialWindowSize);
     }
 
 
