@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.Adapter;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.InputBuffer;
 import org.apache.coyote.OutputBuffer;
@@ -244,8 +245,8 @@ public class AjpProcessor extends AbstractProcessor {
 
     // ------------------------------------------------------------ Constructor
 
-    public AjpProcessor(AbstractAjpProtocol<?> protocol) {
-        super();
+    public AjpProcessor(AbstractAjpProtocol<?> protocol, Adapter adapter) {
+        super(adapter);
         this.protocol = protocol;
 
         int packetSize = protocol.getPacketSize();

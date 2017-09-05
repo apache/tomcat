@@ -42,7 +42,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
     private static final StringManager sm = StringManager.getManager(AbstractProcessor.class);
 
-    protected Adapter adapter;
+    protected final Adapter adapter;
     protected final AsyncStateMachine asyncStateMachine;
     private volatile long asyncTimeout = -1;
     protected final Request request;
@@ -57,12 +57,13 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     private ErrorState errorState = ErrorState.NONE;
 
 
-    public AbstractProcessor() {
-        this(new Request(), new Response());
+    public AbstractProcessor(Adapter adapter) {
+        this(adapter, new Request(), new Response());
     }
 
 
-    protected AbstractProcessor(Request coyoteRequest, Response coyoteResponse) {
+    protected AbstractProcessor(Adapter adapter, Request coyoteRequest, Response coyoteResponse) {
+        this.adapter = adapter;
         asyncStateMachine = new AsyncStateMachine(this);
         request = coyoteRequest;
         response = coyoteResponse;
@@ -110,16 +111,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     @Override
     public Request getRequest() {
         return request;
-    }
-
-
-    /**
-     * Set the associated adapter.
-     *
-     * @param adapter the new adapter
-     */
-    public void setAdapter(Adapter adapter) {
-        this.adapter = adapter;
     }
 
 

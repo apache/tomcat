@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.AbstractProcessor;
 import org.apache.coyote.ActionCode;
+import org.apache.coyote.Adapter;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestInfo;
@@ -149,8 +150,8 @@ public class Http11Processor extends AbstractProcessor {
     private SendfileDataBase sendfileData = null;
 
 
-    public Http11Processor(AbstractHttp11Protocol<?> protocol) {
-        super();
+    public Http11Processor(AbstractHttp11Protocol<?> protocol, Adapter adapter) {
+        super(adapter);
         this.protocol = protocol;
 
         userDataHelper = new UserDataHelper(log);

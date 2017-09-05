@@ -45,10 +45,9 @@ class StreamProcessor extends AbstractProcessor {
 
     StreamProcessor(Http2UpgradeHandler handler, Stream stream, Adapter adapter,
             SocketWrapperBase<?> socketWrapper) {
-        super(stream.getCoyoteRequest(), stream.getCoyoteResponse());
+        super(adapter, stream.getCoyoteRequest(), stream.getCoyoteResponse());
         this.handler = handler;
         this.stream = stream;
-        setAdapter(adapter);
         setSocketWrapper(socketWrapper);
     }
 
@@ -235,7 +234,6 @@ class StreamProcessor extends AbstractProcessor {
         // Clear fields that can be cleared to aid GC and trigger NPEs if this
         // is reused
         setSocketWrapper(null);
-        setAdapter(null);
     }
 
 
