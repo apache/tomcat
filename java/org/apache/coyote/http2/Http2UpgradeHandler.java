@@ -96,7 +96,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     protected final String connectionId;
 
-    private final Http2Protocol protocol;
+    protected final Http2Protocol protocol;
     private final Adapter adapter;
     protected volatile SocketWrapperBase<?> socketWrapper;
     private volatile SSLSupport sslSupport;
@@ -121,11 +121,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     private HpackDecoder hpackDecoder;
     private HpackEncoder hpackEncoder;
-
-    // All timeouts in milliseconds
-    private long readTimeout = Http2Protocol.DEFAULT_READ_TIMEOUT;
-    private long keepAliveTimeout = Http2Protocol.DEFAULT_KEEP_ALIVE_TIMEOUT;
-    private long writeTimeout = Http2Protocol.DEFAULT_WRITE_TIMEOUT;
 
     private final Map<Integer,Stream> streams = new HashMap<>();
     protected final AtomicInteger activeRemoteStreamCount = new AtomicInteger(0);
@@ -201,8 +196,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         Stream stream = null;
 
-        socketWrapper.setReadTimeout(getReadTimeout());
-        socketWrapper.setWriteTimeout(getWriteTimeout());
+        socketWrapper.setReadTimeout(protocol.getReadTimeout());
+        socketWrapper.setWriteTimeout(protocol.getWriteTimeout());
 
         if (webConnection != null) {
             // HTTP/2 started via HTTP upgrade.
@@ -316,7 +311,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 try {
                     // There is data to read so use the read timeout while
                     // reading frames.
-                    socketWrapper.setReadTimeout(getReadTimeout());
+                    socketWrapper.setReadTimeout(protocol.getReadTimeout());
                     while (true) {
                         try {
                             if (!parser.readFrame(false)) {
@@ -335,7 +330,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     }
                     // No more frames to read so switch to the keep-alive
                     // timeout.
-                    socketWrapper.setReadTimeout(getKeepAliveTimeout());
+                    socketWrapper.setReadTimeout(protocol.getKeepAliveTimeout());
                 } catch (Http2Exception ce) {
                     // Really ConnectionException
                     if (log.isDebugEnabled()) {
@@ -1129,36 +1124,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     // ------------------------------------------- Configuration getters/setters
-
-    public long getReadTimeout() {
-        return readTimeout;
-    }
-
-
-    public void setReadTimeout(long readTimeout) {
-        this.readTimeout = readTimeout;
-    }
-
-
-    public long getKeepAliveTimeout() {
-        return keepAliveTimeout;
-    }
-
-
-    public void setKeepAliveTimeout(long keepAliveTimeout) {
-        this.keepAliveTimeout = keepAliveTimeout;
-    }
-
-
-    public long getWriteTimeout() {
-        return writeTimeout;
-    }
-
-
-    public void setWriteTimeout(long writeTimeout) {
-        this.writeTimeout = writeTimeout;
-    }
-
 
     public void setMaxConcurrentStreams(long maxConcurrentStreams) {
         localSettings.set(Setting.MAX_CONCURRENT_STREAMS, maxConcurrentStreams);

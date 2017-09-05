@@ -105,9 +105,6 @@ public class Http2Protocol implements UpgradeProtocol {
                 ? new Http2AsyncUpgradeHandler(this, adapter, coyoteRequest)
                 : new Http2UpgradeHandler(this, adapter, coyoteRequest);
 
-        result.setReadTimeout(getReadTimeout());
-        result.setKeepAliveTimeout(getKeepAliveTimeout());
-        result.setWriteTimeout(getWriteTimeout());
         result.setMaxConcurrentStreams(getMaxConcurrentStreams());
         result.setMaxConcurrentStreamExecution(getMaxConcurrentStreamExecution());
         result.setInitialWindowSize(getInitialWindowSize());
