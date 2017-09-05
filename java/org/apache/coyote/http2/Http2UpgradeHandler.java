@@ -96,6 +96,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     protected final String connectionId;
 
+    private final Http2Protocol protocol;
     private final Adapter adapter;
     protected volatile SocketWrapperBase<?> socketWrapper;
     private volatile SSLSupport sslSupport;
@@ -151,8 +152,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private int maxTrailerSize = Constants.DEFAULT_MAX_TRAILER_SIZE;
 
 
-    Http2UpgradeHandler(Adapter adapter, Request coyoteRequest) {
+    Http2UpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest) {
         super (STREAM_ID_ZERO);
+        this.protocol = protocol;
         this.adapter = adapter;
         this.connectionId = Integer.toString(connectionIdGenerator.getAndIncrement());
 
