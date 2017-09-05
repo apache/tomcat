@@ -28,7 +28,7 @@ public class TestAbstractStream {
     @Test
     public void testDependenciesFig3() {
         // Setup
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(null, null, null);
+        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
         Stream a = new Stream(Integer.valueOf(1), handler);
         Stream b = new Stream(Integer.valueOf(2), handler);
         Stream c = new Stream(Integer.valueOf(3), handler);
@@ -59,7 +59,7 @@ public class TestAbstractStream {
     @Test
     public void testDependenciesFig4() {
         // Setup
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(null, null, null);
+        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
         Stream a = new Stream(Integer.valueOf(1), handler);
         Stream b = new Stream(Integer.valueOf(2), handler);
         Stream c = new Stream(Integer.valueOf(3), handler);
@@ -90,7 +90,7 @@ public class TestAbstractStream {
     @Test
     public void testDependenciesFig5NonExclusive() {
         // Setup
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(null, null, null);
+        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
         Stream a = new Stream(Integer.valueOf(1), handler);
         Stream b = new Stream(Integer.valueOf(2), handler);
         Stream c = new Stream(Integer.valueOf(3), handler);
@@ -132,7 +132,7 @@ public class TestAbstractStream {
     @Test
     public void testDependenciesFig5Exclusive() {
         // Setup
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(null, null, null);
+        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
         Stream a = new Stream(Integer.valueOf(1), handler);
         Stream b = new Stream(Integer.valueOf(2), handler);
         Stream c = new Stream(Integer.valueOf(3), handler);
@@ -174,7 +174,7 @@ public class TestAbstractStream {
     @Test
     public void testCircular01() {
         // Setup
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(null, null, null);
+        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
         Stream a = new Stream(Integer.valueOf(1), handler);
         Stream b = new Stream(Integer.valueOf(2), handler);
         Stream c = new Stream(Integer.valueOf(3), handler);
@@ -204,7 +204,7 @@ public class TestAbstractStream {
     @Test
     public void testCircular02() {
         // Setup
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(null, null, null);
+        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
         Stream a = new Stream(Integer.valueOf(1), handler);
         Stream b = new Stream(Integer.valueOf(2), handler);
         Stream c = new Stream(Integer.valueOf(3), handler);
