@@ -105,11 +105,6 @@ public class Http2Protocol implements UpgradeProtocol {
                 ? new Http2AsyncUpgradeHandler(this, adapter, coyoteRequest)
                 : new Http2UpgradeHandler(this, adapter, coyoteRequest);
 
-        result.setAllowedTrailerHeaders(allowedTrailerHeaders);
-        result.setMaxHeaderCount(getMaxHeaderCount());
-        result.setMaxHeaderSize(getMaxHeaderSize());
-        result.setMaxTrailerCount(getMaxTrailerCount());
-        result.setMaxTrailerSize(getMaxTrailerSize());
         result.setInitiatePingDisabled(initiatePingDisabled);
         return result;
     }
@@ -223,6 +218,11 @@ public class Http2Protocol implements UpgradeProtocol {
         List<String> copy = new ArrayList<>(allowedTrailerHeaders.size());
         copy.addAll(allowedTrailerHeaders);
         return StringUtils.join(copy);
+    }
+
+
+    boolean isTrailerHeaderAllowed(String headerName) {
+        return allowedTrailerHeaders.contains(headerName);
     }
 
 

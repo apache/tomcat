@@ -20,7 +20,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -137,13 +136,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     // Stream concurrency control
     private AtomicInteger streamConcurrency = null;
     private Queue<StreamRunnable> queuedRunnable = null;
-
-    // Limits
-    private Set<String> allowedTrailerHeaders = Collections.emptySet();
-    private int maxHeaderCount = Constants.DEFAULT_MAX_HEADER_COUNT;
-    private int maxHeaderSize = Constants.DEFAULT_MAX_HEADER_SIZE;
-    private int maxTrailerCount = Constants.DEFAULT_MAX_TRAILER_COUNT;
-    private int maxTrailerSize = Constants.DEFAULT_MAX_TRAILER_SIZE;
 
 
     Http2UpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest) {
@@ -381,6 +373,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     ConnectionSettingsLocal getLocalSettings() {
         return localSettings;
+    }
+
+
+    Http2Protocol getProtocol() {
+        return protocol;
     }
 
 
@@ -1120,57 +1117,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    boolean isTrailerHeaderAllowed(String headerName) {
-        return allowedTrailerHeaders.contains(headerName);
-    }
-
-
     // ------------------------------------------- Configuration getters/setters
-
-    public void setAllowedTrailerHeaders(Set<String> allowedTrailerHeaders) {
-        this.allowedTrailerHeaders = allowedTrailerHeaders;
-    }
-
-
-    public void setMaxHeaderCount(int maxHeaderCount) {
-        this.maxHeaderCount = maxHeaderCount;
-    }
-
-
-    public int getMaxHeaderCount() {
-        return maxHeaderCount;
-    }
-
-
-    public void setMaxHeaderSize(int maxHeaderSize) {
-        this.maxHeaderSize = maxHeaderSize;
-    }
-
-
-    public int getMaxHeaderSize() {
-        return maxHeaderSize;
-    }
-
-
-    public void setMaxTrailerCount(int maxTrailerCount) {
-        this.maxTrailerCount = maxTrailerCount;
-    }
-
-
-    public int getMaxTrailerCount() {
-        return maxTrailerCount;
-    }
-
-
-    public void setMaxTrailerSize(int maxTrailerSize) {
-        this.maxTrailerSize = maxTrailerSize;
-    }
-
-
-    public int getMaxTrailerSize() {
-        return maxTrailerSize;
-    }
-
 
     public void setInitiatePingDisabled(boolean initiatePingDisabled) {
         pingManager.initiateDisabled = initiatePingDisabled;

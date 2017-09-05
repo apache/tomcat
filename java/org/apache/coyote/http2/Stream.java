@@ -348,7 +348,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
             break;
         }
         default: {
-            if (headerState == HEADER_STATE_TRAILER && !handler.isTrailerHeaderAllowed(name)) {
+            if (headerState == HEADER_STATE_TRAILER &&
+                    !handler.getProtocol().isTrailerHeaderAllowed(name)) {
                 break;
             }
             if ("expect".equals(name) && "100-continue".equals(value)) {
@@ -487,14 +488,16 @@ class Stream extends AbstractStream implements HeaderEmitter {
     final void receivedStartOfHeaders(boolean headersEndStream) throws Http2Exception {
         if (headerState == HEADER_STATE_START) {
             headerState = HEADER_STATE_PSEUDO;
-            handler.getHpackDecoder().setMaxHeaderCount(handler.getMaxHeaderCount());
-            handler.getHpackDecoder().setMaxHeaderSize(handler.getMaxHeaderSize());
+            handler.getHpackDecoder().setMaxHeaderCount(handler.getProtocol().getMaxHeaderCount());
+            handler.getHpackDecoder().setMaxHeaderSize(handler.getProtocol().getMaxHeaderSize());
         } else if (headerState == HEADER_STATE_PSEUDO || headerState == HEADER_STATE_REGULAR) {
             // Trailer headers MUST include the end of stream flag
             if (headersEndStream) {
                 headerState = HEADER_STATE_TRAILER;
-                handler.getHpackDecoder().setMaxHeaderCount(handler.getMaxTrailerCount());
-                handler.getHpackDecoder().setMaxHeaderSize(handler.getMaxTrailerSize());
+                handler.getHpackDecoder().setMaxHeaderCount(
+                        handler.getProtocol().getMaxTrailerCount());
+                handler.getHpackDecoder().setMaxHeaderSize(
+                        handler.getProtocol().getMaxTrailerSize());
             } else {
                 throw new ConnectionException(sm.getString("stream.trailerHeader.noEndOfStream",
                         getConnectionId(), getIdentifier()), Http2Error.PROTOCOL_ERROR);
