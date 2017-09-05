@@ -150,6 +150,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         localSettings.set(Setting.MAX_CONCURRENT_STREAMS, protocol.getMaxConcurrentStreams());
         localSettings.set(Setting.INITIAL_WINDOW_SIZE, protocol.getInitialWindowSize());
 
+        pingManager.initiateDisabled = protocol.getInitiatePingDisabled();
+
         // Initial HTTP request becomes stream 1.
         if (coyoteRequest != null) {
             if (log.isDebugEnabled()) {
@@ -1114,13 +1116,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     @Override
     protected final int getWeight() {
         return 0;
-    }
-
-
-    // ------------------------------------------- Configuration getters/setters
-
-    public void setInitiatePingDisabled(boolean initiatePingDisabled) {
-        pingManager.initiateDisabled = initiatePingDisabled;
     }
 
 

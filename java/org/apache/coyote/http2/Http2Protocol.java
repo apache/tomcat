@@ -101,12 +101,9 @@ public class Http2Protocol implements UpgradeProtocol {
     @Override
     public InternalHttpUpgradeHandler getInternalUpgradeHandler(SocketWrapperBase<?> socketWrapper,
             Adapter adapter, Request coyoteRequest) {
-        Http2UpgradeHandler result = (socketWrapper.hasAsyncIO())
+        return socketWrapper.hasAsyncIO()
                 ? new Http2AsyncUpgradeHandler(this, adapter, coyoteRequest)
                 : new Http2UpgradeHandler(this, adapter, coyoteRequest);
-
-        result.setInitiatePingDisabled(initiatePingDisabled);
-        return result;
     }
 
 
@@ -268,5 +265,10 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public void setInitiatePingDisabled(boolean initiatePingDisabled) {
         this.initiatePingDisabled = initiatePingDisabled;
+    }
+
+
+    public boolean getInitiatePingDisabled() {
+        return initiatePingDisabled;
     }
 }
