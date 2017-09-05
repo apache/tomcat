@@ -135,7 +135,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private long backLogSize = 0;
 
     // Stream concurrency control
-    private int maxConcurrentStreamExecution = Http2Protocol.DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION;
     private AtomicInteger streamConcurrency = null;
     private Queue<StreamRunnable> queuedRunnable = null;
 
@@ -190,7 +189,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
 
         // Init concurrency control if needed
-        if (maxConcurrentStreamExecution < localSettings.getMaxConcurrentStreams()) {
+        if (protocol.getMaxConcurrentStreamExecution() < localSettings.getMaxConcurrentStreams()) {
             streamConcurrency = new AtomicInteger(0);
             queuedRunnable = new ConcurrentLinkedQueue<>();
         }
@@ -269,7 +268,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         if (streamConcurrency == null) {
             socketWrapper.execute(streamRunnable);
         } else {
-            if (getStreamConcurrency() < maxConcurrentStreamExecution) {
+            if (getStreamConcurrency() < protocol.getMaxConcurrentStreamExecution()) {
                 increaseStreamConcurrency();
                 socketWrapper.execute(streamRunnable);
             } else {
@@ -438,7 +437,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             return;
         }
         decreaseStreamConcurrency();
-        if (getStreamConcurrency() < maxConcurrentStreamExecution) {
+        if (getStreamConcurrency() < protocol.getMaxConcurrentStreamExecution()) {
             StreamRunnable streamRunnable = queuedRunnable.poll();
             if (streamRunnable != null) {
                 increaseStreamConcurrency();
@@ -1127,11 +1126,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     // ------------------------------------------- Configuration getters/setters
-
-    public void setMaxConcurrentStreamExecution(int maxConcurrentStreamExecution) {
-        this.maxConcurrentStreamExecution = maxConcurrentStreamExecution;
-    }
-
 
     public void setAllowedTrailerHeaders(Set<String> allowedTrailerHeaders) {
         this.allowedTrailerHeaders = allowedTrailerHeaders;

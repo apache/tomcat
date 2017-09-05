@@ -105,7 +105,6 @@ public class Http2Protocol implements UpgradeProtocol {
                 ? new Http2AsyncUpgradeHandler(this, adapter, coyoteRequest)
                 : new Http2UpgradeHandler(this, adapter, coyoteRequest);
 
-        result.setMaxConcurrentStreamExecution(getMaxConcurrentStreamExecution());
         result.setAllowedTrailerHeaders(allowedTrailerHeaders);
         result.setMaxHeaderCount(getMaxHeaderCount());
         result.setMaxHeaderSize(getMaxHeaderSize());
