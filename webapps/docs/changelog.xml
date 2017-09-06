@@ -242,6 +242,11 @@
         <code>daemon.sh</code> script when running on a platform where Java has
         been installed from an RPM. (rjung)
       </fix>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.14 to
+        pick up the latest Windows binaries built with APR 1.6.2 and OpenSSL
+        1.0.2l. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
