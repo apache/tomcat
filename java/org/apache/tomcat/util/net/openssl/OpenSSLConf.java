@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.net.openssl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,9 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.SSLConf;
 import org.apache.tomcat.util.res.StringManager;
 
-public class OpenSSLConf {
+public class OpenSSLConf implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private static final Log log = LogFactory.getLog(OpenSSLConf.class);
     private static final StringManager sm = StringManager.getManager(OpenSSLConf.class);

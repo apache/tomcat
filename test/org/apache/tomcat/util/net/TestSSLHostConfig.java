@@ -16,9 +16,18 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.tomcat.util.net.openssl.OpenSSLConf;
+import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 
 public class TestSSLHostConfig {
@@ -64,5 +73,40 @@ public class TestSSLHostConfig {
         // Single OpenSSLName name
         hc.setCiphers(c.getOpenSSLAlias());
         Assert.assertEquals(c.getOpenSSLAlias(), hc.getCiphers());
+    }
+
+
+    @Test
+    public void testSerialization() throws IOException, ClassNotFoundException {
+        // Dummy OpenSSL command name/value pair
+        String name = "foo";
+        String value = "bar";
+
+        // Set up the object
+        SSLHostConfig sslHostConfig = new SSLHostConfig();
+        OpenSSLConf openSSLConf = new OpenSSLConf();
+        OpenSSLConfCmd openSSLConfCmd = new OpenSSLConfCmd();
+        openSSLConfCmd.setName(name);
+        openSSLConfCmd.setValue(value);
+        openSSLConf.addCmd(openSSLConfCmd);
+        sslHostConfig.setOpenSslConf(openSSLConf);
+
+        // Serialize
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(sslHostConfig);
+        oos.close();
+
+        // Deserialize
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        SSLHostConfig output = (SSLHostConfig) ois.readObject();
+
+        // Check values
+        List<OpenSSLConfCmd> commands = output.getOpenSslConf().getCommands();
+        Assert.assertEquals(1, commands.size());
+        OpenSSLConfCmd command = commands.get(0);
+        Assert.assertEquals(name, command.getName());
+        Assert.assertEquals(value, command.getValue());
     }
 }

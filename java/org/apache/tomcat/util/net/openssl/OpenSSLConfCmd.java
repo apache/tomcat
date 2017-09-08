@@ -16,7 +16,11 @@
  */
 package org.apache.tomcat.util.net.openssl;
 
-public class OpenSSLConfCmd {
+import java.io.Serializable;
+
+public class OpenSSLConfCmd implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String name = null;
     private String value = null;
