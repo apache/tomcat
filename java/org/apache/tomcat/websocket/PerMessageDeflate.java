@@ -315,16 +315,20 @@ public class PerMessageDeflate implements Transformation {
     public List<MessagePart> sendMessagePart(List<MessagePart> uncompressedParts) {
         List<MessagePart> allCompressedParts = new ArrayList<>();
 
+        // Flag to track if a message is completely empty
+        boolean emptyMessage = true;
+
         for (MessagePart uncompressedPart : uncompressedParts) {
             byte opCode = uncompressedPart.getOpCode();
+            boolean emptyPart = uncompressedPart.getPayload().limit() == 0;
+            emptyMessage = emptyMessage && emptyPart;
             if (Util.isControl(opCode)) {
                 // Control messages can appear in the middle of other messages
                 // and must not be compressed. Pass it straight through
                 allCompressedParts.add(uncompressedPart);
-            } else if (uncompressedPart.getPayload().limit() == 0 && uncompressedPart.isFin() &&
-                    deflater.getBytesRead() == 0) {
-                // Zero length messages can't be compressed so pass them
-                // straight through.
+            } else if (emptyMessage && uncompressedPart.isFin()) {
+                // Zero length messages can't be compressed so pass the
+                // final (empty) part straight through.
                 allCompressedParts.add(uncompressedPart);
             } else {
                 List<MessagePart> compressedParts = new ArrayList<>();
