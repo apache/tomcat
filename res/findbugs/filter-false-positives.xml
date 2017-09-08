@@ -205,6 +205,18 @@
     <Bug code="REC" />
   </Match>
   <Match>
+    <!-- SQL construction is safe since it is from trusted config -->
+    <Or>
+      <Class name="org.apache.catalina.realm.DataSourceRealm" />
+      <Class name="org.apache.catalina.realm.JDBCRealm" />
+    </Or>
+    <Or>
+      <Method name="credentials" />
+      <Method name="roles" />
+    </Or>
+    <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.realm.JDBCRealm" />
     <Field name="containerLog" />
     <Bug code="IS" />
@@ -262,10 +274,14 @@
          supplied -->
     <Class name="org.apache.catalina.session.JDBCStore" />
     <Or>
+      <Method name="clear" />
+      <Method name="getSize" />
+      <Method name="keys" />
       <Method name="load" />
+      <Method name="remove" />
       <Method name="save" />
     </Or>
-    <Bug code="SQL" />
+    <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
   </Match>
   <Match>
     <!-- We can live with the threading issue. See code comment for details. -->
@@ -633,6 +649,39 @@
     <Bug pattern="NP_NONNULL_RETURN_VIOLATION" />
   </Match>
   <Match>
+    <!-- SQL is from config so is considered safe -->
+    <Class name="org.apache.tomcat.dbcp.dbcp2.PoolableConnectionFactory" />
+    <Method name="initializeConnection" />
+    <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" />
+  </Match>
+  <Match>
+    <!-- SQL construction is safe for validation query -->
+    <Class name="org.apache.tomcat.dbcp.dbcp2.PoolableConnectionFactory" />
+    <Method name="validateConnection" />
+    <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
+  </Match>
+  <Match>
+    <!-- SQL construction is necessary for pooled statements -->
+    <Class name="org.apache.tomcat.dbcp.dbcp2.PoolingConnection" />
+    <Method name="makeObject" />
+    <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
+  </Match>
+  <Match>
+    <!-- SQL construction is necessary for pooled statements -->
+    <Class name="org.apache.tomcat.dbcp.dbcp2.cpdsadapter.PooledConnectionImpl" />
+    <Method name="makeObject" />
+    <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
+  </Match>
+  <Match>
+    <!-- SQL construction is safe for validation query -->
+    <Or>
+      <Class name="org.apache.tomcat.dbcp.dbcp2.datasources.CPDSConnectionFactory" />
+      <Class name="org.apache.tomcat.dbcp.dbcp2.datasources.KeyedCPDSConnectionFactory" />
+    </Or>
+    <Method name="validateObject" />
+    <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" />
+  </Match>
+  <Match>
     <!-- Pooled objects can't be null so this is OK -->
     <Class name="org.apache.tomcat.dbcp.pool2.impl.BaseGenericObjectPool$IdentityWrapper" />
     <Method name="equals" />
@@ -668,6 +717,12 @@
     <Class name="org.apache.tomcat.jdbc.pool.MultiLockFairBlockingQueue" />
     <Method name="poll" />
     <Bug code="UL" />
+  </Match>
+  <Match>
+    <!-- SQL is from config so is considered safe -->
+    <Class name="org.apache.tomcat.jdbc.pool.PooledConnection" />
+    <Method name="validate" />
+    <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" />
   </Match>
   <Match>
     <!-- Lack of thread-safety is accepted in return for better performance. -->
@@ -1104,10 +1159,22 @@
     <Bug pattern="RV_RETURN_VALUE_IGNORED" />
   </Match>
   <Match>
+    <!-- SQL is from config so is considered safe -->
+    <Class name="org.apache.tomcat.jdbc.test.TestSlowQueryReport" />
+    <Method name="testFastSql" />
+    <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" />
+  </Match>
+  <Match>
     <!-- Use of static is unavoidable -->
     <Class name="org.apache.tomcat.jdbc.test.TestStatementCache" />
     <Method name="tearDown" />
     <Bug code="ST" />
+  </Match>
+  <Match>
+    <!-- SQL is from generated in test code so is considered safe -->
+    <Class name="org.apache.tomcat.jdbc.test.TestStatementCache" />
+    <Method name="testMaxCacheSize" />
+    <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
   </Match>
   <Match>
     <Class name="org.apache.tomcat.jdbc.test.TwoDataSources" />
