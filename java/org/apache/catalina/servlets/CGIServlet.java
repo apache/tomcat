@@ -283,6 +283,13 @@ public final class CGIServlet extends HttpServlet {
     private final Hashtable<String,String> shellEnv = new Hashtable<>();
 
     /**
+     * Enable creation of script command line arguments from query-string.
+     * See https://tools.ietf.org/html/rfc3875#section-4.4
+     * 4.4.  The Script Command Line
+     */
+    private boolean enableCmdLineArguments = false;
+
+    /**
      * Sets instance variables.
      * <P>
      * Modified from Craig R. McClanahan's InvokerServlet
@@ -340,6 +347,11 @@ public final class CGIServlet extends HttpServlet {
         if (getServletConfig().getInitParameter("envHttpHeaders") != null) {
             envHttpHeadersPattern =
                     Pattern.compile(getServletConfig().getInitParameter("envHttpHeaders"));
+        }
+
+        if (getServletConfig().getInitParameter("enableCmdLineArguments") != null) {
+            enableCmdLineArguments =
+                    Boolean.parseBoolean(config.getInitParameter("enableCmdLineArguments"));
         }
     }
 
@@ -670,9 +682,8 @@ public final class CGIServlet extends HttpServlet {
             // does not contain an unencoded "=" this is an indexed query.
             // The parsed query string becomes the command line parameters
             // for the cgi command.
-            if (req.getMethod().equals("GET")
-                || req.getMethod().equals("POST")
-                || req.getMethod().equals("HEAD")) {
+            if (enableCmdLineArguments && (req.getMethod().equals("GET")
+                || req.getMethod().equals("POST") || req.getMethod().equals("HEAD"))) {
                 String qs;
                 if (isIncluded) {
                     qs = (String) req.getAttribute(

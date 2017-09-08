@@ -75,6 +75,12 @@
         added in Java 9 to only disable the caching for JAR URL connections.
         (markt)
       </add>
+      <add>
+        <bug>61489</bug>: When using the CGI servlet, make the generation of
+        command line arguments from the query string (as per section 4.4 of RFC
+        3875) optional and disabled by default. Based on a patch by jm009.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

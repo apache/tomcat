@@ -346,6 +346,11 @@
   <!--                        If not set, then webAppRootDir is used.       -->
   <!--                        Recommended value: WEB-INF/cgi                -->
   <!--                                                                      -->
+  <!--   enableCmdLineArguments                                             -->
+  <!--                        Are command line parameters generated from    -->
+  <!--                        the query string as per section 4.4 of 3875   -->
+  <!--                        RFC? [false]                                  -->
+  <!--                                                                      -->
   <!--   executable           Name of the executable used to run the        -->
   <!--                        script. [perl]                                -->
   <!--                                                                      -->
