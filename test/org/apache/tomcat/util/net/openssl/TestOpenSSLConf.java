@@ -69,7 +69,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
         String[] ciphers = sslHostConfig.getEnabledCiphers();
         assertEquals("Checking enabled cipher count", 1, ciphers.length);
         assertEquals("Checking enabled cipher", CIPHER, ciphers[0]);
-        ciphers = SSLContext.getCiphers(sslHostConfig.getOpenSslContext());
+        ciphers = SSLContext.getCiphers(sslHostConfig.getOpenSslContext().longValue());
         assertEquals("Checking context cipher count", 1, ciphers.length);
         assertEquals("Checking context cipher", CIPHER, ciphers[0]);
     }
