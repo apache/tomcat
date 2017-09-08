@@ -68,6 +68,12 @@
         running under a <code>SecurityManager</code> and using
         <code>Subject.doAs()</code>. (markt)
       </fix>
+      <add>
+        <bug>61489</bug>: When using the CGI servlet, make the generation of
+        command line arguments from the query string (as per section 4.4 of RFC
+        3875) optional. The feature is enabled by default for consistency with
+        previous releases. Based on a patch by jm009. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
