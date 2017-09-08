@@ -43,12 +43,6 @@ public abstract class BaseNCodec {
         int ibitWorkArea;
 
         /**
-         * Place holder for the bytes we're dealing with for our based logic.
-         * Bitwise operations store and extract the encoding or decoding from this variable.
-         */
-        long lbitWorkArea;
-
-        /**
          * Buffer for streaming.
          */
         byte[] buffer;
@@ -93,10 +87,10 @@ public abstract class BaseNCodec {
         @Override
         public String toString() {
             return String.format("%s[buffer=%s, currentLinePos=%s, eof=%s, " +
-                    "ibitWorkArea=%s, lbitWorkArea=%s, modulus=%s, pos=%s, " +
+                    "ibitWorkArea=%s, modulus=%s, pos=%s, " +
                     "readPos=%s]", this.getClass().getSimpleName(),
                     HexUtils.toHexString(buffer), currentLinePos, eof,
-                    ibitWorkArea, lbitWorkArea, modulus, pos, readPos);
+                    ibitWorkArea, modulus, pos, readPos);
         }
     }
 
