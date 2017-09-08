@@ -585,11 +585,6 @@ public abstract class FileUploadBase {
             private final InputStream stream;
 
             /**
-             * Whether the file item was already opened.
-             */
-            private boolean opened;
-
-            /**
              * The headers, if any.
              */
             private FileItemHeaders headers;
@@ -698,10 +693,6 @@ public abstract class FileUploadBase {
              */
             @Override
             public InputStream openStream() throws IOException {
-                if (opened) {
-                    throw new IllegalStateException(
-                            "The stream was already opened.");
-                }
                 if (((Closeable) stream).isClosed()) {
                     throw new FileItemStream.ItemSkippedException();
                 }
