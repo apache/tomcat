@@ -60,6 +60,11 @@
 <section name="Tomcat 7.0.82 (violetagg)">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>61210</bug>: When running under a SecurityManager, do not print a
+        warning about not being able to read a logging configuration file when
+        that file does not exist. (markt)
+      </fix>
       <add>
         <bug>61280</bug>: Add RFC 7617 support to the
         <code>BasicAuthenticator</code>. Note that the default configuration
