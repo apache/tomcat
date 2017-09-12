@@ -53,6 +53,10 @@
         before generating the error page so that the page generation can be
         skipped if the page is never going to be sent. (markt)
       </fix>
+      <add>
+        <bug>61189</bug>: Add the ability to set environment variables for
+        individual CGI scripts. Based on a patch by jm009. (markt)
+      </add>
       <fix>
         <bug>61210</bug>: When running under a SecurityManager, do not print a
         warning about not being able to read a logging configuration file when
