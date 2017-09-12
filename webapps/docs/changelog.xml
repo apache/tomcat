@@ -81,6 +81,12 @@
         3875) optional and disabled by default. Based on a patch by jm009.
         (markt)
       </add>
+      <fix>
+        <bug>61503</bug>: This corrects a potential regression in the fix for
+        <bug>60940</bug> with an alternative solution that adds the
+        <code>JarEntry</code> objects normally skipped by a
+        <code>JarInputStream</code> only if those entries exist. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

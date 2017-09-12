@@ -106,29 +106,26 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                     JarEntry jarFileInWar = warFile.getJarEntry(archivePath);
                     jarFileIs = warFile.getInputStream(jarFileInWar);
 
-                    try (JarInputStream jarIs = new JarInputStream(jarFileIs)) {
+                    try (TomcatJarInputStream jarIs = new TomcatJarInputStream(jarFileIs)) {
                         JarEntry entry = jarIs.getNextJarEntry();
-                        boolean hasMetaInf = false;
                         while (entry != null) {
-                            if (!hasMetaInf && entry.getName().startsWith("META-INF/")) {
-                                hasMetaInf = true;
-                            }
                             archiveEntries.put(entry.getName(), entry);
                             entry = jarIs.getNextJarEntry();
                         }
                         setManifest(jarIs.getManifest());
-                        // Hacks to work-around JarInputStream swallowing these
-                        // entries. The attributes for these entries will be
-                        // incomplete. Making the attributes available would
-                        // require (re-)reading the stream as a ZipInputStream
-                        // and creating JarEntry objects from the ZipEntries.
-                        if (hasMetaInf) {
-                            JarEntry metaInfDir = new JarEntry("META-INF/");
-                            archiveEntries.put(metaInfDir.getName(), metaInfDir);
+                        // Hack to work-around JarInputStream swallowing these
+                        // entries. TomcatJarInputStream is used above which
+                        // extends JarInputStream and the method that creates
+                        // the entries over-ridden so we can a) tell if the
+                        // entries are present and b) cache them so we can
+                        // access them here.
+                        entry = jarIs.getMetaInfEntry();
+                        if (entry != null) {
+                            archiveEntries.put(entry.getName(), entry);
                         }
-                        if (jarIs.getManifest() != null) {
-                            JarEntry manifest = new JarEntry("META-INF/MANIFEST.MF");
-                            archiveEntries.put(manifest.getName(), manifest);
+                        entry = jarIs.getManifestEntry();
+                        if (entry != null) {
+                            archiveEntries.put(entry.getName(), entry);
                         }
                     }
                 } catch (IOException ioe) {
