@@ -363,6 +363,15 @@
   <!--                        [ACCEPT[-0-9A-Z]*|CACHE-CONTROL|COOKIE|HOST|  -->
   <!--                         IF-[-0-9A-Z]*|REFERER|USER-AGENT]            -->
   <!--                                                                      -->
+  <!--  environment-variable- An environment to be set for the execution    -->
+  <!--                        environment of the CGI script. The name of    -->
+  <!--                        variable is taken from the parameter name.    -->
+  <!--                        To configure an environment variable named    -->
+  <!--                        FOO, configure a parameter named              -->
+  <!--                        environment-variable-FOO. The parameter value -->
+  <!--                        is used as the environment variable value.    -->
+  <!--                        The default is no environment variables.      -->
+  <!--                                                                      -->
   <!--   parameterEncoding    Name of parameter encoding to be used with    -->
   <!--                        CGI servlet.                                  -->
   <!--                        [System.getProperty("file.encoding","UTF-8")] -->

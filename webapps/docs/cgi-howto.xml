@@ -99,6 +99,11 @@ directory being used as the search path. The recommended value is
 <li><strong>enableCmdLineArguments</strong> - Are command line parameters
 generated from the query string as per section 4.4 of 3875 RFC? The default is
 <code>false</code>.</li>
+<li><strong>environment-variable-</strong> - An environment to be set for the
+execution environment of the CGI script. The name of variable is taken from the
+parameter name. To configure an environment variable named FOO, configure a
+parameter named environment-variable-FOO. The parameter value is used as the
+environment variable value. The default is no environment variables.</li>
 <li><strong>executable</strong> - The name of the executable to be used to
 run the script. You may explicitly set this parameter to be an empty string
 if your script is itself executable (e.g. an exe file). Default is

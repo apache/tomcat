@@ -318,6 +318,17 @@ public final class CGIServlet extends HttpServlet {
             shellEnv.putAll(System.getenv());
         }
 
+        Enumeration<String> e = config.getInitParameterNames();
+        while(e.hasMoreElements()) {
+            String initParamName = e.nextElement();
+            if (initParamName.startsWith("environment-variable-")) {
+                if (initParamName.length() == 21) {
+                    throw new ServletException(sm.getString("cgiServlet.emptyEnvVarName"));
+                }
+                shellEnv.put(initParamName.substring(21), config.getInitParameter(initParamName));
+            }
+        }
+
         if (getServletConfig().getInitParameter("executable") != null) {
             cgiExecutable = getServletConfig().getInitParameter("executable");
         }
