@@ -933,7 +933,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // Called from StandardContext.setResources()
         //              <- StandardContext.start()
         //              <- ContainerBase.addChildInternal()
-        Lock writeLock = managerLock.writeLock();
+        Lock writeLock = resourcesLock.writeLock();
         writeLock.lock();
         DirContext oldResources = null;
         try {
