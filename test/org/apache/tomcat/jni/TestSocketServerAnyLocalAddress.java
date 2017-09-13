@@ -131,7 +131,7 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
                 int rep = in.read();
                 sock.close();
                 if (rep != 'Z') {
-                     throw new Exception("Read wrong data");
+                     throw new Exception("Read wrong data [" + rep + "]");
                 }
 
                 sock = new java.net.Socket();
