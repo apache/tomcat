@@ -19,8 +19,8 @@ package org.apache.catalina.tribes.group;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.ChannelException;
@@ -50,7 +50,7 @@ public class RpcChannel implements ChannelListener {
     private byte[] rpcId;
     private int replyMessageOptions = 0;
 
-    private final Map<RpcCollectorKey, RpcCollector> responseMap = new HashMap<>();
+    private final ConcurrentMap<RpcCollectorKey, RpcCollector> responseMap = new ConcurrentHashMap<>();
 
     /**
      * Create an RPC channel. You can have several RPC channels attached to a group

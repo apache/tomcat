@@ -229,6 +229,10 @@
         Correct the backup node selection logic that node 0 is returned twice
         consecutively. (kfujino)
       </fix>
+      <fix>
+        Fix race condition of <code>responseMap</code> in
+        <code>RpcChannel</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
