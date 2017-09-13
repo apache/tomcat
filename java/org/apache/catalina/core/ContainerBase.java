@@ -941,11 +941,17 @@ public abstract class ContainerBase extends LifecycleMBeanBase
             oldResources = this.resources;
             if (oldResources == resources)
                 return;
-            Hashtable<String, String> env = new Hashtable<String, String>();
-            if (getParent() != null)
-                env.put(ProxyDirContext.HOST, getParent().getName());
-            env.put(ProxyDirContext.CONTEXT, getName());
-            this.resources = new ProxyDirContext(env, resources);
+            // null resources don't need to be wrapped. Neither do resources
+            // that are already wrapped.
+            if (resources == null || resources instanceof ProxyDirContext) {
+                this.resources = resources;
+            } else {
+                Hashtable<String, String> env = new Hashtable<String, String>();
+                if (getParent() != null)
+                    env.put(ProxyDirContext.HOST, getParent().getName());
+                env.put(ProxyDirContext.CONTEXT, getName());
+                this.resources = new ProxyDirContext(env, resources);
+            }
         } finally {
             writeLock.unlock();
         }
