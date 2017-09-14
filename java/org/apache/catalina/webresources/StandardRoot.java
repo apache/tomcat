@@ -344,7 +344,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         return listResources(path, true);
     }
 
-    private WebResource[] listResources(String path, boolean validate) {
+    protected WebResource[] listResources(String path, boolean validate) {
         if (validate) {
             path = validate(path);
         }
@@ -574,8 +574,11 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
      * the methods that are explicitly defined to return class loader resources.
      * This prevents calls to getResource("/WEB-INF/classes") returning from one
      * or more of the JAR files.
+     *
+     * @throws LifecycleException If an error occurs that should stop the web
+     *                            application from starting
      */
-    private void processWebInfLib() {
+    protected void processWebInfLib() throws LifecycleException {
         WebResource[] possibleJars = listResources("/WEB-INF/lib", false);
 
         for (WebResource possibleJar : possibleJars) {
