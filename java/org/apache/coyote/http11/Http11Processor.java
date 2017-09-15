@@ -1392,6 +1392,7 @@ public class Http11Processor extends AbstractProcessor {
         upgradeToken = null;
         socketWrapper = null;
         sendfileData = null;
+        sslSupport = null;
     }
 
 
