@@ -89,7 +89,7 @@ public class LocalResolver implements EntityResolver2 {
         // If there is no systemId, can't try anything else
         if (systemId == null) {
             throw new FileNotFoundException(sm.getString("localResolver.unresolvedEntity",
-                    name, publicId, systemId, base));
+                    name, publicId, null, base));
         }
 
         // Try resolving with the supplied systemId

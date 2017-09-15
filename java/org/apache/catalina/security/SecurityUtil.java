@@ -153,7 +153,7 @@ public final class SecurityUtil{
         Method method = null;
         Method[] methodsCache = classCache.get(Servlet.class);
         if(methodsCache == null) {
-            method = createMethodAndCacheIt(methodsCache,
+            method = createMethodAndCacheIt(null,
                                             Servlet.class,
                                             methodName,
                                             targetParameterTypes);
@@ -236,7 +236,7 @@ public final class SecurityUtil{
         Method method = null;
         Method[] methodsCache = classCache.get(Filter.class);
         if(methodsCache == null) {
-            method = createMethodAndCacheIt(methodsCache,
+            method = createMethodAndCacheIt(null,
                                             Filter.class,
                                             methodName,
                                             targetParameterTypes);

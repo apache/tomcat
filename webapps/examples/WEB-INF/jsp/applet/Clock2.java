@@ -138,12 +138,12 @@ public class Clock2 extends Applet implements Runnable {
     // a= s* pi/2 - pi/2 (to switch 0,0 from 3:00 to 12:00)
     // x = r(cos a) + xcenter, y = r(sin a) + ycenter
 
-        xs = (int)(Math.cos(s * 3.14f/30 - 3.14f/2) * 45 + xcenter);
-        ys = (int)(Math.sin(s * 3.14f/30 - 3.14f/2) * 45 + ycenter);
-        xm = (int)(Math.cos(m * 3.14f/30 - 3.14f/2) * 40 + xcenter);
-        ym = (int)(Math.sin(m * 3.14f/30 - 3.14f/2) * 40 + ycenter);
-        xh = (int)(Math.cos((h*30 + m/2) * 3.14f/180 - 3.14f/2) * 30 + xcenter);
-        yh = (int)(Math.sin((h*30 + m/2) * 3.14f/180 - 3.14f/2) * 30 + ycenter);
+        xs = (int)(Math.cos(s * Math.PI/30 - Math.PI/2) * 45 + xcenter);
+        ys = (int)(Math.sin(s * Math.PI/30 - Math.PI/2) * 45 + ycenter);
+        xm = (int)(Math.cos(m * Math.PI/30 - Math.PI/2) * 40 + xcenter);
+        ym = (int)(Math.sin(m * Math.PI/30 - Math.PI/2) * 40 + ycenter);
+        xh = (int)(Math.cos((h*30 + m/2) * Math.PI/180 - Math.PI/2) * 30 + xcenter);
+        yh = (int)(Math.sin((h*30 + m/2) * Math.PI/180 - Math.PI/2) * 30 + ycenter);
 
     // Draw the circle and numbers
 

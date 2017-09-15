@@ -234,7 +234,7 @@ public class JSSEUtil extends SSLUtilBase {
                     }
                 }
                 if (keyAlias == null) {
-                    throw new IOException(sm.getString("jsse.alias_no_key_entry", keyAlias));
+                    throw new IOException(sm.getString("jsse.alias_no_key_entry", (Object) null));
                 }
             }
 

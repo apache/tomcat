@@ -347,7 +347,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             String maxRedirectsValue =
                     (String) userProperties.get(Constants.MAX_REDIRECTIONS_PROPERTY);
             if (maxRedirectsValue != null) {
-                maxRedirects = Integer.valueOf(maxRedirectsValue).intValue();
+                maxRedirects = Integer.parseInt(maxRedirectsValue);
             }
 
             if (httpResponse.status != 101) {

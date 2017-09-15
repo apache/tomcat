@@ -557,7 +557,7 @@ class Util {
 
         if (clazz == null) {
             throw new MethodNotFoundException(
-                    message(null, "util.method.notfound", clazz, methodName,
+                    message(null, "util.method.notfound", null, methodName,
                     paramString(paramTypes)));
         }
 
