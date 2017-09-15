@@ -34,11 +34,18 @@ public class OpenSSLSessionContext implements SSLSessionContext {
     private static final Enumeration<byte[]> EMPTY = new EmptyEnumeration();
 
     private final OpenSSLSessionStats stats;
-    private final long context;
+    // This is deliberately unused. The reference is retained so that a
+    // reference chain is established and maintained to the OpenSSLContext while
+    // there is a connection that is using the OpenSSLContext. Therefore, the
+    // OpenSSLContext can not be eligible for GC while it is in use.
+    @SuppressWarnings("unused")
+    private final OpenSSLContext context;
+    private final long contextID;
 
-    OpenSSLSessionContext(long context) {
+    OpenSSLSessionContext(OpenSSLContext context) {
         this.context = context;
-        stats = new OpenSSLSessionStats(context);
+        this.contextID = context.getSSLContextID();
+        stats = new OpenSSLSessionStats(contextID);
     }
 
     @Override
@@ -60,7 +67,7 @@ public class OpenSSLSessionContext implements SSLSessionContext {
         if (keys == null) {
             throw new IllegalArgumentException(sm.getString("sessionContext.nullTicketKeys"));
         }
-        SSLContext.setSessionTicketKeys(context, keys);
+        SSLContext.setSessionTicketKeys(contextID, keys);
     }
 
     /**
@@ -70,7 +77,7 @@ public class OpenSSLSessionContext implements SSLSessionContext {
      */
     public void setSessionCacheEnabled(boolean enabled) {
         long mode = enabled ? SSL.SSL_SESS_CACHE_SERVER : SSL.SSL_SESS_CACHE_OFF;
-        SSLContext.setSessionCacheMode(context, mode);
+        SSLContext.setSessionCacheMode(contextID, mode);
     }
 
     /**
@@ -78,7 +85,7 @@ public class OpenSSLSessionContext implements SSLSessionContext {
      *         otherwise.
      */
     public boolean isSessionCacheEnabled() {
-        return SSLContext.getSessionCacheMode(context) == SSL.SSL_SESS_CACHE_SERVER;
+        return SSLContext.getSessionCacheMode(contextID) == SSL.SSL_SESS_CACHE_SERVER;
     }
 
     /**
@@ -93,12 +100,12 @@ public class OpenSSLSessionContext implements SSLSessionContext {
         if (seconds < 0) {
             throw new IllegalArgumentException();
         }
-        SSLContext.setSessionCacheTimeout(context, seconds);
+        SSLContext.setSessionCacheTimeout(contextID, seconds);
     }
 
     @Override
     public int getSessionTimeout() {
-        return (int) SSLContext.getSessionCacheTimeout(context);
+        return (int) SSLContext.getSessionCacheTimeout(contextID);
     }
 
     @Override
@@ -106,12 +113,12 @@ public class OpenSSLSessionContext implements SSLSessionContext {
         if (size < 0) {
             throw new IllegalArgumentException();
         }
-        SSLContext.setSessionCacheSize(context, size);
+        SSLContext.setSessionCacheSize(contextID, size);
     }
 
     @Override
     public int getSessionCacheSize() {
-        return (int) SSLContext.getSessionCacheSize(context);
+        return (int) SSLContext.getSessionCacheSize(contextID);
     }
 
     /**
@@ -124,7 +131,7 @@ public class OpenSSLSessionContext implements SSLSessionContext {
      * @return {@code true} if success, {@code false} otherwise.
      */
     public boolean setSessionIdContext(byte[] sidCtx) {
-        return SSLContext.setSessionIdContext(context, sidCtx);
+        return SSLContext.setSessionIdContext(contextID, sidCtx);
     }
 
     private static final class EmptyEnumeration implements Enumeration<byte[]> {

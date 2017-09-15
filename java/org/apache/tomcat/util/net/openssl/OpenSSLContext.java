@@ -414,7 +414,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 sslHostConfig.setEnabledCiphers(SSLContext.getCiphers(ctx));
             }
 
-            sessionContext = new OpenSSLSessionContext(ctx);
+            sessionContext = new OpenSSLSessionContext(this);
             // If client authentication is being used, OpenSSL requires that
             // this is set so always set it in case an app is configured to
             // require it
@@ -480,6 +480,12 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         return peerCerts;
     }
 
+
+    long getSSLContextID() {
+        return ctx;
+    }
+
+
     @Override
     public SSLSessionContext getServerSessionContext() {
         return sessionContext;
@@ -501,4 +507,23 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        /*
+         * When an SSLHostConfig is replaced at runtime, it is not possible to
+         * call destroy() on the associated OpenSSLContext since it is likely
+         * that there will be in-progress connections using the OpenSSLContext.
+         * A reference chain has been deliberately established (see
+         * OpenSSLSessionContext) to ensure that the OpenSSLContext remains
+         * ineligible for GC while those connections are alive. Once those
+         * connections complete, the OpenSSLContext will become eligible for GC
+         * and this method will ensure that the associated native resources are
+         * cleaned up.
+         */
+        try {
+            destroy();
+        } finally {
+            super.finalize();
+        }
+    }
 }
