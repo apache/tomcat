@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.management.ObjectName;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManagerFactory;
 
@@ -78,6 +79,7 @@ public class SSLHostConfig implements Serializable {
     // Internal
     private String[] enabledCiphers;
     private String[] enabledProtocols;
+    private ObjectName oname;
     // Nested
     private SSLHostConfigCertificate defaultCertificate = null;
     private Set<SSLHostConfigCertificate> certificates = new HashSet<>(4);
@@ -215,6 +217,16 @@ public class SSLHostConfig implements Serializable {
 
     public void setEnabledCiphers(String[] enabledCiphers) {
         this.enabledCiphers = enabledCiphers;
+    }
+
+
+    public ObjectName getObjectName() {
+        return oname;
+    }
+
+
+    public void setObjectName(ObjectName oname) {
+        this.oname = oname;
     }
 
 

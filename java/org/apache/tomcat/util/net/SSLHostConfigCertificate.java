@@ -22,6 +22,8 @@ import java.security.KeyStore;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.management.ObjectName;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
@@ -40,6 +42,9 @@ public class SSLHostConfigCertificate implements Serializable {
             System.getProperty("javax.net.ssl.keyStoreProvider");
     static final String DEFAULT_KEYSTORE_TYPE =
             System.getProperty("javax.net.ssl.keyStoreType", "JKS");
+
+    // Internal
+    private ObjectName oname;
 
     // OpenSSL can handle multiple certs in a single config so the reference to
     // the context is at the virtual host level. JSSE can't so the reference is
@@ -89,6 +94,18 @@ public class SSLHostConfigCertificate implements Serializable {
 
     public SSLHostConfig getSSLHostConfig() {
         return sslHostConfig;
+    }
+
+
+    // Internal
+
+    public ObjectName getObjectName() {
+        return oname;
+    }
+
+
+    public void setObjectName(ObjectName oname) {
+        this.oname = oname;
     }
 
 

@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.0.M28 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        <bug>60762</bug>: Add the ability to make changes to the TLS
+        configuration of a connector at runtime without having to restart the
+        Connector. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0.M27 (markt)" rtext="release in progress">
   <subsection name="Catalina">
