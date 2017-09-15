@@ -143,7 +143,10 @@ final class PersistentProviderRegistrations {
             }
             writer.write("</jaspic-providers>\n");
         } catch (IOException e) {
-            configFileNew.delete();
+            if (!configFileNew.delete()) {
+                log.warn(sm.getString("persistentProviderRegistrations.deleteFail",
+                        configFileNew.getAbsolutePath()));
+            }
             throw new SecurityException(e);
         }
 
