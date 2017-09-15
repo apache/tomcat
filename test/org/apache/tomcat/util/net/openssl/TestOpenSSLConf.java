@@ -16,11 +16,17 @@
  */
 package org.apache.tomcat.util.net.openssl;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.hamcrest.CoreMatchers;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -32,10 +38,10 @@ import org.apache.tomcat.util.net.TesterSupport;
 
 public class TestOpenSSLConf extends TomcatBaseTest {
 
-    private static final String CIPHER = "AES256-SHA256";
+    private static final String ENABLED_CIPHER = "AES256-SHA256";
     private static final String[] EXPECTED_CIPHERS = {"AES256-SHA256"};
-    private static final String PROTOCOL = "-SSLv3,-TLSv1,TLSv1.1,-TLSv1.2";
-    private static final String[] EXPECTED_PROTOCOLS = {"SSLv2Hello", "TLSv1.1"};
+    private static final String[] ENABLED_PROTOCOLS = {"TLSv1.1"};
+    private static final String[] DISABLED_PROTOCOLS = {"SSLv3", "TLSv1", "TLSv1.2"};
 
     public SSLHostConfig initOpenSSLConfCmdCipher(String name, String value) throws Exception {
         Tomcat tomcat = getTomcatInstance();
@@ -56,33 +62,51 @@ public class TestOpenSSLConf extends TomcatBaseTest {
         cmd.setValue(value);
         OpenSSLConf conf = new OpenSSLConf();
         conf.addCmd(cmd);
-        SSLHostConfig[] sslHostConfigs = tomcat.getConnector().getProtocolHandler().findSslHostConfigs();
-        assertEquals("Checking SSLHostConfigCount", 1, sslHostConfigs.length);
+        SSLHostConfig[] sslHostConfigs = tomcat.getConnector().
+                                         getProtocolHandler().findSslHostConfigs();
+        assertEquals("Wrong SSLHostConfigCount", 1, sslHostConfigs.length);
         sslHostConfigs[0].setOpenSslConf(conf);
 
         tomcat.start();
 
         sslHostConfigs = tomcat.getConnector().getProtocolHandler().findSslHostConfigs();
-        assertEquals("Checking SSLHostConfigCount", 1, sslHostConfigs.length);
+        assertEquals("Wrong SSLHostConfigCount", 1, sslHostConfigs.length);
         return sslHostConfigs[0];
     }
 
     @Test
     public void testOpenSSLConfCmdCipher() throws Exception {
-        SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("CipherString", CIPHER);
+        SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("CipherString",
+                                                               ENABLED_CIPHER);
         String[] ciphers = sslHostConfig.getEnabledCiphers();
-        Assert.assertThat("Checking HostConfig ciphers", ciphers,
-                          CoreMatchers.is(EXPECTED_CIPHERS));
+        assertThat("Wrong HostConfig ciphers", ciphers,
+                   CoreMatchers.is(EXPECTED_CIPHERS));
         ciphers = SSLContext.getCiphers(sslHostConfig.getOpenSslContext().longValue());
-        Assert.assertThat("Checking native SSL context ciphers", ciphers,
-                          CoreMatchers.is(EXPECTED_CIPHERS));
+        assertThat("Wrong native SSL context ciphers", ciphers,
+                   CoreMatchers.is(EXPECTED_CIPHERS));
     }
 
     @Test
     public void testOpenSSLConfCmdProtocol() throws Exception {
-        SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("Protocol", PROTOCOL);
+        Set<String> disabledProtocols = new HashSet<String>(Arrays.asList(DISABLED_PROTOCOLS));
+        StringBuilder sb = new StringBuilder();
+        for (String protocol : DISABLED_PROTOCOLS) {
+            sb.append(",").append("-").append(protocol);
+        }
+        for (String protocol : ENABLED_PROTOCOLS) {
+            sb.append(",").append(protocol);
+        }
+        SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("Protocol",
+                                                               sb.substring(1));
         String[] protocols = sslHostConfig.getEnabledProtocols();
-        Assert.assertThat("Checking enabled HostConfig protocols", protocols,
-                          CoreMatchers.is(EXPECTED_PROTOCOLS));
+        for (String protocol : protocols) {
+            assertFalse("Protocol " + protocol + " is not allowed",
+                        disabledProtocols.contains(protocol));
+        }
+        Set<String> enabledProtocols = new HashSet<String>(Arrays.asList(protocols));
+        for (String protocol : ENABLED_PROTOCOLS) {
+            assertTrue("Protocol " + protocol + " is not enabled",
+                       enabledProtocols.contains(protocol));
+        }
     }
 }
