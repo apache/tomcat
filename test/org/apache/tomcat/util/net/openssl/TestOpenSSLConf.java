@@ -67,10 +67,14 @@ public class TestOpenSSLConf extends TomcatBaseTest {
     public void testOpenSSLConfCmdCipher() throws Exception {
         SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("CipherString", CIPHER);
         String[] ciphers = sslHostConfig.getEnabledCiphers();
-        assertEquals("Checking enabled cipher count", 1, ciphers.length);
+        String cipherList = String.join(",", ciphers);
+        assertEquals("Checking enabled cipher count (ciphers " +
+                     cipherList + ")", 1, ciphers.length);
         assertEquals("Checking enabled cipher", CIPHER, ciphers[0]);
         ciphers = SSLContext.getCiphers(sslHostConfig.getOpenSslContext().longValue());
-        assertEquals("Checking context cipher count", 1, ciphers.length);
+        cipherList = String.join(",", ciphers);
+        assertEquals("Checking context cipher count (ciphers " +
+                     cipherList + ")", 1, ciphers.length);
         assertEquals("Checking context cipher", CIPHER, ciphers[0]);
     }
 
@@ -78,8 +82,10 @@ public class TestOpenSSLConf extends TomcatBaseTest {
     public void testOpenSSLConfCmdProtocol() throws Exception {
         SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("Protocol", PROTOCOL);
         String[] protocols = sslHostConfig.getEnabledProtocols();
-        assertEquals("Checking enabled protocol count", 2, protocols.length);
-        assertEquals("Checking enabled protocol", EXPECTED_PROTOCOLS,
-                     protocols[0] + "," + protocols[1]);
+        String protocolList = String.join(",", protocols);
+        assertEquals("Checking enabled protocol count (protocols "
+                     + protocolList + ")", 2, protocols.length);
+        assertEquals("Checking enabled protocols", EXPECTED_PROTOCOLS,
+                     protocolList);
     }
 }
