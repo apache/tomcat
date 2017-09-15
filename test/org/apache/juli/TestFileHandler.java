@@ -29,6 +29,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -59,8 +60,9 @@ public class TestFileHandler {
 
         String date = LocalDateTime.now().minusDays(3).toString().replaceAll(":", "-");
         File file = new File(logsDir, PREFIX_1 + date + SUFIX_1);
-        file.createNewFile();
-
+        if (!file.createNewFile()) {
+            Assert.fail("Unable to create " + file.getAbsolutePath());
+        }
     }
 
     @After
@@ -118,7 +120,9 @@ public class TestFileHandler {
         for (int i = 0; i < amount; i++) {
             String date = LocalDate.now().minusDays(i + 1).toString().substring(0, 10);
             File file = new File(dir, prefix + date + sufix);
-            file.createNewFile();
+            if (!file.createNewFile()) {
+                Assert.fail("Unable to create " + file.getAbsolutePath());
+            }
         }
     }
 }
