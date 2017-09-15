@@ -16,8 +16,11 @@
  */
 package org.apache.tomcat.util.net.openssl;
 
+import org.hamcrest.CoreMatchers;
+
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -30,8 +33,9 @@ import org.apache.tomcat.util.net.TesterSupport;
 public class TestOpenSSLConf extends TomcatBaseTest {
 
     private static final String CIPHER = "AES256-SHA256";
+    private static final String[] EXPECTED_CIPHERS = {"AES256-SHA256"};
     private static final String PROTOCOL = "-SSLv3,-TLSv1,TLSv1.1,-TLSv1.2";
-    private static final String EXPECTED_PROTOCOLS = "SSLv2Hello,TLSv1.1";
+    private static final String[] EXPECTED_PROTOCOLS = {"SSLv2Hello", "TLSv1.1"};
 
     public SSLHostConfig initOpenSSLConfCmdCipher(String name, String value) throws Exception {
         Tomcat tomcat = getTomcatInstance();
@@ -67,25 +71,18 @@ public class TestOpenSSLConf extends TomcatBaseTest {
     public void testOpenSSLConfCmdCipher() throws Exception {
         SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("CipherString", CIPHER);
         String[] ciphers = sslHostConfig.getEnabledCiphers();
-        String cipherList = String.join(",", ciphers);
-        assertEquals("Checking enabled cipher count (ciphers " +
-                     cipherList + ")", 1, ciphers.length);
-        assertEquals("Checking enabled cipher", CIPHER, ciphers[0]);
+        Assert.assertThat("Checking HostConfig ciphers", ciphers,
+                          CoreMatchers.is(EXPECTED_CIPHERS));
         ciphers = SSLContext.getCiphers(sslHostConfig.getOpenSslContext().longValue());
-        cipherList = String.join(",", ciphers);
-        assertEquals("Checking context cipher count (ciphers " +
-                     cipherList + ")", 1, ciphers.length);
-        assertEquals("Checking context cipher", CIPHER, ciphers[0]);
+        Assert.assertThat("Checking native SSL context ciphers", ciphers,
+                          CoreMatchers.is(EXPECTED_CIPHERS));
     }
 
     @Test
     public void testOpenSSLConfCmdProtocol() throws Exception {
         SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("Protocol", PROTOCOL);
         String[] protocols = sslHostConfig.getEnabledProtocols();
-        String protocolList = String.join(",", protocols);
-        assertEquals("Checking enabled protocol count (protocols "
-                     + protocolList + ")", 2, protocols.length);
-        assertEquals("Checking enabled protocols", EXPECTED_PROTOCOLS,
-                     protocolList);
+        Assert.assertThat("Checking enabled HostConfig protocols", protocols,
+                          CoreMatchers.is(EXPECTED_PROTOCOLS));
     }
 }
