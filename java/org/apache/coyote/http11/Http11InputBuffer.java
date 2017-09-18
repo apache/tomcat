@@ -790,7 +790,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 headerData.lastSignificantChar = pos;
                 break;
             } else if (!HttpParser.isToken(chr)) {
-                // If a non-token characters are illegal in header names
+                // Non-token characters are illegal in header names
                 // Parsing continues so the error can be reported in context
                 headerData.lastSignificantChar = pos;
                 byteBuffer.position(byteBuffer.position() - 1);
