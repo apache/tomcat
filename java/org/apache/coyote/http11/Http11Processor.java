@@ -156,7 +156,8 @@ public class Http11Processor extends AbstractProcessor {
 
         userDataHelper = new UserDataHelper(log);
 
-        inputBuffer = new Http11InputBuffer(request, protocol.getMaxHttpHeaderSize());
+        inputBuffer = new Http11InputBuffer(request, protocol.getMaxHttpHeaderSize(),
+                protocol.getRejectIllegalHeaderName());
         request.setInputBuffer(inputBuffer);
 
         outputBuffer = new Http11OutputBuffer(response, protocol.getMaxHttpHeaderSize());

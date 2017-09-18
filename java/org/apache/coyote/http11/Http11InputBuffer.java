@@ -64,6 +64,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
     private final MimeHeaders headers;
 
 
+    private final boolean rejectIllegalHeaderName;
+
     /**
      * State.
      */
@@ -146,12 +148,14 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
     // ----------------------------------------------------------- Constructors
 
-    public Http11InputBuffer(Request request, int headerBufferSize) {
+    public Http11InputBuffer(Request request, int headerBufferSize,
+            boolean rejectIllegalHeaderName) {
 
         this.request = request;
         headers = request.getMimeHeaders();
 
         this.headerBufferSize = headerBufferSize;
+        this.rejectIllegalHeaderName = rejectIllegalHeaderName;
 
         filterLibrary = new InputFilter[0];
         activeFilters = new InputFilter[0];
@@ -786,10 +790,11 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 headerData.lastSignificantChar = pos;
                 break;
             } else if (!HttpParser.isToken(chr)) {
-                // If a non-token header is detected, skip the line and
-                // ignore the header
+                // If a non-token characters are illegal in header names
+                // Parsing continues so the error can be reported in context
                 headerData.lastSignificantChar = pos;
                 byteBuffer.position(byteBuffer.position() - 1);
+                // skipLine() will handle the error
                 return skipLine();
             }
 
@@ -921,11 +926,15 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 headerData.lastSignificantChar = pos;
             }
         }
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("iib.invalidheader",
+        if (rejectIllegalHeaderName || log.isDebugEnabled()) {
+            String message = sm.getString("iib.invalidheader",
                     new String(byteBuffer.array(), headerData.start,
                             headerData.lastSignificantChar - headerData.start + 1,
-                            StandardCharsets.ISO_8859_1)));
+                            StandardCharsets.ISO_8859_1));
+            if (rejectIllegalHeaderName) {
+                throw new IllegalArgumentException(message);
+            }
+            log.debug(message);
         }
 
         headerParsePos = HeaderParsePosition.HEADER_START;

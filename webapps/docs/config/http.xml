@@ -543,6 +543,14 @@
       expected concurrent requests (synchronous and asynchronous).</p>
     </attribute>
 
+    <attribute name="rejectIllegalHeaderName" required="false">
+      <p>If an HTTP request is received that contains an illegal header name
+      (i.e. the header name is not a token) this setting determines if the
+      request will be rejected with a 400 response (<code>true</code>) or if the
+      illegal header be ignored (<code>false</code>). The default value is
+      <code>true</code> which will cause the request to be rejected.</p>
+    </attribute>
+
     <attribute name="restrictedUserAgents" required="false">
       <p>The value is a regular expression (using <code>java.util.regex</code>)
       matching the <code>user-agent</code> header of HTTP clients for which

@@ -52,6 +52,11 @@
         configuration of a connector at runtime without having to restart the
         Connector. (markt)
       </add>
+      <add>
+        Add an option to reject requests that contain HTTP headers with invalid
+        (non-token) header names with a 400 response and reject such requests by
+        default. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
