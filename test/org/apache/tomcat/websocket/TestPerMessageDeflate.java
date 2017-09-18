@@ -18,7 +18,7 @@ package org.apache.tomcat.websocket;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,6 +29,13 @@ import javax.websocket.Extension.Parameter;
 import org.junit.Test;
 
 public class TestPerMessageDeflate {
+
+    /*
+     * This replaces StandardCharsets.UTF_8 as that requires Java 7 and this is
+     * simpler than refactoring the build script to build the WebSocket unit
+     * tests with Java 7.
+     */
+    private static final Charset UTF_8 = Charset.forName("UTF-8");
 
     /*
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=61491
@@ -44,14 +51,14 @@ public class TestPerMessageDeflate {
         PerMessageDeflate perMessageDeflate = PerMessageDeflate.negotiate(preferences, true);
         perMessageDeflate.setNext(new TesterTransformation());
 
-        ByteBuffer bb1 = ByteBuffer.wrap("A".getBytes(StandardCharsets.UTF_8));
+        ByteBuffer bb1 = ByteBuffer.wrap("A".getBytes(UTF_8));
         MessagePart mp1 = new MessagePart(true, 0, Constants.OPCODE_TEXT, bb1, null, null);
 
         List<MessagePart> uncompressedParts1 = new ArrayList<MessagePart>();
         uncompressedParts1.add(mp1);
         perMessageDeflate.sendMessagePart(uncompressedParts1);
 
-        ByteBuffer bb2 = ByteBuffer.wrap("".getBytes(StandardCharsets.UTF_8));
+        ByteBuffer bb2 = ByteBuffer.wrap("".getBytes(UTF_8));
         MessagePart mp2 = new MessagePart(true, 0, Constants.OPCODE_TEXT, bb2, null, null);
 
         List<MessagePart> uncompressedParts2 = new ArrayList<MessagePart>();
