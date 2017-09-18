@@ -293,7 +293,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
                         "ASCII");
 
                 request = new String[] { "POST http://localhost:" + getPort() + URI + " HTTP/1.1" + CRLF
-                        + "Host: localhost" + CRLF
+                        + "Host: localhost:" + getPort() + CRLF
                         + "Connection: close" + CRLF
                         + "Content-Type: multipart/form-data; boundary=" + boundary + CRLF
                         + "Content-Length: " + content.length() + CRLF
@@ -384,7 +384,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
                 String content = new String(body);
 
                 request = new String[] { "POST http://localhost:" + getPort() + URI + " HTTP/1.1" + CRLF
-                        + "Host: localhost" + CRLF
+                        + "Host: localhost:" + getPort() + CRLF
                         + "Connection: close" + CRLF
                         + "Content-Length: " + content.length() + CRLF
                         + CRLF

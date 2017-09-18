@@ -808,6 +808,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
                 String[] request = new String[2];
                 request[0] =
                     "PUT http://localhost:8080/test HTTP/1.1" + CRLF +
+                    "Host: localhost:8080" + CRLF +
                     "Transfer-encoding: chunked" + CRLF +
                     CRLF +
                     "2" + CRLF +

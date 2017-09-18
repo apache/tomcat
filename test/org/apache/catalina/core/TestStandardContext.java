@@ -771,7 +771,7 @@ public class TestStandardContext extends TomcatBaseTest {
 
                     request = new String[] {
                         "POST http://localhost:" + getPort() + uri + " HTTP/1.1" + CRLF
-                        + "Host: localhost" + CRLF
+                        + "Host: localhost:" + getPort() + CRLF
                         + "Connection: close" + CRLF
                         + "Content-Type: multipart/form-data; boundary=" + boundary + CRLF
                         + "Content-Length: " + content.length() + CRLF
@@ -779,12 +779,10 @@ public class TestStandardContext extends TomcatBaseTest {
                         + content
                         + CRLF
                     };
-                }
-                else
-                {
+                } else {
                     request = new String[] {
                         "GET http://localhost:" + getPort() + uri + " HTTP/1.1" + CRLF
-                        + "Host: localhost" + CRLF
+                        + "Host: localhost:" + getPort() + CRLF
                         + "Connection: close" + CRLF
                         + CRLF
                     };
