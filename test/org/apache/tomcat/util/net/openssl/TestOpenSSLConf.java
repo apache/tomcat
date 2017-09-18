@@ -88,7 +88,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
 
     @Test
     public void testOpenSSLConfCmdProtocol() throws Exception {
-        Set<String> disabledProtocols = new HashSet<String>(Arrays.asList(DISABLED_PROTOCOLS));
+        Set<String> disabledProtocols = new HashSet<>(Arrays.asList(DISABLED_PROTOCOLS));
         StringBuilder sb = new StringBuilder();
         for (String protocol : DISABLED_PROTOCOLS) {
             sb.append(",").append("-").append(protocol);
@@ -103,7 +103,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
             assertFalse("Protocol " + protocol + " is not allowed",
                         disabledProtocols.contains(protocol));
         }
-        Set<String> enabledProtocols = new HashSet<String>(Arrays.asList(protocols));
+        Set<String> enabledProtocols = new HashSet<>(Arrays.asList(protocols));
         for (String protocol : ENABLED_PROTOCOLS) {
             assertTrue("Protocol " + protocol + " is not enabled",
                        enabledProtocols.contains(protocol));
