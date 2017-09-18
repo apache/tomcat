@@ -114,6 +114,10 @@
         Poller if a connection is closed at the same time as new data arrives on
         that connection. (markt) 
       </fix>
+      <add>
+        Add an option to reject requests that contain HTTP headers with invalid
+        (non-token) header names with a 400 response. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

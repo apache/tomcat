@@ -33,7 +33,6 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      */
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
-
     /**
      * Associated Coyote request.
      */
@@ -106,6 +105,9 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
      * Index of the last active filter.
      */
     protected int lastActiveFilter;
+
+
+    protected boolean rejectIllegalHeaderName;
 
 
     // ------------------------------------------------------------- Properties

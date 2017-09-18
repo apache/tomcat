@@ -51,7 +51,8 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
     /**
      * Alternate constructor.
      */
-    public InternalAprInputBuffer(Request request, int headerBufferSize) {
+    public InternalAprInputBuffer(Request request, int headerBufferSize,
+            boolean rejectIllegalHeaderName) {
 
         this.request = request;
         headers = request.getMimeHeaders();
@@ -62,6 +63,8 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
         } else {
             bbuf = ByteBuffer.allocateDirect((headerBufferSize / 1500 + 1) * 1500);
         }
+
+        this.rejectIllegalHeaderName = rejectIllegalHeaderName;
 
         inputStreamInputBuffer = new SocketInputBuffer();
 
@@ -387,8 +390,9 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                 colon = true;
                 headerValue = headers.addValue(buf, start, pos - start);
             } else if (!HttpParser.isToken(buf[pos])) {
-                // If a non-token header is detected, skip the line and
-                // ignore the header
+                // Non-token characters are illegal in header names
+                // Parsing continues so the error can be reported in context
+                // skipLine() will handle the error
                 skipLine(start);
                 return true;
             }
@@ -518,9 +522,13 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
             pos++;
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("iib.invalidheader", new String(buf, start,
-                    lastRealByte - start + 1, Charset.forName("ISO-8859-1"))));
+        if (rejectIllegalHeaderName || log.isDebugEnabled()) {
+            String message = sm.getString("iib.invalidheader", new String(buf, start,
+                    lastRealByte - start + 1, Charset.forName("ISO-8859-1")));
+            if (rejectIllegalHeaderName) {
+                throw new IllegalArgumentException(message);
+            }
+            log.debug(message);
         }
     }
 

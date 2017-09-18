@@ -52,12 +52,15 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
     /**
      * Default constructor.
      */
-    public InternalInputBuffer(Request request, int headerBufferSize) {
+    public InternalInputBuffer(Request request, int headerBufferSize,
+            boolean rejectIllegalHeaderName) {
 
         this.request = request;
         headers = request.getMimeHeaders();
 
         buf = new byte[headerBufferSize];
+
+        this.rejectIllegalHeaderName = rejectIllegalHeaderName;
 
         inputStreamInputBuffer = new InputStreamInputBuffer();
 
@@ -339,8 +342,9 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
                 colon = true;
                 headerValue = headers.addValue(buf, start, pos - start);
             } else if (!HttpParser.isToken(buf[pos])) {
-                // If a non-token header is detected, skip the line and
-                // ignore the header
+                // Non-token characters are illegal in header names
+                // Parsing continues so the error can be reported in context
+                // skipLine() will handle the error
                 skipLine(start);
                 return true;
             }
@@ -489,9 +493,13 @@ public class InternalInputBuffer extends AbstractInputBuffer<Socket> {
             pos++;
         }
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("iib.invalidheader", new String(buf, start,
-                    lastRealByte - start + 1, Charset.forName("ISO-8859-1"))));
+        if (rejectIllegalHeaderName || log.isDebugEnabled()) {
+            String message = sm.getString("iib.invalidheader", new String(buf, start,
+                    lastRealByte - start + 1, Charset.forName("ISO-8859-1")));
+            if (rejectIllegalHeaderName) {
+                throw new IllegalArgumentException(message);
+            }
+            log.debug(message);
         }
     }
 
