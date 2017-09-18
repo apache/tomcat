@@ -53,6 +53,10 @@
         work directory for improved performance when deploying packed WAR files.
         (markt)
       </fix>
+      <add>
+        Add an option to reject requests that contain HTTP headers with invalid
+        (non-token) header names with a 400 response. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

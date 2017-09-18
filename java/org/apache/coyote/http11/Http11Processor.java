@@ -225,14 +225,15 @@ public class Http11Processor extends AbstractProcessor {
     private final Map<String,UpgradeProtocol> httpUpgradeProtocols;
 
 
-    public Http11Processor(int maxHttpHeaderSize, AbstractEndpoint<?> endpoint,int maxTrailerSize,
-            Set<String> allowedTrailerHeaders, int maxExtensionSize, int maxSwallowSize,
+    public Http11Processor(int maxHttpHeaderSize, boolean rejectIllegalHeaderName,
+            AbstractEndpoint<?> endpoint, int maxTrailerSize, Set<String> allowedTrailerHeaders,
+            int maxExtensionSize, int maxSwallowSize,
             Map<String,UpgradeProtocol> httpUpgradeProtocols, boolean sendReasonPhrase) {
 
         super(endpoint);
         userDataHelper = new UserDataHelper(log);
 
-        inputBuffer = new Http11InputBuffer(request, maxHttpHeaderSize);
+        inputBuffer = new Http11InputBuffer(request, maxHttpHeaderSize,rejectIllegalHeaderName);
         request.setInputBuffer(inputBuffer);
 
         outputBuffer = new Http11OutputBuffer(response, maxHttpHeaderSize, sendReasonPhrase);

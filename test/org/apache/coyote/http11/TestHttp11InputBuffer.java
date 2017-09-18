@@ -33,6 +33,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
@@ -130,6 +131,28 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
 
     @Test
+    public void testBug51557Valid() {
+
+        Bug51557Client client = new Bug51557Client("X-Bug51557Valid", "1234");
+
+        client.doRequest();
+        assertTrue(client.isResponse200());
+        assertEquals("1234abcd", client.getResponseBody());
+        assertTrue(client.isResponseBodyOK());
+    }
+
+
+    @Test
+    public void testBug51557Invalid() {
+
+        Bug51557Client client = new Bug51557Client("X-Bug51557=Invalid", "1234", true);
+
+        client.doRequest();
+        assertTrue(client.isResponse400());
+    }
+
+
+    @Test
     public void testBug51557NoColon() {
 
         Bug51557Client client = new Bug51557Client("X-Bug51557NoColon");
@@ -220,17 +243,25 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
      */
     private class Bug51557Client extends SimpleHttpClient {
 
-        private String headerName;
-        private String headerLine;
+        private final String headerName;
+        private final String headerLine;
+        private final boolean rejectIllegalHeaderName;
 
         public Bug51557Client(String headerName) {
             this.headerName = headerName;
             this.headerLine = headerName;
+            this.rejectIllegalHeaderName = false;
         }
 
         public Bug51557Client(String headerName, String headerValue) {
+            this(headerName, headerValue, false);
+        }
+
+        public Bug51557Client(String headerName, String headerValue,
+                boolean rejectIllegalHeaderName) {
             this.headerName = headerName;
             this.headerLine = headerName + ": " + headerValue;
+            this.rejectIllegalHeaderName = rejectIllegalHeaderName;
         }
 
         private Exception doRequest() {
@@ -243,8 +274,12 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
             root.addServletMappingDecoded("/test", "Bug51557");
 
             try {
+                Connector connector = tomcat.getConnector();
+                connector.setProperty("rejectIllegalHeaderName",
+                        Boolean.toString(rejectIllegalHeaderName));
                 tomcat.start();
-                setPort(tomcat.getConnector().getLocalPort());
+                setPort(connector.getLocalPort());
+
 
                 // Open connection
                 connect();
@@ -511,8 +546,10 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
             root.addServletMappingDecoded("/test", "Bug59089");
 
             try {
+                Connector connector = tomcat.getConnector();
+                connector.setProperty("rejectIllegalHeaderName", "false");
                 tomcat.start();
-                setPort(tomcat.getConnector().getLocalPort());
+                setPort(connector.getLocalPort());
 
                 // Open connection
                 connect();
