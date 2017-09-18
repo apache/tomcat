@@ -725,6 +725,30 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
 
+
+        // Check host header
+        MessageBytes hostValueMB = null;
+        try {
+            hostValueMB = headers.getUniqueValue("host");
+        } catch (IllegalArgumentException iae) {
+            // Multiple Host headers are not permitted
+            // 400 - Bad request
+            response.setStatus(400);
+            setErrorState(ErrorState.CLOSE_CLEAN, null);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("http11processor.request.multipleHosts"));
+            }
+        }
+        if (http11 && hostValueMB == null) {
+            // 400 - Bad request
+            response.setStatus(400);
+            setErrorState(ErrorState.CLOSE_CLEAN, null);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("http11processor.request.prepare")+
+                          " host header missing");
+            }
+        }
+
         // Check for a full URI (including protocol://host:port/)
         ByteChunk uriBC = request.requestURI().getByteChunk();
         if (uriBC.startsWithIgnoreCase("http", 0)) {
@@ -733,21 +757,44 @@ public class Http11Processor extends AbstractProcessor {
             int uriBCStart = uriBC.getStart();
             int slashPos = -1;
             if (pos != -1) {
+                pos += 3;
                 byte[] uriB = uriBC.getBytes();
-                slashPos = uriBC.indexOf('/', pos + 3);
+                slashPos = uriBC.indexOf('/', pos);
+                int atPos = uriBC.indexOf('@', pos);
                 if (slashPos == -1) {
                     slashPos = uriBC.getLength();
                     // Set URI as "/"
                     request.requestURI().setBytes
-                        (uriB, uriBCStart + pos + 1, 1);
+                        (uriB, uriBCStart + pos - 2, 1);
                 } else {
                     request.requestURI().setBytes
                         (uriB, uriBCStart + slashPos,
                          uriBC.getLength() - slashPos);
                 }
-                MessageBytes hostMB = headers.setValue("host");
-                hostMB.setBytes(uriB, uriBCStart + pos + 3,
-                                slashPos - pos - 3);
+                // Skip any user info
+                if (atPos != -1) {
+                    pos = atPos + 1;
+                }
+                if (http11) {
+                    // Missing host header is illegal but handled above
+                    if (hostValueMB != null) {
+                        // Any host in the request line must be consistent with
+                        // the Host header
+                        if (!hostValueMB.getByteChunk().equals(
+                                uriB, uriBCStart + pos, slashPos - pos)) {
+                            response.setStatus(400);
+                            setErrorState(ErrorState.CLOSE_CLEAN, null);
+                            if (log.isDebugEnabled()) {
+                                log.debug(sm.getString("http11processor.request.inconsistentHosts"));
+                            }
+                        }
+                    }
+                } else {
+                    // Not HTTP/1.1 - no Host header so generate one since
+                    // Tomcat internals assume it is set
+                    hostValueMB = headers.setValue("host");
+                    hostValueMB.setBytes(uriB, uriBCStart + pos, slashPos - pos);
+                }
             }
         }
 
@@ -792,20 +839,7 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
 
-        MessageBytes valueMB = headers.getValue("host");
-
-        // Check host header
-        if (http11 && (valueMB == null)) {
-            // 400 - Bad request
-            response.setStatus(400);
-            setErrorState(ErrorState.CLOSE_CLEAN, null);
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("http11processor.request.prepare")+
-                          " host header missing");
-            }
-        }
-
-        parseHost(valueMB);
+        parseHost(hostValueMB);
 
         if (!contentDelimitation) {
             // If there's no content length
