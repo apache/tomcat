@@ -192,6 +192,10 @@
         pick up the latest Windows binaries built with APR 1.6.2 and OpenSSL
         1.0.2l. (markt)
       </update>
+      <fix>
+        Update fix for <bug>59904</bug> so that values less than zero are accepted
+        instead of throwing a NegativeArraySizeException. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>

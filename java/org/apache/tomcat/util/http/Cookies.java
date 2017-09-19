@@ -134,7 +134,7 @@ public final class Cookies {
         }
 
         if (cookieCount >= scookies.length) {
-            int newSize = Math.min(2*cookieCount, limit);
+            int newSize = limit > -1 ? Math.min(2*cookieCount, limit) : 2*cookieCount;
             ServerCookie scookiesTmp[] = new ServerCookie[newSize];
             System.arraycopy( scookies, 0, scookiesTmp, 0, cookieCount);
             scookies=scookiesTmp;
