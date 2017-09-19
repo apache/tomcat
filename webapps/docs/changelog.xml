@@ -59,6 +59,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Update fix for <bug>59904</bug> so that values less than zero are accepted
+        instead of throwing a NegativeArraySizeException. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.21 (markt)" rtext="release in progress">
   <subsection name="Catalina">
