@@ -132,6 +132,13 @@ public abstract class AbstractTestResourceSet {
     }
 
     @Test
+    public final void testGetResourceFileWithTrailingSlash() {
+        WebResource webResource =
+                resourceRoot.getResource(getMount() + "/d1/d1-f1.txt/");
+        Assert.assertFalse(webResource.exists());
+    }
+
+    @Test
     public final void testGetResourceCaseSensitive() {
         WebResource webResource =
                 resourceRoot.getResource(getMount() + "/d1/d1-F1.txt");
