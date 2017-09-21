@@ -44,7 +44,7 @@
   <property name="md5sum.binary-prefix" value=" *" />
 
   <!-- Exact spec versions (for the manifests) -->
-  <property name="servlet.revision" value="EDR-b01" />
+  <property name="servlet.revision" value="FR" />
   <property name="jsp.revision" value="FR" />
   <property name="el.revision" value="FR" />
   <property name="websocket.revision" value="FR" />
