@@ -122,7 +122,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
      * @param path Path to be normalized
      */
     private String normalize(String path) {
-        return RequestUtil.normalize(path, File.separatorChar == '/');
+        return RequestUtil.normalize(path, File.separatorChar == '\\');
     }
 
     @Override
