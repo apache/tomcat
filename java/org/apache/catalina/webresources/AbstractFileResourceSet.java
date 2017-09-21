@@ -61,7 +61,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         // If the requested names ends in '/', the Java File API will return a
         // matching file if one exists. This isn't what we want as it is not
         // consistent with the Servlet spec rules for request mapping.
-        if (file.isFile() && name.endsWith("/")) {
+        if (name.endsWith("/") && file.isFile()) {
             return null;
         }
 
