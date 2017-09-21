@@ -90,10 +90,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
             //       point. The purpose of this code is to check in a case
             //       sensitive manner, the path to the resource under base
             //       agrees with what was requested
-            String fileAbsPath = file.getAbsolutePath();
-            if (fileAbsPath.endsWith("."))
-                fileAbsPath = fileAbsPath + '/';
-            String absPath = normalize(fileAbsPath);
+            String absPath = normalize(file.getAbsolutePath());
             if ((absoluteBase.length() < absPath.length())
                 && (canonicalBase.length() < canPath.length())) {
                 absPath = absPath.substring(absoluteBase.length() + 1);
@@ -152,11 +149,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         fileBase = new File(getBase(), getInternalPath());
         checkType(fileBase);
 
-        String absolutePath = fileBase.getAbsolutePath();
-        if (absolutePath.endsWith(".")) {
-            absolutePath = absolutePath + '/';
-        }
-        this.absoluteBase = normalize(absolutePath);
+        this.absoluteBase = normalize(fileBase.getAbsolutePath());
 
         try {
             this.canonicalBase = fileBase.getCanonicalPath();
