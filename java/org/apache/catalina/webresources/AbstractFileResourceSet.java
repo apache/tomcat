@@ -92,15 +92,18 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
             //       agrees with what was requested
             String absPath = normalize(file.getAbsolutePath());
             if ((absoluteBase.length() < absPath.length())
-                && (canonicalBase.length() < canPath.length())) {
+                    && (canonicalBase.length() < canPath.length())) {
                 absPath = absPath.substring(absoluteBase.length() + 1);
-                if (absPath.equals(""))
+                if (absPath.equals("")) {
                     absPath = "/";
+                }
                 canPath = canPath.substring(canonicalBase.length() + 1);
-                if (canPath.equals(""))
+                if (canPath.equals("")) {
                     canPath = "/";
-                if (!canPath.equals(absPath))
+                }
+                if (!canPath.equals(absPath)) {
                     return null;
+                }
             }
 
         } else {
