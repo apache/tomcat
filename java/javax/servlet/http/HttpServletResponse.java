@@ -348,6 +348,8 @@ public interface HttpServletResponse extends ServletResponse {
      * <br>
      * Trailers that don't meet the requirements of RFC 7230, section 4.1.2 will
      * be ignored.
+     * <br>
+     * The default implementation is a NO-OP.
      *
      * @param supplier The supplier for the trailer headers
      *
@@ -359,6 +361,19 @@ public interface HttpServletResponse extends ServletResponse {
      */
     public default void setTrailerFields(Supplier<Map<String, String>> supplier) {
         // NO-OP
+    }
+
+    /**
+     * Obtain the supplier of the trailer headers.
+     * <br>
+     * The default implementation returns null.
+     *
+     * @return The supplier for the trailer headers
+     *
+     * @since Servlet 4.0
+     */
+    public default Supplier<Map<String, String>> getTrailerFields() {
+        return null;
     }
 
     /*

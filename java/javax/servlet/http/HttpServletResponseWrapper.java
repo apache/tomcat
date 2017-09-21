@@ -282,4 +282,18 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
     public void setTrailerFields(Supplier<Map<String, String>> supplier) {
         this._getHttpServletResponse().setTrailerFields(supplier);
     }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The default implementation is to call
+     * {@link HttpServletResponse#getTrailerFields()}
+     * on the wrapper {@link HttpServletResponse}.
+     *
+     * @since Servlet 4.0
+     */
+    @Override
+    public Supplier<Map<String, String>> getTrailerFields() {
+        return this._getHttpServletResponse().getTrailerFields();
+    }
 }

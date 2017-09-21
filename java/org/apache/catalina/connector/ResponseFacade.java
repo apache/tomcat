@@ -648,4 +648,10 @@ public class ResponseFacade implements HttpServletResponse {
     public void setTrailerFields(Supplier<Map<String, String>> supplier) {
         response.setTrailerFields(supplier);
     }
+
+
+    @Override
+    public Supplier<Map<String, String>> getTrailerFields() {
+        return response.getTrailerFields();
+    }
 }

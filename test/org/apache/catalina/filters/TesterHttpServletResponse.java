@@ -251,4 +251,6 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     public void setContentLengthLong(long length) {/* NOOP */}
     @Override
     public void setTrailerFields(Supplier<Map<String, String>> supplier) { /* NOOP */ }
+    @Override
+    public Supplier<Map<String, String>> getTrailerFields() { return null; }
 }

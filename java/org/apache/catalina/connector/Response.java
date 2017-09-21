@@ -1159,6 +1159,12 @@ public class Response implements HttpServletResponse {
     }
 
 
+    @Override
+    public Supplier<Map<String, String>> getTrailerFields() {
+        return getCoyoteResponse().getTrailerFields();
+    }
+
+
     /**
      * Encode the session identifier associated with this response
      * into the specified redirect URL, if necessary.
