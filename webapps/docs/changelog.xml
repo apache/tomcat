@@ -81,6 +81,9 @@
         contains multiple <code>Host</code> headers is rejected with a 400
         response. (markt)
       </fix>
+      <update>
+        Add a way to set the property source in embedded mode. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">

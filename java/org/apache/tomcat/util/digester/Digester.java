@@ -82,7 +82,8 @@ public class Digester extends DefaultHandler2 {
 
     // ---------------------------------------------------------- Static Fields
 
-    protected static final IntrospectionUtils.PropertySource propertySource;
+    protected static IntrospectionUtils.PropertySource propertySource;
+    private static boolean propertySourceSet = false;
 
     static {
         String className = System.getProperty("org.apache.tomcat.util.digester.PROPERTY_SOURCE");
@@ -102,9 +103,18 @@ public class Digester extends DefaultHandler2 {
                 }
             }
         }
-        propertySource = source;
+        if (source != null) {
+            propertySource = source;
+            propertySourceSet = true;
+        }
     }
 
+    public static void setPropertySource(IntrospectionUtils.PropertySource propertySource) {
+        if (!propertySourceSet) {
+            Digester.propertySource = propertySource;
+            propertySourceSet = true;
+        }
+    }
 
     // --------------------------------------------------- Instance Variables
 
@@ -304,6 +314,7 @@ public class Digester extends DefaultHandler2 {
 
 
     public Digester() {
+        propertySourceSet = true;
         if (propertySource != null) {
             source = new IntrospectionUtils.PropertySource[] { propertySource, source[0] };
         }
