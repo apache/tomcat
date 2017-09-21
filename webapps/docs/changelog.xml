@@ -52,6 +52,11 @@
         uploaded via a specially crafted request when HTTP PUT was enabled.
         (markt)
       </fix>
+      <fix>
+        <bug>61554</bug>: Exclude test files in unusual encodings and markdown
+        files intended for display in GitHub from RAT analysis. Patch provided
+        by Chris Thistlethwaite. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

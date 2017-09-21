@@ -30,8 +30,8 @@
   - package-list and script.js files in API documentation (javadoc) are
     generated
 
-  - other test files, such as trivial textual files containing only "OK' string
-    or compressed files are also excluded.
+  - other test files, such as trivial textual files containing only "OK' string,
+    files in unusual encodings or compressed files are also excluded.
 
   - JSON files (RFC7159) are data and cannot contain comments
 
@@ -51,6 +51,9 @@
     (*.gif, *.jpg are also binary, but are automatically detected by RAT as
     ones, so no explicit configuration is needed)
 
+  - Markdown files for display in ther GitHub UI
+
+
 output/build/logs/*
 output/test-tmp/**
 
@@ -68,6 +71,11 @@ output/dist/webapps/docs/*/package-list
 output/dist/webapps/docs/*/script.js
 
 output/dist/src/test/webapp/index.html.br
+output/dist/src/test/webapp/bug49nnn/bug49464-cp1252.txt
+output/dist/src/test/webapp/bug49nnn/bug49464-ibm850.txt
+output/dist/src/test/webapp/bug49nnn/bug49464-iso-8859-1.txt
+output/dist/src/test/webapp/bug49nnn/bug49464-utf-8-bom.txt
+output/dist/src/test/webapp/bug49nnn/bug49464-utf-8.txt
 output/dist/src/test/webapp/bug53257/*.txt
 output/dist/src/test/webapp/bug53257/foo bar/foobar.txt
 output/dist/src/test/webapp-fragments/WEB-INF/classes/*.txt
@@ -75,12 +83,18 @@ output/dist/src/test/webresources/dir1/d1/d1-f1.txt
 output/dist/src/test/webresources/dir1/d2/d2-f1.txt
 output/dist/src/test/webresources/dir1/*.txt
 test/webapp/index.html.br
+test/webapp/bug49nnn/bug49464-cp1252.txt
+test/webapp/bug49nnn/bug49464-ibm850.txt
+test/webapp/bug49nnn/bug49464-iso-8859-1.txt
+test/webapp/bug49nnn/bug49464-utf-8-bom.txt
+test/webapp/bug49nnn/bug49464-utf-8.txt
 test/webapp/bug53257/*.txt
 test/webapp/bug53257/foo bar/foobar.txt
 test/webapp-fragments/WEB-INF/classes/*.txt
 test/webresources/dir1/d1/d1-f1.txt
 test/webresources/dir1/d2/d2-f1.txt
 test/webresources/dir1/*.txt
+
 
 **/*.json
 
@@ -159,5 +173,9 @@ res/checkstyle/header-al2.txt
 
 output/dist/temp/safeToDelete.tmp
 
+
 **/*.bmp
 **/*.dia
+
+output/dist/src/README.md
+README.md
