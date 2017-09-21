@@ -59,6 +59,13 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Add a way to set the property source in embedded mode. (remm)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
