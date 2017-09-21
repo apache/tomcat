@@ -218,7 +218,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
      * <p>
      * The default implementation is to call
      * {@link HttpServletResponse#getStatus()}
-     * on the wrapper {@link HttpServletResponse}.
+     * on the wrapped {@link HttpServletResponse}.
      *
      * @since Servlet 3.0
      */
@@ -232,7 +232,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
      * <p>
      * The default implementation is to call
      * {@link HttpServletResponse#getHeader(String)}
-     * on the wrapper {@link HttpServletResponse}.
+     * on the wrapped {@link HttpServletResponse}.
      *
      * @since Servlet 3.0
      */
@@ -246,7 +246,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
      * <p>
      * The default implementation is to call
      * {@link HttpServletResponse#getHeaders(String)}
-     * on the wrapper {@link HttpServletResponse}.
+     * on the wrapped {@link HttpServletResponse}.
      *
      * @since Servlet 3.0
      */
@@ -260,7 +260,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
      * <p>
      * The default implementation is to call
      * {@link HttpServletResponse#getHeaderNames()}
-     * on the wrapper {@link HttpServletResponse}.
+     * on the wrapped {@link HttpServletResponse}.
      *
      * @since Servlet 3.0
      */
@@ -274,7 +274,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
      * <p>
      * The default implementation is to call
      * {@link HttpServletResponse#setTrailerFields(Supplier)}
-     * on the wrapper {@link HttpServletResponse}.
+     * on the wrapped {@link HttpServletResponse}.
      *
      * @since Servlet 4.0
      */
@@ -288,7 +288,7 @@ public class HttpServletResponseWrapper extends ServletResponseWrapper
      * <p>
      * The default implementation is to call
      * {@link HttpServletResponse#getTrailerFields()}
-     * on the wrapper {@link HttpServletResponse}.
+     * on the wrapped {@link HttpServletResponse}.
      *
      * @since Servlet 4.0
      */
