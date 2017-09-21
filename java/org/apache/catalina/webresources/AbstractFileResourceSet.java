@@ -115,6 +115,12 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         //
         // In all cases, a mis-match here results in the resource not being
         // found
+        //
+        // absPath is normalized so canPath needs to be normalized as well
+        // Can't normalize canPath earlier as canonicalBase is not normalized
+        if (canPath.length() > 0) {
+            canPath = normalize(canPath);
+        }
         if (!canPath.equals(absPath)) {
             return null;
         }
