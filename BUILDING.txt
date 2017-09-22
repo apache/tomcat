@@ -20,7 +20,7 @@
             ====================================================
 
 This subproject contains the source code for Tomcat @VERSION_MAJOR_MINOR@, a container that
-implements the Servlet 4.0, JSP 2.4?, EL 3.1?, WebSocket 1.2? and JASPIC 1.1
+implements the Servlet 4.0, JSP 2.3, EL 3.0, WebSocket 1.1 and JASPIC 1.1
 specifications from the Java Community Process <http://www.jcp.org/>.
 
 Note: If you just need to run Apache Tomcat, it is not necessary to build
