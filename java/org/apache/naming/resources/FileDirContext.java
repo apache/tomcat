@@ -870,8 +870,9 @@ public class FileDirContext extends BaseDirContext {
         //
         // absPath is normalized so canPath needs to be normalized as well
         // Can't normalize canPath earlier as canonicalBase is not normalized
-        if (canPath.length() > 0) {
-            canPath = normalize(canPath);
+        canPath = normalize(canPath);
+        if (absPath.length() == 0) {
+            absPath = "/";
         }
         if (!canPath.equals(absPath)) {
             return null;
