@@ -32,7 +32,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
  */
 public class TestProxyDirContext extends TomcatBaseTest {
 
-    /**
+    /*
      * lookup doesn't always throw the same exception.
      */
     @Test

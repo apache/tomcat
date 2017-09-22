@@ -44,7 +44,7 @@ public class TestWarDirContext extends TomcatBaseTest {
                 new JreMemoryLeakPreventionListener());
     }
 
-    /**
+    /*
      * Check https://jira.springsource.org/browse/SPR-7350 isn't really an issue
      */
     @Test
@@ -64,7 +64,7 @@ public class TestWarDirContext extends TomcatBaseTest {
     }
 
 
-    /**
+    /*
      * Additional test following on from SPR-7350 above to check files that
      * contain JNDI reserved characters can be served when caching is enabled.
      */
@@ -94,7 +94,7 @@ public class TestWarDirContext extends TomcatBaseTest {
     }
 
 
-    /**
+    /*
      * Additional test following on from SPR-7350 above to check files that
      * contain JNDI reserved characters can be served when caching is disabled.
      */
