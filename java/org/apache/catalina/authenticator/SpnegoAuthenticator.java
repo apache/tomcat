@@ -45,7 +45,6 @@ import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.Oid;
 
-
 /**
  * A SPNEGO authenticator that uses the SPNEGO/Kerberos support built in to Java
  * 6. Successful Kerberos authentication depends on the correct configuration of
