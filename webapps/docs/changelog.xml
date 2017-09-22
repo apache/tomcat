@@ -97,6 +97,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>61545</bug>: Correctly handle invocations of methods defined in the
+        <code>PooledConnection</code> interface when using pooled XA
+        connections. Patch provided by Nils Winkler. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
