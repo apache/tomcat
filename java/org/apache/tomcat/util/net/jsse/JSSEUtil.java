@@ -241,7 +241,13 @@ public class JSSEUtil extends SSLUtilBase {
             Key k = ks.getKey(keyAlias, keyPassArray);
             if (k != null && "PKCS#8".equalsIgnoreCase(k.getFormat())) {
                 // Switch to in-memory key store
-                ksUsed = KeyStore.getInstance("JKS");
+                String provider = certificate.getCertificateKeystoreProvider();
+                if (provider == null) {
+                    ksUsed = KeyStore.getInstance(certificate.getCertificateKeystoreType());
+                } else {
+                    ksUsed = KeyStore.getInstance(certificate.getCertificateKeystoreType(),
+                            provider);
+                }
                 ksUsed.load(null,  null);
                 ksUsed.setKeyEntry(keyAlias, k, keyPassArray, ks.getCertificateChain(keyAlias));
             }
