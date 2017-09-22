@@ -801,11 +801,18 @@ public class FileDirContext extends BaseDirContext {
      */
     protected File file(String name, boolean mustExist) {
         File file = new File(base, name);
-        return validate(file, mustExist, absoluteBase);
+        return validate(file, name, mustExist, absoluteBase);
     }
 
 
-    protected File validate(File file, boolean mustExist, String absoluteBase) {
+    protected File validate(File file, String name, boolean mustExist, String absoluteBase) {
+
+        // If the requested names ends in '/', the Java File API will return a
+        // matching file if one exists. This isn't what we want as it is not
+        // consistent with the Servlet spec rules for request mapping.
+        if (file.isFile() && name.endsWith("/")) {
+            return null;
+        }
 
         if (!mustExist || file.exists() && file.canRead()) {
 
