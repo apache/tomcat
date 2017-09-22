@@ -93,11 +93,10 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         // the request processing) but might be possible for some access via the
         // Servlet API (RequestDispatcher, HTTP/2 push etc.) therefore these
         // checks are retained as an additional safety measure
-        // absoluteBase has been normalized so absPath needs to normalized as
+        // absoluteBase has been normalized so absPath needs to be normalized as
         // well.
         String absPath = normalize(file.getAbsolutePath());
-        if (absoluteBase.length() > absPath.length() ||
-                canonicalBase.length() > canPath.length()) {
+        if (absoluteBase.length() > absPath.length()) {
             return null;
         }
 
