@@ -476,10 +476,15 @@ public class FileDirContext extends BaseDirContext {
      * @exception NamingException if a naming exception is encountered
      */
     @Override
-    public void bind(String name, Object obj, Attributes attrs)
-        throws NamingException {
+    public void bind(String name, Object obj, Attributes attrs) throws NamingException {
 
         // Note: No custom attributes allowed
+
+        // bind() is meant to create a file so ensure that the path doesn't end
+        // in '/'
+        if (name.endsWith("/")) {
+            throw new NamingException(sm.getString("resources.bindFailed", name));
+        }
 
         File file = file(name, false);
         if (file == null) {
