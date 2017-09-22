@@ -79,7 +79,10 @@
       <fix>
         Implement the requirements of RFC 7230 that any HTTP/1.1 request that
         specifies a host in the request line, must specify the same host in the
-        <code>Host</code> header. (markt)
+        <code>Host</code> header and that any such request that does not, must
+        be rejected with a 400 response. This check is optional but enabled by
+        default. It may be disabled with the
+        <code>allowHostHeaderMismatch</code> attribute of the Connector. (markt)
       </fix>
       <fix>
         Implement the requirements of RFC 7230 that any HTTP/1.1 request that

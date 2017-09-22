@@ -323,6 +323,13 @@
       configured with <code>::</code>.</p>
     </attribute>
 
+    <attribute name="allowHostHeaderMismatch" required="false">
+      <p>By default Tomcat will reject requests that specify a host in the
+      request line but specify a different host in the host header. This
+      chekc can be disabled by setting this attribute to <code>false</code>. If
+      not specified, the default is <code>true</code>.</p>
+    </attribute>
+
     <attribute name="allowedTrailerHeaders" required="false">
       <p>By default Tomcat will ignore all trailer headers when processing
       chunked input. For a header to be processed, it must be added to this

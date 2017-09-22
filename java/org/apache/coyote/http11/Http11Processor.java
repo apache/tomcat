@@ -782,10 +782,22 @@ public class Http11Processor extends AbstractProcessor {
                         // the Host header
                         if (!hostValueMB.getByteChunk().equals(
                                 uriB, uriBCStart + pos, slashPos - pos)) {
-                            response.setStatus(400);
-                            setErrorState(ErrorState.CLOSE_CLEAN, null);
-                            if (log.isDebugEnabled()) {
-                                log.debug(sm.getString("http11processor.request.inconsistentHosts"));
+                            if (protocol.getAllowHostHeaderMismatch()) {
+                                // The requirements of RFC 2616 are being
+                                // applied. If the host header and the request
+                                // line do not agree, the request line takes
+                                // precedence
+                                hostValueMB = headers.setValue("host");
+                                hostValueMB.setBytes(uriB, uriBCStart + pos, slashPos - pos);
+                            } else {
+                                // The requirements of RFC 7230 are being
+                                // applied. If the host header and the request
+                                // line do not agree, trigger a 400 response.
+                                response.setStatus(400);
+                                setErrorState(ErrorState.CLOSE_CLEAN, null);
+                                if (log.isDebugEnabled()) {
+                                    log.debug(sm.getString("http11processor.request.inconsistentHosts"));
+                                }
                             }
                         }
                     }
