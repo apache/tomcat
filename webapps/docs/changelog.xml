@@ -89,6 +89,12 @@
       <update>
         Add a way to set the property source in embedded mode. (remm)
       </update>
+      <fix>
+        <bug>61557</bug>: Correct a further regression in the fix to enable the
+        use of Java key stores that contain multiple keys that do not all have
+        the same password. The regression broke support for some FIPS compliant
+        key stores. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
