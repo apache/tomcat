@@ -50,8 +50,21 @@ import java.util.logging.Logger;
  * Short configuration information will be sent to <code>System.err</code>.
  */
 public class ClassLoaderLogManager extends LogManager {
+
+    private static final boolean isJava9;
+
     public static final String DEBUG_PROPERTY =
             ClassLoaderLogManager.class.getName() + ".debug";
+
+    static {
+        Class<?> c = null;
+        try {
+            c = Class.forName("java.lang.Runtime$Version");
+        } catch (ClassNotFoundException e) {
+            // Must be Java 8
+        }
+        isJava9 = c != null;
+    }
 
     private final class Cleaner extends Thread {
 
@@ -478,7 +491,8 @@ public class ClassLoaderLogManager extends LogManager {
             }
             // Try the default JVM configuration
             if (is == null) {
-                File defaultFile = new File(new File(System.getProperty("java.home"), "lib"),
+                File defaultFile = new File(new File(System.getProperty("java.home"),
+                                                     isJava9 ? "conf" : "lib"),
                     "logging.properties");
                 try {
                     is = new FileInputStream(defaultFile);

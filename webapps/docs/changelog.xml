@@ -45,6 +45,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.1 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Use the correct path when loading the JVM <code>logging.properties</code>
+        file for Java 9. (rjung)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0 (markt)" rtext="release in progress">
   <subsection name="Catalina">
