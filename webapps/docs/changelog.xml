@@ -206,6 +206,10 @@
         Update fix for <bug>59904</bug> so that values less than zero are accepted
         instead of throwing a NegativeArraySizeException. (remm)
       </fix>
+      <fix>
+        <bug>61563</bug>: Correct typos in Spanish translation. Patch provided by
+        Gonzalo Vásquez. (csutherl)
+      </fix>
     </changelog>
   </subsection>
 </section>
