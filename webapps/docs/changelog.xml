@@ -45,6 +45,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.23 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Add additional validation to the resource handling required to fix
+        CVE-2017-12617 on Windows. The checks were being performed elsewhere but
+        adding them to the resource handling ensures that the checks are always
+        performed. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
