@@ -51,6 +51,12 @@
         Use the correct path when loading the JVM <code>logging.properties</code>
         file for Java 9. (rjung)
       </fix>
+      <fix>
+        Add additional validation to the resource handling required to fix
+        CVE-2017-12617 on Windows. The checks were being performed elsewhere but
+        adding them to the resource handling ensures that the checks are always
+        performed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
