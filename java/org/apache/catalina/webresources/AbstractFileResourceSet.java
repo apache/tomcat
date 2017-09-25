@@ -136,6 +136,9 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
 
 
     private boolean isInvalidWindowsFilename(String name) {
+        if (name.length() == 0) {
+            return false;
+        }
         // For typical length file names, this is 2-3 times faster than the
         // equivalent regular expression. The cut-over point is file names (not
         // full paths) of ~65 characters.
