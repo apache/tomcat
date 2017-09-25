@@ -53,6 +53,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>61563</bug>: Correct typos in Spanish translation. Patch provided by
+        Gonzalo Vásquez. (csutherl)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.0 (markt)" rtext="release in progress">
   <subsection name="Catalina">
