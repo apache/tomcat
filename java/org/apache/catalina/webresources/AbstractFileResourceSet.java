@@ -136,12 +136,12 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
 
 
     private boolean isInvalidWindowsFilename(String name) {
-        if (name.length() == 0) {
+        final int len = name.length();
+        if (len == 0) {
             return false;
         }
         // This consistently ~10 times faster than the equivalent regular
         // expression irrespective of input length.
-        final int len = name.length();
         for (int i = 0; i < len; i++) {
             char c = name.charAt(i);
             if (c == '\"' || c == '<' || c == '>') {
