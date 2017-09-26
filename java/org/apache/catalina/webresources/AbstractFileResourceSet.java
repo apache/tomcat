@@ -139,11 +139,11 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         if (name.length() == 0) {
             return false;
         }
-        // For typical length file names, this is 2-3 times faster than the
-        // equivalent regular expression. The cut-over point is file names (not
-        // full paths) of ~65 characters.
-        char[] chars = name.toCharArray();
-        for (char c : chars) {
+        // This consistently ~10 times faster than the equivalent regular
+        // expression irrespective of input length.
+        final int len = name.length();
+        for (int i = 0; i < len; i++) {
+            char c = name.charAt(i);
             if (c == '\"' || c == '<' || c == '>') {
                 // These characters are disallowed in Windows file names and
                 // there are known problems for file names with these characters
@@ -154,11 +154,11 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
                 return true;
             }
         }
-        // Windows does allow file names to end in ' ' unless specific low level
-        // APIs are used to create the files that bypass various checks. File
-        // names that end in ' ' are known to cause problems when using
+        // Windows does not allow file names to end in ' ' unless specific low
+        // level APIs are used to create the files that bypass various checks.
+        // File names that end in ' ' are known to cause problems when using
         // File#getCanonicalPath().
-        if (chars[chars.length -1] == ' ') {
+        if (name.charAt(len -1) == ' ') {
             return true;
         }
         return false;
