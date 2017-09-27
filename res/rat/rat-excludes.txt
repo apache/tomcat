@@ -99,6 +99,7 @@ test/webresources/dir1/*.txt
 **/*.json
 
 build.properties
+res/maven/mvn.properties
 
 output/dist/confinstall/tomcat-users_2.xml
 output/dist/src/res/confinstall/tomcat-users_2.xml
@@ -177,5 +178,5 @@ output/dist/temp/safeToDelete.tmp
 **/*.bmp
 **/*.dia
 
-output/dist/src/README.md
-README.md
+output/dist/src/*.md
+*.md
