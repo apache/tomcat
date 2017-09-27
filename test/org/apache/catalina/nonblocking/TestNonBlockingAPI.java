@@ -269,7 +269,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 }
             }
 
-            Assert.assertTrue(line.endsWith("\r\n"));
+            Assert.assertTrue(line, line.endsWith("\r\n"));
             Assert.assertEquals(chunkSize + 2, line.length());
 
             totalBodyRead += chunkSize;
