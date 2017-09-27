@@ -57,6 +57,11 @@
         adding them to the resource handling ensures that the checks are always
         performed. (markt)
       </fix>
+      <fix>
+        <bug>61554</bug>: Exclude test files in unusual encodings and markdown
+        files intended for display in GitHub from RAT analysis. Patch provided
+        by Chris Thistlethwaite. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
