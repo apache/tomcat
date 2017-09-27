@@ -53,6 +53,8 @@
 
   - Markdown files for display in ther GitHub UI
 
+  - Temporary cache files used by Checkstle
+
 
 output/build/logs/*
 output/test-tmp/**
@@ -180,5 +182,6 @@ output/dist/temp/safeToDelete.tmp
 **/*.bmp
 **/*.dia
 
-output/dist/src/*.md
-*.md
+**/*.md
+
+output/res/checkstyle/*
