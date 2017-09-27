@@ -812,6 +812,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
                 String[] request = new String[2];
                 request[0] =
                     "PUT http://localhost:8080/test HTTP/1.1" + CRLF +
+                    "Host: localhost:8080" + CRLF +
                     "Transfer-encoding: chunked" + CRLF +
                     CRLF +
                     "2" + CRLF +
@@ -1123,6 +1124,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
         // request
         tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
 
+        tomcat.getConnector().setAttribute("allowHostHeaderMismatch", "false");
+
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
 
@@ -1155,6 +1158,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
         // request
         tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
 
+        tomcat.getConnector().setAttribute("allowHostHeaderMismatch", "false");
+
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);
 
@@ -1186,6 +1191,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
         // This setting means the connection will be closed at the end of the
         // request
         tomcat.getConnector().setAttribute("maxKeepAliveRequests", "1");
+
+        tomcat.getConnector().setAttribute("allowHostHeaderMismatch", "false");
 
         // No file system docBase required
         Context ctx = tomcat.addContext("", null);

@@ -78,6 +78,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
                 String[] request = new String[1];
                 request[0] =
                     "GET http://localhost:8080/test HTTP/1.1" + CRLF +
+                    "Host: localhost:8080" + CRLF +
                     "X-Bug48839: abcd" + CRLF +
                     "\tefgh" + CRLF +
                     "Connection: close" + CRLF +
@@ -287,6 +288,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
                 String[] request = new String[1];
                 request[0] =
                     "GET http://localhost:8080/test HTTP/1.1" + CRLF +
+                    "Host: localhost:8080" + CRLF +
                     headerLine + CRLF +
                     "X-Bug51557: abcd" + CRLF +
                     "Connection: close" + CRLF +
@@ -420,6 +422,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
                 request[0] =
                     newLines +
                     "GET http://localhost:8080/test HTTP/1.1" + CRLF +
+                    "Host: localhost:8080" + CRLF +
                     "X-Bug48839: abcd" + CRLF +
                     "\tefgh" + CRLF +
                     "Connection: close" + CRLF +
@@ -487,6 +490,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
                 String[] request = new String[2];
                 request[0] = "GET http://localhost:8080/test HTTP/1.1" + CR;
                 request[1] = LF +
+                        "Host: localhost:8080" + CRLF +
                         "Connection: close" + CRLF +
                         CRLF;
 
@@ -556,6 +560,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
                 String[] request = new String[1];
                 request[0] = "GET http://localhost:8080/test HTTP/1.1" + CRLF +
+                        "Host: localhost:8080" + CRLF +
                         "X-Header: Ignore" + CRLF +
                         "X-Header" + (char) 130 + ": Broken" + CRLF + CRLF;
 

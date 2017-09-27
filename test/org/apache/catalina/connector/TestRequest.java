@@ -216,6 +216,7 @@ public class TestRequest extends TomcatBaseTest {
                 if (ucChunkedHead) {
                     request[0] =
                         "POST http://localhost:8080/test HTTP/1.1" + CRLF +
+                        "Host: localhost:8080" + CRLF +
                         "content-type: application/x-www-form-urlencoded" + CRLF +
                         "Transfer-Encoding: CHUNKED" + CRLF +
                         "Connection: close" + CRLF +
@@ -225,6 +226,7 @@ public class TestRequest extends TomcatBaseTest {
                 } else {
                     request[0] =
                         "POST http://localhost:8080/test HTTP/1.1" + CRLF +
+                        "Host: localhost:8080" + CRLF +
                         "content-type: application/x-www-form-urlencoded" + CRLF +
                         "Transfer-Encoding: chunked" + CRLF +
                         "Connection: close" + CRLF +
