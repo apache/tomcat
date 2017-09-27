@@ -91,6 +91,24 @@
         uploaded via a specially crafted request when HTTP PUT was enabled.
         (markt)
       </fix>
+      <fix>
+        Implement the requirements of RFC 7230 (and RFC 2616) that HTTP/1.1
+        requests must include a <code>Host</code> header and any request that
+        does not must be rejected with a 400 response. (markt)
+      </fix>
+      <fix>
+        Implement the requirements of RFC 7230 that any HTTP/1.1 request that
+        specifies a host in the request line, must specify the same host in the
+        <code>Host</code> header and that any such request that does not, must
+        be rejected with a 400 response. This check is optional but disabled by
+        default. It may be enabled with the
+        <code>allowHostHeaderMismatch</code> attribute of the Connector. (markt)
+      </fix>
+      <fix>
+        Implement the requirements of RFC 7230 that any HTTP/1.1 request that
+        contains multiple <code>Host</code> headers is rejected with a 400
+        response. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
