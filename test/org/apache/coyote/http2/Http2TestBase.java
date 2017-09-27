@@ -812,6 +812,14 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    protected void skipWindowSizeFrames() throws Http2Exception, IOException {
+        do {
+            output.clearTrace();
+            parser.readFrame(true);
+        } while (output.getTrace().contains("WindowSize"));
+    }
+
+
     void handleGoAwayResponse(int lastStream, Http2Error expectedError)
             throws Http2Exception, IOException {
         try {

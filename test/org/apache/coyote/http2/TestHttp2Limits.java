@@ -482,18 +482,15 @@ public class TestHttp2Limits extends Http2TestBase {
             break;
         }
         case STREAM_RESET: {
-            parser.readFrame(true);
+            // NIO2 can sometimes send window updates depending timing
+            skipWindowSizeFrames();
+
             Assert.assertEquals("3-RST-[11]\n", output.getTrace());
             break;
         }
         case CONNECTION_RESET: {
-            // Connection reset
-            do {
-                // NIO2 can sometimes send window updates depending on the
-                // timing of the connection close
-                output.clearTrace();
-                parser.readFrame(true);
-            } while (output.getTrace().contains("WindowSize"));
+            // NIO2 can sometimes send window updates depending timing
+            skipWindowSizeFrames();
 
             // Connection ID will vary so use a pattern
             Assert.assertThat(output.getTrace(), RegexMatcher.matchesRegex(
