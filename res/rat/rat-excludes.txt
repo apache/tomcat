@@ -44,6 +44,7 @@
 
   - Markdown files for display in ther GitHub UI
 
+  - Temporary cache files used by Checkstle
 
 output/build/webapps/**/*.html
 output/dist/webapps/docs/**/*.html
@@ -107,3 +108,5 @@ output/dist/src/java/javax/servlet/resources/web-fragment_3_0.xsd
 **/*.dia
 
 **/*.md
+
+output/res/checkstyle/*
