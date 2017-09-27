@@ -95,6 +95,10 @@
         uploaded via a specially crafted request when HTTP PUT was enabled.
         (markt)
       </fix>
+      <fix>
+        Use the correct path when loading the JVM <code>logging.properties</code>
+        file for Java 9. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
