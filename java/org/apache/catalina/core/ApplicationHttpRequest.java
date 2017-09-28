@@ -78,13 +78,13 @@ class ApplicationHttpRequest
       RequestDispatcher.INCLUDE_SERVLET_PATH,
       RequestDispatcher.INCLUDE_PATH_INFO,
       RequestDispatcher.INCLUDE_QUERY_STRING,
-      org.apache.catalina.servlet4preview.RequestDispatcher.INCLUDE_MAPPING,
+      ApplicationDispatcher.INCLUDE_MAPPING,
       RequestDispatcher.FORWARD_REQUEST_URI,
       RequestDispatcher.FORWARD_CONTEXT_PATH,
       RequestDispatcher.FORWARD_SERVLET_PATH,
       RequestDispatcher.FORWARD_PATH_INFO,
       RequestDispatcher.FORWARD_QUERY_STRING,
-      org.apache.catalina.servlet4preview.RequestDispatcher.FORWARD_MAPPING};
+      ApplicationDispatcher.FORWARD_MAPPING};
 
     private static final int SPECIALS_FIRST_FORWARD_INDEX = 6;
 

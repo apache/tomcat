@@ -347,7 +347,7 @@ public class TestApplicationMapping extends TomcatBaseTest {
             pw.println("MatchType=[" + mapping.getMappingMatch() + "]");
             pw.println("ServletName=[" + mapping.getServletName() + "]");
             ServletMapping includeMapping = (ServletMapping) req.getAttribute(
-                    org.apache.catalina.servlet4preview.RequestDispatcher.INCLUDE_MAPPING);
+                    ApplicationDispatcher.INCLUDE_MAPPING);
             if (includeMapping != null) {
                 pw.println("IncludeMatchValue=[" + includeMapping.getMatchValue() + "]");
                 pw.println("IncludePattern=[" + includeMapping.getPattern() + "]");
@@ -356,7 +356,7 @@ public class TestApplicationMapping extends TomcatBaseTest {
 
             }
             ServletMapping forwardMapping = (ServletMapping) req.getAttribute(
-                    org.apache.catalina.servlet4preview.RequestDispatcher.FORWARD_MAPPING);
+                    ApplicationDispatcher.FORWARD_MAPPING);
             if (forwardMapping != null) {
                 pw.println("ForwardMatchValue=[" + forwardMapping.getMatchValue() + "]");
                 pw.println("ForwardPattern=[" + forwardMapping.getPattern() + "]");
@@ -364,7 +364,7 @@ public class TestApplicationMapping extends TomcatBaseTest {
                 pw.println("ForwardServletName=[" + forwardMapping.getServletName() + "]");
             }
             ServletMapping asyncMapping = (ServletMapping) req.getAttribute(
-                    org.apache.catalina.servlet4preview.AsyncContext.ASYNC_MAPPING);
+                    ApplicationDispatcher.ASYNC_MAPPING);
             if (asyncMapping != null) {
                 pw.println("AsyncMatchValue=[" + asyncMapping.getMatchValue() + "]");
                 pw.println("AsyncPattern=[" + asyncMapping.getPattern() + "]");

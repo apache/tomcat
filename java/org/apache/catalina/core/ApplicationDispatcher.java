@@ -62,6 +62,11 @@ import org.apache.tomcat.util.res.StringManager;
  */
 final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher {
 
+    /* Servlet 4.0 constants */
+    public static final String ASYNC_MAPPING = "javax.servlet.async.mapping";
+    public static final String FORWARD_MAPPING = "javax.servlet.forward.mapping";
+    public static final String INCLUDE_MAPPING = "javax.servlet.include.mapping";
+
     static final boolean STRICT_SERVLET_COMPLIANCE;
 
     static final boolean WRAP_SAME_OBJECT;
@@ -374,9 +379,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                 } else {
                     mapping = (new ApplicationMapping(null)).getServletMapping();
                 }
-                wrequest.setAttribute(
-                        org.apache.catalina.servlet4preview.RequestDispatcher.FORWARD_MAPPING,
-                        mapping);
+                wrequest.setAttribute(FORWARD_MAPPING, mapping);
             }
 
             wrequest.setContextPath(context.getPath());
@@ -578,9 +581,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                 wrequest.setQueryParams(queryString);
             }
             if (mapping != null) {
-                wrequest.setAttribute(
-                        org.apache.catalina.servlet4preview.RequestDispatcher.INCLUDE_MAPPING,
-                        mapping);
+                wrequest.setAttribute(INCLUDE_MAPPING, mapping);
             }
 
             wrequest.setAttribute(Globals.DISPATCHER_TYPE_ATTR,
@@ -633,8 +634,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         } else {
             mapping = (new ApplicationMapping(null)).getServletMapping();
         }
-        wrequest.setAttribute(
-                org.apache.catalina.servlet4preview.AsyncContext.ASYNC_MAPPING, mapping);
+        wrequest.setAttribute(ASYNC_MAPPING, mapping);
 
         wrequest.setContextPath(context.getPath());
         wrequest.setRequestURI(requestURI);
