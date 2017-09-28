@@ -24,6 +24,15 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
+/**
+ * @deprecated This class is not included in Tomcat 9 onwards. Users of this
+ *             class should normally upgrade to Tomcat 9 and switch to the
+ *             Servlet 4.0 API. If the functionality is required in Tomcat 8.5,
+ *             then the Tomcat implementation classes should be used directly.
+ *             This class may be removed from Tomcat 8.5.x some time after 30
+ *             September 2018.
+ */
+@Deprecated
 public abstract class GenericFilter implements Filter, FilterConfig, Serializable {
 
     private static final long serialVersionUID = 1L;
