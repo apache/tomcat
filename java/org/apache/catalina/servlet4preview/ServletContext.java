@@ -20,6 +20,17 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
 
+/**
+ * Provides early access to some parts of the proposed Servlet 4.0 API.
+ *
+ * @deprecated This class is not included in Tomcat 9 onwards. Users of this
+ *             class should normally upgrade to Tomcat 9 and switch to the
+ *             Servlet 4.0 API. If the functionality is required in Tomcat 8.5,
+ *             then the Tomcat implementation classes should be used directly.
+ *             This class may be removed from Tomcat 8.5.x some time after 30
+ *             September 2018.
+ */
+@Deprecated
 public interface ServletContext extends javax.servlet.ServletContext {
 
     /**

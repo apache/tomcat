@@ -87,6 +87,7 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
+@SuppressWarnings("deprecation")
 public class ApplicationContext implements org.apache.catalina.servlet4preview.ServletContext {
 
     protected static final boolean STRICT_SERVLET_COMPLIANCE;

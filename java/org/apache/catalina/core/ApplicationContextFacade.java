@@ -57,6 +57,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  *
  * @author Remy Maucherat
  */
+@SuppressWarnings("deprecation")
 public class ApplicationContextFacade implements org.apache.catalina.servlet4preview.ServletContext {
 
     // ---------------------------------------------------------- Attributes

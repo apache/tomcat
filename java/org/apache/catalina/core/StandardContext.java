@@ -6419,6 +6419,7 @@ public class StandardContext extends ContainerBase
     }
 
 
+    @SuppressWarnings("deprecation")
     private static class NoPluggabilityServletContext
             implements org.apache.catalina.servlet4preview.ServletContext {
 
