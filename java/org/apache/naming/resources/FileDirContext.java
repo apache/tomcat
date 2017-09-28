@@ -810,7 +810,7 @@ public class FileDirContext extends BaseDirContext {
 
 
     protected File validate(File file, String name, boolean mustExist, String absoluteBase,
-    		String canonicalBase) {
+            String canonicalBase) {
 
         // If the requested names ends in '/', the Java File API will return a
         // matching file if one exists. This isn't what we want as it is not
