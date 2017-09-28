@@ -805,11 +805,12 @@ public class FileDirContext extends BaseDirContext {
      */
     protected File file(String name, boolean mustExist) {
         File file = new File(base, name);
-        return validate(file, name, mustExist, absoluteBase);
+        return validate(file, name, mustExist, absoluteBase, canonicalBase);
     }
 
 
-    protected File validate(File file, String name, boolean mustExist, String absoluteBase) {
+    protected File validate(File file, String name, boolean mustExist, String absoluteBase,
+    		String canonicalBase) {
 
         // If the requested names ends in '/', the Java File API will return a
         // matching file if one exists. This isn't what we want as it is not
@@ -850,8 +851,8 @@ public class FileDirContext extends BaseDirContext {
         // Ensure that the file is not outside the fileBase. This should not be
         // possible for standard requests (the request is normalized early in
         // the request processing) but might be possible for some access via the
-        // Servlet API (RequestDispatcheretc.) therefore these checks are
-        // retained as an additional safety measure absoluteBase has been
+        // Servlet API (RequestDispatcher etc.) therefore these checks are
+        // retained as an additional safety measure. absoluteBase has been
         // normalized so absPath needs to be normalized as well.
         String absPath = normalize(file.getAbsolutePath());
         if ((absoluteBase.length() > absPath.length())) {
