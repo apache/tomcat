@@ -804,6 +804,10 @@ public class FileDirContext extends BaseDirContext {
      * @param mustExist Must the specified resource exist?
      */
     protected File file(String name, boolean mustExist) {
+        if (name.equals("/")) {
+            name = "";
+        }
+
         File file = new File(base, name);
         return validate(file, name, mustExist, absoluteBase, canonicalBase);
     }
