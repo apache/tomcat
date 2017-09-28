@@ -102,6 +102,7 @@ output/classes/javax/servlet/resources/javaee_web_services_1_2.xsd
 output/classes/javax/servlet/resources/javaee_web_services_1_3.xsd
 output/classes/javax/servlet/resources/javaee_web_services_client_1_2.xsd
 output/classes/javax/servlet/resources/javaee_web_services_client_1_3.xsd
+output/classes/javax/servlet/resources/jsp_2_2.xsd
 output/classes/javax/servlet/resources/web-app_3_0.xsd
 output/classes/javax/servlet/resources/web-common_3_0.xsd
 output/classes/javax/servlet/resources/web-fragment_3_0.xsd
