@@ -95,6 +95,15 @@
         uploaded via a specially crafted request when HTTP PUT was enabled.
         (markt)
       </fix>
+      <fix>
+        Use the correct path when loading the JVM <code>logging.properties</code>
+        file for Java 9. (rjung)
+      </fix>
+      <fix>
+        <bug>61554</bug>: Exclude test files in unusual encodings and markdown
+        files intended for display in GitHub from RAT analysis. Patch provided
+        by Chris Thistlethwaite. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -205,6 +214,10 @@
       <fix>
         Update fix for <bug>59904</bug> so that values less than zero are accepted
         instead of throwing a NegativeArraySizeException. (remm)
+      </fix>
+      <fix>
+        <bug>61563</bug>: Correct typos in Spanish translation. Patch provided by
+        Gonzalo Vásquez. (csutherl)
       </fix>
     </changelog>
   </subsection>

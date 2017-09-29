@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.naming.resources;
 
 import java.io.File;
@@ -97,6 +95,8 @@ public class FileDirContext extends BaseDirContext {
      */
     protected String absoluteBase = null;
 
+    private String canonicalBase = null;
+
 
     /**
      * Allow linking.
@@ -105,7 +105,6 @@ public class FileDirContext extends BaseDirContext {
 
 
     // ------------------------------------------------------------- Properties
-
 
     /**
      * Set the document root.
@@ -137,14 +136,14 @@ public class FileDirContext extends BaseDirContext {
             throw new IllegalArgumentException(sm.getString("fileResources.base", docBase));
         }
 
+        this.absoluteBase = normalize(base.getAbsolutePath());
+
         // absoluteBase also needs to be normalized. Using the canonical path is
         // the simplest way of doing this.
         try {
-            this.absoluteBase = base.getCanonicalPath();
+            this.canonicalBase = base.getCanonicalPath();
         } catch (IOException e) {
-            log.warn(sm.getString("fileResources.canonical.fail", base.getPath()));
-            // Fall back to the absolute path
-            this.absoluteBase = base.getAbsolutePath();
+            throw new IllegalArgumentException(e);
         }
         super.setDocBase(docBase);
     }
@@ -805,12 +804,17 @@ public class FileDirContext extends BaseDirContext {
      * @param mustExist Must the specified resource exist?
      */
     protected File file(String name, boolean mustExist) {
+        if (name.equals("/")) {
+            name = "";
+        }
+
         File file = new File(base, name);
-        return validate(file, name, mustExist, absoluteBase);
+        return validate(file, name, mustExist, absoluteBase, canonicalBase);
     }
 
 
-    protected File validate(File file, String name, boolean mustExist, String absoluteBase) {
+    protected File validate(File file, String name, boolean mustExist, String absoluteBase,
+            String canonicalBase) {
 
         // If the requested names ends in '/', the Java File API will return a
         // matching file if one exists. This isn't what we want as it is not
@@ -827,8 +831,15 @@ public class FileDirContext extends BaseDirContext {
 
         // If allow linking is enabled, files are not limited to being located
         // under the fileBase so all further checks are disabled.
-        if (allowLinking)
+        if (allowLinking) {
             return file;
+        }
+
+        // Additional Windows specific checks to handle known problems with
+        // File.getCanonicalPath()
+        if (JrePlatform.IS_WINDOWS && isInvalidWindowsFilename(name)) {
+            return null;
+        }
 
         // Check that this file is located under the web application root
         String canPath = null;
@@ -837,17 +848,16 @@ public class FileDirContext extends BaseDirContext {
         } catch (IOException e) {
             // Ignore
         }
-        if (canPath == null || !canPath.startsWith(absoluteBase)) {
+        if (canPath == null || !canPath.startsWith(canonicalBase)) {
             return null;
         }
 
         // Ensure that the file is not outside the fileBase. This should not be
         // possible for standard requests (the request is normalized early in
         // the request processing) but might be possible for some access via the
-        // Servlet API (RequestDispatcher, HTTP/2 push etc.) therefore these
-        // checks are retained as an additional safety measure
-        // absoluteBase has been normalized so absPath needs to be normalized as
-        // well.
+        // Servlet API (RequestDispatcher etc.) therefore these checks are
+        // retained as an additional safety measure. absoluteBase has been
+        // normalized so absPath needs to be normalized as well.
         String absPath = normalize(file.getAbsolutePath());
         if ((absoluteBase.length() > absPath.length())) {
             return null;
@@ -857,7 +867,7 @@ public class FileDirContext extends BaseDirContext {
         // was not part of the requested path and the remaining check only
         // applies to the request path
         absPath = absPath.substring(absoluteBase.length());
-        canPath = canPath.substring(absoluteBase.length());
+        canPath = canPath.substring(canonicalBase.length());
 
         // Case sensitivity check
         // The normalized requested path should be an exact match the equivalent
@@ -870,15 +880,44 @@ public class FileDirContext extends BaseDirContext {
         //
         // absPath is normalized so canPath needs to be normalized as well
         // Can't normalize canPath earlier as canonicalBase is not normalized
-        canPath = normalize(canPath);
-        if (absPath.length() == 0) {
-            absPath = "/";
+        if (canPath.length() > 0) {
+            canPath = normalize(canPath);
         }
         if (!canPath.equals(absPath)) {
             return null;
         }
 
         return file;
+    }
+
+
+    private boolean isInvalidWindowsFilename(String name) {
+        final int len = name.length();
+        if (len == 0) {
+            return false;
+        }
+        // This consistently ~10 times faster than the equivalent regular
+        // expression irrespective of input length.
+        for (int i = 0; i < len; i++) {
+            char c = name.charAt(i);
+            if (c == '\"' || c == '<' || c == '>') {
+                // These characters are disallowed in Windows file names and
+                // there are known problems for file names with these characters
+                // when using File#getCanonicalPath().
+                // Note: There are additional characters that are disallowed in
+                //       Windows file names but these are not known to cause
+                //       problems when using File#getCanonicalPath().
+                return true;
+            }
+        }
+        // Windows does not allow file names to end in ' ' unless specific low
+        // level APIs are used to create the files that bypass various checks.
+        // File names that end in ' ' are known to cause problems when using
+        // File#getCanonicalPath().
+        if (name.charAt(len -1) == ' ') {
+            return true;
+        }
+        return false;
     }
 
 

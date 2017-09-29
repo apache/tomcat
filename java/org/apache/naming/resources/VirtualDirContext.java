@@ -330,4 +330,9 @@ public class VirtualDirContext extends FileDirContext {
             return null;
         }
     }
+
+
+    protected File validate(File file, String name, boolean mustExist, String absoluteBase) {
+        return validate(file, name, mustExist, normalize(absoluteBase), absoluteBase);
+    }
 }
