@@ -256,13 +256,11 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         }
 
         // Create the initial HTTP request to open the WebSocket connection
-        Map<String,List<String>> reqHeaders = createRequestHeaders(host, port,
-                clientEndpointConfiguration.getPreferredSubprotocols(),
-                clientEndpointConfiguration.getExtensions());
-        clientEndpointConfiguration.getConfigurator().
-                beforeRequest(reqHeaders);
-        if (Constants.DEFAULT_ORIGIN_HEADER_VALUE != null &&
-                !reqHeaders.containsKey(Constants.ORIGIN_HEADER_NAME)) {
+        Map<String, List<String>> reqHeaders = createRequestHeaders(host, port,
+                clientEndpointConfiguration);
+        clientEndpointConfiguration.getConfigurator().beforeRequest(reqHeaders);
+        if (Constants.DEFAULT_ORIGIN_HEADER_VALUE != null
+                && !reqHeaders.containsKey(Constants.ORIGIN_HEADER_NAME)) {
             List<String> originValues = new ArrayList<>(1);
             originValues.add(Constants.DEFAULT_ORIGIN_HEADER_VALUE);
             reqHeaders.put(Constants.ORIGIN_HEADER_NAME, originValues);
@@ -392,8 +390,47 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     return connectToServer(endpoint, clientEndpointConfiguration, redirectLocation);
 
                 }
-                throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidStatus",
-                        Integer.toString(httpResponse.status)));
+
+                else if (httpResponse.status == 401) {
+
+                    if (userProperties.get(Constants.AUTHORIZATION_HEADER_NAME) != null) {
+                        throw new DeploymentException(sm.getString(
+                                "wsWebSocketContainer.failedAuthentication", httpResponse.status));
+                    }
+
+                    List<String> wwwAuthenticateHeaders = httpResponse.getHandshakeResponse()
+                            .getHeaders().get(Constants.WWW_AUTHENTICATE_HEADER_NAME);
+
+                    if (wwwAuthenticateHeaders == null || wwwAuthenticateHeaders.isEmpty() ||
+                            wwwAuthenticateHeaders.get(0) == null || wwwAuthenticateHeaders.get(0).isEmpty()) {
+                        throw new DeploymentException(sm.getString(
+                                "wsWebSocketContainer.missingWWWAuthenticateHeader",
+                                Integer.toString(httpResponse.status)));
+                    }
+
+                    String authScheme = wwwAuthenticateHeaders.get(0).split("\\s+", 2)[0];
+                    String requestUri = new String(request.array(), StandardCharsets.ISO_8859_1)
+                            .split("\\s", 3)[1];
+
+                    Authenticator auth = AuthenticatorFactory.getAuthenticator(authScheme);
+
+                    if (auth == null) {
+                        throw new DeploymentException(
+                                sm.getString("wsWebSocketContainer.unsupportedAuthScheme",
+                                        httpResponse.status, authScheme));
+                    }
+
+                    userProperties.put(Constants.AUTHORIZATION_HEADER_NAME, auth.getAuthorization(
+                            requestUri, wwwAuthenticateHeaders.get(0), userProperties));
+
+                    return connectToServer(endpoint, clientEndpointConfiguration, path);
+
+                }
+
+                else {
+                    throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidStatus",
+                            Integer.toString(httpResponse.status)));
+                }
             }
             HandshakeResponse handshakeResponse = httpResponse.getHandshakeResponse();
             clientEndpointConfiguration.getConfigurator().afterResponse(handshakeResponse);
@@ -440,12 +477,16 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
             success = true;
         } catch (ExecutionException | InterruptedException | SSLException |
-                EOFException | TimeoutException | URISyntaxException e) {
+                EOFException | TimeoutException | URISyntaxException | AuthenticationException e) {
             throw new DeploymentException(
                     sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
         } finally {
             if (!success) {
                 channel.close();
+            }
+
+            if (redirectSet != null && !redirectSet.isEmpty()) {
+                redirectSet.clear();
             }
         }
 
@@ -588,10 +629,19 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         return result;
     }
 
-    private static Map<String,List<String>> createRequestHeaders(String host,
-            int port, List<String> subProtocols, List<Extension> extensions) {
+    private static Map<String, List<String>> createRequestHeaders(String host, int port,
+            ClientEndpointConfig clientEndpointConfiguration) {
 
-        Map<String,List<String>> headers = new HashMap<>();
+        Map<String, List<String>> headers = new HashMap<>();
+        List<Extension> extensions = clientEndpointConfiguration.getExtensions();
+        List<String> subProtocols = clientEndpointConfiguration.getPreferredSubprotocols();
+        Map<String, Object> userProperties = clientEndpointConfiguration.getUserProperties();
+
+        if (userProperties.get(Constants.AUTHORIZATION_HEADER_NAME) != null) {
+            List<String> authValues = new ArrayList<>(1);
+            authValues.add((String) userProperties.get(Constants.AUTHORIZATION_HEADER_NAME));
+            headers.put(Constants.AUTHORIZATION_HEADER_NAME, authValues);
+        }
 
         // Host header
         List<String> hostValues = new ArrayList<>(1);
