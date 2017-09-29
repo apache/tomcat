@@ -296,9 +296,6 @@
   <!-- Pattern sets for jar files in standard distributions -->
   <patternset id="files.annotations-api">
     <include name="javax/annotation/**" />
-    <include name="javax/ejb/**" />
-    <include name="javax/persistence/**" />
-    <include name="javax/xml/ws/**" />
   </patternset>
 
   <patternset id="files.servlet-api">
