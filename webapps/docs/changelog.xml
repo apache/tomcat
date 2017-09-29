@@ -46,10 +46,12 @@
 -->
 <section name="Tomcat 9.0.2 (markt)" rtext="in development">
   <subsection name="Other">
-    <fix>
-      Improve the fix for <bug>61439</bug> and exclude the JPA, JAX-WS and EJB
-      annotations completely from the Tomcat distributions. (markt)
-    </fix>
+    <changelog>
+      <fix>
+        Improve the fix for <bug>61439</bug> and exclude the JPA, JAX-WS and EJB
+        annotations completely from the Tomcat distributions. (markt)
+      </fix>
+    </changelog>
   </subsection>
 </section>
 <section name="Tomcat 9.0.1 (markt)" rtext="release in progress">
