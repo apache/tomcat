@@ -50,18 +50,23 @@ import org.apache.tomcat.util.res.StringManager;
 
 public class WsWebSocketClient {
 
-    private static final StringManager sm = StringManager.getManager(WsWebSocketContainer.class);
+    private static final StringManager sm = StringManager.getManager(WsWebSocketClient.class);
     private static final Random random = new Random();
     private static final byte[] crlf = new byte[] { 13, 10 };
-    private final Log log = LogFactory.getLog(WsWebSocketContainer.class);
+    private final Log log = LogFactory.getLog(WsWebSocketClient.class);
 
     private static final byte[] GET_BYTES = "GET ".getBytes(StandardCharsets.ISO_8859_1);
     private static final byte[] ROOT_URI_BYTES = "/".getBytes(StandardCharsets.ISO_8859_1);
     private static final byte[] HTTP_VERSION_BYTES = " HTTP/1.1\r\n".getBytes(StandardCharsets.ISO_8859_1);
     private Set<URI> redirectSet = null;
 
-    public Session connectRecursive(Endpoint endpoint, ClientEndpointConfig clientEndpointConfiguration, URI path,
+    public Session connectToServer(Endpoint endpoint, ClientEndpointConfig clientEndpointConfiguration, URI path,
             WsWebSocketContainer websocketContainer) throws DeploymentException {
+        return connectToServerRecursive(endpoint, clientEndpointConfiguration, path, websocketContainer);
+    }
+
+    private Session connectToServerRecursive(Endpoint endpoint, ClientEndpointConfig clientEndpointConfiguration,
+            URI path, WsWebSocketContainer websocketContainer) throws DeploymentException {
 
         boolean secure = false;
         ByteBuffer proxyConnect = null;

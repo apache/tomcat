@@ -157,7 +157,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             throws DeploymentException {
 
         WsWebSocketClient client = new WsWebSocketClient();
-        return client.connectRecursive(endpoint, clientEndpointConfiguration, path, this);
+        return client.connectToServer(endpoint, clientEndpointConfiguration, path, this);
     }
 
     protected void registerSession(Endpoint endpoint, WsSession wsSession) {
