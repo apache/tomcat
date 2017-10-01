@@ -231,6 +231,16 @@ implementation.  For more information, see:
 http://docs.oracle.com/javase/1.5.0/docs/guide/standards/index.html</a>. For
 Java 9+, use the upgradeable modules feature.</p>
 
+<p>Tomcat utilizes the endorsed mechanism by including the system property setting
+<code>-Djava.endorsed.dirs=$JAVA_ENDORSED_DIRS</code> in the
+command line that starts the container. The default value of this option is
+<em>$CATALINA_HOME/endorsed</em>. This <em>endorsed</em> directory is not
+created by default. Note that the endorsed feature is no longer supported
+with Java 9 and the above system property will only be set if either the
+directory <em>$CATALINA_HOME/endorsed</em> exists, or the variable
+<code>JAVA_ENDORSED_DIRS</code> has been set.
+</p>
+
 <p>Note that overriding any JRE component carries risk. If the overriding
 component does not provide a 100% compatible API (e.g. the API provided by
 Xerces is not 100% compatible with the XML API provided by the JRE) then there
