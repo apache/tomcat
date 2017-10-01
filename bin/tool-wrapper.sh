@@ -37,6 +37,7 @@
 #                   containing some jars in order to allow replacement of APIs
 #                   created outside of the JCP (i.e. DOM and SAX from W3C).
 #                   It can also be used to update the XML parser implementation.
+#                   Note that Java 9 no longer supports this feature.
 #                   Defaults to $CATALINA_HOME/endorsed.
 # -----------------------------------------------------------------------------
 
@@ -129,11 +130,24 @@ if $cygwin; then
   JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
 fi
 
+# Java 9 no longer supports the java.endorsed.dirs
+# system property. Only try to use it if
+# JAVA_ENDORSED_DIRS was explicitly set
+# or CATALINA_HOME/endorsed exists.
+ENDORSED_PROP=ignore.endorsed.dirs
+if [ -n "$JAVA_ENDORSED_DIRS" ]; then
+    ENDORSED_PROP=java.endorsed.dirs
+fi
+if [ -d "$CATALINA_HOME/endorsed" ]; then
+    ENDORSED_PROP=java.endorsed.dirs
+fi
+
 JAVA_OPTS="$JAVA_OPTS -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
 
 # ----- Execute The Requested Command -----------------------------------------
 
 exec "$_RUNJAVA" $JAVA_OPTS $TOOL_OPTS \
-  -Djava.endorsed.dirs="$JAVA_ENDORSED_DIRS" -classpath "$CLASSPATH" \
+  -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
+  -classpath "$CLASSPATH" \
   -Dcatalina.home="$CATALINA_HOME" \
   org.apache.catalina.startup.Tool "$@"

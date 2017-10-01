@@ -67,7 +67,10 @@ goto exit
 :okJava
 rem Don't override the endorsed dir if the user has set it previously
 if not "%JAVA_ENDORSED_DIRS%" == "" goto gotEndorseddir
-rem Set the default -Djava.endorsed.dirs argument
+rem Java 9 no longer supports the java.endorsed.dirs
+rem system property. Only try to use it if
+rem CATALINA_HOME/endorsed exists.
+if not exist "%CATALINA_HOME%\endorsed" goto gotEndorseddir
 set "JAVA_ENDORSED_DIRS=%CATALINA_HOME%\endorsed"
 :gotEndorseddir
 

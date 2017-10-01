@@ -175,8 +175,8 @@ class from the web application's <em>WebappX</em> class loader is processed,
 this class loader will look in the local repositories <strong>first</strong>,
 instead of delegating before looking.  There are exceptions. Classes which are
 part of the JRE base classes cannot be overridden. For some classes (such as
-the XML parser components in J2SE 1.4+), the J2SE 1.4 endorsed feature can be
-used.
+the XML parser components in J2SE 1.4+), the Java endorsed feature can be
+used up to Java 8.
 Last, any JAR file that contains Servlet API classes will be explicitly
 ignored by the classloader &#8212; Do not include such JARs in your web
 application.
@@ -231,7 +231,11 @@ http://docs.oracle.com/javase/1.5.0/docs/guide/standards/index.html</a>.</p>
 <code>-Djava.endorsed.dirs=$JAVA_ENDORSED_DIRS</code> in the
 command line that starts the container. The default value of this option is
 <em>$CATALINA_HOME/endorsed</em>. This <em>endorsed</em> directory is not
-created by default.</p>
+created by default. Note that the endorsed feature is no longer supported
+with Java 9 and the above system property will only be set if either the
+directory <em>$CATALINA_HOME/endorsed</em> exists, or the variable
+<code>JAVA_ENDORSED_DIRS</code> has been set.
+</p>
 
 <p>Note that overriding any JRE component carries risk. If the overriding
 component does not provide a 100% compatible API (e.g. the API provided by

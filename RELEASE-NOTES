@@ -123,7 +123,7 @@ or by placing them in JAR files in the "lib" directory.
 
 To override the XML parser implementation or interfaces, use the endorsed
 mechanism of the JVM. The default configuration defines JARs located in
-"endorsed" as endorsed.
+"endorsed" as endorsed. This mechanism is no longer supported with Java 9.
 
 
 ================================================================

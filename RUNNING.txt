@@ -275,6 +275,7 @@ In CATALINA_HOME:
  * endorsed - Libraries that override standard "Endorsed Standards"
               libraries provided by JRE. See Classloading documentation
               in the User Guide for details.
+              No longer supported with Java 9.
 
               By default this "endorsed" directory is absent.
 
