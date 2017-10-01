@@ -93,7 +93,8 @@ or by placing them in JAR files in the "lib" directory.
 
 To override the XML parser implementation or interfaces, use the appropriate
 feature for your JVM. For Java <= 8 use the endorsed standards override
-feature. For Java 9+ use the upgradeable modules feature.
+feature. The default configuration defines JARs located in "endorsed" as endorsed.
+For Java 9+ use the upgradeable modules feature.
 
 
 ================================================================
