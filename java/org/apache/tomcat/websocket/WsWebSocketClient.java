@@ -99,14 +99,14 @@ public class WsWebSocketClient {
             secure = true;
         } else {
             throw new DeploymentException(sm.getString(
-                    "wsWebSocketContainer.pathWrongScheme", scheme));
+                    "wsWebSocketClient.pathWrongScheme", scheme));
         }
 
         // Validate host
         String host = path.getHost();
         if (host == null) {
             throw new DeploymentException(
-                    sm.getString("wsWebSocketContainer.pathNoHost"));
+                    sm.getString("wsWebSocketClient.pathNoHost"));
         }
         int port = path.getPort();
 
@@ -165,7 +165,7 @@ public class WsWebSocketClient {
             socketChannel = AsynchronousSocketChannel.open(webSocketContainer.getAsynchronousChannelGroup());
         } catch (IOException ioe) {
             throw new DeploymentException(sm.getString(
-                    "wsWebSocketContainer.asynchronousSocketChannelFail"), ioe);
+                    "wsWebSocketClient.asynchronousSocketChannelFail"), ioe);
         }
 
         Map<String,Object> userProperties = clientEndpointConfiguration.getUserProperties();
@@ -198,7 +198,7 @@ public class WsWebSocketClient {
                 HttpResponse httpResponse = processResponse(response, channel, timeout);
                 if (httpResponse.getStatus() != 200) {
                     throw new DeploymentException(sm.getString(
-                            "wsWebSocketContainer.proxyConnectFail", selectedProxy,
+                            "wsWebSocketClient.proxyConnectFail", selectedProxy,
                             Integer.toString(httpResponse.getStatus())));
                 }
             } catch (TimeoutException | InterruptedException | ExecutionException |
@@ -207,7 +207,7 @@ public class WsWebSocketClient {
                     channel.close();
                 }
                 throw new DeploymentException(
-                        sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
+                        sm.getString("wsWebSocketClient.httpRequestFailed"), e);
             }
         }
 
@@ -250,7 +250,7 @@ public class WsWebSocketClient {
                     if (locationHeader == null || locationHeader.isEmpty() ||
                             locationHeader.get(0) == null || locationHeader.get(0).isEmpty()) {
                         throw new DeploymentException(sm.getString(
-                                "wsWebSocketContainer.missingLocationHeader",
+                                "wsWebSocketClient.missingLocationHeader",
                                 Integer.toString(httpResponse.status)));
                     }
 
@@ -275,7 +275,7 @@ public class WsWebSocketClient {
 
                     if (!redirectSet.add(redirectLocation) || redirectSet.size() > maxRedirects) {
                         throw new DeploymentException(sm.getString(
-                                "wsWebSocketContainer.redirectThreshold", redirectLocation,
+                                "wsWebSocketClient.redirectThreshold", redirectLocation,
                                 Integer.toString(redirectSet.size()),
                                 Integer.toString(maxRedirects)));
                     }
@@ -288,7 +288,7 @@ public class WsWebSocketClient {
 
                     if (userProperties.get(Constants.AUTHORIZATION_HEADER_NAME) != null) {
                         throw new DeploymentException(sm.getString(
-                                "wsWebSocketContainer.failedAuthentication", httpResponse.status));
+                                "wsWebSocketClient.failedAuthentication", httpResponse.status));
                     }
 
                     List<String> wwwAuthenticateHeaders = httpResponse.getHandshakeResponse()
@@ -297,7 +297,7 @@ public class WsWebSocketClient {
                     if (wwwAuthenticateHeaders == null || wwwAuthenticateHeaders.isEmpty() ||
                             wwwAuthenticateHeaders.get(0) == null || wwwAuthenticateHeaders.get(0).isEmpty()) {
                         throw new DeploymentException(sm.getString(
-                                "wsWebSocketContainer.missingWWWAuthenticateHeader",
+                                "wsWebSocketClient.missingWWWAuthenticateHeader",
                                 Integer.toString(httpResponse.status)));
                     }
 
@@ -309,7 +309,7 @@ public class WsWebSocketClient {
 
                     if (auth == null) {
                         throw new DeploymentException(
-                                sm.getString("wsWebSocketContainer.unsupportedAuthScheme",
+                                sm.getString("wsWebSocketClient.unsupportedAuthScheme",
                                         httpResponse.status, authScheme));
                     }
 
@@ -321,7 +321,7 @@ public class WsWebSocketClient {
                 }
 
                 else {
-                    throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidStatus",
+                    throw new DeploymentException(sm.getString("wsWebSocketClient.invalidStatus",
                             Integer.toString(httpResponse.status)));
                 }
             }
@@ -337,7 +337,7 @@ public class WsWebSocketClient {
                 subProtocol = protocolHeaders.get(0);
             } else {
                 throw new DeploymentException(
-                        sm.getString("wsWebSocketContainer.invalidSubProtocol"));
+                        sm.getString("wsWebSocketClient.invalidSubProtocol"));
             }
 
             // Extensions
@@ -359,7 +359,7 @@ public class WsWebSocketClient {
                 Transformation t = factory.create(extension.getName(), wrapper, false);
                 if (t == null) {
                     throw new DeploymentException(sm.getString(
-                            "wsWebSocketContainer.invalidExtensionParameters"));
+                            "wsWebSocketClient.invalidExtensionParameters"));
                 }
                 if (transformation == null) {
                     transformation = t;
@@ -372,7 +372,7 @@ public class WsWebSocketClient {
         } catch (ExecutionException | InterruptedException | SSLException |
                 EOFException | TimeoutException | URISyntaxException | AuthenticationException e) {
             throw new DeploymentException(
-                    sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
+                    sm.getString("wsWebSocketClient.httpRequestFailed"), e);
         } finally {
             if (!success) {
                 channel.close();
@@ -660,13 +660,13 @@ public class WsWebSocketClient {
         // CONNECT for proxy may return a 1.0 response
         if (parts.length < 2 || !("HTTP/1.0".equals(parts[0]) || "HTTP/1.1".equals(parts[0]))) {
             throw new DeploymentException(sm.getString(
-                    "wsWebSocketContainer.invalidStatus", line));
+                    "wsWebSocketClient.invalidStatus", line));
         }
         try {
             return Integer.parseInt(parts[1]);
         } catch (NumberFormatException nfe) {
             throw new DeploymentException(sm.getString(
-                    "wsWebSocketContainer.invalidStatus", line));
+                    "wsWebSocketClient.invalidStatus", line));
         }
     }
 
@@ -676,7 +676,7 @@ public class WsWebSocketClient {
 
         int index = line.indexOf(':');
         if (index == -1) {
-            log.warn(sm.getString("wsWebSocketContainer.invalidHeader", line));
+            log.warn(sm.getString("wsWebSocketClient.invalidHeader", line));
             return;
         }
         // Header names are case insensitive so always use lower case
@@ -761,7 +761,7 @@ public class WsWebSocketClient {
             return engine;
         } catch (Exception e) {
             throw new DeploymentException(sm.getString(
-                    "wsWebSocketContainer.sslEngineFail"), e);
+                    "wsWebSocketClient.sslEngineFail"), e);
         }
     }
 
