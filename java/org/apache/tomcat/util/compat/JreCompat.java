@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.util.compat;
 
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Locale;
 
 import javax.net.ssl.SSLEngine;
@@ -36,8 +39,8 @@ public class JreCompat {
     private static final boolean jre9Available;
     private static final boolean jre8Available;
     private static final boolean jre7Available;
-    
-    
+
+
     static {
         // This is Tomcat 7 with a minimum Java version of Java 6. The latest
         // Java version the optional features require is Java 9.
@@ -65,20 +68,20 @@ public class JreCompat {
             jre7Available = false;
         }
     }
-    
-    
+
+
     public static JreCompat getInstance() {
         return instance;
     }
-    
-    
+
+
     // Java 6 implementation of Java 7 methods
-    
+
     public static boolean isJre7Available() {
         return jre7Available;
     }
-    
-    
+
+
     public Locale forLanguageTag(String languageTag) {
         // Extract the language and country for this entry
         String language = null;
@@ -107,8 +110,8 @@ public class JreCompat {
 
         return new Locale(language, country, variant);
     }
-    
-    
+
+
     private static final boolean isAlpha(String value) {
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
@@ -118,22 +121,22 @@ public class JreCompat {
         }
         return true;
     }
-   
-    
+
+
     // Java 6 implementation of Java 8 methods
-    
+
     public static boolean isJre8Available() {
         return jre8Available;
     }
-    
-    
+
+
     @SuppressWarnings("unused")
     public void setUseServerCipherSuitesOrder(SSLServerSocket socket,
             boolean useCipherSuitesOrder) {
         throw new UnsupportedOperationException(sm.getString("jreCompat.noServerCipherSuiteOrder"));
     }
-    
-    
+
+
     @SuppressWarnings("unused")
     public void setUseServerCipherSuitesOrder(SSLEngine engine,
             boolean useCipherSuitesOrder) {
@@ -160,5 +163,20 @@ public class JreCompat {
     public boolean isInstanceOfInaccessibleObjectException(Throwable t) {
         // Exception does not exist prior to Java 9
         return false;
+    }
+
+
+    /**
+     * Disables caching for JAR URL connections. For Java 8 and earlier, this also disables
+     * caching for ALL URL connections.
+     *
+     * @throws IOException If a dummy JAR URLConnection can not be created
+     */
+    public void disableCachingForJarUrlConnections() throws IOException {
+        // Doesn't matter that this JAR doesn't exist - just as
+        // long as the URL is well-formed
+        URL url = new URL("jar:file://dummy.jar!/");
+        URLConnection uConn = url.openConnection();
+        uConn.setDefaultUseCaches(false);
     }
 }

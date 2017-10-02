@@ -16,21 +16,32 @@
  */
 package org.apache.tomcat.util.compat;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URLConnection;
+
 class Jre9Compat extends Jre8Compat {
 
     private static final Class<?> inaccessibleObjectExceptionClazz;
-
+    private static final Method setDefaultUseCaches;
 
     static {
         Class<?> c1 = null;
+        Method m4 = null;
+
         try {
             c1 = Class.forName("java.lang.reflect.InaccessibleObjectException");
+            m4 = URLConnection.class.getMethod("setDefaultUseCaches", String.class, boolean.class);
         } catch (SecurityException e) {
             // Should never happen
         } catch (ClassNotFoundException e) {
             // Must be Java 8
+        } catch (NoSuchMethodException e) {
+            // Should never happen
         }
         inaccessibleObjectExceptionClazz = c1;
+        setDefaultUseCaches = m4;
     }
 
 
@@ -46,5 +57,19 @@ class Jre9Compat extends Jre8Compat {
         }
 
         return inaccessibleObjectExceptionClazz.isAssignableFrom(t.getClass());
+    }
+
+
+    @Override
+    public void disableCachingForJarUrlConnections() throws IOException {
+        try {
+            setDefaultUseCaches.invoke(null, "JAR", Boolean.FALSE);
+        } catch (IllegalAccessException e) {
+            throw new UnsupportedOperationException(e);
+        } catch (IllegalArgumentException e) {
+            throw new UnsupportedOperationException(e);
+        } catch (InvocationTargetException e) {
+            throw new UnsupportedOperationException(e);
+        }
     }
 }

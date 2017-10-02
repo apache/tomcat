@@ -58,6 +58,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.83 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        When running under Java 9 or later, and the
+        <code>urlCacheProtection</code> option of the
+        <code>JreMemoryLeakPreventionListener</code> is enabled, use the API
+        added in Java 9 to only disable the caching for JAR URL connections.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
@@ -100,11 +111,24 @@
         <bug>61452</bug>: Fix a copy paste error that caused an
         <code>UnsupportedEncodingException</code> when using WebDAV. (markt)
       </fix>
+<<<<<<< .working
       <fix>
         Correct regression in 7.0.80 that broke the use of relative paths with
         the <code>extraResourcePaths</code> attribute of a
         <code>VirtualDirContext</code>. (markt)
       </fix>
+||||||| .merge-left.r1810587
+      <fix>
+        <bug>61437</bug>: Fix a possible <code>AccessControlException</code>
+        accessing the WebSocket examples when running under a
+        <code>SecurityManager</code>. (markt)
+      </fix>
+      <fix>
+        <bug>61452</bug>: Fix a copy paste error that caused an
+        <code>UnsupportedEncodingException</code> when using WebDAV. (markt)
+      </fix>
+=======
+>>>>>>> .merge-right.r1810588
       <add>
         <bug>61489</bug>: When using the CGI servlet, make the generation of
         command line arguments from the query string (as per section 4.4 of RFC
