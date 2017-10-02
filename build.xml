@@ -191,6 +191,12 @@
   <defaultexcludes remove="**/.gitignore" />
   <!--<defaultexcludes echo="true" />-->
 
+  <!-- Java 9 -->
+  <available classname="java.lang.reflect.InaccessibleObjectException"
+             property="java9.add.modules"
+             value="--add-modules java.xml.ws"/>
+  <property name="java9.add.modules" value=""/>
+
   <!-- Classpaths -->
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
@@ -1849,7 +1855,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
-      additionalparam="-breakiterator -notimestamp"
+      additionalparam="-breakiterator -notimestamp ${java9.add.modules}"
       maxmemory="512m"
       failonerror="true"
       failonwarning="true">

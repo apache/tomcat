@@ -23,7 +23,7 @@ The Digester package provides for rules-based processing of arbitrary
 XML documents.
 <br><br>
 <a name="doc.Description"></a>
-<div align="center">
+<div>
 <a href="#doc.Intro">[Introduction]</a>
 <a href="#doc.Properties">[Configuration Properties]</a>
 <a href="#doc.Stack">[The Object Stack]</a>
@@ -95,12 +95,13 @@ parse.</p>
 
 <blockquote>
   <table border="1">
+    <caption>Digester Configuration Properties</caption>
     <tr>
-      <th width="15%">Property</th>
-      <th width="85%">Description</th>
+      <th>Property</th>
+      <th>Description</th>
     </tr>
     <tr>
-      <td align="center">classLoader</td>
+      <td>classLoader</td>
       <td>You can optionally specify the class loader that will be used to
           load classes when required by the <code>ObjectCreateRule</code>
           and <code>FactoryCreateRule</code> rules.  If not specified,
@@ -110,14 +111,14 @@ parse.</p>
           used to load the <code>Digester</code> class itself.</td>
     </tr>
     <tr>
-      <td align="center">errorHandler</td>
+      <td>errorHandler</td>
       <td>You can optionally specify a SAX <code>ErrorHandler</code> that
           is notified when parsing errors occur.  By default, any parsing
           errors that are encountered are logged, but Digester will continue
           processing as well.</td>
     </tr>
     <tr>
-      <td align="center">namespaceAware</td>
+      <td>namespaceAware</td>
       <td>A boolean that is set to <code>true</code> to perform parsing in a
           manner that is aware of XML namespaces.  Among other things, this
           setting affects how elements are matched to processing rules.  See
@@ -125,7 +126,7 @@ parse.</p>
           information.</td>
     </tr>
     <tr>
-      <td align="center">ruleNamespaceURI</td>
+      <td>ruleNamespaceURI</td>
       <td>The public URI of the namespace for which all subsequently added
           rules are associated, or <code>null</code> for adding rules that
           are not associated with any namespace.  See
@@ -133,7 +134,7 @@ parse.</p>
           information.</td>
     </tr>
     <tr>
-      <td align="center">rules</td>
+      <td>rules</td>
       <td>The <code>Rules</code> component that actually performs matching of
           <code>Rule</code> instances against the current element nesting
           pattern is pluggable.  By default, Digester includes a
@@ -143,7 +144,7 @@ parse.</p>
           more information.</td>
     </tr>
     <tr>
-      <td align="center">useContextClassLoader</code>
+      <td>useContextClassLoader</td>
       <td>A boolean that is set to <code>true</code> if you want application
           classes required by <code>FactoryCreateRule</code> and
           <code>ObjectCreateRule</code> to be loaded from the context class
@@ -154,7 +155,7 @@ parse.</p>
           will be used unconditionally.</td>
     </tr>
     <tr>
-      <td align="center">validating</td>
+      <td>validating</td>
       <td>A boolean that is set to <code>true</code> if you wish to validate
           the XML document against a Document Type Definition (DTD) that is
           specified in its <code>DOCTYPE</code> declaration.  The default
@@ -268,7 +269,7 @@ such arrangements are called <em>element matching patterns</em>.
 pattern is matched whenever an <code>&lt;a&gt;</code> top-level element is
 encountered in the XML document, no matter how many times it occurs.  Note that
 nested <code>&lt;a&gt;</code> elements will <strong>not</strong> match this
-pattern -- we will describe means to support this kind of matching later.</li>
+pattern -- we will describe means to support this kind of matching later.</p>
 
 <p>The next step up in matching pattern complexity is "a/b".  This pattern will
 be matched when a <code>&lt;b&gt;</code> element is found nested inside a
@@ -448,7 +449,7 @@ works before you start using Digester seriously.</p>
 <h3>Usage Examples</h3>
 
 
-<h5>Creating a Simple Object Tree</h5>
+<h4>Creating a Simple Object Tree</h4>
 
 <p>Let's assume that you have two simple JavaBeans, <code>Foo</code> and
 <code>Bar</code>, with the following method signatures:</p>
@@ -528,7 +529,7 @@ have had its properties set, and all of its child <code>Bar</code> objects
 created for you.</p>
 
 
-<h5>Processing A Struts Configuration File</h5>
+<h4>Processing A Struts Configuration File</h4>
 
 <p>As stated earlier, the primary reason that the
 <code>Digester</code> package was created is because the
@@ -622,7 +623,7 @@ now represented as collections of objects cached within the Struts controller
 servlet, as well as being exposed as servlet context attributes.</p>
 
 
-<h5>Parsing Body Text In XML Files</h5>
+<h4>Parsing Body Text In XML Files</h4>
 
 <p>The Digester module also allows you to process the nested body text in an
 XML file, not just the elements and attributes that are encountered.  The
@@ -861,7 +862,7 @@ Example usage:
   digester.setRules(new RegexRules(new SimpleRegexMatcher()));
   ...
 </pre>
-<h5>RegexMatchers</h5>
+<h4>RegexMatchers</h4>
 <p>
 <code>Digester</code> ships only with one <code>RegexMatcher</code>
 implementation: <a href='SimpleRegexMatcher.html'>SimpleRegexMatcher</a>.
@@ -987,7 +988,7 @@ the term <em>named stack</em> comes from.) These stacks are
 accessed through calls to:
 </p>
 <ul>
-    <li><a href='Digester.html#push(java.lang.String, java.lang.Object)'>
+    <li><a href='Digester.html#push(java.lang.String,%20java.lang.Object)'>
         void push(String stackName, Object value)</a></li>
     <li><a href='Digester.html#pop(java.lang.String)'>
         Object pop(String stackName)</a></li>
@@ -1063,9 +1064,9 @@ but ships with a simple internal implementation. This implementation allows loca
 to be easily associated with <code><em>public-identifiers</em></code>.
 </p>
 <p>For example:</p>
-<code><pre>
+<pre>
     digester.register("-//Example Dot Com //DTD Sample Example//EN", "assets/sample.dtd");
-</pre></code>
+</pre>
 <p>
 will make digester return the relative file path <code>assets/sample.dtd</code>
 whenever an external entity with public id
@@ -1091,7 +1092,7 @@ that developers know all about. The second is thrown by SAX parsers when the pro
 of the XML cannot be completed. So, to diagnose the cause a certain familiarity with
 the way that SAX error handling works is very useful.
 </p>
-<h5>Diagnosing SAX Exceptions</h5>
+<h4>Diagnosing SAX Exceptions</h4>
 <p>
 This is a short, potted guide to SAX error handling strategies. It's not intended as a
 proper guide to error handling in SAX.
@@ -1116,16 +1117,15 @@ exception to diagnose what went wrong.
 </p>
 <a name="doc.FAQ"></a>
 <h3>Frequently Asked Questions</h3>
-<p><ul>
+<ul>
 <li><strong>Why do I get warnings when using a JAXP 1.1 parser?</strong>
-<p>If you're using a JAXP 1.1 parser, you might see the following warning (in your log):
-<code><pre>
+If you're using a JAXP 1.1 parser, you might see the following warning (in your log):
+<pre>
 [WARN] Digester - -Error: JAXP SAXParser property not recognized: http://java.sun.com/xml/jaxp/properties/schemaLanguage
-</pre></code>
+</pre>
 This property is needed for JAXP 1.2 (XML Schema support) as required
 for the Servlet Spec. 2.4 but is not recognized by JAXP 1.1 parsers.
-This warning is harmless.</p>
-<p>
+This warning is harmless.
 </li>
 <li><strong>Why Doesn't Schema Validation Work With Parser XXX Out Of The Box?</strong>
 <p>
@@ -1160,7 +1160,7 @@ Digester logs but the processing will continue. To change this behaviour, call
 </p>
 
 <li><strong>Where Can I Find Example Code?</strong>
-<a name="doc.FAQ.Examples">
+<a name="doc.FAQ.Examples"></a>
 <p>Digester ships with a sample application: a mapping for the <em>Rich Site
 Summary</em> format used by many newsfeeds. Download the source distribution
 to see how it works.</p>

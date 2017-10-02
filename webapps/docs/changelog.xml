@@ -50,6 +50,9 @@
       <fix>
         Correct Javadoc links to point to Java SE 8 and Java EE 8. (markt)
       </fix>
+      <fix>
+        Enable Javadoc to be built with Java 9. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
