@@ -106,4 +106,18 @@ public class JreCompat {
     public void setApplicationProtocols(SSLParameters sslParameters, String[] protocols) {
         throw new UnsupportedOperationException(sm.getString("jreCompat.noApplicationProtocols"));
     }
+
+
+    /**
+     * Get the application protocol that has been negotiated for connection
+     * associated with the given SSLEngine.
+     *
+     * @param sslEngine The SSLEngine for which to obtain the negotiated
+     *                  protocol
+     *
+     * @return The name of the negotiated protocol
+     */
+    public String getApplicationProtocol(SSLEngine sslEngine) {
+        throw new UnsupportedOperationException(sm.getString("jreCompat.noApplicationProtocol"));
+    }
 }

@@ -19,20 +19,24 @@ package org.apache.tomcat.util.compat;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 
 class Jre9Compat extends Jre8Compat {
 
     private static final Class<?> inaccessibleObjectExceptionClazz;
     private static final Method setApplicationProtocolsMethod;
+    private static final Method getApplicationProtocolMethod;
 
     static {
         Class<?> c1 = null;
         Method m2 = null;
+        Method m3 = null;
 
         try {
             c1 = Class.forName("java.lang.reflect.InaccessibleObjectException");
-            SSLParameters.class.getMethod("setApplicationProtocolsMethod", String[].class);
+            m2 = SSLParameters.class.getMethod("setApplicationProtocolsMethod", String[].class);
+            m3 = SSLEngine.class.getMethod("getApplicationProtocol");
         } catch (SecurityException | NoSuchMethodException e) {
             // Should never happen
         } catch (ClassNotFoundException e) {
@@ -40,6 +44,7 @@ class Jre9Compat extends Jre8Compat {
         }
         inaccessibleObjectExceptionClazz = c1;
         setApplicationProtocolsMethod = m2;
+        getApplicationProtocolMethod = m3;
     }
 
 
@@ -62,6 +67,16 @@ class Jre9Compat extends Jre8Compat {
     public void setApplicationProtocols(SSLParameters sslParameters, String[] protocols) {
         try {
             setApplicationProtocolsMethod.invoke(sslParameters, (Object) protocols);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw new UnsupportedOperationException(e);
+        }
+    }
+
+
+    @Override
+    public String getApplicationProtocol(SSLEngine sslEngine) {
+        try {
+            return (String) getApplicationProtocolMethod.invoke(sslEngine);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new UnsupportedOperationException(e);
         }
