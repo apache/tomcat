@@ -18,8 +18,8 @@ package org.apache.catalina.filters;
 
 import java.util.Enumeration;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
+import javax.servlet.GenericFilter;
 import javax.servlet.ServletException;
 
 import org.apache.juli.logging.Log;
@@ -33,11 +33,10 @@ import org.apache.tomcat.util.res.StringManager;
  * @author xxd
  *
  */
-public abstract class FilterBase implements Filter {
+public abstract class FilterBase extends GenericFilter {
 
     protected static final StringManager sm = StringManager.getManager(FilterBase.class);
 
-    protected abstract Log getLogger();
 
     /**
      * Iterates over the configuration parameters and either logs a warning,
@@ -51,6 +50,9 @@ public abstract class FilterBase implements Filter {
      */
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+
+        super.init(filterConfig);
+
         Enumeration<String> paramNames = filterConfig.getInitParameterNames();
         while (paramNames.hasMoreElements()) {
             String paramName = paramNames.nextElement();
@@ -61,7 +63,7 @@ public abstract class FilterBase implements Filter {
                 if (isConfigProblemFatal()) {
                     throw new ServletException(msg);
                 } else {
-                    getLogger().warn(msg);
+                    warn(msg);
                 }
             }
         }
@@ -77,5 +79,40 @@ public abstract class FilterBase implements Filter {
      */
     protected boolean isConfigProblemFatal() {
         return false;
+    }
+
+    /**
+     * This method returns the parameter's value if it exists, or defaultValue if not.
+     *
+     * @param name - The parameter's name
+     * @param defaultValue - The default value to return if the parameter does not exist
+     * @return The parameter's value or the default value if the parameter does not exist
+     */
+    public String getInitParameter(String name, String defaultValue){
+
+        String value = getInitParameter(name);
+
+        if (value == null)
+            return defaultValue;
+
+        return value;
+    }
+
+    /**
+     * Sub-classes can return a Log that will be used to write log entries
+     * @return The default implementation returns null which means that no log entries will be written
+     */
+    protected Log getLogger(){
+        return null;
+    }
+
+    /**
+     * Logs the message at warn level if a logger exists
+     * @param message The warning message to be logged
+     */
+    protected void warn(Object message){
+        Log log = getLogger();
+        if (log != null)
+            log.warn(message);
     }
 }
