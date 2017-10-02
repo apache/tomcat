@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.compat;
 
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
 
 import org.apache.tomcat.util.res.StringManager;
 
@@ -92,5 +93,17 @@ public class JreCompat {
     public boolean isInstanceOfInaccessibleObjectException(Throwable t) {
         // Exception does not exist prior to Java 9
         return false;
+    }
+
+
+    /**
+     * Set the application protocols the server will accept for ALPN
+     *
+     * @param sslParameters    The SSL parameters for a connection
+     * @param protocols        The application protocols to be allowed for that
+     *                         connection
+     */
+    public void setApplicationProtocols(SSLParameters sslParameters, String[] protocols) {
+        throw new UnsupportedOperationException(sm.getString("jreCompat.noApplicationProtocols"));
     }
 }

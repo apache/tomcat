@@ -16,21 +16,30 @@
  */
 package org.apache.tomcat.util.compat;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import javax.net.ssl.SSLParameters;
+
 class Jre9Compat extends Jre8Compat {
 
     private static final Class<?> inaccessibleObjectExceptionClazz;
-
+    private static final Method setApplicationProtocolsMethod;
 
     static {
         Class<?> c1 = null;
+        Method m2 = null;
+
         try {
             c1 = Class.forName("java.lang.reflect.InaccessibleObjectException");
-        } catch (SecurityException e) {
+            SSLParameters.class.getMethod("setApplicationProtocolsMethod", String[].class);
+        } catch (SecurityException | NoSuchMethodException e) {
             // Should never happen
         } catch (ClassNotFoundException e) {
             // Must be Java 8
         }
         inaccessibleObjectExceptionClazz = c1;
+        setApplicationProtocolsMethod = m2;
     }
 
 
@@ -46,5 +55,15 @@ class Jre9Compat extends Jre8Compat {
         }
 
         return inaccessibleObjectExceptionClazz.isAssignableFrom(t.getClass());
+    }
+
+
+    @Override
+    public void setApplicationProtocols(SSLParameters sslParameters, String[] protocols) {
+        try {
+            setApplicationProtocolsMethod.invoke(sslParameters, (Object) protocols);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw new UnsupportedOperationException(e);
+        }
     }
 }
