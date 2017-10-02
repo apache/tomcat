@@ -29,7 +29,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * these tests must be executed in a new JVM instance. The tests have been place
  * in separate classes to facilitate this when running the unit tests via Ant.
  */
-@SuppressWarnings("javadoc")
 public class TestCookiesNoStrictNamingSysProps extends CookiesBaseTest {
 
     @Override
