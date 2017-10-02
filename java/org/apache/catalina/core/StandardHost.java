@@ -806,7 +806,7 @@ public class StandardHost extends ContainerBase implements Host {
                 }
                 if(!found) {
                     Valve valve =
-                        (Valve) Class.forName(errorValve).newInstance();
+                        (Valve) Class.forName(errorValve).getDeclaredConstructor().newInstance();
                     getPipeline().addValve(valve);
                 }
             } catch (Throwable t) {

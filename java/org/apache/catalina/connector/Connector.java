@@ -53,7 +53,7 @@ public class Connector extends LifecycleMBeanBase  {
      * Alternate flag to enable recycling of facades.
      */
     public static final boolean RECYCLE_FACADES =
-        Boolean.parseBoolean(System.getProperty("org.apache.catalina.connector.RECYCLE_FACADES", "false"));
+            Boolean.parseBoolean(System.getProperty("org.apache.catalina.connector.RECYCLE_FACADES", "false"));
 
 
     // ------------------------------------------------------------ Constructor
@@ -67,7 +67,7 @@ public class Connector extends LifecycleMBeanBase  {
         // Instantiate protocol handler
         try {
             Class<?> clazz = Class.forName(protocolHandlerClassName);
-            this.protocolHandler = (ProtocolHandler) clazz.newInstance();
+            this.protocolHandler = (ProtocolHandler) clazz.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             log.error(sm.getString(
                     "coyoteConnector.protocolHandlerInstantiationFailed"), e);
@@ -112,7 +112,7 @@ public class Connector extends LifecycleMBeanBase  {
      * Descriptive information about this Connector implementation.
      */
     protected static final String info =
-        "org.apache.catalina.connector.Connector/2.1";
+            "org.apache.catalina.connector.Connector/2.1";
 
 
     /**
@@ -163,7 +163,7 @@ public class Connector extends LifecycleMBeanBase  {
      * The string manager for this package.
      */
     protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+            StringManager.getManager(Constants.Package);
 
 
     /**
@@ -209,7 +209,7 @@ public class Connector extends LifecycleMBeanBase  {
      * Defaults to the Coyote HTTP/1.1 protocolHandler.
      */
     protected String protocolHandlerClassName =
-        "org.apache.coyote.http11.Http11Protocol";
+            "org.apache.coyote.http11.Http11Protocol";
 
 
     /**
@@ -224,38 +224,38 @@ public class Connector extends LifecycleMBeanBase  {
     protected Adapter adapter = null;
 
 
-     /**
-      * Mapper.
-      */
-     protected Mapper mapper = new Mapper();
+    /**
+     * Mapper.
+     */
+    protected Mapper mapper = new Mapper();
 
 
-     /**
-      * Mapper listener.
-      */
-     protected MapperListener mapperListener = new MapperListener(mapper, this);
+    /**
+     * Mapper listener.
+     */
+    protected MapperListener mapperListener = new MapperListener(mapper, this);
 
 
-     /**
-      * URI encoding.
-      */
-     protected String URIEncoding = null;
+    /**
+     * URI encoding.
+     */
+    protected String URIEncoding = null;
 
 
-     /**
-      * URI encoding as body.
-      */
-     protected boolean useBodyEncodingForURI = false;
+    /**
+     * URI encoding as body.
+     */
+    protected boolean useBodyEncodingForURI = false;
 
 
-     protected static HashMap<String,String> replacements =
-         new HashMap<String,String>();
-     static {
-         replacements.put("acceptCount", "backlog");
-         replacements.put("connectionLinger", "soLinger");
-         replacements.put("connectionTimeout", "soTimeout");
-         replacements.put("rootFile", "rootfile");
-     }
+    protected static HashMap<String,String> replacements =
+            new HashMap<String,String>();
+    static {
+        replacements.put("acceptCount", "backlog");
+        replacements.put("connectionLinger", "soLinger");
+        replacements.put("connectionTimeout", "soTimeout");
+        replacements.put("rootFile", "rootfile");
+    }
 
 
     // ------------------------------------------------------------- Properties
@@ -567,14 +567,14 @@ public class Connector extends LifecycleMBeanBase  {
     public String getProtocol() {
 
         if ("org.apache.coyote.http11.Http11Protocol".equals
-            (getProtocolHandlerClassName())
-            || "org.apache.coyote.http11.Http11AprProtocol".equals
-            (getProtocolHandlerClassName())) {
+                (getProtocolHandlerClassName())
+                || "org.apache.coyote.http11.Http11AprProtocol".equals
+                (getProtocolHandlerClassName())) {
             return "HTTP/1.1";
         } else if ("org.apache.coyote.ajp.AjpProtocol".equals
-                   (getProtocolHandlerClassName())
-                   || "org.apache.coyote.ajp.AjpAprProtocol".equals
-                   (getProtocolHandlerClassName())) {
+                (getProtocolHandlerClassName())
+                || "org.apache.coyote.ajp.AjpAprProtocol".equals
+                (getProtocolHandlerClassName())) {
             return "AJP/1.3";
         }
         return getProtocolHandlerClassName();
@@ -592,23 +592,23 @@ public class Connector extends LifecycleMBeanBase  {
         if (AprLifecycleListener.isAprAvailable()) {
             if ("HTTP/1.1".equals(protocol)) {
                 setProtocolHandlerClassName
-                    ("org.apache.coyote.http11.Http11AprProtocol");
+                ("org.apache.coyote.http11.Http11AprProtocol");
             } else if ("AJP/1.3".equals(protocol)) {
                 setProtocolHandlerClassName
-                    ("org.apache.coyote.ajp.AjpAprProtocol");
+                ("org.apache.coyote.ajp.AjpAprProtocol");
             } else if (protocol != null) {
                 setProtocolHandlerClassName(protocol);
             } else {
                 setProtocolHandlerClassName
-                    ("org.apache.coyote.http11.Http11AprProtocol");
+                ("org.apache.coyote.http11.Http11AprProtocol");
             }
         } else {
             if ("HTTP/1.1".equals(protocol)) {
                 setProtocolHandlerClassName
-                    ("org.apache.coyote.http11.Http11Protocol");
+                ("org.apache.coyote.http11.Http11Protocol");
             } else if ("AJP/1.3".equals(protocol)) {
                 setProtocolHandlerClassName
-                    ("org.apache.coyote.ajp.AjpProtocol");
+                ("org.apache.coyote.ajp.AjpProtocol");
             } else if (protocol != null) {
                 setProtocolHandlerClassName(protocol);
             }
@@ -772,51 +772,51 @@ public class Connector extends LifecycleMBeanBase  {
         setProperty("secure", Boolean.toString(secure));
     }
 
-     /**
-      * Return the character encoding to be used for the URI.
-      */
-     public String getURIEncoding() {
+    /**
+     * Return the character encoding to be used for the URI.
+     */
+    public String getURIEncoding() {
 
-         return (this.URIEncoding);
+        return (this.URIEncoding);
 
-     }
-
-
-     /**
-      * Set the URI encoding to be used for the URI.
-      *
-      * @param URIEncoding The new URI character encoding.
-      */
-     public void setURIEncoding(String URIEncoding) {
-
-         this.URIEncoding = URIEncoding;
-         setProperty("uRIEncoding", URIEncoding);
-
-     }
+    }
 
 
-     /**
-      * Return the true if the entity body encoding should be used for the URI.
-      */
-     public boolean getUseBodyEncodingForURI() {
+    /**
+     * Set the URI encoding to be used for the URI.
+     *
+     * @param URIEncoding The new URI character encoding.
+     */
+    public void setURIEncoding(String URIEncoding) {
 
-         return (this.useBodyEncodingForURI);
+        this.URIEncoding = URIEncoding;
+        setProperty("uRIEncoding", URIEncoding);
 
-     }
+    }
 
 
-     /**
-      * Set if the entity body encoding should be used for the URI.
-      *
-      * @param useBodyEncodingForURI The new value for the flag.
-      */
-     public void setUseBodyEncodingForURI(boolean useBodyEncodingForURI) {
+    /**
+     * Return the true if the entity body encoding should be used for the URI.
+     */
+    public boolean getUseBodyEncodingForURI() {
 
-         this.useBodyEncodingForURI = useBodyEncodingForURI;
-         setProperty
-             ("useBodyEncodingForURI", String.valueOf(useBodyEncodingForURI));
+        return (this.useBodyEncodingForURI);
 
-     }
+    }
+
+
+    /**
+     * Set if the entity body encoding should be used for the URI.
+     *
+     * @param useBodyEncodingForURI The new value for the flag.
+     */
+    public void setUseBodyEncodingForURI(boolean useBodyEncodingForURI) {
+
+        this.useBodyEncodingForURI = useBodyEncodingForURI;
+        setProperty
+        ("useBodyEncodingForURI", String.valueOf(useBodyEncodingForURI));
+
+    }
 
     /**
      * Indicates whether the generation of an X-Powered-By response header for
@@ -935,7 +935,7 @@ public class Connector extends LifecycleMBeanBase  {
             protocolHandler.pause();
         } catch (Exception e) {
             log.error(sm.getString
-                      ("coyoteConnector.protocolHandlerPauseFailed"), e);
+                    ("coyoteConnector.protocolHandlerPauseFailed"), e);
         }
     }
 
@@ -948,7 +948,7 @@ public class Connector extends LifecycleMBeanBase  {
             protocolHandler.resume();
         } catch (Exception e) {
             log.error(sm.getString
-                      ("coyoteConnector.protocolHandlerResumeFailed"), e);
+                    ("coyoteConnector.protocolHandlerResumeFailed"), e);
         }
     }
 
@@ -978,8 +978,8 @@ public class Connector extends LifecycleMBeanBase  {
             protocolHandler.init();
         } catch (Exception e) {
             throw new LifecycleException
-                (sm.getString
-                 ("coyoteConnector.protocolHandlerInitializationFailed"), e);
+            (sm.getString
+                    ("coyoteConnector.protocolHandlerInitializationFailed"), e);
         }
 
         // Initialize mapper listener
@@ -1012,8 +1012,8 @@ public class Connector extends LifecycleMBeanBase  {
             }
 
             throw new LifecycleException
-                (errPrefix + " " + sm.getString
-                 ("coyoteConnector.protocolHandlerStartFailed"), e);
+            (errPrefix + " " + sm.getString
+                    ("coyoteConnector.protocolHandlerStartFailed"), e);
         }
 
         mapperListener.start();
@@ -1034,8 +1034,8 @@ public class Connector extends LifecycleMBeanBase  {
             protocolHandler.stop();
         } catch (Exception e) {
             throw new LifecycleException
-                (sm.getString
-                 ("coyoteConnector.protocolHandlerStopFailed"), e);
+            (sm.getString
+                    ("coyoteConnector.protocolHandlerStopFailed"), e);
         }
 
         mapperListener.stop();
@@ -1050,8 +1050,8 @@ public class Connector extends LifecycleMBeanBase  {
             protocolHandler.destroy();
         } catch (Exception e) {
             throw new LifecycleException
-                (sm.getString
-                 ("coyoteConnector.protocolHandlerDestroyFailed"), e);
+            (sm.getString
+                    ("coyoteConnector.protocolHandlerDestroyFailed"), e);
         }
 
         if (getService() != null) {

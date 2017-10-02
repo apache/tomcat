@@ -16,6 +16,7 @@
  */
 package javax.websocket;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
@@ -48,14 +49,22 @@ public abstract class ContainerProvider {
             try {
                 @SuppressWarnings("unchecked")
                 Class<WebSocketContainer> clazz =
-                        (Class<WebSocketContainer>) Class.forName(
-                                DEFAULT_PROVIDER_CLASS_NAME);
-                result = clazz.newInstance();
+                (Class<WebSocketContainer>) Class.forName(
+                        DEFAULT_PROVIDER_CLASS_NAME);
+                result = clazz.getDeclaredConstructor().newInstance();
             } catch (ClassNotFoundException e) {
                 // No options left. Just return null.
             } catch (InstantiationException e) {
                 // No options left. Just return null.
             } catch (IllegalAccessException e) {
+                // No options left. Just return null.
+            } catch (IllegalArgumentException e) {
+                // No options left. Just return null.
+            } catch (SecurityException e) {
+                // No options left. Just return null.
+            } catch (InvocationTargetException e) {
+                // No options left. Just return null.
+            } catch (NoSuchMethodException e) {
                 // No options left. Just return null.
             }
         }

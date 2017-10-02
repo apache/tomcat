@@ -227,12 +227,11 @@ public abstract class ExpressionFactory {
                 }
             }
             if (constructor == null) {
-                result = (ExpressionFactory) clazz.newInstance();
+                result = (ExpressionFactory) clazz.getDeclaredConstructor().newInstance();
             } else {
                 result =
                     (ExpressionFactory) constructor.newInstance(properties);
             }
-            
         } catch (InstantiationException e) {
             throw new ELException(
                     "Unable to create ExpressionFactory of type: " + clazz.getName(),
@@ -242,6 +241,10 @@ public abstract class ExpressionFactory {
                     "Unable to create ExpressionFactory of type: " + clazz.getName(),
                     e);
         } catch (IllegalArgumentException e) {
+            throw new ELException(
+                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
+                    e);
+        } catch (NoSuchMethodException e) {
             throw new ELException(
                     "Unable to create ExpressionFactory of type: " + clazz.getName(),
                     e);

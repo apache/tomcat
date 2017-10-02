@@ -115,7 +115,7 @@ import org.ietf.jgss.GSSException;
  * @author Craig R. McClanahan
  */
 public class Request
-    implements HttpServletRequest {
+implements HttpServletRequest {
 
     private static final Log log = LogFactory.getLog(Request.class);
 
@@ -167,7 +167,7 @@ public class Request
      * The string manager for this package.
      */
     protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+            StringManager.getManager(Constants.Package);
 
 
     /**
@@ -183,9 +183,9 @@ public class Request
      * declare formats[] as a static variable.
      */
     protected SimpleDateFormat formats[] = {
-        new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US),
-        new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
-        new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
+            new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US),
+            new SimpleDateFormat("EEEEEE, dd-MMM-yy HH:mm:ss zzz", Locale.US),
+            new SimpleDateFormat("EEE MMMM d HH:mm:ss yyyy", Locale.US)
     };
 
 
@@ -256,7 +256,7 @@ public class Request
      * ServletInputStream.
      */
     protected CoyoteInputStream inputStream =
-        new CoyoteInputStream(inputBuffer);
+            new CoyoteInputStream(inputBuffer);
 
 
     /**
@@ -669,7 +669,7 @@ public class Request
      * Descriptive information about this Request implementation.
      */
     protected static final String info =
-        "org.apache.coyote.catalina.CoyoteRequest/1.0";
+            "org.apache.coyote.catalina.CoyoteRequest/1.0";
 
     /**
      * Return descriptive information about this Request implementation and
@@ -798,7 +798,7 @@ public class Request
      * @exception IOException if an input/output error occurs
      */
     public ServletInputStream createInputStream()
-        throws IOException {
+            throws IOException {
         if (inputStream == null) {
             inputStream = new CoyoteInputStream(inputBuffer);
         }
@@ -959,7 +959,7 @@ public class Request
         }
         if( isSSLAttribute(name) || name.equals(SSLSupport.PROTOCOL_VERSION_KEY)) {
             coyoteRequest.action(ActionCode.REQ_SSL_ATTRIBUTE,
-                                 coyoteRequest);
+                    coyoteRequest);
             attr = coyoteRequest.getAttribute(Globals.CERTIFICATES_ATTR);
             if( attr != null) {
                 attributes.put(Globals.CERTIFICATES_ATTR, attr);
@@ -997,11 +997,11 @@ public class Request
      */
     static boolean isSSLAttribute(String name) {
         return Globals.CERTIFICATES_ATTR.equals(name) ||
-            Globals.CIPHER_SUITE_ATTR.equals(name) ||
-            Globals.KEY_SIZE_ATTR.equals(name)  ||
-            Globals.SSL_SESSION_ID_ATTR.equals(name) ||
-            Globals.SSL_SESSION_ID_TOMCAT_ATTR.equals(name) ||
-            Globals.SSL_SESSION_MGR_ATTR.equals(name);
+                Globals.CIPHER_SUITE_ATTR.equals(name) ||
+                Globals.KEY_SIZE_ATTR.equals(name)  ||
+                Globals.SSL_SESSION_ID_ATTR.equals(name) ||
+                Globals.SSL_SESSION_ID_TOMCAT_ATTR.equals(name) ||
+                Globals.SSL_SESSION_MGR_ATTR.equals(name);
     }
 
     /**
@@ -1052,7 +1052,7 @@ public class Request
      */
     @Override
     public String getCharacterEncoding() {
-      return coyoteRequest.getCharacterEncoding();
+        return coyoteRequest.getCharacterEncoding();
     }
 
 
@@ -1088,7 +1088,7 @@ public class Request
 
         if (usingReader) {
             throw new IllegalStateException
-                (sm.getString("coyoteRequest.getInputStream.ise"));
+            (sm.getString("coyoteRequest.getInputStream.ise"));
         }
 
         usingInputStream = true;
@@ -1250,7 +1250,7 @@ public class Request
 
         if (usingInputStream) {
             throw new IllegalStateException
-                (sm.getString("coyoteRequest.getReader.ise"));
+            (sm.getString("coyoteRequest.getReader.ise"));
         }
 
         usingReader = true;
@@ -1298,7 +1298,7 @@ public class Request
     public String getRemoteAddr() {
         if (remoteAddr == null) {
             coyoteRequest.action
-                (ActionCode.REQ_HOST_ADDR_ATTRIBUTE, coyoteRequest);
+            (ActionCode.REQ_HOST_ADDR_ATTRIBUTE, coyoteRequest);
             remoteAddr = coyoteRequest.remoteAddr().toString();
         }
         return remoteAddr;
@@ -1315,7 +1315,7 @@ public class Request
                 remoteHost = getRemoteAddr();
             } else {
                 coyoteRequest.action
-                    (ActionCode.REQ_HOST_ATTRIBUTE, coyoteRequest);
+                (ActionCode.REQ_HOST_ATTRIBUTE, coyoteRequest);
                 remoteHost = coyoteRequest.remoteHost().toString();
             }
         }
@@ -1330,7 +1330,7 @@ public class Request
     public int getRemotePort(){
         if (remotePort == -1) {
             coyoteRequest.action
-                (ActionCode.REQ_REMOTEPORT_ATTRIBUTE, coyoteRequest);
+            (ActionCode.REQ_REMOTEPORT_ATTRIBUTE, coyoteRequest);
             remotePort = coyoteRequest.getRemotePort();
         }
         return remotePort;
@@ -1344,7 +1344,7 @@ public class Request
     public String getLocalName(){
         if (localName == null) {
             coyoteRequest.action
-                (ActionCode.REQ_LOCAL_NAME_ATTRIBUTE, coyoteRequest);
+            (ActionCode.REQ_LOCAL_NAME_ATTRIBUTE, coyoteRequest);
             localName = coyoteRequest.localName().toString();
         }
         return localName;
@@ -1358,7 +1358,7 @@ public class Request
     public String getLocalAddr(){
         if (localAddr == null) {
             coyoteRequest.action
-                (ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE, coyoteRequest);
+            (ActionCode.REQ_LOCAL_ADDR_ATTRIBUTE, coyoteRequest);
             localAddr = coyoteRequest.localAddr().toString();
         }
         return localAddr;
@@ -1373,7 +1373,7 @@ public class Request
     public int getLocalPort(){
         if (localPort == -1){
             coyoteRequest.action
-                (ActionCode.REQ_LOCALPORT_ATTRIBUTE, coyoteRequest);
+            (ActionCode.REQ_LOCALPORT_ATTRIBUTE, coyoteRequest);
             localPort = coyoteRequest.getLocalPort();
         }
         return localPort;
@@ -1511,7 +1511,7 @@ public class Request
         // Name cannot be null
         if (name == null) {
             throw new IllegalArgumentException
-                (sm.getString("coyoteRequest.setAttribute.namenull"));
+            (sm.getString("coyoteRequest.setAttribute.namenull"));
         }
 
         // Null value is the same as removeAttribute()
@@ -1584,7 +1584,7 @@ public class Request
                 continue;
             }
             ServletRequestAttributeListener listener =
-                (ServletRequestAttributeListener) listeners[i];
+                    (ServletRequestAttributeListener) listeners[i];
             try {
                 if (replaced) {
                     listener.attributeReplaced(event);
@@ -1610,14 +1610,14 @@ public class Request
             return;
         }
         ServletRequestAttributeEvent event =
-          new ServletRequestAttributeEvent(context.getServletContext(),
-                                           getRequest(), name, value);
+                new ServletRequestAttributeEvent(context.getServletContext(),
+                        getRequest(), name, value);
         for (int i = 0; i < listeners.length; i++) {
             if (!(listeners[i] instanceof ServletRequestAttributeListener)) {
                 continue;
             }
             ServletRequestAttributeListener listener =
-                (ServletRequestAttributeListener) listeners[i];
+                    (ServletRequestAttributeListener) listeners[i];
             try {
                 listener.attributeRemoved(event);
             } catch (Throwable t) {
@@ -1644,7 +1644,7 @@ public class Request
      */
     @Override
     public void setCharacterEncoding(String enc)
-        throws UnsupportedEncodingException {
+            throws UnsupportedEncodingException {
 
         if (usingReader) {
             return;
@@ -1661,7 +1661,7 @@ public class Request
     @Override
     public ServletContext getServletContext() {
         return context.getServletContext();
-     }
+    }
 
     @Override
     public AsyncContext startAsync() {
@@ -2019,7 +2019,6 @@ public class Request
 
     // --------------------------------------------- HttpServletRequest Methods
 
-
     /**
      * Return the authentication type used for this Request.
      */
@@ -2376,7 +2375,7 @@ public class Request
         String scheme = getScheme();
         int port = getServerPort();
         if (port < 0)
-         {
+        {
             port = 80; // Work around java.net.URL bug
         }
 
@@ -2384,7 +2383,7 @@ public class Request
         url.append("://");
         url.append(getServerName());
         if ((scheme.equals("http") && (port != 80))
-            || (scheme.equals("https") && (port != 443))) {
+                || (scheme.equals("https") && (port != 443))) {
             url.append(':');
             url.append(port);
         }
@@ -2645,8 +2644,8 @@ public class Request
 
         if (response != null) {
             Cookie newCookie =
-                ApplicationSessionCookieConfig.createSessionCookie(context,
-                        newSessionId, secure);
+                    ApplicationSessionCookieConfig.createSessionCookie(context,
+                            newSessionId, secure);
             response.addSessionCookieInternal(newCookie);
         }
     }
@@ -2740,7 +2739,7 @@ public class Request
      */
     @Override
     public boolean authenticate(HttpServletResponse response)
-    throws IOException, ServletException {
+            throws IOException, ServletException {
         if (response.isCommitted()) {
             throw new IllegalStateException(
                     sm.getString("coyoteRequest.authenticate.ise"));
@@ -2754,7 +2753,7 @@ public class Request
      */
     @Override
     public void login(String username, String password)
-    throws ServletException {
+            throws ServletException {
         if (getAuthType() != null || getRemoteUser() != null ||
                 getUserPrincipal() != null) {
             throw new ServletException(
@@ -2781,7 +2780,7 @@ public class Request
      */
     @Override
     public Collection<Part> getParts() throws IOException, IllegalStateException,
-            ServletException {
+    ServletException {
 
         parseParts();
 
@@ -2810,9 +2809,9 @@ public class Request
         if (mce == null) {
             if(getContext().getAllowCasualMultipartParsing()) {
                 mce = new MultipartConfigElement(null,
-                                                 connector.getMaxPostSize(),
-                                                 connector.getMaxPostSize(),
-                                                 connector.getMaxPostSize());
+                        connector.getMaxPostSize(),
+                        connector.getMaxPostSize(),
+                        connector.getMaxPostSize());
             } else {
                 parts = Collections.emptyList();
                 return;
@@ -2835,8 +2834,8 @@ public class Request
                 if (!location.isAbsolute()) {
                     location = new File(
                             (File) context.getServletContext().getAttribute(
-                                        ServletContext.TEMPDIR),
-                                        locationStr).getAbsoluteFile();
+                                    ServletContext.TEMPDIR),
+                            locationStr).getAbsoluteFile();
                 }
             }
 
@@ -2959,7 +2958,7 @@ public class Request
      */
     @Override
     public Part getPart(String name) throws IOException, IllegalStateException,
-            ServletException {
+    ServletException {
         Collection<Part> c = getParts();
         Iterator<Part> iterator = c.iterator();
         while (iterator.hasNext()) {
@@ -2995,7 +2994,7 @@ public class Request
     @SuppressWarnings("unchecked")
     public <T extends HttpUpgradeHandler> T upgrade(
             Class<T> httpUpgradeHandlerClass) throws ServletException {
-            
+
         T handler;
         try {
             handler = (T) context.getInstanceManager().newInstance(httpUpgradeHandlerClass);
@@ -3006,6 +3005,12 @@ public class Request
         } catch (InvocationTargetException e) {
             throw new ServletException(e);
         } catch (NamingException e) {
+            throw new ServletException(e);
+        } catch (IllegalArgumentException e) {
+            throw new ServletException(e);
+        } catch (SecurityException e) {
+            throw new ServletException(e);
+        } catch (NoSuchMethodException e) {
             throw new ServletException(e);
         }
 
@@ -3063,11 +3068,11 @@ public class Request
             return (null);
         }
         if ((response != null) &&
-            context.getServletContext().getEffectiveSessionTrackingModes().
-                    contains(SessionTrackingMode.COOKIE) &&
-            response.getResponse().isCommitted()) {
+                context.getServletContext().getEffectiveSessionTrackingModes().
+                contains(SessionTrackingMode.COOKIE) &&
+                response.getResponse().isCommitted()) {
             throw new IllegalStateException
-              (sm.getString("coyoteRequest.sessionCreateCommitted"));
+            (sm.getString("coyoteRequest.sessionCreateCommitted"));
         }
 
         // Re-use session IDs provided by the client in very limited
@@ -3115,12 +3120,12 @@ public class Request
 
         // Creating a new session cookie based on that session
         if ((session != null) && (getContext() != null)
-               && getContext().getServletContext().
-                       getEffectiveSessionTrackingModes().contains(
-                               SessionTrackingMode.COOKIE)) {
+                && getContext().getServletContext().
+                getEffectiveSessionTrackingModes().contains(
+                        SessionTrackingMode.COOKIE)) {
             Cookie cookie =
-                ApplicationSessionCookieConfig.createSessionCookie(
-                        context, session.getIdInternal(), isSecure());
+                    ApplicationSessionCookieConfig.createSessionCookie(
+                            context, session.getIdInternal(), isSecure());
 
             response.addSessionCookieInternal(cookie);
         }
@@ -3147,7 +3152,7 @@ public class Request
                 buf.append(c);
             } else {
                 if (++i >= s.length())
-                 {
+                {
                     throw new IllegalArgumentException();//invalid escape, hence invalid cookie
                 }
                 c = s.charAt(i);
@@ -3178,7 +3183,7 @@ public class Request
             try {
                 /*
                 we must unescape the '\\' escape character
-                */
+                 */
                 Cookie cookie = new Cookie(scookie.getName().toString(),null);
                 int version = scookie.getVersion();
                 cookie.setVersion(version);
@@ -3186,7 +3191,7 @@ public class Request
                 cookie.setPath(unescape(scookie.getPath().toString()));
                 String domain = scookie.getDomain().toString();
                 if (domain!=null)
-                 {
+                {
                     cookie.setDomain(unescape(domain));//avoid NPE
                 }
                 String comment = scookie.getComment().toString();
@@ -3229,10 +3234,10 @@ public class Request
                 }
             } else {
                 parameters.setEncoding
-                    (org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
+                (org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
                 if (useBodyEncodingForURI) {
                     parameters.setQueryStringEncoding
-                        (org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
+                    (org.apache.coyote.Constants.DEFAULT_CHARACTER_ENCODING);
                 }
             }
 
@@ -3350,7 +3355,7 @@ public class Request
      * Read post body in an array.
      */
     protected int readPostBody(byte body[], int len)
-        throws IOException {
+            throws IOException {
 
         int offset = 0;
         do {
@@ -3456,7 +3461,7 @@ public class Request
         }
 
         JreCompat jreCompat = JreCompat.getInstance();
-        
+
         // Process each comma-delimited language specification
         int length = parser.getLength();
         while (true) {
@@ -3489,11 +3494,11 @@ public class Request
 
             // Skip entries we are not going to keep track of
             if (quality < 0.00005)
-             {
+            {
                 continue;       // Zero (or effectively zero) quality factors
             }
             if ("*".equals(entry))
-             {
+            {
                 continue;       // FIXME - "*" entries are not handled
             }
 
@@ -3525,93 +3530,93 @@ public class Request
     }
 
     private static final Map<String, SpecialAttributeAdapter> specialAttributes
-        = new HashMap<String, SpecialAttributeAdapter>();
+    = new HashMap<String, SpecialAttributeAdapter>();
 
     static {
         specialAttributes.put(Globals.DISPATCHER_TYPE_ATTR,
                 new SpecialAttributeAdapter() {
-                    @Override
-                    public Object get(Request request, String name) {
-                        return (request.internalDispatcherType == null) ? DispatcherType.REQUEST
-                                : request.internalDispatcherType;
-                    }
+            @Override
+            public Object get(Request request, String name) {
+                return (request.internalDispatcherType == null) ? DispatcherType.REQUEST
+                        : request.internalDispatcherType;
+            }
 
-                    @Override
-                    public void set(Request request, String name, Object value) {
-                        request.internalDispatcherType = (DispatcherType) value;
-                    }
-                });
+            @Override
+            public void set(Request request, String name, Object value) {
+                request.internalDispatcherType = (DispatcherType) value;
+            }
+        });
         specialAttributes.put(Globals.DISPATCHER_REQUEST_PATH_ATTR,
                 new SpecialAttributeAdapter() {
-                    @Override
-                    public Object get(Request request, String name) {
-                        return (request.requestDispatcherPath == null) ? request
-                                .getRequestPathMB().toString()
-                                : request.requestDispatcherPath.toString();
-                    }
+            @Override
+            public Object get(Request request, String name) {
+                return (request.requestDispatcherPath == null) ? request
+                        .getRequestPathMB().toString()
+                        : request.requestDispatcherPath.toString();
+            }
 
-                    @Override
-                    public void set(Request request, String name, Object value) {
-                        request.requestDispatcherPath = value;
-                    }
-                });
+            @Override
+            public void set(Request request, String name, Object value) {
+                request.requestDispatcherPath = value;
+            }
+        });
         specialAttributes.put(Globals.ASYNC_SUPPORTED_ATTR,
                 new SpecialAttributeAdapter() {
-                    @Override
-                    public Object get(Request request, String name) {
-                        return request.asyncSupported;
-                    }
+            @Override
+            public Object get(Request request, String name) {
+                return request.asyncSupported;
+            }
 
-                    @Override
-                    public void set(Request request, String name, Object value) {
-                        Boolean oldValue = request.asyncSupported;
-                        request.asyncSupported = (Boolean)value;
-                        request.notifyAttributeAssigned(name, value, oldValue);
-                    }
-                });
+            @Override
+            public void set(Request request, String name, Object value) {
+                Boolean oldValue = request.asyncSupported;
+                request.asyncSupported = (Boolean)value;
+                request.notifyAttributeAssigned(name, value, oldValue);
+            }
+        });
         specialAttributes.put(Globals.GSS_CREDENTIAL_ATTR,
                 new SpecialAttributeAdapter() {
-                    @Override
-                    public Object get(Request request, String name) {
-                        if (request.userPrincipal instanceof GenericPrincipal) {
-                            return ((GenericPrincipal) request.userPrincipal)
-                                    .getGssCredential();
-                        }
-                        return null;
-                    }
+            @Override
+            public Object get(Request request, String name) {
+                if (request.userPrincipal instanceof GenericPrincipal) {
+                    return ((GenericPrincipal) request.userPrincipal)
+                            .getGssCredential();
+                }
+                return null;
+            }
 
-                    @Override
-                    public void set(Request request, String name, Object value) {
-                        // NO-OP
-                    }
-                });
+            @Override
+            public void set(Request request, String name, Object value) {
+                // NO-OP
+            }
+        });
         specialAttributes.put(Globals.PARAMETER_PARSE_FAILED_ATTR,
                 new SpecialAttributeAdapter() {
-                    @Override
-                    public Object get(Request request, String name) {
-                        if (request.getCoyoteRequest().getParameters()
-                                .isParseFailed()) {
-                            return Boolean.TRUE;
-                        }
-                        return null;
-                    }
+            @Override
+            public Object get(Request request, String name) {
+                if (request.getCoyoteRequest().getParameters()
+                        .isParseFailed()) {
+                    return Boolean.TRUE;
+                }
+                return null;
+            }
 
-                    @Override
-                    public void set(Request request, String name, Object value) {
-                        // NO-OP
-                    }
-                });
+            @Override
+            public void set(Request request, String name, Object value) {
+                // NO-OP
+            }
+        });
         specialAttributes.put(Globals.PARAMETER_PARSE_FAILED_REASON_ATTR,
                 new SpecialAttributeAdapter() {
-                    @Override
-                    public Object get(Request request, String name) {
-                        return request.getCoyoteRequest().getParameters().getParseFailedReason();
-                    }
+            @Override
+            public Object get(Request request, String name) {
+                return request.getCoyoteRequest().getParameters().getParseFailedReason();
+            }
 
-                    @Override
-                    public void set(Request request, String name, Object value) {
-                        // NO-OP
-                    }
-                });
+            @Override
+            public void set(Request request, String name, Object value) {
+                // NO-OP
+            }
+        });
     }
 }
