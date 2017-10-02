@@ -120,7 +120,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                     if ("java.lang.Integer".equals(paramType.getName())
                             || "int".equals(paramType.getName())) {
                         try {
-                            params[0] = new Integer(value);
+                            params[0] = Integer.valueOf(value);
                         } catch (NumberFormatException ex) {
                             ok = false;
                         }
@@ -128,7 +128,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                     }else if ("java.lang.Long".equals(paramType.getName())
                                 || "long".equals(paramType.getName())) {
                             try {
-                                params[0] = new Long(value);
+                                params[0] = Long.valueOf(value);
                             } catch (NumberFormatException ex) {
                                 ok = false;
                             }

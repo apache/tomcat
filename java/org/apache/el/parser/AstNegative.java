@@ -56,7 +56,7 @@ public final class AstNegative extends SimpleNode {
         }
         if (obj instanceof String) {
             if (isStringFloat((String) obj)) {
-                return new Double(-Double.parseDouble((String) obj));
+                return Double.valueOf(-Double.parseDouble((String) obj));
             }
             return Long.valueOf(-Long.parseLong((String) obj));
         }
@@ -64,13 +64,13 @@ public final class AstNegative extends SimpleNode {
             return Long.valueOf(-((Long) obj).longValue());
         }
         if (obj instanceof Double) {
-            return new Double(-((Double) obj).doubleValue());
+            return Double.valueOf(-((Double) obj).doubleValue());
         }
         if (obj instanceof Integer) {
             return Integer.valueOf(-((Integer) obj).intValue());
         }
         if (obj instanceof Float) {
-            return new Float(-((Float) obj).floatValue());
+            return Float.valueOf(-((Float) obj).floatValue());
         }
         if (obj instanceof Short) {
             return Short.valueOf((short) -((Short) obj).shortValue());

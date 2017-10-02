@@ -38,7 +38,7 @@ public final class AstInteger extends SimpleNode {
     protected Number getInteger() {
         if (this.number == null) {
             try {
-                this.number = new Long(this.image);
+                this.number = Long.valueOf(this.image);
             } catch (ArithmeticException e1) {
                 this.number = new BigInteger(this.image);
             }

@@ -45,6 +45,7 @@ import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.MonitorInfo;
 import java.lang.management.OperatingSystemMXBean;
+import java.lang.management.PlatformLoggingMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
@@ -57,8 +58,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.LogManager;
-import java.util.logging.LoggingMXBean;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -95,8 +94,8 @@ public class Diagnostics {
     // XXX Not sure whether the following MBeans should better
     // be retrieved on demand, i.e. whether they can change
     // dynamically in the MBeanServer.
-    private static final LoggingMXBean loggingMXBean =
-        LogManager.getLoggingMXBean();
+    private static final PlatformLoggingMXBean loggingMXBean =
+        ManagementFactory.getPlatformMXBean(PlatformLoggingMXBean.class);
     private static final MemoryMXBean memoryMXBean =
         ManagementFactory.getMemoryMXBean();
     private static final List<GarbageCollectorMXBean> garbageCollectorMXBeans =
