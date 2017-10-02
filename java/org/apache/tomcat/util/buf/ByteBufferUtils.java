@@ -16,12 +16,14 @@
  */
 package org.apache.tomcat.util.buf;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 public class ByteBufferUtils {
@@ -30,31 +32,50 @@ public class ByteBufferUtils {
             StringManager.getManager(Constants.Package);
     private static final Log log = LogFactory.getLog(ByteBufferUtils.class);
 
+    private static final Object unsafe;
     private static final Method cleanerMethod;
     private static final Method cleanMethod;
+    private static final Method invokeCleanerMethod;
 
     static {
         ByteBuffer tempBuffer = ByteBuffer.allocateDirect(0);
         Method cleanerMethodLocal = null;
         Method cleanMethodLocal = null;
-        try {
-            cleanerMethodLocal = tempBuffer.getClass().getMethod("cleaner");
-            cleanerMethodLocal.setAccessible(true);
-            Object cleanerObject = cleanerMethodLocal.invoke(tempBuffer);
-            if (cleanerObject instanceof Runnable) {
-                cleanMethodLocal = Runnable.class.getMethod("run");
-            } else {
-                cleanMethodLocal = cleanerObject.getClass().getMethod("clean");
+        Object unsafeLocal = null;
+        Method invokeCleanerMethodLocal = null;
+        if (JreCompat.isJre9Available()) {
+            try {
+                Class<?> clazz = Class.forName("sun.misc.Unsafe");
+                Field theUnsafe = clazz.getDeclaredField("theUnsafe");
+                theUnsafe.setAccessible(true);
+                unsafeLocal = theUnsafe.get(null);
+                invokeCleanerMethodLocal = clazz.getMethod("invokeCleaner", ByteBuffer.class);
+                invokeCleanerMethodLocal.invoke(unsafeLocal, tempBuffer);
+            } catch (IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | NoSuchMethodException | SecurityException
+                    | ClassNotFoundException | NoSuchFieldException e) {
+                log.warn(sm.getString("byteBufferUtils.cleaner"), e);
+                unsafeLocal = null;
+                invokeCleanerMethodLocal = null;
             }
-            cleanMethodLocal.invoke(cleanerObject);
-        } catch (IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            log.warn(sm.getString("byteBufferUtils.cleaner"), e);
-            cleanerMethodLocal = null;
-            cleanMethodLocal = null;
+        } else {
+            try {
+                cleanerMethodLocal = tempBuffer.getClass().getMethod("cleaner");
+                cleanerMethodLocal.setAccessible(true);
+                Object cleanerObject = cleanerMethodLocal.invoke(tempBuffer);
+                cleanMethodLocal = cleanerObject.getClass().getMethod("clean");
+                cleanMethodLocal.invoke(cleanerObject);
+            } catch (NoSuchMethodException | SecurityException | IllegalAccessException |
+                    IllegalArgumentException | InvocationTargetException e) {
+                log.warn(sm.getString("byteBufferUtils.cleaner"), e);
+                cleanerMethodLocal = null;
+                cleanMethodLocal = null;
+            }
         }
         cleanerMethod = cleanerMethodLocal;
         cleanMethod = cleanMethodLocal;
+        unsafe = unsafeLocal;
+        invokeCleanerMethod = invokeCleanerMethodLocal;
     }
 
     private ByteBufferUtils() {
@@ -105,6 +126,14 @@ public class ByteBufferUtils {
             } catch (IllegalAccessException | IllegalArgumentException
                     | InvocationTargetException | SecurityException e) {
                 // Ignore
+            }
+        } else if (invokeCleanerMethod != null) {
+            try {
+                invokeCleanerMethod.invoke(unsafe, buf);
+            } catch (IllegalAccessException | IllegalArgumentException
+                    | InvocationTargetException | SecurityException e) {
+                // Ignore
+                e.printStackTrace();
             }
         }
     }
