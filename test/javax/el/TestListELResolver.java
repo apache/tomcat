@@ -55,7 +55,7 @@ public class TestListELResolver {
 
         List<String> list = new ArrayList<String>();
         list.add("key");
-        Object result = resolver.getValue(context, list, new Integer(0));
+        Object result = resolver.getValue(context, list, Integer.valueOf(0));
 
         Assert.assertEquals("key", result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -84,12 +84,12 @@ public class TestListELResolver {
 
         List<String> list = new ArrayList<String>();
         list.add("key");
-        Object result = resolver.getValue(context, list, new Integer(1));
+        Object result = resolver.getValue(context, list, Integer.valueOf(1));
 
         Assert.assertNull(result);
         Assert.assertTrue(context.isPropertyResolved());
 
-        result = resolver.getValue(context, list, new Integer(-1));
+        result = resolver.getValue(context, list, Integer.valueOf(-1));
 
         Assert.assertNull(result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -123,7 +123,7 @@ public class TestListELResolver {
 
         List<String> list = new ArrayList<String>();
         list.add("key");
-        Class<?> result = resolver.getType(context, list, new Integer(0));
+        Class<?> result = resolver.getType(context, list, Integer.valueOf(0));
 
         Assert.assertEquals(Object.class, result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -139,7 +139,7 @@ public class TestListELResolver {
 
         List<String> list = new ArrayList<String>();
         list.add("key");
-        resolver.getType(context, list, new Integer(1));
+        resolver.getType(context, list, Integer.valueOf(1));
     }
 
     /**
@@ -182,10 +182,10 @@ public class TestListELResolver {
 
         List<String> list = new ArrayList<String>();
         list.add("value");
-        resolver.setValue(context, list, new Integer(0), "value");
+        resolver.setValue(context, list, Integer.valueOf(0), "value");
 
         Assert.assertEquals("value",
-                resolver.getValue(context, list, new Integer(0)));
+                resolver.getValue(context, list, Integer.valueOf(0)));
         Assert.assertTrue(context.isPropertyResolved());
     }
 
@@ -199,7 +199,7 @@ public class TestListELResolver {
 
         List<Object> list = Collections
                 .unmodifiableList(new ArrayList<Object>());
-        resolver.setValue(context, list, new Integer(0), "value");
+        resolver.setValue(context, list, Integer.valueOf(0), "value");
     }
 
     /**
@@ -225,7 +225,7 @@ public class TestListELResolver {
 
         List<String> list = new ArrayList<String>();
         list.add("key");
-        resolver.setValue(context, list, new Integer(1), "value");
+        resolver.setValue(context, list, Integer.valueOf(1), "value");
     }
 
     /**
@@ -270,14 +270,14 @@ public class TestListELResolver {
 
         List<String> list = new ArrayList<String>();
         list.add("key");
-        boolean result = resolver.isReadOnly(context, list, new Integer(0));
+        boolean result = resolver.isReadOnly(context, list, Integer.valueOf(0));
 
         Assert.assertFalse(result);
         Assert.assertTrue(context.isPropertyResolved());
 
         resolver = new ListELResolver(true);
 
-        result = resolver.isReadOnly(context, list, new Integer(0));
+        result = resolver.isReadOnly(context, list, Integer.valueOf(0));
 
         Assert.assertTrue(result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -295,7 +295,7 @@ public class TestListELResolver {
         list.add("key");
         List<String> unmodifiableList = Collections.unmodifiableList(list);
         boolean result = resolver.isReadOnly(context, unmodifiableList,
-                new Integer(0));
+                Integer.valueOf(0));
 
         Assert.assertTrue(result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -311,7 +311,7 @@ public class TestListELResolver {
 
         List<String> list = new ArrayList<String>();
         list.add("key");
-        resolver.isReadOnly(context, list, new Integer(1));
+        resolver.isReadOnly(context, list, Integer.valueOf(1));
     }
 
     /**

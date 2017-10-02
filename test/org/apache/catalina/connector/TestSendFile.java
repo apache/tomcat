@@ -144,8 +144,8 @@ public class TestSendFile extends TomcatBaseTest {
             resp.setContentLength((int) f.length());
             if (Boolean.TRUE.equals(req.getAttribute(Globals.SENDFILE_SUPPORTED_ATTR))) {
                 req.setAttribute(Globals.SENDFILE_FILENAME_ATTR, f.getAbsolutePath());
-                req.setAttribute(Globals.SENDFILE_FILE_START_ATTR, new Long(0));
-                req.setAttribute(Globals.SENDFILE_FILE_END_ATTR, new Long(f.length()));
+                req.setAttribute(Globals.SENDFILE_FILE_START_ATTR, Long.valueOf(0));
+                req.setAttribute(Globals.SENDFILE_FILE_END_ATTR, Long.valueOf(f.length()));
             } else {
                 byte[] c = new byte[8192];
                 BufferedInputStream in = null;
@@ -220,8 +220,8 @@ public class TestSendFile extends TomcatBaseTest {
                 resp.setCharacterEncoding("ISO-8859-1");
                 resp.setContentLength((int) file.length());
                 req.setAttribute(Globals.SENDFILE_FILENAME_ATTR, file.getAbsolutePath());
-                req.setAttribute(Globals.SENDFILE_FILE_START_ATTR, new Long(0));
-                req.setAttribute(Globals.SENDFILE_FILE_END_ATTR, new Long(file.length()));
+                req.setAttribute(Globals.SENDFILE_FILE_START_ATTR, Long.valueOf(0));
+                req.setAttribute(Globals.SENDFILE_FILE_END_ATTR, Long.valueOf(file.length()));
                 file.delete();
             } else {
                 byte[] c = new byte[1024];

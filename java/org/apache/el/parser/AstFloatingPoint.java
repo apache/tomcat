@@ -38,7 +38,7 @@ public final class AstFloatingPoint extends SimpleNode {
     public Number getFloatingPoint() {
         if (this.number == null) {
             try {
-                this.number = new Double(this.image);
+                this.number = Double.valueOf(this.image);
             } catch (ArithmeticException e0) {
                 this.number = new BigDecimal(this.image);
             }

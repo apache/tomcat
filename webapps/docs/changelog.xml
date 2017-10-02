@@ -72,6 +72,10 @@
         such attempted use of the endorsed directory mechanism will trigger an
         error and Tomcat will fail to start. (rjung)
       </fix>
+      <scode>
+        Refactoring in preparation for Java 9. Refactor to avoid using some
+        methods that will be deprecated in Java 9 onwards. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>

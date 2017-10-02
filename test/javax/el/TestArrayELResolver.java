@@ -50,7 +50,7 @@ public class TestArrayELResolver {
         ELContext context = new ELContextImpl();
 
         String[] base = new String[] { "element" };
-        Class<?> result = resolver.getType(context, base, new Integer(0));
+        Class<?> result = resolver.getType(context, base, Integer.valueOf(0));
 
         Assert.assertEquals(base.getClass().getComponentType(), result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -65,7 +65,7 @@ public class TestArrayELResolver {
         ELContext context = new ELContextImpl();
 
         String[] base = new String[] { "element" };
-        resolver.getType(context, base, new Integer(1));
+        resolver.getType(context, base, Integer.valueOf(1));
     }
 
     /**
@@ -110,7 +110,7 @@ public class TestArrayELResolver {
         ELContext context = new ELContextImpl();
 
         String[] base = new String[] { "element" };
-        Object result = resolver.getValue(context, base, new Integer(0));
+        Object result = resolver.getValue(context, base, Integer.valueOf(0));
 
         Assert.assertEquals("element", result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -137,12 +137,12 @@ public class TestArrayELResolver {
         ELContext context = new ELContextImpl();
 
         String[] base = new String[] { "element" };
-        Object result = resolver.getValue(context, base, new Integer(1));
+        Object result = resolver.getValue(context, base, Integer.valueOf(1));
 
         Assert.assertNull(result);
         Assert.assertTrue(context.isPropertyResolved());
 
-        result = resolver.getValue(context, base, new Integer(-1));
+        result = resolver.getValue(context, base, Integer.valueOf(-1));
 
         Assert.assertNull(result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -186,16 +186,16 @@ public class TestArrayELResolver {
         ELContext context = new ELContextImpl();
 
         String[] base = new String[] { "element" };
-        resolver.setValue(context, base, new Integer(0), "new-element");
+        resolver.setValue(context, base, Integer.valueOf(0), "new-element");
 
         Assert.assertEquals("new-element",
-                resolver.getValue(context, base, new Integer(0)));
+                resolver.getValue(context, base, Integer.valueOf(0)));
         Assert.assertTrue(context.isPropertyResolved());
 
-        resolver.setValue(context, base, new Integer(0), null);
+        resolver.setValue(context, base, Integer.valueOf(0), null);
 
         Assert.assertEquals(null,
-                resolver.getValue(context, base, new Integer(0)));
+                resolver.getValue(context, base, Integer.valueOf(0)));
         Assert.assertTrue(context.isPropertyResolved());
     }
 
@@ -220,7 +220,7 @@ public class TestArrayELResolver {
         ELContext context = new ELContextImpl();
 
         String[] base = new String[] { "element" };
-        resolver.setValue(context, base, new Integer(1), "new-element");
+        resolver.setValue(context, base, Integer.valueOf(1), "new-element");
     }
 
     /**
@@ -233,7 +233,7 @@ public class TestArrayELResolver {
         ELContext context = new ELContextImpl();
 
         String[] base = new String[] { "element" };
-        resolver.setValue(context, base, new Integer(0), new Integer(1));
+        resolver.setValue(context, base, Integer.valueOf(0), Integer.valueOf(1));
     }
 
     /**
@@ -246,7 +246,7 @@ public class TestArrayELResolver {
         ELContext context = new ELContextImpl();
 
         int[] base = new int[] { 1, 2, 3 };
-        resolver.setValue(context, base, new Integer(1), Integer.valueOf(4));
+        resolver.setValue(context, base, Integer.valueOf(1), Integer.valueOf(4));
 
         Assert.assertEquals(Integer.valueOf(base[1]), Integer.valueOf(4));
     }
@@ -292,14 +292,14 @@ public class TestArrayELResolver {
         ELContext context = new ELContextImpl();
 
         String[] base = new String[] { "element" };
-        boolean result = resolver.isReadOnly(context, base, new Integer(0));
+        boolean result = resolver.isReadOnly(context, base, Integer.valueOf(0));
 
         Assert.assertFalse(result);
         Assert.assertTrue(context.isPropertyResolved());
 
         resolver = new ArrayELResolver(true);
 
-        result = resolver.isReadOnly(context, base, new Integer(0));
+        result = resolver.isReadOnly(context, base, Integer.valueOf(0));
 
         Assert.assertTrue(result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -314,7 +314,7 @@ public class TestArrayELResolver {
         ELContext context = new ELContextImpl();
 
         String[] base = new String[] { "element" };
-        resolver.isReadOnly(context, base, new Integer(1));
+        resolver.isReadOnly(context, base, Integer.valueOf(1));
     }
 
     /**
