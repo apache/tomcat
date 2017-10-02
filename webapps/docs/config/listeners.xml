@@ -183,17 +183,20 @@
         <code>sun.awt.AppContext.getAppContext()</code> triggered by a web
         application do not result in a memory leak. Note that a call to this
         method will be triggered as part of the web application stop process
-        when running on Java 6 and earlier. It is therefore strongly recommended
-        that this protection is enabled when running on Java 6 and earlier. The
-        default is <code>true</code> for Java 6 and earlier versions. The
-        default is <code>false</code> for Java 7 and later versions.</p>
+        when running on Java 6. It is therefore strongly recommended that this
+        protection is enabled when running on Java 6. The default is
+        <code>true</code> for Java 6. The default is <code>false</code> for Java
+        7. This protection is disabled if running on Java 8 onwards since the
+        leak has been fixed for Java 8 onwards.</p>
       </attribute>
 
       <attribute name="AWTThreadProtection" required="false">
         <p>Enables protection so that calls to
         <code>java.awt.Toolkit.getDefaultToolkit()</code> triggered by a web
         application do not result in a memory leak.
-        Defaults to <code>false</code> because an AWT thread is launched.</p>
+        Defaults to <code>false</code> because an AWT thread is launched. This
+        protection is disabled if running on Java 9 onwards since the leak has
+        been fixed for Java 9 onwards.</p>
       </attribute>
 
       <attribute name="classesToInitialize" required="false">
@@ -233,7 +236,9 @@
         trigger a call to this method. A side effect of enabling this protection
         is the creation of a thread named "GC Daemon". The protection uses
         reflection to access internal Sun classes and may generate errors on
-        startup on non-Sun JVMs. The default is <code>true</code>.</p>
+        startup on non-Sun JVMs. The default is <code>true</code>. This
+        protection is disabled if running on Java 9 onwards since the leak has
+        been fixed for Java 9 onwards.</p>
       </attribute>
 
       <attribute name="java2DDisposerProtection" required="false">
@@ -256,7 +261,8 @@
         class the PoolCleaner thread will be configured with the thread's
         context class loader set to the web application class loader which in
         turn will trigger a memory leak on reload. Defaults to
-        <code>true</code>.</p>
+        <code>true</code>. This protection is disabled if running on Java 9 
+        onwards since the leak has been fixed for Java 9 onwards.</p>
       </attribute>
 
       <attribute name="securityLoginConfigurationProtection" required="false">
@@ -266,7 +272,9 @@
         class will trigger the initializer that will retain a static reference
         to the context class loader. The protection loads the class with the
         system class loader to ensure that the static initializer is not
-        triggered by a web application. Defaults to <code>true</code>.</p>
+        triggered by a web application. Defaults to <code>true</code>. This
+        protection is disabled if running on Java 8 onwards since the leak has
+        been fixed for Java 8 onwards.</p>
       </attribute>
 
       <attribute name="securityPolicyProtection" required="false">
@@ -278,8 +286,8 @@
         of this class to ensure that the static initializer is not triggered by
         a web application. Defaults to <code>true</code>.</p>
         <p>Note: The underlying leak has been fixed in Java 7 update 51 onwards
-        and Java 8 onwards. This option is unnecessary if running on a fixed
-        version of Java.</p>
+        and Java 8 onwards. This protection is therefor disabled if running on
+        Java 8 onwards.</p>
       </attribute>
 
       <attribute name="tokenPollerProtection" required="false">
@@ -291,7 +299,9 @@
         deployment when the MessageDigest for generating session IDs is
         initialized. As a result the thread has the Webapp class loader as its
         thread context class loader. Enabling the protection initializes JCA
-        early during Tomcat startup. Defaults to <code>true</code>.</p>
+        early during Tomcat startup. Defaults to <code>true</code>. This
+        protection is disabled if running on Java 9 onwards since the leak has
+        been fixed for Java 9 onwards.</p>
       </attribute>
 
       <attribute name="urlCacheProtection" required="false">
@@ -307,7 +317,9 @@
         <p>Enables protection so that parsing XML files within a web application
         does not result in a memory leak. Note that memory profilers may not
         display the GC root associated with this leak making it particularly
-        hard to diagnose. Defaults to <code>true</code>.</p>
+        hard to diagnose. Defaults to <code>true</code>. This protection is
+        disabled if running on Java 9 onwards since the leak has been fixed for
+        Java 9 onwards.</p>
       </attribute>
 
     </attributes>
