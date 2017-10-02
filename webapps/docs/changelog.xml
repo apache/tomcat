@@ -45,6 +45,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.24 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        When running under Java 9 or later, and the
+        <code>urlCacheProtection</code> option of the
+        <code>JreMemoryLeakPreventionListener</code> is enabled, use the API
+        added in Java 9 to only disable the caching for JAR URL connections.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <add>
@@ -211,18 +222,6 @@
         <bug>61424</bug>: Avoid a possible <code>StackOverflowError</code> when
         running under a <code>SecurityManager</code> and using
         <code>Subject.doAs()</code>. (markt)
-      </fix>
-      <add>
-        <bug>61489</bug>: When using the CGI servlet, make the generation of
-        command line arguments from the query string (as per section 4.4 of RFC
-        3875) optional. The feature is enabled by default for consistency with
-        previous releases. Based on a patch by jm009. (markt)
-      </add>
-      <fix>
-        <bug>61503</bug>: This corrects a potential regression in the fix for
-        <bug>60940</bug> with an alternative solution that adds the
-        <code>JarEntry</code> objects normally skipped by a
-        <code>JarInputStream</code> only if those entries exist. (markt)
       </fix>
     </changelog>
   </subsection>

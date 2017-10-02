@@ -20,7 +20,6 @@ package org.apache.catalina.core;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.net.URLConnection;
 import java.sql.DriverManager;
 import java.util.StringTokenizer;
@@ -393,19 +392,17 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                  * include:
                  * - log4j versions 1.2.15 and earlier
                  * - javax.xml.bind.JAXBContext.newInstance()
+                 *
+                 * Java 9 onwards disables caching for JAR URLConnections
+                 * Java 8 and earlier disables caching for all URLConnections
                  */
 
                 // Set the default URL caching policy to not to cache
                 if (urlCacheProtection) {
                     try {
-                        // Doesn't matter that this JAR doesn't exist - just as
-                        // long as the URL is well-formed
-                        URL url = new URL("jar:file://dummy.jar!/");
-                        URLConnection uConn = url.openConnection();
-                        uConn.setDefaultUseCaches(false);
+                        JreCompat.getInstance().disableCachingForJarUrlConnections();
                     } catch (IOException e) {
-                        log.error(sm.getString(
-                                "jreLeakListener.jarUrlConnCacheFail"), e);
+                        log.error(sm.getString("jreLeakListener.jarUrlConnCacheFail"), e);
                     }
                 }
 
