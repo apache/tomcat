@@ -354,9 +354,12 @@ public class SecureNio2Channel extends Nio2Channel  {
 
         String hostName = null;
         List<Cipher> clientRequestedCiphers = null;
+        List<String> clientRequestedApplicationProtocols = null;
         switch (extractor.getResult()) {
         case COMPLETE:
             hostName = extractor.getSNIValue();
+            clientRequestedApplicationProtocols =
+                    extractor.getClientRequestedApplicationProtocols();
             //$FALL-THROUGH$ to set the client requested ciphers
         case NOT_PRESENT:
             clientRequestedCiphers = extractor.getClientRequestedCiphers();
@@ -378,7 +381,8 @@ public class SecureNio2Channel extends Nio2Channel  {
             log.debug(sm.getString("channel.nio.ssl.sniHostName", hostName));
         }
 
-        sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers);
+        sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers,
+                clientRequestedApplicationProtocols);
 
         // Ensure the application buffers (which have to be created earlier) are
         // big enough.

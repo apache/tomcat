@@ -146,7 +146,8 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
     }
 
 
-    protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers) {
+    protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers,
+            List<String> clientRequestedApplicationProtocols) {
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
 
         SSLHostConfigCertificate certificate = selectCertificate(sslHostConfig, clientRequestedCiphers);
