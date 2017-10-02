@@ -32,6 +32,24 @@ public abstract class GenericFilter implements Filter, FilterConfig, Serializabl
     }
 
 
+    /**
+     * This method returns the parameter's value if it exists, or defaultValue if not.
+     *
+     * @param name - The parameter's name
+     * @param defaultValue - The default value to return if the parameter does not exist
+     * @return The parameter's value or the default value if the parameter does not exist
+     */
+    public String getInitParameter(String name, String defaultValue){
+
+        String value = getInitParameter(name);
+
+        if (value == null)
+            return defaultValue;
+
+        return value;
+    }
+
+
     @Override
     public Enumeration<String> getInitParameterNames() {
         return getFilterConfig().getInitParameterNames();
@@ -55,6 +73,15 @@ public abstract class GenericFilter implements Filter, FilterConfig, Serializabl
     }
 
 
+    /**
+     * This method stores filterConfig in a private variable and then calls init() which can be
+     * overridden in sub-classes to provide ad-hoc implementation.
+     *
+     * @param filterConfig The configuration information associated with the
+     *                     filter instance being initialised
+     *
+     * @throws ServletException
+     */
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         this.filterConfig  = filterConfig;
@@ -65,6 +92,8 @@ public abstract class GenericFilter implements Filter, FilterConfig, Serializabl
     /**
      * Convenience method for sub-classes to save them having to call
      * <code>super.init(config)</code>. This is a NO-OP by default.
+     *
+     * This method is called by init(config) after the config is set to this.filterConfig.
      *
      * @throws ServletException If an exception occurs that interrupts the
      *         Filter's normal operation
