@@ -27,7 +27,8 @@ import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * This class extracts the SNI host name from a TLS client-hello message.
+ * This class extracts the SNI host name and ALPN protocols from a TLS
+ * client-hello message.
  */
 public class TLSClientHelloExtractor {
 
@@ -37,9 +38,12 @@ public class TLSClientHelloExtractor {
     private final ExtractorResult result;
     private final List<Cipher> clientRequestedCiphers;
     private final String sniValue;
+    private final List<String> clientRequestedApplicationProtocols;
 
     private static final int TLS_RECORD_HEADER_LEN = 5;
 
+    private static final int TLS_EXTENSION_SERVER_NAME = 0;
+    private static final int TLS_EXTENSION_ALPN = 16;
 
     /**
      * Creates the instance of the parser and processes the provided buffer. The
@@ -59,6 +63,7 @@ public class TLSClientHelloExtractor {
         int limit = netInBuffer.limit();
         ExtractorResult result = ExtractorResult.NOT_PRESENT;
         List<Cipher> clientRequestedCiphers = new ArrayList<>();
+        List<String> clientRequestedApplicationProtocols = new ArrayList<>();
         String sniValue = null;
         try {
             // Switch to read mode.
@@ -116,16 +121,32 @@ public class TLSClientHelloExtractor {
 
             // Extension length
             skipBytes(netInBuffer, 2);
-            // Read the extensions until we run out of data or find the SNI
-            while (netInBuffer.hasRemaining() && sniValue == null) {
-                sniValue = readSniExtension(netInBuffer);
+            // Read the extensions until we run out of data or find the data
+            // we need
+            while (netInBuffer.hasRemaining() &&
+                    (sniValue == null || clientRequestedApplicationProtocols.size() == 0)) {
+                // Extension type is two byte
+                char extensionType = netInBuffer.getChar();
+                // Extension size is another two bytes
+                char extensionDataSize = netInBuffer.getChar();
+                switch (extensionType) {
+                case TLS_EXTENSION_SERVER_NAME: {
+                    sniValue = readSniExtension(netInBuffer);
+                    break;
+                }
+                case TLS_EXTENSION_ALPN:
+                    readAlpnExtension(netInBuffer, clientRequestedApplicationProtocols);
+                    break;
+                default: {
+                    skipBytes(netInBuffer, extensionDataSize);
+                }
+                }
             }
-            if (sniValue != null) {
-                result = ExtractorResult.COMPLETE;
-            }
+            result = ExtractorResult.COMPLETE;
         } finally {
             this.result = result;
             this.clientRequestedCiphers = clientRequestedCiphers;
+            this.clientRequestedApplicationProtocols = clientRequestedApplicationProtocols;
             this.sniValue = sniValue;
             // Whatever happens, return the buffer to its original state
             netInBuffer.limit(limit);
@@ -156,6 +177,14 @@ public class TLSClientHelloExtractor {
         }
     }
 
+
+    public List<String> getClientRequestedApplicationProtocols() {
+        if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
+            return clientRequestedApplicationProtocols;
+        } else {
+            throw new IllegalStateException();
+        }
+    }
 
     private static ExtractorResult handleIncompleteRead(ByteBuffer bb) {
         if (bb.limit() == bb.capacity()) {
@@ -223,23 +252,30 @@ public class TLSClientHelloExtractor {
 
 
     private static String readSniExtension(ByteBuffer bb) {
-        // SNI extension is type 0
-        char extensionType = bb.getChar();
-        // Next byte is data size
-        char extensionDataSize = bb.getChar();
-        if (extensionType == 0) {
-            // First 2 bytes are size of server name list (only expecting one)
-            // Next byte is type (0 for hostname)
-            skipBytes(bb, 3);
-            // Next 2 bytes are length of host name
-            char serverNameSize = bb.getChar();
-            byte[] serverNameBytes = new byte[serverNameSize];
-            bb.get(serverNameBytes);
-            return new String(serverNameBytes, StandardCharsets.UTF_8);
-        } else {
-            skipBytes(bb, extensionDataSize);
+        // First 2 bytes are size of server name list (only expecting one)
+        // Next byte is type (0 for hostname)
+        skipBytes(bb, 3);
+        // Next 2 bytes are length of host name
+        char serverNameSize = bb.getChar();
+        byte[] serverNameBytes = new byte[serverNameSize];
+        bb.get(serverNameBytes);
+        return new String(serverNameBytes, StandardCharsets.UTF_8);
+    }
+
+
+    private static void readAlpnExtension(ByteBuffer bb, List<String> protocolNames) {
+        // First 2 bytes are size of the protocol list
+        char toRead = bb.getChar();
+        byte[] inputBuffer = new byte[255];
+        while (toRead > 0) {
+            // Each list entry has one byte for length followed by a string of
+            // that length
+            int len = bb.get() & 0xFF;
+            bb.get(inputBuffer, 0, len);
+            protocolNames.add(new String(inputBuffer, 0, len, StandardCharsets.UTF_8));
+            toRead--;
+            toRead -= len;
         }
-        return null;
     }
 
 
