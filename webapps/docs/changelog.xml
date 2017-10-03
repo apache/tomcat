@@ -45,6 +45,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.2 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>61583</bug>: Correct a further regression in the fix to enable the
+        use of Java key stores that contained multiple keys that did not all
+        have the same password. This fixes PKCS11 key store handling with
+        multiple keys selected with an alias. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
