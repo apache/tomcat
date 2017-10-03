@@ -32,10 +32,7 @@ import javax.net.ssl.X509KeyManager;
  * authenticate itself to SSL clients.
  *
  * @author Jan Luehe
- *
- * @deprecated Unused. This class will be removed in Tomcat 9.
  */
-@Deprecated
 public final class JSSEKeyManager extends X509ExtendedKeyManager {
 
     private X509KeyManager delegate;

@@ -53,6 +53,7 @@ import javax.net.ssl.ManagerFactoryParameters;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509KeyManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -258,7 +259,23 @@ public class JSSEUtil extends SSLUtilBase {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
         kmf.init(ksUsed, keyPassArray);
 
-        return kmf.getKeyManagers();
+        KeyManager[] kms = kmf.getKeyManagers();
+
+        // Only need to filter keys by alias if there are key managers to filter
+        // and the original key store was used. The in memory key stores only
+        // have a single key so don't need filtering
+        if (kms != null && ksUsed == ks) {
+            String alias = keyAlias;
+            // JKS keystores always convert the alias name to lower case
+            if ("JKS".equals(certificate.getCertificateKeystoreType())) {
+                alias = alias.toLowerCase(Locale.ENGLISH);
+            }
+            for(int i = 0; i < kms.length; i++) {
+                kms[i] = new JSSEKeyManager((X509KeyManager)kms[i], alias);
+            }
+        }
+
+        return kms;
     }
 
 
