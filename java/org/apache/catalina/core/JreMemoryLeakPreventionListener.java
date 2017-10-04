@@ -20,7 +20,6 @@ package org.apache.catalina.core;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URLConnection;
 import java.sql.DriverManager;
 import java.util.StringTokenizer;
 
