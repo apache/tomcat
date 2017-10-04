@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,17 +28,14 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Base class for filters that provides generic initialisation and a simple
- * no-op destruction. 
- * 
- * @author xxd
- *
+ * no-op destruction.
  */
 public abstract class FilterBase implements Filter {
-    
+
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     protected abstract Log getLogger();
-    
+
 
     /**
      * Iterates over the configuration parameters and either logs a warning,
@@ -66,7 +63,7 @@ public abstract class FilterBase implements Filter {
                     getLogger().warn(msg);
                 }
             }
-        }    
+        }
     }
 
     @Override
