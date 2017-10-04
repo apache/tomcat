@@ -178,24 +178,38 @@ public class CorsFilter extends GenericFilter {
 
     @Override
     public void init() throws ServletException {
-        // Initialize defaults
-        parseAndStore(DEFAULT_ALLOWED_ORIGINS, DEFAULT_ALLOWED_HTTP_METHODS,
-                DEFAULT_ALLOWED_HTTP_HEADERS, DEFAULT_EXPOSED_HEADERS,
-                DEFAULT_SUPPORTS_CREDENTIALS, DEFAULT_PREFLIGHT_MAXAGE,
-                DEFAULT_DECORATE_REQUEST);
+        parseAndStore(
+                getInitParameter(PARAM_CORS_ALLOWED_ORIGINS,     DEFAULT_ALLOWED_ORIGINS),
+                getInitParameter(PARAM_CORS_ALLOWED_METHODS,     DEFAULT_ALLOWED_HTTP_METHODS),
+                getInitParameter(PARAM_CORS_ALLOWED_HEADERS,     DEFAULT_ALLOWED_HTTP_HEADERS),
+                getInitParameter(PARAM_CORS_EXPOSED_HEADERS,     DEFAULT_EXPOSED_HEADERS),
+                getInitParameter(PARAM_CORS_SUPPORT_CREDENTIALS, DEFAULT_SUPPORTS_CREDENTIALS),
+                getInitParameter(PARAM_CORS_PREFLIGHT_MAXAGE,    DEFAULT_PREFLIGHT_MAXAGE),
+                getInitParameter(PARAM_CORS_REQUEST_DECORATE,    DEFAULT_DECORATE_REQUEST)
+        );
+    }
 
-        String configAllowedOrigins = getInitParameter(PARAM_CORS_ALLOWED_ORIGINS);
-        String configAllowedHttpMethods = getInitParameter(PARAM_CORS_ALLOWED_METHODS);
-        String configAllowedHttpHeaders = getInitParameter(PARAM_CORS_ALLOWED_HEADERS);
-        String configExposedHeaders = getInitParameter(PARAM_CORS_EXPOSED_HEADERS);
-        String configSupportsCredentials = getInitParameter(PARAM_CORS_SUPPORT_CREDENTIALS);
-        String configPreflightMaxAge = getInitParameter(PARAM_CORS_PREFLIGHT_MAXAGE);
-        String configDecorateRequest = getInitParameter(PARAM_CORS_REQUEST_DECORATE);
 
-        parseAndStore(configAllowedOrigins, configAllowedHttpMethods,
-                configAllowedHttpHeaders, configExposedHeaders,
-                configSupportsCredentials, configPreflightMaxAge,
-                configDecorateRequest);
+    /**
+     * This method returns the parameter's value if it exists, or defaultValue
+     * if not.
+     *
+     * @param name          The parameter's name
+     *
+     * @param defaultValue  The default value to return if the parameter does
+     *                      not exist
+     *
+     * @return The parameter's value or the default value if the parameter does
+     *         not exist
+     */
+    private String getInitParameter(String name, String defaultValue){
+
+        String value = getInitParameter(name);
+        if (value != null) {
+            return value;
+        }
+
+        return defaultValue;
     }
 
 
@@ -718,66 +732,49 @@ public class CorsFilter extends GenericFilter {
             final String exposedHeaders, final String supportsCredentials,
             final String preflightMaxAge, final String decorateRequest)
                     throws ServletException {
-        if (allowedOrigins != null) {
-            if (allowedOrigins.trim().equals("*")) {
-                this.anyOriginAllowed = true;
+
+        if (allowedOrigins.trim().equals("*")) {
+            this.anyOriginAllowed = true;
+        } else {
+            this.anyOriginAllowed = false;
+            Set<String> setAllowedOrigins = parseStringToSet(allowedOrigins);
+            this.allowedOrigins.clear();
+            this.allowedOrigins.addAll(setAllowedOrigins);
+        }
+
+        Set<String> setAllowedHttpMethods = parseStringToSet(allowedHttpMethods);
+        this.allowedHttpMethods.clear();
+        this.allowedHttpMethods.addAll(setAllowedHttpMethods);
+
+        Set<String> setAllowedHttpHeaders = parseStringToSet(allowedHttpHeaders);
+        Set<String> lowerCaseHeaders = new HashSet<>();
+        for (String header : setAllowedHttpHeaders) {
+            String lowerCase = header.toLowerCase(Locale.ENGLISH);
+            lowerCaseHeaders.add(lowerCase);
+        }
+        this.allowedHttpHeaders.clear();
+        this.allowedHttpHeaders.addAll(lowerCaseHeaders);
+
+        Set<String> setExposedHeaders = parseStringToSet(exposedHeaders);
+        this.exposedHeaders.clear();
+        this.exposedHeaders.addAll(setExposedHeaders);
+
+        // For any value other then 'true' this will be false.
+        this.supportsCredentials = Boolean.parseBoolean(supportsCredentials);
+
+        try {
+            if (!preflightMaxAge.isEmpty()) {
+                this.preflightMaxAge = Long.parseLong(preflightMaxAge);
             } else {
-                this.anyOriginAllowed = false;
-                Set<String> setAllowedOrigins =
-                        parseStringToSet(allowedOrigins);
-                this.allowedOrigins.clear();
-                this.allowedOrigins.addAll(setAllowedOrigins);
+                this.preflightMaxAge = 0L;
             }
+        } catch (NumberFormatException e) {
+            throw new ServletException(
+                    sm.getString("corsFilter.invalidPreflightMaxAge"), e);
         }
 
-        if (allowedHttpMethods != null) {
-            Set<String> setAllowedHttpMethods =
-                    parseStringToSet(allowedHttpMethods);
-            this.allowedHttpMethods.clear();
-            this.allowedHttpMethods.addAll(setAllowedHttpMethods);
-        }
-
-        if (allowedHttpHeaders != null) {
-            Set<String> setAllowedHttpHeaders =
-                    parseStringToSet(allowedHttpHeaders);
-            Set<String> lowerCaseHeaders = new HashSet<>();
-            for (String header : setAllowedHttpHeaders) {
-                String lowerCase = header.toLowerCase(Locale.ENGLISH);
-                lowerCaseHeaders.add(lowerCase);
-            }
-            this.allowedHttpHeaders.clear();
-            this.allowedHttpHeaders.addAll(lowerCaseHeaders);
-        }
-
-        if (exposedHeaders != null) {
-            Set<String> setExposedHeaders = parseStringToSet(exposedHeaders);
-            this.exposedHeaders.clear();
-            this.exposedHeaders.addAll(setExposedHeaders);
-        }
-
-        if (supportsCredentials != null) {
-            // For any value other then 'true' this will be false.
-            this.supportsCredentials = Boolean
-                    .parseBoolean(supportsCredentials);
-        }
-
-        if (preflightMaxAge != null) {
-            try {
-                if (!preflightMaxAge.isEmpty()) {
-                    this.preflightMaxAge = Long.parseLong(preflightMaxAge);
-                } else {
-                    this.preflightMaxAge = 0L;
-                }
-            } catch (NumberFormatException e) {
-                throw new ServletException(
-                        sm.getString("corsFilter.invalidPreflightMaxAge"), e);
-            }
-        }
-
-        if (decorateRequest != null) {
-            // For any value other then 'true' this will be false.
-            this.decorateRequest = Boolean.parseBoolean(decorateRequest);
-        }
+        // For any value other then 'true' this will be false.
+        this.decorateRequest = Boolean.parseBoolean(decorateRequest);
     }
 
     /**
