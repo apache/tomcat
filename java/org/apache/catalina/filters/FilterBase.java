@@ -18,29 +18,38 @@ package org.apache.catalina.filters;
 
 import java.util.Enumeration;
 
-import javax.servlet.Filter;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 
-import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Base class for filters that provides generic initialisation and a simple
- * no-op destruction.
+ * Base class for filters that provides generic initialisation via setter methods that
+ * match config init parameters, and a simple no-op destruction.
  *
  * @author xxd
  *
  */
-public abstract class FilterBase implements Filter {
+public abstract class FilterBase extends FilterBaseNoop {
 
     protected static final StringManager sm = StringManager.getManager(FilterBase.class);
 
-    protected abstract Log getLogger();
-
+    /**
+     * Iterates over the configuration parameters and either logs a warning,
+     * or throws an exception (if isConfigProblemFatal() returns true), for any parameter
+     * that does not have a matching setter in this filter.
+     *
+     * @param filterConfig The configuration information associated with the
+     *                     filter instance being initialised
+     *
+     * @throws ServletException
+     */
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+
+        super.init(filterConfig);
+
         Enumeration<String> paramNames = filterConfig.getInitParameterNames();
         while (paramNames.hasMoreElements()) {
             String paramName = paramNames.nextElement();
@@ -51,7 +60,7 @@ public abstract class FilterBase implements Filter {
                 if (isConfigProblemFatal()) {
                     throw new ServletException(msg);
                 } else {
-                    getLogger().warn(msg);
+                    warn(msg);
                 }
             }
         }
@@ -68,4 +77,5 @@ public abstract class FilterBase implements Filter {
     protected boolean isConfigProblemFatal() {
         return false;
     }
+
 }
