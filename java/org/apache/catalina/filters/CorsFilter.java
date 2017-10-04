@@ -194,6 +194,8 @@ public class CorsFilter extends GenericFilter {
      * This method returns the parameter's value if it exists, or defaultValue
      * if not.
      *
+     * @param filterConfig  The configuration for the filter
+     *
      * @param name          The parameter's name
      *
      * @param defaultValue  The default value to return if the parameter does
