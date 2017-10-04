@@ -39,6 +39,18 @@ public abstract class FilterBase implements Filter {
 
     protected abstract Log getLogger();
 
+
+    /**
+     * Iterates over the configuration parameters and either logs a warning,
+     * or throws an exception (if {@link #isConfigProblemFatal()} returns
+     * {@code true}), for any parameter that does not have a matching setter
+     * in this filter.
+     *
+     * @param filterConfig The configuration information associated with the
+     *                     filter instance being initialised
+     *
+     * @throws ServletException
+     */
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         Enumeration<String> paramNames = filterConfig.getInitParameterNames();
