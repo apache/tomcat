@@ -39,14 +39,15 @@ public abstract class FilterBase implements Filter {
 
     /**
      * Iterates over the configuration parameters and either logs a warning,
-     * or throws an exception (if {@link #isConfigProblemFatal()} returns
-     * {@code true}), for any parameter that does not have a matching setter
-     * in this filter.
+     * or throws an exception for any parameter that does not have a matching
+     * setter in this filter.
      *
      * @param filterConfig The configuration information associated with the
      *                     filter instance being initialised
      *
-     * @throws ServletException
+     * @throws ServletException if {@link #isConfigProblemFatal()} returns
+     *                          {@code true} and a configured parameter does not
+     *                          have a matching setter
      */
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
