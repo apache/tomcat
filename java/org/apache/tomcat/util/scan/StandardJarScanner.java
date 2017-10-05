@@ -329,7 +329,7 @@ public class StandardJarScanner implements JarScanner {
 
         String[] classPathEntries = classPath.split(File.pathSeparator);
         for (String classPathEntry : classPathEntries) {
-            File f = new File(classPath);
+            File f = new File(classPathEntry);
             try {
                 classPathUrlsToProcess.add(f.toURI().toURL());
             } catch (MalformedURLException e) {
