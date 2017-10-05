@@ -69,7 +69,7 @@ public abstract class FactoryBase implements ObjectFactory {
                     throw ex;
                 }
                 try {
-                    factory = (ObjectFactory) factoryClass.newInstance();
+                    factory = (ObjectFactory) factoryClass.getDeclaredConstructor().newInstance();
                 } catch(Throwable t) {
                     if (t instanceof NamingException) {
                         throw (NamingException) t;
