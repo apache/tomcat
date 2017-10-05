@@ -598,7 +598,7 @@ public class Tomcat {
         LifecycleListener listener = null;
         try {
             Class<?> clazz = Class.forName(getHost().getConfigClass());
-            listener = (LifecycleListener) clazz.getDeclaredConstructor().newInstance();
+            listener = (LifecycleListener) clazz.getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
             // Wrap in IAE since we can't easily change the method signature to
             // to throw the specific checked exceptions
@@ -1030,7 +1030,7 @@ public class Tomcat {
             if (singleThreadModel) {
                 Servlet instance;
                 try {
-                    instance = existing.getClass().getDeclaredConstructor().newInstance();
+                    instance = existing.getClass().getConstructor().newInstance();
                 } catch (ReflectiveOperationException e) {
                     throw new ServletException(e);
                 }

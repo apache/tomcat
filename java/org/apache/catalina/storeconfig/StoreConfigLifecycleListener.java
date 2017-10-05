@@ -84,7 +84,7 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
         try {
             Class<?> clazz = Class.forName(getStoreConfigClass(), true, this
                     .getClass().getClassLoader());
-            storeConfig = (IStoreConfig) clazz.getDeclaredConstructor().newInstance();
+            storeConfig = (IStoreConfig) clazz.getConstructor().newInstance();
             if (null == getStoreRegistry())
                 // default Loading
                 loader.load();

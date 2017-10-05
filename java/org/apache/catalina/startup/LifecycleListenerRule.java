@@ -124,8 +124,7 @@ public class LifecycleListenerRule extends Rule {
 
         // Instantiate a new LifecycleListener implementation object
         Class<?> clazz = Class.forName(className);
-        LifecycleListener listener =
-            (LifecycleListener) clazz.getDeclaredConstructor().newInstance();
+        LifecycleListener listener = (LifecycleListener) clazz.getConstructor().newInstance();
 
         // Add this LifecycleListener to our associated component
         c.addLifecycleListener(listener);

@@ -186,7 +186,7 @@ public class WebappServiceLoader<T> {
         for (String serviceClass : servicesFound) {
             try {
                 Class<?> clazz = Class.forName(serviceClass, true, loader);
-                services.add(serviceType.cast(clazz.getDeclaredConstructor().newInstance()));
+                services.add(serviceType.cast(clazz.getConstructor().newInstance()));
             } catch (ReflectiveOperationException | ClassCastException e) {
                 throw new IOException(e);
             }

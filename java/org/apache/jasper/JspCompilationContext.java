@@ -242,7 +242,7 @@ public class JspCompilationContext {
     protected Compiler createCompiler(String className) {
         Compiler compiler = null;
         try {
-            compiler = (Compiler) Class.forName(className).getDeclaredConstructor().newInstance();
+            compiler = (Compiler) Class.forName(className).getConstructor().newInstance();
         } catch (NoClassDefFoundError | ClassNotFoundException e) {
             if (log.isDebugEnabled()) {
                 log.debug(Localizer.getMessage("jsp.error.compiler"), e);

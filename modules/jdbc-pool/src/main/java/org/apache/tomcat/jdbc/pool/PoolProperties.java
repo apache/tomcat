@@ -773,7 +773,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 PoolProperties.class.getClassLoader(),
                 Thread.currentThread().getContextClassLoader()
             );
-            validator = validatorClass.getDeclaredConstructor().newInstance();
+            validator = validatorClass.getConstructor().newInstance();
         } catch (ClassNotFoundException e) {
             log.warn("The class "+className+" cannot be found.", e);
         } catch (ClassCastException e) {

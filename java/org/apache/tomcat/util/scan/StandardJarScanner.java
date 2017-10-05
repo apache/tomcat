@@ -42,6 +42,7 @@ import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.UriUtil;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -225,78 +226,91 @@ public class StandardJarScanner implements JarScanner {
 
         // Scan the classpath
         if (isScanClassPath()) {
-            if (log.isTraceEnabled()) {
-                log.trace(sm.getString("jarScan.classloaderStart"));
-            }
+            doScanClassPath(scanType, context, callback, processedURLs);
+        }
+    }
 
-            ClassLoader stopLoader = null;
-            if (!isScanBootstrapClassPath()) {
-                // Stop when we reach the bootstrap class loader
-                stopLoader = ClassLoader.getSystemClassLoader().getParent();
-            }
 
-            ClassLoader classLoader = context.getClassLoader();
+    protected void doScanClassPath(JarScanType scanType, ServletContext context,
+            JarScannerCallback callback, Set<URL> processedURLs) {
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("jarScan.classloaderStart"));
+        }
 
-            // JARs are treated as application provided until the common class
-            // loader is reached.
-            boolean isWebapp = true;
+        ClassLoader stopLoader = null;
+        if (!isScanBootstrapClassPath()) {
+            // Stop when we reach the bootstrap class loader
+            stopLoader = ClassLoader.getSystemClassLoader().getParent();
+        }
 
-            while (classLoader != null && classLoader != stopLoader) {
-                if (classLoader instanceof URLClassLoader) {
-                    if (isWebapp) {
-                        isWebapp = isWebappClassLoader(classLoader);
+        ClassLoader classLoader = context.getClassLoader();
+
+        // JARs are treated as application provided until the common class
+        // loader is reached.
+        boolean isWebapp = true;
+
+        while (classLoader != null && classLoader != stopLoader) {
+            if (classLoader instanceof URLClassLoader) {
+                if (isWebapp) {
+                    isWebapp = isWebappClassLoader(classLoader);
+                }
+
+                // Use a Deque so URLs can be removed as they are processed
+                // and new URLs can be added as they are discovered during
+                // processing.
+                Deque<URL> classPathUrlsToProcess = new LinkedList<>();
+                classPathUrlsToProcess.addAll(
+                        Arrays.asList(((URLClassLoader) classLoader).getURLs()));
+
+                while (!classPathUrlsToProcess.isEmpty()) {
+                    URL url = classPathUrlsToProcess.pop();
+
+                    if (processedURLs.contains(url)) {
+                        // Skip this URL it has already been processed
+                        continue;
                     }
 
-                    // Use a Deque so URLs can be removed as they are processed
-                    // and new URLs can be added as they are discovered during
-                    // processing.
-                    Deque<URL> classPathUrlsToProcess = new LinkedList<>();
-                    classPathUrlsToProcess.addAll(
-                            Arrays.asList(((URLClassLoader) classLoader).getURLs()));
+                    // TODO: Java 9 support. Details are TBD. It will depend
+                    //       on the extent to which Java 8 supports the
+                    //       Java 9 file formats since this code MUST run on
+                    //       Java 8.
+                    ClassPathEntry cpe = new ClassPathEntry(url);
 
-                    while (!classPathUrlsToProcess.isEmpty()) {
-                        URL url = classPathUrlsToProcess.pop();
-
-                        if (processedURLs.contains(url)) {
-                            // Skip this URL it has already been processed
-                            continue;
+                    // JARs are scanned unless the filter says not to.
+                    // Directories are scanned for pluggability scans or
+                    // if scanAllDirectories is enabled unless the
+                    // filter says not to.
+                    if ((cpe.isJar() ||
+                            scanType == JarScanType.PLUGGABILITY ||
+                            isScanAllDirectories()) &&
+                                    getJarScanFilter().check(scanType,
+                                            cpe.getName())) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("jarScan.classloaderJarScan", url));
                         }
-
-                        // TODO: Java 9 support. Details are TBD. It will depend
-                        //       on the extent to which Java 8 supports the
-                        //       Java 9 file formats since this code MUST run on
-                        //       Java 8.
-                        ClassPathEntry cpe = new ClassPathEntry(url);
-
-                        // JARs are scanned unless the filter says not to.
-                        // Directories are scanned for pluggability scans or
-                        // if scanAllDirectories is enabled unless the
-                        // filter says not to.
-                        if ((cpe.isJar() ||
-                                scanType == JarScanType.PLUGGABILITY ||
-                                isScanAllDirectories()) &&
-                                        getJarScanFilter().check(scanType,
-                                                cpe.getName())) {
-                            if (log.isDebugEnabled()) {
-                                log.debug(sm.getString("jarScan.classloaderJarScan", url));
-                            }
-                            try {
-                                processedURLs.add(url);
-                                process(scanType, callback, url, null, isWebapp, classPathUrlsToProcess);
-                            } catch (IOException ioe) {
-                                log.warn(sm.getString("jarScan.classloaderFail", url), ioe);
-                            }
-                        } else {
-                            // JAR / directory has been skipped
-                            if (log.isTraceEnabled()) {
-                                log.trace(sm.getString("jarScan.classloaderJarNoScan", url));
-                            }
+                        try {
+                            processedURLs.add(url);
+                            process(scanType, callback, url, null, isWebapp, classPathUrlsToProcess);
+                        } catch (IOException ioe) {
+                            log.warn(sm.getString("jarScan.classloaderFail", url), ioe);
+                        }
+                    } else {
+                        // JAR / directory has been skipped
+                        if (log.isTraceEnabled()) {
+                            log.trace(sm.getString("jarScan.classloaderJarNoScan", url));
                         }
                     }
                 }
-                classLoader = classLoader.getParent();
             }
+            classLoader = classLoader.getParent();
         }
+
+        if (JreCompat.isJre9Available()) {
+            // The application and platform class loaders are not instances of
+            // URLClassLoader
+
+        }
+
     }
 
 

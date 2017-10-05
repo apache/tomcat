@@ -273,7 +273,7 @@ public class PooledConnection {
                             poolProperties.getDriverClassName(),
                             PooledConnection.class.getClassLoader(),
                             Thread.currentThread().getContextClassLoader()
-                        ).getDeclaredConstructor().newInstance();
+                        ).getConstructor().newInstance();
                 }
             }
         } catch (java.lang.Exception cn) {

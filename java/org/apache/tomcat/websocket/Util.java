@@ -342,7 +342,7 @@ public class Util {
                 @SuppressWarnings("unused")
                 Decoder instance;
                 try {
-                    instance = decoderClazz.getDeclaredConstructor().newInstance();
+                    instance = decoderClazz.getConstructor().newInstance();
                 } catch (ReflectiveOperationException e) {
                     throw new DeploymentException(
                             sm.getString("pojoMethodMapping.invalidDecoder",

@@ -153,7 +153,7 @@ public abstract class ClusterManagerBase extends ManagerBase implements ClusterM
         copy.setSecureRandomAlgorithm(getSecureRandomAlgorithm());
         if (getSessionIdGenerator() != null) {
             try {
-                SessionIdGenerator copyIdGenerator = sessionIdGeneratorClass.getDeclaredConstructor().newInstance();
+                SessionIdGenerator copyIdGenerator = sessionIdGeneratorClass.getConstructor().newInstance();
                 copyIdGenerator.setSessionIdLength(getSessionIdGenerator().getSessionIdLength());
                 copyIdGenerator.setJvmRoute(getSessionIdGenerator().getJvmRoute());
                 copy.setSessionIdGenerator(copyIdGenerator);

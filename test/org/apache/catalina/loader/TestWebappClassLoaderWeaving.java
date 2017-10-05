@@ -307,7 +307,7 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
 
         Method m = c.getMethod("doMethod");
 
-        Object o = c.getDeclaredConstructor().newInstance();
+        Object o = c.getConstructor().newInstance();
         return (String) m.invoke(o);
 
     }

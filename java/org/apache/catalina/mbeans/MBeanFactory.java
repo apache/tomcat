@@ -631,7 +631,7 @@ public class MBeanFactory {
             throw new IllegalArgumentException();
         }
 
-        Valve valve = (Valve) Class.forName(className).getDeclaredConstructor().newInstance();
+        Valve valve = (Valve) Class.forName(className).getConstructor().newInstance();
 
         container.getPipeline().addValve(valve);
 

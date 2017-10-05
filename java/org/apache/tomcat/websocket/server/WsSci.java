@@ -72,7 +72,7 @@ public class WsSci implements ServletContainerInitializer {
                 }
                 if (ServerApplicationConfig.class.isAssignableFrom(clazz)) {
                     serverApplicationConfigs.add(
-                            (ServerApplicationConfig) clazz.getDeclaredConstructor().newInstance());
+                            (ServerApplicationConfig) clazz.getConstructor().newInstance());
                 }
                 if (Endpoint.class.isAssignableFrom(clazz)) {
                     @SuppressWarnings("unchecked")

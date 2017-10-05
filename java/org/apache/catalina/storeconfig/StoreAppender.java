@@ -321,7 +321,7 @@ public class StoreAppender {
      * @throws ReflectiveOperationException Error creating a new instance
      */
     public Object defaultInstance(Object bean) throws ReflectiveOperationException {
-        return bean.getClass().getDeclaredConstructor().newInstance();
+        return bean.getClass().getConstructor().newInstance();
     }
 
     /**

@@ -920,7 +920,7 @@ public class JDBCStore extends StoreBase {
         if (driver == null) {
             try {
                 Class<?> clazz = Class.forName(driverName);
-                driver = (Driver) clazz.getDeclaredConstructor().newInstance();
+                driver = (Driver) clazz.getConstructor().newInstance();
             } catch (ReflectiveOperationException e) {
                 manager.getContext().getLogger().error(
                         sm.getString(getStoreName() + ".checkConnectionClassNotFoundException",

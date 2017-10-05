@@ -302,7 +302,7 @@ public class ConnectionPool {
             for (int i=proxies.length-1; i>=0; i--) {
                 try {
                     //create a new instance
-                    JdbcInterceptor interceptor = proxies[i].getInterceptorClass().getDeclaredConstructor().newInstance();
+                    JdbcInterceptor interceptor = proxies[i].getInterceptorClass().getConstructor().newInstance();
                     //configure properties
                     interceptor.setProperties(proxies[i].getProperties());
                     //setup the chain
@@ -415,7 +415,7 @@ public class ConnectionPool {
         PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
         for (int i=0; i<proxies.length; i++) {
             try {
-                JdbcInterceptor interceptor = proxies[i].getInterceptorClass().getDeclaredConstructor().newInstance();
+                JdbcInterceptor interceptor = proxies[i].getInterceptorClass().getConstructor().newInstance();
                 interceptor.setProperties(proxies[i].getProperties());
                 interceptor.poolClosed(this);
             }catch (Exception x) {
@@ -462,7 +462,7 @@ public class ConnectionPool {
                 if (log.isDebugEnabled()) {
                     log.debug("Creating interceptor instance of class:"+proxies[i].getInterceptorClass());
                 }
-                JdbcInterceptor interceptor = proxies[i].getInterceptorClass().getDeclaredConstructor().newInstance();
+                JdbcInterceptor interceptor = proxies[i].getInterceptorClass().getConstructor().newInstance();
                 interceptor.setProperties(proxies[i].getProperties());
                 interceptor.poolStarted(this);
             }catch (Exception x) {

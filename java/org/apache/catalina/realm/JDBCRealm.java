@@ -639,7 +639,7 @@ public class JDBCRealm
         if (driver == null) {
             try {
                 Class<?> clazz = Class.forName(driverName);
-                driver = (Driver) clazz.getDeclaredConstructor().newInstance();
+                driver = (Driver) clazz.getConstructor().newInstance();
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 throw new SQLException(e.getMessage(), e);

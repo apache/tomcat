@@ -118,6 +118,6 @@ public class StoreFactoryRule extends Rule {
                 className = value;
         }
         Class<?> clazz = Class.forName(className);
-        return clazz.getDeclaredConstructor().newInstance();
+        return clazz.getConstructor().newInstance();
     }
 }

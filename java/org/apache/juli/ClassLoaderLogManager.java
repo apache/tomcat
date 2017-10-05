@@ -579,7 +579,7 @@ public class ClassLoaderLogManager extends LogManager {
                 try {
                     this.prefix.set(prefix);
                     Handler handler = (Handler) classLoader.loadClass(
-                            handlerClassName).getDeclaredConstructor().newInstance();
+                            handlerClassName).getConstructor().newInstance();
                     // The specification strongly implies all configuration should be done
                     // during the creation of the handler object.
                     // This includes setting level, filter, formatter and encoding.

@@ -1402,7 +1402,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         if (handlerClassName == null) {
             for (Class<? extends DigestCredentialHandlerBase> clazz : credentialHandlerClasses) {
                 try {
-                    handler = clazz.getDeclaredConstructor().newInstance();
+                    handler = clazz.getConstructor().newInstance();
                     if (IntrospectionUtils.setProperty(handler, "algorithm", algorithm)) {
                         break;
                     }
@@ -1414,7 +1414,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         } else {
             try {
                 Class<?> clazz = Class.forName(handlerClassName);
-                handler = (DigestCredentialHandlerBase) clazz.getDeclaredConstructor().newInstance();
+                handler = (DigestCredentialHandlerBase) clazz.getConstructor().newInstance();
                 IntrospectionUtils.setProperty(handler, "algorithm", algorithm);
             } catch (ReflectiveOperationException e) {
                 throw new RuntimeException(e);
@@ -1547,7 +1547,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         try {
             @SuppressWarnings("unchecked")
             Class<? extends X509UsernameRetriever> clazz = (Class<? extends X509UsernameRetriever>)Class.forName(className);
-            return clazz.getDeclaredConstructor().newInstance();
+            return clazz.getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
             throw new LifecycleException(sm.getString("realmBase.createUsernameRetriever.newInstance", className), e);
         } catch (ClassCastException e) {

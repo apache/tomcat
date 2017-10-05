@@ -63,7 +63,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             ClassLoaderUtil.loadClass(
                 type,
                 GenericNamingResourcesFactory.class.getClassLoader(),
-                Thread.currentThread().getContextClassLoader()).getDeclaredConstructor().newInstance();
+                Thread.currentThread().getContextClassLoader()).getConstructor().newInstance();
 
         while (refs.hasMoreElements()) {
             RefAddr addr = refs.nextElement();

@@ -66,14 +66,13 @@ public class PojoMessageHandlerWholeBinary
             if (decoderClazzes != null) {
                 for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
                     if (Binary.class.isAssignableFrom(decoderClazz)) {
-                        Binary<?> decoder =
-                                (Binary<?>) decoderClazz.getDeclaredConstructor().newInstance();
+                        Binary<?> decoder = (Binary<?>) decoderClazz.getConstructor().newInstance();
                         decoder.init(config);
                         decoders.add(decoder);
                     } else if (BinaryStream.class.isAssignableFrom(
                             decoderClazz)) {
                         BinaryStream<?> decoder = (BinaryStream<?>)
-                                decoderClazz.getDeclaredConstructor().newInstance();
+                                decoderClazz.getConstructor().newInstance();
                         decoder.init(config);
                         decoders.add(decoder);
                     } else {

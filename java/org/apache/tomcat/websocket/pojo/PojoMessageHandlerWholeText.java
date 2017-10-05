@@ -75,14 +75,13 @@ public class PojoMessageHandlerWholeText
             if (decoderClazzes != null) {
                 for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
                     if (Text.class.isAssignableFrom(decoderClazz)) {
-                        Text<?> decoder =
-                                (Text<?>) decoderClazz.getDeclaredConstructor().newInstance();
+                        Text<?> decoder = (Text<?>) decoderClazz.getConstructor().newInstance();
                         decoder.init(config);
                         decoders.add(decoder);
                     } else if (TextStream.class.isAssignableFrom(
                             decoderClazz)) {
                         TextStream<?> decoder =
-                                (TextStream<?>) decoderClazz.getDeclaredConstructor().newInstance();
+                                (TextStream<?>) decoderClazz.getConstructor().newInstance();
                         decoder.init(config);
                         decoders.add(decoder);
                     } else {

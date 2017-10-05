@@ -605,7 +605,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
             } catch (final ClassNotFoundException e) {
                 clazz = Class.forName(evictionPolicyClassName);
             }
-            final Object policy = clazz.getDeclaredConstructor().newInstance();
+            final Object policy = clazz.getConstructor().newInstance();
             if (policy instanceof EvictionPolicy<?>) {
                 @SuppressWarnings("unchecked") // safe, because we just checked the class
                 final

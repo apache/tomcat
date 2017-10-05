@@ -95,7 +95,7 @@ public class Digester extends DefaultHandler2 {
                 try {
                     Class<?> clazz = Class.forName(className, true, cls[i]);
                     source = (IntrospectionUtils.PropertySource)
-                            clazz.getDeclaredConstructor().newInstance();
+                            clazz.getConstructor().newInstance();
                     break;
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);

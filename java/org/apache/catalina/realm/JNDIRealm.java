@@ -1247,7 +1247,7 @@ public class JNDIRealm extends RealmBase {
     private Object constructInstance(String className)
             throws ReflectiveOperationException {
         Class<?> clazz = Class.forName(className);
-        return clazz.getDeclaredConstructor().newInstance();
+        return clazz.getConstructor().newInstance();
     }
 
     // ---------------------------------------------------------- Realm Methods

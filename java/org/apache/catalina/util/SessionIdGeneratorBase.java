@@ -220,7 +220,7 @@ public abstract class SessionIdGeneratorBase extends LifecycleBase
             try {
                 // Construct and seed a new random number generator
                 Class<?> clazz = Class.forName(secureRandomClass);
-                result = (SecureRandom) clazz.getDeclaredConstructor().newInstance();
+                result = (SecureRandom) clazz.getConstructor().newInstance();
             } catch (Exception e) {
                 log.error(sm.getString("sessionIdGeneratorBase.random",
                         secureRandomClass), e);

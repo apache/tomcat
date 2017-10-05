@@ -145,7 +145,7 @@ public class BeanFactory
                 BeanInfo bi = Introspector.getBeanInfo(beanClass);
                 PropertyDescriptor[] pda = bi.getPropertyDescriptors();
 
-                Object bean = beanClass.getDeclaredConstructor().newInstance();
+                Object bean = beanClass.getConstructor().newInstance();
 
                 /* Look for properties with explicitly configured setter */
                 RefAddr ra = ref.get("forceString");

@@ -132,7 +132,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         if (!ClientEndpointConfig.Configurator.class.equals(
                 configuratorClazz)) {
             try {
-                configurator = configuratorClazz.getDeclaredConstructor().newInstance();
+                configurator = configuratorClazz.getConstructor().newInstance();
             } catch (ReflectiveOperationException e) {
                 throw new DeploymentException(sm.getString(
                         "wsWebSocketContainer.defaultConfiguratorFail"), e);
@@ -159,7 +159,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
         Object pojo;
         try {
-            pojo = annotatedEndpointClass.getDeclaredConstructor().newInstance();
+            pojo = annotatedEndpointClass.getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
             throw new DeploymentException(sm.getString(
                     "wsWebSocketContainer.endpointCreateFail",
@@ -177,7 +177,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
         Endpoint endpoint;
         try {
-            endpoint = clazz.getDeclaredConstructor().newInstance();
+            endpoint = clazz.getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
             throw new DeploymentException(sm.getString(
                     "wsWebSocketContainer.endpointCreateFail", clazz.getName()),
