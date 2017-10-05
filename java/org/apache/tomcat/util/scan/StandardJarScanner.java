@@ -20,11 +20,14 @@ package org.apache.tomcat.util.scan;
 import java.io.File;
 import java.io.IOException;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -36,6 +39,7 @@ import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.UriUtil;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.file.Matcher;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -155,9 +159,7 @@ public class StandardJarScanner implements JarScanner {
         // Scan WEB-INF/lib
         Set<String> dirList = context.getResourcePaths(Constants.WEB_INF_LIB);
         if (dirList != null) {
-            Iterator<String> it = dirList.iterator();
-            while (it.hasNext()) {
-                String path = it.next();
+            for (String path : dirList) {
                 if (path.endsWith(Constants.JAR_EXT) &&
                     !Matcher.matchName(ignoredJars,
                         path.substring(path.lastIndexOf('/')+1))) {
@@ -189,58 +191,109 @@ public class StandardJarScanner implements JarScanner {
 
         // Scan the classpath
         if (scanClassPath && classloader != null) {
-            if (log.isTraceEnabled()) {
-                log.trace(sm.getString("jarScan.classloaderStart"));
-            }
-
-            ClassLoader loader = classloader;
-
-            ClassLoader stopLoader = null;
-            if (!scanBootstrapClassPath) {
-                // Stop when we reach the bootstrap class loader
-                stopLoader = ClassLoader.getSystemClassLoader().getParent();
-            }
-
-            while (loader != null && loader != stopLoader) {
-                if (loader instanceof URLClassLoader) {
-                    URL[] urls = ((URLClassLoader) loader).getURLs();
-                    for (int i=0; i<urls.length; i++) {
-                        // Extract the jarName if there is one to be found
-                        String jarName = getJarName(urls[i]);
-
-                        // Skip JARs known not to be interesting and JARs
-                        // in WEB-INF/lib we have already scanned
-                        if (jarName != null &&
-                            !(Matcher.matchName(ignoredJars, jarName) ||
-                                urls[i].toString().contains(
-                                        Constants.WEB_INF_LIB + jarName))) {
-                            if (log.isDebugEnabled()) {
-                                log.debug(sm.getString("jarScan.classloaderJarScan", urls[i]));
-                            }
-                            try {
-                                process(callback, urls[i]);
-                            } catch (IOException ioe) {
-                                log.warn(sm.getString(
-                                        "jarScan.classloaderFail",urls[i]), ioe);
-                            }
-                        } else {
-                            if (log.isTraceEnabled()) {
-                                log.trace(sm.getString("jarScan.classloaderJarNoScan", urls[i]));
-                            }
-                        }
-                    }
-                }
-                loader = loader.getParent();
-            }
 
         }
     }
+
+
+    protected void doScanClassPath(ClassLoader classloader, JarScannerCallback callback,
+            Set<String> ignoredJars) {
+
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("jarScan.classloaderStart"));
+        }
+
+        ClassLoader loader = classloader;
+
+        ClassLoader stopLoader = null;
+        if (!scanBootstrapClassPath) {
+            // Stop when we reach the bootstrap class loader
+            stopLoader = ClassLoader.getSystemClassLoader().getParent();
+        }
+
+        Set<URL> processedURLs = new HashSet<URL>();
+
+        while (loader != null && loader != stopLoader) {
+            if (loader instanceof URLClassLoader) {
+                URL[] urls = ((URLClassLoader) loader).getURLs();
+                for (int i=0; i<urls.length; i++) {
+                    // Extract the jarName if there is one to be found
+                    String jarName = getJarName(urls[i]);
+
+                    // Skip JARs known not to be interesting and JARs
+                    // in WEB-INF/lib we have already scanned
+                    if (jarName != null &&
+                        !(Matcher.matchName(ignoredJars, jarName) ||
+                            urls[i].toString().contains(
+                                    Constants.WEB_INF_LIB + jarName))) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("jarScan.classloaderJarScan", urls[i]));
+                        }
+                        try {
+                            process(callback, urls[i]);
+                            processedURLs.add(urls[i]);
+                        } catch (IOException ioe) {
+                            log.warn(sm.getString("jarScan.classloaderFail",urls[i]), ioe);
+                        }
+                    } else {
+                        if (log.isTraceEnabled()) {
+                            log.trace(sm.getString("jarScan.classloaderJarNoScan", urls[i]));
+                        }
+                    }
+                }
+            }
+            loader = loader.getParent();
+        }
+
+        if (JreCompat.isJre9Available()) {
+            // The application and platform class loaders are not
+            // instances of URLClassLoader. Use the class path in this
+            // case.
+            List<URL> urls = getClassPath();
+            for (URL url : urls) {
+                if (!processedURLs.contains(url)) {
+                    try {
+                        process(callback, url);
+                        processedURLs.add(url);
+                    } catch (IOException ioe) {
+                        log.warn(sm.getString("jarScan.classloaderFail",url), ioe);
+                    }
+                }
+            }
+
+            // TODO Java 9 module path
+        }
+
+    }
+
+
+    protected List<URL> getClassPath() {
+        String classPath = System.getProperty("java.class.path");
+
+        if (classPath == null || classPath.length() == 0) {
+            return Collections.emptyList();
+        }
+
+        String[] classPathEntries = classPath.split(File.pathSeparator);
+        List<URL> urls = new ArrayList<URL>(classPathEntries.length);
+        for (String classPathEntry : classPathEntries) {
+            File f = new File(classPath);
+            try {
+                urls.add(f.toURI().toURL());
+            } catch (MalformedURLException e) {
+                log.warn(sm.getString("jarScan.classPath.badEntry", classPathEntry), e);
+            }
+        }
+
+        return urls;
+    }
+
 
     /*
      * Scan a URL for JARs with the optional extensions to look at all files
      * and all directories.
      */
-    private void process(JarScannerCallback callback, URL url)
+    protected void process(JarScannerCallback callback, URL url)
             throws IOException {
 
         if (log.isTraceEnabled()) {
