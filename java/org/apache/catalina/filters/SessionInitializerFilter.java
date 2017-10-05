@@ -16,8 +16,8 @@
  */
 package org.apache.catalina.filters;
 
+import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.GenericFilter;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -35,7 +35,7 @@ import java.io.IOException;
  * does not provide a way to do so.
  * </p>
  */
-public class SessionInitializerFilter extends GenericFilter {
+public class SessionInitializerFilter implements Filter {
 
     /**
      * Calls {@link HttpServletRequest}'s getSession() to initialize the HttpSession
