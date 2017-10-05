@@ -214,8 +214,8 @@ public class WsServerContainer extends WsWebSocketContainer
         Configurator configurator = null;
         if (!configuratorClazz.equals(Configurator.class)) {
             try {
-                configurator = annotation.configurator().newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
+                configurator = annotation.configurator().getDeclaredConstructor().newInstance();
+            } catch (ReflectiveOperationException e) {
                 throw new DeploymentException(sm.getString(
                         "serverContainer.configuratorFail",
                         annotation.configurator().getName(),
@@ -416,8 +416,8 @@ public class WsServerContainer extends WsWebSocketContainer
             @SuppressWarnings("unused")
             Encoder instance;
             try {
-                encoder.newInstance();
-            } catch(InstantiationException | IllegalAccessException e) {
+                encoder.getDeclaredConstructor().newInstance();
+            } catch(ReflectiveOperationException e) {
                 throw new DeploymentException(sm.getString(
                         "serverContainer.encoderFail", encoder.getName()), e);
             }

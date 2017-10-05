@@ -605,7 +605,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
             } catch (final ClassNotFoundException e) {
                 clazz = Class.forName(evictionPolicyClassName);
             }
-            final Object policy = clazz.newInstance();
+            final Object policy = clazz.getDeclaredConstructor().newInstance();
             if (policy instanceof EvictionPolicy<?>) {
                 @SuppressWarnings("unchecked") // safe, because we just checked the class
                 final
@@ -616,11 +616,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
             throw new IllegalArgumentException(
                     "Unable to create EvictionPolicy instance of type " +
                     evictionPolicyClassName, e);
-        } catch (final InstantiationException e) {
-            throw new IllegalArgumentException(
-                    "Unable to create EvictionPolicy instance of type " +
-                    evictionPolicyClassName, e);
-        } catch (final IllegalAccessException e) {
+        } catch (final ReflectiveOperationException e) {
             throw new IllegalArgumentException(
                     "Unable to create EvictionPolicy instance of type " +
                     evictionPolicyClassName, e);

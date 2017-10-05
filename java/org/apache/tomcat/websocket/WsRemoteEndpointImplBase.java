@@ -676,9 +676,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 endpointConfig.getEncoders()) {
             Encoder instance;
             try {
-                instance = encoderClazz.newInstance();
+                instance = encoderClazz.getDeclaredConstructor().newInstance();
                 instance.init(endpointConfig);
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (ReflectiveOperationException e) {
                 throw new DeploymentException(
                         sm.getString("wsRemoteEndpoint.invalidEncoder",
                                 encoderClazz.getName()), e);

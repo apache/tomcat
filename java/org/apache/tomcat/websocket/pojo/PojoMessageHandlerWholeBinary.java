@@ -67,13 +67,13 @@ public class PojoMessageHandlerWholeBinary
                 for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
                     if (Binary.class.isAssignableFrom(decoderClazz)) {
                         Binary<?> decoder =
-                                (Binary<?>) decoderClazz.newInstance();
+                                (Binary<?>) decoderClazz.getDeclaredConstructor().newInstance();
                         decoder.init(config);
                         decoders.add(decoder);
                     } else if (BinaryStream.class.isAssignableFrom(
                             decoderClazz)) {
-                        BinaryStream<?> decoder =
-                                (BinaryStream<?>) decoderClazz.newInstance();
+                        BinaryStream<?> decoder = (BinaryStream<?>)
+                                decoderClazz.getDeclaredConstructor().newInstance();
                         decoder.init(config);
                         decoders.add(decoder);
                     } else {
@@ -81,7 +81,7 @@ public class PojoMessageHandlerWholeBinary
                     }
                 }
             }
-        } catch (IllegalAccessException | InstantiationException e) {
+        } catch (ReflectiveOperationException e) {
             throw new IllegalArgumentException(e);
         }
         this.isForInputStream = isForInputStream;

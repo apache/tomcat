@@ -290,7 +290,7 @@ public class JSSEUtil extends SSLUtilBase {
                 throw new InstantiationException(sm.getString(
                         "jsse.invalidTrustManagerClassName", className));
              }
-             Object trustManagerObject = clazz.newInstance();
+             Object trustManagerObject = clazz.getDeclaredConstructor().newInstance();
              TrustManager trustManager = (TrustManager) trustManagerObject;
              return new TrustManager[]{ trustManager };
         }

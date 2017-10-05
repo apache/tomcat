@@ -342,8 +342,8 @@ public class Util {
                 @SuppressWarnings("unused")
                 Decoder instance;
                 try {
-                    instance = decoderClazz.newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
+                    instance = decoderClazz.getDeclaredConstructor().newInstance();
+                } catch (ReflectiveOperationException e) {
                     throw new DeploymentException(
                             sm.getString("pojoMethodMapping.invalidDecoder",
                                     decoderClazz.getName()), e);

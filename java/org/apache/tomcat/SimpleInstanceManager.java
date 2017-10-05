@@ -32,24 +32,24 @@ public class SimpleInstanceManager implements InstanceManager {
 
     @Override
     public Object newInstance(Class<?> clazz) throws IllegalAccessException,
-            InvocationTargetException, NamingException, InstantiationException {
-        return prepareInstance(clazz.newInstance());
+            InvocationTargetException, NamingException, InstantiationException, NoSuchMethodException {
+        return prepareInstance(clazz.getDeclaredConstructor().newInstance());
     }
 
     @Override
     public Object newInstance(String className) throws IllegalAccessException,
             InvocationTargetException, NamingException, InstantiationException,
-            ClassNotFoundException  {
+            ClassNotFoundException, NoSuchMethodException  {
         Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(className);
-        return prepareInstance(clazz.newInstance());
+        return prepareInstance(clazz.getDeclaredConstructor().newInstance());
     }
 
     @Override
     public Object newInstance(String fqcn, ClassLoader classLoader) throws IllegalAccessException,
             InvocationTargetException, NamingException, InstantiationException,
-            ClassNotFoundException  {
+            ClassNotFoundException, NoSuchMethodException  {
         Class<?> clazz = classLoader.loadClass(fqcn);
-        return prepareInstance(clazz.newInstance());
+        return prepareInstance(clazz.getDeclaredConstructor().newInstance());
     }
 
     @Override

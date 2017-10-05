@@ -53,7 +53,7 @@ public abstract class SSLImplementation {
 
         try {
             Class<?> clazz = Class.forName(className);
-            return (SSLImplementation) clazz.newInstance();
+            return (SSLImplementation) clazz.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             String msg = sm.getString("sslImplementation.cnfe", className);
             if (logger.isDebugEnabled()) {
