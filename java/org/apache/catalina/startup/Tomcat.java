@@ -598,8 +598,8 @@ public class Tomcat {
         LifecycleListener listener = null;
         try {
             Class<?> clazz = Class.forName(getHost().getConfigClass());
-            listener = (LifecycleListener) clazz.newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            listener = (LifecycleListener) clazz.getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
             // Wrap in IAE since we can't easily change the method signature to
             // to throw the specific checked exceptions
             throw new IllegalArgumentException(e);
@@ -1030,10 +1030,8 @@ public class Tomcat {
             if (singleThreadModel) {
                 Servlet instance;
                 try {
-                    instance = existing.getClass().newInstance();
-                } catch (InstantiationException e) {
-                    throw new ServletException(e);
-                } catch (IllegalAccessException e) {
+                    instance = existing.getClass().getDeclaredConstructor().newInstance();
+                } catch (ReflectiveOperationException e) {
                     throw new ServletException(e);
                 }
                 instance.init(facade);

@@ -152,8 +152,7 @@ public class StoreContextAppender extends StoreAppender {
      * @see org.apache.catalina.storeconfig.StoreAppender#defaultInstance(java.lang.Object)
      */
     @Override
-    public Object defaultInstance(Object bean) throws InstantiationException,
-            IllegalAccessException {
+    public Object defaultInstance(Object bean) throws ReflectiveOperationException {
         if (bean instanceof StandardContext) {
             StandardContext defaultContext = new StandardContext();
             /*

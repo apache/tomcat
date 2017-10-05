@@ -399,7 +399,7 @@ public class ContextConfig implements LifecycleListener {
             // Instantiate and install an Authenticator of the requested class
             try {
                 Class<?> authenticatorClass = Class.forName(authenticatorName);
-                authenticator = (Valve) authenticatorClass.newInstance();
+                authenticator = (Valve) authenticatorClass.getDeclaredConstructor().newInstance();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 log.error(sm.getString(

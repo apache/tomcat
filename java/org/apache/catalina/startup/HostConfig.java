@@ -584,7 +584,7 @@ public class HostConfig implements LifecycleListener {
 
             Class<?> clazz = Class.forName(host.getConfigClass());
             LifecycleListener listener =
-                (LifecycleListener) clazz.newInstance();
+                (LifecycleListener) clazz.getDeclaredConstructor().newInstance();
             context.addLifecycleListener(listener);
 
             context.setConfigFile(contextXml.toURI().toURL());
@@ -891,7 +891,8 @@ public class HostConfig implements LifecycleListener {
                         cn.getPath(), Constants.ApplicationContextXml,
                         new File(host.getConfigBaseFile(), cn.getBaseName() + ".xml")));
             } else {
-                context = (Context) Class.forName(contextClass).newInstance();
+                context = (Context) Class.forName(
+                        contextClass).getDeclaredConstructor().newInstance();
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -968,7 +969,7 @@ public class HostConfig implements LifecycleListener {
 
             Class<?> clazz = Class.forName(host.getConfigClass());
             LifecycleListener listener =
-                (LifecycleListener) clazz.newInstance();
+                (LifecycleListener) clazz.getDeclaredConstructor().newInstance();
             context.addLifecycleListener(listener);
 
             context.setName(cn.getName());
@@ -1119,12 +1120,13 @@ public class HostConfig implements LifecycleListener {
                         cn.getPath(), xml, xmlCopy));
                 context = new FailedContext();
             } else {
-                context = (Context) Class.forName(contextClass).newInstance();
+                context = (Context) Class.forName(
+                        contextClass).getDeclaredConstructor().newInstance();
             }
 
             Class<?> clazz = Class.forName(host.getConfigClass());
             LifecycleListener listener =
-                (LifecycleListener) clazz.newInstance();
+                    (LifecycleListener) clazz.getDeclaredConstructor().newInstance();
             context.addLifecycleListener(listener);
 
             context.setName(cn.getName());

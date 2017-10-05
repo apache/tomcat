@@ -39,8 +39,8 @@ public abstract class BaseCatalinaMBean<T> extends BaseModelMBean {
 
     protected static Object newInstance(String type) throws MBeanException {
         try {
-            return Class.forName(type).newInstance();
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            return Class.forName(type).getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
             throw new MBeanException(e);
         }
     }

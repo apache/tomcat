@@ -289,7 +289,7 @@ public final class UserConfig
         UserDatabase database = null;
         try {
             Class<?> clazz = Class.forName(userClass);
-            database = (UserDatabase) clazz.newInstance();
+            database = (UserDatabase) clazz.getDeclaredConstructor().newInstance();
             database.setUserConfig(this);
         } catch (Exception e) {
             host.getLogger().error(sm.getString("userConfig.database"), e);
@@ -340,13 +340,12 @@ public final class UserConfig
         // Deploy the web application for this user
         try {
             Class<?> clazz = Class.forName(contextClass);
-            Context context =
-              (Context) clazz.newInstance();
+            Context context = (Context) clazz.getDeclaredConstructor().newInstance();
             context.setPath(contextPath);
             context.setDocBase(app.toString());
             clazz = Class.forName(configClass);
             LifecycleListener listener =
-                (LifecycleListener) clazz.newInstance();
+                (LifecycleListener) clazz.getDeclaredConstructor().newInstance();
             context.addLifecycleListener(listener);
             host.addChild(context);
         } catch (Exception e) {

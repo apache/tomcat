@@ -115,7 +115,7 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "http11.Constants");
         // Make sure system property is read at this point
         Class<?> clazz = loader.loadClass(basePackage + "Constants");
-        clazz.newInstance();
+        clazz.getDeclaredConstructor().newInstance();
         loader.loadClass(basePackage + "http2.Stream$PrivilegedPush");
     }
 
@@ -178,7 +178,7 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "util.http.NamesEnumerator");
         // Make sure system property is read at this point
         Class<?> clazz = loader.loadClass(basePackage + "util.http.FastHttpDateFormat");
-        clazz.newInstance();
+        clazz.getDeclaredConstructor().newInstance();
         loader.loadClass(basePackage + "util.http.parser.HttpParser");
         loader.loadClass(basePackage + "util.http.parser.MediaType");
         loader.loadClass(basePackage + "util.http.parser.MediaTypeCache");
