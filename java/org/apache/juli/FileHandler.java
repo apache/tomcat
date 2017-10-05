@@ -424,7 +424,7 @@ public class FileHandler extends Handler {
         String filterName = getProperty(className + ".filter", null);
         if (filterName != null) {
             try {
-                setFilter((Filter) cl.loadClass(filterName).newInstance());
+                setFilter((Filter) cl.loadClass(filterName).getDeclaredConstructor().newInstance());
             } catch (Exception e) {
                 // Ignore
             }
@@ -434,7 +434,8 @@ public class FileHandler extends Handler {
         String formatterName = getProperty(className + ".formatter", null);
         if (formatterName != null) {
             try {
-                setFormatter((Formatter) cl.loadClass(formatterName).newInstance());
+                setFormatter((Formatter) cl.loadClass(
+                        formatterName).getDeclaredConstructor().newInstance());
             } catch (Exception e) {
                 // Ignore and fallback to defaults
                 setFormatter(new OneLineFormatter());

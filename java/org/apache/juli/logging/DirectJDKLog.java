@@ -42,11 +42,12 @@ class DirectJDKLog implements Log {
             // default configuration - it sucks. Let's override at least the
             // formatter for the console
             try {
-                Class.forName(SIMPLE_CFG).newInstance();
+                Class.forName(SIMPLE_CFG).getDeclaredConstructor().newInstance();
             } catch( Throwable t ) {
             }
             try {
-                Formatter fmt=(Formatter)Class.forName(System.getProperty(FORMATTER, SIMPLE_FMT)).newInstance();
+                Formatter fmt= (Formatter) Class.forName(System.getProperty(
+                        FORMATTER, SIMPLE_FMT)).getDeclaredConstructor().newInstance();
                 // it is also possible that the user modified jre/lib/logging.properties -
                 // but that's really stupid in most cases
                 Logger root=Logger.getLogger("");
