@@ -773,16 +773,16 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 PoolProperties.class.getClassLoader(),
                 Thread.currentThread().getContextClassLoader()
             );
-            validator = validatorClass.newInstance();
+            validator = validatorClass.getDeclaredConstructor().newInstance();
         } catch (ClassNotFoundException e) {
             log.warn("The class "+className+" cannot be found.", e);
         } catch (ClassCastException e) {
             log.warn("The class "+className+" does not implement the Validator interface.", e);
-        } catch (InstantiationException e) {
-            log.warn("An object of class "+className+" cannot be instantiated. Make sure that "+
-                     "it includes an implicit or explicit no-arg constructor.", e);
         } catch (IllegalAccessException e) {
             log.warn("The class "+className+" or its no-arg constructor are inaccessible.", e);
+        } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+            log.warn("An object of class "+className+" cannot be instantiated. Make sure that "+
+                     "it includes an implicit or explicit no-arg constructor.", e);
         }
     }
 
