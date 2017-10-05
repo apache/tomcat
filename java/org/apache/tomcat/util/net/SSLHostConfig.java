@@ -68,11 +68,11 @@ public class SSLHostConfig implements Serializable {
 
     private String hostName = DEFAULT_SSL_HOST_NAME;
 
-    private transient Long openSslConfContext = new Long(0);
+    private transient Long openSslConfContext = Long.valueOf(0);
     // OpenSSL can handle multiple certs in a single config so the reference to
     // the context is here at the virtual host level. JSSE can't so the
     // reference is held on the certificate.
-    private transient Long openSslContext = new Long(0);
+    private transient Long openSslContext = Long.valueOf(0);
 
     // Configuration properties
 
