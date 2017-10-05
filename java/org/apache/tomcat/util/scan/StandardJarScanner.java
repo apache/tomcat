@@ -262,6 +262,15 @@ public class StandardJarScanner implements JarScanner {
                 classPathUrlsToProcess.addAll(
                         Arrays.asList(((URLClassLoader) classLoader).getURLs()));
 
+                if (JreCompat.isJre9Available()) {
+                    // The application and platform class loaders are not
+                    // instances of URLClassLoader. Use the class path in this
+                    // case.
+                    addClassPath(classPathUrlsToProcess);
+
+                    // TODO Java 9 module path
+                }
+
                 while (!classPathUrlsToProcess.isEmpty()) {
                     URL url = classPathUrlsToProcess.pop();
 
@@ -270,10 +279,6 @@ public class StandardJarScanner implements JarScanner {
                         continue;
                     }
 
-                    // TODO: Java 9 support. Details are TBD. It will depend
-                    //       on the extent to which Java 8 supports the
-                    //       Java 9 file formats since this code MUST run on
-                    //       Java 8.
                     ClassPathEntry cpe = new ClassPathEntry(url);
 
                     // JARs are scanned unless the filter says not to.
@@ -304,13 +309,25 @@ public class StandardJarScanner implements JarScanner {
             }
             classLoader = classLoader.getParent();
         }
+    }
 
-        if (JreCompat.isJre9Available()) {
-            // The application and platform class loaders are not instances of
-            // URLClassLoader
 
+    protected void addClassPath(Deque<URL> classPathUrlsToProcess) {
+        String classPath = System.getProperty("java.class.path");
+
+        if (classPath == null || classPath.length() == 0) {
+            return;
         }
 
+        String[] classPathEntries = classPath.split(File.pathSeparator);
+        for (String classPathEntry : classPathEntries) {
+            File f = new File(classPath);
+            try {
+                classPathUrlsToProcess.add(f.toURI().toURL());
+            } catch (MalformedURLException e) {
+                log.warn(sm.getString("jarScan.classPath.badEntry", classPathEntry), e);
+            }
+        }
     }
 
 
@@ -337,7 +354,7 @@ public class StandardJarScanner implements JarScanner {
      * Scan a URL for JARs with the optional extensions to look at all files
      * and all directories.
      */
-    private void process(JarScanType scanType, JarScannerCallback callback,
+    protected void process(JarScanType scanType, JarScannerCallback callback,
             URL url, String webappPath, boolean isWebapp, Deque<URL> classPathUrlsToProcess)
             throws IOException {
 
