@@ -191,7 +191,7 @@ public class StandardJarScanner implements JarScanner {
 
         // Scan the classpath
         if (scanClassPath && classloader != null) {
-
+            doScanClassPath(classloader, callback, ignoredJars);
         }
     }
 
