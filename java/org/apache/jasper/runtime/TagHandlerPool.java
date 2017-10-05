@@ -47,7 +47,7 @@ public class TagHandlerPool {
         if (tpClassName != null) {
             try {
                 Class<?> c = Class.forName(tpClassName);
-                result = (TagHandlerPool) c.newInstance();
+                result = (TagHandlerPool) c.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 e.printStackTrace();
                 result = null;
@@ -112,7 +112,7 @@ public class TagHandlerPool {
                 return (Tag) instanceManager.newInstance(
                         handlerClass.getName(), handlerClass.getClassLoader());
             } else {
-                Tag instance = handlerClass.newInstance();
+                Tag instance = handlerClass.getDeclaredConstructor().newInstance();
                 instanceManager.newInstance(instance);
                 return instance;
             }

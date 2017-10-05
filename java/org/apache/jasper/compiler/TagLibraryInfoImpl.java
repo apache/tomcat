@@ -290,7 +290,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         if (teiClassName != null && !teiClassName.isEmpty()) {
             try {
                 Class<?> teiClass = ctxt.getClassLoader().loadClass(teiClassName);
-                tei = (TagExtraInfo) teiClass.newInstance();
+                tei = (TagExtraInfo) teiClass.getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 err.jspError(e, "jsp.error.teiclass.instantiation", teiClassName);
             }
@@ -346,7 +346,8 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
 
         try {
             Class<?> tlvClass = ctxt.getClassLoader().loadClass(validatorClass);
-            TagLibraryValidator tlv = (TagLibraryValidator) tlvClass.newInstance();
+            TagLibraryValidator tlv =
+                    (TagLibraryValidator) tlvClass.getDeclaredConstructor().newInstance();
             tlv.setInitParameters(initParams);
             return tlv;
         } catch (Exception e) {

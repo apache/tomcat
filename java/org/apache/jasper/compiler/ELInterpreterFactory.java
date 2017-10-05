@@ -85,7 +85,7 @@ public class ELInterpreterFactory {
     private static ELInterpreter createInstance(ServletContext context,
             String className) throws Exception {
         return (ELInterpreter) context.getClassLoader().loadClass(
-                    className).newInstance();
+                    className).getDeclaredConstructor().newInstance();
     }
 
 

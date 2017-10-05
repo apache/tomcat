@@ -784,7 +784,7 @@ public class JspRuntimeLibrary {
     {
         try {
             PropertyEditor pe =
-                (PropertyEditor)propertyEditorClass.newInstance();
+                (PropertyEditor)propertyEditorClass.getDeclaredConstructor().newInstance();
             pe.setAsText(attrValue);
             return pe.getValue();
         } catch (Exception ex) {
