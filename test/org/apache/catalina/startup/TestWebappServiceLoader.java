@@ -172,7 +172,7 @@ public class TestWebappServiceLoader {
         try {
             loader.loadServices(ServletContainerInitializer.class, names);
         } catch (IOException e) {
-            Assert.assertTrue(e.getCause() instanceof InstantiationException);
+            Assert.assertTrue(e.getCause() instanceof ReflectiveOperationException);
         } finally {
             control.verify();
         }

@@ -319,7 +319,7 @@ public class ManagedBean implements java.io.Serializable {
             }
             try {
                 // Stupid - this will set the default minfo first....
-                mbean = (BaseModelMBean) clazz.newInstance();
+                mbean = (BaseModelMBean) clazz.getConstructor().newInstance();
             } catch (RuntimeOperationsException e) {
                 throw e;
             } catch (Exception e) {

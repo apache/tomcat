@@ -72,7 +72,7 @@ public class WsSci implements ServletContainerInitializer {
                 }
                 if (ServerApplicationConfig.class.isAssignableFrom(clazz)) {
                     serverApplicationConfigs.add(
-                            (ServerApplicationConfig) clazz.newInstance());
+                            (ServerApplicationConfig) clazz.getConstructor().newInstance());
                 }
                 if (Endpoint.class.isAssignableFrom(clazz)) {
                     @SuppressWarnings("unchecked")
@@ -84,7 +84,7 @@ public class WsSci implements ServletContainerInitializer {
                     scannedPojoEndpoints.add(clazz);
                 }
             }
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (ReflectiveOperationException e) {
             throw new ServletException(e);
         }
 

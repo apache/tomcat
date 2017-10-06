@@ -145,7 +145,7 @@ public class BeanFactory
                 BeanInfo bi = Introspector.getBeanInfo(beanClass);
                 PropertyDescriptor[] pda = bi.getPropertyDescriptors();
 
-                Object bean = beanClass.newInstance();
+                Object bean = beanClass.getConstructor().newInstance();
 
                 /* Look for properties with explicitly configured setter */
                 RefAddr ra = ref.get("forceString");
@@ -288,24 +288,16 @@ public class BeanFactory
                 NamingException ne = new NamingException(ie.getMessage());
                 ne.setRootCause(ie);
                 throw ne;
-            } catch (java.lang.IllegalAccessException iae) {
-                NamingException ne = new NamingException(iae.getMessage());
-                ne.setRootCause(iae);
-                throw ne;
-            } catch (java.lang.InstantiationException ie2) {
-                NamingException ne = new NamingException(ie2.getMessage());
-                ne.setRootCause(ie2);
-                throw ne;
-            } catch (java.lang.reflect.InvocationTargetException ite) {
-                Throwable cause = ite.getCause();
+            } catch (java.lang.ReflectiveOperationException e) {
+                Throwable cause = e.getCause();
                 if (cause instanceof ThreadDeath) {
                     throw (ThreadDeath) cause;
                 }
                 if (cause instanceof VirtualMachineError) {
                     throw (VirtualMachineError) cause;
                 }
-                NamingException ne = new NamingException(ite.getMessage());
-                ne.setRootCause(ite);
+                NamingException ne = new NamingException(e.getMessage());
+                ne.setRootCause(e);
                 throw ne;
             }
 

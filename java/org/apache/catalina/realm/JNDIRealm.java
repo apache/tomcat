@@ -1209,8 +1209,7 @@ public class JNDIRealm extends RealmBase {
                         "jndiRealm.invalidHostnameVerifier",
                         hostNameVerifierClassName));
             }
-        } catch (ClassNotFoundException | SecurityException
-                | InstantiationException | IllegalAccessException e) {
+        } catch (ReflectiveOperationException | SecurityException e) {
             throw new IllegalArgumentException(sm.getString(
                     "jndiRealm.invalidHostnameVerifier",
                     hostNameVerifierClassName), e);
@@ -1254,10 +1253,9 @@ public class JNDIRealm extends RealmBase {
     }
 
     private Object constructInstance(String className)
-            throws ClassNotFoundException, InstantiationException,
-            IllegalAccessException {
+            throws ReflectiveOperationException {
         Class<?> clazz = Class.forName(className);
-        return clazz.newInstance();
+        return clazz.getConstructor().newInstance();
     }
 
     // ---------------------------------------------------------- Realm Methods
@@ -2454,8 +2452,7 @@ public class JNDIRealm extends RealmBase {
                         "jndiRealm.invalidSslSocketFactory",
                         className));
             }
-        } catch (ClassNotFoundException | SecurityException
-                | InstantiationException | IllegalAccessException e) {
+        } catch (ReflectiveOperationException | SecurityException e) {
             throw new IllegalArgumentException(sm.getString(
                     "jndiRealm.invalidSslSocketFactory",
                     className), e);

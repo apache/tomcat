@@ -714,7 +714,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         }
 
         Class<?> c = Class.forName(type);
-        ModelerSource ds=(ModelerSource)c.newInstance();
+        ModelerSource ds=(ModelerSource)c.getConstructor().newInstance();
         return ds;
     }
 

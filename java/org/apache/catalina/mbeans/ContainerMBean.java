@@ -70,7 +70,7 @@ public class ContainerMBean extends BaseModelMBean {
     public void addChild(String type, String name) throws MBeanException{
         Container contained = null;
         try {
-            contained = (Container)Class.forName(type).newInstance();
+            contained = (Container)Class.forName(type).getConstructor().newInstance();
             contained.setName(name);
 
             if(contained instanceof StandardHost){
@@ -81,11 +81,7 @@ public class ContainerMBean extends BaseModelMBean {
                 contained.addLifecycleListener(config);
             }
 
-        } catch (InstantiationException e) {
-            throw new MBeanException(e);
-        } catch (IllegalAccessException e) {
-            throw new MBeanException(e);
-        } catch (ClassNotFoundException e) {
+        } catch (ReflectiveOperationException e) {
             throw new MBeanException(e);
         }
 
@@ -146,12 +142,8 @@ public class ContainerMBean extends BaseModelMBean {
     public String addValve(String valveType) throws MBeanException{
         Valve valve = null;
         try {
-            valve = (Valve)Class.forName(valveType).newInstance();
-        } catch (InstantiationException e) {
-            throw new MBeanException(e);
-        } catch (IllegalAccessException e) {
-            throw new MBeanException(e);
-        } catch (ClassNotFoundException e) {
+            valve = (Valve)Class.forName(valveType).getConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
             throw new MBeanException(e);
         }
 
@@ -228,12 +220,8 @@ public class ContainerMBean extends BaseModelMBean {
     public void addLifecycleListener(String type) throws MBeanException{
         LifecycleListener listener = null;
         try {
-            listener = (LifecycleListener)Class.forName(type).newInstance();
-        } catch (InstantiationException e) {
-            throw new MBeanException(e);
-        } catch (IllegalAccessException e) {
-            throw new MBeanException(e);
-        } catch (ClassNotFoundException e) {
+            listener = (LifecycleListener)Class.forName(type).getConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
             throw new MBeanException(e);
         }
 

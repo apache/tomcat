@@ -123,7 +123,7 @@ public class TagPluginManager {
                 String tagClass = entry.getKey();
                 String pluginName = entry.getValue();
                 Class<?> pluginClass = ctxt.getClassLoader().loadClass(pluginName);
-                TagPlugin plugin = (TagPlugin) pluginClass.newInstance();
+                TagPlugin plugin = (TagPlugin) pluginClass.getConstructor().newInstance();
                 tagPlugins.put(tagClass, plugin);
             } catch (Exception e) {
                 err.jspError(e);

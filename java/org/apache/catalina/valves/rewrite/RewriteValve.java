@@ -652,7 +652,8 @@ public class RewriteValve extends ValveBase {
                 String rewriteMapClassName = tokenizer.nextToken();
                 RewriteMap map = null;
                 try {
-                    map = (RewriteMap) (Class.forName(rewriteMapClassName).newInstance());
+                    map = (RewriteMap) (Class.forName(
+                            rewriteMapClassName).getConstructor().newInstance());
                 } catch (Exception e) {
                     throw new IllegalArgumentException("Invalid map className: " + line);
                 }

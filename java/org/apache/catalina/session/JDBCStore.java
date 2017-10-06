@@ -919,8 +919,8 @@ public class JDBCStore extends StoreBase {
         if (driver == null) {
             try {
                 Class<?> clazz = Class.forName(driverName);
-                driver = (Driver) clazz.newInstance();
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+                driver = (Driver) clazz.getConstructor().newInstance();
+            } catch (ReflectiveOperationException e) {
                 manager.getContext().getLogger().error(
                         sm.getString(getStoreName() + ".checkConnectionClassNotFoundException",
                         e.toString()));

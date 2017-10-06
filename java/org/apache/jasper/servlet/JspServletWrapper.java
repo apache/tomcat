@@ -294,7 +294,7 @@ public class JspServletWrapper {
                     tagHandlerClass = ctxt.load();
                     reload = false;
                 }
-                target = tagHandlerClass.newInstance();
+                target = tagHandlerClass.getConstructor().newInstance();
             } else {
                 target = getServlet();
             }

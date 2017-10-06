@@ -75,13 +75,13 @@ public class PojoMessageHandlerWholeText
             if (decoderClazzes != null) {
                 for (Class<? extends Decoder> decoderClazz : decoderClazzes) {
                     if (Text.class.isAssignableFrom(decoderClazz)) {
-                        Text<?> decoder = (Text<?>) decoderClazz.newInstance();
+                        Text<?> decoder = (Text<?>) decoderClazz.getConstructor().newInstance();
                         decoder.init(config);
                         decoders.add(decoder);
                     } else if (TextStream.class.isAssignableFrom(
                             decoderClazz)) {
                         TextStream<?> decoder =
-                                (TextStream<?>) decoderClazz.newInstance();
+                                (TextStream<?>) decoderClazz.getConstructor().newInstance();
                         decoder.init(config);
                         decoders.add(decoder);
                     } else {
@@ -89,7 +89,7 @@ public class PojoMessageHandlerWholeText
                     }
                 }
             }
-        } catch (IllegalAccessException | InstantiationException e) {
+        } catch (ReflectiveOperationException e) {
             throw new IllegalArgumentException(e);
         }
     }

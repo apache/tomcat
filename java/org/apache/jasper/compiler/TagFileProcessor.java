@@ -593,7 +593,7 @@ class TagFileProcessor {
                     // Dependent list. The only reliable dependency information
                     // can only be obtained from the tag instance.
                     try {
-                        Object tagIns = tagClazz.newInstance();
+                        Object tagIns = tagClazz.getConstructor().newInstance();
                         if (tagIns instanceof JspSourceDependent) {
                             Iterator<Entry<String,Long>> iter = ((JspSourceDependent)
                                     tagIns).getDependants().entrySet().iterator();

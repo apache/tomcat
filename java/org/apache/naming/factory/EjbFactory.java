@@ -44,7 +44,7 @@ public class EjbFactory extends FactoryBase {
                 "javax.ejb.Factory", Constants.OPENEJB_EJB_FACTORY);
         try {
             factory = (ObjectFactory)
-                Class.forName(javaxEjbFactoryClassName).newInstance();
+                Class.forName(javaxEjbFactoryClassName).getConstructor().newInstance();
         } catch(Throwable t) {
             if (t instanceof NamingException) {
                 throw (NamingException) t;

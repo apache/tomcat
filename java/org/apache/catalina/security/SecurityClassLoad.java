@@ -170,7 +170,7 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "http11.Constants");
         // Make sure system property is read at this point
         Class<?> clazz = loader.loadClass(basePackage + "Constants");
-        clazz.newInstance();
+        clazz.getConstructor().newInstance();
         loader.loadClass(basePackage + "http2.Stream$1");
     }
 
@@ -282,7 +282,7 @@ public final class SecurityClassLoad {
         // collections
         Class<?> clazz = loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap");
         // Ensure StringManager is configured
-        clazz.newInstance();
+        clazz.getConstructor().newInstance();
         loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap$EntryImpl");
         loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap$EntryIterator");
         loader.loadClass(basePackage + "util.collections.CaseInsensitiveKeyMap$EntrySet");
@@ -292,7 +292,7 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "util.http.NamesEnumerator");
         // Make sure system property is read at this point
         clazz = loader.loadClass(basePackage + "util.http.FastHttpDateFormat");
-        clazz.newInstance();
+        clazz.getConstructor().newInstance();
         loader.loadClass(basePackage + "util.http.parser.HttpParser");
         loader.loadClass(basePackage + "util.http.parser.MediaType");
         loader.loadClass(basePackage + "util.http.parser.MediaTypeCache");

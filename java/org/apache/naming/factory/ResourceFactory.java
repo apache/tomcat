@@ -45,7 +45,7 @@ public class ResourceFactory extends FactoryBase {
                         Constants.DBCP_DATASOURCE_FACTORY);
             try {
                 factory = (ObjectFactory) Class.forName(
-                        javaxSqlDataSourceFactoryClassName).newInstance();
+                        javaxSqlDataSourceFactoryClassName).getConstructor().newInstance();
             } catch (Exception e) {
                 NamingException ex = new NamingException(
                         "Could not create resource factory instance");
@@ -57,8 +57,8 @@ public class ResourceFactory extends FactoryBase {
                 System.getProperty("javax.mail.Session.Factory",
                         "org.apache.naming.factory.MailSessionFactory");
             try {
-                factory = (ObjectFactory)
-                    Class.forName(javaxMailSessionFactoryClassName).newInstance();
+                factory = (ObjectFactory) Class.forName(
+                        javaxMailSessionFactoryClassName).getConstructor().newInstance();
             } catch(Throwable t) {
                 if (t instanceof NamingException) {
                     throw (NamingException) t;

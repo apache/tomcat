@@ -171,7 +171,7 @@ public class ChannelCreator {
         System.out.println("Creating receiver class="+receiver);
         Class<?> cl = Class.forName(receiver, true,
                 ChannelCreator.class.getClassLoader());
-        ReceiverBase rx = (ReceiverBase)cl.newInstance();
+        ReceiverBase rx = (ReceiverBase)cl.getConstructor().newInstance();
         rx.setAddress(bind);
         rx.setPort(port);
         rx.setSelectorTimeout(tcpseltimeout);
@@ -185,7 +185,8 @@ public class ChannelCreator {
 
         ReplicationTransmitter ps = new ReplicationTransmitter();
         System.out.println("Creating transport class="+transport);
-        MultiPointSender sender = (MultiPointSender)Class.forName(transport,true,ChannelCreator.class.getClassLoader()).newInstance();
+        MultiPointSender sender = (MultiPointSender)Class.forName(
+                transport,true,ChannelCreator.class.getClassLoader()).getConstructor().newInstance();
         sender.setTimeout(acktimeout);
         sender.setMaxRetryAttempts(2);
         sender.setRxBufSize(43800);

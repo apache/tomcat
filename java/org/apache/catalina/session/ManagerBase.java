@@ -377,11 +377,9 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
             return sessionIdGenerator;
         } else if (sessionIdGeneratorClass != null) {
             try {
-                sessionIdGenerator = sessionIdGeneratorClass.newInstance();
+                sessionIdGenerator = sessionIdGeneratorClass.getConstructor().newInstance();
                 return sessionIdGenerator;
-            } catch(IllegalAccessException ex) {
-                // Ignore
-            } catch(InstantiationException ex) {
+            } catch(ReflectiveOperationException ex) {
                 // Ignore
             }
         }

@@ -33,8 +33,10 @@ public class DefaultServerEndpointConfigurator
     public <T> T getEndpointInstance(Class<T> clazz)
             throws InstantiationException {
         try {
-            return clazz.newInstance();
-        } catch (IllegalAccessException e) {
+            return clazz.getConstructor().newInstance();
+        } catch (InstantiationException e) {
+            throw e;
+        } catch (ReflectiveOperationException e) {
             InstantiationException ie = new InstantiationException();
             ie.initCause(e);
             throw ie;

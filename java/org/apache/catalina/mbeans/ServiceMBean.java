@@ -92,12 +92,8 @@ public class ServiceMBean extends BaseModelMBean {
 
         Executor executor;
         try {
-             executor = (Executor)Class.forName(type).newInstance();
-        } catch (InstantiationException e) {
-            throw new MBeanException(e);
-        } catch (IllegalAccessException e) {
-            throw new MBeanException(e);
-        } catch (ClassNotFoundException e) {
+             executor = (Executor)Class.forName(type).getConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
             throw new MBeanException(e);
         }
 

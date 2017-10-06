@@ -1596,7 +1596,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             Class<?> lpClass =
                 defineClass("org.apache.catalina.loader.JdbcLeakPrevention",
                     classBytes, 0, offset, this.getClass().getProtectionDomain());
-            Object obj = lpClass.newInstance();
+            Object obj = lpClass.getConstructor().newInstance();
             @SuppressWarnings("unchecked")
             List<String> driverNames = (List<String>) obj.getClass().getMethod(
                     "clearJdbcDriverRegistrations").invoke(obj);
