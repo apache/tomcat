@@ -282,6 +282,8 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "util.http.parser.HttpParser$SkipConstantResult");
         loader.loadClass(basePackage + "util.http.parser.MediaType");
         loader.loadClass(basePackage + "util.http.parser.MediaTypeCache");
+        // jni
+        loader.loadClass(basePackage + "jni.Status");
         // net
         loader.loadClass(basePackage + "util.net.Constants");
         loader.loadClass(basePackage +

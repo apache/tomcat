@@ -67,6 +67,10 @@
         added in Java 9 to only disable the caching for JAR URL connections.
         (markt)
       </add>
+      <fix>
+        <bug>61581</bug>: Fix possible <code>SecurityException</code> when using
+        the APR/native connector with a <code>SecurityManager</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
