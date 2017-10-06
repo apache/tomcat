@@ -18,7 +18,6 @@
 
 package org.apache.naming.factory;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -70,10 +69,10 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
 
     protected Object wrapDataSource(Object datasource, String username, String password) throws NamingException {
         try {
-            Class<?> proxyClass = Proxy.getProxyClass(datasource.getClass().getClassLoader(), datasource.getClass().getInterfaces());
-            Constructor<?> proxyConstructor = proxyClass.getConstructor(new Class[] { InvocationHandler.class });
-            DataSourceHandler handler = new DataSourceHandler((DataSource)datasource, username, password);
-            return proxyConstructor.newInstance(handler);
+            DataSourceHandler handler =
+                    new DataSourceHandler((DataSource)datasource, username, password);
+            return Proxy.newProxyInstance(datasource.getClass().getClassLoader(),
+                    datasource.getClass().getInterfaces(), handler);
         }catch (Exception x) {
             if (x instanceof InvocationTargetException) {
                 Throwable cause = x.getCause();
