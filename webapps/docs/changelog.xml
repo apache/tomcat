@@ -50,7 +50,7 @@
       <fix>
         Fix possible <code>SecurityException</code> when using TLS related
         request attributes. (markt)
-      </fix>    
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
