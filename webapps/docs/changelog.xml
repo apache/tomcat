@@ -56,6 +56,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix possible <code>SecurityException</code> when using TLS related
+        request attributes. (markt)
+      </fix>    
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <add>
