@@ -19,11 +19,7 @@ package org.apache.tomcat.util.compat;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLConnection;
-import java.util.Deque;
-import java.util.Optional;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
@@ -100,20 +96,5 @@ class Jre9Compat extends JreCompat {
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new UnsupportedOperationException(e);
         }
-    }
-
-
-    @Override
-    public void addClassPath(Deque<URL> classPathUrlsToProcess) {
-        ModuleLayer.boot().configuration().modules().stream().map(
-                rm -> rm.reference().location()).flatMap(Optional::stream).map(u -> {
-                    try {
-                        return u.toURL();
-                    } catch (MalformedURLException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                        return null;
-                    }
-                }).forEach(classPathUrlsToProcess::add);
     }
 }
