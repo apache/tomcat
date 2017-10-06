@@ -107,6 +107,7 @@ public final class SecurityClassLoad {
         final String basePackage = "org.apache.catalina.util.";
         loader.loadClass(basePackage + "ParameterMap");
         loader.loadClass(basePackage + "RequestUtil");
+        loader.loadClass(basePackage + "TLSUtil");
     }
 
 
