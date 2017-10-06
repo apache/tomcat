@@ -175,14 +175,13 @@ public abstract class ExpressionFactory {
                     (ExpressionFactory) constructor.newInstance(properties);
             }
 
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException |
-                NoSuchMethodException e) {
-            throw new ELException(
-                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
-                    e);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
             Util.handleThrowable(cause);
+            throw new ELException(
+                    "Unable to create ExpressionFactory of type: " + clazz.getName(),
+                    e);
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
             throw new ELException(
                     "Unable to create ExpressionFactory of type: " + clazz.getName(),
                     e);

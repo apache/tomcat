@@ -16,7 +16,6 @@
  */
 package javax.websocket.server;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -177,9 +176,8 @@ public interface ServerEndpointConfig extends EndpointConfig {
                             (Class<Configurator>) Class.forName(
                                     DEFAULT_IMPL_CLASSNAME);
                     result = clazz.getConstructor().newInstance();
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
-                        IllegalArgumentException | InvocationTargetException |
-                        NoSuchMethodException | SecurityException e) {
+                } catch (ReflectiveOperationException | IllegalArgumentException |
+                        SecurityException e) {
                     // No options left. Just return null.
                 }
             }

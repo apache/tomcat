@@ -268,8 +268,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         try {
              listener = (T) getInstanceManager().newInstance(clazz.getName(),
                      clazz.getClassLoader());
-        } catch (InstantiationException | IllegalAccessException | NamingException |
-                ClassNotFoundException e) {
+        } catch (ReflectiveOperationException | NamingException e) {
             ServletException se = new ServletException(e);
             throw se;
         } catch (Exception e) {

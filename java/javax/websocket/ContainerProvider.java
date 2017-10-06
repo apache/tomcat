@@ -16,7 +16,6 @@
  */
 package javax.websocket;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
@@ -52,8 +51,7 @@ public abstract class ContainerProvider {
                         (Class<WebSocketContainer>) Class.forName(
                                 DEFAULT_PROVIDER_CLASS_NAME);
                 result = clazz.getConstructor().newInstance();
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
-                    IllegalArgumentException | InvocationTargetException | NoSuchMethodException |
+            } catch (ReflectiveOperationException | IllegalArgumentException |
                     SecurityException e) {
                 // No options left. Just return null.
             }

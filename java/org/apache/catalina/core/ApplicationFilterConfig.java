@@ -20,7 +20,6 @@ package org.apache.catalina.core;
 
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -89,15 +88,12 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      *  instantiating the filter object
      * @exception ServletException if thrown by the filter's init() method
      * @throws NamingException
-     * @throws InvocationTargetException
      * @throws SecurityException
-     * @throws NoSuchMethodException
      * @throws IllegalArgumentException
      */
     ApplicationFilterConfig(Context context, FilterDef filterDef)
-            throws ClassCastException, ClassNotFoundException, IllegalAccessException,
-            InstantiationException, ServletException, InvocationTargetException, NamingException,
-            IllegalArgumentException, NoSuchMethodException, SecurityException {
+            throws ClassCastException, ReflectiveOperationException, ServletException,
+            NamingException, IllegalArgumentException, SecurityException {
 
         super();
 
@@ -244,14 +240,12 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
      *  instantiating the filter object
      * @exception ServletException if thrown by the filter's init() method
      * @throws NamingException
-     * @throws InvocationTargetException
+     * @throws ReflectiveOperationException
      * @throws SecurityException
-     * @throws NoSuchMethodException
      * @throws IllegalArgumentException
      */
-    Filter getFilter() throws ClassCastException, ClassNotFoundException, IllegalAccessException,
-            InstantiationException, ServletException, InvocationTargetException, NamingException,
-            IllegalArgumentException, NoSuchMethodException, SecurityException {
+    Filter getFilter() throws ClassCastException, ReflectiveOperationException, ServletException,
+            NamingException, IllegalArgumentException, SecurityException {
 
         // Return the existing filter instance, if any
         if (this.filter != null)

@@ -18,7 +18,6 @@ package org.apache.catalina.startup;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Principal;
@@ -853,10 +852,7 @@ public class Tomcat {
         try {
             return (Context) Class.forName(contextClass).getConstructor()
                     .newInstance();
-        } catch (InstantiationException | IllegalAccessException
-                | IllegalArgumentException | InvocationTargetException
-                | NoSuchMethodException | SecurityException
-                | ClassNotFoundException e) {
+        } catch (ReflectiveOperationException  | IllegalArgumentException | SecurityException e) {
             throw new IllegalArgumentException(
                     "Can't instantiate context-class " + contextClass
                             + " for host " + host + " and url "

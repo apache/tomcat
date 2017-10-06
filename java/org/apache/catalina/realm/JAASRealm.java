@@ -628,23 +628,11 @@ public class JAASRealm extends RealmBase {
                 this.jaasConfigurationLoaded = true;
                 return this.jaasConfiguration;
             }
-        } catch (URISyntaxException ex) {
-            throw new RuntimeException(ex);
-        } catch (NoSuchMethodException ex) {
-            throw new RuntimeException(ex);
-        } catch (SecurityException ex) {
-            throw new RuntimeException(ex);
-        } catch (InstantiationException ex) {
-            throw new RuntimeException(ex);
-        } catch (IllegalAccessException ex) {
-            throw new RuntimeException(ex);
-        } catch (IllegalArgumentException ex) {
-            throw new RuntimeException(ex);
         } catch (InvocationTargetException ex) {
             throw new RuntimeException(ex.getCause());
-        } catch (ClassNotFoundException ex) {
+        } catch (SecurityException | URISyntaxException | ReflectiveOperationException |
+                IllegalArgumentException ex) {
             throw new RuntimeException(ex);
         }
-
     }
 }

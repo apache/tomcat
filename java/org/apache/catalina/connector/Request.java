@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
@@ -1988,8 +1987,7 @@ public class Request implements HttpServletRequest {
                 instanceManager = getContext().getInstanceManager();
                 handler = (T) instanceManager.newInstance(httpUpgradeHandlerClass);
             }
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                NamingException | IllegalArgumentException | NoSuchMethodException |
+        } catch (ReflectiveOperationException | NamingException | IllegalArgumentException |
                 SecurityException e) {
             throw new ServletException(e);
         }

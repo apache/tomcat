@@ -825,8 +825,7 @@ public class ApplicationContext implements ServletContext {
         } catch (InvocationTargetException e) {
             ExceptionUtils.handleThrowable(e.getCause());
             throw new ServletException(e);
-        } catch (IllegalAccessException | NamingException | InstantiationException |
-                ClassNotFoundException | NoSuchMethodException e) {
+        } catch (ReflectiveOperationException | NamingException e) {
             throw new ServletException(e);
         }
     }
@@ -959,8 +958,7 @@ public class ApplicationContext implements ServletContext {
         } catch (InvocationTargetException e) {
             ExceptionUtils.handleThrowable(e.getCause());
             throw new ServletException(e);
-        } catch (IllegalAccessException | NamingException | InstantiationException |
-                ClassNotFoundException | NoSuchMethodException e) {
+        } catch (ReflectiveOperationException | NamingException e) {
             throw new ServletException(e);
         }
     }
@@ -1100,8 +1098,7 @@ public class ApplicationContext implements ServletContext {
             throw new IllegalArgumentException(sm.getString(
                     "applicationContext.addListener.iae.cnfe", className),
                     e);
-        } catch (IllegalAccessException | NamingException | InstantiationException |
-                ClassNotFoundException | NoSuchMethodException e) {
+        } catch (ReflectiveOperationException| NamingException e) {
             throw new IllegalArgumentException(sm.getString(
                     "applicationContext.addListener.iae.cnfe", className),
                     e);
@@ -1173,8 +1170,7 @@ public class ApplicationContext implements ServletContext {
         } catch (InvocationTargetException e) {
             ExceptionUtils.handleThrowable(e.getCause());
             throw new ServletException(e);
-        } catch (IllegalAccessException | NamingException | InstantiationException |
-                NoSuchMethodException e) {
+        } catch (ReflectiveOperationException | NamingException e) {
             throw new ServletException(e);
         }
     }

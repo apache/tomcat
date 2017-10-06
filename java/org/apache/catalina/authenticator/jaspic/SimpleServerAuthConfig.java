@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.authenticator.jaspic;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -118,9 +117,7 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                                     (ServerAuthModule) clazz.getConstructor().newInstance();
                             module.initialize(null, null, handler, mergedProperties);
                             modules.add(module);
-                        } catch (ClassNotFoundException | InstantiationException |
-                                IllegalAccessException | IllegalArgumentException |
-                                InvocationTargetException | NoSuchMethodException |
+                        } catch (ReflectiveOperationException | IllegalArgumentException |
                                 SecurityException e) {
                             AuthException ae = new AuthException();
                             ae.initCause(e);

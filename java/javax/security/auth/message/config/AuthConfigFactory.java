@@ -16,7 +16,6 @@
  */
 package javax.security.auth.message.config;
 
-import java.lang.reflect.InvocationTargetException;
 import java.security.AccessController;
 import java.security.Permission;
 import java.security.PrivilegedAction;
@@ -65,9 +64,8 @@ public abstract class AuthConfigFactory {
             factory = AccessController.doPrivileged(
                     new PrivilegedExceptionAction<AuthConfigFactory>() {
                 @Override
-                public AuthConfigFactory run() throws ClassNotFoundException,
-                        InstantiationException, IllegalAccessException, IllegalArgumentException,
-                        InvocationTargetException, NoSuchMethodException, SecurityException {
+                public AuthConfigFactory run() throws ReflectiveOperationException,
+                        IllegalArgumentException, SecurityException {
                     // Load this class with the same class loader as used for
                     // this class. Note that the Thread context class loader
                     // should not be used since that would trigger a memory leak

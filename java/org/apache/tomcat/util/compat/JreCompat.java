@@ -19,6 +19,7 @@ package org.apache.tomcat.util.compat;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Deque;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
@@ -114,5 +115,17 @@ public class JreCompat {
         URL url = new URL("jar:file://dummy.jar!/");
         URLConnection uConn = url.openConnection();
         uConn.setDefaultUseCaches(false);
+    }
+
+
+    /**
+     * Scans the module path and adds the locations of each module found to the
+     * queue for URLs to be processed.
+     *
+     * @param classPathUrlsToProcess    The queue of URLs to which found
+     *                                  locations should be added
+     */
+    public void addClassPath(Deque<URL> classPathUrlsToProcess) {
+        // NO-OP unless running on Java 9 or later
     }
 }
