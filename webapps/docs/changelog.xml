@@ -48,8 +48,8 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        Fix possible <code>SecurityException</code> when using requesting TLS
-        related request attributes. (markt)
+        Fix possible <code>SecurityException</code> when using TLS related
+        request attributes. (markt)
       </fix>    
     </changelog>
   </subsection>
