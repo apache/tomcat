@@ -45,28 +45,21 @@ public class TaskThreadFactory implements ThreadFactory {
 
     @Override
     public Thread newThread(Runnable r) {
-        ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        try {
-            // Threads should not be created by the webapp classloader
-            if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                        getClass().getClassLoader());
-                AccessController.doPrivileged(pa);
-            } else {
-                Thread.currentThread().setContextClassLoader(
-                        getClass().getClassLoader());
-            }
-            TaskThread t = new TaskThread(group, r, namePrefix + threadNumber.getAndIncrement());
-            t.setDaemon(daemon);
-            t.setPriority(threadPriority);
-            return t;
-        } finally {
-            if (Constants.IS_SECURITY_ENABLED) {
-                PrivilegedAction<Void> pa = new PrivilegedSetTccl(loader);
-                AccessController.doPrivileged(pa);
-            } else {
-                Thread.currentThread().setContextClassLoader(loader);
-            }
+        TaskThread t = new TaskThread(group, r, namePrefix + threadNumber.getAndIncrement());
+        t.setDaemon(daemon);
+        t.setPriority(threadPriority);
+
+        // Set the context class loader of newly created threads to be the class
+        // loader that loaded this factory. This avoids retaining references to
+        // web application class loaders and similar.
+        if (Constants.IS_SECURITY_ENABLED) {
+            PrivilegedAction<Void> pa = new PrivilegedSetTccl(
+                    t, getClass().getClassLoader());
+            AccessController.doPrivileged(pa);
+        } else {
+            t.setContextClassLoader(getClass().getClassLoader());
         }
+
+        return t;
     }
 }
