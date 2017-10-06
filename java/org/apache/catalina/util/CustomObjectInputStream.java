@@ -185,7 +185,7 @@ public final class CustomObjectInputStream extends ObjectInputStream {
         }
 
         try {
-            @SuppressWarnings("deprecation")
+            // @SuppressWarnings("deprecation") Java 9
             Class<?> proxyClass = Proxy.getProxyClass(classLoader, cinterfaces);
             return proxyClass;
         } catch (IllegalArgumentException e) {
