@@ -290,6 +290,12 @@
     <Bug code="VO" />
   </Match>
   <Match>
+    <!-- Ignoring IOException on InputStream close -->
+    <Class name="javax.el.ExpressionFactory" />
+    <Mehtod name="getClassNameServices" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
     <!-- Use of null is deliberate -->
     <Class name="org.apache.catalina.ssi.ExpressionParseTree" />
     <Method name="pushOpp" />
