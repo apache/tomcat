@@ -32,7 +32,7 @@ import org.apache.catalina.tribes.util.UUIDGenerator;
  * interceptors, the message data can be manipulated as each interceptor seems appropriate.
  * @author Peter Rossbach
  */
-public class ChannelData implements ChannelMessage {
+public final class ChannelData implements ChannelMessage {
     private static final long serialVersionUID = 1L;
 
     public static final ChannelData[] EMPTY_DATA_ARRAY = new ChannelData[0];

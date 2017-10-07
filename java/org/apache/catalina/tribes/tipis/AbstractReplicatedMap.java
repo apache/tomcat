@@ -1385,7 +1385,7 @@ public abstract class AbstractReplicatedMap<K,V>
 //                map message to send to and from other maps
 //------------------------------------------------------------------------------
 
-    public static class MapMessage implements Serializable, Cloneable {
+    public static final class MapMessage implements Serializable, Cloneable {
         private static final long serialVersionUID = 1L;
         public static final int MSG_BACKUP = 1;
         public static final int MSG_RETRIEVE_BACKUP = 2;

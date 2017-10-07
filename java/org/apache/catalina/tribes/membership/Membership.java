@@ -32,7 +32,7 @@ import org.apache.catalina.tribes.Member;
  *
  * @author Peter Rossbach
  */
-public class Membership implements Cloneable {
+public final class Membership implements Cloneable {
 
     protected static final Member[] EMPTY_MEMBERS = new Member[0];
 
