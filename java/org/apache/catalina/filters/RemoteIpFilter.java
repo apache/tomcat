@@ -18,6 +18,7 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -496,7 +497,7 @@ public class RemoteIpFilter extends GenericFilter {
                 DateFormat dateFormat = dateFormats[i];
                 try {
                     date = dateFormat.parse(value);
-                } catch (Exception ParseException) {
+                } catch (ParseException ex) {
                     // Ignore
                 }
             }

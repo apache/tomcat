@@ -66,6 +66,13 @@
     <Bug code="Eq" />
   </Match>
   <Match>
+    <!-- Ignore: Expected if not running on Tomcat. Not a problem since
+            this just allows a short-cut. -->
+    <Class name="javax.servlet.jsp.el.ScopedAttributeELResolver" />
+    <Mehtod name="&lt;static initializer for ScopedAttributeELResolver&gt;" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
     <!-- Yes the simple name is the same as the super class. Accept it. -->
     <Class name="org.apache.catalina.Executor" />
     <Bug code="Nm" />
@@ -192,6 +199,12 @@
       <Method name="handleSimpleCORS" />
     </Or>
     <Bug pattern="HRS_REQUEST_PARAMETER_TO_HTTP_HEADER" />
+  </Match>
+  <Match>
+    <!-- ParseException is ignored in loop but handled afterwards if all formats failed -->
+    <Class name="org.apache.catalina.filters.RemoteIpFilter$XForwardedRequest" />
+    <Mehtod name="getDateHeader" />
+    <Bug code="DE" />
   </Match>
   <Match>
     <!-- shost will not be null in normal usage -->
