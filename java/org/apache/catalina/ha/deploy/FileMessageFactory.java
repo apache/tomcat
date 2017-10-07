@@ -310,12 +310,12 @@ public class FileMessageFactory {
         if (in != null)
             try {
                 in.close();
-            } catch (Exception ignore) {
+            } catch (IOException ignore) {
             }
         if (out != null)
             try {
                 out.close();
-            } catch (Exception ignore) {
+            } catch (IOException ignore) {
             }
         in = null;
         out = null;

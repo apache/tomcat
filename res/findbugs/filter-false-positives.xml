@@ -213,6 +213,12 @@
     <Bug code="NP" />
   </Match>
   <Match>
+    <!-- Ignore IOException when closing input/output streams in cleanup -->
+    <Class name="org.apache.catalina.ha.deploy.FileMessageFactory" />
+    <Mehtod name="cleanup" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
     <!-- Field is only modified during Servlet load -->
     <Class name="org.apache.catalina.manager.host.HostManagerServlet" />
     <Bug code="MSF" />
