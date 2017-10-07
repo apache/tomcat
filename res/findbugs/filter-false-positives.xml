@@ -28,6 +28,12 @@
     <Bug code="NP" />
   </Match>
   <Match>
+    <!-- Ignoring IOException on InputStream close -->
+    <Class name="javax.el.ExpressionFactory" />
+    <Mehtod name="getClassNameServices" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
     <!-- Only base null is handled by this resolver -->
     <Class name="javax.servlet.jsp.el.ImplicitObjectELResolver"/>
     <Or>
@@ -288,12 +294,6 @@
     <Class name="org.apache.catalina.session.ManagerBase" />
     <Method name="generateSessionId" />
     <Bug code="VO" />
-  </Match>
-  <Match>
-    <!-- Ignoring IOException on InputStream close -->
-    <Class name="javax.el.ExpressionFactory" />
-    <Mehtod name="getClassNameServices" />
-    <Bug code="DE" />
   </Match>
   <Match>
     <!-- Use of null is deliberate -->
