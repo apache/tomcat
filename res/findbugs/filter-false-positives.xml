@@ -219,6 +219,15 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <!-- Ignore exceptions from Thread.sleep() -->
+    <Class name="org.apache.catalina.ha.session.DeltaManager" />
+    <Or>
+      <Method name="handleGET_ALL_SESSIONS" />
+      <Method name="waitForSendAllSessions" />
+    </Or>
+    <Bug code="DE" />
+  </Match>
+  <Match>
     <!-- Field is only modified during Servlet load -->
     <Class name="org.apache.catalina.manager.host.HostManagerServlet" />
     <Bug code="MSF" />
