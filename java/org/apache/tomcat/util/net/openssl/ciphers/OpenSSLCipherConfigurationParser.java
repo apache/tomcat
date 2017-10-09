@@ -824,4 +824,77 @@ public class OpenSSLCipherConfigurationParser {
         }
         return builder.toString().substring(0, builder.length() - 1);
     }
+
+    public static void usage() {
+        System.out.println("Usage: java " + OpenSSLCipherConfigurationParser.class.getName() + " [options] cipherspec");
+        System.out.println();
+        System.out.println("Displays the TLS cipher suites matching the cipherspec.");
+        System.out.println();
+        System.out.println(" --help,");
+        System.out.println(" -h          Print this help message");
+        System.out.println(" --openssl   Show OpenSSL cipher suite names instead of IANA cipher suite names.");
+        System.out.println(" --verbose,");
+        System.out.println(" -v          Provide detailed cipher listing");
+    }
+
+    public static void main(String[] args) throws Exception
+    {
+        boolean verbose = false;
+        boolean useOpenSSLNames = false;
+        int argindex;
+        for(argindex = 0; argindex < args.length; ++argindex)
+        {
+            String arg = args[argindex];
+            if("--verbose".equals(arg) || "-v".equals(arg))
+                verbose = true;
+            else if("--openssl".equals(arg))
+                useOpenSSLNames = true;
+            else if("--help".equals(arg) || "-h".equals(arg)) {
+                usage();
+                System.exit(0);
+            }
+            else if("--".equals(arg)) {
+                ++argindex;
+                break;
+            } else if(arg.startsWith("-")) {
+                System.out.println("Unknown option: " + arg);
+                usage();
+                System.exit(1);
+            } else {
+                // Non-switch argument... probably the cipher spec
+                break;
+            }
+        }
+
+        String cipherSpec;
+        if(argindex < args.length) {
+            cipherSpec = args[argindex];
+        } else {
+            cipherSpec = "DEFAULT";
+        }
+        Set<Cipher> ciphers = parse(cipherSpec);
+        boolean first = true;
+        if(null != ciphers && 0 < ciphers.size()) {
+            for(Cipher cipher : ciphers)
+            {
+                if(first) {
+                    first = false;
+                } else {
+                    if(verbose) {
+                        System.out.println("\t" + cipher.getProtocol() + "\tKx=" + cipher.getKx() + "\tAu=" + cipher.getAu() + "\tEnc=" + cipher.getEnc() + "\tMac=" + cipher.getMac());
+                    }
+                    else
+                        System.out.print(',');
+                }
+                if(useOpenSSLNames)
+                    System.out.print(cipher.getOpenSSLAlias());
+                else
+                    System.out.print(cipher.name());
+            }
+            if(verbose)
+                System.out.println();
+        } else {
+            System.out.println("No ciphers match '" + cipherSpec + "'");
+        }
+    }
 }
