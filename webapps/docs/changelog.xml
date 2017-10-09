@@ -91,6 +91,10 @@
         such attempted use of the endorsed directory mechanism will trigger an
         error and Tomcat will fail to start. (rjung)
       </fix>
+      <fix>
+        <bug>61590</bug>: Enable <code>service.bat</code> to recognise when
+        <code>JAVA_HOME</code> is configured for a Java 9 JDK. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
