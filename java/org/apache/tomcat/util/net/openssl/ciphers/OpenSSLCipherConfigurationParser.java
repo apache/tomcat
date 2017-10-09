@@ -880,16 +880,16 @@ public class OpenSSLCipherConfigurationParser {
                 if(first) {
                     first = false;
                 } else {
-                    if(verbose) {
-                        System.out.println("\t" + cipher.getProtocol() + "\tKx=" + cipher.getKx() + "\tAu=" + cipher.getAu() + "\tEnc=" + cipher.getEnc() + "\tMac=" + cipher.getMac());
-                    }
-                    else
+                    if(!verbose)
                         System.out.print(',');
                 }
                 if(useOpenSSLNames)
                     System.out.print(cipher.getOpenSSLAlias());
                 else
                     System.out.print(cipher.name());
+                if(verbose) {
+                    System.out.println("\t" + cipher.getProtocol() + "\tKx=" + cipher.getKx() + "\tAu=" + cipher.getAu() + "\tEnc=" + cipher.getEnc() + "\tMac=" + cipher.getMac());
+                }
             }
             System.out.println();
         } else {
