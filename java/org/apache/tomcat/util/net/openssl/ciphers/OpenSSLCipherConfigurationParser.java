@@ -891,8 +891,7 @@ public class OpenSSLCipherConfigurationParser {
                 else
                     System.out.print(cipher.name());
             }
-            if(verbose)
-                System.out.println();
+            System.out.println();
         } else {
             System.out.println("No ciphers match '" + cipherSpec + "'");
         }
