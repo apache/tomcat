@@ -313,11 +313,6 @@ public class SmapStratum {
         out.append(outputFileName + '\n');
         out.append("JSP\n");
 
-        // print our StratumSection, FileSection, and LineSections
-        if (fileNameList.size() == 0 || lineData.size() == 0) {
-            throw new IllegalStateException();
-        }
-
         // print StratumSection
         out.append("*S JSP\n");
 
