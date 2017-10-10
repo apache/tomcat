@@ -75,6 +75,10 @@
       <fix>
         Enable Javadoc to be built with Java 9. (markt)
       </fix>
+      <fix>
+        <bug>61603</bug>: Add XML filtering for the status servlet output where
+        needed. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
