@@ -2553,9 +2553,7 @@ skip.installer property in build.properties" />
     <!-- Protocol handlers - Coyote -->
     <jarIt jarfile="${tomcat-coyote-src.jar}"
       filesDir="java"
-      filesId="files.tomcat-coyote"
-      notice="${tomcat.manifests}/tomcat-coyote.jar.notice"
-      license="${tomcat.manifests}/tomcat-coyote.license" />
+      filesId="files.tomcat-coyote" />
 
     <!-- JNI -->
     <jarIt jarfile="${tomcat-jni-src.jar}"
