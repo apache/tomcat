@@ -26,7 +26,9 @@ import java.net.URLClassLoader;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -250,6 +252,11 @@ public class StandardJarScanner implements JarScanner {
             // instances of URLClassLoader. Use the class path in this
             // case.
             List<URL> urls = getClassPath();
+            // Also add any modules
+            Deque<URL> modulePathUrls = new LinkedList<URL>();
+            JreCompat.getInstance().addBootModulePath(modulePathUrls);
+            urls.addAll(modulePathUrls);
+            // Process URLs
             for (URL url : urls) {
                 if (!processedURLs.contains(url)) {
                     try {
@@ -260,8 +267,6 @@ public class StandardJarScanner implements JarScanner {
                     }
                 }
             }
-
-            // TODO Java 9 module path
         }
 
     }
