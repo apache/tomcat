@@ -29,7 +29,7 @@ class Jre9Compat extends JreCompat {
     private static final Class<?> inaccessibleObjectExceptionClazz;
     private static final Method setApplicationProtocolsMethod;
     private static final Method getApplicationProtocolMethod;
-    private static final Method setDefaultUseCaches;
+    private static final Method setDefaultUseCachesMethod;
 
     static {
         Class<?> c1 = null;
@@ -50,7 +50,7 @@ class Jre9Compat extends JreCompat {
         inaccessibleObjectExceptionClazz = c1;
         setApplicationProtocolsMethod = m2;
         getApplicationProtocolMethod = m3;
-        setDefaultUseCaches = m4;
+        setDefaultUseCachesMethod = m4;
     }
 
 
@@ -92,7 +92,7 @@ class Jre9Compat extends JreCompat {
     @Override
     public void disableCachingForJarUrlConnections() throws IOException {
         try {
-            setDefaultUseCaches.invoke(null, "JAR", Boolean.FALSE);
+            setDefaultUseCachesMethod.invoke(null, "JAR", Boolean.FALSE);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new UnsupportedOperationException(e);
         }
