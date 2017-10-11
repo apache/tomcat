@@ -112,6 +112,10 @@
         <bug>61590</bug>: Enable <code>service.bat</code> to recognise when
         <code>JAVA_HOME</code> is configured for a Java 9 JDK. (markt)
       </fix>
+      <fix>
+        <bug>61598</bug>: Update the Windows installer to search the new (as of
+        Java 9) registry locations when looking for a JRE. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
