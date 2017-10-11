@@ -51,6 +51,11 @@
         Fix possible <code>SecurityException</code> when using TLS related
         request attributes. (markt)
       </fix>
+      <fix>
+        <bug>61597</bug>: Extend the <code>StandardJarScanner</code> to scan
+        JARs on the module path when running on Java 9 and class path scanning
+        is enabled. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
