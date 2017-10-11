@@ -273,9 +273,9 @@ public class StandardJarScanner implements JarScanner {
             // instances of URLClassLoader. Use the class path in this
             // case.
             addClassPath(classPathUrlsToProcess);
+            // Also add any modules
+            JreCompat.getInstance().addBootModulePath(classPathUrlsToProcess);
             processURLs(scanType, callback, processedURLs, false, classPathUrlsToProcess);
-
-            // TODO Java 9 module path
         }
     }
 

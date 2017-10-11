@@ -19,6 +19,7 @@ package org.apache.tomcat.util.compat;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Deque;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
@@ -115,4 +116,17 @@ public class JreCompat {
         URLConnection uConn = url.openConnection();
         uConn.setDefaultUseCaches(false);
     }
+
+
+    /**
+     * Obtains the URls for all the JARs on the module path when the JVM starts
+     * and adds them to the provided Deque.
+     *
+     * @param classPathUrlsToProcess    The Deque to which the modules should be
+     *                                  added
+     */
+    public void addBootModulePath(Deque<URL> classPathUrlsToProcess) {
+        // NO-OP for Java 8. There is no module path.
+    }
+
 }
