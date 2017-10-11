@@ -54,10 +54,6 @@
         added in Java 9 to only disable the caching for JAR URL connections.
         (markt)
       </add>
-    </changelog>
-  </subsection>
-  <subsection name="Catalina">
-    <changelog>
       <fix>
         Fix possible <code>SecurityException</code> when using TLS related
         request attributes. (markt)
@@ -76,10 +72,6 @@
         connectors when using the JSSE implementation for TLS when running on
         Java 9. (markt)
       </add>
-    </changelog>
-  </subsection>
-  <subsection name="Coyote">
-    <changelog>
       <fix>
         <bug>61568</bug>: Avoid a potential <code>SecurityException</code> when
         using the NIO2 connector and a new thread is added to the pool. (markt)
