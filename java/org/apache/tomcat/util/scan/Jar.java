@@ -34,9 +34,14 @@ public interface Jar {
      * Determines if a specific entry exists within the JAR.
      *
      * @param name  Entry to look for
-     * @return      <code>true</code> if the specified entry exists else
-     *               <code>false</code>
+     * @return      Implementations will always return {@code false}
+     *
+     * @throws IOException if an I/O error occurs while processing the JAR file
+     *   entries
+     *
+     * @deprecated Unused.
      */
+    @Deprecated
     boolean entryExists(String name) throws IOException;
 
 

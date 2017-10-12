@@ -39,16 +39,9 @@ public class UrlJar implements Jar {
     }
 
     @Override
+    @Deprecated
     public boolean entryExists(String name) throws IOException {
-        JarEntry entry = jarInputStream.getNextJarEntry();
-        while (entry != null) {
-            if (name.equals(entry.getName())) {
-                break;
-            }
-            entry = jarInputStream.getNextJarEntry();
-        }
-
-        return entry != null;
+        return false;
     }
 
     @Override
