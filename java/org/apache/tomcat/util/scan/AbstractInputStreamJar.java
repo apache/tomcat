@@ -81,13 +81,6 @@ public abstract class AbstractInputStreamJar implements Jar {
 
 
     @Override
-    @Deprecated
-    public boolean entryExists(String name) throws IOException {
-        return false;
-    }
-
-
-    @Override
     public InputStream getInputStream(String name) throws IOException {
         gotoEntry(name);
         if (entry == null) {

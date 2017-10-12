@@ -70,12 +70,6 @@ public class JarFileUrlJar implements Jar {
 
 
     @Override
-    @Deprecated
-    public boolean entryExists(String name) {
-        return false;
-    }
-
-    @Override
     public InputStream getInputStream(String name) throws IOException {
         ZipEntry entry = jarFile.getEntry(name);
         if (entry == null) {

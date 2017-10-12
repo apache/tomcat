@@ -40,21 +40,6 @@ public interface Jar extends AutoCloseable {
     URL getJarFileURL();
 
     /**
-     * Determines if a specific entry exists within the JAR.
-     *
-     * @param name  Entry to look for
-     * @return      Implementations will always return {@code false}
-     *
-     * @throws IOException if an I/O error occurs while processing the JAR file
-     *   entries
-     *
-     * @deprecated Unused. This will be removed in Tomcat 9 onwards.
-     */
-    @Deprecated
-    boolean entryExists(String name) throws IOException;
-
-
-    /**
      * Obtain an {@link InputStream} for a given entry in a JAR. The caller is
      * responsible for closing the stream.
      *
