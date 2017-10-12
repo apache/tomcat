@@ -70,9 +70,9 @@ public class JarFileUrlJar implements Jar {
 
 
     @Override
+    @Deprecated
     public boolean entryExists(String name) {
-        ZipEntry entry = jarFile.getEntry(name);
-        return entry != null;
+        return false;
     }
 
     @Override
