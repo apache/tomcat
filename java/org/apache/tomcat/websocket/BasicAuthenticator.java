@@ -18,8 +18,9 @@ package org.apache.tomcat.websocket;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Map;
+
+import org.apache.tomcat.util.codec.binary.Base64;
 
 /**
  * Authenticator supporting the BASIC auth method.
@@ -53,7 +54,7 @@ public class BasicAuthenticator extends Authenticator {
             charset = StandardCharsets.ISO_8859_1;
         }
 
-        String base64 = Base64.getEncoder().encodeToString(userPass.getBytes(charset));
+        String base64 = Base64.encodeBase64String(userPass.getBytes(charset));
 
         return " Basic " + base64;
     }
