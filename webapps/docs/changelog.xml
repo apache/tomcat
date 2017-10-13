@@ -80,6 +80,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>61604</bug>: Add support for authentication in the websocket
+        client. Patch submitted by J Fernandez. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
