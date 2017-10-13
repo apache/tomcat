@@ -88,6 +88,8 @@ public class Constants {
     public static final String CONNECTION_HEADER_NAME = "Connection";
     public static final String CONNECTION_HEADER_VALUE = "upgrade";
     public static final String LOCATION_HEADER_NAME = "Location";
+    public static final String AUTHORIZATION_HEADER_NAME = "Authorization";
+    public static final String WWW_AUTHENTICATE_HEADER_NAME = "WWW-Authenticate";
     public static final String WS_VERSION_HEADER_NAME = "Sec-WebSocket-Version";
     public static final String WS_VERSION_HEADER_VALUE = "13";
     public static final String WS_KEY_HEADER_NAME = "Sec-WebSocket-Key";
@@ -116,6 +118,9 @@ public class Constants {
     static final int DEFAULT_PROCESS_PERIOD = Integer.getInteger(
             "org.apache.tomcat.websocket.DEFAULT_PROCESS_PERIOD", 10)
             .intValue();
+
+    public static final String WS_AUTHENTICATION_USER_NAME = "org.apache.tomcat.websocket.WS_AUTHENTICATION_USER_NAME";
+    public static final String WS_AUTHENTICATION_PASSWORD = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PASSWORD";
 
     /* Configuration for extensions
      * Note: These options are primarily present to enable this implementation

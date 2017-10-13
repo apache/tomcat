@@ -30,12 +30,21 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.authenticator.AuthenticatorBase;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.util.descriptor.web.LoginConfig;
+import org.apache.tomcat.util.descriptor.web.SecurityCollection;
+import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
 public class TestWebSocketFrameClient extends WebSocketBaseTest {
+
+    private static final String USER = "Aladdin";
+    private static final String PWD = "open sesame";
+    private static final String ROLE = "role";
+    private static final String URI_PROTECTED = "/foo";
 
     @Test
     public void testConnectToServerEndpoint() throws Exception {
@@ -93,15 +102,19 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
 
         tomcat.start();
 
-        echoTester("");
-        echoTester("/");
-        echoTester("/foo");
-        echoTester("/foo/");
+        echoTester("",null);
+        echoTester("/",null);
+        echoTester("/foo",null);
+        echoTester("/foo/",null);
     }
 
-    public void echoTester(String path) throws Exception {
+    public void echoTester(String path, ClientEndpointConfig clientEndpointConfig)
+            throws Exception {
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
-        ClientEndpointConfig clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
+
+        if (clientEndpointConfig == null) {
+            clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
+        }
         Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 clientEndpointConfig, new URI("ws://localhost:" + getPort() + path));
         CountDownLatch latch = new CountDownLatch(1);
@@ -118,6 +131,82 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
             Assert.assertEquals("Hello", message);
         }
         wsSession.close();
+    }
+
+    @Test
+    public void testConnectToBasicEndpoint() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        Context ctx = tomcat.addContext(URI_PROTECTED, null);
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMappingDecoded("/", "default");
+
+        SecurityCollection collection = new SecurityCollection();
+        collection.addPatternDecoded("/");
+        String utf8User = "test";
+        String utf8Pass = "123£";
+
+        tomcat.addUser(utf8User, utf8Pass);
+        tomcat.addRole(utf8User, ROLE);
+
+        SecurityConstraint sc = new SecurityConstraint();
+        sc.addAuthRole(ROLE);
+        sc.addCollection(collection);
+        ctx.addConstraint(sc);
+
+        LoginConfig lc = new LoginConfig();
+        lc.setAuthMethod("BASIC");
+        ctx.setLoginConfig(lc);
+
+        AuthenticatorBase basicAuthenticator = new org.apache.catalina.authenticator.BasicAuthenticator();
+        ctx.getPipeline().addValve(basicAuthenticator);
+
+        tomcat.start();
+
+        ClientEndpointConfig clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
+        clientEndpointConfig.getUserProperties().put(Constants.WS_AUTHENTICATION_USER_NAME, utf8User);
+        clientEndpointConfig.getUserProperties().put(Constants.WS_AUTHENTICATION_PASSWORD, utf8Pass);
+
+        echoTester(URI_PROTECTED, clientEndpointConfig);
+
+    }
+
+    @Test
+    public void testConnectToDigestEndpoint() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        Context ctx = tomcat.addContext(URI_PROTECTED, null);
+        ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
+        Tomcat.addServlet(ctx, "default", new DefaultServlet());
+        ctx.addServletMappingDecoded("/", "default");
+
+        SecurityCollection collection = new SecurityCollection();
+        collection.addPatternDecoded("/*");
+
+        tomcat.addUser(USER, PWD);
+        tomcat.addRole(USER, ROLE);
+
+        SecurityConstraint sc = new SecurityConstraint();
+        sc.addAuthRole(ROLE);
+        sc.addCollection(collection);
+        ctx.addConstraint(sc);
+
+        LoginConfig lc = new LoginConfig();
+        lc.setAuthMethod("DIGEST");
+        ctx.setLoginConfig(lc);
+
+        AuthenticatorBase digestAuthenticator = new org.apache.catalina.authenticator.DigestAuthenticator();
+        ctx.getPipeline().addValve(digestAuthenticator);
+
+        tomcat.start();
+
+        ClientEndpointConfig clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
+        clientEndpointConfig.getUserProperties().put(Constants.WS_AUTHENTICATION_USER_NAME, USER);
+        clientEndpointConfig.getUserProperties().put(Constants.WS_AUTHENTICATION_PASSWORD,PWD);
+
+        echoTester(URI_PROTECTED, clientEndpointConfig);
+
     }
 
 }
