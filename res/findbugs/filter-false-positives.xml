@@ -738,6 +738,14 @@
     <Bug code="RV" />
   </Match>
   <Match>
+    <!-- Name shadowing is deliberate -->
+    <Or>
+      <Class name="org.apache.tomcat.jdbc.pool.DataSource" />
+      <Class name="org.apache.tomcat.jdbc.pool.XADataSource" />
+    </Or>
+    <Bug pattern="NM_SAME_SIMPLE_NAME_AS_INTERFACE" />
+  </Match>
+  <Match>
     <!-- Lock is released -->
     <Class name="org.apache.tomcat.jdbc.pool.FairBlockingQueue" />
     <Method name="poll" />
@@ -760,6 +768,11 @@
     <Class name="org.apache.tomcat.jdbc.pool.PooledConnection" />
     <Method name="validate" />
     <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" />
+  </Match>
+  <Match>
+    <!-- The name isn't great but it is part of the public API now -->
+    <Class name="org.apache.tomcat.jdbc.pool.TrapException" />
+    <Bug pattern="NM_CLASS_NOT_EXCEPTION" />
   </Match>
   <Match>
     <!-- Lack of thread-safety is accepted in return for better performance. -->

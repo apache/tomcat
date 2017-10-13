@@ -621,7 +621,10 @@ public class ConnectionPool {
         // we could have threads stuck in idle.poll(timeout) that will never be
         // notified
         if (waitcount.get() > 0) {
-            idle.offer(create(true));
+            if (!idle.offer(create(true))) {
+                log.warn("Failed to add a new connection to the pool after releasing a connection " +
+                        "when at least one thread was waiting for a connection.");
+            }
         }
     }
 
