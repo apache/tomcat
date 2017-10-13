@@ -17,6 +17,13 @@
 <FindBugsFilter>
   <!--  Considered to be false positives -->
   <Match>
+    <!-- Ignore: Expected if not running on Tomcat. Not a problem since
+            this just allows a short-cut. -->
+    <Class name="javax.servlet.jsp.el.ScopedAttributeELResolver" />
+    <Method name="&lt;clinit&gt;" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
     <!--  Cannot do anything about this. API is fixed by the specification. -->
     <Class name="javax.servlet.jsp.tagext.TagData"/>
     <Bug code="CN" />
@@ -158,10 +165,31 @@
     <Bug pattern="HRS_REQUEST_PARAMETER_TO_HTTP_HEADER" />
   </Match>
   <Match>
+    <!-- ParseException is ignored in loop but handled afterwards if all formats failed -->
+    <Class name="org.apache.catalina.filters.RemoteIpFilter$XForwardedRequest" />
+    <Method name="getDateHeader" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
     <!-- shost will not be null in normal usage -->
     <Class name="org.apache.catalina.ha.backend.CollectedInfo" />
     <Method name="init" />
     <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Ignore IOException when closing input/output streams in cleanup -->
+    <Class name="org.apache.catalina.ha.deploy.FileMessageFactory" />
+    <Method name="cleanup" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
+    <!-- Ignore exceptions from Thread.sleep() -->
+    <Class name="org.apache.catalina.ha.session.DeltaManager" />
+    <Or>
+      <Method name="handleGET_ALL_SESSIONS" />
+      <Method name="waitForSendAllSessions" />
+    </Or>
+    <Bug code="DE" />
   </Match>
   <Match>
     <!-- Field is only modified during Servlet load -->
