@@ -540,7 +540,7 @@
   <Match>
     <!-- Notify is correct. Condition changed outside of this method. -->
     <Class name="org.apache.coyote.http2.Http2UpgradeHandler" />
-    <Method name="releaseBackLog" />
+    <Method name="incrementWindowSize" />
     <Bug pattern="NN_NAKED_NOTIFY" />
   </Match>
   <Match>
@@ -552,7 +552,10 @@
   <Match>
     <!-- Notify is correct. Condition changed outside of this method. -->
     <Class name="org.apache.coyote.http2.Stream" />
-    <Method name="incrementWindowSize" />
+    <Or>
+      <Method name="incrementWindowSize" />
+      <Method name="receiveReset" />
+    </Or>
     <Bug pattern="NN_NAKED_NOTIFY" />
   </Match>
   <Match>
