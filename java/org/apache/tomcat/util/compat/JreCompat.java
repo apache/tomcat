@@ -139,6 +139,8 @@ public class JreCompat {
      *
      * @param s The JAR file to open
      *
+     * @return A JarFile instance based on the provided path
+     *
      * @throws IOException  If an I/O error occurs creating the JarFile instance
      */
     public final JarFile jarFileNewInstance(String s) throws IOException {
@@ -151,6 +153,8 @@ public class JreCompat {
      * JarFile will be multi-release JAR aware.
      *
      * @param f The JAR file to open
+     *
+     * @return A JarFile instance based on the provided file
      *
      * @throws IOException  If an I/O error occurs creating the JarFile instance
      */
