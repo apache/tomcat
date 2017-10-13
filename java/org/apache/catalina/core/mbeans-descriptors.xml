@@ -1791,11 +1791,11 @@
     </operation>
     
     <operation name="findInitParameter"
-               description="Add a mapping associated with the Wrapper."
+               description="Return the value of an initialization parameter"
                impact="ACTION"
-               returnType="void">
-      <parameter name="mapping"
-                 description="The new wrapper mapping"
+               returnType="java.lang.String">
+      <parameter name="name"
+                 description="The name of the initialization parameter"
                  type="java.lang.String"/>
     </operation>
     

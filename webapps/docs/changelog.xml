@@ -76,6 +76,10 @@
         JARs on the module path when running on Java 9 and class path scanning
         is enabled. (markt)
       </fix>
+      <fix>
+        Fix the JMX descriptor for <code>Wrapper.findInitParameter()</code>.
+        (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
