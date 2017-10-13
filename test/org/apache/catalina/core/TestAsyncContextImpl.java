@@ -2032,7 +2032,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        private AsyncContext asyncContext;
+        private transient AsyncContext asyncContext;
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)

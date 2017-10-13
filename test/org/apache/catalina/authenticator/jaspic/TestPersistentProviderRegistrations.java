@@ -81,7 +81,7 @@ public class TestPersistentProviderRegistrations {
         validateSimple(end);
 
         if (f.exists()) {
-            f.delete();
+            Assert.assertTrue("Failed to clean up [" + f + "]", f.delete());
         }
     }
 }

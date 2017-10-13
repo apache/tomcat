@@ -308,7 +308,7 @@ public class TestVirtualContext extends TomcatBaseTest {
         assertPageContains("/test/annotatedServlet", MyAnnotatedServlet.MESSAGE);
         tomcat.stop();
         FileUtils.deleteDirectory(additionWebInfClasses);
-        tempFile.delete();
+        Assert.assertTrue("Failed to clean up [" + tempFile + "]", tempFile.delete());
     }
 
     private void assertPageContains(String pageUrl, String expectedBody)

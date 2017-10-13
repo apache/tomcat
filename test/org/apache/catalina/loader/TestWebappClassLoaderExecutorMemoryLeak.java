@@ -83,7 +83,7 @@ public class TestWebappClassLoaderExecutorMemoryLeak extends TomcatBaseTest {
         long n = 1000L;
         int tpSize = 10;
 
-        public volatile ThreadPoolExecutor tpe;
+        public transient volatile ThreadPoolExecutor tpe;
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)

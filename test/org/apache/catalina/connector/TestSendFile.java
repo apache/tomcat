@@ -88,7 +88,7 @@ public class TestSendFile extends TomcatBaseTest {
             }
         } finally {
             for (File f : files) {
-                f.delete();
+                Assert.assertTrue("Failed to clean up [" + f + "]", f.delete());
             }
         }
     }
@@ -205,7 +205,9 @@ public class TestSendFile extends TomcatBaseTest {
                 req.setAttribute(Globals.SENDFILE_FILENAME_ATTR, file.getAbsolutePath());
                 req.setAttribute(Globals.SENDFILE_FILE_START_ATTR, Long.valueOf(0));
                 req.setAttribute(Globals.SENDFILE_FILE_END_ATTR, Long.valueOf(file.length()));
-                file.delete();
+                if (!file.delete()) {
+                    throw new ServletException("Failed to delete [" + file + "]");
+                }
             } else {
                 byte[] c = new byte[1024];
                 Random rd = new Random();

@@ -848,8 +848,9 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                 Files.copy(file, destPath);
                 // Make sure that HostConfig thinks all newly copied files have
                 // been modified.
-                destPath.toFile().setLastModified(
-                        System.currentTimeMillis() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS);
+                Assert.assertTrue("Failed to set last modified for [" + destPath + "]",
+                        destPath.toFile().setLastModified(
+                        System.currentTimeMillis() - 2 * HostConfig.FILE_MODIFICATION_RESOLUTION_MS));
                 return FileVisitResult.CONTINUE;
             }
 
