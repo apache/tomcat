@@ -49,7 +49,7 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         File webappDocBaseFile = new File(webappDocBase);
         WEBAPP_DOC_BASE = webappDocBaseFile.getCanonicalPath();
         File classes = new File(webappDocBaseFile, "/WEB-INF/classes/" + PACKAGE_PREFIX);
-        classes.mkdirs();
+        Assert.assertTrue("Failed to create [" + classes + "]", classes.mkdirs());
 
         copyResource(PACKAGE_PREFIX + "/TesterNeverWeavedClass.class",
                 new File(classes, "TesterNeverWeavedClass.class"));
