@@ -85,8 +85,6 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     private static final byte[] HTTP_VERSION_BYTES =
             " HTTP/1.1\r\n".getBytes(StandardCharsets.ISO_8859_1);
 
-    private Set<URI> redirectSet = null;
-
     private volatile AsynchronousChannelGroup asynchronousChannelGroup = null;
     private final Object asynchronousChannelGroupLock = new Object();
 
@@ -522,6 +520,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 maxRedirects = Integer.parseInt(maxRedirectsValue);
             }
 
+            Set<URI> redirectSet = null;
+
             if (httpResponse.status != 101) {
                 if(isRedirectStatus(httpResponse.status)){
                     List<String> locationHeader =
@@ -657,10 +657,6 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         } finally {
             if (!success) {
                 channel.close();
-            }
-
-            if (redirectSet != null && !redirectSet.isEmpty()) {
-                redirectSet.clear();
             }
         }
 
