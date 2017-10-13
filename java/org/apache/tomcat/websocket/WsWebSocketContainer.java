@@ -76,7 +76,6 @@ import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 public class WsWebSocketContainer implements WebSocketContainer, BackgroundProcess {
 
     private static final StringManager sm = StringManager.getManager(WsWebSocketContainer.class);
-
     private static final Random RANDOM = new Random();
     private static final byte[] CRLF = new byte[] { 13, 10 };
 
@@ -195,172 +194,6 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         return connectToServerRecursive(endpoint, clientEndpointConfiguration, path, new HashSet<>());
     }
 
-    protected void registerSession(Endpoint endpoint, WsSession wsSession) {
-
-        if (!wsSession.isOpen()) {
-            // The session was closed during onOpen. No need to register it.
-            return;
-        }
-        synchronized (endPointSessionMapLock) {
-            if (endpointSessionMap.size() == 0) {
-                BackgroundProcessManager.getInstance().register(this);
-            }
-            Set<WsSession> wsSessions = endpointSessionMap.get(endpoint);
-            if (wsSessions == null) {
-                wsSessions = new HashSet<>();
-                endpointSessionMap.put(endpoint, wsSessions);
-            }
-            wsSessions.add(wsSession);
-        }
-        sessions.put(wsSession, wsSession);
-    }
-
-
-    protected void unregisterSession(Endpoint endpoint, WsSession wsSession) {
-
-        synchronized (endPointSessionMapLock) {
-            Set<WsSession> wsSessions = endpointSessionMap.get(endpoint);
-            if (wsSessions != null) {
-                wsSessions.remove(wsSession);
-                if (wsSessions.size() == 0) {
-                    endpointSessionMap.remove(endpoint);
-                }
-            }
-            if (endpointSessionMap.size() == 0) {
-                BackgroundProcessManager.getInstance().unregister(this);
-            }
-        }
-        sessions.remove(wsSession);
-    }
-
-
-    Set<Session> getOpenSessions(Endpoint endpoint) {
-        Set<Session> result = new HashSet<>();
-        synchronized (endPointSessionMapLock) {
-            Set<WsSession> sessions = endpointSessionMap.get(endpoint);
-            if (sessions != null) {
-                result.addAll(sessions);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public long getDefaultMaxSessionIdleTimeout() {
-        return defaultMaxSessionIdleTimeout;
-    }
-
-
-    @Override
-    public void setDefaultMaxSessionIdleTimeout(long timeout) {
-        this.defaultMaxSessionIdleTimeout = timeout;
-    }
-
-
-    @Override
-    public int getDefaultMaxBinaryMessageBufferSize() {
-        return maxBinaryMessageBufferSize;
-    }
-
-
-    @Override
-    public void setDefaultMaxBinaryMessageBufferSize(int max) {
-        maxBinaryMessageBufferSize = max;
-    }
-
-
-    @Override
-    public int getDefaultMaxTextMessageBufferSize() {
-        return maxTextMessageBufferSize;
-    }
-
-
-    @Override
-    public void setDefaultMaxTextMessageBufferSize(int max) {
-        maxTextMessageBufferSize = max;
-    }
-
-
-    /**
-     * {@inheritDoc}
-     *
-     * Currently, this implementation does not support any extensions.
-     */
-    @Override
-    public Set<Extension> getInstalledExtensions() {
-        return Collections.emptySet();
-    }
-
-
-    /**
-     * {@inheritDoc}
-     *
-     * The default value for this implementation is -1.
-     */
-    @Override
-    public long getDefaultAsyncSendTimeout() {
-        return defaultAsyncTimeout;
-    }
-
-
-    /**
-     * {@inheritDoc}
-     *
-     * The default value for this implementation is -1.
-     */
-    @Override
-    public void setAsyncSendTimeout(long timeout) {
-        this.defaultAsyncTimeout = timeout;
-    }
-
-
-    /**
-     * Cleans up the resources still in use by WebSocket sessions created from
-     * this container. This includes closing sessions and cancelling
-     * {@link Future}s associated with blocking read/writes.
-     */
-    public void destroy() {
-        CloseReason cr = new CloseReason(
-                CloseCodes.GOING_AWAY, sm.getString("wsWebSocketContainer.shutdown"));
-
-        for (WsSession session : sessions.keySet()) {
-            try {
-                session.close(cr);
-            } catch (IOException ioe) {
-                log.debug(sm.getString(
-                        "wsWebSocketContainer.sessionCloseFail", session.getId()), ioe);
-            }
-        }
-
-        // Only unregister with AsyncChannelGroupUtil if this instance
-        // registered with it
-        if (asynchronousChannelGroup != null) {
-            synchronized (asynchronousChannelGroupLock) {
-                if (asynchronousChannelGroup != null) {
-                    AsyncChannelGroupUtil.unregister();
-                    asynchronousChannelGroup = null;
-                }
-            }
-        }
-    }
-
-
-    protected AsynchronousChannelGroup getAsynchronousChannelGroup() {
-        // Use AsyncChannelGroupUtil to share a common group amongst all
-        // WebSocket clients
-        AsynchronousChannelGroup result = asynchronousChannelGroup;
-        if (result == null) {
-            synchronized (asynchronousChannelGroupLock) {
-                if (asynchronousChannelGroup == null) {
-                    asynchronousChannelGroup = AsyncChannelGroupUtil.register();
-                }
-                result = asynchronousChannelGroup;
-            }
-        }
-        return result;
-    }
-
-
     private Session connectToServerRecursive(Endpoint endpoint,
             ClientEndpointConfig clientEndpointConfiguration, URI path,
             Set<URI> redirectSet)
@@ -379,14 +212,14 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             secure = true;
         } else {
             throw new DeploymentException(sm.getString(
-                    "wsWebSocketClient.pathWrongScheme", scheme));
+                    "wsWebSocketContainer.pathWrongScheme", scheme));
         }
 
         // Validate host
         String host = path.getHost();
         if (host == null) {
             throw new DeploymentException(
-                    sm.getString("wsWebSocketClient.pathNoHost"));
+                    sm.getString("wsWebSocketContainer.pathNoHost"));
         }
         int port = path.getPort();
 
@@ -445,7 +278,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             socketChannel = AsynchronousSocketChannel.open(getAsynchronousChannelGroup());
         } catch (IOException ioe) {
             throw new DeploymentException(sm.getString(
-                    "wsWebSocketClient.asynchronousSocketChannelFail"), ioe);
+                    "wsWebSocketContainer.asynchronousSocketChannelFail"), ioe);
         }
 
         Map<String,Object> userProperties = clientEndpointConfiguration.getUserProperties();
@@ -478,7 +311,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 HttpResponse httpResponse = processResponse(response, channel, timeout);
                 if (httpResponse.getStatus() != 200) {
                     throw new DeploymentException(sm.getString(
-                            "wsWebSocketClient.proxyConnectFail", selectedProxy,
+                            "wsWebSocketContainer.proxyConnectFail", selectedProxy,
                             Integer.toString(httpResponse.getStatus())));
                 }
             } catch (TimeoutException | InterruptedException | ExecutionException |
@@ -487,7 +320,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     channel.close();
                 }
                 throw new DeploymentException(
-                        sm.getString("wsWebSocketClient.httpRequestFailed"), e);
+                        sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
             }
         }
 
@@ -530,7 +363,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     if (locationHeader == null || locationHeader.isEmpty() ||
                             locationHeader.get(0) == null || locationHeader.get(0).isEmpty()) {
                         throw new DeploymentException(sm.getString(
-                                "wsWebSocketClient.missingLocationHeader",
+                                "wsWebSocketContainer.missingLocationHeader",
                                 Integer.toString(httpResponse.status)));
                     }
 
@@ -551,7 +384,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
                     if (!redirectSet.add(redirectLocation) || redirectSet.size() > maxRedirects) {
                         throw new DeploymentException(sm.getString(
-                                "wsWebSocketClient.redirectThreshold", redirectLocation,
+                                "wsWebSocketContainer.redirectThreshold", redirectLocation,
                                 Integer.toString(redirectSet.size()),
                                 Integer.toString(maxRedirects)));
                     }
@@ -564,7 +397,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
                     if (userProperties.get(Constants.AUTHORIZATION_HEADER_NAME) != null) {
                         throw new DeploymentException(sm.getString(
-                                "wsWebSocketClient.failedAuthentication",
+                                "wsWebSocketContainer.failedAuthentication",
                                 Integer.valueOf(httpResponse.status)));
                     }
 
@@ -574,7 +407,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     if (wwwAuthenticateHeaders == null || wwwAuthenticateHeaders.isEmpty() ||
                             wwwAuthenticateHeaders.get(0) == null || wwwAuthenticateHeaders.get(0).isEmpty()) {
                         throw new DeploymentException(sm.getString(
-                                "wsWebSocketClient.missingWWWAuthenticateHeader",
+                                "wsWebSocketContainer.missingWWWAuthenticateHeader",
                                 Integer.toString(httpResponse.status)));
                     }
 
@@ -586,7 +419,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
                     if (auth == null) {
                         throw new DeploymentException(
-                                sm.getString("wsWebSocketClient.unsupportedAuthScheme",
+                                sm.getString("wsWebSocketContainer.unsupportedAuthScheme",
                                         Integer.valueOf(httpResponse.status), authScheme));
                     }
 
@@ -598,7 +431,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 }
 
                 else {
-                    throw new DeploymentException(sm.getString("wsWebSocketClient.invalidStatus",
+                    throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidStatus",
                             Integer.toString(httpResponse.status)));
                 }
             }
@@ -614,7 +447,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 subProtocol = protocolHeaders.get(0);
             } else {
                 throw new DeploymentException(
-                        sm.getString("wsWebSocketClient.invalidSubProtocol"));
+                        sm.getString("wsWebSocketContainer.invalidSubProtocol"));
             }
 
             // Extensions
@@ -636,7 +469,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 Transformation t = factory.create(extension.getName(), wrapper, false);
                 if (t == null) {
                     throw new DeploymentException(sm.getString(
-                            "wsWebSocketClient.invalidExtensionParameters"));
+                            "wsWebSocketContainer.invalidExtensionParameters"));
                 }
                 if (transformation == null) {
                     transformation = t;
@@ -649,7 +482,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         } catch (ExecutionException | InterruptedException | SSLException |
                 EOFException | TimeoutException | URISyntaxException | AuthenticationException e) {
             throw new DeploymentException(
-                    sm.getString("wsWebSocketClient.httpRequestFailed"), e);
+                    sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
         } finally {
             if (!success) {
                 channel.close();
@@ -742,6 +575,56 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
         byte[] bytes = request.toString().getBytes(StandardCharsets.ISO_8859_1);
         return ByteBuffer.wrap(bytes);
+    }
+
+    protected void registerSession(Endpoint endpoint, WsSession wsSession) {
+
+        if (!wsSession.isOpen()) {
+            // The session was closed during onOpen. No need to register it.
+            return;
+        }
+        synchronized (endPointSessionMapLock) {
+            if (endpointSessionMap.size() == 0) {
+                BackgroundProcessManager.getInstance().register(this);
+            }
+            Set<WsSession> wsSessions = endpointSessionMap.get(endpoint);
+            if (wsSessions == null) {
+                wsSessions = new HashSet<>();
+                endpointSessionMap.put(endpoint, wsSessions);
+            }
+            wsSessions.add(wsSession);
+        }
+        sessions.put(wsSession, wsSession);
+    }
+
+
+    protected void unregisterSession(Endpoint endpoint, WsSession wsSession) {
+
+        synchronized (endPointSessionMapLock) {
+            Set<WsSession> wsSessions = endpointSessionMap.get(endpoint);
+            if (wsSessions != null) {
+                wsSessions.remove(wsSession);
+                if (wsSessions.size() == 0) {
+                    endpointSessionMap.remove(endpoint);
+                }
+            }
+            if (endpointSessionMap.size() == 0) {
+                BackgroundProcessManager.getInstance().unregister(this);
+            }
+        }
+        sessions.remove(wsSession);
+    }
+
+
+    Set<Session> getOpenSessions(Endpoint endpoint) {
+        HashSet<Session> result = new HashSet<>();
+        synchronized (endPointSessionMapLock) {
+            Set<WsSession> sessions = endpointSessionMap.get(endpoint);
+            if (sessions != null) {
+                result.addAll(sessions);
+            }
+        }
+        return result;
     }
 
     private static Map<String, List<String>> createRequestHeaders(String host, int port,
@@ -933,13 +816,13 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         // CONNECT for proxy may return a 1.0 response
         if (parts.length < 2 || !("HTTP/1.0".equals(parts[0]) || "HTTP/1.1".equals(parts[0]))) {
             throw new DeploymentException(sm.getString(
-                    "wsWebSocketClient.invalidStatus", line));
+                    "wsWebSocketContainer.invalidStatus", line));
         }
         try {
             return Integer.parseInt(parts[1]);
         } catch (NumberFormatException nfe) {
             throw new DeploymentException(sm.getString(
-                    "wsWebSocketClient.invalidStatus", line));
+                    "wsWebSocketContainer.invalidStatus", line));
         }
     }
 
@@ -949,7 +832,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
         int index = line.indexOf(':');
         if (index == -1) {
-            log.warn(sm.getString("wsWebSocketClient.invalidHeader", line));
+            log.warn(sm.getString("wsWebSocketContainer.invalidHeader", line));
             return;
         }
         // Header names are case insensitive so always use lower case
@@ -1034,27 +917,126 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             return engine;
         } catch (Exception e) {
             throw new DeploymentException(sm.getString(
-                    "wsWebSocketClient.sslEngineFail"), e);
+                    "wsWebSocketContainer.sslEngineFail"), e);
         }
     }
 
-    private static class HttpResponse {
-        private final int status;
-        private final HandshakeResponse handshakeResponse;
 
-        public HttpResponse(int status, HandshakeResponse handshakeResponse) {
-            this.status = status;
-            this.handshakeResponse = handshakeResponse;
+    @Override
+    public long getDefaultMaxSessionIdleTimeout() {
+        return defaultMaxSessionIdleTimeout;
+    }
+
+
+    @Override
+    public void setDefaultMaxSessionIdleTimeout(long timeout) {
+        this.defaultMaxSessionIdleTimeout = timeout;
+    }
+
+
+    @Override
+    public int getDefaultMaxBinaryMessageBufferSize() {
+        return maxBinaryMessageBufferSize;
+    }
+
+
+    @Override
+    public void setDefaultMaxBinaryMessageBufferSize(int max) {
+        maxBinaryMessageBufferSize = max;
+    }
+
+
+    @Override
+    public int getDefaultMaxTextMessageBufferSize() {
+        return maxTextMessageBufferSize;
+    }
+
+
+    @Override
+    public void setDefaultMaxTextMessageBufferSize(int max) {
+        maxTextMessageBufferSize = max;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * Currently, this implementation does not support any extensions.
+     */
+    @Override
+    public Set<Extension> getInstalledExtensions() {
+        return Collections.emptySet();
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * The default value for this implementation is -1.
+     */
+    @Override
+    public long getDefaultAsyncSendTimeout() {
+        return defaultAsyncTimeout;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     *
+     * The default value for this implementation is -1.
+     */
+    @Override
+    public void setAsyncSendTimeout(long timeout) {
+        this.defaultAsyncTimeout = timeout;
+    }
+
+
+    /**
+     * Cleans up the resources still in use by WebSocket sessions created from
+     * this container. This includes closing sessions and cancelling
+     * {@link Future}s associated with blocking read/writes.
+     */
+    public void destroy() {
+        CloseReason cr = new CloseReason(
+                CloseCodes.GOING_AWAY, sm.getString("wsWebSocketContainer.shutdown"));
+
+        for (WsSession session : sessions.keySet()) {
+            try {
+                session.close(cr);
+            } catch (IOException ioe) {
+                log.debug(sm.getString(
+                        "wsWebSocketContainer.sessionCloseFail", session.getId()), ioe);
+            }
         }
 
-        public int getStatus() {
-            return status;
-        }
-
-        public HandshakeResponse getHandshakeResponse() {
-            return handshakeResponse;
+        // Only unregister with AsyncChannelGroupUtil if this instance
+        // registered with it
+        if (asynchronousChannelGroup != null) {
+            synchronized (asynchronousChannelGroupLock) {
+                if (asynchronousChannelGroup != null) {
+                    AsyncChannelGroupUtil.unregister();
+                    asynchronousChannelGroup = null;
+                }
+            }
         }
     }
+
+
+    private AsynchronousChannelGroup getAsynchronousChannelGroup() {
+        // Use AsyncChannelGroupUtil to share a common group amongst all
+        // WebSocket clients
+        AsynchronousChannelGroup result = asynchronousChannelGroup;
+        if (result == null) {
+            synchronized (asynchronousChannelGroupLock) {
+                if (asynchronousChannelGroup == null) {
+                    asynchronousChannelGroup = AsyncChannelGroupUtil.register();
+                }
+                result = asynchronousChannelGroup;
+            }
+        }
+        return result;
+    }
+
 
     // ----------------------------------------------- BackgroundProcess methods
 
@@ -1090,4 +1072,24 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         return processPeriod;
     }
 
+
+    private static class HttpResponse {
+        private final int status;
+        private final HandshakeResponse handshakeResponse;
+
+        public HttpResponse(int status, HandshakeResponse handshakeResponse) {
+            this.status = status;
+            this.handshakeResponse = handshakeResponse;
+        }
+
+
+        public int getStatus() {
+            return status;
+        }
+
+
+        public HandshakeResponse getHandshakeResponse() {
+            return handshakeResponse;
+        }
+    }
 }
