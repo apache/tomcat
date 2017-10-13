@@ -257,8 +257,11 @@ public abstract class AbstractEndpoint<S,U> {
      * @return  The SSL host configuration that was removed, if any
      */
     public SSLHostConfig removeSslHostConfig(String hostName) {
+        if (hostName == null) {
+            return null;
+        }
         // Host names are case insensitive
-        if (hostName != null && hostName.equalsIgnoreCase(getDefaultSSLHostConfigName())) {
+        if (hostName.equalsIgnoreCase(getDefaultSSLHostConfigName())) {
             throw new IllegalArgumentException(
                     sm.getString("endpoint.removeDefaultSslHostConfig", hostName));
         }
