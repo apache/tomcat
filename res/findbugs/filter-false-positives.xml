@@ -1183,6 +1183,12 @@
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
   <Match>
+    <!-- Result is negated to compare result when order is reversed -->
+    <Class name="org.apache.el.TestELEvaluation" />
+    <Method name="compareBoth" />
+    <Bug pattern="RV_NEGATING_RESULT_OF_COMPARETO" />
+  </Match>
+  <Match>
     <!-- Use of statics is unavoidable in all cases -->
     <!-- Better to use it consistently rather than only where necessary -->
     <Class name="org.apache.tomcat.jdbc.pool.interceptor.TestInterceptor" />
@@ -1227,6 +1233,12 @@
     <Class name="org.apache.tomcat.util.http.TestCookieParsing$EchoCookieHeader"/>
     <Method name="service"/>
     <Bug pattern="XSS_REQUEST_PARAMETER_TO_SERVLET_WRITER"/>
+  </Match>
+  <Match>
+    <!-- No performance issue as there is no DNS resolution -->
+    <Class name="org.apache.tomcat.util.bcel.TesterPerformance" />
+    <Method name="testClassParserPerformance" />
+    <Bug pattern="DMI_COLLECTION_OF_URLS" />
   </Match>
   <Match>
     <Class name="org.apache.tomcat.util.net.TestSsl" />

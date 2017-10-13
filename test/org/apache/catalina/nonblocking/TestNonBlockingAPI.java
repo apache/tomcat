@@ -19,6 +19,7 @@ package org.apache.catalina.nonblocking;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
@@ -154,7 +155,13 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                     "Host: localhost:" + getPort() + "\r\n" +
                     "\r\n").getBytes(StandardCharsets.ISO_8859_1));
             os.flush();
-            is.read(buffer);
+            // Make sure the entire response has been read.
+            int read = is.read(buffer);
+            // The response should end with CRLFCRLF
+            Assert.assertEquals(buffer[read - 4], '\r');
+            Assert.assertEquals(buffer[read - 3], '\n');
+            Assert.assertEquals(buffer[read - 2], '\r');
+            Assert.assertEquals(buffer[read - 1], '\n');
         }
         os.write(("GET / HTTP/1.1\r\n" +
                 "Host: localhost:" + getPort() + "\r\n" +
@@ -843,7 +850,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     private static final class DelayedNBWriteServlet extends TesterServlet {
         private static final long serialVersionUID = 1L;
         private final Set<Emitter> emitters = new HashSet<>();
-        private final CountDownLatch latch;
+        private transient final CountDownLatch latch;
 
         public DelayedNBWriteServlet(CountDownLatch latch) {
             this.latch = latch;
@@ -870,8 +877,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     }
 
-    private static final class Emitter {
-        private final AsyncContext ctx;
+    private static final class Emitter implements Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        private transient final AsyncContext ctx;
 
         Emitter(AsyncContext ctx) {
             this.ctx = ctx;

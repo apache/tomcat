@@ -70,9 +70,9 @@ public class TestFileHandler {
         File[] files = logsDir.listFiles();
         if (files != null) {
             for (File file : files) {
-                file.delete();
+                Assert.assertTrue("Failed to create [" + file + "]", file.delete());
             }
-            logsDir.delete();
+            Assert.assertTrue("Failed to create [" + logsDir + "]", logsDir.delete());
         }
     }
 

@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.junit.Assert;
+
 /**
  * Simple client for unit testing. It isn't robust, it isn't secure and
  * should not be used as the basis for production code. Its only purpose
@@ -298,7 +300,8 @@ public abstract class SimpleHttpClient {
         if (wantBody) {
             if (useContentLength && (contentLength > -1)) {
                 char[] body = new char[contentLength];
-                reader.read(body);
+                int read = reader.read(body);
+                Assert.assertEquals(contentLength, read);
                 builder.append(body);
             }
             else {
