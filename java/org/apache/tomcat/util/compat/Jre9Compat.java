@@ -16,7 +16,9 @@
  */
 package org.apache.tomcat.util.compat;
 
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -25,6 +27,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Deque;
 import java.util.Set;
+import java.util.jar.JarFile;
+import java.util.zip.ZipFile;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
@@ -49,14 +53,12 @@ class Jre9Compat extends JreCompat {
     private static final Method locationMethod;
     private static final Method isPresentMethod;
     private static final Method getMethod;
+    private static final Constructor<JarFile> jarFileConstructor;
+    private static final Method isMultiReleaseMethod;
+
+    private static final Object RUNTIME_VERSION;
 
     static {
-        Class<?> moduleLayerClazz = null;
-        Class<?> configurationClazz = null;
-        Class<?> resolvedModuleClazz = null;
-        Class<?> moduleReferenceClazz = null;
-        Class<?> optionalClazz = null;
-
         Class<?> c1 = null;
         Method m2 = null;
         Method m3 = null;
@@ -68,13 +70,18 @@ class Jre9Compat extends JreCompat {
         Method m9 = null;
         Method m10 = null;
         Method m11 = null;
+        Constructor<JarFile> c12 = null;
+        Method m13 = null;
+        Object o14 = null;
 
         try {
-            moduleLayerClazz = Class.forName("java.lang.ModuleLayer");
-            configurationClazz = Class.forName("java.lang.module.Configuration");
-            resolvedModuleClazz = Class.forName("java.lang.module.ResolvedModule");
-            moduleReferenceClazz = Class.forName("java.lang.module.ModuleReference");
-            optionalClazz = Class.forName("java.util.Optional");
+            Class<?> moduleLayerClazz = Class.forName("java.lang.ModuleLayer");
+            Class<?> configurationClazz = Class.forName("java.lang.module.Configuration");
+            Class<?> resolvedModuleClazz = Class.forName("java.lang.module.ResolvedModule");
+            Class<?> moduleReferenceClazz = Class.forName("java.lang.module.ModuleReference");
+            Class<?> optionalClazz = Class.forName("java.util.Optional");
+            Class<?> versionClazz = Class.forName("java.lang.Runtime$Version");
+            Method versionMethod = JarFile.class.getMethod("runtimeVersion");
 
             c1 = Class.forName("java.lang.reflect.InaccessibleObjectException");
             m2 = SSLParameters.class.getMethod("setApplicationProtocols", String[].class);
@@ -87,11 +94,15 @@ class Jre9Compat extends JreCompat {
             m9 = moduleReferenceClazz.getMethod("location");
             m10 = optionalClazz.getMethod("isPresent");
             m11 = optionalClazz.getMethod("get");
-        } catch (SecurityException | NoSuchMethodException e) {
-            // Should never happen
+            c12 = JarFile.class.getConstructor(File.class, boolean.class, int.class, versionClazz);
+            m13 = JarFile.class.getMethod("isMultiRelease");
+            o14 = versionMethod.invoke(null);
         } catch (ClassNotFoundException e) {
             // Must be Java 8
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            // Should never happen
         }
+
         inaccessibleObjectExceptionClazz = c1;
         setApplicationProtocolsMethod = m2;
         getApplicationProtocolMethod = m3;
@@ -103,6 +114,10 @@ class Jre9Compat extends JreCompat {
         locationMethod = m9;
         isPresentMethod = m10;
         getMethod = m11;
+        jarFileConstructor = c12;
+        isMultiReleaseMethod = m13;
+
+        RUNTIME_VERSION = o14;
     }
 
 
@@ -173,6 +188,27 @@ class Jre9Compat extends JreCompat {
             }
         } catch (ReflectiveOperationException e) {
             throw new UnsupportedOperationException(e);
+        }
+    }
+
+
+    @Override
+    public JarFile jarFileNewInstance(File f) throws IOException {
+        try {
+            return jarFileConstructor.newInstance(
+                    f, Boolean.TRUE, Integer.valueOf(ZipFile.OPEN_READ), RUNTIME_VERSION);
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            throw new IOException(e);
+        }
+    }
+
+
+    @Override
+    public boolean jarFileIsMultiRelease(JarFile jarFile) {
+        try {
+            return ((Boolean) isMultiReleaseMethod.invoke(jarFile)).booleanValue();
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            return false;
         }
     }
 }

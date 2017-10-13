@@ -16,10 +16,12 @@
  */
 package org.apache.tomcat.util.compat;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Deque;
+import java.util.jar.JarFile;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
@@ -119,7 +121,7 @@ public class JreCompat {
 
 
     /**
-     * Obtains the URls for all the JARs on the module path when the JVM starts
+     * Obtains the URLs for all the JARs on the module path when the JVM starts
      * and adds them to the provided Deque.
      *
      * @param classPathUrlsToProcess    The Deque to which the modules should be
@@ -129,4 +131,44 @@ public class JreCompat {
         // NO-OP for Java 8. There is no module path.
     }
 
+
+    /**
+     * Creates a new JarFile instance. When running on Java 9 and later, the
+     * JarFile will be multi-release JAR aware. While this isn't strictly
+     * required to be in this package, it is provided as a convenience method.
+     *
+     * @param s The JAR file to open
+     *
+     * @throws IOException  If an I/O error occurs creating the JarFile instance
+     */
+    public final JarFile jarFileNewInstance(String s) throws IOException {
+        return jarFileNewInstance(new File(s));
+    }
+
+
+    /**
+     * Creates a new JarFile instance. When running on Java 9 and later, the
+     * JarFile will be multi-release JAR aware.
+     *
+     * @param f The JAR file to open
+     *
+     * @throws IOException  If an I/O error occurs creating the JarFile instance
+     */
+    public JarFile jarFileNewInstance(File f) throws IOException {
+        return new JarFile(f);
+    }
+
+
+    /**
+     * Is this JarFile a multi-release JAR file.
+     *
+     * @param jarFile   The JarFile to test
+     *
+     * @return {@code true} If it is a multi-release JAR file and is configured
+     *         to behave as such.
+     */
+    public boolean jarFileIsMultiRelease(JarFile jarFile) {
+        // Java 8 doesn't support multi-release so default to false
+        return false;
+    }
 }

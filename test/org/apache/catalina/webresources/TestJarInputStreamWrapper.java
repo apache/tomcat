@@ -27,6 +27,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.WebResource;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestJarInputStreamWrapper {
 
@@ -118,7 +119,7 @@ public class TestJarInputStreamWrapper {
 
     private InputStream getUnwrappedClosedInputStream() throws IOException {
         File file = new File("test/webresources/non-static-resources.jar");
-        JarFile jarFile = new JarFile(file);
+        JarFile jarFile = JreCompat.getInstance().jarFileNewInstance(file);
         ZipEntry jarEntry = jarFile.getEntry("META-INF/MANIFEST.MF");
         InputStream unwrapped = jarFile.getInputStream(jarEntry);
         unwrapped.close();

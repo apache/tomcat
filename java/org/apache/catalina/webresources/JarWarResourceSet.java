@@ -162,6 +162,13 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
     }
 
 
+    @Override
+    protected boolean isMultiRelease() {
+        // TODO: multi-release support for packed WAR files
+        return false;
+    }
+
+
     //-------------------------------------------------------- Lifecycle methods
     @Override
     protected void initInternal() throws LifecycleException {
