@@ -192,7 +192,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     public Session connectToServer(Endpoint endpoint,
             ClientEndpointConfig clientEndpointConfiguration, URI path)
             throws DeploymentException {
-        return connectToServerRecursive(endpoint, clientEndpointConfiguration, path);
+        return connectToServerRecursive(endpoint, clientEndpointConfiguration, path, new HashSet<>());
     }
 
     protected void registerSession(Endpoint endpoint, WsSession wsSession) {
@@ -362,7 +362,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
 
     private Session connectToServerRecursive(Endpoint endpoint,
-            ClientEndpointConfig clientEndpointConfiguration, URI path)
+            ClientEndpointConfig clientEndpointConfiguration, URI path,
+            Set<URI> redirectSet)
             throws DeploymentException {
 
         boolean secure = false;
@@ -520,8 +521,6 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 maxRedirects = Integer.parseInt(maxRedirectsValue);
             }
 
-            Set<URI> redirectSet = null;
-
             if (httpResponse.status != 101) {
                 if(isRedirectStatus(httpResponse.status)){
                     List<String> locationHeader =
@@ -550,10 +549,6 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                                 redirectLocation.getQuery(), redirectLocation.getFragment());
                     }
 
-                    if (redirectSet == null) {
-                        redirectSet = new HashSet<>(maxRedirects);
-                    }
-
                     if (!redirectSet.add(redirectLocation) || redirectSet.size() > maxRedirects) {
                         throw new DeploymentException(sm.getString(
                                 "wsWebSocketClient.redirectThreshold", redirectLocation,
@@ -561,7 +556,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                                 Integer.toString(maxRedirects)));
                     }
 
-                    return connectToServerRecursive(endpoint, clientEndpointConfiguration, redirectLocation);
+                    return connectToServerRecursive(endpoint, clientEndpointConfiguration, redirectLocation, redirectSet);
 
                 }
 
@@ -597,7 +592,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     userProperties.put(Constants.AUTHORIZATION_HEADER_NAME, auth.getAuthorization(
                             requestUri, wwwAuthenticateHeaders.get(0), userProperties));
 
-                    return connectToServerRecursive(endpoint, clientEndpointConfiguration, path);
+                    return connectToServerRecursive(endpoint, clientEndpointConfiguration, path, redirectSet);
 
                 }
 
