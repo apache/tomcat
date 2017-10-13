@@ -28,6 +28,12 @@
     <Bug code="NP" />
   </Match>
   <Match>
+    <!-- Ignoring IOException on InputStream close -->
+    <Class name="javax.el.ExpressionFactory" />
+    <Method name="getClassNameServices" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
     <!-- Only base null is handled by this resolver -->
     <Class name="javax.servlet.jsp.el.ImplicitObjectELResolver"/>
     <Or>
@@ -48,6 +54,13 @@
       <Method name="setValue" />
     </Or>
     <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Ignore: Expected if not running on Tomcat. Not a problem since
+            this just allows a short-cut. -->
+    <Class name="javax.servlet.jsp.el.ScopedAttributeELResolver" />
+    <Method name="&lt;clinit&gt;" />
+    <Bug code="DE" />
   </Match>
   <Match>
     <!--  Cannot do anything about this. API is fixed by the specification. -->
@@ -188,10 +201,31 @@
     <Bug pattern="HRS_REQUEST_PARAMETER_TO_HTTP_HEADER" />
   </Match>
   <Match>
+    <!-- ParseException is ignored in loop but handled afterwards if all formats failed -->
+    <Class name="org.apache.catalina.filters.RemoteIpFilter$XForwardedRequest" />
+    <Method name="getDateHeader" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
     <!-- shost will not be null in normal usage -->
     <Class name="org.apache.catalina.ha.backend.CollectedInfo" />
     <Method name="init" />
     <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Ignore IOException when closing input/output streams in cleanup -->
+    <Class name="org.apache.catalina.ha.deploy.FileMessageFactory" />
+    <Method name="cleanup" />
+    <Bug code="DE" />
+  </Match>
+  <Match>
+    <!-- Ignore exceptions from Thread.sleep() -->
+    <Class name="org.apache.catalina.ha.session.DeltaManager" />
+    <Or>
+      <Method name="handleGET_ALL_SESSIONS" />
+      <Method name="waitForSendAllSessions" />
+    </Or>
+    <Bug code="DE" />
   </Match>
   <Match>
     <!-- Field is only modified during Servlet load -->
@@ -506,19 +540,19 @@
   <Match>
     <!-- Notify is correct. Condition changed outside of this method. -->
     <Class name="org.apache.coyote.http2.Http2UpgradeHandler" />
-    <Mehtod name="releaseBackLog" />
+    <Method name="releaseBackLog" />
     <Bug pattern="NN_NAKED_NOTIFY" />
   </Match>
   <Match>
     <!-- Return value is intentionally ignored. -->
     <Class name="org.apache.coyote.http2.Http2UpgradeHandler$PingManager" />
-    <Mehtod name="receivePing" />
+    <Method name="receivePing" />
     <Bug pattern="RV_RETURN_VALUE_IGNORED" />
   </Match>
   <Match>
     <!-- Notify is correct. Condition changed outside of this method. -->
     <Class name="org.apache.coyote.http2.Stream" />
-    <Mehtod name="incrementWindowSize" />
+    <Method name="incrementWindowSize" />
     <Bug pattern="NN_NAKED_NOTIFY" />
   </Match>
   <Match>
