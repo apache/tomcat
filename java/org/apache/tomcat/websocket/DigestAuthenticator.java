@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.websocket;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -78,7 +77,7 @@ public class DigestAuthenticator extends Authenticator {
                     realm, nonce, messageQop, algorithm) + "\",");
         }
 
-        catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+        catch (NoSuchAlgorithmException e) {
             throw new AuthenticationException(
                     "Unable to generate request digest " + e.getMessage());
         }
@@ -89,7 +88,7 @@ public class DigestAuthenticator extends Authenticator {
         if (!messageQop.isEmpty()) {
             challenge.append("qop=\"" + messageQop + "\"");
             challenge.append(",cnonce=\"" + cNonce + "\",");
-            challenge.append("nc=" + String.format("%08X", nonceCount));
+            challenge.append("nc=" + String.format("%08X", Integer.valueOf(nonceCount)));
         }
 
         return challenge.toString();
@@ -98,7 +97,7 @@ public class DigestAuthenticator extends Authenticator {
 
     private String calculateRequestDigest(String requestUri, String userName, String password,
             String realm, String nonce, String qop, String algorithm)
-            throws UnsupportedEncodingException, NoSuchAlgorithmException {
+            throws NoSuchAlgorithmException {
 
         StringBuilder preDigest = new StringBuilder();
         String A1;
@@ -122,7 +121,7 @@ public class DigestAuthenticator extends Authenticator {
 
         if (qop.toLowerCase().contains("auth")) {
             preDigest.append(":");
-            preDigest.append(String.format("%08X", nonceCount));
+            preDigest.append(String.format("%08X", Integer.valueOf(nonceCount)));
             preDigest.append(":");
             preDigest.append(String.valueOf(cNonce));
             preDigest.append(":");
@@ -136,8 +135,7 @@ public class DigestAuthenticator extends Authenticator {
 
     }
 
-    private String encodeMD5(String value)
-            throws UnsupportedEncodingException, NoSuchAlgorithmException {
+    private String encodeMD5(String value) throws NoSuchAlgorithmException {
         byte[] bytesOfMessage = value.getBytes(StandardCharsets.ISO_8859_1);
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] thedigest = md.digest(bytesOfMessage);
