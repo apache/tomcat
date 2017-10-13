@@ -36,7 +36,7 @@ import org.apache.tomcat.util.compat.JreCompat;
  */
 public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveResourceSet {
 
-    private Boolean multiRelease;
+    private volatile Boolean multiRelease;
 
     /**
      * A no argument constructor is required for this to work with the digester.
