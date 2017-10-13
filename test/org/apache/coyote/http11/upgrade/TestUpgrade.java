@@ -148,6 +148,7 @@ public class TestUpgrade extends TomcatBaseTest {
         Assert.assertEquals(MESSAGE, response);
 
         uc.shutdownInput();
+        pw.close();
     }
 
 

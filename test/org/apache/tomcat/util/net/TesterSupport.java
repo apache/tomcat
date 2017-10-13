@@ -226,7 +226,7 @@ public final class TesterSupport {
             X509Certificate cert = (X509Certificate)ks.getCertificate(CA_ALIAS);
             clientAuthExpectedIssuer = cert.getSubjectDN().getName();
         } catch (Exception ex) {
-            // Ignore
+            throw new RuntimeException(ex);
         }
 
         String cn = "NOTFOUND";
@@ -235,7 +235,7 @@ public final class TesterSupport {
             X509Certificate cert = (X509Certificate)ks.getCertificate(CLIENT_ALIAS);
             cn = cert.getSubjectDN().getName();
         } catch (Exception ex) {
-            // Ignore
+            throw new RuntimeException(ex);
         }
 
         realm.addUser(cn, "not used");

@@ -58,7 +58,8 @@ public class TestJspCompilationContext extends TomcatBaseTest {
         Assert.assertTrue(body.toString().contains("00 - OK"));
 
         File jsp = new File("test/webapp/jsp/tagFileInJar.jsp");
-        jsp.setLastModified(jsp.lastModified() + 10000);
+        Assert.assertTrue("Failed to set last modified for [" + jsp + "]",
+                jsp.setLastModified(jsp.lastModified() + 10000));
 
         // This test requires that modificationTestInterval is set to zero in
         // web.xml. If not, a sleep longer that modificationTestInterval is

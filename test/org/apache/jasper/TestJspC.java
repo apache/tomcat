@@ -114,7 +114,7 @@ public class TestJspC {
 
     private void precompile(File appDir, File webappOut) throws IOException {
         remove(webappOut);
-        webappOut.mkdirs();
+        Assert.assertTrue("Failed to create [" + webappOut + "]", webappOut.mkdirs());
         jspc.setUriroot(appDir.toString());
         jspc.setOutputDir(webappOut.toString());
         jspc.setValidateTld(false);

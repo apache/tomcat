@@ -80,6 +80,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
         Assert.assertEquals(MESSAGE, response);
 
         uc.shutdownInput();
+        pw.close();
     }
 
     private UpgradeConnection doUpgrade(
