@@ -981,6 +981,11 @@
     <Bug code="SF" />
   </Match>
   <Match>
+    <!-- No performance issue as there is no DNS resolution -->
+    <Class name="org.apache.tomcat.util.scan.StandardJarScanner" />
+    <Bug pattern="DMI_COLLECTION_OF_URLS" />
+  </Match>
+  <Match>
     <!-- Yes the simple name is the same as the super class. Accept it. -->
     <Class name="org.apache.tomcat.util.threads.ThreadPoolExecutor" />
     <Bug code="Nm" />

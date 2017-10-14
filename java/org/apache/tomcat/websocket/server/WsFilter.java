@@ -33,7 +33,7 @@ public class WsFilter extends GenericFilter {
 
     private static final long serialVersionUID = 1L;
 
-    private WsServerContainer sc;
+    private transient WsServerContainer sc;
 
 
     @Override
