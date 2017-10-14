@@ -31,11 +31,11 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.authenticator.AuthenticatorBase;
+import org.apache.catalina.deploy.LoginConfig;
+import org.apache.catalina.deploy.SecurityCollection;
+import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.tomcat.util.descriptor.web.LoginConfig;
-import org.apache.tomcat.util.descriptor.web.SecurityCollection;
-import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.websocket.TesterMessageCountClient.BasicText;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 
@@ -139,12 +139,12 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Context ctx = tomcat.addContext(URI_PROTECTED, null);
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         SecurityCollection collection = new SecurityCollection();
-        collection.addPatternDecoded("/");
+        collection.addPattern("/");
         String utf8User = "test";
-        String utf8Pass = "123£";
+        String utf8Pass = "123ï¿½";
 
         tomcat.addUser(utf8User, utf8Pass);
         tomcat.addRole(utf8User, ROLE);
@@ -178,10 +178,10 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Context ctx = tomcat.addContext(URI_PROTECTED, null);
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
-        ctx.addServletMappingDecoded("/", "default");
+        ctx.addServletMapping("/", "default");
 
         SecurityCollection collection = new SecurityCollection();
-        collection.addPatternDecoded("/*");
+        collection.addPattern("/*");
 
         tomcat.addUser(USER, PWD);
         tomcat.addRole(USER, ROLE);
