@@ -107,8 +107,8 @@ public class WsWebSocketContainer
 
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
-    private static final Random random = new Random();
-    private static final byte[] crlf = new byte[] {13, 10};
+    private static final Random RANDOM = new Random();
+    private static final byte[] CRLF = new byte[] { 13, 10 };
 
     private static final byte[] GET_BYTES = "GET ".getBytes(StandardCharsets.ISO_8859_1);
     private static final byte[] ROOT_URI_BYTES = "/".getBytes(StandardCharsets.ISO_8859_1);
@@ -130,7 +130,6 @@ public class WsWebSocketContainer
     private volatile long defaultMaxSessionIdleTimeout = 0;
     private int backgroundProcessCount = 0;
     private int processPeriod = Constants.DEFAULT_PROCESS_PERIOD;
-    private Set<URI> redirectSet = null;
 
     private InstanceManager instanceManager;
 
@@ -234,6 +233,13 @@ public class WsWebSocketContainer
     public Session connectToServer(Endpoint endpoint,
             ClientEndpointConfig clientEndpointConfiguration, URI path)
             throws DeploymentException {
+        return connectToServerRecursive(endpoint, clientEndpointConfiguration, path, new HashSet<URI>());
+    }
+
+    private Session connectToServerRecursive(Endpoint endpoint,
+            ClientEndpointConfig clientEndpointConfiguration, URI path,
+            Set<URI> redirectSet)
+            throws DeploymentException {
 
         boolean secure = false;
         ByteBuffer proxyConnect = null;
@@ -298,13 +304,11 @@ public class WsWebSocketContainer
         }
 
         // Create the initial HTTP request to open the WebSocket connection
-        Map<String,List<String>> reqHeaders = createRequestHeaders(host, port,
-                clientEndpointConfiguration.getPreferredSubprotocols(),
-                clientEndpointConfiguration.getExtensions());
-        clientEndpointConfiguration.getConfigurator().
-                beforeRequest(reqHeaders);
-        if (Constants.DEFAULT_ORIGIN_HEADER_VALUE != null &&
-                !reqHeaders.containsKey(Constants.ORIGIN_HEADER_NAME)) {
+        Map<String, List<String>> reqHeaders = createRequestHeaders(host, port,
+                clientEndpointConfiguration);
+        clientEndpointConfiguration.getConfigurator().beforeRequest(reqHeaders);
+        if (Constants.DEFAULT_ORIGIN_HEADER_VALUE != null
+                && !reqHeaders.containsKey(Constants.ORIGIN_HEADER_NAME)) {
             List<String> originValues = new ArrayList<String>(1);
             originValues.add(Constants.DEFAULT_ORIGIN_HEADER_VALUE);
             reqHeaders.put(Constants.ORIGIN_HEADER_NAME, originValues);
@@ -330,7 +334,7 @@ public class WsWebSocketContainer
 
         // Set-up
         // Same size as the WsFrame input buffer
-        ByteBuffer response = ByteBuffer.allocate(maxBinaryMessageBufferSize);
+        ByteBuffer response = ByteBuffer.allocate(getDefaultMaxBinaryMessageBufferSize());
         String subProtocol;
         boolean success = false;
         List<Extension> extensionsAgreed = new ArrayList<Extension>();
@@ -388,7 +392,7 @@ public class WsWebSocketContainer
             String maxRedirectsValue =
                     (String) userProperties.get(Constants.MAX_REDIRECTIONS_PROPERTY);
             if (maxRedirectsValue != null) {
-                maxRedirects = Integer.valueOf(maxRedirectsValue).intValue();
+                maxRedirects = Integer.parseInt(maxRedirectsValue);
             }
 
             if (httpResponse.status != 101) {
@@ -419,10 +423,6 @@ public class WsWebSocketContainer
                                 redirectLocation.getQuery(), redirectLocation.getFragment());
                     }
 
-                    if (redirectSet == null) {
-                        redirectSet = new HashSet<URI>(maxRedirects);
-                    }
-
                     if (!redirectSet.add(redirectLocation) || redirectSet.size() > maxRedirects) {
                         throw new DeploymentException(sm.getString(
                                 "wsWebSocketContainer.redirectThreshold", redirectLocation,
@@ -430,11 +430,51 @@ public class WsWebSocketContainer
                                 Integer.toString(maxRedirects)));
                     }
 
-                    return connectToServer(endpoint, clientEndpointConfiguration, redirectLocation);
+                    return connectToServerRecursive(endpoint, clientEndpointConfiguration, redirectLocation, redirectSet);
 
                 }
-                throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidStatus",
-                        Integer.toString(httpResponse.status)));
+
+                else if (httpResponse.status == 401) {
+
+                    if (userProperties.get(Constants.AUTHORIZATION_HEADER_NAME) != null) {
+                        throw new DeploymentException(sm.getString(
+                                "wsWebSocketContainer.failedAuthentication",
+                                Integer.valueOf(httpResponse.status)));
+                    }
+
+                    List<String> wwwAuthenticateHeaders = httpResponse.getHandshakeResponse()
+                            .getHeaders().get(Constants.WWW_AUTHENTICATE_HEADER_NAME);
+
+                    if (wwwAuthenticateHeaders == null || wwwAuthenticateHeaders.isEmpty() ||
+                            wwwAuthenticateHeaders.get(0) == null || wwwAuthenticateHeaders.get(0).isEmpty()) {
+                        throw new DeploymentException(sm.getString(
+                                "wsWebSocketContainer.missingWWWAuthenticateHeader",
+                                Integer.toString(httpResponse.status)));
+                    }
+
+                    String authScheme = wwwAuthenticateHeaders.get(0).split("\\s+", 2)[0];
+                    String requestUri = new String(request.array(), StandardCharsets.ISO_8859_1)
+                            .split("\\s", 3)[1];
+
+                    Authenticator auth = AuthenticatorFactory.getAuthenticator(authScheme);
+
+                    if (auth == null) {
+                        throw new DeploymentException(
+                                sm.getString("wsWebSocketContainer.unsupportedAuthScheme",
+                                        Integer.valueOf(httpResponse.status), authScheme));
+                    }
+
+                    userProperties.put(Constants.AUTHORIZATION_HEADER_NAME, auth.getAuthorization(
+                            requestUri, wwwAuthenticateHeaders.get(0), userProperties));
+
+                    return connectToServerRecursive(endpoint, clientEndpointConfiguration, path, redirectSet);
+
+                }
+
+                else {
+                    throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidStatus",
+                            Integer.toString(httpResponse.status)));
+                }
             }
             HandshakeResponse handshakeResponse = httpResponse.getHandshakeResponse();
             clientEndpointConfiguration.getConfigurator().afterResponse(handshakeResponse);
@@ -484,6 +524,9 @@ public class WsWebSocketContainer
             throw new DeploymentException(
                     sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
         } catch (InterruptedException e) {
+            throw new DeploymentException(
+                    sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
+        } catch (AuthenticationException e) {
             throw new DeploymentException(
                     sm.getString("wsWebSocketContainer.httpRequestFailed"), e);
         } catch (SSLException e) {
@@ -592,7 +635,6 @@ public class WsWebSocketContainer
         return ByteBuffer.wrap(bytes);
     }
 
-
     protected void registerSession(Endpoint endpoint, WsSession wsSession) {
 
         if (!wsSession.isOpen()) {
@@ -643,10 +685,19 @@ public class WsWebSocketContainer
         return result;
     }
 
-    private static Map<String,List<String>> createRequestHeaders(String host,
-            int port, List<String> subProtocols, List<Extension> extensions) {
+    private static Map<String, List<String>> createRequestHeaders(String host, int port,
+            ClientEndpointConfig clientEndpointConfiguration) {
 
-        Map<String,List<String>> headers = new HashMap<String, List<String>>();
+        Map<String, List<String>> headers = new HashMap<String, List<String>>();
+        List<Extension> extensions = clientEndpointConfiguration.getExtensions();
+        List<String> subProtocols = clientEndpointConfiguration.getPreferredSubprotocols();
+        Map<String, Object> userProperties = clientEndpointConfiguration.getUserProperties();
+
+        if (userProperties.get(Constants.AUTHORIZATION_HEADER_NAME) != null) {
+            List<String> authValues = new ArrayList<String>(1);
+            authValues.add((String) userProperties.get(Constants.AUTHORIZATION_HEADER_NAME));
+            headers.put(Constants.AUTHORIZATION_HEADER_NAME, authValues);
+        }
 
         // Host header
         List<String> hostValues = new ArrayList<String>(1);
@@ -715,7 +766,7 @@ public class WsWebSocketContainer
 
     private static String generateWsKeyValue() {
         byte[] keyBytes = new byte[16];
-        random.nextBytes(keyBytes);
+        RANDOM.nextBytes(keyBytes);
         return Base64.encodeBase64String(keyBytes);
     }
 
@@ -736,15 +787,12 @@ public class WsWebSocketContainer
         result.put(HTTP_VERSION_BYTES);
 
         // Headers
-        Iterator<Entry<String,List<String>>> iter =
-                reqHeaders.entrySet().iterator();
-        while (iter.hasNext()) {
-            Entry<String,List<String>> entry = iter.next();
+        for (Entry<String, List<String>> entry : reqHeaders.entrySet()) {
             addHeader(result, entry.getKey(), entry.getValue());
         }
 
         // Terminating CRLF
-        result.put(crlf);
+        result.put(CRLF);
 
         result.flip();
 
@@ -768,7 +816,7 @@ public class WsWebSocketContainer
         result.put(key.getBytes(StandardCharsets.ISO_8859_1));
         result.put(": ".getBytes(StandardCharsets.ISO_8859_1));
         result.put(sb.toString().getBytes(StandardCharsets.ISO_8859_1));
-        result.put(crlf);
+        result.put(CRLF);
     }
 
 
