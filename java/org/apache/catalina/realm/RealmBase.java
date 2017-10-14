@@ -1267,7 +1267,10 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *
      * @return The digested credentials as a hex string or the original plain
      *         text credentials if an error occurs.
+     *
+     * @deprecated  Unused. This will be removed in Tomcat 9.
      */
+    @Deprecated
     public static final String Digest(String credentials, String algorithm,
                                       String encoding) {
 
