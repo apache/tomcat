@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
@@ -54,7 +53,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.B2CConverter;
-import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.res.StringManager;
@@ -1255,47 +1253,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     // --------------------------------------------------------- Static Methods
-
-    /**
-     * Digest password using the algorithm specified and convert the result to a
-     * corresponding hex string.
-     *
-     * @param credentials Password or other credentials to use in authenticating
-     *                    this username
-     * @param algorithm   Algorithm used to do the digest
-     * @param encoding    Character encoding of the string to digest
-     *
-     * @return The digested credentials as a hex string or the original plain
-     *         text credentials if an error occurs.
-     *
-     * @deprecated  Unused. This will be removed in Tomcat 9.
-     */
-    @Deprecated
-    public static final String Digest(String credentials, String algorithm,
-                                      String encoding) {
-
-        try {
-            // Obtain a new message digest with "digest" encryption
-            MessageDigest md =
-                (MessageDigest) MessageDigest.getInstance(algorithm).clone();
-
-            // encode the credentials
-            // Should use the digestEncoding, but that's not a static field
-            if (encoding == null) {
-                md.update(credentials.getBytes());
-            } else {
-                md.update(credentials.getBytes(encoding));
-            }
-
-            // Digest the credentials and return as hexadecimal
-            return HexUtils.toHexString(md.digest());
-        } catch(Exception ex) {
-            log.error(ex);
-            return credentials;
-        }
-
-    }
-
 
     /**
      * Generate a stored credential string for the given password and associated
