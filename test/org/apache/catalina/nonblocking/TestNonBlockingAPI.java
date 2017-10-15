@@ -850,7 +850,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     private static final class DelayedNBWriteServlet extends TesterServlet {
         private static final long serialVersionUID = 1L;
         private final Set<Emitter> emitters = new HashSet<>();
-        private transient final CountDownLatch latch;
+        private final transient CountDownLatch latch;
 
         public DelayedNBWriteServlet(CountDownLatch latch) {
             this.latch = latch;
@@ -881,7 +881,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        private transient final AsyncContext ctx;
+        private final transient AsyncContext ctx;
 
         Emitter(AsyncContext ctx) {
             this.ctx = ctx;

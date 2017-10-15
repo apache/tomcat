@@ -54,7 +54,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private volatile String validationQuery;
     private volatile int validationQueryTimeout = -1;
     private volatile String validatorClassName;
-    private volatile transient Validator validator;
+    private transient volatile Validator validator;
     private volatile boolean testOnBorrow = false;
     private volatile boolean testOnReturn = false;
     private volatile boolean testWhileIdle = false;
