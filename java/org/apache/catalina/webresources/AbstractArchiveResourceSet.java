@@ -32,6 +32,7 @@ import java.util.jar.Manifest;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.util.ResourceSet;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
@@ -253,23 +254,28 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                 return new JarResourceRoot(root, new File(getBase()),
                         baseUrlString, path);
             } else {
-                Map<String,JarEntry> jarEntries = getArchiveEntries(true);
                 JarEntry jarEntry = null;
-                if (!(pathInJar.charAt(pathInJar.length() - 1) == '/')) {
-                    if (jarEntries == null) {
-                        jarEntry = getArchiveEntry(pathInJar + '/');
-                    } else {
-                        jarEntry = jarEntries.get(pathInJar + '/');
+                if (isMultiRelease()) {
+                    // Calls JarFile.getJarEntry() which is multi-release aware
+                    jarEntry = getArchiveEntry(pathInJar);
+                } else {
+                    Map<String,JarEntry> jarEntries = getArchiveEntries(true);
+                    if (!(pathInJar.charAt(pathInJar.length() - 1) == '/')) {
+                        if (jarEntries == null) {
+                            jarEntry = getArchiveEntry(pathInJar + '/');
+                        } else {
+                            jarEntry = jarEntries.get(pathInJar + '/');
+                        }
+                        if (jarEntry != null) {
+                            path = path + '/';
+                        }
                     }
-                    if (jarEntry != null) {
-                        path = path + '/';
-                    }
-                }
-                if (jarEntry == null) {
-                    if (jarEntries == null) {
-                        jarEntry = getArchiveEntry(pathInJar);
-                    } else {
-                        jarEntry = jarEntries.get(pathInJar);
+                    if (jarEntry == null) {
+                        if (jarEntries == null) {
+                            jarEntry = getArchiveEntry(pathInJar);
+                        } else {
+                            jarEntry = jarEntries.get(pathInJar);
+                        }
                     }
                 }
                 if (jarEntry == null) {
@@ -282,6 +288,8 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
             return new EmptyResource(root, path);
         }
     }
+
+    protected abstract boolean isMultiRelease();
 
     protected abstract WebResource createArchiveResource(JarEntry jarEntry,
             String webAppPath, Manifest manifest);
@@ -305,7 +313,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
     protected JarFile openJarFile() throws IOException {
         synchronized (archiveLock) {
             if (archive == null) {
-                archive = new JarFile(getBase());
+                archive = JreCompat.getInstance().jarFileNewInstance(getBase());
             }
             archiveUseCount++;
             return archive;
