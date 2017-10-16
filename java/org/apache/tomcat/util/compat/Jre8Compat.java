@@ -24,6 +24,8 @@ import javax.net.ssl.SSLParameters;
 
 class Jre8Compat extends JreCompat {
 
+    private static final int RUNTIME_MAJOR_VERSION = 8;
+
     private static final Method setUseCipherSuitesOrderMethod;
 
 
@@ -65,5 +67,11 @@ class Jre8Compat extends JreCompat {
         } catch (InvocationTargetException e) {
             throw new UnsupportedOperationException(e);
         }
+    }
+
+
+    @Override
+    public int jarFileRuntimeMajorVersion() {
+        return RUNTIME_MAJOR_VERSION;
     }
 }

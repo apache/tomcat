@@ -35,7 +35,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class JreCompat {
 
-    private static final int RUNTIME_MAJOR_VERSION = 8;
+    private static final int RUNTIME_MAJOR_VERSION = 7;
 
     private static final JreCompat instance;
     private static StringManager sm =
