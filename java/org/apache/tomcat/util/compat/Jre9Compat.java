@@ -57,6 +57,7 @@ class Jre9Compat extends JreCompat {
     private static final Method isMultiReleaseMethod;
 
     private static final Object RUNTIME_VERSION;
+    private static final int RUNTIME_MAJOR_VERSION;
 
     static {
         Class<?> c1 = null;
@@ -73,6 +74,7 @@ class Jre9Compat extends JreCompat {
         Constructor<JarFile> c12 = null;
         Method m13 = null;
         Object o14 = null;
+        Object o15 = null;
 
         try {
             Class<?> moduleLayerClazz = Class.forName("java.lang.ModuleLayer");
@@ -81,7 +83,8 @@ class Jre9Compat extends JreCompat {
             Class<?> moduleReferenceClazz = Class.forName("java.lang.module.ModuleReference");
             Class<?> optionalClazz = Class.forName("java.util.Optional");
             Class<?> versionClazz = Class.forName("java.lang.Runtime$Version");
-            Method versionMethod = JarFile.class.getMethod("runtimeVersion");
+            Method runtimeVersionMethod = JarFile.class.getMethod("runtimeVersion");
+            Method majorMethod = versionClazz.getMethod("major");
 
             c1 = Class.forName("java.lang.reflect.InaccessibleObjectException");
             m2 = SSLParameters.class.getMethod("setApplicationProtocols", String[].class);
@@ -96,7 +99,9 @@ class Jre9Compat extends JreCompat {
             m11 = optionalClazz.getMethod("get");
             c12 = JarFile.class.getConstructor(File.class, boolean.class, int.class, versionClazz);
             m13 = JarFile.class.getMethod("isMultiRelease");
-            o14 = versionMethod.invoke(null);
+            o14 = runtimeVersionMethod.invoke(null);
+            o15 = majorMethod.invoke(o14);
+
         } catch (ClassNotFoundException e) {
             // Must be Java 8
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
@@ -118,6 +123,12 @@ class Jre9Compat extends JreCompat {
         isMultiReleaseMethod = m13;
 
         RUNTIME_VERSION = o14;
+        if (o15 != null) {
+            RUNTIME_MAJOR_VERSION = ((Integer) o15).intValue();
+        } else {
+            // Must be Java 8
+            RUNTIME_MAJOR_VERSION = 8;
+        }
     }
 
 
@@ -210,5 +221,11 @@ class Jre9Compat extends JreCompat {
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             return false;
         }
+    }
+
+
+    @Override
+    public int jarFileRuntimeMajorVersion() {
+        return RUNTIME_MAJOR_VERSION;
     }
 }

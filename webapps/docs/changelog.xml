@@ -56,6 +56,10 @@
         JARs on the module path when running on Java 9 and class path scanning
         is enabled. (markt)
       </fix>
+      <fix>
+        <bug>61601</bug>: Add support for multi-release JARs in JAR scanning and
+        web application class loading. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -35,6 +35,8 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class JreCompat {
 
+    private static final int RUNTIME_MAJOR_VERSION = 8;
+
     private static final JreCompat instance;
     private static final boolean jre9Available;
     private static final StringManager sm = StringManager.getManager(JreCompat.class);
@@ -174,5 +176,10 @@ public class JreCompat {
     public boolean jarFileIsMultiRelease(JarFile jarFile) {
         // Java 8 doesn't support multi-release so default to false
         return false;
+    }
+
+
+    public int jarFileRuntimeMajorVersion() {
+        return RUNTIME_MAJOR_VERSION;
     }
 }

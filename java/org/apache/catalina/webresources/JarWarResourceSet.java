@@ -21,7 +21,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
@@ -31,6 +33,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.tomcat.util.buf.UriUtil;
+import org.apache.tomcat.util.compat.JreCompat;
 
 /**
  * Represents a {@link org.apache.catalina.WebResourceSet} based on a JAR file
@@ -101,6 +104,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                 JarFile warFile = null;
                 InputStream jarFileIs = null;
                 archiveEntries = new HashMap<>();
+                boolean multiRelease = false;
                 try {
                     warFile = openJarFile();
                     JarEntry jarFileInWar = warFile.getJarEntry(archivePath);
@@ -112,7 +116,14 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                             archiveEntries.put(entry.getName(), entry);
                             entry = jarIs.getNextJarEntry();
                         }
-                        setManifest(jarIs.getManifest());
+                        Manifest m = jarIs.getManifest();
+                        setManifest(m);
+                        if (m != null && JreCompat.isJre9Available()) {
+                            String value = m.getMainAttributes().getValue("Multi-Release");
+                            if (value != null) {
+                                multiRelease = Boolean.parseBoolean(value);
+                            }
+                        }
                         // Hack to work-around JarInputStream swallowing these
                         // entries. TomcatJarInputStream is used above which
                         // extends JarInputStream and the method that creates
@@ -127,6 +138,9 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                         if (entry != null) {
                             archiveEntries.put(entry.getName(), entry);
                         }
+                    }
+                    if (multiRelease) {
+                        processArchivesEntriesForMultiRelease();
                     }
                 } catch (IOException ioe) {
                     // Should never happen
@@ -150,6 +164,56 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
     }
 
 
+    protected void processArchivesEntriesForMultiRelease() {
+
+        int targetVersion = JreCompat.getInstance().jarFileRuntimeMajorVersion();
+
+        Map<String,VersionedJarEntry> versionedEntries = new HashMap<>();
+        Iterator<Entry<String,JarEntry>> iter = archiveEntries.entrySet().iterator();
+        while (iter.hasNext()) {
+            Entry<String,JarEntry> entry = iter.next();
+            String name = entry.getKey();
+            if (name.startsWith("META-INF/versions/")) {
+                // Remove the multi-release version
+                iter.remove();
+
+                // Get the base name and version for this versioned entry
+                int i = name.indexOf('/', 18);
+                if (i > 0) {
+                    String baseName = name.substring(i + 1);
+                    int version = Integer.parseInt(name.substring(18, i));
+
+                    // Ignore any entries targeting for a later version than
+                    // the target for this runtime
+                    if (version <= targetVersion) {
+                        VersionedJarEntry versionedJarEntry = versionedEntries.get(baseName);
+                        if (versionedJarEntry == null) {
+                            // No versioned entry found for this name. Create
+                            // one.
+                            versionedEntries.put(baseName,
+                                    new VersionedJarEntry(version, entry.getValue()));
+                        } else {
+                            // Ignore any entry for which we have already found
+                            // a later version
+                            if (version > versionedJarEntry.getVersion()) {
+                                // Replace the entry targeted at an earlier
+                                // version
+                                versionedEntries.put(baseName,
+                                        new VersionedJarEntry(version, entry.getValue()));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (Entry<String,VersionedJarEntry> versionedJarEntry : versionedEntries.entrySet()) {
+            archiveEntries.put(versionedJarEntry.getKey(),
+                    versionedJarEntry.getValue().getJarEntry());
+        }
+    }
+
+
     /**
      * {@inheritDoc}
      * <p>
@@ -164,7 +228,8 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
 
     @Override
     protected boolean isMultiRelease() {
-        // TODO: multi-release support for packed WAR files
+        // This always returns false otherwise the superclass will call
+        // #getArchiveEntry(String)
         return false;
     }
 
@@ -188,6 +253,27 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
             setBaseUrl(UriUtil.buildJarSafeUrl(new File(getBase())));
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException(e);
+        }
+    }
+
+
+    private static final class VersionedJarEntry {
+        private final int version;
+        private final JarEntry jarEntry;
+
+        public VersionedJarEntry(int version, JarEntry jarEntry) {
+            this.version = version;
+            this.jarEntry = jarEntry;
+        }
+
+
+        public int getVersion() {
+            return version;
+        }
+
+
+        public JarEntry getJarEntry() {
+            return jarEntry;
         }
     }
 }
