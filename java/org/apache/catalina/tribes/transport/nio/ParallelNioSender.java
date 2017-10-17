@@ -155,7 +155,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                 }
                 SenderState state = SenderState.getSenderState(sender.getDestination());
                 int attempt = sender.getAttempt()+1;
-                boolean retry = (sender.getAttempt() <= maxAttempts && maxAttempts>0);
+                boolean retry = (attempt <= maxAttempts && maxAttempts>0);
                 synchronized (state) {
 
                     //sk.cancel();
