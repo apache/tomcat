@@ -82,6 +82,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        Enable Jasper to compile JSPs for Java 9. In addition to configuring the
+        JSP servlet with for Java 9 via the <code>compilerSourceVM</code> and
+        <code>compilerTargetVM</code>, it is necessary to replace
+        <code>ecj-4.4.2.jar</code> with a more recent version that supports Java
+        9. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <fix>
