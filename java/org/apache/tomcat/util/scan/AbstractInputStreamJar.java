@@ -189,8 +189,10 @@ public abstract class AbstractInputStreamJar implements Jar {
 
 
     private void gotoEntry(String name) throws IOException {
+        boolean needsReset = true;
         if (multiRelease == null) {
             reset();
+            needsReset = false;
         }
 
         // Need to convert requested name to multi-release name (if one exists)
@@ -206,6 +208,9 @@ public abstract class AbstractInputStreamJar implements Jar {
 
         if (entry != null && name.equals(entry.getName())) {
             return;
+        }
+        if (needsReset) {
+            reset();
         }
 
         JarEntry jarEntry = jarInputStream.getNextJarEntry();
