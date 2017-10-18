@@ -34,7 +34,10 @@ public final class RequestUtil {
      * @param message The message string to be filtered
      *
      * @return the filtered message
+     *
+     * @deprecated This method will be removed in Tomcat 9
      */
+    @Deprecated
     public static String filter(String message) {
 
         if (message == null) {

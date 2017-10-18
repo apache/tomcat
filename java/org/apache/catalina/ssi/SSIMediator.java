@@ -26,9 +26,9 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.Strftime;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.tomcat.util.security.Escape;
 
 /**
  * Allows the different SSICommand implementations to share data/talk to each
@@ -284,7 +284,7 @@ public class SSIMediator {
         } else if (encoding.equalsIgnoreCase("none")) {
             retVal = value;
         } else if (encoding.equalsIgnoreCase("entity")) {
-            retVal = RequestUtil.filter(value);
+            retVal = Escape.htmlElementContent(value);
         } else {
             //This shouldn't be possible
             throw new IllegalArgumentException("Unknown encoding: " + encoding);

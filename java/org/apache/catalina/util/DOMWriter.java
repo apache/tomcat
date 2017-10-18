@@ -19,6 +19,7 @@ package org.apache.catalina.util;
 import java.io.PrintWriter;
 import java.io.Writer;
 
+import org.apache.tomcat.util.security.Escape;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -35,6 +36,12 @@ public class DOMWriter {
     private final boolean canonical;
 
 
+    public DOMWriter(Writer writer) {
+        this (writer, true);
+    }
+
+
+    @Deprecated
     public DOMWriter(Writer writer, boolean canonical) {
         out = new PrintWriter(writer);
         this.canonical = canonical;
@@ -74,7 +81,7 @@ public class DOMWriter {
                     out.print(attr.getLocalName());
 
                     out.print("=\"");
-                    out.print(escape(attr.getNodeValue()));
+                    out.print(Escape.xml("", canonical, attr.getNodeValue()));
                     out.print('"');
                 }
                 out.print('>');
@@ -95,7 +102,7 @@ public class DOMWriter {
             // print cdata sections
             case Node.CDATA_SECTION_NODE:
                 if (canonical) {
-                    out.print(escape(node.getNodeValue()));
+                    out.print(Escape.xml("", canonical, node.getNodeValue()));
                 } else {
                     out.print("<![CDATA[");
                     out.print(node.getNodeValue());
@@ -105,7 +112,7 @@ public class DOMWriter {
 
             // print text
             case Node.TEXT_NODE:
-                out.print(escape(node.getNodeValue()));
+                out.print(Escape.xml("", canonical, node.getNodeValue()));
                 break;
 
             // print processing instruction
@@ -179,51 +186,5 @@ public class DOMWriter {
         }
 
         return array;
-    }
-
-    /**
-     * Normalizes the given string.
-     * @param s The string to escape
-     * @return the escaped string
-     */
-    private String escape(String s) {
-        if (s == null) {
-            return "";
-        }
-
-        StringBuilder str = new StringBuilder();
-
-        int len = s.length();
-        for (int i = 0; i < len; i++) {
-            char ch = s.charAt(i);
-            switch (ch) {
-                case '<':
-                    str.append("&lt;");
-                    break;
-                case '>':
-                    str.append("&gt;");
-                    break;
-                case '&':
-                    str.append("&amp;");
-                    break;
-                case '"':
-                    str.append("&quot;");
-                    break;
-                case '\r':
-                case '\n':
-                    if (canonical) {
-                        str.append("&#");
-                        str.append(Integer.toString(ch));
-                        str.append(';');
-                        break;
-                    }
-                    // else, default append char
-                //$FALL-THROUGH$
-                default:
-                    str.append(ch);
-            }
-        }
-
-        return str.toString();
     }
 }

@@ -42,6 +42,7 @@ import javax.servlet.jsp.tagext.ValidationMessage;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.compiler.ELNode.Text;
 import org.apache.jasper.el.ELContextImpl;
+import org.apache.tomcat.util.security.Escape;
 import org.xml.sax.Attributes;
 
 /**
@@ -1405,7 +1406,7 @@ class Validator {
                             el.visit(v);
                             value = v.getText();
                         } else {
-                            value = xmlEscape(value);
+                            value = Escape.xml(value);
                         }
                     }
 
@@ -1454,7 +1455,7 @@ class Validator {
             @Override
             public void visit(Text n) throws JasperException {
                 output.append(ELParser.escapeLiteralExpression(
-                        xmlEscape(n.getText()),
+                        Escape.xml(n.getText()),
                         isDeferredSyntaxAllowedAsLiteral));
             }
         }
@@ -1914,68 +1915,5 @@ class Validator {
         if (errMsg != null) {
             errDisp.jspError(errMsg.toString());
         }
-    }
-
-    protected static String xmlEscape(String s) {
-        if (s == null) {
-            return null;
-        }
-        int len = s.length();
-
-        /*
-         * Look for any "bad" characters, Escape "bad" character was found
-         */
-        // ASCII " 34 & 38 ' 39 < 60 > 62
-        for (int i = 0; i < len; i++) {
-            char c = s.charAt(i);
-            if (c >= '\"' && c <= '>' &&
-                    (c == '<' || c == '>' || c == '\'' || c == '&' || c == '"')) {
-                // need to escape them and then quote the whole string
-                StringBuilder sb = new StringBuilder((int) (len * 1.2));
-                sb.append(s, 0, i);
-                int pos = i + 1;
-                for (int j = i; j < len; j++) {
-                    c = s.charAt(j);
-                    if (c >= '\"' && c <= '>') {
-                        if (c == '<') {
-                            if (j > pos) {
-                                sb.append(s, pos, j);
-                            }
-                            sb.append("&lt;");
-                            pos = j + 1;
-                        } else if (c == '>') {
-                            if (j > pos) {
-                                sb.append(s, pos, j);
-                            }
-                            sb.append("&gt;");
-                            pos = j + 1;
-                        } else if (c == '\'') {
-                            if (j > pos) {
-                                sb.append(s, pos, j);
-                            }
-                            sb.append("&#039;"); // &apos;
-                            pos = j + 1;
-                        } else if (c == '&') {
-                            if (j > pos) {
-                                sb.append(s, pos, j);
-                            }
-                            sb.append("&amp;");
-                            pos = j + 1;
-                        } else if (c == '"') {
-                            if (j > pos) {
-                                sb.append(s, pos, j);
-                            }
-                            sb.append("&#034;"); // &quot;
-                            pos = j + 1;
-                        }
-                    }
-                }
-                if (pos < len) {
-                    sb.append(s, pos, len);
-                }
-                return sb.toString();
-            }
-        }
-        return s;
     }
 }

@@ -1090,7 +1090,7 @@ public class WebdavServlet extends DefaultServlet {
                         break;
                     case Node.ELEMENT_NODE:
                         strWriter = new StringWriter();
-                        domWriter = new DOMWriter(strWriter, true);
+                        domWriter = new DOMWriter(strWriter);
                         domWriter.print(currentNode);
                         lock.owner += strWriter.toString();
                         break;

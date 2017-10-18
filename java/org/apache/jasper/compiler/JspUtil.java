@@ -28,6 +28,7 @@ import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.tomcat.Jar;
+import org.apache.tomcat.util.security.Escape;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 
@@ -81,7 +82,7 @@ public class JspUtil {
             returnString = expression;
         }
 
-        return escapeXml(returnString);
+        return Escape.xml(returnString);
     }
 
     /**
@@ -218,7 +219,9 @@ public class JspUtil {
      * Escape the 5 entities defined by XML.
      * @param s String to escape
      * @return XML escaped string
+     * @deprecated This method will be removed in Tomcat 9
      */
+    @Deprecated
     public static String escapeXml(String s) {
         if (s == null) {
             return null;

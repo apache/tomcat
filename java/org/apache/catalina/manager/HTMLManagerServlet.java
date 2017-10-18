@@ -49,10 +49,10 @@ import org.apache.catalina.Session;
 import org.apache.catalina.manager.util.BaseSessionComparator;
 import org.apache.catalina.manager.util.SessionUtils;
 import org.apache.catalina.util.ContextName;
-import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.Escape;
 
 /**
 * Servlet that enables remote management of the web applications deployed
@@ -349,7 +349,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         if (message == null || message.length() == 0) {
             args[1] = "OK";
         } else {
-            args[1] = RequestUtil.filter(message);
+            args[1] = Escape.htmlElementContent(message);
         }
         writer.print(MessageFormat.format(Constants.MESSAGE_SECTION, args));
 
@@ -442,19 +442,19 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 args = new Object[7];
                 args[0] = "<a href=\"" +
                         URLEncoder.DEFAULT.encode(contextPath + "/", StandardCharsets.UTF_8) +
-                        "\">" + RequestUtil.filter(displayPath) + "</a>";
+                        "\">" + Escape.htmlElementContent(displayPath) + "</a>";
                 if ("".equals(ctxt.getWebappVersion())) {
                     args[1] = noVersion;
                 } else {
-                    args[1] = RequestUtil.filter(ctxt.getWebappVersion());
+                    args[1] = Escape.htmlElementContent(ctxt.getWebappVersion());
                 }
                 if (ctxt.getDisplayName() == null) {
                     args[2] = "&nbsp;";
                 } else {
-                    args[2] = RequestUtil.filter(ctxt.getDisplayName());
+                    args[2] = Escape.htmlElementContent(ctxt.getDisplayName());
                 }
                 args[3] = Boolean.valueOf(ctxt.getState().isAvailable());
-                args[4] = RequestUtil.filter(response.encodeURL(request.getContextPath() +
+                args[4] = Escape.htmlElementContent(response.encodeURL(request.getContextPath() +
                      "/html/sessions?" + pathVersion));
                 Manager manager = ctxt.getManager();
                 if (manager instanceof DistributedManager && showProxySessions) {
@@ -472,19 +472,19 @@ public final class HTMLManagerServlet extends ManagerServlet {
                     (MessageFormat.format(APPS_ROW_DETAILS_SECTION, args));
 
                 args = new Object[14];
-                args[0] = RequestUtil.filter(response.encodeURL(request
+                args[0] = Escape.htmlElementContent(response.encodeURL(request
                         .getContextPath() + "/html/start?" + pathVersion));
                 args[1] = appsStart;
-                args[2] = RequestUtil.filter(response.encodeURL(request
+                args[2] = Escape.htmlElementContent(response.encodeURL(request
                         .getContextPath() + "/html/stop?" + pathVersion));
                 args[3] = appsStop;
-                args[4] = RequestUtil.filter(response.encodeURL(request
+                args[4] = Escape.htmlElementContent(response.encodeURL(request
                         .getContextPath() + "/html/reload?" + pathVersion));
                 args[5] = appsReload;
-                args[6] = RequestUtil.filter(response.encodeURL(request
+                args[6] = Escape.htmlElementContent(response.encodeURL(request
                         .getContextPath() + "/html/undeploy?" + pathVersion));
                 args[7] = appsUndeploy;
-                args[8] = RequestUtil.filter(response.encodeURL(request
+                args[8] = Escape.htmlElementContent(response.encodeURL(request
                         .getContextPath() + "/html/expire?" + pathVersion));
                 args[9] = appsExpire;
                 args[10] = smClient.getString("htmlManagerServlet.expire.explain");
@@ -824,14 +824,14 @@ public final class HTMLManagerServlet extends ManagerServlet {
             }
             throw new IllegalArgumentException(smClient.getString(
                     "managerServlet.invalidPath",
-                    RequestUtil.filter(path)));
+                    Escape.htmlElementContent(path)));
         }
 
         Context ctxt = (Context) host.findChild(cn.getName());
         if (null == ctxt) {
             throw new IllegalArgumentException(smClient.getString(
                     "managerServlet.noContext",
-                    RequestUtil.filter(cn.getDisplayName())));
+                    Escape.htmlElementContent(cn.getDisplayName())));
         }
         Manager manager = ctxt.getManager();
         List<Session> sessions = new ArrayList<>();

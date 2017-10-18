@@ -47,7 +47,10 @@ public final class SecurityUtil{
      *
      * @param message The message string to be filtered
      * @return the HTML filtered message
+     *
+     * @deprecated This method will be removed in Tomcat 9
      */
+    @Deprecated
     public static String filter(String message) {
 
         if (message == null)
@@ -77,5 +80,4 @@ public final class SecurityUtil{
         return result.toString();
 
     }
-
 }

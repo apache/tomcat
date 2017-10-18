@@ -27,12 +27,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.util.RequestUtil;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.TomcatCSS;
 import org.apache.coyote.ActionCode;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.Escape;
 
 /**
  * <p>Implementation of a Valve that outputs HTML error pages.</p>
@@ -159,12 +159,12 @@ public class ErrorReportValve extends ValveBase {
             return;
         }
 
-        String message = RequestUtil.filter(response.getMessage());
+        String message = Escape.htmlElementContent(response.getMessage());
         if (message == null) {
             if (throwable != null) {
                 String exceptionMessage = throwable.getMessage();
                 if (exceptionMessage != null && exceptionMessage.length() > 0) {
-                    message = RequestUtil.filter((new Scanner(exceptionMessage)).nextLine());
+                    message = Escape.htmlElementContent((new Scanner(exceptionMessage)).nextLine());
                 }
             }
             if (message == null) {
@@ -237,7 +237,7 @@ public class ErrorReportValve extends ValveBase {
                 sb.append("<p><b>");
                 sb.append(smClient.getString("errorReportValve.exception"));
                 sb.append("</b></p><pre>");
-                sb.append(RequestUtil.filter(stackTrace));
+                sb.append(Escape.htmlElementContent(stackTrace));
                 sb.append("</pre>");
 
                 int loops = 0;
@@ -247,7 +247,7 @@ public class ErrorReportValve extends ValveBase {
                     sb.append("<p><b>");
                     sb.append(smClient.getString("errorReportValve.rootCause"));
                     sb.append("</b></p><pre>");
-                    sb.append(RequestUtil.filter(stackTrace));
+                    sb.append(Escape.htmlElementContent(stackTrace));
                     sb.append("</pre>");
                     // In case root cause is somehow heavily nested
                     rootCause = rootCause.getCause();

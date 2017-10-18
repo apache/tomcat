@@ -46,6 +46,7 @@ import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
 import org.apache.tomcat.util.digester.DocumentProperties;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.Escape;
 
 /**
  * Representation of common elements of web.xml and web-fragment.xml. Provides
@@ -1386,7 +1387,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             sb.append('<');
             sb.append(elementName);
             sb.append('>');
-            sb.append(escapeXml(value));
+            sb.append(Escape.xml(value));
             sb.append("</");
             sb.append(elementName);
             sb.append(">\n");
@@ -1397,33 +1398,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             String elementName, Object value) {
         if (value == null) return;
         appendElement(sb, indent, elementName, value.toString());
-    }
-
-
-    /**
-     * Escape the 5 entities defined by XML.
-     */
-    private static String escapeXml(String s) {
-        if (s == null)
-            return null;
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (c == '<') {
-                sb.append("&lt;");
-            } else if (c == '>') {
-                sb.append("&gt;");
-            } else if (c == '\'') {
-                sb.append("&apos;");
-            } else if (c == '&') {
-                sb.append("&amp;");
-            } else if (c == '"') {
-                sb.append("&quot;");
-            } else {
-                sb.append(c);
-            }
-        }
-        return sb.toString();
     }
 
 
