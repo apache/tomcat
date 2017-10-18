@@ -27,24 +27,15 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * A sample DOM writer. This sample program illustrates how to traverse a DOM
- * tree in order to print a document that is parsed.
+ * A DOM writer optimised for use by WebDAV.
  */
 public class DOMWriter {
 
     private final PrintWriter out;
-    private final boolean canonical;
 
 
     public DOMWriter(Writer writer) {
-        this (writer, true);
-    }
-
-
-    @Deprecated
-    public DOMWriter(Writer writer, boolean canonical) {
         out = new PrintWriter(writer);
-        this.canonical = canonical;
     }
 
 
@@ -63,9 +54,6 @@ public class DOMWriter {
         switch (type) {
             // print document
             case Node.DOCUMENT_NODE:
-                if (!canonical) {
-                    out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                }
                 print(((Document) node).getDocumentElement());
                 out.flush();
                 break;
@@ -81,7 +69,7 @@ public class DOMWriter {
                     out.print(attr.getLocalName());
 
                     out.print("=\"");
-                    out.print(Escape.xml("", canonical, attr.getNodeValue()));
+                    out.print(Escape.xml("", true, attr.getNodeValue()));
                     out.print('"');
                 }
                 out.print('>');
@@ -90,29 +78,17 @@ public class DOMWriter {
 
             // handle entity reference nodes
             case Node.ENTITY_REFERENCE_NODE:
-                if (canonical) {
-                    printChildren(node);
-                } else {
-                    out.print('&');
-                    out.print(node.getLocalName());
-                    out.print(';');
-                }
+                printChildren(node);
                 break;
 
             // print cdata sections
             case Node.CDATA_SECTION_NODE:
-                if (canonical) {
-                    out.print(Escape.xml("", canonical, node.getNodeValue()));
-                } else {
-                    out.print("<![CDATA[");
-                    out.print(node.getNodeValue());
-                    out.print("]]>");
-                }
+                out.print(Escape.xml("", true, node.getNodeValue()));
                 break;
 
             // print text
             case Node.TEXT_NODE:
-                out.print(Escape.xml("", canonical, node.getNodeValue()));
+                out.print(Escape.xml("", true, node.getNodeValue()));
                 break;
 
             // print processing instruction
