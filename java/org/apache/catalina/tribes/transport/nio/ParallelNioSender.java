@@ -90,8 +90,6 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                         remaining -= (cx.getFaultyMembers().length - faulty);
                     }
                 }
-                //bail out if all remaining senders are failing
-                if ( cx != null && cx.getFaultyMembers().length == remaining ) throw cx;
                 delta = System.currentTimeMillis() - start;
             }
             if ( remaining > 0 ) {

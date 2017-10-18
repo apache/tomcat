@@ -113,6 +113,11 @@
         than the actual setting value of <code>maxRetryAttempts</code>.
         (kfujino)
       </fix>
+      <fix>
+        Ensure that the remaining Sender can send channel messages by avoiding
+        unintended <code>ChannelException</code> caused by comparing the number
+        of failed members and the number of remaining Senders. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
