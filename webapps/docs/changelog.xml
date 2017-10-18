@@ -74,6 +74,9 @@
         have the same password. This fixes PKCS11 key store handling with
         multiple keys selected with an alias. (markt)
       </fix>
+      <fix>
+        Improve NIO2 syncing for async IO operations. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

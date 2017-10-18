@@ -894,14 +894,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         }
                     }
                     if (complete) {
-                        readPending.release();
-                        if (state.block == BlockingMode.BLOCK && currentState != CompletionState.INLINE) {
-                            synchronized (this) {
+                        synchronized (state) {
+                            readPending.release();
+                            if (state.block == BlockingMode.BLOCK && currentState != CompletionState.INLINE) {
                                 state.state = currentState;
-                                notify();
+                                state.notify();
+                            } else {
+                                state.state = currentState;
                             }
-                        } else {
-                            state.state = currentState;
                         }
                         if (completion && state.handler != null) {
                             state.handler.completed(Long.valueOf(state.nBytes), state.attachment);
@@ -921,14 +921,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     ioe = new IOException(exc);
                 }
                 setError(ioe);
-                readPending.release();
-                if (state.block == BlockingMode.BLOCK) {
-                    synchronized (this) {
+                synchronized (this) {
+                    readPending.release();
+                    if (state.block == BlockingMode.BLOCK) {
                         state.state = Nio2Endpoint.isInline() ? CompletionState.ERROR : CompletionState.DONE;
-                        notify();
+                        state.notify();
+                    } else {
+                        state.state = Nio2Endpoint.isInline() ? CompletionState.ERROR : CompletionState.DONE;
                     }
-                } else {
-                    state.state = Nio2Endpoint.isInline() ? CompletionState.ERROR : CompletionState.DONE;
                 }
                 if (exc instanceof AsynchronousCloseException) {
                     // If already closed, don't call onError and close again
@@ -963,14 +963,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         }
                     }
                     if (complete) {
-                        writePending.release();
-                        if (state.block == BlockingMode.BLOCK && currentState != CompletionState.INLINE) {
-                            synchronized (this) {
+                        synchronized (state) {
+                            writePending.release();
+                            if (state.block == BlockingMode.BLOCK && currentState != CompletionState.INLINE) {
                                 state.state = currentState;
-                                notify();
+                                state.notify();
+                            } else {
+                                state.state = currentState;
                             }
-                        } else {
-                            state.state = currentState;
                         }
                         if (completion && state.handler != null) {
                             state.handler.completed(Long.valueOf(state.nBytes), state.attachment);
@@ -990,14 +990,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     ioe = new IOException(exc);
                 }
                 setError(ioe);
-                writePending.release();
-                if (state.block == BlockingMode.BLOCK) {
-                    synchronized (this) {
+                synchronized (state) {
+                    writePending.release();
+                    if (state.block == BlockingMode.BLOCK) {
                         state.state = Nio2Endpoint.isInline() ? CompletionState.ERROR : CompletionState.DONE;
-                        notify();
+                        state.notify();
+                    } else {
+                        state.state = Nio2Endpoint.isInline() ? CompletionState.ERROR : CompletionState.DONE;
                     }
-                } else {
-                    state.state = Nio2Endpoint.isInline() ? CompletionState.ERROR : CompletionState.DONE;
                 }
                 if (state.handler != null) {
                     state.handler.failed(ioe, state.attachment);
@@ -1009,6 +1009,11 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         public <A> CompletionState read(ByteBuffer[] dsts, int offset, int length,
                 BlockingMode block, long timeout, TimeUnit unit, A attachment,
                 CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
+            IOException ioe = getError();
+            if (ioe != null) {
+                handler.failed(ioe, attachment);
+                return CompletionState.ERROR;
+            }
             if (block != BlockingMode.NON_BLOCK) {
                 try {
                     if (!readPending.tryAcquire(timeout, unit)) {
@@ -1030,10 +1035,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             getSocket().read(dsts, offset, length, timeout, unit, state, completion);
             Nio2Endpoint.endInline();
             if (block == BlockingMode.BLOCK) {
-                synchronized (completion) {
+                synchronized (state) {
                     if (state.state == CompletionState.PENDING) {
                         try {
-                            completion.wait(unit.toMillis(timeout));
+                            state.wait(unit.toMillis(timeout));
                             if (state.state == CompletionState.PENDING) {
                                 handler.failed(new SocketTimeoutException(), attachment);
                                 return CompletionState.ERROR;
@@ -1085,10 +1090,10 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             getSocket().write(srcs, offset, length, timeout, unit, state, completion);
             Nio2Endpoint.endInline();
             if (block == BlockingMode.BLOCK) {
-                synchronized (completion) {
+                synchronized (state) {
                     if (state.state == CompletionState.PENDING) {
                         try {
-                            completion.wait(unit.toMillis(timeout));
+                            state.wait(unit.toMillis(timeout));
                             if (state.state == CompletionState.PENDING) {
                                 handler.failed(new SocketTimeoutException(), attachment);
                                 return CompletionState.ERROR;
