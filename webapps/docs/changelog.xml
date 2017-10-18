@@ -114,6 +114,16 @@
         than the actual setting value of <code>maxRetryAttempts</code>.
         (kfujino)
       </fix>
+      <fix>
+        Ensure that the remaining Sender can send channel messages by avoiding
+        unintended <code>ChannelException</code> caused by comparing the number
+        of failed members and the number of remaining Senders. (kfujino)
+      </fix>
+      <fix>
+        Ensure that remaining SelectionKeys that were not handled by throwing a
+        <code>ChannelException</code> during SelectionKey processing are
+        handled. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
