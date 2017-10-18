@@ -25,6 +25,8 @@ import javax.net.ssl.SSLServerSocket;
 
 class Jre8Compat extends Jre7Compat {
 
+    private static final int RUNTIME_MAJOR_VERSION = 8;
+
     private static final Method getSSLParametersMethod;
     private static final Method setUseCipherSuitesOrderMethod;
     private static final Method setSSLParametersMethod;
@@ -92,5 +94,11 @@ class Jre8Compat extends Jre7Compat {
         } catch (InvocationTargetException e) {
             throw new UnsupportedOperationException(e);
         }
+    }
+
+
+    @Override
+    public int jarFileRuntimeMajorVersion() {
+        return RUNTIME_MAJOR_VERSION;
     }
 }

@@ -80,6 +80,10 @@
         Fix the JMX descriptor for <code>Wrapper.findInitParameter()</code>.
         (rjung)
       </fix>
+      <fix>
+        <bug>61601</bug>: Add support for multi-release JARs in JAR scanning and
+        web application class loading. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

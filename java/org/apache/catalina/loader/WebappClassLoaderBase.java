@@ -3006,7 +3006,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (jarFiles[0] == null) {
                 for (int i = 0; i < jarFiles.length; i++) {
                     try {
-                        jarFiles[i] = new JarFile(jarRealFiles[i]);
+                        jarFiles[i] = JreCompat.getInstance().jarFileNewInstance(jarRealFiles[i]);
                     } catch (IOException e) {
                         log.warn(sm.getString("webappClassLoader.jarOpenFail", jarFiles[i]), e);
                         closeJARs(true);
@@ -3695,7 +3695,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         JarFile jarFile = null;
         try {
-            jarFile = new JarFile(file);
+            jarFile = JreCompat.getInstance().jarFileNewInstance(file);
             for (int i = 0; i < triggers.length; i++) {
                 Class<?> clazz = null;
                 try {

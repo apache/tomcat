@@ -22,6 +22,8 @@ import java.util.Locale;
 
 class Jre7Compat extends JreCompat {
 
+    private static final int RUNTIME_MAJOR_VERSION = 7;
+
     private static final Method forLanguageTagMethod;
 
 
@@ -54,5 +56,11 @@ class Jre7Compat extends JreCompat {
         } catch (InvocationTargetException e) {
             return null;
         }
+    }
+
+
+    @Override
+    public int jarFileRuntimeMajorVersion() {
+        return RUNTIME_MAJOR_VERSION;
     }
 }

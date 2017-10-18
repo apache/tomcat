@@ -59,6 +59,7 @@ import org.apache.naming.resources.DirContextURLStreamHandler;
 import org.apache.naming.resources.DirContextURLStreamHandlerFactory;
 import org.apache.naming.resources.Resource;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -999,7 +1000,7 @@ public class WebappLoader extends LifecycleMBeanBase
                 }
 
                 try {
-                    JarFile jarFile = new JarFile(destFile);
+                    JarFile jarFile = JreCompat.getInstance().jarFileNewInstance(destFile);
                     classLoader.addJar(filename, jarFile, destFile);
                 } catch (Exception ex) {
                     // Catch the exception if there is an empty jar file

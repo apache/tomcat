@@ -16,7 +16,9 @@
  */
 package org.apache.tomcat.util.compat;
 
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
@@ -25,6 +27,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Deque;
 import java.util.Set;
+import java.util.jar.JarFile;
+import java.util.zip.ZipFile;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -44,14 +48,13 @@ class Jre9Compat extends Jre8Compat {
     private static final Method locationMethod;
     private static final Method isPresentMethod;
     private static final Method getMethod;
+    private static final Constructor<JarFile> jarFileConstructor;
+    private static final Method isMultiReleaseMethod;
+
+    private static final Object RUNTIME_VERSION;
+    private static final int RUNTIME_MAJOR_VERSION;
 
     static {
-        Class<?> moduleLayerClazz = null;
-        Class<?> configurationClazz = null;
-        Class<?> resolvedModuleClazz = null;
-        Class<?> moduleReferenceClazz = null;
-        Class<?> optionalClazz = null;
-
         Class<?> c1 = null;
         Method m4 = null;
         Method m5 = null;
@@ -61,13 +64,20 @@ class Jre9Compat extends Jre8Compat {
         Method m9 = null;
         Method m10 = null;
         Method m11 = null;
+        Constructor<JarFile> c12 = null;
+        Method m13 = null;
+        Object o14 = null;
+        Object o15 = null;
 
         try {
-            moduleLayerClazz = Class.forName("java.lang.ModuleLayer");
-            configurationClazz = Class.forName("java.lang.module.Configuration");
-            resolvedModuleClazz = Class.forName("java.lang.module.ResolvedModule");
-            moduleReferenceClazz = Class.forName("java.lang.module.ModuleReference");
-            optionalClazz = Class.forName("java.util.Optional");
+            Class<?> moduleLayerClazz = Class.forName("java.lang.ModuleLayer");
+            Class<?> configurationClazz = Class.forName("java.lang.module.Configuration");
+            Class<?> resolvedModuleClazz = Class.forName("java.lang.module.ResolvedModule");
+            Class<?> moduleReferenceClazz = Class.forName("java.lang.module.ModuleReference");
+            Class<?> optionalClazz = Class.forName("java.util.Optional");
+            Class<?> versionClazz = Class.forName("java.lang.Runtime$Version");
+            Method runtimeVersionMethod = JarFile.class.getMethod("runtimeVersion");
+            Method majorMethod = versionClazz.getMethod("major");
 
             c1 = Class.forName("java.lang.reflect.InaccessibleObjectException");
             m4 = URLConnection.class.getMethod("setDefaultUseCaches", String.class, boolean.class);
@@ -78,13 +88,25 @@ class Jre9Compat extends Jre8Compat {
             m9 = moduleReferenceClazz.getMethod("location");
             m10 = optionalClazz.getMethod("isPresent");
             m11 = optionalClazz.getMethod("get");
+            c12 = JarFile.class.getConstructor(File.class, boolean.class, int.class, versionClazz);
+            m13 = JarFile.class.getMethod("isMultiRelease");
+            o14 = runtimeVersionMethod.invoke(null);
+            o15 = majorMethod.invoke(o14);
+
         } catch (SecurityException e) {
             // Should never happen
         } catch (NoSuchMethodException e) {
             // Should never happen
         } catch (ClassNotFoundException e) {
             // Must be Java 8
+        } catch (IllegalArgumentException e) {
+            // Should never happen
+        } catch (IllegalAccessException e) {
+            // Should never happen
+        } catch (InvocationTargetException e) {
+            // Should never happen
         }
+
         inaccessibleObjectExceptionClazz = c1;
         setDefaultUseCachesMethod = m4;
         bootMethod = m5;
@@ -94,6 +116,16 @@ class Jre9Compat extends Jre8Compat {
         locationMethod = m9;
         isPresentMethod = m10;
         getMethod = m11;
+        jarFileConstructor = c12;
+        isMultiReleaseMethod = m13;
+
+        RUNTIME_VERSION = o14;
+        if (o15 != null) {
+            RUNTIME_MAJOR_VERSION = ((Integer) o15).intValue();
+        } else {
+            // Must be Java 8
+            RUNTIME_MAJOR_VERSION = 8;
+        }
     }
 
 
@@ -153,5 +185,42 @@ class Jre9Compat extends Jre8Compat {
         } catch (InvocationTargetException e) {
             throw new UnsupportedOperationException(e);
         }
+    }
+
+
+    @Override
+    public JarFile jarFileNewInstance(File f) throws IOException {
+        try {
+            return jarFileConstructor.newInstance(
+                    f, Boolean.TRUE, Integer.valueOf(ZipFile.OPEN_READ), RUNTIME_VERSION);
+        } catch (IllegalArgumentException e) {
+            throw new IOException(e);
+        } catch (InstantiationException e) {
+            throw new IOException(e);
+        } catch (IllegalAccessException e) {
+            throw new IOException(e);
+        } catch (InvocationTargetException e) {
+            throw new IOException(e);
+        }
+    }
+
+
+    @Override
+    public boolean jarFileIsMultiRelease(JarFile jarFile) {
+        try {
+            return ((Boolean) isMultiReleaseMethod.invoke(jarFile)).booleanValue();
+        } catch (IllegalArgumentException e) {
+            return false;
+        } catch (IllegalAccessException e) {
+            return false;
+        } catch (InvocationTargetException e) {
+            return false;
+        }
+    }
+
+
+    @Override
+    public int jarFileRuntimeMajorVersion() {
+        return RUNTIME_MAJOR_VERSION;
     }
 }

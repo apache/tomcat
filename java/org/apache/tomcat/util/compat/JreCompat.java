@@ -16,11 +16,13 @@
  */
 package org.apache.tomcat.util.compat;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Deque;
 import java.util.Locale;
+import java.util.jar.JarFile;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLServerSocket;
@@ -33,6 +35,8 @@ import org.apache.tomcat.util.res.StringManager;
  * alternative implementations for later JRE versions
  */
 public class JreCompat {
+
+    private static final int RUNTIME_MAJOR_VERSION = 6;
 
     private static final JreCompat instance;
     private static StringManager sm =
@@ -190,7 +194,40 @@ public class JreCompat {
      *                                  added
      */
     public void addBootModulePath(Deque<URL> classPathUrlsToProcess) {
-        // NO-OP for Java 8. There is no module path.
+        // NO-OP. There is no module path prior to Java 9.
     }
 
+
+    /**
+     * Creates a new JarFile instance. When running on Java 9 and later, the
+     * JarFile will be multi-release JAR aware.
+     *
+     * @param f The JAR file to open
+     *
+     * @return A JarFile instance based on the provided file
+     *
+     * @throws IOException  If an I/O error occurs creating the JarFile instance
+     */
+    public JarFile jarFileNewInstance(File f) throws IOException {
+        return new JarFile(f);
+    }
+
+
+    /**
+     * Is this JarFile a multi-release JAR file.
+     *
+     * @param jarFile   The JarFile to test
+     *
+     * @return {@code true} If it is a multi-release JAR file and is configured
+     *         to behave as such.
+     */
+    public boolean jarFileIsMultiRelease(JarFile jarFile) {
+        // There is no multi-release JAR support prior to Java 9
+        return false;
+    }
+
+
+    public int jarFileRuntimeMajorVersion() {
+        return RUNTIME_MAJOR_VERSION;
+    }
 }
