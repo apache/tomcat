@@ -25,6 +25,7 @@ import java.util.ListIterator;
 import javax.servlet.jsp.tagext.PageData;
 
 import org.apache.jasper.JasperException;
+import org.apache.tomcat.util.security.Escape;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -331,7 +332,7 @@ class PageDataImpl extends PageData implements TagConstants {
                 buf.append(jspId++).append("\">");
             }
             buf.append("${");
-            buf.append(JspUtil.escapeXml(n.getText()));
+            buf.append(Escape.xml(n.getText()));
             buf.append("}");
             if (!n.getRoot().isXmlSyntax()) {
                 buf.append(JSP_TEXT_ACTION_END);

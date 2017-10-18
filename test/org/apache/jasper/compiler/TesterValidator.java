@@ -16,6 +16,7 @@
  */
 package org.apache.jasper.compiler;
 
+import org.apache.tomcat.util.security.Escape;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,7 +43,7 @@ public class TesterValidator {
 
         for (int j = 0; j < bug53867TestData.length; j++) {
             Assert.assertEquals(doTestBug53867OldVersion(bug53867TestData[j]),
-                    Validator.xmlEscape(bug53867TestData[j]));
+                    Escape.xml(bug53867TestData[j]));
         }
 
         for (int i = 0; i < 100; i++) {
@@ -52,7 +53,7 @@ public class TesterValidator {
         }
         for (int i = 0; i < 100; i++) {
             for (int j = 0; j < bug53867TestData.length; j++) {
-                Validator.xmlEscape(bug53867TestData[j]);
+                Escape.xml(bug53867TestData[j]);
             }
         }
 
@@ -68,7 +69,7 @@ public class TesterValidator {
         start = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
             for (int j = 0; j < bug53867TestData.length; j++) {
-                Validator.xmlEscape(bug53867TestData[j]);
+                Escape.xml(bug53867TestData[j]);
             }
         }
         System.out.println(

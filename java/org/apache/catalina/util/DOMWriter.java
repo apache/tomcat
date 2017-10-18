@@ -49,6 +49,12 @@ public class DOMWriter {
     protected final boolean canonical;
 
 
+    public DOMWriter(Writer writer) {
+        this (writer, true);
+    }
+
+
+    @Deprecated
     public DOMWriter(Writer writer, boolean canonical) {
         out = new PrintWriter(writer);
         this.canonical = canonical;
@@ -130,7 +136,7 @@ public class DOMWriter {
 
             // print text
             case Node.TEXT_NODE:
-                out.print(normalize(node.getNodeValue()));
+               out.print(normalize(node.getNodeValue()));
                 break;
 
             // print processing instruction

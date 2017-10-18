@@ -26,6 +26,7 @@ import java.util.Iterator;
 
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.descriptor.web.ResourceBase;
+import org.apache.tomcat.util.security.Escape;
 
 /**
  * StoreAppends generate really the xml tag elements
@@ -106,7 +107,7 @@ public class StoreAppender {
         aWriter.print("<");
         aWriter.print(tag);
         aWriter.print(">");
-        aWriter.print(convertStr(content));
+        aWriter.print(Escape.xml(content));
         aWriter.print("</");
         aWriter.print(tag);
         aWriter.println(">");
@@ -341,7 +342,7 @@ public class StoreAppender {
         if (!(value instanceof String)) {
             value = value.toString();
         }
-        String strValue = convertStr((String) value);
+        String strValue = Escape.xml((String) value);
         pos = pos + name.length() + strValue.length();
         if (pos > 60) {
             writer.println();
@@ -360,7 +361,9 @@ public class StoreAppender {
      * '&amp;', and '"'.
      * @param input The string to escape
      * @return the escaped string
+     * @deprecated This method will be removed in Tomcat 9
      */
+    @Deprecated
     public String convertStr(String input) {
 
         StringBuffer filtered = new StringBuffer(input.length());

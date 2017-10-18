@@ -43,6 +43,7 @@ import org.apache.jasper.security.SecurityUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.PeriodicEventListener;
+import org.apache.tomcat.util.security.Escape;
 
 /**
  * The JSP engine (a.k.a Jasper).
@@ -404,7 +405,7 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                 Localizer.getMessage("jsp.error.file.not.found",jspUri);
             // Strictly, filtering this is an application
             // responsibility but just in case...
-            throw new ServletException(SecurityUtil.filter(msg));
+            throw new ServletException(Escape.htmlElementContent(msg));
         } else {
             try {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND,
