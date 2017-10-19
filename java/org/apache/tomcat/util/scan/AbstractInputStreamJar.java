@@ -267,8 +267,8 @@ public abstract class AbstractInputStreamJar implements Jar {
         mrMap = new HashMap<>();
 
         for (Entry<String,Integer> mrVersion : mrVersions.entrySet()) {
-            mrMap.put(mrVersion.getKey() , "META-INF/versions/" + mrVersion.getValue().toString() + ""
-                    + "/" +  mrVersion.getKey());
+            mrMap.put(mrVersion.getKey() , "META-INF/versions/" + mrVersion.getValue().toString() +
+                    "/" +  mrVersion.getKey());
         }
 
         // Reset stream back to the beginning of the JAR
