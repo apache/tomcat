@@ -16,9 +16,10 @@
  */
 package org.apache.jasper.compiler;
 
-import org.apache.tomcat.util.security.Escape;
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.tomcat.util.security.Escape;
 
 /**
  * Performance tests for {@link Validator}.
