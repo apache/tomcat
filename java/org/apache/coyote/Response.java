@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote;
 
 import java.io.IOException;
@@ -23,7 +22,6 @@ import java.util.Locale;
 
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.http.parser.MediaType;
 
@@ -332,15 +330,6 @@ public final class Response {
                 // Do nothing - the spec doesn't have any "throws"
                 // and the user might know what he's doing
                 return false;
-            }
-        }
-        if (name.equalsIgnoreCase("Content-Language")) {
-            Locale locale = ResponseUtil.getLocaleFromLanguageHeader(value);
-            if (locale == null) {
-                return false;
-            } else {
-                setLocale(locale);
-                return true;
             }
         }
         return false;

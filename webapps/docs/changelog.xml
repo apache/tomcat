@@ -84,6 +84,11 @@
         <bug>61601</bug>: Add support for multi-release JARs in JAR scanning and
         web application class loading. (markt)
       </fix>
+      <fix>
+        Revert the change from 7.0.80 that called
+        <code>ServletResponse.setLocale()</code> if the
+        <code>Content-Language</code> HTTP header was set directly. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

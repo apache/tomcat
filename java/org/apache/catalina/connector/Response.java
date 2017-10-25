@@ -55,7 +55,6 @@ import org.apache.tomcat.util.buf.UEncoder;
 import org.apache.tomcat.util.buf.UEncoder.SafeCharsSet;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
-import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.http.ServerCookie;
 import org.apache.tomcat.util.http.parser.MediaTypeCache;
 import org.apache.tomcat.util.net.URL;
@@ -1129,9 +1128,9 @@ public class Response implements HttpServletResponse {
 
     /**
      * An extended version of this exists in {@link org.apache.coyote.Response}.
-     * This check is required here to ensure that the usingWriter checks in
-     * {@link #setContentType(String)} and {@link #setLocale(Locale) are applied
-     * since usingWriter is not visible to {@link org.apache.coyote.Response}
+     * This check is required here to ensure that the usingWriter check in
+     * {@link #setContentType(String)} is applied since usingWriter is not
+     * visible to {@link org.apache.coyote.Response}
      *
      * Called from set/addHeader.
      * Return true if the header is special, no need to set the header.
@@ -1140,15 +1139,6 @@ public class Response implements HttpServletResponse {
         if (name.equalsIgnoreCase("Content-Type")) {
             setContentType(value);
             return true;
-        }
-        if (name.equalsIgnoreCase("Content-Language")) {
-            Locale locale = ResponseUtil.getLocaleFromLanguageHeader(value);
-            if (locale == null) {
-                return false;
-            } else {
-                setLocale(locale);
-                return true;
-            }
         }
         return false;
     }
