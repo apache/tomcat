@@ -45,7 +45,7 @@ public class Http2Protocol implements UpgradeProtocol {
     static final long DEFAULT_MAX_CONCURRENT_STREAMS = 200;
     // Maximum amount of streams which can be concurrently executed over
     // a single connection
-    static final int DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION = 200;
+    static final int DEFAULT_MAX_CONCURRENT_STREAM_EXECUTION = 20;
     // This default is defined by the HTTP/2 specification
     static final int DEFAULT_INITIAL_WINDOW_SIZE = (1 << 16) - 1;
 

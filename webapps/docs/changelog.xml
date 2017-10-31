@@ -86,6 +86,10 @@
         have the same password. This fixes PKCS11 key store handling with
         multiple keys selected with an alias. (markt)
       </fix>
+      <fix>
+        Reduce default HTTP/2 stream concurrent execution within a connection
+        from 200 to 20. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
