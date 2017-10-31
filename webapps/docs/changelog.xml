@@ -80,6 +80,10 @@
       <add>
         Sendfile support for HTTP/2 and NIO2. (remm)
       </add>
+      <fix>
+        Reduce default HTTP/2 stream concurrent execution within a connection
+        from 200 to 20. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
