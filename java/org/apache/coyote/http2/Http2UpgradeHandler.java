@@ -50,6 +50,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
+import org.apache.tomcat.util.net.SendfileState;
 import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -699,7 +700,12 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    private void processWrites() throws IOException {
+    boolean hasAsyncIO() {
+        return false;
+    }
+
+
+    protected void processWrites() throws IOException {
         synchronized (socketWrapper) {
             if (socketWrapper.flush(false)) {
                 socketWrapper.registerWriteInterest();
@@ -798,6 +804,10 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
     }
 
+
+    protected SendfileState processSendfile(Stream stream) {
+        return SendfileState.DONE;
+    }
 
     private synchronized Set<AbstractStream> releaseBackLog(int increment) {
         Set<AbstractStream> result = new HashSet<>();

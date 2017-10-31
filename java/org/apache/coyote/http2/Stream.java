@@ -104,8 +104,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
             // TODO Assuming the body has been read at this point is not valid
             state.receivedEndOfStream();
         }
-        // No sendfile for HTTP/2 (it is enabled by default in the request)
-        this.coyoteRequest.setSendfile(false);
+        this.coyoteRequest.setSendfile(handler.hasAsyncIO());
         this.coyoteResponse.setOutputBuffer(outputBuffer);
         this.coyoteRequest.setResponse(coyoteResponse);
         this.coyoteRequest.protocol().setString("HTTP/2.0");
@@ -198,7 +197,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    private final synchronized int reserveWindowSize(int reservation, boolean block)
+    final synchronized int reserveWindowSize(int reservation, boolean block)
             throws IOException {
         long windowSize = getWindowSize();
         while (windowSize < 1) {

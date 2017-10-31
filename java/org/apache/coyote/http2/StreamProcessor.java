@@ -30,6 +30,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.DispatchType;
+import org.apache.tomcat.util.net.SendfileState;
 import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -41,6 +42,7 @@ class StreamProcessor extends AbstractProcessor {
 
     private final Http2UpgradeHandler handler;
     private final Stream stream;
+    private SendfileState sendfileState = null;
 
 
     StreamProcessor(Http2UpgradeHandler handler, Stream stream, Adapter adapter,
@@ -102,7 +104,10 @@ class StreamProcessor extends AbstractProcessor {
 
     @Override
     protected final void finishResponse() throws IOException {
-        stream.getOutputBuffer().close();
+        sendfileState = handler.processSendfile(stream);
+        if (!(sendfileState == SendfileState.PENDING)) {
+            stream.getOutputBuffer().close();
+        }
     }
 
 
@@ -261,7 +266,9 @@ class StreamProcessor extends AbstractProcessor {
             setErrorState(ErrorState.CLOSE_NOW, e);
         }
 
-        if (getErrorState().isError()) {
+        if (sendfileState == SendfileState.PENDING) {
+            return SocketState.SENDFILE;
+        } else if (getErrorState().isError()) {
             action(ActionCode.CLOSE, null);
             request.updateCounters();
             return SocketState.CLOSED;

@@ -77,6 +77,9 @@
       <fix>
         Improve NIO2 syncing for async IO operations. (remm)
       </fix>
+      <add>
+        Sendfile support for HTTP/2 and NIO2. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
