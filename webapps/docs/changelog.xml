@@ -60,6 +60,9 @@
         <bug>61601</bug>: Add support for multi-release JARs in JAR scanning and
         web application class loading. (markt)
       </fix>
+      <fix>
+        <bug>61681</bug>: Allow HTTP/2 push when using request wrapping. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

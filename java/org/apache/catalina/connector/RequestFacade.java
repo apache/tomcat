@@ -1130,6 +1130,11 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
+    public PushBuilder newPushBuilder(HttpServletRequest request) {
+        return this.request.newPushBuilder(request);
+    }
+
+
     @Override
     public boolean isTrailerFieldsReady() {
         return request.isTrailerFieldsReady();

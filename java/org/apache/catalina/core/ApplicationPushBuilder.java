@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletRequestWrapper;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -74,20 +72,11 @@ public class ApplicationPushBuilder implements PushBuilder {
     private String sessionId;
 
 
-    public ApplicationPushBuilder(HttpServletRequest request) {
+    public ApplicationPushBuilder(Request catalinaRequest, HttpServletRequest request) {
+
         baseRequest = request;
-        // Need a reference to the CoyoteRequest in order to process the push
-        ServletRequest current = request;
-        while (current instanceof ServletRequestWrapper) {
-            current = ((ServletRequestWrapper) current).getRequest();
-        }
-        if (current instanceof Request) {
-            catalinaRequest = (Request) current;
-            coyoteRequest = catalinaRequest.getCoyoteRequest();
-        } else {
-            throw new UnsupportedOperationException(sm.getString(
-                    "applicationPushBuilder.noCoyoteRequest", current.getClass().getName()));
-        }
+        this.catalinaRequest = catalinaRequest;
+        coyoteRequest = catalinaRequest.getCoyoteRequest();
 
         // Populate the initial list of HTTP headers
         Enumeration<String> headerNames = request.getHeaderNames();
@@ -168,7 +157,6 @@ public class ApplicationPushBuilder implements PushBuilder {
             }
         }
     }
-
 
     @Override
     public PushBuilder path(String path) {
