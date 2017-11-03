@@ -70,6 +70,7 @@ public class Http2Protocol implements UpgradeProtocol {
     private int maxTrailerCount = Constants.DEFAULT_MAX_TRAILER_COUNT;
     private int maxTrailerSize = Constants.DEFAULT_MAX_TRAILER_SIZE;
     private boolean initiatePingDisabled = false;
+    private boolean useSendfile = true;
 
     @Override
     public String getHttpUpgradeName(boolean isSSLEnabled) {
@@ -186,6 +187,16 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public void setInitialWindowSize(int initialWindowSize) {
         this.initialWindowSize = initialWindowSize;
+    }
+
+
+    public boolean getUseSendfile() {
+        return useSendfile;
+    }
+
+
+    public void setUseSendfile(boolean useSendfile) {
+        this.useSendfile = useSendfile;
     }
 
 

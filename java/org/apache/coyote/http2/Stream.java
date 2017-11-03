@@ -104,7 +104,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
             // TODO Assuming the body has been read at this point is not valid
             state.receivedEndOfStream();
         }
-        this.coyoteRequest.setSendfile(handler.hasAsyncIO());
+        this.coyoteRequest.setSendfile(handler.hasAsyncIO() && handler.getProtocol().getUseSendfile());
         this.coyoteResponse.setOutputBuffer(outputBuffer);
         this.coyoteRequest.setResponse(coyoteResponse);
         this.coyoteRequest.protocol().setString("HTTP/2.0");

@@ -146,6 +146,11 @@
       <code>10000</code> will be used.</p>
     </attribute>
 
+    <attribute name="useSendfile" required="false">
+      <p>Use this boolean attribute to enable or disable sendfile capability.
+      The default value is <code>true</code>.</p>
+    </attribute>
+
     <attribute name="writeTimeout" required="false">
       <p>The time, in milliseconds, that Tomcat will wait to write additional
       data when an HTTP/2 frame has been partially written. Negative values will
