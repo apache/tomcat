@@ -37,6 +37,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
+import javax.servlet.ServletRequestWrapper;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -44,7 +45,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
-import org.apache.catalina.core.ApplicationPushBuilder;
+import org.apache.catalina.connector.RequestFacade;
+import org.apache.catalina.servlet4preview.http.PushBuilder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
@@ -638,8 +640,16 @@ public class RemoteIpFilter implements Filter {
             return url;
         }
 
-        public ApplicationPushBuilder getPushBuilder() {
-            return new ApplicationPushBuilder(this);
+        public PushBuilder getPushBuilder() {
+            ServletRequest current = getRequest();
+            while (current instanceof ServletRequestWrapper) {
+                current = ((ServletRequestWrapper) current).getRequest();
+            }
+            if (current instanceof RequestFacade) {
+                return ((RequestFacade) current).newPushBuilder(this);
+            } else {
+                return null;
+            }
         }
     }
 

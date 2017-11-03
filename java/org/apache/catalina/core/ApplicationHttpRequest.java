@@ -32,6 +32,8 @@ import java.util.NoSuchElementException;
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletRequestWrapper;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -39,6 +41,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
+import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.servlet4preview.http.PushBuilder;
 import org.apache.catalina.servlet4preview.http.ServletMapping;
 import org.apache.catalina.util.ParameterMap;
@@ -637,7 +640,15 @@ class ApplicationHttpRequest
 
     @Override
     public PushBuilder newPushBuilder() {
-        return new ApplicationPushBuilder(this);
+        ServletRequest current = getRequest();
+        while (current instanceof ServletRequestWrapper) {
+            current = ((ServletRequestWrapper) current).getRequest();
+        }
+        if (current instanceof RequestFacade) {
+            return ((RequestFacade) current).newPushBuilder(this);
+        } else {
+            return null;
+        }
     }
 
 

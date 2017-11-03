@@ -1128,6 +1128,11 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
+    public PushBuilder newPushBuilder(javax.servlet.http.HttpServletRequest request) {
+        return this.request.newPushBuilder(request);
+    }
+
+
     /**
      * {@inheritDoc}
      * <p>
