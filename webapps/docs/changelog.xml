@@ -87,6 +87,10 @@
         Reduce default HTTP/2 stream concurrent execution within a connection
         from 200 to 20. (remm)
       </fix>
+      <fix>
+        <bug>61719</bug>: Avoid possible NPE calling
+        InputStream.setReadListener with HTTP/2. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

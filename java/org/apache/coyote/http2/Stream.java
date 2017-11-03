@@ -916,8 +916,10 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
 
         final void registerReadInterest() {
-            synchronized (inBuffer) {
-                readInterest = true;
+            if (inBuffer != null) {
+                synchronized (inBuffer) {
+                    readInterest = true;
+                }
             }
         }
 
