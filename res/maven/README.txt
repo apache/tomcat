@@ -35,3 +35,6 @@ To release do the following:
 2 - check the upload and then close the repository
 3 - include the repository in the VOTE thread
 4 - in https://repository.apache.org/index.html#stagingRepositories release it
+
+To install in your maven repo:
+1 - ant -f mvn-pub.xml generic-install
