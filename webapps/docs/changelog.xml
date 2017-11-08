@@ -88,6 +88,10 @@
         from 200 to 20. (remm)
       </fix>
       <fix>
+        <bug>61668</bug>: Avoid a possible NPE when calling
+        <code>AbstractHttp11Protocol.getSSLProtocol()</code>. (markt)
+      </fix>
+      <fix>
         <bug>61719</bug>: Avoid possible NPE calling
         InputStream.setReadListener with HTTP/2. (remm)
       </fix>

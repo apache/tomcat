@@ -23,7 +23,8 @@ import java.util.function.Function;
 /**
  * Utility methods to build a separated list from a given set (not
  * java.util.Set) of inputs and return that list as a string or append it to an
- * existing StringBuilder.
+ * existing StringBuilder. If the given set is null or empty, an empty string
+ * will be returned.
  */
 public final class StringUtils {
 
@@ -35,11 +36,17 @@ public final class StringUtils {
 
 
     public static String join(String[] array) {
+        if (array == null) {
+            return EMPTY_STRING;
+        }
         return join(Arrays.asList(array));
     }
 
 
     public static void join(String[] array, char separator, StringBuilder sb) {
+        if (array == null) {
+            return;
+        }
         join(Arrays.asList(array), separator, sb);
     }
 
@@ -51,7 +58,7 @@ public final class StringUtils {
 
     public static String join(Collection<String> collection, char separator) {
         // Shortcut
-        if (collection.isEmpty()) {
+        if (collection == null || collection.isEmpty()) {
             return EMPTY_STRING;
         }
 
@@ -68,12 +75,18 @@ public final class StringUtils {
 
     public static <T> void join(T[] array, char separator, Function<T,String> function,
             StringBuilder sb) {
+        if (array == null) {
+            return;
+        }
         join(Arrays.asList(array), separator, function, sb);
     }
 
 
     public static <T> void join(Iterable<T> iterable, char separator, Function<T,String> function,
             StringBuilder sb) {
+        if (iterable == null) {
+            return;
+        }
         boolean first = true;
         for (T value : iterable) {
             if (first) {
