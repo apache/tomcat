@@ -629,7 +629,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     public String getSslEnabledProtocols() {
         registerDefaultSSLHostConfig();
-        return StringUtils.join(defaultSSLHostConfig.getEnabledProtocols());
+        getSSLProtocol();
     }
     public void setSslEnabledProtocols(String enabledProtocols) {
         registerDefaultSSLHostConfig();
@@ -637,7 +637,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
     public String getSSLProtocol() {
         registerDefaultSSLHostConfig();
-        return StringUtils.join(defaultSSLHostConfig.getEnabledProtocols());
+        if (defaultSSLHostConfig.getEnabledProtocols() == null) {
+            return null;
+        } else {
+            return StringUtils.join(defaultSSLHostConfig.getEnabledProtocols());
+        }
     }
     public void setSSLProtocol(String sslProtocol) {
         registerDefaultSSLHostConfig();
