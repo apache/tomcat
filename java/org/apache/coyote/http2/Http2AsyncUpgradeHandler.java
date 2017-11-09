@@ -31,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolException;
 import org.apache.coyote.Request;
-import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.SendfileState;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
@@ -146,16 +145,6 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                     ByteBuffer.wrap(fixedPayload));
         }
         handleAsyncException();
-    }
-
-
-    @Override
-    void writeHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders,
-            boolean endOfStream, int payloadSize) throws IOException {
-        doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
-        if (endOfStream) {
-            stream.sentEndOfStream();
-        }
     }
 
 
