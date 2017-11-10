@@ -125,6 +125,10 @@
         <bug>61603</bug>: Add XML filtering for the status servlet output where
         needed. (remm)
       </fix>
+      <fix>
+        Correct the description of how the CGI servlet maps a request to a
+        script in the CGI How-To. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
