@@ -129,18 +129,16 @@ the reading of stderr to complete before terminating the CGI process. Default
 is <code>2000</code>.</li>
 </ul>
 
-<p>The name and path of the CGI script to search for in the CGI search path
-depends on how the Servlet has been mapped. If the <strong>pathInfo</strong> is
-<code>null</code>, the <strong>servletPath</strong> will be used. If the
-<strong>pathInfo</strong> is not <code>null</code> then the
-<strong>servletPath</strong> is appended to the CGI search path and the
-<strong>pathInfo</strong> is used.</p>
+<p>The CGI script executed depends on the configuration of the CGI Servlet and
+how the request is mapped to the CGI Servlet. The CGI search path starts at the
+web application root directory + File.separator + cgiPathPrefix. The
+<strong>pathInfo</strong> is then searched unless it is <code>null</code> - in
+which case the <strong>servletPath</strong> is searched.</p>
 
-<p>The search will start with the first path segment and expand one path segment
-at a time until no path segments are left (resulting in a 404) or a matching
-script is found in the CGI search path. Any remaining path segments will be
-passed to the CGI executable in the <strong>PATH_INFO</strong> environment
-variable.</p>
+<p>The search starts with the first path segment and expands one path segment
+at a time until no path segments are left (resulting in a 404) or a script is
+found. Any remaining path segments are passed to the script in the
+<strong>PATH_INFO</strong> environment variable.</p>
 
 </section>
 
