@@ -89,6 +89,11 @@
         <code>ServletResponse.setLocale()</code> if the
         <code>Content-Language</code> HTTP header was set directly. (markt)
       </fix>
+      <add>
+        Provide the <code>SessionInitializerFilter</code> that can be used to
+        ensure that an HTTP session exists when initiating a WebSocket
+        connection. Patch provided by isapir. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
