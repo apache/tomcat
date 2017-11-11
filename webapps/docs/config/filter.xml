@@ -1592,6 +1592,46 @@ org.apache.catalina.filters.RequestDumperFilter.handlers = \
   </subsection>
 </section>
 
+<section name="Session Initializer Filter">
+
+  <subsection name="Introduction">
+    <p>The Session Initializer Filter initializes the <code>javax.servlet.http.HttpSession</code>
+    before the Request is processed.  This is required for JSR-356 compliant WebSocket implementations,
+    if the <code>HttpSession</code> is needed during the HandShake phase.</p>
+
+    <p>The Java API for WebSocket does not mandate that an <code>HttpSession</code> would
+    be initialized upon request, and thus <code>javax.servlet.http.HttpServletRequest</code>'s
+    <code>getSession()</code> returns <code>null</code> if the <code>HttpSession</code> was not
+    initialized in advance.</p>
+
+    <p>This filter solves that problem by initializing the HttpSession for any <code>HttpServletRequest</code>
+    that matches its <code>url-pattern</code>.</p>
+  </subsection>
+
+  <subsection name="Filter Class Name">
+    <p>The filter class name for the Session Initializer Filter is
+    <strong><code>org.apache.catalina.filters.SessionInitializerFilter</code></strong>.</p>
+  </subsection>
+
+  <subsection name="Initialisation parameters">
+    <p>The Session Initializer Filter does not support any initialization parameters.</p>
+  </subsection>
+
+  <subsection name="Sample Configuration">
+    <p>The following entries in the Web Application Deployment Descriptor, <strong>web.xml</strong>,
+    would enable the Session Initializer Filter for requests that match the given URL pattern
+    (in this example, "/ws/*").</p>
+
+    <source><![CDATA[<filter>
+    <filter-name>SessionInitializer</filter-name>
+    <filter-class>org.apache.catalina.filters.SessionInitializerFilter</filter-class>
+</filter>
+<filter-mapping>
+    <filter-name>SessionInitializer</filter-name>
+    <url-pattern>/ws/*</url-pattern>
+</filter-mapping>]]></source>
+    </subsection>
+</section>
 
 <section name="Set Character Encoding Filter">
 

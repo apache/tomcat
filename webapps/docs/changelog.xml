@@ -63,6 +63,11 @@
       <fix>
         <bug>61681</bug>: Allow HTTP/2 push when using request wrapping. (remm)
       </fix>
+      <add>
+        Provide the <code>SessionInitializerFilter</code> that can be used to
+        ensure that an HTTP session exists when initiating a WebSocket
+        connection. Patch provided by isapir. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
