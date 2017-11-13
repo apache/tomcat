@@ -16,8 +16,7 @@
  */
 package org.apache.tomcat.util.http;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestRequestUtil {
@@ -158,6 +157,6 @@ public class TestRequestUtil {
     }
 
     private void doTestNormalize(String input, String expected) {
-        assertEquals(expected,RequestUtil.normalize(input));
+        Assert.assertEquals(expected,RequestUtil.normalize(input));
     }
 }

@@ -16,8 +16,7 @@
  */
 package org.apache.tomcat.util.http;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
@@ -48,17 +47,16 @@ public class TestCookiesNoStrictNamingSysProps extends CookiesBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/invalid");
-        assertEquals("Cookie name fail", res.toString());
+        Assert.assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/null");
-        assertEquals("Cookie name fail", res.toString());
+        Assert.assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/blank");
-        assertEquals("Cookie name fail", res.toString());
+        Assert.assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/invalidFwd");
-        assertEquals("Cookie name fail", res.toString());
+        Assert.assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/invalidStrict");
-        assertEquals("Cookie name ok", res.toString());
+        Assert.assertEquals("Cookie name ok", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/valid");
-        assertEquals("Cookie name ok", res.toString());
-
+        Assert.assertEquals("Cookie name ok", res.toString());
     }
 }

@@ -20,8 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
@@ -50,26 +49,24 @@ public class TestCookiesStrictSysProps extends CookiesBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/invalid");
-        assertEquals("Cookie name fail", res.toString());
+        Assert.assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/null");
-        assertEquals("Cookie name fail", res.toString());
+        Assert.assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/blank");
-        assertEquals("Cookie name fail", res.toString());
+        Assert.assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/invalidFwd");
-        assertEquals("Cookie name fail", res.toString());
+        Assert.assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/invalidStrict");
-        assertEquals("Cookie name fail", res.toString());
+        Assert.assertEquals("Cookie name fail", res.toString());
         res = getUrl("http://localhost:" + getPort() + "/valid");
-        assertEquals("Cookie name ok", res.toString());
+        Assert.assertEquals("Cookie name ok", res.toString());
 
         // Need to read response headers to test version switching
         Map<String,List<String>> headers = new HashMap<>();
         getUrl("http://localhost:" + getPort() + "/switch", res, headers);
         List<String> cookieHeaders = headers.get("Set-Cookie");
         for (String cookieHeader : cookieHeaders) {
-            assertEquals("name=\"val?ue\"; Version=1", cookieHeader);
+            Assert.assertEquals("name=\"val?ue\"; Version=1", cookieHeader);
         }
-
     }
-
 }

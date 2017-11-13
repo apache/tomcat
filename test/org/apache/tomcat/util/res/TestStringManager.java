@@ -14,11 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.util.res;
 
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestStringManager {
@@ -35,7 +33,7 @@ public class TestStringManager {
         } catch (IllegalArgumentException iae) {
             iaeThrown = true;
         }
-        assertTrue("IAE not thrown on null key", iaeThrown);
+        Assert.assertTrue("IAE not thrown on null key", iaeThrown);
     }
 
     @Test
