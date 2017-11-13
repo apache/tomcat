@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.Assert.assertSame;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -182,9 +181,9 @@ public class TestMapper extends LoggingBaseTest {
         Assert.assertEquals("zzzz_alias1", mapper.hosts[17].name);
         Assert.assertEquals("zzzz_alias2", mapper.hosts[18].name);
         Assert.assertEquals(2, mapper.hosts[16].getAliases().size());
-        assertSame(contextZ,
+        Assert.assertSame(contextZ,
                 mapper.hosts[16].contextList.contexts[0].versions[0].object);
-        assertSame(contextZ,
+        Assert.assertSame(contextZ,
                 mapper.hosts[18].contextList.contexts[0].versions[0].object);
     }
 
@@ -205,12 +204,12 @@ public class TestMapper extends LoggingBaseTest {
         Mapper.Host aliasMapping = mapper.hosts[iowPos + 1];
         Assert.assertEquals("iowejoiejfoiew_alias", aliasMapping.name);
         Assert.assertTrue(aliasMapping.isAlias());
-        assertSame(hostMapping.object, aliasMapping.object);
+        Assert.assertSame(hostMapping.object, aliasMapping.object);
 
         Assert.assertEquals("iowejoiejfoiew", hostMapping.getRealHostName());
         Assert.assertEquals("iowejoiejfoiew", aliasMapping.getRealHostName());
-        assertSame(hostMapping, hostMapping.getRealHost());
-        assertSame(hostMapping, aliasMapping.getRealHost());
+        Assert.assertSame(hostMapping, hostMapping.getRealHost());
+        Assert.assertSame(hostMapping, aliasMapping.getRealHost());
 
         mapper.removeHost("iowejoiejfoiew");
         Assert.assertEquals(14, mapper.hosts.length); // Both host and alias removed

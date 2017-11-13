@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
-import static org.junit.Assert.assertArrayEquals;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -80,7 +79,7 @@ public class TestFlushableGZIPOutputStream {
         byte[] decompressedBytes = sink.toByteArray();
         int originalLength = 0;
         for (byte[] bytes : parts) {
-            assertArrayEquals(bytes, Arrays.copyOfRange(decompressedBytes,
+            Assert.assertArrayEquals(bytes, Arrays.copyOfRange(decompressedBytes,
                     originalLength, originalLength + bytes.length));
             originalLength += bytes.length;
         }
@@ -124,7 +123,7 @@ public class TestFlushableGZIPOutputStream {
         byte[] decompressedBytes = sink.toByteArray();
         Assert.assertEquals(data.length * 4, decompressedBytes.length);
         for (int i = 0; i < 4; i++) {
-            assertArrayEquals(data, Arrays.copyOfRange(decompressedBytes,
+            Assert.assertArrayEquals(data, Arrays.copyOfRange(decompressedBytes,
                     data.length * i, data.length * (i + 1)));
         }
     }
