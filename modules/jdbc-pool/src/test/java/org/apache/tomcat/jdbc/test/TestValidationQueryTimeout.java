@@ -26,8 +26,6 @@ import java.sql.Statement;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.fail;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -165,7 +163,7 @@ public class TestValidationQueryTimeout extends DefaultTestCase {
         } catch (SQLTimeoutException ex) {
 
         } catch (SQLException x) {
-            fail("We should have got a timeout exception.");
+            Assert.fail("We should have got a timeout exception.");
         } finally {
             end = System.currentTimeMillis();
 

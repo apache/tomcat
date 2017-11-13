@@ -18,8 +18,7 @@ package org.apache.tomcat.jdbc.bugs;
 
 import java.sql.SQLException;
 
-import static org.junit.Assert.fail;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
@@ -43,7 +42,7 @@ public class Bug54978 {
         final DataSource ds = new DataSource(poolProperties);
         try {
             ds.getConnection().close();
-            fail("Validation should have failed.");
+            Assert.fail("Validation should have failed.");
         }catch (SQLException x) {
         }
     }
