@@ -35,10 +35,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -92,7 +88,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
         // Make sure we got an upgrade response
         String responseLine = client.reader.readLine();
-        assertTrue(responseLine.startsWith("HTTP/1.1 101"));
+        Assert.assertTrue(responseLine.startsWith("HTTP/1.1 101"));
 
         // Swallow the headers
         String responseHeaderLine = client.reader.readLine();
@@ -104,7 +100,7 @@ public class TestWebSocket extends TomcatBaseTest {
         client.sendMessage("foo", false);
         client.sendMessage("foo", true);
 
-        assertEquals("foofoo", client.readMessage());
+        Assert.assertEquals("foofoo", client.readMessage());
 
         // Finished with the socket
         client.close();
@@ -137,7 +133,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
         // Make sure we got an upgrade response
         String responseLine = client.reader.readLine();
-        assertTrue(responseLine.startsWith("HTTP/1.1 426"));
+        Assert.assertTrue(responseLine.startsWith("HTTP/1.1 426"));
 
         List<String> headerlines = new ArrayList<String>();
 
@@ -147,7 +143,7 @@ public class TestWebSocket extends TomcatBaseTest {
             responseHeaderLine = client.reader.readLine();
         }
 
-        assertTrue(headerlines.contains("Sec-WebSocket-Version: 13"));
+        Assert.assertTrue(headerlines.contains("Sec-WebSocket-Version: 13"));
         // Finished with the socket
         client.close();
     }
@@ -178,7 +174,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
         // Make sure we got an error response
         String responseLine = client.reader.readLine();
-        assertTrue(responseLine.startsWith("HTTP/1.1 400"));
+        Assert.assertTrue(responseLine.startsWith("HTTP/1.1 400"));
 
         // Finished with the socket
         client.close();
@@ -213,7 +209,7 @@ public class TestWebSocket extends TomcatBaseTest {
         // No upgrade means it is not treated an as upgrade request so a 404 is
         // generated when the request reaches the Default Servlet.s
         String responseLine = client.reader.readLine();
-        assertTrue(responseLine.startsWith("HTTP/1.1 404"));
+        Assert.assertTrue(responseLine.startsWith("HTTP/1.1 404"));
 
         // Finished with the socket
         client.close();
@@ -246,7 +242,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
         // Make sure we got an upgrade response
         String responseLine = client.reader.readLine();
-        assertTrue(responseLine.startsWith("HTTP/1.1 101"));
+        Assert.assertTrue(responseLine.startsWith("HTTP/1.1 101"));
 
         String accept = null;
         String responseHeaderLine = client.reader.readLine();
@@ -257,17 +253,17 @@ public class TestWebSocket extends TomcatBaseTest {
             }
             responseHeaderLine = client.reader.readLine();
         }
-        assertTrue(accept != null);
+        Assert.assertTrue(accept != null);
         MessageDigest sha1Helper = MessageDigest.getInstance("SHA1");
         sha1Helper.reset();
         sha1Helper.update("TODO".getBytes(B2CConverter.ISO_8859_1));
         String source = Base64.encode(sha1Helper.digest(WS_ACCEPT));
-        assertEquals(source,accept);
+        Assert.assertEquals(source,accept);
 
         sha1Helper.reset();
         sha1Helper.update("TOD".getBytes(B2CConverter.ISO_8859_1));
         source = Base64.encode(sha1Helper.digest(WS_ACCEPT));
-        assertFalse(source.equals(accept));
+        Assert.assertFalse(source.equals(accept));
         // Finished with the socket
         client.close();
     }
@@ -307,7 +303,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
         // Make sure we got an upgrade response
         String responseLine = client.reader.readLine();
-        assertTrue(responseLine.startsWith("HTTP/1.1 101"));
+        Assert.assertTrue(responseLine.startsWith("HTTP/1.1 101"));
 
         // Swallow the headers
         String responseHeaderLine = client.reader.readLine();
@@ -317,7 +313,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
         // Now we can do WebSocket
         String msg = client.readMessage();
-        assertEquals(Bug53339WsInbound.TEST_MESSAGE, msg);
+        Assert.assertEquals(Bug53339WsInbound.TEST_MESSAGE, msg);
 
         // Finished with the socket
         client.close();
@@ -407,7 +403,7 @@ public class TestWebSocket extends TomcatBaseTest {
             c2b.convert(cc, bc);
 
             int len = bc.getLength();
-            assertTrue(len < 126);
+            Assert.assertTrue(len < 126);
 
             byte first;
             if (isContinuation) {
@@ -444,7 +440,7 @@ public class TestWebSocket extends TomcatBaseTest {
 
             // Get payload length
             int len = reader.read() & 0x7F;
-            assertTrue(len < 126);
+            Assert.assertTrue(len < 126);
 
             // Read payload
             reader.setEncoding("UTF-8");

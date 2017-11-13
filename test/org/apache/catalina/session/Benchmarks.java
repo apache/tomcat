@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.SecureRandom;
 
-import static org.junit.Assert.fail;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.LifecycleException;
@@ -105,7 +104,7 @@ public class Benchmarks {
                 threads[i].join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                fail(e.getMessage());
+                Assert.fail(e.getMessage());
             }
         }
         long end = System.currentTimeMillis();
@@ -201,7 +200,7 @@ public class Benchmarks {
                 threads[i].join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                fail(e.getMessage());
+                Assert.fail(e.getMessage());
             }
         }
         long end = System.currentTimeMillis();
@@ -286,7 +285,7 @@ public class Benchmarks {
                 threads[i].join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                fail(e.getMessage());
+                Assert.fail(e.getMessage());
             }
         }
         long end = System.currentTimeMillis();

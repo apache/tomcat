@@ -16,9 +16,8 @@
  */
 package org.apache.catalina.tribes.group;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -58,7 +57,7 @@ public class TestGroupChannelStartStop {
             channel.start(Channel.DEFAULT);
             count++;
         } catch ( Exception x){x.printStackTrace();}
-        assertEquals(count,2);
+        Assert.assertEquals(count,2);
         channel.stop(Channel.DEFAULT);
     }
 
@@ -83,7 +82,7 @@ public class TestGroupChannelStartStop {
         } catch ( Exception x){
             // expected
         }
-        assertEquals(count,1);
+        Assert.assertEquals(count,1);
         channel.stop(Channel.DEFAULT);
         //double the membership sender
         count = 0;
@@ -98,7 +97,7 @@ public class TestGroupChannelStartStop {
         } catch ( Exception x){
             // expected
         }
-        assertEquals(count,1);
+        Assert.assertEquals(count,1);
         channel.stop(Channel.DEFAULT);
 
         count = 0;
@@ -112,7 +111,7 @@ public class TestGroupChannelStartStop {
         } catch ( Exception x){
             // expected
         }
-        assertEquals(count,1);
+        Assert.assertEquals(count,1);
         channel.stop(Channel.DEFAULT);
 
         count = 0;
@@ -126,7 +125,7 @@ public class TestGroupChannelStartStop {
         } catch ( Exception x){
             // expected
         }
-        assertEquals(count,1);
+        Assert.assertEquals(count,1);
         channel.stop(Channel.DEFAULT);
     }
 
@@ -144,7 +143,7 @@ public class TestGroupChannelStartStop {
         } catch ( Exception x){
             // expected
         }
-        assertEquals(count,2);
+        Assert.assertEquals(count,2);
         channel.stop(Channel.DEFAULT);
     }
 

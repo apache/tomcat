@@ -24,8 +24,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -77,7 +76,7 @@ public class TestCookiesAllowEquals extends TomcatBaseTest {
             disconnect();
             reset();
             tomcat.stop();
-            assertEquals(COOKIE_WITH_EQUALS_1 + COOKIE_WITH_EQUALS_2 +
+            Assert.assertEquals(COOKIE_WITH_EQUALS_1 + COOKIE_WITH_EQUALS_2 +
                     COOKIE_WITH_EQUALS_3, response);
         }
 

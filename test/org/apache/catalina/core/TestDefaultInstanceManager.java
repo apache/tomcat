@@ -18,8 +18,7 @@ package org.apache.catalina.core;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -67,7 +66,7 @@ public class TestDefaultInstanceManager extends TomcatBaseTest {
 
         // First JSP should be unloaded and replaced by third (second left
         // alone) so no change in overall count
-        assertEquals(count, instanceManager.getAnnotationCacheSize());
+        Assert.assertEquals(count, instanceManager.getAnnotationCacheSize());
     }
 
     private DefaultInstanceManager doClassUnloadingPrep() throws Exception {

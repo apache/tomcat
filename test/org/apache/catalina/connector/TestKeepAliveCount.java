@@ -23,8 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -86,7 +85,7 @@ public class TestKeepAliveCount extends TomcatBaseTest {
             disconnect();
             reset();
             tomcat.stop();
-            assertTrue(passed);
+            Assert.assertTrue(passed);
         }
 
         private void doHttp11Request() throws Exception {
@@ -110,14 +109,14 @@ public class TestKeepAliveCount extends TomcatBaseTest {
 
             for (int i=0; i<5; i++) {
                 processRequest(false); // blocks until response has been read
-                assertTrue(getResponseLine()!=null && getResponseLine().startsWith("HTTP/1.1 200 "));
+                Assert.assertTrue(getResponseLine()!=null && getResponseLine().startsWith("HTTP/1.1 200 "));
             }
             boolean passed = (this.readLine()==null);
             // Close the connection
             disconnect();
             reset();
             tomcat.stop();
-            assertTrue(passed);
+            Assert.assertTrue(passed);
         }
 
         @Override

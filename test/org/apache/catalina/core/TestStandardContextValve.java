@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -79,8 +79,8 @@ public class TestStandardContextValve extends TomcatBaseTest {
             i--;
         }
 
-        assertEquals(Response.SC_NOT_FOUND, rc);
-        assertEquals("InitErrorDestroy", trace.toString());
+        Assert.assertEquals(Response.SC_NOT_FOUND, rc);
+        Assert.assertEquals("InitErrorDestroy", trace.toString());
     }
 
     @Test
@@ -129,8 +129,8 @@ public class TestStandardContextValve extends TomcatBaseTest {
             i--;
         }
 
-        assertEquals(Response.SC_NOT_FOUND, rc);
-        assertEquals("InitErrorDestroy", trace.toString());
+        Assert.assertEquals(Response.SC_NOT_FOUND, rc);
+        Assert.assertEquals("InitErrorDestroy", trace.toString());
     }
 
     private static class Bug51653ErrorTrigger extends HttpServlet {

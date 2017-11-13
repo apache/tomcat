@@ -43,11 +43,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -91,11 +86,11 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
         // Expected response is a 200 response followed by an incomplete chunked
         // body.
-        assertTrue(client.isResponse200());
+        Assert.assertTrue(client.isResponse200());
         // There should not be an end chunk
-        assertFalse(client.getResponseBody().endsWith("0"));
+        Assert.assertFalse(client.getResponseBody().endsWith("0"));
         // The last portion of text should be there
-        assertTrue(client.getResponseBody().endsWith("line03"));
+        Assert.assertTrue(client.getResponseBody().endsWith("line03"));
     }
 
     private static class ResponseWithErrorServlet extends HttpServlet {
@@ -155,7 +150,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
         client.connect();
         client.processRequest();
-        assertTrue(client.isResponse417());
+        Assert.assertTrue(client.isResponse417());
     }
 
 
@@ -184,7 +179,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
         client.connect();
         client.processRequest();
-        assertTrue(client.isResponse501());
+        Assert.assertTrue(client.isResponse501());
     }
 
     @Test
@@ -212,7 +207,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
         client.connect();
         client.processRequest();
-        assertTrue(client.isResponse501());
+        Assert.assertTrue(client.isResponse501());
     }
 
 
@@ -259,8 +254,8 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
         client.connect();
         client.processRequest();
-        assertTrue(client.isResponse200());
-        assertTrue(client.getResponseBody().contains("test - data"));
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.getResponseBody().contains("test - data"));
     }
 
 
@@ -290,8 +285,8 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
         client.connect();
         client.processRequest();
-        assertTrue(client.isResponse200());
-        assertTrue(client.getResponseBody().contains("test - data"));
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.getResponseBody().contains("test - data"));
     }
 
 
@@ -320,7 +315,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
         client.connect();
         client.processRequest();
-        assertTrue(client.isResponse501());
+        Assert.assertTrue(client.isResponse501());
     }
 
 
@@ -349,7 +344,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
         client.connect();
         client.processRequest();
-        assertTrue(client.isResponse501());
+        Assert.assertTrue(client.isResponse501());
     }
 
 
@@ -400,16 +395,16 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
         // Now read the first response
         client.readResponse(true);
-        assertFalse(client.isResponse50x());
-        assertTrue(client.isResponse200());
-        assertEquals("OK", client.getResponseBody());
+        Assert.assertFalse(client.isResponse50x());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("OK", client.getResponseBody());
 
         // Read the second response. No need to sleep, read will block until
         // there is data to process
         client.readResponse(true);
-        assertFalse(client.isResponse50x());
-        assertTrue(client.isResponse200());
-        assertEquals("OK", client.getResponseBody());
+        Assert.assertFalse(client.isResponse50x());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("OK", client.getResponseBody());
     }
 
 
@@ -432,11 +427,11 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() + "/test", responseBody,
                 responseHeaders);
 
-        assertEquals(HttpServletResponse.SC_OK, rc);
-        assertTrue(responseHeaders.containsKey("Transfer-Encoding"));
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertTrue(responseHeaders.containsKey("Transfer-Encoding"));
         List<String> encodings = responseHeaders.get("Transfer-Encoding");
-        assertEquals(1, encodings.size());
-        assertEquals("chunked", encodings.get(0));
+        Assert.assertEquals(1, encodings.size());
+        Assert.assertEquals("chunked", encodings.get(0));
     }
 
     @Test
@@ -461,16 +456,16 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() + "/test", responseBody,
                 responseHeaders);
 
-        assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
-        assertTrue(responseHeaders.containsKey("Connection"));
+        Assert.assertTrue(responseHeaders.containsKey("Connection"));
         List<String> connections = responseHeaders.get("Connection");
-        assertEquals(1, connections.size());
-        assertEquals("close", connections.get(0));
+        Assert.assertEquals(1, connections.size());
+        Assert.assertEquals("close", connections.get(0));
 
-        assertFalse(responseHeaders.containsKey("Transfer-Encoding"));
+        Assert.assertFalse(responseHeaders.containsKey("Transfer-Encoding"));
 
-        assertEquals("OK", responseBody.toString());
+        Assert.assertEquals("OK", responseBody.toString());
     }
 
     @Test
@@ -501,11 +496,11 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() + "/test", responseBody,
                 responseHeaders);
 
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
         if (responseBody.getLength() > 0) {
             // It will be >0 if the standard error page handlign has been
             // triggered
-            assertFalse(responseBody.toString().contains("FAIL"));
+            Assert.assertFalse(responseBody.toString().contains("FAIL"));
         }
     }
 
@@ -756,10 +751,10 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     public void testBug57621() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
-        
+
         // Must have a real docBase - just use temp
         Context root = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
-        
+
         Wrapper w = Tomcat.addServlet(root, "Bug57621", new Bug57621Servlet());
         w.setAsyncSupported(true);
         root.addServletMapping("/test", "Bug57621");
@@ -774,14 +769,14 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         client.connect();
 
         client.doRequest();
-        assertTrue(client.getResponseLine(), client.isResponse200());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.getResponseLine(), client.isResponse200());
+        Assert.assertTrue(client.isResponseBodyOK());
 
         // Do the request again to ensure that the remaining body was swallowed
         client.resetResponse();
         client.processRequest();
-        assertTrue(client.isResponse200());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.isResponseBodyOK());
 
         client.disconnect();
     }
@@ -929,9 +924,9 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         int rc = headUrl("http://localhost:" + getPort() + "/test", responseBody,
                 responseHeaders);
 
-        assertEquals(HttpServletResponse.SC_OK, rc);
-        assertEquals(0, responseBody.getLength());
-        assertFalse(responseHeaders.containsKey("Content-Length"));
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals(0, responseBody.getLength());
+        Assert.assertFalse(responseHeaders.containsKey("Content-Length"));
     }
 
 
@@ -1066,10 +1061,10 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
         Map<String,List<String>> responseHeaders = new HashMap<String, List<String>>();
         int rc = getUrl("http://localhost:" + getPort() + "/test", responseBody, responseHeaders);
 
-        assertEquals(HttpServletResponse.SC_RESET_CONTENT, rc);
-        assertNotNull(responseHeaders.get("Content-Length"));
-        assertTrue("0".equals(responseHeaders.get("Content-Length").get(0)));
-        assertTrue(responseBody.getLength() == 0);
+        Assert.assertEquals(HttpServletResponse.SC_RESET_CONTENT, rc);
+        Assert.assertNotNull(responseHeaders.get("Content-Length"));
+        Assert.assertTrue("0".equals(responseHeaders.get("Content-Length").get(0)));
+        Assert.assertTrue(responseBody.getLength() == 0);
     }
 
     private static final class Bug61086Servlet extends HttpServlet {

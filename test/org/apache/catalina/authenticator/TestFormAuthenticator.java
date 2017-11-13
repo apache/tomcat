@@ -26,10 +26,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -256,28 +253,28 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         client.doResourceRequest("PUT", true, "/test?" +
                 SelectedMethodsServlet.PARAM + "=" +
                 SelectedMethodsServlet.VALUE, null);
-        assertTrue(client.getResponseLine(), client.isResponse200());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.getResponseLine(), client.isResponse200());
+        Assert.assertTrue(client.isResponseBodyOK());
         String originalSessionId = client.getSessionId();
         client.reset();
 
         // Second request replies to the login challenge
         client.doResourceRequest("POST", true, "/test/j_security_check",
                 FormAuthClientBase.LOGIN_REPLY);
-        assertTrue("login failed " + client.getResponseLine(),
+        Assert.assertTrue("login failed " + client.getResponseLine(),
                 client.isResponse302());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponseBodyOK());
         String redirectUri = client.getRedirectUri();
         client.reset();
 
         // Third request - the login was successful so
         // follow the redirect to the protected resource
         client.doResourceRequest("GET", true, redirectUri, null);
-        assertTrue(client.isResponse200());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.isResponseBodyOK());
         String newSessionId = client.getSessionId();
 
-        assertTrue(!originalSessionId.equals(newSessionId));
+        Assert.assertTrue(!originalSessionId.equals(newSessionId));
         client.reset();
     }
 
@@ -304,12 +301,12 @@ public class TestFormAuthenticator extends TomcatBaseTest {
 
         client = new FormAuthClient(clientShouldUseCookies,
                 serverWillUseCookies, serverWillChangeSessid);
-        
+
         // First request for protected resource gets the login page
         client.setUseContinue(useContinue);
         client.doResourceRequest(resourceMethod, false, null, null);
-        assertTrue(client.isResponse200());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.isResponseBodyOK());
         String loginUri = client.extractBodyUri(
                 FormAuthClient.LOGIN_PARAM_TAG,
                 FormAuthClient.LOGIN_RESOURCE);
@@ -325,9 +322,9 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         // Second request replies to the login challenge
         client.setUseContinue(useContinue);
         client.doLoginRequest(loginUri);
-        assertTrue("login failed " + client.getResponseLine(),
+        Assert.assertTrue("login failed " + client.getResponseLine(),
                 client.isResponse302());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponseBodyOK());
         String redirectUri = client.getRedirectUri();
         client.reset();
 
@@ -337,8 +334,8 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         if ("POST".equals(redirectMethod)) {
             client.setUseContinue(useContinue);
         }
-        assertTrue(client.isResponse200());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.isResponseBodyOK());
         String protectedUri = client.extractBodyUri(
                 FormAuthClient.RESOURCE_PARAM_TAG,
                 FormAuthClient.PROTECTED_RESOURCE);
@@ -350,7 +347,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             newSessionId = client.extractPathSessionId(protectedUri);
         }
         boolean sessionIdIsChanged = !(originalSessionId.equals(newSessionId));
-        assertTrue(sessionIdIsChanged == serverWillChangeSessid);
+        Assert.assertTrue(sessionIdIsChanged == serverWillChangeSessid);
         client.reset();
 
         // Subsequent requests - keep accessing the protected resource
@@ -383,8 +380,8 @@ public class TestFormAuthenticator extends TomcatBaseTest {
         for (int i = 0; i < repeatCount; i++) {
             client.setUseContinue(useContinue);
             client.doResourceRequest(resourceMethod, false, protectedUri, null);
-            assertTrue(client.isResponse200());
-            assertTrue(client.isResponseBodyOK(phase));
+            Assert.assertTrue(client.isResponse200());
+            Assert.assertTrue(client.isResponseBodyOK(phase));
             client.reset();
         }
     }
@@ -591,7 +588,7 @@ public class TestFormAuthenticator extends TomcatBaseTest {
 
         private void assertContains(String body, String expected) {
             if (!body.contains(expected)) {
-                fail("Response number " + requestCount
+                Assert.fail("Response number " + requestCount
                         + ": body check failure.\n"
                         + "Expected to contain substring: [" + expected
                         + "]\nActual: [" + body + "]");
@@ -717,8 +714,8 @@ public class TestFormAuthenticator extends TomcatBaseTest {
             if (isResponse302()) {
                 return true;
             }
-            assertTrue(getResponseBody(), getResponseBody().contains("OK"));
-            assertFalse(getResponseBody().contains("FAIL"));
+            Assert.assertTrue(getResponseBody(), getResponseBody().contains("OK"));
+            Assert.assertFalse(getResponseBody().contains("FAIL"));
             return true;
         }
     }

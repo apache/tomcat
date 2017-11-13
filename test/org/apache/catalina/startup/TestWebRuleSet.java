@@ -21,10 +21,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.deploy.WebXml;
@@ -50,7 +47,7 @@ public class TestWebRuleSet {
         WebXml webXml = new WebXml();
 
         parse(webXml, "web-fragment-1name.xml", true, true);
-        assertEquals("name1", webXml.getName());
+        Assert.assertEquals("name1", webXml.getName());
     }
 
 
@@ -66,8 +63,8 @@ public class TestWebRuleSet {
         WebXml webXml = new WebXml();
 
         parse(webXml, "web-fragment-1ordering.xml", true, true);
-        assertEquals(1, webXml.getBeforeOrdering().size());
-        assertTrue(webXml.getBeforeOrdering().contains("bar"));
+        Assert.assertEquals(1, webXml.getBeforeOrdering().size());
+        Assert.assertTrue(webXml.getBeforeOrdering().contains("bar"));
     }
 
 
@@ -83,8 +80,8 @@ public class TestWebRuleSet {
         WebXml webXml = new WebXml();
 
         parse(webXml, "web-1ordering.xml", false, true);
-        assertEquals(1, webXml.getAbsoluteOrdering().size());
-        assertTrue(webXml.getAbsoluteOrdering().contains("bar"));
+        Assert.assertEquals(1, webXml.getAbsoluteOrdering().size());
+        Assert.assertTrue(webXml.getAbsoluteOrdering().contains("bar"));
     }
 
 
@@ -161,9 +158,9 @@ public class TestWebRuleSet {
         }
 
         if (expected) {
-            assertTrue(result);
+            Assert.assertTrue(result);
         } else {
-            assertFalse(result);
+            Assert.assertFalse(result);
         }
     }
 }

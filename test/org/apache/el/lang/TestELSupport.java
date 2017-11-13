@@ -22,17 +22,13 @@ import java.math.BigInteger;
 
 import javax.el.ELException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Assert;
 import org.junit.Test;
 
 public class TestELSupport {
     @Test
     public void testEquals() {
-        assertTrue(ELSupport.equals("01", Long.valueOf(1)));
+        Assert.assertTrue(ELSupport.equals("01", Long.valueOf(1)));
     }
 
     @Test
@@ -81,13 +77,13 @@ public class TestELSupport {
     public void testCoerceIntegerToNumber() {
         Integer input = Integer.valueOf(4390241);
         Object output = ELSupport.coerceToType(input, Number.class);
-        assertEquals(input, output);
+        Assert.assertEquals(input, output);
     }
 
     @Test
     public void testCoerceNullToNumber() {
         Object output = ELSupport.coerceToType(null, Number.class);
-        assertEquals(Long.valueOf(0), output);
+        Assert.assertEquals(Long.valueOf(0), output);
     }
 
     @Test
@@ -96,7 +92,7 @@ public class TestELSupport {
         try {
             output = ELSupport.coerceToEnum(TestEnumA.VALA1, TestEnumA.class);
         } finally {
-            assertEquals(TestEnumA.VALA1, output);
+            Assert.assertEquals(TestEnumA.VALA1, output);
         }
     }
 
@@ -108,7 +104,7 @@ public class TestELSupport {
         } catch (ELException ele) {
             // Ignore
         }
-        assertNull(output);
+        Assert.assertNull(output);
     }
 
     @Test
@@ -119,7 +115,7 @@ public class TestELSupport {
         } catch (ELException ele) {
             // Ignore
         }
-        assertNull(output);
+        Assert.assertNull(output);
     }
 
     @Test
@@ -236,7 +232,7 @@ public class TestELSupport {
     }
 
     private static void testIsSame(Object value) {
-        assertEquals(value, ELSupport.coerceToNumber(value, value.getClass()));
+        Assert.assertEquals(value, ELSupport.coerceToNumber(value, value.getClass()));
     }
 
     private static enum TestEnumA {

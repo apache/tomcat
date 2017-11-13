@@ -22,10 +22,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,7 +43,7 @@ public class TestFileHandler {
         File logsBase = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
         logsDir = new File(logsBase, "test-" + System.currentTimeMillis());
         if (!logsDir.mkdirs() && !logsDir.isDirectory()) {
-            fail("Unable to create logs directory.");
+            Assert.fail("Unable to create logs directory.");
         }
 
         generateLogFiles(logsDir, PREFIX_1, SUFIX_2, 3);
@@ -81,7 +79,7 @@ public class TestFileHandler {
 
         Thread.sleep(1000);
 
-        assertTrue(logsDir.list().length == 16);
+        Assert.assertTrue(logsDir.list().length == 16);
     }
 
     @SuppressWarnings("unused")
@@ -96,7 +94,7 @@ public class TestFileHandler {
 
         Thread.sleep(1000);
 
-        assertTrue(logsDir.list().length == 16);
+        Assert.assertTrue(logsDir.list().length == 16);
     }
 
     @SuppressWarnings("unused")
@@ -108,7 +106,7 @@ public class TestFileHandler {
 
         Thread.sleep(1000);
 
-        assertTrue(logsDir.list().length == 17);
+        Assert.assertTrue(logsDir.list().length == 17);
     }
 
     private void generateLogFiles(File dir, String prefix, String sufix, int amount)

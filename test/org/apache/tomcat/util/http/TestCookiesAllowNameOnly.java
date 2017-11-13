@@ -24,8 +24,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -76,7 +75,7 @@ public class TestCookiesAllowNameOnly extends TomcatBaseTest {
             reset();
             tomcat.stop();
             // Need the extra equals since cookie 1 is just the name
-            assertEquals(COOKIE_WITH_NAME_ONLY_1 + "=" +
+            Assert.assertEquals(COOKIE_WITH_NAME_ONLY_1 + "=" +
                     COOKIE_WITH_NAME_ONLY_2, response);
         }
 

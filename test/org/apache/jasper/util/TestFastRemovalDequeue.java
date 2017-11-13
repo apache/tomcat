@@ -16,9 +16,7 @@
  */
 package org.apache.jasper.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 
@@ -34,9 +32,9 @@ public class TestFastRemovalDequeue {
 
         Object r = q.pop();
 
-        assertEquals(o1, r);
-        assertNull(q.first);
-        assertNull(q.last);
+        Assert.assertEquals(o1, r);
+        Assert.assertNull(q.first);
+        Assert.assertNull(q.last);
     }
 
 
@@ -50,20 +48,20 @@ public class TestFastRemovalDequeue {
         q.push(o1);
         q.push(o2);
 
-        assertEquals(o2, q.first.getContent());
-        assertEquals(o1, q.last.getContent());
+        Assert.assertEquals(o2, q.first.getContent());
+        Assert.assertEquals(o1, q.last.getContent());
 
         Object r1 = q.pop();
 
-        assertEquals(o1, r1);
-        assertEquals(o2, q.first.getContent());
-        assertEquals(o2, q.last.getContent());
+        Assert.assertEquals(o1, r1);
+        Assert.assertEquals(o2, q.first.getContent());
+        Assert.assertEquals(o2, q.last.getContent());
 
 
         Object r2 = q.pop();
-        assertEquals(o2, r2);
-        assertNull(q.first);
-        assertNull(q.last);
+        Assert.assertEquals(o2, r2);
+        Assert.assertNull(q.first);
+        Assert.assertNull(q.last);
     }
 
 
@@ -77,9 +75,9 @@ public class TestFastRemovalDequeue {
 
         Object r = q.pop();
 
-        assertEquals(o1, r);
-        assertNull(q.first);
-        assertNull(q.last);
+        Assert.assertEquals(o1, r);
+        Assert.assertNull(q.first);
+        Assert.assertNull(q.last);
     }
 
 
@@ -93,20 +91,20 @@ public class TestFastRemovalDequeue {
         q.unpop(o1);
         q.unpop(o2);
 
-        assertEquals(o1, q.first.getContent());
-        assertEquals(o2, q.last.getContent());
+        Assert.assertEquals(o1, q.first.getContent());
+        Assert.assertEquals(o2, q.last.getContent());
 
         Object r2 = q.pop();
 
-        assertEquals(o2, r2);
-        assertEquals(o1, q.first.getContent());
-        assertEquals(o1, q.last.getContent());
+        Assert.assertEquals(o2, r2);
+        Assert.assertEquals(o1, q.first.getContent());
+        Assert.assertEquals(o1, q.last.getContent());
 
 
         Object r1 = q.pop();
-        assertEquals(o1, r1);
-        assertNull(q.first);
-        assertNull(q.last);
+        Assert.assertEquals(o1, r1);
+        Assert.assertNull(q.first);
+        Assert.assertNull(q.last);
     }
 
 
@@ -120,9 +118,9 @@ public class TestFastRemovalDequeue {
 
         Object r = q.unpush();
 
-        assertEquals(o1, r);
-        assertNull(q.first);
-        assertNull(q.last);
+        Assert.assertEquals(o1, r);
+        Assert.assertNull(q.first);
+        Assert.assertNull(q.last);
     }
 
 
@@ -136,20 +134,20 @@ public class TestFastRemovalDequeue {
         q.push(o1);
         q.push(o2);
 
-        assertEquals(o2, q.first.getContent());
-        assertEquals(o1, q.last.getContent());
+        Assert.assertEquals(o2, q.first.getContent());
+        Assert.assertEquals(o1, q.last.getContent());
 
         Object r2 = q.unpush();
 
-        assertEquals(o2, r2);
-        assertEquals(o1, q.first.getContent());
-        assertEquals(o1, q.last.getContent());
+        Assert.assertEquals(o2, r2);
+        Assert.assertEquals(o1, q.first.getContent());
+        Assert.assertEquals(o1, q.last.getContent());
 
 
         Object r1 = q.unpush();
-        assertEquals(o1, r1);
-        assertNull(q.first);
-        assertNull(q.last);
+        Assert.assertEquals(o1, r1);
+        Assert.assertNull(q.first);
+        Assert.assertNull(q.last);
     }
 
 
@@ -161,12 +159,12 @@ public class TestFastRemovalDequeue {
 
         FastRemovalDequeue<Object>.Entry e1 = q.push(o1);
 
-        assertEquals(o1, e1.getContent());
+        Assert.assertEquals(o1, e1.getContent());
 
         q.remove(e1);
 
-        assertNull(q.first);
-        assertNull(q.last);
+        Assert.assertNull(q.first);
+        Assert.assertNull(q.last);
     }
 
 
@@ -180,20 +178,20 @@ public class TestFastRemovalDequeue {
         FastRemovalDequeue<Object>.Entry e1 = q.push(o1);
         FastRemovalDequeue<Object>.Entry e2 = q.push(o2);
 
-        assertEquals(o1, e1.getContent());
-        assertEquals(o2, e2.getContent());
+        Assert.assertEquals(o1, e1.getContent());
+        Assert.assertEquals(o2, e2.getContent());
 
-        assertEquals(o2, q.first.getContent());
-        assertEquals(o1, q.last.getContent());
+        Assert.assertEquals(o2, q.first.getContent());
+        Assert.assertEquals(o1, q.last.getContent());
 
         q.remove(e1);
 
-        assertEquals(o2, q.first.getContent());
-        assertEquals(o2, q.last.getContent());
+        Assert.assertEquals(o2, q.first.getContent());
+        Assert.assertEquals(o2, q.last.getContent());
 
         q.remove(e2);
 
-        assertNull(q.first);
-        assertNull(q.last);
+        Assert.assertNull(q.first);
+        Assert.assertNull(q.last);
     }
 }

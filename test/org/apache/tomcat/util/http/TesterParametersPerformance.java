@@ -21,7 +21,7 @@ import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.tomcat.util.buf.B2CConverter;
@@ -46,7 +46,7 @@ public class TesterParametersPerformance {
     }
 
     private long doTestProcessParameters(byte[] input, int size) {
-        assertEquals(input.length, 3);
+        Assert.assertEquals(input.length, 3);
 
         Parameters p = new Parameters();
 

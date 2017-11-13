@@ -19,8 +19,7 @@ package org.apache.jasper.compiler;
 
 import java.io.File;
 
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
@@ -45,8 +44,8 @@ public class TestJspConfig extends TomcatBaseTest {
 
         String result = res.toString();
 
-        assertTrue(result.indexOf("<p>00-${'hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>01-#{'hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>00-${'hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>01-#{'hello world'}</p>") > 0);
     }
 
     @Test
@@ -65,8 +64,8 @@ public class TestJspConfig extends TomcatBaseTest {
 
         String result = res.toString();
 
-        assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
-        assertTrue(result.indexOf("<p>01-#{'hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>01-#{'hello world'}</p>") > 0);
     }
 
     @Test
@@ -85,7 +84,7 @@ public class TestJspConfig extends TomcatBaseTest {
 
         String result = res.toString();
 
-        assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
     }
 
     @Test
@@ -104,7 +103,7 @@ public class TestJspConfig extends TomcatBaseTest {
 
         String result = res.toString();
 
-        assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
     }
 
 }

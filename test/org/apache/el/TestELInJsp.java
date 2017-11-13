@@ -18,8 +18,6 @@ package org.apache.el;
 
 import java.io.File;
 
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -562,6 +560,6 @@ public class TestELInJsp extends TomcatBaseTest {
 
     // Assertion for text contained with <p></p>, e.g. printed by tags:echo
     private static void assertEcho(String result, String expected) {
-        assertTrue(result, result.indexOf("<p>" + expected + "</p>") > 0);
+        Assert.assertTrue(result, result.indexOf("<p>" + expected + "</p>") > 0);
     }
 }

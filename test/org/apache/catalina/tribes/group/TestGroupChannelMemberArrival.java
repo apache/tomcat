@@ -18,9 +18,8 @@ package org.apache.catalina.tribes.group;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -77,7 +76,7 @@ public class TestGroupChannelMemberArrival {
         for (int i = listeners.length - 1; i >= 0; i--) {
             TestMbrListener listener = listeners[i];
             synchronized (listener.members) {
-                assertEquals("Checking member arrival length (" + listener.name
+                Assert.assertEquals("Checking member arrival length (" + listener.name
                         + ")", channels.length - 1, listener.members.size());
             }
         }

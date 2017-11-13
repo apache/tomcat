@@ -28,10 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
@@ -91,7 +87,7 @@ public class TestCometProcessor extends TomcatBaseTest {
         }
 
         if (count == 10) {
-            fail("Comet request did not complete");
+            Assert.fail("Comet request did not complete");
         }
 
         // Send a standard HTTP request on the same connection
@@ -109,7 +105,7 @@ public class TestCometProcessor extends TomcatBaseTest {
         }
 
         if (count == 10) {
-            fail("Non-comet request did not complete");
+            Assert.fail("Non-comet request did not complete");
         }
 
         readThread.join();
@@ -162,7 +158,7 @@ public class TestCometProcessor extends TomcatBaseTest {
         Assert.assertTrue(readThread.getResponse().contains("2\r\nOK"));
 
         if (count == 10) {
-            fail("Comet request did not complete");
+            Assert.fail("Comet request did not complete");
         }
 
         // Send a standard HTTP request on the same connection
@@ -181,7 +177,7 @@ public class TestCometProcessor extends TomcatBaseTest {
         }
 
         if (count == 10) {
-            fail("Non-comet request did not complete");
+            Assert.fail("Non-comet request did not complete");
         }
 
         readThread.join();
@@ -232,7 +228,7 @@ public class TestCometProcessor extends TomcatBaseTest {
         }
 
         if (count == 10) {
-            fail("Comet request did not complete");
+            Assert.fail("Comet request did not complete");
         }
 
         // Read thread should have terminated cleanly when the server closed the
@@ -311,43 +307,43 @@ public class TestCometProcessor extends TomcatBaseTest {
         if (initParam == null) {
             // Normal response expected
             // Validate response
-            assertEquals("HTTP/1.1 200 OK", response[0]);
-            assertEquals("Server: Apache-Coyote/1.1", response[1]);
-            assertTrue(response[2].startsWith("Set-Cookie: JSESSIONID="));
-            assertEquals("Content-Type: text/plain;charset=ISO-8859-1", response[3]);
-            assertEquals("Transfer-Encoding: chunked", response[4]);
-            assertTrue(response[5].startsWith("Date: "));
-            assertEquals("", response[6]);
-            assertEquals("7", response[7]);
-            assertEquals("BEGIN", response[8]);
-            assertEquals("", response[9]);
-            assertEquals("17", response[10]);
-            assertEquals("Client: READ: 4 bytes", response[11]);
-            assertEquals("", response[12]);
-            assertEquals("17", response[13]);
-            assertEquals("Client: READ: 4 bytes", response[14]);
-            assertEquals("", response[15]);
-            assertEquals("17", response[16]);
-            assertEquals("Client: READ: 4 bytes", response[17]);
-            assertEquals("", response[18]);
-            assertEquals("17", response[19]);
-            assertEquals("Client: READ: 4 bytes", response[20]);
-            assertEquals("", response[21]);
-            assertEquals("d", response[22]);
-            assertEquals("Client: END", response[23]);
-            assertEquals("", response[24]);
-            assertEquals("0", response[25]);
+            Assert.assertEquals("HTTP/1.1 200 OK", response[0]);
+            Assert.assertEquals("Server: Apache-Coyote/1.1", response[1]);
+            Assert.assertTrue(response[2].startsWith("Set-Cookie: JSESSIONID="));
+            Assert.assertEquals("Content-Type: text/plain;charset=ISO-8859-1", response[3]);
+            Assert.assertEquals("Transfer-Encoding: chunked", response[4]);
+            Assert.assertTrue(response[5].startsWith("Date: "));
+            Assert.assertEquals("", response[6]);
+            Assert.assertEquals("7", response[7]);
+            Assert.assertEquals("BEGIN", response[8]);
+            Assert.assertEquals("", response[9]);
+            Assert.assertEquals("17", response[10]);
+            Assert.assertEquals("Client: READ: 4 bytes", response[11]);
+            Assert.assertEquals("", response[12]);
+            Assert.assertEquals("17", response[13]);
+            Assert.assertEquals("Client: READ: 4 bytes", response[14]);
+            Assert.assertEquals("", response[15]);
+            Assert.assertEquals("17", response[16]);
+            Assert.assertEquals("Client: READ: 4 bytes", response[17]);
+            Assert.assertEquals("", response[18]);
+            Assert.assertEquals("17", response[19]);
+            Assert.assertEquals("Client: READ: 4 bytes", response[20]);
+            Assert.assertEquals("", response[21]);
+            Assert.assertEquals("d", response[22]);
+            Assert.assertEquals("Client: END", response[23]);
+            Assert.assertEquals("", response[24]);
+            Assert.assertEquals("0", response[25]);
             // Expect 26 lines
-            assertEquals(26, response.length);
+            Assert.assertEquals(26, response.length);
         } else {
             // Failure expected only expected for the fail on begin
             // Failure at any later stage and the response headers (including
             // the 200 response code will already have been sent to the client
             if (SimpleCometServlet.FAIL_ON_BEGIN.equals(initParam)) {
-                assertEquals("HTTP/1.1 500 Internal Server Error", response[0]);
+                Assert.assertEquals("HTTP/1.1 500 Internal Server Error", response[0]);
                 alv.validateAccessLog(1, 500, 0, 1000);
             } else {
-                assertEquals("HTTP/1.1 200 OK", response[0]);
+                Assert.assertEquals("HTTP/1.1 200 OK", response[0]);
                 alv.validateAccessLog(1, 200, 0, 5000);
             }
 
@@ -441,8 +437,8 @@ public class TestCometProcessor extends TomcatBaseTest {
         } else {
             log.info(status);
         }
-        assertTrue("Comet END event not received", servlet.getEndEventOccurred());
-        assertTrue("Comet END event not last event received",
+        Assert.assertTrue("Comet END event not received", servlet.getEndEventOccurred());
+        Assert.assertTrue("Comet END event not last event received",
                 EventType.END.equals(servlet.getLastEvent()));
     }
 

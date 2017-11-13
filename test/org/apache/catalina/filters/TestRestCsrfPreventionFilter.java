@@ -29,9 +29,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -262,24 +260,24 @@ public class TestRestCsrfPreventionFilter {
     }
 
     private void verifyContinueChain() {
-        assertTrue(filterChain.isVisited());
+        Assert.assertTrue(filterChain.isVisited());
     }
 
     private void verifyContinueChainNonceAvailable() {
-        assertTrue(NONCE.equals(response.getHeader(Constants.CSRF_REST_NONCE_HEADER_NAME)));
+        Assert.assertTrue(NONCE.equals(response.getHeader(Constants.CSRF_REST_NONCE_HEADER_NAME)));
         verifyContinueChain();
     }
 
     private void verifyContinueChainNonceNotAvailable() {
-        assertNull(response.getHeader(Constants.CSRF_REST_NONCE_HEADER_NAME));
+        Assert.assertNull(response.getHeader(Constants.CSRF_REST_NONCE_HEADER_NAME));
         verifyContinueChain();
     }
 
     private void verifyDenyResponse(int statusCode) {
-        assertTrue(Constants.CSRF_REST_NONCE_HEADER_REQUIRED_VALUE.equals(response
+        Assert.assertTrue(Constants.CSRF_REST_NONCE_HEADER_REQUIRED_VALUE.equals(response
                 .getHeader(Constants.CSRF_REST_NONCE_HEADER_NAME)));
-        assertTrue(statusCode == response.getStatus());
-        assertTrue(!filterChain.isVisited());
+        Assert.assertTrue(statusCode == response.getStatus());
+        Assert.assertTrue(!filterChain.isVisited());
     }
 
     private static class TesterFilterChain implements FilterChain {
@@ -343,7 +341,7 @@ public class TestRestCsrfPreventionFilter {
 
     private static class TesterSession implements HttpSession {
         Map<String,Object> attributes = new HashMap<String, Object>();
- 
+
         @Override
         public long getCreationTime() {
             return 0;
@@ -424,6 +422,6 @@ public class TestRestCsrfPreventionFilter {
         public boolean isNew() {
             return false;
         }
-        
+
     }
 }

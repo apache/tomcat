@@ -24,12 +24,6 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -95,20 +89,20 @@ public class TestRemoteIpValve {
     public void testListToCommaDelimitedString() {
         List<String> elements = Arrays.asList("element1", "element2", "element3");
         String actual = RemoteIpValve.listToCommaDelimitedString(elements);
-        assertEquals("element1, element2, element3", actual);
+        Assert.assertEquals("element1, element2, element3", actual);
     }
 
     @Test
     public void testListToCommaDelimitedStringEmptyList() {
         List<String> elements = new ArrayList<String>();
         String actual = RemoteIpValve.listToCommaDelimitedString(elements);
-        assertEquals("", actual);
+        Assert.assertEquals("", actual);
     }
 
     @Test
     public void testCommaDelimitedListToStringArrayNullList() {
         String actual = RemoteIpValve.listToCommaDelimitedString(null);
-        assertEquals("", actual);
+        Assert.assertEquals("", actual);
     }
 
     @Test
@@ -132,22 +126,22 @@ public class TestRemoteIpValve {
 
         // VERIFY
         String actualXForwardedFor = request.getHeader("x-forwarded-for");
-        assertNull("x-forwarded-for must be null", actualXForwardedFor);
+        Assert.assertNull("x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = request.getHeader("x-forwarded-by");
-        assertNull("x-forwarded-by must be null", actualXForwardedBy);
+        Assert.assertNull("x-forwarded-by must be null", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
-        assertEquals("remoteAddr", "192.168.0.10", actualRemoteAddr);
+        Assert.assertEquals("remoteAddr", "192.168.0.10", actualRemoteAddr);
 
         String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
-        assertEquals("remoteHost", "remote-host-original-value", actualRemoteHost);
+        Assert.assertEquals("remoteHost", "remote-host-original-value", actualRemoteHost);
 
         String actualPostInvokeRemoteAddr = request.getRemoteAddr();
-        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
 
         String actualPostInvokeRemoteHost = request.getRemoteHost();
-        assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
+        Assert.assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
 
     }
 
@@ -174,22 +168,22 @@ public class TestRemoteIpValve {
 
         // VERIFY
         String actualXForwardedFor = request.getHeader("x-forwarded-for");
-        assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
+        Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = request.getHeader("x-forwarded-by");
-        assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2", actualXForwardedBy);
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
-        assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+        Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
 
         String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
-        assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+        Assert.assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
 
         String actualPostInvokeRemoteAddr = request.getRemoteAddr();
-        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
 
         String actualPostInvokeRemoteHost = request.getRemoteHost();
-        assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
+        Assert.assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
     }
 
     @Test
@@ -216,22 +210,22 @@ public class TestRemoteIpValve {
 
         // VERIFY
         String actualXForwardedFor = request.getHeader("x-forwarded-for");
-        assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
+        Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = request.getHeader("x-forwarded-by");
-        assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2", actualXForwardedBy);
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
-        assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+        Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
 
         String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
-        assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+        Assert.assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
 
         String actualPostInvokeRemoteAddr = request.getRemoteAddr();
-        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
 
         String actualPostInvokeRemoteHost = request.getRemoteHost();
-        assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
+        Assert.assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
     }
 
     @Test
@@ -257,22 +251,22 @@ public class TestRemoteIpValve {
 
         // VERIFY
         String actualXForwardedFor = request.getHeader("x-forwarded-for");
-        assertNull("all proxies are internal, x-forwarded-for must be null", actualXForwardedFor);
+        Assert.assertNull("all proxies are internal, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = request.getHeader("x-forwarded-by");
-        assertNull("all proxies are internal, x-forwarded-by must be null", actualXForwardedBy);
+        Assert.assertNull("all proxies are internal, x-forwarded-by must be null", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
-        assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+        Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
 
         String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
-        assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+        Assert.assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
 
         String actualPostInvokeRemoteAddr = request.getRemoteAddr();
-        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
 
         String actualPostInvokeRemoteHost = request.getRemoteHost();
-        assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
+        Assert.assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
     }
 
     @Test
@@ -300,22 +294,22 @@ public class TestRemoteIpValve {
 
         // VERIFY
         String actualXForwardedFor = request.getHeader("x-forwarded-for");
-        assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
+        Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = request.getHeader("x-forwarded-by");
-        assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2", actualXForwardedBy);
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
-        assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+        Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
 
         String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
-        assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+        Assert.assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
 
         String actualPostInvokeRemoteAddr = request.getRemoteAddr();
-        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
 
         String actualPostInvokeRemoteHost = request.getRemoteHost();
-        assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
+        Assert.assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
     }
 
     @Test
@@ -346,41 +340,41 @@ public class TestRemoteIpValve {
         // VERIFY
         // client ip
         String actualXForwardedFor = request.getHeader("x-forwarded-for");
-        assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
+        Assert.assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = request.getHeader("x-forwarded-by");
-        assertNull("no intermediate trusted proxy", actualXForwardedBy);
+        Assert.assertNull("no intermediate trusted proxy", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
-        assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+        Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
 
         String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
-        assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+        Assert.assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
 
         String actualPostInvokeRemoteAddr = request.getRemoteAddr();
-        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
 
         String actualPostInvokeRemoteHost = request.getRemoteHost();
-        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteHost);
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteHost);
 
         // protocol
         String actualScheme = remoteAddrAndHostTrackerValve.getScheme();
-        assertEquals("x-forwarded-proto says https", "https", actualScheme);
+        Assert.assertEquals("x-forwarded-proto says https", "https", actualScheme);
 
         int actualServerPort = remoteAddrAndHostTrackerValve.getServerPort();
-        assertEquals("x-forwarded-proto says https", 443, actualServerPort);
+        Assert.assertEquals("x-forwarded-proto says https", 443, actualServerPort);
 
         boolean actualSecure = remoteAddrAndHostTrackerValve.isSecure();
-        assertTrue("x-forwarded-proto says https", actualSecure);
+        Assert.assertTrue("x-forwarded-proto says https", actualSecure);
 
         boolean actualPostInvokeSecure = request.isSecure();
-        assertFalse("postInvoke secure", actualPostInvokeSecure);
+        Assert.assertFalse("postInvoke secure", actualPostInvokeSecure);
 
         int actualPostInvokeServerPort = request.getServerPort();
-        assertEquals("postInvoke serverPort", 8080, actualPostInvokeServerPort);
+        Assert.assertEquals("postInvoke serverPort", 8080, actualPostInvokeServerPort);
 
         String actualPostInvokeScheme = request.getScheme();
-        assertEquals("postInvoke scheme", "http", actualPostInvokeScheme);
+        Assert.assertEquals("postInvoke scheme", "http", actualPostInvokeScheme);
     }
 
     @Test
@@ -411,41 +405,41 @@ public class TestRemoteIpValve {
         // VERIFY
         // client ip
         String actualXForwardedFor = request.getHeader("x-forwarded-for");
-        assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
+        Assert.assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = request.getHeader("x-forwarded-by");
-        assertNull("no intermediate trusted proxy", actualXForwardedBy);
+        Assert.assertNull("no intermediate trusted proxy", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
-        assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+        Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
 
         String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
-        assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+        Assert.assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
 
         String actualPostInvokeRemoteAddr = request.getRemoteAddr();
-        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
 
         String actualPostInvokeRemoteHost = request.getRemoteHost();
-        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteHost);
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteHost);
 
         // protocol
         String actualScheme = remoteAddrAndHostTrackerValve.getScheme();
-        assertEquals("x-forwarded-proto is null", "http", actualScheme);
+        Assert.assertEquals("x-forwarded-proto is null", "http", actualScheme);
 
         int actualServerPort = remoteAddrAndHostTrackerValve.getServerPort();
-        assertEquals("x-forwarded-proto is null", 8080, actualServerPort);
+        Assert.assertEquals("x-forwarded-proto is null", 8080, actualServerPort);
 
         boolean actualSecure = remoteAddrAndHostTrackerValve.isSecure();
-        assertFalse("x-forwarded-proto is null", actualSecure);
+        Assert.assertFalse("x-forwarded-proto is null", actualSecure);
 
         boolean actualPostInvokeSecure = request.isSecure();
-        assertFalse("postInvoke secure", actualPostInvokeSecure);
+        Assert.assertFalse("postInvoke secure", actualPostInvokeSecure);
 
         int actualPostInvokeServerPort = request.getServerPort();
-        assertEquals("postInvoke serverPort", 8080, actualPostInvokeServerPort);
+        Assert.assertEquals("postInvoke serverPort", 8080, actualPostInvokeServerPort);
 
         String actualPostInvokeScheme = request.getScheme();
-        assertEquals("postInvoke scheme", "http", actualPostInvokeScheme);
+        Assert.assertEquals("postInvoke scheme", "http", actualPostInvokeScheme);
     }
 
     @Test
@@ -476,41 +470,41 @@ public class TestRemoteIpValve {
         // VERIFY
         // client ip
         String actualXForwardedFor = request.getHeader("x-forwarded-for");
-        assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
+        Assert.assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = request.getHeader("x-forwarded-by");
-        assertNull("no intermediate trusted proxy", actualXForwardedBy);
+        Assert.assertNull("no intermediate trusted proxy", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
-        assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+        Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
 
         String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
-        assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+        Assert.assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
 
         String actualPostInvokeRemoteAddr = request.getRemoteAddr();
-        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
 
         String actualPostInvokeRemoteHost = request.getRemoteHost();
-        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteHost);
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteHost);
 
         // protocol
         String actualScheme = remoteAddrAndHostTrackerValve.getScheme();
-        assertEquals("x-forwarded-proto says http", "http", actualScheme);
+        Assert.assertEquals("x-forwarded-proto says http", "http", actualScheme);
 
         int actualServerPort = remoteAddrAndHostTrackerValve.getServerPort();
-        assertEquals("x-forwarded-proto says http", 80, actualServerPort);
+        Assert.assertEquals("x-forwarded-proto says http", 80, actualServerPort);
 
         boolean actualSecure = remoteAddrAndHostTrackerValve.isSecure();
-        assertFalse("x-forwarded-proto says http", actualSecure);
+        Assert.assertFalse("x-forwarded-proto says http", actualSecure);
 
         boolean actualPostInvokeSecure = request.isSecure();
-        assertTrue("postInvoke secure", actualPostInvokeSecure);
+        Assert.assertTrue("postInvoke secure", actualPostInvokeSecure);
 
         int actualPostInvokeServerPort = request.getServerPort();
-        assertEquals("postInvoke serverPort", 8443, actualPostInvokeServerPort);
+        Assert.assertEquals("postInvoke serverPort", 8443, actualPostInvokeServerPort);
 
         String actualPostInvokeScheme = request.getScheme();
-        assertEquals("postInvoke scheme", "https", actualPostInvokeScheme);
+        Assert.assertEquals("postInvoke scheme", "https", actualPostInvokeScheme);
     }
 
     @Test
@@ -541,41 +535,41 @@ public class TestRemoteIpValve {
         // VERIFY
         // client ip
         String actualXForwardedFor = request.getHeader("x-forwarded-for");
-        assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
+        Assert.assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = request.getHeader("x-forwarded-by");
-        assertNull("no intermediate trusted proxy", actualXForwardedBy);
+        Assert.assertNull("no intermediate trusted proxy", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
-        assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+        Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
 
         String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
-        assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+        Assert.assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
 
         String actualPostInvokeRemoteAddr = request.getRemoteAddr();
-        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
 
         String actualPostInvokeRemoteHost = request.getRemoteHost();
-        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteHost);
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteHost);
 
         // protocol
         String actualScheme = remoteAddrAndHostTrackerValve.getScheme();
-        assertEquals("x-forwarded-proto is null", "https", actualScheme);
+        Assert.assertEquals("x-forwarded-proto is null", "https", actualScheme);
 
         int actualServerPort = remoteAddrAndHostTrackerValve.getServerPort();
-        assertEquals("x-forwarded-proto is null", 8443, actualServerPort);
+        Assert.assertEquals("x-forwarded-proto is null", 8443, actualServerPort);
 
         boolean actualSecure = remoteAddrAndHostTrackerValve.isSecure();
-        assertTrue("x-forwarded-proto is null", actualSecure);
+        Assert.assertTrue("x-forwarded-proto is null", actualSecure);
 
         boolean actualPostInvokeSecure = request.isSecure();
-        assertTrue("postInvoke secure", actualPostInvokeSecure);
+        Assert.assertTrue("postInvoke secure", actualPostInvokeSecure);
 
         int actualPostInvokeServerPort = request.getServerPort();
-        assertEquals("postInvoke serverPort", 8443, actualPostInvokeServerPort);
+        Assert.assertEquals("postInvoke serverPort", 8443, actualPostInvokeServerPort);
 
         String actualPostInvokeScheme = request.getScheme();
-        assertEquals("postInvoke scheme", "https", actualPostInvokeScheme);
+        Assert.assertEquals("postInvoke scheme", "https", actualPostInvokeScheme);
     }
 
     @Test
@@ -600,22 +594,22 @@ public class TestRemoteIpValve {
 
         // VERIFY
         String actualXForwardedFor = request.getHeader("x-forwarded-for");
-        assertEquals("x-forwarded-for must be unchanged", "140.211.11.130, proxy1, proxy2", actualXForwardedFor);
+        Assert.assertEquals("x-forwarded-for must be unchanged", "140.211.11.130, proxy1, proxy2", actualXForwardedFor);
 
         String actualXForwardedBy = request.getHeader("x-forwarded-by");
-        assertNull("x-forwarded-by must be null", actualXForwardedBy);
+        Assert.assertNull("x-forwarded-by must be null", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
-        assertEquals("remoteAddr", "not-allowed-internal-proxy", actualRemoteAddr);
+        Assert.assertEquals("remoteAddr", "not-allowed-internal-proxy", actualRemoteAddr);
 
         String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
-        assertEquals("remoteHost", "not-allowed-internal-proxy-host", actualRemoteHost);
+        Assert.assertEquals("remoteHost", "not-allowed-internal-proxy-host", actualRemoteHost);
 
         String actualPostInvokeRemoteAddr = request.getRemoteAddr();
-        assertEquals("postInvoke remoteAddr", "not-allowed-internal-proxy", actualPostInvokeRemoteAddr);
+        Assert.assertEquals("postInvoke remoteAddr", "not-allowed-internal-proxy", actualPostInvokeRemoteAddr);
 
         String actualPostInvokeRemoteHost = request.getRemoteHost();
-        assertEquals("postInvoke remoteAddr", "not-allowed-internal-proxy-host", actualPostInvokeRemoteHost);
+        Assert.assertEquals("postInvoke remoteAddr", "not-allowed-internal-proxy-host", actualPostInvokeRemoteHost);
     }
 
     @Test
@@ -641,22 +635,22 @@ public class TestRemoteIpValve {
 
         // VERIFY
         String actualXForwardedFor = request.getHeader("x-forwarded-for");
-        assertEquals("ip/host before untrusted-proxy must appear in x-forwarded-for", "140.211.11.130, proxy1", actualXForwardedFor);
+        Assert.assertEquals("ip/host before untrusted-proxy must appear in x-forwarded-for", "140.211.11.130, proxy1", actualXForwardedFor);
 
         String actualXForwardedBy = request.getHeader("x-forwarded-by");
-        assertEquals("ip/host after untrusted-proxy must appear in  x-forwarded-by", "proxy2", actualXForwardedBy);
+        Assert.assertEquals("ip/host after untrusted-proxy must appear in  x-forwarded-by", "proxy2", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
-        assertEquals("remoteAddr", "untrusted-proxy", actualRemoteAddr);
+        Assert.assertEquals("remoteAddr", "untrusted-proxy", actualRemoteAddr);
 
         String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
-        assertEquals("remoteHost", "untrusted-proxy", actualRemoteHost);
+        Assert.assertEquals("remoteHost", "untrusted-proxy", actualRemoteHost);
 
         String actualPostInvokeRemoteAddr = request.getRemoteAddr();
-        assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
+        Assert.assertEquals("postInvoke remoteAddr", "192.168.0.10", actualPostInvokeRemoteAddr);
 
         String actualPostInvokeRemoteHost = request.getRemoteHost();
-        assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
+        Assert.assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
     }
 
     @Test
@@ -716,19 +710,19 @@ public class TestRemoteIpValve {
 
     private void assertArrayEquals(String[] expected, String[] actual) {
         if (expected == null) {
-            assertNull(actual);
+            Assert.assertNull(actual);
             return;
         }
-        assertNotNull(actual);
-        assertEquals(expected.length, actual.length);
+        Assert.assertNotNull(actual);
+        Assert.assertEquals(expected.length, actual.length);
         List<String> e = new ArrayList<String>();
         e.addAll(Arrays.asList(expected));
         List<String> a = new ArrayList<String>();
         a.addAll(Arrays.asList(actual));
 
         for (String entry : e) {
-            assertTrue(a.remove(entry));
+            Assert.assertTrue(a.remove(entry));
         }
-        assertTrue(a.isEmpty());
+        Assert.assertTrue(a.isEmpty());
     }
 }

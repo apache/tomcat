@@ -38,12 +38,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -260,7 +254,7 @@ public class TestTomcat extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals("Hello world", res.toString());
+        Assert.assertEquals("Hello world", res.toString());
     }
 
     @Test
@@ -276,7 +270,7 @@ public class TestTomcat extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/examples/servlets/servlet/HelloWorldExample");
         String text = res.toString();
-        assertTrue(text, text.indexOf("<a href=\"../helloworld.html\">") > 0);
+        Assert.assertTrue(text, text.indexOf("<a href=\"../helloworld.html\">") > 0);
     }
 
     @Test
@@ -292,7 +286,7 @@ public class TestTomcat extends TomcatBaseTest {
         ByteChunk res = getUrl("http://localhost:" + getPort() +
                 "/examples/jsp/jsp2/el/basic-arithmetic.jsp");
         String text = res.toString();
-        assertTrue(text, text.indexOf("<td>${(1==2) ? 3 : 4}</td>") > 0);
+        Assert.assertTrue(text, text.indexOf("<td>${(1==2) ? 3 : 4}</td>") > 0);
     }
 
     @Test
@@ -310,7 +304,7 @@ public class TestTomcat extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals("Hello world", res.toString());
+        Assert.assertEquals("Hello world", res.toString());
     }
 
     @Test
@@ -351,7 +345,7 @@ public class TestTomcat extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals("Hello, Tomcat User", res.toString());
+        Assert.assertEquals("Hello, Tomcat User", res.toString());
     }
 
     /**
@@ -387,7 +381,7 @@ public class TestTomcat extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals("Hello, Tomcat User", res.toString());
+        Assert.assertEquals("Hello, Tomcat User", res.toString());
     }
 
 
@@ -414,8 +408,8 @@ public class TestTomcat extends TomcatBaseTest {
 
         int rc =getUrl("http://localhost:" + getPort() + contextPath +
                 "/testGetResource", res, null);
-        assertEquals(HttpServletResponse.SC_OK, rc);
-        assertTrue(res.toString().contains("<?xml version=\"1.0\" "));
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertTrue(res.toString().contains("<?xml version=\"1.0\" "));
     }
 
     @Test
@@ -434,7 +428,7 @@ public class TestTomcat extends TomcatBaseTest {
             ex.printStackTrace();
             e = ex;
         }
-        assertNull(e);
+        Assert.assertNull(e);
     }
 
     @Test
@@ -451,33 +445,33 @@ public class TestTomcat extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals("OK", res.toString());
+        Assert.assertEquals("OK", res.toString());
 
-        assertEquals(1, initCount.getCallCount());
+        Assert.assertEquals(1, initCount.getCallCount());
     }
 
     @Test
     public void testGetWebappConfigFileFromDirectory() {
         Tomcat tomcat = new Tomcat();
-        assertNotNull(tomcat.getWebappConfigFile("test/deployment/dirContext", ""));
+        Assert.assertNotNull(tomcat.getWebappConfigFile("test/deployment/dirContext", ""));
     }
 
     @Test
     public void testGetWebappConfigFileFromDirectoryNegative() {
         Tomcat tomcat = new Tomcat();
-        assertNull(tomcat.getWebappConfigFile("test/deployment/dirNoContext", ""));
+        Assert.assertNull(tomcat.getWebappConfigFile("test/deployment/dirNoContext", ""));
     }
 
     @Test
     public void testGetWebappConfigFileFromJar() {
         Tomcat tomcat = new Tomcat();
-        assertNotNull(tomcat.getWebappConfigFile("test/deployment/context.war", ""));
+        Assert.assertNotNull(tomcat.getWebappConfigFile("test/deployment/context.war", ""));
     }
 
     @Test
     public void testGetWebappConfigFileFromJarNegative() {
         Tomcat tomcat = new Tomcat();
-        assertNull(tomcat.getWebappConfigFile("test/deployment/noContext.war", ""));
+        Assert.assertNull(tomcat.getWebappConfigFile("test/deployment/noContext.war", ""));
     }
 
     @Test
@@ -490,7 +484,7 @@ public class TestTomcat extends TomcatBaseTest {
 
         tomcat.start();
 
-        assertEquals("WAR_CONTEXT", context.getSessionCookieName());
+        Assert.assertEquals("WAR_CONTEXT", context.getSessionCookieName());
     }
 
     @Test
@@ -501,7 +495,7 @@ public class TestTomcat extends TomcatBaseTest {
         Context context = tomcat.addWebapp(null,
                 "/test", appFile.getAbsolutePath());
 
-        assertEquals(StandardContext.class.getName(), context.getClass()
+        Assert.assertEquals(StandardContext.class.getName(), context.getClass()
                 .getName());
     }
 
@@ -516,7 +510,7 @@ public class TestTomcat extends TomcatBaseTest {
         try {
             File appFile = new File("test/deployment/context.war");
             tomcat.addWebapp(null, "/test", appFile.getAbsolutePath());
-            fail();
+            Assert.fail();
         } catch (IllegalArgumentException e) {
             // OK
         }
@@ -535,7 +529,7 @@ public class TestTomcat extends TomcatBaseTest {
         Context context = tomcat.addWebapp(null, "/test",
                 appFile.getAbsolutePath());
 
-        assertEquals(ReplicatedContext.class.getName(), context.getClass()
+        Assert.assertEquals(ReplicatedContext.class.getName(), context.getClass()
                 .getName());
     }
 
@@ -552,7 +546,7 @@ public class TestTomcat extends TomcatBaseTest {
         Context context = tomcat.addWebapp(host, "/test",
                 appFile.getAbsolutePath());
 
-        assertEquals(ReplicatedContext.class.getName(), context.getClass()
+        Assert.assertEquals(ReplicatedContext.class.getName(), context.getClass()
                 .getName());
     }
 
@@ -562,7 +556,7 @@ public class TestTomcat extends TomcatBaseTest {
 
         // No file system docBase required
         Context ctx = tomcat.addContext(null, "", null);
-        assertEquals(StandardContext.class.getName(), ctx.getClass().getName());
+        Assert.assertEquals(StandardContext.class.getName(), ctx.getClass().getName());
     }
 
     @Test
@@ -576,7 +570,7 @@ public class TestTomcat extends TomcatBaseTest {
         // No file system docBase required
         try {
             tomcat.addContext(null, "", null);
-            fail();
+            Assert.fail();
         } catch (IllegalArgumentException e) {
             // OK
         }
@@ -593,7 +587,7 @@ public class TestTomcat extends TomcatBaseTest {
 
         // No file system docBase required
         Context ctx = tomcat.addContext(host, "", null);
-        assertEquals(ReplicatedContext.class.getName(), ctx.getClass()
+        Assert.assertEquals(ReplicatedContext.class.getName(), ctx.getClass()
                 .getName());
     }
 

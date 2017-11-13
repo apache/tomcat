@@ -25,8 +25,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.fail;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -64,7 +63,7 @@ public class TestWebappClassLoaderMemoryLeak extends TomcatBaseTest {
                     TaskServlet.TIMER_THREAD_NAME.equals(thread.getName())) {
                 thread.join(5000);
                 if (thread.isAlive()) {
-                    fail("Timer thread still running");
+                    Assert.fail("Timer thread still running");
                 }
             }
         }

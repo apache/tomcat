@@ -20,9 +20,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.fail;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -109,7 +108,7 @@ public abstract class LoggingBaseTest {
         // Create catalina.base directory
         tempDir = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
         if (!tempDir.mkdirs() && !tempDir.isDirectory()) {
-            fail("Unable to create temporary directory for test");
+            Assert.fail("Unable to create temporary directory for test");
         }
 
         System.setProperty("catalina.base", tempDir.getAbsolutePath());

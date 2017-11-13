@@ -18,19 +18,19 @@ package org.apache.catalina.util;
 
 import java.io.IOException;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestConversions {
 
     @Test
     public void testByteArrayToLong() throws IOException {
-        assertEquals(0L, Conversions.byteArrayToLong(new byte[] { 0 }));
-        assertEquals(1L, Conversions.byteArrayToLong(new byte[] { 1 }));
-        assertEquals(0xFF, Conversions.byteArrayToLong(new byte[] { -1 }));
-        assertEquals(0xFFFF,
+        Assert.assertEquals(0L, Conversions.byteArrayToLong(new byte[] { 0 }));
+        Assert.assertEquals(1L, Conversions.byteArrayToLong(new byte[] { 1 }));
+        Assert.assertEquals(0xFF, Conversions.byteArrayToLong(new byte[] { -1 }));
+        Assert.assertEquals(0xFFFF,
                 Conversions.byteArrayToLong(new byte[] { -1, -1 }));
-        assertEquals(0xFFFFFF,
+        Assert.assertEquals(0xFFFFFF,
                 Conversions.byteArrayToLong(new byte[] { -1, -1, -1 }));
     }
 

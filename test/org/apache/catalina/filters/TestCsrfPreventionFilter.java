@@ -24,10 +24,7 @@ import java.io.ObjectOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.filters.CsrfPreventionFilter.LruCache;
@@ -44,25 +41,25 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
 
     @Test
     public void testAddNonceNoQueryNoAnchor() throws Exception {
-        assertEquals("/test?" + RESULT_NONCE ,
+        Assert.assertEquals("/test?" + RESULT_NONCE ,
                 wrapper.encodeRedirectURL("/test"));
     }
 
     @Test
     public void testAddNonceQueryNoAnchor() throws Exception {
-        assertEquals("/test?a=b&" + RESULT_NONCE ,
+        Assert.assertEquals("/test?a=b&" + RESULT_NONCE ,
                 wrapper.encodeRedirectURL("/test?a=b"));
     }
 
     @Test
     public void testAddNonceNoQueryAnchor() throws Exception {
-        assertEquals("/test?" + RESULT_NONCE + "#c",
+        Assert.assertEquals("/test?" + RESULT_NONCE + "#c",
                 wrapper.encodeRedirectURL("/test#c"));
     }
 
     @Test
     public void testAddNonceQueryAnchor() throws Exception {
-        assertEquals("/test?a=b&" + RESULT_NONCE + "#c",
+        Assert.assertEquals("/test?a=b&" + RESULT_NONCE + "#c",
                 wrapper.encodeRedirectURL("/test?a=b#c"));
     }
 
@@ -87,13 +84,13 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         LruCache<String> cache2 = (LruCache<String>) ois.readObject();
 
         cache2.add("key7");
-        assertFalse(cache2.contains("key1"));
-        assertFalse(cache2.contains("key2"));
-        assertTrue(cache2.contains("key3"));
-        assertTrue(cache2.contains("key4"));
-        assertTrue(cache2.contains("key5"));
-        assertTrue(cache2.contains("key6"));
-        assertTrue(cache2.contains("key7"));
+        Assert.assertFalse(cache2.contains("key1"));
+        Assert.assertFalse(cache2.contains("key2"));
+        Assert.assertTrue(cache2.contains("key3"));
+        Assert.assertTrue(cache2.contains("key4"));
+        Assert.assertTrue(cache2.contains("key5"));
+        Assert.assertTrue(cache2.contains("key6"));
+        Assert.assertTrue(cache2.contains("key7"));
     }
 
     @Test

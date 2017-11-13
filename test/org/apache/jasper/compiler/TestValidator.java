@@ -24,9 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
@@ -49,7 +47,7 @@ public class TestValidator extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug47331.jsp", new ByteChunk(), null);
 
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
     @Test
@@ -68,13 +66,13 @@ public class TestValidator extends TomcatBaseTest {
 
         String result = res.toString();
 
-        assertTrue(result.indexOf("<p>${'00-hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>${'02-hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>${'04-hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>${'06-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>${'00-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>${'02-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>${'04-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>${'06-hello world'}</p>") > 0);
     }
 
     @Test
@@ -93,13 +91,13 @@ public class TestValidator extends TomcatBaseTest {
 
         String result = res.toString();
 
-        assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
-        assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>02-hello world</p>") > 0);
-        assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
-        assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>02-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
     }
 
     @Test
@@ -118,13 +116,13 @@ public class TestValidator extends TomcatBaseTest {
 
         String result = res.toString();
 
-        assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
-        assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>02-hello world</p>") > 0);
-        assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
-        assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>02-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
     }
 
     @Test
@@ -143,13 +141,13 @@ public class TestValidator extends TomcatBaseTest {
 
         String result = res.toString();
 
-        assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
-        assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>02-hello world</p>") > 0);
-        assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
-        assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
-        assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>02-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
     }
 
     public static class Echo extends TagSupport {

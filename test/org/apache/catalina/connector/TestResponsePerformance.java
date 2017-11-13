@@ -18,7 +18,7 @@ package org.apache.catalina.connector;
 
 import java.net.URI;
 
-import static org.junit.Assert.assertTrue;
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.startup.LoggingBaseTest;
@@ -50,6 +50,6 @@ public class TestResponsePerformance extends LoggingBaseTest {
 
         System.out.println("Current 'home-brew': " + homebrew +
                 "ms, Using URI: " + uri + "ms");
-        assertTrue(homebrew < uri);
+        Assert.assertTrue(homebrew < uri);
     }
 }

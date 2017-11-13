@@ -27,10 +27,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.fail;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.realm.GenericPrincipal;
@@ -47,7 +44,7 @@ public class TestSerializablePrincipal  {
 
         File tempDir = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
         if (!tempDir.mkdirs() && !tempDir.isDirectory()) {
-            fail("Unable to create temporary directory for test");
+            Assert.fail("Unable to create temporary directory for test");
         }
 
         // Create the Principal to serialize
@@ -64,7 +61,7 @@ public class TestSerializablePrincipal  {
             file = File.createTempFile("ser", null, tempDir);
         } catch (IOException e) {
             e.printStackTrace();
-            fail("ioe creating temporary file");
+            Assert.fail("ioe creating temporary file");
         }
 
         GenericPrincipal gpNew = null;
@@ -78,10 +75,10 @@ public class TestSerializablePrincipal  {
                 SerializablePrincipal.writePrincipal(gpOriginal, oos);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                fail("fnfe creating object output stream");
+                Assert.fail("fnfe creating object output stream");
             } catch (IOException e) {
                 e.printStackTrace();
-                fail("ioe serializing principal");
+                Assert.fail("ioe serializing principal");
             } finally {
                 if (oos != null) {
                     try {
@@ -108,13 +105,13 @@ public class TestSerializablePrincipal  {
                 gpNew = SerializablePrincipal.readPrincipal(ois);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                fail("fnfe reading object output stream");
+                Assert.fail("fnfe reading object output stream");
             } catch (IOException e) {
                 e.printStackTrace();
-                fail("ioe de-serializing principal");
+                Assert.fail("ioe de-serializing principal");
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
-                fail("cnfe de-serializing principal");
+                Assert.fail("cnfe de-serializing principal");
             } finally {
                 if (ois != null) {
                     try {
@@ -138,20 +135,20 @@ public class TestSerializablePrincipal  {
         }
 
         // Now test how similar original and de-serialized versions are
-        assertEquals("User names different", gpOriginal.getName(),
+        Assert.assertEquals("User names different", gpOriginal.getName(),
                 gpNew.getName());
-        assertEquals("Passwords different", gpOriginal.getPassword(),
+        Assert.assertEquals("Passwords different", gpOriginal.getPassword(),
                 gpNew.getPassword());
-        assertEquals("Number of roles different", gpOriginal.getRoles().length,
+        Assert.assertEquals("Number of roles different", gpOriginal.getRoles().length,
                 gpNew.getRoles().length);
         for (int i = 0; i < gpOriginal.getRoles().length; i++) {
-            assertEquals("Role name index " + i + "different",
+            Assert.assertEquals("Role name index " + i + "different",
                     gpOriginal.getRoles()[i], gpNew.getRoles()[i]);
         }
         // These are the key tests for bug 43840
-        assertNotSame("Inner principal not present", gpNew,
+        Assert.assertNotSame("Inner principal not present", gpNew,
                 gpNew.getUserPrincipal());
-        assertEquals("Inner user names are different", tpOriginal.getName(),
+        Assert.assertEquals("Inner user names are different", tpOriginal.getName(),
                 gpNew.getUserPrincipal().getName());
     }
 

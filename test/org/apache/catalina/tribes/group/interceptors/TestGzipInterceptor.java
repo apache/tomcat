@@ -18,8 +18,7 @@ package org.apache.catalina.tribes.group.interceptors;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestGzipInterceptor {
@@ -64,6 +63,6 @@ public class TestGzipInterceptor {
         Arrays.fill(data, (byte)1);
         byte[] compress = GzipInterceptor.compress(data);
         byte[] result = GzipInterceptor.decompress(compress);
-        assertTrue(Arrays.equals(data, result));
+        Assert.assertTrue(Arrays.equals(data, result));
     }
 }

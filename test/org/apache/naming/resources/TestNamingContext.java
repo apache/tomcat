@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -33,9 +33,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -58,14 +55,14 @@ public class TestNamingContext extends TomcatBaseTest {
     public void testLookupNonSingletonResource() throws Exception {
         doTestLookup(false);
     }
-    
+
     public void doTestLookup(boolean useSingletonResource) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         tomcat.enableNaming();
 
         // No file system docBase required
         StandardContext ctx = (StandardContext) tomcat.addContext("", null);
-        
+
         // Create the resource
         ContextResource cr = new ContextResource();
         cr.setName("list/foo");
@@ -73,7 +70,7 @@ public class TestNamingContext extends TomcatBaseTest {
         cr.setProperty("factory", "org.apache.naming.resources.TesterFactory");
         cr.setSingleton(useSingletonResource);
         ctx.getNamingResources().addResource(cr);
-        
+
         // Map the test Servlet
         Bug49994Servlet bug49994Servlet = new Bug49994Servlet();
         Tomcat.addServlet(ctx, "bug49994Servlet", bug49994Servlet);
@@ -82,14 +79,14 @@ public class TestNamingContext extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
-        
+
         String expected;
         if (useSingletonResource) {
             expected = "EQUAL";
         } else {
             expected = "NOTEQUAL";
         }
-        assertEquals(expected, bc.toString());
+        Assert.assertEquals(expected, bc.toString());
 
     }
 
@@ -164,7 +161,7 @@ public class TestNamingContext extends TomcatBaseTest {
         }
         String contents = new String(buffer, 0, len, "UTF-8");
 
-        assertEquals(foxText, contents);
+        Assert.assertEquals(foxText, contents);
 
         // Check second alias
         file = ctx.lookup("/a2/test2.txt");
@@ -181,7 +178,7 @@ public class TestNamingContext extends TomcatBaseTest {
         }
         contents = new String(buffer, 0, len, "UTF-8");
 
-        assertEquals(loremIpsum, contents);
+        Assert.assertEquals(loremIpsum, contents);
 
         // Test aliases with spaces around the separators
         ctx.setAliases("   /a1= " + alternate1.getCanonicalPath()
@@ -204,7 +201,7 @@ public class TestNamingContext extends TomcatBaseTest {
         }
         contents = new String(buffer, 0, len, "UTF-8");
 
-        assertEquals(foxText, contents);
+        Assert.assertEquals(foxText, contents);
 
         // Check second alias
         file = ctx.lookup("/a2/test2.txt");
@@ -221,13 +218,13 @@ public class TestNamingContext extends TomcatBaseTest {
         }
         contents = new String(buffer, 0, len, "UTF-8");
 
-        assertEquals(loremIpsum, contents);
+        Assert.assertEquals(loremIpsum, contents);
     }
 
     public static final class Bug49994Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
-        
+
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
@@ -257,14 +254,14 @@ public class TestNamingContext extends TomcatBaseTest {
 
         // No file system docBase required
         StandardContext ctx = (StandardContext) tomcat.addContext("", null);
-        
+
         // Create the resource
         ContextResource cr = new ContextResource();
         cr.setName("list/foo");
         cr.setType("org.apache.naming.resources.TesterObject");
         cr.setProperty("factory", "org.apache.naming.resources.TesterFactory");
         ctx.getNamingResources().addResource(cr);
-        
+
         // Map the test Servlet
         Bug23950Servlet bug23950Servlet = new Bug23950Servlet();
         Tomcat.addServlet(ctx, "bug23950Servlet", bug23950Servlet);
@@ -273,13 +270,13 @@ public class TestNamingContext extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals("org.apache.naming.resources.TesterObject", bc.toString());
+        Assert.assertEquals("org.apache.naming.resources.TesterObject", bc.toString());
     }
-    
+
     public static final class Bug23950Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
-        
+
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
@@ -308,7 +305,7 @@ public class TestNamingContext extends TomcatBaseTest {
 
         // No file system docBase required
         StandardContext ctx = (StandardContext) tomcat.addContext("", null);
-        
+
         // Create the resource
         ContextResource cr = new ContextResource();
         cr.setName("bug50351");
@@ -316,7 +313,7 @@ public class TestNamingContext extends TomcatBaseTest {
         cr.setProperty("factory", "org.apache.naming.factory.BeanFactory");
         cr.setProperty("foo", "value");
         ctx.getNamingResources().addResource(cr);
-        
+
         // Map the test Servlet
         Bug50351Servlet bug50351Servlet = new Bug50351Servlet();
         Tomcat.addServlet(ctx, "bug50351Servlet", bug50351Servlet);
@@ -325,13 +322,13 @@ public class TestNamingContext extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals("value", bc.toString());
+        Assert.assertEquals("value", bc.toString());
     }
 
     public static final class Bug50351Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
-        
+
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
@@ -349,7 +346,7 @@ public class TestNamingContext extends TomcatBaseTest {
             }
         }
     }
-    
+
     @Test
     public void testBug51744a() throws Exception {
         doTestBug51744(true);
@@ -367,7 +364,7 @@ public class TestNamingContext extends TomcatBaseTest {
 
         // No file system docBase required
         StandardContext ctx = (StandardContext) tomcat.addContext("", null);
-        
+
         ctx.setJndiExceptionOnFailedWrite(exceptionOnFailedWrite);
 
         // Map the test Servlet
@@ -379,10 +376,10 @@ public class TestNamingContext extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() + "/", bc, null);
-        assertEquals(200, rc);
-        assertTrue(bc.toString().contains(Bug51744Servlet.EXPECTED));
+        Assert.assertEquals(200, rc);
+        Assert.assertTrue(bc.toString().contains(Bug51744Servlet.EXPECTED));
         if (exceptionOnFailedWrite) {
-            assertTrue(bc.toString().contains(Bug51744Servlet.ERROR_MESSAGE));
+            Assert.assertTrue(bc.toString().contains(Bug51744Servlet.ERROR_MESSAGE));
         }
     }
 
@@ -442,8 +439,8 @@ public class TestNamingContext extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() + "/", bc, null);
-        assertEquals(200, rc);
-        assertTrue(bc.toString().contains("truetrue"));
+        Assert.assertEquals(200, rc);
+        Assert.assertTrue(bc.toString().contains("truetrue"));
     }
 
     public static final class Bug52830Servlet extends HttpServlet {

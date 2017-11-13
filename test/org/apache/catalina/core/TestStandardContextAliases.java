@@ -28,8 +28,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
@@ -58,9 +57,9 @@ public class TestStandardContextAliases extends TomcatBaseTest {
 
         String result = res.toString();
 
-        assertTrue(result.indexOf("00-PASS") > -1);
-        assertTrue(result.indexOf("01-PASS") > -1);
-        assertTrue(result.indexOf("02-PASS") > -1);
+        Assert.assertTrue(result.indexOf("00-PASS") > -1);
+        Assert.assertTrue(result.indexOf("01-PASS") > -1);
+        Assert.assertTrue(result.indexOf("02-PASS") > -1);
     }
 
 

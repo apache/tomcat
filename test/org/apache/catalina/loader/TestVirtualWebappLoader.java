@@ -18,10 +18,7 @@ package org.apache.catalina.loader;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.core.StandardContext;
@@ -34,8 +31,8 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
     @Test
     public void testModified() throws Exception {
         WebappLoader loader = new WebappLoader();
-        assertNull(loader.getClassLoader());
-        assertFalse(loader.modified());
+        Assert.assertNull(loader.getClassLoader());
+        Assert.assertFalse(loader.modified());
     }
 
     @Test
@@ -56,16 +53,16 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
         loader.setVirtualClasspath(dir.getAbsolutePath() + "/*.jar");
         loader.start();
         String[] repos = loader.getRepositories();
-        assertEquals(2,repos.length);
+        Assert.assertEquals(2,repos.length);
         loader.stop();
         // ToDo: Why doesn't remove repositories?
         repos = loader.getRepositories();
-        assertEquals(2, repos.length);
+        Assert.assertEquals(2, repos.length);
 
         // no leak
         loader.start();
         repos = loader.getRepositories();
-        assertEquals(2,repos.length);
+        Assert.assertEquals(2,repos.length);
 
         // clear loader
         ctx.setLoader(null);

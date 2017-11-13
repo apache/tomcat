@@ -21,10 +21,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -93,7 +91,7 @@ public class TestOrderInterceptor {
         }
         Thread.sleep(5000);
         for ( int i=0; i<test.length; i++ ) {
-            assertFalse(test[i].fail);
+            Assert.assertFalse(test[i].fail);
         }
     }
 
@@ -127,12 +125,12 @@ public class TestOrderInterceptor {
             threads[i].join();
         }
         if (!exceptionQueue.isEmpty()) {
-            fail("Exception while sending in threads: "
+            Assert.fail("Exception while sending in threads: "
                     + exceptionQueue.remove().toString());
         }
         Thread.sleep(5000);
         for ( int i=0; i<test.length; i++ ) {
-            assertFalse(test[i].fail);
+            Assert.assertFalse(test[i].fail);
         }
     }
 

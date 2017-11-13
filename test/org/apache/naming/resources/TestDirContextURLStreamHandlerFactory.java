@@ -21,9 +21,7 @@ import java.net.URL;
 import java.net.URLStreamHandler;
 import java.net.URLStreamHandlerFactory;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestDirContextURLStreamHandlerFactory {
@@ -39,7 +37,7 @@ public class TestDirContextURLStreamHandlerFactory {
         } catch (MalformedURLException ignore) {
             // Ignore
         }
-        assertNull(url);
+        Assert.assertNull(url);
 
         // Set the factory
         URL.setURLStreamHandlerFactory(
@@ -51,7 +49,7 @@ public class TestDirContextURLStreamHandlerFactory {
         } catch (MalformedURLException ignore) {
             // Ignore
         }
-        assertNull(url);
+        Assert.assertNull(url);
 
         // Register a user factory
         DirContextURLStreamHandlerFactory.addUserFactory(
@@ -63,7 +61,7 @@ public class TestDirContextURLStreamHandlerFactory {
         } catch (MalformedURLException ignore) {
             // Ignore
         }
-        assertNotNull(url);
+        Assert.assertNotNull(url);
     }
 
     public static class FooURLStreamHandlerFactory

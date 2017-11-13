@@ -18,8 +18,7 @@ package org.apache.naming.resources;
 
 import javax.naming.NameNotFoundException;
 
-import static org.junit.Assert.fail;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.core.StandardContext;
@@ -46,7 +45,7 @@ public class TestProxyDirContext extends TomcatBaseTest {
 
         try {
             ctx.getResources().lookup("/WEB-INF/web.xml");
-            fail();
+            Assert.fail();
         }
         catch (final NameNotFoundException e) {
             // as expected
@@ -54,7 +53,7 @@ public class TestProxyDirContext extends TomcatBaseTest {
         Thread.sleep(600); // see ProxyDirContext.cacheTTL
         try {
             ctx.getResources().lookup("/WEB-INF/web.xml");
-            fail();
+            Assert.fail();
         }
         catch (final NameNotFoundException e) {
             // as expected
