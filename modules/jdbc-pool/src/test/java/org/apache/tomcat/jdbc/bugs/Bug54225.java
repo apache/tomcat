@@ -20,8 +20,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.junit.Assert.assertNull;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -60,6 +59,6 @@ public class Bug54225 {
         poolProperties.setInitSQL(initSQL);
         final DataSource ds = new DataSource(poolProperties);
         ds.getConnection().close();
-        assertNull(poolProperties.getInitSQL());
+        Assert.assertNull(poolProperties.getInitSQL());
     }
 }

@@ -21,9 +21,7 @@ import java.sql.SQLException;
 
 import javax.sql.PooledConnection;
 
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
@@ -56,12 +54,12 @@ public class Bug54227 {
         con.close();
         con = ds.getConnection();
         actual2 = ((PooledConnection)con).getConnection();
-        assertSame(actual1, actual2);
+        Assert.assertSame(actual1, actual2);
         con.close();
         Thread.sleep(150);
         con = ds.getConnection();
         actual2 = ((PooledConnection)con).getConnection();
-        assertNotSame(actual1, actual2);
+        Assert.assertNotSame(actual1, actual2);
         con.close();
     }
 }
