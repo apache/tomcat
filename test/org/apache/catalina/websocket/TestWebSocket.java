@@ -35,6 +35,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
