@@ -42,8 +42,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import static org.junit.Assert.fail;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -151,7 +149,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
         File appBase = new File(getTemporaryDirectory(), "webapps");
         if (!appBase.exists() && !appBase.mkdir()) {
-            fail("Unable to create appBase for test");
+            Assert.fail("Unable to create appBase for test");
         }
 
         tomcat = new TomcatWithFastSessionIDs();

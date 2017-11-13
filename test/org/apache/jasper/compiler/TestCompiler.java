@@ -23,9 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -50,7 +48,7 @@ public class TestCompiler extends TomcatBaseTest {
         assertEcho(result, "OK");
 
         // Check content type
-        assertTrue(headers.get("Content-Type").get(0).startsWith("text/html"));
+        Assert.assertTrue(headers.get("Content-Type").get(0).startsWith("text/html"));
     }
 
     @Test
@@ -68,7 +66,7 @@ public class TestCompiler extends TomcatBaseTest {
         assertEcho(result, "OK");
 
         // Check content type
-        assertTrue(headers.get("Content-Type").get(0).startsWith("text/plain"));
+        Assert.assertTrue(headers.get("Content-Type").get(0).startsWith("text/plain"));
     }
 
     @Test
@@ -166,7 +164,7 @@ public class TestCompiler extends TomcatBaseTest {
         ByteChunk res = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug53257/foo%2525bar.jsp", res, null);
-        assertEquals(404, rc);
+        Assert.assertEquals(404, rc);
     }
 
     @Test
@@ -197,12 +195,12 @@ public class TestCompiler extends TomcatBaseTest {
         Pattern coda = Pattern.compile(
                 "(.*This is a coda\\.){2}.*",
                 Pattern.MULTILINE|Pattern.DOTALL);
-        assertTrue(prelude.matcher(result).matches());
-        assertTrue(coda.matcher(result).matches());
+        Assert.assertTrue(prelude.matcher(result).matches());
+        Assert.assertTrue(coda.matcher(result).matches());
     }
 
     /** Assertion for text printed by tags:echo */
     private static void assertEcho(String result, String expected) {
-        assertTrue(result, result.indexOf("<p>" + expected + "</p>") > 0);
+        Assert.assertTrue(result, result.indexOf("<p>" + expected + "</p>") > 0);
     }
 }

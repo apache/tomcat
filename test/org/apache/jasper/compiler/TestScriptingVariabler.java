@@ -24,8 +24,7 @@ import javax.servlet.jsp.tagext.TagExtraInfo;
 import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.tagext.VariableInfo;
 
-import static org.junit.Assert.assertNull;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -44,7 +43,7 @@ public class TestScriptingVariabler extends TomcatBaseTest {
         }
 
         // Should not fail
-        assertNull(e);
+        Assert.assertNull(e);
     }
 
     public static class Bug48616aTag extends TagSupport {
@@ -80,7 +79,7 @@ public class TestScriptingVariabler extends TomcatBaseTest {
         }
 
         // Should not fail
-        assertNull(e);
+        Assert.assertNull(e);
     }
 
     @Test
@@ -95,6 +94,6 @@ public class TestScriptingVariabler extends TomcatBaseTest {
         }
 
         // Should not fail
-        assertNull(e);
+        Assert.assertNull(e);
     }
 }

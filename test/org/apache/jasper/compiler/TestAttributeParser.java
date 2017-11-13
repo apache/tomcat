@@ -19,8 +19,7 @@ package org.apache.jasper.compiler;
 
 import javax.el.ValueExpression;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.el.ExpressionFactoryImpl;
@@ -39,22 +38,22 @@ public class TestAttributeParser {
      */
     @Test
     public void testBug42565() {
-        assertEquals("false", evalAttr("${false?true:false}", '\"'));
-        assertEquals("false", evalAttr("${false?true: false}", '\"'));
-        assertEquals("false", evalAttr("${false?true :false}", '\"'));
-        assertEquals("false", evalAttr("${false?true : false}", '\"'));
-        assertEquals("false", evalAttr("${false? true:false}", '\"'));
-        assertEquals("false", evalAttr("${false? true: false}", '\"'));
-        assertEquals("false", evalAttr("${false? true :false}", '\"'));
-        assertEquals("false", evalAttr("${false? true : false}", '\"'));
-        assertEquals("false", evalAttr("${false ?true:false}", '\"'));
-        assertEquals("false", evalAttr("${false ?true: false}", '\"'));
-        assertEquals("false", evalAttr("${false ?true :false}", '\"'));
-        assertEquals("false", evalAttr("${false ?true : false}", '\"'));
-        assertEquals("false", evalAttr("${false ? true:false}", '\"'));
-        assertEquals("false", evalAttr("${false ? true: false}", '\"'));
-        assertEquals("false", evalAttr("${false ? true :false}", '\"'));
-        assertEquals("false", evalAttr("${false ? true : false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false?true:false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false?true: false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false?true :false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false?true : false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false? true:false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false? true: false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false? true :false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false? true : false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false ?true:false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false ?true: false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false ?true :false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false ?true : false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false ? true:false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false ? true: false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false ? true :false}", '\"'));
+        Assert.assertEquals("false", evalAttr("${false ? true : false}", '\"'));
     }
 
 
@@ -65,11 +64,11 @@ public class TestAttributeParser {
      */
     @Test
     public void testBug44994() {
-        assertEquals("none",
+        Assert.assertEquals("none",
                 evalAttr("${0 lt 0 ? 1 lt 0 ? 'many': 'one': 'none'}", '\"'));
-        assertEquals("one",
+        Assert.assertEquals("one",
                 evalAttr("${0 lt 1 ? 1 lt 1 ? 'many': 'one': 'none'}", '\"'));
-        assertEquals("many",
+        Assert.assertEquals("many",
                 evalAttr("${0 lt 2 ? 1 lt 2 ? 'many': 'one': 'none'}", '\"'));
     }
 
@@ -82,40 +81,40 @@ public class TestAttributeParser {
     @Test
     public void testBug45015() {
         // Warning: Java String quoting vs. JSP attribute quoting
-        assertEquals("hello 'world'", evalAttr("hello 'world'", '\"'));
-        assertEquals("hello 'world", evalAttr("hello 'world", '\"'));
-        assertEquals("hello world'", evalAttr("hello world'", '\"'));
-        assertEquals("hello world'", evalAttr("hello world\\'", '\"'));
-        assertEquals("hello world\"", evalAttr("hello world\\\"", '\"'));
-        assertEquals("hello \"world\"", evalAttr("hello \"world\"", '\"'));
-        assertEquals("hello \"world", evalAttr("hello \"world", '\"'));
-        assertEquals("hello world\"", evalAttr("hello world\"", '\"'));
-        assertEquals("hello world'", evalAttr("hello world\\'", '\"'));
-        assertEquals("hello world\"", evalAttr("hello world\\\"", '\"'));
+        Assert.assertEquals("hello 'world'", evalAttr("hello 'world'", '\"'));
+        Assert.assertEquals("hello 'world", evalAttr("hello 'world", '\"'));
+        Assert.assertEquals("hello world'", evalAttr("hello world'", '\"'));
+        Assert.assertEquals("hello world'", evalAttr("hello world\\'", '\"'));
+        Assert.assertEquals("hello world\"", evalAttr("hello world\\\"", '\"'));
+        Assert.assertEquals("hello \"world\"", evalAttr("hello \"world\"", '\"'));
+        Assert.assertEquals("hello \"world", evalAttr("hello \"world", '\"'));
+        Assert.assertEquals("hello world\"", evalAttr("hello world\"", '\"'));
+        Assert.assertEquals("hello world'", evalAttr("hello world\\'", '\"'));
+        Assert.assertEquals("hello world\"", evalAttr("hello world\\\"", '\"'));
 
-        assertEquals("hello 'world'", evalAttr("hello 'world'", '\''));
-        assertEquals("hello 'world", evalAttr("hello 'world", '\''));
-        assertEquals("hello world'", evalAttr("hello world'", '\''));
-        assertEquals("hello world'", evalAttr("hello world\\'", '\''));
-        assertEquals("hello world\"", evalAttr("hello world\\\"", '\''));
-        assertEquals("hello \"world\"", evalAttr("hello \"world\"", '\''));
-        assertEquals("hello \"world", evalAttr("hello \"world", '\''));
-        assertEquals("hello world\"", evalAttr("hello world\"", '\''));
-        assertEquals("hello world'", evalAttr("hello world\\'", '\''));
-        assertEquals("hello world\"", evalAttr("hello world\\\"", '\''));
+        Assert.assertEquals("hello 'world'", evalAttr("hello 'world'", '\''));
+        Assert.assertEquals("hello 'world", evalAttr("hello 'world", '\''));
+        Assert.assertEquals("hello world'", evalAttr("hello world'", '\''));
+        Assert.assertEquals("hello world'", evalAttr("hello world\\'", '\''));
+        Assert.assertEquals("hello world\"", evalAttr("hello world\\\"", '\''));
+        Assert.assertEquals("hello \"world\"", evalAttr("hello \"world\"", '\''));
+        Assert.assertEquals("hello \"world", evalAttr("hello \"world", '\''));
+        Assert.assertEquals("hello world\"", evalAttr("hello world\"", '\''));
+        Assert.assertEquals("hello world'", evalAttr("hello world\\'", '\''));
+        Assert.assertEquals("hello world\"", evalAttr("hello world\\\"", '\''));
 
     }
 
     @Test
     public void testBug45451() {
-        assertEquals("2", evalAttr("${1+1}", '\"'));
-        assertEquals("${1+1}", evalAttr("\\${1+1}", '\"'));
-        assertEquals("\\2", evalAttr("\\\\${1+1}", '\"'));
+        Assert.assertEquals("2", evalAttr("${1+1}", '\"'));
+        Assert.assertEquals("${1+1}", evalAttr("\\${1+1}", '\"'));
+        Assert.assertEquals("\\2", evalAttr("\\\\${1+1}", '\"'));
     }
 
     @Test
     public void testBug49081() {
-        assertEquals("#2", evalAttr("#${1+1}", '\"'));
+        Assert.assertEquals("#2", evalAttr("#${1+1}", '\"'));
     }
 
     @Test
@@ -125,18 +124,18 @@ public class TestAttributeParser {
 
         // '\' is only an escape character inside a StringLiteral
         // Attribute escaping does not apply inside EL expressions
-        assertEquals("\\", evalAttr("${'\\\\'}", '\"'));
+        Assert.assertEquals("\\", evalAttr("${'\\\\'}", '\"'));
 
         // Can use ''' inside '"' when quoting with '"' and vice versa without
         // escaping
-        assertEquals("\\\"", evalAttr("${'\\\\\"'}", '\"'));
-        assertEquals("\"\\", evalAttr("${'\\\"\\\\'}", '\"'));
-        assertEquals("\\'", evalAttr("${'\\\\\\''}", '\"'));
-        assertEquals("'\\", evalAttr("${'\\'\\\\'}", '\"'));
+        Assert.assertEquals("\\\"", evalAttr("${'\\\\\"'}", '\"'));
+        Assert.assertEquals("\"\\", evalAttr("${'\\\"\\\\'}", '\"'));
+        Assert.assertEquals("\\'", evalAttr("${'\\\\\\''}", '\"'));
+        Assert.assertEquals("'\\", evalAttr("${'\\'\\\\'}", '\"'));
 
         // Quoting <% and %>
-        assertEquals("hello <% world", evalAttr("hello <\\% world", '\"'));
-        assertEquals("hello %> world", evalAttr("hello %> world", '\"'));
+        Assert.assertEquals("hello <% world", evalAttr("hello <\\% world", '\"'));
+        Assert.assertEquals("hello %> world", evalAttr("hello %> world", '\"'));
 
         // Test that the end of literal in EL expression is recognized in
         // parseEL(), be it quoted with single or double quotes. That is, that
@@ -148,16 +147,16 @@ public class TestAttributeParser {
         // inside of parseEL it will be printed as \${, thus preventing the EL
         // expression that follows from being evaluated.
         //
-        assertEquals("foo\\bar\\baz", evalAttr("${\'foo\'}\\\\${\'bar\'}\\\\${\'baz\'}", '\"'));
-        assertEquals("foo\\bar\\baz", evalAttr("${\'foo\'}\\\\${\"bar\"}\\\\${\'baz\'}", '\"'));
-        assertEquals("foo\\bar\\baz", evalAttr("${\"foo\"}\\\\${\'bar\'}\\\\${\"baz\"}", '\"'));
+        Assert.assertEquals("foo\\bar\\baz", evalAttr("${\'foo\'}\\\\${\'bar\'}\\\\${\'baz\'}", '\"'));
+        Assert.assertEquals("foo\\bar\\baz", evalAttr("${\'foo\'}\\\\${\"bar\"}\\\\${\'baz\'}", '\"'));
+        Assert.assertEquals("foo\\bar\\baz", evalAttr("${\"foo\"}\\\\${\'bar\'}\\\\${\"baz\"}", '\"'));
     }
 
     @Test
     public void testScriptExpressionLiterals() {
-        assertEquals(" \"hello world\" ", parseScriptExpression(
+        Assert.assertEquals(" \"hello world\" ", parseScriptExpression(
                 " \"hello world\" ", (char) 0));
-        assertEquals(" \"hello \\\"world\" ", parseScriptExpression(
+        Assert.assertEquals(" \"hello \\\"world\" ", parseScriptExpression(
                 " \"hello \\\\\"world\" ", (char) 0));
     }
 

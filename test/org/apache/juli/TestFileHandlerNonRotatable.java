@@ -19,9 +19,8 @@ package org.apache.juli;
 import java.io.File;
 import java.net.URLDecoder;
 
-import static org.junit.Assert.assertTrue;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -56,7 +55,7 @@ public class TestFileHandlerNonRotatable extends LoggingBaseTest {
                 "juli.", ".log");
 
         File logFile = new File(this.getTemporaryDirectory(), "juli.log");
-        assertTrue(logFile.exists());
+        Assert.assertTrue(logFile.exists());
     }
 
     @Test
@@ -65,7 +64,7 @@ public class TestFileHandlerNonRotatable extends LoggingBaseTest {
                 "juli.", "log");
 
         File logFile = new File(this.getTemporaryDirectory(), "juli.log");
-        assertTrue(logFile.exists());
+        Assert.assertTrue(logFile.exists());
     }
 
     @Test
@@ -74,6 +73,6 @@ public class TestFileHandlerNonRotatable extends LoggingBaseTest {
                 "juli", ".log");
 
         File logFile = new File(this.getTemporaryDirectory(), "juli.log");
-        assertTrue(logFile.exists());
+        Assert.assertTrue(logFile.exists());
     }
 }

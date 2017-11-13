@@ -44,12 +44,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.hamcrest.CoreMatchers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -95,7 +89,7 @@ public class TestStandardContext extends TomcatBaseTest {
 
         File docBase = new File(tomcat.getHost().getAppBaseFile(), "ROOT");
         if (!docBase.mkdirs() && !docBase.isDirectory()) {
-            fail("Unable to create docBase");
+            Assert.fail("Unable to create docBase");
         }
 
         Context root = tomcat.addContext("", "ROOT");
@@ -109,11 +103,11 @@ public class TestStandardContext extends TomcatBaseTest {
 
         client.connect();
         client.processRequest();
-        assertTrue(client.isResponse404());
+        Assert.assertTrue(client.isResponse404());
 
         // Context failed to start. This checks that automatic transition
         // from FAILED to STOPPED state was successful.
-        assertEquals(LifecycleState.STOPPED, root.getState());
+        Assert.assertEquals(LifecycleState.STOPPED, root.getState());
 
         // Prepare context for the second attempt
         // Configuration was cleared on stop() thanks to
@@ -124,8 +118,8 @@ public class TestStandardContext extends TomcatBaseTest {
         // The same request is processed successfully
         client.connect();
         client.processRequest();
-        assertTrue(client.isResponse200());
-        assertEquals(Bug46243Filter.class.getName()
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals(Bug46243Filter.class.getName()
                 + HelloWorldServlet.RESPONSE_TEXT, client.getResponseBody());
     }
 
@@ -200,21 +194,21 @@ public class TestStandardContext extends TomcatBaseTest {
 
         try {
             context.start();
-            fail();
+            Assert.fail();
         } catch (LifecycleException ex) {
             // As expected
         }
-        assertEquals(LifecycleState.FAILED, context.getState());
+        Assert.assertEquals(LifecycleState.FAILED, context.getState());
 
         // The second attempt
         loader.setFail(false);
         context.start();
-        assertEquals(LifecycleState.STARTED, context.getState());
+        Assert.assertEquals(LifecycleState.STARTED, context.getState());
 
         // Using a test from testBug49922() to check that the webapp is running
         ByteChunk result = getUrl("http://localhost:" + getPort() +
                 "/bug49922/target");
-        assertEquals("Target", result.toString());
+        Assert.assertEquals("Target", result.toString());
     }
 
     @Test
@@ -236,21 +230,21 @@ public class TestStandardContext extends TomcatBaseTest {
 
         try {
             context.start();
-            fail();
+            Assert.fail();
         } catch (LifecycleException ex) {
             // As expected
         }
-        assertEquals(LifecycleState.FAILED, context.getState());
+        Assert.assertEquals(LifecycleState.FAILED, context.getState());
 
         // The second attempt
         listener.setFail(false);
         context.start();
-        assertEquals(LifecycleState.STARTED, context.getState());
+        Assert.assertEquals(LifecycleState.STARTED, context.getState());
 
         // Using a test from testBug49922() to check that the webapp is running
         ByteChunk result = getUrl("http://localhost:" + getPort() +
                 "/bug49922/target");
-        assertEquals("Target", result.toString());
+        Assert.assertEquals("Target", result.toString());
     }
 
     private static class FailingWebappLoader extends WebappLoader {
@@ -294,39 +288,39 @@ public class TestStandardContext extends TomcatBaseTest {
         // Check filter and servlet aren't called
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug49922/foo", result, null);
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
-        assertTrue(result.getLength() > 0);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        Assert.assertTrue(result.getLength() > 0);
 
         // Check extension mapping works
         result = getUrl("http://localhost:" + getPort() + "/test/foo.do");
-        assertEquals("FilterServlet", result.toString());
+        Assert.assertEquals("FilterServlet", result.toString());
 
         // Check path mapping works
         result = getUrl("http://localhost:" + getPort() + "/test/bug49922/servlet");
-        assertEquals("FilterServlet", result.toString());
+        Assert.assertEquals("FilterServlet", result.toString());
 
         // Check servlet name mapping works
         result = getUrl("http://localhost:" + getPort() + "/test/foo.od");
-        assertEquals("FilterServlet", result.toString());
+        Assert.assertEquals("FilterServlet", result.toString());
 
         // Check filter is only called once
         result = getUrl("http://localhost:" + getPort() +
                 "/test/bug49922/servlet/foo.do");
-        assertEquals("FilterServlet", result.toString());
+        Assert.assertEquals("FilterServlet", result.toString());
         result = getUrl("http://localhost:" + getPort() +
                 "/test/bug49922/servlet/foo.od");
-        assertEquals("FilterServlet", result.toString());
+        Assert.assertEquals("FilterServlet", result.toString());
 
         // Check dispatcher mapping
         result = getUrl("http://localhost:" + getPort() +
                 "/test/bug49922/target");
-        assertEquals("Target", result.toString());
+        Assert.assertEquals("Target", result.toString());
         result = getUrl("http://localhost:" + getPort() +
                 "/test/bug49922/forward");
-        assertEquals("FilterTarget", result.toString());
+        Assert.assertEquals("FilterTarget", result.toString());
         result = getUrl("http://localhost:" + getPort() +
                 "/test/bug49922/include");
-        assertEquals("IncludeFilterTarget", result.toString());
+        Assert.assertEquals("IncludeFilterTarget", result.toString());
     }
 
 
@@ -431,8 +425,8 @@ public class TestStandardContext extends TomcatBaseTest {
                 bc, null);
 
         // Check for a 401
-        assertNotSame("OK", bc.toString());
-        assertEquals(401, rc);
+        Assert.assertNotSame("OK", bc.toString());
+        Assert.assertEquals(401, rc);
     }
 
     public static final class Bug50015SCI
@@ -567,8 +561,8 @@ public class TestStandardContext extends TomcatBaseTest {
         ctx.stop();
 
         // Make sure that init() and destroy() were called correctly
-        assertTrue(sci.getServlet().isOk());
-        assertTrue(loadOnStartUp == sci.getServlet().isInitCalled());
+        Assert.assertTrue(sci.getServlet().isOk());
+        Assert.assertTrue(loadOnStartUp == sci.getServlet().isInitCalled());
     }
 
     public static final class Bug51376SCI
@@ -658,14 +652,14 @@ public class TestStandardContext extends TomcatBaseTest {
         client.doRequest("/regular", false, false);
 
         // Servlet attempts to read parts which will trigger an ISE
-        assertTrue(client.isResponse500());
+        Assert.assertTrue(client.isResponse500());
 
         client.reset();
 
         // Make sure regular multipart works properly
         client.doRequest("/multipart", false, true); // send multipart request
 
-        assertEquals("Regular multipart doesn't work",
+        Assert.assertEquals("Regular multipart doesn't work",
                      "parts=1",
                      client.getResponseBody());
 
@@ -676,7 +670,7 @@ public class TestStandardContext extends TomcatBaseTest {
         client.doRequest("/regular", false, true); // send multipart request
 
         // Servlet attempts to read parts which will trigger an ISE
-        assertTrue(client.isResponse500());
+        Assert.assertTrue(client.isResponse500());
 
         client.reset();
 
@@ -685,7 +679,7 @@ public class TestStandardContext extends TomcatBaseTest {
         // there is no @MultipartConfig
         client.doRequest("/regular", true, true); // send multipart request
 
-        assertEquals("Incorrect response for configured casual multipart request",
+        Assert.assertEquals("Incorrect response for configured casual multipart request",
                      "parts=1",
                      client.getResponseBody());
 
@@ -870,13 +864,13 @@ public class TestStandardContext extends TomcatBaseTest {
 
         // first we test the flag itself, which can be set on the Host and
         // Context
-        assertFalse(context.getComputedFailCtxIfServletStartFails());
+        Assert.assertFalse(context.getComputedFailCtxIfServletStartFails());
 
         StandardHost host = (StandardHost) tomcat.getHost();
         host.setFailCtxIfServletStartFails(true);
-        assertTrue(context.getComputedFailCtxIfServletStartFails());
+        Assert.assertTrue(context.getComputedFailCtxIfServletStartFails());
         context.setFailCtxIfServletStartFails(Boolean.FALSE);
-        assertFalse("flag on Context should override Host config",
+        Assert.assertFalse("flag on Context should override Host config",
                 context.getComputedFailCtxIfServletStartFails());
 
         // second, we test the actual effect of the flag on the startup
@@ -885,11 +879,11 @@ public class TestStandardContext extends TomcatBaseTest {
         servlet.setLoadOnStartup(1);
 
         tomcat.start();
-        assertTrue("flag false should not fail deployment", context.getState()
+        Assert.assertTrue("flag false should not fail deployment", context.getState()
                 .isAvailable());
 
         tomcat.stop();
-        assertFalse(context.getState().isAvailable());
+        Assert.assertFalse(context.getState().isAvailable());
 
         host.removeChild(context);
         context = (StandardContext) tomcat.addContext("",
@@ -898,7 +892,7 @@ public class TestStandardContext extends TomcatBaseTest {
                 new FailingStartupServlet());
         servlet.setLoadOnStartup(1);
         tomcat.start();
-        assertFalse("flag true should fail deployment", context.getState()
+        Assert.assertFalse("flag true should fail deployment", context.getState()
                 .isAvailable());
     }
 

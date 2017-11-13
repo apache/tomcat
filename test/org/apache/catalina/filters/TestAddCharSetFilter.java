@@ -29,8 +29,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -119,9 +118,9 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
         getUrl("http://localhost:" + getPort() + "/", new ByteChunk(), headers);
 
         List<String> ctHeaders = headers.get("Content-Type");
-        assertEquals(1, ctHeaders.size());
+        Assert.assertEquals(1, ctHeaders.size());
         String ct = ctHeaders.get(0).toLowerCase(Locale.ENGLISH);
-        assertEquals("text/plain;charset=" + expected.toLowerCase(Locale.ENGLISH), ct);
+        Assert.assertEquals("text/plain;charset=" + expected.toLowerCase(Locale.ENGLISH), ct);
     }
 
     private static class CharsetServlet extends HttpServlet {

@@ -21,8 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.zip.GZIPOutputStream;
 
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.coyote.Response;
@@ -81,6 +80,6 @@ public class TestGzipOutputFilter {
         byte[] dataExpected = gbos.toByteArray();
 
         // most of the data should have been flushed out
-        assertTrue(dataFound.length >= (dataExpected.length - 20));
+        Assert.assertTrue(dataFound.length >= (dataExpected.length - 20));
     }
 }

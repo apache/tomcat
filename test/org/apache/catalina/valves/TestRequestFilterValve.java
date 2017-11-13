@@ -14,15 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.valves;
 
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -133,7 +129,7 @@ public class TestRequestFilterValve {
             } else if (valve instanceof RemoteHostValve) {
                 ((RemoteHostValve)valve).setAddConnectorPort(true);
             } else {
-                fail("Can only set 'addConnectorPort' for RemoteAddrValve and RemoteHostValve");
+                Assert.fail("Can only set 'addConnectorPort' for RemoteAddrValve and RemoteHostValve");
             }
             msg.append(" addConnectorPort='true'");
         }
@@ -154,10 +150,10 @@ public class TestRequestFilterValve {
 
         // VERIFY
         if (!allowed && auth) {
-            assertEquals(msg.toString(), OK, response.getStatus());
-            assertEquals(msg.toString(), "invalid", request.getHeader("authorization"));
+            Assert.assertEquals(msg.toString(), OK, response.getStatus());
+            Assert.assertEquals(msg.toString(), "invalid", request.getHeader("authorization"));
         } else {
-            assertEquals(msg.toString(), expected, response.getStatus());
+            Assert.assertEquals(msg.toString(), expected, response.getStatus());
         }
     }
 

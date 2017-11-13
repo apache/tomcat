@@ -23,17 +23,13 @@ import java.math.BigInteger;
 import javax.el.ELException;
 import javax.el.ELManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Assert;
 import org.junit.Test;
 
 public class TestELSupport {
     @Test
     public void testEquals() {
-        assertTrue(ELSupport.equals(null, "01", Long.valueOf(1)));
+        Assert.assertTrue(ELSupport.equals(null, "01", Long.valueOf(1)));
     }
 
     @Test
@@ -82,13 +78,13 @@ public class TestELSupport {
     public void testCoerceIntegerToNumber() {
         Integer input = Integer.valueOf(4390241);
         Object output = ELSupport.coerceToType(null, input, Number.class);
-        assertEquals(input, output);
+        Assert.assertEquals(input, output);
     }
 
     @Test
     public void testCoerceNullToNumber() {
         Object output = ELSupport.coerceToType(null, null, Number.class);
-        assertNull(output);
+        Assert.assertNull(output);
     }
 
     @Test
@@ -97,7 +93,7 @@ public class TestELSupport {
         try {
             output = ELSupport.coerceToEnum(null, TestEnumA.VALA1, TestEnumA.class);
         } finally {
-            assertEquals(TestEnumA.VALA1, output);
+            Assert.assertEquals(TestEnumA.VALA1, output);
         }
     }
 
@@ -109,7 +105,7 @@ public class TestELSupport {
         } catch (ELException ele) {
             // Ignore
         }
-        assertNull(output);
+        Assert.assertNull(output);
     }
 
     @Test
@@ -120,7 +116,7 @@ public class TestELSupport {
         } catch (ELException ele) {
             // Ignore
         }
-        assertNull(output);
+        Assert.assertNull(output);
     }
 
     @Test
@@ -265,7 +261,7 @@ public class TestELSupport {
     }
 
     private static void testIsSame(Object value) {
-        assertEquals(value, ELSupport.coerceToNumber(null, value, value.getClass()));
+        Assert.assertEquals(value, ELSupport.coerceToNumber(null, value, value.getClass()));
     }
 
     private static enum TestEnumA {

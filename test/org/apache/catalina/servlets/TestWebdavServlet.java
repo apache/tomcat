@@ -23,8 +23,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
@@ -57,23 +56,23 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         int rc =getUrl("http://localhost:" + getPort() + contextPath +
                 "/WEB-INF/web.xml", res, null);
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
         rc =getUrl("http://localhost:" + getPort() + contextPath +
                 "/WEB-INF/doesntexistanywhere", res, null);
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
         rc =getUrl("http://localhost:" + getPort() + contextPath +
                 "/WEB-INF/", res, null);
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
         rc =getUrl("http://localhost:" + getPort() + contextPath +
                 "/META-INF/MANIFEST.MF", res, null);
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
         rc =getUrl("http://localhost:" + getPort() + contextPath +
                 "/META-INF/doesntexistanywhere", res, null);
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
     }
 
@@ -106,41 +105,41 @@ public class TestWebdavServlet extends TomcatBaseTest {
         int rc =getUrl("http://localhost:" + getPort() + contextPath +
                 "/webdav/WEB-INF/web.xml", res, null);
 
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
         rc =getUrl("http://localhost:" + getPort() + contextPath +
                 "/webdav/WEB-INF/doesntexistanywhere", res, null);
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
         rc =getUrl("http://localhost:" + getPort() + contextPath +
                 "/webdav/WEB-INF/", res, null);
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
         rc =getUrl("http://localhost:" + getPort() + contextPath +
                 "/webdav/META-INF/MANIFEST.MF", res, null);
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
         rc =getUrl("http://localhost:" + getPort() + contextPath +
                 "/webdav/META-INF/doesntexistanywhere", res, null);
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
         // Make sure WebdavServlet is serving resources
         // relative to the map/mount point
         final ByteChunk rootResource = new ByteChunk();
         rc =getUrl("http://localhost:" + getPort() + contextPath +
                 "/index.html", rootResource, null);
-        assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         final ByteChunk subpathResource = new ByteChunk();
         rc =getUrl("http://localhost:" + getPort() + contextPath +
                 "/webdav/index.html", subpathResource, null);
-        assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
-        assertEquals(rootResource.toString(), subpathResource.toString());
+        Assert.assertEquals(rootResource.toString(), subpathResource.toString());
 
         rc =getUrl("http://localhost:" + getPort() + contextPath +
                 "/webdav/static/index.html", res, null);
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
     }
 

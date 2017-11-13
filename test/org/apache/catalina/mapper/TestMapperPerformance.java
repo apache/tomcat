@@ -16,8 +16,7 @@
  */
 package org.apache.catalina.mapper;
 
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -55,7 +54,7 @@ public class TestMapperPerformance extends TestMapper {
             time = testPerformanceImpl(requestedHostName);
             log.warn("testPerformance() test rerun completed in " + time + " ms");
         }
-        assertTrue(String.valueOf(time), time < maxTime);
+        Assert.assertTrue(String.valueOf(time), time < maxTime);
     }
 
     private long testPerformanceImpl(String requestedHostName) throws Exception {

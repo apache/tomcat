@@ -31,9 +31,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -94,7 +92,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
         }
         int index = orderedLibs.indexOf("resources.jar");
         int index2 = orderedLibs.indexOf("resources2.jar");
-        assertTrue(orderedLibs.toString(), index >= 0 && index2 >= 0
+        Assert.assertTrue(orderedLibs.toString(), index >= 0 && index2 >= 0
                 && index < index2);
     }
 
@@ -147,7 +145,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
         "<p>resourceB.jsp in resources.jar</p>");
 
         // Check ordering, for BZ 54391
-        assertEquals(Arrays.asList("resources.jar", "resources2.jar"), ctx
+        Assert.assertEquals(Arrays.asList("resources.jar", "resources2.jar"), ctx
                 .getServletContext().getAttribute(ServletContext.ORDERED_LIBS));
 
         tomcat.getHost().removeChild(ctx);
@@ -169,7 +167,7 @@ public class TestStandardContextResources extends TomcatBaseTest {
         "<p>resourceB.jsp in resources2.jar</p>");
 
         // Check ordering, for BZ 54391
-        assertEquals(Arrays.asList("resources2.jar", "resources.jar"), ctx
+        Assert.assertEquals(Arrays.asList("resources2.jar", "resources.jar"), ctx
                 .getServletContext().getAttribute(ServletContext.ORDERED_LIBS));
     }
 
@@ -273,11 +271,11 @@ public class TestStandardContextResources extends TomcatBaseTest {
         ByteChunk res = new ByteChunk();
         int sc = getUrl("http://localhost:" + getPort() + pageUrl, res, null);
 
-        assertEquals(expectedStatus, sc);
+        Assert.assertEquals(expectedStatus, sc);
 
         if (expectedStatus == 200) {
             String result = res.toString();
-            assertTrue(result, result.indexOf(expectedBody) > 0);
+            Assert.assertTrue(result, result.indexOf(expectedBody) > 0);
         }
     }
 }

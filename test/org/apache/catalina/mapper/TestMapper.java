@@ -20,13 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -165,14 +159,14 @@ public class TestMapper extends LoggingBaseTest {
 
         // Check we have the right number
         // (added 17 including one host alias. Three duplicates do not increase the count.)
-        assertEquals(19, mapper.hosts.length);
+        Assert.assertEquals(19, mapper.hosts.length);
 
         // Make sure adding a duplicate *does not* overwrite
         final int iowPos = 4;
-        assertEquals("blah7", mapper.hosts[iowPos].object.getName());
+        Assert.assertEquals("blah7", mapper.hosts[iowPos].object.getName());
 
         final int qwigPos = 10;
-        assertEquals("blah14", mapper.hosts[qwigPos].object.getName());
+        Assert.assertEquals("blah14", mapper.hosts[qwigPos].object.getName());
 
         // Check for alphabetical order of host names
         String previous;
@@ -180,69 +174,69 @@ public class TestMapper extends LoggingBaseTest {
         for (int i = 1; i < mapper.hosts.length; i++) {
             previous = current;
             current = mapper.hosts[i].name;
-            assertTrue(previous.compareTo(current) < 0);
+            Assert.assertTrue(previous.compareTo(current) < 0);
         }
 
         // Check that host alias has the same data
         Mapper.MappedHost host = mapper.hosts[iowPos];
         Mapper.MappedHost alias = mapper.hosts[iowPos + 1];
-        assertEquals("iowejoiejfoiew", host.name);
-        assertEquals("iowejoiejfoiew_alias", alias.name);
-        assertFalse(host.isAlias());
-        assertTrue(alias.isAlias());
-        assertEquals(host.object, alias.object);
+        Assert.assertEquals("iowejoiejfoiew", host.name);
+        Assert.assertEquals("iowejoiejfoiew_alias", alias.name);
+        Assert.assertFalse(host.isAlias());
+        Assert.assertTrue(alias.isAlias());
+        Assert.assertEquals(host.object, alias.object);
 
         // Test addContextVersion() followed by addHost()
         Host hostZ = createHost("zzzz");
         Context contextZ = createContext("contextZ");
 
-        assertEquals(19, mapper.hosts.length);
+        Assert.assertEquals(19, mapper.hosts.length);
         mapper.addContextVersion("zzzz", hostZ, "/", "", contextZ, null, null,
                 null);
-        assertEquals(20, mapper.hosts.length);
+        Assert.assertEquals(20, mapper.hosts.length);
 
         mapper.addHost("zzzz", new String[] { "zzzz_alias1", "zzzz_alias2" },
                 hostZ);
-        assertEquals(22, mapper.hosts.length);
+        Assert.assertEquals(22, mapper.hosts.length);
 
-        assertEquals("zzzz", mapper.hosts[19].name);
-        assertEquals("zzzz_alias1", mapper.hosts[20].name);
-        assertEquals("zzzz_alias2", mapper.hosts[21].name);
-        assertEquals(2, mapper.hosts[19].getAliases().size());
-        assertSame(contextZ,
+        Assert.assertEquals("zzzz", mapper.hosts[19].name);
+        Assert.assertEquals("zzzz_alias1", mapper.hosts[20].name);
+        Assert.assertEquals("zzzz_alias2", mapper.hosts[21].name);
+        Assert.assertEquals(2, mapper.hosts[19].getAliases().size());
+        Assert.assertSame(contextZ,
                 mapper.hosts[19].contextList.contexts[0].versions[0].object);
-        assertSame(contextZ,
+        Assert.assertSame(contextZ,
                 mapper.hosts[21].contextList.contexts[0].versions[0].object);
     }
 
     @Test
     public void testRemoveHost() {
-        assertEquals(19, mapper.hosts.length);
+        Assert.assertEquals(19, mapper.hosts.length);
         mapper.removeHostAlias("iowejoiejfoiew");
         mapper.removeHost("iowejoiejfoiew_alias");
-        assertEquals(19, mapper.hosts.length); // No change
+        Assert.assertEquals(19, mapper.hosts.length); // No change
         mapper.removeHostAlias("iowejoiejfoiew_alias");
-        assertEquals(18, mapper.hosts.length); // Removed
+        Assert.assertEquals(18, mapper.hosts.length); // Removed
 
         mapper.addHostAlias("iowejoiejfoiew", "iowejoiejfoiew_alias");
-        assertEquals(19, mapper.hosts.length);
+        Assert.assertEquals(19, mapper.hosts.length);
 
         final int iowPos = 4;
         Mapper.MappedHost hostMapping = mapper.hosts[iowPos];
         Mapper.MappedHost aliasMapping = mapper.hosts[iowPos + 1];
-        assertEquals("iowejoiejfoiew_alias", aliasMapping.name);
-        assertTrue(aliasMapping.isAlias());
-        assertSame(hostMapping.object, aliasMapping.object);
+        Assert.assertEquals("iowejoiejfoiew_alias", aliasMapping.name);
+        Assert.assertTrue(aliasMapping.isAlias());
+        Assert.assertSame(hostMapping.object, aliasMapping.object);
 
-        assertEquals("iowejoiejfoiew", hostMapping.getRealHostName());
-        assertEquals("iowejoiejfoiew", aliasMapping.getRealHostName());
-        assertSame(hostMapping, hostMapping.getRealHost());
-        assertSame(hostMapping, aliasMapping.getRealHost());
+        Assert.assertEquals("iowejoiejfoiew", hostMapping.getRealHostName());
+        Assert.assertEquals("iowejoiejfoiew", aliasMapping.getRealHostName());
+        Assert.assertSame(hostMapping, hostMapping.getRealHost());
+        Assert.assertSame(hostMapping, aliasMapping.getRealHost());
 
         mapper.removeHost("iowejoiejfoiew");
-        assertEquals(17, mapper.hosts.length); // Both host and alias removed
+        Assert.assertEquals(17, mapper.hosts.length); // Both host and alias removed
         for (Mapper.MappedHost host : mapper.hosts) {
-            assertTrue(host.name, !host.name.startsWith("iowejoiejfoiew"));
+            Assert.assertTrue(host.name, !host.name.startsWith("iowejoiejfoiew"));
         }
     }
 
@@ -261,13 +255,13 @@ public class TestMapper extends LoggingBaseTest {
         uri.getCharChunk().setLimit(-1);
 
         mapper.map(host, uri, null, mappingData);
-        assertEquals("blah7", mappingData.host.getName());
-        assertEquals("context2", mappingData.context.getName());
-        assertEquals("wrapper5", mappingData.wrapper.getName());
-        assertEquals("/foo/bar", mappingData.contextPath.toString());
-        assertEquals("/blah/bobou", mappingData.wrapperPath.toString());
-        assertEquals("/foo", mappingData.pathInfo.toString());
-        assertTrue(mappingData.redirectPath.isNull());
+        Assert.assertEquals("blah7", mappingData.host.getName());
+        Assert.assertEquals("context2", mappingData.context.getName());
+        Assert.assertEquals("wrapper5", mappingData.wrapper.getName());
+        Assert.assertEquals("/foo/bar", mappingData.contextPath.toString());
+        Assert.assertEquals("/blah/bobou", mappingData.wrapperPath.toString());
+        Assert.assertEquals("/foo", mappingData.pathInfo.toString());
+        Assert.assertTrue(mappingData.redirectPath.isNull());
 
         mappingData.recycle();
         uri.recycle();
@@ -275,13 +269,13 @@ public class TestMapper extends LoggingBaseTest {
         uri.toChars();
         uri.getCharChunk().setLimit(-1);
         mapper.map(host, uri, null, mappingData);
-        assertEquals("blah7", mappingData.host.getName());
-        assertEquals("context3", mappingData.context.getName());
-        assertEquals("wrapper7", mappingData.wrapper.getName());
-        assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
-        assertEquals("/bobou", mappingData.wrapperPath.toString());
-        assertEquals("/foo", mappingData.pathInfo.toString());
-        assertTrue(mappingData.redirectPath.isNull());
+        Assert.assertEquals("blah7", mappingData.host.getName());
+        Assert.assertEquals("context3", mappingData.context.getName());
+        Assert.assertEquals("wrapper7", mappingData.wrapper.getName());
+        Assert.assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
+        Assert.assertEquals("/bobou", mappingData.wrapperPath.toString());
+        Assert.assertEquals("/foo", mappingData.pathInfo.toString());
+        Assert.assertTrue(mappingData.redirectPath.isNull());
 
         mappingData.recycle();
         uri.recycle();
@@ -289,26 +283,26 @@ public class TestMapper extends LoggingBaseTest {
         uri.toChars();
         uri.getCharChunk().setLimit(-1);
         mapper.map(wildcard, uri, null, mappingData);
-        assertEquals("blah16", mappingData.host.getName());
-        assertEquals("context4", mappingData.context.getName());
-        assertEquals("context4-defaultWrapper", mappingData.wrapper.getName());
-        assertEquals("", mappingData.contextPath.toString());
-        assertEquals("/foo/bar/bla/bobou/foo", mappingData.wrapperPath.toString());
-        assertTrue(mappingData.pathInfo.isNull());
-        assertTrue(mappingData.redirectPath.isNull());
+        Assert.assertEquals("blah16", mappingData.host.getName());
+        Assert.assertEquals("context4", mappingData.context.getName());
+        Assert.assertEquals("context4-defaultWrapper", mappingData.wrapper.getName());
+        Assert.assertEquals("", mappingData.contextPath.toString());
+        Assert.assertEquals("/foo/bar/bla/bobou/foo", mappingData.wrapperPath.toString());
+        Assert.assertTrue(mappingData.pathInfo.isNull());
+        Assert.assertTrue(mappingData.redirectPath.isNull());
 
         mappingData.recycle();
         uri.setString("/foo/bar/bla/bobou/foo");
         uri.toChars();
         uri.getCharChunk().setLimit(-1);
         mapper.map(alias, uri, null, mappingData);
-        assertEquals("blah7", mappingData.host.getName());
-        assertEquals("context3", mappingData.context.getName());
-        assertEquals("wrapper7", mappingData.wrapper.getName());
-        assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
-        assertEquals("/bobou", mappingData.wrapperPath.toString());
-        assertEquals("/foo", mappingData.pathInfo.toString());
-        assertTrue(mappingData.redirectPath.isNull());
+        Assert.assertEquals("blah7", mappingData.host.getName());
+        Assert.assertEquals("context3", mappingData.context.getName());
+        Assert.assertEquals("wrapper7", mappingData.wrapper.getName());
+        Assert.assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
+        Assert.assertEquals("/bobou", mappingData.wrapperPath.toString());
+        Assert.assertEquals("/foo", mappingData.pathInfo.toString());
+        Assert.assertTrue(mappingData.redirectPath.isNull());
     }
 
     @Test
@@ -326,26 +320,26 @@ public class TestMapper extends LoggingBaseTest {
 
         // Verifying configuration created by setUp()
         Mapper.MappedHost mappedHost = mapper.hosts[iowPos];
-        assertEquals(hostName, mappedHost.name);
+        Assert.assertEquals(hostName, mappedHost.name);
         Mapper.MappedContext mappedContext = mappedHost.contextList.contexts[contextPos];
-        assertEquals(contextPath, mappedContext.name);
-        assertEquals(1, mappedContext.versions.length);
-        assertEquals("0", mappedContext.versions[0].name);
+        Assert.assertEquals(contextPath, mappedContext.name);
+        Assert.assertEquals(1, mappedContext.versions.length);
+        Assert.assertEquals("0", mappedContext.versions[0].name);
         Host oldHost = mappedHost.object;
         Context oldContext = mappedContext.versions[0].object;
-        assertEquals("context2", oldContext.getName());
+        Assert.assertEquals("context2", oldContext.getName());
 
         Context oldContext1 = mappedHost.contextList.contexts[contextPos - 1].versions[0].object;
-        assertEquals("context1", oldContext1.getName());
+        Assert.assertEquals("context1", oldContext1.getName());
 
         mappingData.recycle();
         mapper.map(hostMB, uriMB, null, mappingData);
-        assertEquals("blah7", mappingData.host.getName());
-        assertEquals("context2", mappingData.context.getName());
-        assertEquals("wrapper5", mappingData.wrapper.getName());
+        Assert.assertEquals("blah7", mappingData.host.getName());
+        Assert.assertEquals("context2", mappingData.context.getName());
+        Assert.assertEquals("wrapper5", mappingData.wrapper.getName());
         mappingData.recycle();
         mapper.map(oldContext, uriMB, mappingData);
-        assertEquals("wrapper5", mappingData.wrapper.getName());
+        Assert.assertEquals("wrapper5", mappingData.wrapper.getName());
 
         Context newContext = createContext("newContext");
         mapper.addContextVersion(
@@ -359,40 +353,40 @@ public class TestMapper extends LoggingBaseTest {
                 Arrays.asList(new WrapperMappingInfo[] { new WrapperMappingInfo(
                         "/", createWrapper("newContext-default"), false, false) }));
 
-        assertEquals(2, mappedContext.versions.length);
-        assertEquals("0", mappedContext.versions[0].name);
-        assertEquals("1", mappedContext.versions[1].name);
+        Assert.assertEquals(2, mappedContext.versions.length);
+        Assert.assertEquals("0", mappedContext.versions[0].name);
+        Assert.assertEquals("1", mappedContext.versions[1].name);
         mappingData.recycle();
         mapper.map(hostMB, uriMB, null, mappingData);
-        assertEquals("newContext", mappingData.context.getName());
-        assertEquals("newContext-default", mappingData.wrapper.getName());
+        Assert.assertEquals("newContext", mappingData.context.getName());
+        Assert.assertEquals("newContext-default", mappingData.wrapper.getName());
         mappingData.recycle();
         mapper.map(newContext, uriMB, mappingData);
-        assertEquals("newContext-default", mappingData.wrapper.getName());
+        Assert.assertEquals("newContext-default", mappingData.wrapper.getName());
 
         mapper.removeContextVersion(oldContext, hostName, contextPath, "0");
 
-        assertEquals(1, mappedContext.versions.length);
-        assertEquals("1", mappedContext.versions[0].name);
+        Assert.assertEquals(1, mappedContext.versions.length);
+        Assert.assertEquals("1", mappedContext.versions[0].name);
         mappingData.recycle();
         mapper.map(hostMB, uriMB, null, mappingData);
-        assertEquals("newContext", mappingData.context.getName());
-        assertEquals("newContext-default", mappingData.wrapper.getName());
+        Assert.assertEquals("newContext", mappingData.context.getName());
+        Assert.assertEquals("newContext-default", mappingData.wrapper.getName());
         mappingData.recycle();
         mapper.map(newContext, uriMB, mappingData);
-        assertEquals("newContext-default", mappingData.wrapper.getName());
+        Assert.assertEquals("newContext-default", mappingData.wrapper.getName());
 
         mapper.removeContextVersion(oldContext, hostName, contextPath, "1");
 
-        assertNotSame(mappedContext, mappedHost.contextList.contexts[contextPos]);
-        assertEquals("/foo/bar/bla", mappedHost.contextList.contexts[contextPos].name);
+        Assert.assertNotSame(mappedContext, mappedHost.contextList.contexts[contextPos]);
+        Assert.assertEquals("/foo/bar/bla", mappedHost.contextList.contexts[contextPos].name);
         mappingData.recycle();
         mapper.map(hostMB, uriMB, null, mappingData);
-        assertEquals("context1", mappingData.context.getName());
-        assertEquals("context1-defaultWrapper", mappingData.wrapper.getName());
+        Assert.assertEquals("context1", mappingData.context.getName());
+        Assert.assertEquals("context1-defaultWrapper", mappingData.wrapper.getName());
         mappingData.recycle();
         mapper.map(oldContext1, uriMB, mappingData);
-        assertEquals("context1-defaultWrapper", mappingData.wrapper.getName());
+        Assert.assertEquals("context1-defaultWrapper", mappingData.wrapper.getName());
 
         mapper.addContextVersion(
                 hostName,
@@ -406,16 +400,16 @@ public class TestMapper extends LoggingBaseTest {
                         "/", createWrapper("newContext-defaultWrapper2"), false, false) }));
         mappedContext = mappedHost.contextList.contexts[contextPos];
 
-        assertEquals(contextPath, mappedContext.name);
-        assertEquals(1, mappedContext.versions.length);
-        assertEquals("0", mappedContext.versions[0].name);
+        Assert.assertEquals(contextPath, mappedContext.name);
+        Assert.assertEquals(1, mappedContext.versions.length);
+        Assert.assertEquals("0", mappedContext.versions[0].name);
         mappingData.recycle();
         mapper.map(hostMB, uriMB, null, mappingData);
-        assertEquals("newContext", mappingData.context.getName());
-        assertEquals("newContext-defaultWrapper2", mappingData.wrapper.getName());
+        Assert.assertEquals("newContext", mappingData.context.getName());
+        Assert.assertEquals("newContext-defaultWrapper2", mappingData.wrapper.getName());
         mappingData.recycle();
         mapper.map(newContext, uriMB, mappingData);
-        assertEquals("newContext-defaultWrapper2", mappingData.wrapper.getName());
+        Assert.assertEquals("newContext-defaultWrapper2", mappingData.wrapper.getName());
     }
 
     @Test
@@ -433,26 +427,26 @@ public class TestMapper extends LoggingBaseTest {
 
         // Verifying configuration created by setUp()
         Mapper.MappedHost mappedHost = mapper.hosts[iowPos];
-        assertEquals(hostName, mappedHost.name);
+        Assert.assertEquals(hostName, mappedHost.name);
         Mapper.MappedContext mappedContext = mappedHost.contextList.contexts[contextPos];
-        assertEquals(contextPath, mappedContext.name);
-        assertEquals(1, mappedContext.versions.length);
-        assertEquals("0", mappedContext.versions[0].name);
+        Assert.assertEquals(contextPath, mappedContext.name);
+        Assert.assertEquals(1, mappedContext.versions.length);
+        Assert.assertEquals("0", mappedContext.versions[0].name);
         Host oldHost = mappedHost.object;
         Context oldContext = mappedContext.versions[0].object;
-        assertEquals("context2", oldContext.getName());
+        Assert.assertEquals("context2", oldContext.getName());
 
         Context oldContext1 = mappedHost.contextList.contexts[contextPos - 1].versions[0].object;
-        assertEquals("context1", oldContext1.getName());
+        Assert.assertEquals("context1", oldContext1.getName());
 
         mappingData.recycle();
         mapper.map(hostMB, uriMB, null, mappingData);
-        assertEquals("blah7", mappingData.host.getName());
-        assertEquals("context2", mappingData.context.getName());
-        assertEquals("wrapper5", mappingData.wrapper.getName());
+        Assert.assertEquals("blah7", mappingData.host.getName());
+        Assert.assertEquals("context2", mappingData.context.getName());
+        Assert.assertEquals("wrapper5", mappingData.wrapper.getName());
         mappingData.recycle();
         mapper.map(oldContext, uriMB, mappingData);
-        assertEquals("wrapper5", mappingData.wrapper.getName());
+        Assert.assertEquals("wrapper5", mappingData.wrapper.getName());
 
         // Mark context as paused
         // This is what happens when context reload starts
@@ -460,14 +454,14 @@ public class TestMapper extends LoggingBaseTest {
 
         mappingData.recycle();
         mapper.map(hostMB, uriMB, null, mappingData);
-        assertEquals("blah7", mappingData.host.getName());
-        assertEquals("context2", mappingData.context.getName());
+        Assert.assertEquals("blah7", mappingData.host.getName());
+        Assert.assertEquals("context2", mappingData.context.getName());
         // Wrapper is not mapped for incoming requests if context is paused
-        assertNull(mappingData.wrapper);
+        Assert.assertNull(mappingData.wrapper);
         mappingData.recycle();
         mapper.map(oldContext, uriMB, mappingData);
         // Wrapper is mapped for mapping method used by forward or include dispatch
-        assertEquals("wrapper5", mappingData.wrapper.getName());
+        Assert.assertEquals("wrapper5", mappingData.wrapper.getName());
 
         // Re-add the same context, but different list of wrappers
         // This is what happens when context reload completes
@@ -483,18 +477,18 @@ public class TestMapper extends LoggingBaseTest {
                         "/", createWrapper("newDefaultWrapper"), false, false) }));
 
         mappedContext = mappedHost.contextList.contexts[contextPos];
-        assertEquals(contextPath, mappedContext.name);
-        assertEquals(1, mappedContext.versions.length);
-        assertEquals("0", mappedContext.versions[0].name);
+        Assert.assertEquals(contextPath, mappedContext.name);
+        Assert.assertEquals(1, mappedContext.versions.length);
+        Assert.assertEquals("0", mappedContext.versions[0].name);
 
         mappingData.recycle();
         mapper.map(hostMB, uriMB, null, mappingData);
-        assertEquals("blah7", mappingData.host.getName());
-        assertEquals("context2", mappingData.context.getName());
-        assertEquals("newDefaultWrapper", mappingData.wrapper.getName());
+        Assert.assertEquals("blah7", mappingData.host.getName());
+        Assert.assertEquals("context2", mappingData.context.getName());
+        Assert.assertEquals("newDefaultWrapper", mappingData.wrapper.getName());
         mappingData.recycle();
         mapper.map(oldContext, uriMB, mappingData);
-        assertEquals("newDefaultWrapper", mappingData.wrapper.getName());
+        Assert.assertEquals("newDefaultWrapper", mappingData.wrapper.getName());
     }
 
     @Test
@@ -545,24 +539,24 @@ public class TestMapper extends LoggingBaseTest {
         uriMB.setChars(uri, 0, uri.length);
 
         mapper.map(hostMB, uriMB, null, mappingData);
-        assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
+        Assert.assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
 
         mappingData.recycle();
         uriMB.setChars(uri, 0, uri.length);
         mapper.map(aliasMB, uriMB, null, mappingData);
-        assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
+        Assert.assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
 
         t.start();
         while (running.get()) {
             mappingData.recycle();
             uriMB.setChars(uri, 0, uri.length);
             mapper.map(hostMB, uriMB, null, mappingData);
-            assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
+            Assert.assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
 
             mappingData.recycle();
             uriMB.setChars(uri, 0, uri.length);
             mapper.map(aliasMB, uriMB, null, mappingData);
-            assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
+            Assert.assertEquals("/foo/bar/bla", mappingData.contextPath.toString());
         }
     }
 }

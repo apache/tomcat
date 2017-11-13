@@ -18,9 +18,8 @@ package org.apache.catalina.tribes.group.interceptors;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -77,7 +76,9 @@ public class TestDomainFilterInterceptor {
         for (int i=0; i<threads.length; i++ ) threads[i].start();
         for (int i=0; i<threads.length; i++ ) threads[i].join();
         System.out.println("All channels started.");
-        for (int i=listeners.length-1; i>=0; i-- ) assertEquals("Checking member arrival length",0,listeners[i].members.size());
+        for (int i=listeners.length-1; i>=0; i-- ) {
+            Assert.assertEquals("Checking member arrival length",0,listeners[i].members.size());
+        }
     }
 
     @After

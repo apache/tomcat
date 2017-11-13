@@ -18,9 +18,7 @@ package org.apache.catalina.tribes.membership;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -51,13 +49,13 @@ public class TestMemberImplSerialization {
 
     @Test
     public void testCompare() throws Exception {
-        assertTrue(m1.equals(m2));
-        assertTrue(m2.equals(m1));
-        assertTrue(p1.equals(m2));
-        assertFalse(m1.equals(p2));
-        assertFalse(m1.equals(p2));
-        assertFalse(m2.equals(p2));
-        assertFalse(p1.equals(p2));
+        Assert.assertTrue(m1.equals(m2));
+        Assert.assertTrue(m2.equals(m1));
+        Assert.assertTrue(p1.equals(m2));
+        Assert.assertFalse(m1.equals(p2));
+        Assert.assertFalse(m1.equals(p2));
+        Assert.assertFalse(m2.equals(p2));
+        Assert.assertFalse(p1.equals(p2));
     }
 
     @Test
@@ -68,8 +66,8 @@ public class TestMemberImplSerialization {
         Member a1 = MemberImpl.getMember(md1);
         Member a2 = MemberImpl.getMember(md2);
 
-        assertTrue(a1.getUdpPort()==a2.getUdpPort());
-        assertTrue(a1.getUdpPort()==udpPort);
+        Assert.assertTrue(a1.getUdpPort()==a2.getUdpPort());
+        Assert.assertTrue(a1.getUdpPort()==udpPort);
     }
 
     @Test
@@ -77,23 +75,23 @@ public class TestMemberImplSerialization {
         Member m = m1;
         byte[] md1 = m.getData(false,true);
         byte[] mda1 = m.getData(false,false);
-        assertTrue(Arrays.equals(md1,mda1));
-        assertTrue(md1==mda1);
+        Assert.assertTrue(Arrays.equals(md1,mda1));
+        Assert.assertTrue(md1==mda1);
         mda1 = m.getData(true,true);
         Member ma1 = MemberImpl.getMember(mda1);
-        assertTrue(compareMembers(m,ma1));
+        Assert.assertTrue(compareMembers(m,ma1));
         mda1 = p1.getData(false);
-        assertFalse(Arrays.equals(md1,mda1));
+        Assert.assertFalse(Arrays.equals(md1,mda1));
         ma1 = MemberImpl.getMember(mda1);
-        assertTrue(compareMembers(p1,ma1));
+        Assert.assertTrue(compareMembers(p1,ma1));
 
         md1 = m.getData(true,true);
         Thread.sleep(50);
         mda1 = m.getData(true,true);
         Member a1 = MemberImpl.getMember(md1);
         Member a2 = MemberImpl.getMember(mda1);
-        assertTrue(a1.equals(a2));
-        assertFalse(Arrays.equals(md1,mda1));
+        Assert.assertTrue(a1.equals(a2));
+        Assert.assertFalse(Arrays.equals(md1,mda1));
 
 
     }

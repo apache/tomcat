@@ -28,9 +28,7 @@ import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.jasper.el.ELContextImpl;
@@ -53,14 +51,14 @@ public class TestValueExpressionImpl {
 
         // First check the basics work
         String result = (String) ve.getValue(context);
-        assertEquals("Tomcat", result);
+        Assert.assertEquals("Tomcat", result);
 
         // Now check the value reference
         ValueReference vr = ve.getValueReference(context);
-        assertNotNull(vr);
+        Assert.assertNotNull(vr);
 
-        assertEquals(beanB, vr.getBase());
-        assertEquals("name", vr.getProperty());
+        Assert.assertEquals(beanB, vr.getBase());
+        Assert.assertEquals("name", vr.getProperty());
     }
 
     @Test
@@ -85,10 +83,10 @@ public class TestValueExpressionImpl {
 
         // Now check the value reference
         ValueReference vr = ve.getValueReference(context);
-        assertNotNull(vr);
+        Assert.assertNotNull(vr);
 
-        assertEquals(beanB, vr.getBase());
-        assertEquals("name", vr.getProperty());
+        Assert.assertEquals(beanB, vr.getBase());
+        Assert.assertEquals("name", vr.getProperty());
     }
 
     @Test
@@ -110,14 +108,14 @@ public class TestValueExpressionImpl {
 
         // First check the basics work
         String result = (String) ve.getValue(context);
-        assertEquals("Tomcat", result);
+        Assert.assertEquals("Tomcat", result);
 
         // Now check the value reference
         ValueReference vr = ve.getValueReference(context);
-        assertNotNull(vr);
+        Assert.assertNotNull(vr);
 
-        assertEquals(beanB, vr.getBase());
-        assertEquals("name", vr.getProperty());
+        Assert.assertEquals(beanB, vr.getBase());
+        Assert.assertEquals("name", vr.getProperty());
     }
 
     @Test
@@ -135,12 +133,12 @@ public class TestValueExpressionImpl {
         ValueExpression ve1 = factory.createValueExpression(
                 context, "${testEnum}", String.class);
         String result1 = (String) ve1.getValue(context);
-        assertEquals("APPLE", result1);
+        Assert.assertEquals("APPLE", result1);
 
         ValueExpression ve2 = factory.createValueExpression(
                 context, "foo${testEnum}bar", String.class);
         String result2 = (String) ve2.getValue(context);
-        assertEquals("fooAPPLEbar", result2);
+        Assert.assertEquals("fooAPPLEbar", result2);
     }
 
     @Test
@@ -162,12 +160,12 @@ public class TestValueExpressionImpl {
         ValueExpression ve1 = factory.createValueExpression(
                 context, "${map.key1}", Object.class);
         ve1.setValue(context, o2);
-        assertEquals(o2, ve1.getValue(context));
+        Assert.assertEquals(o2, ve1.getValue(context));
 
         ValueExpression ve2 = factory.createValueExpression(
                 context, "${map.key2}", Object.class);
         ve2.setValue(context, o1);
-        assertEquals(o1, ve2.getValue(context));
+        Assert.assertEquals(o1, ve2.getValue(context));
     }
 
     @Test
@@ -189,12 +187,12 @@ public class TestValueExpressionImpl {
         ValueExpression ve1 = factory.createValueExpression(
                 context, "${list[0]}", Object.class);
         ve1.setValue(context, o2);
-        assertEquals(o2, ve1.getValue(context));
+        Assert.assertEquals(o2, ve1.getValue(context));
 
         ValueExpression ve2 = factory.createValueExpression(
                 context, "${list[1]}", Object.class);
         ve2.setValue(context, o1);
-        assertEquals(o1, ve2.getValue(context));
+        Assert.assertEquals(o1, ve2.getValue(context));
     }
 
 
@@ -217,7 +215,7 @@ public class TestValueExpressionImpl {
                 context, "${beanA.valList.size()}", Integer.class);
 
         Integer result = (Integer) ve.getValue(context);
-        assertEquals(Integer.valueOf(0), result);
+        Assert.assertEquals(Integer.valueOf(0), result);
     }
 
 
@@ -239,7 +237,7 @@ public class TestValueExpressionImpl {
                 context, "${list.size()}", Integer.class);
 
         Integer result = (Integer) ve.getValue(context);
-        assertEquals(Integer.valueOf(0), result);
+        Assert.assertEquals(Integer.valueOf(0), result);
     }
 
 
@@ -259,11 +257,11 @@ public class TestValueExpressionImpl {
 
         // First check the basics work
         String result = (String) ve.getValue(context);
-        assertEquals("Tomcat", result);
+        Assert.assertEquals("Tomcat", result);
 
         // Now set the value to null
         ve.setValue(context, null);
 
-        assertEquals("", beanB.getName());
+        Assert.assertEquals("", beanB.getName());
     }
 }

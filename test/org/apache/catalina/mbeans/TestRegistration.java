@@ -28,10 +28,6 @@ import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -152,16 +148,16 @@ public class TestRegistration extends TomcatBaseTest {
         // Verify there are no Catalina or Tomcat MBeans
         Set<ObjectName> onames = mbeanServer.queryNames(new ObjectName("Catalina:*"), null);
         log.info(MBeanDumper.dumpBeans(mbeanServer, onames));
-        assertEquals("Unexpected: " + onames, 0, onames.size());
+        Assert.assertEquals("Unexpected: " + onames, 0, onames.size());
         onames = mbeanServer.queryNames(new ObjectName("Tomcat:*"), null);
         log.info(MBeanDumper.dumpBeans(mbeanServer, onames));
-        assertEquals("Unexpected: " + onames, 0, onames.size());
+        Assert.assertEquals("Unexpected: " + onames, 0, onames.size());
 
         final Tomcat tomcat = getTomcatInstance();
         final File contextDir = new File(getTemporaryDirectory(), "webappFoo");
         addDeleteOnTearDown(contextDir);
         if (!contextDir.mkdirs() && !contextDir.isDirectory()) {
-            fail("Failed to create: [" + contextDir.toString() + "]");
+            Assert.fail("Failed to create: [" + contextDir.toString() + "]");
         }
         Context ctx = tomcat.addContext(contextName, contextDir.getAbsolutePath());
 
@@ -177,7 +173,7 @@ public class TestRegistration extends TomcatBaseTest {
         // Verify there are no Catalina MBeans
         onames = mbeanServer.queryNames(new ObjectName("Catalina:*"), null);
         log.info(MBeanDumper.dumpBeans(mbeanServer, onames));
-        assertEquals("Found: " + onames, 0, onames.size());
+        Assert.assertEquals("Found: " + onames, 0, onames.size());
 
         // Verify there are the correct Tomcat MBeans
         onames = mbeanServer.queryNames(new ObjectName("Tomcat:*"), null);
@@ -207,18 +203,18 @@ public class TestRegistration extends TomcatBaseTest {
         // Did we find all expected MBeans?
         ArrayList<String> missing = new ArrayList<>(expected);
         missing.removeAll(found);
-        assertTrue("Missing Tomcat MBeans: " + missing, missing.isEmpty());
+        Assert.assertTrue("Missing Tomcat MBeans: " + missing, missing.isEmpty());
 
         // Did we find any unexpected MBeans?
         List<String> additional = found;
         additional.removeAll(expected);
-        assertTrue("Unexpected Tomcat MBeans: " + additional, additional.isEmpty());
+        Assert.assertTrue("Unexpected Tomcat MBeans: " + additional, additional.isEmpty());
 
         tomcat.stop();
 
         // There should still be some Tomcat MBeans
         onames = mbeanServer.queryNames(new ObjectName("Tomcat:*"), null);
-        assertTrue("No Tomcat MBeans", onames.size() > 0);
+        Assert.assertTrue("No Tomcat MBeans", onames.size() > 0);
 
         // add a new host
         StandardHost host = new StandardHost();
@@ -228,7 +224,7 @@ public class TestRegistration extends TomcatBaseTest {
         final File contextDir2 = new File(getTemporaryDirectory(), "webappFoo2");
         addDeleteOnTearDown(contextDir2);
         if (!contextDir2.mkdirs() && !contextDir2.isDirectory()) {
-            fail("Failed to create: [" + contextDir2.toString() + "]");
+            Assert.fail("Failed to create: [" + contextDir2.toString() + "]");
         }
         tomcat.addContext(host, contextName + "2", contextDir2.getAbsolutePath());
 
@@ -239,10 +235,10 @@ public class TestRegistration extends TomcatBaseTest {
         // There should be no Catalina MBeans and no Tomcat MBeans
         onames = mbeanServer.queryNames(new ObjectName("Catalina:*"), null);
         log.info(MBeanDumper.dumpBeans(mbeanServer, onames));
-        assertEquals("Remaining: " + onames, 0, onames.size());
+        Assert.assertEquals("Remaining: " + onames, 0, onames.size());
         onames = mbeanServer.queryNames(new ObjectName("Tomcat:*"), null);
         log.info(MBeanDumper.dumpBeans(mbeanServer, onames));
-        assertEquals("Remaining: " + onames, 0, onames.size());
+        Assert.assertEquals("Remaining: " + onames, 0, onames.size());
     }
 
     /*

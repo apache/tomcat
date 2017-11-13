@@ -14,9 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.catalina.loader;
-
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,9 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashSet;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -145,19 +140,19 @@ public class TestVirtualContext extends TomcatBaseTest {
             getUrl(
                 "http://localhost:" + getPort() +
                     "/test/classpathGetResources.jsp?path=rsrc/").toString();
-        assertTrue(
+        Assert.assertTrue(
             allUrls,
             allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp/WEB-INF/classes/rsrc") > 0);
-        assertTrue(
+        Assert.assertTrue(
             allUrls,
             allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp2/WEB-INF/classes/rsrc") > 0);
-        assertTrue(
+        Assert.assertTrue(
             allUrls,
             allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp/WEB-INF/lib/rsrc.jar!/rsrc") > 0);
-        assertTrue(
+        Assert.assertTrue(
             allUrls,
             allUrls.indexOf("/test/webapp-virtual-webapp/target/classes/rsrc") > 0);
-        assertTrue(
+        Assert.assertTrue(
             allUrls,
             allUrls.indexOf("/test/webapp-virtual-library/target/WEB-INF/classes/rsrc") > 0);
 
@@ -170,7 +165,7 @@ public class TestVirtualContext extends TomcatBaseTest {
             getUrl(
                 "http://localhost:" + getPort() +
                     "/test/classpathGetResources.jsp?path=rsrc2/").toString();
-        assertTrue(
+        Assert.assertTrue(
             allRsrsc2ClasspathUrls,
             allRsrsc2ClasspathUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp2/WEB-INF/classes/rsrc2") > 0);
 
@@ -213,13 +208,13 @@ public class TestVirtualContext extends TomcatBaseTest {
             getUrl(
                 "http://localhost:" + getPort() +
                     "/test/contextGetResourcePaths.jsp?path=/rsrc/").toString();
-        assertTrue(
+        Assert.assertTrue(
             allRsrcPaths,
             allRsrcPaths.indexOf("/rsrc/resourceF.properties") > 0);
-        assertTrue(
+        Assert.assertTrue(
             allRsrcPaths,
             allRsrcPaths.indexOf("/rsrc/resourceE.properties") > 0);
-        assertTrue(
+        Assert.assertTrue(
             allRsrcPaths,
             allRsrcPaths.indexOf("/rsrc/resourceH.properties") > 0);
 
@@ -232,7 +227,7 @@ public class TestVirtualContext extends TomcatBaseTest {
             getUrl(
                 "http://localhost:" + getPort() +
                     "/test/contextGetResourcePaths.jsp?path=/rsrc2/").toString();
-        assertTrue(
+        Assert.assertTrue(
             allRsrc2Paths,
             allRsrc2Paths.indexOf("/rsrc2/resourceJ.properties") > 0);
 
@@ -329,11 +324,11 @@ public class TestVirtualContext extends TomcatBaseTest {
         int sc = getUrl("http://localhost:" + getPort() + pageUrl, res, 10000,
                 null, null);
 
-        assertEquals(expectedStatus, sc);
+        Assert.assertEquals(expectedStatus, sc);
 
         if (expectedStatus == 200) {
             String result = res.toString();
-            assertTrue(result, result.contains(expectedBody));
+            Assert.assertTrue(result, result.contains(expectedBody));
         }
     }
 }

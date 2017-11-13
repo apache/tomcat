@@ -16,8 +16,7 @@
  */
 package org.apache.catalina.tribes.test.channel;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.ha.session.BackupManager;
@@ -32,7 +31,7 @@ public class TestChannelConfig {
 
         SimpleTcpCluster cluster = new SimpleTcpCluster();
         cluster.setChannelSendOptions(Channel.SEND_OPTIONS_ASYNCHRONOUS | Channel.SEND_OPTIONS_MULTICAST);
-        assertEquals(Channel.SEND_OPTIONS_ASYNCHRONOUS | Channel.SEND_OPTIONS_MULTICAST, cluster.getChannelSendOptions());
+        Assert.assertEquals(Channel.SEND_OPTIONS_ASYNCHRONOUS | Channel.SEND_OPTIONS_MULTICAST, cluster.getChannelSendOptions());
     }
 
     @Test
@@ -40,7 +39,7 @@ public class TestChannelConfig {
 
         SimpleTcpCluster cluster = new SimpleTcpCluster();
         cluster.setChannelSendOptions("multicast");
-        assertEquals(Channel.SEND_OPTIONS_MULTICAST, cluster.getChannelSendOptions());
+        Assert.assertEquals(Channel.SEND_OPTIONS_MULTICAST, cluster.getChannelSendOptions());
     }
 
     @Test
@@ -48,7 +47,7 @@ public class TestChannelConfig {
 
         SimpleTcpCluster cluster = new SimpleTcpCluster();
         cluster.setChannelSendOptions("async, multicast");
-        assertEquals(Channel.SEND_OPTIONS_ASYNCHRONOUS | Channel.SEND_OPTIONS_MULTICAST, cluster.getChannelSendOptions());
+        Assert.assertEquals(Channel.SEND_OPTIONS_ASYNCHRONOUS | Channel.SEND_OPTIONS_MULTICAST, cluster.getChannelSendOptions());
     }
 
     @Test
@@ -57,7 +56,7 @@ public class TestChannelConfig {
         String options = "multicast, async";
         SimpleTcpCluster cluster = new SimpleTcpCluster();
         cluster.setChannelSendOptions(options);
-        assertEquals(options, cluster.getChannelSendOptionsName());
+        Assert.assertEquals(options, cluster.getChannelSendOptionsName());
     }
 
     @Test
@@ -65,7 +64,7 @@ public class TestChannelConfig {
 
         BackupManager manager = new BackupManager();
         manager.setMapSendOptions("async, multicast");
-        assertEquals(Channel.SEND_OPTIONS_ASYNCHRONOUS | Channel.SEND_OPTIONS_MULTICAST, manager.getMapSendOptions());
+        Assert.assertEquals(Channel.SEND_OPTIONS_ASYNCHRONOUS | Channel.SEND_OPTIONS_MULTICAST, manager.getMapSendOptions());
     }
 
 }

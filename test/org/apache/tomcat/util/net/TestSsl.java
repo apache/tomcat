@@ -65,7 +65,7 @@ public class TestSsl extends TomcatBaseTest {
         ByteChunk res = getUrl("https://localhost:" + getPort() +
             "/examples/servlets/servlet/HelloWorldExample");
         Assert.assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
-        Assert. assertTrue("Checking no client issuer has been requested",
+        Assert.assertTrue("Checking no client issuer has been requested",
                 TesterSupport.getLastClientAuthRequestedIssuerCount() == 0);
     }
 

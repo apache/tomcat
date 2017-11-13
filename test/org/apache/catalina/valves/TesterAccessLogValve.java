@@ -22,8 +22,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.servlet.ServletException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Assert;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.connector.Request;
@@ -85,12 +84,12 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
             entriesLog.append(entry.toString());
             entriesLog.append(System.lineSeparator());
         }
-        assertEquals(entriesLog.toString(), count, entries.size());
+        Assert.assertEquals(entriesLog.toString(), count, entries.size());
         for (Entry entry : entries) {
-            assertEquals(status, entry.getStatus());
-            assertTrue(entry.toString() + " duration is not >= " + (minTime - ERROR_MARGIN),
+            Assert.assertEquals(status, entry.getStatus());
+            Assert.assertTrue(entry.toString() + " duration is not >= " + (minTime - ERROR_MARGIN),
                     entry.getTime() >= minTime - ERROR_MARGIN);
-            assertTrue(entry.toString() + " duration is not < " + (maxTime + ERROR_MARGIN),
+            Assert.assertTrue(entry.toString() + " duration is not < " + (maxTime + ERROR_MARGIN),
                     entry.getTime() < maxTime + ERROR_MARGIN);
         }
     }

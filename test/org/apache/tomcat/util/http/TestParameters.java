@@ -21,13 +21,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestParameters {
@@ -79,13 +73,13 @@ public class TestParameters {
     // Make sure the inner Parameter class behaves correctly
     @Test
     public void testInternal() {
-        assertEquals("foo1=bar1", SIMPLE.toString());
+        Assert.assertEquals("foo1=bar1", SIMPLE.toString());
         // Note: testing requires that ' ' is encoded as '+',
         // because that is what browsers will send us.
-        assertEquals("foo2=bar1&foo2=bar2&foo2=hello+world&foo2=%3F%25%40",
+        Assert.assertEquals("foo2=bar1&foo2=bar2&foo2=hello+world&foo2=%3F%25%40",
                 SIMPLE_MULTIPLE.toString());
-        assertEquals("foo3", NO_VALUE.toString());
-        assertEquals("foo4=", EMPTY_VALUE.toString());
+        Assert.assertEquals("foo3", NO_VALUE.toString());
+        Assert.assertEquals("foo4=", EMPTY_VALUE.toString());
     }
 
     private long doTestProcessParametersByteArrayIntInt(int limit,
@@ -128,13 +122,13 @@ public class TestParameters {
         Parameters p = new Parameters();
 
         String value = p.getParameter("foo");
-        assertNull(value);
+        Assert.assertNull(value);
 
         Enumeration<String> names = p.getParameterNames();
-        assertFalse(names.hasMoreElements());
+        Assert.assertFalse(names.hasMoreElements());
 
         String[] values = p.getParameterValues("foo");
-        assertNull(values);
+        Assert.assertNull(values);
     }
 
 
@@ -144,39 +138,39 @@ public class TestParameters {
 
         // Empty at this point
         Enumeration<String> names = p.getParameterNames();
-        assertFalse(names.hasMoreElements());
+        Assert.assertFalse(names.hasMoreElements());
         String[] values = p.getParameterValues("foo");
-        assertNull(values);
+        Assert.assertNull(values);
 
         // Add a parameter with two values
         p.addParameter("foo", "value1");
         p.addParameter("foo", "value2");
 
         names = p.getParameterNames();
-        assertTrue(names.hasMoreElements());
-        assertEquals("foo", names.nextElement());
-        assertFalse(names.hasMoreElements());
+        Assert.assertTrue(names.hasMoreElements());
+        Assert.assertEquals("foo", names.nextElement());
+        Assert.assertFalse(names.hasMoreElements());
 
         values = p.getParameterValues("foo");
-        assertEquals(2, values.length);
-        assertEquals("value1", values[0]);
-        assertEquals("value2", values[1]);
+        Assert.assertEquals(2, values.length);
+        Assert.assertEquals("value1", values[0]);
+        Assert.assertEquals("value2", values[1]);
 
         // Add two more values
         p.addParameter("foo", "value3");
         p.addParameter("foo", "value4");
 
         names = p.getParameterNames();
-        assertTrue(names.hasMoreElements());
-        assertEquals("foo", names.nextElement());
-        assertFalse(names.hasMoreElements());
+        Assert.assertTrue(names.hasMoreElements());
+        Assert.assertEquals("foo", names.nextElement());
+        Assert.assertFalse(names.hasMoreElements());
 
         values = p.getParameterValues("foo");
-        assertEquals(4, values.length);
-        assertEquals("value1", values[0]);
-        assertEquals("value2", values[1]);
-        assertEquals("value3", values[2]);
-        assertEquals("value4", values[3]);
+        Assert.assertEquals(4, values.length);
+        Assert.assertEquals("value1", values[0]);
+        Assert.assertEquals("value2", values[1]);
+        Assert.assertEquals("value3", values[2]);
+        Assert.assertEquals("value4", values[3]);
     }
 
     @Test
@@ -187,38 +181,38 @@ public class TestParameters {
 
         // Empty at this point
         Enumeration<String> names = p.getParameterNames();
-        assertFalse(names.hasMoreElements());
+        Assert.assertFalse(names.hasMoreElements());
         String[] values = p.getParameterValues("foo1");
-        assertNull(values);
+        Assert.assertNull(values);
 
         // Add a parameter
         p.addParameter("foo1", "value1");
 
         names = p.getParameterNames();
-        assertTrue(names.hasMoreElements());
-        assertEquals("foo1", names.nextElement());
-        assertFalse(names.hasMoreElements());
+        Assert.assertTrue(names.hasMoreElements());
+        Assert.assertEquals("foo1", names.nextElement());
+        Assert.assertFalse(names.hasMoreElements());
 
         values = p.getParameterValues("foo1");
-        assertEquals(1, values.length);
-        assertEquals("value1", values[0]);
+        Assert.assertEquals(1, values.length);
+        Assert.assertEquals("value1", values[0]);
 
         // Add another parameter
         p.addParameter("foo2", "value2");
 
         names = p.getParameterNames();
-        assertTrue(names.hasMoreElements());
-        assertEquals("foo1", names.nextElement());
-        assertEquals("foo2", names.nextElement());
-        assertFalse(names.hasMoreElements());
+        Assert.assertTrue(names.hasMoreElements());
+        Assert.assertEquals("foo1", names.nextElement());
+        Assert.assertEquals("foo2", names.nextElement());
+        Assert.assertFalse(names.hasMoreElements());
 
         values = p.getParameterValues("foo1");
-        assertEquals(1, values.length);
-        assertEquals("value1", values[0]);
+        Assert.assertEquals(1, values.length);
+        Assert.assertEquals("value1", values[0]);
 
         values = p.getParameterValues("foo2");
-        assertEquals(1, values.length);
-        assertEquals("value2", values[0]);
+        Assert.assertEquals(1, values.length);
+        Assert.assertEquals("value2", values[0]);
 
         // Add another parameter
         IllegalStateException e = null;
@@ -227,22 +221,22 @@ public class TestParameters {
         } catch (IllegalStateException ise) {
             e = ise;
         }
-        assertNotNull(e);
+        Assert.assertNotNull(e);
 
         // Check current parameters remain unaffected
         names = p.getParameterNames();
-        assertTrue(names.hasMoreElements());
-        assertEquals("foo1", names.nextElement());
-        assertEquals("foo2", names.nextElement());
-        assertFalse(names.hasMoreElements());
+        Assert.assertTrue(names.hasMoreElements());
+        Assert.assertEquals("foo1", names.nextElement());
+        Assert.assertEquals("foo2", names.nextElement());
+        Assert.assertFalse(names.hasMoreElements());
 
         values = p.getParameterValues("foo1");
-        assertEquals(1, values.length);
-        assertEquals("value1", values[0]);
+        Assert.assertEquals(1, values.length);
+        Assert.assertEquals("value1", values[0]);
 
         values = p.getParameterValues("foo2");
-        assertEquals(1, values.length);
-        assertEquals("value2", values[0]);
+        Assert.assertEquals(1, values.length);
+        Assert.assertEquals("value2", values[0]);
 
     }
 
@@ -265,14 +259,14 @@ public class TestParameters {
                     match = true;
                     if (parameter.values.length == 0) {
                         // Special case
-                        assertArrayEquals(new String[] {""}, values);
+                        Assert.assertArrayEquals(new String[] {""}, values);
                     } else {
-                        assertArrayEquals(parameter.getValues(), values);
+                        Assert.assertArrayEquals(parameter.getValues(), values);
                     }
                     break;
                 }
             }
-            assertTrue(match);
+            Assert.assertTrue(match);
         }
     }
 

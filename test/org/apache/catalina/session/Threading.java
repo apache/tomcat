@@ -20,8 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import static org.junit.Assert.fail;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -82,11 +81,11 @@ public class Threading {
             try {
                 threads[i].join();
                 if (runnables[i].isfailed()) {
-                    fail();
+                    Assert.fail();
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                fail(e.getMessage());
+                Assert.fail(e.getMessage());
             }
         }
         long end = System.currentTimeMillis();

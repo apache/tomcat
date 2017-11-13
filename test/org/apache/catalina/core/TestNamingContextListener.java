@@ -22,8 +22,7 @@ import javax.naming.NamingException;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -65,7 +64,7 @@ public class TestNamingContextListener extends TomcatBaseTest {
 
         tomcat.start();
 
-        assertEquals(LifecycleState.STARTED, ctx.getState());
+        Assert.assertEquals(LifecycleState.STARTED, ctx.getState());
     }
 
     public static final class Bug49132Listener implements ServletContextListener {
@@ -113,7 +112,7 @@ public class TestNamingContextListener extends TomcatBaseTest {
 
         tomcat.start();
 
-        assertEquals(LifecycleState.STARTED, ctx.getState());
+        Assert.assertEquals(LifecycleState.STARTED, ctx.getState());
     }
 
     public static class Bug54096EnvA {

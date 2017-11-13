@@ -20,8 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.startup.Tomcat;
@@ -37,8 +36,8 @@ public class TestDeployTask extends TomcatBaseTest {
             @Override
             public void execute(String command, InputStream istream, String contentType, long contentLength)
                     throws BuildException {
-                assertEquals("/deploy?path=somepath", command);
-                assertEquals("application/octet-stream", contentType);
+                Assert.assertEquals("/deploy?path=somepath", command);
+                Assert.assertEquals("application/octet-stream", contentType);
                 try {
                     istream.close();
                 } catch (IOException e) {
@@ -89,8 +88,8 @@ public class TestDeployTask extends TomcatBaseTest {
             @Override
             public void execute(String command, InputStream istream, String contentType, long contentLength)
                     throws BuildException {
-                assertEquals("/deploy?path=somepath", command);
-                assertEquals("application/octet-stream", contentType);
+                Assert.assertEquals("/deploy?path=somepath", command);
+                Assert.assertEquals("application/octet-stream", contentType);
                 try {
                     istream.close();
                 } catch (IOException e) {

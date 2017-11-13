@@ -20,9 +20,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -84,7 +83,7 @@ public class TestDataIntegrity {
         long start = System.currentTimeMillis();
         while ( (System.currentTimeMillis()-start)<15000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
         System.err.println("Finished NO_ACK ["+listener1.count+"]");
-        assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
+        Assert.assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
     }
 
     @Test
@@ -111,7 +110,7 @@ public class TestDataIntegrity {
             long start = System.currentTimeMillis();
             while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
             System.err.println("Finished ASYNC MULTI THREAD ["+listener1.count+"]");
-            assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
+            Assert.assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
     }
 
     @Test
@@ -122,7 +121,7 @@ public class TestDataIntegrity {
         long start = System.currentTimeMillis();
         while ( (System.currentTimeMillis()-start)<5000 && msgCount!=listener1.count) Thread.sleep(500);
         System.err.println("Finished ASYNC");
-        assertEquals("Checking success messages.",msgCount,listener1.count);
+        Assert.assertEquals("Checking success messages.",msgCount,listener1.count);
     }
 
     @Test
@@ -131,7 +130,7 @@ public class TestDataIntegrity {
         for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(),Channel.SEND_OPTIONS_USE_ACK);
         Thread.sleep(250);
         System.err.println("Finished ACK");
-        assertEquals("Checking success messages.",msgCount,listener1.count);
+        Assert.assertEquals("Checking success messages.",msgCount,listener1.count);
     }
 
     @Test
@@ -140,7 +139,7 @@ public class TestDataIntegrity {
         for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(),Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK);
         Thread.sleep(250);
         System.err.println("Finished SYNC_ACK");
-        assertEquals("Checking success messages.",msgCount,listener1.count);
+        Assert.assertEquals("Checking success messages.",msgCount,listener1.count);
     }
 
     public static class Listener implements ChannelListener {

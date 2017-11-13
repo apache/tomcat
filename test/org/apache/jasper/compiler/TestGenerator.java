@@ -30,9 +30,6 @@ import javax.servlet.jsp.tagext.TagExtraInfo;
 import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.tagext.VariableInfo;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -71,7 +68,7 @@ public class TestGenerator extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug45nnn/bug45015b.jsp", new ByteChunk(), null);
 
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
     @Test
@@ -81,7 +78,7 @@ public class TestGenerator extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug45nnn/bug45015c.jsp", new ByteChunk(), null);
 
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
     @Test
@@ -91,7 +88,7 @@ public class TestGenerator extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() +
                 "/test/bug48nnn/bug48701-fail.jsp", new ByteChunk(), null);
 
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
 
     @Test
@@ -197,7 +194,7 @@ public class TestGenerator extends TomcatBaseTest {
         int i = 0;
         for (String line : lines) {
             if (line.length() > 0) {
-                assertEquals(expected[i], line);
+                Assert.assertEquals(expected[i], line);
                 i++;
             }
         }
@@ -205,7 +202,7 @@ public class TestGenerator extends TomcatBaseTest {
 
     /** Assertion for text printed by tags:echo */
     private static void assertEcho(String result, String expected) {
-        assertTrue(result.indexOf("<p>" + expected + "</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>" + expected + "</p>") > 0);
     }
 
     @Test
@@ -278,8 +275,8 @@ public class TestGenerator extends TomcatBaseTest {
         }
 
         String result = res.toString();
-        assertTrue(result.startsWith("0 Hello world!\n"));
-        assertTrue(result.endsWith("999 Hello world!\n"));
+        Assert.assertTrue(result.startsWith("0 Hello world!\n"));
+        Assert.assertTrue(result.endsWith("999 Hello world!\n"));
     }
 
 

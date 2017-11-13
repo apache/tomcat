@@ -26,8 +26,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -49,7 +48,7 @@ public class TestTomcatClassLoader extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals("WEBAPP,SYSTEM,OTHER,", res.toString());
+        Assert.assertEquals("WEBAPP,SYSTEM,OTHER,", res.toString());
     }
 
     @Test
@@ -72,7 +71,7 @@ public class TestTomcatClassLoader extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals("WEBAPP,CUSTOM,SYSTEM,OTHER,", res.toString());
+        Assert.assertEquals("WEBAPP,CUSTOM,SYSTEM,OTHER,", res.toString());
     }
 
     private static final class ClassLoaderReport extends HttpServlet {

@@ -26,11 +26,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -147,17 +143,17 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         }
 
         if (expectPass) {
-            assertTrue(client.isResponse200());
-            assertEquals("nullnull7TestValue1TestValue2",
+            Assert.assertTrue(client.isResponse200());
+            Assert.assertEquals("nullnull7TestValue1TestValue2",
                     client.getResponseBody());
-            assertNull(processException);
-            assertFalse(servlet.getExceptionDuringRead());
+            Assert.assertNull(processException);
+            Assert.assertFalse(servlet.getExceptionDuringRead());
         } else {
             if (processException == null) {
-                assertTrue(client.getResponseLine(), client.isResponse500());
+                Assert.assertTrue(client.getResponseLine(), client.isResponse500());
             } else {
                 // Use fall-back for checking the error occurred
-                assertTrue(servlet.getExceptionDuringRead());
+                Assert.assertTrue(servlet.getExceptionDuringRead());
             }
         }
     }
@@ -201,7 +197,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         client.processRequest();
         // Expected to fail because the trailers are longer
         // than the set limit of 10 bytes
-        assertTrue(client.isResponse500());
+        Assert.assertTrue(client.isResponse500());
     }
 
 
@@ -267,9 +263,9 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         client.processRequest();
 
         if (ok) {
-            assertTrue(client.isResponse200());
+            Assert.assertTrue(client.isResponse200());
         } else {
-            assertTrue(client.isResponse500());
+            Assert.assertTrue(client.isResponse500());
         }
     }
 
@@ -307,7 +303,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         client.connect();
         client.processRequest();
-        assertEquals("nullnull7nullnull", client.getResponseBody());
+        Assert.assertEquals("nullnull7nullnull", client.getResponseBody());
     }
 
     @Test
@@ -411,20 +407,20 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         }
         if (expectPass) {
             if (expectReadWholeBody) {
-                assertNull(processException);
+                Assert.assertNull(processException);
             }
             if (processException == null) {
-                assertTrue(client.getResponseLine(), client.isResponse200());
-                assertEquals(String.valueOf(expectReadCount),
+                Assert.assertTrue(client.getResponseLine(), client.isResponse200());
+                Assert.assertEquals(String.valueOf(expectReadCount),
                         client.getResponseBody());
             }
-            assertEquals(expectReadCount, servlet.getCountRead());
+            Assert.assertEquals(expectReadCount, servlet.getCountRead());
         } else {
             if (processException == null) {
-                assertTrue(client.getResponseLine(), client.isResponse500());
+                Assert.assertTrue(client.getResponseLine(), client.isResponse500());
             }
-            assertEquals(0, servlet.getCountRead());
-            assertTrue(servlet.getExceptionDuringRead());
+            Assert.assertEquals(0, servlet.getCountRead());
+            Assert.assertTrue(servlet.getExceptionDuringRead());
         }
     }
 

@@ -21,8 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -105,7 +104,7 @@ public class TesterDigestAuthenticatorPerformance {
         System.out.println("Average time per request (wall): " +
                 wallTime/(threadCount * requestCount));
 
-        assertEquals(requestCount * threadCount, totalSuccess);
+        Assert.assertEquals(requestCount * threadCount, totalSuccess);
     }
 
     @Before

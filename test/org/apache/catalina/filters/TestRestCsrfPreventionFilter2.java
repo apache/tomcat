@@ -30,11 +30,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -223,21 +219,21 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
             rc = postUrl(body, HTTP_PREFIX + getPort() + uri, bc, reqHeaders, respHeaders);
         }
 
-        assertEquals(expectedRC, rc);
+        Assert.assertEquals(expectedRC, rc);
 
         if (expectedRC == HttpServletResponse.SC_OK) {
-            assertEquals(expectedResponse, bc.toString());
+            Assert.assertEquals(expectedResponse, bc.toString());
             List<String> newCookies = respHeaders.get(SERVER_COOKIE_HEADER);
             saveCookies(newCookies, l -> Objects.nonNull(l) && l.size() > 0);
         }
 
         if (!expectCsrfRH) {
-            assertNull(respHeaders.get(Constants.CSRF_REST_NONCE_HEADER_NAME));
+            Assert.assertNull(respHeaders.get(Constants.CSRF_REST_NONCE_HEADER_NAME));
         } else {
             List<String> respHeaderValue = respHeaders.get(Constants.CSRF_REST_NONCE_HEADER_NAME);
-            assertNotNull(respHeaderValue);
+            Assert.assertNotNull(respHeaderValue);
             if (Objects.nonNull(expectedCsrfRHV)) {
-                assertTrue(respHeaderValue.contains(expectedCsrfRHV));
+                Assert.assertTrue(respHeaderValue.contains(expectedCsrfRHV));
             } else {
                 validNonce = respHeaderValue.get(0);
             }

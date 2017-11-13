@@ -21,9 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -215,12 +213,12 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
                 respHeaders);
 
         if (expectedReject) {
-            assertEquals(expectedRC, rc);
-            assertTrue(bc.getLength() > 0);
+            Assert.assertEquals(expectedRC, rc);
+            Assert.assertTrue(bc.getLength() > 0);
         }
         else {
-            assertEquals(200, rc);
-            assertEquals("OK", bc.toString());
+            Assert.assertEquals(200, rc);
+            Assert.assertEquals("OK", bc.toString());
             saveCookies(respHeaders);
         }
 }
@@ -248,12 +246,12 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
                 respHeaders1);
 
         if (expectedReject1) {
-            assertEquals(expectedRC1, rc);
-            assertTrue(bc.getLength() > 0);
+            Assert.assertEquals(expectedRC1, rc);
+            Assert.assertTrue(bc.getLength() > 0);
         }
         else {
-            assertEquals(200, rc);
-            assertEquals("OK", bc.toString());
+            Assert.assertEquals(200, rc);
+            Assert.assertEquals("OK", bc.toString());
             saveCookies(respHeaders1);
             return;
         }
@@ -289,12 +287,12 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
                 respHeaders2);
 
         if (req2expect200) {
-            assertEquals(200, rc);
-            assertEquals("OK", bc.toString());
+            Assert.assertEquals(200, rc);
+            Assert.assertEquals("OK", bc.toString());
             saveCookies(respHeaders2);
         } else {
-            assertEquals(401, rc);
-            assertTrue((bc.getLength() > 0));
+            Assert.assertEquals(401, rc);
+            Assert.assertTrue((bc.getLength() > 0));
         }
     }
 

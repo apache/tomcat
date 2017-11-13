@@ -16,8 +16,7 @@
  */
 package org.apache.catalina.util;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -75,132 +74,132 @@ public class TestContextName {
 
     @Test
     public void testGetBaseName() {
-        assertEquals("ROOT", cn1.getBaseName());
-        assertEquals("ROOT", cn2.getBaseName());
-        assertEquals("ROOT", cn3.getBaseName());
-        assertEquals("foo", cn4.getBaseName());
-        assertEquals("foo#bar", cn5.getBaseName());
-        assertEquals("ROOT##A", cn6.getBaseName());
-        assertEquals("ROOT##B", cn7.getBaseName());
-        assertEquals("ROOT##C", cn8.getBaseName());
-        assertEquals("foo##D", cn9.getBaseName());
-        assertEquals("foo#bar##E", cn10.getBaseName());
-        assertEquals("ROOT", cn11.getBaseName());
-        assertEquals("foo", cn12.getBaseName());
-        assertEquals("foo#bar", cn13.getBaseName());
-        assertEquals("ROOT##A", cn14.getBaseName());
-        assertEquals("foo##D", cn15.getBaseName());
-        assertEquals("foo#bar##E", cn16.getBaseName());
-        assertEquals("ROOT", cn17.getBaseName());
-        assertEquals("ROOT#bar", cn18.getBaseName());
-        assertEquals("ROOT#bar##A", cn19.getBaseName());
-        assertEquals("ROOT##A", cn20.getBaseName());
-        assertEquals("foo.war", cn21.getBaseName());
-        assertEquals("foo", cn22.getBaseName());
+        Assert.assertEquals("ROOT", cn1.getBaseName());
+        Assert.assertEquals("ROOT", cn2.getBaseName());
+        Assert.assertEquals("ROOT", cn3.getBaseName());
+        Assert.assertEquals("foo", cn4.getBaseName());
+        Assert.assertEquals("foo#bar", cn5.getBaseName());
+        Assert.assertEquals("ROOT##A", cn6.getBaseName());
+        Assert.assertEquals("ROOT##B", cn7.getBaseName());
+        Assert.assertEquals("ROOT##C", cn8.getBaseName());
+        Assert.assertEquals("foo##D", cn9.getBaseName());
+        Assert.assertEquals("foo#bar##E", cn10.getBaseName());
+        Assert.assertEquals("ROOT", cn11.getBaseName());
+        Assert.assertEquals("foo", cn12.getBaseName());
+        Assert.assertEquals("foo#bar", cn13.getBaseName());
+        Assert.assertEquals("ROOT##A", cn14.getBaseName());
+        Assert.assertEquals("foo##D", cn15.getBaseName());
+        Assert.assertEquals("foo#bar##E", cn16.getBaseName());
+        Assert.assertEquals("ROOT", cn17.getBaseName());
+        Assert.assertEquals("ROOT#bar", cn18.getBaseName());
+        Assert.assertEquals("ROOT#bar##A", cn19.getBaseName());
+        Assert.assertEquals("ROOT##A", cn20.getBaseName());
+        Assert.assertEquals("foo.war", cn21.getBaseName());
+        Assert.assertEquals("foo", cn22.getBaseName());
     }
 
     @Test
     public void testGetPath() {
-        assertEquals("", cn1.getPath());
-        assertEquals("", cn2.getPath());
-        assertEquals("", cn3.getPath());
-        assertEquals("/foo", cn4.getPath());
-        assertEquals("/foo/bar", cn5.getPath());
-        assertEquals("", cn6.getPath());
-        assertEquals("", cn7.getPath());
-        assertEquals("", cn8.getPath());
-        assertEquals("/foo", cn9.getPath());
-        assertEquals("/foo/bar", cn10.getPath());
-        assertEquals("", cn11.getPath());
-        assertEquals("/foo", cn12.getPath());
-        assertEquals("/foo/bar", cn13.getPath());
-        assertEquals("", cn14.getPath());
-        assertEquals("/foo", cn15.getPath());
-        assertEquals("/foo/bar", cn16.getPath());
-        assertEquals("", cn17.getPath());
-        assertEquals("/ROOT/bar", cn18.getPath());
-        assertEquals("/ROOT/bar", cn19.getPath());
-        assertEquals("", cn20.getPath());
-        assertEquals("/foo.war", cn21.getPath());
-        assertEquals("/foo", cn22.getPath());
+        Assert.assertEquals("", cn1.getPath());
+        Assert.assertEquals("", cn2.getPath());
+        Assert.assertEquals("", cn3.getPath());
+        Assert.assertEquals("/foo", cn4.getPath());
+        Assert.assertEquals("/foo/bar", cn5.getPath());
+        Assert.assertEquals("", cn6.getPath());
+        Assert.assertEquals("", cn7.getPath());
+        Assert.assertEquals("", cn8.getPath());
+        Assert.assertEquals("/foo", cn9.getPath());
+        Assert.assertEquals("/foo/bar", cn10.getPath());
+        Assert.assertEquals("", cn11.getPath());
+        Assert.assertEquals("/foo", cn12.getPath());
+        Assert.assertEquals("/foo/bar", cn13.getPath());
+        Assert.assertEquals("", cn14.getPath());
+        Assert.assertEquals("/foo", cn15.getPath());
+        Assert.assertEquals("/foo/bar", cn16.getPath());
+        Assert.assertEquals("", cn17.getPath());
+        Assert.assertEquals("/ROOT/bar", cn18.getPath());
+        Assert.assertEquals("/ROOT/bar", cn19.getPath());
+        Assert.assertEquals("", cn20.getPath());
+        Assert.assertEquals("/foo.war", cn21.getPath());
+        Assert.assertEquals("/foo", cn22.getPath());
     }
 
     @Test
     public void testGetVersion() {
-        assertEquals("", cn1.getVersion());
-        assertEquals("", cn2.getVersion());
-        assertEquals("", cn3.getVersion());
-        assertEquals("", cn4.getVersion());
-        assertEquals("", cn5.getVersion());
-        assertEquals("A", cn6.getVersion());
-        assertEquals("B", cn7.getVersion());
-        assertEquals("C", cn8.getVersion());
-        assertEquals("D", cn9.getVersion());
-        assertEquals("E", cn10.getVersion());
-        assertEquals("", cn11.getVersion());
-        assertEquals("", cn12.getVersion());
-        assertEquals("", cn13.getVersion());
-        assertEquals("A", cn14.getVersion());
-        assertEquals("D", cn15.getVersion());
-        assertEquals("E", cn16.getVersion());
-        assertEquals("", cn17.getVersion());
-        assertEquals("", cn18.getVersion());
-        assertEquals("A", cn19.getVersion());
-        assertEquals("A", cn20.getVersion());
-        assertEquals("", cn21.getVersion());
-        assertEquals("", cn22.getVersion());
+        Assert.assertEquals("", cn1.getVersion());
+        Assert.assertEquals("", cn2.getVersion());
+        Assert.assertEquals("", cn3.getVersion());
+        Assert.assertEquals("", cn4.getVersion());
+        Assert.assertEquals("", cn5.getVersion());
+        Assert.assertEquals("A", cn6.getVersion());
+        Assert.assertEquals("B", cn7.getVersion());
+        Assert.assertEquals("C", cn8.getVersion());
+        Assert.assertEquals("D", cn9.getVersion());
+        Assert.assertEquals("E", cn10.getVersion());
+        Assert.assertEquals("", cn11.getVersion());
+        Assert.assertEquals("", cn12.getVersion());
+        Assert.assertEquals("", cn13.getVersion());
+        Assert.assertEquals("A", cn14.getVersion());
+        Assert.assertEquals("D", cn15.getVersion());
+        Assert.assertEquals("E", cn16.getVersion());
+        Assert.assertEquals("", cn17.getVersion());
+        Assert.assertEquals("", cn18.getVersion());
+        Assert.assertEquals("A", cn19.getVersion());
+        Assert.assertEquals("A", cn20.getVersion());
+        Assert.assertEquals("", cn21.getVersion());
+        Assert.assertEquals("", cn22.getVersion());
     }
 
     @Test
     public void testGetName() {
-        assertEquals("", cn1.getName());
-        assertEquals("", cn2.getName());
-        assertEquals("", cn3.getName());
-        assertEquals("/foo", cn4.getName());
-        assertEquals("/foo/bar", cn5.getName());
-        assertEquals("##A", cn6.getName());
-        assertEquals("##B", cn7.getName());
-        assertEquals("##C", cn8.getName());
-        assertEquals("/foo##D", cn9.getName());
-        assertEquals("/foo/bar##E", cn10.getName());
-        assertEquals("", cn11.getName());
-        assertEquals("/foo", cn12.getName());
-        assertEquals("/foo/bar", cn13.getName());
-        assertEquals("##A", cn14.getName());
-        assertEquals("/foo##D", cn15.getName());
-        assertEquals("/foo/bar##E", cn16.getName());
-        assertEquals("", cn17.getName());
-        assertEquals("/ROOT/bar", cn18.getName());
-        assertEquals("/ROOT/bar##A", cn19.getName());
-        assertEquals("##A", cn20.getName());
-        assertEquals("/foo.war", cn21.getName());
-        assertEquals("/foo", cn22.getName());
+        Assert.assertEquals("", cn1.getName());
+        Assert.assertEquals("", cn2.getName());
+        Assert.assertEquals("", cn3.getName());
+        Assert.assertEquals("/foo", cn4.getName());
+        Assert.assertEquals("/foo/bar", cn5.getName());
+        Assert.assertEquals("##A", cn6.getName());
+        Assert.assertEquals("##B", cn7.getName());
+        Assert.assertEquals("##C", cn8.getName());
+        Assert.assertEquals("/foo##D", cn9.getName());
+        Assert.assertEquals("/foo/bar##E", cn10.getName());
+        Assert.assertEquals("", cn11.getName());
+        Assert.assertEquals("/foo", cn12.getName());
+        Assert.assertEquals("/foo/bar", cn13.getName());
+        Assert.assertEquals("##A", cn14.getName());
+        Assert.assertEquals("/foo##D", cn15.getName());
+        Assert.assertEquals("/foo/bar##E", cn16.getName());
+        Assert.assertEquals("", cn17.getName());
+        Assert.assertEquals("/ROOT/bar", cn18.getName());
+        Assert.assertEquals("/ROOT/bar##A", cn19.getName());
+        Assert.assertEquals("##A", cn20.getName());
+        Assert.assertEquals("/foo.war", cn21.getName());
+        Assert.assertEquals("/foo", cn22.getName());
     }
 
     @Test
     public void testGetDisplayName() {
-        assertEquals("/", cn1.getDisplayName());
-        assertEquals("/", cn2.getDisplayName());
-        assertEquals("/", cn3.getDisplayName());
-        assertEquals("/foo", cn4.getDisplayName());
-        assertEquals("/foo/bar", cn5.getDisplayName());
-        assertEquals("/##A", cn6.getDisplayName());
-        assertEquals("/##B", cn7.getDisplayName());
-        assertEquals("/##C", cn8.getDisplayName());
-        assertEquals("/foo##D", cn9.getDisplayName());
-        assertEquals("/foo/bar##E", cn10.getDisplayName());
-        assertEquals("/", cn11.getDisplayName());
-        assertEquals("/foo", cn12.getDisplayName());
-        assertEquals("/foo/bar", cn13.getDisplayName());
-        assertEquals("/##A", cn14.getDisplayName());
-        assertEquals("/foo##D", cn15.getDisplayName());
-        assertEquals("/foo/bar##E", cn16.getDisplayName());
-        assertEquals("/", cn17.getDisplayName());
-        assertEquals("/ROOT/bar", cn18.getDisplayName());
-        assertEquals("/ROOT/bar##A", cn19.getDisplayName());
-        assertEquals("/##A", cn20.getDisplayName());
-        assertEquals("/foo.war", cn21.getDisplayName());
-        assertEquals("/foo", cn22.getDisplayName());
+        Assert.assertEquals("/", cn1.getDisplayName());
+        Assert.assertEquals("/", cn2.getDisplayName());
+        Assert.assertEquals("/", cn3.getDisplayName());
+        Assert.assertEquals("/foo", cn4.getDisplayName());
+        Assert.assertEquals("/foo/bar", cn5.getDisplayName());
+        Assert.assertEquals("/##A", cn6.getDisplayName());
+        Assert.assertEquals("/##B", cn7.getDisplayName());
+        Assert.assertEquals("/##C", cn8.getDisplayName());
+        Assert.assertEquals("/foo##D", cn9.getDisplayName());
+        Assert.assertEquals("/foo/bar##E", cn10.getDisplayName());
+        Assert.assertEquals("/", cn11.getDisplayName());
+        Assert.assertEquals("/foo", cn12.getDisplayName());
+        Assert.assertEquals("/foo/bar", cn13.getDisplayName());
+        Assert.assertEquals("/##A", cn14.getDisplayName());
+        Assert.assertEquals("/foo##D", cn15.getDisplayName());
+        Assert.assertEquals("/foo/bar##E", cn16.getDisplayName());
+        Assert.assertEquals("/", cn17.getDisplayName());
+        Assert.assertEquals("/ROOT/bar", cn18.getDisplayName());
+        Assert.assertEquals("/ROOT/bar##A", cn19.getDisplayName());
+        Assert.assertEquals("/##A", cn20.getDisplayName());
+        Assert.assertEquals("/foo.war", cn21.getDisplayName());
+        Assert.assertEquals("/foo", cn22.getDisplayName());
     }
 
     @Test
@@ -236,10 +235,10 @@ public class TestContextName {
     }
 
     private void doCompare(ContextName cn1, ContextName cn2) {
-        assertEquals(cn1.getBaseName(), cn2.getBaseName());
-        assertEquals(cn1.getDisplayName(), cn2.getDisplayName());
-        assertEquals(cn1.getName(), cn2.getName());
-        assertEquals(cn1.getPath(), cn2.getPath());
-        assertEquals(cn1.getVersion(), cn2.getVersion());
+        Assert.assertEquals(cn1.getBaseName(), cn2.getBaseName());
+        Assert.assertEquals(cn1.getDisplayName(), cn2.getDisplayName());
+        Assert.assertEquals(cn1.getName(), cn2.getName());
+        Assert.assertEquals(cn1.getPath(), cn2.getPath());
+        Assert.assertEquals(cn1.getVersion(), cn2.getVersion());
     }
 }
