@@ -36,9 +36,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -79,10 +77,10 @@ public class TestSendFile extends TomcatBaseTest {
                 long start = System.currentTimeMillis();
                 int rc = getUrl("http://localhost:" + getPort() + "/servlet" + i, bc, null,
                         respHeaders);
-                assertEquals(HttpServletResponse.SC_OK, rc);
+                Assert.assertEquals(HttpServletResponse.SC_OK, rc);
                 System.out.println("Client received " + bc.getLength() + " bytes in "
                         + (System.currentTimeMillis() - start) + " ms.");
-                assertEquals(EXPECTED_CONTENT_LENGTH * (i + 1), bc.getLength());
+                Assert.assertEquals(EXPECTED_CONTENT_LENGTH * (i + 1), bc.getLength());
 
                 bc.recycle();
             }
@@ -183,7 +181,7 @@ public class TestSendFile extends TomcatBaseTest {
         latch.await(3000, TimeUnit.MILLISECONDS);
 
         if (exceptions.size() > 0) {
-            fail();
+            Assert.fail();
         }
     }
 
@@ -237,8 +235,8 @@ public class TestSendFile extends TomcatBaseTest {
             try {
                 ByteChunk result = new ByteChunk();
                 int rc = getUrl(url, result, null);
-                assertEquals(HttpServletResponse.SC_OK, rc);
-                assertEquals(1024, result.getLength());
+                Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+                Assert.assertEquals(1024, result.getLength());
             } catch (Throwable e) {
                 e.printStackTrace();
                 exceptions.add(e);

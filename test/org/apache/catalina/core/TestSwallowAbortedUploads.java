@@ -35,9 +35,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -94,9 +91,9 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         log.info("Unlimited, swallow enabled");
         AbortedUploadClient client = new AbortedUploadClient();
         Exception ex = doAbortedUploadTest(client, false, true);
-        assertNull("Unlimited upload with swallow enabled generates client exception",
+        Assert.assertNull("Unlimited upload with swallow enabled generates client exception",
                    ex);
-        assertTrue("Unlimited upload with swallow enabled returns error status code",
+        Assert.assertTrue("Unlimited upload with swallow enabled returns error status code",
                    client.isResponse200());
         client.reset();
     }
@@ -106,9 +103,9 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         log.info("Unlimited, swallow disabled");
         AbortedUploadClient client = new AbortedUploadClient();
         Exception ex = doAbortedUploadTest(client, false, false);
-        assertNull("Unlimited upload with swallow disabled generates client exception",
+        Assert.assertNull("Unlimited upload with swallow disabled generates client exception",
                    ex);
-        assertTrue("Unlimited upload with swallow disabled returns error status code",
+        Assert.assertTrue("Unlimited upload with swallow disabled returns error status code",
                    client.isResponse200());
         client.reset();
     }
@@ -118,9 +115,9 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         log.info("Limited, swallow enabled");
         AbortedUploadClient client = new AbortedUploadClient();
         Exception ex = doAbortedUploadTest(client, true, true);
-        assertNull("Limited upload with swallow enabled generates client exception",
+        Assert.assertNull("Limited upload with swallow enabled generates client exception",
                    ex);
-        assertTrue("Limited upload with swallow enabled returns non-500 status code",
+        Assert.assertTrue("Limited upload with swallow enabled returns non-500 status code",
                    client.isResponse500());
         client.reset();
     }
@@ -130,7 +127,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         log.info("Limited, swallow disabled");
         AbortedUploadClient client = new AbortedUploadClient();
         Exception ex = doAbortedUploadTest(client, true, false);
-        assertTrue("Limited upload with swallow disabled does not generate client exception",
+        Assert.assertTrue("Limited upload with swallow disabled does not generate client exception",
                    ex instanceof java.net.SocketException);
         client.reset();
     }
@@ -140,9 +137,9 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         log.info("Aborted (OK), swallow enabled");
         AbortedPOSTClient client = new AbortedPOSTClient();
         Exception ex = doAbortedPOSTTest(client, HttpServletResponse.SC_OK, true);
-        assertNull("Unlimited upload with swallow enabled generates client exception",
+        Assert.assertNull("Unlimited upload with swallow enabled generates client exception",
                    ex);
-        assertTrue("Unlimited upload with swallow enabled returns error status code",
+        Assert.assertTrue("Unlimited upload with swallow enabled returns error status code",
                    client.isResponse200());
         client.reset();
     }
@@ -152,9 +149,9 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         log.info("Aborted (OK), swallow disabled");
         AbortedPOSTClient client = new AbortedPOSTClient();
         Exception ex = doAbortedPOSTTest(client, HttpServletResponse.SC_OK, false);
-        assertNull("Unlimited upload with swallow disabled generates client exception",
+        Assert.assertNull("Unlimited upload with swallow disabled generates client exception",
                    ex);
-        assertTrue("Unlimited upload with swallow disabled returns error status code",
+        Assert.assertTrue("Unlimited upload with swallow disabled returns error status code",
                    client.isResponse200());
         client.reset();
     }
@@ -164,9 +161,9 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         log.info("Aborted (413), swallow enabled");
         AbortedPOSTClient client = new AbortedPOSTClient();
         Exception ex = doAbortedPOSTTest(client, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, true);
-        assertNull("Limited upload with swallow enabled generates client exception",
+        Assert.assertNull("Limited upload with swallow enabled generates client exception",
                    ex);
-        assertTrue("Limited upload with swallow enabled returns error status code",
+        Assert.assertTrue("Limited upload with swallow enabled returns error status code",
                    client.isResponse413());
         client.reset();
     }
@@ -176,7 +173,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
         log.info("Aborted (413), swallow disabled");
         AbortedPOSTClient client = new AbortedPOSTClient();
         Exception ex = doAbortedPOSTTest(client, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, false);
-        assertTrue("Limited upload with swallow disabled does not generate client exception",
+        Assert.assertTrue("Limited upload with swallow disabled does not generate client exception",
                    ex instanceof java.net.SocketException);
         client.reset();
     }

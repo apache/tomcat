@@ -21,10 +21,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Random;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -71,7 +69,7 @@ public class TestRemoteProcessException {
                         Channel.SEND_OPTIONS_SYNCHRONIZED_ACK
                                 | Channel.SEND_OPTIONS_USE_ACK);
                 if (error) {
-                    fail("A ChannelException was expected");
+                    Assert.fail("A ChannelException was expected");
                 }
             } catch (ChannelException e) {
                 if (!error) {
@@ -86,10 +84,10 @@ public class TestRemoteProcessException {
         // as it is being re-sent. Thus the listener1 count is off by +2.
         final int duplicate = 2;
 
-        assertEquals("Checking failure messages.", errC + duplicate,
+        Assert.assertEquals("Checking failure messages.", errC + duplicate,
                 listener1.errCnt);
-        assertEquals("Checking success messages.", nerrC, listener1.noErrCnt);
-        assertEquals("Checking all messages.", msgCount + duplicate,
+        Assert.assertEquals("Checking success messages.", nerrC, listener1.noErrCnt);
+        Assert.assertEquals("Checking all messages.", msgCount + duplicate,
                 listener1.noErrCnt + listener1.errCnt);
         System.out.println("Listener 1 stats:");
         listener1.printStats(System.out);

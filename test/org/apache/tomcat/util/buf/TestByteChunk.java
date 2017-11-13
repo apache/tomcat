@@ -19,9 +19,7 @@ package org.apache.tomcat.util.buf;
 import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -34,7 +32,7 @@ public class TestByteChunk {
         String string = "HTTP/1.1 100 \r\n\r\n";
         byte[] bytes = ByteChunk.convertToBytes(string);
         byte[] expected = string.getBytes("ISO-8859-1");
-        assertTrue(Arrays.equals(bytes, expected));
+        Assert.assertTrue(Arrays.equals(bytes, expected));
     }
 
     /*
@@ -53,23 +51,23 @@ public class TestByteChunk {
         final int len = bytes.length;
 
         // indexOf() does not work outside of 0-127
-        assertEquals(5, ByteChunk.findByte(bytes, 0, len, (byte) '\u00a0'));
-        assertEquals(-1, ByteChunk.indexOf(bytes, 0, len, '\u00a0'));
+        Assert.assertEquals(5, ByteChunk.findByte(bytes, 0, len, (byte) '\u00a0'));
+        Assert.assertEquals(-1, ByteChunk.indexOf(bytes, 0, len, '\u00a0'));
 
-        assertEquals(0, ByteChunk.findByte(bytes, 0, len, (byte) 'H'));
-        assertEquals(0, ByteChunk.indexOf(bytes, 0, len, 'H'));
+        Assert.assertEquals(0, ByteChunk.findByte(bytes, 0, len, (byte) 'H'));
+        Assert.assertEquals(0, ByteChunk.indexOf(bytes, 0, len, 'H'));
 
-        assertEquals(len - 1, ByteChunk.findByte(bytes, 0, len, (byte) 'd'));
-        assertEquals(len - 1, ByteChunk.indexOf(bytes, 0, len, 'd'));
+        Assert.assertEquals(len - 1, ByteChunk.findByte(bytes, 0, len, (byte) 'd'));
+        Assert.assertEquals(len - 1, ByteChunk.indexOf(bytes, 0, len, 'd'));
 
-        assertEquals(-1, ByteChunk.findByte(bytes, 0, len, (byte) 'x'));
-        assertEquals(-1, ByteChunk.indexOf(bytes, 0, len, 'x'));
+        Assert.assertEquals(-1, ByteChunk.findByte(bytes, 0, len, (byte) 'x'));
+        Assert.assertEquals(-1, ByteChunk.indexOf(bytes, 0, len, 'x'));
 
-        assertEquals(7, ByteChunk.findByte(bytes, 5, len, (byte) 'o'));
-        assertEquals(7, ByteChunk.indexOf(bytes, 5, len, 'o'));
+        Assert.assertEquals(7, ByteChunk.findByte(bytes, 5, len, (byte) 'o'));
+        Assert.assertEquals(7, ByteChunk.indexOf(bytes, 5, len, 'o'));
 
-        assertEquals(-1, ByteChunk.findByte(bytes, 2, 5, (byte) 'w'));
-        assertEquals(-1, ByteChunk.indexOf(bytes, 5, 5, 'w'));
+        Assert.assertEquals(-1, ByteChunk.findByte(bytes, 2, 5, (byte) 'w'));
+        Assert.assertEquals(-1, ByteChunk.indexOf(bytes, 5, 5, 'w'));
     }
 
     @Test
@@ -80,18 +78,18 @@ public class TestByteChunk {
         ByteChunk bc = new ByteChunk();
         bc.setBytes(bytes, 0, len);
 
-        assertEquals(0, bc.indexOf('H', 0));
-        assertEquals(6, bc.indexOf('w', 0));
+        Assert.assertEquals(0, bc.indexOf('H', 0));
+        Assert.assertEquals(6, bc.indexOf('w', 0));
 
         // Does not work outside of 0-127
-        assertEquals(-1, bc.indexOf('\u00a0', 0));
+        Assert.assertEquals(-1, bc.indexOf('\u00a0', 0));
 
         bc.setBytes(bytes, 6, 5);
-        assertEquals(1, bc.indexOf('o', 0));
+        Assert.assertEquals(1, bc.indexOf('o', 0));
 
         bc.setBytes(bytes, 6, 2);
-        assertEquals(0, bc.indexOf('w', 0));
-        assertEquals(-1, bc.indexOf('d', 0));
+        Assert.assertEquals(0, bc.indexOf('w', 0));
+        Assert.assertEquals(-1, bc.indexOf('d', 0));
     }
 
     @Test
@@ -102,21 +100,21 @@ public class TestByteChunk {
         ByteChunk bc = new ByteChunk();
         bc.setBytes(bytes, 0, len);
 
-        assertEquals(0, bc.indexOf("Hello", 0, "Hello".length(), 0));
-        assertEquals(2, bc.indexOf("ll", 0, 2, 0));
-        assertEquals(2, bc.indexOf("Hello", 2, 2, 0));
+        Assert.assertEquals(0, bc.indexOf("Hello", 0, "Hello".length(), 0));
+        Assert.assertEquals(2, bc.indexOf("ll", 0, 2, 0));
+        Assert.assertEquals(2, bc.indexOf("Hello", 2, 2, 0));
 
-        assertEquals(7, bc.indexOf("o", 0, 1, 5));
+        Assert.assertEquals(7, bc.indexOf("o", 0, 1, 5));
 
         // Does not work outside of 0-127
-        assertEquals(-1, bc.indexOf("\u00a0", 0, 1, 0));
+        Assert.assertEquals(-1, bc.indexOf("\u00a0", 0, 1, 0));
 
         bc.setBytes(bytes, 6, 5);
-        assertEquals(1, bc.indexOf("o", 0, 1, 0));
+        Assert.assertEquals(1, bc.indexOf("o", 0, 1, 0));
 
         bc.setBytes(bytes, 6, 2);
-        assertEquals(0, bc.indexOf("wo", 0, 1, 0));
-        assertEquals(-1, bc.indexOf("d", 0, 1, 0));
+        Assert.assertEquals(0, bc.indexOf("wo", 0, 1, 0));
+        Assert.assertEquals(-1, bc.indexOf("d", 0, 1, 0));
     }
 
     @Test
@@ -124,15 +122,15 @@ public class TestByteChunk {
         byte[] bytes = "Hello\u00a0world".getBytes("ISO-8859-1");
         final int len = bytes.length;
 
-        assertEquals(0, ByteChunk.findBytes(bytes, 0, len, new byte[] { 'H' }));
-        assertEquals(5, ByteChunk.findBytes(bytes, 0, len, new byte[] {
+        Assert.assertEquals(0, ByteChunk.findBytes(bytes, 0, len, new byte[] { 'H' }));
+        Assert.assertEquals(5, ByteChunk.findBytes(bytes, 0, len, new byte[] {
                 (byte) '\u00a0', 'x' }));
-        assertEquals(5, ByteChunk.findBytes(bytes, 0, len - 4, new byte[] {
+        Assert.assertEquals(5, ByteChunk.findBytes(bytes, 0, len - 4, new byte[] {
                 'x', (byte) '\u00a0' }));
-        assertEquals(len - 1, ByteChunk.findBytes(bytes, 2, len, new byte[] {
+        Assert.assertEquals(len - 1, ByteChunk.findBytes(bytes, 2, len, new byte[] {
                 'x', 'd' }));
-        assertEquals(1, ByteChunk.findBytes(bytes, 0, len, new byte[] { 'o',
+        Assert.assertEquals(1, ByteChunk.findBytes(bytes, 0, len, new byte[] { 'o',
                 'e' }));
-        assertEquals(-1, ByteChunk.findBytes(bytes, 2, 5, new byte[] { 'w' }));
+        Assert.assertEquals(-1, ByteChunk.findBytes(bytes, 2, 5, new byte[] { 'w' }));
     }
 }

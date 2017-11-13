@@ -22,9 +22,8 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.fail;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -79,7 +78,7 @@ public class TestGroupChannelSenderConnections extends LoggingBaseTest {
         while ((countReceived = getReceivedMessageCount()) != n) {
             long time = System.currentTimeMillis();
             if ((time - startTime) > sleep) {
-                fail("Only " + countReceived + " out of " + n
+                Assert.fail("Only " + countReceived + " out of " + n
                         + " messages have been received in " + (sleep / 1000)
                         + " seconds");
                 break;

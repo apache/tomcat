@@ -17,8 +17,7 @@
 
 package org.apache.catalina.core;
 
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,7 +37,7 @@ public class TestApplicationSessionCookieConfig {
     public void testSetCommentInitPhase() {
         context.setState(LifecycleState.STARTING_PREP);
         applicationSessionCookieConfig.setComment("test");
-        assertTrue(applicationSessionCookieConfig.getComment().equals("test"));
+        Assert.assertTrue(applicationSessionCookieConfig.getComment().equals("test"));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -51,7 +50,7 @@ public class TestApplicationSessionCookieConfig {
     public void testSetDomainInitPhase() {
         context.setState(LifecycleState.STARTING_PREP);
         applicationSessionCookieConfig.setDomain("test");
-        assertTrue(applicationSessionCookieConfig.getDomain().equals("test"));
+        Assert.assertTrue(applicationSessionCookieConfig.getDomain().equals("test"));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -64,7 +63,7 @@ public class TestApplicationSessionCookieConfig {
     public void testSetHttpOnlyInitPhase() {
         context.setState(LifecycleState.STARTING_PREP);
         applicationSessionCookieConfig.setHttpOnly(true);
-        assertTrue(applicationSessionCookieConfig.isHttpOnly());
+        Assert.assertTrue(applicationSessionCookieConfig.isHttpOnly());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -77,7 +76,7 @@ public class TestApplicationSessionCookieConfig {
     public void testSetMaxAgeInitPhase() {
         context.setState(LifecycleState.STARTING_PREP);
         applicationSessionCookieConfig.setMaxAge(1);
-        assertTrue(applicationSessionCookieConfig.getMaxAge() == 1);
+        Assert.assertTrue(applicationSessionCookieConfig.getMaxAge() == 1);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -90,7 +89,7 @@ public class TestApplicationSessionCookieConfig {
     public void testSetNameInitPhase() {
         context.setState(LifecycleState.STARTING_PREP);
         applicationSessionCookieConfig.setName("test");
-        assertTrue(applicationSessionCookieConfig.getName().equals("test"));
+        Assert.assertTrue(applicationSessionCookieConfig.getName().equals("test"));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -103,7 +102,7 @@ public class TestApplicationSessionCookieConfig {
     public void testSetPathInitPhase() {
         context.setState(LifecycleState.STARTING_PREP);
         applicationSessionCookieConfig.setPath("test");
-        assertTrue(applicationSessionCookieConfig.getPath().equals("test"));
+        Assert.assertTrue(applicationSessionCookieConfig.getPath().equals("test"));
     }
 
     @Test(expected = IllegalStateException.class)
@@ -116,7 +115,7 @@ public class TestApplicationSessionCookieConfig {
     public void testSetSecureInitPhase() {
         context.setState(LifecycleState.STARTING_PREP);
         applicationSessionCookieConfig.setSecure(true);
-        assertTrue(applicationSessionCookieConfig.isSecure());
+        Assert.assertTrue(applicationSessionCookieConfig.isSecure());
     }
 
     @Test(expected = IllegalStateException.class)

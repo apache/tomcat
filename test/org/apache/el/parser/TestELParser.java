@@ -24,9 +24,7 @@ import javax.el.ELException;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -83,7 +81,7 @@ public class TestELParser {
         } catch (ELException ele) {
             e = ele;
         }
-        assertNotNull(e);
+        Assert.assertNotNull(e);
     }
 
     @Test
@@ -104,7 +102,7 @@ public class TestELParser {
         } catch (ELException ele) {
             e = ele;
         }
-        assertNotNull(e);
+        Assert.assertNotNull(e);
     }
 
 
@@ -200,7 +198,7 @@ public class TestELParser {
                 context, expr.toString(), String.class);
 
         String result = (String) ve.getValue(context);
-        assertEquals("true", result);
+        Assert.assertEquals("true", result);
     }
 
     @Test
@@ -217,10 +215,10 @@ public class TestELParser {
             "${(myBean.int1 > 1 and myBean.myBool) or "+
             "((myBean.myBool or myBean.myBool1) and myBean.int1 > 1)}",
             Boolean.class);
-        assertEquals(Boolean.FALSE, ve.getValue(context));
+        Assert.assertEquals(Boolean.FALSE, ve.getValue(context));
         beanC.setInt1(2);
         beanC.setMyBool1(true);
-        assertEquals(Boolean.TRUE, ve.getValue(context));
+        Assert.assertEquals(Boolean.TRUE, ve.getValue(context));
     }
 
     private void testExpression(String expression, String expected) {
@@ -231,7 +229,7 @@ public class TestELParser {
                 context, expression, String.class);
 
         String result = (String) ve.getValue(context);
-        assertEquals(expected, result);
+        Assert.assertEquals(expected, result);
     }
 
     /*

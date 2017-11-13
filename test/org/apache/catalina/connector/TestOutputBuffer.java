@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -60,16 +60,16 @@ public class TestOutputBuffer extends TomcatBaseTest{
         for (int i = 1; i <= WritingServlet.EXPECTED_CONTENT_LENGTH; i*=10) {
             int rc = getUrl("http://localhost:" + getPort() +
                     "/servlet" + i, bc, null, null);
-            assertEquals(HttpServletResponse.SC_OK, rc);
-            assertEquals(
+            Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+            Assert.assertEquals(
                     WritingServlet.EXPECTED_CONTENT_LENGTH, bc.getLength());
 
             bc.recycle();
 
             rc = getUrl("http://localhost:" + getPort() +
                     "/servlet" + i + "?useBuffer=y", bc, null, null);
-            assertEquals(HttpServletResponse.SC_OK, rc);
-            assertEquals(
+            Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+            Assert.assertEquals(
                     WritingServlet.EXPECTED_CONTENT_LENGTH, bc.getLength());
 
             bc.recycle();
@@ -91,8 +91,8 @@ public class TestOutputBuffer extends TomcatBaseTest{
         ByteChunk bc = new ByteChunk();
 
         int rc = getUrl("http://localhost:" + getPort() + "/", bc, null, null);
-        assertEquals(HttpServletResponse.SC_OK, rc);
-        assertEquals("OK", bc.toString());
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals("OK", bc.toString());
     }
 
     private static class WritingServlet extends HttpServlet {

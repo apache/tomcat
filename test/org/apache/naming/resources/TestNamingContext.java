@@ -31,9 +31,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -86,7 +83,7 @@ public class TestNamingContext extends TomcatBaseTest {
         } else {
             expected = "NOTEQUAL";
         }
-        assertEquals(expected, bc.toString());
+        Assert.assertEquals(expected, bc.toString());
 
     }
 
@@ -139,7 +136,7 @@ public class TestNamingContext extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals("org.apache.naming.resources.TesterObject", bc.toString());
+        Assert.assertEquals("org.apache.naming.resources.TesterObject", bc.toString());
     }
 
     public static final class Bug23950Servlet extends HttpServlet {
@@ -191,7 +188,7 @@ public class TestNamingContext extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals("value", bc.toString());
+        Assert.assertEquals("value", bc.toString());
     }
 
     public static final class Bug50351Servlet extends HttpServlet {
@@ -245,10 +242,10 @@ public class TestNamingContext extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() + "/", bc, null);
-        assertEquals(200, rc);
-        assertTrue(bc.toString().contains(Bug51744Servlet.EXPECTED));
+        Assert.assertEquals(200, rc);
+        Assert.assertTrue(bc.toString().contains(Bug51744Servlet.EXPECTED));
         if (exceptionOnFailedWrite) {
-            assertTrue(bc.toString().contains(Bug51744Servlet.ERROR_MESSAGE));
+            Assert.assertTrue(bc.toString().contains(Bug51744Servlet.ERROR_MESSAGE));
         }
     }
 
@@ -308,8 +305,8 @@ public class TestNamingContext extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() + "/", bc, null);
-        assertEquals(200, rc);
-        assertTrue(bc.toString().contains("truetrue"));
+        Assert.assertEquals(200, rc);
+        Assert.assertTrue(bc.toString().contains("truetrue"));
     }
 
     public static final class Bug52830Servlet extends HttpServlet {

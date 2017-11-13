@@ -24,10 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.LogManager;
 
-import static org.junit.Assert.fail;
-
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -117,7 +116,7 @@ public abstract class LoggingBaseTest {
         // Create catalina.base directory
         File tempBase = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
         if (!tempBase.mkdirs() && !tempBase.isDirectory()) {
-            fail("Unable to create base temporary directory for tests");
+            Assert.fail("Unable to create base temporary directory for tests");
         }
         Path tempBasePath = FileSystems.getDefault().getPath(tempBase.getAbsolutePath());
         tempDir = Files.createTempDirectory(tempBasePath, "test").toFile();

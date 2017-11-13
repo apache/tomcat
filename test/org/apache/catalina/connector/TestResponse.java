@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.catalina.connector;
 
 import java.io.IOException;
@@ -28,9 +27,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -72,7 +68,7 @@ public class TestResponse extends TomcatBaseTest {
                         values.get(0).startsWith("HTTP/1.1")) {
                     continue;
                 }
-                fail("Null header name detected for value " + values);
+                Assert.fail("Null header name detected for value " + values);
             }
         }
 
@@ -83,7 +79,7 @@ public class TestResponse extends TomcatBaseTest {
                 count ++;
             }
         }
-        assertEquals(1, count);
+        Assert.assertEquals(1, count);
     }
 
     private static final class Bug49598Servlet extends HttpServlet {
@@ -118,7 +114,7 @@ public class TestResponse extends TomcatBaseTest {
 
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
 
-        assertEquals("OK", bc.toString());
+        Assert.assertEquals("OK", bc.toString());
     }
 
     private static final class CharsetServlet extends HttpServlet {
@@ -157,7 +153,7 @@ public class TestResponse extends TomcatBaseTest {
 
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
 
-        assertEquals("OK", bc.toString());
+        Assert.assertEquals("OK", bc.toString());
     }
 
 

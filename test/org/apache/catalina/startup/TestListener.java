@@ -24,9 +24,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -47,7 +45,7 @@ public class TestListener extends TomcatBaseTest {
 
         context.addServletContainerInitializer(new SCI(), null);
         tomcat.start();
-        assertTrue(SCL.initialized);
+        Assert.assertTrue(SCL.initialized);
     }
 
     /*
@@ -68,7 +66,7 @@ public class TestListener extends TomcatBaseTest {
         tomcat.start();
 
         //check that the ServletContextInitializer wasn't initialized.
-        assertFalse(SCL3.initialized);
+        Assert.assertFalse(SCL3.initialized);
     }
 
     public static class SCI implements ServletContainerInitializer {

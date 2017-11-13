@@ -16,10 +16,7 @@
  */
 package org.apache.catalina.tribes.io;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 public class TestXByteBuffer {
@@ -27,7 +24,7 @@ public class TestXByteBuffer {
     @Test
     public void testEmptyArray() throws Exception {
         Object obj = XByteBuffer.deserialize(new byte[0]);
-        assertNull(obj);
+        Assert.assertNull(obj);
     }
 
     @Test
@@ -35,7 +32,7 @@ public class TestXByteBuffer {
         String test = "This is as test.";
         byte[] msg = XByteBuffer.serialize(test);
         Object obj = XByteBuffer.deserialize(msg);
-        assertTrue(obj instanceof String);
-        assertEquals(test, obj);
+        Assert.assertTrue(obj instanceof String);
+        Assert.assertEquals(test, obj);
     }
 }

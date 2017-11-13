@@ -45,10 +45,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -109,7 +105,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         // Call the servlet once
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals("OK", bc.toString());
+        Assert.assertEquals("OK", bc.toString());
 
         // Give the async thread a chance to finish (but not too long)
         int counter = 0;
@@ -118,7 +114,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             counter++;
         }
 
-        assertEquals("1false2true3true4true5false", servlet.getResult());
+        Assert.assertEquals("1false2true3true4true5false", servlet.getResult());
 
         // Check the access log
         alv.validateAccessLog(1, 200, Bug49528Servlet.THREAD_SLEEP_TIME,
@@ -146,7 +142,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         // Call the servlet once
         ByteChunk bc = getUrl("http://localhost:" + getPort() + "/");
-        assertEquals("OK", bc.toString());
+        Assert.assertEquals("OK", bc.toString());
 
         // Give the async thread a chance to finish (but not too long)
         int counter = 0;
@@ -155,7 +151,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             counter++;
         }
 
-        assertEquals("1false2true3true4true5false", servlet.getResult());
+        Assert.assertEquals("1false2true3true4true5false", servlet.getResult());
 
         // Check the access log
         alv.validateAccessLog(1, 200, Bug49567Servlet.THREAD_SLEEP_TIME,
@@ -231,7 +227,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Map<String,List<String>> headers = new HashMap<>();
         getUrl("http://localhost:" + getPort() + "/", bc, headers);
 
-        assertEquals("OK", bc.toString());
+        Assert.assertEquals("OK", bc.toString());
         List<String> contentLength = headers.get("Content-Length");
         Assert.assertNotNull(contentLength);
         Assert.assertEquals(1,  contentLength.size());
@@ -533,7 +529,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             Thread.sleep(50);
             count ++;
         }
-        assertEquals(expectedTrack, getTrack());
+        Assert.assertEquals(expectedTrack, getTrack());
 
         // Check the access log
         if (completeOnTimeout == null ||
@@ -670,7 +666,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             Thread.sleep(50);
             count ++;
         }
-        assertEquals(expectedTrack, getTrack());
+        Assert.assertEquals(expectedTrack, getTrack());
 
         // Check the access log
         alv.validateAccessLog(1, 200, 0, REQUEST_TIME);
@@ -1013,7 +1009,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             Thread.sleep(50);
             count ++;
         }
-        assertEquals(expectedTrack, getTrack());
+        Assert.assertEquals(expectedTrack, getTrack());
 
         // Check the access log
         alv.validateAccessLog(1, 500, 0, REQUEST_TIME);
@@ -1067,7 +1063,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             Thread.sleep(50);
             count ++;
         }
-        assertEquals(expectedTrack, getTrack());
+        Assert.assertEquals(expectedTrack, getTrack());
 
         // Check the access log
         alv.validateAccessLog(1, 200, AsyncStartRunnable.THREAD_SLEEP_TIME,
@@ -1129,12 +1125,12 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         Map<String,List<String>> headers = new LinkedHashMap<>();
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() + "/", bc, headers);
-        assertEquals(200, rc);
-        assertEquals("OK", bc.toString());
+        Assert.assertEquals(200, rc);
+        Assert.assertEquals("OK", bc.toString());
         List<String> testHeader = headers.get("A");
-        assertNotNull(testHeader);
-        assertEquals(1, testHeader.size());
-        assertEquals("xyz",testHeader.get(0));
+        Assert.assertNotNull(testHeader);
+        Assert.assertEquals(1, testHeader.size());
+        Assert.assertEquals("xyz",testHeader.get(0));
 
         // Check the access log
         alv.validateAccessLog(1, 200, Bug50753Servlet.THREAD_SLEEP_TIME,
@@ -1195,7 +1191,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         int rc = getUrl(url.toString(), new ByteChunk(), null);
 
-        assertEquals(500, rc);
+        Assert.assertEquals(500, rc);
 
         // Without this test may complete before access log has a chance to log
         // the request
@@ -1232,7 +1228,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         int rc = getUrl(url.toString(), new ByteChunk(), null);
 
-        assertEquals(HttpServletResponse.SC_BAD_REQUEST, rc);
+        Assert.assertEquals(HttpServletResponse.SC_BAD_REQUEST, rc);
 
         // Without this test may complete before access log has a chance to log
         // the request
@@ -1322,7 +1318,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         ByteChunk res = new ByteChunk();
         int rc = getUrl(url.toString(), res, null);
 
-        assertEquals(HttpServletResponse.SC_BAD_REQUEST, rc);
+        Assert.assertEquals(HttpServletResponse.SC_BAD_REQUEST, rc);
 
         // SRV 10.9.2 - Handling an error is entirely the application's
         // responsibility when an error occurs on an application thread.
@@ -1330,11 +1326,11 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         // error page mechanism to kick in could be viewed as handling the error
         String responseBody = res.toString();
         Assert.assertNotNull(responseBody);
-        assertTrue(responseBody.length() > 0);
+        Assert.assertTrue(responseBody.length() > 0);
         if (customError) {
-            assertTrue(responseBody, responseBody.contains(CustomErrorServlet.ERROR_MESSAGE));
+            Assert.assertTrue(responseBody, responseBody.contains(CustomErrorServlet.ERROR_MESSAGE));
         } else {
-            assertTrue(responseBody, responseBody.contains(AsyncErrorServlet.ERROR_MESSAGE));
+            Assert.assertTrue(responseBody, responseBody.contains(AsyncErrorServlet.ERROR_MESSAGE));
         }
 
         // Without this test may complete before access log has a chance to log
@@ -1427,8 +1423,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         ByteChunk body = new ByteChunk();
         int rc = getUrl(url.toString(), body, null);
 
-        assertEquals(HttpServletResponse.SC_OK, rc);
-        assertEquals("OK", body.toString());
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals("OK", body.toString());
     }
 
     private static class Bug53337ServletA extends HttpServlet {
@@ -1506,9 +1502,9 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         ByteChunk body = new ByteChunk();
         int rc = getUrl(url.toString(), body, null);
 
-        assertEquals(HttpServletResponse.SC_OK, rc);
-        assertEquals("OK", body.toString());
-        assertTrue(servletA.isAsyncWhenExpected());
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals("OK", body.toString());
+        Assert.assertTrue(servletA.isAsyncWhenExpected());
     }
 
     private static class Bug53843ServletA extends HttpServlet {
@@ -1755,15 +1751,15 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             ioe.printStackTrace();
         }
 
-        assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         body.recycle();
 
         rc = getUrl("http://localhost:" + getPort() + "/bug54178ServletB",
                 body, null);
 
-        assertEquals(HttpServletResponse.SC_OK, rc);
-        assertEquals("OK", body.toString());
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals("OK", body.toString());
     }
 
     private static class Bug54178ServletA extends HttpServlet {
@@ -2193,7 +2189,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         getUrl("http://localhost:" + getPort()+ "/stage1");
 
-        assertEquals("doGet-startAsync-doGet-startAsync-onStartAsync-NonAsyncServletGet-onComplete-", getTrack());
+        Assert.assertEquals("doGet-startAsync-doGet-startAsync-onStartAsync-NonAsyncServletGet-onComplete-", getTrack());
 
         // Check the access log
         alv.validateAccessLog(1, 200, 0, REQUEST_TIME);
@@ -2475,8 +2471,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             }
 
             private void checkRequestResponse(AsyncEvent event) {
-                assertEquals(servletRequest, event.getSuppliedRequest());
-                assertEquals(servletResponse, event.getSuppliedResponse());
+                Assert.assertEquals(servletRequest, event.getSuppliedRequest());
+                Assert.assertEquals(servletResponse, event.getSuppliedResponse());
             }
         };
         final Context context = new TesterContext();
@@ -2630,8 +2626,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         ByteChunk body = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() + EncodedDispatchServlet.ENCODED_URI, body, null);
 
-        assertEquals(HttpServletResponse.SC_OK, rc);
-        assertEquals("OK", body.toString());
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertEquals("OK", body.toString());
     }
 
 

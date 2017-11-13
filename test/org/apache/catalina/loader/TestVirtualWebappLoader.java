@@ -18,10 +18,7 @@ package org.apache.catalina.loader;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.WebResourceRoot;
@@ -35,8 +32,8 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
     @Test
     public void testModified() throws Exception {
         WebappLoader loader = new WebappLoader();
-        assertNull(loader.getClassLoader());
-        assertFalse(loader.modified());
+        Assert.assertNull(loader.getClassLoader());
+        Assert.assertFalse(loader.modified());
     }
 
     @Test
@@ -63,16 +60,16 @@ public class TestVirtualWebappLoader extends TomcatBaseTest {
 
         loader.start();
         String[] repos = loader.getLoaderRepositories();
-        assertEquals(4,repos.length);
+        Assert.assertEquals(4,repos.length);
         loader.stop();
 
         repos = loader.getLoaderRepositories();
-        assertEquals(0, repos.length);
+        Assert.assertEquals(0, repos.length);
 
         // no leak
         loader.start();
         repos = loader.getLoaderRepositories();
-        assertEquals(4,repos.length);
+        Assert.assertEquals(4,repos.length);
 
         // clear loader
         ctx.setLoader(null);

@@ -18,8 +18,7 @@ package org.apache.naming.resources;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.core.JreMemoryLeakPreventionListener;
@@ -60,7 +59,7 @@ public class TestWarDirContext extends TomcatBaseTest {
 
         ByteChunk bc = getUrl("http://localhost:" + getPort() +
                 "/test/warDirContext.jsp");
-        assertEquals("<p>java.lang.ClassNotFoundException</p>",
+        Assert.assertEquals("<p>java.lang.ClassNotFoundException</p>",
                 bc.toString());
     }
 
@@ -86,13 +85,13 @@ public class TestWarDirContext extends TomcatBaseTest {
         // Should be found in resources.jar
         ByteChunk bc = getUrl("http://localhost:" + getPort() +
                 "/test/'singlequote.jsp");
-        assertEquals("<p>'singlequote.jsp in resources.jar</p>",
+        Assert.assertEquals("<p>'singlequote.jsp in resources.jar</p>",
                 bc.toString());
 
         // Should be found in file system
         bc = getUrl("http://localhost:" + getPort() +
                 "/test/'singlequote2.jsp");
-        assertEquals("<p>'singlequote2.jsp in file system</p>",
+        Assert.assertEquals("<p>'singlequote2.jsp in file system</p>",
                 bc.toString());
     }
 
@@ -119,13 +118,13 @@ public class TestWarDirContext extends TomcatBaseTest {
         // Should be found in resources.jar
         ByteChunk bc = getUrl("http://localhost:" + getPort() +
                 "/test/'singlequote.jsp");
-        assertEquals("<p>'singlequote.jsp in resources.jar</p>",
+        Assert.assertEquals("<p>'singlequote.jsp in resources.jar</p>",
                 bc.toString());
 
         // Should be found in file system
         bc = getUrl("http://localhost:" + getPort() +
                 "/test/'singlequote2.jsp");
-        assertEquals("<p>'singlequote2.jsp in file system</p>",
+        Assert.assertEquals("<p>'singlequote2.jsp in file system</p>",
                 bc.toString());
     }
 }

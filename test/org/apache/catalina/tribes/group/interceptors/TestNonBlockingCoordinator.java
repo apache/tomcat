@@ -16,9 +16,8 @@
  */
 package org.apache.catalina.tribes.group.interceptors;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -72,7 +71,7 @@ public class TestNonBlockingCoordinator {
     public void testCoord1() throws Exception {
         int expectedCount = channels[0].getMembers().length;
         for (int i = 1; i < CHANNEL_COUNT; i++) {
-            assertEquals("Message count expected to be equal.", expectedCount,
+            Assert.assertEquals("Message count expected to be equal.", expectedCount,
                     channels[i].getMembers().length);
         }
         Member member = coordinators[0].getCoordinator();
@@ -86,7 +85,7 @@ public class TestNonBlockingCoordinator {
             }
         }
         for (int i = 0; i < CHANNEL_COUNT; i++) {
-            assertEquals(member, coordinators[i].getCoordinator());
+            Assert.assertEquals(member, coordinators[i].getCoordinator());
         }
         System.out.println("Coordinator[1] is:" + member);
     }
@@ -114,7 +113,7 @@ public class TestNonBlockingCoordinator {
         member = coordinators[index].getCoordinator();
         for (int i = 1; i < CHANNEL_COUNT; i++) {
             if (i != dead) {
-                assertEquals(member, coordinators[i].getCoordinator());
+                Assert.assertEquals(member, coordinators[i].getCoordinator());
             }
         }
         System.out.println("Coordinator[2b] is:" + member);

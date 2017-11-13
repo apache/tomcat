@@ -23,9 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -215,8 +212,8 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() + uri, bc, reqHeaders,
                 respHeaders);
-        assertEquals(401, rc);
-        assertTrue(bc.getLength() > 0);
+        Assert.assertEquals(401, rc);
+        Assert.assertTrue(bc.getLength() > 0);
         bc.recycle();
 
         // Second request should succeed (if we use the server nonce)
@@ -238,11 +235,11 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
                 null);
 
         if (req2expect200) {
-            assertEquals(200, rc);
-            assertEquals("OK", bc.toString());
+            Assert.assertEquals(200, rc);
+            Assert.assertEquals("OK", bc.toString());
         } else {
-            assertEquals(401, rc);
-            assertTrue(bc.getLength() > 0);
+            Assert.assertEquals(401, rc);
+            Assert.assertTrue(bc.getLength() > 0);
         }
 
         // Third request should succeed if we increment nc
@@ -255,11 +252,11 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
                 null);
 
         if (req3expect200) {
-            assertEquals(200, rc);
-            assertEquals("OK", bc.toString());
+            Assert.assertEquals(200, rc);
+            Assert.assertEquals("OK", bc.toString());
         } else {
-            assertEquals(401, rc);
-            assertTrue(bc.getLength() > 0);
+            Assert.assertEquals(401, rc);
+            Assert.assertTrue(bc.getLength() > 0);
         }
     }
 

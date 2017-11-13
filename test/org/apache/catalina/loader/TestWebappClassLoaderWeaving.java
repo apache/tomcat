@@ -24,14 +24,9 @@ import java.lang.instrument.ClassFileTransformer;
 import java.lang.reflect.Method;
 import java.security.ProtectionDomain;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -85,8 +80,8 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         this.tomcat.start();
 
         ClassLoader loader = this.context.getLoader().getClassLoader();
-        assertNotNull("The class loader should not be null.", loader);
-        assertTrue("The class loader is not correct.", loader instanceof WebappClassLoaderBase);
+        Assert.assertNotNull("The class loader should not be null.", loader);
+        Assert.assertTrue("The class loader is not correct.", loader instanceof WebappClassLoaderBase);
 
         this.loader = (WebappClassLoaderBase) loader;
 
@@ -112,10 +107,10 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
     public void testNoWeaving() throws Exception {
 
         String result = invokeDoMethodOnClass(this.loader, "TesterNeverWeavedClass");
-        assertEquals("The first result is not correct.", "This will never be weaved.", result);
+        Assert.assertEquals("The first result is not correct.", "This will never be weaved.", result);
 
         result = invokeDoMethodOnClass(this.loader, "TesterUnweavedClass");
-        assertEquals("The second result is not correct.", "Hello, Unweaved World!", result);
+        Assert.assertEquals("The second result is not correct.", "Hello, Unweaved World!", result);
 
     }
 
@@ -124,17 +119,17 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
 
         try {
             this.loader.addTransformer(null);
-            fail("Expected exception IllegalArgumentException, got no exception.");
+            Assert.fail("Expected exception IllegalArgumentException, got no exception.");
         } catch (IllegalArgumentException ignore) {
             // good
         }
 
         // class loading should still work, no weaving
         String result = invokeDoMethodOnClass(this.loader, "TesterNeverWeavedClass");
-        assertEquals("The first result is not correct.", "This will never be weaved.", result);
+        Assert.assertEquals("The first result is not correct.", "This will never be weaved.", result);
 
         result = invokeDoMethodOnClass(this.loader, "TesterUnweavedClass");
-        assertEquals("The second result is not correct.", "Hello, Unweaved World!", result);
+        Assert.assertEquals("The second result is not correct.", "Hello, Unweaved World!", result);
 
     }
 
@@ -144,10 +139,10 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         this.loader.addTransformer(new ReplacementTransformer(WEAVED_REPLACEMENT_1));
 
         String result = invokeDoMethodOnClass(this.loader, "TesterNeverWeavedClass");
-        assertEquals("The first result is not correct.", "This will never be weaved.", result);
+        Assert.assertEquals("The first result is not correct.", "This will never be weaved.", result);
 
         result = invokeDoMethodOnClass(this.loader, "TesterUnweavedClass");
-        assertEquals("The second result is not correct.", "Hello, Weaver #1!", result);
+        Assert.assertEquals("The second result is not correct.", "Hello, Weaver #1!", result);
 
     }
 
@@ -157,10 +152,10 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         this.loader.addTransformer(new ReplacementTransformer(WEAVED_REPLACEMENT_2));
 
         String result = invokeDoMethodOnClass(this.loader, "TesterNeverWeavedClass");
-        assertEquals("The first result is not correct.", "This will never be weaved.", result);
+        Assert.assertEquals("The first result is not correct.", "This will never be weaved.", result);
 
         result = invokeDoMethodOnClass(this.loader, "TesterUnweavedClass");
-        assertEquals("The second result is not correct.", "Hello, Weaver #2!", result);
+        Assert.assertEquals("The second result is not correct.", "Hello, Weaver #2!", result);
 
     }
 
@@ -171,10 +166,10 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         this.loader.addTransformer(new ReplacementTransformer(WEAVED_REPLACEMENT_2));
 
         String result = invokeDoMethodOnClass(this.loader, "TesterNeverWeavedClass");
-        assertEquals("The first result is not correct.", "This will never be weaved.", result);
+        Assert.assertEquals("The first result is not correct.", "This will never be weaved.", result);
 
         result = invokeDoMethodOnClass(this.loader, "TesterUnweavedClass");
-        assertEquals("The second result is not correct.", "Hello, Weaver #2!", result);
+        Assert.assertEquals("The second result is not correct.", "Hello, Weaver #2!", result);
 
     }
 
@@ -185,10 +180,10 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         this.loader.addTransformer(new ReplacementTransformer(WEAVED_REPLACEMENT_1));
 
         String result = invokeDoMethodOnClass(this.loader, "TesterNeverWeavedClass");
-        assertEquals("The first result is not correct.", "This will never be weaved.", result);
+        Assert.assertEquals("The first result is not correct.", "This will never be weaved.", result);
 
         result = invokeDoMethodOnClass(this.loader, "TesterUnweavedClass");
-        assertEquals("The second result is not correct.", "Hello, Weaver #1!", result);
+        Assert.assertEquals("The second result is not correct.", "Hello, Weaver #1!", result);
 
     }
 
@@ -200,10 +195,10 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         this.loader.removeTransformer(removed);
 
         String result = invokeDoMethodOnClass(this.loader, "TesterNeverWeavedClass");
-        assertEquals("The first result is not correct.", "This will never be weaved.", result);
+        Assert.assertEquals("The first result is not correct.", "This will never be weaved.", result);
 
         result = invokeDoMethodOnClass(this.loader, "TesterUnweavedClass");
-        assertEquals("The second result is not correct.", "Hello, Unweaved World!", result);
+        Assert.assertEquals("The second result is not correct.", "Hello, Unweaved World!", result);
 
     }
 
@@ -217,10 +212,10 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         this.loader.removeTransformer(removed);
 
         String result = invokeDoMethodOnClass(this.loader, "TesterNeverWeavedClass");
-        assertEquals("The first result is not correct.", "This will never be weaved.", result);
+        Assert.assertEquals("The first result is not correct.", "This will never be weaved.", result);
 
         result = invokeDoMethodOnClass(this.loader, "TesterUnweavedClass");
-        assertEquals("The second result is not correct.", "Hello, Weaver #1!", result);
+        Assert.assertEquals("The second result is not correct.", "Hello, Weaver #1!", result);
 
     }
 
@@ -234,10 +229,10 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         this.loader.removeTransformer(removed);
 
         String result = invokeDoMethodOnClass(this.loader, "TesterNeverWeavedClass");
-        assertEquals("The first result is not correct.", "This will never be weaved.", result);
+        Assert.assertEquals("The first result is not correct.", "This will never be weaved.", result);
 
         result = invokeDoMethodOnClass(this.loader, "TesterUnweavedClass");
-        assertEquals("The second result is not correct.", "Hello, Weaver #2!", result);
+        Assert.assertEquals("The second result is not correct.", "Hello, Weaver #2!", result);
 
     }
 
@@ -248,39 +243,39 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         this.loader.addTransformer(new ReplacementTransformer(WEAVED_REPLACEMENT_2));
 
         String result = invokeDoMethodOnClass(this.loader, "TesterNeverWeavedClass");
-        assertEquals("The first result is not correct.", "This will never be weaved.", result);
+        Assert.assertEquals("The first result is not correct.", "This will never be weaved.", result);
 
         result = invokeDoMethodOnClass(this.loader, "TesterUnweavedClass");
-        assertEquals("The second result is not correct.", "Hello, Weaver #2!", result);
+        Assert.assertEquals("The second result is not correct.", "Hello, Weaver #2!", result);
 
         WebappClassLoaderBase copiedLoader = (WebappClassLoaderBase) this.loader.copyWithoutTransformers();
 
         result = invokeDoMethodOnClass(copiedLoader, "TesterNeverWeavedClass");
-        assertEquals("The third result is not correct.", "This will never be weaved.", result);
+        Assert.assertEquals("The third result is not correct.", "This will never be weaved.", result);
 
         result = invokeDoMethodOnClass(copiedLoader, "TesterUnweavedClass");
-        assertEquals("The fourth result is not correct.", "Hello, Unweaved World!", result);
+        Assert.assertEquals("The fourth result is not correct.", "Hello, Unweaved World!", result);
 
-        assertEquals("getClearReferencesHttpClientKeepAliveThread did not match.",
+        Assert.assertEquals("getClearReferencesHttpClientKeepAliveThread did not match.",
                 Boolean.valueOf(this.loader.getClearReferencesHttpClientKeepAliveThread()),
                 Boolean.valueOf(copiedLoader.getClearReferencesHttpClientKeepAliveThread()));
-        assertEquals("getClearReferencesLogFactoryRelease did not match.",
+        Assert.assertEquals("getClearReferencesLogFactoryRelease did not match.",
                 Boolean.valueOf(this.loader.getClearReferencesLogFactoryRelease()),
                 Boolean.valueOf(copiedLoader.getClearReferencesLogFactoryRelease()));
-        assertEquals("getClearReferencesStopThreads did not match.",
+        Assert.assertEquals("getClearReferencesStopThreads did not match.",
                 Boolean.valueOf(this.loader.getClearReferencesStopThreads()),
                 Boolean.valueOf(copiedLoader.getClearReferencesStopThreads()));
-        assertEquals("getClearReferencesStopTimerThreads did not match.",
+        Assert.assertEquals("getClearReferencesStopTimerThreads did not match.",
                 Boolean.valueOf(this.loader.getClearReferencesStopTimerThreads()),
                 Boolean.valueOf(copiedLoader.getClearReferencesStopTimerThreads()));
-        assertEquals("getContextName did not match.", this.loader.getContextName(),
+        Assert.assertEquals("getContextName did not match.", this.loader.getContextName(),
                 copiedLoader.getContextName());
-        assertEquals("getDelegate did not match.",
+        Assert.assertEquals("getDelegate did not match.",
                 Boolean.valueOf(this.loader.getDelegate()),
                 Boolean.valueOf(copiedLoader.getDelegate()));
-        assertEquals("getURLs did not match.", this.loader.getURLs().length,
+        Assert.assertEquals("getURLs did not match.", this.loader.getURLs().length,
                 copiedLoader.getURLs().length);
-        assertSame("getParent did not match.", this.loader.getParent(), copiedLoader.getParent());
+        Assert.assertSame("getParent did not match.", this.loader.getParent(), copiedLoader.getParent());
 
     }
 
@@ -303,7 +298,7 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
             throws Exception {
 
         Class<?> c = loader.findClass("org.apache.catalina.loader." + className);
-        assertNotNull("The loaded class should not be null.", c);
+        Assert.assertNotNull("The loaded class should not be null.", c);
 
         Method m = c.getMethod("doMethod");
 

@@ -25,10 +25,8 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,7 +45,7 @@ public class TestFileHandler {
     public void setUp() throws Exception {
         File logsBase = new File(System.getProperty("tomcat.test.temp", "output/tmp"));
         if (!logsBase.mkdirs() && !logsBase.isDirectory()) {
-            fail("Unable to create logs directory.");
+            Assert.fail("Unable to create logs directory.");
         }
         Path logsBasePath = FileSystems.getDefault().getPath(logsBase.getAbsolutePath());
         logsDir = Files.createTempDirectory(logsBasePath, "test").toFile();
@@ -85,7 +83,7 @@ public class TestFileHandler {
 
         Thread.sleep(1000);
 
-        assertTrue(logsDir.list().length == 16);
+        Assert.assertTrue(logsDir.list().length == 16);
     }
 
     @SuppressWarnings("unused")
@@ -100,7 +98,7 @@ public class TestFileHandler {
 
         Thread.sleep(1000);
 
-        assertTrue(logsDir.list().length == 16);
+        Assert.assertTrue(logsDir.list().length == 16);
     }
 
     @SuppressWarnings("unused")
@@ -112,7 +110,7 @@ public class TestFileHandler {
 
         Thread.sleep(1000);
 
-        assertTrue(logsDir.list().length == 17);
+        Assert.assertTrue(logsDir.list().length == 17);
     }
 
     private void generateLogFiles(File dir, String prefix, String sufix, int amount)

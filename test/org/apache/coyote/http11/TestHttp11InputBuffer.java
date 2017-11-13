@@ -26,10 +26,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -50,8 +47,8 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         Bug48839Client client = new Bug48839Client();
 
         client.doRequest();
-        assertTrue(client.isResponse200());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.isResponseBodyOK());
     }
 
 
@@ -137,9 +134,9 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         Bug51557Client client = new Bug51557Client("X-Bug51557Valid", "1234");
 
         client.doRequest();
-        assertTrue(client.isResponse200());
-        assertEquals("1234abcd", client.getResponseBody());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("1234abcd", client.getResponseBody());
+        Assert.assertTrue(client.isResponseBodyOK());
     }
 
 
@@ -149,7 +146,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         Bug51557Client client = new Bug51557Client("X-Bug51557=Invalid", "1234", true);
 
         client.doRequest();
-        assertTrue(client.isResponse400());
+        Assert.assertTrue(client.isResponse400());
     }
 
 
@@ -159,9 +156,9 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         Bug51557Client client = new Bug51557Client("X-Bug51557NoColon");
 
         client.doRequest();
-        assertTrue(client.isResponse200());
-        assertEquals("abcd", client.getResponseBody());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("abcd", client.getResponseBody());
+        Assert.assertTrue(client.isResponseBodyOK());
     }
 
 
@@ -197,9 +194,9 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
                 "foo" + SimpleHttpClient.CRLF + " bar");
 
         client.doRequest();
-        assertTrue(client.isResponse200());
-        assertEquals("abcd", client.getResponseBody());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("abcd", client.getResponseBody());
+        Assert.assertTrue(client.isResponseBodyOK());
     }
 
 
@@ -210,9 +207,9 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
                 "invalid");
 
         client.doRequest();
-        assertTrue(client.isResponse200());
-        assertEquals("abcd", client.getResponseBody());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("abcd", client.getResponseBody());
+        Assert.assertTrue(client.isResponseBodyOK());
     }
 
 
@@ -223,9 +220,9 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
                 "invalid");
 
         client.doRequest();
-        assertTrue(client.isResponse200());
-        assertEquals("abcd", client.getResponseBody());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("abcd", client.getResponseBody());
+        Assert.assertTrue(client.isResponseBodyOK());
     }
 
 
@@ -234,9 +231,9 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
             new Bug51557Client("X-Bug" + s + "51557", "invalid");
 
         client.doRequest();
-        assertTrue(client.isResponse200());
-        assertEquals("abcd", client.getResponseBody());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertEquals("abcd", client.getResponseBody());
+        Assert.assertTrue(client.isResponseBodyOK());
     }
 
     /**
@@ -367,8 +364,8 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         NewLinesClient client = new NewLinesClient(10);
 
         client.doRequest();
-        assertTrue(client.isResponse200());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.isResponseBodyOK());
     }
 
 
@@ -385,9 +382,9 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         // fail and the response won't be read.
         Exception e = client.doRequest();
         if (e == null) {
-            assertTrue(client.getResponseLine(), client.isResponse400());
+            Assert.assertTrue(client.getResponseLine(), client.isResponse400());
         }
-        assertFalse(client.isResponseBodyOK());
+        Assert.assertFalse(client.isResponseBodyOK());
     }
 
 
@@ -462,8 +459,8 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         Bug54947Client client = new Bug54947Client();
 
         client.doRequest();
-        assertTrue(client.isResponse200());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.isResponseBodyOK());
     }
 
 
@@ -528,8 +525,8 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         Bug59089Client client = new Bug59089Client();
 
         client.doRequest();
-        assertTrue(client.isResponse200());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.isResponseBodyOK());
     }
 
 
@@ -594,8 +591,8 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
         InvalidMethodClient client = new InvalidMethodClient();
 
         client.doRequest();
-        assertTrue(client.getResponseLine(), client.isResponse400());
-        assertTrue(client.isResponseBodyOK());
+        Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+        Assert.assertTrue(client.isResponseBodyOK());
     }
 
 
