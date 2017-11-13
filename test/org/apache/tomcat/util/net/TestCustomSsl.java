@@ -21,10 +21,7 @@ import java.net.SocketException;
 
 import javax.net.ssl.SSLException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -88,7 +85,7 @@ public class TestCustomSsl extends TomcatBaseTest {
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
             "/examples/servlets/servlet/HelloWorldExample");
-        assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
+        Assert.assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
     }
 
     @Test
@@ -122,7 +119,7 @@ public class TestCustomSsl extends TomcatBaseTest {
             ((AbstractHttp11JsseProtocol<?>) handler).setTruststoreFile(null);
         } else {
             // Unexpected
-            fail("Unexpected handler type");
+            Assert.fail("Unexpected handler type");
         }
         if (trustType.equals(TrustType.ALL)) {
             tomcat.getConnector().setAttribute("trustManagerClassName",
@@ -140,7 +137,7 @@ public class TestCustomSsl extends TomcatBaseTest {
         // Unprotected resource
         ByteChunk res =
                 getUrl("https://localhost:" + getPort() + "/unprotected");
-        assertEquals("OK", res.toString());
+        Assert.assertEquals("OK", res.toString());
 
         // Protected resource
         res.recycle();
@@ -150,12 +147,12 @@ public class TestCustomSsl extends TomcatBaseTest {
                 null, null);
         } catch (SocketException se) {
             if (!trustType.equals(TrustType.NONE)) {
-                fail(se.getMessage());
+                Assert.fail(se.getMessage());
                 se.printStackTrace();
             }
         } catch (SSLException he) {
             if (!trustType.equals(TrustType.NONE)) {
-                fail(he.getMessage());
+                Assert.fail(he.getMessage());
                 he.printStackTrace();
             }
         }
@@ -168,17 +165,17 @@ public class TestCustomSsl extends TomcatBaseTest {
                           (count > 0 ? TesterSupport.getLastClientAuthRequestedIssuer(0).getName() : "NONE"));
                 log.debug("Expected requested Issuer: " + TesterSupport.getClientAuthExpectedIssuer());
             }
-            assertTrue("Checking requested client issuer against " +
-                       TesterSupport.getClientAuthExpectedIssuer(),
-                       TesterSupport.checkLastClientAuthRequestedIssuers());
+            Assert.assertTrue("Checking requested client issuer against " +
+                    TesterSupport.getClientAuthExpectedIssuer(),
+                    TesterSupport.checkLastClientAuthRequestedIssuers());
         }
 
         if (trustType.equals(TrustType.NONE)) {
-            assertTrue(rc != 200);
-            assertEquals("", res.toString());
+            Assert.assertTrue(rc != 200);
+            Assert.assertEquals("", res.toString());
         } else {
-            assertEquals(200, rc);
-            assertEquals("OK-" + TesterSupport.ROLE, res.toString());
+            Assert.assertEquals(200, rc);
+            Assert.assertEquals("OK-" + TesterSupport.ROLE, res.toString());
         }
     }
 }

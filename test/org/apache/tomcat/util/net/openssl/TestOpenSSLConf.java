@@ -22,11 +22,7 @@ import java.util.Set;
 
 import org.hamcrest.CoreMatchers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -54,7 +50,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
             String sslImplementation = String.valueOf(
                     tomcat.getConnector().getProperty("sslImplementationName"));
             Assume.assumeTrue("This test is only for OpenSSL based SSL connectors",
-                sslImplementation.contains("openssl"));
+                    sslImplementation.contains("openssl"));
         }
 
         OpenSSLConfCmd cmd = new OpenSSLConfCmd();
@@ -64,13 +60,13 @@ public class TestOpenSSLConf extends TomcatBaseTest {
         conf.addCmd(cmd);
         SSLHostConfig[] sslHostConfigs = tomcat.getConnector().
                                          getProtocolHandler().findSslHostConfigs();
-        assertEquals("Wrong SSLHostConfigCount", 1, sslHostConfigs.length);
+        Assert.assertEquals("Wrong SSLHostConfigCount", 1, sslHostConfigs.length);
         sslHostConfigs[0].setOpenSslConf(conf);
 
         tomcat.start();
 
         sslHostConfigs = tomcat.getConnector().getProtocolHandler().findSslHostConfigs();
-        assertEquals("Wrong SSLHostConfigCount", 1, sslHostConfigs.length);
+        Assert.assertEquals("Wrong SSLHostConfigCount", 1, sslHostConfigs.length);
         return sslHostConfigs[0];
     }
 
@@ -79,11 +75,11 @@ public class TestOpenSSLConf extends TomcatBaseTest {
         SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("CipherString",
                                                                ENABLED_CIPHER);
         String[] ciphers = sslHostConfig.getEnabledCiphers();
-        assertThat("Wrong HostConfig ciphers", ciphers,
-                   CoreMatchers.is(EXPECTED_CIPHERS));
+        Assert.assertThat("Wrong HostConfig ciphers", ciphers,
+                CoreMatchers.is(EXPECTED_CIPHERS));
         ciphers = SSLContext.getCiphers(sslHostConfig.getOpenSslContext().longValue());
-        assertThat("Wrong native SSL context ciphers", ciphers,
-                   CoreMatchers.is(EXPECTED_CIPHERS));
+        Assert.assertThat("Wrong native SSL context ciphers", ciphers,
+                CoreMatchers.is(EXPECTED_CIPHERS));
     }
 
     @Test
@@ -100,13 +96,13 @@ public class TestOpenSSLConf extends TomcatBaseTest {
                                                                sb.substring(1));
         String[] protocols = sslHostConfig.getEnabledProtocols();
         for (String protocol : protocols) {
-            assertFalse("Protocol " + protocol + " is not allowed",
-                        disabledProtocols.contains(protocol));
+            Assert.assertFalse("Protocol " + protocol + " is not allowed",
+                    disabledProtocols.contains(protocol));
         }
         Set<String> enabledProtocols = new HashSet<>(Arrays.asList(protocols));
         for (String protocol : ENABLED_PROTOCOLS) {
-            assertTrue("Protocol " + protocol + " is not enabled",
-                       enabledProtocols.contains(protocol));
+            Assert.assertTrue("Protocol " + protocol + " is not enabled",
+                    enabledProtocols.contains(protocol));
         }
     }
 }

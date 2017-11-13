@@ -18,9 +18,7 @@ package org.apache.tomcat.util.net;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -71,14 +69,14 @@ public class TestClientCert extends TomcatBaseTest {
                       (count > 0 ? TesterSupport.getLastClientAuthRequestedIssuer(0).getName() : "NONE"));
             log.debug("Expected requested Issuer: " + TesterSupport.getClientAuthExpectedIssuer());
         }
-        assertTrue("Checking requested client issuer against " +
-                   TesterSupport.getClientAuthExpectedIssuer(),
-                   TesterSupport.checkLastClientAuthRequestedIssuers());
+        Assert.assertTrue("Checking requested client issuer against " +
+                TesterSupport.getClientAuthExpectedIssuer(),
+                TesterSupport.checkLastClientAuthRequestedIssuers());
 
         if (preemptive) {
-            assertEquals("OK-" + TesterSupport.ROLE, res.toString());
+            Assert.assertEquals("OK-" + TesterSupport.ROLE, res.toString());
         } else {
-            assertEquals("OK", res.toString());
+            Assert.assertEquals("OK", res.toString());
         }
 
         // Protected resource
@@ -91,11 +89,11 @@ public class TestClientCert extends TomcatBaseTest {
                       (count > 0 ? TesterSupport.getLastClientAuthRequestedIssuer(0).getName() : "NONE"));
             log.debug("Expected requested Issuer: " + TesterSupport.getClientAuthExpectedIssuer());
         }
-        assertTrue("Checking requested client issuer against " +
-                   TesterSupport.getClientAuthExpectedIssuer(),
-                   TesterSupport.checkLastClientAuthRequestedIssuers());
+        Assert.assertTrue("Checking requested client issuer against " +
+                TesterSupport.getClientAuthExpectedIssuer(),
+                TesterSupport.checkLastClientAuthRequestedIssuers());
 
-        assertEquals("OK-" + TesterSupport.ROLE, res.toString());
+        Assert.assertEquals("OK-" + TesterSupport.ROLE, res.toString());
     }
 
     @Test
@@ -140,11 +138,11 @@ public class TestClientCert extends TomcatBaseTest {
                       (count > 0 ? TesterSupport.getLastClientAuthRequestedIssuer(0).getName() : "NONE"));
             log.debug("Expected requested Issuer: " + TesterSupport.getClientAuthExpectedIssuer());
         }
-        assertTrue("Checking requested client issuer against " +
-                   TesterSupport.getClientAuthExpectedIssuer(),
-                   TesterSupport.checkLastClientAuthRequestedIssuers());
+        Assert.assertTrue("Checking requested client issuer against " +
+                TesterSupport.getClientAuthExpectedIssuer(),
+                TesterSupport.checkLastClientAuthRequestedIssuers());
 
-        assertEquals("OK-" + bodySize, res.toString());
+        Assert.assertEquals("OK-" + bodySize, res.toString());
 
         // Protected resource
         res.recycle();
@@ -158,14 +156,14 @@ public class TestClientCert extends TomcatBaseTest {
                       (count > 0 ? TesterSupport.getLastClientAuthRequestedIssuer(0).getName() : "NONE"));
             log.debug("Expected requested Issuer: " + TesterSupport.getClientAuthExpectedIssuer());
         }
-        assertTrue("Checking requested client issuer against " +
-                   TesterSupport.getClientAuthExpectedIssuer(),
-                   TesterSupport.checkLastClientAuthRequestedIssuers());
+        Assert.assertTrue("Checking requested client issuer against " +
+                TesterSupport.getClientAuthExpectedIssuer(),
+                TesterSupport.checkLastClientAuthRequestedIssuers());
 
         if (expectProtectedFail) {
-            assertEquals(401, rc);
+            Assert.assertEquals(401, rc);
         } else {
-            assertEquals("OK-" + bodySize, res.toString());
+            Assert.assertEquals("OK-" + bodySize, res.toString());
         }
     }
 

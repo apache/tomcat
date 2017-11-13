@@ -25,10 +25,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -93,20 +90,20 @@ public class TestMimeHeadersIntegration extends TomcatBaseTest {
         if (successExpected) {
             alv.validateAccessLog(1, 200, 0, 3000);
             // Response 200
-            assertTrue("Response line is: " + client.getResponseLine(),
+            Assert.assertTrue("Response line is: " + client.getResponseLine(),
                     client.getResponseLine() != null && client.isResponse200());
-            assertEquals("OK", client.getResponseBody());
+            Assert.assertEquals("OK", client.getResponseBody());
         } else {
             alv.validateAccessLog(1, 400, 0, 0);
             // Connection aborted or response 400
-            assertTrue("Response line is: " + client.getResponseLine(),
+            Assert.assertTrue("Response line is: " + client.getResponseLine(),
                     client.getResponseLine() == null || client.isResponse400());
         }
         int maxHeaderCount =
                 ((Integer) tomcat.getConnector().getProperty("maxHeaderCount")).intValue();
-        assertEquals(expectedMaxHeaderCount, maxHeaderCount);
+        Assert.assertEquals(expectedMaxHeaderCount, maxHeaderCount);
         if (maxHeaderCount > 0) {
-            assertEquals(maxHeaderCount, alv.arraySize);
+            Assert.assertEquals(maxHeaderCount, alv.arraySize);
         } else if (maxHeaderCount < 0) {
             int maxHttpHeaderSize = ((Integer) tomcat.getConnector()
                     .getAttribute("maxHttpHeaderSize")).intValue();
@@ -116,7 +113,7 @@ public class TestMimeHeadersIntegration extends TomcatBaseTest {
             while (arraySize < headerCount) {
                 arraySize <<= 1;
             }
-            assertEquals(arraySize, alv.arraySize);
+            Assert.assertEquals(arraySize, alv.arraySize);
         }
     }
 
@@ -167,7 +164,7 @@ public class TestMimeHeadersIntegration extends TomcatBaseTest {
                 headersArrayField.setAccessible(true);
                 arraySize = ((Object[]) headersArrayField.get(mh)).length;
             } catch (Exception ex) {
-                assertNull(ex.getMessage(), ex);
+                Assert.assertNull(ex.getMessage(), ex);
             }
         }
     }
