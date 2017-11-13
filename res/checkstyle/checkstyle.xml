@@ -62,7 +62,6 @@
     <module name="AvoidStaticImport">
         <property name="excludes"
                   value="org.apache.catalina.startup.SimpleHttpClient.CRLF"/>
-        <property name="excludes" value="org.junit.Assert.*"/>
     </module>
     <module name="IllegalImport">
         <property name="illegalPkgs" value="sun,junit.framework"/>
