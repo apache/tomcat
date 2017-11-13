@@ -21,10 +21,7 @@ import java.net.SocketException;
 
 import javax.net.ssl.SSLException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -75,7 +72,7 @@ public class TestCustomSsl extends TomcatBaseTest {
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
             "/examples/servlets/servlet/HelloWorldExample");
-        assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
+        Assert.assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
     }
 
     @Test
@@ -110,7 +107,7 @@ public class TestCustomSsl extends TomcatBaseTest {
             ((AbstractHttp11JsseProtocol<?>) handler).setTruststoreFile(null);
         } else {
             // Unexpected
-            fail("Unexpected handler type");
+            Assert.fail("Unexpected handler type");
         }
         if (serverTrustAll) {
             tomcat.getConnector().setAttribute("trustManagerClassName",
@@ -125,7 +122,7 @@ public class TestCustomSsl extends TomcatBaseTest {
         // Unprotected resource
         ByteChunk res =
                 getUrl("https://localhost:" + getPort() + "/unprotected");
-        assertEquals("OK", res.toString());
+        Assert.assertEquals("OK", res.toString());
 
         // Protected resource
         res.recycle();
@@ -135,21 +132,21 @@ public class TestCustomSsl extends TomcatBaseTest {
                 null, null);
         } catch (SocketException se) {
             if (serverTrustAll) {
-                fail(se.getMessage());
+                Assert.fail(se.getMessage());
                 se.printStackTrace();
             }
         } catch (SSLException he) {
             if (serverTrustAll) {
-                fail(he.getMessage());
+                Assert.fail(he.getMessage());
                 he.printStackTrace();
             }
         }
         if (serverTrustAll) {
-            assertEquals(200, rc);
-            assertEquals("OK-" + TesterSupport.ROLE, res.toString());
+            Assert.assertEquals(200, rc);
+            Assert.assertEquals("OK-" + TesterSupport.ROLE, res.toString());
         } else {
-            assertTrue(rc != 200);
-            assertEquals("", res.toString());
+            Assert.assertTrue(rc != 200);
+            Assert.assertEquals("", res.toString());
         }
     }
 }

@@ -14,12 +14,9 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.buf;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -30,13 +27,13 @@ public class TestCharChunk {
     @Test
     public void testEndsWith() {
         CharChunk cc = new CharChunk();
-        assertFalse(cc.endsWith("test"));
+        Assert.assertFalse(cc.endsWith("test"));
         cc.setChars("xxtestxx".toCharArray(), 2, 4);
-        assertTrue(cc.endsWith(""));
-        assertTrue(cc.endsWith("t"));
-        assertTrue(cc.endsWith("st"));
-        assertTrue(cc.endsWith("test"));
-        assertFalse(cc.endsWith("x"));
-        assertFalse(cc.endsWith("xxtest"));
+        Assert.assertTrue(cc.endsWith(""));
+        Assert.assertTrue(cc.endsWith("t"));
+        Assert.assertTrue(cc.endsWith("st"));
+        Assert.assertTrue(cc.endsWith("test"));
+        Assert.assertFalse(cc.endsWith("x"));
+        Assert.assertFalse(cc.endsWith("xxtest"));
     }
 }

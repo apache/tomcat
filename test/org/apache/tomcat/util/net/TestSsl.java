@@ -30,9 +30,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -61,7 +59,7 @@ public class TestSsl extends TomcatBaseTest {
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
             "/examples/servlets/servlet/HelloWorldExample");
-        assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
+        Assert.assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
     }
 
     @Test
@@ -79,7 +77,7 @@ public class TestSsl extends TomcatBaseTest {
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
             "/examples/servlets/servlet/HelloWorldExample");
-        assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
+        Assert.assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
     }
 
 
@@ -135,7 +133,7 @@ public class TestSsl extends TomcatBaseTest {
             os.write("Host: localhost\n\n".getBytes());
         } catch (IOException ex) {
             ex.printStackTrace();
-            fail("Re-negotiation failed");
+            Assert.fail("Re-negotiation failed");
         }
         Reader r = new InputStreamReader(is);
         BufferedReader br = new BufferedReader(r);
@@ -150,7 +148,7 @@ public class TestSsl extends TomcatBaseTest {
             return;
         }
 
-        fail("Re-negotiation worked");
+        Assert.fail("Re-negotiation worked");
     }
 
     @Test
@@ -170,7 +168,7 @@ public class TestSsl extends TomcatBaseTest {
 
         SSLContext sslCtx = SSLContext.getInstance("TLS");
         sslCtx.init(null, TesterSupport.getTrustManagers(), null);
-        SSLSocketFactory socketFactory = 
+        SSLSocketFactory socketFactory =
                 new TesterSupport.NoSSLv2SocketFactory(sslCtx.getSocketFactory());
         SSLSocket socket = (SSLSocket) socketFactory.createSocket("localhost",
                 getPort());
@@ -186,7 +184,7 @@ public class TestSsl extends TomcatBaseTest {
             os.write("Host: localhost\n\n".getBytes());
         } catch (IOException ex) {
             ex.printStackTrace();
-            fail("Re-negotiation failed");
+            Assert.fail("Re-negotiation failed");
         }
 
         InputStream is = socket.getInputStream();

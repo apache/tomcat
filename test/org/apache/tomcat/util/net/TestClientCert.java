@@ -18,8 +18,7 @@ package org.apache.tomcat.util.net;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -63,14 +62,14 @@ public class TestClientCert extends TomcatBaseTest {
         ByteChunk res =
                 getUrl("https://localhost:" + getPort() + "/unprotected");
         if (preemptive) {
-            assertEquals("OK-" + TesterSupport.ROLE, res.toString());
+            Assert.assertEquals("OK-" + TesterSupport.ROLE, res.toString());
         } else {
-            assertEquals("OK", res.toString());
+            Assert.assertEquals("OK", res.toString());
         }
 
         // Protected resource
         res = getUrl("https://localhost:" + getPort() + "/protected");
-        assertEquals("OK-" + TesterSupport.ROLE, res.toString());
+        Assert.assertEquals("OK-" + TesterSupport.ROLE, res.toString());
     }
 
     @Test
@@ -107,16 +106,16 @@ public class TestClientCert extends TomcatBaseTest {
         // Unprotected resource
         ByteChunk res = postUrl(body,
                 "https://localhost:" + getPort() + "/unprotected");
-        assertEquals("OK-" + bodySize, res.toString());
+        Assert.assertEquals("OK-" + bodySize, res.toString());
 
         // Protected resource
         res.recycle();
         int rc = postUrl(body, "https://localhost:" + getPort() + "/protected",
                 res, null);
         if (expectProtectedFail) {
-            assertEquals(401, rc);
+            Assert.assertEquals(401, rc);
         } else {
-            assertEquals("OK-" + bodySize, res.toString());
+            Assert.assertEquals("OK-" + bodySize, res.toString());
         }
     }
 

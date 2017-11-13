@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.http;
 
 import java.io.IOException;
@@ -28,8 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import static org.junit.Assert.assertEquals;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -55,7 +53,7 @@ public class TestBug49158 extends CookiesBaseTest {
         ByteChunk res = new ByteChunk();
         getUrl("http://localhost:" + getPort() + "/"+path, res, headers);
         List<String> cookieHeaders = headers.get("Set-Cookie");
-        assertEquals("There should only be one Set-Cookie header in this test",
+        Assert.assertEquals("There should only be one Set-Cookie header in this test",
                 1, cookieHeaders.size());
     }
 
