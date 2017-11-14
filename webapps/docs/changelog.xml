@@ -178,7 +178,7 @@
         Java 9) registry locations when looking for a JRE. (markt)
       </fix>
       <add>
-        Add generatation of a SHA-256 hash for release artefacts to the build
+        Add generation of a SHA-512 hash for release artifacts to the build
         script. (markt)
       </add>
     </changelog>

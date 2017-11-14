@@ -2946,16 +2946,16 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
       <local name="filename" />
       <local name="md5value" />
       <local name="sha1value" />
-      <local name="sha256value" />
+      <local name="sha512value" />
 
       <basename file="@{file}" property="filename" />
       <checksum algorithm="MD5" file="@{file}" property="md5value" />
       <checksum algorithm="SHA-1" file="@{file}" property="sha1value" />
-      <checksum algorithm="SHA-256" file="@{file}" property="sha256value" />
+      <checksum algorithm="SHA-512" file="@{file}" property="sha512value" />
 
       <echo file="@{file}.md5" message="${md5value}${md5sum.binary-prefix}${filename}" />
       <echo file="@{file}.sha1" message="${sha1value}${md5sum.binary-prefix}${filename}" />
-      <echo file="@{file}.sha256" message="${sha256value}${md5sum.binary-prefix}${filename}" />
+      <echo file="@{file}.sha512" message="${sha512value}${md5sum.binary-prefix}${filename}" />
 
       <antcall target="sign" >
         <param name="file" value="@{file}" />
