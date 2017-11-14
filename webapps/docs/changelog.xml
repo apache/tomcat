@@ -177,6 +177,10 @@
         <bug>61598</bug>: Update the Windows installer to search the new (as of
         Java 9) registry locations when looking for a JRE. (markt)
       </fix>
+      <add>
+        Add generatation of a SHA-256 hash for release artefacts to the build
+        script. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
