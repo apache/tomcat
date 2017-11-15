@@ -47,9 +47,11 @@ public class UrlJar implements Jar {
         boolean multiRelease = false;
         if (JreCompat.isJre9Available()) {
             Manifest manifest = jarInputStream.getManifest();
-            String mrValue = manifest.getMainAttributes().getValue("Multi-Release");
-            if (mrValue != null) {
-                multiRelease = Boolean.valueOf(mrValue).booleanValue();
+            if (manifest != null) {
+                String mrValue = manifest.getMainAttributes().getValue("Multi-Release");
+                if (mrValue != null) {
+                    multiRelease = Boolean.valueOf(mrValue).booleanValue();
+                }
             }
         }
         if (multiRelease) {
