@@ -137,8 +137,8 @@ public class TestSocketServer extends AbstractJniTest {
         while (Socket.recv(clientSocket, buf, 0, 1) == 1) {
         }
         long wait = System.nanoTime() - start;
-        Assert.assertFalse("non_blocking client Socket.APR_SO_NONBLOCK failed (>1ms)",
-                wait > 1000000 + ERROR_MARGIN);
+        Assert.assertFalse("non_blocking client Socket.APR_SO_NONBLOCK failed (>2ms)",
+                wait > 2000000 + ERROR_MARGIN);
 
         client.countDown();
         client.join();
