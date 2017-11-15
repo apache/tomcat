@@ -73,43 +73,49 @@ public class TestFileHandler {
         }
     }
 
-    @SuppressWarnings("unused")
     @Test
     public void testCleanOnInitOneHandler() throws Exception {
         generateLogFiles(logsDir, PREFIX_1, SUFIX_1, 3);
 
-        new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, 2);
+        FileHandler fh1 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, 2);
 
         Thread.sleep(1000);
 
         Assert.assertTrue(logsDir.list().length == 16);
+
+        fh1.close();
     }
 
-    @SuppressWarnings("unused")
     @Test
     public void testCleanOnInitMultipleHandlers() throws Exception {
         generateLogFiles(logsDir, PREFIX_1, SUFIX_1, 3);
 
-        new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, 2);
-        new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_2, 2);
-        new FileHandler(logsDir.getAbsolutePath(), PREFIX_2, SUFIX_1, 2);
-        new FileHandler(logsDir.getAbsolutePath(), PREFIX_3, SUFIX_1, 2);
+        FileHandler fh1 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, 2);
+        FileHandler fh2 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_2, 2);
+        FileHandler fh3 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_2, SUFIX_1, 2);
+        FileHandler fh4 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_3, SUFIX_1, 2);
 
         Thread.sleep(1000);
 
         Assert.assertTrue(logsDir.list().length == 16);
+
+        fh1.close();
+        fh2.close();
+        fh3.close();
+        fh4.close();
     }
 
-    @SuppressWarnings("unused")
     @Test
     public void testCleanDisabled() throws Exception {
         generateLogFiles(logsDir, PREFIX_1, SUFIX_1, 3);
 
-        new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, -1);
+        FileHandler fh1 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, -1);
 
         Thread.sleep(1000);
 
         Assert.assertTrue(logsDir.list().length == 17);
+
+        fh1.close();
     }
 
     private void generateLogFiles(File dir, String prefix, String sufix, int amount)
