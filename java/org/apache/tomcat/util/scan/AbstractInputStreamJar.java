@@ -156,11 +156,15 @@ public abstract class AbstractInputStreamJar implements Jar {
         if (multiRelease == null) {
             if (JreCompat.isJre9Available()) {
                 Manifest manifest = jarInputStream.getManifest();
-                String mrValue = manifest.getMainAttributes().getValue("Multi-Release");
-                if (mrValue == null) {
+                if (manifest == null) {
                     multiRelease = Boolean.FALSE;
                 } else {
-                    multiRelease = Boolean.valueOf(mrValue);
+                    String mrValue = manifest.getMainAttributes().getValue("Multi-Release");
+                    if (mrValue == null) {
+                        multiRelease = Boolean.FALSE;
+                    } else {
+                        multiRelease = Boolean.valueOf(mrValue);
+                    }
                 }
             } else {
                 multiRelease = Boolean.FALSE;
