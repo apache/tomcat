@@ -97,6 +97,11 @@
         <code>AbstractHttp11Protocol.getSSLProtocol()</code>. (markt)
       </fix>
       <fix>
+        <bug>61673</bug>: Avoid a possible
+        <code>ConcurrentModificationException</code> when working with the
+        streams associated with a connection. (markt)
+      </fix>
+      <fix>
         <bug>61719</bug>: Avoid possible NPE calling
         InputStream.setReadListener with HTTP/2. (remm)
       </fix>

@@ -20,7 +20,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -122,7 +121,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private HpackDecoder hpackDecoder;
     private HpackEncoder hpackEncoder;
 
-    private final Map<Integer,Stream> streams = new HashMap<>();
+    private final Map<Integer,Stream> streams = new ConcurrentHashMap<>();
     protected final AtomicInteger activeRemoteStreamCount = new AtomicInteger(0);
     // Start at -1 so the 'add 2' logic in closeIdleStreams() works
     private volatile int maxActiveRemoteStreamId = -1;
