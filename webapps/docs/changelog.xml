@@ -78,6 +78,10 @@
         <code>javax.security.auth.message.config.AuthConfigFactory</code> in the
         JASPIC API implementation. Based on a patch by Pavan Kumar. (markt)
       </fix>
+      <fix>
+        Avoid a possible <code>NullPointerException</code> when timing out
+        <code>AsyncContext</code> instances during shut down. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
