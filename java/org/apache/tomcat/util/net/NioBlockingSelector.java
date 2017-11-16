@@ -260,9 +260,7 @@ public class NioBlockingSelector {
         }
 
         public boolean events() {
-            boolean result = false;
             Runnable r = null;
-            result = (events.size() > 0);
 
             /* We only poll and run the runnable events when we start this
              * method. Further events added to the queue later will be delayed
@@ -277,12 +275,12 @@ public class NioBlockingSelector {
              * which will kill a lot of time, and greatly affect performance of
              * the poller loop.
              */
-            for (int i = 0, size = events.size(); i < size && (r = events.poll()) != null; i++) {
+            int size = events.size();
+            for (int i = 0; i < size && (r = events.poll()) != null; i++) {
                 r.run();
-                result = true;
             }
 
-            return result;
+            return (size > 0);
         }
 
         @Override
