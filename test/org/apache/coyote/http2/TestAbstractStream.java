@@ -250,7 +250,7 @@ public class TestAbstractStream {
     @Test
     public void testCircular03() {
         // Setup
-        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
+        Http2UpgradeHandler handler = new Http2UpgradeHandler(null, null);
         Stream a = new Stream(Integer.valueOf(1), handler);
         Stream b = new Stream(Integer.valueOf(3), handler);
         Stream c = new Stream(Integer.valueOf(5), handler);
