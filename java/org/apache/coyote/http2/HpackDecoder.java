@@ -240,8 +240,11 @@ public class HpackDecoder {
         if (index <= Hpack.STATIC_TABLE_LENGTH) {
             return Hpack.STATIC_TABLE[index].name;
         } else {
-            if (index >= Hpack.STATIC_TABLE_LENGTH + filledTableSlots) {
-                throw new HpackException();
+            // index is 1 based
+            if (index > Hpack.STATIC_TABLE_LENGTH + filledTableSlots) {
+                throw new HpackException(sm.getString("hpackdecoder.headerTableIndexInvalid",
+                        Integer.valueOf(index), Integer.valueOf(Hpack.STATIC_TABLE_LENGTH),
+                        Integer.valueOf(filledTableSlots)));
             }
             int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
             Hpack.HeaderField res = headerTable[adjustedIndex];
