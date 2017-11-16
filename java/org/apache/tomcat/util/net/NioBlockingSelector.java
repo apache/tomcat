@@ -263,10 +263,25 @@ public class NioBlockingSelector {
             boolean result = false;
             Runnable r = null;
             result = (events.size() > 0);
-            while ( (r = events.poll()) != null ) {
+
+            /* We only poll and run the runnable events when we start this
+             * method. Further events added to the queue later will be delayed
+             * to the next execution of this method.
+             *
+             * We do in this way, because running event from the events queue
+             * may lead the working thread to add more events to the queue (for
+             * example, the worker thread may add another RunnableAdd event when
+             * waken up by a previous RunnableAdd event who got an invalid
+             * SelectionKey). Trying to consume all the events in an increasing
+             * queue till it's empty, will make the loop hard to be terminated,
+             * which will kill a lot of time, and greatly affect performance of
+             * the poller loop.
+             */
+            for (int i = 0, size = events.size(); i < size && (r = events.poll()) != null; i++) {
                 r.run();
                 result = true;
             }
+
             return result;
         }
 

@@ -111,6 +111,11 @@
         InputStream.setReadListener with HTTP/2. (remm)
       </fix>
       <fix>
+        <bug>61736</bug>: Improve performance of NIO connector when clients
+        leave large time gaps between network packets. Patch provided by Zilong
+        Song. (markt)
+      </fix>
+      <fix>
         <bug>61740</bug>: Correct an off-by-one error in the Hpack header index
         validation that caused intermittent request failures when using HTTP/2.
         (markt)
