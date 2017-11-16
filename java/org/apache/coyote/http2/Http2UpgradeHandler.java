@@ -1108,6 +1108,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             }
         }
         streamToRemove.detachFromParent();
+        streamToRemove.getChildStreams().clear();
     }
 
 

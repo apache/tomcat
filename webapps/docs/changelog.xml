@@ -68,6 +68,11 @@
         ensure that an HTTP session exists when initiating a WebSocket
         connection. Patch provided by isapir. (markt)
       </add>
+      <fix>
+        <bug>61682</bug>: When re-prioritising HTTP/2 streams, ensure that both
+        parent and children fields are correctly updated to avoid a possible
+        <code>StackOverflowError</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

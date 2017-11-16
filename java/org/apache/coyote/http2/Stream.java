@@ -87,7 +87,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
     Stream(Integer identifier, Http2UpgradeHandler handler, Request coyoteRequest) {
         super(identifier);
         this.handler = handler;
-        setParentStream(handler);
+        handler.addChild(this);
         setWindowSize(handler.getRemoteSettings().getInitialWindowSize());
         state = new StreamStateMachine(this);
         if (coyoteRequest == null) {
@@ -139,6 +139,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 this.addChild(parentsChild);
             }
         }
+        detachFromParent();
         parent.addChild(this);
         this.weight = weight;
     }

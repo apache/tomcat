@@ -243,7 +243,44 @@ public class TestAbstractStream {
         Assert.assertTrue(e.getChildStreams().contains(f));
         Assert.assertEquals(1,  f.getChildStreams().size());
         Assert.assertTrue(f.getChildStreams().contains(a));
-
     }
 
+
+    // https://bz.apache.org/bugzilla/show_bug.cgi?id=61682
+    @Test
+    public void testCircular03() {
+        // Setup
+        Http2UpgradeHandler handler = new Http2UpgradeHandler(new Http2Protocol(), null, null);
+        Stream a = new Stream(Integer.valueOf(1), handler);
+        Stream b = new Stream(Integer.valueOf(3), handler);
+        Stream c = new Stream(Integer.valueOf(5), handler);
+        Stream d = new Stream(Integer.valueOf(7), handler);
+
+        // Action
+        b.rePrioritise(a, false, 16);
+        c.rePrioritise(a, false, 16);
+        d.rePrioritise(b, false, 16);
+        c.rePrioritise(handler, false, 16);
+        a.rePrioritise(c, false, 16);
+
+        // Check parents
+        Assert.assertEquals(c, a.getParentStream());
+        Assert.assertEquals(a, b.getParentStream());
+        Assert.assertEquals(handler, c.getParentStream());
+        Assert.assertEquals(b, d.getParentStream());
+
+        // This triggers the StackOverflowError
+        c.isDescendant(d);
+
+        // Check children
+        Assert.assertEquals(1,  handler.getChildStreams().size());
+        Assert.assertTrue(handler.getChildStreams().contains(c));
+        Assert.assertEquals(1,  c.getChildStreams().size());
+        Assert.assertTrue(c.getChildStreams().contains(a));
+        Assert.assertEquals(1,  a.getChildStreams().size());
+        Assert.assertTrue(a.getChildStreams().contains(b));
+        Assert.assertEquals(1,  b.getChildStreams().size());
+        Assert.assertTrue(b.getChildStreams().contains(d));
+        Assert.assertEquals(0,  d.getChildStreams().size());
+    }
 }
