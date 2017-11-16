@@ -48,40 +48,44 @@ public abstract class AuthConfigFactory {
     private static final String DEFAULT_JASPI_AUTHCONFIGFACTORYIMPL =
             "org.apache.catalina.authenticator.jaspic.AuthConfigFactoryImpl";
 
-    private static AuthConfigFactory factory;
+    private static volatile AuthConfigFactory factory;
 
     public AuthConfigFactory() {
     }
 
-    public static synchronized AuthConfigFactory getFactory() {
+    public static AuthConfigFactory getFactory() {
         checkPermission(getFactorySecurityPermission);
         if (factory != null) {
             return factory;
         }
 
-        final String className = getFactoryClassName();
-        try {
-            factory = AccessController.doPrivileged(
-                    new PrivilegedExceptionAction<AuthConfigFactory>() {
-                @Override
-                public AuthConfigFactory run() throws ReflectiveOperationException,
-                        IllegalArgumentException, SecurityException {
-                    // Load this class with the same class loader as used for
-                    // this class. Note that the Thread context class loader
-                    // should not be used since that would trigger a memory leak
-                    // in container environments.
-                    Class<?> clazz = Class.forName(className);
-                    return (AuthConfigFactory) clazz.getConstructor().newInstance();
+        synchronized (AuthConfigFactory.class) {
+            if (factory == null) {
+                final String className = getFactoryClassName();
+                try {
+                    factory = AccessController.doPrivileged(
+                            new PrivilegedExceptionAction<AuthConfigFactory>() {
+                        @Override
+                        public AuthConfigFactory run() throws ReflectiveOperationException,
+                                IllegalArgumentException, SecurityException {
+                            // Load this class with the same class loader as used for
+                            // this class. Note that the Thread context class loader
+                            // should not be used since that would trigger a memory leak
+                            // in container environments.
+                            Class<?> clazz = Class.forName(className);
+                            return (AuthConfigFactory) clazz.getConstructor().newInstance();
+                        }
+                    });
+                } catch (PrivilegedActionException e) {
+                    Exception inner = e.getException();
+                    if (inner instanceof InstantiationException) {
+                        throw (SecurityException) new SecurityException("AuthConfigFactory error:" +
+                                inner.getCause().getMessage()).initCause(inner.getCause());
+                    } else {
+                        throw (SecurityException) new SecurityException(
+                                "AuthConfigFactory error: " + inner).initCause(inner);
+                    }
                 }
-            });
-        } catch (PrivilegedActionException e) {
-            Exception inner = e.getException();
-            if (inner instanceof InstantiationException) {
-                throw (SecurityException) new SecurityException("AuthConfigFactory error:" +
-                        inner.getCause().getMessage()).initCause(inner.getCause());
-            } else {
-                throw (SecurityException) new SecurityException(
-                        "AuthConfigFactory error: " + inner).initCause(inner);
             }
         }
 

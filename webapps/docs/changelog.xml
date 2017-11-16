@@ -73,6 +73,11 @@
         parent and children fields are correctly updated to avoid a possible
         <code>StackOverflowError</code>. (markt)
       </fix>
+      <fix>
+        Improve concurrency by reducing the scope of the synchronisation for
+        <code>javax.security.auth.message.config.AuthConfigFactory</code> in the
+        JASPIC API implementation. Based on a patch by Pavan Kumar. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
