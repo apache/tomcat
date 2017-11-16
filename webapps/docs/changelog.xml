@@ -105,6 +105,11 @@
         <code>ecj-4.4.2.jar</code> with a more recent version that supports Java
         9. (markt)
       </add>
+      <fix>
+        <bug>61736</bug>: Improve performance of NIO connector when clients
+        leave large time gaps between network packets. Patch provided by Zilong
+        Song. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

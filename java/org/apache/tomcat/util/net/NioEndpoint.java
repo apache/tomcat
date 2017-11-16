@@ -1073,7 +1073,7 @@ public class NioEndpoint extends AbstractEndpoint<NioChannel> {
             boolean result = false;
 
             Runnable r = null;
-            while ( (r = events.poll()) != null ) {
+            for (int i = 0, size = events.size(); i < size && (r = events.poll()) != null; i++ ) {
                 result = true;
                 try {
                     r.run();
