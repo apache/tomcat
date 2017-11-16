@@ -539,7 +539,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
      * Separate method to allow Http2AsyncUpgradeHandler to call this code
      * without synchronizing on socketWrapper since it doesn't need to.
      */
-    void doWriteHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders,
+    protected HeaderFrameBuffers doWriteHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders,
             boolean endOfStream, int payloadSize) throws IOException {
 
         if (log.isDebugEnabled()) {
@@ -549,7 +549,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
 
         if (!stream.canWrite()) {
-            return;
+            return null;
         }
 
         HeaderFrameBuffers headerFrameBuffers = getHeaderFrameBuffers(payloadSize);
@@ -598,8 +598,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             }
         }
         headerFrameBuffers.endHeaders();
+        return headerFrameBuffers;
     }
-
 
     protected HeaderFrameBuffers getHeaderFrameBuffers(int initialPayloadSize) {
         return new DefaultHeaderFrameBuffers(initialPayloadSize);

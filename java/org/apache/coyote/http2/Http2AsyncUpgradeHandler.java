@@ -31,6 +31,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolException;
 import org.apache.coyote.Request;
+import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.SendfileState;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
@@ -145,6 +146,28 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                     ByteBuffer.wrap(fixedPayload));
         }
         handleAsyncException();
+    }
+
+
+    @Override
+    void writeHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders,
+            boolean endOfStream, int payloadSize) throws IOException {
+        // This ensures the Stream processing thread has control of the socket.
+        ByteBuffer[] bufs = null;
+        synchronized (socketWrapper) {
+            AsyncHeaderFrameBuffers headerFrameBuffers = (AsyncHeaderFrameBuffers)
+                    doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
+            bufs = headerFrameBuffers.bufs.toArray(BYTEBUFFER_ARRAY);
+        }
+        if (bufs != null) {
+            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
+                    TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE,
+                    applicationErrorCompletion, bufs);
+            handleAsyncException();
+        }
+        if (endOfStream) {
+            stream.sentEndOfStream();
+        }
     }
 
 
@@ -451,10 +474,6 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
         @Override
         public void endHeaders() throws IOException {
-            socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                    TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE,
-                    applicationErrorCompletion, bufs.toArray(BYTEBUFFER_ARRAY));
-            handleAsyncException();
         }
 
         @Override
@@ -470,6 +489,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         @Override
         public void expandPayload() {
             payloadSize = payloadSize * 2;
+            payload = ByteBuffer.allocate(payloadSize);
         }
     }
 }
