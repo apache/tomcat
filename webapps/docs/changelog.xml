@@ -94,6 +94,10 @@
         ensure that an HTTP session exists when initiating a WebSocket
         connection. Patch provided by isapir. (markt)
       </add>
+      <fix>
+        Avoid a possible <code>NullPointerException</code> when timing out
+        <code>AsyncContext</code> instances during shut down. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

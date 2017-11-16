@@ -150,6 +150,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     public boolean timeout() {
         AtomicBoolean result = new AtomicBoolean();
         request.getCoyoteRequest().action(ActionCode.ASYNC_TIMEOUT, result);
+        // Avoids NPEs during shutdown. A call to recycle will null this field.
+        Context context = this.context;
 
         if (result.get()) {
 
