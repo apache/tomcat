@@ -75,9 +75,11 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         RegistrationContextImpl registrationContext =
                 findRegistrationContextImpl(layer, appContext);
         if (registrationContext != null) {
-            RegistrationListenerWrapper wrapper = new RegistrationListenerWrapper(
-                    layer, appContext, listener);
-            registrationContext.addListener(wrapper);
+            if (listener != null) {
+                RegistrationListenerWrapper wrapper = new RegistrationListenerWrapper(
+                        layer, appContext, listener);
+                registrationContext.addListener(wrapper);
+            }
             return registrationContext.getProvider();
         }
         return null;
