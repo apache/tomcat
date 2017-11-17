@@ -210,6 +210,10 @@
         Add generation of a SHA-512 hash for release artifacts to the build
         script. (markt)
       </add>
+      <fix>
+        <bug>61658</bug>: Update MIME mappings for fonts to use
+        <code>font/*</code> as per RFC8081. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
