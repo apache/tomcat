@@ -244,6 +244,15 @@ public class TestAuthConfigFactoryImpl {
     }
 
 
+    @Test
+    public void testRegistrationNullClassName() {
+        AuthConfigFactory factory = new AuthConfigFactoryImpl();
+        factory.registerConfigProvider(null, null, "L_1", "AC_1", null);
+        AuthConfigProvider provider = factory.getConfigProvider("L_1", "AC_1", null);
+        Assert.assertNull(provider);
+    }
+
+
     private static class SimpleRegistrationListener implements RegistrationListener {
 
         private final String layer;
