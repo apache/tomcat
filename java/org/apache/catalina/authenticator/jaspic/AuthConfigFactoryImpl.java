@@ -257,7 +257,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             result.addAll(layerAppContextRegistrations.keySet());
             result.addAll(appContextRegistrations.keySet());
             result.addAll(layerRegistrations.keySet());
-            if (defaultRegistration != null) {
+            if (defaultRegistration != null && !defaultRegistration.isEmpty()) {
                 result.add(DEFAULT_REGISTRATION_ID);
             }
         } else {
