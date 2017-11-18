@@ -90,7 +90,9 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             String description) {
         String registrationID =
                 doRegisterConfigProvider(className, properties, layer, appContext, description);
-        savePersistentRegistrations();
+        if (className != null) {
+            savePersistentRegistrations();
+        }
         return registrationID;
     }
 
@@ -103,6 +105,11 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             log.debug(sm.getString("authConfigFactoryImpl.registerClass",
                     className, layer, appContext));
         }
+        String registrationID = getRegistrationID(layer, appContext);
+        if (className == null) {
+            return registrationID;
+        }
+
         Class<?> clazz;
         AuthConfigProvider provider = null;
         try {
@@ -118,7 +125,6 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             throw new SecurityException(e);
         }
 
-        String registrationID = getRegistrationID(layer, appContext);
         RegistrationContextImpl registrationContextImpl = new RegistrationContextImpl(
                 layer, appContext, description, true, provider, properties);
         addRegistrationContextImpl(layer, appContext, registrationID, registrationContextImpl);
