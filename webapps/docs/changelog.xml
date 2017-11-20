@@ -111,10 +111,16 @@
       </fix>
       <fix>
         <bug>61782</bug>: When calling
-        <code>AuthConfigFactoryImpl.doRegisterConfigProvider()</code> and the
+        <code>AuthConfigFactory.doRegisterConfigProvider()</code> and the
         requested JASPIC config provider class is found by the web application
         class loader, do not attempt to load the class with the class loader
         that loaded the JASPIC API. Patch provided by Lazar. (markt)
+      </fix>
+      <fix>
+        <bug>61783</bug>: When calling
+        <code>AuthConfigFactory.removeRegistration()</code> and the registration
+        is persistent, it should be removed from the persistent store. Patch
+        provided by Lazar. (markt)
       </fix>
     </changelog>
   </subsection>

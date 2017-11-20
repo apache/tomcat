@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.authenticator.jaspic;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -28,6 +29,8 @@ import javax.security.auth.message.config.RegistrationListener;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.catalina.Globals;
 
 public class TestAuthConfigFactoryImpl {
 
@@ -303,6 +306,45 @@ public class TestAuthConfigFactoryImpl {
         Set<String> ids = new HashSet<>(Arrays.asList(registrationIds));
         Assert.assertTrue(ids.contains(registrationId1));
         Assert.assertTrue(ids.contains(registrationId2));
+    }
+
+
+    @Test
+    public void testRemovePersistentRegistration() {
+        // set CATALINA_BASE to test so that the file with persistent providers will be written in test/conf folder
+        String oldCatalinaBase = System.getProperty(Globals.CATALINA_BASE_PROP);
+        System.setProperty(Globals.CATALINA_BASE_PROP, "test");
+
+        File file = new File("test/conf/jaspic-providers.xml");
+        if (file.exists()) {
+            file.delete();
+        }
+
+        try {
+            AuthConfigFactory factory = new AuthConfigFactoryImpl();
+            factory.registerConfigProvider(
+                    SimpleAuthConfigProvider.class.getName(), null, "L_1", "AC_1", null);
+            String registrationId2 = factory.registerConfigProvider(
+                    SimpleAuthConfigProvider.class.getName(), null, "L_2", "AC_2", null);
+
+            factory.removeRegistration(registrationId2);
+            factory.refresh();
+
+            String[] registrationIds = factory.getRegistrationIDs(null);
+            for (String registrationId : registrationIds) {
+                Assert.assertNotEquals(registrationId2, registrationId);
+            }
+        } finally {
+            if (oldCatalinaBase != null ) {
+                System.setProperty(Globals.CATALINA_BASE_PROP, oldCatalinaBase);
+            } else {
+                System.clearProperty(Globals.CATALINA_BASE_PROP);
+            }
+
+            if (file.exists()) {
+                file.delete();
+            }
+        }
     }
 
 

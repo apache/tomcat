@@ -238,6 +238,9 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             for (RegistrationListenerWrapper wrapper : registration.listeners) {
                 wrapper.getListener().notify(wrapper.getMessageLayer(), wrapper.getAppContext());
             }
+            if (registration.isPersistent()) {
+                savePersistentRegistrations();
+            }
             return true;
         }
     }
