@@ -243,6 +243,20 @@ public class TestAuthConfigFactoryImpl {
         }
     }
 
+    @Test
+    public void testDetachListenerNonexistingRegistrarion() {
+        AuthConfigFactory factory = new AuthConfigFactoryImpl();
+        AuthConfigProvider acp1 = new SimpleAuthConfigProvider(null, null);
+        String registrationId = factory.registerConfigProvider(acp1, "L_1", "AC_1", null);
+
+        SimpleRegistrationListener listener1 = new SimpleRegistrationListener("L_1", "AC_1");
+        factory.getConfigProvider("L_1", "AC_1", listener1);
+
+        factory.removeRegistration(registrationId);
+        String[] registrationIds = factory.detachListener(listener1, "L_1", "AC_1");
+        Assert.assertTrue(registrationIds.length == 0);
+    }
+
 
     private static class SimpleRegistrationListener implements RegistrationListener {
 
