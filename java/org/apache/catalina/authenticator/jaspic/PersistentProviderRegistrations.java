@@ -123,14 +123,9 @@ final class PersistentProviderRegistrations {
             for (Provider provider : providers.providers) {
                 writer.write("  <provider className=\"");
                 writer.write(provider.getClassName());
-                writer.write("\" layer=\"");
-                writer.write(provider.getLayer());
-                writer.write("\" appContext=\"");
-                writer.write(provider.getAppContext());
-                if (provider.getDescription() != null) {
-                    writer.write("\" description=\"");
-                    writer.write(provider.getDescription());
-                }
+                writeOptional("layer", provider.getLayer(), writer);
+                writeOptional("appContext", provider.getAppContext(), writer);
+                writeOptional("description", provider.getDescription(), writer);
                 writer.write("\">\n");
                 for (Entry<String,String> entry : provider.getProperties().entrySet()) {
                     writer.write("    <property name=\"");
@@ -168,6 +163,14 @@ final class PersistentProviderRegistrations {
         if (configFileOld.exists() && !configFileOld.delete()) {
             log.warn(sm.getString("persistentProviderRegistrations.deleteFail",
                     configFileOld.getAbsolutePath()));
+        }
+    }
+
+
+    private static void writeOptional(String name, String value, Writer writer) throws IOException {
+        if (value != null) {
+            writer.write("\" " + name + "=\"");
+            writer.write(value);
         }
     }
 

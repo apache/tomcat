@@ -84,4 +84,50 @@ public class TestPersistentProviderRegistrations {
             Assert.assertTrue("Failed to clean up [" + f + "]", f.delete());
         }
     }
+
+
+    @Test
+    public void testLoadProviderWithoutLayerAndAC() {
+        File f = new File("test/conf/jaspic-test-04.xml");
+        Providers providers = PersistentProviderRegistrations.loadProviders(f);
+        validateNoLayerAndAC(providers);
+    }
+
+
+    private void validateNoLayerAndAC(Providers providers) {
+        Assert.assertEquals(1,  providers.getProviders().size());
+        Provider p = providers.getProviders().get(0);
+        Assert.assertEquals("a", p.getClassName());
+        Assert.assertNull(p.getLayer());
+        Assert.assertNull(p.getAppContext());
+        Assert.assertEquals("d", p.getDescription());
+    }
+
+
+    @Test
+    public void testSaveProviderWithoutLayerAndAC() {
+        File f = new File("test/conf/jaspic-test-05.xml");
+        if (f.exists()) {
+            Assert.assertTrue(f.delete());
+        }
+
+        // Create a config and write it out
+        Providers initialProviders = new Providers();
+        Provider p = new Provider();
+        p.setClassName("a");
+        p.setDescription("d");
+        initialProviders.addProvider(p);
+        PersistentProviderRegistrations.writeProviders(initialProviders, f);
+
+        // Read it back
+        Providers loadedProviders = PersistentProviderRegistrations.loadProviders(f);
+
+        try {
+            validateNoLayerAndAC(loadedProviders);
+        } finally {
+            if (f.exists()) {
+                f.delete();
+            }
+        }
+    }
 }

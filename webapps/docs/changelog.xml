@@ -104,6 +104,11 @@
         <code>RegistrationContext</code> has been registered using the default
         registration ID. Patch provided by Lazar. (markt)
       </fix>
+      <fix>
+        <bug>61781</bug>: Enable JASPIC provider registrations to be persisted
+        when the layer and/or application context are <code>null</code>. Patch
+        provided by Lazar. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
