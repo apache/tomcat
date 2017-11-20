@@ -52,6 +52,7 @@ import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.http.parser.Host;
 import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -1100,6 +1101,32 @@ public class Http11Processor extends AbstractProcessor {
         int colonPos = -1;
         if (hostNameC.length < valueL) {
             hostNameC = new char[valueL];
+        }
+
+        // TODO
+        // To minimise breakage to existing systems, just report any errors. In
+        // a future release this will switch to returning a 400 response.
+        // Depending on user feedback, the 400 response may be made optional.
+        try {
+            Host.parse(valueMB);
+        } catch (IOException | IllegalArgumentException e) {
+            // IOException should never happen
+            // IllegalArgumentException indicates that the host name is invalid
+            UserDataHelper.Mode logMode = userDataHelper.getNextMode();
+            if (logMode != null) {
+                String message = sm.getString("http11processor.host.parse",
+                        valueMB.toString(), e.getMessage());
+                switch (logMode) {
+                    case INFO_THEN_DEBUG:
+                        message += sm.getString("http11processor.fallToDebug");
+                        //$FALL-THROUGH$
+                    case INFO:
+                        log.info(message, e);
+                        break;
+                    case DEBUG:
+                        log.debug(message, e);
+                }
+            }
         }
 
         boolean ipv6 = (valueB[valueS] == '[');
