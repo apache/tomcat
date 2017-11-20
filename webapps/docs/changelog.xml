@@ -109,6 +109,13 @@
         when the layer and/or application context are <code>null</code>. Patch
         provided by Lazar. (markt)
       </fix>
+      <fix>
+        <bug>61782</bug>: When calling
+        <code>AuthConfigFactoryImpl.doRegisterConfigProvider()</code> and the
+        requested JASPIC config provider class is found by the web application
+        class loader, do not attempt to load the class with the class loader
+        that loaded the JASPIC API. Patch provided by Lazar. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
