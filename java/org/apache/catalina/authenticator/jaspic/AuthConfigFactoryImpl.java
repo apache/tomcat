@@ -243,7 +243,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
     public String[] detachListener(RegistrationListener listener, String layer, String appContext) {
         String registrationID = getRegistrationID(layer, appContext);
         RegistrationContextImpl registrationContext = findRegistrationContextImpl(layer, appContext);
-        if (registrationContext.removeListener(listener)) {
+        if (registrationContext != null && registrationContext.removeListener(listener)) {
             return new String[] { registrationID };
         }
         return EMPTY_STRING_ARRAY;

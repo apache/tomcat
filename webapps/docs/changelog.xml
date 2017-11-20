@@ -82,6 +82,11 @@
         Avoid a possible <code>NullPointerException</code> when timing out
         <code>AsyncContext</code> instances during shut down. (markt)
       </fix>
+      <fix>
+        <bug>61777</bug>: Avoid a <code>NullPointerException</code> when
+        detaching a JASPIC <code>RegistrationListener</code>. Patch provided by
+        Lazar. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
