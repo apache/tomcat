@@ -171,7 +171,7 @@ class EncodingDetector {
             return new BomResult("ISO-10646-UCS-4", 0);
         }
         if (b0 == 0x00 && b1 == 0x3C && b2 == 0x00 && b3 == 0x00) {
-            // UCS-4, unusual octect order (3412)
+            // UCS-4, unusual octet order (3412)
             // REVISIT: What should this be?
             return new BomResult("ISO-10646-UCS-4", 0);
         }
