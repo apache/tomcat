@@ -36,8 +36,8 @@
               </xs:element>
             </xs:sequence>
             <xs:attribute name="className" use="required" type="xs:string" />
-            <xs:attribute name="layer" use="required" type="xs:string" />
-            <xs:attribute name="appContext" use="required" type="xs:string" />
+            <xs:attribute name="layer" type="xs:string" />
+            <xs:attribute name="appContext" type="xs:string" />
             <xs:attribute name="description" type="xs:string" />
           </xs:complexType>
         </xs:element>
