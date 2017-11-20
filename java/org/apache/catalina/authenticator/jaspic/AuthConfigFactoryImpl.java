@@ -106,7 +106,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             log.debug(sm.getString("authConfigFactoryImpl.registerClass",
                     className, layer, appContext));
         }
-        Class<?> clazz;
+        Class<?> clazz = null;
         AuthConfigProvider provider = null;
         try {
             clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
@@ -114,7 +114,9 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             // Ignore so the re-try below can proceed
         }
         try {
-            clazz = Class.forName(className);
+            if (clazz == null) {
+                clazz = Class.forName(className);
+            }
             Constructor<?> constructor = clazz.getConstructor(Map.class, AuthConfigFactory.class);
             provider = (AuthConfigProvider) constructor.newInstance(properties, null);
         } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException |
