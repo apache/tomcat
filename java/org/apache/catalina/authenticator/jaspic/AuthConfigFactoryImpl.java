@@ -454,6 +454,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             for (RegistrationListenerWrapper wrapper : listeners) {
                 if (wrapper.getListener().equals(listener)) {
                     listeners.remove(wrapper);
+                    result = true;
                 }
             }
             return result;

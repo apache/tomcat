@@ -259,6 +259,21 @@ public class TestAuthConfigFactoryImpl {
     }
 
 
+    @Test
+    public void testDetachListener() {
+        AuthConfigFactory factory = new AuthConfigFactoryImpl();
+        AuthConfigProvider acp1 = new SimpleAuthConfigProvider(null, null);
+        String registrationId = factory.registerConfigProvider(acp1, "L_1", "AC_1", null);
+
+        SimpleRegistrationListener listener1 = new SimpleRegistrationListener("L_1", "AC_1");
+        factory.getConfigProvider("L_1", "AC_1", listener1);
+
+        String[] registrationIds = factory.detachListener(listener1, "L_1", "AC_1");
+        Assert.assertTrue(registrationIds.length == 1);
+        Assert.assertEquals(registrationId, registrationIds[0]);
+    }
+
+
     private static class SimpleRegistrationListener implements RegistrationListener {
 
         private final String layer;
