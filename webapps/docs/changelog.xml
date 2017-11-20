@@ -91,6 +91,12 @@
         <bug>61778</bug>: Correct the return value when detaching a JASPIC
         <code>RegistrationListener</code>. Patch provided by Lazar. (markt)
       </fix>
+      <fix>
+        <bug>61779</bug>: Avoid a <code>NullPointerException</code> when a
+        <code>null</code> <code>RegistrationListener</code> is passed to
+        <code>AuthConfigFactory.getConfigProvider()</code>. Patch provided by
+        Lazar. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
