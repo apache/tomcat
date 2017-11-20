@@ -97,6 +97,13 @@
         <code>AuthConfigFactory.getConfigProvider()</code>. Patch provided by
         Lazar. (markt)
       </fix>
+      <fix>
+        <bug>61780</bug>: Only include the default JASPIC registration ID in the
+        return value for a call to
+        <code>AuthConfigFactory.getRegistrationIDs()</code> if a
+        <code>RegistrationContext</code> has been registered using the default
+        registration ID. Patch provided by Lazar. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

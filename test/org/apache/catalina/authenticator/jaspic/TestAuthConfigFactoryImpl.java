@@ -17,7 +17,10 @@
 package org.apache.catalina.authenticator.jaspic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.security.auth.message.config.AuthConfigFactory;
 import javax.security.auth.message.config.AuthConfigProvider;
@@ -284,6 +287,22 @@ public class TestAuthConfigFactoryImpl {
 
         boolean result = factory.removeRegistration(registrationId);
         Assert.assertTrue(result);
+    }
+
+
+    @Test
+    public void testAllRegistrationIds() {
+        AuthConfigFactory factory = new AuthConfigFactoryImpl();
+        AuthConfigProvider acp1 = new SimpleAuthConfigProvider(null, null);
+        String registrationId1 = factory.registerConfigProvider(acp1, "L_1", "AC_1", null);
+        AuthConfigProvider acp2 = new SimpleAuthConfigProvider(null, null);
+        String registrationId2 = factory.registerConfigProvider(acp2, "L_2", "AC_2", null);
+
+        String[] registrationIds = factory.getRegistrationIDs(null);
+        Assert.assertTrue(registrationIds.length == 2);
+        Set<String> ids = new HashSet<>(Arrays.asList(registrationIds));
+        Assert.assertTrue(ids.contains(registrationId1));
+        Assert.assertTrue(ids.contains(registrationId2));
     }
 
 

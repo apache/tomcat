@@ -60,7 +60,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             new ConcurrentHashMap<>();
     // Note: Although there will only ever be a maximum of one entry in this
     //       Map, use a ConcurrentHashMap for consistency
-    private volatile Map<String,RegistrationContextImpl> defaultRegistration =
+    private final Map<String,RegistrationContextImpl> defaultRegistration =
             new ConcurrentHashMap<>(1);
 
 
@@ -259,7 +259,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             result.addAll(layerAppContextRegistrations.keySet());
             result.addAll(appContextRegistrations.keySet());
             result.addAll(layerRegistrations.keySet());
-            if (defaultRegistration != null) {
+            if (!defaultRegistration.isEmpty()) {
                 result.add(DEFAULT_REGISTRATION_ID);
             }
         } else {
