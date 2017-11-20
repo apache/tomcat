@@ -479,7 +479,7 @@ public class HttpParser {
 
 
     /**
-     * @return If inIPv6 us false, the position of ':' that separates the host
+     * @return If inIPv6 is false, the position of ':' that separates the host
      *         from the port or -1 if it is not present. If inIPv6 is true, the
      *         number of characters read
      */
