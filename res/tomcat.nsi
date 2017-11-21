@@ -356,6 +356,8 @@ Section -post
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName" \
                    "DisplayIcon" "$\"$INSTDIR\tomcat.ico$\""
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName" \
+                   "Publisher" "The Apache Software Foundation"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName" \
                    "UninstallString" "$\"$INSTDIR\Uninstall.exe$\" -ServiceName=$\"$TomcatServiceName$\""
 
 SectionEnd
