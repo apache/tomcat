@@ -254,6 +254,11 @@
         <bug>61658</bug>: Update MIME mappings for fonts to use
         <code>font/*</code> as per RFC8081. (markt)
       </fix>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.16 to
+        pick up the latest Windows binaries built with APR 1.6.3 and OpenSSL
+        1.0.2m. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
