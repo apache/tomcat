@@ -263,6 +263,11 @@
         Update the NSIS Installer used to build the Windows installer to version
         3.02.1. (kkolinko)
       </update>
+      <update>
+        Update the Windows installer to use "The Apache Software Foundation" as
+        the Publisher when Tomcat is displayed in the list of installed
+        applications in Microsoft Windows. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
