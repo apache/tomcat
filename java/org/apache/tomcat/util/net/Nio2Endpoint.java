@@ -921,7 +921,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     ioe = new IOException(exc);
                 }
                 setError(ioe);
-                synchronized (this) {
+                synchronized (state) {
                     readPending.release();
                     if (state.block == BlockingMode.BLOCK) {
                         state.state = Nio2Endpoint.isInline() ? CompletionState.ERROR : CompletionState.DONE;
