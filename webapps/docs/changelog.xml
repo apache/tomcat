@@ -259,6 +259,10 @@
         pick up the latest Windows binaries built with APR 1.6.3 and OpenSSL
         1.0.2m. (markt)
       </update>
+      <update>
+        Update the NSIS Installer used to build the Windows installer to version
+        3.02.1. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
