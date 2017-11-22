@@ -1162,6 +1162,14 @@
         specified, the platform default provider will be used.</p>
       </attribute>
 
+      <attribute name="jaspicCallbackHandlerClass" required="false">
+        <p>Name of the Java class of the
+        <code>javax.security.auth.callback.CallbackHandler</code> implementation
+        which should be used by JASPIC. If none is specified the default
+        <code>org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl</code>
+        will be used.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>
@@ -1308,6 +1316,14 @@
         authentication always fails.</p>
       </attribute>
 
+      <attribute name="jaspicCallbackHandlerClass" required="false">
+        <p>Name of the Java class of the
+        <code>javax.security.auth.callback.CallbackHandler</code> implementation
+        which should be used by JASPIC. If none is specified the default
+        <code>org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl</code>
+        will be used.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>
@@ -1413,6 +1429,14 @@
         specified, the platform default provider will be used.</p>
       </attribute>
 
+      <attribute name="jaspicCallbackHandlerClass" required="false">
+        <p>Name of the Java class of the
+        <code>javax.security.auth.callback.CallbackHandler</code> implementation
+        which should be used by JASPIC. If none is specified the default
+        <code>org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl</code>
+        will be used.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>
@@ -1503,6 +1527,14 @@
         session IDs. If an invalid algorithm and/or provider is specified, the
         platform default provider and the default algorithm will be used. If not
         specified, the platform default provider will be used.</p>
+      </attribute>
+
+      <attribute name="jaspicCallbackHandlerClass" required="false">
+        <p>Name of the Java class of the
+        <code>javax.security.auth.callback.CallbackHandler</code> implementation
+        which should be used by JASPIC. If none is specified the default
+        <code>org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl</code>
+        will be used.</p>
       </attribute>
 
     </attributes>
@@ -1652,6 +1684,14 @@
         available to applications (e.g. for onward authentication to external
         services) via the <code>org.apache.catalina.realm.GSS_CREDENTIAL</code>
         request attribute. If not set, the default value of <code>true</code>
+        will be used.</p>
+      </attribute>
+
+      <attribute name="jaspicCallbackHandlerClass" required="false">
+        <p>Name of the Java class of the
+        <code>javax.security.auth.callback.CallbackHandler</code> implementation
+        which should be used by JASPIC. If none is specified the default
+        <code>org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl</code>
         will be used.</p>
       </attribute>
 
