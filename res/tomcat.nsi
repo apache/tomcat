@@ -57,6 +57,7 @@ Var TomcatPortAjp
 Var TomcatMenuEntriesEnable
 Var TomcatShortcutAllUsers
 Var TomcatServiceName
+Var TomcatServiceNameAlreadyInstalled
 Var TomcatServiceDefaultName
 Var TomcatServiceFileName
 Var TomcatServiceManagerFileName
@@ -629,6 +630,15 @@ Function pageConfigurationLeave
 
   ${If} $TomcatServiceName == ""
     MessageBox MB_ICONEXCLAMATION|MB_OK 'The Service Name may not be empty'
+    Abort "Config not right"
+    Goto exit
+  ${EndIf}
+
+  ReadRegStr $TomcatServiceNameAlreadyInstalled HKLM "SYSTEM\CurrentControlSet\Services\$TomcatServiceName" \
+    "DisplayName"
+  ${If} $TomcatServiceNameAlreadyInstalled != ""
+    MessageBox MB_ICONEXCLAMATION|MB_OK 'A service with the given Service Name is already installed on this machine. \
+      Please choose another Service Name'
     Abort "Config not right"
     Goto exit
   ${EndIf}
