@@ -122,6 +122,12 @@
         is persistent, it should be removed from the persistent store. Patch
         provided by Lazar. (markt)
       </fix>
+      <fix>
+        <bug>61784</bug>: Correctly handle the case when
+        <code>AuthConfigFactoryImpl.registerConfigProvider()</code> is called
+        with a provider name of <code>null</code>. Patch provided by Lazar.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

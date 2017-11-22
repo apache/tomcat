@@ -105,6 +105,22 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             log.debug(sm.getString("authConfigFactoryImpl.registerClass",
                     className, layer, appContext));
         }
+
+        AuthConfigProvider provider = null;
+        if (className != null) {
+            provider = createAuthConfigProvider(className, properties);
+        }
+
+        String registrationID = getRegistrationID(layer, appContext);
+        RegistrationContextImpl registrationContextImpl = new RegistrationContextImpl(
+                layer, appContext, description, true, provider, properties);
+        addRegistrationContextImpl(layer, appContext, registrationID, registrationContextImpl);
+        return registrationID;
+    }
+
+
+    private AuthConfigProvider createAuthConfigProvider(String className,
+            @SuppressWarnings("rawtypes") Map properties) throws SecurityException {
         Class<?> clazz = null;
         AuthConfigProvider provider = null;
         try {
@@ -121,12 +137,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             throw new SecurityException(e);
         }
-
-        String registrationID = getRegistrationID(layer, appContext);
-        RegistrationContextImpl registrationContextImpl = new RegistrationContextImpl(
-                layer, appContext, description, true, provider, properties);
-        addRegistrationContextImpl(layer, appContext, registrationID, registrationContextImpl);
-        return registrationID;
+        return provider;
     }
 
 
@@ -365,7 +376,9 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         if (registrationContextImpl != null && registrationContextImpl.isPersistent()) {
             Provider provider = new Provider();
             provider.setAppContext(registrationContextImpl.getAppContext());
-            provider.setClassName(registrationContextImpl.getProvider().getClass().getName());
+            if (registrationContextImpl.getProvider() != null) {
+                provider.setClassName(registrationContextImpl.getProvider().getClass().getName());
+            }
             provider.setDescription(registrationContextImpl.getDescription());
             provider.setLayer(registrationContextImpl.getMessageLayer());
             for (Entry<String,String> property : registrationContextImpl.getProperties().entrySet()) {
