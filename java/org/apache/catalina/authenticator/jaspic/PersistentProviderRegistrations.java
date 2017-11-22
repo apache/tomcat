@@ -121,12 +121,12 @@ final class PersistentProviderRegistrations {
                     "    xsi:schemaLocation=\"http://tomcat.apache.org/xml jaspic-providers.xsd\"\n" +
                     "    version=\"1.0\">\n");
             for (Provider provider : providers.providers) {
-                writer.write("  <provider className=\"");
-                writer.write(provider.getClassName());
+                writer.write("  <provider");
+                writeOptional("className", provider.getClassName(), writer);
                 writeOptional("layer", provider.getLayer(), writer);
                 writeOptional("appContext", provider.getAppContext(), writer);
                 writeOptional("description", provider.getDescription(), writer);
-                writer.write("\">\n");
+                writer.write(">\n");
                 for (Entry<String,String> entry : provider.getProperties().entrySet()) {
                     writer.write("    <property name=\"");
                     writer.write(entry.getKey());
@@ -169,8 +169,9 @@ final class PersistentProviderRegistrations {
 
     private static void writeOptional(String name, String value, Writer writer) throws IOException {
         if (value != null) {
-            writer.write("\" " + name + "=\"");
+            writer.write(" " + name + "=\"");
             writer.write(value);
+            writer.write("\"");
         }
     }
 
