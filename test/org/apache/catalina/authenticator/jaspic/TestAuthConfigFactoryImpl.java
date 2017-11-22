@@ -27,12 +27,17 @@ import javax.security.auth.message.config.AuthConfigFactory;
 import javax.security.auth.message.config.AuthConfigProvider;
 import javax.security.auth.message.config.RegistrationListener;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.Globals;
 
 public class TestAuthConfigFactoryImpl {
+
+    private String oldCatalinaBase;
+    private static final File TEST_CONFIG_FILE = new File("test/conf/jaspic-providers.xml");
 
     @Test
     public void testRegistrationNullLayer() {
@@ -309,18 +314,34 @@ public class TestAuthConfigFactoryImpl {
     }
 
 
-    @Test
-    public void testRemovePersistentRegistration() {
+    @Before
+    public void setUp() {
         // set CATALINA_BASE to test so that the file with persistent providers will be written in test/conf folder
-        String oldCatalinaBase = System.getProperty(Globals.CATALINA_BASE_PROP);
+        oldCatalinaBase = System.getProperty(Globals.CATALINA_BASE_PROP);
         System.setProperty(Globals.CATALINA_BASE_PROP, "test");
 
-        File file = new File("test/conf/jaspic-providers.xml");
-        if (file.exists()) {
-            file.delete();
+        if (TEST_CONFIG_FILE.exists()) {
+            TEST_CONFIG_FILE.delete();
+        }
+    }
+
+
+    @After
+    public void cleanUp() {
+        if (oldCatalinaBase != null ) {
+            System.setProperty(Globals.CATALINA_BASE_PROP, oldCatalinaBase);
+        } else {
+            System.clearProperty(Globals.CATALINA_BASE_PROP);
         }
 
-        try {
+        if (TEST_CONFIG_FILE.exists()) {
+            TEST_CONFIG_FILE.delete();
+        }
+    }
+
+
+    @Test
+    public void testRemovePersistentRegistration() {
             AuthConfigFactory factory = new AuthConfigFactoryImpl();
             factory.registerConfigProvider(
                     SimpleAuthConfigProvider.class.getName(), null, "L_1", "AC_1", null);
@@ -334,17 +355,40 @@ public class TestAuthConfigFactoryImpl {
             for (String registrationId : registrationIds) {
                 Assert.assertNotEquals(registrationId2, registrationId);
             }
-        } finally {
-            if (oldCatalinaBase != null ) {
-                System.setProperty(Globals.CATALINA_BASE_PROP, oldCatalinaBase);
-            } else {
-                System.clearProperty(Globals.CATALINA_BASE_PROP);
-            }
+    }
 
-            if (file.exists()) {
-                file.delete();
+
+    @Test
+    public void testRegistrationNullClassName() {
+        doTestNullClassName(false, "L_1", "AC_1");
+    }
+
+
+    @Test
+    public void testRegistrationNullClassOverrideExisting() {
+        doTestNullClassName(true, "L_1", "AC_1");
+    }
+
+
+    @Test
+    public void testRegistrationNullClassNullLayerNullAppContext() {
+        doTestNullClassName(false, null, null);
+    }
+
+
+    private void doTestNullClassName(boolean shouldOverrideExistingProvider, String layer, String appContext) {
+            AuthConfigFactory factory = new AuthConfigFactoryImpl();
+            if (shouldOverrideExistingProvider) {
+                factory.registerConfigProvider(SimpleAuthConfigProvider.class.getName(), null, layer, appContext, null);
             }
-        }
+            String registrationId = factory.registerConfigProvider(null, null, layer, appContext, null);
+            factory.refresh();
+
+            String[] registrationIds = factory.getRegistrationIDs(null);
+            Set<String> ids = new HashSet<>(Arrays.asList(registrationIds));
+            Assert.assertTrue(ids.contains(registrationId));
+            AuthConfigProvider provider = factory.getConfigProvider(layer, appContext, null);
+            Assert.assertNull(provider);
     }
 
 
