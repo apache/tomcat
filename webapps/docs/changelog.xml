@@ -173,6 +173,12 @@
         Refactoring in preparation for Java 9. Refactor to avoid using some
         methods that will be deprecated in Java 9 onwards. (markt)
       </scode>
+      <add>
+        <bug>51496</bug>: When using the Windows installer, check if the
+        requested service name already exists and, if it does, prompt the user
+        to select an alternative service name. Patch provided by Ralph
+        Plawetzki. (markt)
+      </add>
       <fix>
         Add necessary Java 9 configuration options to the startup scripts to
         prevent warnings being generated on web application stop. (markt)
