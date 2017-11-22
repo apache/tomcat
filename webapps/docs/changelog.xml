@@ -128,6 +128,11 @@
         with a provider name of <code>null</code>. Patch provided by Lazar.
         (markt)
       </fix>
+      <add>
+        <bug>61795</bug>: Add a property to the <code>Authenticator</code>
+        implementations to enable a custom JASPIC <code>CallbackHandler</code>
+        to be specified. Patch provided by Lazar. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

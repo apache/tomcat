@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.message.AuthException;
 import javax.security.auth.message.AuthStatus;
 import javax.security.auth.message.MessageInfo;
@@ -210,6 +211,13 @@ public abstract class AuthenticatorBase extends ValveBase
      * instances will be created using platform defaults.
      */
     protected String secureRandomProvider = null;
+
+    /**
+     * The name of the JASPIC callback handler class. If none is specified the
+     * default {@link org.apache.catalina.authenticator.jaspic.CallbackHandlerImpl}
+     * will be used.
+     */
+    protected String jaspicCallbackHandlerClass = null;
 
     protected SessionIdGeneratorBase sessionIdGenerator = null;
 
@@ -405,6 +413,25 @@ public abstract class AuthenticatorBase extends ValveBase
      */
     public void setSecureRandomProvider(String secureRandomProvider) {
         this.secureRandomProvider = secureRandomProvider;
+    }
+
+    /**
+     * Return the JASPIC callback handler class name
+     *
+     * @return The name of the JASPIC callback handler
+     */
+    public String getJaspicCallbackHandlerClass() {
+        return jaspicCallbackHandlerClass;
+    }
+
+    /**
+     * Set the JASPIC callback handler class name
+     *
+     * @param jaspicCallbackHandlerClass
+     *            The new JASPIC callback handler class name
+     */
+    public void setJaspicCallbackHandlerClass(String jaspicCallbackHandlerClass) {
+        this.jaspicCallbackHandlerClass = jaspicCallbackHandlerClass;
     }
 
     // --------------------------------------------------------- Public Methods
@@ -640,8 +667,9 @@ public abstract class AuthenticatorBase extends ValveBase
                 new MessageInfoImpl(request.getRequest(), response.getResponse(), authMandatory);
 
         try {
+            CallbackHandler callbackHandler = createCallbackHandler();
             ServerAuthConfig serverAuthConfig = jaspicProvider.getServerAuthConfig(
-                    "HttpServlet", jaspicAppContextID, CallbackHandlerImpl.getInstance());
+                    "HttpServlet", jaspicAppContextID, callbackHandler);
             String authContextID = serverAuthConfig.getAuthContextID(jaspicState.messageInfo);
             jaspicState.serverAuthContext = serverAuthConfig.getAuthContext(authContextID, null, null);
         } catch (AuthException e) {
@@ -651,6 +679,32 @@ public abstract class AuthenticatorBase extends ValveBase
         }
 
         return jaspicState;
+    }
+
+    private CallbackHandler createCallbackHandler() {
+        CallbackHandler callbackHandler = null;
+        if (jaspicCallbackHandlerClass == null) {
+            callbackHandler = CallbackHandlerImpl.getInstance();
+        } else {
+            Class<?> clazz = null;
+            try {
+                clazz = Class.forName(jaspicCallbackHandlerClass, true,
+                        Thread.currentThread().getContextClassLoader());
+            } catch (ClassNotFoundException e) {
+                // Proceed with the retry below
+            }
+
+            try {
+                if (clazz == null) {
+                    clazz = Class.forName(jaspicCallbackHandlerClass);
+                }
+                callbackHandler = (CallbackHandler)clazz.getConstructor().newInstance();
+            } catch (ReflectiveOperationException e) {
+                throw new SecurityException(e);
+            }
+        }
+
+        return callbackHandler;
     }
 
 
