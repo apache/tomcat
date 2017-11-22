@@ -249,6 +249,12 @@
         such attempted use of the endorsed directory mechanism will trigger an
         error and Tomcat will fail to start. (rjung)
       </fix>
+      <add>
+        <bug>51496</bug>: When using the Windows installer, check if the
+        requested service name already exists and, if it does, prompt the user
+        to select an alternative service name. Patch provided by Ralph
+        Plawetzki. (markt)
+      </add>
       <fix>
         <bug>61590</bug>: Enable <code>service.bat</code> to recognise when
         <code>JAVA_HOME</code> is configured for a Java 9 JDK. (markt)
