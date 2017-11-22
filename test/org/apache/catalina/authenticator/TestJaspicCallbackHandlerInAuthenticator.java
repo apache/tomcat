@@ -77,6 +77,11 @@ public class TestJaspicCallbackHandlerInAuthenticator {
 
 class TestCallbackHandlerImpl implements CallbackHandler {
 
+    public TestCallbackHandlerImpl() {
+        // Default constructor required by reflection
+    }
+
+
     @Override
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
         // don't have to do anything; needed only for instantiation
