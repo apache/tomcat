@@ -618,6 +618,10 @@
         pick up the latest Windows binaries built with APR 1.6.2 and OpenSSL
         1.0.2l. (markt)
       </update>
+      <update>
+        <bug>61599</bug>: Update to Commons Daemon 1.1.0 for improved Java 9
+        support. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
