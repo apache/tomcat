@@ -1351,6 +1351,10 @@
         Update the packaged version of the Tomcat Native Library to 1.2.10 to
         pick up the latest Windows binaries built with OpenSSL 1.0.2j. (markt)
       </update>
+      <update>
+        <bug>61599</bug>: Update to Commons Daemon 1.1.0 for improved Java 9
+        support. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
