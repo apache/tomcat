@@ -146,8 +146,8 @@ nsis.system.dll=${nsis.home}/Plugins/${nsis.arch.dir}System.dll
 nsis.nsdialogs.dll=${nsis.home}/Plugins/${nsis.arch.dir}nsDialogs.dll
 nsis.loc=${base-sf.loc}/nsis/nsis-${nsis.version}.zip
 
-# ----- Commons Daemon, version 1.0-Alpha or later -----
-commons-daemon.version=1.0.15
+# ----- Commons Daemon, version 1.1.0 or later -----
+commons-daemon.version=1.1.0
 commons-daemon.home=${base.path}/commons-daemon-${commons-daemon.version}
 commons-daemon.jar=${commons-daemon.home}/commons-daemon-${commons-daemon.version}.jar
 commons-daemon.native.win.home=${commons-daemon.home}/windows
