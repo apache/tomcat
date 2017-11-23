@@ -133,7 +133,7 @@
 
 <source>cd $CATALINA_HOME/bin
 tar xvfz commons-daemon-native.tar.gz
-cd commons-daemon-1.0.x-native-src/unix
+cd commons-daemon-1.1.x-native-src/unix
 ./configure
 make
 cp jsvc ../..
@@ -152,6 +152,14 @@ cd $CATALINA_HOME
     -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager \
     -Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties \
     org.apache.catalina.startup.Bootstrap</source>
+
+    <p>When runnong on Java 9 you will need to additionally specify the
+    following when starting jsvc to avoid warnings on shutdown.</p>
+<source>...
+--add-opens=java.base/java.lang=ALL-UNNAMED \
+--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED \
+...
+</source>
 
     <p>You may also need to specify <code>-jvm server</code> if the JVM defaults
        to using a server VM rather than a client VM. This has been observed on
