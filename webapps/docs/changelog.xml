@@ -285,6 +285,10 @@
         the Publisher when Tomcat is displayed in the list of installed
         applications in Microsoft Windows. (kkolinko)
       </update>
+      <fix>
+        <bug>61803</bug>: Remove outdated SSL information from the Security
+        documentation. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
