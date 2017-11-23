@@ -149,6 +149,11 @@
         connectors when using the JSSE implementation for TLS when running on
         Java 9. (markt)
       </add>
+      <add>
+        <bug>60762</bug>: Add the ability to make changes to the TLS
+        configuration of a connector at runtime without having to restart the
+        Connector. (markt)
+      </add>
       <fix>
         <bug>61568</bug>: Avoid a potential <code>SecurityException</code> when
         using the NIO2 connector and a new thread is added to the pool. (markt)
