@@ -324,6 +324,16 @@
     <Bug code="VO" />
   </Match>
   <Match>
+    <!-- These fields should not be serialized with the session -->
+    <Class name="org.apache.catalina.session.StandardSession" />
+    <Or>
+      <Field name="listeners" />
+      <Field name="notes" />
+      <Field name="support" />
+    </Or>
+    <Bug pattern="SE_TRANSIENT_FIELD_NOT_RESTORED" />
+  </Match>
+  <Match>
     <!-- Use of null is deliberate -->
     <Class name="org.apache.catalina.ssi.ExpressionParseTree" />
     <Method name="pushOpp" />
