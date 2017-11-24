@@ -18,6 +18,7 @@ package org.apache.catalina.servlets;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -916,7 +917,7 @@ public class WebdavServlet extends DefaultServlet {
             return;
         }
 
-        LockInfo lock = new LockInfo();
+        LockInfo lock = new LockInfo(maxDepth);
 
         // Parsing lock request
 
@@ -2359,11 +2360,18 @@ public class WebdavServlet extends DefaultServlet {
     /**
      * Holds a lock information.
      */
-    private class LockInfo {
+    private static class LockInfo implements Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        public LockInfo(int maxDepth) {
+            this.maxDepth = maxDepth;
+        }
 
 
         // ------------------------------------------------- Instance Variables
 
+        private final int maxDepth;
 
         String path = "/";
         String type = "write";
@@ -2376,7 +2384,6 @@ public class WebdavServlet extends DefaultServlet {
 
 
         // ----------------------------------------------------- Public Methods
-
 
         /**
          * Get a String representation of this lock token.
@@ -2466,10 +2473,7 @@ public class WebdavServlet extends DefaultServlet {
             generatedXML.writeElement("D", "locktoken", XMLWriter.CLOSING);
 
             generatedXML.writeElement("D", "activelock", XMLWriter.CLOSING);
-
         }
-
-
     }
 
 

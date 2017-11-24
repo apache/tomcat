@@ -233,7 +233,7 @@ public class DefaultServlet extends HttpServlet {
      * the platform default is used.
      */
     protected String fileEncoding = null;
-    private Charset fileEncodingCharset = null;
+    private transient Charset fileEncodingCharset = null;
 
     /**
      * If a file has a BOM, should that be used in preference to fileEncoding?
