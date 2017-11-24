@@ -264,7 +264,10 @@ public final class FileStore extends StoreBase {
             manager.getContext().getLogger().debug(sm.getString(getStoreName() + ".removing",
                              id, file.getAbsolutePath()));
         }
-        file.delete();
+
+        if (!file.delete()) {
+            throw new IOException(sm.getString("fileStore.deleteSessionFailed", file));
+        }
     }
 
 

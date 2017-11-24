@@ -230,7 +230,9 @@ public class StandardManager extends ManagerBase {
                 } finally {
                     // Delete the persistent storage file
                     if (file.exists()) {
-                        file.delete();
+                        if (!file.delete()) {
+                            log.warn(sm.getString("standardManager.deletePersistedFileFail", file));
+                        }
                     }
                 }
             }

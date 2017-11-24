@@ -719,7 +719,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                             return;
                         }
                         // Rename uploaded WAR file
-                        uploadedWar.renameTo(deployedWar);
+                        if (!uploadedWar.renameTo(deployedWar)) {
+                            writer.println(smClient.getString("managerServlet.renameFail",
+                                    uploadedWar, deployedWar));
+                            return;
+                        }
                     }
                     if (tag != null) {
                         // Copy WAR to the host's appBase

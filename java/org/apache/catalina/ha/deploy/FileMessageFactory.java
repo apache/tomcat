@@ -396,7 +396,9 @@ public class FileMessageFactory {
             int timeIdle = (int) ((timeNow - creationTime) / 1000L);
             if (timeIdle > maxValidTime) {
                 cleanup();
-                if (file.exists()) file.delete();
+                if (file.exists() && !file.delete()) {
+                    log.warn(sm.getString("fileMessageFactory.deleteFail", file));
+                }
                 return false;
             }
         }
