@@ -1621,7 +1621,7 @@ class Validator {
             try {
                 ef.createValueExpression(ctx, expr, Object.class);
             } catch (ELException e) {
-
+                throw new JasperException(e);
             }
         }
 
