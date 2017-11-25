@@ -188,6 +188,11 @@
         <bug>61604</bug>: Fix SMAP generation for JSPs that generate no output.
         (markt)
       </fix>
+      <fix>
+        <bug>61816</bug>: Invalid expressions in attribute values or template
+        text should trigger a translation (compile time) error, not a run time
+        error. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
