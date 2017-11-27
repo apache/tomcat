@@ -325,7 +325,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
 
         // Set the async timeout
         if (setTimeoutOnContainer) {
-            wsContainer.setAsyncSendTimeout(TIMEOUT_MS);
+            wsContainer.setDefaultAsyncSendTimeout(TIMEOUT_MS);
         }
 
         tomcat.start();
@@ -606,7 +606,7 @@ public class TestWsWebSocketContainer extends WebSocketBaseTest {
                 sc.addEndpoint(ServerEndpointConfig.Builder.create(
                         ConstantTxEndpoint.class, PATH).build());
                 if (TestWsWebSocketContainer.timeoutOnContainer) {
-                    sc.setAsyncSendTimeout(TIMEOUT_MS);
+                    sc.setDefaultAsyncSendTimeout(TIMEOUT_MS);
                 }
             } catch (DeploymentException e) {
                 throw new IllegalStateException(e);
