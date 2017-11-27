@@ -82,6 +82,7 @@ public class StarvationTest extends DefaultTestCase {
         }finally {
             if (con2!=null) con2.close();
         }
+        con1.close();
     }
 
     @Test
@@ -104,5 +105,6 @@ public class StarvationTest extends DefaultTestCase {
         }finally {
             if (con2!=null) con2.close();
         }
+        con1.close();
     }
 }

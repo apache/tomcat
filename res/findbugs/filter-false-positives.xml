@@ -1223,12 +1223,47 @@
     <Bug code="ST" />
   </Match>
   <Match>
+    <!-- The name shadowing is deliberate -->
+    <Or>
+      <Class name="org.apache.tomcat.jdbc.test.driver.Connection" />
+      <Class name="org.apache.tomcat.jdbc.test.driver.Driver" />
+      <Class name="org.apache.tomcat.jdbc.test.driver.ResultSet" />
+    </Or>
+    <Bug pattern="NM_SAME_SIMPLE_NAME_AS_INTERFACE" />
+  </Match>
+  <Match>
     <!-- The call with the ignored return value is used to ensure the pool -->
     <!-- thinks the connection is being used.                              -->
     <Class name="org.apache.tomcat.jdbc.test.AbandonPercentageTest" />
     <Method name="testResetConnection" />
     <Bug pattern="RV_RETURN_VALUE_IGNORED" />
   </Match>
+  <Match>
+    <!-- A number of the tests incude performance tests -->
+    <Class name="org.apache.tomcat.jdbc.test.DefaultTestCase" />
+    <Method name="tearDown" />
+    <Bug pattern="DM_GC" />
+  </Match>
+  <Match>
+    <!-- Test does not explicitly close statement deliberately -->
+    <Class name="org.apache.tomcat.jdbc.test.StatementFinalizerTest" />
+    <Method name="testStatementFinalization" />
+    <Bug pattern="ODR_OPEN_DATABASE_RESOURCE"/>
+  </Match>
+  <Match>
+    <!-- Choice of name is deliberate -->
+    <Class name="org.apache.tomcat.jdbc.test.TestException" />
+    <Bug pattern="NM_CLASS_NOT_EXCEPTION" />
+  </Match>
+  <Match>
+    <!-- Testing auto-close so connections not explicitly closed -->
+    <Class name="org.apache.tomcat.jdbc.test.TestGCClose" />
+    <Or>
+      <Method name="testGCStop" />
+      <Method name="testClose" />
+    </Or>
+    <Bug pattern="ODR_OPEN_DATABASE_RESOURCE" />
+   </Match>
   <Match>
     <!-- SQL is from config so is considered safe -->
     <Class name="org.apache.tomcat.jdbc.test.TestSlowQueryReport" />
@@ -1246,6 +1281,16 @@
     <Class name="org.apache.tomcat.jdbc.test.TestStatementCache" />
     <Method name="testMaxCacheSize" />
     <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
+  </Match>
+  <Match>
+    <!-- Tests throw exceptions so connections are never created -->
+    <Class name="org.apache.tomcat.jdbc.test.TestValidationQueryTimeout" />
+    <Or>
+      <Method name="testValidationQueryTimeoutOnConnection" />
+      <Method name="testValidationInvalidOnConnection" />
+      <Method name="testValidationQueryTimeoutOnBorrow" />
+    </Or>
+    <Bug pattern="ODR_OPEN_DATABASE_RESOURCE" />
   </Match>
   <Match>
     <Class name="org.apache.tomcat.jdbc.test.TwoDataSources" />
