@@ -95,6 +95,7 @@ derby.home=${base.path}/db-derby-10.5.1.1-bin
 derby.loc=http://archive.apache.org/dist/db/derby/db-derby-10.5.1.1/db-derby-10.5.1.1-bin.tar.gz
 derby.jar=${derby.home}/lib/derby.jar
 
-h2.home=${base.path}/h2
-h2.loc=http://h2database.googlecode.com/files/h2-2010-02-19.zip
-h2.jar=${h2.home}/bin/h2-1.2.129.jar
+h2.version=1.2.129
+h2.home=${base.path}/h2-${h2.version}
+h2.loc=http://repo.maven.apache.org/maven2/com/h2database/h2/1.2.129/h2-1.2.129.jar
+h2.jar=${h2.home}/h2-1.2.129.jar
