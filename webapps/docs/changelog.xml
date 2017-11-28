@@ -266,7 +266,7 @@
       <fix>
         Improve handling of endorsed directories. The endorsed directory
         mechanism will only be used if the <code>JAVA_ENDORSED_DIRS</code>
-        system property is explictly set or if
+        system property is explicitly set or if
         <code>$CATALINA_HOME/endorsed</code> exists. When running on Java 9, any
         such attempted use of the endorsed directory mechanism will trigger an
         error and Tomcat will fail to start. (rjung)
