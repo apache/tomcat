@@ -46,9 +46,13 @@
       <p>Use this to add a property source, that will be invoked when <code>${parameter}</code>
          denoted parameters are found in the XML files that Tomcat parses.</p>
       <p>Property replacement from the specified property source on the JVM
-         system properties can also be done by adding the
-         <code>org.apache.catalina.util.SystemPropertyReplacerListener</code>
-         listener as a Server listener in the container.</p>
+         system properties can also be done using the
+         <code>REPLACE_SYSTEM_PROPERTIES</code> system property.</p>
+    </property>
+    <property name="org.apache.tomcat.util.digester. REPLACE_SYSTEM_PROPERTIES">
+      <p>Set this boolean system property to <code>true</code> to cause
+         property replacement from the digester property source on the JVM
+         system properties.</p>
     </property>
   </properties>
 
