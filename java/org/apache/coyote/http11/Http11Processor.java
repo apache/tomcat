@@ -190,90 +190,6 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * Checks if any entry in the string array starts with the specified value
-     *
-     * @param sArray the StringArray
-     * @param value string
-     */
-    private static boolean startsWithStringArray(String sArray[], String value) {
-        if (value == null) {
-            return false;
-        }
-        for (int i = 0; i < sArray.length; i++) {
-            if (value.startsWith(sArray[i])) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * Check if the resource could be compressed, if the client supports it.
-     */
-    private boolean isCompressible() {
-
-        // Check if content is not already gzipped
-        MessageBytes contentEncodingMB = response.getMimeHeaders().getValue("Content-Encoding");
-
-        if ((contentEncodingMB != null) && (contentEncodingMB.indexOf("gzip") != -1)) {
-            return false;
-        }
-
-        // If force mode, always compress (test purposes only)
-        if (protocol.getCompressionLevel() == 2) {
-            return true;
-        }
-
-        // Check if sufficient length to trigger the compression
-        long contentLength = response.getContentLengthLong();
-        if ((contentLength == -1) || (contentLength > protocol.getCompressionMinSize())) {
-            // Check for compatible MIME-TYPE
-            String[] compressibleMimeTypes = protocol.getCompressibleMimeTypes();
-            if (compressibleMimeTypes != null) {
-                return startsWithStringArray(compressibleMimeTypes, response.getContentType());
-            }
-        }
-
-        return false;
-    }
-
-
-    /**
-     * Check if compression should be used for this resource. Already checked
-     * that the resource could be compressed if the client supports it.
-     */
-    private boolean useCompression() {
-
-        // Check if browser support gzip encoding
-        MessageBytes acceptEncodingMB = request.getMimeHeaders().getValue("accept-encoding");
-
-        if ((acceptEncodingMB == null) || (acceptEncodingMB.indexOf("gzip") == -1)) {
-            return false;
-        }
-
-        // If force mode, always compress (test purposes only)
-        if (protocol.getCompressionLevel() == 2) {
-            return true;
-        }
-
-        // Check for incompatible Browser
-        Pattern noCompressionUserAgents = protocol.getNoCompressionUserAgentsPattern();
-        if (noCompressionUserAgents != null) {
-            MessageBytes userAgentValueMB = request.getMimeHeaders().getValue("user-agent");
-            if(userAgentValueMB != null) {
-                String userAgentValue = userAgentValueMB.toString();
-                if (noCompressionUserAgents.matcher(userAgentValue).matches()) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
-
-
-    /**
      * Specialized utility method: find a sequence of lower case bytes inside
      * a ByteChunk.
      */
@@ -919,17 +835,10 @@ public class Http11Processor extends AbstractProcessor {
         }
 
         // Check for compression
-        boolean isCompressible = false;
+
         boolean useCompression = false;
-        if (entityBody && (protocol.getCompressionLevel() > 0) && sendfileData == null) {
-            isCompressible = isCompressible();
-            if (isCompressible) {
-                useCompression = useCompression();
-            }
-            // Change content-length to -1 to force chunking
-            if (useCompression) {
-                response.setContentLength(-1);
-            }
+        if (entityBody && sendfileData == null) {
+            useCompression = protocol.useCompression(request, response);
         }
 
         MimeHeaders headers = response.getMimeHeaders();
@@ -972,22 +881,6 @@ public class Http11Processor extends AbstractProcessor {
 
         if (useCompression) {
             outputBuffer.addActiveFilter(outputFilters[Constants.GZIP_FILTER]);
-            headers.setValue("Content-Encoding").setString("gzip");
-        }
-        // If it might be compressed, set the Vary header
-        if (isCompressible) {
-            // Make Proxies happy via Vary (from mod_deflate)
-            MessageBytes vary = headers.getValue("Vary");
-            if (vary == null) {
-                // Add a new Vary header
-                headers.setValue("Vary").setString("Accept-Encoding");
-            } else if (vary.equals("*")) {
-                // No action required
-            } else {
-                // Merge into current header
-                headers.setValue("Vary").setString(
-                        vary.getString() + ",Accept-Encoding");
-            }
         }
 
         // Add date header unless application has already set one (e.g. in a
