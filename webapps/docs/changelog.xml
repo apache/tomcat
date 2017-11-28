@@ -52,6 +52,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Add an additional system property for the system property replacement.
+        (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.2 (markt)" rtext="release in progress">
   <subsection name="Catalina">

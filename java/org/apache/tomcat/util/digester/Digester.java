@@ -108,6 +108,9 @@ public class Digester extends DefaultHandler2 {
             propertySource = source;
             propertySourceSet = true;
         }
+        if (Boolean.getBoolean("org.apache.tomcat.util.digester.REPLACE_SYSTEM_PROPERTIES")) {
+            replaceSystemProperties();
+        }
     }
 
     public static void setPropertySource(IntrospectionUtils.PropertySource propertySource) {
