@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.http11.filters;
 
 import java.io.IOException;
@@ -31,9 +30,7 @@ import org.apache.coyote.http11.OutputFilter;
  */
 public class IdentityOutputFilter implements OutputFilter {
 
-
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Content length.
@@ -101,12 +98,6 @@ public class IdentityOutputFilter implements OutputFilter {
 
     // --------------------------------------------------- OutputFilter Methods
 
-
-    /**
-     * Some filters need additional parameters from the response. All the
-     * necessary reading can occur in that method, as this method is called
-     * after the response header processing is complete.
-     */
     @Override
     public void setResponse(Response response) {
         contentLength = response.getContentLengthLong();
@@ -114,33 +105,18 @@ public class IdentityOutputFilter implements OutputFilter {
     }
 
 
-    /**
-     * Set the next buffer in the filter pipeline.
-     */
     @Override
     public void setBuffer(OutputBuffer buffer) {
         this.buffer = buffer;
     }
 
 
-    /**
-     * End the current request. It is acceptable to write extra bytes using
-     * buffer.doWrite during the execution of this method.
-     */
     @Override
-    public long end()
-        throws IOException {
-
-        if (remaining > 0)
-            return remaining;
-        return 0;
-
+    public void end() throws IOException {
+        // NO-OP
     }
 
 
-    /**
-     * Make the filter ready to process the next request.
-     */
     @Override
     public void recycle() {
         contentLength = -1;
