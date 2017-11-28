@@ -145,7 +145,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         SecurityCollection collection = new SecurityCollection();
         collection.addPatternDecoded("/");
         String utf8User = "test";
-        String utf8Pass = "123£";
+        String utf8Pass = "123Â£";
 
         tomcat.addUser(utf8User, utf8Pass);
         tomcat.addRole(utf8User, ROLE);
