@@ -693,9 +693,10 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
     @Override
     public void setAttribute(String name, Object value) {
         // Name cannot be null
-        if (name == null)
-            throw new IllegalArgumentException
+        if (name == null) {
+            throw new NullPointerException
                 (sm.getString("applicationContext.setAttribute.namenull"));
+        }
 
         // Null value is the same as removeAttribute()
         if (value == null) {
@@ -1058,6 +1059,11 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
 
     @Override
     public boolean setInitParameter(String name, String value) {
+        // Name cannot be null
+        if (name == null) {
+            throw new NullPointerException
+                (sm.getString("applicationContext.setAttribute.namenull"));
+        }
         if (!context.getState().equals(LifecycleState.STARTING_PREP)) {
             throw new IllegalStateException(
                     sm.getString("applicationContext.setInitParam.ise",
