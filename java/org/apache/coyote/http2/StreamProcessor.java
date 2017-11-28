@@ -25,9 +25,12 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.Request;
+import org.apache.coyote.Response;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.DispatchType;
 import org.apache.tomcat.util.net.SendfileState;
@@ -98,7 +101,35 @@ class StreamProcessor extends AbstractProcessor {
     @Override
     protected final void prepareResponse() throws IOException {
         response.setCommitted(true);
+        prepareHeaders(response);
         stream.writeHeaders();
+    }
+
+
+    static void prepareHeaders(Response coyoteResponse) {
+        MimeHeaders headers = coyoteResponse.getMimeHeaders();
+        int statusCode = coyoteResponse.getStatus();
+
+        // Add the pseudo header for status
+        headers.addValue(":status").setString(Integer.toString(statusCode));
+
+        // Check to see if a response body is present
+        if (!(statusCode < 200 || statusCode == 205 || statusCode == 304)) {
+            String contentType = coyoteResponse.getContentType();
+            if (contentType != null) {
+                headers.setValue("content-type").setString(contentType);
+            }
+            String contentLanguage = coyoteResponse.getContentLanguage();
+            if (contentLanguage != null) {
+                headers.setValue("content-language").setString(contentLanguage);
+            }
+        }
+
+        // Add date header unless it is an informational response or the
+        // application has already set one
+        if (statusCode >= 200 && headers.getValue("date") == null) {
+            headers.addValue("date").setString(FastHttpDateFormat.getCurrentDate());
+        }
     }
 
 
