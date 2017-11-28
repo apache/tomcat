@@ -808,13 +808,14 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
      * Process send file (if supported) for the given stream. The appropriate
      * request attributes should be set before calling this method.
      *
-     * @param stream    The stream to process
+     * @param sendfileData  The stream and associated data to process
      *
      * @return  The result of the send file processing
      */
-    protected SendfileState processSendfile(Stream stream) {
+    protected SendfileState processSendfile(SendfileData sendfileData) {
         return SendfileState.DONE;
     }
+
 
     private synchronized Set<AbstractStream> releaseBackLog(int increment) {
         Set<AbstractStream> result = new HashSet<>();

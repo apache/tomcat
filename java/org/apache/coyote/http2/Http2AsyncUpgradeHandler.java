@@ -16,10 +16,8 @@
  */
 package org.apache.coyote.http2;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
@@ -264,47 +262,37 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     }
 
     @Override
-    protected SendfileState processSendfile(Stream stream) {
-        String fileName = (String) stream.getCoyoteRequest().getAttribute(
-                org.apache.coyote.Constants.SENDFILE_FILENAME_ATTR);
-        if (fileName != null) {
-            java.nio.file.Path path = new File(fileName).toPath();
-            SendfileData sendfile = new SendfileData();
-            sendfile.pos = ((Long) stream.getCoyoteRequest().getAttribute(
-                    org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR)).longValue();
-            sendfile.end = ((Long) stream.getCoyoteRequest().getAttribute(
-                    org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR)).longValue();
-            sendfile.left = sendfile.end - sendfile.pos;
+    protected SendfileState processSendfile(SendfileData sendfile) {
+        if (sendfile != null) {
             try {
-                try (FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
+                try (FileChannel channel = FileChannel.open(sendfile.path, StandardOpenOption.READ)) {
                     sendfile.mappedBuffer = channel.map(MapMode.READ_ONLY, sendfile.pos, sendfile.end - sendfile.pos);
-                    sendfile.stream = stream;
                 }
                 // Reserve as much as possible right away
                 int reservation = (sendfile.end - sendfile.pos > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) (sendfile.end - sendfile.pos);
-                sendfile.streamReservation  = stream.reserveWindowSize(reservation, true);
-                sendfile.connectionReservation = reserveWindowSize(stream, sendfile.streamReservation);
+                sendfile.streamReservation  = sendfile.stream.reserveWindowSize(reservation, true);
+                sendfile.connectionReservation = reserveWindowSize(sendfile.stream, sendfile.streamReservation);
             } catch (IOException e) {
                 return SendfileState.ERROR;
             }
             // Actually perform the write
             int frameSize = Integer.min(getMaxFrameSize(), sendfile.connectionReservation);
-            boolean finished = (frameSize == sendfile.left) && stream.getCoyoteResponse().getTrailerFields() == null;
+            boolean finished = (frameSize == sendfile.left) && sendfile.stream.getCoyoteResponse().getTrailerFields() == null;
 
             // Need to check this now since sending end of stream will change this.
-            boolean writeable = stream.canWrite();
+            boolean writeable = sendfile.stream.canWrite();
             byte[] header = new byte[9];
             ByteUtil.setThreeBytes(header, 0, frameSize);
             header[3] = FrameType.DATA.getIdByte();
             if (finished) {
                 header[4] = FLAG_END_OF_STREAM;
-                stream.sentEndOfStream();
-                if (!stream.isActive()) {
+                sendfile.stream.sentEndOfStream();
+                if (!sendfile.stream.isActive()) {
                     activeRemoteStreamCount.decrementAndGet();
                 }
             }
             if (writeable) {
-                ByteUtil.set31Bits(header, 5, stream.getIdentifier().intValue());
+                ByteUtil.set31Bits(header, 5, sendfile.stream.getIdentifier().intValue());
                 sendfile.mappedBuffer.limit(sendfile.mappedBuffer.position() + frameSize);
                 socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
                         TimeUnit.MILLISECONDS, sendfile, COMPLETE_WRITE_WITH_COMPLETION,
@@ -395,19 +383,6 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         public void failed(Throwable t, SendfileData sendfile) {
             applicationErrorCompletion.failed(t, null);
         }
-    }
-
-    protected class SendfileData {
-        protected Stream stream;
-        // Note: a mapped buffer is a special construct with an underlying file
-        // that doesn't need to be closed
-        protected MappedByteBuffer mappedBuffer;
-        protected int frameSize;
-        protected long left;
-        protected int streamReservation;
-        protected int connectionReservation;
-        protected long pos;
-        protected long end;
     }
 
     protected class AsyncPingManager extends PingManager {

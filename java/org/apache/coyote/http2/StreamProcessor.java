@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http2;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
@@ -45,6 +46,7 @@ class StreamProcessor extends AbstractProcessor {
 
     private final Http2UpgradeHandler handler;
     private final Stream stream;
+    private SendfileData sendfileData = null;
     private SendfileState sendfileState = null;
 
 
@@ -101,8 +103,27 @@ class StreamProcessor extends AbstractProcessor {
     @Override
     protected final void prepareResponse() throws IOException {
         response.setCommitted(true);
+        if (handler.hasAsyncIO() && handler.getProtocol().getUseSendfile()) {
+            prepareSendfile();
+        }
         prepareHeaders(response);
         stream.writeHeaders();
+    }
+
+
+    private void prepareSendfile() {
+        String fileName = (String) stream.getCoyoteRequest().getAttribute(
+                org.apache.coyote.Constants.SENDFILE_FILENAME_ATTR);
+        if (fileName != null) {
+            sendfileData.path = new File(fileName).toPath();
+            sendfileData = new SendfileData();
+            sendfileData.pos = ((Long) stream.getCoyoteRequest().getAttribute(
+                    org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR)).longValue();
+            sendfileData.end = ((Long) stream.getCoyoteRequest().getAttribute(
+                    org.apache.coyote.Constants.SENDFILE_FILE_END_ATTR)).longValue();
+            sendfileData.left = sendfileData.end - sendfileData.pos;
+            sendfileData.stream = stream;
+        }
     }
 
 
@@ -135,7 +156,7 @@ class StreamProcessor extends AbstractProcessor {
 
     @Override
     protected final void finishResponse() throws IOException {
-        sendfileState = handler.processSendfile(stream);
+        sendfileState = handler.processSendfile(sendfileData);
         if (!(sendfileState == SendfileState.PENDING)) {
             stream.getOutputBuffer().close();
         }
