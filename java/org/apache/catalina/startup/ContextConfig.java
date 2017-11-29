@@ -1257,7 +1257,6 @@ public class ContextConfig implements LifecycleListener {
         for (Entry<String, String> entry : webxml.getContextParams().entrySet()) {
             context.addParameter(entry.getKey(), entry.getValue());
         }
-        context.setDefaultContextPath(webxml.getDefaultContextPath());
         context.setDenyUncoveredHttpMethods(
                 webxml.getDenyUncoveredHttpMethods());
         context.setDisplayName(webxml.getDisplayName());

@@ -372,11 +372,6 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void setAltDDName(String altDDName) { /* NO-OP */ }
 
     @Override
-    public String getDefaultContextPath() { return null; }
-    @Override
-    public void setDefaultContextPath(String defaultContextPath) { /* NO-OP */ }
-
-    @Override
     public boolean getDenyUncoveredHttpMethods() { return false; }
     @Override
     public void setDenyUncoveredHttpMethods(boolean denyUncoveredHttpMethods) {

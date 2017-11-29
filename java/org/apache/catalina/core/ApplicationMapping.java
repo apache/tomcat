@@ -19,7 +19,6 @@ package org.apache.catalina.core;
 import javax.servlet.http.HttpServletMapping;
 import javax.servlet.http.MappingMatch;
 
-import org.apache.catalina.Globals;
 import org.apache.catalina.mapper.MappingData;
 
 public class ApplicationMapping {
@@ -48,8 +47,7 @@ public class ApplicationMapping {
                         mapping = new MappingImpl("", "", mappingData.matchType, servletName);
                         break;
                     case DEFAULT:
-                        String match = Globals.STRICT_SERVLET_COMPLIANCE ? "default" : "";
-                        mapping = new MappingImpl(match, "/", mappingData.matchType, servletName);
+                        mapping = new MappingImpl("", "/", mappingData.matchType, servletName);
                         break;
                     case EXACT:
                         mapping = new MappingImpl(mappingData.wrapperPath.toString().substring(1),

@@ -348,20 +348,6 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * Get the best effort path for mapping.
-     * @return the default context path
-     */
-    public String getDefaultContextPath();
-
-
-    /**
-     * Return the best effort path for mapping.
-     * @param defaultContextPath The default context path
-     */
-    public void setDefaultContextPath(String defaultContextPath);
-
-
-    /**
      * Return the deny-uncovered-http-methods flag for this web application.
      *
      * @return The current value of the flag

@@ -1525,7 +1525,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    private class DefaultHeaderFrameBuffers implements HeaderFrameBuffers {
+    protected class DefaultHeaderFrameBuffers implements HeaderFrameBuffers {
 
         private final byte[] header;
         private ByteBuffer payload;

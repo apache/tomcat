@@ -231,13 +231,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // - description
     // - icon
 
-    // default-context-path
-    private String defaultContextPath = null;
-    public String getDefaultContextPath() { return defaultContextPath; }
-    public void setDefaultContextPath(String defaultContextPath) {
-        this.defaultContextPath = defaultContextPath;
-    }
-
     // display-name - TODO should support multiple with language
     private String displayName = null;
     public String getDisplayName() { return displayName; }
@@ -1430,24 +1423,6 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             }
         }
         contextParams.putAll(temp.getContextParams());
-
-        if (defaultContextPath == null) {
-            for (WebXml fragment : fragments) {
-                String value = fragment.getDefaultContextPath();
-                if (value != null) {
-                    if (temp.getDefaultContextPath() == null) {
-                        temp.setDefaultContextPath(value);
-                    } else {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictDefaultContextPath",
-                                fragment.getName(),
-                                fragment.getURL()));
-                        return false;
-                    }
-                }
-            }
-            defaultContextPath = temp.getDefaultContextPath();
-        }
 
         if (displayName == null) {
             for (WebXml fragment : fragments) {

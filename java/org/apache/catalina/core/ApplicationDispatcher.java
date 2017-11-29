@@ -626,9 +626,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
             wrequest.setQueryString(queryString);
             wrequest.setQueryParams(queryString);
         }
-        if (!Globals.STRICT_SERVLET_COMPLIANCE) {
-            wrequest.setMapping(mapping);
-        }
+        wrequest.setMapping(mapping);
 
         invoke(state.outerRequest, state.outerResponse, state);
     }

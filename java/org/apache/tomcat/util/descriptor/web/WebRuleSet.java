@@ -203,9 +203,6 @@ public class WebRuleSet implements RuleSet {
         digester.addCallParam(fullPrefix + "/context-param/param-name", 0);
         digester.addCallParam(fullPrefix + "/context-param/param-value", 1);
 
-        digester.addCallMethod(fullPrefix + "/default-context-path",
-                "setDefaultContextPath", 0);
-
         digester.addCallMethod(fullPrefix + "/display-name",
                                "setDisplayName", 0);
 

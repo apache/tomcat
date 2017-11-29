@@ -51,12 +51,6 @@
         Add some missing NPEs to ServletContext. (remm)
       </fix>
       <fix>
-        Minor HttpServletMapping issues. (remm)
-      </fix>
-      <fix>
-        Add bare bones support for default context path. (remm)
-      </fix>
-      <fix>
         Update the Java EE 8 XML schema to the released versions. (markt)
       </fix>
     </changelog>

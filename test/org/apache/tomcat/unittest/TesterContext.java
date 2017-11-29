@@ -471,16 +471,6 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public String getDefaultContextPath() {
-        return null;
-    }
-
-    @Override
-    public void setDefaultContextPath(String defaultContextPath) {
-        // NO-OP
-    }
-
-    @Override
     public boolean getDenyUncoveredHttpMethods() {
         return false;
     }

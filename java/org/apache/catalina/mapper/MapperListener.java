@@ -24,7 +24,6 @@ import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
-import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -365,14 +364,11 @@ public class MapperListener extends LifecycleMBeanBase
      */
     private void registerContext(Context context) {
 
-        Host host = (Host)context.getParent();
-        String contextPath = Globals.STRICT_SERVLET_COMPLIANCE ? context.getDefaultContextPath() : null;
-        if (contextPath == null || host.findChild(contextPath) != null) {
-            contextPath = context.getPath();
-        }
+        String contextPath = context.getPath();
         if ("/".equals(contextPath)) {
             contextPath = "";
         }
+        Host host = (Host)context.getParent();
 
         WebResourceRoot resources = context.getResources();
         String[] welcomeFiles = context.findWelcomeFiles();
@@ -403,11 +399,7 @@ public class MapperListener extends LifecycleMBeanBase
      */
     private void unregisterContext(Context context) {
 
-        Host host = (Host)context.getParent();
-        String contextPath = Globals.STRICT_SERVLET_COMPLIANCE ? context.getDefaultContextPath() : null;
-        if (contextPath == null || host.findChild(contextPath) != null) {
-            contextPath = context.getPath();
-        }
+        String contextPath = context.getPath();
         if ("/".equals(contextPath)) {
             contextPath = "";
         }
