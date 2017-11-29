@@ -321,7 +321,9 @@ public class TestAuthConfigFactoryImpl {
         System.setProperty(Globals.CATALINA_BASE_PROP, "test");
 
         if (TEST_CONFIG_FILE.exists()) {
-            TEST_CONFIG_FILE.delete();
+            if (!TEST_CONFIG_FILE.delete()) {
+                Assert.fail("Failed to delete " + TEST_CONFIG_FILE);
+            }
         }
     }
 
@@ -335,7 +337,9 @@ public class TestAuthConfigFactoryImpl {
         }
 
         if (TEST_CONFIG_FILE.exists()) {
-            TEST_CONFIG_FILE.delete();
+            if (!TEST_CONFIG_FILE.delete()) {
+                Assert.fail("Failed to delete " + TEST_CONFIG_FILE);
+            }
         }
     }
 
