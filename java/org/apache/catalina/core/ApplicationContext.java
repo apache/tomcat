@@ -287,7 +287,11 @@ public class ApplicationContext implements ServletContext {
 
     @Override
     public String getContextPath() {
-        return context.getPath();
+        if (Globals.STRICT_SERVLET_COMPLIANCE && context.getDefaultContextPath() != null) {
+            return context.getDefaultContextPath();
+        } else {
+            return context.getPath();
+        }
     }
 
 

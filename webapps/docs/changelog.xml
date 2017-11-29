@@ -50,6 +50,12 @@
       <fix>
         Add some missing NPEs to ServletContext. (remm)
       </fix>
+      <fix>
+        Minor HttpServletMapping issues. (remm)
+      </fix>
+      <fix>
+        Add bare bones support for default context path. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

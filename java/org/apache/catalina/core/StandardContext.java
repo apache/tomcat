@@ -343,6 +343,12 @@ public class StandardContext extends ContainerBase
 
 
     /**
+     * Best effort mapping path.
+     */
+    private String defaultContextPath;
+
+
+    /**
      * Override the default context xml location.
      */
     private String defaultContextXml;
@@ -1596,6 +1602,21 @@ public class StandardContext extends ContainerBase
                                    oldCrossContext,
                                    this.crossContext);
 
+    }
+
+    @Override
+    public String getDefaultContextPath() {
+        return defaultContextPath;
+    }
+
+    /**
+     * Set the best effort path for mapping.
+     *
+     * @param defaultContextPath The default context path
+     */
+    @Override
+    public void setDefaultContextPath(String defaultContextPath) {
+        this.defaultContextPath = defaultContextPath;
     }
 
     public String getDefaultContextXml() {
