@@ -3167,7 +3167,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             return null;
 
         JarEntry jarEntry = null;
-        // Need to skip the leading / to find resoucres in JARs
+        // Need to skip the leading / to find resources in JARs
         String jarEntryPath = path.substring(1);
 
         ResourceEntry entry = resourceEntries.get(path);
