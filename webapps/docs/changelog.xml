@@ -61,6 +61,10 @@
         Add an additional system property for the system property replacement.
         (remm)
       </fix>
+      <fix>
+        Add missing SHA-512 hash for release artifacts to the build script.
+        (markt) 
+      </fix>
     </changelog>
   </subsection>
 </section>
