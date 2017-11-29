@@ -56,6 +56,9 @@
       <fix>
         Add bare bones support for default context path. (remm)
       </fix>
+      <fix>
+        Update the Java EE 8 XML schema to the released versions. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

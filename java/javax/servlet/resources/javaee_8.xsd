@@ -1,75 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-
-    Copyright (c) 2009-2015 Oracle and/or its affiliates. All rights reserved.
-
-    The contents of this file are subject to the terms of either the GNU
-    General Public License Version 2 only ("GPL") or the Common Development
-    and Distribution License("CDDL") (collectively, the "License").  You
-    may not use this file except in compliance with the License.  You can
-    obtain a copy of the License at
-    https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
-    or packager/legal/LICENSE.txt.  See the License for the specific
-    language governing permissions and limitations under the License.
-
-    When distributing the software, include this License Header Notice in each
-    file and include the License file at packager/legal/LICENSE.txt.
-
-    GPL Classpath Exception:
-    Oracle designates this particular file as subject to the "Classpath"
-    exception as provided by Oracle in the GPL Version 2 section of the License
-    file that accompanied this code.
-
-    Modifications:
-    If applicable, add the following below the License Header, with the fields
-    enclosed by brackets [] replaced by your own identifying information:
-    "Portions Copyright [year] [name of copyright owner]"
-
-    Contributor(s):
-    If you wish your version of this file to be governed by only the CDDL or
-    only the GPL Version 2, indicate your decision by adding "[Contributor]
-    elects to include this software in this distribution under the [CDDL or GPL
-    Version 2] license."  If you don't indicate a single choice of license, a
-    recipient has the option to distribute your version of this file under
-    either the CDDL, the GPL Version 2 or to extend the choice of license to
-    its licensees as provided above.  However, if you add GPL Version 2 code
-    and therefore, elected the GPL Version 2 license, then the option applies
-    only if the new code is made subject to such option by the copyright
-    holder.
-
-    The Apache Software Foundation elects to include this software under the
-    CDDL license.
-
--->
-<xsd:schema
-     targetNamespace="http://xmlns.jcp.org/xml/ns/javaee"
-     xmlns:javaee="http://xmlns.jcp.org/xml/ns/javaee"
-     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-     elementFormDefault="qualified"
-     attributeFormDefault="unqualified"
-     version="8">
-
+<xsd:schema targetNamespace="http://xmlns.jcp.org/xml/ns/javaee"
+            xmlns:javaee="http://xmlns.jcp.org/xml/ns/javaee"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified"
+            version="8">
   <xsd:annotation>
     <xsd:documentation>
-      <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="license.inc" parse="text"/>
+
+      DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+      Copyright (c) 2009-2017 Oracle and/or its affiliates. All rights reserved.
+
+      The contents of this file are subject to the terms of either the GNU
+      General Public License Version 2 only ("GPL") or the Common Development
+      and Distribution License("CDDL") (collectively, the "License").  You
+      may not use this file except in compliance with the License.  You can
+      obtain a copy of the License at
+      https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+      or packager/legal/LICENSE.txt.  See the License for the specific
+      language governing permissions and limitations under the License.
+
+      When distributing the software, include this License Header Notice in each
+      file and include the License file at packager/legal/LICENSE.txt.
+
+      GPL Classpath Exception:
+      Oracle designates this particular file as subject to the "Classpath"
+      exception as provided by Oracle in the GPL Version 2 section of the License
+      file that accompanied this code.
+
+      Modifications:
+      If applicable, add the following below the License Header, with the fields
+      enclosed by brackets [] replaced by your own identifying information:
+      "Portions Copyright [year] [name of copyright owner]"
+
+      Contributor(s):
+      If you wish your version of this file to be governed by only the CDDL or
+      only the GPL Version 2, indicate your decision by adding "[Contributor]
+      elects to include this software in this distribution under the [CDDL or GPL
+      Version 2] license."  If you don't indicate a single choice of license, a
+      recipient has the option to distribute your version of this file under
+      either the CDDL, the GPL Version 2 or to extend the choice of license to
+      its licensees as provided above.  However, if you add GPL Version 2 code
+      and therefore, elected the GPL Version 2 license, then the option applies
+      only if the new code is made subject to such option by the copyright
+      holder.
+
+      The Apache Software Foundation elects to include this software under the
+      CDDL license.
+
     </xsd:documentation>
   </xsd:annotation>
 
   <xsd:annotation>
     <xsd:documentation>
-      <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="glossary.inc" parse="text"/>
+
+      The following definitions that appear in the common
+      shareable schema(s) of Java EE deployment descriptors should be
+      interpreted with respect to the context they are included:
+
+      Deployment Component may indicate one of the following:
+      java ee application;
+      application client;
+      web application;
+      enterprise bean;
+      resource adapter;
+
+      Deployment File may indicate one of the following:
+      ear file;
+      war file;
+      jar file;
+      rar file;
+
     </xsd:documentation>
   </xsd:annotation>
-
 
   <xsd:import namespace="http://www.w3.org/XML/1998/namespace"
               schemaLocation="http://www.w3.org/2001/xml.xsd"/>
 
   <xsd:include schemaLocation="javaee_web_services_client_1_4.xsd"/>
-
-  <!-- **************************************************** -->
 
   <xsd:group name="descriptionGroup">
     <xsd:annotation>
@@ -99,8 +108,6 @@
     </xsd:sequence>
   </xsd:group>
 
-  <!-- **************************************************** -->
-
   <xsd:group name="jndiEnvironmentRefsGroup">
     <xsd:annotation>
       <xsd:documentation>
@@ -113,57 +120,71 @@
     <xsd:sequence>
       <xsd:element name="env-entry"
                    type="javaee:env-entryType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="ejb-ref"
                    type="javaee:ejb-refType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="ejb-local-ref"
                    type="javaee:ejb-local-refType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:group ref="javaee:service-refGroup"/>
       <xsd:element name="resource-ref"
                    type="javaee:resource-refType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="resource-env-ref"
                    type="javaee:resource-env-refType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="message-destination-ref"
                    type="javaee:message-destination-refType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="persistence-context-ref"
                    type="javaee:persistence-context-refType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="persistence-unit-ref"
                    type="javaee:persistence-unit-refType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="post-construct"
                    type="javaee:lifecycle-callbackType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="pre-destroy"
                    type="javaee:lifecycle-callbackType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="data-source"
                    type="javaee:data-sourceType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="jms-connection-factory"
                    type="javaee:jms-connection-factoryType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="jms-destination"
                    type="javaee:jms-destinationType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="mail-session"
                    type="javaee:mail-sessionType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="connection-factory"
                    type="javaee:connection-factory-resourceType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
       <xsd:element name="administered-object"
                    type="javaee:administered-objectType"
-                   minOccurs="0" maxOccurs="unbounded"/>
+                   minOccurs="0"
+                   maxOccurs="unbounded"/>
     </xsd:sequence>
   </xsd:group>
-
-  <!-- **************************************************** -->
 
   <xsd:group name="resourceGroup">
     <xsd:annotation>
@@ -175,25 +196,20 @@
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
-
       <xsd:group ref="javaee:resourceBaseGroup"/>
-
       <xsd:element name="lookup-name"
                    type="javaee:xsdStringType"
                    minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
 
-              The JNDI name to be looked up to resolve a resource reference.
+            The JNDI name to be looked up to resolve a resource reference.
 
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
     </xsd:sequence>
   </xsd:group>
-
-  <!-- **************************************************** -->
 
   <xsd:group name="resourceBaseGroup">
     <xsd:annotation>
@@ -211,36 +227,33 @@
                    minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
-            <![CDATA[
 
-              A product specific name that this resource should be
-              mapped to.  The name of this resource, as defined by the
-              resource's name element or defaulted, is a name that is
-              local to the application component using the resource.
-              (It's a name in the JNDI java:comp/env namespace.)  Many
-              application servers provide a way to map these local
-              names to names of resources known to the application
-              server.  This mapped name is often a global JNDI name,
-              but may be a name of any form.
+            A product specific name that this resource should be
+            mapped to.  The name of this resource, as defined by the
+            resource's name element or defaulted, is a name that is
+            local to the application component using the resource.
+            (It's a name in the JNDI java:comp/env namespace.)  Many
+            application servers provide a way to map these local
+            names to names of resources known to the application
+            server.  This mapped name is often a global JNDI name,
+            but may be a name of any form.
 
-              Application servers are not required to support any
-              particular form or type of mapped name, nor the ability
-              to use mapped names.  The mapped name is
-              product-dependent and often installation-dependent.  No
-              use of a mapped name is portable.
+            Application servers are not required to support any
+            particular form or type of mapped name, nor the ability
+            to use mapped names.  The mapped name is
+            product-dependent and often installation-dependent.  No
+            use of a mapped name is portable.
 
-              ]]>
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
       <xsd:element name="injection-target"
                    type="javaee:injection-targetType"
                    minOccurs="0"
                    maxOccurs="unbounded"/>
-
     </xsd:sequence>
   </xsd:group>
+
 
 <!-- **************************************************** -->
 
@@ -281,7 +294,7 @@
         <xsd:annotation>
           <xsd:documentation>
 
-              The administered object's interface type.
+            The administered object's interface type.
 
           </xsd:documentation>
         </xsd:annotation>
@@ -291,7 +304,7 @@
         <xsd:annotation>
           <xsd:documentation>
 
-              The administered object's class name.
+            The administered object's class name.
 
           </xsd:documentation>
         </xsd:annotation>
@@ -323,6 +336,7 @@
     <xsd:attribute name="id"
                    type="xsd:ID"/>
   </xsd:complexType>
+
 
 <!-- **************************************************** -->
 
@@ -364,7 +378,6 @@
 
             The fully qualified class name of the connection factory
             interface.
-
 
           </xsd:documentation>
         </xsd:annotation>
@@ -433,7 +446,8 @@
                    type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="data-sourceType">
     <xsd:annotation>
@@ -466,7 +480,6 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
       <xsd:element name="class-name"
                    type="javaee:fully-qualified-classType"
                    minOccurs="0">
@@ -518,7 +531,6 @@
         <xsd:annotation>
           <xsd:documentation>
             <![CDATA[
-
             A JDBC URL. If the <code>url</code> property is specified
             along with other standard <code>DataSource</code> properties
             such as <code>serverName</code>, <code>databaseName</code>
@@ -660,12 +672,13 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="descriptionType">
     <xsd:annotation>
@@ -693,8 +706,6 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
-
   <xsd:simpleType name="dewey-versionType">
     <xsd:annotation>
       <xsd:documentation>
@@ -704,33 +715,32 @@
 
       </xsd:documentation>
     </xsd:annotation>
-
     <xsd:restriction base="xsd:token">
       <xsd:pattern value="\.?[0-9]+(\.[0-9]+)*"/>
     </xsd:restriction>
   </xsd:simpleType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="display-nameType">
     <xsd:annotation>
       <xsd:documentation>
         <![CDATA[
+        The display-name type contains a short name that is intended
+        to be displayed by tools. It is used by display-name
+        elements.  The display name need not be unique.
 
-          The display-name type contains a short name that is intended
-          to be displayed by tools. It is used by display-name
-          elements.  The display name need not be unique.
+        Example:
 
-          Example:
+        ...
+        <display-name xml:lang="en">
+        Employee Self Service
+        </display-name>
 
-          ...
-             <display-name xml:lang="en">
-               Employee Self Service
-             </display-name>
+        The value of the xml:lang attribute is "en" (English) by default.
 
-          The value of the xml:lang attribute is "en" (English) by default.
-
-          ]]>
+        ]]>
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -740,37 +750,37 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="ejb-linkType">
     <xsd:annotation>
       <xsd:documentation>
         <![CDATA[
+        The ejb-linkType is used by ejb-link
+        elements in the ejb-ref or ejb-local-ref elements to specify
+        that an EJB reference is linked to enterprise bean.
 
-          The ejb-linkType is used by ejb-link
-          elements in the ejb-ref or ejb-local-ref elements to specify
-          that an EJB reference is linked to enterprise bean.
+        The value of the ejb-link element must be the ejb-name of an
+        enterprise bean in the same ejb-jar file or in another ejb-jar
+        file in the same Java EE application unit.
 
-          The value of the ejb-link element must be the ejb-name of an
-          enterprise bean in the same ejb-jar file or in another ejb-jar
-          file in the same Java EE application unit.
+        Alternatively, the name in the ejb-link element may be
+        composed of a path name specifying the ejb-jar containing the
+        referenced enterprise bean with the ejb-name of the target
+        bean appended and separated from the path name by "#".  The
+        path name is relative to the Deployment File containing
+        Deployment Component that is referencing the enterprise
+        bean.  This allows multiple enterprise beans with the same
+        ejb-name to be uniquely identified.
 
-          Alternatively, the name in the ejb-link element may be
-          composed of a path name specifying the ejb-jar containing the
-          referenced enterprise bean with the ejb-name of the target
-          bean appended and separated from the path name by "#".  The
-          path name is relative to the Deployment File containing
-          Deployment Component that is referencing the enterprise
-          bean.  This allows multiple enterprise beans with the same
-          ejb-name to be uniquely identified.
+        Examples:
 
-          Examples:
+        <ejb-link>EmployeeRecord</ejb-link>
 
-              <ejb-link>EmployeeRecord</ejb-link>
+        <ejb-link>../products/product.jar#ProductEJB</ejb-link>
 
-              <ejb-link>../products/product.jar#ProductEJB</ejb-link>
-
-          ]]>
+        ]]>
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -778,7 +788,8 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="ejb-local-refType">
     <xsd:annotation>
@@ -789,24 +800,23 @@
         home or to the local business interface of a 3.0 bean.
         The declaration consists of:
 
-            - an optional description
-            - the EJB reference name used in the code of the Deployment
-              Component that's referencing the enterprise bean.
-            - the optional expected type of the referenced enterprise bean
-            - the optional expected local interface of the referenced
-              enterprise bean or the local business interface of the
-              referenced enterprise bean.
-            - the optional expected local home interface of the referenced
-              enterprise bean. Not applicable if this ejb-local-ref refers
-              to the local business interface of a 3.0 bean.
-            - optional ejb-link information, used to specify the
-              referenced enterprise bean
-            - optional elements to define injection of the named enterprise
-              bean into a component field or property.
+        - an optional description
+        - the EJB reference name used in the code of the Deployment
+        Component that's referencing the enterprise bean.
+        - the optional expected type of the referenced enterprise bean
+        - the optional expected local interface of the referenced
+        enterprise bean or the local business interface of the
+        referenced enterprise bean.
+        - the optional expected local home interface of the referenced
+        enterprise bean. Not applicable if this ejb-local-ref refers
+        to the local business interface of a 3.0 bean.
+        - optional ejb-link information, used to specify the
+        referenced enterprise bean
+        - optional elements to define injection of the named enterprise
+        bean into a component field or property.
 
       </xsd:documentation>
     </xsd:annotation>
-
     <xsd:sequence>
       <xsd:element name="description"
                    type="javaee:descriptionType"
@@ -828,29 +838,30 @@
                    minOccurs="0"/>
       <xsd:group ref="javaee:resourceGroup"/>
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="ejb-ref-nameType">
     <xsd:annotation>
       <xsd:documentation>
         <![CDATA[
+        The ejb-ref-name element contains the name of an EJB
+        reference. The EJB reference is an entry in the
+        Deployment Component's environment and is relative to the
+        java:comp/env context.  The name must be unique within the
+        Deployment Component.
 
-          The ejb-ref-name element contains the name of an EJB
-          reference. The EJB reference is an entry in the
-          Deployment Component's environment and is relative to the
-          java:comp/env context.  The name must be unique within the
-          Deployment Component.
+        It is recommended that name is prefixed with "ejb/".
 
-          It is recommended that name is prefixed with "ejb/".
+        Example:
 
-          Example:
+        <ejb-ref-name>ejb/Payroll</ejb-ref-name>
 
-          <ejb-ref-name>ejb/Payroll</ejb-ref-name>
-
-          ]]>
+        ]]>
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -858,7 +869,8 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="ejb-refType">
     <xsd:annotation>
@@ -869,26 +881,24 @@
         to the remote business interface of a 3.0 bean.
         The declaration consists of:
 
-            - an optional description
-            - the EJB reference name used in the code of
-              the Deployment Component that's referencing the enterprise
-              bean.
-            - the optional expected type of the referenced enterprise bean
-            - the optional remote interface of the referenced enterprise bean
-              or the remote business interface of the referenced enterprise
-              bean
-            - the optional expected home interface of the referenced
-              enterprise bean.  Not applicable if this ejb-ref
-              refers to the remote business interface of a 3.0 bean.
-            - optional ejb-link information, used to specify the
-              referenced enterprise bean
-            - optional elements to define injection of the named enterprise
-              bean into a component field or property
-
+        - an optional description
+        - the EJB reference name used in the code of
+        the Deployment Component that's referencing the enterprise
+        bean.
+        - the optional expected type of the referenced enterprise bean
+        - the optional remote interface of the referenced enterprise bean
+        or the remote business interface of the referenced enterprise
+        bean
+        - the optional expected home interface of the referenced
+        enterprise bean.  Not applicable if this ejb-ref
+        refers to the remote business interface of a 3.0 bean.
+        - optional ejb-link information, used to specify the
+        referenced enterprise bean
+        - optional elements to define injection of the named enterprise
+        bean into a component field or property
 
       </xsd:documentation>
     </xsd:annotation>
-
     <xsd:sequence>
       <xsd:element name="description"
                    type="javaee:descriptionType"
@@ -910,10 +920,12 @@
                    minOccurs="0"/>
       <xsd:group ref="javaee:resourceGroup"/>
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="ejb-ref-typeType">
     <xsd:annotation>
@@ -925,8 +937,8 @@
         The ejb-ref-type designates a value
         that must be one of the following:
 
-            Entity
-            Session
+        Entity
+        Session
 
       </xsd:documentation>
     </xsd:annotation>
@@ -938,7 +950,8 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="emptyType">
     <xsd:annotation>
@@ -949,10 +962,12 @@
 
       </xsd:documentation>
     </xsd:annotation>
-    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="env-entryType">
     <xsd:annotation>
@@ -980,7 +995,6 @@
 
       </xsd:documentation>
     </xsd:annotation>
-
     <xsd:sequence>
       <xsd:element name="description"
                    type="javaee:descriptionType"
@@ -991,108 +1005,102 @@
         <xsd:annotation>
           <xsd:documentation>
             <![CDATA[
+            The env-entry-name element contains the name of a
+            Deployment Component's environment entry.  The name
+            is a JNDI name relative to the java:comp/env
+            context.  The name must be unique within a
+            Deployment Component. The uniqueness
+            constraints must be defined within the declared
+            context.
 
-              The env-entry-name element contains the name of a
-              Deployment Component's environment entry.  The name
-              is a JNDI name relative to the java:comp/env
-              context.  The name must be unique within a
-              Deployment Component. The uniqueness
-              constraints must be defined within the declared
-              context.
+            Example:
 
-              Example:
+            <env-entry-name>minAmount</env-entry-name>
 
-              <env-entry-name>minAmount</env-entry-name>
-
-              ]]>
+            ]]>
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
       <xsd:element name="env-entry-type"
                    type="javaee:env-entry-type-valuesType"
                    minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
             <![CDATA[
+            The env-entry-type element contains the Java language
+            type of the environment entry.  If an injection target
+            is specified for the environment entry, the type may
+            be omitted, or must match the type of the injection
+            target.  If no injection target is specified, the type
+            is required.
 
-              The env-entry-type element contains the Java language
-              type of the environment entry.  If an injection target
-              is specified for the environment entry, the type may
-              be omitted, or must match the type of the injection
-              target.  If no injection target is specified, the type
-              is required.
+            Example:
 
-              Example:
+            <env-entry-type>java.lang.Integer</env-entry-type>
 
-              <env-entry-type>java.lang.Integer</env-entry-type>
-
-              ]]>
+            ]]>
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
       <xsd:element name="env-entry-value"
                    type="javaee:xsdStringType"
                    minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
             <![CDATA[
+            The env-entry-value designates the value of a
+            Deployment Component's environment entry. The value
+            must be a String that is valid for the
+            constructor of the specified type that takes a
+            single String parameter, or for java.lang.Character,
+            a single character.
 
-              The env-entry-value designates the value of a
-              Deployment Component's environment entry. The value
-              must be a String that is valid for the
-              constructor of the specified type that takes a
-              single String parameter, or for java.lang.Character,
-              a single character.
+            Example:
 
-              Example:
+            <env-entry-value>100.00</env-entry-value>
 
-              <env-entry-value>100.00</env-entry-value>
-
-              ]]>
+            ]]>
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
       <xsd:group ref="javaee:resourceGroup"/>
-
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="env-entry-type-valuesType">
     <xsd:annotation>
       <xsd:documentation>
         <![CDATA[
+        This type contains the fully-qualified Java type of the
+        environment entry value that is expected by the
+        application's code.
 
-          This type contains the fully-qualified Java type of the
-          environment entry value that is expected by the
-          application's code.
+        The following are the legal values of env-entry-type-valuesType:
 
-          The following are the legal values of env-entry-type-valuesType:
+        java.lang.Boolean
+        java.lang.Byte
+        java.lang.Character
+        java.lang.String
+        java.lang.Short
+        java.lang.Integer
+        java.lang.Long
+        java.lang.Float
+        java.lang.Double
+        java.lang.Class
+        any enumeration type (i.e. a subclass of java.lang.Enum)
 
-              java.lang.Boolean
-              java.lang.Byte
-              java.lang.Character
-              java.lang.String
-              java.lang.Short
-              java.lang.Integer
-              java.lang.Long
-              java.lang.Float
-              java.lang.Double
-                          java.lang.Class
-                          any enumeration type (i.e. a subclass of java.lang.Enum)
+        Examples:
 
-          Examples:
+        <env-entry-type>java.lang.Boolean</env-entry-type>
+        <env-entry-type>java.lang.Class</env-entry-type>
+        <env-entry-type>com.example.Color</env-entry-type>
 
-          <env-entry-type>java.lang.Boolean</env-entry-type>
-          <env-entry-type>java.lang.Class</env-entry-type>
-          <env-entry-type>com.example.Color</env-entry-type>
-
-          ]]>
+        ]]>
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1100,7 +1108,8 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ***************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="fully-qualified-classType">
     <xsd:annotation>
@@ -1120,7 +1129,8 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ***************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="generic-booleanType">
     <xsd:annotation>
@@ -1142,7 +1152,8 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ***************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="iconType">
     <xsd:annotation>
@@ -1159,62 +1170,60 @@
 
       </xsd:documentation>
     </xsd:annotation>
-
     <xsd:sequence>
-      <xsd:element name="small-icon" type="javaee:pathType"
+      <xsd:element name="small-icon"
+                   type="javaee:pathType"
                    minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
             <![CDATA[
+            The small-icon element contains the name of a file
+            containing a small (16 x 16) icon image. The file
+            name is a relative path within the Deployment
+            Component's Deployment File.
 
-              The small-icon element contains the name of a file
-              containing a small (16 x 16) icon image. The file
-              name is a relative path within the Deployment
-              Component's Deployment File.
+            The image may be in the GIF, JPEG, or PNG format.
+            The icon can be used by tools.
 
-              The image may be in the GIF, JPEG, or PNG format.
-              The icon can be used by tools.
+            Example:
 
-              Example:
+            <small-icon>employee-service-icon16x16.jpg</small-icon>
 
-              <small-icon>employee-service-icon16x16.jpg</small-icon>
-
-              ]]>
+            ]]>
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-      <xsd:element name="large-icon" type="javaee:pathType"
+      <xsd:element name="large-icon"
+                   type="javaee:pathType"
                    minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
             <![CDATA[
+            The large-icon element contains the name of a file
+            containing a large
+            (32 x 32) icon image. The file name is a relative
+            path within the Deployment Component's Deployment
+            File.
 
-              The large-icon element contains the name of a file
-              containing a large
-              (32 x 32) icon image. The file name is a relative
-              path within the Deployment Component's Deployment
-              File.
+            The image may be in the GIF, JPEG, or PNG format.
+            The icon can be used by tools.
 
-              The image may be in the GIF, JPEG, or PNG format.
-              The icon can be used by tools.
+            Example:
 
-              Example:
+            <large-icon>employee-service-icon32x32.jpg</large-icon>
 
-              <large-icon>employee-service-icon32x32.jpg</large-icon>
-
-              ]]>
+            ]]>
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
     </xsd:sequence>
-
     <xsd:attribute ref="xml:lang"/>
-    <xsd:attribute name="id" type="xsd:ID"/>
-
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- ***************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="injection-targetType">
     <xsd:annotation>
@@ -1248,18 +1257,16 @@
     </xsd:sequence>
   </xsd:complexType>
 
-  <!-- ***************************************************** -->
-
   <xsd:simpleType name="isolation-levelType">
     <xsd:annotation>
       <xsd:documentation>
 
-                The following transaction isolation levels are allowed
-                (see documentation for the java.sql.Connection interface):
-                TRANSACTION_READ_UNCOMMITTED
-                TRANSACTION_READ_COMMITTED
-                TRANSACTION_REPEATABLE_READ
-                TRANSACTION_SERIALIZABLE
+        The following transaction isolation levels are allowed
+        (see documentation for the java.sql.Connection interface):
+        TRANSACTION_READ_UNCOMMITTED
+        TRANSACTION_READ_COMMITTED
+        TRANSACTION_REPEATABLE_READ
+        TRANSACTION_SERIALIZABLE
 
       </xsd:documentation>
     </xsd:annotation>
@@ -1271,7 +1278,8 @@
     </xsd:restriction>
   </xsd:simpleType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="java-identifierType">
     <xsd:annotation>
@@ -1290,7 +1298,8 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="java-typeType">
     <xsd:annotation>
@@ -1309,32 +1318,33 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ***************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="jdbc-urlType">
     <xsd:annotation>
       <xsd:documentation>
-    <![CDATA[
-
+        <![CDATA[
         The jdbc-urlType contains the url pattern of the mapping.
         It must follow the rules specified in Section 9.3 of the
         JDBC Specification where the format is:
 
-            jdbc:<subprotocol>:<subname>
+        jdbc:<subprotocol>:<subname>
 
         Example:
 
-            <url>jdbc:mysql://localhost:3307/testdb</url>
+        <url>jdbc:mysql://localhost:3307/testdb</url>
 
-      ]]>
+        ]]>
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
       <xsd:restriction base="javaee:string">
-         <xsd:pattern value="jdbc:(.*):(.*)"/>
+        <xsd:pattern value="jdbc:(.*):(.*)"/>
       </xsd:restriction>
     </xsd:simpleContent>
   </xsd:complexType>
+
 
 <!-- **************************************************** -->
 
@@ -1375,11 +1385,11 @@
         <xsd:annotation>
           <xsd:documentation>
 
-              Fully-qualified name of the JMS connection factory
-              interface.  Permitted values are javax.jms.ConnectionFactory,
-              javax.jms.QueueConnectionFactory, or
-              javax.jms.TopicConnectionFactory.  If not specified,
-              javax.jms.ConnectionFactory will be used.
+            Fully-qualified name of the JMS connection factory
+            interface.  Permitted values are javax.jms.ConnectionFactory,
+            javax.jms.QueueConnectionFactory, or
+            javax.jms.TopicConnectionFactory.  If not specified,
+            javax.jms.ConnectionFactory will be used.
 
           </xsd:documentation>
         </xsd:annotation>
@@ -1390,9 +1400,9 @@
         <xsd:annotation>
           <xsd:documentation>
 
-              Fully-qualified name of the JMS connection factory
-              implementation class.  Ignored if a resource adapter
-              is used.
+            Fully-qualified name of the JMS connection factory
+            implementation class.  Ignored if a resource adapter
+            is used.
 
           </xsd:documentation>
         </xsd:annotation>
@@ -1536,8 +1546,8 @@
         <xsd:annotation>
           <xsd:documentation>
 
-              Fully-qualified name of the JMS destination interface.
-              Permitted values are javax.jms.Queue and javax.jms.Topic
+            Fully-qualified name of the JMS destination interface.
+            Permitted values are javax.jms.Queue and javax.jms.Topic
 
           </xsd:documentation>
         </xsd:annotation>
@@ -1548,10 +1558,10 @@
         <xsd:annotation>
           <xsd:documentation>
 
-              Fully-qualified name of the JMS destination implementation
-              class.  Ignored if a resource adapter is used unless the
-              resource adapter defines more than one destination implementation
-              class for the specified interface.
+            Fully-qualified name of the JMS destination implementation
+            class.  Ignored if a resource adapter is used unless the
+            resource adapter defines more than one destination implementation
+            class for the specified interface.
 
           </xsd:documentation>
         </xsd:annotation>
@@ -1599,8 +1609,7 @@
   </xsd:complexType>
 
 
-
-  <!-- ***************************************************** -->
+<!-- **************************************************** -->
 
   <xsd:complexType name="jndi-nameType">
     <xsd:annotation>
@@ -1618,21 +1627,21 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ***************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="homeType">
     <xsd:annotation>
       <xsd:documentation>
         <![CDATA[
+        The homeType defines the fully-qualified name of
+        an enterprise bean's home interface.
 
-          The homeType defines the fully-qualified name of
-          an enterprise bean's home interface.
+        Example:
 
-          Example:
+        <home>com.aardvark.payroll.PayrollHome</home>
 
-              <home>com.aardvark.payroll.PayrollHome</home>
-
-          ]]>
+        ]]>
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -1641,7 +1650,7 @@
   </xsd:complexType>
 
 
-  <!-- **************************************************** -->
+<!-- **************************************************** -->
 
   <xsd:complexType name="lifecycle-callbackType">
     <xsd:annotation>
@@ -1653,7 +1662,7 @@
         method for any given event and that the method may not
         be overloaded.
 
-        If the lifecycle-callback-class element is missing then
+        If the lifefycle-callback-class element is missing then
         the class defining the callback is assumed to be the
         component class in scope at the place in the descriptor
         in which the callback definition appears.
@@ -1669,7 +1678,8 @@
     </xsd:sequence>
   </xsd:complexType>
 
-  <!-- ***************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="listenerType">
     <xsd:annotation>
@@ -1680,7 +1690,6 @@
 
       </xsd:documentation>
     </xsd:annotation>
-
     <xsd:sequence>
       <xsd:group ref="javaee:descriptionGroup"/>
       <xsd:element name="listener-class"
@@ -1697,10 +1706,12 @@
         </xsd:annotation>
       </xsd:element>
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- ***************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="localType">
     <xsd:annotation>
@@ -1716,7 +1727,8 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ***************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="local-homeType">
     <xsd:annotation>
@@ -1731,6 +1743,7 @@
       <xsd:restriction base="javaee:fully-qualified-classType"/>
     </xsd:simpleContent>
   </xsd:complexType>
+
 
 <!-- **************************************************** -->
 
@@ -1782,7 +1795,7 @@
         <xsd:annotation>
           <xsd:documentation>
 
-              Service provider store protocol implementation class
+            Service provider store protocol implementation class
 
           </xsd:documentation>
         </xsd:annotation>
@@ -1804,7 +1817,7 @@
         <xsd:annotation>
           <xsd:documentation>
 
-              Service provider transport protocol implementation class
+            Service provider transport protocol implementation class
 
           </xsd:documentation>
         </xsd:annotation>
@@ -1872,7 +1885,7 @@
   </xsd:complexType>
 
 
-  <!-- ***************************************************** -->
+<!-- **************************************************** -->
 
   <xsd:complexType name="param-valueType">
     <xsd:annotation>
@@ -1883,7 +1896,6 @@
 
       </xsd:documentation>
     </xsd:annotation>
-
     <xsd:sequence>
       <xsd:element name="description"
                    type="javaee:descriptionType"
@@ -1900,7 +1912,6 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
       <xsd:element name="param-value"
                    type="javaee:xsdStringType">
         <xsd:annotation>
@@ -1913,10 +1924,12 @@
         </xsd:annotation>
       </xsd:element>
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- ***************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="pathType">
     <xsd:annotation>
@@ -1941,48 +1954,48 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="persistence-context-refType">
     <xsd:annotation>
       <xsd:documentation>
         <![CDATA[
+        The persistence-context-ref element contains a declaration
+        of Deployment Component's reference to a persistence context
+        associated within a Deployment Component's
+        environment. It consists of:
 
-          The persistence-context-ref element contains a declaration
-          of Deployment Component's reference to a persistence context
-          associated within a Deployment Component's
-          environment. It consists of:
+        - an optional description
+        - the persistence context reference name
+        - an optional persistence unit name.  If not specified,
+        the default persistence unit is assumed.
+        - an optional specification as to whether
+        the persistence context type is Transaction or
+        Extended.  If not specified, Transaction is assumed.
+        - an optional specification as to whether
+        the persistence context synchronization with the current
+        transaction is Synchronized or Unsynchronized. If not
+        specified, Synchronized is assumed.
+        - an optional list of persistence properties
+        - optional injection targets
 
-                  - an optional description
-                  - the persistence context reference name
-                  - an optional persistence unit name.  If not specified,
-                    the default persistence unit is assumed.
-                  - an optional specification as to whether
-                    the persistence context type is Transaction or
-                    Extended.  If not specified, Transaction is assumed.
-                  - an optional specification as to whether
-                    the persistence context synchronization with the current
-                    transaction is Synchronized or Unsynchronized. If not
-                    specified, Synchronized is assumed.
-                  - an optional list of persistence properties
-                  - optional injection targets
+        Examples:
 
-          Examples:
+        <persistence-context-ref>
+        <persistence-context-ref-name>myPersistenceContext
+        </persistence-context-ref-name>
+        </persistence-context-ref>
 
-            <persistence-context-ref>
-              <persistence-context-ref-name>myPersistenceContext
-              </persistence-context-ref-name>
-            </persistence-context-ref>
+        <persistence-context-ref>
+        <persistence-context-ref-name>myPersistenceContext
+        </persistence-context-ref-name>
+        <persistence-unit-name>PersistenceUnit1
+        </persistence-unit-name>
+        <persistence-context-type>Extended</persistence-context-type>
+        </persistence-context-ref>
 
-            <persistence-context-ref>
-              <persistence-context-ref-name>myPersistenceContext
-                </persistence-context-ref-name>
-              <persistence-unit-name>PersistenceUnit1
-                </persistence-unit-name>
-              <persistence-context-type>Extended</persistence-context-type>
-            </persistence-context-ref>
-
-          ]]>
+        ]]>
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -2026,15 +2039,12 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
       <xsd:element name="persistence-context-type"
                    type="javaee:persistence-context-typeType"
                    minOccurs="0"/>
-
       <xsd:element name="persistence-context-synchronization"
                    type="javaee:persistence-context-synchronizationType"
                    minOccurs="0"/>
-
       <xsd:element name="persistence-property"
                    type="javaee:propertyType"
                    minOccurs="0"
@@ -2053,15 +2063,14 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
       <xsd:group ref="javaee:resourceBaseGroup"/>
-
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
-
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="persistence-context-synchronizationType">
     <xsd:annotation>
@@ -2073,8 +2082,8 @@
 
         The value of the persistence-context-synchronization element
         must be one of the following:
-            Synchronized
-            Unsynchronized
+        Synchronized
+        Unsynchronized
 
       </xsd:documentation>
     </xsd:annotation>
@@ -2085,7 +2094,9 @@
       </xsd:restriction>
     </xsd:simpleContent>
   </xsd:complexType>
-  <!-- **************************************************** -->
+
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="persistence-context-typeType">
     <xsd:annotation>
@@ -2096,8 +2107,8 @@
 
         The value of the persistence-context-type element must be
         one of the following:
-            Transaction
-            Extended
+        Transaction
+        Extended
 
       </xsd:documentation>
     </xsd:annotation>
@@ -2109,6 +2120,7 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
+
 <!-- **************************************************** -->
 
   <xsd:complexType name="propertyType">
@@ -2119,7 +2131,6 @@
 
       </xsd:documentation>
     </xsd:annotation>
-
     <xsd:sequence>
       <xsd:element name="name"
                    type="javaee:xsdStringType">
@@ -2128,42 +2139,43 @@
                    type="javaee:xsdStringType">
       </xsd:element>
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="persistence-unit-refType">
     <xsd:annotation>
       <xsd:documentation>
         <![CDATA[
+        The persistence-unit-ref element contains a declaration
+        of Deployment Component's reference to a persistence unit
+        associated within a Deployment Component's
+        environment. It consists of:
 
-          The persistence-unit-ref element contains a declaration
-          of Deployment Component's reference to a persistence unit
-          associated within a Deployment Component's
-          environment. It consists of:
+        - an optional description
+        - the persistence unit reference name
+        - an optional persistence unit name.  If not specified,
+        the default persistence unit is assumed.
+        - optional injection targets
 
-                  - an optional description
-                  - the persistence unit reference name
-                  - an optional persistence unit name.  If not specified,
-                    the default persistence unit is assumed.
-                  - optional injection targets
+        Examples:
 
-          Examples:
+        <persistence-unit-ref>
+        <persistence-unit-ref-name>myPersistenceUnit
+        </persistence-unit-ref-name>
+        </persistence-unit-ref>
 
-            <persistence-unit-ref>
-              <persistence-unit-ref-name>myPersistenceUnit
-              </persistence-unit-ref-name>
-            </persistence-unit-ref>
+        <persistence-unit-ref>
+        <persistence-unit-ref-name>myPersistenceUnit
+        </persistence-unit-ref-name>
+        <persistence-unit-name>PersistenceUnit1
+        </persistence-unit-name>
+        </persistence-unit-ref>
 
-            <persistence-unit-ref>
-              <persistence-unit-ref-name>myPersistenceUnit
-                </persistence-unit-ref-name>
-              <persistence-unit-name>PersistenceUnit1
-                </persistence-unit-name>
-            </persistence-unit-ref>
-
-          ]]>
+        ]]>
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -2207,29 +2219,27 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
       <xsd:group ref="javaee:resourceBaseGroup"/>
-
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
-
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- ***************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="remoteType">
     <xsd:annotation>
       <xsd:documentation>
         <![CDATA[
+        The remote element contains the fully-qualified name
+        of the enterprise bean's remote interface.
 
-          The remote element contains the fully-qualified name
-          of the enterprise bean's remote interface.
+        Example:
 
-          Example:
+        <remote>com.wombat.empl.EmployeeService</remote>
 
-              <remote>com.wombat.empl.EmployeeService</remote>
-
-          ]]>
+        ]]>
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -2237,44 +2247,43 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ***************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="resource-env-refType">
     <xsd:annotation>
       <xsd:documentation>
         <![CDATA[
+        The resource-env-refType is used to define
+        resource-env-ref elements.  It contains a declaration of a
+        Deployment Component's reference to an administered object
+        associated with a resource in the Deployment Component's
+        environment.  It consists of an optional description, the
+        resource environment reference name, and an optional
+        indication of the resource environment reference type
+        expected by the Deployment Component code.
 
-          The resource-env-refType is used to define
-          resource-env-ref elements.  It contains a declaration of a
-          Deployment Component's reference to an administered object
-          associated with a resource in the Deployment Component's
-          environment.  It consists of an optional description, the
-          resource environment reference name, and an optional
-          indication of the resource environment reference type
-          expected by the Deployment Component code.
+        It also includes optional elements to define injection of
+        the named resource into fields or JavaBeans properties.
 
-          It also includes optional elements to define injection of
-          the named resource into fields or JavaBeans properties.
+        The resource environment type must be supplied unless an
+        injection target is specified, in which case the type
+        of the target is used.  If both are specified, the type
+        must be assignment compatible with the type of the injection
+        target.
 
-          The resource environment type must be supplied unless an
-          injection target is specified, in which case the type
-          of the target is used.  If both are specified, the type
-          must be assignment compatible with the type of the injection
-          target.
+        Example:
 
-          Example:
+        <resource-env-ref>
+        <resource-env-ref-name>jms/StockQueue
+        </resource-env-ref-name>
+        <resource-env-ref-type>javax.jms.Queue
+        </resource-env-ref-type>
+        </resource-env-ref>
 
-          <resource-env-ref>
-              <resource-env-ref-name>jms/StockQueue
-              </resource-env-ref-name>
-              <resource-env-ref-type>javax.jms.Queue
-              </resource-env-ref-type>
-          </resource-env-ref>
-
-          ]]>
+        ]]>
       </xsd:documentation>
     </xsd:annotation>
-
     <xsd:sequence>
       <xsd:element name="description"
                    type="javaee:descriptionType"
@@ -2295,7 +2304,6 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
       <xsd:element name="resource-env-ref-type"
                    type="javaee:fully-qualified-classType"
                    minOccurs="0">
@@ -2310,52 +2318,50 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
       <xsd:group ref="javaee:resourceGroup"/>
-
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- ***************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="resource-refType">
     <xsd:annotation>
       <xsd:documentation>
         <![CDATA[
+        The resource-refType contains a declaration of a
+        Deployment Component's reference to an external resource. It
+        consists of an optional description, the resource manager
+        connection factory reference name, an optional indication of
+        the resource manager connection factory type expected by the
+        Deployment Component code, an optional type of authentication
+        (Application or Container), and an optional specification of
+        the shareability of connections obtained from the resource
+        (Shareable or Unshareable).
 
-          The resource-refType contains a declaration of a
-          Deployment Component's reference to an external resource. It
-          consists of an optional description, the resource manager
-          connection factory reference name, an optional indication of
-          the resource manager connection factory type expected by the
-          Deployment Component code, an optional type of authentication
-          (Application or Container), and an optional specification of
-          the shareability of connections obtained from the resource
-          (Shareable or Unshareable).
+        It also includes optional elements to define injection of
+        the named resource into fields or JavaBeans properties.
 
-          It also includes optional elements to define injection of
-          the named resource into fields or JavaBeans properties.
+        The connection factory type must be supplied unless an
+        injection target is specified, in which case the type
+        of the target is used.  If both are specified, the type
+        must be assignment compatible with the type of the injection
+        target.
 
-          The connection factory type must be supplied unless an
-          injection target is specified, in which case the type
-          of the target is used.  If both are specified, the type
-          must be assignment compatible with the type of the injection
-          target.
+        Example:
 
-          Example:
+        <resource-ref>
+        <res-ref-name>jdbc/EmployeeAppDB</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+        <res-sharing-scope>Shareable</res-sharing-scope>
+        </resource-ref>
 
-          <resource-ref>
-              <res-ref-name>jdbc/EmployeeAppDB</res-ref-name>
-              <res-type>javax.sql.DataSource</res-type>
-              <res-auth>Container</res-auth>
-              <res-sharing-scope>Shareable</res-sharing-scope>
-          </resource-ref>
-
-          ]]>
+        ]]>
       </xsd:documentation>
     </xsd:annotation>
-
     <xsd:sequence>
       <xsd:element name="description"
                    type="javaee:descriptionType"
@@ -2375,7 +2381,6 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
       <xsd:element name="res-type"
                    type="javaee:fully-qualified-classType"
                    minOccurs="0">
@@ -2390,22 +2395,20 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
       <xsd:element name="res-auth"
                    type="javaee:res-authType"
                    minOccurs="0"/>
-
       <xsd:element name="res-sharing-scope"
                    type="javaee:res-sharing-scopeType"
                    minOccurs="0"/>
-
       <xsd:group ref="javaee:resourceGroup"/>
-
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="res-authType">
     <xsd:annotation>
@@ -2420,8 +2423,8 @@
 
         The value must be one of the two following:
 
-            Application
-            Container
+        Application
+        Container
 
       </xsd:documentation>
     </xsd:annotation>
@@ -2433,7 +2436,8 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="res-sharing-scopeType">
     <xsd:annotation>
@@ -2444,8 +2448,8 @@
         factory reference can be shared. The value, if specified,
         must be one of the two following:
 
-            Shareable
-            Unshareable
+        Shareable
+        Unshareable
 
         The default value is Shareable.
 
@@ -2459,7 +2463,8 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="run-asType">
     <xsd:annotation>
@@ -2471,7 +2476,6 @@
 
       </xsd:documentation>
     </xsd:annotation>
-
     <xsd:sequence>
       <xsd:element name="description"
                    type="javaee:descriptionType"
@@ -2480,10 +2484,12 @@
       <xsd:element name="role-name"
                    type="javaee:role-nameType"/>
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="role-nameType">
     <xsd:annotation>
@@ -2495,37 +2501,35 @@
 
       </xsd:documentation>
     </xsd:annotation>
-
     <xsd:simpleContent>
       <xsd:restriction base="javaee:string"/>
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="security-roleType">
     <xsd:annotation>
       <xsd:documentation>
         <![CDATA[
+        The security-roleType contains the definition of a security
+        role. The definition consists of an optional description of
+        the security role, and the security role name.
 
-          The security-roleType contains the definition of a security
-          role. The definition consists of an optional description of
-          the security role, and the security role name.
+        Example:
 
-          Example:
+        <security-role>
+        <description>
+        This role includes all employees who are authorized
+        to access the employee service application.
+        </description>
+        <role-name>employee</role-name>
+        </security-role>
 
-              <security-role>
-              <description>
-                  This role includes all employees who are authorized
-                  to access the employee service application.
-              </description>
-              <role-name>employee</role-name>
-              </security-role>
-
-          ]]>
+        ]]>
       </xsd:documentation>
     </xsd:annotation>
-
     <xsd:sequence>
       <xsd:element name="description"
                    type="javaee:descriptionType"
@@ -2534,10 +2538,12 @@
       <xsd:element name="role-name"
                    type="javaee:role-nameType"/>
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="security-role-refType">
     <xsd:annotation>
@@ -2553,7 +2559,6 @@
 
       </xsd:documentation>
     </xsd:annotation>
-
     <xsd:sequence>
       <xsd:element name="description"
                    type="javaee:descriptionType"
@@ -2572,7 +2577,6 @@
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
       <xsd:element name="role-link"
                    type="javaee:role-nameType"
                    minOccurs="0">
@@ -2588,10 +2592,12 @@
         </xsd:annotation>
       </xsd:element>
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="xsdQNameType">
     <xsd:annotation>
@@ -2603,12 +2609,14 @@
     </xsd:annotation>
     <xsd:simpleContent>
       <xsd:extension base="xsd:QName">
-        <xsd:attribute name="id" type="xsd:ID"/>
+        <xsd:attribute name="id"
+                       type="xsd:ID"/>
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="xsdBooleanType">
     <xsd:annotation>
@@ -2620,12 +2628,14 @@
     </xsd:annotation>
     <xsd:simpleContent>
       <xsd:extension base="xsd:boolean">
-        <xsd:attribute name="id" type="xsd:ID"/>
+        <xsd:attribute name="id"
+                       type="xsd:ID"/>
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="xsdNMTOKENType">
     <xsd:annotation>
@@ -2637,12 +2647,14 @@
     </xsd:annotation>
     <xsd:simpleContent>
       <xsd:extension base="xsd:NMTOKEN">
-        <xsd:attribute name="id" type="xsd:ID"/>
+        <xsd:attribute name="id"
+                       type="xsd:ID"/>
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="xsdAnyURIType">
     <xsd:annotation>
@@ -2654,12 +2666,14 @@
     </xsd:annotation>
     <xsd:simpleContent>
       <xsd:extension base="xsd:anyURI">
-        <xsd:attribute name="id" type="xsd:ID"/>
+        <xsd:attribute name="id"
+                       type="xsd:ID"/>
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="xsdIntegerType">
     <xsd:annotation>
@@ -2671,12 +2685,14 @@
     </xsd:annotation>
     <xsd:simpleContent>
       <xsd:extension base="xsd:integer">
-        <xsd:attribute name="id" type="xsd:ID"/>
+        <xsd:attribute name="id"
+                       type="xsd:ID"/>
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="xsdPositiveIntegerType">
     <xsd:annotation>
@@ -2688,12 +2704,14 @@
     </xsd:annotation>
     <xsd:simpleContent>
       <xsd:extension base="xsd:positiveInteger">
-        <xsd:attribute name="id" type="xsd:ID"/>
+        <xsd:attribute name="id"
+                       type="xsd:ID"/>
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="xsdNonNegativeIntegerType">
     <xsd:annotation>
@@ -2705,12 +2723,14 @@
     </xsd:annotation>
     <xsd:simpleContent>
       <xsd:extension base="xsd:nonNegativeInteger">
-        <xsd:attribute name="id" type="xsd:ID"/>
+        <xsd:attribute name="id"
+                       type="xsd:ID"/>
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="xsdStringType">
     <xsd:annotation>
@@ -2722,12 +2742,14 @@
     </xsd:annotation>
     <xsd:simpleContent>
       <xsd:extension base="xsd:string">
-        <xsd:attribute name="id" type="xsd:ID"/>
+        <xsd:attribute name="id"
+                       type="xsd:ID"/>
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="string">
     <xsd:annotation>
@@ -2743,12 +2765,14 @@
     </xsd:annotation>
     <xsd:simpleContent>
       <xsd:extension base="xsd:token">
-        <xsd:attribute name="id" type="xsd:ID"/>
+        <xsd:attribute name="id"
+                       type="xsd:ID"/>
       </xsd:extension>
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="true-falseType">
     <xsd:annotation>
@@ -2769,7 +2793,8 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- ************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="url-patternType">
     <xsd:annotation>
@@ -2790,36 +2815,36 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="message-destinationType">
     <xsd:annotation>
       <xsd:documentation>
         <![CDATA[
+        The message-destinationType specifies a message
+        destination. The logical destination described by this
+        element is mapped to a physical destination by the Deployer.
 
-          The message-destinationType specifies a message
-          destination. The logical destination described by this
-          element is mapped to a physical destination by the Deployer.
+        The message destination element contains:
 
-          The message destination element contains:
+        - an optional description
+        - an optional display-name
+        - an optional icon
+        - a message destination name which must be unique
+        among message destination names within the same
+        Deployment File.
+        - an optional mapped name
+        - an optional lookup name
 
-                  - an optional description
-                  - an optional display-name
-                  - an optional icon
-                  - a message destination name which must be unique
-                    among message destination names within the same
-                    Deployment File.
-                  - an optional mapped name
-                  - an optional lookup name
+        Example:
 
-          Example:
+        <message-destination>
+        <message-destination-name>CorporateStocks
+        </message-destination-name>
+        </message-destination>
 
-          <message-destination>
-                  <message-destination-name>CorporateStocks
-                  </message-destination-name>
-          </message-destination>
-
-          ]]>
+        ]]>
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -2842,89 +2867,85 @@
                    minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
-            <![CDATA[
 
-              A product specific name that this message destination
-              should be mapped to.  Each message-destination-ref
-              element that references this message destination will
-              define a name in the namespace of the referencing
-              component or in one of the other predefined namespaces.
-              Many application servers provide a way to map these
-              local names to names of resources known to the
-              application server.  This mapped name is often a global
-              JNDI name, but may be a name of any form.  Each of the
-              local names should be mapped to this same global name.
+            A product specific name that this message destination
+            should be mapped to.  Each message-destination-ref
+            element that references this message destination will
+            define a name in the namespace of the referencing
+            component or in one of the other predefined namespaces.
+            Many application servers provide a way to map these
+            local names to names of resources known to the
+            application server.  This mapped name is often a global
+            JNDI name, but may be a name of any form.  Each of the
+            local names should be mapped to this same global name.
 
-              Application servers are not required to support any
-              particular form or type of mapped name, nor the ability
-              to use mapped names.  The mapped name is
-              product-dependent and often installation-dependent.  No
-              use of a mapped name is portable.
+            Application servers are not required to support any
+            particular form or type of mapped name, nor the ability
+            to use mapped names.  The mapped name is
+            product-dependent and often installation-dependent.  No
+            use of a mapped name is portable.
 
-              ]]>
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
       <xsd:element name="lookup-name"
                    type="javaee:xsdStringType"
                    minOccurs="0">
         <xsd:annotation>
           <xsd:documentation>
 
-              The JNDI name to be looked up to resolve the message destination.
+            The JNDI name to be looked up to resolve the message destination.
 
           </xsd:documentation>
         </xsd:annotation>
       </xsd:element>
-
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="message-destination-refType">
     <xsd:annotation>
       <xsd:documentation>
         <![CDATA[
+        The message-destination-ref element contains a declaration
+        of Deployment Component's reference to a message destination
+        associated with a resource in Deployment Component's
+        environment. It consists of:
 
-          The message-destination-ref element contains a declaration
-          of Deployment Component's reference to a message destination
-          associated with a resource in Deployment Component's
-          environment. It consists of:
+        - an optional description
+        - the message destination reference name
+        - an optional message destination type
+        - an optional specification as to whether
+        the destination is used for
+        consuming or producing messages, or both.
+        if not specified, "both" is assumed.
+        - an optional link to the message destination
+        - optional injection targets
 
-                  - an optional description
-                  - the message destination reference name
-                  - an optional message destination type
-                  - an optional specification as to whether
-                    the destination is used for
-                    consuming or producing messages, or both.
-                    if not specified, "both" is assumed.
-                  - an optional link to the message destination
-                  - optional injection targets
+        The message destination type must be supplied unless an
+        injection target is specified, in which case the type
+        of the target is used.  If both are specified, the type
+        must be assignment compatible with the type of the injection
+        target.
 
-          The message destination type must be supplied unless an
-          injection target is specified, in which case the type
-          of the target is used.  If both are specified, the type
-          must be assignment compatible with the type of the injection
-          target.
+        Examples:
 
+        <message-destination-ref>
+        <message-destination-ref-name>jms/StockQueue
+        </message-destination-ref-name>
+        <message-destination-type>javax.jms.Queue
+        </message-destination-type>
+        <message-destination-usage>Consumes
+        </message-destination-usage>
+        <message-destination-link>CorporateStocks
+        </message-destination-link>
+        </message-destination-ref>
 
-          Examples:
-
-          <message-destination-ref>
-                  <message-destination-ref-name>jms/StockQueue
-                  </message-destination-ref-name>
-                  <message-destination-type>javax.jms.Queue
-                  </message-destination-type>
-                  <message-destination-usage>Consumes
-                  </message-destination-usage>
-                  <message-destination-link>CorporateStocks
-                  </message-destination-link>
-          </message-destination-ref>
-
-          ]]>
+        ]]>
       </xsd:documentation>
     </xsd:annotation>
     <xsd:sequence>
@@ -2954,15 +2975,14 @@
       <xsd:element name="message-destination-link"
                    type="javaee:message-destination-linkType"
                    minOccurs="0"/>
-
       <xsd:group ref="javaee:resourceGroup"/>
-
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:ID"/>
-
+    <xsd:attribute name="id"
+                   type="xsd:ID"/>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="message-destination-usageType">
     <xsd:annotation>
@@ -2977,9 +2997,9 @@
 
         The value of the message-destination-usage element must be
         one of the following:
-            Consumes
-            Produces
-            ConsumesProduces
+        Consumes
+        Produces
+        ConsumesProduces
 
       </xsd:documentation>
     </xsd:annotation>
@@ -2992,23 +3012,23 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="message-destination-typeType">
     <xsd:annotation>
       <xsd:documentation>
         <![CDATA[
+        The message-destination-typeType specifies the type of
+        the destination. The type is specified by the Java interface
+        expected to be implemented by the destination.
 
-          The message-destination-typeType specifies the type of
-          the destination. The type is specified by the Java interface
-          expected to be implemented by the destination.
+        Example:
 
-          Example:
+        <message-destination-type>javax.jms.Queue
+        </message-destination-type>
 
-            <message-destination-type>javax.jms.Queue
-            </message-destination-type>
-
-          ]]>
+        ]]>
       </xsd:documentation>
     </xsd:annotation>
     <xsd:simpleContent>
@@ -3016,7 +3036,8 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="message-destination-linkType">
     <xsd:annotation>
@@ -3049,7 +3070,8 @@
     </xsd:simpleContent>
   </xsd:complexType>
 
-  <!-- **************************************************** -->
+
+<!-- **************************************************** -->
 
   <xsd:complexType name="transaction-supportType">
     <xsd:annotation>
@@ -3061,9 +3083,9 @@
 
         The value must be one of the following:
 
-            NoTransaction
-            LocalTransaction
-            XATransaction
+        NoTransaction
+        LocalTransaction
+        XATransaction
 
       </xsd:documentation>
     </xsd:annotation>

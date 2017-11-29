@@ -47,13 +47,9 @@
       only if the new code is made subject to such option by the copyright
       holder.
 
-    </xsd:documentation>
-  </xsd:annotation>
-
-  <xsd:annotation>
-    <xsd:documentation>
       The Apache Software Foundation elects to include this software under the
       CDDL license.
+
     </xsd:documentation>
   </xsd:annotation>
 
@@ -153,7 +149,7 @@
           <xsd:documentation>
 
             The jaxrpc-mapping-file element contains the name of a file that
-            describes the JAX-RPC mapping between the Java interfaces used by
+            describes the JAX-RPC mapping between the Java interaces used by
             the application and the WSDL description in the wsdl-file.  The
             file name is a relative path within the module file.
 
@@ -200,13 +196,13 @@
           <xsd:annotation>
             <xsd:documentation>
 
-              Declares the handler for a port-component. Handlers can
-              access the init-param name/value pairs using the
-              HandlerInfo interface. If port-name is not specified, the
-              handler is assumed to be associated with all ports of the
-              service.
+                  Declares the handler for a port-component. Handlers can
+                  access the init-param name/value pairs using the
+                  HandlerInfo interface. If port-name is not specified, the
+                  handler is assumed to be associated with all ports of the
+                  service.
 
-              To be used with JAX-RPC based runtime only.
+                  To be used with JAX-RPC based runtime only.
 
             </xsd:documentation>
           </xsd:annotation>
@@ -218,7 +214,7 @@
           <xsd:annotation>
             <xsd:documentation>
 
-              To be used with JAX-WS based runtime only.
+                   To be used with JAX-WS based runtime only.
 
             </xsd:documentation>
           </xsd:annotation>
@@ -488,31 +484,31 @@
 
         Exact Name: service-name-pattern="ns1:EchoService"
 
-        In this case, handlers specified in this
-        handler-chain element will apply to all ports with
-        this exact service name. The namespace prefix must
-        have been declared in a namespace declaration
-        attribute in either the start-tag of the element
-        where the prefix is used or in an an ancestor
-        element (i.e. an element in whose content the
-        prefixed markup occurs)
+             In this case, handlers specified in this
+             handler-chain element will apply to all ports with
+             this exact service name. The namespace prefix must
+             have been declared in a namespace declaration
+             attribute in either the start-tag of the element
+             where the prefix is used or in an an ancestor
+             element (i.e. an element in whose content the
+             prefixed markup occurs)
 
 
         Pattern : service-name-pattern="ns1:EchoService*"
 
-        In this case, handlers specified in this
-        handler-chain element will apply to all ports whose
-        Service names are like EchoService1, EchoServiceFoo
-        etc. The namespace prefix must have been declared in
-        a namespace declaration attribute in either the
-        start-tag of the element where the prefix is used or
-        in an an ancestor element (i.e. an element in whose
-        content the prefixed markup occurs)
+             In this case, handlers specified in this
+             handler-chain element will apply to all ports whose
+             Service names are like EchoService1, EchoServiceFoo
+             etc. The namespace prefix must have been declared in
+             a namespace declaration attribute in either the
+             start-tag of the element where the prefix is used or
+             in an an ancestor element (i.e. an element in whose
+             content the prefixed markup occurs)
 
         Wild Card : service-name-pattern="*"
 
-        In this case, handlers specified in this handler-chain
-        element will apply to ports of all service names.
+            In this case, handlers specified in this handler-chain
+            element will apply to ports of all service names.
 
         The same can be applied to port-name attribute in
         handler-chain element.
