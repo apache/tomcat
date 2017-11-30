@@ -158,7 +158,7 @@ class StreamProcessor extends AbstractProcessor {
     protected final void finishResponse() throws IOException {
         sendfileState = handler.processSendfile(sendfileData);
         if (!(sendfileState == SendfileState.PENDING)) {
-            stream.getOutputBuffer().close();
+            stream.getOutputBuffer().end();
         }
     }
 
