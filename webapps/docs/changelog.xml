@@ -52,6 +52,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Remove the Servlet 4.0 early preview example from the examples web
+        application as the early preview is now deprecated in favour of Tomcat
+        9 which provides a full Servlet 4.0 implementation. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
