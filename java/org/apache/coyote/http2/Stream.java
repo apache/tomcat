@@ -77,7 +77,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
     private final Response coyoteResponse = new Response();
     private final StreamInputBuffer inputBuffer;
     private final StreamOutputBuffer streamOutputBuffer = new StreamOutputBuffer();
-    private final Http2OutputBuffer http2OutputBuffer = new Http2OutputBuffer(streamOutputBuffer);
+    private final Http2OutputBuffer http2OutputBuffer =
+            new Http2OutputBuffer(coyoteResponse, streamOutputBuffer);
 
 
     Stream(Integer identifier, Http2UpgradeHandler handler) {
@@ -711,9 +712,6 @@ class Stream extends AbstractStream implements HeaderEmitter {
             if (closed) {
                 throw new IllegalStateException(
                         sm.getString("stream.closed", getConnectionId(), getIdentifier()));
-            }
-            if (!coyoteResponse.isCommitted()) {
-                coyoteResponse.sendHeaders();
             }
             int chunkLimit = chunk.limit();
             int offset = 0;
