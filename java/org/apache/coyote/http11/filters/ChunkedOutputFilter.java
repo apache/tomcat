@@ -195,9 +195,8 @@ public class ChunkedOutputFilter implements OutputFilter {
 
             buffer.doWrite(crlfChunk);
             crlfChunk.position(0).limit(crlfChunk.capacity());
-
-            buffer.end();
         }
+        buffer.end();
     }
 
 
