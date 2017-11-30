@@ -1296,6 +1296,7 @@
         <exclude name="*.asc" />
         <exclude name="*.md5" />
         <exclude name="*.sha1" />
+        <exclude name="*.sha512" />
         <exclude name="*.zip" />
         <exclude name="*.tar.gz" />
       </fileset>
@@ -1313,6 +1314,7 @@
         <exclude name="*.asc" />
         <exclude name="*.md5" />
         <exclude name="*.sha1" />
+        <exclude name="*.sha512" />
         <exclude name="*.zip" />
         <exclude name="*.tar.gz" />
       </tarfileset>
@@ -2126,6 +2128,7 @@ skip.installer property in build.properties" />
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc" />
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.md5" />
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sha1" />
+    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sha512" />
     <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe" />
   </target>
 
@@ -2166,6 +2169,7 @@ skip.installer property in build.properties" />
         <include name="*.asc"/>
         <include name="*.md5"/>
         <include name="*.sha1"/>
+        <include name="*.sha512"/>
       </fileset>
     </copy>
 
