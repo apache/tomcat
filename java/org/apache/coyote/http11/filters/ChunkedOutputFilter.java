@@ -152,6 +152,13 @@ public class ChunkedOutputFilter implements OutputFilter {
 
 
     @Override
+    public void flush() throws IOException {
+        // No data buffered in this filter. Flush next buffer.
+        buffer.flush();
+    }
+
+
+    @Override
     public void end() throws IOException {
 
         Supplier<Map<String,String>> trailerFieldsSupplier = response.getTrailerFields();

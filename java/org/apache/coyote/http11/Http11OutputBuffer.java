@@ -210,31 +210,40 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
     }
 
 
-    // --------------------------------------------------------- Public Methods
+    // ----------------------------------------------- HttpOutputBuffer Methods
 
     /**
      * Flush the response.
      *
      * @throws IOException an underlying I/O error occurred
      */
+    @Override
     public void flush() throws IOException {
-        // go through the filters and if there is gzip filter
-        // invoke it to flush
-        for (int i = 0; i <= lastActiveFilter; i++) {
-            if (activeFilters[i] instanceof GzipOutputFilter) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Flushing the gzip filter at position " + i +
-                            " of the filter chain...");
-                }
-                ((GzipOutputFilter) activeFilters[i]).flush();
-                break;
-            }
+        if (lastActiveFilter == -1) {
+            outputStreamOutputBuffer.flush();
+        } else {
+            activeFilters[lastActiveFilter].flush();
         }
-
-        // Flush the current buffer(s)
-        flushBuffer(isBlocking());
     }
 
+
+    @Override
+    public void end() throws IOException {
+        if (responseFinished) {
+            return;
+        }
+
+        if (lastActiveFilter == -1) {
+            outputStreamOutputBuffer.end();
+        } else {
+            activeFilters[lastActiveFilter].end();
+        }
+
+        responseFinished = true;
+    }
+
+
+    // --------------------------------------------------------- Public Methods
 
     /**
      * Reset the header buffer if an error occurs during the writing of the
@@ -273,22 +282,6 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
         lastActiveFilter = -1;
         responseFinished = false;
         byteCount = 0;
-    }
-
-
-    @Override
-    public void end() throws IOException {
-        if (responseFinished) {
-            return;
-        }
-
-        if (lastActiveFilter == -1) {
-            outputStreamOutputBuffer.end();
-        } else {
-            activeFilters[lastActiveFilter].end();
-        }
-
-        responseFinished = true;
     }
 
 
@@ -562,6 +555,11 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
         @Override
         public void end() throws IOException {
             socketWrapper.flush(true);
+        }
+
+        @Override
+        public void flush() throws IOException {
+            socketWrapper.flush(isBlocking());
         }
     }
 }
