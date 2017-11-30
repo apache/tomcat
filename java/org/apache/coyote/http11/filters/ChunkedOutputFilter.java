@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
+import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.coyote.http11.OutputFilter;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
@@ -67,7 +67,7 @@ public class ChunkedOutputFilter implements OutputFilter {
     /**
      * Next buffer in the pipeline.
      */
-    protected OutputBuffer buffer;
+    protected HttpOutputBuffer buffer;
 
 
     /**
@@ -146,7 +146,7 @@ public class ChunkedOutputFilter implements OutputFilter {
 
 
     @Override
-    public void setBuffer(OutputBuffer buffer) {
+    public void setBuffer(HttpOutputBuffer buffer) {
         this.buffer = buffer;
     }
 

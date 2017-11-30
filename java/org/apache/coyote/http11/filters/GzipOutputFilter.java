@@ -21,8 +21,8 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.zip.GZIPOutputStream;
 
-import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
+import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.coyote.http11.OutputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -42,7 +42,7 @@ public class GzipOutputFilter implements OutputFilter {
     /**
      * Next buffer in the pipeline.
      */
-    protected OutputBuffer buffer;
+    protected HttpOutputBuffer buffer;
 
 
     /**
@@ -110,7 +110,7 @@ public class GzipOutputFilter implements OutputFilter {
 
 
     @Override
-    public void setBuffer(OutputBuffer buffer) {
+    public void setBuffer(HttpOutputBuffer buffer) {
         this.buffer = buffer;
     }
 

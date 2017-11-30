@@ -20,9 +20,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.Http11OutputBuffer;
+import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 
 /**
@@ -99,7 +99,7 @@ public class TesterOutputBuffer extends Http11OutputBuffer {
      * This class is an output buffer which will write data to an output
      * stream.
      */
-    protected class OutputStreamOutputBuffer implements OutputBuffer {
+    protected class OutputStreamOutputBuffer implements HttpOutputBuffer {
 
         @Override
         public int doWrite(ByteBuffer chunk) throws IOException {

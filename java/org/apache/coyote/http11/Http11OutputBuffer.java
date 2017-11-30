@@ -21,7 +21,6 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 import org.apache.coyote.ActionCode;
-import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.filters.GzipOutputFilter;
 import org.apache.juli.logging.Log;
@@ -37,7 +36,7 @@ import org.apache.tomcat.util.res.StringManager;
  * headers (once committed) and the response body. Note that buffering of the
  * response body happens at a higher level.
  */
-public class Http11OutputBuffer implements OutputBuffer {
+public class Http11OutputBuffer implements HttpOutputBuffer {
 
     // -------------------------------------------------------------- Variables
 
@@ -94,7 +93,7 @@ public class Http11OutputBuffer implements OutputBuffer {
     /**
      * Underlying output buffer.
      */
-    protected OutputBuffer outputStreamOutputBuffer;
+    protected HttpOutputBuffer outputStreamOutputBuffer;
 
 
     /**
@@ -539,7 +538,7 @@ public class Http11OutputBuffer implements OutputBuffer {
     /**
      * This class is an output buffer which will write data to a socket.
      */
-    protected class SocketOutputBuffer implements OutputBuffer {
+    protected class SocketOutputBuffer implements HttpOutputBuffer {
 
         /**
          * Write chunk.

@@ -19,8 +19,8 @@ package org.apache.coyote.http11.filters;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
+import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.coyote.http11.OutputFilter;
 
 /**
@@ -47,7 +47,7 @@ public class IdentityOutputFilter implements OutputFilter {
     /**
      * Next buffer in the pipeline.
      */
-    protected OutputBuffer buffer;
+    protected HttpOutputBuffer buffer;
 
 
     // --------------------------------------------------- OutputBuffer Methods
@@ -106,7 +106,7 @@ public class IdentityOutputFilter implements OutputFilter {
 
 
     @Override
-    public void setBuffer(OutputBuffer buffer) {
+    public void setBuffer(HttpOutputBuffer buffer) {
         this.buffer = buffer;
     }
 

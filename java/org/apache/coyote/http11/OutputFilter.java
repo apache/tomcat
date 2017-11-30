@@ -18,7 +18,6 @@ package org.apache.coyote.http11;
 
 import java.io.IOException;
 
-import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 
 /**
@@ -26,7 +25,7 @@ import org.apache.coyote.Response;
  *
  * @author Remy Maucherat
  */
-public interface OutputFilter extends OutputBuffer {
+public interface OutputFilter extends HttpOutputBuffer {
 
     /**
      * Some filters need additional parameters from the response. All the
@@ -49,7 +48,7 @@ public interface OutputFilter extends OutputBuffer {
      *
      * @param buffer The next buffer instance
      */
-    public void setBuffer(OutputBuffer buffer);
+    public void setBuffer(HttpOutputBuffer buffer);
 
 
     /**
