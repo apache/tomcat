@@ -1294,6 +1294,7 @@
         <exclude name="*.asc" />
         <exclude name="*.md5" />
         <exclude name="*.sha1" />
+        <exclude name="*.sha512" />
         <exclude name="*.zip" />
         <exclude name="*.tar.gz" />
       </fileset>
@@ -1311,6 +1312,7 @@
         <exclude name="*.asc" />
         <exclude name="*.md5" />
         <exclude name="*.sha1" />
+        <exclude name="*.sha512" />
         <exclude name="*.zip" />
         <exclude name="*.tar.gz" />
       </tarfileset>
@@ -2196,6 +2198,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <include name="*.asc"/>
         <include name="*.md5"/>
         <include name="*.sha1"/>
+        <include name="*.sha512"/>
       </fileset>
     </copy>
 
