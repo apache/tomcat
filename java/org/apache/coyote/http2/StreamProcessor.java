@@ -236,7 +236,7 @@ class StreamProcessor extends AbstractProcessor {
 
     @Override
     protected final boolean isReady() {
-        return stream.getOutputBuffer().isReady();
+        return stream.isReady();
     }
 
 
@@ -336,7 +336,7 @@ class StreamProcessor extends AbstractProcessor {
 
     @Override
     protected final boolean flushBufferedWrite() throws IOException {
-        if (stream.getOutputBuffer().flush(false)) {
+        if (stream.flush(false)) {
             // The buffer wasn't fully flushed so re-register the
             // stream for write. Note this does not go via the
             // Response since the write registration state at
@@ -344,7 +344,7 @@ class StreamProcessor extends AbstractProcessor {
             // has been emptied then the code below will call
             // dispatch() which will enable the
             // Response to respond to this event.
-            if (stream.getOutputBuffer().isReady()) {
+            if (stream.isReady()) {
                 // Unexpected
                 throw new IllegalStateException();
             }

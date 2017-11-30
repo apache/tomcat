@@ -75,7 +75,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
     private StringBuilder cookieHeader = null;
     private final Response coyoteResponse = new Response();
     private final StreamInputBuffer inputBuffer;
-    private final StreamOutputBuffer outputBuffer = new StreamOutputBuffer();
+    private final StreamOutputBuffer streamOutputBuffer = new StreamOutputBuffer();
+    private final Http2OutputBuffer http2OutputBuffer = new Http2OutputBuffer(streamOutputBuffer);
 
 
     Stream(Integer identifier, Http2UpgradeHandler handler) {
@@ -104,7 +105,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
             state.receivedEndOfStream();
         }
         this.coyoteRequest.setSendfile(handler.hasAsyncIO() && handler.getProtocol().getUseSendfile());
-        this.coyoteResponse.setOutputBuffer(outputBuffer);
+        this.coyoteResponse.setOutputBuffer(http2OutputBuffer);
         this.coyoteRequest.setResponse(coyoteResponse);
         this.coyoteRequest.protocol().setString("HTTP/2.0");
         if (this.coyoteRequest.getStartTime() < 0) {
@@ -406,7 +407,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
 
     final void writeHeaders() throws IOException {
-        boolean endOfStream = getOutputBuffer().hasNoBody() &&
+        boolean endOfStream = streamOutputBuffer.hasNoBody() &&
                 coyoteResponse.getTrailerFields() == null;
         // TODO: Is 1k the optimal value?
         handler.writeHeaders(this, 0, coyoteResponse.getMimeHeaders(), endOfStream, 1024);
@@ -525,8 +526,18 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
 
     final void sentEndOfStream() {
-        outputBuffer.endOfStreamSent = true;
+        streamOutputBuffer.endOfStreamSent = true;
         state.sentEndOfStream();
+    }
+
+
+    final boolean isReady() {
+        return streamOutputBuffer.isReady();
+    }
+
+
+    final boolean flush(boolean block) throws IOException {
+        return streamOutputBuffer.flush(block);
     }
 
 
@@ -535,8 +546,8 @@ class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    final StreamOutputBuffer getOutputBuffer() {
-        return outputBuffer;
+    final HttpOutputBuffer getOutputBuffer() {
+        return http2OutputBuffer;
     }
 
 
@@ -632,7 +643,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
 
 
     boolean isTrailerFieldsSupported() {
-        return !getOutputBuffer().endOfStreamSent;
+        return !streamOutputBuffer.endOfStreamSent;
     }
 
 
