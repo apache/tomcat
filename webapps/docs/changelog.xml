@@ -55,6 +55,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection>
+    <changelog>
+      <add>
+        <bug>60276</bug>: Implement GZIP compression support for responses
+        served over HTTP/2. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
