@@ -34,6 +34,7 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
 import org.apache.coyote.http.HttpOutputBuffer;
+import org.apache.coyote.http11.OutputFilter;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -58,7 +59,7 @@ class Stream extends AbstractStream implements HeaderEmitter {
     static {
         Response response =  new Response();
         response.setStatus(100);
-        StreamProcessor.prepareHeaders(response);
+        StreamProcessor.prepareHeaders(null, response, true, null, null);
         ACK_HEADERS = response.getMimeHeaders();
     }
 
@@ -411,6 +412,11 @@ class Stream extends AbstractStream implements HeaderEmitter {
                 coyoteResponse.getTrailerFields() == null;
         // TODO: Is 1k the optimal value?
         handler.writeHeaders(this, 0, coyoteResponse.getMimeHeaders(), endOfStream, 1024);
+    }
+
+
+    final void addOutputFilter(OutputFilter filter) {
+        http2OutputBuffer.addFilter(filter);
     }
 
 
