@@ -100,6 +100,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>57870</bug>: When running on Java 7 or later, take advantage of the
+        new <code>syncFlush</code> parameter when constructing a
+        <code>GZIPOutputStream</code> rather than using the custom
+        <code>FlushableGZIPOutputStream</code> implementation as a work-around.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <add>

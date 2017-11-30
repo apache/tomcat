@@ -16,27 +16,34 @@
  */
 package org.apache.tomcat.util.compat;
 
+import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
+import java.util.zip.GZIPOutputStream;
 
 class Jre7Compat extends JreCompat {
 
     private static final int RUNTIME_MAJOR_VERSION = 7;
 
     private static final Method forLanguageTagMethod;
+    private static final Constructor<GZIPOutputStream> gzipOutputStreamConstructor;
 
 
     static {
         Method m = null;
+        Constructor<GZIPOutputStream> c = null;
         try {
             m = Locale.class.getMethod("forLanguageTag", String.class);
+            c = GZIPOutputStream.class.getConstructor(OutputStream.class, boolean.class);
         } catch (SecurityException e) {
             // Should never happen
         } catch (NoSuchMethodException e) {
             // Expected on Java < 7
         }
         forLanguageTagMethod = m;
+        gzipOutputStreamConstructor = c;
     }
 
 
@@ -55,6 +62,22 @@ class Jre7Compat extends JreCompat {
             return null;
         } catch (InvocationTargetException e) {
             return null;
+        }
+    }
+
+
+    @Override
+    public GZIPOutputStream getFlushableGZipOutputStream(OutputStream os) {
+        try {
+            return gzipOutputStreamConstructor.newInstance(os, Boolean.TRUE);
+        } catch (InstantiationException e) {
+            throw new UnsupportedOperationException(e);
+        } catch (IllegalAccessException e) {
+            throw new UnsupportedOperationException(e);
+        } catch (IllegalArgumentException e) {
+            throw new UnsupportedOperationException(e);
+        } catch (InvocationTargetException e) {
+            throw new UnsupportedOperationException(e);
         }
     }
 

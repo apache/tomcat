@@ -18,11 +18,13 @@ package org.apache.tomcat.util.compat;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Deque;
 import java.util.Locale;
 import java.util.jar.JarFile;
+import java.util.zip.GZIPOutputStream;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLServerSocket;
@@ -55,8 +57,7 @@ public class JreCompat {
             jre9Available = true;
             jre8Available = true;
             jre7Available = true;
-        }
-        else if (Jre8Compat.isSupported()) {
+        } else if (Jre8Compat.isSupported()) {
             instance = new Jre8Compat();
             jre9Available = false;
             jre8Available = true;
@@ -127,6 +128,12 @@ public class JreCompat {
         return true;
     }
 
+    
+    @SuppressWarnings("unused")
+    public GZIPOutputStream getFlushableGZipOutputStream(OutputStream os) {
+        throw new UnsupportedOperationException(
+                sm.getString("jreCompat.noFlushableGzipOutputStream"));
+    }
 
     // Java 6 implementation of Java 8 methods
 

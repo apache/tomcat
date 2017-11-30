@@ -25,6 +25,7 @@ import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.OutputFilter;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.compat.JreCompat;
 
 /**
  * Gzip output filter.
@@ -74,7 +75,12 @@ public class GzipOutputFilter implements OutputFilter {
     public int doWrite(ByteChunk chunk, Response res)
         throws IOException {
         if (compressionStream == null) {
-            compressionStream = new FlushableGZIPOutputStream(fakeOutputStream);
+            if (JreCompat.isJre7Available()) {
+                compressionStream =
+                        JreCompat.getInstance().getFlushableGZipOutputStream(fakeOutputStream);
+            } else {
+                compressionStream = new FlushableGZIPOutputStream(fakeOutputStream);
+            }
         }
         compressionStream.write(chunk.getBytes(), chunk.getStart(), 
                                 chunk.getLength());
