@@ -29,6 +29,7 @@ import org.apache.tomcat.util.digester.Digester;
  * Helper class used to do property replacement on system properties.
  * @deprecated
  */
+@Deprecated
 public class SystemPropertyReplacerListener
     implements LifecycleListener {
 
