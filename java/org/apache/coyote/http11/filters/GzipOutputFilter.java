@@ -139,10 +139,14 @@ public class GzipOutputFilter implements OutputFilter {
      * buffer.doWrite during the execution of this method.
      */
     @Override
-    public long end()
-        throws IOException {
+    public long end() throws IOException {
         if (compressionStream == null) {
-            compressionStream = new FlushableGZIPOutputStream(fakeOutputStream);
+            if (JreCompat.isJre7Available()) {
+                compressionStream =
+                        JreCompat.getInstance().getFlushableGZipOutputStream(fakeOutputStream);
+            } else {
+                compressionStream = new FlushableGZIPOutputStream(fakeOutputStream);
+            }
         }
         compressionStream.finish();
         compressionStream.close();
