@@ -852,6 +852,16 @@
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- URLs used are always provided by the container so would normally be -->
+    <!-- file URLs.                                                          -->
+    <Class name="org.apache.tomcat.util.descriptor.tld.TldResourcePath" />
+    <Or>
+      <Method name="equals" />
+      <Method name="hashCode" />
+    </Or>
+    <Bug pattern="DMI_BLOCKING_METHODS_ON_URL" />
+  </Match>
+  <Match>
     <!-- NPE is desired as it indicates an error condition -->
     <Class name="org.apache.tomcat.util.digester.CallMethodRule"/>
     <Method name="end"/>
@@ -898,6 +908,18 @@
       <Method name="logInvalidVersion"/>
     </Or>
     <Bug code="SF" />
+  </Match>
+  <Match>
+    <!-- Reader instance always accepts -ve skip values and there is -->
+    <!-- always enough space to skip back the requested amount.      -->
+    <Class name="org.apache.tomcat.util.http.parser.HttpParser" />
+    <Or>
+      <Method name="skipConstant" />
+      <Method name="readToken" />
+      <Method name="readQuotedToken" />
+      <Method name="readLhex" />
+    </Or>
+    <Bug pattern="SR_NOT_CHECKED" />
   </Match>
   <Match>
     <!-- Hiding of field in superclass is deliberate -->
