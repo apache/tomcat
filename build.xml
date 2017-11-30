@@ -582,6 +582,7 @@
       <fileset dir="modules/jdbc-pool" >
         <exclude name=".*/**"/>
         <exclude name="**/MANIFEST.MF"/>
+        <exclude name="build.properties" />
         <patternset refid="text.files" />
       </fileset>
     </checkstyle>
