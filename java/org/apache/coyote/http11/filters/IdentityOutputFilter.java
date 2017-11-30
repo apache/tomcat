@@ -113,7 +113,7 @@ public class IdentityOutputFilter implements OutputFilter {
 
     @Override
     public void end() throws IOException {
-        // NO-OP
+        buffer.end();
     }
 
 

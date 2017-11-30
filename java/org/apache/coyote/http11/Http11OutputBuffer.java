@@ -282,11 +282,11 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
             return;
         }
 
-        if (lastActiveFilter != -1) {
+        if (lastActiveFilter == -1) {
+            outputStreamOutputBuffer.end();
+        } else {
             activeFilters[lastActiveFilter].end();
         }
-
-        outputStreamOutputBuffer.end();
 
         responseFinished = true;
     }
