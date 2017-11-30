@@ -22,9 +22,6 @@ import java.util.Arrays;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.Response;
-import org.apache.coyote.http11.filters.GzipOutputFilter;
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.net.SocketWrapperBase;
@@ -44,12 +41,6 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
      * The string manager for this package.
      */
     protected static final StringManager sm = StringManager.getManager(Http11OutputBuffer.class);
-
-
-    /**
-     * Logger.
-     */
-    private static final Log log = LogFactory.getLog(Http11OutputBuffer.class);
 
 
     // ----------------------------------------------------- Instance Variables
