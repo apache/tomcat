@@ -177,7 +177,7 @@ class StreamProcessor extends AbstractProcessor {
 
     @Override
     protected final void flush() throws IOException {
-        stream.flushData();
+        stream.getOutputBuffer().flush();
     }
 
 
