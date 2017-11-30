@@ -276,12 +276,8 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
     }
 
 
-    /**
-     * Finish writing the response.
-     *
-     * @throws IOException an underlying I/O error occurred
-     */
-    public void finishResponse() throws IOException {
+    @Override
+    public void end() throws IOException {
         if (responseFinished) {
             return;
         }
@@ -290,7 +286,7 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
             activeFilters[lastActiveFilter].end();
         }
 
-        flushBuffer(true);
+        outputStreamOutputBuffer.end();
 
         responseFinished = true;
     }
@@ -561,6 +557,11 @@ public class Http11OutputBuffer implements HttpOutputBuffer {
         @Override
         public long getBytesWritten() {
             return byteCount;
+        }
+
+        @Override
+        public void end() throws IOException {
+            socketWrapper.flush(true);
         }
     }
 }

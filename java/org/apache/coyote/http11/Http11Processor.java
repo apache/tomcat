@@ -1141,7 +1141,7 @@ public class Http11Processor extends AbstractProcessor {
         if (getErrorState().isIoAllowed()) {
             try {
                 action(ActionCode.COMMIT, null);
-                outputBuffer.finishResponse();
+                outputBuffer.end();
             } catch (IOException e) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
             } catch (Throwable t) {
@@ -1155,7 +1155,7 @@ public class Http11Processor extends AbstractProcessor {
 
     @Override
     protected final void finishResponse() throws IOException {
-        outputBuffer.finishResponse();
+        outputBuffer.end();
     }
 
 

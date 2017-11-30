@@ -113,5 +113,10 @@ public class TesterOutputBuffer extends Http11OutputBuffer {
         public long getBytesWritten() {
             return byteCount;
         }
+
+        @Override
+        public void end() throws IOException {
+            // NO-OP: Unused
+        }
     }
 }

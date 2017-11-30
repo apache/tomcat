@@ -16,8 +16,6 @@
  */
 package org.apache.coyote.http11;
 
-import java.io.IOException;
-
 import org.apache.coyote.Response;
 
 /**
@@ -49,13 +47,4 @@ public interface OutputFilter extends HttpOutputBuffer {
      * @param buffer The next buffer instance
      */
     public void setBuffer(HttpOutputBuffer buffer);
-
-
-    /**
-     * End the current request. It is acceptable to write extra bytes using
-     * buffer.doWrite during the execution of this method.
-     *
-     * @throws IOException If an I/O error occurs while writing to the client
-     */
-    public void end() throws IOException;
 }
