@@ -63,7 +63,7 @@
       </fix>
       <fix>
         Add missing SHA-512 hash for release artifacts to the build script.
-        (markt) 
+        (markt)
       </fix>
     </changelog>
   </subsection>
