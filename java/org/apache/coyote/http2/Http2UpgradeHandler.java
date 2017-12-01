@@ -49,8 +49,6 @@ import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.apache.tomcat.util.http.FastHttpDateFormat;
-import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SocketEvent;
@@ -516,7 +514,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         }
     }
 
-    void writeHeaders(Stream stream, Response coyoteResponse, int payloadSize)
+    void writeHeaders(Stream stream, Response coyoteResponse, boolean endOfStream, int payloadSize)
             throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId,
@@ -526,8 +524,6 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         if (!stream.canWrite()) {
             return;
         }
-
-        prepareHeaders(coyoteResponse);
 
         byte[] header = new byte[9];
         ByteBuffer target = ByteBuffer.allocate(payloadSize);
@@ -543,7 +539,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
                     if (first) {
                         first = false;
                         header[3] = FrameType.HEADERS.getIdByte();
-                        if (stream.getOutputBuffer().hasNoBody()) {
+                        if (endOfStream) {
                             header[4] = FLAG_END_OF_STREAM;
                         }
                     } else {
@@ -574,39 +570,15 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
     }
 
 
-    private void prepareHeaders(Response coyoteResponse) {
-        MimeHeaders headers = coyoteResponse.getMimeHeaders();
-        int statusCode = coyoteResponse.getStatus();
-
-        // Add the pseudo header for status
-        headers.addValue(":status").setString(Integer.toString(statusCode));
-
-        // Check to see if a response body is present
-        if (!(statusCode < 200 || statusCode == 205 || statusCode == 304)) {
-            String contentType = coyoteResponse.getContentType();
-            if (contentType != null) {
-                headers.setValue("content-type").setString(contentType);
-            }
-            String contentLanguage = coyoteResponse.getContentLanguage();
-            if (contentLanguage != null) {
-                headers.setValue("content-language").setString(contentLanguage);
-            }
-        }
-
-
-        // Add date header unless it is an informational response or the
-        // application has already set one
-        if (statusCode >= 200 && headers.getValue("date") == null) {
-            headers.addValue("date").setString(FastHttpDateFormat.getCurrentDate());
-        }
-    }
-
-
     void writePushHeaders(Stream stream, int pushedStreamId, Request coyoteRequest, int payloadSize)
             throws IOException {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("upgradeHandler.writePushHeaders", connectionId,
                     stream.getIdentifier(), Integer.toString(pushedStreamId)));
+        }
+
+        if (!stream.canWrite()) {
+            return;
         }
 
         byte[] header = new byte[9];
