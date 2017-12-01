@@ -104,7 +104,8 @@ public class GzipOutputFilter implements OutputFilter {
     /**
      * Added to allow flushing to happen for the gzip'ed outputstream
      */
-    public void flush() {
+    @Override
+    public void flush() throws IOException {
         if (compressionStream != null) {
             try {
                 if (log.isDebugEnabled()) {
@@ -117,6 +118,7 @@ public class GzipOutputFilter implements OutputFilter {
                 }
             }
         }
+        buffer.flush();
     }
 
 

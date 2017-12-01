@@ -72,6 +72,12 @@ public class VoidOutputFilter implements OutputFilter {
 
 
     @Override
+    public void flush() throws IOException {
+        // NO-OP
+    }
+
+
+    @Override
     public void recycle() {
         // NOOP: Nothing to recycle
     }
