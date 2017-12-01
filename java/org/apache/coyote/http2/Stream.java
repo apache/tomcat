@@ -71,7 +71,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private StringBuilder cookieHeader = null;
     private final Response coyoteResponse = new Response();
     private final StreamInputBuffer inputBuffer;
-    private final StreamOutputBuffer outputBuffer = new StreamOutputBuffer();
+    private final StreamOutputBuffer streamOutputBuffer = new StreamOutputBuffer();
+    private final Http2OutputBuffer http2OutputBuffer = new Http2OutputBuffer(streamOutputBuffer);
 
 
     public Stream(Integer identifier, Http2UpgradeHandler handler) {
@@ -101,7 +102,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         }
         // No sendfile for HTTP/2 (it is enabled by default in the request)
         this.coyoteRequest.setSendfile(false);
-        this.coyoteResponse.setOutputBuffer(outputBuffer);
+        this.coyoteResponse.setOutputBuffer(http2OutputBuffer);
         this.coyoteRequest.setResponse(coyoteResponse);
         this.coyoteRequest.protocol().setString("HTTP/2.0");
         if (this.coyoteRequest.getStartTime() < 0) {
@@ -233,7 +234,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             // Use notifyAll() to be safe (should be unnecessary)
             this.notifyAll();
         } else {
-            if (outputBuffer.isRegisteredForWrite()) {
+            if (streamOutputBuffer.isRegisteredForWrite()) {
                 coyoteResponse.action(ActionCode.DISPATCH_WRITE, null);
             }
         }
@@ -410,7 +411,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     void writeHeaders() throws IOException {
-        boolean endOfStream = getOutputBuffer().hasNoBody();
+        boolean endOfStream = streamOutputBuffer.hasNoBody();
         // TODO: Is 1k the optimal value?
         handler.writeHeaders(this, 0, coyoteResponse.getMimeHeaders(), endOfStream, 1024);
     }
@@ -496,8 +497,18 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     void sentEndOfStream() {
-        outputBuffer.endOfStreamSent = true;
+        streamOutputBuffer.endOfStreamSent = true;
         state.sentEndOfStream();
+    }
+
+
+    final boolean isReady() {
+        return streamOutputBuffer.isReady();
+    }
+
+
+    final boolean flush(boolean block) throws IOException {
+        return streamOutputBuffer.flush(block);
     }
 
 
@@ -506,8 +517,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    StreamOutputBuffer getOutputBuffer() {
-        return outputBuffer;
+    final HttpOutputBuffer getOutputBuffer() {
+        return http2OutputBuffer;
     }
 
 
@@ -596,8 +607,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    private static void push(final Http2UpgradeHandler handler, final Request request, final Stream stream)
-            throws IOException {
+    private static void push(final Http2UpgradeHandler handler, final Request request,
+            final Stream stream) throws IOException {
         if (org.apache.coyote.Constants.IS_SECURITY_ENABLED) {
             try {
                 AccessController.doPrivileged(new PrivilegedPush(handler, request, stream));
