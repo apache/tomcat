@@ -19,8 +19,8 @@ package org.apache.coyote.http11.filters;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Response;
+import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.coyote.http11.OutputFilter;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -66,7 +66,7 @@ public class VoidOutputFilter implements OutputFilter {
 
 
     @Override
-    public void setBuffer(OutputBuffer buffer) {
+    public void setBuffer(HttpOutputBuffer buffer) {
         // NO-OP
     }
 
