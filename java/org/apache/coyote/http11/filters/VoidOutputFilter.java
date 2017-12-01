@@ -31,6 +31,9 @@ import org.apache.coyote.http11.OutputFilter;
  */
 public class VoidOutputFilter implements OutputFilter {
 
+    private HttpOutputBuffer buffer = null;
+
+
     // --------------------------------------------------- OutputBuffer Methods
 
     @Override
@@ -55,24 +58,24 @@ public class VoidOutputFilter implements OutputFilter {
 
     @Override
     public void setBuffer(HttpOutputBuffer buffer) {
-        // NO-OP
+        this.buffer = buffer;
     }
 
 
     @Override
     public void flush() throws IOException {
-        // NO-OP
+        this.buffer.flush();
     }
 
 
     @Override
     public void recycle() {
-        // NOOP: Nothing to recycle
+        buffer = null;
     }
 
 
     @Override
     public void  end() throws IOException {
-        // NO-OP
+        buffer.end();
     }
 }
