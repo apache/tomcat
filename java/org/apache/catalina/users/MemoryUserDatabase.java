@@ -504,16 +504,12 @@ public class MemoryUserDatabase implements UserDatabase {
         // Write out contents to a temporary file
         File fileNew = new File(pathnameNew);
         if (!fileNew.isAbsolute()) {
-            fileNew =
-                new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathnameNew);
+            fileNew = new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathnameNew);
         }
-        PrintWriter writer = null;
-        try {
 
-            // Configure our PrintWriter
-            FileOutputStream fos = new FileOutputStream(fileNew);
-            OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF8");
-            writer = new PrintWriter(osw);
+        try (FileOutputStream fos = new FileOutputStream(fileNew);
+                OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF8");
+                PrintWriter writer = new PrintWriter(osw)) {
 
             // Print the file prolog
             writer.println("<?xml version='1.0' encoding='utf-8'?>");
@@ -545,51 +541,46 @@ public class MemoryUserDatabase implements UserDatabase {
 
             // Check for errors that occurred while printing
             if (writer.checkError()) {
-                writer.close();
-                fileNew.delete();
-                throw new IOException
-                    (sm.getString("memoryUserDatabase.writeException",
-                                  fileNew.getAbsolutePath()));
+                throw new IOException(sm.getString("memoryUserDatabase.writeException",
+                        fileNew.getAbsolutePath()));
             }
-            writer.close();
         } catch (IOException e) {
-            if (writer != null) {
-                writer.close();
+            if (fileNew.exists() && !fileNew.delete()) {
+                log.warn(sm.getString("memoryUserDatabase.fileDelete", fileNew));
             }
-            fileNew.delete();
             throw e;
         }
 
         // Perform the required renames to permanently save this file
         File fileOld = new File(pathnameOld);
         if (!fileOld.isAbsolute()) {
-            fileOld =
-                new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathnameOld);
+            fileOld = new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathnameOld);
         }
-        fileOld.delete();
+        if (fileOld.exists() && !fileOld.delete()) {
+            throw new IOException(sm.getString("memoryUserDatabase.fileDelete", fileOld));
+        }
         File fileOrig = new File(pathname);
         if (!fileOrig.isAbsolute()) {
-            fileOrig =
-                new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathname);
+            fileOrig = new File(System.getProperty(Globals.CATALINA_BASE_PROP), pathname);
         }
         if (fileOrig.exists()) {
-            fileOld.delete();
             if (!fileOrig.renameTo(fileOld)) {
-                throw new IOException
-                    (sm.getString("memoryUserDatabase.renameOld",
-                                  fileOld.getAbsolutePath()));
+                throw new IOException(sm.getString("memoryUserDatabase.renameOld",
+                        fileOld.getAbsolutePath()));
             }
         }
         if (!fileNew.renameTo(fileOrig)) {
             if (fileOld.exists()) {
-                fileOld.renameTo(fileOrig);
+                if (!fileOld.renameTo(fileOrig)) {
+                    log.warn(sm.getString("memoryUserDatabase.restoreOrig", fileOld));
+                }
             }
-            throw new IOException
-                (sm.getString("memoryUserDatabase.renameNew",
-                              fileOrig.getAbsolutePath()));
+            throw new IOException(sm.getString("memoryUserDatabase.renameNew",
+                    fileOrig.getAbsolutePath()));
         }
-        fileOld.delete();
-
+        if (fileOld.exists() && !fileOld.delete()) {
+            throw new IOException(sm.getString("memoryUserDatabase.fileDelete", fileOld));
+        }
     }
 
 

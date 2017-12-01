@@ -745,7 +745,10 @@ public class Tomcat {
             server.setCatalinaHome(baseFile);
         } else {
             File homeFile = new File(catalinaHome);
-            homeFile.mkdirs();
+            if (!homeFile.isDirectory() && !homeFile.mkdirs()) {
+                // Failed to create home directory
+                throw new IllegalStateException(sm.getString("tomcat.homeDirMakeFail", homeFile));
+            }
             try {
                 homeFile = homeFile.getCanonicalFile();
             } catch (IOException e) {

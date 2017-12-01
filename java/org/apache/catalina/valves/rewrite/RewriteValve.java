@@ -523,18 +523,18 @@ public class RewriteValve extends ValveBase {
                     }
                     request.getMappingData().recycle();
                     // Reinvoke the whole request recursively
+                    Connector connector = request.getConnector();
                     try {
-                        Connector connector = request.getConnector();
                         if (!connector.getProtocolHandler().getAdapter().prepare(
                                 request.getCoyoteRequest(), response.getCoyoteResponse())) {
                             return;
                         }
-                        Pipeline pipeline = connector.getService().getContainer().getPipeline();
-                        request.setAsyncSupported(pipeline.isAsyncSupported());
-                        pipeline.getFirst().invoke(request, response);
                     } catch (Exception e) {
                         // This doesn't actually happen in the Catalina adapter implementation
                     }
+                    Pipeline pipeline = connector.getService().getContainer().getPipeline();
+                    request.setAsyncSupported(pipeline.isAsyncSupported());
+                    pipeline.getFirst().invoke(request, response);
                 }
             } else {
                 getNext().invoke(request, response);

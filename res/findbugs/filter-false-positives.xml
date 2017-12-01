@@ -354,6 +354,12 @@
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- Failure at this point is fatal -->
+    <Class name="org.apache.catalina.startup.Bootstrap" />
+    <Method name="initClassLoaders" />
+    <Bug pattern="DM_EXIT" />
+  </Match>
+  <Match>
     <!-- Catalina isn't used when embedding -->
     <Class name="org.apache.catalina.startup.Catalina" />
     <Method name="stopServer" />
@@ -367,6 +373,12 @@
       <Method name="getWebXmlSource" />
     </Or>
     <Bug code="OBL" />
+  </Match>
+  <Match>
+    <!-- Method checks result and logs error later -->
+    <Class name="org.apache.catalina.startup.ExpandWar" />
+    <Method name="deleteDir" />
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
   </Match>
   <Match>
     <!-- Sleep is short, needs to keep lock -->
