@@ -139,7 +139,7 @@ public class GzipOutputFilter implements OutputFilter {
         }
         compressionStream.finish();
         compressionStream.close();
-        ((OutputFilter) buffer).end();
+        buffer.end();
     }
 
 
