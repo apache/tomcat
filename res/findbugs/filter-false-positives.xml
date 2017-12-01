@@ -575,6 +575,12 @@
     <Bug pattern="NP_BOOLEAN_RETURN_NULL"/>
   </Match>
   <Match>
+    <!-- Result is negated because arguments have to be swapped -->
+    <Class name="org.apache.el.lang.ELSupport" />
+    <Method name="compare"/>
+    <Bug pattern="RV_NEGATING_RESULT_OF_COMPARETO"/>
+  </Match>
+  <Match>
     <!-- JspC will not be used under a security manager -->
     <Class name="org.apache.jasper.JspC"/>
     <Method name="initClassLoader"/>
@@ -735,6 +741,11 @@
     <Bug pattern="NP_EQUALS_SHOULD_HANDLE_NULL_ARGUMENT" />
   </Match>
   <Match>
+    <!-- Natural ordering behavoiur is docuemented in Javadoc -->
+    <Class name="org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject" />
+    <Bug pattern="EQ_COMPARETO_USE_OBJECT_EQUALS" />
+  </Match>
+  <Match>
     <!-- Increment is in sync block so it is safe. Volatile is used so reading
          thread sees latest value.  -->
     <Class name="org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject" />
@@ -887,6 +898,15 @@
     <Class name="org.apache.tomcat.util.http.fileupload.MultipartStream"/>
     <Method name="readHeaders"/>
     <Bug code="Dm" />
+  </Match>
+  <Match>
+    <!-- Deletion failure should never happen -->
+    <Class name="org.apache.tomcat.util.http.fileupload.disk.DiskFileItem"/>
+    <Or>
+      <Method name="delete"/>
+      <Method name="finalize"/>
+    </Or>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
   </Match>
   <Match>
     <!-- the platform default encoding is a fallback -->

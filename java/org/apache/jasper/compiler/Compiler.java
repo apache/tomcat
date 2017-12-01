@@ -384,14 +384,19 @@ public abstract class Compiler {
             Map<String,SmapStratum> smaps = generateJava();
             File javaFile = new File(ctxt.getServletJavaFileName());
             Long jspLastModified = ctxt.getLastModified(ctxt.getJspFile());
-            javaFile.setLastModified(jspLastModified.longValue());
+            if (!javaFile.setLastModified(jspLastModified.longValue())) {
+                throw new JasperException(Localizer.getMessage("jsp.error.setLastModified", javaFile));
+            }
             if (compileClass) {
                 generateClass(smaps);
                 // Fix for bugzilla 41606
                 // Set JspServletWrapper.servletClassLastModifiedTime after successful compile
                 File targetFile = new File(ctxt.getClassFileName());
                 if (targetFile.exists()) {
-                    targetFile.setLastModified(jspLastModified.longValue());
+                    if (!targetFile.setLastModified(jspLastModified.longValue())) {
+                        throw new JasperException(
+                                Localizer.getMessage("jsp.error.setLastModified", targetFile));
+                    }
                     if (jsw != null) {
                         jsw.setServletClassLastModifiedTime(
                                 jspLastModified.longValue());

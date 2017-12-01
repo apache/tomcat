@@ -250,7 +250,10 @@ public class AntCompiler extends Compiler {
 
         if (!ctxt.keepGenerated()) {
             File javaFile = new File(javaFileName);
-            javaFile.delete();
+            if (!javaFile.delete()) {
+                throw new JasperException(Localizer.getMessage(
+                        "jsp.warning.compiler.javafile.delete.fail", javaFile));
+            }
         }
 
         if (be != null) {
