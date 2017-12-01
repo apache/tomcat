@@ -25,10 +25,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 import org.apache.coyote.Adapter;
+import org.apache.coyote.CompressionConfig;
 import org.apache.coyote.Processor;
 import org.apache.coyote.Request;
+import org.apache.coyote.Response;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.UpgradeToken;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
@@ -70,6 +73,8 @@ public class Http2Protocol implements UpgradeProtocol {
     private int maxTrailerCount = Constants.DEFAULT_MAX_TRAILER_COUNT;
     private int maxTrailerSize = Constants.DEFAULT_MAX_TRAILER_SIZE;
     private boolean initiatePingDisabled = false;
+    // Compression
+    private final CompressionConfig compressionConfig = new CompressionConfig();
 
     @Override
     public String getHttpUpgradeName(boolean isSSLEnabled) {
@@ -272,5 +277,51 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public void setInitiatePingDisabled(boolean initiatePingDisabled) {
         this.initiatePingDisabled = initiatePingDisabled;
+    }
+
+
+    public void setCompression(String compression) {
+        compressionConfig.setCompression(compression);
+    }
+    public String getCompression() {
+        return compressionConfig.getCompression();
+    }
+    protected int getCompressionLevel() {
+        return compressionConfig.getCompressionLevel();
+    }
+
+
+    public String getNoCompressionUserAgents() {
+        return compressionConfig.getNoCompressionUserAgents();
+    }
+    protected Pattern getNoCompressionUserAgentsPattern() {
+        return compressionConfig.getNoCompressionUserAgentsPattern();
+    }
+    public void setNoCompressionUserAgents(String noCompressionUserAgents) {
+        compressionConfig.setNoCompressionUserAgents(noCompressionUserAgents);
+    }
+
+
+    public String getCompressibleMimeType() {
+        return compressionConfig.getCompressibleMimeType();
+    }
+    public void setCompressibleMimeType(String valueS) {
+        compressionConfig.setCompressibleMimeType(valueS);
+    }
+    public String[] getCompressibleMimeTypes() {
+        return compressionConfig.getCompressibleMimeTypes();
+    }
+
+
+    public int getCompressionMinSize() {
+        return compressionConfig.getCompressionMinSize();
+    }
+    public void setCompressionMinSize(int compressionMinSize) {
+        compressionConfig.setCompressionMinSize(compressionMinSize);
+    }
+
+
+    public boolean useCompression(Request request, Response response) {
+        return compressionConfig.useCompression(request, response);
     }
 }
