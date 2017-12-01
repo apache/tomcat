@@ -421,15 +421,6 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-
-    void flushData() throws IOException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("stream.write", getConnectionId(), getIdentifier()));
-        }
-        outputBuffer.flush(true);
-    }
-
-
     @Override
     protected final String getConnectionId() {
         return handler.getConnectionId();
@@ -790,7 +781,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         @Override
         public final void end() throws IOException {
             closed = true;
-            flushData();
+            flush(true);
         }
 
         public boolean isClosed() {
