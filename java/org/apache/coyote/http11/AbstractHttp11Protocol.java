@@ -24,12 +24,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpUpgradeHandler;
 
 import org.apache.coyote.AbstractProtocol;
+import org.apache.coyote.CompressionConfig;
 import org.apache.coyote.Processor;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.UpgradeToken;
@@ -46,6 +46,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     protected static final StringManager sm =
             StringManager.getManager(AbstractHttp11Protocol.class);
+
+    private final CompressionConfig compressionConfig = new CompressionConfig();
 
 
     public AbstractHttp11Protocol(AbstractEndpoint<S> endpoint) {
@@ -176,17 +178,19 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     /**
      * Integrated compression support.
      */
-    private String compression = "off";
-    public String getCompression() { return compression; }
-    public void setCompression(String valueS) { compression = valueS; }
+    public String getCompression() {
+        return compressionConfig.getCompression();
+    }
+    public void setCompression(String valueS) {
+        compressionConfig.setCompression(valueS);
+    }
 
 
-    private String noCompressionUserAgents = null;
     public String getNoCompressionUserAgents() {
-        return noCompressionUserAgents;
+        return compressionConfig.getNoCompressionUserAgents();
     }
     public void setNoCompressionUserAgents(String valueS) {
-        noCompressionUserAgents = valueS;
+        compressionConfig.setNoCompressionUserAgents(valueS);
     }
 
 
@@ -214,36 +218,24 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     public String[] getCompressableMimeTypes() {
         return getCompressibleMimeTypes();
     }
-    private String compressibleMimeType = "text/html,text/xml,text/plain,text/css,text/javascript,application/javascript";
-    private String[] compressibleMimeTypes = null;
-    public String getCompressibleMimeType() { return compressibleMimeType; }
+
+
+    public String getCompressibleMimeType() {
+        return compressionConfig.getCompressibleMimeType();
+    }
     public void setCompressibleMimeType(String valueS) {
-        compressibleMimeType = valueS;
-        compressibleMimeTypes = null;
+        compressionConfig.setCompressibleMimeType(valueS);
     }
     public String[] getCompressibleMimeTypes() {
-        String[] result = compressibleMimeTypes;
-        if (result != null) {
-            return result;
-        }
-        List<String> values = new ArrayList<>();
-        StringTokenizer tokens = new StringTokenizer(compressibleMimeType, ",");
-        while (tokens.hasMoreTokens()) {
-            String token = tokens.nextToken().trim();
-            if (token.length() > 0) {
-                values.add(token);
-            }
-        }
-        result = values.toArray(new String[values.size()]);
-        compressibleMimeTypes = result;
-        return result;
+        return compressionConfig.getCompressibleMimeTypes();
     }
 
 
-    private int compressionMinSize = 2048;
-    public int getCompressionMinSize() { return compressionMinSize; }
+    public int getCompressionMinSize() {
+        return compressionConfig.getCompressionMinSize();
+    }
     public void setCompressionMinSize(int valueI) {
-        compressionMinSize = valueI;
+        compressionConfig.setCompressionMinSize(valueI);
     }
 
 
