@@ -604,14 +604,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             throws IOException {
         if (org.apache.coyote.Constants.IS_SECURITY_ENABLED) {
             try {
-                AccessController.doPrivileged(
-                        new PrivilegedExceptionAction<Void>() {
-                            @Override
-                            public Void run() throws IOException {
-                                handler.push(request, stream);
-                                return null;
-                            }
-                        });
+                AccessController.doPrivileged(new PrivilegedPush(handler, request, stream));
             } catch (PrivilegedActionException ex) {
                 Exception e = ex.getException();
                 if (e instanceof IOException) {
@@ -625,6 +618,28 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             handler.push(request, stream);
         }
     }
+
+
+    private static class PrivilegedPush implements PrivilegedExceptionAction<Void> {
+
+        private final Http2UpgradeHandler handler;
+        private final Request request;
+        private final Stream stream;
+
+        public PrivilegedPush(Http2UpgradeHandler handler, Request request,
+                Stream stream) {
+            this.handler = handler;
+            this.request = request;
+            this.stream = stream;
+        }
+
+        @Override
+        public Void run() throws IOException {
+            handler.push(request, stream);
+            return null;
+        }
+    }
+
 
     class StreamOutputBuffer implements OutputBuffer {
 

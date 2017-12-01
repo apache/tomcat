@@ -172,7 +172,7 @@ public final class SecurityClassLoad {
         // Make sure system property is read at this point
         Class<?> clazz = loader.loadClass(basePackage + "Constants");
         clazz.getConstructor().newInstance();
-        loader.loadClass(basePackage + "http2.Stream$1");
+        loader.loadClass(basePackage + "http2.Stream$PrivilegedPush");
     }
 
 
