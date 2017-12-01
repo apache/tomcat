@@ -77,6 +77,46 @@
       comma-separated list of header names.</p>
     </attribute>
 
+    <attribute name="compressibleMimeType" required="false">
+      <p>The value is a comma separated list of MIME types for which HTTP
+      compression may be used.
+      The default value is
+      <code>
+      text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
+      </code>.
+      </p>
+    </attribute>
+
+    <attribute name="compression" required="false">
+      <p>The HTTP/2 protocol may use compression in an attempt to save server
+      bandwidth. The acceptable values for the parameter is "off" (disable
+      compression), "on" (allow compression, which causes text data to be
+      compressed), "force" (forces compression in all cases), or a numerical
+      integer value (which is equivalent to "on", but specifies the minimum
+      amount of data before the output is compressed). If the content-length is
+      not known and compression is set to "on" or more aggressive, the output
+      will also be compressed. If not specified, this attribute is set to
+      "off".</p>
+      <p><em>Note</em>: There is a tradeoff between using compression (saving
+      your bandwidth) and using the sendfile feature (saving your CPU cycles).
+      If the connector supports the sendfile feature, e.g. the NIO2 connector,
+      using sendfile will take precedence over compression. The symptoms will
+      be that static files greater that 48 Kb will be sent uncompressed.
+      You can turn off sendfile by setting <code>useSendfile</code> attribute
+      of the protocol, as documented below, or change the sendfile usage
+      threshold in the configuration of the
+      <a href="../default-servlet.html">DefaultServlet</a> in the default
+      <code>conf/web.xml</code> or in the <code>web.xml</code> of your web
+      application.
+      </p>
+    </attribute>
+
+    <attribute name="compressionMinSize" required="false">
+      <p>If <strong>compression</strong> is set to "on" then this attribute
+      may be used to specify the minimum amount of data before the output is
+      compressed. If not specified, this attribute is defaults to "2048".</p>
+    </attribute>
+
     <attribute name="initialWindowSize" required="false">
       <p>Controls the initial size of the flow control window for streams that
       Tomcat advertises to clients. If not specified, the default value of
@@ -137,6 +177,15 @@
       header. A request that contains a set of trailer headers that requires
       more than the specified limit will be rejected. A value of less than 0
       means no limit. If not specified, a default of 8192 is used.</p>
+    </attribute>
+
+    <attribute name="noCompressionUserAgents" required="false">
+      <p>The value is a regular expression (using <code>java.util.regex</code>)
+      matching the <code>user-agent</code> header of HTTP clients for which
+      compression should not be used,
+      because these clients, although they do advertise support for the
+      feature, have a broken implementation.
+      The default value is an empty String (regexp matching disabled).</p>
     </attribute>
 
     <attribute name="readTimeout" required="false">
