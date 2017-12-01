@@ -31,6 +31,7 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
 import org.apache.coyote.http11.HttpOutputBuffer;
+import org.apache.coyote.http11.OutputFilter;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -54,7 +55,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     static {
         Response response =  new Response();
         response.setStatus(100);
-        StreamProcessor.prepareHeaders(response);
+        StreamProcessor.prepareHeaders(null, response, null, null);
         ACK_HEADERS = response.getMimeHeaders();
     }
 
@@ -72,7 +73,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     private final Response coyoteResponse = new Response();
     private final StreamInputBuffer inputBuffer;
     private final StreamOutputBuffer streamOutputBuffer = new StreamOutputBuffer();
-    private final Http2OutputBuffer http2OutputBuffer = new Http2OutputBuffer(streamOutputBuffer);
+    private final Http2OutputBuffer http2OutputBuffer =
+            new Http2OutputBuffer(coyoteResponse, streamOutputBuffer);
 
 
     public Stream(Integer identifier, Http2UpgradeHandler handler) {
@@ -416,6 +418,12 @@ public class Stream extends AbstractStream implements HeaderEmitter {
         handler.writeHeaders(this, 0, coyoteResponse.getMimeHeaders(), endOfStream, 1024);
     }
 
+
+    final void addOutputFilter(OutputFilter filter) {
+        http2OutputBuffer.addFilter(filter);
+    }
+
+
     void writeAck() throws IOException {
         // TODO: Is 64 too big? Just the status header with compression
         handler.writeHeaders(this, 0, ACK_HEADERS, false, 64);
@@ -671,9 +679,6 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             if (closed) {
                 throw new IllegalStateException(
                         sm.getString("stream.closed", getConnectionId(), getIdentifier()));
-            }
-            if (!coyoteResponse.isCommitted()) {
-                coyoteResponse.sendHeaders();
             }
             int len = chunk.getLength();
             int offset = 0;

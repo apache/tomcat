@@ -26,6 +26,7 @@ import org.apache.coyote.ContainerThreadMarker;
 import org.apache.coyote.ErrorState;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
+import org.apache.coyote.http11.filters.GzipOutputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -100,12 +101,15 @@ class StreamProcessor extends AbstractProcessor {
     @Override
     protected final void prepareResponse() throws IOException {
         response.setCommitted(true);
-        prepareHeaders(response);
+        prepareHeaders(request, response, handler.getProtocol(), stream);
         stream.writeHeaders();
     }
 
 
-    static void prepareHeaders(Response coyoteResponse) {
+    // Static so it can be used by Stream to build the MimeHeaders required for
+    // an ACK. For that use case coyoteRequest, protocol and stream will be null.
+    static void prepareHeaders(Request coyoteRequest, Response coyoteResponse,
+            Http2Protocol protocol, Stream stream) {
         MimeHeaders headers = coyoteResponse.getMimeHeaders();
         int statusCode = coyoteResponse.getStatus();
 
@@ -128,6 +132,12 @@ class StreamProcessor extends AbstractProcessor {
         // application has already set one
         if (statusCode >= 200 && headers.getValue("date") == null) {
             headers.addValue("date").setString(FastHttpDateFormat.getCurrentDate());
+        }
+
+        if (protocol != null && protocol.useCompression(coyoteRequest, coyoteResponse)) {
+            // Enable compression. Headers will have been set. Need to configure
+            // output filter at this point.
+            stream.addOutputFilter(new GzipOutputFilter());
         }
     }
 

@@ -19,6 +19,7 @@ package org.apache.coyote.http2;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import org.apache.coyote.Response;
 import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.coyote.http11.OutputFilter;
 import org.apache.coyote.http2.Stream.StreamOutputBuffer;
@@ -26,6 +27,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 public class Http2OutputBuffer implements HttpOutputBuffer {
 
+    private final Response coyoteResponse;
     private HttpOutputBuffer next;
 
 
@@ -44,13 +46,17 @@ public class Http2OutputBuffer implements HttpOutputBuffer {
     }
 
 
-    public Http2OutputBuffer(StreamOutputBuffer streamOutputBuffer) {
+    public Http2OutputBuffer(Response coyoteResponse, StreamOutputBuffer streamOutputBuffer) {
+        this.coyoteResponse = coyoteResponse;
         this.next = streamOutputBuffer;
     }
 
 
     @Override
     public int doWrite(ByteBuffer chunk) throws IOException {
+        if (!coyoteResponse.isCommitted()) {
+            coyoteResponse.sendHeaders();
+        }
         return next.doWrite(chunk);
     }
 

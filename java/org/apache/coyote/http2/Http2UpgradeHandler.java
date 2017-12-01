@@ -96,6 +96,7 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     private final String connectionId;
 
+    private final Http2Protocol protocol;
     private final Adapter adapter;
     private volatile SocketWrapperBase<?> socketWrapper;
     private volatile SSLSupport sslSupport;
@@ -152,7 +153,12 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     public Http2UpgradeHandler(Adapter adapter, Request coyoteRequest) {
+        this(null, adapter, coyoteRequest);
+    }
+
+    public Http2UpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest) {
         super (STREAM_ID_ZERO);
+        this.protocol = protocol;
         this.adapter = adapter;
         this.connectionId = Integer.toString(connectionIdGenerator.getAndIncrement());
 
@@ -387,6 +393,11 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
     ConnectionSettingsLocal getLocalSettings() {
         return localSettings;
+    }
+
+
+    Http2Protocol getProtocol() {
+        return protocol;
     }
 
 
