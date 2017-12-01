@@ -134,7 +134,7 @@ class StreamProcessor extends AbstractProcessor {
 
     @Override
     protected final void finishResponse() throws IOException {
-        stream.getOutputBuffer().close();
+        stream.getOutputBuffer().end();
     }
 
 

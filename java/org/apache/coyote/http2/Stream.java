@@ -28,9 +28,9 @@ import java.util.Locale;
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.CloseNowException;
 import org.apache.coyote.InputBuffer;
-import org.apache.coyote.OutputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.Response;
+import org.apache.coyote.http11.HttpOutputBuffer;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -646,7 +646,7 @@ public class Stream extends AbstractStream implements HeaderEmitter {
     }
 
 
-    class StreamOutputBuffer implements OutputBuffer {
+    class StreamOutputBuffer implements HttpOutputBuffer {
 
         private final ByteBuffer buffer = ByteBuffer.allocate(8 * 1024);
         private volatile long written = 0;
@@ -787,7 +787,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
             return written;
         }
 
-        public void close() throws IOException {
+        @Override
+        public final void end() throws IOException {
             closed = true;
             flushData();
         }
@@ -802,6 +803,11 @@ public class Stream extends AbstractStream implements HeaderEmitter {
          */
         public boolean hasNoBody() {
             return ((written == 0) && closed);
+        }
+
+        @Override
+        public void flush() throws IOException {
+            flush(true);
         }
     }
 
