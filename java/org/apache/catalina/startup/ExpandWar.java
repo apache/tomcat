@@ -166,15 +166,22 @@ public class ExpandWar {
                     expand(input, expandedFile);
                     long lastModified = jarEntry.getTime();
                     if ((lastModified != -1) && (lastModified != 0)) {
-                        expandedFile.setLastModified(lastModified);
+                        if (!expandedFile.setLastModified(lastModified)) {
+                            throw new IOException(
+                                    sm.getString("expandWar.lastModifiedFailed", expandedFile));
+                        }
                     }
                 }
             }
 
             // Create the warTracker file and align the last modified time
             // with the last modified time of the WAR
-            warTracker.createNewFile();
-            warTracker.setLastModified(warLastModified);
+            if (!warTracker.createNewFile()) {
+                throw new IOException(sm.getString("expandWar.createFileFailed", warTracker));
+            }
+            if (!warTracker.setLastModified(warLastModified)) {
+                throw new IOException(sm.getString("expandWar.lastModifiedFailed", warTracker));
+            }
 
             success = true;
         } catch (IOException e) {

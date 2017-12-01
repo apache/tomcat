@@ -20,6 +20,7 @@ import java.beans.FeatureDescriptor;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import javax.el.ELContext;
 import javax.el.ELResolver;
@@ -97,7 +98,11 @@ public class StreamELResolverImpl extends ELResolver {
 
         @Override
         public Object next() {
-            return Array.get(base, index++);
+            try {
+                return Array.get(base, index++);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                throw new NoSuchElementException();
+            }
         }
 
         @Override

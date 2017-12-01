@@ -37,7 +37,7 @@ import org.apache.tomcat.util.buf.B2CConverter;
  * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
-public class URLEncoder implements Cloneable {
+public final class URLEncoder implements Cloneable {
 
     private static final char[] hexadecimal =
             {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
