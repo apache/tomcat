@@ -203,8 +203,12 @@ public class UpgradeServletInputStream extends ServletInputStream {
 
 
     final void onDataAvailable() {
-        if (listener == null) {
-            return;
+        try {
+            if (listener == null || !socketWrapper.isReadyForRead()) {
+                return;
+            }
+        } catch (IOException e) {
+            onError(e);
         }
         ready = Boolean.TRUE;
         ClassLoader oldCL = processor.getUpgradeToken().getContextBind().bind(false, null);
