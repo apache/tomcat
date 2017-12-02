@@ -140,7 +140,9 @@ public class StoreFileMover {
             configNew = new File(getBasename(), configFile + ".new");
         }
         if (!configNew.getParentFile().exists()) {
-            configNew.getParentFile().mkdirs();
+            if (!configNew.getParentFile().mkdirs()) {
+                throw new IllegalStateException("Cannot create directory " + configNew);
+            }
         }
         String sb = getTimeTag();
         configSave = new File(configFile + sb);
