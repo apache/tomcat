@@ -38,7 +38,7 @@ public class TestMembership {
         original.addMember(m2);
         original.addMember(m3);
 
-        Membership clone = (Membership) original.clone();
+        Membership clone = original.clone();
 
         Assert.assertFalse(original == clone);
         Assert.assertTrue(original.getClass() == clone.getClass());

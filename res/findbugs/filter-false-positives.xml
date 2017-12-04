@@ -438,6 +438,12 @@
     <Bug pattern="UG_SYNC_SET_UNSYNC_GET"/>
   </Match>
   <Match>
+    <!-- lock is in clone so this is safe -->
+    <Class name="org.apache.catalina.tribes.membership.Membership" />
+    <Method name="clone" />
+    <Bug pattern="ML_SYNC_ON_FIELD_TO_GUARD_CHANGING_THAT_FIELD" />
+  </Match>
+  <Match>
     <!-- Intentional in case thread is waiting -->
     <Class name="org.apache.catalina.tribes.transport.RxTaskPool"/>
     <Method name="returnWorker"/>
