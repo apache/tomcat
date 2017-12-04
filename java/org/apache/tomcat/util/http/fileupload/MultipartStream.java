@@ -87,6 +87,7 @@ public class MultipartStream {
      * {@link ProgressListener}.
      */
     public static class ProgressNotifier {
+
         /**
          * The listener to invoke.
          */
@@ -226,7 +227,7 @@ public class MultipartStream {
     private final byte[] boundary;
 
     /**
-     * The table for Knuth-Morris-Pratt search algorithm
+     * The table for Knuth-Morris-Pratt search algorithm.
      */
     private int[] boundaryTable;
 
@@ -302,7 +303,7 @@ public class MultipartStream {
         }
 
         this.input = input;
-        this.bufSize = Math.max(bufSize, boundaryLength*2);
+        this.bufSize = Math.max(bufSize, boundaryLength * 2);
         this.buffer = new byte[this.bufSize];
         this.notifier = pNotifier;
 
@@ -731,7 +732,6 @@ public class MultipartStream {
      * Thrown upon attempt of setting an invalid boundary token.
      */
     public static class IllegalBoundaryException extends IOException {
-
 
         /**
          * The UID to use when serializing this instance.

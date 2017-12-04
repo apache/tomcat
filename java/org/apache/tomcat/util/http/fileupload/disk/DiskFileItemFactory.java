@@ -77,6 +77,12 @@ public class DiskFileItemFactory implements FileItemFactory {
      */
     private int sizeThreshold = DEFAULT_SIZE_THRESHOLD;
 
+    /**
+     * Default content charset to be used when no explicit charset
+     * parameter is provided by the sender.
+     */
+    private String defaultCharset = DiskFileItem.DEFAULT_CHARSET;
+
     // ----------------------------------------------------------- Constructors
 
     /**
@@ -173,7 +179,27 @@ public class DiskFileItemFactory implements FileItemFactory {
     @Override
     public FileItem createItem(String fieldName, String contentType,
             boolean isFormField, String fileName) {
-        return new DiskFileItem(fieldName, contentType,
+        DiskFileItem result = new DiskFileItem(fieldName, contentType,
                 isFormField, fileName, sizeThreshold, repository);
+        result.setDefaultCharset(defaultCharset);
+        return result;
+    }
+
+    /**
+     * Returns the default charset for use when no explicit charset
+     * parameter is provided by the sender.
+     * @return the default charset
+     */
+    public String getDefaultCharset() {
+        return defaultCharset;
+    }
+
+    /**
+     * Sets the default charset for use when no explicit charset
+     * parameter is provided by the sender.
+     * @param pCharset the default charset
+     */
+    public void setDefaultCharset(String pCharset) {
+        defaultCharset = pCharset;
     }
 }
