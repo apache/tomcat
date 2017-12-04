@@ -124,7 +124,7 @@ public class PStmtKeyCPDS extends PStmtKey {
         buf.append(getResultSetType());
         buf.append(", resultSetConcurrency=");
         buf.append(getResultSetConcurrency());
-        buf.append(", statmentType=");
+        buf.append(", statementType=");
         buf.append(getStmtType());
         buf.append(", resultSetHoldability=");
         buf.append(_resultSetHoldability);

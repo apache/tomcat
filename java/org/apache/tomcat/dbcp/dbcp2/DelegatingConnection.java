@@ -35,6 +35,7 @@ import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Struct;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -633,7 +634,9 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace
         // DBCP-288. Not all the traced objects will be statements
         final List<AbandonedTrace> traces = getTrace();
         if(traces != null && traces.size() > 0) {
-            for (AbandonedTrace trace : traces) {
+            final Iterator<AbandonedTrace> traceIter = traces.iterator();
+            while (traceIter.hasNext()) {
+                final Object trace = traceIter.next();
                 if (trace instanceof Statement) {
                     ((Statement) trace).close();
                 } else if (trace instanceof ResultSet) {

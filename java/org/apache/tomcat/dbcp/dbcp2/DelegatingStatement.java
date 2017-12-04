@@ -81,7 +81,7 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
      * Hence this method will return the first
      * delegate that is not a {@code DelegatingStatement}
      * or {@code null} when no non-{@code DelegatingStatement}
-     * delegate can be found by transversing this chain.
+     * delegate can be found by traversing this chain.
      * <p>
      * This method is useful when you may have nested
      * {@code DelegatingStatement}s, and you want to make

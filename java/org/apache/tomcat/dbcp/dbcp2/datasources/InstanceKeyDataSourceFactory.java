@@ -20,6 +20,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -44,7 +45,9 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
 
     static synchronized String registerNewInstance(final InstanceKeyDataSource ds) {
         int max = 0;
-        for (String s : instanceMap.keySet()) {
+        final Iterator<String> i = instanceMap.keySet().iterator();
+        while (i.hasNext()) {
+            final String s = i.next();
             if (s != null) {
                 try {
                     max = Math.max(max, Integer.parseInt(s));
@@ -72,8 +75,10 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
      */
     public static void closeAll() throws Exception {
         //Get iterator to loop over all instances of this datasource.
-        for (Entry<String, InstanceKeyDataSource> stringInstanceKeyDataSourceEntry : instanceMap.entrySet()) {
-            stringInstanceKeyDataSourceEntry.getValue().close();
+        final Iterator<Entry<String,InstanceKeyDataSource>> instanceIterator =
+            instanceMap.entrySet().iterator();
+        while (instanceIterator.hasNext()) {
+            instanceIterator.next().getValue().close();
         }
         instanceMap.clear();
     }

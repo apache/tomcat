@@ -82,6 +82,10 @@
       <update>
         Update the internal fork of Commons Pool 2 to 2.4.3. (markt)
       </update>
+      <update>
+        Update the internal fork of Commons DBCP 2 to 8a71764 (2017-10-18) to
+        pick up some bug fixes and enhancements. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
