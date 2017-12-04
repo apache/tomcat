@@ -53,6 +53,9 @@
       <fix>
         Update the Java EE 8 XML schema to the released versions. (markt)
       </fix>
+      <fix>
+        Minor HTTP/2 push fixes. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

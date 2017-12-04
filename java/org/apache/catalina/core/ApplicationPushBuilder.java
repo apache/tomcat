@@ -98,7 +98,6 @@ public class ApplicationPushBuilder implements PushBuilder {
         headers.remove("if-range");
         headers.remove("range");
         headers.remove("expect");
-        headers.remove("authorization");
         headers.remove("referer");
         // Also remove the cookie header since it will be regenerated
         headers.remove("cookie");
@@ -108,7 +107,6 @@ public class ApplicationPushBuilder implements PushBuilder {
         if (request.getQueryString() != null) {
             referer.append('?');
             referer.append(request.getQueryString());
-
         }
         addHeader("referer", referer.toString());
 
@@ -184,7 +182,7 @@ public class ApplicationPushBuilder implements PushBuilder {
     @Override
     public PushBuilder method(String method) {
         String upperMethod = method.trim().toUpperCase();
-        if (DISALLOWED_METHODS.contains(upperMethod)) {
+        if (DISALLOWED_METHODS.contains(upperMethod) || upperMethod.length() == 0) {
             throw new IllegalArgumentException(
                     sm.getString("applicationPushBuilder.methodInvalid", upperMethod));
         }
