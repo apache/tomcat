@@ -19,6 +19,7 @@ package org.apache.tomcat.dbcp.pool2;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Timer;
@@ -190,7 +191,9 @@ public final class PoolUtils {
             throw new IllegalArgumentException("keys must not be null.");
         }
         final Map<K, TimerTask> tasks = new HashMap<>(keys.size());
-        for (K key : keys) {
+        final Iterator<K> iter = keys.iterator();
+        while (iter.hasNext()) {
+            final K key = iter.next();
             final TimerTask task = checkMinIdle(keyedPool, key, minIdle, period);
             tasks.put(key, task);
         }
@@ -280,8 +283,9 @@ public final class PoolUtils {
         if (keys == null) {
             throw new IllegalArgumentException("keys must not be null.");
         }
-        for (K key : keys) {
-            prefill(keyedPool, key, count);
+        final Iterator<K> iter = keys.iterator();
+        while (iter.hasNext()) {
+            prefill(keyedPool, iter.next(), count);
         }
     }
 
@@ -558,6 +562,8 @@ public final class PoolUtils {
      * Timer task that adds objects to the pool until the number of idle
      * instances reaches the configured minIdle. Note that this is not the same
      * as the pool's minIdle setting.
+     *
+     * @param <T> type of objects in the pool
      */
     private static final class ObjectPoolMinIdleTimerTask<T> extends TimerTask {
 
@@ -627,6 +633,9 @@ public final class PoolUtils {
      * Timer task that adds objects to the pool until the number of idle
      * instances for the given key reaches the configured minIdle. Note that
      * this is not the same as the pool's minIdle setting.
+     *
+     * @param <K> object pool key type
+     * @param <V> object pool value type
      */
     private static final class KeyedObjectPoolMinIdleTimerTask<K, V> extends
             TimerTask {
@@ -711,6 +720,8 @@ public final class PoolUtils {
      * another layer of synchronization will cause liveliness issues or a
      * deadlock.
      * </p>
+     *
+     * @param <T> type of objects in the pool
      */
     private static final class SynchronizedObjectPool<T> implements ObjectPool<T> {
 
@@ -884,6 +895,9 @@ public final class PoolUtils {
      * another layer of synchronization will cause liveliness issues or a
      * deadlock.
      * </p>
+     *
+     * @param <K> object pool key type
+     * @param <V> object pool value type
      */
     private static final class SynchronizedKeyedObjectPool<K, V> implements
             KeyedObjectPool<K, V> {
@@ -1099,6 +1113,8 @@ public final class PoolUtils {
      * provide proper synchronization such as the pools provided in the Commons
      * Pool library.
      * </p>
+     *
+     * @param <T> pooled object factory type
      */
     private static final class SynchronizedPooledObjectFactory<T> implements
             PooledObjectFactory<T> {
@@ -1212,6 +1228,9 @@ public final class PoolUtils {
      * provide proper synchronization such as the pools provided in the Commons
      * Pool library.
      * </p>
+     *
+     * @param <K> pooled object factory key type
+     * @param <V> pooled object factory key value
      */
     private static final class SynchronizedKeyedPooledObjectFactory<K, V>
             implements KeyedPooledObjectFactory<K, V> {
@@ -1395,6 +1414,8 @@ public final class PoolUtils {
      * Decorates an object pool, adding "eroding" behavior. Based on the
      * configured {@link #factor erosion factor}, objects returning to the pool
      * may be invalidated instead of being added to idle capacity.
+     *
+     * @param <T> type of objects in the pool
      */
     private static class ErodingObjectPool<T> implements ObjectPool<T> {
         /** Underlying object pool */
@@ -1536,6 +1557,9 @@ public final class PoolUtils {
      * Decorates a keyed object pool, adding "eroding" behavior. Based on the
      * configured erosion factor, objects returning to the pool
      * may be invalidated instead of being added to idle capacity.
+     *
+     * @param <K> object pool key type
+     * @param <V> object pool value type
      */
     private static class ErodingKeyedObjectPool<K, V> implements
             KeyedObjectPool<K, V> {
@@ -1746,6 +1770,9 @@ public final class PoolUtils {
      * Extends ErodingKeyedObjectPool to allow erosion to take place on a
      * per-key basis. Timing of erosion events is tracked separately for
      * separate keyed pools.
+     *
+     * @param <K> object pool key type
+     * @param <V> object pool value type
      */
     private static final class ErodingPerKeyKeyedObjectPool<K, V> extends
             ErodingKeyedObjectPool<K, V> {

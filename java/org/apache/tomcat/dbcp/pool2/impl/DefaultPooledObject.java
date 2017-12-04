@@ -42,10 +42,8 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     private volatile long lastUseTime = createTime;
     private volatile long lastReturnTime = createTime;
     private volatile boolean logAbandoned = false;
-    private final CallStack borrowedBy = new ThrowableCallStack("'Pooled object created' " +
-        "yyyy-MM-dd HH:mm:ss Z 'by the following code has not been returned to the pool:'", true);
-    private final CallStack usedBy = new ThrowableCallStack("The last code to use this object was:",
-        false);
+    private volatile CallStack borrowedBy = NoOpCallStack.INSTANCE;
+    private volatile CallStack usedBy = NoOpCallStack.INSTANCE;
     private volatile long borrowedCount = 0;
 
     /**
@@ -276,4 +274,24 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
         this.logAbandoned = logAbandoned;
     }
 
-        }
+    /**
+     * Configures the stack trace generation strategy based on whether or not fully
+     * detailed stack traces are required. When set to false, abandoned logs may
+     * only include caller class information rather than method names, line numbers,
+     * and other normal metadata available in a full stack trace.
+     *
+     * @param requireFullStackTrace the new configuration setting for abandoned object
+     *                              logging
+     * @since 2.5
+     */
+    // TODO: uncomment below in 3.0
+    // @Override
+    public void setRequireFullStackTrace(final boolean requireFullStackTrace) {
+        borrowedBy = CallStackUtils.newCallStack("'Pooled object created' " +
+            "yyyy-MM-dd HH:mm:ss Z 'by the following code has not been returned to the pool:'",
+            true, requireFullStackTrace);
+        usedBy = CallStackUtils.newCallStack("The last code to use this object was:",
+            false, requireFullStackTrace);
+    }
+
+}

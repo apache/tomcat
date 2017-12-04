@@ -48,7 +48,7 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
     long getCreateTime();
 
     /**
-     * Obtain the time in milliseconds that this object last spent in the the
+     * Obtain the time in milliseconds that this object last spent in the
      * active state (it may still be active in which case subsequent calls will
      * return an increased value).
      *
@@ -57,7 +57,7 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
     long getActiveTimeMillis();
 
     /**
-     * Obtain the time in milliseconds that this object last spend in the the
+     * Obtain the time in milliseconds that this object last spend in the
      * idle state (it may still be idle in which case subsequent calls will
      * return an increased value).
      *
@@ -166,6 +166,18 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
      *                          object tracking
      */
     void setLogAbandoned(boolean logAbandoned);
+
+// TODO: uncomment in 3.0 (API compatibility)
+//    /**
+//     * Configures the stack trace generation strategy based on whether or not fully
+//     * detailed stack traces are required. When set to false, abandoned logs may
+//     * only include caller class information rather than method names, line numbers,
+//     * and other normal metadata available in a full stack trace.
+//     *
+//     * @param requireFullStackTrace the new configuration setting for abandoned object
+//     *                              logging
+//     */
+//    void setRequireFullStackTrace(boolean requireFullStackTrace);
 
     /**
      * Record the current stack trace as the last time the object was used.

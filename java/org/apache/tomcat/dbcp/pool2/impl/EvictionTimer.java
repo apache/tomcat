@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
  * Provides a shared idle object eviction timer for all pools. This class is
  * currently implemented using {@link ScheduledThreadPoolExecutor}. This
  * implementation may change in any future release. This class keeps track of
- * how many pools are using it. If no pools are using the timer, it is canceled.
+ * how many pools are using it. If no pools are using the timer, it is cancelled.
  * This prevents a thread being left running which, in application server
  * environments, can lead to memory leads and/or prevent applications from
  * shutting down or reloading cleanly.
@@ -76,10 +76,10 @@ class EvictionTimer {
     static synchronized void schedule(final Runnable task, final long delay, final long period) {
         if (null == executor) {
             executor = new ScheduledThreadPoolExecutor(1, new EvictorThreadFactory());
-            }
+        }
         usageCount++;
         executor.scheduleWithFixedDelay(task, delay, period, TimeUnit.MILLISECONDS);
-        }
+    }
 
     /**
      * Remove the specified eviction task from the timer.
@@ -90,22 +90,25 @@ class EvictionTimer {
      *                  terminate?
      * @param unit      The units for the specified timeout
      */
-    static synchronized void cancel(final TimerTask task, long timeout, TimeUnit unit) {
+    static synchronized void cancel(final TimerTask task, final long timeout, final TimeUnit unit) {
         task.cancel();
         usageCount--;
         if (usageCount == 0) {
             executor.shutdown();
             try {
                 executor.awaitTermination(timeout, unit);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 // Swallow
                 // Significant API changes would be required to propagate this
-        }
+            }
             executor.setCorePoolSize(0);
             executor = null;
-    }
+        }
     }
 
+    /**
+     * Thread factory that creates a thread, with the context classloader from this class.
+     */
     private static class EvictorThreadFactory implements ThreadFactory {
 
         @Override
@@ -113,14 +116,14 @@ class EvictionTimer {
             final Thread t = new Thread(null, r, "commons-pool-evictor-thread");
 
             AccessController.doPrivileged(new PrivilegedAction<Void>() {
-        @Override
-        public Void run() {
+                @Override
+                public Void run() {
                     t.setContextClassLoader(EvictorThreadFactory.class.getClassLoader());
-            return null;
-        }
+                    return null;
+                }
             });
 
             return t;
         }
     }
-        }
+}

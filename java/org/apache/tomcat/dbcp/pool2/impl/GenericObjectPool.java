@@ -18,7 +18,7 @@ package org.apache.tomcat.dbcp.pool2.impl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -140,7 +140,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * is set too low on heavily loaded systems it is possible you will see
      * objects being destroyed and almost immediately new objects being created.
      * This is a result of the active threads momentarily returning objects
-     * faster than they are requesting them them, causing the number of idle
+     * faster than they are requesting them, causing the number of idle
      * objects to rise above maxIdle. The best value for maxIdle for heavily
      * loaded system will vary but the default is a good starting point.
      *
@@ -159,7 +159,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * is set too low on heavily loaded systems it is possible you will see
      * objects being destroyed and almost immediately new objects being created.
      * This is a result of the active threads momentarily returning objects
-     * faster than they are requesting them them, causing the number of idle
+     * faster than they are requesting them, causing the number of idle
      * objects to rise above maxIdle. The best value for maxIdle for heavily
      * loaded system will vary but the default is a good starting point.
      *
@@ -336,6 +336,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
             this.abandonedConfig.setRemoveAbandonedOnMaintenance(abandonedConfig.getRemoveAbandonedOnMaintenance());
             this.abandonedConfig.setRemoveAbandonedTimeout(abandonedConfig.getRemoveAbandonedTimeout());
             this.abandonedConfig.setUseUsageTracking(abandonedConfig.getUseUsageTracking());
+            this.abandonedConfig.setRequireFullStackTrace(abandonedConfig.getRequireFullStackTrace());
         }
     }
 
@@ -759,16 +760,16 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                         continue;
                     }
 
-                    // User provided eviction policy could throw all sorts of crazy
-                    // exceptions. Protect against such an exception killing the
-                    // eviction thread.
+                    // User provided eviction policy could throw all sorts of
+                    // crazy exceptions. Protect against such an exception
+                    // killing the eviction thread.
                     boolean evict;
                     try {
                         evict = evictionPolicy.evict(evictionConfig, underTest,
                                 idleObjects.size());
                     } catch (final Throwable t) {
-                        // Slightly convoluted as SwallowedExceptionListener uses
-                        // Exception rather than Throwable
+                        // Slightly convoluted as SwallowedExceptionListener
+                        // uses Exception rather than Throwable
                         PoolUtils.checkRethrow(t);
                         swallowException(new Exception(t));
                         // Don't evict on error conditions
@@ -887,7 +888,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         final PooledObject<T> p;
         try {
             p = factory.makeObject();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             createCount.decrementAndGet();
             throw e;
         } finally {
@@ -900,6 +901,10 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         final AbandonedConfig ac = this.abandonedConfig;
         if (ac != null && ac.getLogAbandoned()) {
             p.setLogAbandoned(true);
+            // TODO: in 3.0, this can use the method defined on PooledObject
+            if (p instanceof DefaultPooledObject<?>) {
+                ((DefaultPooledObject<T>) p).setRequireFullStackTrace(ac.getRequireFullStackTrace());
+            }
         }
 
         createdCount.incrementAndGet();
@@ -1034,8 +1039,10 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         final long now = System.currentTimeMillis();
         final long timeout =
                 now - (ac.getRemoveAbandonedTimeout() * 1000L);
-        final List<PooledObject<T>> remove = new ArrayList<>();
-        for (PooledObject<T> pooledObject : allObjects.values()) {
+        final ArrayList<PooledObject<T>> remove = new ArrayList<>();
+        final Iterator<PooledObject<T>> it = allObjects.values().iterator();
+        while (it.hasNext()) {
+            final PooledObject<T> pooledObject = it.next();
             synchronized (pooledObject) {
                 if (pooledObject.getState() == PooledObjectState.ALLOCATED &&
                         pooledObject.getLastUsedTime() <= timeout) {
@@ -1046,7 +1053,9 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         }
 
         // Now remove the abandoned objects
-        for (PooledObject<T> pooledObject : remove) {
+        final Iterator<PooledObject<T>> itr = remove.iterator();
+        while (itr.hasNext()) {
+            final PooledObject<T> pooledObject = itr.next();
             if (ac.getLogAbandoned()) {
                 pooledObject.printStackTrace(ac.getLogWriter());
             }
@@ -1191,4 +1200,5 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         builder.append(", abandonedConfig=");
         builder.append(abandonedConfig);
     }
+
 }

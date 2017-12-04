@@ -76,6 +76,9 @@
         Add missing SHA-512 hash for release artifacts to the build script.
         (markt)
       </fix>
+      <update>
+        Update the internal fork of Commons Pool 2 to 2.4.3. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

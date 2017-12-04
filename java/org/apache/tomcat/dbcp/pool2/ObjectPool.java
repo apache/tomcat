@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.dbcp.pool2;
 
+import java.io.Closeable;
 import java.util.NoSuchElementException;
 
 /**
@@ -54,7 +55,7 @@ import java.util.NoSuchElementException;
  *
  * @since 2.0
  */
-public interface ObjectPool<T> {
+public interface ObjectPool<T> extends Closeable {
     /**
      * Obtains an instance from this pool.
      * <p>
@@ -172,5 +173,6 @@ public interface ObjectPool<T> {
      * <p>
      * Implementations should silently fail if not all resources can be freed.
      */
+    @Override
     void close();
 }

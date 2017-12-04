@@ -35,13 +35,15 @@ BCEL
 org.apache.tomcat.util.bcel is copied from:
 /commons/proper/bcel/trunk/src/main/java/org/apache/bcel
 
-DBCP
+DBCP (inc. Pool2)
 org.apache.tomcat.dbcp.dbcp2 is copied from:
 /commons/proper/dbcp/trunk/src/main/java/org/apache/commons/dbcp2
 and
 /commons/proper/dbcp/trunk/src/main/resources/org/apache/commons/dbcp2
-org.apache.tomcat.dbcp.pool2 is copied from:
-/commons/proper/pool/trunk/src/main/java/org/apache/commons/pool2
+
+Pool2 used to be hosted in svn. All changes up to the point where Pool2 was
+migrated to git have been merged.
+
 
 FileUpload
 This used to be hosted in svn. All changes up to the point where FileUpload was
@@ -70,3 +72,9 @@ The SHA1 ID for the most recent commit to be merged to Tomcat is:
 
 Note: Tomcat's copy of fileupload also includes classes copied manually (rather
       than svn copied) from Commons IO.
+
+Pool2
+Sub-tree
+src/main/java/org/apache/commons/pool2
+The SHA1 ID for the most recent commit to be merged to Tomcat is:
+191a391166a8565718ef685531afa3fa44afd69c
