@@ -68,6 +68,15 @@ public abstract class BaseObjectPoolConfig extends BaseObject implements Cloneab
     public static final long DEFAULT_SOFT_MIN_EVICTABLE_IDLE_TIME_MILLIS = -1;
 
     /**
+     * The default value for {@code evictorShutdownTimeoutMillis} configuration
+     * attribute.
+     * @see GenericObjectPool#getEvictorShutdownTimeoutMillis()
+     * @see GenericKeyedObjectPool#getEvictorShutdownTimeoutMillis()
+     */
+    public static final long DEFAULT_EVICTOR_SHUTDOWN_TIMEOUT_MILLIS =
+            10L * 1000L;
+
+    /**
      * The default value for the {@code numTestsPerEvictionRun} configuration
      * attribute.
      * @see GenericObjectPool#getNumTestsPerEvictionRun()
@@ -163,8 +172,11 @@ public abstract class BaseObjectPoolConfig extends BaseObject implements Cloneab
     private long minEvictableIdleTimeMillis =
         DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS;
 
+    private long evictorShutdownTimeoutMillis =
+            DEFAULT_EVICTOR_SHUTDOWN_TIMEOUT_MILLIS;
+
     private long softMinEvictableIdleTimeMillis =
-            DEFAULT_MIN_EVICTABLE_IDLE_TIME_MILLIS;
+            DEFAULT_SOFT_MIN_EVICTABLE_IDLE_TIME_MILLIS;
 
     private int numTestsPerEvictionRun =
         DEFAULT_NUM_TESTS_PER_EVICTION_RUN;
@@ -362,6 +374,36 @@ public abstract class BaseObjectPoolConfig extends BaseObject implements Cloneab
      */
     public void setNumTestsPerEvictionRun(final int numTestsPerEvictionRun) {
         this.numTestsPerEvictionRun = numTestsPerEvictionRun;
+    }
+
+    /**
+     * Get the value for the {@code evictorShutdownTimeoutMillis} configuration
+     * attribute for pools created with this configuration instance.
+     *
+     * @return  The current setting of {@code evictorShutdownTimeoutMillis} for
+     *          this configuration instance
+     *
+     * @see GenericObjectPool#getEvictorShutdownTimeoutMillis()
+     * @see GenericKeyedObjectPool#getEvictorShutdownTimeoutMillis()
+     */
+    public long getEvictorShutdownTimeoutMillis() {
+        return evictorShutdownTimeoutMillis;
+    }
+
+    /**
+     * Set the value for the {@code evictorShutdownTimeoutMillis} configuration
+     * attribute for pools created with this configuration instance.
+     *
+     * @param evictorShutdownTimeoutMillis The new setting of
+     *        {@code evictorShutdownTimeoutMillis} for this configuration
+     *        instance
+     *
+     * @see GenericObjectPool#getEvictorShutdownTimeoutMillis()
+     * @see GenericKeyedObjectPool#getEvictorShutdownTimeoutMillis()
+     */
+    public void setEvictorShutdownTimeoutMillis(
+            final long evictorShutdownTimeoutMillis) {
+        this.evictorShutdownTimeoutMillis = evictorShutdownTimeoutMillis;
     }
 
     /**

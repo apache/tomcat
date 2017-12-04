@@ -252,6 +252,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
         setTimeBetweenEvictionRunsMillis(
                 conf.getTimeBetweenEvictionRunsMillis());
         setEvictionPolicyClassName(conf.getEvictionPolicyClassName());
+        setEvictorShutdownTimeoutMillis(conf.getEvictorShutdownTimeoutMillis());
     }
 
     /**
@@ -1205,7 +1206,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
      */
     private void ensureMinIdle(final K key) throws Exception {
         // Calculate current pool objects
-        final ObjectDeque<T> objectDeque = poolMap.get(key);
+        ObjectDeque<T> objectDeque = poolMap.get(key);
 
         // objectDeque == null is OK here. It is handled correctly by both
         // methods called below.
@@ -1219,7 +1220,13 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
 
         for (int i = 0; i < deficit && calculateDeficit(objectDeque) > 0; i++) {
             addObject(key);
+            // If objectDeque was null, it won't be any more. Obtain a reference
+            // to it so the deficit can be correctly calculated. It needs to
+            // take account of objects created in other threads.
+            if (objectDeque == null) {
+                objectDeque = poolMap.get(key);
         }
+    }
     }
 
     /**
