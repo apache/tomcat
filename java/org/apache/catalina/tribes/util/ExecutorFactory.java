@@ -92,8 +92,11 @@ public class ExecutorFactory {
         }
 
         public boolean force(Runnable o) {
-            if ( parent.isShutdown() ) throw new RejectedExecutionException(sm.getString("executorFactory.not.running"));
-            return super.offer(o); //forces the item onto the queue, to be used if the task is rejected
+            if (parent != null && parent.isShutdown()) {
+                throw new RejectedExecutionException(sm.getString("executorFactory.not.running"));
+            }
+            // Forces the item onto the queue, to be used if the task is rejected
+            return super.offer(o);
         }
 
         @Override
