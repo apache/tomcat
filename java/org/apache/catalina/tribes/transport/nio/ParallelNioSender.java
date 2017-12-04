@@ -116,7 +116,11 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                 throw cx;
             }
         } catch (Exception x ) {
-            try { this.disconnect(); } catch (Exception e) {/*Ignore*/}
+            try {
+                this.disconnect();
+            } catch (Exception e) {
+                // Ignore
+            }
             if ( x instanceof ChannelException ) throw (ChannelException)x;
             else throw new ChannelException(x);
         }
@@ -320,7 +324,11 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
     @Override
     public synchronized void disconnect() {
         setConnected(false);
-        try {close(); }catch (Exception x){/*Ignore*/}
+        try {
+            close();
+        } catch (Exception x) {
+            // Ignore
+        }
     }
 
     @Override
