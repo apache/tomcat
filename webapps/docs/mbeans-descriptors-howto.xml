@@ -52,6 +52,11 @@ in order to avoid a "ManagedBean is not found" exception.</p>
 a mbeans-descriptors.xml file, located in the same package as the class files
 it describes.</p>
 
+<p>The permitted syntax for the mbeans-descriptors.xml is defined by
+the <a href="mbeans-descriptors.dtd">DTD</a> file.</p>
+
+<p>The entries for a custom LDAP authentication Realm may look like this:</p>
+
 <source><![CDATA[  <mbean         name="LDAPRealm"
             className="org.apache.catalina.mbeans.ClassNameMBean"
           description="Custom LDAPRealm"
