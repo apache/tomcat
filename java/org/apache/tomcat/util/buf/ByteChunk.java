@@ -134,8 +134,9 @@ public final class ByteChunk implements Cloneable, Serializable {
     // How much can it grow, when data is added
     private int limit=-1;
 
-    private ByteInputChannel in = null;
-    private ByteOutputChannel out = null;
+    // transient as serialization is primarily for values via, e.g. JMX
+    private transient ByteInputChannel in = null;
+    private transient ByteOutputChannel out = null;
 
     /**
      * Creates a new, uninitialized ByteChunk object.
