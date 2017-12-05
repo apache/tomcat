@@ -896,6 +896,8 @@
     <copy tofile="${tomcat.build}/webapps/docs/RELEASE-NOTES.txt" file="RELEASE-NOTES" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
     </copy>
+    <copy tofile="${tomcat.build}/webapps/docs/mbeans-descriptors.dtd"
+            file="java/org/apache/tomcat/util/modeler/mbeans-descriptors.dtd" />
 
     <copy   tofile="${tomcat.build}/webapps/docs/appdev/sample/build.xml"
               file="webapps/docs/appdev/build.xml.txt"/>
