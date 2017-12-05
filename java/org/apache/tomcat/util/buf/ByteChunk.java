@@ -17,6 +17,8 @@
 package org.apache.tomcat.util.buf;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -127,7 +129,7 @@ public final class ByteChunk implements Cloneable, Serializable {
     private int start=0;
     private int end;
 
-    private Charset charset;
+    private transient Charset charset;
 
     private boolean isSet=false; // XXX
 
@@ -148,6 +150,19 @@ public final class ByteChunk implements Cloneable, Serializable {
     public ByteChunk( int initial ) {
         allocate( initial, -1 );
     }
+
+
+    private void writeObject(ObjectOutputStream oos) throws IOException {
+        oos.defaultWriteObject();
+        oos.writeUTF(getCharset().name());
+    }
+
+
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        this.charset = Charset.forName(ois.readUTF());
+    }
+
 
     @Override
     public Object clone() throws CloneNotSupportedException {
@@ -798,6 +813,7 @@ public final class ByteChunk implements Cloneable, Serializable {
         int ret = indexOf(buff, start + starting, end, c);
         return (ret >= start) ? ret - start : -1;
     }
+
 
     /**
      * Returns the first instance of the given character in the given byte array

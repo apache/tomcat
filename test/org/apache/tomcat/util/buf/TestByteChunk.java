@@ -16,7 +16,12 @@
  */
 package org.apache.tomcat.util.buf;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.junit.Assert;
@@ -132,5 +137,27 @@ public class TestByteChunk {
         Assert.assertEquals(1, ByteChunk.findBytes(bytes, 0, len, new byte[] { 'o',
                 'e' }));
         Assert.assertEquals(-1, ByteChunk.findBytes(bytes, 2, 5, new byte[] { 'w' }));
+    }
+
+    @Test
+    public void testSerialization() throws Exception {
+        String data = "Hello world!";
+        byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
+
+        ByteChunk bcIn = new ByteChunk();
+        bcIn.setBytes(bytes, 0, bytes.length);
+        bcIn.setCharset(StandardCharsets.UTF_8);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(bcIn);
+        oos.close();
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        ByteChunk bcOut = (ByteChunk) ois.readObject();
+
+        Assert.assertArrayEquals(bytes, bcOut.getBytes());
+        Assert.assertEquals(bcIn.getCharset(), bcOut.getCharset());
     }
 }
