@@ -38,6 +38,33 @@
 <p>Tomcat uses JMX MBeans as the technology for implementing
 manageability of Tomcat.</p>
 
+<p> The "mbean" element describes a particular JMX ModelMBean implementation,
+     including the information necessary to construct the corresponding
+     ModelMBeanInfo structures.  The following attributes are supported:
+  <ul>
+    <li><code>className</code>: Fully qualified Java class name of the
+        ModelMBean implementation class. If not specified, the standard
+        implementation provided by JMX will be utilized.
+    </li>
+    <li><code>description</code>: Human-readable description of this managed
+        bean.
+    </li>
+    <li><code>domain</code>: The JMX MBeanServer domain in which the ModelMBean
+        created by this managed bean should be registered, when creating its
+        ObjectName.
+    </li>
+    <li><code>group</code>: Optional name of a "grouping classification" that
+        can be used to select groups of similar MBean implementation classes.
+    </li>
+    <li><code>name</code>: Unique name of this MBean (normally corresponds to
+        the base class name of the corresponding server component).
+    </li>
+    <li><code>type</code>: Fully qualified Java class name of the underlying
+        managed resource implementation class.
+    </li>
+  </ul>
+</p>
+
 <p>The descriptions of JMX MBeans for Catalina are in the mbeans-descriptors.xml
 file in each package.</p>
 
