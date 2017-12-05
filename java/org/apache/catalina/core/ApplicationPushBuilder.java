@@ -70,6 +70,7 @@ public class ApplicationPushBuilder implements PushBuilder {
     private String path;
     private String queryString;
     private String sessionId;
+    private String userName;
 
 
     public ApplicationPushBuilder(Request catalinaRequest, HttpServletRequest request) {
@@ -154,6 +155,12 @@ public class ApplicationPushBuilder implements PushBuilder {
             } else {
                 cookies.add(new Cookie(responseCookie.getName(), responseCookie.getValue()));
             }
+        }
+
+        // Authentication
+        if (catalinaRequest.getPrincipal() != null) {
+            userName = catalinaRequest.getPrincipal().getName();
+            setHeader("authorization", "x-push");
         }
     }
 
@@ -344,8 +351,15 @@ public class ApplicationPushBuilder implements PushBuilder {
         }
 
         // Cookies
-        setHeader("cookie", generateCookieHeader(cookies,
+        pushTarget.getMimeHeaders().addValue("cookie")
+            .setString(generateCookieHeader(cookies,
                 catalinaRequest.getContext().getCookieProcessor()));
+
+        // Authorization
+        if (userName != null) {
+            pushTarget.getRemoteUser().setString(userName);
+            pushTarget.setRemoteUserNeedsAuthorization(true);
+        }
 
         coyoteRequest.action(ActionCode.PUSH_REQUEST, pushTarget);
 
