@@ -444,6 +444,15 @@
     <Bug pattern="ML_SYNC_ON_FIELD_TO_GUARD_CHANGING_THAT_FIELD" />
   </Match>
   <Match>
+    <!--  Fields are always recalculated on access -->
+    <Class name="org.apache.catalina.tribes.tipis.AbstractReplicatedMap$MapMessage" />
+    <Or>
+      <Field name="key" />
+      <Field name="value" />
+    </Or>
+    <Bug pattern="SE_TRANSIENT_FIELD_NOT_RESTORED" />
+  </Match>
+  <Match>
     <!-- Intentional in case thread is waiting -->
     <Class name="org.apache.catalina.tribes.transport.RxTaskPool"/>
     <Method name="returnWorker"/>
