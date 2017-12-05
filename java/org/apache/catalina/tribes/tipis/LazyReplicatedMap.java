@@ -66,7 +66,8 @@ import org.apache.juli.logging.LogFactory;
  */
 public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
     private static final long serialVersionUID = 1L;
-    private final Log log = LogFactory.getLog(LazyReplicatedMap.class);
+    // Lazy init to support serialization
+    private transient volatile Log log;
 
 
 //------------------------------------------------------------------------------
@@ -148,6 +149,7 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
      */
     @Override
     protected Member[] publishEntryInfo(Object key, Object value) throws ChannelException {
+        Log log = getLog();
         if  (! (key instanceof Serializable && value instanceof Serializable)  ) return new Member[0];
         Member[] members = getMapMembers();
         int firstIdx = getNextBackupIndex();
@@ -208,4 +210,14 @@ public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
     }
 
 
+    private Log getLog() {
+        if (log == null) {
+            synchronized (this) {
+                if (log == null) {
+                    log = LogFactory.getLog(LazyReplicatedMap.class);
+                }
+            }
+        }
+        return log;
+    }
 }

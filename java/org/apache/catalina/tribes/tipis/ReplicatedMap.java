@@ -57,7 +57,8 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
 
     private static final long serialVersionUID = 1L;
 
-    private final Log log = LogFactory.getLog(ReplicatedMap.class);
+    // Lazy init to support serialization
+    private transient volatile Log log;
 
     //--------------------------------------------------------------------------
     //              CONSTRUCTORS / DESTRUCTORS
@@ -164,8 +165,8 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                 if (backup.length == 0) {
                     throw e;
                 } else {
-                    if (log.isWarnEnabled()) {
-                        log.warn(sm.getString("replicatedMap.unableReplicate.completely", key,
+                    if (getLog().isWarnEnabled()) {
+                        getLog().warn(sm.getString("replicatedMap.unableReplicate.completely", key,
                                 Arrays.toString(backup), Arrays.toString(realFaultyMembers)), e);
                     }
                 }
@@ -177,6 +178,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
     @Override
     public void memberDisappeared(Member member) {
         boolean removed = false;
+        Log log = getLog();
         synchronized (mapMembers) {
             removed = (mapMembers.remove(member) != null );
             if (!removed) {
@@ -259,5 +261,17 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
                 }
             }
         }
+    }
+
+
+    private Log getLog() {
+        if (log == null) {
+            synchronized (this) {
+                if (log == null) {
+                    log = LogFactory.getLog(ReplicatedMap.class);
+                }
+            }
+        }
+        return log;
     }
 }

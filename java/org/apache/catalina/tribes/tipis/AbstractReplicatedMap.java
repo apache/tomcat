@@ -1555,11 +1555,13 @@ public abstract class AbstractReplicatedMap<K,V>
          * @return Object
          */
         @Override
-        public Object clone() {
-            MapMessage msg = new MapMessage(this.mapId, this.msgtype, this.diff, this.key, this.value, this.diffvalue, this.primary, this.nodes);
-            msg.keydata = this.keydata;
-            msg.valuedata = this.valuedata;
-            return msg;
+        public MapMessage clone() {
+            try {
+                return (MapMessage) super.clone();
+            } catch (CloneNotSupportedException e) {
+                // Not possible
+                throw new AssertionError();
+            }
         }
     } //MapMessage
 
