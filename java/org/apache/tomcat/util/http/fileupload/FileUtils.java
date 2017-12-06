@@ -38,6 +38,10 @@ import java.io.IOException;
  * <li>calculating a checksum
  * </ul>
  * <p>
+ * Note that a specific charset should be specified whenever possible.
+ * Relying on the platform default means that the code is Locale-dependent.
+ * Only use the default if the files are known to always use the platform default.
+ * <p>
  * Origin of code: Excalibur, Alexandria, Commons-Utils
  */
 public class FileUtils {
@@ -53,10 +57,11 @@ public class FileUtils {
     /**
      * Deletes a directory recursively.
      *
-     * @param directory  directory to delete
-     * @throws IOException in case deletion is unsuccessful
+     * @param directory directory to delete
+     * @throws IOException              in case deletion is unsuccessful
+     * @throws IllegalArgumentException if {@code directory} does not exist or is not a directory
      */
-    public static void deleteDirectory(File directory) throws IOException {
+    public static void deleteDirectory(final File directory) throws IOException {
         if (!directory.exists()) {
             return;
         }
@@ -66,8 +71,8 @@ public class FileUtils {
         }
 
         if (!directory.delete()) {
-            String message =
-                "Unable to delete directory " + directory + ".";
+            final String message =
+                    "Unable to delete directory " + directory + ".";
             throw new IOException(message);
         }
     }
@@ -76,20 +81,21 @@ public class FileUtils {
      * Cleans a directory without deleting it.
      *
      * @param directory directory to clean
-     * @throws IOException in case cleaning is unsuccessful
+     * @throws IOException              in case cleaning is unsuccessful
+     * @throws IllegalArgumentException if {@code directory} does not exist or is not a directory
      */
-    public static void cleanDirectory(File directory) throws IOException {
+    public static void cleanDirectory(final File directory) throws IOException {
         if (!directory.exists()) {
-            String message = directory + " does not exist";
+            final String message = directory + " does not exist";
             throw new IllegalArgumentException(message);
         }
 
         if (!directory.isDirectory()) {
-            String message = directory + " is not a directory";
+            final String message = directory + " is not a directory";
             throw new IllegalArgumentException(message);
         }
 
-        File[] files = directory.listFiles();
+        final File[] files = directory.listFiles();
         if (files == null) {  // null if security restricted
             throw new IOException("Failed to list contents of " + directory);
         }
@@ -116,25 +122,25 @@ public class FileUtils {
      * <ul>
      * <li>A directory to be deleted does not have to be empty.</li>
      * <li>You get exceptions when a file or directory cannot be deleted.
-     *      (java.io.File methods returns a boolean)</li>
+     * (java.io.File methods returns a boolean)</li>
      * </ul>
      *
-     * @param file  file or directory to delete, must not be {@code null}
-     * @throws NullPointerException if the directory is {@code null}
+     * @param file file or directory to delete, must not be {@code null}
+     * @throws NullPointerException  if the directory is {@code null}
      * @throws FileNotFoundException if the file was not found
-     * @throws IOException in case deletion is unsuccessful
+     * @throws IOException           in case deletion is unsuccessful
      */
-    public static void forceDelete(File file) throws IOException {
+    public static void forceDelete(final File file) throws IOException {
         if (file.isDirectory()) {
             deleteDirectory(file);
         } else {
-            boolean filePresent = file.exists();
+            final boolean filePresent = file.exists();
             if (!file.delete()) {
-                if (!filePresent){
+                if (!filePresent) {
                     throw new FileNotFoundException("File does not exist: " + file);
                 }
-                String message =
-                    "Unable to delete file: " + file;
+                final String message =
+                        "Unable to delete file: " + file;
                 throw new IOException(message);
             }
         }
@@ -144,11 +150,11 @@ public class FileUtils {
      * Schedules a file to be deleted when JVM exits.
      * If file is directory delete it and all sub-directories.
      *
-     * @param file  file or directory to delete, must not be {@code null}
+     * @param file file or directory to delete, must not be {@code null}
      * @throws NullPointerException if the file is {@code null}
-     * @throws IOException in case deletion is unsuccessful
+     * @throws IOException          in case deletion is unsuccessful
      */
-    public static void forceDeleteOnExit(File file) throws IOException {
+    public static void forceDeleteOnExit(final File file) throws IOException {
         if (file.isDirectory()) {
             deleteDirectoryOnExit(file);
         } else {
@@ -159,11 +165,11 @@ public class FileUtils {
     /**
      * Schedules a directory recursively for deletion on JVM exit.
      *
-     * @param directory  directory to delete, must not be {@code null}
+     * @param directory directory to delete, must not be {@code null}
      * @throws NullPointerException if the directory is {@code null}
-     * @throws IOException in case deletion is unsuccessful
+     * @throws IOException          in case deletion is unsuccessful
      */
-    private static void deleteDirectoryOnExit(File directory) throws IOException {
+    private static void deleteDirectoryOnExit(final File directory) throws IOException {
         if (!directory.exists()) {
             return;
         }
@@ -177,11 +183,11 @@ public class FileUtils {
     /**
      * Cleans a directory without deleting it.
      *
-     * @param directory  directory to clean, must not be {@code null}
+     * @param directory directory to clean, must not be {@code null}
      * @throws NullPointerException if the directory is {@code null}
-     * @throws IOException in case cleaning is unsuccessful
+     * @throws IOException          in case cleaning is unsuccessful
      */
-    private static void cleanDirectoryOnExit(File directory) throws IOException {
+    private static void cleanDirectoryOnExit(final File directory) throws IOException {
         if (!directory.exists()) {
             String message = directory + " does not exist";
             throw new IllegalArgumentException(message);
@@ -209,6 +215,57 @@ public class FileUtils {
         if (null != exception) {
             throw exception;
         }
+    }
+
+    /**
+     * Makes a directory, including any necessary but nonexistent parent
+     * directories. If a file already exists with specified name but it is
+     * not a directory then an IOException is thrown.
+     * If the directory cannot be created (or does not already exist)
+     * then an IOException is thrown.
+     *
+     * @param directory directory to create, must not be {@code null}
+     * @throws NullPointerException if the directory is {@code null}
+     * @throws IOException          if the directory cannot be created or the file already exists but is not a directory
+     */
+    public static void forceMkdir(final File directory) throws IOException {
+        if (directory.exists()) {
+            if (!directory.isDirectory()) {
+                final String message =
+                        "File "
+                                + directory
+                                + " exists and is "
+                                + "not a directory. Unable to create directory.";
+                throw new IOException(message);
+            }
+        } else {
+            if (!directory.mkdirs()) {
+                // Double-check that some other thread or process hasn't made
+                // the directory in the background
+                if (!directory.isDirectory()) {
+                    final String message =
+                            "Unable to create directory " + directory;
+                    throw new IOException(message);
+                }
+            }
+        }
+    }
+
+    /**
+     * Makes any necessary but nonexistent parent directories for a given File. If the parent directory cannot be
+     * created then an IOException is thrown.
+     *
+     * @param file file with parent to create, must not be {@code null}
+     * @throws NullPointerException if the file is {@code null}
+     * @throws IOException          if the parent directory cannot be created
+     * @since 2.5
+     */
+    public static void forceMkdirParent(final File file) throws IOException {
+        final File parent = file.getParentFile();
+        if (parent == null) {
+            return;
+        }
+        forceMkdir(parent);
     }
 
 
