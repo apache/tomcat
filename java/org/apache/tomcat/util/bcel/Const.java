@@ -44,86 +44,122 @@ public final class Const {
      */
     public static final short ACC_ANNOTATION   = 0x2000;
 
-    /** Marks a constant pool entry as type UTF-8.
+    /**
+     * Marks a constant pool entry as type UTF-8.
      * @see  <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.7">
-     * The Constant Pool in The Java Virtual Machine Specification</a> */
+     * The Constant Pool in The Java Virtual Machine Specification</a>
+     */
     public static final byte CONSTANT_Utf8           = 1;
 
-    /** Marks a constant pool entry as type Integer.
+    /**
+     * Marks a constant pool entry as type Integer.
      * @see  <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.4">
-     * The Constant Pool in The Java Virtual Machine Specification</a> */
+     * The Constant Pool in The Java Virtual Machine Specification</a>
+     */
     public static final byte CONSTANT_Integer        = 3;
 
-    /** Marks a constant pool entry as type Float.
+    /**
+     * Marks a constant pool entry as type Float.
      * @see  <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.4">
-     * The Constant Pool in The Java Virtual Machine Specification</a> */
+     * The Constant Pool in The Java Virtual Machine Specification</a>
+     */
     public static final byte CONSTANT_Float          = 4;
 
-    /** Marks a constant pool entry as type Long.
+    /**
+     * Marks a constant pool entry as type Long.
      * @see  <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.5">
-     * The Constant Pool in The Java Virtual Machine Specification</a> */
+     * The Constant Pool in The Java Virtual Machine Specification</a>
+     */
     public static final byte CONSTANT_Long           = 5;
 
-    /** Marks a constant pool entry as type Double.
+    /**
+     * Marks a constant pool entry as type Double.
      * @see  <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.5">
-     * The Constant Pool in The Java Virtual Machine Specification</a> */
+     * The Constant Pool in The Java Virtual Machine Specification</a>
+     */
     public static final byte CONSTANT_Double         = 6;
 
-    /** Marks a constant pool entry as a Class
+    /**
+     * Marks a constant pool entry as a Class
      * @see  <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.1">
-     * The Constant Pool in The Java Virtual Machine Specification</a> */
+     * The Constant Pool in The Java Virtual Machine Specification</a>
+     */
     public static final byte CONSTANT_Class          = 7;
 
-    /** Marks a constant pool entry as a Field Reference.
+    /**
+     * Marks a constant pool entry as a Field Reference.
      * @see  <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.2">
-     * The Constant Pool in The Java Virtual Machine Specification</a> */
+     * The Constant Pool in The Java Virtual Machine Specification</a>
+     */
     public static final byte CONSTANT_Fieldref         = 9;
 
-    /** Marks a constant pool entry as type String
+    /**
+     * Marks a constant pool entry as type String
      * @see  <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.3">
-     * The Constant Pool in The Java Virtual Machine Specification</a> */
+     * The Constant Pool in The Java Virtual Machine Specification</a>
+     */
     public static final byte CONSTANT_String         = 8;
 
-    /** Marks a constant pool entry as a Method Reference.
+    /**
+     * Marks a constant pool entry as a Method Reference.
      * @see  <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.2">
-     * The Constant Pool in The Java Virtual Machine Specification</a> */
+     * The Constant Pool in The Java Virtual Machine Specification</a>
+     */
     public static final byte CONSTANT_Methodref        = 10;
 
-    /** Marks a constant pool entry as an Interface Method Reference.
+    /**
+     * Marks a constant pool entry as an Interface Method Reference.
      * @see  <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.2">
-     * The Constant Pool in The Java Virtual Machine Specification</a> */
+     * The Constant Pool in The Java Virtual Machine Specification</a>
+     */
     public static final byte CONSTANT_InterfaceMethodref = 11;
 
-    /** Marks a constant pool entry as a name and type.
+    /**
+     * Marks a constant pool entry as a name and type.
      * @see  <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.6">
-     * The Constant Pool in The Java Virtual Machine Specification</a> */
+     * The Constant Pool in The Java Virtual Machine Specification</a>
+     */
     public static final byte CONSTANT_NameAndType      = 12;
 
-    /** Marks a constant pool entry as a Method Handle.
+    /**
+     * Marks a constant pool entry as a Method Handle.
      * @see  <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.8">
-     * The Constant Pool in The Java Virtual Machine Specification</a> */
+     * The Constant Pool in The Java Virtual Machine Specification</a>
+     */
     public static final byte CONSTANT_MethodHandle     = 15;
 
-    /** Marks a constant pool entry as a Method Type.
+    /**
+     * Marks a constant pool entry as a Method Type.
      * @see  <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.9">
-     * The Constant Pool in The Java Virtual Machine Specification</a> */
+     * The Constant Pool in The Java Virtual Machine Specification</a>
+     */
     public static final byte CONSTANT_MethodType       = 16;
 
-    /** Marks a constant pool entry as an Invoke Dynamic
+    /**
+     * Marks a constant pool entry as an Invoke Dynamic
      * @see  <a href="http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.4.10">
-     * The Constant Pool in The Java Virtual Machine Specification</a> */
+     * The Constant Pool in The Java Virtual Machine Specification</a>
+     */
     public static final byte CONSTANT_InvokeDynamic    = 18;
 
-    /** Marks a constant pool entry as a Module Reference.
-     * Note: Early access Java 9 support- currently subject to change.
+    /**
+     * Marks a constant pool entry as a Module Reference.
+     *
+     * <p>Note: Early access Java 9 support- currently subject to change</p>
+     *
      * @see <a href="http://cr.openjdk.java.net/~mr/jigsaw/spec/lang-vm.html#jigsaw-2.6">
-     * JPMS: Modules in the Java Language and JVM</a> */
+     * JPMS: Modules in the Java Language and JVM</a>
+     */
     public static final byte CONSTANT_Module             = 19;
 
-    /** Marks a constant pool entry as a Package Reference.
-     * Note: Early access Java 9 support- currently subject to change.
+    /**
+     * Marks a constant pool entry as a Package Reference.
+     *
+     * <p>Note: Early access Java 9 support- currently subject to change</p>
+     *
      * @see <a href="http://cr.openjdk.java.net/~mr/jigsaw/spec/lang-vm.html#jigsaw-2.6">
-     * JPMS: Modules in the Java Language and JVM</a> */
+     * JPMS: Modules in the Java Language and JVM</a>
+     */
     public static final byte CONSTANT_Package            = 20;
 
     /**
