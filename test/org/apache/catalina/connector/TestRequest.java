@@ -931,7 +931,7 @@ public class TestRequest extends TomcatBaseTest {
 
         tomcat.start();
 
-        byte[] body = "Test".getBytes();
+        byte[] body = "Test".getBytes(userAgentCharaceterEncoding);
         ByteChunk bc = new ByteChunk();
         Map<String,List<String>> reqHeaders = new HashMap<>();
         reqHeaders.put("Content-Type",

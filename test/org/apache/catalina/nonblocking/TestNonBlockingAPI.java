@@ -412,8 +412,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         final int max = 5;
         int count = 0;
         long delay = 0;
-        byte[] b = "WANTMORE".getBytes();
-        byte[] f = "FINISHED".getBytes();
+        byte[] b = "WANTMORE".getBytes(StandardCharsets.ISO_8859_1);
+        byte[] f = "FINISHED".getBytes(StandardCharsets.ISO_8859_1);
 
         public DataWriter(long delay) {
             this.delay = delay;

@@ -383,7 +383,6 @@ public class TestDigestAuthenticator extends TomcatBaseTest {
     }
 
     private static String digest(String input) {
-        return MD5Encoder.encode(
-                ConcurrentMessageDigest.digestMD5(input.getBytes()));
+        return MD5Encoder.encode(ConcurrentMessageDigest.digestMD5(input.getBytes()));
     }
 }

@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.authenticator;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -458,8 +459,8 @@ public class TestSSOnonLoginAndDigestAuthenticator extends TomcatBaseTest {
     }
 
     private static String digest(String input) {
-        return MD5Encoder.encode(
-                ConcurrentMessageDigest.digestMD5(input.getBytes()));
+        return MD5Encoder.encode(ConcurrentMessageDigest.digestMD5(
+                input.getBytes(StandardCharsets.UTF_8)));
     }
 
     /*

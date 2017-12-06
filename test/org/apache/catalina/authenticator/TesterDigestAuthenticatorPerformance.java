@@ -17,6 +17,7 @@
 package org.apache.catalina.authenticator;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.http.HttpServletResponse;
@@ -160,9 +161,9 @@ public class TesterDigestAuthenticatorPerformance {
         private static final String A2 = METHOD + ":" + CONTEXT_PATH + URI;
 
         private static final String MD5A1 = MD5Encoder.encode(
-                ConcurrentMessageDigest.digest("MD5", A1.getBytes()));
+                ConcurrentMessageDigest.digest("MD5", A1.getBytes(StandardCharsets.UTF_8)));
         private static final String MD5A2 = MD5Encoder.encode(
-                ConcurrentMessageDigest.digest("MD5", A2.getBytes()));
+                ConcurrentMessageDigest.digest("MD5", A2.getBytes(StandardCharsets.UTF_8)));
 
 
 
@@ -214,8 +215,8 @@ public class TesterDigestAuthenticatorPerformance {
             String response = MD5A1 + ":" + nonce + ":" + ncString + ":" +
                     cnonce + ":" + QOP + ":" + MD5A2;
 
-            String md5response = MD5Encoder.encode(
-                    ConcurrentMessageDigest.digest("MD5", response.getBytes()));
+            String md5response = MD5Encoder.encode(ConcurrentMessageDigest.digest(
+                    "MD5", response.getBytes(StandardCharsets.UTF_8)));
 
             StringBuilder auth = new StringBuilder();
             auth.append("Digest username=\"");

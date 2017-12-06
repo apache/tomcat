@@ -27,6 +27,7 @@ import java.io.Writer;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.SocketFactory;
@@ -159,8 +160,9 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
                 throw new IllegalArgumentException(ioe);
             }
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            Writer writer = new OutputStreamWriter(os);
+            BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            Writer writer = new OutputStreamWriter(os, StandardCharsets.UTF_8);
 
             this.writer = writer;
             this.reader = reader;

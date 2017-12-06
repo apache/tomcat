@@ -256,13 +256,7 @@ public class CompressionServletResponseWrapper
         if (debug > 1) {
             System.out.println("character encoding is " + charEnc);
         }
-        // HttpServletResponse.getCharacterEncoding() shouldn't return null
-        // according the spec, so feel free to remove that "if"
-        if (charEnc != null) {
-            writer = new PrintWriter(new OutputStreamWriter(stream, charEnc));
-        } else {
-            writer = new PrintWriter(stream);
-        }
+        writer = new PrintWriter(new OutputStreamWriter(stream, charEnc));
 
         return writer;
     }
