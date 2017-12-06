@@ -41,7 +41,7 @@ public interface DefaultPooledObjectInfoMBean {
     /**
      * Obtain the time that pooled object was created.
      *
-     * @return The creation time for the pooled object formated as
+     * @return The creation time for the pooled object formatted as
      *         <code>yyyy-MM-dd HH:mm:ss Z</code>
      */
     String getCreateTimeFormatted();

@@ -17,8 +17,6 @@
 package org.apache.tomcat.dbcp.pool2.impl;
 
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Deque;
 
 import org.apache.tomcat.dbcp.pool2.PooledObject;
@@ -44,8 +42,8 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     private volatile long lastUseTime = createTime;
     private volatile long lastReturnTime = createTime;
     private volatile boolean logAbandoned = false;
-    private volatile Exception borrowedBy = null;
-    private volatile Exception usedBy = null;
+    private volatile CallStack borrowedBy = NoOpCallStack.INSTANCE;
+    private volatile CallStack usedBy = NoOpCallStack.INSTANCE;
     private volatile long borrowedCount = 0;
 
     /**
@@ -191,7 +189,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
             lastUseTime = lastBorrowTime;
             borrowedCount++;
             if (logAbandoned) {
-                borrowedBy = new AbandonedObjectCreatedException();
+                borrowedBy.fillInStackTrace();
             }
             return true;
         } else if (state == PooledObjectState.EVICTION) {
@@ -216,7 +214,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
                 state == PooledObjectState.RETURNING) {
             state = PooledObjectState.IDLE;
             lastReturnTime = System.currentTimeMillis();
-            borrowedBy = null;
+            borrowedBy.clear();
             return true;
         }
 
@@ -234,22 +232,13 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     @Override
     public void use() {
         lastUseTime = System.currentTimeMillis();
-        usedBy = new Exception("The last code to use this object was:");
+        usedBy.fillInStackTrace();
     }
 
     @Override
     public void printStackTrace(final PrintWriter writer) {
-        boolean written = false;
-        final Exception borrowedByCopy = this.borrowedBy;
-        if (borrowedByCopy != null) {
-            borrowedByCopy.printStackTrace(writer);
-            written = true;
-        }
-        final Exception usedByCopy = this.usedBy;
-        if (usedByCopy != null) {
-            usedByCopy.printStackTrace(writer);
-            written = true;
-        }
+        boolean written = borrowedBy.printStackTrace(writer);
+        written |= usedBy.printStackTrace(writer);
         if (written) {
             writer.flush();
         }
@@ -286,41 +275,23 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
     }
 
     /**
-     * Used to track how an object was obtained from the pool (the stack trace
-     * of the exception will show which code borrowed the object) and when the
-     * object was borrowed.
+     * Configures the stack trace generation strategy based on whether or not fully
+     * detailed stack traces are required. When set to false, abandoned logs may
+     * only include caller class information rather than method names, line numbers,
+     * and other normal metadata available in a full stack trace.
+     *
+     * @param requireFullStackTrace the new configuration setting for abandoned object
+     *                              logging
+     * @since 2.5
      */
-    static class AbandonedObjectCreatedException extends Exception {
-
-        private static final long serialVersionUID = 7398692158058772916L;
-
-        /** Date format */
-        //@GuardedBy("format")
-        private static final SimpleDateFormat format = new SimpleDateFormat
-            ("'Pooled object created' yyyy-MM-dd HH:mm:ss Z " +
-             "'by the following code has not been returned to the pool:'");
-
-        private final long _createdTime;
-
-        /**
-         * Create a new instance.
-         * <p>
-         * @see Exception#Exception()
-         */
-        public AbandonedObjectCreatedException() {
-            super();
-            _createdTime = System.currentTimeMillis();
-        }
-
-        // Override getMessage to avoid creating objects and formatting
-        // dates unless the log message will actually be used.
-        @Override
-        public String getMessage() {
-            String msg;
-            synchronized(format) {
-                msg = format.format(new Date(_createdTime));
-            }
-            return msg;
-        }
+    // TODO: uncomment below in 3.0
+    // @Override
+    public void setRequireFullStackTrace(final boolean requireFullStackTrace) {
+        borrowedBy = CallStackUtils.newCallStack("'Pooled object created' " +
+            "yyyy-MM-dd HH:mm:ss Z 'by the following code has not been returned to the pool:'",
+            true, requireFullStackTrace);
+        usedBy = CallStackUtils.newCallStack("The last code to use this object was:",
+            false, requireFullStackTrace);
     }
+
 }

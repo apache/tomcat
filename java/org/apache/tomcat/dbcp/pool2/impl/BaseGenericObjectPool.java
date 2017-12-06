@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -85,6 +86,8 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     private volatile long softMinEvictableIdleTimeMillis =
             BaseObjectPoolConfig.DEFAULT_SOFT_MIN_EVICTABLE_IDLE_TIME_MILLIS;
     private volatile EvictionPolicy<T> evictionPolicy;
+    private volatile long evictorShutdownTimeoutMillis =
+            BaseObjectPoolConfig.DEFAULT_EVICTOR_SHUTDOWN_TIMEOUT_MILLIS;
 
 
     // Internal (primarily state) attributes
@@ -611,6 +614,9 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
                 final
                 EvictionPolicy<T> evicPolicy = (EvictionPolicy<T>) policy;
                 this.evictionPolicy = evicPolicy;
+            } else {
+                throw new IllegalArgumentException("[" + evictionPolicyClassName +
+                        "] does not implement EvictionPolicy");
             }
         } catch (final ClassNotFoundException e) {
             throw new IllegalArgumentException(
@@ -623,6 +629,31 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
         }
     }
 
+    /**
+     * Gets the timeout that will be used when waiting for the Evictor to
+     * shutdown if this pool is closed and it is the only pool still using the
+     * the value for the Evictor.
+     *
+     * @return  The timeout in milliseconds that will be used while waiting for
+     *          the Evictor to shut down.
+     */
+    public final long getEvictorShutdownTimeoutMillis() {
+        return evictorShutdownTimeoutMillis;
+    }
+
+    /**
+     * Sets the timeout that will be used when waiting for the Evictor to
+     * shutdown if this pool is closed and it is the only pool still using the
+     * the value for the Evictor.
+     *
+     * @param evictorShutdownTimeoutMillis  the timeout in milliseconds that
+     *                                      will be used while waiting for the
+     *                                      Evictor to shut down.
+     */
+    public final void setEvictorShutdownTimeoutMillis(
+            final long evictorShutdownTimeoutMillis) {
+        this.evictorShutdownTimeoutMillis = evictorShutdownTimeoutMillis;
+    }
 
     /**
      * Closes the pool, destroys the remaining idle objects and, if registered
@@ -683,7 +714,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject {
     final void startEvictor(final long delay) {
         synchronized (evictionLock) {
             if (null != evictor) {
-                EvictionTimer.cancel(evictor);
+                EvictionTimer.cancel(evictor, evictorShutdownTimeoutMillis, TimeUnit.MILLISECONDS);
                 evictor = null;
                 evictionIterator = null;
             }

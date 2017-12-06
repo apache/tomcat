@@ -88,7 +88,11 @@ class LinkedBlockingDeque<E> extends AbstractQueue<E>
 
     private static final long serialVersionUID = -387911632671998426L;
 
-    /** Doubly-linked list node class */
+    /**
+     * Doubly-linked list node class.
+     *
+     * @param <E> node item type
+     */
     private static final class Node<E> {
         /**
          * The item, or null if this node has been removed.

@@ -140,7 +140,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * is set too low on heavily loaded systems it is possible you will see
      * objects being destroyed and almost immediately new objects being created.
      * This is a result of the active threads momentarily returning objects
-     * faster than they are requesting them them, causing the number of idle
+     * faster than they are requesting them, causing the number of idle
      * objects to rise above maxIdle. The best value for maxIdle for heavily
      * loaded system will vary but the default is a good starting point.
      *
@@ -159,7 +159,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
      * is set too low on heavily loaded systems it is possible you will see
      * objects being destroyed and almost immediately new objects being created.
      * This is a result of the active threads momentarily returning objects
-     * faster than they are requesting them them, causing the number of idle
+     * faster than they are requesting them, causing the number of idle
      * objects to rise above maxIdle. The best value for maxIdle for heavily
      * loaded system will vary but the default is a good starting point.
      *
@@ -315,6 +315,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         setSoftMinEvictableIdleTimeMillis(
                 conf.getSoftMinEvictableIdleTimeMillis());
         setEvictionPolicyClassName(conf.getEvictionPolicyClassName());
+        setEvictorShutdownTimeoutMillis(conf.getEvictorShutdownTimeoutMillis());
     }
 
     /**
@@ -335,6 +336,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
             this.abandonedConfig.setRemoveAbandonedOnMaintenance(abandonedConfig.getRemoveAbandonedOnMaintenance());
             this.abandonedConfig.setRemoveAbandonedTimeout(abandonedConfig.getRemoveAbandonedTimeout());
             this.abandonedConfig.setUseUsageTracking(abandonedConfig.getUseUsageTracking());
+            this.abandonedConfig.setRequireFullStackTrace(abandonedConfig.getRequireFullStackTrace());
         }
     }
 
@@ -758,16 +760,16 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
                         continue;
                     }
 
-                    // User provided eviction policy could throw all sorts of crazy
-                    // exceptions. Protect against such an exception killing the
-                    // eviction thread.
+                    // User provided eviction policy could throw all sorts of
+                    // crazy exceptions. Protect against such an exception
+                    // killing the eviction thread.
                     boolean evict;
                     try {
                         evict = evictionPolicy.evict(evictionConfig, underTest,
                                 idleObjects.size());
                     } catch (final Throwable t) {
-                        // Slightly convoluted as SwallowedExceptionListener uses
-                        // Exception rather than Throwable
+                        // Slightly convoluted as SwallowedExceptionListener
+                        // uses Exception rather than Throwable
                         PoolUtils.checkRethrow(t);
                         swallowException(new Exception(t));
                         // Don't evict on error conditions
@@ -886,7 +888,7 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         final PooledObject<T> p;
         try {
             p = factory.makeObject();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             createCount.decrementAndGet();
             throw e;
         } finally {
@@ -899,6 +901,10 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         final AbandonedConfig ac = this.abandonedConfig;
         if (ac != null && ac.getLogAbandoned()) {
             p.setLogAbandoned(true);
+            // TODO: in 3.0, this can use the method defined on PooledObject
+            if (p instanceof DefaultPooledObject<?>) {
+                ((DefaultPooledObject<T>) p).setRequireFullStackTrace(ac.getRequireFullStackTrace());
+            }
         }
 
         createdCount.incrementAndGet();
@@ -1194,4 +1200,5 @@ public class GenericObjectPool<T> extends BaseGenericObjectPool<T>
         builder.append(", abandonedConfig=");
         builder.append(abandonedConfig);
     }
+
 }

@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.dbcp.pool2.impl;
 
+import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
@@ -375,7 +376,9 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
         // Remove wrappers for enqueued references from idle and allReferences lists
         removeClearedReferences(idleReferences.iterator());
         removeClearedReferences(allReferences.iterator());
-        while (refQueue.poll() != null) {}
+        while (refQueue.poll() != null) {
+            // empty
+        }
     }
 
     /**

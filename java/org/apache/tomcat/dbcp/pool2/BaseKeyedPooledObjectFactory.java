@@ -66,11 +66,12 @@ public abstract class BaseKeyedPooledObjectFactory<K,V> extends BaseObject
      * The default implementation is a no-op.
      *
      * @param key the key used when selecting the instance
-     * @param p a {@code PooledObject} wrapping the the instance to be destroyed
+     * @param p a {@code PooledObject} wrapping the instance to be destroyed
      */
     @Override
     public void destroyObject(final K key, final PooledObject<V> p)
         throws Exception {
+        // The default implementation is a no-op.
     }
 
     /**
@@ -79,7 +80,7 @@ public abstract class BaseKeyedPooledObjectFactory<K,V> extends BaseObject
      * The default implementation always returns {@code true}.
      *
      * @param key the key used when selecting the object
-     * @param p a {@code PooledObject} wrapping the the instance to be validated
+     * @param p a {@code PooledObject} wrapping the instance to be validated
      * @return always <code>true</code> in the default implementation
      */
     @Override
@@ -93,11 +94,12 @@ public abstract class BaseKeyedPooledObjectFactory<K,V> extends BaseObject
      * The default implementation is a no-op.
      *
      * @param key the key used when selecting the object
-     * @param p a {@code PooledObject} wrapping the the instance to be activated
+     * @param p a {@code PooledObject} wrapping the instance to be activated
      */
     @Override
     public void activateObject(final K key, final PooledObject<V> p)
         throws Exception {
+        // The default implementation is a no-op.
     }
 
     /**
@@ -106,10 +108,11 @@ public abstract class BaseKeyedPooledObjectFactory<K,V> extends BaseObject
      * The default implementation is a no-op.
      *
      * @param key the key used when selecting the object
-     * @param p a {@code PooledObject} wrapping the the instance to be passivated
+     * @param p a {@code PooledObject} wrapping the instance to be passivated
      */
     @Override
     public void passivateObject(final K key, final PooledObject<V> p)
         throws Exception {
+        // The default implementation is a no-op.
     }
 }
