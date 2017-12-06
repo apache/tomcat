@@ -24,6 +24,9 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -931,7 +934,13 @@ public class TestRequest extends TomcatBaseTest {
 
         tomcat.start();
 
-        byte[] body = "Test".getBytes(userAgentCharaceterEncoding);
+        Charset charset = StandardCharsets.ISO_8859_1;
+        try {
+            charset = Charset.forName(userAgentCharaceterEncoding);
+        } catch (UnsupportedCharsetException e) {
+            // Ignore - use default set above
+        }
+        byte[] body = "Test".getBytes(charset);
         ByteChunk bc = new ByteChunk();
         Map<String,List<String>> reqHeaders = new HashMap<>();
         reqHeaders.put("Content-Type",
