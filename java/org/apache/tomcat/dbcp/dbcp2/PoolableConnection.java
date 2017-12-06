@@ -164,9 +164,9 @@ public class PoolableConnection extends DelegatingConnection<Connection>
             return;
         }
 
-        boolean isUnderlyingConectionClosed;
+        boolean isUnderlyingConnectionClosed;
         try {
-            isUnderlyingConectionClosed = getDelegateInternal().isClosed();
+            isUnderlyingConnectionClosed = getDelegateInternal().isClosed();
         } catch (final SQLException e) {
             try {
                 _pool.invalidateObject(this);
@@ -186,7 +186,7 @@ public class PoolableConnection extends DelegatingConnection<Connection>
          * may have been borrowed by another thread. Therefore, the close flag
          * is set in passivate().
          */
-        if (isUnderlyingConectionClosed) {
+        if (isUnderlyingConnectionClosed) {
             // Abnormal close: underlying connection closed unexpectedly, so we
             // must destroy this proxy
             try {
@@ -325,7 +325,8 @@ public class PoolableConnection extends DelegatingConnection<Connection>
             fatalException = _disconnectionSqlCodes == null ? sqlState.startsWith(Utils.DISCONNECTION_SQL_CODE_PREFIX)
                     || Utils.DISCONNECTION_SQL_CODES.contains(sqlState) : _disconnectionSqlCodes.contains(sqlState);
             if (!fatalException) {
-                if (e.getNextException() != null) {
+                final SQLException nextException = e.getNextException();
+                if (nextException != null && nextException != e) {
                     fatalException = isDisconnectionSqlException(e.getNextException());
                 }
             }

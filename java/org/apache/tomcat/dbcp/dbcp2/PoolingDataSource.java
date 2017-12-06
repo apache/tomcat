@@ -142,6 +142,10 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
             throw new SQLException("Cannot get a connection, pool error " + e.getMessage(), e);
         } catch(final RuntimeException e) {
             throw e;
+        } catch(final InterruptedException e) {
+            // Reset the interrupt status so it is visible to callers
+            Thread.currentThread().interrupt();
+            throw new SQLException("Cannot get a connection, general error", e);
         } catch(final Exception e) {
             throw new SQLException("Cannot get a connection, general error", e);
         }

@@ -59,7 +59,7 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
      * Hence this method will return the first
      * delegate that is not a {@code DelegatingResultSet},
      * or {@code null} when no non-{@code DelegatingResultSet}
-     * delegate can be found by transversing this chain.
+     * delegate can be found by traversing this chain.
      * <p>
      * This method is useful when you may have nested
      * {@code DelegatingResultSet}s, and you want to make

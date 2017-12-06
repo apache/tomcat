@@ -32,24 +32,12 @@ merges. This file keeps track of these copies to assist committers in keeping
 them up to date.
 
 BCEL
+----
 org.apache.tomcat.util.bcel is copied from:
 /commons/proper/bcel/trunk/src/main/java/org/apache/bcel
 
-DBCP (inc. Pool2)
-org.apache.tomcat.dbcp.dbcp2 is copied from:
-/commons/proper/dbcp/trunk/src/main/java/org/apache/commons/dbcp2
-and
-/commons/proper/dbcp/trunk/src/main/resources/org/apache/commons/dbcp2
-
-Pool2 used to be hosted in svn. All changes up to the point where Pool2 was
-migrated to git have been merged.
-
-
-FileUpload
-This used to be hosted in svn. All changes up to the point where FileUpload was
-migrated to git have been merged.
-
 Codec
+-----
 org.apache.tomcat.util.codec is copied from:
 /commons/proper/codec/trunk/src/main/java/org/apache/commons/codec/
 Note: Only classes required for Base64 encoding/decoding. The rest are removed.
@@ -65,6 +53,7 @@ The more recently merged SHA1 for the component below should be updated after
 the patch file has been applied and committed
 
 FileUpload
+----------
 Sub-tree:
 src/main/java/org/apache/commons/fileupload
 The SHA1 ID for the most recent commit to be merged to Tomcat is:
@@ -72,6 +61,15 @@ The SHA1 ID for the most recent commit to be merged to Tomcat is:
 
 Note: Tomcat's copy of fileupload also includes classes copied manually (rather
       than svn copied) from Commons IO.
+
+DBCP
+----
+DBCP2
+Sub-tree
+/commons/proper/dbcp/trunk/src/main/java/org/apache/commons/dbcp2
+/commons/proper/dbcp/trunk/src/main/resources/org/apache/commons/dbcp2
+The SHA1 ID for the most recent commit to be merged to Tomcat is:
+8a71764a895b234bd1fc76553835ef4c974f22e1
 
 Pool2
 Sub-tree

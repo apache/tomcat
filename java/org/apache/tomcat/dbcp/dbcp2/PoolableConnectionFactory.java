@@ -158,7 +158,12 @@ public class PoolableConnectionFactory
         this.poolStatements = poolStatements;
     }
 
+    @Deprecated // Due to typo in method name.
     public void setMaxOpenPrepatedStatements(final int maxOpenPreparedStatements) {
+        setMaxOpenPreparedStatements(maxOpenPreparedStatements);
+    }
+
+    public void setMaxOpenPreparedStatements(final int maxOpenPreparedStatements) {
         this.maxOpenPreparedStatements = maxOpenPreparedStatements;
     }
 
@@ -318,7 +323,7 @@ public class PoolableConnectionFactory
             throw new SQLException("initializeConnection: connection closed");
         }
         if(null != sqls) {
-            try (Statement stmt = conn.createStatement();) {
+            try (Statement stmt = conn.createStatement()) {
                 for (final String sql : sqls) {
                     if (sql == null) {
                         throw new NullPointerException(
