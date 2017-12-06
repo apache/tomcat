@@ -84,7 +84,7 @@ public class StringUtils {
      *         or <code>null</code> if the input byte array was <code>null</code>.
      */
     public static String newStringUsAscii(final byte[] bytes) {
-        return newString(bytes, StandardCharsets.US_ASCII);
+        return newString(bytes, Charset.forName("US-ASCII"));
     }
 
     /**
