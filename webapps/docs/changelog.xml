@@ -58,6 +58,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>61854</bug>: When using sets and/or maps in EL expressions, ensure
+        that Jasper correctly parses the expression. Patch provided by Ricardo
+        Martin Camarero. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <add>
