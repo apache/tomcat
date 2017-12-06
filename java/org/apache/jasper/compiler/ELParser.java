@@ -106,11 +106,17 @@ public class ELParser {
         ELexpr = new ELNode.Nodes();
         curToken = null;
         prevToken = null;
+        int openBraces = 0;
         while (hasNext()) {
             curToken = nextToken();
             if (curToken instanceof Char) {
                 if (curToken.toChar() == '}') {
-                    break;
+                    openBraces--;
+                    if (openBraces < 0) {
+                        break;
+                    }
+                } else if (curToken.toChar() == '{') {
+                    openBraces++;
                 }
                 buf.append(curToken.toString());
             } else {
