@@ -28,7 +28,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Test case for {@link LegacyCookieProcessor}. <b>Note</b> because of the use
- * of <code>final static</code> constants in {@link CookieSupport}, each of
+ * of <code>final static</code> constants in the cookie processing code, each of
  * these tests must be executed in a new JVM instance. The tests have been place
  * in separate classes to facilitate this when running the unit tests via Ant.
  */
