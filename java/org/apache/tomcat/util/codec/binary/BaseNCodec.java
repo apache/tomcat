@@ -345,6 +345,8 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
      *
      * @param pArray a byte array containing binary data
      * @return String containing only character data in the appropriate alphabet.
+     * @since 1.5
+     * This is a duplicate of {@link #encodeToString(byte[])}; it was merged during refactoring.
     */
     public String encodeAsString(final byte[] pArray){
         return StringUtils.newStringUtf8(encode(pArray));
@@ -437,7 +439,7 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
      * @return A byte array containing only the base N alphabetic character data
      * @since 1.11
      */
-    public byte[] encode(final byte[] pArray, int offset, int length) {
+    public byte[] encode(final byte[] pArray, final int offset, final int length) {
         if (pArray == null || pArray.length == 0) {
             return pArray;
         }
@@ -476,7 +478,7 @@ public abstract class BaseNCodec implements BinaryEncoder, BinaryDecoder {
      *         <code>false</code>, otherwise
      */
     public boolean isInAlphabet(final byte[] arrayOctet, final boolean allowWSPad) {
-        for (byte octet : arrayOctet) {
+        for (final byte octet : arrayOctet) {
             if (!isInAlphabet(octet) &&
                     (!allowWSPad || (octet != pad) && !isWhiteSpace(octet))) {
                 return false;
