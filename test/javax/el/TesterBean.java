@@ -29,6 +29,15 @@ public class TesterBean {
         return name;
     }
 
+    public String getNameVarargs(@SuppressWarnings("unused") Integer... someNumbers) {
+        return name;
+    }
+
+    public String getNameVarargs(@SuppressWarnings("unused") Boolean someBoolean,
+            @SuppressWarnings("unused") Integer... someNumbers) {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
     }

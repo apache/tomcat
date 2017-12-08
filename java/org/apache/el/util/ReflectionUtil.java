@@ -129,6 +129,7 @@ public class ReflectionUtil {
     public static Method getMethod(EvaluationContext ctx, Object base, Object property,
             Class<?>[] paramTypes, Object[] paramValues)
             throws MethodNotFoundException {
+
         if (base == null || property == null) {
             throw new MethodNotFoundException(MessageFactory.get(
                     "error.method.notfound", base, property,
@@ -163,10 +164,28 @@ public class ReflectionUtil {
             }
 
             // Check the number of parameters
-            if (!(paramCount == mParamCount ||
-                    (m.isVarArgs() && paramCount >= mParamCount))) {
+            // Multiple tests to improve readability
+            if (!m.isVarArgs() && paramCount != mParamCount) {
                 // Method has wrong number of parameters
                 continue;
+            }
+            if (m.isVarArgs() && paramCount < mParamCount -1) {
+                // Method has wrong number of parameters
+                continue;
+            }
+            if (m.isVarArgs() && paramCount == mParamCount && paramValues != null &&
+                    paramValues.length > paramCount && !paramTypes[mParamCount -1].isArray()) {
+                // Method arguments don't match
+                continue;
+            }
+            if (m.isVarArgs() && paramCount > mParamCount && paramValues != null &&
+                    paramValues.length != paramCount) {
+                // Number of parameter types and values do not agree
+                throw new IllegalArgumentException();
+            }
+            if (!m.isVarArgs() && paramValues != null && paramCount != paramValues.length) {
+                // Number of parameter types and values do not agree
+                throw new IllegalArgumentException();
             }
 
             // Check the parameters match
@@ -176,15 +195,18 @@ public class ReflectionUtil {
             boolean noMatch = false;
             for (int i = 0; i < mParamCount; i++) {
                 // Can't be null
-                if (mParamTypes[i].equals(paramTypes[i])) {
-                    exactMatch++;
-                } else if (i == (mParamCount - 1) && m.isVarArgs()) {
+                if (m.isVarArgs() && i == (mParamCount - 1)) {
+                    if (i == paramCount && paramCount == (mParamCount - 1)) {
+                        // Nothing is passed as varargs
+                        assignableMatch++;
+                        break;
+                    }
                     Class<?> varType = mParamTypes[i].getComponentType();
                     for (int j = i; j < paramCount; j++) {
                         if (isAssignableFrom(paramTypes[j], varType)) {
                             assignableMatch++;
                         } else {
-                            if (paramValues == null || j >= paramValues.length) {
+                            if (paramValues == null) {
                                 noMatch = true;
                                 break;
                             } else {
@@ -200,18 +222,22 @@ public class ReflectionUtil {
                         // lead to a varArgs method matching when the result
                         // should be ambiguous
                     }
-                } else if (isAssignableFrom(paramTypes[i], mParamTypes[i])) {
-                    assignableMatch++;
                 } else {
-                    if (paramValues == null || i >= paramValues.length) {
-                        noMatch = true;
-                        break;
+                    if (mParamTypes[i].equals(paramTypes[i])) {
+                        exactMatch++;
+                    } else if (paramTypes[i] != null && isAssignableFrom(paramTypes[i], mParamTypes[i])) {
+                        assignableMatch++;
                     } else {
-                        if (isCoercibleFrom(ctx, paramValues[i], mParamTypes[i])) {
-                            coercibleMatch++;
-                        } else {
+                        if (paramValues == null) {
                             noMatch = true;
                             break;
+                        } else {
+                            if (isCoercibleFrom(ctx, paramValues[i], mParamTypes[i])) {
+                                coercibleMatch++;
+                            } else {
+                                noMatch = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -527,5 +553,4 @@ public class ReflectionUtil {
                     ;
         }
     }
-
 }

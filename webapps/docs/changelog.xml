@@ -65,6 +65,11 @@
         that Jasper correctly parses the expression. Patch provided by Ricardo
         Martin Camarero. (markt)
       </fix>
+      <fix>
+        Improve the handling of methods with varargs in EL expressions. In
+        particular, the calling of a varargs method with no parameters now works
+        correctly. Based on a patch by Nitkalya (Ing) Wiriyanuparb. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -18,6 +18,7 @@ package javax.el;
 
 import java.beans.FeatureDescriptor;
 import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.junit.Assert;
@@ -455,6 +456,486 @@ public class TestBeanELResolver {
 
         resolver.invoke(context, new TesterBean(BEAN_NAME), METHOD03_NAME, new Class<?>[] {},
                 new Object[] {});
+    }
+
+    @Test
+    public void testInvokeVarargsCoerce01() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] {}, new String[] {});
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargsCoerce02() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                null, null);
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargsCoerce03() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                null, new String[] {});
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargsCoerce04() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] {}, null);
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargsCoerce05() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { null }, new String[] { null });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargsCoerce06() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                null, new String[] { null });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargsCoerce07() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { null }, null);
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargsCoerce08() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String.class }, new String[] { "true" });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargsCoerce09() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String.class, String.class }, new Object[] { "true", null });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargsCoerce10() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String.class, String[].class }, new Object[] { "true", null });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargsCoerce11() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String.class }, new Object[] { "10" });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargsCoerce12() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String[].class }, new String[] { "10" });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    // Ambiguous because the Strings coerce to both Boolean and Integer hence
+    // both varargs methods match.
+    @Test(expected=MethodNotFoundException.class)
+    public void testInvokeVarargsCoerce13() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String.class, String.class }, new String[] { "10", "11" });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargsCoerce14() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String.class, String.class }, new String[] { "true", null });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test(expected=MethodNotFoundException.class)
+    public void testInvokeVarargsCoerce15() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String.class, String.class }, new Object[] { "true", new ArrayList<>() });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    // Ambiguous because the Strings coerce to both Boolean and Integer hence
+    // both varargs methods match.
+    @Test(expected=MethodNotFoundException.class)
+    public void testInvokeVarargsCoerce16() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String.class, String.class, String.class },
+                new Object[] { "10", "11", "12" });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testInvokeVarargsCoerce17() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String.class, String.class },
+                new Object[] { "10", "11", "12" });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testInvokeVarargsCoerce18() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String.class, String.class, String.class, String.class },
+                new Object[] { "10", "11", "12" });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargsCoerce19() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String.class, String.class, String.class, String.class },
+                new Object[] { "true", "10", "11", "12" });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testInvokeVarargsCoerce20() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String.class, String.class, String.class },
+                new Object[] { "true", "10", "11", "12" });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testInvokeVarargsCoerce21() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { String.class, String.class, String.class, String.class, String.class },
+                new Object[] { "true", "10", "11", "12" });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargs01() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] {}, new Object[] {});
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargs02() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                null, null);
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargs03() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                null, new Object[] {});
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargs04() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] {}, null);
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargs05() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { null }, new Object[] { null });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargs06() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                null, new Object[] { null });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargs07() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { null }, null);
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargs08() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { Boolean.class }, new Object[] { Boolean.TRUE });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargs09() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { Boolean.class, Integer.class }, new Object[] { Boolean.TRUE, null });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargs10() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { Boolean.class, Integer[].class }, new Object[] { Boolean.TRUE, null });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargs11() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { Integer.class }, new Object[] { Integer.valueOf(10) });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargs12() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { Integer[].class }, new Object[] { Integer.valueOf(10) });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargs13() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { Integer.class, Integer.class }, new Object[] { Integer.valueOf(10), Integer.valueOf(11) });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    // Note: The coercion rules are that a null of any type can be coerced to a
+    //       null of *any* other type so this works.
+    @Test
+    public void testInvokeVarargs14() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { Boolean.class, ArrayList.class }, new Object[] { Boolean.TRUE, null });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test(expected=MethodNotFoundException.class)
+    public void testInvokeVarargs15() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { Boolean.class, ArrayList.class }, new Object[] { Boolean.TRUE, new ArrayList<>() });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargs16() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { Integer.class, Integer.class, Integer.class },
+                new Object[] { Integer.valueOf(10), Integer.valueOf(11),  Integer.valueOf(12) });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testInvokeVarargs17() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { Integer.class, Integer.class },
+                new Object[] { Integer.valueOf(10), Integer.valueOf(11),  Integer.valueOf(12) });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testInvokeVarargs18() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { Integer.class, Integer.class, Integer.class, Integer.class },
+                new Object[] { Integer.valueOf(10), Integer.valueOf(11),  Integer.valueOf(12) });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test
+    public void testInvokeVarargs19() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { Boolean.class, Integer.class, Integer.class, Integer.class },
+                new Object[] { Boolean.TRUE, Integer.valueOf(10), Integer.valueOf(11),  Integer.valueOf(12) });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testInvokeVarargs20() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { Boolean.class, Integer.class, Integer.class },
+                new Object[] { Boolean.TRUE, Integer.valueOf(10), Integer.valueOf(11),  Integer.valueOf(12) });
+
+        Assert.assertEquals(BEAN_NAME, result);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testInvokeVarargs21() {
+        BeanELResolver resolver = new BeanELResolver();
+        ELContext context = new StandardELContext(ELManager.getExpressionFactory());
+
+        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs",
+                new Class<?>[] { Boolean.class, Integer.class, Integer.class, Integer.class, Integer.class },
+                new Object[] { Boolean.TRUE, Integer.valueOf(10), Integer.valueOf(11),  Integer.valueOf(12) });
+
+        Assert.assertEquals(BEAN_NAME, result);
     }
 
     private static class Bean {
