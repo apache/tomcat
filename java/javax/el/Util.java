@@ -38,6 +38,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 class Util {
 
+    private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[0];
+
     /**
      * Checks whether the supplied Throwable is one that needs to be
      * rethrown and swallows all others.
@@ -210,12 +212,8 @@ class Util {
 
         List<Wrapper> wrappers = Wrapper.wrap(methods, methodName);
 
-        Wrapper result = findWrapper(
-                clazz, wrappers, methodName, paramTypes, paramValues);
+        Wrapper result = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues);
 
-        if (result == null) {
-            return null;
-        }
         return getMethod(clazz, (Method) result.unWrap());
     }
 
@@ -229,12 +227,7 @@ class Util {
 
         Map<Wrapper,MatchResult> candidates = new HashMap<>();
 
-        int paramCount;
-        if (paramTypes == null) {
-            paramCount = 0;
-        } else {
-            paramCount = paramTypes.length;
-        }
+        int paramCount = paramTypes.length;
 
         for (Wrapper w : wrappers) {
             Class<?>[] mParamTypes = w.getParameterTypes();
@@ -500,7 +493,7 @@ class Util {
 
     private static Class<?>[] getTypesFromValues(Object[] values) {
         if (values == null) {
-            return null;
+            return EMPTY_CLASS_ARRAY;
         }
 
         Class<?> result[] = new Class<?>[values.length];
@@ -571,12 +564,8 @@ class Util {
 
         List<Wrapper> wrappers = Wrapper.wrap(constructors);
 
-        Wrapper result = findWrapper(
-                clazz, wrappers, methodName, paramTypes, paramValues);
+        Wrapper result = findWrapper(clazz, wrappers, methodName, paramTypes, paramValues);
 
-        if (result == null) {
-            return null;
-        }
         return getConstructor(clazz, (Constructor<?>) result.unWrap());
     }
 
