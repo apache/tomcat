@@ -254,12 +254,12 @@ class Util {
             }
             if (w.isVarArgs() && paramCount > mParamCount && paramValues != null &&
                     paramValues.length != paramCount) {
-                // Number of parameter types and values do not agree
-                throw new IllegalArgumentException();
+                // Might match a different varargs method
+                continue;
             }
             if (!w.isVarArgs() && paramValues != null && paramCount != paramValues.length) {
-                // Number of parameter types and values do not agree
-                throw new IllegalArgumentException();
+                // Might match a different varargs method
+                continue;
             }
 
             // Check the parameters match
@@ -270,7 +270,7 @@ class Util {
             for (int i = 0; i < mParamCount; i++) {
                 // Can't be null
                 if (w.isVarArgs() && i == (mParamCount - 1)) {
-                    if (i == paramCount && paramCount == (mParamCount - 1)) {
+                    if (i == paramCount || (paramValues != null && paramValues.length == i)) {
                         // Nothing is passed as varargs
                         assignableMatch++;
                         break;
