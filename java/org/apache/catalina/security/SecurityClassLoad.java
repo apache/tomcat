@@ -301,12 +301,9 @@ public final class SecurityClassLoad {
         // net
         loader.loadClass(basePackage + "util.net.Constants");
         loader.loadClass(basePackage + "util.net.DispatchType");
-        loader.loadClass(basePackage +
-                "util.net.NioBlockingSelector$BlockPoller$1");
-        loader.loadClass(basePackage +
-                "util.net.NioBlockingSelector$BlockPoller$2");
-        loader.loadClass(basePackage +
-                "util.net.NioBlockingSelector$BlockPoller$3");
+        loader.loadClass(basePackage + "util.net.NioBlockingSelector$BlockPoller$RunnableAdd");
+        loader.loadClass(basePackage + "util.net.NioBlockingSelector$BlockPoller$RunnableCancel");
+        loader.loadClass(basePackage + "util.net.NioBlockingSelector$BlockPoller$RunnableRemove");
         // security
         loader.loadClass(basePackage + "util.security.PrivilegedGetTccl");
         loader.loadClass(basePackage + "util.security.PrivilegedSetTccl");
