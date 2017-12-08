@@ -639,7 +639,7 @@ public class TestBeanELResolver {
         Assert.assertEquals(BEAN_NAME, result);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=MethodNotFoundException.class)
     public void testInvokeVarargsCoerce17() {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
@@ -651,7 +651,7 @@ public class TestBeanELResolver {
         Assert.assertEquals(BEAN_NAME, result);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=MethodNotFoundException.class)
     public void testInvokeVarargsCoerce18() {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
@@ -675,7 +675,7 @@ public class TestBeanELResolver {
         Assert.assertEquals(BEAN_NAME, result);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=MethodNotFoundException.class)
     public void testInvokeVarargsCoerce20() {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
@@ -687,7 +687,7 @@ public class TestBeanELResolver {
         Assert.assertEquals(BEAN_NAME, result);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=MethodNotFoundException.class)
     public void testInvokeVarargsCoerce21() {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
@@ -878,7 +878,7 @@ public class TestBeanELResolver {
         Assert.assertEquals(BEAN_NAME, result);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=MethodNotFoundException.class)
     public void testInvokeVarargs17() {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
@@ -890,7 +890,7 @@ public class TestBeanELResolver {
         Assert.assertEquals(BEAN_NAME, result);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=MethodNotFoundException.class)
     public void testInvokeVarargs18() {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
@@ -914,7 +914,7 @@ public class TestBeanELResolver {
         Assert.assertEquals(BEAN_NAME, result);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=MethodNotFoundException.class)
     public void testInvokeVarargs20() {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
@@ -926,7 +926,7 @@ public class TestBeanELResolver {
         Assert.assertEquals(BEAN_NAME, result);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=MethodNotFoundException.class)
     public void testInvokeVarargs21() {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
