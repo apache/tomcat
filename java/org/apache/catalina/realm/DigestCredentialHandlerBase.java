@@ -165,7 +165,7 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
         if (storedCredentials == null) {
             // Stored credentials are invalid
             // This may be expected if nested credential handlers are being used
-            logInvalidStoredCredentials(storedCredentials);
+            logInvalidStoredCredentials(null);
             return false;
         }
 
