@@ -20,6 +20,7 @@ package org.apache.el;
 import javax.el.ELContext;
 import javax.el.ExpressionFactory;
 import javax.el.MethodExpression;
+import javax.el.MethodNotFoundException;
 import javax.el.ValueExpression;
 
 import org.junit.Assert;
@@ -519,7 +520,8 @@ public class TestMethodExpressionImpl {
         Object r = me.invoke(context, new String[] { "aaa" });
         Assert.assertEquals("aaa", r.toString());
     }
-    @Test
+
+    @Test(expected=MethodNotFoundException.class)
     public void testBug57855e() {
         MethodExpression me = factory.createMethodExpression(context,
                 "${beanB.echo}", null , new Class[]{String.class});
