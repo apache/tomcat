@@ -490,7 +490,7 @@ public class TestMethodExpressionImpl {
     }
 
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected=MethodNotFoundException.class)
     public void testBug57855a() {
         MethodExpression me = factory.createMethodExpression(context,
                 "${beanAA.echo2}", null , new Class[]{String.class});

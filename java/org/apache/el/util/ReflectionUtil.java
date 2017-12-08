@@ -180,12 +180,12 @@ public class ReflectionUtil {
             }
             if (m.isVarArgs() && paramCount > mParamCount && paramValues != null &&
                     paramValues.length != paramCount) {
-                // Number of parameter types and values do not agree
-                throw new IllegalArgumentException();
+                // Might match a different varargs method
+                continue;
             }
             if (!m.isVarArgs() && paramValues != null && paramCount != paramValues.length) {
-                // Number of parameter types and values do not agree
-                throw new IllegalArgumentException();
+                // Might match a different varargs method
+                continue;
             }
 
             // Check the parameters match
@@ -196,7 +196,7 @@ public class ReflectionUtil {
             for (int i = 0; i < mParamCount; i++) {
                 // Can't be null
                 if (m.isVarArgs() && i == (mParamCount - 1)) {
-                    if (i == paramCount && paramCount == (mParamCount - 1)) {
+                    if (i == paramCount || (paramValues != null && paramValues.length == i)) {
                         // Nothing is passed as varargs
                         assignableMatch++;
                         break;
