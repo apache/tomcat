@@ -986,19 +986,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
      * The default value for this implementation is -1.
      */
     @Override
-    @Deprecated
     public void setAsyncSendTimeout(long timeout) {
-        this.defaultAsyncTimeout = timeout;
-    }
-
-
-    /**
-     * {@inheritDoc}
-     *
-     * The default value for this implementation is -1.
-     */
-    @Override
-    public void setDefaultAsyncSendTimeout(long timeout) {
         this.defaultAsyncTimeout = timeout;
     }
 
