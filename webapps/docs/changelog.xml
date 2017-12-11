@@ -61,9 +61,10 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        Pre-load additional classes to prevent <code>SecurityException</code>s
-        if the first request received when running under a
-        <code>SecurityManager</code> is an asynchronous Servlet. (markt)
+        <bug>61886</bug>: Pre-load additional classes to prevent
+        <code>SecurityException</code>s if the first request received when
+        running under a <code>SecurityManager</code> is an asynchronous Servlet.
+        (markt)
       </fix>
     </changelog>
   </subsection>
