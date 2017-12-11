@@ -33,6 +33,17 @@ public interface WebSocketContainer {
      * Set the default timeout for sending a message asynchronously.
      * @param timeout The new default timeout in milliseconds. A non-positive
      *                value means an infinite timeout.
+     *
+     * @deprecated This will be removed in Tomcat 9.
+     *             Use {@link #setDefaultAsyncSendTimeout(long)}
+     */
+    @Deprecated
+    void setAsyncSendTimeout(long timeout);
+
+    /**
+     * Set the default timeout for sending a message asynchronously.
+     * @param timeout The new default timeout in milliseconds. A non-positive
+     *                value means an infinite timeout.
      */
     void setDefaultAsyncSendTimeout(long timeout);
 
