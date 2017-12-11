@@ -163,6 +163,10 @@ public final class SecurityClassLoad {
     private static final void loadCoyotePackage(ClassLoader loader)
             throws Exception {
         final String basePackage = "org.apache.coyote.";
+        // Classes created by the Java 6 compiler because we use switch with an enum
+        loader.loadClass(basePackage + "http11.Http11Processor$1");
+        loader.loadClass(basePackage + "http11.Http11NioProcessor$1");
+        loader.loadClass(basePackage + "http11.Http11AprProcessor$1");
         loader.loadClass(basePackage + "http11.AbstractOutputBuffer$1");
         loader.loadClass(basePackage + "http11.Constants");
         // Make sure system property is read at this point
@@ -292,6 +296,7 @@ public final class SecurityClassLoad {
                 "util.net.NioBlockingSelector$BlockPoller$2");
         loader.loadClass(basePackage +
                 "util.net.NioBlockingSelector$BlockPoller$3");
+        loader.loadClass(basePackage + "util.net.SendfileState");
         loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
         // security
         loader.loadClass(basePackage + "util.security.PrivilegedGetTccl");

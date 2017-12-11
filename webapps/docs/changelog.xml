@@ -58,6 +58,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.84 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Pre-load additional classes to prevent <code>SecurityException</code>s
+        if the first request received when running under a
+        <code>SecurityManager</code> is an asynchronous Servlet. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
