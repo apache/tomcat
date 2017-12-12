@@ -61,6 +61,11 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>47214</bug>: Use a loop to preload anonymous inner classes
+        when running under a <code>SecurityManager</code>, to be safe for
+        future changes in the code or using a different compiler. (kkolinko)
+      </fix>
+      <fix>
         <bug>61886</bug>: Pre-load additional classes to prevent
         <code>SecurityException</code>s if the first request received when
         running under a <code>SecurityManager</code> is an asynchronous Servlet.

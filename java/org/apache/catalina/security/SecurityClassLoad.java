@@ -52,51 +52,21 @@ public final class SecurityClassLoad {
     private static final void loadCorePackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.catalina.core.";
-        loader.loadClass
-            (basePackage +
-             "AccessLogAdapter");
-        loader.loadClass
-            (basePackage +
-             "ApplicationContextFacade$1");
-        loader.loadClass
-            (basePackage +
-             "ApplicationDispatcher$PrivilegedForward");
-        loader.loadClass
-            (basePackage +
-             "ApplicationDispatcher$PrivilegedInclude");
-        loader.loadClass
-            (basePackage +
-            "AsyncContextImpl");
-        loader.loadClass
-            (basePackage +
-            "AsyncContextImpl$DebugException");
-        loader.loadClass
-            (basePackage +
-            "AsyncContextImpl$1");
-        loader.loadClass
-            (basePackage +
-            "AsyncListenerWrapper");
-        loader.loadClass
-            (basePackage +
-             "ContainerBase$PrivilegedAddChild");
-        loader.loadClass
-            (basePackage +
-             "DefaultInstanceManager$1");
-        loader.loadClass
-            (basePackage +
-             "DefaultInstanceManager$2");
-        loader.loadClass
-            (basePackage +
-             "DefaultInstanceManager$3");
-        loader.loadClass
-            (basePackage +
-             "DefaultInstanceManager$AnnotationCacheEntry");
-        loader.loadClass
-            (basePackage +
-             "DefaultInstanceManager$AnnotationCacheEntryType");
-        loader.loadClass
-            (basePackage +
-             "ApplicationHttpRequest$AttributeNamesEnumerator");
+        loader.loadClass(basePackage + "AccessLogAdapter");
+        loadAnonymousInnerClasses(loader, basePackage + "ApplicationContextFacade");
+        loader.loadClass(basePackage + "ApplicationDispatcher$PrivilegedForward");
+        loader.loadClass(basePackage + "ApplicationDispatcher$PrivilegedInclude");
+        loader.loadClass(basePackage + "AsyncContextImpl");
+        loader.loadClass(basePackage + "AsyncContextImpl$DebugException");
+        loadAnonymousInnerClasses(loader, basePackage + "AsyncContextImpl");
+        loader.loadClass(basePackage + "AsyncListenerWrapper");
+        loader.loadClass(basePackage + "ContainerBase$PrivilegedAddChild");
+        loadAnonymousInnerClasses(loader, basePackage + "DefaultInstanceManager");
+        loader.loadClass(basePackage + "DefaultInstanceManager$2");
+        loader.loadClass(basePackage + "DefaultInstanceManager$3");
+        loader.loadClass(basePackage + "DefaultInstanceManager$AnnotationCacheEntry");
+        loader.loadClass(basePackage + "DefaultInstanceManager$AnnotationCacheEntryType");
+        loader.loadClass(basePackage + "ApplicationHttpRequest$AttributeNamesEnumerator");
     }
 
 
@@ -135,12 +105,9 @@ public final class SecurityClassLoad {
     private static final void loadSessionPackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.catalina.session.";
-        loader.loadClass
-            (basePackage + "StandardSession");
-        loader.loadClass
-            (basePackage + "StandardSession$1");
-        loader.loadClass
-            (basePackage + "StandardManager$PrivilegedDoUnload");
+        loader.loadClass(basePackage + "StandardSession");
+        loadAnonymousInnerClasses(loader, basePackage + "StandardSession");
+        loader.loadClass(basePackage + "StandardManager$PrivilegedDoUnload");
     }
 
 
@@ -163,11 +130,12 @@ public final class SecurityClassLoad {
     private static final void loadCoyotePackage(ClassLoader loader)
             throws Exception {
         final String basePackage = "org.apache.coyote.";
-        // Classes created by the Java 6 compiler because we use switch with an enum
-        loader.loadClass(basePackage + "http11.Http11Processor$1");
-        loader.loadClass(basePackage + "http11.Http11NioProcessor$1");
-        loader.loadClass(basePackage + "http11.Http11AprProcessor$1");
-        loader.loadClass(basePackage + "http11.AbstractOutputBuffer$1");
+        // Java 6 compiler creates helper *$1 classes because we use switch with an enum
+        loadAnonymousInnerClasses(loader, basePackage + "http11.AbstractHttp11Processor");
+        loadAnonymousInnerClasses(loader, basePackage + "http11.Http11Processor");
+        loadAnonymousInnerClasses(loader, basePackage + "http11.Http11NioProcessor");
+        loadAnonymousInnerClasses(loader, basePackage + "http11.Http11AprProcessor");
+        loadAnonymousInnerClasses(loader, basePackage + "http11.AbstractOutputBuffer");
         loader.loadClass(basePackage + "http11.Constants");
         // Make sure system property is read at this point
         Class<?> clazz = loader.loadClass(basePackage + "Constants");
@@ -184,84 +152,26 @@ public final class SecurityClassLoad {
     private static final void loadConnectorPackage(ClassLoader loader)
         throws Exception {
         final String basePackage = "org.apache.catalina.connector.";
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetAttributePrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetParameterMapPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetRequestDispatcherPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetParameterPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetParameterNamesPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetParameterValuePrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetCharacterEncodingPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetHeadersPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetHeaderNamesPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetCookiesPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetLocalePrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetLocalesPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "ResponseFacade$SetContentTypePrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "ResponseFacade$DateHeaderPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetSessionPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "ResponseFacade$1");
-        loader.loadClass
-            (basePackage +
-             "OutputBuffer$1");
-        loader.loadClass
-            (basePackage +
-             "CoyoteInputStream$1");
-        loader.loadClass
-            (basePackage +
-             "CoyoteInputStream$2");
-        loader.loadClass
-            (basePackage +
-             "CoyoteInputStream$3");
-        loader.loadClass
-            (basePackage +
-             "CoyoteInputStream$4");
-        loader.loadClass
-            (basePackage +
-             "CoyoteInputStream$5");
-        loader.loadClass
-            (basePackage +
-             "InputBuffer$1");
-        loader.loadClass
-            (basePackage +
-             "Response$1");
-        loader.loadClass
-            (basePackage +
-             "Response$2");
-        loader.loadClass
-            (basePackage +
-             "Response$3");
+        loader.loadClass(basePackage + "RequestFacade$GetAttributePrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetParameterMapPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetRequestDispatcherPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetParameterPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetParameterNamesPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetParameterValuePrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetCharacterEncodingPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetHeadersPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetHeaderNamesPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetCookiesPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetLocalePrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetLocalesPrivilegedAction");
+        loader.loadClass(basePackage + "ResponseFacade$SetContentTypePrivilegedAction");
+        loader.loadClass(basePackage + "ResponseFacade$DateHeaderPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetSessionPrivilegedAction");
+        loadAnonymousInnerClasses(loader, basePackage + "ResponseFacade");
+        loadAnonymousInnerClasses(loader, basePackage + "OutputBuffer");
+        loadAnonymousInnerClasses(loader, basePackage + "CoyoteInputStream");
+        loadAnonymousInnerClasses(loader, basePackage + "InputBuffer");
+        loadAnonymousInnerClasses(loader, basePackage + "Response");
     }
 
     private static final void loadTomcatPackage(ClassLoader loader)
@@ -290,17 +200,22 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "jni.Status");
         // net
         loader.loadClass(basePackage + "util.net.Constants");
-        loader.loadClass(basePackage +
-                "util.net.NioBlockingSelector$BlockPoller$1");
-        loader.loadClass(basePackage +
-                "util.net.NioBlockingSelector$BlockPoller$2");
-        loader.loadClass(basePackage +
-                "util.net.NioBlockingSelector$BlockPoller$3");
+        loadAnonymousInnerClasses(loader, basePackage + "util.net.NioBlockingSelector$BlockPoller");
         loader.loadClass(basePackage + "util.net.SendfileState");
         loader.loadClass(basePackage + "util.net.SSLSupport$CipherData");
         // security
         loader.loadClass(basePackage + "util.security.PrivilegedGetTccl");
         loader.loadClass(basePackage + "util.security.PrivilegedSetTccl");
+    }
+
+    private static final void loadAnonymousInnerClasses(ClassLoader loader, String enclosingClass) {
+        try {
+            for (int i = 1;; i++) {
+                loader.loadClass(enclosingClass + '$' + i);
+            }
+        } catch (ClassNotFoundException ignored) {
+            //
+        }
     }
 }
 
