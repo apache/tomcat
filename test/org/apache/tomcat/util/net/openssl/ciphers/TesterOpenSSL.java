@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.net.openssl.ciphers;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -27,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.catalina.util.IOTools;
-import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 
 public class TesterOpenSSL {
 
