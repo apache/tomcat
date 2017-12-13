@@ -1327,75 +1327,53 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "<tr>\n" +
         " <td colspan=\"2\" class=\"header-left\"><small>{1}</small></td>\n" +
         "</tr>\n" +
-        "<tr>\n" +
-        " <td colspan=\"2\">\n" +
-        "<form method=\"post\" action=\"{2}\">\n" +
-        "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
+
         "<tr>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"submit\" value=\"{4}\">\n" +
+        "  <form method=\"post\" action=\"{2}\">\n" +
+        "   <input type=\"submit\" value=\"{4}\">\n" +
+        "  </form>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
         "  <small>{3}</small>\n" +
         " </td>\n" +
         "</tr>\n" +
-        "</table>\n" +
-        "</form>\n" +
-        "</td>\n" +
-        "</tr>\n" +
 
         "<tr>\n" +
         " <td colspan=\"2\" class=\"header-left\"><small>{5}</small></td>\n" +
         "</tr>\n" +
-        "<tr>\n" +
-        " <td colspan=\"2\">\n" +
-        "<form method=\"post\" action=\"{6}\">\n" +
-        "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
+
         "<tr>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"submit\" value=\"{7}\">\n" +
+        "  <form method=\"post\" action=\"{6}\">\n" +
+        "   <input type=\"submit\" value=\"{7}\">\n" +
+        "  </form>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
         "  <small>{8}</small>\n" +
         " </td>\n" +
         "</tr>\n" +
-        "</table>\n" +
-        "</form>\n" +
-        "</td>\n" +
-        "</tr>\n" +
 
         "<tr>\n" +
-        " <td colspan=\"2\">\n" +
-        "<form method=\"post\" action=\"{9}\">\n" +
-        "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
-        "<tr>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"submit\" value=\"{10}\">\n" +
+        "  <form method=\"post\" action=\"{9}\">\n" +
+        "   <input type=\"submit\" value=\"{10}\">\n" +
+        "  </form>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
         "  <small>{11}</small>\n" +
         " </td>\n" +
         "</tr>\n" +
-        "</table>\n" +
-        "</form>\n" +
-        "</td>\n" +
-        "</tr>\n" +
 
         "<tr>\n" +
-        " <td colspan=\"2\">\n" +
-        "<form method=\"post\" action=\"{12}\">\n" +
-        "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
-        "<tr>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"submit\" value=\"{13}\">\n" +
+        "  <form method=\"post\" action=\"{12}\">\n" +
+        "   <input type=\"submit\" value=\"{13}\">\n" +
+        "  </form>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
         "  <small>{14}</small>\n" +
         " </td>\n" +
-        "</tr>\n" +
-        "</table>\n" +
-        "</form>\n" +
-        "</td>\n" +
         "</tr>\n" +
 
         "</table>\n" +
