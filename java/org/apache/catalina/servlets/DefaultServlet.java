@@ -504,10 +504,12 @@ public class DefaultServlet extends HttpServlet {
         allow.append("GET, HEAD");
         // There is a doPost
         allow.append(", POST");
-        // There is a doPut
-        allow.append(", PUT");
-        // There is a doDelete
-        allow.append(", DELETE");
+        if (!readOnly) {
+            // There is a doPut
+            allow.append(", PUT");
+            // There is a doDelete
+            allow.append(", DELETE");
+        }
         // Trace - assume disabled unless we can prove otherwise
         if (req instanceof RequestFacade &&
                 ((RequestFacade) req).getAllowTrace()) {
