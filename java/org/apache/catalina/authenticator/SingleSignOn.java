@@ -604,7 +604,7 @@ public class SingleSignOn extends ValveBase {
         while (c != null && !(c instanceof Engine)) {
             c = c.getParent();
         }
-        if (c instanceof Engine) {
+        if (c != null) {
             engine = (Engine) c;
         }
         super.startInternal();
