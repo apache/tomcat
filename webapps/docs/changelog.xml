@@ -91,10 +91,10 @@
         mbeans-descriptiors.xml files for custom components. (markt)
       </add>
       <add>
-        <bug>61566</bug>: Provide a partial fix for this issue. The fix exposes
-        the currently in use certificate chain and list of trusted certificates
-        for all virtual hosts configured using the JSSE style (keystore) TLS
-        configuration via the Manager web application.
+        <bug>61566</bug>: Expose the currently in use certificate chain and list
+        of trusted certificates for all virtual hosts configured using the JSSE
+        style (keystore) TLS configuration via the Manager web application.
+        (markt)
       </add>
     </changelog>
   </subsection>
