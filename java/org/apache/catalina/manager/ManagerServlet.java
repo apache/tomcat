@@ -1761,4 +1761,40 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         return result;
     }
 
+
+    protected Map<String,List<String>> getConnectorTrustedCerts() {
+        Map<String,List<String>> result = new HashMap<>();
+
+        Engine e = (Engine) host.getParent();
+        Service s = e.getService();
+        Connector connectors[] = s.findConnectors();
+        for (Connector connector : connectors) {
+            if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
+                SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
+                for (SSLHostConfig sslHostConfig : sslHostConfigs) {
+                    String name = connector.toString() + "-" + sslHostConfig.getHostName();
+                    List<String> certList = new ArrayList<>();
+                    SSLContext sslContext =
+                            sslHostConfig.getCertificates().iterator().next().getSslContext();
+                    X509Certificate[] certs = sslContext.getAcceptedIssuers();
+                    if (certs == null) {
+                        certList.add(sm.getString("managerServlet.certsNotAvailable"));
+                    } else if (certs.length == 0) {
+                        certList.add(sm.getString("managerServlet.trustedCertsNotConfigured"));
+                    } else {
+                        for (Certificate cert : certs) {
+                            certList.add(cert.toString());
+                        }
+                    }
+                    result.put(name, certList);
+                }
+            } else {
+                List<String> certList = new ArrayList<>(1);
+                certList.add(sm.getString("managerServlet.notSslConnector"));
+                result.put(connector.toString(), certList);
+            }
+        }
+
+        return result;
+    }
 }

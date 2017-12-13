@@ -24,7 +24,7 @@
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<% Map<String,List<String>> certList = (Map<String,List<String>>) request.getAttribute("certList");
+<% Map<String,List<String>> trustedCertList = (Map<String,List<String>>) request.getAttribute("trustedCertList");
 %>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
@@ -34,21 +34,21 @@
     <meta http-equiv="content-language" content="en"/>
     <meta name="copyright" content="copyright 2005-2017 the Apache Software Foundation"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
-    <title>Configured certificate chains per Connector</title>
+    <title>Trusted certificates per Connector</title>
 </head>
 <body>
-<h1>Configured certificate chains per Connector</h1>
+<h1>Trusted certificates per Connector</h1>
 
 <table border="1" cellpadding="2" cellspacing="2" width="100%">
     <thead>
         <tr>
-            <th>Connector / TLS Virtual Host / Certificate type</th>
-            <th>Certificate chain</th>
+            <th>Connector / TLS Virtual Host</th>
+            <th>Trusted Certificates</th>
         </tr>
     </thead>
     <tbody>
         <%
-        for (Map.Entry<String, List<String>> entry : certList.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : trustedCertList.entrySet()) {
         %>
         <tr>
             <td><%=entry.getKey()%></td>

@@ -86,6 +86,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     static final String sessionDetailJspPath = "/WEB-INF/jsp/sessionDetail.jsp";
     static final String connectorCiphersJspPath = "/WEB-INF/jsp/connectorCiphers.jsp";
     static final String connectorCertsJspPath = "/WEB-INF/jsp/connectorCerts.jsp";
+    static final String connectorTrustedCertsJspPath = "/WEB-INF/jsp/connectorTrustedCerts.jsp";
 
     private boolean showProxySessions = false;
 
@@ -140,7 +141,9 @@ public final class HTMLManagerServlet extends ManagerServlet {
         } else if (command.equals("/sslConnectorCiphers")) {
             sslConnectorCiphers(request, response);
         } else if (command.equals("/sslConnectorCerts")) {
-            sslConnectorHostCerts(request, response);
+            sslConnectorCerts(request, response);
+        } else if (command.equals("/sslConnectorTrustedCerts")) {
+            sslConnectorTrustedCerts(request, response);
         } else if (command.equals("/upload") || command.equals("/deploy") ||
                 command.equals("/reload") || command.equals("/undeploy") ||
                 command.equals("/expire") || command.equals("/start") ||
@@ -538,7 +541,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         writer.print(MessageFormat.format(UPLOAD_SECTION, args));
 
         // Diagnostics section
-        args = new Object[12];
+        args = new Object[15];
         args[0] = smClient.getString("htmlManagerServlet.diagnosticsTitle");
         args[1] = smClient.getString("htmlManagerServlet.diagnosticsLeak");
         args[2] = response.encodeURL(
@@ -554,6 +557,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 request.getContextPath() + "/html/sslConnectorCerts");
         args[10] = smClient.getString("htmlManagerServlet.diagnosticsSslConnectorCertsButton");
         args[11] = smClient.getString("htmlManagerServlet.diagnosticsSslConnectorCertsText");
+        args[12] = response.encodeURL(
+                request.getContextPath() + "/html/sslConnectorTrustedCerts");
+        args[13] = smClient.getString("htmlManagerServlet.diagnosticsSslConnectorTrustedCertsButton");
+        args[14] = smClient.getString("htmlManagerServlet.diagnosticsSslConnectorTrustedCertsText");
         writer.print(MessageFormat.format(DIAGNOSTICS_SECTION, args));
 
         // Server Header Section
@@ -735,11 +742,19 @@ public final class HTMLManagerServlet extends ManagerServlet {
     }
 
 
-    protected void sslConnectorHostCerts(HttpServletRequest request,
+    protected void sslConnectorCerts(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
         request.setAttribute("certList", getConnectorCerts());
         getServletContext().getRequestDispatcher(
                 connectorCertsJspPath).forward(request, response);
+    }
+
+
+    protected void sslConnectorTrustedCerts(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
+        request.setAttribute("trustedCertList", getConnectorTrustedCerts());
+        getServletContext().getRequestDispatcher(
+                connectorTrustedCertsJspPath).forward(request, response);
     }
 
 
@@ -1365,11 +1380,24 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</form>\n" +
         "</td>\n" +
         "</tr>\n" +
+
+        "<tr>\n" +
+        " <td colspan=\"2\">\n" +
+        "<form method=\"post\" action=\"{12}\">\n" +
+        "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
+        "<tr>\n" +
+        " <td class=\"row-left\">\n" +
+        "  <input type=\"submit\" value=\"{13}\">\n" +
+        " </td>\n" +
+        " <td class=\"row-left\">\n" +
+        "  <small>{14}</small>\n" +
+        " </td>\n" +
+        "</tr>\n" +
         "</table>\n" +
         "</form>\n" +
-
         "</td>\n" +
         "</tr>\n" +
+
         "</table>\n" +
         "<br>";
 }

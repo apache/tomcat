@@ -49,4 +49,6 @@ public interface SSLContext {
     public SSLParameters getSupportedSSLParameters();
 
     public X509Certificate[] getCertificateChain(String alias);
+
+    public X509Certificate[] getAcceptedIssuers();
 }
