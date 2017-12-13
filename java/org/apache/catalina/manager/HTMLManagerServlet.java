@@ -85,6 +85,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     static final String sessionsListJspPath = "/WEB-INF/jsp/sessionsList.jsp";
     static final String sessionDetailJspPath = "/WEB-INF/jsp/sessionDetail.jsp";
     static final String connectorCiphersJspPath = "/WEB-INF/jsp/connectorCiphers.jsp";
+    static final String connectorCertsJspPath = "/WEB-INF/jsp/connectorCerts.jsp";
 
     private boolean showProxySessions = false;
 
@@ -138,6 +139,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
             }
         } else if (command.equals("/sslConnectorCiphers")) {
             sslConnectorCiphers(request, response);
+        } else if (command.equals("/sslConnectorCerts")) {
+            sslConnectorHostCerts(request, response);
         } else if (command.equals("/upload") || command.equals("/deploy") ||
                 command.equals("/reload") || command.equals("/undeploy") ||
                 command.equals("/expire") || command.equals("/start") ||
@@ -535,7 +538,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         writer.print(MessageFormat.format(UPLOAD_SECTION, args));
 
         // Diagnostics section
-        args = new Object[9];
+        args = new Object[12];
         args[0] = smClient.getString("htmlManagerServlet.diagnosticsTitle");
         args[1] = smClient.getString("htmlManagerServlet.diagnosticsLeak");
         args[2] = response.encodeURL(
@@ -547,6 +550,10 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 request.getContextPath() + "/html/sslConnectorCiphers");
         args[7] = smClient.getString("htmlManagerServlet.diagnosticsSslConnectorCipherButton");
         args[8] = smClient.getString("htmlManagerServlet.diagnosticsSslConnectorCipherText");
+        args[9] = response.encodeURL(
+                request.getContextPath() + "/html/sslConnectorCerts");
+        args[10] = smClient.getString("htmlManagerServlet.diagnosticsSslConnectorCertsButton");
+        args[11] = smClient.getString("htmlManagerServlet.diagnosticsSslConnectorCertsText");
         writer.print(MessageFormat.format(DIAGNOSTICS_SECTION, args));
 
         // Server Header Section
@@ -726,6 +733,15 @@ public final class HTMLManagerServlet extends ManagerServlet {
         getServletContext().getRequestDispatcher(
                 connectorCiphersJspPath).forward(request, response);
     }
+
+
+    protected void sslConnectorHostCerts(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
+        request.setAttribute("certList", getConnectorCerts());
+        getServletContext().getRequestDispatcher(
+                connectorCertsJspPath).forward(request, response);
+    }
+
 
     /**
      * @see javax.servlet.Servlet#getServletInfo()
@@ -1292,6 +1308,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "<tr>\n" +
         " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
         "</tr>\n" +
+
         "<tr>\n" +
         " <td colspan=\"2\" class=\"header-left\"><small>{1}</small></td>\n" +
         "</tr>\n" +
@@ -1311,6 +1328,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</form>\n" +
         "</td>\n" +
         "</tr>\n" +
+
         "<tr>\n" +
         " <td colspan=\"2\" class=\"header-left\"><small>{5}</small></td>\n" +
         "</tr>\n" +
@@ -1328,6 +1346,28 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</tr>\n" +
         "</table>\n" +
         "</form>\n" +
+        "</td>\n" +
+        "</tr>\n" +
+
+        "<tr>\n" +
+        " <td colspan=\"2\">\n" +
+        "<form method=\"post\" action=\"{9}\">\n" +
+        "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
+        "<tr>\n" +
+        " <td class=\"row-left\">\n" +
+        "  <input type=\"submit\" value=\"{10}\">\n" +
+        " </td>\n" +
+        " <td class=\"row-left\">\n" +
+        "  <small>{11}</small>\n" +
+        " </td>\n" +
+        "</tr>\n" +
+        "</table>\n" +
+        "</form>\n" +
+        "</td>\n" +
+        "</tr>\n" +
+        "</table>\n" +
+        "</form>\n" +
+
         "</td>\n" +
         "</tr>\n" +
         "</table>\n" +

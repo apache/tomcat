@@ -68,6 +68,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
     private OpenSSLSessionContext sessionContext;
+    private X509KeyManager x509KeyManager;
 
     private final List<String> negotiableProtocols;
 
@@ -286,17 +287,17 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         SSLHostConfig.adjustRelativePath(
                                 sslHostConfig.getCertificateRevocationListPath()));
             } else {
-                X509KeyManager keyManager = chooseKeyManager(kms);
+                x509KeyManager = chooseKeyManager(kms);
                 String alias = certificate.getCertificateKeyAlias();
                 if (alias == null) {
                     alias = "tomcat";
                 }
-                X509Certificate[] chain = keyManager.getCertificateChain(alias);
+                X509Certificate[] chain = x509KeyManager.getCertificateChain(alias);
                 if (chain == null) {
-                    alias = findAlias(keyManager, certificate);
-                    chain = keyManager.getCertificateChain(alias);
+                    alias = findAlias(x509KeyManager, certificate);
+                    chain = x509KeyManager.getCertificateChain(alias);
                 }
-                PrivateKey key = keyManager.getPrivateKey(alias);
+                PrivateKey key = x509KeyManager.getPrivateKey(alias);
                 StringBuilder sb = new StringBuilder(BEGIN_KEY);
                 sb.append(Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(key.getEncoded()));
                 sb.append(END_KEY);
@@ -511,6 +512,20 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     @Override
     public SSLParameters getSupportedSSLParameters() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public X509Certificate[] getCertificateChain(String alias) {
+        if (alias == null) {
+            alias = "tomcat";
+        }
+        X509Certificate[] chain = x509KeyManager.getCertificateChain(alias);
+        if (chain == null) {
+            alias = findAlias(x509KeyManager, certificate);
+            chain = x509KeyManager.getCertificateChain(alias);
+        }
+
+        return chain;
     }
 
     @Override

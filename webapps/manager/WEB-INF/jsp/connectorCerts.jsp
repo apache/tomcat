@@ -24,7 +24,7 @@
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<% Map<String,List<String>> cipherList = (Map<String,List<String>>) request.getAttribute("cipherList");
+<% Map<String,List<String>> certList = (Map<String,List<String>>) request.getAttribute("certList");
 %>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
@@ -34,7 +34,7 @@
     <meta http-equiv="content-language" content="en"/>
     <meta name="copyright" content="copyright 2005-2017 the Apache Software Foundation"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
-    <title>Configured ciphers per Connector</title>
+    <title>Configured certificate chains per Connector</title>
 </head>
 <body>
 <h1>Configured ciphers per Connector</h1>
@@ -42,21 +42,21 @@
 <table border="1" cellpadding="2" cellspacing="2" width="100%">
     <thead>
         <tr>
-            <th>Connector / TLS Virtual Host</th>
-            <th>Enabled Ciphers</th>
+            <th>Connector / TLS Virtual Host / Certificate type</th>
+            <th>Certificate chain</th>
         </tr>
     </thead>
     <tbody>
         <%
-        for (Map.Entry<String, List<String>> entry : cipherList.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : certList.entrySet()) {
         %>
         <tr>
             <td><%=entry.getKey()%></td>
             <td>
             <%
-            for (String cipher : entry.getValue()) {
+            for (String cert : entry.getValue()) {
             %>
-                <p><%=cipher%></p>
+                <pre><%=cert%></pre>
             <%
             }
             %>

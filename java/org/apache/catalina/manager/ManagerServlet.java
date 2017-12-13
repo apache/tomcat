@@ -22,6 +22,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -30,6 +32,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -62,7 +65,9 @@ import org.apache.catalina.util.ServerInfo;
 import org.apache.tomcat.util.Diagnostics;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
+import org.apache.tomcat.util.net.SSLContext;
 import org.apache.tomcat.util.net.SSLHostConfig;
+import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 
@@ -1712,4 +1717,48 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
         return result;
     }
+
+
+    protected Map<String,List<String>> getConnectorCerts() {
+        Map<String,List<String>> result = new HashMap<>();
+
+        Engine e = (Engine) host.getParent();
+        Service s = e.getService();
+        Connector connectors[] = s.findConnectors();
+        for (Connector connector : connectors) {
+            if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
+                SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
+                for (SSLHostConfig sslHostConfig : sslHostConfigs) {
+                    Set<SSLHostConfigCertificate> sslHostConfigCerts =
+                            sslHostConfig.getCertificates();
+                    for (SSLHostConfigCertificate sslHostConfigCert : sslHostConfigCerts) {
+                        String name = connector.toString() + "-" + sslHostConfig.getHostName() +
+                                "-" + sslHostConfigCert.getType();
+                        List<String> certList = new ArrayList<>();
+                        SSLContext sslContext = sslHostConfigCert.getSslContext();
+                        String alias = sslHostConfigCert.getCertificateKeyAlias();
+                        if (alias == null) {
+                            alias = "tomcat";
+                        }
+                        X509Certificate[] certs = sslContext.getCertificateChain(alias);
+                        if (certs == null) {
+                            certList.add(sm.getString("managerServlet.certsNotAvailable"));
+                        } else {
+                            for (Certificate cert : certs) {
+                                certList.add(cert.toString());
+                            }
+                        }
+                        result.put(name, certList);
+                    }
+                }
+            } else {
+                List<String> certList = new ArrayList<>(1);
+                certList.add(sm.getString("managerServlet.notSslConnector"));
+                result.put(connector.toString(), certList);
+            }
+        }
+
+        return result;
+    }
+
 }

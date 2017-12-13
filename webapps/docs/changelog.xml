@@ -90,6 +90,12 @@
         MBean documentation so users have a reference to use when constructing
         mbeans-descriptiors.xml files for custom components. (markt)
       </add>
+      <add>
+        <bug>61566</bug>: Provide a partial fix for this issue. The fix exposes
+        the currently in use certificate chain for all virtual hosts configured
+        using the JSSE style (keystore) TLS configuration via the Manager web
+        application.
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
