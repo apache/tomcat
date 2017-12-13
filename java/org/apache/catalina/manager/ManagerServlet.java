@@ -373,6 +373,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             threadDump(writer, smClient, request.getLocales());
         } else if (command.equals("/sslConnectorCiphers")) {
             sslConnectorCiphers(writer, smClient);
+        } else if (command.equals("/sslConnectorCerts")) {
+            sslConnectorCerts(writer, smClient);
+        } else if (command.equals("/sslConnectorTrustedCerts")) {
+            sslConnectorTrustedCerts(writer, smClient);
         } else {
             writer.println(smClient.getString("managerServlet.unknownCommand",
                     command));
@@ -565,16 +569,39 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         writer.print(Diagnostics.getThreadDump(requestedLocales));
     }
 
-    protected void sslConnectorCiphers(PrintWriter writer,
-            StringManager smClient) {
-        writer.println(smClient.getString(
-                "managerServlet.sslConnectorCiphers"));
+
+    protected void sslConnectorCiphers(PrintWriter writer, StringManager smClient) {
+        writer.println(smClient.getString("managerServlet.sslConnectorCiphers"));
         Map<String,List<String>> connectorCiphers = getConnectorCiphers();
         for (Map.Entry<String,List<String>> entry : connectorCiphers.entrySet()) {
             writer.println(entry.getKey());
             for (String cipher : entry.getValue()) {
                 writer.print("  ");
                 writer.println(cipher);
+            }
+        }
+    }
+
+
+    private void sslConnectorCerts(PrintWriter writer, StringManager smClient) {
+        writer.println(smClient.getString("managerServlet.sslConnectorCerts"));
+        Map<String,List<String>> connectorCerts = getConnectorCerts();
+        for (Map.Entry<String,List<String>> entry : connectorCerts.entrySet()) {
+            writer.println(entry.getKey());
+            for (String cert : entry.getValue()) {
+                writer.println(cert);
+            }
+        }
+    }
+
+
+    private void sslConnectorTrustedCerts(PrintWriter writer, StringManager smClient) {
+        writer.println(smClient.getString("managerServlet.sslConnectorTrustedCerts"));
+        Map<String,List<String>> connectorTrustedCerts = getConnectorTrustedCerts();
+        for (Map.Entry<String,List<String>> entry : connectorTrustedCerts.entrySet()) {
+            writer.println(entry.getKey());
+            for (String cert : entry.getValue()) {
+                writer.println(cert);
             }
         }
     }
