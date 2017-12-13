@@ -33,7 +33,6 @@ import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
-import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
@@ -70,7 +69,7 @@ public class ServiceRefFactory implements ObjectFactory {
     throws Exception {
 
         if (obj instanceof ServiceRef) {
-            Reference ref = (Reference) obj;
+            ServiceRef ref = (ServiceRef) obj;
 
             // ClassLoader
             ClassLoader tcl =
@@ -236,13 +235,13 @@ public class ServiceRefFactory implements ObjectFactory {
             }
 
             // Use handler
-            if (((ServiceRef) ref).getHandlersSize() > 0) {
+            if (ref.getHandlersSize() > 0) {
 
                 HandlerRegistry handlerRegistry = service.getHandlerRegistry();
                 List<String> soaproles = new ArrayList<>();
 
-                while (((ServiceRef) ref).getHandlersSize() > 0) {
-                    HandlerRef handlerRef = ((ServiceRef) ref).getHandler();
+                while (ref.getHandlersSize() > 0) {
+                    HandlerRef handlerRef = ref.getHandler();
                     HandlerInfo handlerInfo = new HandlerInfo();
 
                     // Loading handler Class
