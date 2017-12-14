@@ -91,6 +91,11 @@
         mbeans-descriptiors.xml files for custom components. (markt)
       </add>
       <add>
+        <bug>61565</bug>: Add the ability to trigger a reloading of TLS host
+        configuration (certificate and key files, server.xml is not re-parsed)
+        via the Manager web application. (markt)
+      </add>
+      <add>
         <bug>61566</bug>: Expose the currently in use certificate chain and list
         of trusted certificates for all virtual hosts configured using the JSSE
         style (keystore) TLS configuration via the Manager web application.

@@ -193,6 +193,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         }
         String deployConfig = request.getParameter("deployConfig");
         String deployWar = request.getParameter("deployWar");
+        String tlsHostName = request.getParameter("tlsHostName");
 
         // Prepare our output writer to generate the response message
         response.setContentType("text/html; charset=" + Constants.CHARSET);
@@ -219,6 +220,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
             message = stop(cn, smClient);
         } else if (command.equals("/findleaks")) {
             message = findleaks(smClient);
+        } else if (command.equals("/sslReload")) {
+            message = sslReload(tlsHostName, smClient);
         } else {
             // Try GET
             doGet(request,response);
@@ -227,6 +230,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
         list(request, response, message, smClient);
     }
+
 
     protected String upload(HttpServletRequest request, StringManager smClient) {
         String message = "";
@@ -540,6 +544,15 @@ public final class HTMLManagerServlet extends ManagerServlet {
         args[3] = smClient.getString("htmlManagerServlet.deployButton");
         writer.print(MessageFormat.format(UPLOAD_SECTION, args));
 
+        // Config section
+        args = new Object[5];
+        args[0] = smClient.getString("htmlManagerServlet.configTitle");
+        args[1] = smClient.getString("htmlManagerServlet.configSslReloadTitle");
+        args[2] = response.encodeURL(request.getContextPath() + "/html/sslReload");
+        args[3] = smClient.getString("htmlManagerServlet.configSslHostName");
+        args[4] = smClient.getString("htmlManagerServlet.configReloadButton");
+        writer.print(MessageFormat.format(CONFIG_SECTION, args));
+
         // Diagnostics section
         args = new Object[15];
         args[0] = smClient.getString("htmlManagerServlet.diagnosticsTitle");
@@ -731,6 +744,16 @@ public final class HTMLManagerServlet extends ManagerServlet {
         }
 
         return msg.toString();
+    }
+
+
+    protected String sslReload(String tlsHostName, StringManager smClient) {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+
+        super.sslReload(printWriter, tlsHostName, smClient);
+
+        return stringWriter.toString();
     }
 
 
@@ -1317,6 +1340,43 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "</table>\n" +
         "<br>\n" +
         "\n";
+
+    private static final String CONFIG_SECTION =
+        "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
+        "<tr>\n" +
+        " <td colspan=\"2\" class=\"title\">{0}</td>\n" +
+        "</tr>\n" +
+
+        "<tr>\n" +
+        " <td colspan=\"2\" class=\"header-left\"><small>{1}</small></td>\n" +
+        "</tr>\n" +
+        "<tr>\n" +
+        " <td colspan=\"2\">\n" +
+        "<form method=\"post\" action=\"{2}\">\n" +
+        "<table cellspacing=\"0\" cellpadding=\"3\">\n" +
+        "<tr>\n" +
+        " <td class=\"row-right\">\n" +
+        "  <small>{3}</small>\n" +
+        " </td>\n" +
+        " <td class=\"row-left\">\n" +
+        "  <input type=\"text\" name=\"tlsHostName\" size=\"20\">\n" +
+        " </td>\n" +
+        "</tr>\n" +
+        "<tr>\n" +
+        " <td class=\"row-right\">\n" +
+        "  &nbsp;\n" +
+        " </td>\n" +
+        " <td class=\"row-left\">\n" +
+        "  <input type=\"submit\" value=\"{4}\">\n" +
+        " </td>\n" +
+        "</tr>\n" +
+        "</table>\n" +
+        "</form>\n" +
+        "</td>\n" +
+        "</tr>\n" +
+
+        "</table>\n" +
+        "<br>";
 
     private static final String DIAGNOSTICS_SECTION =
         "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
