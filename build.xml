@@ -2619,25 +2619,11 @@ skip.installer property in build.properties" />
   <target name="download-compile"
           description="Download (and build) components necessary to compile" >
 
-    <antcall target="downloadfile-2">
-      <param name="sourcefile.1" value="${tomcat-native.loc.1}"/>
-      <param name="sourcefile.2" value="${tomcat-native.loc.2}"/>
-      <param name="destfile" value="${tomcat-native.tar.gz}"/>
-      <param name="destdir" value="${tomcat-native.home}"/>
-    </antcall>
-
     <!-- Download Commons Daemon -->
     <antcall target="downloadgz-2">
       <param name="sourcefile.1" value="${commons-daemon.bin.loc.1}"/>
       <param name="sourcefile.2" value="${commons-daemon.bin.loc.2}"/>
       <param name="destfile" value="${commons-daemon.jar}"/>
-    </antcall>
-
-    <antcall target="downloadfile-2">
-      <param name="sourcefile.1" value="${commons-daemon.native.src.loc.1}"/>
-      <param name="sourcefile.2" value="${commons-daemon.native.src.loc.2}"/>
-      <param name="destfile" value="${commons-daemon.native.src.tgz}"/>
-      <param name="destdir" value="${commons-daemon.home}"/>
     </antcall>
 
     <!-- Download JDT (Eclipse compiler) -->
@@ -2710,11 +2696,25 @@ skip.installer property in build.properties" />
   <target name="download-dist"
           description="Download additional components for a distribution" >
 
+    <antcall target="downloadfile-2">
+      <param name="sourcefile.1" value="${tomcat-native.loc.1}"/>
+      <param name="sourcefile.2" value="${tomcat-native.loc.2}"/>
+      <param name="destfile" value="${tomcat-native.tar.gz}"/>
+      <param name="destdir" value="${tomcat-native.home}"/>
+    </antcall>
+
     <antcall target="downloadzip-2">
       <param name="sourcefile.1" value="${tomcat-native.win.1}"/>
       <param name="sourcefile.2" value="${tomcat-native.win.2}"/>
       <param name="destfile" value="${tomcat-native.home}/LICENSE"/>
       <param name="destdir" value="${tomcat-native.home}"/>
+    </antcall>
+
+    <antcall target="downloadfile-2">
+      <param name="sourcefile.1" value="${commons-daemon.native.src.loc.1}"/>
+      <param name="sourcefile.2" value="${commons-daemon.native.src.loc.2}"/>
+      <param name="destfile" value="${commons-daemon.native.src.tgz}"/>
+      <param name="destdir" value="${commons-daemon.home}"/>
     </antcall>
 
     <antcall target="downloadzip-2">
