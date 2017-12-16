@@ -67,6 +67,10 @@
       <fix>
         Do not call onDataAvailable without any data to read. (remm)
       </fix>
+      <fix>
+        Correctly handle EOF when <code>ServletInputStream.isReady()</code> is
+        called. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
