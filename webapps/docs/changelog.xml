@@ -58,6 +58,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        <bug>60276</bug>: Implement GZIP compression support for responses
+        served over HTTP/2. (markt)
+      </add>
+      <fix>
+        Do not call onDataAvailable without any data to read. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
@@ -69,17 +80,6 @@
         Improve the handling of methods with varargs in EL expressions. In
         particular, the calling of a varargs method with no parameters now works
         correctly. Based on a patch by Nitkalya (Ing) Wiriyanuparb. (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Coyote">
-    <changelog>
-      <add>
-        <bug>60276</bug>: Implement GZIP compression support for responses
-        served over HTTP/2. (markt)
-      </add>
-      <fix>
-        Do not call onDataAvailable without any data to read. (remm)
       </fix>
     </changelog>
   </subsection>
