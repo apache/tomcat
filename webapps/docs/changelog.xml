@@ -71,6 +71,10 @@
         Correctly handle EOF when <code>ServletInputStream.isReady()</code> is
         called. (markt)
       </fix>
+      <fix>
+        <bug>61918</bug>: Fix connectionLimitLatch counting when closing an
+        already closed socket. Based on a patch by Ryan Fong. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
