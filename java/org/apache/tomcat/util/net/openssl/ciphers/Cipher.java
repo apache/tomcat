@@ -3706,9 +3706,291 @@ public enum Cipher {
             null
     ),
 
-    /* ARIA ciphers 0xC03C to 0xC071
+    /* ARIA ciphers 0xC03C to 0xC04F
      * Unsupported by both Java and OpenSSL
      */
+
+    TLS_RSA_WITH_ARIA_128_GCM_SHA256(
+            0xC050,
+            "ARIA128-GCM-SHA256",
+            KeyExchange.RSA,
+            Authentication.RSA,
+            Encryption.ARIA128GCM,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128,
+            null,
+            null
+    ),
+    TLS_RSA_WITH_ARIA_256_GCM_SHA384(
+            0xC051,
+            "ARIA256-GCM-SHA384",
+            KeyExchange.RSA,
+            Authentication.RSA,
+            Encryption.ARIA256GCM,
+            MessageDigest.SHA384,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256,
+            null,
+            null
+    ),
+    TLS_DHE_RSA_WITH_ARIA_128_GCM_SHA256(
+            0xC052,
+            "DHE-RSA-ARIA128-GCM-SHA256",
+            KeyExchange.EDH,
+            Authentication.RSA,
+            Encryption.ARIA128GCM,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128,
+            null,
+            null
+    ),
+    TLS_DHE_RSA_WITH_ARIA_256_GCM_SHA384(
+            0xC053,
+            "DHE-RSA-ARIA256-GCM-SHA384",
+            KeyExchange.EDH,
+            Authentication.RSA,
+            Encryption.ARIA256GCM,
+            MessageDigest.SHA384,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256,
+            null,
+            null
+    ),
+
+    /* ARIA ciphers 0xC054 to 0xC055
+     * Unsupported by both Java and OpenSSL
+     */
+
+    TLS_DHE_DSS_WITH_ARIA_128_GCM_SHA256(
+            0xC056,
+            "DHE-DSS-ARIA128-GCM-SHA256",
+            KeyExchange.EDH,
+            Authentication.DSS,
+            Encryption.ARIA128GCM,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128,
+            null,
+            null
+    ),
+    TLS_DHE_DSS_WITH_ARIA_256_GCM_SHA384(
+            0xC057,
+            "DHE-DSS-ARIA256-GCM-SHA384",
+            KeyExchange.EDH,
+            Authentication.DSS,
+            Encryption.ARIA256GCM,
+            MessageDigest.SHA384,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256,
+            null,
+            null
+    ),
+
+    /* ARIA ciphers 0xC058 to 0xC05B
+     * Unsupported by both Java and OpenSSL
+     */
+
+    TLS_ECDHE_ECDSA_WITH_ARIA_128_GCM_SHA256(
+            0xC05C,
+            "ECDHE_ECDSA-ARIA128-GCM-SHA256",
+            KeyExchange.ECDHe,
+            Authentication.ECDSA,
+            Encryption.ARIA128GCM,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128,
+            null,
+            null
+    ),
+    TLS_ECDHE_ECDSA_WITH_ARIA_256_GCM_SHA384(
+            0xC05D,
+            "ECDHE_ECDSA-ARIA256-GCM-SHA384",
+            KeyExchange.ECDHe,
+            Authentication.ECDSA,
+            Encryption.ARIA256GCM,
+            MessageDigest.SHA384,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256,
+            null,
+            null
+    ),
+
+    /* ARIA ciphers 0xC05E to 0xC05F
+     * Unsupported by both Java and OpenSSL
+     */
+
+    TLS_ECDHE_RSA_WITH_ARIA_128_GCM_SHA256(
+            0xC060,
+            "ECDHE-RSA-ARIA128-GCM-SHA256",
+            KeyExchange.ECDHe,
+            Authentication.RSA,
+            Encryption.ARIA128GCM,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128,
+            null,
+            null
+    ),
+    TLS_ECDHE_RSA_WITH_ARIA_256_GCM_SHA384(
+            0xC061,
+            "ECDHE-RSA-ARIA256-GCM-SHA384",
+            KeyExchange.ECDHe,
+            Authentication.RSA,
+            Encryption.ARIA256GCM,
+            MessageDigest.SHA384,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256,
+            null,
+            null
+    ),
+
+    /* ARIA ciphers 0xC062 to 0xC069
+     * Unsupported by both Java and OpenSSL
+     */
+
+    TLS_PSK_WITH_ARIA_128_GCM_SHA256(
+            0xC06A,
+            "PSK-ARIA128-GCM-SHA256",
+            KeyExchange.PSK,
+            Authentication.PSK,
+            Encryption.ARIA128GCM,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128,
+            null,
+            null
+    ),
+    TLS_PSK_WITH_ARIA_256_GCM_SHA384(
+            0xC06B,
+            "PSK-ARIA256-GCM-SHA384",
+            KeyExchange.PSK,
+            Authentication.PSK,
+            Encryption.ARIA256GCM,
+            MessageDigest.SHA384,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256,
+            null,
+            null
+    ),
+    TLS_DHE_PSK_WITH_ARIA_128_GCM_SHA256(
+            0xC06C,
+            "DHE-PSK-ARIA128-GCM-SHA256",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.ARIA128GCM,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128,
+            null,
+            null
+    ),
+    TLS_DHE_PSK_WITH_ARIA_256_GCM_SHA384(
+            0xC06D,
+            "DHE-PSK-ARIA256-GCM-SHA384",
+            KeyExchange.DHEPSK,
+            Authentication.PSK,
+            Encryption.ARIA256GCM,
+            MessageDigest.SHA384,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256,
+            null,
+            null
+    ),
+    TLS_RSA_PSK_WITH_ARIA_128_GCM_SHA256(
+            0xC06E,
+            "RSA-PSK-ARIA128-GCM-SHA256",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.ARIA128GCM,
+            MessageDigest.SHA256,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            128,
+            128,
+            null,
+            null
+    ),
+    TLS_RSA_PSK_WITH_ARIA_256_GCM_SHA384(
+            0xC06F,
+            "RSA-PSK-ARIA256-GCM-SHA384",
+            KeyExchange.RSAPSK,
+            Authentication.RSA,
+            Encryption.ARIA256GCM,
+            MessageDigest.SHA384,
+            Protocol.TLSv1_2,
+            false,
+            EncryptionLevel.HIGH,
+            false,
+            256,
+            256,
+            null,
+            null
+    ),
+
+    /* ARIA ciphers 0xC070 to 0xC071
+     * Unsupported by both Java and OpenSSL
+     */
+
     // Cipher C072
     TLS_ECDHE_ECDSA_WITH_CAMELLIA_128_CBC_SHA256(
             0xC072,
