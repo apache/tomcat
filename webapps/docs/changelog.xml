@@ -79,6 +79,10 @@
         <bug>61914</bug>: Possible NPE with Java 9 when creating a SSL engine.
         Patch submitted by Evgenij Ryazanov. (remm)
       </fix>
+      <add>
+        Add support for the OpenSSL ARIA ciphers to the OpenSSL to JSSE
+        cipher mapping. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
