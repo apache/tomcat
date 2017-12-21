@@ -75,6 +75,10 @@
         <bug>61918</bug>: Fix connectionLimitLatch counting when closing an
         already closed socket. Based on a patch by Ryan Fong. (remm)
       </fix>
+      <fix>
+        <bug>61914</bug>: Possible NPE with Java 9 when creating a SSL engine.
+        Patch submitted by Evgenij Ryazanov. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
