@@ -371,6 +371,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      */
     protected long lastJarAccessed = 0L;
 
+    /**
+     * The interval in milliseconds that we can keep jar files open.
+     */
+    protected int jarOpenInterval = 90000;
 
     /**
      * The list of local repositories, in the order they should be searched
@@ -656,6 +660,20 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     }
 
+    /**
+     * Set the interval to keep all jar files open
+     * @param jarOpenInterval the interval in milliseconds to keep jar files open
+     */
+    public void setJarOpenInterval(int jarOpenInterval) {
+        this.jarOpenInterval = jarOpenInterval;
+    }
+
+    /**
+     * Return the interval to keep all jar files open if no jar is accessed
+     */
+    public int getJarOpenInterval() {
+        return jarOpenInterval;
+    }
 
     /**
      * @return Returns the antiJARLocking.
@@ -987,6 +1005,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         base.contextName = this.contextName;
         base.hasExternalRepositories = this.hasExternalRepositories;
         base.searchExternalFirst = this.searchExternalFirst;
+        base.jarOpenInterval = this.jarOpenInterval;
     }
 
 
@@ -2174,10 +2193,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * JAR resources.
      */
     public void closeJARs(boolean force) {
-        if (jarFiles.length > 0) {
+        if (jarFiles.length > 0 && (force || jarOpenInterval > 0)) {
                 synchronized (jarFiles) {
-                    if (force || (System.currentTimeMillis()
-                                  > (lastJarAccessed + 90000))) {
+                    if (force || (jarOpenInterval > 0 && System.currentTimeMillis()
+                            > (lastJarAccessed + jarOpenInterval))) {
                         for (int i = 0; i < jarFiles.length; i++) {
                             try {
                                 if (jarFiles[i] != null) {

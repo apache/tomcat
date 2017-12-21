@@ -71,6 +71,11 @@
         running under a <code>SecurityManager</code> is an asynchronous Servlet.
         (markt)
       </fix>
+      <add>
+        <bug>61810</bug>: Support configure the interval to keep all jars open
+        if no jar is accessed, a non-positive interval indicates
+        keeping jars always open. (huxing)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

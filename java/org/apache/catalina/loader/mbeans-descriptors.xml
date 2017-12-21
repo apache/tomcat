@@ -169,6 +169,10 @@
              writeable="false" 
                  type="java.lang.String"/>
 
+    <attribute   name="jarOpenInterval"
+                 description="The interval in milliseconds to keep all jar files open if no jar is accessed"
+                 type="int"/>
+
   </mbean>
 
   <mbean         name="ParallelWebappClassLoader"
@@ -212,6 +216,10 @@
           description="The jarPath of this loader"
              writeable="false" 
                  type="java.lang.String"/>
+
+    <attribute   name="jarOpenInterval"
+                 description="The interval in milliseconds to keep all jar files open if no jar is accessed"
+                 type="int"/>
 
   </mbean>
 

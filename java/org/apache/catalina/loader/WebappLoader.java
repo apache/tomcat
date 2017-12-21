@@ -137,6 +137,10 @@ public class WebappLoader extends LifecycleMBeanBase
      */
     private boolean delegate = false;
 
+    /**
+     * The interval in milliseconds to keep all jar files open if no jar is accessed
+     */
+    private int jarOpenInterval = 90000;
 
     /**
      * The descriptive information about this Loader implementation.
@@ -282,6 +286,21 @@ public class WebappLoader extends LifecycleMBeanBase
 
     }
 
+    /**
+     * The interval to keep all jar files open if no jar is accessed
+     *
+     * @param jarOpenInterval The new interval
+     */
+    public void setJarOpenInterval(int jarOpenInterval) {
+        this.jarOpenInterval = jarOpenInterval;
+    }
+
+    /**
+     * Return the interval to keep all jar files open if no jar is accessed
+     */
+    public int getJarOpenInterval() {
+        return jarOpenInterval;
+    }
 
     /**
      * Return descriptive information about this Loader implementation and
@@ -580,6 +599,7 @@ public class WebappLoader extends LifecycleMBeanBase
         try {
 
             classLoader = createClassLoader();
+            classLoader.setJarOpenInterval(this.jarOpenInterval);
             classLoader.setResources(container.getResources());
             classLoader.setDelegate(this.delegate);
             classLoader.setSearchExternalFirst(searchExternalFirst);
