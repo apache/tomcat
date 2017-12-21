@@ -138,6 +138,13 @@
         be searched first. Default value is <code>false</code>.</p>
       </attribute>
 
+      <attribute name="jarOpenInterval" required="false">
+        <p>The interval in milliseconds to keep all jar files open if no jar
+          is accessed. The default value is <code>90000</code> milliseconds.
+          A non-positive interval indicates keeping jars always open.
+        </p>
+      </attribute>
+
     </attributes>
 
   </subsection>
