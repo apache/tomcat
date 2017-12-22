@@ -3855,7 +3855,7 @@ public enum Cipher {
 
     TLS_ECDHE_RSA_WITH_ARIA_128_GCM_SHA256(
             0xC060,
-            "ECDHE-RSA-ARIA128-GCM-SHA256",
+            "ECDHE-ARIA128-GCM-SHA256",
             KeyExchange.ECDHe,
             Authentication.RSA,
             Encryption.ARIA128GCM,
@@ -3871,7 +3871,7 @@ public enum Cipher {
     ),
     TLS_ECDHE_RSA_WITH_ARIA_256_GCM_SHA384(
             0xC061,
-            "ECDHE-RSA-ARIA256-GCM-SHA384",
+            "ECDHE-ARIA256-GCM-SHA384",
             KeyExchange.ECDHe,
             Authentication.RSA,
             Encryption.ARIA256GCM,
