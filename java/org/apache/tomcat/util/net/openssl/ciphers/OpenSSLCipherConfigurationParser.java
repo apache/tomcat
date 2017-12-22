@@ -539,7 +539,7 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(SRP, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.SRP)));
         initialized = true;
         // Despite what the OpenSSL docs say, DEFAULT also excludes SSLv2
-        addListAlias(DEFAULT, parse("ALL:!EXPORT:!eNULL:!aNULL:!SSLv2:!DES:!RC2:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM:!3DES!ARIA"));
+        addListAlias(DEFAULT, parse("ALL:!EXPORT:!eNULL:!aNULL:!SSLv2:!DES:!RC2:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM:!3DES:!ARIA"));
         // COMPLEMENTOFDEFAULT is also not exactly as defined by the docs
         LinkedHashSet<Cipher> complementOfDefault = filterByKeyExchange(all, new HashSet<>(Arrays.asList(KeyExchange.EDH,KeyExchange.EECDH)));
         complementOfDefault = filterByAuthentication(complementOfDefault, Collections.singleton(Authentication.aNULL));
