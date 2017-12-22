@@ -264,6 +264,18 @@ public class OpenSSLCipherConfigurationParser {
      */
     private static final String AESCCM8 = "AESCCM8";
     /**
+     * Cipher suites using either 128 bit ARIA.
+     */
+    private static final String ARIA128 = "ARIA128";
+    /**
+     * Cipher suites using either 256 bit ARIA.
+     */
+    private static final String ARIA256 = "ARIA";
+    /**
+     * Cipher suites using either 128 or 256 bit ARIA.
+     */
+    private static final String ARIA = "ARIA";
+    /**
      * Cipher suites using 128 bit CAMELLIA.
      */
     private static final String CAMELLIA128 = "CAMELLIA128";
@@ -488,6 +500,9 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(AES128, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.AES128, Encryption.AES128CCM, Encryption.AES128CCM8, Encryption.AES128GCM))));
         addListAlias(AES256, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.AES256, Encryption.AES256CCM, Encryption.AES256CCM8, Encryption.AES256GCM))));
         addListAlias(AES, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.AES128, Encryption.AES128CCM, Encryption.AES128CCM8, Encryption.AES128GCM, Encryption.AES256, Encryption.AES256CCM, Encryption.AES256CCM8, Encryption.AES256GCM))));
+        addListAlias(ARIA128, filterByEncryption(allCiphers, Collections.singleton(Encryption.ARIA128GCM)));
+        addListAlias(ARIA256, filterByEncryption(allCiphers, Collections.singleton(Encryption.ARIA256GCM)));
+        addListAlias(ARIA, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.ARIA128GCM, Encryption.ARIA256GCM))));
         addListAlias(AESGCM, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.AES128GCM, Encryption.AES256GCM))));
         addListAlias(AESCCM, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.AES128CCM, Encryption.AES128CCM8, Encryption.AES256CCM, Encryption.AES256CCM8))));
         addListAlias(AESCCM8, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.AES128CCM8, Encryption.AES256CCM8))));
@@ -524,7 +539,7 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(SRP, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.SRP)));
         initialized = true;
         // Despite what the OpenSSL docs say, DEFAULT also excludes SSLv2
-        addListAlias(DEFAULT, parse("ALL:!EXPORT:!eNULL:!aNULL:!SSLv2:!DES:!RC2:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM:!3DES"));
+        addListAlias(DEFAULT, parse("ALL:!EXPORT:!eNULL:!aNULL:!SSLv2:!DES:!RC2:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM:!3DES!ARIA"));
         // COMPLEMENTOFDEFAULT is also not exactly as defined by the docs
         LinkedHashSet<Cipher> complementOfDefault = filterByKeyExchange(all, new HashSet<>(Arrays.asList(KeyExchange.EDH,KeyExchange.EECDH)));
         complementOfDefault = filterByAuthentication(complementOfDefault, Collections.singleton(Authentication.aNULL));
@@ -540,6 +555,7 @@ public class OpenSSLCipherConfigurationParser {
         complementOfDefault.addAll(aliases.get(IDEA));
         complementOfDefault.addAll(aliases.get(CAMELLIA));
         complementOfDefault.addAll(aliases.get(AESCCM));
+        complementOfDefault.addAll(aliases.get(ARIA));
         defaultSort(complementOfDefault);
         addListAlias(COMPLEMENTOFDEFAULT, complementOfDefault);
     }
