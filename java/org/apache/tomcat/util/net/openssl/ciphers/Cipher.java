@@ -3819,7 +3819,7 @@ public enum Cipher {
     TLS_ECDHE_ECDSA_WITH_ARIA_128_GCM_SHA256(
             0xC05C,
             "ECDHE-ECDSA-ARIA128-GCM-SHA256",
-            KeyExchange.ECDHe,
+            KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.ARIA128GCM,
             MessageDigest.SHA256,
@@ -3835,7 +3835,7 @@ public enum Cipher {
     TLS_ECDHE_ECDSA_WITH_ARIA_256_GCM_SHA384(
             0xC05D,
             "ECDHE-ECDSA-ARIA256-GCM-SHA384",
-            KeyExchange.ECDHe,
+            KeyExchange.EECDH,
             Authentication.ECDSA,
             Encryption.ARIA256GCM,
             MessageDigest.SHA384,
@@ -3856,7 +3856,7 @@ public enum Cipher {
     TLS_ECDHE_RSA_WITH_ARIA_128_GCM_SHA256(
             0xC060,
             "ECDHE-ARIA128-GCM-SHA256",
-            KeyExchange.ECDHe,
+            KeyExchange.EECDH,
             Authentication.RSA,
             Encryption.ARIA128GCM,
             MessageDigest.SHA256,
@@ -3872,7 +3872,7 @@ public enum Cipher {
     TLS_ECDHE_RSA_WITH_ARIA_256_GCM_SHA384(
             0xC061,
             "ECDHE-ARIA256-GCM-SHA384",
-            KeyExchange.ECDHe,
+            KeyExchange.EECDH,
             Authentication.RSA,
             Encryption.ARIA256GCM,
             MessageDigest.SHA384,
