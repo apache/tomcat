@@ -270,7 +270,7 @@ public class OpenSSLCipherConfigurationParser {
     /**
      * Cipher suites using either 256 bit ARIA.
      */
-    private static final String ARIA256 = "ARIA";
+    private static final String ARIA256 = "ARIA256";
     /**
      * Cipher suites using either 128 or 256 bit ARIA.
      */
