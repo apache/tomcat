@@ -303,12 +303,11 @@ public final class AstValue extends SimpleNode {
         }
 
         if (m.isVarArgs()) {
-            Object[] varArgs = (Object[]) Array.newInstance(
-                    m.getParameterTypes()[paramCount - 1].getComponentType(),
-                    src.length - (paramCount - 1));
+            Class<?> varArgType = m.getParameterTypes()[paramCount - 1].getComponentType();
+            Object[] varArgs =
+                    (Object[]) Array.newInstance(varArgType, src.length - (paramCount - 1));
             for (int i = 0; i < src.length - (paramCount - 1); i ++) {
-                varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i],
-                        types[paramCount - 1].getComponentType());
+                varArgs[i] = ELSupport.coerceToType(ctx, src[paramCount - 1 + i], varArgType);
             }
             dest[paramCount - 1] = varArgs;
         } else {
