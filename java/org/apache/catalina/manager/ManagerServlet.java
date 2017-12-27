@@ -62,6 +62,8 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.util.ContextName;
 import org.apache.catalina.util.ServerInfo;
+import org.apache.coyote.ProtocolHandler;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.tomcat.util.Diagnostics;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.modeler.Registry;
@@ -323,6 +325,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             && (request.getParameter("update").equals("true"))) {
             update = true;
         }
+        String tlsHostName = request.getParameter("tlsHostName");
 
         boolean statusLine = false;
         if ("true".equals(request.getParameter("statusLine"))) {
@@ -377,6 +380,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             sslConnectorCerts(writer, smClient);
         } else if (command.equals("/sslConnectorTrustedCerts")) {
             sslConnectorTrustedCerts(writer, smClient);
+        } else if (command.equals("/sslReload")) {
+            sslReload(writer, tlsHostName, smClient);
         } else {
             writer.println(smClient.getString("managerServlet.unknownCommand",
                     command));
@@ -539,6 +544,41 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
             }
         } else if (statusLine) {
             writer.println(smClient.getString("managerServlet.findleaksNone"));
+        }
+    }
+
+
+    protected void sslReload(PrintWriter writer, String tlsHostName, StringManager smClient) {
+        Connector connectors[] = getConnectors();
+        boolean found = false;
+        for (Connector connector : connectors) {
+            if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
+                ProtocolHandler protocol = connector.getProtocolHandler();
+                if (protocol instanceof AbstractHttp11Protocol<?>) {
+                    AbstractHttp11Protocol<?> http11Protoocol = (AbstractHttp11Protocol<?>) protocol;
+                    if (tlsHostName == null || tlsHostName.length() == 0) {
+                        found = true;
+                        http11Protoocol.reloadSsslHostConfigs();
+                    } else {
+                        SSLHostConfig[] sslHostConfigs = http11Protoocol.findSslHostConfigs();
+                        for (SSLHostConfig sslHostConfig : sslHostConfigs) {
+                            if (sslHostConfig.getHostName().equalsIgnoreCase(tlsHostName)) {
+                                found = true;
+                                http11Protoocol.reloadSsslHostConfig(tlsHostName);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (found) {
+            if (tlsHostName == null || tlsHostName.length() == 0) {
+                writer.println(smClient.getString("managerServlet.sslReloadAll"));
+            } else {
+                writer.println(smClient.getString("managerServlet.sslReload", tlsHostName));
+            }
+        } else {
+            writer.println(smClient.getString("managerServlet.sslReloadFail"));
         }
     }
 
@@ -1724,9 +1764,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected Map<String,List<String>> getConnectorCiphers() {
         Map<String,List<String>> result = new HashMap<>();
 
-        Engine e = (Engine) host.getParent();
-        Service s = e.getService();
-        Connector connectors[] = s.findConnectors();
+        Connector connectors[] = getConnectors();
         for (Connector connector : connectors) {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
@@ -1749,9 +1787,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected Map<String,List<String>> getConnectorCerts() {
         Map<String,List<String>> result = new HashMap<>();
 
-        Engine e = (Engine) host.getParent();
-        Service s = e.getService();
-        Connector connectors[] = s.findConnectors();
+        Connector connectors[] = getConnectors();
         for (Connector connector : connectors) {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
@@ -1792,9 +1828,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
     protected Map<String,List<String>> getConnectorTrustedCerts() {
         Map<String,List<String>> result = new HashMap<>();
 
-        Engine e = (Engine) host.getParent();
-        Service s = e.getService();
-        Connector connectors[] = s.findConnectors();
+        Connector connectors[] = getConnectors();
         for (Connector connector : connectors) {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
@@ -1823,5 +1857,12 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         return result;
+    }
+
+
+    private Connector[] getConnectors() {
+        Engine e = (Engine) host.getParent();
+        Service s = e.getService();
+        return s.findConnectors();
     }
 }

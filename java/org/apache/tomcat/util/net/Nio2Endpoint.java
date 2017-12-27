@@ -362,10 +362,14 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             ExceptionUtils.handleThrowable(e);
             if (log.isDebugEnabled()) log.error("",e);
         }
+        Nio2SocketWrapper nio2Socket = (Nio2SocketWrapper) socket;
         try {
             synchronized (socket.getSocket()) {
-                if (socket.getSocket().isOpen()) {
+                if (!nio2Socket.closed) {
+                    nio2Socket.closed = true;
                     countDownConnection();
+                }
+                if (socket.getSocket().isOpen()) {
                     socket.getSocket().close(true);
                 }
             }
@@ -374,7 +378,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             if (log.isDebugEnabled()) log.error("",e);
         }
         try {
-            Nio2SocketWrapper nio2Socket = (Nio2SocketWrapper) socket;
             if (nio2Socket.getSendfileData() != null
                     && nio2Socket.getSendfileData().fchannel != null
                     && nio2Socket.getSendfileData().fchannel.isOpen()) {
@@ -407,6 +410,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         private final Semaphore writePending = new Semaphore(1);
         private boolean writeInterest = false; // Guarded by writeCompletionHandler
         private boolean writeNotify = false;
+        private boolean closed = false;
 
         private CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>> awaitBytesHandler
                 = new CompletionHandler<Integer, SocketWrapperBase<Nio2Channel>>() {
@@ -1032,7 +1036,23 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             OperationState<A> state = new OperationState<>(dsts, offset, length, block, timeout, unit, attachment, check, handler);
             ScatterReadCompletionHandler<A> completion = new ScatterReadCompletionHandler<>();
             Nio2Endpoint.startInline();
-            getSocket().read(dsts, offset, length, timeout, unit, state, completion);
+            long nBytes = 0;
+            if (!socketBufferHandler.isReadBufferEmpty()) {
+                // There is still data inside the main read buffer, use it to fill out the destination buffers
+                synchronized (readCompletionHandler) {
+                    // Note: It is not necessary to put this code in the completion handler
+                    socketBufferHandler.configureReadBufferForRead();
+                    for (int i = 0; i < length && !socketBufferHandler.isReadBufferEmpty(); i++) {
+                        nBytes += transfer(socketBufferHandler.getReadBuffer(), dsts[offset + i]);
+                    }
+                }
+                if (nBytes > 0) {
+                    completion.completed(Long.valueOf(nBytes), state);
+                }
+            }
+            if (nBytes == 0) {
+                getSocket().read(dsts, offset, length, timeout, unit, state, completion);
+            }
             Nio2Endpoint.endInline();
             if (block == BlockingMode.BLOCK) {
                 synchronized (state) {
@@ -1087,6 +1107,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             OperationState<A> state = new OperationState<>(srcs, offset, length, block, timeout, unit, attachment, check, handler);
             GatherWriteCompletionHandler<A> completion = new GatherWriteCompletionHandler<>();
             Nio2Endpoint.startInline();
+            // It should be less necessary to check the buffer state as it is easy to flush before
             getSocket().write(srcs, offset, length, timeout, unit, state, completion);
             Nio2Endpoint.endInline();
             if (block == BlockingMode.BLOCK) {

@@ -2500,9 +2500,9 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 return true;
             }
 
-            fillReadBuffer(false);
+            int read = fillReadBuffer(false);
 
-            boolean isReady = socketBufferHandler.getReadBuffer().position() > 0;
+            boolean isReady = socketBufferHandler.getReadBuffer().position() > 0 || read == -1;
             return isReady;
         }
 

@@ -530,6 +530,24 @@ public class TestOpenSSLCipherConfigurationParser {
     }
 
 
+    @Test
+    public void testARIA() throws Exception {
+        testSpecification("ARIA");
+    }
+
+
+    @Test
+    public void testARIA128() throws Exception {
+        testSpecification("ARIA128");
+    }
+
+
+    @Test
+    public void testARIA256() throws Exception {
+        testSpecification("ARIA256");
+    }
+
+
     // TODO: Add tests for the individual operators
 
     @Test

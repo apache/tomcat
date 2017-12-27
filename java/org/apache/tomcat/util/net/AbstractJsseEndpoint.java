@@ -177,8 +177,9 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
 
         SSLParameters sslParameters = engine.getSSLParameters();
         sslParameters.setUseCipherSuitesOrder(sslHostConfig.getHonorCipherOrder());
-        if (JreCompat.isJre9Available() && clientRequestedApplicationProtocols.size() > 0 &&
-                negotiableProtocols.size() > 0) {
+        if (JreCompat.isJre9Available() && clientRequestedApplicationProtocols != null
+                && clientRequestedApplicationProtocols.size() > 0
+                && negotiableProtocols.size() > 0) {
             // Only try to negotiate if both client and server have at least
             // one protocol in common
             // Note: Tomcat does not explicitly negotiate http/1.1

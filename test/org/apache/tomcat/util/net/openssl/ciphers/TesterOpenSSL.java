@@ -230,6 +230,22 @@ public class TesterOpenSSL {
             unimplemented.add(Cipher.TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256);
             unimplemented.add(Cipher.TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256);
             unimplemented.add(Cipher.TLS_RSA_PSK_WITH_CHACHA20_POLY1305_SHA256);
+            unimplemented.add(Cipher.TLS_RSA_WITH_ARIA_128_GCM_SHA256);
+            unimplemented.add(Cipher.TLS_RSA_WITH_ARIA_256_GCM_SHA384);
+            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_ARIA_128_GCM_SHA256);
+            unimplemented.add(Cipher.TLS_DHE_RSA_WITH_ARIA_256_GCM_SHA384);
+            unimplemented.add(Cipher.TLS_DHE_DSS_WITH_ARIA_128_GCM_SHA256);
+            unimplemented.add(Cipher.TLS_DHE_DSS_WITH_ARIA_256_GCM_SHA384);
+            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_ARIA_128_GCM_SHA256);
+            unimplemented.add(Cipher.TLS_ECDHE_ECDSA_WITH_ARIA_256_GCM_SHA384);
+            unimplemented.add(Cipher.TLS_ECDHE_RSA_WITH_ARIA_128_GCM_SHA256);
+            unimplemented.add(Cipher.TLS_ECDHE_RSA_WITH_ARIA_256_GCM_SHA384);
+            unimplemented.add(Cipher.TLS_PSK_WITH_ARIA_128_GCM_SHA256);
+            unimplemented.add(Cipher.TLS_PSK_WITH_ARIA_256_GCM_SHA384);
+            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_ARIA_128_GCM_SHA256);
+            unimplemented.add(Cipher.TLS_DHE_PSK_WITH_ARIA_256_GCM_SHA384);
+            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_ARIA_128_GCM_SHA256);
+            unimplemented.add(Cipher.TLS_RSA_PSK_WITH_ARIA_256_GCM_SHA384);
         } else {
             // These were removed in 1.1.0 so won't be available from that
             // version onwards.

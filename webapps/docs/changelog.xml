@@ -58,6 +58,33 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <add>
+        <bug>60276</bug>: Implement GZIP compression support for responses
+        served over HTTP/2. (markt)
+      </add>
+      <fix>
+        Do not call onDataAvailable without any data to read. (remm)
+      </fix>
+      <fix>
+        Correctly handle EOF when <code>ServletInputStream.isReady()</code> is
+        called. (markt)
+      </fix>
+      <fix>
+        <bug>61918</bug>: Fix connectionLimitLatch counting when closing an
+        already closed socket. Based on a patch by Ryan Fong. (remm)
+      </fix>
+      <fix>
+        <bug>61914</bug>: Possible NPE with Java 9 when creating a SSL engine.
+        Patch submitted by Evgenij Ryazanov. (remm)
+      </fix>
+      <add>
+        Add support for the OpenSSL ARIA ciphers to the OpenSSL to JSSE
+        cipher mapping. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
@@ -72,23 +99,17 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="Coyote">
-    <changelog>
-      <add>
-        <bug>60276</bug>: Implement GZIP compression support for responses
-        served over HTTP/2. (markt)
-      </add>
-      <fix>
-        Do not call onDataAvailable without any data to read. (remm)
-      </fix>
-    </changelog>
-  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
         <bug>61223</bug>: Add the mbeans-descriptors.dtd file to the custom
         MBean documentation so users have a reference to use when constructing
         mbeans-descriptiors.xml files for custom components. (markt)
+      </add>
+      <add>
+        <bug>61565</bug>: Add the ability to trigger a reloading of TLS host
+        configuration (certificate and key files, server.xml is not re-parsed)
+        via the Manager web application. (markt)
       </add>
       <add>
         <bug>61566</bug>: Expose the currently in use certificate chain and list
@@ -123,6 +144,11 @@
         Update the internal fork of Commons Codec to r1817136 to pick up some
         code clean-up. (markt)
       </update>
+      <fix>
+        The native source bundles (for Commons Daemon and Tomcat Native) are no
+        longer copied to the bin directory for the deploy target. They are now
+        only copied to the bin directory for the release target. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
