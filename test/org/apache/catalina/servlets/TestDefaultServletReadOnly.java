@@ -35,26 +35,26 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class TestDefaultServletReadOnly extends TomcatBaseTest {
 
-    @Parameterized.Parameters(name = "{index}: readOnly[{0}], optionsAllowHeader[{1}],"
+    @Parameterized.Parameters(name = "{index}: readOnly[{0}], allowHeader[{1}],"
                     + " putAndDeleteResponse[{2}]")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
 
         parameterSets.add(
-            new Object[]{"true", "Allow: GET, HEAD, POST, OPTIONS", "HTTP/1.1 403 "});
+            new Object[]{true, "Allow: GET, HEAD, POST, OPTIONS", "HTTP/1.1 405 "});
         parameterSets.add(
-            new Object[]{"false", "Allow: GET, HEAD, POST, PUT, DELETE, OPTIONS", "HTTP/1.1 204 "});
+            new Object[]{false, "Allow: GET, HEAD, POST, PUT, DELETE, OPTIONS", "HTTP/1.1 204 "});
         return parameterSets;
     }
 
 
-    private final String readOnly;
-    private final String optionsAllowHeader;
+    private final boolean readOnly;
+    private final String allowHeader;
     private final String putAndDeleteResponse;
 
-    public TestDefaultServletReadOnly(String readOnly, String optionsAllowHeader, String putAndDeleteResponse) {
+    public TestDefaultServletReadOnly(boolean readOnly, String allowHeader, String putAndDeleteResponse) {
         this.readOnly = readOnly;
-        this.optionsAllowHeader = optionsAllowHeader;
+        this.allowHeader = allowHeader;
         this.putAndDeleteResponse = putAndDeleteResponse;
     }
 
@@ -68,7 +68,7 @@ public class TestDefaultServletReadOnly extends TomcatBaseTest {
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
         Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
             DefaultServlet.class.getName());
-        defaultServlet.addInitParameter("readonly", readOnly);
+        defaultServlet.addInitParameter("readonly", Boolean.toString(readOnly));
         ctxt.addServletMappingDecoded("/", "default");
 
         tomcat.start();
@@ -83,7 +83,7 @@ public class TestDefaultServletReadOnly extends TomcatBaseTest {
         client.processRequest();
         Assert.assertTrue(client.isResponse200());
         List<String> responseHeaders = client.getResponseHeaders();
-        Assert.assertTrue(responseHeaders.contains(optionsAllowHeader));
+        Assert.assertTrue(responseHeaders.contains(allowHeader));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class TestDefaultServletReadOnly extends TomcatBaseTest {
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
         Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default",
             DefaultServlet.class.getName());
-        defaultServlet.addInitParameter("readonly", readOnly);
+        defaultServlet.addInitParameter("readonly", Boolean.toString(readOnly));
 
         ctxt.addServletMappingDecoded("/", "default");
 
@@ -135,6 +135,14 @@ public class TestDefaultServletReadOnly extends TomcatBaseTest {
         client.connect();
         client.processRequest();
         Assert.assertTrue(client.responseLineStartsWith(putAndDeleteResponse));
+        List<String> responseHeaders = client.getResponseHeaders();
+        if (readOnly) {
+            Assert.assertTrue(responseHeaders.contains(allowHeader));
+        } else {
+            for (String responseHeader : responseHeaders) {
+                Assert.assertFalse(responseHeader.startsWith("Allow: "));
+            }
+        }
 
         client.reset();
         client.setRequest(new String[] {
@@ -142,6 +150,14 @@ public class TestDefaultServletReadOnly extends TomcatBaseTest {
         client.connect();
         client.processRequest();
         Assert.assertTrue(client.responseLineStartsWith(putAndDeleteResponse));
+        responseHeaders = client.getResponseHeaders();
+        if (readOnly) {
+            Assert.assertTrue(responseHeaders.contains(allowHeader));
+        } else {
+            for (String responseHeader : responseHeaders) {
+                Assert.assertFalse(responseHeader.startsWith("Allow: "));
+            }
+        }
 
         client.reset();
         client.setRequest(new String[] {
