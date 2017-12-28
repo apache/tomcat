@@ -503,43 +503,64 @@ public abstract class HttpServlet extends GenericServlet {
         // End of Tomcat specific hack
 
         for (int i=0; i<methods.length; i++) {
-            Method m = methods[i];
+            String methodName = methods[i].getName();
 
-            if (m.getName().equals("doGet")) {
+            if (methodName.equals("doGet")) {
                 ALLOW_GET = true;
                 ALLOW_HEAD = true;
-            }
-            if (m.getName().equals("doPost"))
+            } else if (methodName.equals("doPost")) {
                 ALLOW_POST = true;
-            if (m.getName().equals("doPut"))
+            } else if (methodName.equals("doPut")) {
                 ALLOW_PUT = true;
-            if (m.getName().equals("doDelete"))
+            } else if (methodName.equals("doDelete")) {
                 ALLOW_DELETE = true;
+            }
         }
 
-        String allow = null;
-        if (ALLOW_GET)
-            allow=METHOD_GET;
-        if (ALLOW_HEAD)
-            if (allow==null) allow=METHOD_HEAD;
-            else allow += ", " + METHOD_HEAD;
-        if (ALLOW_POST)
-            if (allow==null) allow=METHOD_POST;
-            else allow += ", " + METHOD_POST;
-        if (ALLOW_PUT)
-            if (allow==null) allow=METHOD_PUT;
-            else allow += ", " + METHOD_PUT;
-        if (ALLOW_DELETE)
-            if (allow==null) allow=METHOD_DELETE;
-            else allow += ", " + METHOD_DELETE;
-        if (ALLOW_TRACE)
-            if (allow==null) allow=METHOD_TRACE;
-            else allow += ", " + METHOD_TRACE;
-        if (ALLOW_OPTIONS)
-            if (allow==null) allow=METHOD_OPTIONS;
-            else allow += ", " + METHOD_OPTIONS;
+        // we know "allow" is not null as ALLOW_OPTIONS = true
+        // when this method is invoked
+        StringBuilder allow = new StringBuilder();
+        if (ALLOW_GET) {
+            allow.append(METHOD_GET);
+        }
+        if (ALLOW_HEAD) {
+            if (allow.length() > 0) {
+                allow.append(", ");
+            }
+            allow.append(METHOD_HEAD);
+        }
+        if (ALLOW_POST) {
+            if (allow.length() > 0) {
+                allow.append(", ");
+            }
+            allow.append(METHOD_POST);
+        }
+        if (ALLOW_PUT) {
+            if (allow.length() > 0) {
+                allow.append(", ");
+            }
+            allow.append(METHOD_PUT);
+        }
+        if (ALLOW_DELETE) {
+            if (allow.length() > 0) {
+                allow.append(", ");
+            }
+            allow.append(METHOD_DELETE);
+        }
+        if (ALLOW_TRACE) {
+            if (allow.length() > 0) {
+                allow.append(", ");
+            }
+            allow.append(METHOD_TRACE);
+        }
+        if (ALLOW_OPTIONS) {
+            if (allow.length() > 0) {
+                allow.append(", ");
+            }
+            allow.append(METHOD_OPTIONS);
+        }
 
-        resp.setHeader("Allow", allow);
+        resp.setHeader("Allow", allow.toString());
     }
 
 
