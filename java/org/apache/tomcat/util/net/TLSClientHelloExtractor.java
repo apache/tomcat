@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.IOException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -52,8 +54,9 @@ public class TLSClientHelloExtractor {
      * exits.
      *
      * @param netInBuffer The buffer containing the TLS data to process
+     * @throws IOException If the client hello message is malformed
      */
-    public TLSClientHelloExtractor(ByteBuffer netInBuffer) {
+    public TLSClientHelloExtractor(ByteBuffer netInBuffer) throws IOException {
         // TODO: Detect use of http on a secure connection and provide a simple
         //       error page.
 
@@ -143,6 +146,8 @@ public class TLSClientHelloExtractor {
                 }
             }
             result = ExtractorResult.COMPLETE;
+        } catch (BufferUnderflowException | IllegalArgumentException e) {
+            throw new IOException(sm.getString("sniExtractor.clientHelloInvalid"), e);
         } finally {
             this.result = result;
             this.clientRequestedCiphers = clientRequestedCiphers;
