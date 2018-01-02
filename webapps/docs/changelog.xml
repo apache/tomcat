@@ -83,6 +83,11 @@
         Add support for the OpenSSL ARIA ciphers to the OpenSSL to JSSE
         cipher mapping. (markt)
       </add>
+      <fix>
+        <bug>61948</bug>: Improve the handling of malformed ClientHello messages
+        in the code that extracts the SNI information from a TLS handshake for
+        the JSSE based NIO and NIO2 connectors. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
