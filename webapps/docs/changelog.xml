@@ -97,6 +97,9 @@
         particular, the calling of a varargs method with no parameters now works
         correctly. Based on a patch by Nitkalya (Ing) Wiriyanuparb. (markt)
       </fix>
+      <fix>
+        <bug>61945</bug>: Fix prototype mode used to compile tags. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

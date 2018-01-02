@@ -215,6 +215,7 @@ public abstract class Compiler {
                 // generate prototype .java file for the tag file
                 try (ServletWriter writer = setupContextWriter(javaFileName)) {
                     Generator.generate(writer, this, pageNodes);
+                    return null;
                 }
             }
 
