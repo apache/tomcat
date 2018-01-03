@@ -84,6 +84,10 @@
         cipher mapping. (markt)
       </add>
       <fix>
+        <bug>61932</bug>: Allow a call to <code>AsyncContext.dispatch()</code>
+        to terminate non-blocking I/O. (markt)
+      </fix>
+      <fix>
         <bug>61948</bug>: Improve the handling of malformed ClientHello messages
         in the code that extracts the SNI information from a TLS handshake for
         the JSSE based NIO and NIO2 connectors. (markt)

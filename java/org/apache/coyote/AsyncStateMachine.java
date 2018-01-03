@@ -350,6 +350,7 @@ public class AsyncStateMachine {
 
 
     private synchronized boolean doDispatch() {
+        clearNonBlockingListeners();
         boolean doDispatch = false;
         if (state == AsyncState.STARTING ||
                 state == AsyncState.TIMING_OUT ||
