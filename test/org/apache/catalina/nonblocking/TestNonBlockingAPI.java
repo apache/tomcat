@@ -919,7 +919,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=61932
      */
     @Test
-    public void testNonBlockingReadWithDispathch() throws Exception {
+    public void testNonBlockingReadWithDispatch() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
