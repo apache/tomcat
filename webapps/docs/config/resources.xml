@@ -68,9 +68,9 @@
 
       <attribute name="allowLinking" required="false">
         <p>If the value of this flag is <code>true</code>, symlinks will be
-        allowed inside the web application, pointing to resources outside the
-        web application base path. If not specified, the default value
-        of the flag is <code>false</code>.</p>
+        allowed inside the web application, pointing to resources inside or
+        outside the web application base path. If not specified, the default
+        value of the flag is <code>false</code>.</p>
         <p><b>NOTE: This flag MUST NOT be set to true on the Windows platform
         (or any other OS which does not have a case sensitive filesystem),
         as it will disable case sensitivity checks, allowing JSP source code
