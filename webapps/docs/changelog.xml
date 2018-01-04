@@ -84,6 +84,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>61886</bug>: Log errors on non-container threads at
+        <code>DEBUG</code> rather than <code>INFO</code>. The exception will be
+        made available to the application via the asynchronous error handling
+        mechanism. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
@@ -91,6 +101,11 @@
         MBean documentation so users have a reference to use when constructing
         mbeans-descriptiors.xml files for custom components. (markt)
       </add>
+      <fix>
+        Partial fix for <bug>61886</bug>. Ensure that multiple threads do not
+        attempt to complete the <code>AsyncContext</code> if an I/O error occurs
+        in the stock ticker example Servlet. (markt)
+      </fix>
       <fix>
         <bug>61910</bug>: Clarify the meaning of the <code>allowLinking</code>
         option in the documentation web application. (markt)
