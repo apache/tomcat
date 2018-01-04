@@ -56,6 +56,12 @@
       <fix>
         Minor HTTP/2 push fixes. (remm)
       </fix>
+      <fix>
+        <bug>61916</bug>: Extend the <code>AddDefaultCharsetFilter</code> to add
+        a character set when the content type is set via
+        <code>setHeader()</code> or <code>addHeader()</code> as well as when it
+        is set via <code>setContentType()</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -121,6 +121,24 @@ public class AddDefaultCharsetFilter extends FilterBase {
         }
 
         @Override
+        public void setHeader(String name, String value) {
+            if (name.trim().equalsIgnoreCase("content-type")) {
+                setContentType(value);
+            } else {
+                super.setHeader(name, value);
+            }
+        }
+
+        @Override
+        public void addHeader(String name, String value) {
+            if (name.trim().equalsIgnoreCase("content-type")) {
+                setContentType(value);
+            } else {
+                super.setHeader(name, value);
+            }
+        }
+
+        @Override
         public void setCharacterEncoding(String charset) {
             super.setCharacterEncoding(charset);
             encoding = charset;
