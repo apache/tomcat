@@ -816,8 +816,9 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     @Override
+    @Deprecated
     protected synchronized void doNotifyAll() {
-        this.notifyAll();
+        // NO-OP. Unused.
     }
 
 

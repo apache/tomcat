@@ -147,5 +147,6 @@ abstract class AbstractStream {
 
     protected abstract int getWeight();
 
+    @Deprecated // Unused
     protected abstract void doNotifyAll();
 }

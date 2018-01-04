@@ -230,16 +230,9 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     @Override
+    @Deprecated
     protected synchronized void doNotifyAll() {
-        if (coyoteResponse.getWriteListener() == null) {
-            // Blocking IO so thread will be waiting. Release it.
-            // Use notifyAll() to be safe (should be unnecessary)
-            this.notifyAll();
-        } else {
-            if (streamOutputBuffer.isRegisteredForWrite()) {
-                coyoteResponse.action(ActionCode.DISPATCH_WRITE, null);
-            }
-        }
+        // NO-OP. Unused.
     }
 
 
