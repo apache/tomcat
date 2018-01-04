@@ -395,7 +395,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 try {
                     listener.fireOnError(errorEvent);
                 } catch (Throwable t2) {
-                    ExceptionUtils.handleThrowable(t);
+                    ExceptionUtils.handleThrowable(t2);
                     log.warn("onError() failed for listener of type [" +
                             listener.getClass().getName() + "]", t2);
                 }
