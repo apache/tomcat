@@ -1175,6 +1175,12 @@
     <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
   </Match>
   <Match>
+    <!-- Return value of read is intentionally ignored -->
+    <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI$NBReadWithDispatchServlet$1"/>
+    <Method name="onDataAvailable"/>
+    <Bug pattern="RR_NOT_CHECKED"/>
+  </Match>
+  <Match>
     <Or>
       <Class name="org.apache.catalina.startup.TestListener$SCL" />
       <Class name="org.apache.catalina.startup.TestListener$SCL3" />
