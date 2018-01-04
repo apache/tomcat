@@ -1065,6 +1065,12 @@
     <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
   </Match>
   <Match>
+    <!-- Return value of latch is intentionally ignored -->
+    <Class name="org.apache.catalina.nonblocking.TestNonBlockingAPI"/>
+    <Method name="testDelayedNBWrite"/>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
+  </Match>
+  <Match>
     <Or>
       <Class name="org.apache.catalina.startup.TestListener$SCL" />
       <Class name="org.apache.catalina.startup.TestListener$SCL3" />
