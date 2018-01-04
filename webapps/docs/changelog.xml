@@ -139,6 +139,11 @@
         <bug>61910</bug>: Clarify the meaning of the <code>allowLinking</code>
         option in the documentation web application. (markt)
       </fix>
+      <fix>
+        Partial fix for <bug>61886</bug>. Ensure that multiple threads do not
+        attempt to complete the <code>AsyncContext</code> if an I/O error occurs
+        in the stock ticker example Servlet. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

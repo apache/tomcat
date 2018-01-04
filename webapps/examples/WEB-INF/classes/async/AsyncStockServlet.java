@@ -85,25 +85,23 @@ public class AsyncStockServlet extends HttpServlet implements TickListener, Asyn
         }
     }
 
-    public void writeStock(AsyncContext actx, Stock stock) {
+
+    public void writeStock(AsyncContext actx, Stock stock) throws IOException {
         HttpServletResponse response = (HttpServletResponse)actx.getResponse();
-        try {
-            PrintWriter writer = response.getWriter();
-            writer.write("STOCK#");//make client parsing easier
-            writer.write(stock.getSymbol());
-            writer.write("#");
-            writer.write(stock.getValueAsString());
-            writer.write("#");
-            writer.write(stock.getLastChangeAsString());
-            writer.write("#");
-            writer.write(String.valueOf(stock.getCnt()));
-            writer.write("\n");
-            writer.flush();
-            response.flushBuffer();
-        }catch (IOException x) {
-            try {actx.complete();}catch (Exception ignore){/* Ignore */}
-        }
+        PrintWriter writer = response.getWriter();
+        writer.write("STOCK#");//make client parsing easier
+        writer.write(stock.getSymbol());
+        writer.write("#");
+        writer.write(stock.getValueAsString());
+        writer.write("#");
+        writer.write(stock.getLastChangeAsString());
+        writer.write("#");
+        writer.write(String.valueOf(stock.getCnt()));
+        writer.write("\n");
+        writer.flush();
+        response.flushBuffer();
     }
+
 
     @Override
     public void onComplete(AsyncEvent event) throws IOException {
