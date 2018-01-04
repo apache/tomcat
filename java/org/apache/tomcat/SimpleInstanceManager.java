@@ -55,7 +55,7 @@ public class SimpleInstanceManager implements InstanceManager {
     @Override
     public void newInstance(Object o) throws IllegalAccessException, InvocationTargetException,
             NamingException  {
-        prepareInstance(o);
+        // NO-OP
     }
 
     @Override
