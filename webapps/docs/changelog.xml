@@ -78,6 +78,12 @@
         called. (markt)
       </fix>
       <fix>
+        <bug>61886</bug>: Log errors on non-container threads at
+        <code>DEBUG</code> rather than <code>INFO</code>. The exception will be
+        made available to the application via the asynchronous error handling
+        mechanism. (markt)
+      </fix>
+      <fix>
         <bug>61918</bug>: Fix connectionLimitLatch counting when closing an
         already closed socket. Based on a patch by Ryan Fong. (remm)
       </fix>
@@ -97,12 +103,6 @@
         <bug>61948</bug>: Improve the handling of malformed ClientHello messages
         in the code that extracts the SNI information from a TLS handshake for
         the JSSE based NIO and NIO2 connectors. (markt)
-      </fix>
-      <fix>
-        <bug>61886</bug>: Log errors on non-container threads at
-        <code>DEBUG</code> rather than <code>INFO</code>. The exception will be
-        made available to the application via the asynchronous error handling
-        mechanism. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -142,13 +142,13 @@
         (markt)
       </add>
       <fix>
-        <bug>61910</bug>: Clarify the meaning of the <code>allowLinking</code>
-        option in the documentation web application. (markt)
-      </fix>
-      <fix>
         Partial fix for <bug>61886</bug>. Ensure that multiple threads do not
         attempt to complete the <code>AsyncContext</code> if an I/O error occurs
         in the stock ticker example Servlet. (markt)
+      </fix>
+      <fix>
+        <bug>61910</bug>: Clarify the meaning of the <code>allowLinking</code>
+        option in the documentation web application. (markt)
       </fix>
     </changelog>
   </subsection>
