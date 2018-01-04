@@ -52,29 +52,6 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="Web applications">
-    <changelog>
-      <fix>
-        Remove the Servlet 4.0 early preview example from the examples web
-        application as the early preview is now deprecated in favour of Tomcat
-        9 which provides a full Servlet 4.0 implementation. (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Jasper">
-    <changelog>
-      <fix>
-        <bug>61854</bug>: When using sets and/or maps in EL expressions, ensure
-        that Jasper correctly parses the expression. Patch provided by Ricardo
-        Martin Camarero. (markt)
-      </fix>
-      <fix>
-        Improve the handling of methods with varargs in EL expressions. In
-        particular, the calling of a varargs method with no parameters now works
-        correctly. Based on a patch by Nitkalya (Ing) Wiriyanuparb. (markt)
-      </fix>
-    </changelog>
-  </subsection>
   <subsection name="Coyote">
     <changelog>
       <add>
@@ -107,8 +84,27 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>61854</bug>: When using sets and/or maps in EL expressions, ensure
+        that Jasper correctly parses the expression. Patch provided by Ricardo
+        Martin Camarero. (markt)
+      </fix>
+      <fix>
+        Improve the handling of methods with varargs in EL expressions. In
+        particular, the calling of a varargs method with no parameters now works
+        correctly. Based on a patch by Nitkalya (Ing) Wiriyanuparb. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
+      <fix>
+        Remove the Servlet 4.0 early preview example from the examples web
+        application as the early preview is now deprecated in favour of Tomcat
+        9 which provides a full Servlet 4.0 implementation. (markt)
+      </fix>
       <add>
         <bug>61223</bug>: Add the mbeans-descriptors.dtd file to the custom
         MBean documentation so users have a reference to use when constructing
