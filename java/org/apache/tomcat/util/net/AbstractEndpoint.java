@@ -918,9 +918,10 @@ public abstract class AbstractEndpoint<S,U> {
                     waitLeft -= 50;
                 }
             }
-        } catch(Exception e) {
+        } catch(Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("endpoint.debug.unlock.fail", "" + getPort()), e);
+                getLog().debug(sm.getString("endpoint.debug.unlock.fail", "" + getPort()), t);
             }
         }
     }
