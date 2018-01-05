@@ -316,6 +316,12 @@ public class SecureNioChannel extends NioChannel  {
             hostName = endpoint.getDefaultSSLHostConfigName();
             clientRequestedCiphers = Collections.emptyList();
             break;
+        case NON_SECURE:
+            netOutBuffer.clear();
+            netOutBuffer.put(TLSClientHelloExtractor.USE_TLS_RESPONSE);
+            netOutBuffer.flip();
+            flushOutbound();
+            throw new IOException(sm.getString("channel.nio.ssl.foundHttp"));
         }
 
         if (log.isDebugEnabled()) {
