@@ -425,6 +425,111 @@ After that you can proceed with importing your Certificate.</p>
 </subsection>
 </section>
 
+<section name="Using OCSP Certificates">
+<p>To use Online Certificate Status Protocol (OCSP) with Apache Tomcat, ensure
+  you have downloaded, installed, and configured the
+  <a href="https://tomcat.apache.org/download-native.cgi">
+    Tomcat Native Connector</a>.
+Furthermore, if you use the Windows platform, ensure you download the
+ocsp-enabled connector.</p>
+<p>To use OCSP, you require the following:</p>
+
+<ul>
+  <li>OCSP-enabled certificates</li>
+  <li>Tomcat with SSL APR connector</li>
+  <li>Configured OCSP responder</li>
+</ul>
+
+<subsection name="Generating OCSP-Enabled Certificates">
+<p>Apache Tomcat requires the OCSP-enabled certificate to have the OCSP
+  responder location encoded in the certificate. The basic OCSP-related
+  certificate authority settings in the <code>openssl.cnf</code> file could look
+  as follows:</p>
+
+<source>
+#... omitted for brevity
+
+[x509]
+x509_extensions = v3_issued
+
+[v3_issued]
+subjectKeyIdentifier=hash
+authorityKeyIdentifier=keyid,issuer
+# The address of your responder
+authorityInfoAccess = OCSP;URI:http://127.0.0.1:8088
+keyUsage = critical,digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment,keyAgreement,keyCertSign,cRLSign,encipherOnly,decipherOnly
+basicConstraints=critical,CA:FALSE
+nsComment="Testing OCSP Certificate"
+
+#... omitted for brevity
+</source>
+
+<p>The settings above encode the OCSP responder address
+  <code>127.0.0.1:8088</code> into the certificate. Note that for the following
+   steps, you must have <code>openssl.cnf</code> and other configuration of
+   your CA ready. To generate an OCSP-enabled certificate:</p>
+
+<ul>
+  <li>
+    Create a private key:
+    <source>openssl genrsa -aes256 -out ocsp-cert.key 4096</source>
+  </li>
+  <li>
+    Create a signing request (CSR):
+    <source>openssl req -config openssl.cnf -new -sha256 \
+  -key ocsp-cert.key -out ocsp-cert.csr</source></li>
+  <li>
+    Sign the CSR:
+    <source>openssl ca -openssl.cnf -extensions ocsp -days 375 -notext \
+  -md sha256 -in ocsp-cert.csr -out ocsp-cert.crt</source>
+  </li>
+  <li>
+    You may verify the certificate:
+    <source>openssl x509 -noout -text -in ocsp-cert.crt</source>
+  </li>
+</ul>
+</subsection>
+
+<subsection name="Configuring OCSP Connector">
+
+<p>To configure the OCSP connector, first verify that you are loading the Tomcat
+   APR library. Check the <a href="apr.html#Installation">
+   Apache Portable Runtime (APR) based Native library for Tomcat</a>
+for more information about installation of APR. A basic OCSP-enabled connector
+ definition in the <code>server.xml</code> file looks as follows:</p>
+<source>
+<![CDATA[<Connector port="8443"
+   protocol="org.apache.coyote.http11.Http11AprProtocol"
+   secure="true" scheme="https"
+   SSLEnabled="true" SSLCertificateFile="/path/to/ocsp-cert.crt"
+   SSLCertificateKeyFile="/path/to/ocsp-cert.key"
+   SSLCACertificateFile="/path/to/ca.pem"
+   SSLVerifyClient="require"
+   SSLVerifyDepth="10"
+   clientAuth="true"/>]]>
+</source>
+</subsection>
+
+<subsection name="Starting OCSP Responder">
+  <p>Apache Tomcat will query an OCSP responder server to get the certificate
+  status. When testing, an easy way to create an OCSP responder is by executing
+   the following:
+  <source>openssl ocsp -port 127.0.0.1:8088 \
+    -text -sha256 -index index.txt \
+    -CA ca-chain.cert.pem -rkey ocsp-cert.key \
+    -rsigner ocsp-cert.crt</source> </p>
+
+ <p>Do note that when using OCSP, the responder encoded in the connector
+   certificate must be running. For further information, see
+   <a href="https://www.openssl.org/docs/man1.1.0/apps/ocsp.html">
+     OCSP documentation
+   </a>.
+ </p>
+
+</subsection>
+
+</section>
+
 <section name="Troubleshooting">
 
 <p>Here is a list of common problems that you may encounter when setting up

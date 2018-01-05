@@ -158,6 +158,10 @@
         <bug>61910</bug>: Clarify the meaning of the <code>allowLinking</code>
         option in the documentation web application. (markt)
       </fix>
+      <add>
+        Add OCSP configuration information to the SSL How-To. Patch provided by
+        Marek Czernek. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
