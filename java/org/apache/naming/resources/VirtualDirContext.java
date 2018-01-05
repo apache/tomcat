@@ -38,17 +38,17 @@ import org.apache.naming.NamingEntry;
  * This should be used in conjunction with
  * {@link org.apache.catalina.loader.VirtualWebappLoader}.
  *
- * Sample context xml configuration:
+ * Sample context xml configuration:<br/><br/>
  *
- * <code>
- * &lt;Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp" >
- *   &lt;Resources className="org.apache.naming.resources.VirtualDirContext"
+ * <pre>{@code
+ * <Context path="/mywebapp" docBase="/Users/theuser/mywebapp/src/main/webapp" >
+ *   <Resources className="org.apache.naming.resources.VirtualDirContext"
  *              extraResourcePaths="/pictures=/Users/theuser/mypictures,/movies=/Users/theuser/mymovies" />
- *   &lt;Loader className="org.apache.catalina.loader.VirtualWebappLoader"
+ *   <Loader className="org.apache.catalina.loader.VirtualWebappLoader"
  *              virtualClasspath="/Users/theuser/mywebapp/target/classes" />
- *   &lt;JarScanner scanAllDirectories="true" />
- * &lt;/Context>
- * </code>
+ *   <JarScanner scanAllDirectories="true" />
+ * </Context>
+ * }</pre>
  *
  *
  * <strong>This is not meant to be used for production.
