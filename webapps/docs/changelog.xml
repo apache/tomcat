@@ -107,6 +107,11 @@
       <fix>
         Fix NIO2 handshaking with a full input buffer. (remm)
       </fix>
+      <add>
+        Return a simple, plain text error message if a client attempts to make a
+        plain text HTTP connection to a TLS enabled NIO or NIO2 Connector.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

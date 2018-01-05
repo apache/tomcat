@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -47,6 +48,14 @@ public class TLSClientHelloExtractor {
     private static final int TLS_EXTENSION_SERVER_NAME = 0;
     private static final int TLS_EXTENSION_ALPN = 16;
 
+    public static byte[] USE_TLS_RESPONSE = ("HTTP/1.1 400 \r\n" +
+            "Content-Type: text/plain;charset=ISO-8859-1\r\n" +
+            "Connection: close\r\n" +
+            "\r\n" +
+            "Bad Request\r\n" +
+            "This combination of host and port requires TLS.\r\n").getBytes(StandardCharsets.ISO_8859_1);
+
+
     /**
      * Creates the instance of the parser and processes the provided buffer. The
      * buffer position and limit will be modified during the execution of this
@@ -57,9 +66,6 @@ public class TLSClientHelloExtractor {
      * @throws IOException If the client hello message is malformed
      */
     public TLSClientHelloExtractor(ByteBuffer netInBuffer) throws IOException {
-        // TODO: Detect use of http on a secure connection and provide a simple
-        //       error page.
-
         // Buffer is in write mode at this point. Record the current position so
         // the buffer state can be restored at the end of this method.
         int pos = netInBuffer.position();
@@ -80,6 +86,10 @@ public class TLSClientHelloExtractor {
             }
 
             if (!isTLSHandshake(netInBuffer)) {
+                // Is the client trying to use clear text HTTP?
+                if (isHttp(netInBuffer)) {
+                    result = ExtractorResult.NON_SECURE;
+                }
                 return;
             }
 
@@ -191,6 +201,7 @@ public class TLSClientHelloExtractor {
         }
     }
 
+
     private static ExtractorResult handleIncompleteRead(ByteBuffer bb) {
         if (bb.limit() == bb.capacity()) {
             // Buffer not big enough
@@ -222,6 +233,67 @@ public class TLSClientHelloExtractor {
         if (b2 < 3 || b2 == 3 && b3 == 0) {
             return false;
         }
+        return true;
+    }
+
+
+    private static boolean isHttp(ByteBuffer bb) {
+        // Based on code in Http11InputBuffer
+        // Note: The actual request is not important. This code only checks that
+        //       the buffer contains a correctly formatted HTTP request line.
+        //       The method, target and protocol are not validated.
+        byte chr = 0;
+        bb.position(0);
+
+        // Skip blank lines
+        do {
+            if (!bb.hasRemaining()) {
+                return false;
+            }
+            chr = bb.get();
+        } while (chr == '\r' || chr == '\n');
+
+        // Read the method
+        do {
+            if (!HttpParser.isToken(chr) || !bb.hasRemaining()) {
+                return false;
+            }
+            chr = bb.get();
+        } while (chr != ' ' && chr != '\t');
+
+        // Whitespace between method and target
+        while (chr == ' ' || chr == '\t') {
+            if (!bb.hasRemaining()) {
+                return false;
+            }
+            chr = bb.get();
+        }
+
+        // Read the target
+        while (chr != ' ' && chr != '\t') {
+            if (HttpParser.isNotRequestTarget(chr) || !bb.hasRemaining()) {
+                return false;
+            }
+            chr = bb.get();
+        }
+
+        // Whitespace between target and protocol
+        while (chr == ' ' || chr == '\t') {
+            if (!bb.hasRemaining()) {
+                return false;
+            }
+            chr = bb.get();
+        }
+
+        // Read protocol
+        do {
+            if (!HttpParser.isHttpProtocol(chr) || !bb.hasRemaining()) {
+                return false;
+            }
+            chr = bb.get();
+
+        } while (chr != '\r' && chr != '\n');
+
         return true;
     }
 
@@ -288,6 +360,7 @@ public class TLSClientHelloExtractor {
         COMPLETE,
         NOT_PRESENT,
         UNDERFLOW,
-        NEED_READ
+        NEED_READ,
+        NON_SECURE
     }
 }
