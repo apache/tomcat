@@ -498,15 +498,20 @@ nsComment="Testing OCSP Certificate"
 for more information about installation of APR. A basic OCSP-enabled connector
  definition in the <code>server.xml</code> file looks as follows:</p>
 <source>
-<![CDATA[<Connector port="8443"
-   protocol="org.apache.coyote.http11.Http11AprProtocol"
-   secure="true" scheme="https"
-   SSLEnabled="true" SSLCertificateFile="/path/to/ocsp-cert.crt"
-   SSLCertificateKeyFile="/path/to/ocsp-cert.key"
-   SSLCACertificateFile="/path/to/ca.pem"
-   SSLVerifyClient="require"
-   SSLVerifyDepth="10"
-   clientAuth="true"/>]]>
+<![CDATA[<Connector
+    port="8443"
+    protocol="org.apache.coyote.http11.Http11AprProtocol"
+    secure="true"
+    scheme="https"
+    SSLEnabled="true"
+  <SSLHostConfig
+      caCertificateFile="/path/to/ca.pem"
+      certificateVerification="require"
+      certificateVerificationDepth="10" >
+    <Certificate
+        certificateFile="/path/to/ocsp-cert.crt"
+        certificateKeyFile="/path/to/ocsp-cert.key" />
+  </SSLHostConfig>]]>
 </source>
 </subsection>
 
