@@ -121,13 +121,12 @@ public final class UriUtil {
     public static URL buildJarUrl(String fileUrlString, String entryPath) throws MalformedURLException {
         String safeString = makeSafeForJarUrl(fileUrlString);
         StringBuilder sb = new StringBuilder();
-        sb.append("jar:");
         sb.append(safeString);
         sb.append("!/");
         if (entryPath != null) {
             sb.append(makeSafeForJarUrl(entryPath));
         }
-        return new URL(sb.toString());
+        return new URL("jar", null, -1, sb.toString());
     }
 
 

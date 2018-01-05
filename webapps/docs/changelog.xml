@@ -47,6 +47,11 @@
 <section name="Tomcat 9.0.3 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <add>
+        <bug>57619</bug>: Implement a small optimisation to how JAR URLs are
+        processed to reduce the storage of duplicate String objects in memory.
+        Patch provided by Dmitri Blinov. (markt)
+      </add>
       <fix>
         Add some missing NPEs to ServletContext. (remm)
       </fix>
