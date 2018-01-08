@@ -62,8 +62,6 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "AsyncListenerWrapper");
         loader.loadClass(basePackage + "ContainerBase$PrivilegedAddChild");
         loadAnonymousInnerClasses(loader, basePackage + "DefaultInstanceManager");
-        loader.loadClass(basePackage + "DefaultInstanceManager$2");
-        loader.loadClass(basePackage + "DefaultInstanceManager$3");
         loader.loadClass(basePackage + "DefaultInstanceManager$AnnotationCacheEntry");
         loader.loadClass(basePackage + "DefaultInstanceManager$AnnotationCacheEntryType");
         loader.loadClass(basePackage + "ApplicationHttpRequest$AttributeNamesEnumerator");
