@@ -851,7 +851,7 @@ has been reloaded several times, it may be listed several times.</p>
 
 </subsection>
 
-<subsection name="Connector SSL/TLS diagnostics">
+<subsection name="Connector SSL/TLS cipher information">
 
 <source>http://localhost:8080/manager/text/sslConnectorCiphers</source>
 
@@ -868,6 +868,49 @@ Connector[HTTP/1.1-8443]
   TLS_DHE_RSA_WITH_AES_128_CBC_SHA
   TLS_ECDH_RSA_WITH_AES_128_CBC_SHA
   TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA
+  ...</source>
+
+</subsection>
+
+<subsection name="Connector SSL/TLS certificate chain information">
+
+<source>http://localhost:8080/manager/text/sslConnectorCerts</source>
+
+<p>The SSL Connector/Certs diagnostic lists the certificate chain that is
+currently configured for each virtual host.</p>
+
+<p>The response will look something like this:</p>
+<source>OK - Connector / Certificate Chain information
+Connector[HTTP/1.1-8080]
+SSL is not enabled for this connector
+Connector[HTTP/1.1-8443]-_default_-RSA
+[
+[
+  Version: V3
+  Subject: CN=localhost, OU=Apache Tomcat PMC, O=The Apache Software Foundation, L=Wakefield, ST=MA, C=US
+  Signature Algorithm: SHA256withRSA, OID = 1.2.840.113549.1.1.11
+  ...</source>
+
+</subsection>
+
+<subsection name="Connector SSL/TLS trusted certificate information">
+
+<source>http://localhost:8080/manager/text/sslConnectorTrustedCerts</source>
+
+<p>The SSL Connector/Certs diagnostic lists the trusted certificates that are
+currently configured for each virtual host.</p>
+
+<p>The response will look something like this:</p>
+<source>OK - Connector / Trusted Certificate information
+Connector[HTTP/1.1-8080]
+SSL is not enabled for this connector
+Connector[AJP/1.3-8009]
+SSL is not enabled for this connector
+Connector[HTTP/1.1-8443]-_default_
+[
+[
+  Version: V3
+  Subject: CN=Apache Tomcat Test CA, OU=Apache Tomcat PMC, O=The Apache Software Foundation, L=Wakefield, ST=MA, C=US
   ...</source>
 
 </subsection>

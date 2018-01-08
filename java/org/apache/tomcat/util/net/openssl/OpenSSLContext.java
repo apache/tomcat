@@ -70,6 +70,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
     private OpenSSLSessionContext sessionContext;
+    private X509KeyManager x509KeyManager;
+    private X509TrustManager x509TrustManager;
 
     private final List<String> negotiableProtocols;
 
@@ -291,17 +293,17 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         SSLHostConfig.adjustRelativePath(
                                 sslHostConfig.getCertificateRevocationListPath()));
             } else {
-                X509KeyManager keyManager = chooseKeyManager(kms);
+                x509KeyManager = chooseKeyManager(kms);
                 String alias = certificate.getCertificateKeyAlias();
                 if (alias == null) {
                     alias = "tomcat";
                 }
-                X509Certificate[] chain = keyManager.getCertificateChain(alias);
+                X509Certificate[] chain = x509KeyManager.getCertificateChain(alias);
                 if (chain == null) {
-                    alias = findAlias(keyManager, certificate);
-                    chain = keyManager.getCertificateChain(alias);
+                    alias = findAlias(x509KeyManager, certificate);
+                    chain = x509KeyManager.getCertificateChain(alias);
                 }
-                PrivateKey key = keyManager.getPrivateKey(alias);
+                PrivateKey key = x509KeyManager.getPrivateKey(alias);
                 StringBuilder sb = new StringBuilder(BEGIN_KEY);
                 String encoded = BASE64_ENCODER.encodeToString(key.getEncoded());
                 if (encoded.endsWith("\n")) {
@@ -334,13 +336,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
             if (tms != null) {
                 // Client certificate verification based on custom trust managers
-                final X509TrustManager manager = chooseTrustManager(tms);
+                x509TrustManager = chooseTrustManager(tms);
                 SSLContext.setCertVerifyCallback(ctx, new CertificateVerifier() {
                     @Override
                     public boolean verify(long ssl, byte[][] chain, String auth) {
                         X509Certificate[] peerCerts = certificates(chain);
                         try {
-                            manager.checkClientTrusted(peerCerts, auth);
+                            x509TrustManager.checkClientTrusted(peerCerts, auth);
                             return true;
                         } catch (Exception e) {
                             log.debug(sm.getString("openssl.certificateVerificationFailed"), e);
@@ -352,7 +354,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 // certificate issuers, so that their subjects can be presented
                 // by the server during the handshake to allow the client choosing
                 // an acceptable certificate
-                for (X509Certificate caCert : manager.getAcceptedIssuers()) {
+                for (X509Certificate caCert : x509TrustManager.getAcceptedIssuers()) {
                     SSLContext.addClientCACertificateRaw(ctx, caCert.getEncoded());
                     if (log.isDebugEnabled())
                         log.debug(sm.getString("openssl.addedClientCaCert", caCert.toString()));
@@ -520,6 +522,32 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     @Override
     public SSLParameters getSupportedSSLParameters() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public X509Certificate[] getCertificateChain(String alias) {
+        X509Certificate[] chain = null;
+        if (x509KeyManager != null) {
+            if (alias == null) {
+                alias = "tomcat";
+            }
+            chain = x509KeyManager.getCertificateChain(alias);
+            if (chain == null) {
+                alias = findAlias(x509KeyManager, certificate);
+                chain = x509KeyManager.getCertificateChain(alias);
+            }
+        }
+
+        return chain;
+    }
+
+    @Override
+    public X509Certificate[] getAcceptedIssuers() {
+        X509Certificate[] acceptedCerts = null;
+        if (x509TrustManager != null) {
+            acceptedCerts = x509TrustManager.getAcceptedIssuers();
+        }
+        return acceptedCerts;
     }
 
     @Override
