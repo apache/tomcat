@@ -1735,6 +1735,13 @@ public class WebdavServlet extends DefaultServlet {
                     }
                 }
             }
+            // WebDAV Litmus test attempts to copy/move a file over a collection
+            // Need to remove trailing / from destination to enable test to pass
+            if (!destResource.exists() && dest.endsWith("/") && dest.length() > 1) {
+                // Convert destination name from collection (with trailing '/')
+                // to file (without trailing '/')
+                dest = dest.substring(0, dest.length() - 1);
+            }
             try (InputStream is = sourceResource.getInputStream()) {
                 if (!resources.write(dest, is, false)) {
                     errorList.put(source, Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));

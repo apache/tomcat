@@ -59,6 +59,12 @@
         <code>Allow</code> header and a method listed in the <code>Allow</code>
         header will not return a 405 status code. (markt)
       </fix>
+      <fix>
+        When using WebDAV to copy a file resource to a destination that requires
+        a collection to be overwritten, ensure that the operation succeeds
+        rather than fails (with a 500 response). This enables Tomcat to pass two
+        additional tests from the Litmus WebDAV test suite. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
