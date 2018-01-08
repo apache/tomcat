@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-
 package org.apache.catalina.security;
 
 /**
- * Static class used to preload java classes when using the
- * Java SecurityManager so that the defineClassInPackage
- * RuntimePermission does not trigger an AccessControlException.
+ * Static class used to preload java classes when using the Java SecurityManager
+ * so that the defineClassInPackage RuntimePermission does not trigger an
+ * AccessControlException.
  *
  * @author Glenn L. Nielsen
  */
@@ -31,9 +30,7 @@ public final class SecurityClassLoad {
         securityClassLoad(loader, true);
     }
 
-
-    static void securityClassLoad(ClassLoader loader, boolean requireSecurityManager)
-            throws Exception {
+    static void securityClassLoad(ClassLoader loader, boolean requireSecurityManager) throws Exception {
 
         if (requireSecurityManager && System.getSecurityManager() == null) {
             return;
@@ -52,81 +49,38 @@ public final class SecurityClassLoad {
         loadTomcatPackage(loader);
     }
 
-
-    private static final void loadCorePackage(ClassLoader loader)
-            throws Exception {
+    private static final void loadCorePackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.core.";
-        loader.loadClass
-            (basePackage +
-             "AccessLogAdapter");
-        loader.loadClass
-            (basePackage +
-             "ApplicationContextFacade$PrivilegedExecuteMethod");
-        loader.loadClass
-            (basePackage +
-             "ApplicationDispatcher$PrivilegedForward");
-        loader.loadClass
-            (basePackage +
-             "ApplicationDispatcher$PrivilegedInclude");
-        loader.loadClass
-            (basePackage +
-             "ApplicationPushBuilder");
-        loader.loadClass
-            (basePackage +
-            "AsyncContextImpl");
-        loader.loadClass
-            (basePackage +
-            "AsyncContextImpl$AsyncRunnable");
-        loader.loadClass
-            (basePackage +
-            "AsyncContextImpl$DebugException");
-        loader.loadClass
-            (basePackage +
-            "AsyncListenerWrapper");
-        loader.loadClass
-            (basePackage +
-             "ContainerBase$PrivilegedAddChild");
-        loader.loadClass
-            (basePackage +
-             "DefaultInstanceManager$1");
-        loader.loadClass
-            (basePackage +
-             "DefaultInstanceManager$2");
-        loader.loadClass
-            (basePackage +
-             "DefaultInstanceManager$3");
-        loader.loadClass
-            (basePackage +
-             "DefaultInstanceManager$AnnotationCacheEntry");
-        loader.loadClass
-            (basePackage +
-             "DefaultInstanceManager$AnnotationCacheEntryType");
-        loader.loadClass
-            (basePackage +
-             "ApplicationHttpRequest$AttributeNamesEnumerator");
+        loader.loadClass(basePackage + "AccessLogAdapter");
+        loader.loadClass(basePackage + "ApplicationContextFacade$PrivilegedExecuteMethod");
+        loader.loadClass(basePackage + "ApplicationDispatcher$PrivilegedForward");
+        loader.loadClass(basePackage + "ApplicationDispatcher$PrivilegedInclude");
+        loader.loadClass(basePackage + "ApplicationPushBuilder");
+        loader.loadClass(basePackage + "AsyncContextImpl");
+        loader.loadClass(basePackage + "AsyncContextImpl$AsyncRunnable");
+        loader.loadClass(basePackage + "AsyncContextImpl$DebugException");
+        loader.loadClass(basePackage + "AsyncListenerWrapper");
+        loader.loadClass(basePackage + "ContainerBase$PrivilegedAddChild");
+        loader.loadClass(basePackage + "DefaultInstanceManager$1");
+        loader.loadClass(basePackage + "DefaultInstanceManager$2");
+        loader.loadClass(basePackage + "DefaultInstanceManager$3");
+        loader.loadClass(basePackage + "DefaultInstanceManager$AnnotationCacheEntry");
+        loader.loadClass(basePackage + "DefaultInstanceManager$AnnotationCacheEntryType");
+        loader.loadClass(basePackage + "ApplicationHttpRequest$AttributeNamesEnumerator");
     }
 
-
-    private static final void loadLoaderPackage(ClassLoader loader)
-            throws Exception {
+    private static final void loadLoaderPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.loader.";
-        loader.loadClass
-            (basePackage +
-             "WebappClassLoaderBase$PrivilegedFindClassByName");
+        loader.loadClass(basePackage + "WebappClassLoaderBase$PrivilegedFindClassByName");
         loader.loadClass(basePackage + "WebappClassLoaderBase$PrivilegedHasLoggingConfig");
     }
 
-
-    private static final void loadRealmPackage(ClassLoader loader)
-            throws Exception {
+    private static final void loadRealmPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.realm.";
-        loader.loadClass
-            (basePackage + "LockOutRealm$LockRecord");
+        loader.loadClass(basePackage + "LockOutRealm$LockRecord");
     }
 
-
-    private static final void loadServletsPackage(ClassLoader loader)
-            throws Exception {
+    private static final void loadServletsPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.servlets.";
         // Avoid a possible memory leak in the DefaultServlet when running with
         // a security manager. The DefaultServlet needs to load an XML parser
@@ -136,37 +90,26 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "DefaultServlet");
     }
 
-
-    private static final void loadSessionPackage(ClassLoader loader)
-            throws Exception {
+    private static final void loadSessionPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.session.";
-        loader.loadClass
-            (basePackage + "StandardSession");
-        loader.loadClass
-            (basePackage + "StandardSession$1");
-        loader.loadClass
-            (basePackage + "StandardManager$PrivilegedDoUnload");
+        loader.loadClass(basePackage + "StandardSession");
+        loader.loadClass(basePackage + "StandardSession$1");
+        loader.loadClass(basePackage + "StandardManager$PrivilegedDoUnload");
     }
 
-
-    private static final void loadUtilPackage(ClassLoader loader)
-            throws Exception {
+    private static final void loadUtilPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.util.";
         loader.loadClass(basePackage + "ParameterMap");
         loader.loadClass(basePackage + "RequestUtil");
         loader.loadClass(basePackage + "TLSUtil");
     }
 
-
-    private static final void loadValvesPackage(ClassLoader loader)
-            throws Exception {
+    private static final void loadValvesPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.valves.";
         loader.loadClass(basePackage + "AbstractAccessLogValve$3");
     }
 
-
-    private static final void loadCoyotePackage(ClassLoader loader)
-            throws Exception {
+    private static final void loadCoyotePackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.coyote.";
         loader.loadClass(basePackage + "http11.Constants");
         // Make sure system property is read at this point
@@ -175,101 +118,42 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "http2.Stream$PrivilegedPush");
     }
 
-
-    private static final void loadJavaxPackage(ClassLoader loader)
-            throws Exception {
+    private static final void loadJavaxPackage(ClassLoader loader) throws Exception {
         loader.loadClass("javax.servlet.http.Cookie");
     }
 
-
-    private static final void loadConnectorPackage(ClassLoader loader)
-            throws Exception {
+    private static final void loadConnectorPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.catalina.connector.";
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetAttributePrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetParameterMapPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetRequestDispatcherPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetParameterPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetParameterNamesPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetParameterValuePrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetCharacterEncodingPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetHeadersPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetHeaderNamesPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetCookiesPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetLocalePrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetLocalesPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "ResponseFacade$SetContentTypePrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "ResponseFacade$DateHeaderPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "RequestFacade$GetSessionPrivilegedAction");
-        loader.loadClass
-            (basePackage +
-             "ResponseFacade$1");
-        loader.loadClass
-            (basePackage +
-             "OutputBuffer$1");
-        loader.loadClass
-            (basePackage +
-             "OutputBuffer$2");
-        loader.loadClass
-            (basePackage +
-             "CoyoteInputStream$1");
-        loader.loadClass
-            (basePackage +
-             "CoyoteInputStream$2");
-        loader.loadClass
-            (basePackage +
-             "CoyoteInputStream$3");
-        loader.loadClass
-            (basePackage +
-             "CoyoteInputStream$4");
-        loader.loadClass
-            (basePackage +
-             "CoyoteInputStream$5");
-        loader.loadClass
-            (basePackage +
-             "InputBuffer$1");
-        loader.loadClass
-            (basePackage +
-             "Response$1");
-        loader.loadClass
-            (basePackage +
-             "Response$2");
-        loader.loadClass
-            (basePackage +
-             "Response$3");
+        loader.loadClass(basePackage + "RequestFacade$GetAttributePrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetParameterMapPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetRequestDispatcherPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetParameterPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetParameterNamesPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetParameterValuePrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetCharacterEncodingPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetHeadersPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetHeaderNamesPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetCookiesPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetLocalePrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetLocalesPrivilegedAction");
+        loader.loadClass(basePackage + "ResponseFacade$SetContentTypePrivilegedAction");
+        loader.loadClass(basePackage + "ResponseFacade$DateHeaderPrivilegedAction");
+        loader.loadClass(basePackage + "RequestFacade$GetSessionPrivilegedAction");
+        loader.loadClass(basePackage + "ResponseFacade$1");
+        loader.loadClass(basePackage + "OutputBuffer$1");
+        loader.loadClass(basePackage + "OutputBuffer$2");
+        loader.loadClass(basePackage + "CoyoteInputStream$1");
+        loader.loadClass(basePackage + "CoyoteInputStream$2");
+        loader.loadClass(basePackage + "CoyoteInputStream$3");
+        loader.loadClass(basePackage + "CoyoteInputStream$4");
+        loader.loadClass(basePackage + "CoyoteInputStream$5");
+        loader.loadClass(basePackage + "InputBuffer$1");
+        loader.loadClass(basePackage + "Response$1");
+        loader.loadClass(basePackage + "Response$2");
+        loader.loadClass(basePackage + "Response$3");
     }
 
-    private static final void loadTomcatPackage(ClassLoader loader)
-            throws Exception {
+    private static final void loadTomcatPackage(ClassLoader loader) throws Exception {
         final String basePackage = "org.apache.tomcat.";
         // buf
         loader.loadClass(basePackage + "util.buf.B2CConverter");
@@ -309,4 +193,3 @@ public final class SecurityClassLoad {
         loader.loadClass(basePackage + "util.security.PrivilegedSetTccl");
     }
 }
-
