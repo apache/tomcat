@@ -47,6 +47,11 @@
 <section name="Tomcat 8.5.25 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+      <fix>
+        <bug>47214</bug>: Use a loop to preload anonymous inner classes
+        when running under a <code>SecurityManager</code>, to be safe for
+        future changes in the code or using a different compiler. (kkolinko)
+      </fix>
       <add>
         <bug>57619</bug>: Implement a small optimisation to how JAR URLs are
         processed to reduce the storage of duplicate String objects in memory.

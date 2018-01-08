@@ -53,18 +53,7 @@ public final class SecurityClassLoad {
             loader.loadClass(basePackage + "runtime.ProtectedFunctionMapper");
 
             loader.loadClass(basePackage + "runtime.PageContextImpl");
-            loader.loadClass(basePackage + "runtime.PageContextImpl$1");
-            loader.loadClass(basePackage + "runtime.PageContextImpl$2");
-            loader.loadClass(basePackage + "runtime.PageContextImpl$3");
-            loader.loadClass(basePackage + "runtime.PageContextImpl$4");
-            loader.loadClass(basePackage + "runtime.PageContextImpl$5");
-            loader.loadClass(basePackage + "runtime.PageContextImpl$6");
-            loader.loadClass(basePackage + "runtime.PageContextImpl$7");
-            loader.loadClass(basePackage + "runtime.PageContextImpl$8");
-            loader.loadClass(basePackage + "runtime.PageContextImpl$9");
-            loader.loadClass(basePackage + "runtime.PageContextImpl$10");
-            loader.loadClass(basePackage + "runtime.PageContextImpl$11");
-            loader.loadClass(basePackage + "runtime.PageContextImpl$12");
+            loadAnonymousInnerClasses(loader, basePackage + "runtime.PageContextImpl");
 
             loader.loadClass(basePackage + "runtime.JspContextWrapper");
 
@@ -73,9 +62,19 @@ public final class SecurityClassLoad {
 
             loader.loadClass(basePackage + "servlet.JspServletWrapper");
 
-            loader.loadClass(basePackage + "runtime.JspWriterImpl$1");
+            loadAnonymousInnerClasses(loader, "runtime.JspWriterImpl");
         } catch (ClassNotFoundException ex) {
             log.error("SecurityClassLoad", ex);
+        }
+    }
+
+    private static final void loadAnonymousInnerClasses(ClassLoader loader, String enclosingClass) {
+        try {
+            for (int i = 1;; i++) {
+                loader.loadClass(enclosingClass + '$' + i);
+            }
+        } catch (ClassNotFoundException ignored) {
+            //
         }
     }
 }
