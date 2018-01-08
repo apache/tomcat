@@ -67,6 +67,12 @@
         <code>setHeader()</code> or <code>addHeader()</code> as well as when it
         is set via <code>setContentType()</code>. (markt)
       </fix>
+      <fix>
+        When using WebDAV to copy a file resource to a destination that requires
+        a collection to be overwritten, ensure that the operation succeeds
+        rather than fails (with a 500 response). This enables Tomcat to pass two
+        additional tests from the Litmus WebDAV test suite. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
