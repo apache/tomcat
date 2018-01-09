@@ -37,6 +37,12 @@ public class Stockticker implements Runnable {
         }
 
         public synchronized void stop() {
+            // On context stop this can be called multiple times.
+            // NO-OP is the ticker thread is not set
+            // (i.e. stop() has already completed)
+            if (ticker == null) {
+                return;
+            }
             run = false;
             try {
                 ticker.join();
@@ -45,6 +51,17 @@ public class Stockticker implements Runnable {
             }
 
             ticker = null;
+        }
+
+        public void shutdown() {
+            // Notify each listener of the shutdown. This enables them to
+            // trigger any necessary clean-up.
+            for (TickListener l : listeners) {
+                l.shutdown();
+            }
+            // Wait for the thread to stop. This prevents warnings in the logs
+            // that the thread is still active when the context stops.
+            stop();
         }
 
         public void addTickListener(TickListener listener) {
@@ -98,6 +115,7 @@ public class Stockticker implements Runnable {
 
     public static interface TickListener {
         public void tick(Stock stock);
+        public void shutdown();
     }
 
     public static final class Stock implements Cloneable {
