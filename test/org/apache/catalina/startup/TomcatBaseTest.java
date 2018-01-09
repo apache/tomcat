@@ -83,9 +83,9 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
     @SuppressWarnings("unused")
     private static final boolean ignored = TesterSupport.OPENSSL_AVAILABLE;
 
-    protected static final int DEFAULT_CLIENT_TIMEOUT_MS = 300_000;
     private Tomcat tomcat;
     private boolean accessLogEnabled = false;
+    protected static final int DEFAULT_CLIENT_TIMEOUT_MS = 300_000;
 
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
 
