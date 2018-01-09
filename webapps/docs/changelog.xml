@@ -60,27 +60,27 @@
 <section name="Tomcat 7.0.84 (violetagg)">
   <subsection name="Catalina">
     <changelog>
-      <add>
-        <bug>57619</bug>: Implement a small optimisation to how JAR URLs are
-        processed to reduce the storage of duplicate String objects in memory.
-        Patch provided by Dmitri Blinov. (markt)
-      </add>
       <fix>
         <bug>47214</bug>: Use a loop to preload anonymous inner classes
         when running under a <code>SecurityManager</code>, to be safe for
         future changes in the code or using a different compiler. (kkolinko)
       </fix>
+      <add>
+        <bug>57619</bug>: Implement a small optimisation to how JAR URLs are
+        processed to reduce the storage of duplicate String objects in memory.
+        Patch provided by Dmitri Blinov. (markt)
+      </add>
+      <add>
+        <bug>61810</bug>: Support configure the interval to keep all jars open
+        if no jar is accessed, a non-positive interval indicates
+        keeping jars always open. (huxing)
+      </add>
       <fix>
         <bug>61886</bug>: Pre-load additional classes to prevent
         <code>SecurityException</code>s if the first request received when
         running under a <code>SecurityManager</code> is an asynchronous Servlet.
         (markt)
       </fix>
-      <add>
-        <bug>61810</bug>: Support configure the interval to keep all jars open
-        if no jar is accessed, a non-positive interval indicates
-        keeping jars always open. (huxing)
-      </add>
       <fix>
         <bug>61916</bug>: Extend the <code>AddDefaultCharsetFilter</code> to add
         a character set when the content type is set via
@@ -104,7 +104,7 @@
       <add>
         <bug>61223</bug>: Add the mbeans-descriptors.dtd file to the custom
         MBean documentation so users have a reference to use when constructing
-        mbeans-descriptiors.xml files for custom components. (markt)
+        mbeans-descriptors.xml files for custom components. (markt)
       </add>
       <fix>
         Partial fix for <bug>61886</bug>. Ensure that multiple threads do not
@@ -191,6 +191,11 @@
         <code>FlushableGZIPOutputStream</code> implementation as a work-around.
         (markt)
       </fix>
+      <fix>
+        <bug>61736</bug>: Improve performance of NIO connector when clients
+        leave large time gaps between network packets. Patch provided by Zilong
+        Song. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -202,15 +207,6 @@
         <code>ecj-4.4.2.jar</code> with a more recent version that supports Java
         9. (markt)
       </add>
-      <fix>
-        <bug>61736</bug>: Improve performance of NIO connector when clients
-        leave large time gaps between network packets. Patch provided by Zilong
-        Song. (markt)
-      </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Jasper">
-    <changelog>
       <fix>
         <bug>61816</bug>: Invalid expressions in attribute values or template
         text should trigger a translation (compile time) error, not a run time
