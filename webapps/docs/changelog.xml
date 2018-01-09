@@ -95,12 +95,12 @@
         mechanism. (markt)
       </fix>
       <fix>
-        <bug>61918</bug>: Fix connectionLimitLatch counting when closing an
-        already closed socket. Based on a patch by Ryan Fong. (remm)
-      </fix>
-      <fix>
         <bug>61914</bug>: Possible NPE with Java 9 when creating a SSL engine.
         Patch submitted by Evgenij Ryazanov. (remm)
+      </fix>
+      <fix>
+        <bug>61918</bug>: Fix connectionLimitLatch counting when closing an
+        already closed socket. Based on a patch by Ryan Fong. (remm)
       </fix>
       <add>
         Add support for the OpenSSL ARIA ciphers to the OpenSSL to JSSE
@@ -147,7 +147,7 @@
       <add>
         <bug>61223</bug>: Add the mbeans-descriptors.dtd file to the custom
         MBean documentation so users have a reference to use when constructing
-        mbeans-descriptiors.xml files for custom components. (markt)
+        mbeans-descriptors.xml files for custom components. (markt)
       </add>
       <add>
         <bug>61565</bug>: Add the ability to trigger a reloading of TLS host
