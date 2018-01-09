@@ -95,6 +95,11 @@
         <listener-class>listeners.SessionListener</listener-class>
     </listener>
 
+    <!-- Define listeners required by examples -->
+    <listener>
+        <listener-class>async.AsyncStockContextListener</listener-class>
+    </listener>
+
     <!-- Define servlets that are included in the example application -->
 
     <servlet>
