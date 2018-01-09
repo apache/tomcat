@@ -17,14 +17,15 @@
 package async;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Stockticker implements Runnable {
         public volatile boolean run = true;
         protected final AtomicInteger counter = new AtomicInteger(0);
-        final ArrayList<TickListener> listeners = new ArrayList<>();
+        final List<TickListener> listeners = new CopyOnWriteArrayList<>();
         protected volatile Thread ticker = null;
         protected volatile int ticknr = 0;
 
