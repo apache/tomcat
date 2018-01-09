@@ -178,6 +178,11 @@
         in the stock ticker example Servlet. (markt)
       </fix>
       <fix>
+        <bug>61886</bug>: Prevent <code>ConcurrentModificationException</code>
+        when running the asynchronous stock ticker in the examples web
+        application. (markt)
+      </fix>
+      <fix>
         <bug>61910</bug>: Clarify the meaning of the <code>allowLinking</code>
         option in the documentation web application. (markt)
       </fix>
