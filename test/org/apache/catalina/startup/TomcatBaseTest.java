@@ -74,9 +74,9 @@ import org.apache.tomcat.util.scan.StandardJarScanner;
  * don't have to keep writing the cleanup code.
  */
 public abstract class TomcatBaseTest extends LoggingBaseTest {
-    private static final int DEFAULT_CLIENT_TIMEOUT_MS = 300_000;
     private Tomcat tomcat;
     private boolean accessLogEnabled = false;
+    protected static final int DEFAULT_CLIENT_TIMEOUT_MS = 300_000;
 
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
 

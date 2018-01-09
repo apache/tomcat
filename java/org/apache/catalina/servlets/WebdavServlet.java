@@ -464,10 +464,7 @@ public class WebdavServlet extends DefaultServlet {
         throws ServletException, IOException {
 
         resp.addHeader("DAV", "1,2");
-
-        StringBuilder methodsAllowed = determineMethodsAllowed(req);
-
-        resp.addHeader("Allow", methodsAllowed.toString());
+        resp.addHeader("Allow", determineMethodsAllowed(req));
         resp.addHeader("MS-Author-Via", "DAV");
     }
 
@@ -483,11 +480,7 @@ public class WebdavServlet extends DefaultServlet {
         throws ServletException, IOException {
 
         if (!listings) {
-            // Get allowed methods
-            StringBuilder methodsAllowed = determineMethodsAllowed(req);
-
-            resp.addHeader("Allow", methodsAllowed.toString());
-            resp.sendError(WebdavStatus.SC_METHOD_NOT_ALLOWED);
+            sendNotAllowed(req, resp);
             return;
         }
 
@@ -743,16 +736,6 @@ public class WebdavServlet extends DefaultServlet {
     protected void doMkcol(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
 
-        if (readOnly) {
-            resp.sendError(WebdavStatus.SC_FORBIDDEN);
-            return;
-        }
-
-        if (isLocked(req)) {
-            resp.sendError(WebdavStatus.SC_LOCKED);
-            return;
-        }
-
         String path = getRelativePath(req);
 
         WebResource resource = resources.getResource(path);
@@ -760,12 +743,17 @@ public class WebdavServlet extends DefaultServlet {
         // Can't create a collection if a resource already exists at the given
         // path
         if (resource.exists()) {
-            // Get allowed methods
-            StringBuilder methodsAllowed = determineMethodsAllowed(req);
+            sendNotAllowed(req, resp);
+            return;
+        }
 
-            resp.addHeader("Allow", methodsAllowed.toString());
+        if (readOnly) {
+            resp.sendError(WebdavStatus.SC_FORBIDDEN);
+            return;
+        }
 
-            resp.sendError(WebdavStatus.SC_METHOD_NOT_ALLOWED);
+        if (isLocked(req)) {
+            resp.sendError(WebdavStatus.SC_LOCKED);
             return;
         }
 
@@ -809,7 +797,7 @@ public class WebdavServlet extends DefaultServlet {
         throws ServletException, IOException {
 
         if (readOnly) {
-            resp.sendError(WebdavStatus.SC_FORBIDDEN);
+            sendNotAllowed(req, resp);
             return;
         }
 
@@ -841,9 +829,14 @@ public class WebdavServlet extends DefaultServlet {
             return;
         }
 
-        super.doPut(req, resp);
-
         String path = getRelativePath(req);
+        WebResource resource = resources.getResource(path);
+        if (resource.isDirectory()) {
+            sendNotAllowed(req, resp);
+            return;
+        }
+
+        super.doPut(req, resp);
 
         // Removing any lock-null resource which would be present
         lockNullResources.remove(path);
@@ -2325,41 +2318,50 @@ public class WebdavServlet extends DefaultServlet {
 
     /**
      * Determines the methods normally allowed for the resource.
+     *
      * @param req The Servlet request
-     * @return a string builder with the allowed HTTP methods
+     *
+     * @return The allowed HTTP methods
      */
-    private StringBuilder determineMethodsAllowed(HttpServletRequest req) {
+    @Override
+    protected String determineMethodsAllowed(HttpServletRequest req) {
 
-        StringBuilder methodsAllowed = new StringBuilder();
 
         WebResource resource = resources.getResource(getRelativePath(req));
 
-        if (!resource.exists()) {
-            methodsAllowed.append("OPTIONS, MKCOL, PUT, LOCK");
-            return methodsAllowed;
+        // These methods are always allowed. They may return a 404 (not a 405)
+        // if the resource does not exist.
+        StringBuilder methodsAllowed = new StringBuilder(
+                "OPTIONS, GET, POST, HEAD");
+
+        if (!readOnly) {
+            methodsAllowed.append(", DELETE");
+            if (!resource.isDirectory()) {
+                methodsAllowed.append(", PUT");
+            }
         }
 
-        methodsAllowed.append("OPTIONS, GET, HEAD, POST, DELETE");
         // Trace - assume disabled unless we can prove otherwise
         if (req instanceof RequestFacade &&
                 ((RequestFacade) req).getAllowTrace()) {
             methodsAllowed.append(", TRACE");
         }
-        methodsAllowed.append(", PROPPATCH, COPY, MOVE, LOCK, UNLOCK");
+
+        methodsAllowed.append(", LOCK, UNLOCK, PROPPATCH, COPY, MOVE");
 
         if (listings) {
             methodsAllowed.append(", PROPFIND");
         }
 
-        if (resource.isFile()) {
-            methodsAllowed.append(", PUT");
+        if (!resource.exists()) {
+            methodsAllowed.append(", MKCOL");
         }
 
-        return methodsAllowed;
+        return methodsAllowed.toString();
     }
 
-    // --------------------------------------------------  LockInfo Inner Class
 
+    // --------------------------------------------------  LockInfo Inner Class
 
     /**
      * Holds a lock information.

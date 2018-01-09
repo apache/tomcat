@@ -499,24 +499,35 @@ public class DefaultServlet extends HttpServlet {
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
 
+        resp.setHeader("Allow", determineMethodsAllowed(req));
+    }
+
+
+    protected String determineMethodsAllowed(HttpServletRequest req) {
         StringBuilder allow = new StringBuilder();
-        // There is a doGet method
-        allow.append("GET, HEAD");
-        // There is a doPost
-        allow.append(", POST");
-        // There is a doPut
-        allow.append(", PUT");
-        // There is a doDelete
-        allow.append(", DELETE");
+
+        // Start with methods that are always allowed
+        allow.append("OPTIONS, GET, HEAD, POST");
+
+        // PUT and DELETE depend on readonly
+        if (!readOnly) {
+            allow.append(", PUT, DELETE");
+        }
+
         // Trace - assume disabled unless we can prove otherwise
         if (req instanceof RequestFacade &&
                 ((RequestFacade) req).getAllowTrace()) {
             allow.append(", TRACE");
         }
-        // Always allow options
-        allow.append(", OPTIONS");
 
-        resp.setHeader("Allow", allow.toString());
+        return allow.toString();
+    }
+
+
+    protected void sendNotAllowed(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+        resp.addHeader("Allow", determineMethodsAllowed(req));
+        resp.sendError(WebdavStatus.SC_METHOD_NOT_ALLOWED);
     }
 
 
@@ -551,7 +562,7 @@ public class DefaultServlet extends HttpServlet {
         throws ServletException, IOException {
 
         if (readOnly) {
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            sendNotAllowed(req, resp);
             return;
         }
 
@@ -675,7 +686,7 @@ public class DefaultServlet extends HttpServlet {
         throws ServletException, IOException {
 
         if (readOnly) {
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            sendNotAllowed(req, resp);
             return;
         }
 

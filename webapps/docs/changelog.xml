@@ -73,6 +73,18 @@
         rather than fails (with a 500 response). This enables Tomcat to pass two
         additional tests from the Litmus WebDAV test suite. (markt)
       </fix>
+      <update>
+        Modify the Default and WebDAV Servlets so that a 405 status code is
+        returned for <code>PUT</code> and <code>DELETE</code> requests when
+        disabled via the <code>readonly</code> initialisation parameter.
+      </update>
+      <fix>
+        Align the contents of the <code>Allow</code> header with the response
+        code for the Default and WebDAV Servlets. For any given resource a
+        method that returns a 405 status code will not be listed in the
+        <code>Allow</code> header and a method listed in the <code>Allow</code>
+        header will not return a 405 status code. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
