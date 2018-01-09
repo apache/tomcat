@@ -499,15 +499,21 @@ public class DefaultServlet extends HttpServlet {
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp)
         throws ServletException, IOException {
 
+      addAllowHeader(req, resp);
+    }
+
+    private void addAllowHeader(HttpServletRequest req, HttpServletResponse resp) {
         StringBuilder allow = new StringBuilder();
         // There is a doGet method
         allow.append("GET, HEAD");
         // There is a doPost
         allow.append(", POST");
-        // There is a doPut
-        allow.append(", PUT");
-        // There is a doDelete
-        allow.append(", DELETE");
+        if (!readOnly) {
+            // There is a doPut
+            allow.append(", PUT");
+            // There is a doDelete
+            allow.append(", DELETE");
+        }
         // Trace - assume disabled unless we can prove otherwise
         if (req instanceof RequestFacade &&
                 ((RequestFacade) req).getAllowTrace()) {
@@ -551,7 +557,8 @@ public class DefaultServlet extends HttpServlet {
         throws ServletException, IOException {
 
         if (readOnly) {
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            addAllowHeader(req, resp);
+            resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
             return;
         }
 
@@ -675,7 +682,8 @@ public class DefaultServlet extends HttpServlet {
         throws ServletException, IOException {
 
         if (readOnly) {
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            addAllowHeader(req, resp);
+            resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
             return;
         }
 
