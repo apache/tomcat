@@ -186,7 +186,7 @@ public class ELParser {
         int i = 0;
         int j = reservedWords.length;
         while (i < j) {
-            int k = (i + j) / 2;
+            int k = (i + j) >>> 1;
             int result = reservedWords[k].compareTo(id);
             if (result == 0) {
                 return true;

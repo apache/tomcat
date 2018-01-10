@@ -864,7 +864,7 @@ public class JspUtil {
         int i = 0;
         int j = javaKeywords.length;
         while (i < j) {
-            int k = (i + j) / 2;
+            int k = (i + j) >>> 1;
             int result = javaKeywords[k].compareTo(key);
             if (result == 0) {
                 return true;
