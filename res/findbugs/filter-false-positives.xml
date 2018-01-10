@@ -83,12 +83,7 @@
     <Bug code="REC"/>
   </Match>
   <Match>
-    <Class name="org.apache.catalina.ant.jmx.JMXAccessorCondition"/>
-    <Method name="accessJMXValue"/>
-    <Bug code="REC"/>
-  </Match>
-  <Match>
-    <Class name="org.apache.catalina.ant.jmx.JMXAccessorEqualsCondition"/>
+    <Class name="org.apache.catalina.ant.jmx.JMXAccessorConditionBase"/>
     <Method name="accessJMXValue"/>
     <Bug code="REC"/>
   </Match>
