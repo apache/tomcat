@@ -122,6 +122,12 @@
     <Bug code="RCN"/>
   </Match>
   <Match>
+    <!-- False positive. It is lifecycle state that is being protected -->
+    <Class name="org.apache.catalina.authenticator.SingleSignOn" />
+    <Field name="engine" />
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
+  </Match>
+  <Match>
     <!-- req.getRemoteUser(), req.getAuthType(), request.getQueryString() can
     return null because o.a.t.util.buf.MessageBytes.toString() can return NULL
     -->
