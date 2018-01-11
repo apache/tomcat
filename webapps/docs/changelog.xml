@@ -197,6 +197,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        <bug>61312</bug>: Prevent <code>NullPointerException</code>n when using
+        the statement cache of connection that has been closed. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>

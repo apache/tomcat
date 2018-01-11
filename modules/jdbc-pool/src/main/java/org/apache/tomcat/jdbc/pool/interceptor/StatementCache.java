@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
@@ -34,6 +36,7 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  * {@code CallableStatement} instances on a connection.
  */
 public class StatementCache extends StatementDecoratorInterceptor {
+    private static final Log log = LogFactory.getLog(StatementCache.class);
     protected static final String[] ALL_TYPES = new String[] {PREPARE_STATEMENT,PREPARE_CALL};
     protected static final String[] CALLABLE_TYPE = new String[] {PREPARE_CALL};
     protected static final String[] PREPARED_TYPE = new String[] {PREPARE_STATEMENT};
@@ -186,16 +189,14 @@ public class StatementCache extends StatementDecoratorInterceptor {
     }
 
     public CachedStatement isCached(Method method, Object[] args) {
-        @SuppressWarnings("unchecked")
-        ConcurrentHashMap<CacheKey,CachedStatement> cache =
-            (ConcurrentHashMap<CacheKey,CachedStatement>)pcon.getAttributes().get(STATEMENT_CACHE_ATTR);
+        ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
+        if (cache == null) return null;
         return cache.get(createCacheKey(method, args));
     }
 
     public boolean cacheStatement(CachedStatement proxy) {
-        @SuppressWarnings("unchecked")
-        ConcurrentHashMap<CacheKey,CachedStatement> cache =
-            (ConcurrentHashMap<CacheKey,CachedStatement>)pcon.getAttributes().get(STATEMENT_CACHE_ATTR);
+        ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
+        if (cache == null) return false;
         if (proxy.getCacheKey()==null) {
             return false;
         } else if (cache.containsKey(proxy.getCacheKey())) {
@@ -213,9 +214,8 @@ public class StatementCache extends StatementDecoratorInterceptor {
     }
 
     public boolean removeStatement(CachedStatement proxy) {
-        @SuppressWarnings("unchecked")
-        ConcurrentHashMap<CacheKey,CachedStatement> cache =
-            (ConcurrentHashMap<CacheKey,CachedStatement>)pcon.getAttributes().get(STATEMENT_CACHE_ATTR);
+        ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
+        if (cache == null) return false;
         if (cache.remove(proxy.getCacheKey()) != null) {
             cacheSize.decrementAndGet();
             return true;
@@ -225,6 +225,17 @@ public class StatementCache extends StatementDecoratorInterceptor {
     }
     /*end the actual statement cache*/
 
+    protected ConcurrentHashMap<CacheKey,CachedStatement> getCache() {
+        PooledConnection pCon = this.pcon;
+        if (pCon == null) {
+            if (log.isWarnEnabled()) log.warn("Connection has already been closed or abandoned");
+            return null;
+        }
+        @SuppressWarnings("unchecked")
+        ConcurrentHashMap<CacheKey,CachedStatement> cache =
+                (ConcurrentHashMap<CacheKey,CachedStatement>)pCon.getAttributes().get(STATEMENT_CACHE_ATTR);
+        return cache;
+    }
 
     protected class CachedStatement extends StatementDecoratorInterceptor.StatementProxy<Statement> {
         boolean cached = false;
