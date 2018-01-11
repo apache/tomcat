@@ -28,12 +28,6 @@
     <Bug code="NP" />
   </Match>
   <Match>
-    <!-- Ignoring IOException on InputStream close -->
-    <Class name="javax.el.ExpressionFactory" />
-    <Method name="getClassNameServices" />
-    <Bug code="DE" />
-  </Match>
-  <Match>
     <!-- Only base null is handled by this resolver -->
     <Class name="javax.servlet.jsp.el.ImplicitObjectELResolver"/>
     <Or>
@@ -43,6 +37,11 @@
       <Method name="setValue" />
     </Or>
     <Bug code="NP" />
+  </Match>
+  <Match>
+    <Class name="javax.servlet.jsp.el.ImplicitObjectELResolver$ScopeMap$ScopeEntry"/>
+    <Method name="equals"/>
+    <Bug code="Eq" />
   </Match>
   <Match>
     <!-- Only base null is handled by this resolver -->
@@ -56,21 +55,9 @@
     <Bug code="NP" />
   </Match>
   <Match>
-    <!-- Ignore: Expected if not running on Tomcat. Not a problem since
-            this just allows a short-cut. -->
-    <Class name="javax.servlet.jsp.el.ScopedAttributeELResolver" />
-    <Method name="&lt;clinit&gt;" />
-    <Bug code="DE" />
-  </Match>
-  <Match>
     <!--  Cannot do anything about this. API is fixed by the specification. -->
     <Class name="javax.servlet.jsp.tagext.TagData"/>
     <Bug code="CN" />
-  </Match>
-  <Match>
-    <Class name="javax.servlet.jsp.el.ImplicitObjectELResolver$ScopeMap$ScopeEntry"/>
-    <Method name="equals"/>
-    <Bug code="Eq" />
   </Match>
   <Match>
     <!-- Yes the simple name is the same as the super class. Accept it. -->
