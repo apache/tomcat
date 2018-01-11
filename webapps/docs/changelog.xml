@@ -45,6 +45,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.4 (markt)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        <bug>43925</bug>: Add a new system property
+        (<code>org.apache.jasper.runtime.BodyContentImpl.BUFFER_SIZE</code>) to
+        control the size of the buffer used by Jasper when buffering tag bodies.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.3 (markt)" rtext="release in progress">
   <subsection name="Catalina">

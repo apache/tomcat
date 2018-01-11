@@ -154,10 +154,17 @@
       <code>true</code> will be used.</p>
     </property>
 
+    <property name="org.apache.jasper.runtime. BodyContentImpl.BUFFER_SIZE">
+      <p>The size (in characters) to use when creating a tag buffer.</p>
+      <p>If not specified, the default value of
+      <code>org.apache.jasper.Constants.DEFAULT_TAG_BUFFER_SIZE</code> (512)
+      will be used.</p>
+    </property>
+
     <property name="org.apache.jasper.runtime. BodyContentImpl.LIMIT_BUFFER">
       <p>If <code>true</code>, any tag buffer that expands beyond
-      <code>org.apache.jasper.Constants.DEFAULT_TAG_BUFFER_SIZE</code> will be
-      destroyed and a new buffer created of the default size.</p>
+      <code>org.apache.jasper.runtime.BodyContentImpl.BUFFER_SIZE</code> will be
+      destroyed and a new buffer created.</p>
       <p>If not specified, the default value of <code>false</code> will be used.</p>
     </property>
 
