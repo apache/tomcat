@@ -116,8 +116,8 @@ class StreamProcessor extends AbstractProcessor {
         String fileName = (String) stream.getCoyoteRequest().getAttribute(
                 org.apache.coyote.Constants.SENDFILE_FILENAME_ATTR);
         if (fileName != null) {
-            sendfileData.path = new File(fileName).toPath();
             sendfileData = new SendfileData();
+            sendfileData.path = new File(fileName).toPath();
             sendfileData.pos = ((Long) stream.getCoyoteRequest().getAttribute(
                     org.apache.coyote.Constants.SENDFILE_FILE_START_ATTR)).longValue();
             sendfileData.end = ((Long) stream.getCoyoteRequest().getAttribute(
