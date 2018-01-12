@@ -546,38 +546,38 @@ public final class ByteChunk implements Cloneable, Serializable {
     /**
      * Make space for len bytes. If len is small, allocate a reserve space too.
      * Never grow bigger than limit.
-     * @param count The size
+     *
+     * @param count
+     *            The size
      */
     public void makeSpace(int count) {
         byte[] tmp = null;
 
         int newSize;
-        int desiredSize=end + count;
+        int desiredSize = end + count;
 
         // Can't grow above the limit
-        if( limit > 0 &&
-            desiredSize > limit) {
-            desiredSize=limit;
+        if (limit > 0 && desiredSize > limit) {
+            desiredSize = limit;
         }
 
-        if( buff==null ) {
-            if( desiredSize < 256 )
-             {
-                desiredSize=256; // take a minimum
+        if (buff == null) {
+            if (desiredSize < 256) {
+                desiredSize = 256; // take a minimum
             }
-            buff=new byte[desiredSize];
+            buff = new byte[desiredSize];
         }
 
         // limit < buf.length ( the buffer is already big )
         // or we already have space XXX
-        if( desiredSize <= buff.length ) {
+        if (desiredSize <= buff.length) {
             return;
         }
         // grow in larger chunks
-        if( desiredSize < 2 * buff.length ) {
-            newSize= buff.length * 2;
+        if (desiredSize < 2 * buff.length) {
+            newSize = buff.length * 2;
         } else {
-            newSize= buff.length * 2 + count ;
+            newSize = buff.length * 2 + count;
         }
 
         if (limit > 0 && newSize > limit) {
@@ -585,11 +585,11 @@ public final class ByteChunk implements Cloneable, Serializable {
         }
         tmp = new byte[newSize];
 
-        System.arraycopy(buff, start, tmp, 0, end-start);
+        System.arraycopy(buff, start, tmp, 0, end - start);
         buff = tmp;
         tmp = null;
-        end=end-start;
-        start=0;
+        end = end - start;
+        start = 0;
     }
 
     // -------------------- Conversion and getters --------------------

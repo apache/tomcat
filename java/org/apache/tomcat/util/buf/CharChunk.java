@@ -415,41 +415,40 @@ public final class CharChunk implements Cloneable, Serializable, CharSequence {
     }
 
     /**
-     * Make space for len chars. If len is small, allocate
-     * a reserve space too. Never grow bigger than limit.
-     * @param count The size
+     * Make space for len chars. If len is small, allocate a reserve space too.
+     * Never grow bigger than limit.
+     *
+     * @param count
+     *            The size
      */
-    public void makeSpace(int count)
-    {
+    public void makeSpace(int count) {
         char[] tmp = null;
 
         int newSize;
-        int desiredSize=end + count;
+        int desiredSize = end + count;
 
         // Can't grow above the limit
-        if( limit > 0 &&
-            desiredSize > limit) {
-            desiredSize=limit;
+        if (limit > 0 && desiredSize > limit) {
+            desiredSize = limit;
         }
 
-        if( buff==null ) {
-            if( desiredSize < 256 )
-             {
-                desiredSize=256; // take a minimum
+        if (buff == null) {
+            if (desiredSize < 256) {
+                desiredSize = 256; // take a minimum
             }
-            buff=new char[desiredSize];
+            buff = new char[desiredSize];
         }
 
         // limit < buf.length ( the buffer is already big )
         // or we already have space XXX
-        if( desiredSize <= buff.length) {
+        if (desiredSize <= buff.length) {
             return;
         }
         // grow in larger chunks
-        if( desiredSize < 2 * buff.length ) {
-            newSize= buff.length * 2;
+        if (desiredSize < 2 * buff.length) {
+            newSize = buff.length * 2;
         } else {
-            newSize= buff.length * 2 + count ;
+            newSize = buff.length * 2 + count;
         }
 
         if (limit > 0 && newSize > limit) {
