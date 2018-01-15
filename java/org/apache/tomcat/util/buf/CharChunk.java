@@ -178,7 +178,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     }
 
 
-    // -------------------- Adding data --------------------
+    // -------------------- Adding data to the buffer --------------------
 
     public void append(char b) throws IOException {
         makeSpace(1);
@@ -217,8 +217,9 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
         }
 
         // Optimize on a common case.
-        // If the source is going to fill up all the space in buffer, may
-        // as well write it directly to the output, and avoid an extra copy
+        // If the buffer is empty and the source is going to fill up all the
+        // space in buffer, may as well write it directly to the output,
+        // and avoid an extra copy
         if (optimizedWrite && len == limit && end == start && out != null) {
             out.realWriteChars(src, off, len);
             return;

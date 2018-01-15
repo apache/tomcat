@@ -273,6 +273,7 @@ public final class ByteChunk extends AbstractChunk {
 
 
     // -------------------- Adding data to the buffer --------------------
+
     public void append(byte b) throws IOException {
         makeSpace(1);
 
@@ -317,11 +318,13 @@ public final class ByteChunk extends AbstractChunk {
             out.realWriteBytes(src, off, len);
             return;
         }
+
         // if we have limit and we're below
         if (len <= limit - end) {
             // makeSpace will grow the buffer to the limit,
             // so we have space
             System.arraycopy(src, off, buff, end, len);
+
             end += len;
             return;
         }
