@@ -47,10 +47,10 @@
 <section name="Tomcat 9.0.4 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
-      <add>
+      <fix>
         <bug>61999</bug>: maxSavePostSize set to 0 should disable saving POST
         data during authentication. (remm)
-      </add>
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
