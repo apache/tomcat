@@ -324,30 +324,17 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     // -------------------- Removing data from the buffer --------------------
 
     public int substract() throws IOException {
-        if ((end - start) == 0) {
-            if (in == null) {
-                return -1;
-            }
-            int n = in.realReadChars();
-            if (n < 0) {
-                return -1;
-            }
+        if (checkEof()) {
+            return -1;
         }
-        return (buff[start++]);
+        return buff[start++];
     }
 
 
     public int substract(char dest[], int off, int len) throws IOException {
-        if ((end - start) == 0) {
-            if (in == null) {
-                return -1;
-            }
-            int n = in.realReadChars();
-            if (n < 0) {
-                return -1;
-            }
+        if (checkEof()) {
+            return -1;
         }
-
         int n = len;
         if (len > getLength()) {
             n = getLength();
@@ -355,6 +342,20 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
         System.arraycopy(buff, start, dest, off, n);
         start += n;
         return n;
+    }
+
+
+    private boolean checkEof() throws IOException {
+        if ((end - start) == 0) {
+            if (in == null) {
+                return true;
+            }
+            int n = in.realReadChars();
+            if (n < 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
