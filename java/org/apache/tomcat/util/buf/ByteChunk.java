@@ -626,17 +626,18 @@ public final class ByteChunk extends AbstractChunk {
      * Compares the message bytes to the specified String object.
      *
      * @param s the String to compare
-     * @return true if the comparison succeeded, false otherwise
+     * @return <code>true</code> if the comparison succeeded, <code>false</code>
+     *         otherwise
      */
     public boolean equalsIgnoreCase(String s) {
         byte[] b = buff;
-        int blen = end - start;
-        if (b == null || blen != s.length()) {
+        int len = end - start;
+        if (b == null || len != s.length()) {
             return false;
         }
-        int boff = start;
-        for (int i = 0; i < blen; i++) {
-            if (Ascii.toLower(b[boff++]) != Ascii.toLower(s.charAt(i))) {
+        int off = start;
+        for (int i = 0; i < len; i++) {
+            if (Ascii.toLower(b[off++]) != Ascii.toLower(s.charAt(i))) {
                 return false;
             }
         }
@@ -656,7 +657,7 @@ public final class ByteChunk extends AbstractChunk {
         }
 
         int len = end - start;
-        if (len2 != len || b1 == null || b2 == null) {
+        if (len != len2 || b1 == null || b2 == null) {
             return false;
         }
 
