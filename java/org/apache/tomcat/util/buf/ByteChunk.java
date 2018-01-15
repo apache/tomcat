@@ -122,15 +122,8 @@ public final class ByteChunk extends AbstractChunk {
      */
     public static final Charset DEFAULT_CHARSET = StandardCharsets.ISO_8859_1;
 
-    private int hashCode = 0;
-    // did we compute the hashcode ?
-    private boolean hasHashCode = false;
-
     // byte[]
     private byte[] buff;
-
-    private int start = 0;
-    private int end;
 
     private transient Charset charset;
 
@@ -252,36 +245,6 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * @return the start offset of the bytes. For output this is the end of the
-     *         buffer.
-     */
-    public int getStart() {
-        return start;
-    }
-
-
-    public int getOffset() {
-        return start;
-    }
-
-
-    public void setOffset(int off) {
-        if (end < off) {
-            end = off;
-        }
-        start = off;
-    }
-
-
-    /**
-     * @return the length of the bytes.
-     */
-    public int getLength() {
-        return end - start;
-    }
-
-
-    /**
      * Maximum amount of data in this buffer. If -1 or not set, the buffer will
      * grow indefinitely. Can be smaller than the current buffer size ( which
      * will not shrink ). When the limit is reached, the buffer will be flushed
@@ -318,16 +281,6 @@ public final class ByteChunk extends AbstractChunk {
      */
     public void setByteOutputChannel(ByteOutputChannel out) {
         this.out = out;
-    }
-
-
-    public int getEnd() {
-        return end;
-    }
-
-
-    public void setEnd(int i) {
-        end = i;
     }
 
 
@@ -803,36 +756,9 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
-    // -------------------- Hash code --------------------
-
     @Override
-    public int hashCode() {
-        if (hasHashCode) {
-            return hashCode;
-        }
-        int code = 0;
-
-        code = hash();
-        hashCode = code;
-        hasHashCode = true;
-        return code;
-    }
-
-
-    // normal hash.
-    public int hash() {
-        return hashBytes(buff, start, end - start);
-    }
-
-
-    private static int hashBytes(byte buff[], int start, int bytesLen) {
-        int max = start + bytesLen;
-        byte bb[] = buff;
-        int code = 0;
-        for (int i = start; i < max; i++) {
-            code = code * 37 + bb[i];
-        }
-        return code;
+    protected int getBufferElement(int index) {
+        return buff[index];
     }
 
 

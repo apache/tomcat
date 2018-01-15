@@ -65,15 +65,8 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
     // --------------------
 
-    private int hashCode = 0;
-    // did we compute the hashcode ?
-    private boolean hasHashCode = false;
-
     // char[]
     private char buff[];
-
-    private int start;
-    private int end;
 
     private boolean isSet = false; // XXX
 
@@ -204,46 +197,6 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
     public char[] getBuffer() {
         return buff;
-    }
-
-
-    /**
-     * @return the start offset of the chars. For output this is the end of the
-     *         buffer.
-     */
-    public int getStart() {
-        return start;
-    }
-
-
-    public int getOffset() {
-        return start;
-    }
-
-
-    /**
-     * @param off The offset
-     */
-    public void setOffset(int off) {
-        start = off;
-    }
-
-
-    /**
-     * @return the length of the bytes.
-     */
-    public int getLength() {
-        return end - start;
-    }
-
-
-    public int getEnd() {
-        return end;
-    }
-
-
-    public void setEnd(int i) {
-        end = i;
     }
 
 
@@ -647,29 +600,9 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     }
 
 
-    // -------------------- Hash code --------------------
-
     @Override
-    public int hashCode() {
-        if (hasHashCode) {
-            return hashCode;
-        }
-        int code = 0;
-
-        code = hash();
-        hashCode = code;
-        hasHashCode = true;
-        return code;
-    }
-
-
-    // normal hash.
-    public int hash() {
-        int code = 0;
-        for (int i = start; i < start + end - start; i++) {
-            code = code * 37 + buff[i];
-        }
-        return code;
+    protected int getBufferElement(int index) {
+        return buff[index];
     }
 
 
