@@ -116,6 +116,10 @@
         plain text HTTP connection to a TLS enabled NIO or NIO2 Connector.
         (markt)
       </add>
+      <fix>
+        Correctly handle EOF when <code>ServletInputStream.isReady()</code> is
+        called. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
