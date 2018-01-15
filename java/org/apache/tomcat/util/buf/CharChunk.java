@@ -17,7 +17,6 @@
 package org.apache.tomcat.util.buf;
 
 import java.io.IOException;
-import java.io.Serializable;
 
 /**
  * Utilities to manipulate char chunks. While String is the easiest way to
@@ -29,7 +28,7 @@ import java.io.Serializable;
  * @author Costin Manolache
  * @author Remy Maucherat
  */
-public final class CharChunk implements Cloneable, Serializable, CharSequence {
+public final class CharChunk extends AbstractChunk implements CharSequence {
 
     private static final long serialVersionUID = 1L;
 
