@@ -45,6 +45,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.26 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Correct Javadoc errors in release build.
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.25 (markt)" rtext="not released">
   <subsection name="Catalina">
