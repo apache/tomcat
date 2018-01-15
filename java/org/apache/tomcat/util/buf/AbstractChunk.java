@@ -29,6 +29,8 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
     private int hashCode = 0;
     protected boolean hasHashCode = false;
 
+    protected boolean isSet;
+
     protected int start;
     protected int end;
 
@@ -51,14 +53,6 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
     }
 
 
-    /**
-     * @return the length of the data in the buffer
-     */
-    public int getLength() {
-        return end - start;
-    }
-
-
     // TODO: Deprecate offset and use start
 
     public int getOffset() {
@@ -71,6 +65,33 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
             end = off;
         }
         start = off;
+    }
+
+
+    /**
+     * @return the length of the data in the buffer
+     */
+    public int getLength() {
+        return end - start;
+    }
+
+
+    public boolean isNull() {
+        if (end > 0) {
+            return false;
+        }
+        return !isSet;
+    }
+
+
+    /**
+     * Resets the chunk to an uninitialized state.
+     */
+    public void recycle() {
+        hasHashCode = false;
+        isSet = false;
+        start = 0;
+        end = 0;
     }
 
 

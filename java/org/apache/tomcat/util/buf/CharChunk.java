@@ -68,8 +68,6 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     // char[]
     private char buff[];
 
-    private boolean isSet = false; // XXX
-
     // -1: grow indefinitely
     // maximum amount to be cached
     private int limit = -1;
@@ -101,26 +99,6 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     }
 
 
-    public boolean isNull() {
-        if (end > 0) {
-            return false;
-        }
-        return !isSet; // XXX
-    }
-
-
-    /**
-     * Resets the message bytes to an uninitialized state.
-     */
-    public void recycle() {
-        // buff=null;
-        isSet = false; // XXX
-        hasHashCode = false;
-        start = 0;
-        end = 0;
-    }
-
-
     // -------------------- Setup --------------------
 
     public void allocate(int initial, int limit) {
@@ -146,6 +124,17 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
         end = start + len;
         isSet = true;
         hasHashCode = false;
+    }
+
+
+    // compat
+    public char[] getChars() {
+        return getBuffer();
+    }
+
+
+    public char[] getBuffer() {
+        return buff;
     }
 
 
@@ -186,17 +175,6 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
      */
     public void setCharOutputChannel(CharOutputChannel out) {
         this.out = out;
-    }
-
-
-    // compat
-    public char[] getChars() {
-        return getBuffer();
-    }
-
-
-    public char[] getBuffer() {
-        return buff;
     }
 
 
