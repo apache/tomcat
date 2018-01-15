@@ -87,6 +87,10 @@
         <code>setHeader()</code> or <code>addHeader()</code> as well as when it
         is set via <code>setContentType()</code>. (markt)
       </fix>
+      <fix>
+        <bug>61999</bug>: maxSavePostSize set to 0 should disable saving POST
+        data during authentication. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
