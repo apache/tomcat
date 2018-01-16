@@ -36,4 +36,30 @@ public class TestCharChunk {
         Assert.assertFalse(cc.endsWith("x"));
         Assert.assertFalse(cc.endsWith("xxtest"));
     }
+
+    @Test
+    public void testIndexOf_String() {
+        char[] chars = "Hello\u00a0world".toCharArray();
+        final int len = chars.length;
+
+        CharChunk cc = new CharChunk();
+        cc.setChars(chars, 0, len);
+
+        Assert.assertEquals(0, cc.indexOf("Hello", 0, "Hello".length(), 0));
+        Assert.assertEquals(2, cc.indexOf("ll", 0, 2, 0));
+        Assert.assertEquals(2, cc.indexOf("Hello", 2, 2, 0));
+
+        Assert.assertEquals(7, cc.indexOf("o", 0, 1, 5));
+
+        // Does work outside of 0-127 (unlike ByteChunk)
+        Assert.assertEquals(5, cc.indexOf("\u00a0", 0, 1, 0));
+
+        cc.setChars(chars, 6, 5);
+        Assert.assertEquals(1, cc.indexOf("o", 0, 1, 0));
+
+        cc.setChars(chars, 6, 2);
+        Assert.assertEquals(0, cc.indexOf("wo", 0, 1, 0));
+        Assert.assertEquals(-1, cc.indexOf("d", 0, 1, 0));
+    }
+
 }
