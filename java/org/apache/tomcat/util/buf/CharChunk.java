@@ -410,11 +410,10 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
         }
         tmp = new char[newSize];
 
-        System.arraycopy(buff, start, tmp, 0, end - start);
+        // Some calling code assumes buffer will not be compacted
+        System.arraycopy(buff, 0, tmp, 0, end);
         buff = tmp;
         tmp = null;
-        end = end - start;
-        start = 0;
     }
 
 
