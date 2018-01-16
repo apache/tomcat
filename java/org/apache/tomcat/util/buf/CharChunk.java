@@ -78,8 +78,6 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     private transient CharInputChannel in = null;
     private transient CharOutputChannel out = null;
 
-    private boolean optimizedWrite = true;
-
 
     /**
      * Creates a new, uninitialized CharChunk object.
@@ -112,11 +110,6 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
         end = 0;
         isSet = true;
         hasHashCode = false;
-    }
-
-
-    public void setOptimizedWrite(boolean optimizedWrite) {
-        this.optimizedWrite = optimizedWrite;
     }
 
 
@@ -234,7 +227,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
         // If the buffer is empty and the source is going to fill up all the
         // space in buffer, may as well write it directly to the output,
         // and avoid an extra copy
-        if (optimizedWrite && len == limit && end == start && out != null) {
+        if (len == limit && end == start && out != null) {
             out.realWriteChars(src, off, len);
             return;
         }
@@ -693,4 +686,15 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
         return end - start;
     }
 
+    /**
+     * NO-OP.
+     *
+     * @param optimizedWrite Ignored
+     *
+     * @deprecated Unused code. This is now a NO-OP and will be removed without
+     *             replacement in Tomcat 10.
+     */
+    @Deprecated
+    public void setOptimizedWrite(boolean optimizedWrite) {
+    }
 }
