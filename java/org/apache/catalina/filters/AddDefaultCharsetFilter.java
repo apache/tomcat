@@ -134,7 +134,7 @@ public class AddDefaultCharsetFilter extends FilterBase {
             if (name.trim().equalsIgnoreCase("content-type")) {
                 setContentType(value);
             } else {
-                super.setHeader(name, value);
+                super.addHeader(name, value);
             }
         }
 

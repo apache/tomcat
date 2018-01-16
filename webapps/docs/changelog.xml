@@ -45,6 +45,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.27 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Correct a regression in the previous fix for <bug>61916</bug> that meant
+        that any call to <code>addHeader()</code> would have been replaced with
+        a call to <code>setHeader()</code> for all requests mapped to the
+        <code>AddDefaultCharsetFilter</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
