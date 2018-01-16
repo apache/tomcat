@@ -18,14 +18,19 @@ package org.apache.tomcat.util.buf;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import org.apache.tomcat.util.buf.ByteChunk.ByteOutputChannel;
 
 /**
  * Test cases for {@link ByteChunk}.
@@ -39,6 +44,7 @@ public class TestByteChunk {
         byte[] expected = string.getBytes("ISO-8859-1");
         Assert.assertTrue(Arrays.equals(bytes, expected));
     }
+
 
     /*
      * Test for {@code findByte} vs. {@code indexOf} methods difference.
@@ -75,6 +81,7 @@ public class TestByteChunk {
         Assert.assertEquals(-1, ByteChunk.indexOf(bytes, 5, 5, 'w'));
     }
 
+
     @Test
     public void testIndexOf_Char() throws UnsupportedEncodingException {
         byte[] bytes = "Hello\u00a0world".getBytes("ISO-8859-1");
@@ -96,6 +103,7 @@ public class TestByteChunk {
         Assert.assertEquals(0, bc.indexOf('w', 0));
         Assert.assertEquals(-1, bc.indexOf('d', 0));
     }
+
 
     @Test
     public void testIndexOf_String() throws UnsupportedEncodingException {
@@ -122,6 +130,7 @@ public class TestByteChunk {
         Assert.assertEquals(-1, bc.indexOf("d", 0, 1, 0));
     }
 
+
     @Test
     public void testFindBytes() throws UnsupportedEncodingException {
         byte[] bytes = "Hello\u00a0world".getBytes("ISO-8859-1");
@@ -138,6 +147,7 @@ public class TestByteChunk {
                 'e' }));
         Assert.assertEquals(-1, ByteChunk.findBytes(bytes, 2, 5, new byte[] { 'w' }));
     }
+
 
     @Test
     public void testSerialization() throws Exception {
@@ -159,5 +169,36 @@ public class TestByteChunk {
 
         Assert.assertArrayEquals(bytes, bcOut.getBytes());
         Assert.assertEquals(bcIn.getCharset(), bcOut.getCharset());
+    }
+
+
+    @Ignore // Requires a 6GB heap (on markt's desktop - YMMV)
+    @Test
+    public void testAppend() throws Exception {
+        ByteChunk bc = new ByteChunk();
+        bc.setByteOutputChannel(new Sink());
+        // Defaults to no limit
+
+        byte data[] = new byte[32 * 1024 * 1024];
+
+        for (int i = 0; i < 100; i++) {
+            bc.append(data, 0, data.length);
+        }
+
+        Assert.assertEquals(AbstractChunk.ARRAY_MAX_SIZE, bc.getBuffer().length);
+    }
+
+
+    public class Sink implements ByteOutputChannel {
+
+        @Override
+        public void realWriteBytes(byte[] cbuf, int off, int len) throws IOException {
+            // NO-OP
+        }
+
+        @Override
+        public void realWriteBytes(ByteBuffer from) throws IOException {
+            // NO-OP
+        }
     }
 }

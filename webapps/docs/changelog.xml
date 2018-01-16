@@ -58,6 +58,11 @@
       <fix>
         Fix NIO2 HTTP/2 sendfile. (remm)
       </fix>
+      <fix>
+        <bug>61993</bug>: Improve handling for <code>ByteChunk</code> and
+        <code>CharChunk</code> instances that grow close to the maximum size
+        allowed by the JRE. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

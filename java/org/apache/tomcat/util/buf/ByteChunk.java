@@ -130,10 +130,6 @@ public final class ByteChunk extends AbstractChunk {
     // byte[]
     private byte[] buff;
 
-    // -1: grow indefinitely
-    // maximum amount to be cached
-    private int limit = -1;
-
     // transient as serialization is primarily for values via, e.g. JMX
     private transient ByteInputChannel in = null;
     private transient ByteOutputChannel out = null;
@@ -182,7 +178,7 @@ public final class ByteChunk extends AbstractChunk {
         if (buff == null || buff.length < initial) {
             buff = new byte[initial];
         }
-        this.limit = limit;
+        setLimit(limit);
         start = 0;
         end = 0;
         isSet = true;
@@ -236,24 +232,6 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * Maximum amount of data in this buffer. If -1 or not set, the buffer will
-     * grow indefinitely. Can be smaller than the current buffer size ( which
-     * will not shrink ). When the limit is reached, the buffer will be flushed
-     * ( if out is set ) or throw exception.
-     *
-     * @param limit The new limit
-     */
-    public void setLimit(int limit) {
-        this.limit = limit;
-    }
-
-
-    public int getLimit() {
-        return limit;
-    }
-
-
-    /**
      * When the buffer is empty, read the data from the input channel.
      *
      * @param in The input channel
@@ -279,9 +257,10 @@ public final class ByteChunk extends AbstractChunk {
 
     public void append(byte b) throws IOException {
         makeSpace(1);
+        int limit = getLimitInternal();
 
         // couldn't make space
-        if (limit > 0 && end >= limit) {
+        if (end >= limit) {
             flushBuffer();
         }
         buff[end++] = b;
@@ -304,14 +283,7 @@ public final class ByteChunk extends AbstractChunk {
     public void append(byte src[], int off, int len) throws IOException {
         // will grow, up to limit
         makeSpace(len);
-
-        // if we don't have limit: makeSpace can grow as it wants
-        if (limit < 0) {
-            // assert: makeSpace made enough space
-            System.arraycopy(src, off, buff, end, len);
-            end += len;
-            return;
-        }
+        int limit = getLimitInternal();
 
         // Optimize on a common case.
         // If the buffer is empty and the source is going to fill up all the
@@ -322,23 +294,19 @@ public final class ByteChunk extends AbstractChunk {
             return;
         }
 
-        // if we have limit and we're below
+        // if we are below the limit
         if (len <= limit - end) {
-            // makeSpace will grow the buffer to the limit,
-            // so we have space
             System.arraycopy(src, off, buff, end, len);
-
             end += len;
             return;
         }
 
-        // need more space than we can afford, need to flush
-        // buffer
+        // Need more space than we can afford, need to flush buffer.
 
-        // the buffer is already at ( or bigger than ) limit
+        // The buffer is already at (or bigger than) limit.
 
         // We chunk the data into slices fitting in the buffer limit, although
-        // if the data is written directly if it doesn't fit
+        // if the data is written directly if it doesn't fit.
 
         int avail = limit - end;
         System.arraycopy(src, off, buff, end, avail);
@@ -355,7 +323,6 @@ public final class ByteChunk extends AbstractChunk {
 
         System.arraycopy(src, (off + len) - remain, buff, end, remain);
         end += remain;
-
     }
 
 
@@ -370,14 +337,7 @@ public final class ByteChunk extends AbstractChunk {
 
         // will grow, up to limit
         makeSpace(len);
-
-        // if we don't have limit: makeSpace can grow as it wants
-        if (limit < 0) {
-            // assert: makeSpace made enough space
-            from.get(buff, end, len);
-            end += len;
-            return;
-        }
+        int limit = getLimitInternal();
 
         // Optimize on a common case.
         // If the buffer is empty and the source is going to fill up all the
@@ -506,7 +466,7 @@ public final class ByteChunk extends AbstractChunk {
     public void flushBuffer() throws IOException {
         // assert out!=null
         if (out == null) {
-            throw new IOException("Buffer overflow, no sink " + limit + " " + buff.length);
+            throw new IOException("Buffer overflow, no sink " + getLimit() + " " + buff.length);
         }
         out.realWriteBytes(buff, start, end - start);
         end = start;
@@ -515,18 +475,20 @@ public final class ByteChunk extends AbstractChunk {
 
     /**
      * Make space for len bytes. If len is small, allocate a reserve space too.
-     * Never grow bigger than limit.
+     * Never grow bigger than the limit or {@link AbstractChunk#ARRAY_MAX_SIZE}.
      *
      * @param count The size
      */
     public void makeSpace(int count) {
         byte[] tmp = null;
 
-        int newSize;
-        int desiredSize = end + count;
+        int limit = getLimitInternal();
+
+        long newSize;
+        long desiredSize = end + count;
 
         // Can't grow above the limit
-        if (limit > 0 && desiredSize > limit) {
+        if (desiredSize > limit) {
             desiredSize = limit;
         }
 
@@ -534,25 +496,25 @@ public final class ByteChunk extends AbstractChunk {
             if (desiredSize < 256) {
                 desiredSize = 256; // take a minimum
             }
-            buff = new byte[desiredSize];
+            buff = new byte[(int) desiredSize];
         }
 
-        // limit < buf.length ( the buffer is already big )
+        // limit < buf.length (the buffer is already big)
         // or we already have space XXX
         if (desiredSize <= buff.length) {
             return;
         }
         // grow in larger chunks
-        if (desiredSize < 2 * buff.length) {
-            newSize = buff.length * 2;
+        if (desiredSize < 2L * buff.length) {
+            newSize = buff.length * 2L;
         } else {
-            newSize = buff.length * 2 + count;
+            newSize = buff.length * 2L + count;
         }
 
-        if (limit > 0 && newSize > limit) {
+        if (newSize > limit) {
             newSize = limit;
         }
-        tmp = new byte[newSize];
+        tmp = new byte[(int) newSize];
 
         // Compacts buffer
         System.arraycopy(buff, start, tmp, 0, end - start);
