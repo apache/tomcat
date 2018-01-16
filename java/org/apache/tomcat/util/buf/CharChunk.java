@@ -70,8 +70,9 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     // char[]
     private char[] buff;
 
-    private CharInputChannel in = null;
-    private CharOutputChannel out = null;
+    // transient as serialization is primarily for values via, e.g. JMX
+    private transient CharInputChannel in = null;
+    private transient CharOutputChannel out = null;
 
 
     /**

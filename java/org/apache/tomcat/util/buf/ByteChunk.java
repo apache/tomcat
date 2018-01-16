@@ -17,6 +17,8 @@
 package org.apache.tomcat.util.buf;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -128,8 +130,9 @@ public final class ByteChunk extends AbstractChunk {
     // byte[]
     private byte[] buff;
 
-    private ByteInputChannel in = null;
-    private ByteOutputChannel out = null;
+    // transient as serialization is primarily for values via, e.g. JMX
+    private transient ByteInputChannel in = null;
+    private transient ByteOutputChannel out = null;
 
 
     /**
@@ -142,6 +145,19 @@ public final class ByteChunk extends AbstractChunk {
     public ByteChunk(int initial) {
         allocate(initial, -1);
     }
+
+
+    private void writeObject(ObjectOutputStream oos) throws IOException {
+        oos.defaultWriteObject();
+        oos.writeUTF(getCharset().name());
+    }
+
+
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        this.charset = Charset.forName(ois.readUTF());
+    }
+
 
     @Override
     public Object clone() throws CloneNotSupportedException {
@@ -698,6 +714,7 @@ public final class ByteChunk extends AbstractChunk {
         int ret = indexOf(buff, start + starting, end, c);
         return (ret >= start) ? ret - start : -1;
     }
+
 
     /**
      * Returns the first instance of the given character in the given byte array
