@@ -84,6 +84,29 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
     }
 
 
+    public int indexOf(String src, int srcOff, int srcLen, int myOff) {
+        char first = src.charAt(srcOff);
+
+        // Look for first char
+        int srcEnd = srcOff + srcLen;
+
+        mainLoop: for (int i = myOff + start; i <= (end - srcLen); i++) {
+            if (getBufferElement(i) != first) {
+                continue;
+            }
+            // found first char, now look for a match
+            int myPos = i + 1;
+            for (int srcPos = srcOff + 1; srcPos < srcEnd;) {
+                if (getBufferElement(myPos++) != src.charAt(srcPos++)) {
+                    continue mainLoop;
+                }
+            }
+            return i - start; // found it
+        }
+        return -1;
+    }
+
+
     /**
      * Resets the chunk to an uninitialized state.
      */

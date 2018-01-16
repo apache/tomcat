@@ -731,29 +731,6 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
-    public int indexOf(String src, int srcOff, int srcLen, int myOff) {
-        char first = src.charAt(srcOff);
-
-        // Look for first char
-        int srcEnd = srcOff + srcLen;
-
-        mainLoop: for (int i = myOff + start; i <= (end - srcLen); i++) {
-            if (buff[i] != first) {
-                continue;
-            }
-            // found first char, now look for a match
-            int myPos = i + 1;
-            for (int srcPos = srcOff + 1; srcPos < srcEnd;) {
-                if (buff[myPos++] != src.charAt(srcPos++)) {
-                    continue mainLoop;
-                }
-            }
-            return i - start; // found it
-        }
-        return -1;
-    }
-
-
     @Override
     protected int getBufferElement(int index) {
         return buff[index];
