@@ -615,7 +615,11 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
             if (buff[i] != first) {
                 continue;
             }
-            // found first char, now look for a match
+            // Special case - search string is a single character
+            if (srcLen == 1) {
+                return i - start;
+            }
+            // Found first char, now look for a match
             int myPos = i + 1;
             for (int srcPos = srcOff + 1; srcPos < srcEnd;) {
                 if (buff[myPos++] != src.charAt(srcPos++)) {
