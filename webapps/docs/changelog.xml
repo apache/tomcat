@@ -48,6 +48,12 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        Correct a regression in the previous fix for <bug>61916</bug> that meant
+        that any call to <code>addHeader()</code> would have been replaced with
+        a call to <code>setHeader()</code> for all requests mapped to the
+        <code>AddDefaultCharsetFilter</code>. (markt)
+      </fix>
+      <fix>
         <bug>61999</bug>: maxSavePostSize set to 0 should disable saving POST
         data during authentication. (remm)
       </fix>
