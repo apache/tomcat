@@ -16,8 +16,13 @@
  */
 package org.apache.tomcat.util.buf;
 
+import java.io.IOException;
+
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import org.apache.tomcat.util.buf.CharChunk.CharOutputChannel;
 
 /**
  * Test cases for {@link CharChunk}.
@@ -36,6 +41,7 @@ public class TestCharChunk {
         Assert.assertFalse(cc.endsWith("x"));
         Assert.assertFalse(cc.endsWith("xxtest"));
     }
+
 
     @Test
     public void testIndexOf_String() {
@@ -62,4 +68,29 @@ public class TestCharChunk {
         Assert.assertEquals(-1, cc.indexOf("d", 0, 1, 0));
     }
 
+
+    @Ignore // Requires an 11GB heap (on markt's desktop - YMMV)
+    @Test
+    public void testAppend() throws Exception {
+        CharChunk cc = new CharChunk();
+        cc.setCharOutputChannel(new Sink());
+        // Defaults to no limit
+
+        char data[] = new char[32 * 1024 * 1024];
+
+        for (int i = 0; i < 100; i++) {
+            cc.append(data, 0, data.length);
+        }
+
+        Assert.assertEquals(AbstractChunk.ARRAY_MAX_SIZE, cc.getBuffer().length);
+    }
+
+
+    public class Sink implements CharOutputChannel {
+
+        @Override
+        public void realWriteChars(char[] cbuf, int off, int len) throws IOException {
+            // NO-OP
+        }
+    }
 }
