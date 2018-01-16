@@ -308,6 +308,9 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
     /**
      * Append a string to the buffer
+     *
+     * @param s The string
+     * @throws IOException Writing overflow data to the output channel failed
      */
     public void append(String s) throws IOException {
         append(s, 0, s.length());
@@ -585,7 +588,6 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
 
     /**
-<<<<<<< .working
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
      */
     @Deprecated
@@ -611,18 +613,9 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
 
     /**
-     * Returns true if the message bytes starts with the specified string.
-     *
-     * @param s the string
-||||||| .merge-left.r1821315
-     * Returns true if the message bytes starts with the specified string.
-     *
-     * @param s the string
-=======
      * @return <code>true</code> if the message bytes starts with the specified
      *         string.
      * @param s The string
->>>>>>> .merge-right.r1821316
      */
     public boolean startsWith(String s) {
         char[] c = buff;
