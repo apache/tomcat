@@ -42,8 +42,13 @@ public class BodyContentImpl extends BodyContent {
     private static final String LINE_SEPARATOR = 
         System.getProperty("line.separator");
     private static final boolean LIMIT_BUFFER = 
-        Boolean.parseBoolean(System.getProperty("org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER", "false"));
+            Boolean.parseBoolean(System.getProperty(
+                    "org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER", "false"));
     
+    private static final int TAG_BUFFER_SIZE =
+            Integer.getInteger("org.apache.jasper.runtime.BodyContentImpl.BUFFER_SIZE",
+                    Constants.DEFAULT_TAG_BUFFER_SIZE).intValue();
+
     private char[] cb;
     private int nextChar;
     private boolean closed;
@@ -56,7 +61,7 @@ public class BodyContentImpl extends BodyContent {
      */
     public BodyContentImpl(JspWriter enclosingWriter) {
         super(enclosingWriter);
-        cb = new char[Constants.DEFAULT_TAG_BUFFER_SIZE];
+        cb = new char[TAG_BUFFER_SIZE];
         bufferSize = cb.length;
         nextChar = 0;
         closed = false;
@@ -494,8 +499,8 @@ public class BodyContentImpl extends BodyContent {
             throw new IOException();
         } else {
             nextChar = 0;
-            if (LIMIT_BUFFER && (cb.length > Constants.DEFAULT_TAG_BUFFER_SIZE)) {
-                cb = new char[Constants.DEFAULT_TAG_BUFFER_SIZE];
+            if (LIMIT_BUFFER && (cb.length > TAG_BUFFER_SIZE)) {
+                cb = new char[TAG_BUFFER_SIZE];
                 bufferSize = cb.length;
             }
         }
