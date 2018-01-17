@@ -97,9 +97,9 @@
 </section>
 <section name="Command line parameters">
 <p>
-    Each command parameter is prefixed with <b>--</b>.
-    If the command line is prefixed with <b>++</b> then it's value will
-    be appended to the existing option.
+    Each command line parameter is prefixed with <b>--</b>. If the command line
+    parameter is prefixed with <b>++</b> then it's value will be appended to the
+    existing option.
     If the environment variable with the same name as command line parameter but
     prefixed with <code>PR_</code> exists it will take precedence.
     For example:</p>
@@ -136,13 +136,13 @@
     <td>Service startup mode can be either <b>auto</b> or <b>manual</b></td>
     </tr>
     <tr>
-    <td>++DependsOn</td>
+    <td>--DependsOn</td>
     <td></td>
     <td>List of services that this service depend on. Dependent services
         are separated using either <b>#</b> or <b>;</b> characters</td>
     </tr>
     <tr>
-    <td>++Environment</td>
+    <td>--Environment</td>
     <td></td>
     <td>List of environment variables that will be provided to the service
         in the form <b>key=value</b>. They are separated using either
@@ -176,11 +176,22 @@
         You can use the environment variable expansion here.</td>
     </tr>
     <tr>
-    <td>++JvmOptions</td>
+    <td>--JvmOptions</td>
     <td>-Xrs</td>
     <td>List of options in the form of <b>-D</b> or <b>-X</b> that will be
         passed to the JVM. The options are separated using either
-        <b>#</b> or <b>;</b> characters. (Not used in <b>exe</b> mode.)</td>
+        <b>#</b> or <b>;</b> characters. If you need to embed either <b>#</b> or
+        <b>;</b> characters, put them inside single quotes. (Not used in
+        <b>exe</b> mode.)</td>
+    </tr>
+    <tr>
+    <td>--JvmOptions9</td>
+    <td></td>
+    <td>List of options in the form of <b>-D</b> or <b>-X</b> that will be
+        passed to the JVM when running on Java 9 or later. The options are
+        separated using either <b>#</b> or <b>;</b> characters. If you need to
+        embed either <b>#</b> or <b>;</b> characters, put them inside single
+        quotes. (Not used in <b>exe</b> mode.)</td>
     </tr>
     <tr>
     <td>--Classpath</td>
@@ -239,7 +250,7 @@
     <td>Method name if differs then main</td>
     </tr>
     <tr>
-    <td>++StartParams</td>
+    <td>--StartParams</td>
     <td></td>
     <td>List of parameters that will be passed to either StartImage or
         StartClass. Parameters are separated using either <b>#</b> or
@@ -275,7 +286,7 @@
     <td>Method name if differs then main</td>
     </tr>
     <tr>
-    <td>++StopParams</td>
+    <td>--StopParams</td>
     <td></td>
     <td>List of parameters that will be passed to either StopImage or
         StopClass. Parameters are separated using either <b>#</b> or

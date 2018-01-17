@@ -148,6 +148,10 @@
         Add OCSP configuration information to the SSL How-To. Patch provided by
         Marek Czernek. (markt)
       </add>
+      <fix>
+        <bug>62006</bug>: Document the new <code>JvmOptions9</code> command line
+        parameter for <code>tomcat9.exe</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
