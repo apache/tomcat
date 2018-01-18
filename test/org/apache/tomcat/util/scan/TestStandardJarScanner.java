@@ -25,17 +25,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.tomcat.Jar;
 import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.unittest.TesterServletContext;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestStandardJarScanner {
 
     @Test
     public void testWebappClassPath() {
+        Assume.assumeFalse("No URLClassLoader with Java 9", JreCompat.isJre9Available());
+
         StandardJarScanner scanner = new StandardJarScanner();
 
         scanner.setScanClassPath(true);
