@@ -278,7 +278,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
     /**
      * Append a string to the buffer.
      *
-     * @param s The string
+     * @param sb The string builder
      * @throws IOException Writing overflow data to the output channel failed
      *
      * @deprecated Unused. Will be removed in Tomcat 8.0.x onwards.
