@@ -53,6 +53,13 @@ public class ClassLoaderLogManager extends LogManager {
 
     private static final boolean isJava9;
 
+    private static ThreadLocal<Boolean> addingLocalRootLogger = new ThreadLocal<Boolean>() {
+        @Override
+        protected Boolean initialValue() {
+            return Boolean.FALSE;
+        }
+    };
+
     public static final String DEBUG_PROPERTY =
             ClassLoaderLogManager.class.getName() + ".debug";
 
@@ -264,6 +271,13 @@ public class ClassLoaderLogManager extends LogManager {
      */
     @Override
     public String getProperty(String name) {
+
+        // Use a ThreadLocal to work around
+        // https://bugs.openjdk.java.net/browse/JDK-8195096
+        if (".handlers".equals(name) && !addingLocalRootLogger.get().booleanValue()) {
+            return null;
+        }
+
         String prefix = this.prefix.get();
         String result = null;
 
@@ -523,8 +537,14 @@ public class ClassLoaderLogManager extends LogManager {
         if (is != null) {
             readConfiguration(is, classLoader);
         }
-        addLogger(localRootLogger);
-
+        try {
+            // Use a ThreadLocal to work around
+            // https://bugs.openjdk.java.net/browse/JDK-8195096
+            addingLocalRootLogger.set(Boolean.TRUE);
+            addLogger(localRootLogger);
+        } finally {
+            addingLocalRootLogger.set(Boolean.FALSE);
+        }
     }
 
 
