@@ -96,7 +96,7 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
             } else if (buf[0] == 'Z') {
                 // NO-OP - connection closing
             } else {
-                Assert.fail("Unexpected data");
+                Assert.fail("Unexpected data [" + (char) buf[0] + "]");
             }
         }
 
