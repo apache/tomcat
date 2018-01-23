@@ -27,7 +27,7 @@ import org.apache.tomcat.util.digester.Digester;
 
 /**
  * Helper class used to do property replacement on system properties.
- * @deprecated
+ * @deprecated No longer used. Will be removed in Tomcat 9.
  */
 @Deprecated
 public class SystemPropertyReplacerListener
