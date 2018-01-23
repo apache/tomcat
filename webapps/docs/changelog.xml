@@ -53,6 +53,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>62023</bug>: Log error reporting multiple SSLHostConfig elements
+        when using the APR Connector instead of crashing Tomcat. (csutherl)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.4 (markt)" rtext="2018-01-22">
   <subsection name="Catalina">
