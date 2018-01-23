@@ -14265,7 +14265,7 @@
     <changelog>
       <add>
         A new JmxRemoteLifecycleListener that can be used to fix the ports used
-        for remote JMX connections, eg when using JConsole. (markt)
+        for remote JMX connections, e.g. when using JConsole. (markt)
       </add>
     </changelog>
   </subsection>
@@ -14284,6 +14284,13 @@
       <update>
         Parameterize version number throughout build scripts and source. (rjung)
       </update>
+      <add>
+        <rev>766526</rev> Add support for setting up an additional PropertySource
+        that is used to lookup parameters referenced as <code>${..}</code> in
+        XML files parsed by Tomcat. It is configured via
+        <code>org.apache.tomcat.util.digester.PROPERTY_SOURCE</code>
+        system property. (fhanik)
+      </add>
     </changelog>
   </subsection>
 </section>
