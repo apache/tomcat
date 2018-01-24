@@ -51,6 +51,9 @@
         Prevent a stack trace being written to standard out when running on Java
         10 due to changes in the <code>LogManager</code> implementation. (markt)
       </fix>
+      <fix>
+        Avoid duplicate load attempts if one has been made already. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
