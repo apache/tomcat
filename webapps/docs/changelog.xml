@@ -67,7 +67,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 7.0.84 (violetagg)">
+<section name="Tomcat 7.0.84 (violetagg)" rtext="released 2018-01-24">
   <subsection name="Catalina">
     <changelog>
       <fix>
