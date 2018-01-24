@@ -111,7 +111,7 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
                 sslContext = sslUtil.createSSLContext(negotiableProtocols);
                 sslContext.init(sslUtil.getKeyManagers(), sslUtil.getTrustManagers(), null);
             } catch (Exception e) {
-                throw new IllegalArgumentException(e);
+                throw new IllegalArgumentException(e.getMessage(), e);
             }
 
             SSLSessionContext sessionContext = sslContext.getServerSessionContext();

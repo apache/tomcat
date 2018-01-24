@@ -73,6 +73,12 @@
         <bug>62023</bug>: Log error reporting multiple SSLHostConfig elements
         when using the APR Connector instead of crashing Tomcat. (csutherl)
       </fix>
+      <fix>
+        <bug>62032</bug>: Fix NullPointerException when certificateFile is not
+        defined on an SSLHostConfig and unify the behavior when a
+        certificateFile is defined but the file does not exist for both
+        JKS and PEM file types.
+      </fix>
     </changelog>
   </subsection>
 </section>

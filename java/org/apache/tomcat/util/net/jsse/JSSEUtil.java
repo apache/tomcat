@@ -199,6 +199,10 @@ public class JSSEUtil extends SSLUtilBase {
         char[] keyPassArray = keyPass.toCharArray();
 
         if (ks == null) {
+            if (certificate.getCertificateFile() == null) {
+                throw new IOException(sm.getString("jsse.noCertFile"));
+            }
+
             PEMFile privateKeyFile = new PEMFile(SSLHostConfig.adjustRelativePath
                     (certificate.getCertificateKeyFile() != null ? certificate.getCertificateKeyFile() : certificate.getCertificateFile()),
                     keyPass);

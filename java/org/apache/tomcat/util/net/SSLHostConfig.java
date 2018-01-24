@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.net;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.KeyStore;
@@ -824,7 +825,7 @@ public class SSLHostConfig implements Serializable {
 
     // --------------------------------------------------------- Support methods
 
-    public static String adjustRelativePath(String path) {
+    public static String adjustRelativePath(String path) throws FileNotFoundException {
         // Empty or null path can't point to anything useful. The assumption is
         // that the value is deliberately empty / null so leave it that way.
         if (path == null || path.length() == 0) {
@@ -837,8 +838,7 @@ public class SSLHostConfig implements Serializable {
             f = new File(newPath);
         }
         if (!f.exists()) {
-            // TODO i18n, sm
-            log.warn("configured file:["+newPath+"] does not exist.");
+            throw new FileNotFoundException(sm.getString("sslHostConfig.fileNotFound", newPath));
         }
         return newPath;
     }
