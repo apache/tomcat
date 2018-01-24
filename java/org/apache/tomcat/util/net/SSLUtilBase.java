@@ -138,8 +138,6 @@ public abstract class SSLUtilBase implements SSLUtil {
             }
             ks.load(istream, storePass);
         } catch (FileNotFoundException fnfe) {
-            log.error(sm.getString("jsse.keystore_load_failed", type, path,
-                    fnfe.getMessage()), fnfe);
             throw fnfe;
         } catch (IOException ioe) {
             // May be expected when working with a trust store
