@@ -65,6 +65,9 @@
         10 due to changes in the <code>LogManager</code> implementation. (markt)
       </fix>
       <fix>
+        Avoid duplicate load attempts if one has been made already. (remm)
+      </fix>
+      <fix>
         <bug>62036</bug>: When caching an authenticated user Principal in the
         session when the web application is configured with the
         <code>NonLoginAuthenticator</code>, cache the internal Principal object

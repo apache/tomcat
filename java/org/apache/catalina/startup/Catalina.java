@@ -140,6 +140,12 @@ public class Catalina {
     protected boolean useNaming = true;
 
 
+    /**
+     * Prevent duplicate loads.
+     */
+    protected boolean loaded = false;
+
+
     // ----------------------------------------------------------- Constructors
 
     public Catalina() {
@@ -539,6 +545,11 @@ public class Catalina {
      * Start a new server instance.
      */
     public void load() {
+
+        if (loaded) {
+            return;
+        }
+        loaded = true;
 
         long t1 = System.nanoTime();
 
