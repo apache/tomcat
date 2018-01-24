@@ -58,6 +58,9 @@
         rather than the user facing Principal object as Tomcat requires the
         internal object to correctly process later authorization checks. (markt)
       </fix>
+      <fix>
+        Avoid duplicate load attempts if one has been made already. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
