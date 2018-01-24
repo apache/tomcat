@@ -58,6 +58,13 @@
         Avoid NPE in ThreadLocalLeakPreventionListener if there is no Engine.
         (remm)
       </fix>
+      <fix>
+        <bug>62036</bug>: When caching an authenticated user Principal in the
+        session when the web application is configured with the
+        <code>NonLoginAuthenticator</code>, cache the internal Principal object
+        rather than the user facing Principal object as Tomcat requires the
+        internal object to correctly process later authorization checks. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
