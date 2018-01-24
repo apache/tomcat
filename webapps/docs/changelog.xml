@@ -54,6 +54,10 @@
       <fix>
         Avoid duplicate load attempts if one has been made already. (remm)
       </fix>
+      <fix>
+        Avoid NPE in ThreadLocalLeakPreventionListener if there is no Engine.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
