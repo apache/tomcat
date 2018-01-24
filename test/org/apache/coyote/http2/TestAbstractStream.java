@@ -270,7 +270,7 @@ public class TestAbstractStream {
         Assert.assertEquals(b, d.getParentStream());
 
         // This triggers the StackOverflowError
-        c.isDescendant(d);
+        Assert.assertTrue(c.isDescendant(d));
 
         // Check children
         Assert.assertEquals(1,  handler.getChildStreams().size());
