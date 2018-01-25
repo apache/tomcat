@@ -230,6 +230,12 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <!-- False positive. It is lifecycle state that is being protected -->
+    <Class name="org.apache.catalina.ha.authenticator.ClusterSingleSignOn" />
+    <Field name="cluster" />
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
+  </Match>
+  <Match>
     <!-- shost will not be null in normal usage -->
     <Class name="org.apache.catalina.ha.backend.CollectedInfo" />
     <Method name="init" />
