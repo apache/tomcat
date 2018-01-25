@@ -174,7 +174,7 @@
       </add>
       <fix>
         <bug>62006</bug>: Document the new <code>JvmOptions9</code> command line
-        parameter for <code>tomcat9.exe</code>. (markt)
+        parameter for <code>tomcat7.exe</code>. (markt)
       </fix>
     </changelog>
   </subsection>
