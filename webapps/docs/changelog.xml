@@ -59,6 +59,10 @@
         (remm)
       </fix>
       <fix>
+        <bug>62000</bug>: When a JNDI reference cannot be resolved, ensure that
+        the root cause exception is reported rather than swallowed. (markt)
+      </fix>
+      <fix>
         <bug>62036</bug>: When caching an authenticated user Principal in the
         session when the web application is configured with the
         <code>NonLoginAuthenticator</code>, cache the internal Principal object

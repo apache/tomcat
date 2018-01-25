@@ -851,9 +851,11 @@ public class NamingContext implements Context {
                 } catch (NamingException e) {
                     throw e;
                 } catch (Exception e) {
-                    log.warn(sm.getString
-                             ("namingContext.failResolvingReference"), e);
-                    throw new NamingException(e.getMessage());
+                    String msg = sm.getString("namingContext.failResolvingReference");
+                    log.warn(msg, e);
+                    NamingException ne = new NamingException(msg);
+                    ne.initCause(e);
+                    throw ne;
                 }
             } else {
                 return entry.value;
