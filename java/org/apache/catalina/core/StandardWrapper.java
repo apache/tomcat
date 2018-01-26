@@ -562,28 +562,34 @@ public class StandardWrapper extends ContainerBase
         }
 
         Set<String> allow = new HashSet<>();
-        allow.add("TRACE");
         allow.add("OPTIONS");
 
-        Method[] methods = getAllDeclaredMethods(servletClazz);
-        for (int i=0; methods != null && i<methods.length; i++) {
-            Method m = methods[i];
+        if (isJspServlet) {
+            allow.add("GET");
+            allow.add("HEAD");
+            allow.add("POST");
+        } else {
+            allow.add("TRACE");
 
-            if (m.getName().equals("doGet")) {
-                allow.add("GET");
-                allow.add("HEAD");
-            } else if (m.getName().equals("doPost")) {
-                allow.add("POST");
-            } else if (m.getName().equals("doPut")) {
-                allow.add("PUT");
-            } else if (m.getName().equals("doDelete")) {
-                allow.add("DELETE");
+            Method[] methods = getAllDeclaredMethods(servletClazz);
+            for (int i=0; methods != null && i<methods.length; i++) {
+                Method m = methods[i];
+
+                if (m.getName().equals("doGet")) {
+                    allow.add("GET");
+                    allow.add("HEAD");
+                } else if (m.getName().equals("doPost")) {
+                    allow.add("POST");
+                } else if (m.getName().equals("doPut")) {
+                    allow.add("PUT");
+                } else if (m.getName().equals("doDelete")) {
+                    allow.add("DELETE");
+                }
             }
         }
 
         String[] methodNames = new String[allow.size()];
         return allow.toArray(methodNames);
-
     }
 
 
