@@ -75,6 +75,10 @@
         error handling and/or the container provided error handling
         (<code>ErrorReportValve</code>) as appropriate. (markt)
       </add>
+      <add>
+        Pass 404 errors triggered by a missing ROOT web application to the
+        container error handling to generate the response body. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

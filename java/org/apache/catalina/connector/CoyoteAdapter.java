@@ -682,15 +682,11 @@ public class CoyoteAdapter implements Adapter {
             // If there is no context at this point, it is likely no ROOT context
             // has been deployed
             if (request.getContext() == null) {
-                res.setStatus(404);
-                res.setMessage("Not found");
-                // No context, so use host
-                Host host = request.getHost();
-                // Make sure there is a host (might not be during shutdown)
-                if (host != null) {
-                    host.logAccess(request, response, 0, true);
-                }
-                return false;
+                response.sendError(404, "Not found");
+                // Allow processing to continue.
+                // If present, the error reporting valve will provide a response
+                // body.
+                return true;
             }
 
             // Now we have the context, we can parse the session ID from the URL
