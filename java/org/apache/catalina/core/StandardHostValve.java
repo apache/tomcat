@@ -108,8 +108,6 @@ final class StandardHostValve extends ValveBase {
         // Select the Context to be used for this Request
         Context context = request.getContext();
         if (context == null) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                 sm.getString("standardHost.noContext"));
             return;
         }
 
@@ -118,7 +116,6 @@ final class StandardHostValve extends ValveBase {
         }
 
         boolean asyncAtStart = request.isAsync();
-        boolean asyncDispatching = request.isAsyncDispatching();
 
         try {
             context.bind(Globals.IS_SECURITY_ENABLED, MY_CLASSLOADER);
@@ -136,14 +133,8 @@ final class StandardHostValve extends ValveBase {
             // in error and have been routed here to check for application
             // defined error pages.
             try {
-                if (!asyncAtStart || asyncDispatching) {
+                if (!response.isErrorReportRequired()) {
                     context.getPipeline().getFirst().invoke(request, response);
-                } else {
-                    // Make sure this request/response is here because an error
-                    // report is required.
-                    if (!response.isErrorReportRequired()) {
-                        throw new IllegalStateException(sm.getString("standardHost.asyncStateError"));
-                    }
                 }
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);

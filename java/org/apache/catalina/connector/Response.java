@@ -879,12 +879,17 @@ public class Response implements HttpServletResponse {
             return;
         }
 
-        String charset = getContext().getCharset(locale);
-        if (charset != null) {
-            try {
-                getCoyoteResponse().setCharacterEncoding(charset);
-            } catch (UnsupportedEncodingException e) {
-                log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
+        // In some error handling scenarios, the context is unknown
+        // (e.g. a 404 when a ROOT context is not present)
+        Context context = getContext();
+        if (context != null) {
+            String charset = context.getCharset(locale);
+            if (charset != null) {
+                try {
+                    getCoyoteResponse().setCharacterEncoding(charset);
+                } catch (UnsupportedEncodingException e) {
+                    log.warn(sm.getString("coyoteResponse.encoding.invalid", charset), e);
+                }
             }
         }
     }
