@@ -772,13 +772,23 @@ class Generator {
 
         // Method check
         if (!pageInfo.isErrorPage()) {
-            out.printil("final java.lang.String _jspx_method = request.getMethod();");
-            out.printin("if (!\"GET\".equals(_jspx_method) && !\"POST\".equals(_jspx_method) && !\"HEAD\".equals(_jspx_method) && ");
-            out.println("!javax.servlet.DispatcherType.ERROR.equals(request.getDispatcherType())) {");
+            out.printil("if (!javax.servlet.DispatcherType.ERROR.equals(request.getDispatcherType())) {");
             out.pushIndent();
+            out.printil("final java.lang.String _jspx_method = request.getMethod();");
+            out.printil("if (\"OPTIONS\".equals(_jspx_method)) {");
+            out.pushIndent();
+            out.printil("response.setHeader(\"Allow\",\"GET, HEAD, POST, OPTIONS\");");
+            out.printil("return;");
+            out.popIndent();
+            out.printil("}");
+            out.printil("if (!\"GET\".equals(_jspx_method) && !\"POST\".equals(_jspx_method) && !\"HEAD\".equals(_jspx_method)) {");
+            out.pushIndent();
+            out.printil("response.setHeader(\"Allow\",\"GET, HEAD, POST, OPTIONS\");");
             out.printin("response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, ");
             out.println("\"" + Localizer.getMessage("jsp.error.servlet.invalid.method") + "\");");
             out.printil("return;");
+            out.popIndent();
+            out.printil("}");
             out.popIndent();
             out.printil("}");
             out.println();

@@ -95,6 +95,20 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Include an HTTP <code>Allow</code> header when a JSP generates a
+        405 reponse due to a request with an unsupported method. (markt)
+      </fix>
+      <add>
+        Add support for the HTTP <code>OPTION</code> method to JSPs. The
+        JSP specification explicitly states that the behaviour for this
+        method is undefined for JSPs so this is a Tomcat specific
+        behaviour. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.4 (markt)" rtext="2018-01-22">
   <subsection name="Catalina">
