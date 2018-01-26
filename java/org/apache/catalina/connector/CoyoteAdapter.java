@@ -580,13 +580,12 @@ public class CoyoteAdapter implements Adapter {
         if (undecodedURI.equals("*")) {
             if (req.method().equalsIgnoreCase("OPTIONS")) {
                 StringBuilder allow = new StringBuilder();
-                allow.append("GET, HEAD, POST, PUT, DELETE");
+                allow.append("GET, HEAD, POST, PUT, DELETE, OPTIONS");
                 // Trace if allowed
                 if (connector.getAllowTrace()) {
                     allow.append(", TRACE");
                 }
                 // Always allow options
-                allow.append(", OPTIONS");
                 res.setHeader("Allow", allow.toString());
             } else {
                 res.setStatus(404);
@@ -808,11 +807,10 @@ public class CoyoteAdapter implements Adapter {
                     }
                 }
             }
-            res.setStatus(405);
             res.addHeader("Allow", header);
-            res.setMessage("TRACE method is not allowed");
-            request.getContext().logAccess(request, response, 0, true);
-            return false;
+            response.sendError(405, "TRACE method is not allowed");
+            // Safe to skip the remainder of this method.
+            return true;
         }
 
         doConnectorAuthenticationAuthorization(req, request);
