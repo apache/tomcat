@@ -529,7 +529,7 @@ public final class ByteChunk extends AbstractChunk {
 
     @Override
     public String toString() {
-        if (null == buff) {
+        if (isNull()) {
             return null;
         } else if (end - start == 0) {
             return "";

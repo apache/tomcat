@@ -201,4 +201,18 @@ public class TestByteChunk {
             // NO-OP
         }
     }
+
+
+    @Test
+    public void testToString() {
+        ByteChunk bc = new ByteChunk();
+        Assert.assertNull(bc.toString());
+        byte[] data = new byte[8];
+        bc.setBytes(data, 0, data.length);
+        Assert.assertNotNull(bc.toString());
+        bc.recycle();
+        // toString() should behave consistently for new ByteChunk and
+        // immediately after a call to recycle().
+        Assert.assertNull(bc.toString());
+    }
 }

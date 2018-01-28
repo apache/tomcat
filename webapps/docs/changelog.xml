@@ -97,6 +97,15 @@
         certificateFile is defined but the file does not exist for both
         JKS and PEM file types.
       </fix>
+      <fix>
+        Ensure that the <code>toString()</code> method behaves consistently for
+        <code>ByteChunk</code> and <code>CharChunk</code> and that
+        <code>null</code> is returned when <code>toString()</code> is called
+        both on newly created objects and immediately after a call to
+        <code>recycle()</code>. This should not impact typical Tomcat users. It
+        may impact users who use these classes directly in their own code.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

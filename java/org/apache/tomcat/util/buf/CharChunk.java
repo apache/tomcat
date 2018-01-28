@@ -396,7 +396,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
     @Override
     public String toString() {
-        if (null == buff) {
+        if (isNull()) {
             return null;
         } else if (end - start == 0) {
             return "";

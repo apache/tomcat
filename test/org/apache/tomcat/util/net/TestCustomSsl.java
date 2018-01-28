@@ -172,7 +172,7 @@ public class TestCustomSsl extends TomcatBaseTest {
 
         if (trustType.equals(TrustType.NONE)) {
             Assert.assertTrue(rc != 200);
-            Assert.assertEquals("", res.toString());
+            Assert.assertNull(res.toString());
         } else {
             Assert.assertEquals(200, rc);
             Assert.assertEquals("OK-" + TesterSupport.ROLE, res.toString());
