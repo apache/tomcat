@@ -79,6 +79,10 @@
         Pass 404 errors triggered by a missing ROOT web application to the
         container error handling to generate the response body. (markt)
       </add>
+      <add>
+        Pass 400 errors triggered by invalid request targets to the container
+        error handling to generate the response body. (markt)
+      </add>
       <fix>
         Provide a correct <code>Allow</code> header when responding to an HTTP
         <code>TRACE</code> request for a JSP with a 405 status code. (markt)

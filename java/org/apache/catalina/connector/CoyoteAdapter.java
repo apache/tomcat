@@ -587,13 +587,12 @@ public class CoyoteAdapter implements Adapter {
                 }
                 // Always allow options
                 res.setHeader("Allow", allow.toString());
+                // Access log entry as processing won't reach AccessLogValve
+                connector.getService().getContainer().logAccess(request, response, 0, true);
+                return false;
             } else {
-                res.setStatus(404);
-                res.setMessage("Not found");
+                response.sendError(400, "Invalid URI");
             }
-            connector.getService().getContainer().logAccess(
-                    request, response, 0, true);
-            return false;
         }
 
         MessageBytes decodedURI = req.decodedURI();
@@ -612,29 +611,17 @@ public class CoyoteAdapter implements Adapter {
             try {
                 req.getURLDecoder().convert(decodedURI, false);
             } catch (IOException ioe) {
-                res.setStatus(400);
-                res.setMessage("Invalid URI: " + ioe.getMessage());
-                connector.getService().getContainer().logAccess(
-                        request, response, 0, true);
-                return false;
+                response.sendError(400, "Invalid URI: " + ioe.getMessage());
             }
             // Normalization
             if (!normalize(req.decodedURI())) {
-                res.setStatus(400);
-                res.setMessage("Invalid URI");
-                connector.getService().getContainer().logAccess(
-                        request, response, 0, true);
-                return false;
+                response.sendError(400, "Invalid URI");
             }
             // Character decoding
             convertURI(decodedURI, request);
             // Check that the URI is still normalized
             if (!checkNormalize(req.decodedURI())) {
-                res.setStatus(400);
-                res.setMessage("Invalid URI character encoding");
-                connector.getService().getContainer().logAccess(
-                        request, response, 0, true);
-                return false;
+                response.sendError(400, "Invalid URI");
             }
         } else {
             /* The URI is chars or String, and has been sent using an in-memory
@@ -650,8 +637,7 @@ public class CoyoteAdapter implements Adapter {
             CharChunk uriCC = decodedURI.getCharChunk();
             int semicolon = uriCC.indexOf(';');
             if (semicolon > 0) {
-                decodedURI.setChars
-                    (uriCC.getBuffer(), uriCC.getStart(), semicolon);
+                decodedURI.setChars(uriCC.getBuffer(), uriCC.getStart(), semicolon);
             }
         }
 
@@ -673,15 +659,26 @@ public class CoyoteAdapter implements Adapter {
         Context versionContext = null;
         boolean mapRequired = true;
 
+        if (response.isError()) {
+            // An error this early means the URI is invalid. Ensure invalid data
+            // is not passed to the mapper. Note we still want the mapper to
+            // find the correct host.
+            decodedURI.recycle();
+        }
+
         while (mapRequired) {
             // This will map the the latest version by default
             connector.getService().getMapper().map(serverName, decodedURI,
                     version, request.getMappingData());
 
-            // If there is no context at this point, it is likely no ROOT context
-            // has been deployed
+            // If there is no context at this point, either this is a 404
+            // because no ROOT context has been deployed or the URI was invalid
+            // so no context could be mapped.
             if (request.getContext() == null) {
-                response.sendError(404, "Not found");
+                // Don't overwrite an existing error
+                if (!response.isError()) {
+                    response.sendError(404, "Not found");
+                }
                 // Allow processing to continue.
                 // If present, the error reporting valve will provide a response
                 // body.
