@@ -106,6 +106,15 @@
         may impact users who use these classes directly in their own code.
         (markt)
       </fix>
+      <fix>
+        Ensure that the <code>toString()</code>, <code>toBytes()</code> and
+        <code>toChars()</code> methods of <code>MessageBytes</code> behave
+        consistently and do not throw a <code>NullPointerException</code> both
+        on newly created objects and immediately after a call to
+        <code>recycle()</code>. This should not impact typical Tomcat users. It
+        may impact users who use these classes directly in their own code.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
