@@ -979,11 +979,13 @@ public class Http11Processor extends AbstractProcessor {
     private void parseHost(MessageBytes valueMB) {
 
         if (valueMB == null || valueMB.isNull()) {
-            // HTTP/1.0
-            // If no host header, use the port info from the endpoint
-            // The host will be obtained lazily from the socket if required
-            // using ActionCode#REQ_LOCAL_NAME_ATTRIBUTE
-            request.setServerPort(protocol.getPort());
+            // No host information (HTTP/1.0)
+            // Ensure the local port field is populated and then use it.
+            request.action(ActionCode.REQ_LOCALPORT_ATTRIBUTE, request);
+            request.setServerPort(request.getLocalPort());
+
+            // request.serverName() will be set to the default host name by the
+            // mapper
             return;
         }
 

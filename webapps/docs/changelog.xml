@@ -119,6 +119,12 @@
         may impact users who use these classes directly in their own code.
         (markt)
       </fix>
+      <fix>
+        When processing an HTTP 1.0 request in the HTTP connector and no host
+        information is provided in the request, obtain the server port from the
+        local port rather than the connector configuration since the configured
+        value maybe zero. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

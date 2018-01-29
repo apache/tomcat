@@ -871,7 +871,9 @@ public class AjpProcessor extends AbstractProcessor {
     private void parseHost(MessageBytes valueMB) {
 
         if (valueMB == null || valueMB.isNull()) {
-            // HTTP/1.0
+            // No host information (HTTP/1.0)
+            // Ensure the local port field is populated and then use it.
+            request.action(ActionCode.REQ_LOCALPORT_ATTRIBUTE, request);
             request.setServerPort(request.getLocalPort());
             try {
                 request.serverName().duplicate(request.localName());
