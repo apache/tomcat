@@ -81,7 +81,15 @@
         <bug>62032</bug>: Fix NullPointerException when certificateFile is not
         defined on an SSLHostConfig and unify the behavior when a
         certificateFile is defined but the file does not exist for both
-        JKS and PEM file types.
+        JKS and PEM file types. (csutherl)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Webapps">
+    <changelog>
+      <fix>
+        <bug>62049</bug>: Fix missing class from manager 404 JSP error page.
+        (remm)
       </fix>
     </changelog>
   </subsection>
