@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<%@ page import="org.apache.catalina.util.RequestUtil" session="false"
+<%@ page import="org.apache.tomcat.util.security.Escape" session="false"
          trimDirectiveWhitespaces="true" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -33,7 +33,7 @@
    <h1>404 Not found</h1>
    <p>
     The page you tried to access
-    (<%=RequestUtil.filter((String) request.getAttribute(
+    (<%=Escape.htmlElementContent((String) request.getAttribute(
             "javax.servlet.error.request_uri"))%>)
     does not exist.
    </p>
