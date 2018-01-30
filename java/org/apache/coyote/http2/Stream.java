@@ -41,6 +41,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.http.parser.Host;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -325,7 +326,14 @@ class Stream extends AbstractStream implements HeaderEmitter {
         }
         case ":authority": {
             if (coyoteRequest.serverName().isNull()) {
-                int i = value.lastIndexOf(':');
+                int i;
+                try {
+                    i = Host.parse(value);
+                } catch (IllegalArgumentException iae) {
+                    // Host value invalid
+                    throw new HpackException(sm.getString("stream.header.invalid",
+                            getConnectionId(), getIdentifier(), ":authority", value));
+                }
                 if (i > -1) {
                     coyoteRequest.serverName().setString(value.substring(0, i));
                     coyoteRequest.setServerPort(Integer.parseInt(value.substring(i + 1)));

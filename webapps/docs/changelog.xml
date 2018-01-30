@@ -125,6 +125,11 @@
         local port rather than the connector configuration since the configured
         value maybe zero. (markt)
       </fix>
+      <add>
+        Enable strict validation of the provided host name and port for all
+        connectors. Requests with invalid host names and/or ports will be
+        rejected with a 400 response. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
