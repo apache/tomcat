@@ -265,6 +265,13 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
         return cache;
     }
 
+    @Override
+    public int getCacheSizePerConnection() {
+        ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
+        if (cache == null) return 0;
+        return cache.size();
+    }
+
     protected class CachedStatement extends StatementDecoratorInterceptor.StatementProxy<Statement> {
         boolean cached = false;
         CacheKey key;

@@ -7,4 +7,5 @@ public interface StatementCacheMBean {
     public boolean isCacheCallable();
     public int getMaxCacheSize();
     public AtomicInteger getCacheSize();
+    public int getCacheSizePerConnection();
 }
