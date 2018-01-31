@@ -161,6 +161,9 @@
         <code>PooledConnection</code> and <code>JdbcInterceptors</code>.
         (kfujino)
       </add>
+      <add>
+        Add MBean for <code>PooledConnection</code>. (kfujino)
+      </add>
     </changelog>
   </subsection>
 </section>
