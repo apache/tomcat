@@ -23,18 +23,22 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import javax.management.ObjectName;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
+import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 
 /**
  * Represents a pooled connection
  * and holds a reference to the {@link java.sql.Connection} object
  * @version 1.0
  */
-public class PooledConnection {
+public class PooledConnection implements PooledConnectionMBean {
     /**
      * Logger
      */
@@ -106,6 +110,10 @@ public class PooledConnection {
 
     private volatile long connectionVersion=0;
 
+    private static final AtomicLong connectionIndex = new AtomicLong(0);
+
+    private ObjectName oname = null;
+
     /**
      * Weak reference to cache the list of interceptors for this connection
      * so that we don't create a new list of interceptors each time we borrow
@@ -130,6 +138,7 @@ public class PooledConnection {
         connectionVersion = parent.getPoolVersion();
     }
 
+    @Override
     public long getConnectionVersion() {
         return connectionVersion;
     }
@@ -334,6 +343,7 @@ public class PooledConnection {
      *
      * @return true if connect() was called successfully and disconnect has not yet been called
      */
+    @Override
     public boolean isInitialized() {
         return connection!=null;
     }
@@ -344,6 +354,7 @@ public class PooledConnection {
      * @return Returns true if the connection has been connected more than
      * {@link PoolConfiguration#getMaxAge()} milliseconds. false otherwise.
      */
+    @Override
     public boolean isMaxAgeExpired() {
         if (getPoolProperties().getMaxAge()>0 ) {
             return (System.currentTimeMillis() - getLastConnected()) > getPoolProperties().getMaxAge();
@@ -586,6 +597,10 @@ public class PooledConnection {
                 log.debug("Unable to close SQL connection",x);
             }
         }
+        if (oname != null) {
+            JmxUtil.unregisterJmx(oname);
+            oname = null;
+        }
         return released.compareAndSet(false, true);
 
     }
@@ -618,7 +633,7 @@ public class PooledConnection {
         setSuspect(false);
     }
 
-
+    @Override
     public boolean isSuspect() {
         return suspect;
     }
@@ -661,6 +676,7 @@ public class PooledConnection {
      * This timestamp can also be reset by the {@link org.apache.tomcat.jdbc.pool.interceptor.ResetAbandonedTimer#invoke(Object, java.lang.reflect.Method, Object[])}
      * @return the timestamp of the last pool action as defined by {@link System#currentTimeMillis()}
      */
+    @Override
     public long getTimestamp() {
         return timestamp;
     }
@@ -670,6 +686,7 @@ public class PooledConnection {
      * @return the discarded flag. If the value is true,
      * either {@link #disconnect(boolean)} has been called or it will be called when the connection is returned to the pool.
      */
+    @Override
     public boolean isDiscarded() {
         return discarded;
     }
@@ -678,6 +695,7 @@ public class PooledConnection {
      * Returns the timestamp of the last successful validation query execution.
      * @return the timestamp of the last successful validation query execution as defined by {@link System#currentTimeMillis()}
      */
+    @Override
     public long getLastValidated() {
         return lastValidated;
     }
@@ -737,6 +755,7 @@ public class PooledConnection {
      * ie, a successful call to {@link java.sql.Driver#connect(String, java.util.Properties)}.
      * @return the timestamp when this connection was created as defined by {@link System#currentTimeMillis()}
      */
+    @Override
     public long getLastConnected() {
         return lastConnected;
     }
@@ -769,6 +788,7 @@ public class PooledConnection {
      * Returns true if this connection has been released and wont be reused.
      * @return true if the method {@link #release()} has been called
      */
+    @Override
     public boolean isReleased() {
         return released.get();
     }
@@ -777,4 +797,48 @@ public class PooledConnection {
         return attributes;
     }
 
+    public void createMBean() {
+        if (oname != null) return;
+        String keyprop = ",connections=PooledConnection["+connectionIndex.getAndIncrement()+"]";
+        oname = JmxUtil.registerJmx(parent.getJmxPool().getObjectName(), keyprop, this);
+    }
+
+    public ObjectName getObjectName() {
+        return oname;
+    }
+
+    @Override
+    public boolean isClosed() throws SQLException {
+        return connection.isClosed();
+    }
+
+    @Override
+    public boolean getAutoCommit() throws SQLException {
+        return connection.getAutoCommit();
+    }
+
+    @Override
+    public String getCatalog() throws SQLException {
+        return connection.getCatalog();
+    }
+
+    @Override
+    public int getHoldability() throws SQLException {
+        return connection.getHoldability();
+    }
+
+    @Override
+    public boolean isReadOnly() throws SQLException {
+        return connection.isReadOnly();
+    }
+
+    @Override
+    public String getSchema() throws SQLException {
+        return connection.getSchema();
+    }
+
+    @Override
+    public int getTransactionIsolation() throws SQLException {
+        return connection.getTransactionIsolation();
+    }
 }
