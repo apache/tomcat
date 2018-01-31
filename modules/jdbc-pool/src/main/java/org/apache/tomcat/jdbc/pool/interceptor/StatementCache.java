@@ -25,17 +25,20 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.management.ObjectName;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 
 /**
  * Interceptor that caches {@code PreparedStatement} and/or
  * {@code CallableStatement} instances on a connection.
  */
-public class StatementCache extends StatementDecoratorInterceptor {
+public class StatementCache extends StatementDecoratorInterceptor implements StatementCacheMBean {
     private static final Log log = LogFactory.getLog(StatementCache.class);
     protected static final String[] ALL_TYPES = new String[] {PREPARE_STATEMENT,PREPARE_CALL};
     protected static final String[] CALLABLE_TYPE = new String[] {PREPARE_CALL};
@@ -51,15 +54,19 @@ public class StatementCache extends StatementDecoratorInterceptor {
     private PooledConnection pcon;
     private String[] types;
 
+    private ObjectName oname = null;
 
+    @Override
     public boolean isCachePrepared() {
         return cachePrepared;
     }
 
+    @Override
     public boolean isCacheCallable() {
         return cacheCallable;
     }
 
+    @Override
     public int getMaxCacheSize() {
         return maxCacheSize;
     }
@@ -68,6 +75,7 @@ public class StatementCache extends StatementDecoratorInterceptor {
         return types;
     }
 
+    @Override
     public AtomicInteger getCacheSize() {
         return cacheSize;
     }
@@ -120,6 +128,10 @@ public class StatementCache extends StatementDecoratorInterceptor {
         if (parent==null) {
             cacheSize = null;
             this.pcon = null;
+            if (oname != null) {
+                JmxUtil.unregisterJmx(oname);
+                oname = null;
+            }
         } else {
             cacheSize = cacheSizeMap.get(parent);
             this.pcon = con;
@@ -127,6 +139,10 @@ public class StatementCache extends StatementDecoratorInterceptor {
                 ConcurrentHashMap<CacheKey,CachedStatement> cache =
                         new ConcurrentHashMap<>();
                 pcon.getAttributes().put(STATEMENT_CACHE_ATTR,cache);
+            }
+            if (oname == null) {
+                String keyprop = ",JdbcInterceptor=" + getClass().getSimpleName();
+                oname = JmxUtil.registerJmx(pcon.getObjectName(), keyprop, this);
             }
         }
     }
