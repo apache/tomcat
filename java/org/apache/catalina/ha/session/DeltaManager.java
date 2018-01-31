@@ -86,7 +86,7 @@ public class DeltaManager extends ClusterManagerBase{
             new ArrayList<>();
     private boolean receiverQueue = false ;
     private boolean stateTimestampDrop = true ;
-    private long stateTransferCreateSendTime;
+    private volatile long stateTransferCreateSendTime;
 
     // -------------------------------------------------------- stats attributes
 
