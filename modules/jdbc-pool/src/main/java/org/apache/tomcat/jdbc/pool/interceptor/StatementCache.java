@@ -252,7 +252,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                 (ConcurrentHashMap<CacheKey,CachedStatement>)pCon.getAttributes().get(STATEMENT_CACHE_ATTR);
         return cache;
     }
- 
+
     @Override
     public int getCacheSizePerConnection() {
         ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
