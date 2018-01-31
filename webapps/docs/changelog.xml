@@ -165,7 +165,7 @@
         Add MBean for <code>PooledConnection</code>. (kfujino)
       </add>
       <add>
-        Add MBean for <code>StatementCache</code>. (kfujino)
+        <bug>62011</bug>: Add MBean for <code>StatementCache</code>. (kfujino)
       </add>
     </changelog>
   </subsection>
