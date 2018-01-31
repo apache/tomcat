@@ -36,7 +36,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.Vector;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 import javax.servlet.ServletOutputStream;
@@ -179,37 +178,6 @@ public class Response implements HttpServletResponse {
      */
     private boolean isCharacterEncodingSet = false;
 
-    /**
-     * With the introduction of async processing and the possibility of
-     * non-container threads calling sendError() tracking the current error
-     * state and ensuring that the correct error page is called becomes more
-     * complicated. This state attribute helps by tracking the current error
-     * state and informing callers that attempt to change state if the change
-     * was successful or if another thread got there first.
-     *
-     * <pre>
-     * The state machine is very simple:
-     *
-     * 0 - NONE
-     * 1 - NOT_REPORTED
-     * 2 - REPORTED
-     *
-     *
-     *   -->---->-- >NONE
-     *   |   |        |
-     *   |   |        | setError()
-     *   ^   ^        |
-     *   |   |       \|/
-     *   |   |-<-NOT_REPORTED
-     *   |            |
-     *   ^            | report()
-     *   |            |
-     *   |           \|/
-     *   |----<----REPORTED
-     * </pre>
-     */
-    private final AtomicInteger errorState = new AtomicInteger(0);
-
 
     /**
      * Using output stream flag.
@@ -258,7 +226,6 @@ public class Response implements HttpServletResponse {
         usingWriter = false;
         appCommitted = false;
         included = false;
-        errorState.set(0);
         isCharacterEncodingSet = false;
 
         applicationResponse = null;
@@ -438,7 +405,7 @@ public class Response implements HttpServletResponse {
      * @return <code>false</code> if the error flag was already set
      */
     public boolean setError() {
-        boolean result = errorState.compareAndSet(0, 1);
+        boolean result = getCoyoteResponse().setError();
         if (result) {
             Wrapper wrapper = getRequest().getWrapper();
             if (wrapper != null) {
@@ -455,17 +422,17 @@ public class Response implements HttpServletResponse {
      * @return <code>true</code> if the response has encountered an error
      */
     public boolean isError() {
-        return errorState.get() > 0;
+        return getCoyoteResponse().isError();
     }
 
 
     public boolean isErrorReportRequired() {
-        return errorState.get() == 1;
+        return getCoyoteResponse().isErrorReportRequired();
     }
 
 
     public boolean setErrorReported() {
-        return errorState.compareAndSet(1, 2);
+        return getCoyoteResponse().setErrorReported();
     }
 
 
