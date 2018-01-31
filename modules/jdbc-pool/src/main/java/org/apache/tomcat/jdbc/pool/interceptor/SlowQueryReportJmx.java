@@ -16,21 +16,15 @@
  */
 package org.apache.tomcat.jdbc.pool.interceptor;
 
-import java.lang.management.ManagementFactory;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.InstanceNotFoundException;
 import javax.management.ListenerNotFoundException;
-import javax.management.MBeanException;
 import javax.management.MBeanNotificationInfo;
-import javax.management.MBeanRegistrationException;
 import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
 import javax.management.Notification;
 import javax.management.NotificationBroadcasterSupport;
 import javax.management.NotificationEmitter;
@@ -48,6 +42,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PoolProperties.InterceptorProperty;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 /**
  * Publishes data to JMX and provides notifications
  * when failures happen.
@@ -252,12 +247,8 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         try {
             if (mbeans.remove(poolName)!=null) {
                 ObjectName oname = getObjectName(getClass(),poolName);
-                ManagementFactory.getPlatformMBeanServer().unregisterMBean(oname);
+                JmxUtil.unregisterJmx(oname);
             }
-        } catch (MBeanRegistrationException e) {
-            log.debug("Jmx deregistration failed.",e);
-        } catch (InstanceNotFoundException e) {
-            log.debug("Jmx deregistration failed.",e);
         } catch (MalformedObjectNameException e) {
             log.warn("Jmx deregistration failed.",e);
         } catch (RuntimeOperationsException e) {
@@ -286,7 +277,7 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             } else if (getCompositeType()!=null) {
                 ObjectName oname = getObjectName(getClass(),poolName);
                 if (mbeans.putIfAbsent(poolName, this)==null) {
-                    ManagementFactory.getPlatformMBeanServer().registerMBean(this, oname);
+                    JmxUtil.registerJmx(oname, null, this);
                 }
             } else {
                 log.warn(SlowQueryReport.class.getName()+ "- No JMX support, composite type was not found.");
@@ -294,12 +285,6 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
         } catch (MalformedObjectNameException e) {
             log.error("Jmx registration failed, no JMX data will be exposed for the query stats.",e);
         } catch (RuntimeOperationsException e) {
-            log.error("Jmx registration failed, no JMX data will be exposed for the query stats.",e);
-        } catch (MBeanException e) {
-            log.error("Jmx registration failed, no JMX data will be exposed for the query stats.",e);
-        } catch (InstanceAlreadyExistsException e) {
-            log.error("Jmx registration failed, no JMX data will be exposed for the query stats.",e);
-        } catch (NotCompliantMBeanException e) {
             log.error("Jmx registration failed, no JMX data will be exposed for the query stats.",e);
         }
     }
@@ -313,6 +298,4 @@ public class SlowQueryReportJmx extends SlowQueryReport implements NotificationE
             this.setNotifyPool(Boolean.parseBoolean(p1.getValue()));
         }
     }
-
-
 }
