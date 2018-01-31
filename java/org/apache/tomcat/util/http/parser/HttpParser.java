@@ -494,6 +494,9 @@ public class HttpParser {
         int c;
         int pos = 0;
 
+        // readAheadLimit doesn't matter as all the readers passed to this
+        // method buffer the entire content.
+        reader.mark(1);
         do {
             c = reader.read();
             if (c == '.') {
@@ -501,9 +504,14 @@ public class HttpParser {
                     // Valid
                     octetCount++;
                     octet = -1;
-                } else {
+                } else if (inIPv6 || octet == -1) {
                     throw new IllegalArgumentException(
                             sm.getString("http.invalidOctet", Integer.toString(octet)));
+                } else {
+                    // Might not be an IPv4 address. Could be a host / FQDN with
+                    // a fully numeric component.
+                    reader.reset();
+                    return readHostDomainName(reader);
                 }
             } else if (isNumeric(c)) {
                 if (octet == -1) {
@@ -527,6 +535,10 @@ public class HttpParser {
                 } else {
                     throw new IllegalArgumentException(sm.getString("http.closingBracket"));
                 }
+            } else if (!inIPv6 && (isAlpha(c) || c == '-')) {
+                // Go back to the start and parse as a host / FQDN
+                reader.reset();
+                return readHostDomainName(reader);
             } else {
                 throw new IllegalArgumentException(sm.getString(
                         "http.illegalCharacterIpv4", Character.toString((char) c)));
@@ -535,8 +547,11 @@ public class HttpParser {
         } while (true);
 
         if (octetCount != 4) {
-            throw new IllegalArgumentException(
-                    sm.getString("http.wrongOctetCount", Integer.toString(octetCount)));
+            // Might not be an IPv4 address. Could be a host name or a FQDN with
+            // fully numeric components. Go back to the start and parse as a
+            // host / FQDN.
+            reader.reset();
+            return readHostDomainName(reader);
         }
         if (octet < 0 || octet > 255) {
             throw new IllegalArgumentException(
@@ -652,9 +667,13 @@ public class HttpParser {
     static int readHostDomainName(Reader reader) throws IOException {
         DomainParseState state = DomainParseState.NEW;
         int pos = 0;
+        int segmentIndex = 0;
 
         while (state.mayContinue()) {
-            state = state.next(reader.read());
+            state = state.next(reader.read(), segmentIndex);
+            if (DomainParseState.PERIOD == state) {
+                segmentIndex++;
+            }
             pos++;
         }
 
@@ -682,28 +701,32 @@ public class HttpParser {
         }
     }
 
+    private enum AllowsEnd {
+        NEVER,
+        FIRST,
+        ALWAYS
+    }
 
     private enum DomainParseState {
-        NEW(     true, false, false, false, false, false, " at the start of"),
-        ALPHA(   true,  true,  true,  true,  true,  true, " after a letter in"),
-        NUMERIC( true,  true,  true,  true,  true,  true, " after a number in"),
-        PERIOD(  true, false, false, false,  true,  true, " after a period in"),
-        HYPHEN(  true,  true,  true, false, false, false, " after a hypen in"),
-        COLON(  false, false, false, false, false, false, " after a colon in"),
-        END(    false, false, false, false, false, false, " at the end of");
+        NEW(       true, false, false,  AllowsEnd.NEVER,  AllowsEnd.NEVER, " at the start of"),
+        ALL_ALPHA( true,  true,  true, AllowsEnd.ALWAYS, AllowsEnd.ALWAYS, " after a letter in"),
+        ALPHA(     true,  true,  true,  AllowsEnd.FIRST,  AllowsEnd.FIRST, " after a letter in"),
+        NUMERIC(   true,  true,  true,  AllowsEnd.FIRST,  AllowsEnd.FIRST, " after a number in"),
+        PERIOD(    true, false, false,  AllowsEnd.NEVER,  AllowsEnd.NEVER, " after a period in"),
+        HYPHEN(    true,  true, false,  AllowsEnd.NEVER,  AllowsEnd.NEVER, " after a hypen in"),
+        COLON(    false, false, false,  AllowsEnd.NEVER,  AllowsEnd.NEVER, " after a colon in"),
+        END(      false, false, false,  AllowsEnd.NEVER,  AllowsEnd.NEVER, " at the end of");
 
         private final boolean mayContinue;
-        private final boolean allowsNumeric;
         private final boolean allowsHyphen;
         private final boolean allowsPeriod;
-        private final boolean allowsColon;
-        private final boolean allowsEnd;
+        private final AllowsEnd allowsColon;
+        private final AllowsEnd allowsEnd;
         private final String errorLocation;
 
-        private DomainParseState(boolean mayContinue, boolean allowsNumeric, boolean allowsHyphen,
-                boolean allowsPeriod, boolean allowsColon, boolean allowsEnd, String errorLocation) {
+        private DomainParseState(boolean mayContinue, boolean allowsHyphen, boolean allowsPeriod,
+                AllowsEnd allowsColon, AllowsEnd allowsEnd, String errorLocation) {
             this.mayContinue = mayContinue;
-            this.allowsNumeric = allowsNumeric;
             this.allowsHyphen = allowsHyphen;
             this.allowsPeriod = allowsPeriod;
             this.allowsColon = allowsColon;
@@ -715,16 +738,15 @@ public class HttpParser {
             return mayContinue;
         }
 
-        public DomainParseState next(int c) {
+        public DomainParseState next(int c, int segmentIndex) {
             if (HttpParser.isAlpha(c)) {
-                return ALPHA;
-            } else if (HttpParser.isNumeric(c)) {
-                if (allowsNumeric) {
-                    return NUMERIC;
+                if (ALL_ALPHA == this || NEW == this || PERIOD == this) {
+                    return ALL_ALPHA;
                 } else {
-                    throw new IllegalArgumentException(sm.getString("http.invalidCharacterDomain",
-                            Character.toString((char) c), errorLocation));
+                    return ALPHA;
                 }
+            } else if (HttpParser.isNumeric(c)) {
+                return NUMERIC;
             } else if (c == '.') {
                 if (allowsPeriod) {
                     return PERIOD;
@@ -733,14 +755,16 @@ public class HttpParser {
                             Character.toString((char) c), errorLocation));
                 }
             } else if (c == ':') {
-                if (allowsColon) {
+                if (allowsColon == AllowsEnd.ALWAYS ||
+                        allowsColon == AllowsEnd.FIRST && segmentIndex == 0) {
                     return COLON;
                 } else {
                     throw new IllegalArgumentException(sm.getString("http.invalidCharacterDomain",
                             Character.toString((char) c), errorLocation));
                 }
             } else if (c == -1) {
-                if (allowsEnd) {
+                if (allowsEnd == AllowsEnd.ALWAYS ||
+                        allowsEnd == AllowsEnd.FIRST && segmentIndex == 0) {
                     return END;
                 } else {
                     throw new IllegalArgumentException(sm.getString("http.invalidCharacterDomain",

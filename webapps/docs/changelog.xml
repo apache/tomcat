@@ -130,6 +130,11 @@
         connectors. Requests with invalid host names and/or ports will be
         rejected with a 400 response. (markt)
       </add>
+      <fix>
+        Update the host validation to permit host names and components of domain
+        names (excluding top-level domains) to start with a number and to ensure
+        that top-level domains are fully alphabetic. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
