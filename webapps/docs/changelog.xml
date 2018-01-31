@@ -167,6 +167,10 @@
       <add>
         <bug>62011</bug>: Add MBean for <code>StatementCache</code>. (kfujino)
       </add>
+      <add>
+        Expose the cache size for each connection via JMX in
+        <code>StatementCache</code>. (kfujino)
+      </add>
     </changelog>
   </subsection>
 </section>
