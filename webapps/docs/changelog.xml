@@ -154,6 +154,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <add>
+        Enhance the JMX support for jdbc-pool in order to expose
+        <code>PooledConnection</code> and <code>JdbcInterceptors</code>.
+        (kfujino)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.4 (markt)" rtext="2018-01-22">
   <subsection name="Catalina">
