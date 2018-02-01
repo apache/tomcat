@@ -51,7 +51,7 @@ public class JmxUtil {
     private static ObjectName getObjectName(ObjectName base, String keyprop)
             throws MalformedObjectNameException {
         if (base == null) return null;
-        StringBuilder OnameStr =  new StringBuilder(base.toString());
+        StringBuilder OnameStr = new StringBuilder(base.toString());
         if (keyprop != null) OnameStr.append(keyprop);
         ObjectName oname = new ObjectName(OnameStr.toString());
         return oname;
