@@ -19,8 +19,11 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.lang.reflect.Method;
 
+import javax.management.ObjectName;
+
 import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.jmx.JmxUtil;
 
 /**
  * Class that resets the abandoned timer on any activity on the
@@ -30,9 +33,11 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
  * This is useful for batch processing programs that use connections for extensive amount of times.
  *
  */
-public class ResetAbandonedTimer extends AbstractQueryReport {
+public class ResetAbandonedTimer extends AbstractQueryReport implements ResetAbandonedTimerMBean {
 
     private PooledConnection pcon;
+
+    private ObjectName oname = null;
 
     public ResetAbandonedTimer() {
     }
@@ -42,11 +47,20 @@ public class ResetAbandonedTimer extends AbstractQueryReport {
         super.reset(parent, con);
         if (con == null) {
             this.pcon = null;
+            if (oname != null) {
+                JmxUtil.unregisterJmx(oname);
+                oname = null;
+            }
         } else {
             this.pcon = con;
+            if (oname == null) {
+                String keyprop = ",JdbcInterceptor=" + getClass().getSimpleName();
+                oname = JmxUtil.registerJmx(pcon.getObjectName(), keyprop, this);
+            }
         }
     }
 
+    @Override
     public boolean resetTimer() {
         boolean result = false;
         if (pcon != null) {

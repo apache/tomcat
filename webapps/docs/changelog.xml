@@ -176,6 +176,9 @@
         Expose the cache size for each connection via JMX in
         <code>StatementCache</code>. (kfujino)
       </add>
+      <add>
+        Add MBean for <code>ResetAbandonedTimer</code>. (kfujino)
+      </add>
     </changelog>
   </subsection>
 </section>
