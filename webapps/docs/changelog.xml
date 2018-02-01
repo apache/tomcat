@@ -135,6 +135,10 @@
         names (excluding top-level domains) to start with a number and to ensure
         that top-level domains are fully alphabetic. (markt)
       </fix>
+      <fix>
+        <bug>62053</bug>: Fix NPE when writing push headers with HTTP/2 NIO2.
+        Patch submitted by Holger Sunke. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -155,7 +155,9 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         synchronized (socketWrapper) {
             AsyncHeaderFrameBuffers headerFrameBuffers = (AsyncHeaderFrameBuffers)
                     doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
-            bufs = headerFrameBuffers.bufs.toArray(BYTEBUFFER_ARRAY);
+            if (headerFrameBuffers != null) {
+                bufs = headerFrameBuffers.bufs.toArray(BYTEBUFFER_ARRAY);
+            }
         }
         if (bufs != null) {
             socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
