@@ -19,9 +19,8 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 
 import java.lang.reflect.Method;
 
-import org.apache.tomcat.jdbc.pool.JdbcInterceptor;
+import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
-import org.apache.tomcat.jdbc.pool.ProxyConnection;
 
 /**
  * Class that resets the abandoned timer on any activity on the
@@ -33,27 +32,29 @@ import org.apache.tomcat.jdbc.pool.ProxyConnection;
  */
 public class ResetAbandonedTimer extends AbstractQueryReport {
 
+    private PooledConnection pcon;
+
     public ResetAbandonedTimer() {
+    }
+
+    @Override
+    public void reset(ConnectionPool parent, PooledConnection con) {
+        super.reset(parent, con);
+        if (con == null) {
+            this.pcon = null;
+        } else {
+            this.pcon = con;
+        }
     }
 
     public boolean resetTimer() {
         boolean result = false;
-        JdbcInterceptor interceptor = this.getNext();
-        while (interceptor!=null && result==false) {
-            if (interceptor instanceof ProxyConnection) {
-                PooledConnection con = ((ProxyConnection)interceptor).getConnection();
-                if (con!=null) {
-                    con.setTimestamp(System.currentTimeMillis());
-                    result = true;
-                } else {
-                    break;
-                }
-            }
-            interceptor = interceptor.getNext();
+        if (pcon != null) {
+            pcon.setTimestamp(System.currentTimeMillis());
+            result = true;
         }
         return result;
     }
-
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
