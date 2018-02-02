@@ -486,29 +486,15 @@ public class TestRewriteValve extends TomcatBaseTest {
 
     @Test
     public void testDefaultRedirect() throws Exception {
-         // Disable the following of redirects for this test only
-        boolean originalValue = HttpURLConnection.getFollowRedirects();
-        HttpURLConnection.setFollowRedirects(false);
-        try {
-            doTestRedirect("RewriteRule ^/from/a$ /to/b [R]", "/redirect/from/a", "/redirect/to/b",
+        doTestRedirect("RewriteRule ^/from/a$ /to/b [R]", "/redirect/from/a", "/redirect/to/b",
                 302);
-        } finally {
-            HttpURLConnection.setFollowRedirects(originalValue);
-        }
     }
 
 
     @Test
     public void testTempRedirect() throws Exception {
-         // Disable the following of redirects for this test only
-        boolean originalValue = HttpURLConnection.getFollowRedirects();
-        HttpURLConnection.setFollowRedirects(false);
-        try {
-            doTestRedirect("RewriteRule ^/from/a$ /to/b [R=temp]", "/redirect/from/a", "/redirect/to/b",
+        doTestRedirect("RewriteRule ^/from/a$ /to/b [R=temp]", "/redirect/from/a", "/redirect/to/b",
                 302);
-        } finally {
-            HttpURLConnection.setFollowRedirects(originalValue);
-        }
     }
 
 
@@ -645,7 +631,8 @@ public class TestRewriteValve extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         Map<String, List<String>> resHead = new HashMap<>();
-        int rc = getUrl("http://localhost:" + getPort() + request, res, null, resHead);
+        int rc = methodUrl("http://localhost:" + getPort() + request, res,
+                DEFAULT_CLIENT_TIMEOUT_MS, null, resHead, "GET", false);
         res.setCharset(StandardCharsets.UTF_8);
 
         if (expectedURI == null) {
