@@ -895,14 +895,19 @@
     <Bug code="SF" />
   </Match>
   <Match>
-    <!-- Returning null here is fine -->
-    <Class name="org.apache.tomcat.util.buf.ByteChunk"/>
-    <Method name="toString"/>
-    <Bug code="NP" />
+    <!-- Handled by abstract base class -->
+    <Or>
+      <Class name="org.apache.tomcat.util.buf.ByteChunk"/>
+      <Class name="org.apache.tomcat.util.buf.CharChunk"/>
+    </Or>
+    <Bug pattern="HE_EQUALS_NO_HASHCODE" />
   </Match>
   <Match>
     <!-- Returning null here is fine -->
-    <Class name="org.apache.tomcat.util.buf.CharChunk"/>
+    <Or>
+      <Class name="org.apache.tomcat.util.buf.ByteChunk"/>
+      <Class name="org.apache.tomcat.util.buf.CharChunk"/>
+    </Or>
     <Method name="toString"/>
     <Bug code="NP" />
   </Match>
