@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!DOCTYPE document [
+  <!ENTITY project SYSTEM "project.xml">
+]>
+<document url="host-manager-howto.html">
+  &project;
+  
+  <properties>
+        <author email="mczernek@redhat.com">Marek Czernek</author>
+        <title>Host Manager App HOW-TO</title>
+  </properties>
+<body>
+  
+<section name="Table of Contents">
+  <toc/>
+</section>
+
+<section name="Introduction">
+  <p>
+    The <strong>Tomcat Host Manager</strong> application enables you to create,
+    delete, and otherwise manage virtual hosts within Tomcat. This how-to guide
+    is best accompanied by the following pieces of documentation:
+  </p>
+  <ul>
+    <li>
+      <a href="virtual-hosting-howto.html">Virtual Hosting How-To</a> for more
+      information about virtual hosting.
+    </li>
+    <li>
+      <a href="config/host.html">The Host Container</a> for more information 
+      about the underlying xml configuration of virtual hosts and description
+      of attributes.
+    </li>
+  </ul>
+  
+  <p>
+    The <strong>Tomcat Host Manager</strong> application is a part of the 
+    default Tomcat installation, by default available using the following 
+    context: <code>/host-manager</code>. You can use the host manager in the
+    following ways:
+  </p>
+  
+  <ul>
+    <li>
+      Utilizing the graphical user interface, accessible at: 
+      <code>{server}:{port}/host-manager/html</code>.
+    </li>
+    <li>
+      Utilizing a set of minimal HTTP requests suitable for scripting. 
+      You can access this mode at: 
+      <code>{server}:{port}/host-manager/text</code>.
+    </li>
+  </ul>
+  <p>Both ways enable you to add, remove, start, and stop virtual hosts. All
+  of the operations are persistent on Tomcat 9 and newer versions if you use
+  the <code>persist</code> option.</p>
+</section>
+
+<section name="Configuring Manager Application Access">
+  <p><em>The description below uses <code>$CATALINA_HOME</code> to refer the
+    base Tomcat directory. It is the directory in which you installed
+    Tomcat, for example <code>C:/tomcat8</code>, or 
+    <code>/usr/share/tomcat8</code>.</em></p>
+    
+  <p>
+    The Host Manager application requires a user with one of the following
+    roles:
+  </p>
+  
+  <ul>
+    <li>
+      <code>admin-gui</code> - use this role for the graphical web interface.
+    </li>
+    <li>
+      <code>admin-script</code> - use this role for the scripting web interface.
+    </li>
+  </ul>
+  
+  <p>
+    To enable access to the Host Manager application, either grant your Tomcat
+    user the approprite role, or create a new one with the role. For example, 
+    open <code>${CATALINA_BASE}/conf/tomcat-users.xml</code> and enter the
+    following:
+  </p>
+  <source><![CDATA[<user username="test" password="chang3m3N#w" roles="admin-gui"/>]]></source>
+  <p>
+    No further settings is needed. When you now access 
+    <code>{server}:{port}/host-manager</code>, for example 
+    <code>localhost:8080/host-manager</code> you are able to log in with the
+    created credentials. 
+  </p>
+  <p class="notice">
+    Note that in case you retreive your users using the 
+    <code>DataSourceRealm</code>, <code>JDBCRealm</code>, or 
+    <code>JNDIRealm</code> mechanism, add the appropriate role in the database
+    or the directory server respectively.
+  </p>
+</section>
+
+</body>
+</document>
