@@ -189,6 +189,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the list with the public interfaces in the RELEASE-NOTES.
+        (violetagg)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.4 (markt)" rtext="2018-01-22">
   <subsection name="Catalina">
