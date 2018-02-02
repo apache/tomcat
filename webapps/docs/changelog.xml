@@ -87,6 +87,10 @@
         Provide a correct <code>Allow</code> header when responding to an HTTP
         <code>TRACE</code> request for a JSP with a 405 status code. (markt)
       </fix>
+      <fix>
+        When using Tomcat embedded, only perform Authenticator configuration
+        once during web application start. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
