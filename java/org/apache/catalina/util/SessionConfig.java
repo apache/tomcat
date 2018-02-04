@@ -42,7 +42,7 @@ public class SessionConfig {
     }
 
     /**
-     * Determine the name to use for the session cookie for the provided
+     * Determine the name to use for the session path parameter for the provided
      * context.
      * @param context
      */
