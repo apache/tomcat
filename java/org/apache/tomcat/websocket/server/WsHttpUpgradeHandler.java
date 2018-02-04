@@ -147,7 +147,14 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                 try {
                     return wsFrame.notifyDataAvailable();
                 } catch (WsIOException ws) {
-                    close(ws.getCloseReason());
+                    CloseReason cr = ws.getCloseReason();
+                    close(cr);
+                    // If the close was abnormal, close the socket.
+                    // Don't wait for a close response from the client that
+                    // might never arrive.
+                    if (cr.getCloseCode() == CloseCodes.CLOSED_ABNORMALLY) {
+                        return SocketState.CLOSED;
+                    }
                 } catch (IOException ioe) {
                     onError(ioe);
                     CloseReason cr = new CloseReason(
