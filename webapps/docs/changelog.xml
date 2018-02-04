@@ -159,6 +159,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>62024</bug>: When closing a connection with an abnormal close,
+        close the socket immediately rather than waiting for a close message
+        from the client that may never arrive. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Webapps">
     <changelog>
       <fix>
