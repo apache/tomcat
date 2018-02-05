@@ -204,6 +204,10 @@
         Update the list with the public interfaces in the RELEASE-NOTES.
         (violetagg)
       </update>
+      <update>
+        Update the NSIS Installer used to build the Windows installer to version
+        3.03. (kkolinko)
+      </update>
     </changelog>
   </subsection>
 </section>
