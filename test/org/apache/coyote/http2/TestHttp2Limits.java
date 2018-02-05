@@ -17,7 +17,6 @@
 package org.apache.coyote.http2;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -253,13 +252,16 @@ public class TestHttp2Limits extends Http2TestBase {
             // Connection reset. Connection ID will vary so use a pattern
             // On some platform / Connector combinations (e.g. Windows / APR),
             // the TCP connection close will be processed before the client gets
-            // a chance to read the connection close frame
+            // a chance to read the connection close frame which will trigger an
+            // IOException when we try to read the frame.
+            // Note: Some platforms will allow the read if if the write fails
+            //       above.
             try {
                 parser.readFrame(true);
                 Assert.assertThat(output.getTrace(), RegexMatcher.matchesRegex(
                         "0-Goaway-\\[1\\]-\\[11\\]-\\[Connection \\[\\d++\\], Stream \\[3\\], .*"));
-            } catch (SocketException se) {
-                // Expected on Windows
+            } catch (IOException se) {
+                // Expected on some platforms
             }
             break;
         }
