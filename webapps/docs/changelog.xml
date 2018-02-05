@@ -96,6 +96,10 @@
   <subsection name="Coyote">
     <changelog>
       <fix>
+        <bug>61751</bug>: Fix truncated request input streams when using NIO2
+        with TLS. (markt)
+      </fix>
+      <fix>
         <bug>62023</bug>: Log error reporting multiple SSLHostConfig elements
         when using the APR Connector instead of crashing Tomcat. (csutherl)
       </fix>
