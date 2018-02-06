@@ -878,7 +878,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         private class ScatterReadCompletionHandler<A> implements CompletionHandler<Long, OperationState<A>> {
             @Override
             public void completed(Long nBytes, OperationState<A> state) {
-                if (nBytes.intValue() < 0) {
+                if (nBytes.longValue() < 0) {
                     failed(new EOFException(), state);
                 } else {
                     state.nBytes += nBytes.longValue();
