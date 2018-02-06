@@ -33,6 +33,9 @@ import org.junit.Test;
  */
 public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
 
+    // Excessive but allows for slow systems
+    private static final int TIMEOUT_MICROSECONDS = 10 * 1000 * 1000;
+
     private long serverSocket = 0;
     private long clientSocket = 0;
 
@@ -80,8 +83,8 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
             /* Accept the client connection */
             clientSocket = Socket.accept(serverSocket);
 
-            /* Configure a 2ms timeout for reading from client */
-            Socket.timeoutSet(clientSocket, 10000);
+            /* Configure a 1s timeout for reading from client */
+            Socket.timeoutSet(clientSocket, TIMEOUT_MICROSECONDS);
 
             byte [] buf = new byte[1];
             while (Socket.recv(clientSocket, buf, 0, 1) == 1) {
@@ -122,8 +125,8 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
             try {
                 InetSocketAddress connectAddress = getConnectAddress(serverSocket);
                 java.net.Socket sock = new java.net.Socket();
-                sock.connect(connectAddress, 10000);
-                sock.setSoTimeout(10000);
+                sock.connect(connectAddress, TIMEOUT_MICROSECONDS);
+                sock.setSoTimeout(TIMEOUT_MICROSECONDS);
                 OutputStream ou = sock.getOutputStream();
                 InputStream in =  sock.getInputStream();
                 ou.write('A');
@@ -135,8 +138,8 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
                 }
 
                 sock = new java.net.Socket();
-                sock.connect(connectAddress, 10000);
-                sock.setSoTimeout(10000);
+                sock.connect(connectAddress, TIMEOUT_MICROSECONDS);
+                sock.setSoTimeout(TIMEOUT_MICROSECONDS);
                 ou = sock.getOutputStream();
                 ou.write('E');
                 ou.flush();
