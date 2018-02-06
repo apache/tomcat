@@ -91,6 +91,10 @@
         When using Tomcat embedded, only perform Authenticator configuration
         once during web application start. (markt)
       </fix>
+      <fix>
+        <bug>62067</bug>: Correctly apply security constraints mapped to the
+        context root using a URL pattern of <code>&quot;&quot;</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
