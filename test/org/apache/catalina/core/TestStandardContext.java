@@ -36,7 +36,10 @@ import javax.servlet.ServletRegistration;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.ServletSecurityElement;
+import javax.servlet.annotation.HttpConstraint;
+import javax.servlet.annotation.HttpMethodConstraint;
 import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.ServletSecurity;
 import javax.servlet.annotation.ServletSecurity.TransportGuarantee;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -989,5 +992,52 @@ public class TestStandardContext extends TomcatBaseTest {
         StandardContext context = new StandardContext();
         context.setPath(value);
         Assert.assertEquals(expectedValue, context.getPath());
+    }
+
+
+    @Test
+    public void testUncoveredMethods() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("/test", null);
+        ctx.setDenyUncoveredHttpMethods(true);
+
+        ServletContainerInitializer sci = new SCI();
+        ctx.addServletContainerInitializer(sci, null);
+
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        int rc;
+
+        rc = getUrl("http://localhost:" + getPort() + "/test/foo", bc, false);
+
+        Assert.assertEquals(403, rc);
+    }
+
+
+    public static class SCI implements ServletContainerInitializer {
+        @Override
+        public void onStartup(Set<Class<?>> c, ServletContext ctx)
+                throws ServletException {
+            ServletRegistration.Dynamic sr = ctx.addServlet("Foo", Foo.class.getName());
+            sr.addMapping("/foo");
+        }
+    }
+
+
+    @ServletSecurity(value=@HttpConstraint(ServletSecurity.EmptyRoleSemantic.DENY),
+            httpMethodConstraints=@HttpMethodConstraint("POST"))
+    public static class Foo extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            resp.getWriter().print("OK");
+        }
     }
 }
