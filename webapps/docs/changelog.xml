@@ -90,6 +90,11 @@
         When using Tomcat embedded, only perform Authenticator configuration
         once during web application start. (markt)
       </fix>
+      <fix>
+        Process all <code>ServletSecurity</code> annotations at web application
+        start rather than at servlet load time to ensure constraints are applied
+        consistently. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
