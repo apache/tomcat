@@ -82,6 +82,10 @@
         rather than the user facing Principal object as Tomcat requires the
         internal object to correctly process later authorization checks. (markt)
       </fix>
+      <fix>
+        <bug>62067</bug>: Correctly apply security constraints mapped to the
+        context root using a URL pattern of <code>&quot;&quot;</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
