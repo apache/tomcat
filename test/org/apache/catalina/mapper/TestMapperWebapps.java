@@ -18,7 +18,6 @@ package org.apache.catalina.mapper;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -231,61 +230,54 @@ public class TestMapperWebapps extends TomcatBaseTest{
 
     @Test
     public void testRedirect() throws Exception {
-        // Disable the following of redirects for this test only
-        boolean originalValue = HttpURLConnection.getFollowRedirects();
-        HttpURLConnection.setFollowRedirects(false);
-        try {
-            Tomcat tomcat = getTomcatInstance();
+        Tomcat tomcat = getTomcatInstance();
 
-            // Use standard test webapp as ROOT
-            File rootDir = new File("test/webapp");
-            org.apache.catalina.Context root =
-                    tomcat.addWebapp(null, "", rootDir.getAbsolutePath());
+        // Use standard test webapp as ROOT
+        File rootDir = new File("test/webapp");
+        org.apache.catalina.Context root =
+                tomcat.addWebapp(null, "", rootDir.getAbsolutePath());
 
-            // Add a security constraint
-            SecurityConstraint constraint = new SecurityConstraint();
-            SecurityCollection collection = new SecurityCollection();
-            collection.addPatternDecoded("/welcome-files/*");
-            collection.addPatternDecoded("/welcome-files");
-            constraint.addCollection(collection);
-            constraint.addAuthRole("foo");
-            root.addConstraint(constraint);
+        // Add a security constraint
+        SecurityConstraint constraint = new SecurityConstraint();
+        SecurityCollection collection = new SecurityCollection();
+        collection.addPatternDecoded("/welcome-files/*");
+        collection.addPatternDecoded("/welcome-files");
+        constraint.addCollection(collection);
+        constraint.addAuthRole("foo");
+        root.addConstraint(constraint);
 
-            // Also make examples available
-            File examplesDir = new File(getBuildDirectory(), "webapps/examples");
-            org.apache.catalina.Context examples  = tomcat.addWebapp(
-                    null, "/examples", examplesDir.getAbsolutePath());
-            examples.setMapperContextRootRedirectEnabled(false);
-            // Then block access to the examples to test redirection
-            RemoteAddrValve rav = new RemoteAddrValve();
-            rav.setDeny(".*");
-            rav.setDenyStatus(404);
-            examples.getPipeline().addValve(rav);
+        // Also make examples available
+        File examplesDir = new File(getBuildDirectory(), "webapps/examples");
+        org.apache.catalina.Context examples  = tomcat.addWebapp(
+                null, "/examples", examplesDir.getAbsolutePath());
+        examples.setMapperContextRootRedirectEnabled(false);
+        // Then block access to the examples to test redirection
+        RemoteAddrValve rav = new RemoteAddrValve();
+        rav.setDeny(".*");
+        rav.setDenyStatus(404);
+        examples.getPipeline().addValve(rav);
 
-            tomcat.start();
+        tomcat.start();
 
-            // Redirects within a web application
-            doRedirectTest("/welcome-files", 401);
-            doRedirectTest("/welcome-files/", 401);
+        // Redirects within a web application
+        doRedirectTest("/welcome-files", 401);
+        doRedirectTest("/welcome-files/", 401);
 
-            doRedirectTest("/jsp", 302);
-            doRedirectTest("/jsp/", 404);
+        doRedirectTest("/jsp", 302);
+        doRedirectTest("/jsp/", 404);
 
-            doRedirectTest("/WEB-INF", 404);
-            doRedirectTest("/WEB-INF/", 404);
+        doRedirectTest("/WEB-INF", 404);
+        doRedirectTest("/WEB-INF/", 404);
 
-            // Redirects between web applications
-            doRedirectTest("/examples", 404);
-            doRedirectTest("/examples/", 404);
-        } finally {
-            HttpURLConnection.setFollowRedirects(originalValue);
-        }
+        // Redirects between web applications
+        doRedirectTest("/examples", 404);
+        doRedirectTest("/examples/", 404);
     }
 
 
     private void doRedirectTest(String path, int expected) throws IOException {
         ByteChunk bc = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() + path, bc, null);
+        int rc = getUrl("http://localhost:" + getPort() + path, bc, false);
         Assert.assertEquals(expected, rc);
     }
 
