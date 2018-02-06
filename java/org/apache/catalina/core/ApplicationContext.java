@@ -51,8 +51,10 @@ import javax.servlet.ServletRegistration;
 import javax.servlet.ServletRegistration.Dynamic;
 import javax.servlet.ServletRequestAttributeListener;
 import javax.servlet.ServletRequestListener;
+import javax.servlet.ServletSecurityElement;
 import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
+import javax.servlet.annotation.ServletSecurity;
 import javax.servlet.descriptor.JspConfigDescriptor;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionIdListener;
@@ -69,6 +71,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.mapper.MappingData;
 import org.apache.catalina.servlet4preview.http.ServletMapping;
+import org.apache.catalina.util.Introspection;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -935,11 +938,19 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
             }
         }
 
+        ServletSecurity annotation = null;
         if (servlet == null) {
             wrapper.setServletClass(servletClass);
+            Class<?> clazz = Introspection.loadClass(context, servletClass);
+            if (clazz != null) {
+                annotation = clazz.getAnnotation(ServletSecurity.class);
+            }
         } else {
             wrapper.setServletClass(servlet.getClass().getName());
             wrapper.setServlet(servlet);
+            if (context.wasCreatedDynamicServlet(servlet)) {
+                annotation = servlet.getClass().getAnnotation(ServletSecurity.class);
+            }
         }
 
         if (initParams != null) {
@@ -948,7 +959,12 @@ public class ApplicationContext implements org.apache.catalina.servlet4preview.S
             }
         }
 
-        return context.dynamicServletAdded(wrapper);
+        ServletRegistration.Dynamic registration =
+                new ApplicationServletRegistration(wrapper, context);
+        if (annotation != null) {
+            registration.setServletSecurity(new ServletSecurityElement(annotation));
+        }
+        return registration;
     }
 
 

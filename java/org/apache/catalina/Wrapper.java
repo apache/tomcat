@@ -368,21 +368,23 @@ public interface Wrapper extends Container {
     public void setEnabled(boolean enabled);
 
     /**
-     * Set the flag that indicates
-     * {@link javax.servlet.annotation.ServletSecurity} annotations must be
-     * scanned when the Servlet is first used.
+     * This method is no longer used. All implementations should be NO-OPs.
      *
-     * @param b The new value of the flag
+     * @param b Unused.
+     *
+     * @deprecated This will be removed in Tomcat 9.
      */
+    @Deprecated
     public void setServletSecurityAnnotationScanRequired(boolean b);
 
     /**
-     * Scan for (if necessary) and process (if found) the
-     * {@link javax.servlet.annotation.ServletSecurity} annotations for the
-     * Servlet associated with this wrapper.
+     * This method is no longer used. All implementations should be NO-OPs.
      *
-     * @throws ServletException if an annotation scanning error occurs
+     * @throws ServletException Never thrown
+     *
+     * @deprecated This will be removed in Tomcat 9.
      */
+    @Deprecated
     public void servletSecurityAnnotationScan() throws ServletException;
 
     /**
