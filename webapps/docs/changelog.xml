@@ -69,6 +69,10 @@
         Avoid NPE in ThreadLocalLeakPreventionListener if there is no Engine.
         (remm)
       </fix>
+      <fix>
+        <bug>62067</bug>: Correctly apply security constraints mapped to the
+        context root using a URL pattern of <code>&quot;&quot;</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
