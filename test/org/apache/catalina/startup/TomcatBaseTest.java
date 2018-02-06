@@ -62,6 +62,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public abstract class TomcatBaseTest extends LoggingBaseTest {
     private Tomcat tomcat;
     private boolean accessLogEnabled = false;
+    protected static final int DEFAULT_CLIENT_TIMEOUT_MS = 300_000;
 
     public static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
 
@@ -608,13 +609,13 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
     public static int headUrl(String path, ByteChunk out,
             Map<String, List<String>> resHead) throws IOException {
-        return methodUrl(path, out, 1000000, null, resHead, "HEAD");
+        return methodUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, null, resHead, "HEAD");
     }
 
     public static int getUrl(String path, ByteChunk out,
             Map<String, List<String>> reqHead,
             Map<String, List<String>> resHead) throws IOException {
-        return getUrl(path, out, 1000000, reqHead, resHead);
+        return getUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, reqHead, resHead);
     }
 
     public static int getUrl(String path, ByteChunk out, int readTimeout,
