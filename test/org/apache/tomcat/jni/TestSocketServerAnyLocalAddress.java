@@ -83,7 +83,7 @@ public class TestSocketServerAnyLocalAddress extends AbstractJniTest {
             /* Accept the client connection */
             clientSocket = Socket.accept(serverSocket);
 
-            /* Configure a 1s timeout for reading from client */
+            /* Configure a 10s timeout for reading from client */
             Socket.timeoutSet(clientSocket, TIMEOUT_MICROSECONDS);
 
             byte [] buf = new byte[1];
