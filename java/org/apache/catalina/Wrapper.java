@@ -368,26 +368,6 @@ public interface Wrapper extends Container {
     public void setEnabled(boolean enabled);
 
     /**
-     * This method is no longer used. All implementations should be NO-OPs.
-     *
-     * @param b Unused.
-     *
-     * @deprecated This will be removed in Tomcat 9.
-     */
-    @Deprecated
-    public void setServletSecurityAnnotationScanRequired(boolean b);
-
-    /**
-     * This method is no longer used. All implementations should be NO-OPs.
-     *
-     * @throws ServletException Never thrown
-     *
-     * @deprecated This will be removed in Tomcat 9.
-     */
-    @Deprecated
-    public void servletSecurityAnnotationScan() throws ServletException;
-
-    /**
      * Is the Servlet overridable by a ServletContainerInitializer?
      *
      * @return <code>true</code> if the Servlet can be overridden in a ServletContainerInitializer

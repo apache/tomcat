@@ -605,16 +605,7 @@ public class StandardWrapper extends ContainerBase
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setServletSecurityAnnotationScanRequired(boolean b) {
-        // NO-OP
-    }
-
     // --------------------------------------------------------- Public Methods
-
 
     /**
      * Execute a periodic task, such as reloading, etc. This method will be
@@ -1104,14 +1095,6 @@ public class StandardWrapper extends ContainerBase
         }
         return servlet;
 
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void servletSecurityAnnotationScan() throws ServletException {
-        // NO-OP
     }
 
 

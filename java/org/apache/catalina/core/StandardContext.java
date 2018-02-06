@@ -4342,20 +4342,6 @@ public class StandardContext extends ContainerBase
         return null;
     }
 
-    /**
-     * Create a servlet registration.
-     *
-     * @param wrapper The wrapper for which the registration should be created.
-     *
-     * @return An appropriate registration
-     *
-     * @deprecated This will be removed in Tomcat 9. The registration should be
-     *             created directly.
-     */
-    @Deprecated
-    public ServletRegistration.Dynamic dynamicServletAdded(Wrapper wrapper) {
-        return new ApplicationServletRegistration(wrapper, this);
-    }
 
     /**
      * Hook to track which Servlets were created via
