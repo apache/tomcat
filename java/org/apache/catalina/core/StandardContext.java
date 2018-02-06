@@ -4343,25 +4343,33 @@ public class StandardContext extends ContainerBase
     }
 
     /**
-     * Hook to register that we need to scan for security annotations.
-     * @param wrapper   The wrapper for the Servlet that was added
-     * @return the associated registration
+     * Create a servlet registration.
+     *
+     * @param wrapper The wrapper for which the registration should be created.
+     *
+     * @return An appropriate registration
+     *
+     * @deprecated This will be removed in Tomcat 9. The registration should be
+     *             created directly.
      */
+    @Deprecated
     public ServletRegistration.Dynamic dynamicServletAdded(Wrapper wrapper) {
-        Servlet s = wrapper.getServlet();
-        if (s != null && createdServlets.contains(s)) {
-            // Mark the wrapper to indicate annotations need to be scanned
-            wrapper.setServletSecurityAnnotationScanRequired(true);
-        }
         return new ApplicationServletRegistration(wrapper, this);
     }
 
     /**
-     * Hook to track which registrations need annotation scanning
-     * @param servlet the Servlet to add
+     * Hook to track which Servlets were created via
+     * {@link ServletContext#createServlet(Class)}.
+     *
+     * @param servlet the created Servlet
      */
     public void dynamicServletCreated(Servlet servlet) {
         createdServlets.add(servlet);
+    }
+
+
+    public boolean wasCreatedDynamicServlet(Servlet servlet) {
+        return createdServlets.contains(servlet);
     }
 
 
@@ -5639,8 +5647,6 @@ public class StandardContext extends ContainerBase
                         newSecurityConstraints) {
                     addConstraint(securityConstraint);
                 }
-
-                checkConstraintsForUncoveredMethods(newSecurityConstraints);
             }
         }
 

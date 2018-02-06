@@ -95,6 +95,11 @@
         <bug>62067</bug>: Correctly apply security constraints mapped to the
         context root using a URL pattern of <code>&quot;&quot;</code>. (markt)
       </fix>
+      <fix>
+        Process all <code>ServletSecurity</code> annotations at web application
+        start rather than at servlet load time to ensure constraints are applied
+        consistently. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
