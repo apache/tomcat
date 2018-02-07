@@ -39,42 +39,43 @@
         <item name="3) First webapp"        href="appdev/index.html"/>
         <item name="4) Deployer"            href="deployer-howto.html"/>
         <item name="5) Manager"             href="manager-howto.html"/>
-        <item name="6) Realms and AAA"      href="realm-howto.html"/>
-        <item name="7) Security Manager"
+        <item name="6) Host Manager"        href="host-manager-howto.html"/>
+        <item name="7) Realms and AAA"      href="realm-howto.html"/>
+        <item name="8) Security Manager"
               href="security-manager-howto.html"/>
-        <item name="8) JNDI Resources"      href="jndi-resources-howto.html"/>
-        <item name="9) JDBC DataSources"
+        <item name="9) JNDI Resources"      href="jndi-resources-howto.html"/>
+        <item name="10) JDBC DataSources"
               href="jndi-datasource-examples-howto.html"/>
-        <item name="10) Classloading"       href="class-loader-howto.html"/>
-        <item name="11) JSPs"               href="jasper-howto.html"/>
-        <item name="12) SSL/TLS"            href="ssl-howto.html"/>
-        <item name="13) SSI"                href="ssi-howto.html"/>
-        <item name="14) CGI"                href="cgi-howto.html"/>
-        <item name="15) Proxy Support"      href="proxy-howto.html"/>
-        <item name="16) MBeans Descriptors"
-              href="mbeans-descriptors-howto.html"/>
-        <item name="17) Default Servlet"    href="default-servlet.html"/>
-        <item name="18) Clustering"         href="cluster-howto.html"/>
-        <item name="19) Load Balancer"      href="balancer-howto.html"/>
-        <item name="20) Connectors"         href="connectors.html"/>
-        <item name="21) Monitoring and Management"
+        <item name="11) Classloading"       href="class-loader-howto.html"/>
+        <item name="12) JSPs"               href="jasper-howto.html"/>
+        <item name="13) SSL/TLS"            href="ssl-howto.html"/>
+        <item name="14) SSI"                href="ssi-howto.html"/>
+        <item name="15) CGI"                href="cgi-howto.html"/>
+        <item name="16) Proxy Support"      href="proxy-howto.html"/>
+        <item name="17) MBeans Descriptors"
+              href="means-descriptors-howto.html"/>
+        <item name="18) Default Servlet"    href="default-servlet.html"/>
+        <item name="19) Clustering"         href="cluster-howto.html"/>
+        <item name="20) Load Balancer"      href="balancer-howto.html"/>
+        <item name="21) Connectors"         href="connectors.html"/>
+        <item name="22) Monitoring and Management"
               href="monitoring.html"/>
-        <item name="22) Logging"            href="logging.html"/>
-        <item name="23) APR/Native"         href="apr.html"/>
-        <item name="24) Virtual Hosting"    href="virtual-hosting-howto.html"/>
-        <item name="25) Advanced IO"        href="aio.html"/>
-        <item name="26) Additional Components"
+        <item name="23) Logging"            href="logging.html"/>
+        <item name="24) APR/Native"         href="apr.html"/>
+        <item name="25) Virtual Hosting"    href="virtual-hosting-howto.html"/>
+        <item name="26) Advanced IO"        href="aio.html"/>
+        <item name="27) Additional Components"
               href="extras.html"/>
-        <item name="27) Mavenized"          href="maven-jars.html"/>
-        <item name="28) Security Considerations"
+        <item name="28) Mavenized"          href="maven-jars.html"/>
+        <item name="29) Security Considerations"
               href="security-howto.html"/>
-        <item name="29) Windows Service"    href="windows-service-howto.html"/>
-        <item name="30) Windows Authentication"
+        <item name="30) Windows Service"    href="windows-service-howto.html"/>
+        <item name="31) Windows Authentication"
               href="windows-auth-howto.html"/>
-        <item name="31) Tomcat's JDBC Pool"
+        <item name="32) Tomcat's JDBC Pool"
               href="jdbc-pool.html"/>
-        <item name="32) WebSocket"          href="web-socket-howto.html"/>
-        <item name="33) Rewrite"            href="rewrite.html"/>
+        <item name="33) WebSocket"          href="web-socket-howto.html"/>
+        <item name="34) Rewrite"            href="rewrite.html"/>
     </menu>
 
     <menu name="Reference">
