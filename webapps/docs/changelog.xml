@@ -51,6 +51,9 @@
         <bug>48672</bug>: Add documentation for the Host Manager web
         application. Patch provided by Marek Czernek. (markt)
       </add>
+      <fix>
+        Minor optimization when calling class tranformers. (rjung)
+      </fix>
     </changelog>
   </subsection>
 </section>

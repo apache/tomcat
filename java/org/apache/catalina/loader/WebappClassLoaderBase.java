@@ -2198,9 +2198,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (transformers.size() > 0) {
                 // If the resource is a class just being loaded, decorate it
                 // with any attached transformers
-                String className = name.endsWith(CLASS_FILE_SUFFIX) ?
-                        name.substring(0, name.length() - CLASS_FILE_SUFFIX.length()) : name;
-                String internalName = className.replace(".", "/");
+
+                // Ignore leading '/' and trailing CLASS_FILE_SUFFIX
+                // Should be cheaper than replacing '.' by '/' in class name.
+                String internalName = path.substring(1, path.length() - CLASS_FILE_SUFFIX.length());
 
                 for (ClassFileTransformer transformer : this.transformers) {
                     try {
