@@ -67,10 +67,13 @@
     </li>
   </ul>
   <p>
-    Both ways enable you to add, remove, start, and stop virtual hosts. All
-    of the operations are persistent on Tomcat 9 and newer versions if you use
-    the <code>persist</code> option. This document focuses on the text interface.
-    For further information about the graphical interface, see
+    Both ways enable you to add, remove, start, and stop virtual hosts. Changes
+    are not persisted to the Tomcat configuraiton files. If you want your
+    settings to be persistent, you must write them into the <i>server.xml</i>
+    configuration file manually. For full documentation about the configuration,
+    see <a href="config/host.html">The Host Container</a>. This document focuses
+    on the text interface. For further information about the graphical
+    interface, see
     <a href="html-host-manager-howto.html">Host Manager App -- HTML Interface</a>.
   </p>
 </section>
@@ -78,8 +81,8 @@
 <section name="Configuring Manager Application Access">
   <p><em>The description below uses <code>$CATALINA_HOME</code> to refer the
     base Tomcat directory. It is the directory in which you installed
-    Tomcat, for example <code>C:/tomcat9</code>, or
-    <code>/usr/share/tomcat9</code>.</em></p>
+    Tomcat, for example <code>C:\tomcat7</code>, or
+    <code>/usr/share/tomcat7</code>.</em></p>
 
   <p>
     The Host Manager application requires a user with one of the following
@@ -125,7 +128,6 @@ localhost:</source>
     <li>remove</li>
     <li>start</li>
     <li>stop</li>
-    <li>persist - this command is available only for Tomcat 9 and newer.</li>
   </ul>
   <p>
     In the following subsections, the username and password is assumed to be
@@ -212,38 +214,6 @@ localhost:</source>
     <source><![CDATA[curl -u test:test http://localhost:8080/host-manager/text/stop?name=www.awesomeserver.com]]></source>
     <p><i>Example response</i>:</p>
     <source>OK - Host www.awesomeserver.com stopped</source>
-  </subsection>
-  <subsection name="Persist command">
-    <p>
-      Use the <b>persist</b> command to persist a virtual host into
-      <b>server.xml</b>. Parameters used for the <b>persist</b> command:
-    </p>
-    <ul>
-      <li>String <b>name</b>: Name of the virtual host to be persist.
-      <b>REQUIRED</b></li>
-    </ul>
-    <p>
-      Tomcat 9 and newer versions can use the <b>persist</b> command. If you use
-      an older version of Tomcat, note that everything done in the Host Manager
-      application is non-persistent. While that is suitable for some, if you
-      want your settings to be persistent, you must write it into the
-      <i>server.xml</i> configuration file manually. For full documentation
-      about the configuration, see
-      <a href="config/host.html">The Host Container</a>.
-    </p>
-    <p>
-      This functionality is disabled by default. To enable this option, you must
-      configure the <code>StoreConfigLifecycleListener</code> listener first.
-      To do so, add the following listener to your <i>server.xml</i>:
-    </p>
-    <source><![CDATA[<Listener className="org.apache.catalina.storeconfig.StoreConfigLifecycleListener"/>]]></source>
-    <p><i>Example command</i>:</p>
-    <source><![CDATA[curl -u test:test http://localhost:8080/host-manager/text/persist?name=www.awesomeserver.com]]></source>
-    <p><i>Example response</i>:</p>
-    <source>OK - Configuration persisted</source>
-    <p><i>Example manual entry</i>:</p>
-    <source><![CDATA[<Host appBase="www.awesomeserver.com" name="www.awesomeserver.com" deployXML="false" unpackWARs="false">
-</Host>]]></source>
   </subsection>
 </section>
 </body>

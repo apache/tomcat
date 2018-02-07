@@ -70,10 +70,13 @@
       </li>
     </ul>
     <p>
-      Both ways enable you to add, remove, start, and stop virtual hosts. All
-      of the operations are persistent on Tomcat 9 and newer versions if you use
-      the <code>persist</code> option. This document focuses on the HTML interface.
-      For further information about the graphical interface, see
+      Both ways enable you to add, remove, start, and stop virtual hosts.
+      Changes are not persisted to the Tomcat configuraiton files. If you want
+      your settings to be persistent, you must write them into the
+      <i>server.xml</i> configuration file manually. For full documentation
+      about the configuration, see <a href="config/host.html">The Host
+      Container</a>. This document focuses on the HTML interface. For further
+      information about the graphical interface, see
       <a href="host-manager-howto.html">Host Manager App -- Text Interface</a>.
     </p>
   </section>
@@ -81,8 +84,8 @@
   <section name="Configuring Manager Application Access">
     <p><em>The description below uses <code>$CATALINA_HOME</code> to refer the
       base Tomcat directory. It is the directory in which you installed
-      Tomcat, for example <code>C:/tomcat9</code>, or
-      <code>/usr/share/tomcat9</code>.</em></p>
+      Tomcat, for example <code>C:\tomcat8</code>, or
+      <code>/usr/share/tomcat8</code>.</em></p>
 
     <p>
       The Host Manager application requires a user with one of the following
@@ -128,9 +131,6 @@
       enables you to operate them. </li>
       <li><strong>Add Virtual Host</strong> - Enables you to add a new Virtual
       Host.</li>
-      <li><strong>Persist configuration</strong> - Enables you to persist your
-      current Virtual Hosts. This option is available on Tomcat 9 and newer
-      versions.</li>
       <li><strong>Server Information</strong> - Information about the Tomcat
           server.</li>
     </ul>
@@ -187,21 +187,6 @@
   <a href="host-manager-howto.html">Host Manager App -- Text Interface</a>
   documentation. Note that any configuration added via this interface is
   non-persistent.</p>
-  </section>
-
-  <section name="Persist Configuration">
-
-  <p>The Persist Configuration section enables you to persist your current
-  configuration into the <i>server.xml</i> file. This option is available for
-  Tomcat 9 and newer versions.</p>
-
-  <p> This functionality is disabled by default. To enable this option, you must
-  configure the <code>StoreConfigLifecycleListener</code> listener first.
-  To do so, add the following listener to your <i>server.xml</i>:</p>
-  <source><![CDATA[<Listener className="org.apache.catalina.storeconfig.StoreConfigLifecycleListener"/>]]></source>
-
-  <p>After you configure the listener, click <strong>All</strong> to make your
-  configuration persistent.</p>
   </section>
 
   <section name="Server Information">
