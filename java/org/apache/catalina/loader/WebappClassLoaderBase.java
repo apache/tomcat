@@ -3075,6 +3075,28 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (entry.binaryContent == null)
                 throw new ClassNotFoundException(name);
 
+            if (this.transformers.size() > 0) {
+                // If the resource is a class just being loaded, decorate it
+                // with any attached transformers
+                String className = name.endsWith(CLASS_FILE_SUFFIX) ?
+                        name.substring(0, name.length() - CLASS_FILE_SUFFIX.length()) : name;
+                String internalName = className.replace(".", "/");
+
+                for (ClassFileTransformer transformer : this.transformers) {
+                    try {
+                        byte[] transformed = transformer.transform(
+                                this, internalName, null, null, entry.binaryContent
+                        );
+                        if (transformed != null) {
+                            entry.binaryContent = transformed;
+                        }
+                    } catch (IllegalClassFormatException e) {
+                        log.error(sm.getString("webappClassLoader.transformError", name), e);
+                        return null;
+                    }
+                }
+            }
+
             // Looking up the package
             String packageName = null;
             int pos = name.lastIndexOf('.');
@@ -3474,29 +3496,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     try {
                         binaryStream.close();
                     } catch (IOException e) { /* Ignore */}
-                }
-            }
-        }
-
-        if (isClassResource && entry.binaryContent != null &&
-                this.transformers.size() > 0) {
-            // If the resource is a class just being loaded, decorate it
-            // with any attached transformers
-            String className = name.endsWith(CLASS_FILE_SUFFIX) ?
-                    name.substring(0, name.length() - CLASS_FILE_SUFFIX.length()) : name;
-            String internalName = className.replace(".", "/");
-
-            for (ClassFileTransformer transformer : this.transformers) {
-                try {
-                    byte[] transformed = transformer.transform(
-                            this, internalName, null, null, entry.binaryContent
-                    );
-                    if (transformed != null) {
-                        entry.binaryContent = transformed;
-                    }
-                } catch (IllegalClassFormatException e) {
-                    log.error(sm.getString("webappClassLoader.transformError", name), e);
-                    return null;
                 }
             }
         }

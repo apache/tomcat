@@ -72,6 +72,11 @@
         (remm)
       </fix>
       <fix>
+        <bug>58143</bug>: Fix calling classloading transformers broken in 7.0.70
+        by the fix for <bug>59619</bug>. This was observed when using Spring
+        weaving. (rjung)
+      </fix>
+      <fix>
         <bug>62000</bug>: When a JNDI reference cannot be resolved, ensure that
         the root cause exception is reported rather than swallowed. (markt)
       </fix>
