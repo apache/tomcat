@@ -164,7 +164,8 @@ localhost:</source>
       file is read and used by Tomcat.</li>
       <li>Boolean <b>copyXML</b>: If true, Tomcat copies <i>/META-INF/context.xml</i> 
       file and uses the original copy regardless of updates to the application's
-      <i>/META-INF/context.xml</i> file.</li>
+      <i>/META-INF/context.xml</i> file. Available only for 
+      <b>Tomcat 8 and newer</b>.</li>
     </ul>
     <p><i>Example command</i>:</p>
     <source><![CDATA[curl -u test:test http://localhost:8080/host-manager/text/add?name=www.awesomeserver.com&aliases=awesomeserver.com&appBase/mnt/appDir&deployOnStartup=true]]></source>
