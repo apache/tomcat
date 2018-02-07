@@ -100,6 +100,9 @@
         start rather than at servlet load time to ensure constraints are applied
         consistently. (markt)
       </fix>
+      <fix>
+        Minor optimization when calling class tranformers. (rjung)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
