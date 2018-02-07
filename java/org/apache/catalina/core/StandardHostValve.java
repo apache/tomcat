@@ -128,10 +128,10 @@ final class StandardHostValve extends ValveBase {
                 return;
             }
 
-            // Ask this Context to process this request. Requests that are in
-            // async mode and are not being dispatched to this resource must be
-            // in error and have been routed here to check for application
-            // defined error pages.
+            // Ask this Context to process this request. Requests that are
+            // already in error must have been routed here to check for
+            // application defined error pages so DO NOT forward them to the the
+            // application for processing.
             try {
                 if (!response.isErrorReportRequired()) {
                     context.getPipeline().getFirst().invoke(request, response);
