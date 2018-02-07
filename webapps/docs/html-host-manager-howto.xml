@@ -19,7 +19,7 @@
   <!ENTITY project SYSTEM "project.xml">
 ]>
 
-<document url="host-manager-howto.html">
+<document url="html-host-manager-howto.html">
   &project;
   
   <properties>
