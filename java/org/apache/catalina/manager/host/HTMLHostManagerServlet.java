@@ -97,6 +97,10 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                 command.equals("/persist")) {
             message = smClient.getString(
                     "hostManagerServlet.postCommand", command);
+        } else if (command.equals("/logout")) {
+            logout(request, response);
+            // No fail state, always send OK
+            message = smClient.getString("hostManagerServlet.logout");
         } else {
             message = smClient.getString(
                     "hostManagerServlet.unknownCommand", command);
@@ -171,6 +175,18 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         super.add(request,printWriter,name,true, smClient);
 
         return stringWriter.toString();
+    }
+
+    /**
+     * Log out by invalidating the current session and sending 401
+     * in order to prompt user for new login upon next access.
+     *
+     * @param request The Servlet request
+     * @param response The Servlet response
+     */
+    protected void logout(HttpServletRequest request, HttpServletResponse response) {
+        request.getSession().invalidate();
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
 
@@ -277,13 +293,15 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                 org.apache.catalina.manager.Constants.BODY_HEADER_SECTION, args));
 
         // Message Section
-        args = new Object[3];
+        args = new Object[4];
         args[0] = smClient.getString("htmlHostManagerServlet.messageLabel");
         if (message == null || message.length() == 0) {
             args[1] = "OK";
         } else {
             args[1] = Escape.htmlElementContent(message);
         }
+        args[2] = response.encodeURL(request.getContextPath() + "/html/logout");
+        args[3] = smClient.getString("htmlHostManagerServlet.logoutLabel");
         writer.print(MessageFormat.format(Constants.MESSAGE_SECTION, args));
 
         // Manager Section
