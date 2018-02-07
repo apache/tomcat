@@ -50,8 +50,8 @@
   </ul>
   
   <p>
-    The <strong>Tomcat Host Manager</strong> application is a part of the 
-    default Tomcat installation, by default available using the following 
+    The <strong>Tomcat Host Manager</strong> application is a part of 
+    Tomcat installation, by default available using the following 
     context: <code>/host-manager</code>. You can use the host manager in the
     following ways:
   </p>
@@ -79,8 +79,8 @@
 <section name="Configuring Manager Application Access">
   <p><em>The description below uses <code>$CATALINA_HOME</code> to refer the
     base Tomcat directory. It is the directory in which you installed
-    Tomcat, for example <code>C:/tomcat8</code>, or 
-    <code>/usr/share/tomcat8</code>.</em></p>
+    Tomcat, for example <code>C:/tomcat9</code>, or 
+    <code>/usr/share/tomcat9</code>.</em></p>
     
   <p>
     The Host Manager application requires a user with one of the following
@@ -111,7 +111,7 @@
 OK - Listed hosts
 localhost:</source>
   </p>
-  <p class="notice">
+  <p>
     Note that in case you retreive your users using the 
     <code>DataSourceRealm</code>, <code>JDBCRealm</code>, or 
     <code>JNDIRealm</code> mechanism, add the appropriate role in the database
@@ -222,10 +222,28 @@ localhost:</source>
       <li>String <b>name</b>: Name of the virtual host to be persist.
       <b>REQUIRED</b></li>
     </ul>
+    <p>
+      Tomcat 9 and newer versions can use the <b>persist</b> command. If you use 
+      an older version of Tomcat, note that everything done in the Host Manager
+      application is non-persistent. While that is suitable for some, if you 
+      want your settings to be persistent, you must write it into the 
+      <i>server.xml</i> configuration file manually. For full documentation 
+      about the configuration, see 
+      <a href="config/host.html">The Host Container</a>.
+    </p>
+    <p> 
+      This functionality is disabled by default. To enable this option, you must
+      configure the <code>StoreConfigLifecycleListener</code> listener first. 
+      To do so, add the following listener to your <i>server.xml</i>:
+    </p>
+    <source><![CDATA[<Listener className="org.apache.catalina.storeconfig.StoreConfigLifecycleListener"/>]]></source>
     <p><i>Example command</i>:</p>
     <source><![CDATA[curl -u test:test http://localhost:8080/host-manager/text/persist?name=www.awesomeserver.com]]></source>
     <p><i>Example response</i>:</p>
-    <source>TODO</source>
+    <source>OK - Configuration persisted</source>
+    <p><i>Example manual entry</i>:</p>
+    <source><![CDATA[<Host appBase="www.awesomeserver.com" name="www.awesomeserver.com" deployXML="false" unpackWARs="false">
+</Host>]]></source>
   </subsection>
 </section>
 </body>
