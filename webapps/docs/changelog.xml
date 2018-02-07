@@ -45,15 +45,19 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.6 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Minor optimization when calling class tranformers. (rjung)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
         <bug>48672</bug>: Add documentation for the Host Manager web
         application. Patch provided by Marek Czernek. (markt)
       </add>
-      <fix>
-        Minor optimization when calling class tranformers. (rjung)
-      </fix>
     </changelog>
   </subsection>
 </section>
