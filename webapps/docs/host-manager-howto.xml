@@ -67,10 +67,10 @@
     </li>
   </ul>
   <p>
-    Both ways enable you to add, remove, start, and stop virtual hosts. All
-    of the operations are persistent on Tomcat 9 and newer versions if you use
-    the <code>persist</code> option. This document focuses on the text interface.
-    For further information about the graphical interface, see
+    Both ways enable you to add, remove, start, and stop virtual hosts. Changes
+    may be presisted by using the <code>persist</code> command. This document
+    focuses on the text interface. For further information about the graphical
+    interface, see
     <a href="html-host-manager-howto.html">Host Manager App -- HTML Interface</a>.
   </p>
 </section>
@@ -125,7 +125,7 @@ localhost:</source>
     <li>remove</li>
     <li>start</li>
     <li>stop</li>
-    <li>persist - this command is available only for Tomcat 9 and newer.</li>
+    <li>persist</li>
   </ul>
   <p>
     In the following subsections, the username and password is assumed to be
@@ -163,8 +163,7 @@ localhost:</source>
       file is read and used by Tomcat.</li>
       <li>Boolean <b>copyXML</b>: If true, Tomcat copies <i>/META-INF/context.xml</i>
       file and uses the original copy regardless of updates to the application's
-      <i>/META-INF/context.xml</i> file. Available only for
-      <b>Tomcat 8 and newer</b>.</li>
+      <i>/META-INF/context.xml</i> file.</li>
     </ul>
     <p><i>Example command</i>:</p>
     <source><![CDATA[curl -u test:test http://localhost:8080/host-manager/text/add?name=www.awesomeserver.com&aliases=awesomeserver.com&appBase/mnt/appDir&deployOnStartup=true]]></source>
@@ -222,15 +221,6 @@ localhost:</source>
       <li>String <b>name</b>: Name of the virtual host to be persist.
       <b>REQUIRED</b></li>
     </ul>
-    <p>
-      Tomcat 9 and newer versions can use the <b>persist</b> command. If you use
-      an older version of Tomcat, note that everything done in the Host Manager
-      application is non-persistent. While that is suitable for some, if you
-      want your settings to be persistent, you must write it into the
-      <i>server.xml</i> configuration file manually. For full documentation
-      about the configuration, see
-      <a href="config/host.html">The Host Container</a>.
-    </p>
     <p>
       This functionality is disabled by default. To enable this option, you must
       configure the <code>StoreConfigLifecycleListener</code> listener first.

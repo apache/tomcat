@@ -70,10 +70,10 @@
       </li>
     </ul>
     <p>
-      Both ways enable you to add, remove, start, and stop virtual hosts. All
-      of the operations are persistent on Tomcat 9 and newer versions if you use
-      the <code>persist</code> option. This document focuses on the HTML interface.
-      For further information about the graphical interface, see
+      Both ways enable you to add, remove, start, and stop virtual hosts.
+      Changes may be presisted by using the <code>persist</code> command. This
+      document focuses on the HTML interface. For further information about the
+      graphical interface, see
       <a href="host-manager-howto.html">Host Manager App -- Text Interface</a>.
     </p>
   </section>
@@ -129,8 +129,7 @@
       <li><strong>Add Virtual Host</strong> - Enables you to add a new Virtual
       Host.</li>
       <li><strong>Persist configuration</strong> - Enables you to persist your
-      current Virtual Hosts. This option is available on Tomcat 9 and newer
-      versions.</li>
+      current Virtual Hosts.</li>
       <li><strong>Server Information</strong> - Information about the Tomcat
           server.</li>
     </ul>
@@ -192,8 +191,7 @@
   <section name="Persist Configuration">
 
   <p>The Persist Configuration section enables you to persist your current
-  configuration into the <i>server.xml</i> file. This option is available for
-  Tomcat 9 and newer versions.</p>
+  configuration into the <i>server.xml</i> file.</p>
 
   <p> This functionality is disabled by default. To enable this option, you must
   configure the <code>StoreConfigLifecycleListener</code> listener first.
