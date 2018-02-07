@@ -287,6 +287,7 @@ public class CoyoteAdapter implements Adapter {
             req.getRequestProcessor().setWorkerThreadName(null);
             // Recycle the wrapper request and response
             if (!success || !request.isAsync()) {
+                updateWrapperErrorCount(request, response);
                 request.recycle();
                 response.recycle();
             }
@@ -407,8 +408,19 @@ public class CoyoteAdapter implements Adapter {
 
             // Recycle the wrapper request and response
             if (!async) {
+                updateWrapperErrorCount(request, response);
                 request.recycle();
                 response.recycle();
+            }
+        }
+    }
+
+
+    private void updateWrapperErrorCount(Request request, Response response) {
+        if (response.isError()) {
+            Wrapper wrapper = request.getWrapper();
+            if (wrapper != null) {
+                wrapper.incrementErrorCount();
             }
         }
     }
@@ -470,6 +482,7 @@ public class CoyoteAdapter implements Adapter {
             ExceptionUtils.handleThrowable(t);
             log.warn(sm.getString("coyoteAdapter.accesslogFail"), t);
         } finally {
+            updateWrapperErrorCount(request, response);
             request.recycle();
             response.recycle();
         }
