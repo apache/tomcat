@@ -48,7 +48,7 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        Minor optimization when calling class tranformers. (rjung)
+        Minor optimization when calling class transformers. (rjung)
       </fix>
     </changelog>
   </subsection>
@@ -179,7 +179,7 @@
     <changelog>
       <fix>
         Include an HTTP <code>Allow</code> header when a JSP generates a
-        405 reponse due to a request with an unsupported method. (markt)
+        405 response due to a request with an unsupported method. (markt)
       </fix>
       <add>
         Add support for the HTTP <code>OPTION</code> method to JSPs. The
