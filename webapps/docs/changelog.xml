@@ -48,7 +48,7 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        Minor optimization when calling class tranformers. (rjung)
+        Minor optimization when calling class transformers. (rjung)
       </fix>
     </changelog>
   </subsection>
