@@ -188,7 +188,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             queuedRunnable = new ConcurrentLinkedQueue<>();
         }
 
-        parser = new Http2Parser(connectionId, this, this);
+        parser = getParser(connectionId);
 
         Stream stream = null;
 
@@ -247,6 +247,11 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         if (webConnection != null) {
             processStreamOnContainerThread(stream);
         }
+    }
+
+
+    protected Http2Parser getParser(String connectionId) {
+        return new Http2Parser(connectionId, this, this);
     }
 
 
@@ -409,7 +414,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    private void checkPauseState() throws IOException {
+    void checkPauseState() throws IOException {
         if (connectionState.get() == ConnectionState.PAUSING) {
             if (pausedNanoTime + pingManager.getRoundTripTimeNano() < System.nanoTime()) {
                 connectionState.compareAndSet(ConnectionState.PAUSING, ConnectionState.PAUSED);

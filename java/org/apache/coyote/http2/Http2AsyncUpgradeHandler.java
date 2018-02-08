@@ -71,6 +71,12 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     };
 
     @Override
+    protected Http2Parser getParser(String connectionId) {
+        return new Http2AsyncParser(connectionId, this, this, socketWrapper, this);
+    }
+
+
+    @Override
     protected PingManager getPingManager() {
         return new AsyncPingManager();
     }
