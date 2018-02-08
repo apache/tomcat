@@ -50,6 +50,11 @@
       <fix>
         Minor optimization when calling class transformers. (rjung)
       </fix>
+      <add>
+        Pass errors triggered by invalid requests or unavailable services to the
+        application provided error handling and/or the container provided error
+        handling (<code>ErrorReportValve</code>) as appropriate. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

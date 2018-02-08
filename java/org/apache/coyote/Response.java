@@ -227,6 +227,10 @@ public final class Response {
      * @param status The status value to set
      */
     public void setStatus(int status) {
+        if (this.status > 399) {
+            // Don't overwrite first recorded error status
+            return;
+        }
         this.status = status;
     }
 

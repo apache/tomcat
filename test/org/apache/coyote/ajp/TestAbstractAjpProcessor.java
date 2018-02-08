@@ -512,8 +512,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         TesterAjpMessage responseHeaders = ajpClient.sendMessage(forwardMessage);
         // Expect 3 packets: headers, body, end
         validateResponseHeaders(responseHeaders, 403, "403");
-        //TesterAjpMessage responseBody = ajpClient.readMessage();
-        //validateResponseBody(responseBody, HelloWorldServlet.RESPONSE_TEXT);
+        TesterAjpMessage responseBody = ajpClient.readMessage();
+        validateResponseBody(responseBody, "<p><b>Type</b> Status Report</p>");
         validateResponseEnd(ajpClient.readMessage(), false);
 
         ajpClient.connect();
@@ -526,8 +526,8 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         responseHeaders = ajpClient.sendMessage(forwardMessage);
         // Expect 3 packets: headers, body, end
         validateResponseHeaders(responseHeaders, 403, "403");
-        //responseBody = ajpClient.readMessage();
-        //validateResponseBody(responseBody, HelloWorldServlet.RESPONSE_TEXT);
+        responseBody = ajpClient.readMessage();
+        validateResponseBody(responseBody, "<p><b>Type</b> Status Report</p>");
         validateResponseEnd(ajpClient.readMessage(), false);
 
         ajpClient.connect();
@@ -540,7 +540,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         responseHeaders = ajpClient.sendMessage(forwardMessage);
         // Expect 3 packets: headers, body, end
         validateResponseHeaders(responseHeaders, 200, "200");
-        TesterAjpMessage responseBody = ajpClient.readMessage();
+        responseBody = ajpClient.readMessage();
         validateResponseBody(responseBody, HelloWorldServlet.RESPONSE_TEXT);
         validateResponseEnd(ajpClient.readMessage(), true);
 
@@ -641,7 +641,9 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             // Double check the connection is still open
             validateCpong(ajpClient.cping());
         } else {
-            // Expect 2 messages: headers, end for an invalid request
+            // Expect 3 messages: headers, error report body, end for an invalid request
+            TesterAjpMessage responseBody = ajpClient.readMessage();
+            validateResponseBody(responseBody, "<p><b>Type</b> Status Report</p>");
             validateResponseEnd(ajpClient.readMessage(), false);
         }
 

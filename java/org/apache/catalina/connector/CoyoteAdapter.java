@@ -393,14 +393,25 @@ public class CoyoteAdapter implements Adapter {
                 // Log only if processing was invoked.
                 // If postParseRequest() failed, it has already logged it.
                 Context context = request.getContext();
+                Host host = request.getHost();
                 // If the context is null, it is likely that the endpoint was
                 // shutdown, this connection closed and the request recycled in
                 // a different thread. That thread will have updated the access
                 // log so it is OK not to update the access log here in that
                 // case.
+                // The other possibility is that an error occurred early in
+                // processing and the request could not be mapped to a Context.
+                // Log via the host or engine in that case.
+                long time = System.currentTimeMillis() - req.getStartTime();
                 if (context != null) {
-                    context.logAccess(request, response,
-                            System.currentTimeMillis() - req.getStartTime(), false);
+                    context.logAccess(request, response, time, false);
+                } else if (response.isError()) {
+                    if (host != null) {
+                        host.logAccess(request, response, time, false);
+                    } else {
+                        connector.getService().getContainer().logAccess(
+                                request, response, time, false);
+                    }
                 }
             }
 
