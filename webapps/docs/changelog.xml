@@ -62,6 +62,9 @@
       <add>
         Add async HTTP/2 parser for NIO2. (remm)
       </add>
+      <fix>
+        Add minor HPACK fixes, based on fixes by Stuart Douglas. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
