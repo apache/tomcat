@@ -226,14 +226,18 @@ class Http2AsyncParser extends Http2Parser {
                             readUnknownFrame(streamId, frameType, flags, payloadSize, payload);
                         }
                     }
-                } catch (Exception e) {
+                } catch (StreamException e) {
                     error = e;
+                } catch (Exception e) {
+                    unRead(payload);
+                    failed(e, null);
+                    return;
                 }
                 unRead(payload);
             }
             if (state == CompletionState.DONE) {
                 // The call was not completed inline, so must start reading new frames
-                // or process any error
+                // or process the stream exception
                 upgradeHandler.upgradeDispatch(SocketEvent.OPEN_READ);
             }
         }
@@ -241,10 +245,8 @@ class Http2AsyncParser extends Http2Parser {
         @Override
         public void failed(Throwable e, Void attachment) {
             error = e;
-            if (state == CompletionState.DONE) {
-                // The call was not completed inline, so must start reading new frames
-                // or process any error
-                upgradeHandler.upgradeDispatch(SocketEvent.OPEN_READ);
+            if (state == null || state == CompletionState.DONE) {
+                upgradeHandler.upgradeDispatch(SocketEvent.ERROR);
             }
         }
 
