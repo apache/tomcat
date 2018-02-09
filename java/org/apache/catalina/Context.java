@@ -1087,7 +1087,11 @@ public interface Context extends Container, ContextBind {
      * HTTP status code, if any; otherwise return <code>null</code>.
      *
      * @param status HTTP status code to look up
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.
+     *             Use {@link #findErrorPage(int)} instead.
      */
+    @Deprecated
     public String findStatusPage(int status);
 
 
@@ -1095,7 +1099,11 @@ public interface Context extends Container, ContextBind {
      * @return the set of HTTP status codes for which error pages have
      * been specified.  If none are specified, a zero-length array
      * is returned.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.
+     *             Use {@link #findErrorPages()} instead.
      */
+    @Deprecated
     public int[] findStatusPages();
 
 
