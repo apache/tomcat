@@ -42,6 +42,7 @@ class Http2AsyncParser extends Http2Parser {
     }
 
 
+    @Override
     protected boolean readFrame(boolean block, FrameType expected)
             throws IOException, Http2Exception {
         if (block) {
@@ -78,12 +79,14 @@ class Http2AsyncParser extends Http2Parser {
         }
     }
 
+    @Override
     protected void unRead(ByteBuffer buffer) {
         if (buffer != null && buffer.hasRemaining()) {
             socketWrapper.unRead(buffer);
         }
     }
 
+    @Override
     protected void swallow(int streamId, int len, boolean mustBeZero, ByteBuffer buffer)
             throws IOException, ConnectionException {
         if (log.isDebugEnabled()) {
@@ -244,7 +247,7 @@ class Http2AsyncParser extends Http2Parser {
                 upgradeHandler.upgradeDispatch(SocketEvent.OPEN_READ);
             }
         }
-        
+
     }
 
 }
