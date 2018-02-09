@@ -127,14 +127,6 @@ class Http2Parser {
         return true;
     }
 
-    /**
-     * NO-OP for non-async parser.
-     *
-     * @param buffer Unused.
-     */
-    protected void unRead(ByteBuffer buffer) {
-    }
-
     protected void readDataFrame(int streamId, int flags, int payloadSize, ByteBuffer buffer)
             throws Http2Exception, IOException {
         // Process the Stream
@@ -190,7 +182,6 @@ class Http2Parser {
             synchronized (dest) {
                 if (dest.remaining() < dataLength) {
                     swallow(streamId, dataLength, false, buffer);
-                    unRead(buffer);
                     // Client has sent more data than permitted by Window size
                     throw new StreamException("Client sent more data than stream window allowed", Http2Error.FLOW_CONTROL_ERROR, streamId);
                 }
@@ -213,7 +204,6 @@ class Http2Parser {
                 output.endRequestBodyFrame(streamId);
             }
         }
-        unRead(buffer);
         if (padLength > 0) {
             output.swallowedPadding(streamId, padLength);
         }
@@ -277,8 +267,6 @@ class Http2Parser {
 
         swallow(streamId, padLength, true, buffer);
 
-        unRead(buffer);
-
         if (Flags.isEndOfHeaders(flags)) {
             onHeadersComplete(streamId);
         } else {
@@ -293,7 +281,6 @@ class Http2Parser {
             input.fill(true, payload);
         } else {
             buffer.get(payload);
-            unRead(buffer);
         }
 
         boolean exclusive = ByteUtil.isBit7Set(payload[0]);
@@ -315,7 +302,6 @@ class Http2Parser {
             input.fill(true, payload);
         } else {
             buffer.get(payload);
-            unRead(buffer);
         }
 
         long errorCode = ByteUtil.getFourBytes(payload, 0);
@@ -347,13 +333,11 @@ class Http2Parser {
                 output.setting(Setting.valueOf(id), value);
             }
         }
-        unRead(buffer);
         output.settingsEnd(ack);
     }
 
 
     protected void readPushPromiseFrame(int streamId, ByteBuffer buffer) throws Http2Exception {
-        unRead(buffer);
         throw new ConnectionException(sm.getString("http2Parser.processFramePushPromise",
                 connectionId, Integer.valueOf(streamId)), Http2Error.PROTOCOL_ERROR);
     }
@@ -366,7 +350,6 @@ class Http2Parser {
             input.fill(true, payload);
         } else {
             buffer.get(payload);
-            unRead(buffer);
         }
         output.pingReceive(payload, Flags.isAck(flags));
     }
@@ -378,7 +361,6 @@ class Http2Parser {
             input.fill(true, payload);
         } else {
             buffer.get(payload);
-            unRead(buffer);
         }
 
         int lastStreamId = ByteUtil.get31Bits(payload, 0);
@@ -397,7 +379,6 @@ class Http2Parser {
             input.fill(true, payload);
         } else {
             buffer.get(payload);
-            unRead(buffer);
         }
         int windowSizeIncrement = ByteUtil.get31Bits(payload, 0);
 
@@ -433,7 +414,6 @@ class Http2Parser {
         }
 
         readHeaderPayload(streamId, payloadSize, buffer);
-        unRead(buffer);
 
         if (Flags.isEndOfHeaders(flags)) {
             headersCurrentStream = -1;
@@ -521,7 +501,6 @@ class Http2Parser {
             // Will never happen because swallow() is called with mustBeZero set
             // to false
         }
-        unRead(buffer);
         output.swallowed(streamId, frameType, flags, payloadSize);
     }
 

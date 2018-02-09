@@ -79,7 +79,6 @@ class Http2AsyncParser extends Http2Parser {
         }
     }
 
-    @Override
     protected void unRead(ByteBuffer buffer) {
         if (buffer != null && buffer.hasRemaining()) {
             socketWrapper.unRead(buffer);
@@ -186,50 +185,51 @@ class Http2AsyncParser extends Http2Parser {
         @Override
         public void completed(Long result, Void attachment) {
             if (streamException || error == null) {
-                buffers[1].flip();
+                ByteBuffer payload = buffers[1];
+                payload.flip();
                 try {
                     if (streamException) {
-                        swallow(streamId, payloadSize, false, buffers[1]);
-                        unRead(buffers[1]);
+                        swallow(streamId, payloadSize, false, payload);
                     } else {
                         switch (frameType) {
                         case DATA:
-                            readDataFrame(streamId, flags, payloadSize, buffers[1]);
+                            readDataFrame(streamId, flags, payloadSize, payload);
                             break;
                         case HEADERS:
-                            readHeadersFrame(streamId, flags, payloadSize, buffers[1]);
+                            readHeadersFrame(streamId, flags, payloadSize, payload);
                             break;
                         case PRIORITY:
-                            readPriorityFrame(streamId, buffers[1]);
+                            readPriorityFrame(streamId, payload);
                             break;
                         case RST:
-                            readRstFrame(streamId, buffers[1]);
+                            readRstFrame(streamId, payload);
                             break;
                         case SETTINGS:
-                            readSettingsFrame(flags, payloadSize, buffers[1]);
+                            readSettingsFrame(flags, payloadSize, payload);
                             break;
                         case PUSH_PROMISE:
-                            readPushPromiseFrame(streamId, buffers[1]);
+                            readPushPromiseFrame(streamId, payload);
                             break;
                         case PING:
-                            readPingFrame(flags, buffers[1]);
+                            readPingFrame(flags, payload);
                             break;
                         case GOAWAY:
-                            readGoawayFrame(payloadSize, buffers[1]);
+                            readGoawayFrame(payloadSize, payload);
                             break;
                         case WINDOW_UPDATE:
-                            readWindowUpdateFrame(streamId, buffers[1]);
+                            readWindowUpdateFrame(streamId, payload);
                             break;
                         case CONTINUATION:
-                            readContinuationFrame(streamId, flags, payloadSize, buffers[1]);
+                            readContinuationFrame(streamId, flags, payloadSize, payload);
                             break;
                         case UNKNOWN:
-                            readUnknownFrame(streamId, frameType, flags, payloadSize, buffers[1]);
+                            readUnknownFrame(streamId, frameType, flags, payloadSize, payload);
                         }
                     }
                 } catch (Exception e) {
                     error = e;
                 }
+                unRead(payload);
             }
             if (state == CompletionState.DONE) {
                 // The call was not completed inline, so must start reading new frames
