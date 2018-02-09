@@ -808,6 +808,13 @@ public final class HTMLManagerServlet extends ManagerServlet {
         showProxySessions = Boolean.parseBoolean(value);
     }
 
+    /**
+     * Log out by invalidating the current session and sending 401
+     * in order to prompt user for new login upon next access.
+     *
+     * @param request The Servlet request
+     * @param response The Servlet response
+     */
     protected void logout(HttpServletRequest request, HttpServletResponse response) {
         request.getSession().invalidate();
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
