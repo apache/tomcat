@@ -127,6 +127,11 @@ class Http2Parser {
         return true;
     }
 
+    /**
+     * NO-OP for non-async parser.
+     *
+     * @param buffer Unused.
+     */
     protected void unRead(ByteBuffer buffer) {
     }
 
@@ -521,6 +526,19 @@ class Http2Parser {
     }
 
 
+    /**
+     * Swallow bytes.
+     *
+     * @param streamId   Stream being swallowed
+     * @param len        Number of bytes to swallow
+     * @param mustBeZero Are the bytes required to have value zero
+     * @param byteBuffer Unused for non-async parser
+     *
+     * @throws IOException If an I/O error occurs reading additional bytes into
+     *                     the input buffer.
+     * @throws ConnectionException If the swallowed bytes are expected to have a
+     *                             value of zero but do not
+     */
     protected void swallow(int streamId, int len, boolean mustBeZero, ByteBuffer byteBuffer)
             throws IOException, ConnectionException {
         if (log.isDebugEnabled()) {
