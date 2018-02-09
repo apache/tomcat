@@ -510,6 +510,8 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     @Override
     public ErrorPage findErrorPage(String exceptionType) { return null; }
     @Override
+    public ErrorPage findErrorPage(Throwable throwable) { return null; }
+    @Override
     public ErrorPage[] findErrorPages() { return null; }
     @Override
     public void removeErrorPage(ErrorPage errorPage) { /* NO-OP */ }

@@ -969,13 +969,30 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the error page entry for the specified Java exception type,
-     * if any; otherwise return <code>null</code>.
-     *
      * @param exceptionType Exception type to look up
+     *
+     * @return the error page entry for the specified Java exception type,
+     *         if any; otherwise return {@code null}.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10.
+     *             Use {@link #findErrorPage(Throwable)} instead.
      */
+    @Deprecated
     public ErrorPage findErrorPage(String exceptionType);
 
+
+    /**
+     * Find and return the ErrorPage instance for the specified exception's
+     * class, or an ErrorPage instance for the closest superclass for which
+     * there is such a definition.  If no associated ErrorPage instance is
+     * found, return <code>null</code>.
+     *
+     * @param throwable The exception type for which to find an ErrorPage
+     *
+     * @return the error page entry for the specified Java exception type,
+     *         if any; otherwise return {@code null}.
+     */
+    public ErrorPage findErrorPage(Throwable throwable);
 
 
     /**

@@ -293,9 +293,9 @@ final class StandardHostValve extends ValveBase {
             return;
         }
 
-        ErrorPage errorPage = findErrorPage(context, throwable);
+        ErrorPage errorPage = context.findErrorPage(throwable);
         if ((errorPage == null) && (realError != throwable)) {
-            errorPage = findErrorPage(context, realError);
+            errorPage = context.findErrorPage(realError);
         }
 
         if (errorPage != null) {
@@ -397,40 +397,6 @@ final class StandardHostValve extends ValveBase {
             // Report our failure to process this custom page
             container.getLogger().error("Exception Processing " + errorPage, t);
             return false;
-
         }
-    }
-
-
-    /**
-     * Find and return the ErrorPage instance for the specified exception's
-     * class, or an ErrorPage instance for the closest superclass for which
-     * there is such a definition.  If no associated ErrorPage instance is
-     * found, return <code>null</code>.
-     *
-     * @param context The Context in which to search
-     * @param exception The exception for which to find an ErrorPage
-     */
-    private static ErrorPage findErrorPage
-        (Context context, Throwable exception) {
-
-        if (exception == null) {
-            return null;
-        }
-        Class<?> clazz = exception.getClass();
-        String name = clazz.getName();
-        while (!Object.class.equals(clazz)) {
-            ErrorPage errorPage = context.findErrorPage(name);
-            if (errorPage != null) {
-                return errorPage;
-            }
-            clazz = clazz.getSuperclass();
-            if (clazz == null) {
-                break;
-            }
-            name = clazz.getName();
-        }
-        return null;
-
     }
 }

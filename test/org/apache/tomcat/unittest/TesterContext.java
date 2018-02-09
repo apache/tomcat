@@ -811,6 +811,11 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public ErrorPage findErrorPage(Throwable exceptionType) {
+        return null;
+    }
+
+    @Override
     public ErrorPage[] findErrorPages() {
         return null;
     }

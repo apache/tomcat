@@ -3278,14 +3278,15 @@ public class StandardContext extends ContainerBase
     }
 
 
-    /**
-     * Return the error page entry for the specified Java exception type,
-     * if any; otherwise return <code>null</code>.
-     *
-     * @param exceptionType Exception type to look up
-     */
     @Override
+    @Deprecated
     public ErrorPage findErrorPage(String exceptionType) {
+        return errorPageSupport.find(exceptionType);
+    }
+
+
+    @Override
+    public ErrorPage findErrorPage(Throwable exceptionType) {
         return errorPageSupport.find(exceptionType);
     }
 
