@@ -226,12 +226,8 @@ class Http2AsyncParser extends Http2Parser {
                             readUnknownFrame(streamId, frameType, flags, payloadSize, payload);
                         }
                     }
-                } catch (StreamException e) {
-                    error = e;
                 } catch (Exception e) {
-                    unRead(payload);
-                    failed(e, null);
-                    return;
+                    error = e;
                 }
                 unRead(payload);
             }
