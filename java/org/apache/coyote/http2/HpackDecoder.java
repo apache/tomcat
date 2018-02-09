@@ -280,21 +280,23 @@ public class HpackDecoder {
      * @param index The index from the hpack
      * @return the real index into the array
      */
-    int getRealIndex(int index) {
+    int getRealIndex(int index) throws HpackException {
         //the index is one based, but our table is zero based, hence -1
         //also because of our ring buffer setup the indexes are reversed
         //index = 1 is at position firstSlotPosition + filledSlots
-        return (firstSlotPosition + (filledTableSlots - index)) % headerTable.length;
+        int realIndex = (firstSlotPosition + (filledTableSlots - index)) % headerTable.length;
+        if (realIndex < 0) {
+            throw new HpackException(sm.getString("hpackdecoder.headerTableIndexInvalid",
+                    Integer.valueOf(index), Integer.valueOf(Hpack.STATIC_TABLE_LENGTH),
+                    Integer.valueOf(filledTableSlots)));
+        }
+        return realIndex;
     }
 
     private void addStaticTableEntry(int index) throws HpackException {
         //adds an entry from the static table.
-        //this must be an entry with a value as far as I can determine
         Hpack.HeaderField entry = Hpack.STATIC_TABLE[index];
-        if (entry.value == null) {
-            throw new HpackException();
-        }
-        emitHeader(entry.name, entry.value);
+        emitHeader(entry.name, (entry.value == null) ? "" : entry.value);
     }
 
     private void addEntryToHeaderTable(Hpack.HeaderField entry) {

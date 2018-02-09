@@ -52,6 +52,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Add minor HPACK fixes, based on fixes by Stuart Douglas. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
