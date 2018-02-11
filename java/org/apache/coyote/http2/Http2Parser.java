@@ -32,7 +32,7 @@ class Http2Parser {
     protected static final Log log = LogFactory.getLog(Http2Parser.class);
     protected static final StringManager sm = StringManager.getManager(Http2Parser.class);
 
-    private static final byte[] CLIENT_PREFACE_START =
+    static final byte[] CLIENT_PREFACE_START =
             "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n".getBytes(StandardCharsets.ISO_8859_1);
 
     protected final String connectionId;
