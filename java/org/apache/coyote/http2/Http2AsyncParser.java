@@ -30,8 +30,8 @@ import org.apache.tomcat.util.net.SocketWrapperBase.CompletionState;
 
 class Http2AsyncParser extends Http2Parser {
 
-    protected final SocketWrapperBase<?> socketWrapper;
-    protected final Http2AsyncUpgradeHandler upgradeHandler;
+    private final SocketWrapperBase<?> socketWrapper;
+    private final Http2AsyncUpgradeHandler upgradeHandler;
     private Throwable error = null;
 
     Http2AsyncParser(String connectionId, Input input, Output output, SocketWrapperBase<?> socketWrapper, Http2AsyncUpgradeHandler upgradeHandler) {
@@ -79,7 +79,7 @@ class Http2AsyncParser extends Http2Parser {
         }
     }
 
-    protected void unRead(ByteBuffer buffer) {
+    private void unRead(ByteBuffer buffer) {
         if (buffer != null && buffer.hasRemaining()) {
             socketWrapper.unRead(buffer);
         }
@@ -118,25 +118,31 @@ class Http2AsyncParser extends Http2Parser {
     }
 
 
-    protected class FrameCompletionCheck implements CompletionCheck {
-        final FrameCompletionHandler handler;
-        boolean validated = false;
-        protected FrameCompletionCheck(FrameCompletionHandler handler) {
+    private class FrameCompletionCheck implements CompletionCheck {
+
+        private final FrameCompletionHandler handler;
+        private boolean parsedFrameHeader = false;
+        private boolean validated = false;
+
+        private FrameCompletionCheck(FrameCompletionHandler handler) {
             this.handler = handler;
         }
+
         @Override
         public CompletionHandlerCall callHandler(CompletionState state,
                 ByteBuffer[] buffers, int offset, int length) {
-            // The first buffer should be 9 bytes long
-            ByteBuffer frameHeaderBuffer = buffers[offset];
-            if (frameHeaderBuffer.position() < 9) {
-                return CompletionHandlerCall.CONTINUE;
+            if (!parsedFrameHeader) {
+                // The first buffer should be 9 bytes long
+                ByteBuffer frameHeaderBuffer = buffers[offset];
+                if (frameHeaderBuffer.position() < 9) {
+                    return CompletionHandlerCall.CONTINUE;
+                }
+                parsedFrameHeader = true;
+                handler.payloadSize = ByteUtil.getThreeBytes(frameHeaderBuffer, 0);
+                handler.frameType = FrameType.valueOf(ByteUtil.getOneByte(frameHeaderBuffer, 3));
+                handler.flags = ByteUtil.getOneByte(frameHeaderBuffer, 4);
+                handler.streamId = ByteUtil.get31Bits(frameHeaderBuffer, 5);
             }
-
-            handler.payloadSize = ByteUtil.getThreeBytes(frameHeaderBuffer, 0);
-            handler.frameType = FrameType.valueOf(ByteUtil.getOneByte(frameHeaderBuffer, 3));
-            handler.flags = ByteUtil.getOneByte(frameHeaderBuffer, 4);
-            handler.streamId = ByteUtil.get31Bits(frameHeaderBuffer, 5);
             handler.state = state;
 
             if (!validated) {
@@ -167,7 +173,8 @@ class Http2AsyncParser extends Http2Parser {
 
     }
 
-    protected class FrameCompletionHandler implements CompletionHandler<Long, Void> {
+    private class FrameCompletionHandler implements CompletionHandler<Long, Void> {
+
         private final FrameType expected;
         private final ByteBuffer[] buffers;
         private int payloadSize;
@@ -177,7 +184,7 @@ class Http2AsyncParser extends Http2Parser {
         private boolean streamException = false;
         private CompletionState state = null;
 
-        protected FrameCompletionHandler(FrameType expected, ByteBuffer... buffers) {
+        private FrameCompletionHandler(FrameType expected, ByteBuffer... buffers) {
             this.expected = expected;
             this.buffers = buffers;
         }
@@ -240,6 +247,7 @@ class Http2AsyncParser extends Http2Parser {
 
         @Override
         public void failed(Throwable e, Void attachment) {
+            // Always a fatal IO error
             error = e;
             if (state == null || state == CompletionState.DONE) {
                 upgradeHandler.upgradeDispatch(SocketEvent.ERROR);

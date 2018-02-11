@@ -32,19 +32,19 @@ class Http2Parser {
     protected static final Log log = LogFactory.getLog(Http2Parser.class);
     protected static final StringManager sm = StringManager.getManager(Http2Parser.class);
 
-    static final byte[] CLIENT_PREFACE_START =
+    private static final byte[] CLIENT_PREFACE_START =
             "PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n".getBytes(StandardCharsets.ISO_8859_1);
 
     protected final String connectionId;
     protected final Input input;
-    protected final Output output;
-    protected final byte[] frameHeaderBuffer = new byte[9];
+    private final Output output;
+    private final byte[] frameHeaderBuffer = new byte[9];
 
-    protected volatile HpackDecoder hpackDecoder;
-    protected volatile ByteBuffer headerReadBuffer =
+    private volatile HpackDecoder hpackDecoder;
+    private volatile ByteBuffer headerReadBuffer =
             ByteBuffer.allocate(Constants.DEFAULT_HEADER_READ_BUFFER_SIZE);
-    protected volatile int headersCurrentStream = -1;
-    protected volatile boolean headersEndStream = false;
+    private volatile int headersCurrentStream = -1;
+    private volatile boolean headersEndStream = false;
 
     Http2Parser(String connectionId, Input input, Output output) {
         this.connectionId = connectionId;
