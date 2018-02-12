@@ -49,7 +49,7 @@ class Http2AsyncParser extends Http2Parser {
             return super.readFrame(block, expected);
         }
         handleAsyncException();
-        // TODO: examine if it could be possible to reuse byte buffers or loop over frame readings (= less unRead abuse)
+        // TODO: examine if it could be possible to reuse byte buffers
         ByteBuffer header = ByteBuffer.allocate(9);
         ByteBuffer framePaylod = ByteBuffer.allocate(input.getMaxFrameSize());
         FrameCompletionHandler handler = new FrameCompletionHandler(expected, header, framePaylod);
@@ -195,44 +195,71 @@ class Http2AsyncParser extends Http2Parser {
                 ByteBuffer payload = buffers[1];
                 payload.flip();
                 try {
-                    if (streamException) {
-                        swallow(streamId, payloadSize, false, payload);
-                    } else {
-                        switch (frameType) {
-                        case DATA:
-                            readDataFrame(streamId, flags, payloadSize, payload);
-                            break;
-                        case HEADERS:
-                            readHeadersFrame(streamId, flags, payloadSize, payload);
-                            break;
-                        case PRIORITY:
-                            readPriorityFrame(streamId, payload);
-                            break;
-                        case RST:
-                            readRstFrame(streamId, payload);
-                            break;
-                        case SETTINGS:
-                            readSettingsFrame(flags, payloadSize, payload);
-                            break;
-                        case PUSH_PROMISE:
-                            readPushPromiseFrame(streamId, payload);
-                            break;
-                        case PING:
-                            readPingFrame(flags, payload);
-                            break;
-                        case GOAWAY:
-                            readGoawayFrame(payloadSize, payload);
-                            break;
-                        case WINDOW_UPDATE:
-                            readWindowUpdateFrame(streamId, payload);
-                            break;
-                        case CONTINUATION:
-                            readContinuationFrame(streamId, flags, payloadSize, payload);
-                            break;
-                        case UNKNOWN:
-                            readUnknownFrame(streamId, frameType, flags, payloadSize, payload);
+                    boolean continueParsing;
+                    do {
+                        continueParsing = false;
+                        if (streamException) {
+                            swallow(streamId, payloadSize, false, payload);
+                        } else {
+                            switch (frameType) {
+                            case DATA:
+                                readDataFrame(streamId, flags, payloadSize, payload);
+                                break;
+                            case HEADERS:
+                                readHeadersFrame(streamId, flags, payloadSize, payload);
+                                break;
+                            case PRIORITY:
+                                readPriorityFrame(streamId, payload);
+                                break;
+                            case RST:
+                                readRstFrame(streamId, payload);
+                                break;
+                            case SETTINGS:
+                                readSettingsFrame(flags, payloadSize, payload);
+                                break;
+                            case PUSH_PROMISE:
+                                readPushPromiseFrame(streamId, payload);
+                                break;
+                            case PING:
+                                readPingFrame(flags, payload);
+                                break;
+                            case GOAWAY:
+                                readGoawayFrame(payloadSize, payload);
+                                break;
+                            case WINDOW_UPDATE:
+                                readWindowUpdateFrame(streamId, payload);
+                                break;
+                            case CONTINUATION:
+                                readContinuationFrame(streamId, flags, payloadSize, payload);
+                                break;
+                            case UNKNOWN:
+                                readUnknownFrame(streamId, frameType, flags, payloadSize, payload);
+                            }
                         }
-                    }
+                        // See if there is a new 9 byte header and continue parsing if possible
+                        if (payload.remaining() >= 9) {
+                            int position = payload.position();
+                            payloadSize = ByteUtil.getThreeBytes(payload, position);
+                            frameType = FrameType.valueOf(ByteUtil.getOneByte(payload, position + 3));
+                            flags = ByteUtil.getOneByte(payload, position + 4);
+                            streamId = ByteUtil.get31Bits(payload, position + 5);
+                            streamException = false;
+                            if (payload.remaining() - 9 >= payloadSize) {
+                                continueParsing = true;
+                                // Now go over frame header
+                                payload.position(payload.position() + 9);
+                                try {
+                                    validateFrame(null, frameType, streamId, flags, payloadSize);
+                                } catch (StreamException e) {
+                                    error = e;
+                                    streamException = true;
+                                } catch (Http2Exception e) {
+                                    error = e;
+                                    continueParsing = false;
+                                }
+                            }
+                        }
+                    } while (continueParsing);
                 } catch (Exception e) {
                     error = e;
                 }
