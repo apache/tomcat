@@ -527,23 +527,31 @@ class Http2Parser {
         if (len == 0) {
             return;
         }
-        int read = 0;
-        byte[] buffer = new byte[1024];
-        while (read < len) {
-            int thisTime = Math.min(buffer.length, len - read);
-            input.fill(true, buffer, 0, thisTime);
-            if (mustBeZero) {
-                // Validate the padding is zero since receiving non-zero padding
-                // is a strong indication of either a faulty client or a server
-                // side bug.
-                for (int i = 0; i < thisTime; i++) {
-                    if (buffer[i] != 0) {
-                        throw new ConnectionException(sm.getString("http2Parser.nonZeroPadding",
-                                connectionId, Integer.toString(streamId)), Http2Error.PROTOCOL_ERROR);
+        if (!mustBeZero && byteBuffer != null) {
+            byteBuffer.position(byteBuffer.position() + len);
+        } else {
+            int read = 0;
+            byte[] buffer = new byte[1024];
+            while (read < len) {
+                int thisTime = Math.min(buffer.length, len - read);
+                if (byteBuffer == null) {
+                    input.fill(true, buffer, 0, thisTime);
+                } else {
+                    byteBuffer.get(buffer, 0, thisTime);
+                }
+                if (mustBeZero) {
+                    // Validate the padding is zero since receiving non-zero padding
+                    // is a strong indication of either a faulty client or a server
+                    // side bug.
+                    for (int i = 0; i < thisTime; i++) {
+                        if (buffer[i] != 0) {
+                            throw new ConnectionException(sm.getString("http2Parser.nonZeroPadding",
+                                    connectionId, Integer.toString(streamId)), Http2Error.PROTOCOL_ERROR);
+                        }
                     }
                 }
+                read += thisTime;
             }
-            read += thisTime;
         }
     }
 

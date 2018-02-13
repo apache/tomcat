@@ -88,39 +88,6 @@ class Http2AsyncParser extends Http2Parser {
         }
     }
 
-    @Override
-    protected void swallow(int streamId, int len, boolean mustBeZero, ByteBuffer buffer)
-            throws IOException, ConnectionException {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("http2Parser.swallow.debug", connectionId,
-                    Integer.toString(streamId), Integer.toString(len)));
-        }
-        if (len == 0) {
-            return;
-        }
-        if (!mustBeZero) {
-            buffer.position(buffer.position() + len);
-        } else {
-            int read = 0;
-            byte[] buf = new byte[1024];
-            while (read < len) {
-                int thisTime = Math.min(buf.length, len - read);
-                buffer.get(buf, 0, thisTime);
-                // Validate the padding is zero since receiving non-zero padding
-                // is a strong indication of either a faulty client or a server
-                // side bug.
-                for (int i = 0; i < thisTime; i++) {
-                    if (buf[i] != 0) {
-                        throw new ConnectionException(sm.getString("http2Parser.nonZeroPadding",
-                                connectionId, Integer.toString(streamId)), Http2Error.PROTOCOL_ERROR);
-                    }
-                }
-                read += thisTime;
-            }
-        }
-    }
-
-
     private class FrameCompletionCheck implements CompletionCheck {
 
         private final FrameCompletionHandler handler;
