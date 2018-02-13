@@ -50,6 +50,7 @@ class Http2AsyncParser extends Http2Parser {
     protected boolean readFrame(boolean block, FrameType expected)
             throws IOException, Http2Exception {
         if (block) {
+            // Only used when reading the connection preface
             return super.readFrame(block, expected);
         }
         handleAsyncException();
