@@ -456,6 +456,11 @@ public abstract class AbstractEndpoint<S,U> {
     public void setPort(int port ) { this.port=port; }
 
 
+    private int portOffset = 0;
+    public int getPortOffset() { return portOffset; }
+    public void setPortOffset(int portOffset) { this.portOffset = portOffset; }
+    public int getPortWithOffset() { return port + portOffset; }
+
     public final int getLocalPort() {
         try {
             InetSocketAddress localAddress = getLocalAddress();
@@ -922,7 +927,8 @@ public abstract class AbstractEndpoint<S,U> {
         } catch(Throwable t) {
             ExceptionUtils.handleThrowable(t);
             if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("endpoint.debug.unlock.fail", "" + getPort()), t);
+                getLog().debug(sm.getString("endpoint.debug.unlock.fail", "" + getPort()+"-offset-" +
+                  getPortWithOffset()), t);
             }
         }
     }
@@ -1244,4 +1250,3 @@ public abstract class AbstractEndpoint<S,U> {
         closeSocket(socket);
     }
 }
-

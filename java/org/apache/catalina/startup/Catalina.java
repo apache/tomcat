@@ -345,6 +345,8 @@ public class Catalina {
                             "addConnector",
                             "org.apache.catalina.connector.Connector");
 
+        digester.addRule("Server/Service/Connector", new AddPortOffsetRule());
+        
         digester.addObjectCreate("Server/Service/Connector/SSLHostConfig",
                                  "org.apache.tomcat.util.net.SSLHostConfig");
         digester.addSetProperties("Server/Service/Connector/SSLHostConfig");
@@ -494,8 +496,9 @@ public class Catalina {
 
         // Stop the existing server
         s = getServer();
+        String addPortOffset = s.getPortOffset() > 0 ? "-offset-"+s.getPortOffset() : "";
         if (s.getPort()>0) {
-            try (Socket socket = new Socket(s.getAddress(), s.getPort());
+            try (Socket socket = new Socket(s.getAddress(), s.getPortWithOffset());
                     OutputStream stream = socket.getOutputStream()) {
                 String shutdown = s.getShutdown();
                 for (int i = 0; i < shutdown.length(); i++) {
@@ -505,7 +508,7 @@ public class Catalina {
             } catch (ConnectException ce) {
                 log.error(sm.getString("catalina.stopServer.connectException",
                                        s.getAddress(),
-                                       String.valueOf(s.getPort())));
+                                       String.valueOf(s.getPort())+addPortOffset));
                 log.error("Catalina.stop: ", ce);
                 System.exit(1);
             } catch (IOException e) {

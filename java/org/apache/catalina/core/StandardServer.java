@@ -113,6 +113,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     private int port = 8005;
 
+    private int portOffset = 0;
+
     /**
      * The address on which we wait for shutdown commands.
      */
@@ -417,12 +419,14 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         }
 
         // Set up a server socket to wait on
+        String addOffsetToDebugMessage = portOffset > 0 ? "-offset-"+portOffset : "";
         try {
-            awaitSocket = new ServerSocket(port, 1,
+            awaitSocket = new ServerSocket(getPortWithOffset(), 1,
                     InetAddress.getByName(address));
         } catch (IOException e) {
             log.error("StandardServer.await: create[" + address
                                + ":" + port
+                               + addOffsetToDebugMessage
                                + "]: ", e);
             return;
         }
@@ -928,4 +932,19 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         return "type=Server";
     }
 
+
+    public int getPortOffset() {
+        return portOffset;
+    }
+
+    public void setPortOffset(int portOffset) {
+        // Values < 0 aren't valid
+        if(portOffset > 0) {
+            this.portOffset = portOffset;
+        }
+    }
+
+    public int getPortWithOffset() {
+        return this.port + this.portOffset;
+    }
 }

@@ -142,7 +142,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
         serverSock = AsynchronousServerSocketChannel.open(threadGroup);
         socketProperties.setProperties(serverSock);
-        InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
+        InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPortWithOffset()):new
+          InetSocketAddress(getPortWithOffset()));
         serverSock.bind(addr,getAcceptCount());
 
         // Initialize thread count defaults for acceptor, poller

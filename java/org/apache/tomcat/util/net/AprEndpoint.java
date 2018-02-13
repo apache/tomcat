@@ -314,7 +314,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
          }
 
         long inetAddress = Address.info(addressStr, family,
-                getPort(), 0, rootPool);
+                getPortWithOffset(), 0, rootPool);
         // Create the APR server socket
         serverSock = Socket.create(Address.getInfo(inetAddress).family,
                 Socket.SOCK_STREAM,

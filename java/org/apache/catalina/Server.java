@@ -84,6 +84,33 @@ public interface Server extends Lifecycle {
      */
     public void setPort(int port);
 
+    /**
+     * Get the number that offsets the port used for shutdown commands.
+     * For example, if port is 8005, and portOffset is 1000,
+     * the server listens at 9005.
+     *
+     * @return the port offset
+     */
+    public int getPortOffset();
+
+    /**
+     * Set the number that offsets the server port used for shutdown commands.
+     * For example, if port is 8005, and you set portOffset to 1000,
+     * connector listens at 9005.
+     *
+     * @param portOffset sets the port offset
+     */
+    public void setPortOffset(int portOffset);
+
+    /**
+     * Get the actual port on which server is listening for the shutdown commands.
+     * If you do not set port offset, port is returned. If you set
+     * port offset, port offset + port is returned.
+     *
+     * @return the port with offset
+     */
+    public int getPortWithOffset();
+
 
     /**
      * @return the address on which we listen to for shutdown commands.

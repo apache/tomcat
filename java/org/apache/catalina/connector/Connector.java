@@ -150,6 +150,10 @@ public class Connector extends LifecycleMBeanBase  {
      */
     protected int port = -1;
 
+    /**
+    * The number that offsets the port. If set, we listen at port + portOffset.
+    */
+    protected int portOffset = 0;
 
     /**
      * The server name to which we should pretend requests to this Connector
@@ -1019,6 +1023,10 @@ public class Connector extends LifecycleMBeanBase  {
             sb.append("auto-");
             sb.append(getProperty("nameIndex"));
         }
+        if(this.portOffset > 0) {
+            sb.append("-offset-");
+            sb.append(this.portOffset);
+        }
         sb.append(']');
         return sb.toString();
     }
@@ -1041,4 +1049,16 @@ public class Connector extends LifecycleMBeanBase  {
         return createObjectNameKeyProperties("Connector");
     }
 
+    public int getPortOffset() {
+        return this.portOffset;
+    }
+
+    public void setPortOffset(int portOffset) {
+        this.portOffset = portOffset;
+        setProperty("portOffset", String.valueOf(portOffset));
+    }
+
+    public int getPortWithOffset() {
+        return this.port + this.portOffset;
+    }
 }

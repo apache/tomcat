@@ -352,6 +352,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         } else {
             name.append(port);
         }
+        int portOffset = getPortOffset();
+        if(portOffset > 0) {
+            name.append("-offset-");
+            name.append(portOffset);
+        }
         return name.toString();
     }
 
@@ -496,6 +501,11 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
             name.append("auto-");
             name.append(getNameIndex());
         }
+        int offset = getPortOffset();
+        if(offset > 0) {
+            name.append(",port offset=");
+            name.append(offset);
+        }
         InetAddress address = getAddress();
         if (address != null) {
             name.append(",address=");
@@ -630,6 +640,17 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         }
     }
 
+    public int getPortOffset() {
+        return endpoint.getPortOffset();
+    }
+
+    public void setPortOffset(int portOffset) {
+        endpoint.setPortOffset(portOffset);
+    }
+
+    public int getPortWithOffset() {
+        return endpoint.getPortWithOffset();
+    }
 
     @Override
     public void closeServerSocketGraceful() {
