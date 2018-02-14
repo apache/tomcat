@@ -68,11 +68,7 @@ public class ErrorPageSupport {
      *
      * @return The ErrorPage for the named exception type, or {@code null} if
      *         none is configured
-     *
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     *             Use {@link #find(Throwable)} instead.
      */
-    @Deprecated
     public ErrorPage find(String exceptionType) {
         return exceptionPages.get(exceptionType);
     }

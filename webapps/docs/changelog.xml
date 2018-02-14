@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.78 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        <bug>41007</bug>: Add the ability to specify static HTML responses for
+        specific error codes and/or exception types with the
+        <code>ErrorReportValve</code>. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
