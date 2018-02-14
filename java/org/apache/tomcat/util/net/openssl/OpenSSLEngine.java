@@ -133,11 +133,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private long ssl;
     private long networkBIO;
 
-    /**
-     * 0 - not accepted, 1 - accepted implicitly via wrap()/unwrap(), 2 -
-     * accepted explicitly via beginHandshake() call
-     */
-    private int accepted;
+    private enum Accepted { NOT, IMPLICIT, EXPLICIT }
+    private Accepted accepted = Accepted.NOT;
     private boolean handshakeFinished;
     private int currentHandshake;
     private boolean receivedShutdown;
@@ -416,7 +413,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
 
         // Prepare OpenSSL to work in server mode and receive handshake
-        if (accepted == 0) {
+        if (accepted == Accepted.NOT) {
             beginHandshakeImplicitly();
         }
 
@@ -528,7 +525,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
 
         // Prepare OpenSSL to work in server mode and receive handshake
-        if (accepted == 0) {
+        if (accepted == Accepted.NOT) {
             beginHandshakeImplicitly();
         }
 
@@ -659,7 +656,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         shutdown();
 
-        if (accepted != 0 && !receivedShutdown) {
+        if (accepted != Accepted.NOT && !receivedShutdown) {
             throw new SSLException(sm.getString("engine.inboundClose"));
         }
     }
@@ -678,7 +675,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         isOutboundDone = true;
         engineClosed = true;
 
-        if (accepted != 0 && !destroyed) {
+        if (accepted != Accepted.NOT && !destroyed) {
             int mode = SSL.getShutdown(ssl);
             if ((mode & SSL.SSL_SENT_SHUTDOWN) != SSL.SSL_SENT_SHUTDOWN) {
                 SSL.shutdownSSL(ssl);
@@ -861,30 +858,28 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             throw new SSLException(sm.getString("engine.engineClosed"));
         }
         switch (accepted) {
-            case 0:
-                handshake();
-                accepted = 2;
-                break;
-            case 1:
-                // A user did not start handshake by calling this method by him/herself,
-                // but handshake has been started already by wrap() or unwrap() implicitly.
-                // Because it's the user's first time to call this method, it is unfair to
-                // raise an exception.  From the user's standpoint, he or she never asked
-                // for renegotiation.
+        case NOT:
+            handshake();
+            accepted = Accepted.EXPLICIT;
+            break;
+        case IMPLICIT:
+            // A user did not start handshake by calling this method by him/herself,
+            // but handshake has been started already by wrap() or unwrap() implicitly.
+            // Because it's the user's first time to call this method, it is unfair to
+            // raise an exception.  From the user's standpoint, he or she never asked
+            // for renegotiation.
 
-                accepted = 2; // Next time this method is invoked by the user, we should raise an exception.
-                break;
-            case 2:
-                renegotiate();
-                break;
-            default:
-                throw new Error();
+            accepted = Accepted.EXPLICIT; // Next time this method is invoked by the user, we should raise an exception.
+            break;
+        case EXPLICIT:
+            renegotiate();
+            break;
         }
     }
 
     private void beginHandshakeImplicitly() throws SSLException {
         handshake();
-        accepted = 1;
+        accepted = Accepted.IMPLICIT;
     }
 
     private void handshake() throws SSLException {
@@ -947,7 +942,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public synchronized SSLEngineResult.HandshakeStatus getHandshakeStatus() {
-        if (accepted == 0 || destroyed) {
+        if (accepted == Accepted.NOT || destroyed) {
             return SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING;
         }
 
