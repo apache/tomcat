@@ -65,6 +65,11 @@
       <fix>
         Add minor HPACK fixes, based on fixes by Stuart Douglas. (remm)
       </fix>
+      <fix>
+        <bug>61751</bug>: Follow up fix so that OpenSSL engine returns
+        underflow when unwrapping if no bytes were produced and the input is
+        empty. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
