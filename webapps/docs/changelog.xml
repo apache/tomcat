@@ -75,6 +75,9 @@
         underflow when unwrapping if no bytes were produced and the input is
         empty. (remm)
       </fix>
+      <fix>
+        Minor OpenSSL engine cleanups. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
