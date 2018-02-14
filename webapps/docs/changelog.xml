@@ -55,6 +55,11 @@
         application provided error handling and/or the container provided error
         handling (<code>ErrorReportValve</code>) as appropriate. (markt)
       </add>
+      <add>
+        <bug>41007</bug>: Add the ability to specify static HTML responses for
+        specific error codes and/or exception types with the
+        <code>ErrorReportValve</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
