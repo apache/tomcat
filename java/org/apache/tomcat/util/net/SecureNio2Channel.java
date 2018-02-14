@@ -726,7 +726,6 @@ public class SecureNio2Channel extends Nio2Channel  {
             } else {
                 unwrapBeforeRead = false;
             }
-            // FIXME: 61751 implies that this algorithm can still return 0 in some cases
             return Integer.valueOf(read);
         }
     }
