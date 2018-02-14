@@ -1146,26 +1146,8 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             Future<Integer> integer = null;
             if (block) {
                 try {
-                    // When reading from an encrypted channel, a read of bytes
-                    // from the network might result in zero application bytes
-                    // after unwrapping.
-                    // Since this is a blocking read, loop until application
-                    // bytes are available.
-                    // Since we are looping, ensure the timeout is updated for
-                    // each loop.
-                    long start = System.currentTimeMillis();
-                    long timeout = getNio2ReadTimeout();
-                    while (true) {
-                        integer = getSocket().read(to);
-                        nRead = integer.get(timeout, TimeUnit.MILLISECONDS).intValue();
-                        if (nRead != 0) {
-                            break;
-                        }
-                        timeout = timeout - (System.currentTimeMillis() - start);
-                        if (timeout < 0) {
-                            throw new TimeoutException();
-                        }
-                    }
+                    integer = getSocket().read(to);
+                    nRead = integer.get(getNio2ReadTimeout(), TimeUnit.MILLISECONDS).intValue();
                 } catch (ExecutionException e) {
                     if (e.getCause() instanceof IOException) {
                         throw (IOException) e.getCause();
