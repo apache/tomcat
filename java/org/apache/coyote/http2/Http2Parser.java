@@ -337,6 +337,16 @@ class Http2Parser {
     }
 
 
+    /**
+     * This default server side implementation always throws an exception. If
+     * re-used for client side parsing, this method should be overridden with an
+     * appropriate implementation.
+     *
+     * @param streamId The pushed stream
+     * @param buffer   The payload, if available
+     *
+     * @throws Http2Exception
+     */
     protected void readPushPromiseFrame(int streamId, ByteBuffer buffer) throws Http2Exception {
         throw new ConnectionException(sm.getString("http2Parser.processFramePushPromise",
                 connectionId, Integer.valueOf(streamId)), Http2Error.PROTOCOL_ERROR);
