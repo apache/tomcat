@@ -621,8 +621,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             closeOutbound();
             closeInbound();
         }
-        if (bytesProduced == 0 && written == 0) {
-            return new SSLEngineResult(SSLEngineResult.Status.BUFFER_UNDERFLOW, getHandshakeStatus(), 0, 0);
+        if (bytesProduced == 0 && (written == 0 || (written > 0 && !src.hasRemaining() && handshakeFinished))) {
+            return new SSLEngineResult(SSLEngineResult.Status.BUFFER_UNDERFLOW, getHandshakeStatus(), written, 0);
         } else {
             return new SSLEngineResult(getEngineStatus(), getHandshakeStatus(), written, bytesProduced);
         }
