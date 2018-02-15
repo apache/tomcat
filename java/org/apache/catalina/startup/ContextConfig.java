@@ -343,8 +343,7 @@ public class ContextConfig implements LifecycleListener {
 
         LoginConfig loginConfig = context.getLoginConfig();
         if (loginConfig == null) {
-            // Security constraints present. Need an authenticator to
-            // support them.
+            // Need an authenticator to support HttpServletRequest.login()
             loginConfig = DUMMY_LOGIN_CONFIG;
             context.setLoginConfig(loginConfig);
         }
