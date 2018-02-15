@@ -186,9 +186,10 @@ public class CompressionConfig {
 
         MimeHeaders responseHeaders = response.getMimeHeaders();
 
-        // Check if content is not already gzipped
+        // Check if content is not already compressed
         MessageBytes contentEncodingMB = responseHeaders.getValue("Content-Encoding");
-        if ((contentEncodingMB != null) && (contentEncodingMB.indexOf("gzip") != -1)) {
+        if ((contentEncodingMB != null) && (contentEncodingMB.indexOf("gzip") != -1) &&
+                    (contentEncodingMB.indexOf("br") != -1)) {
             return false;
         }
 
