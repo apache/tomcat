@@ -188,8 +188,9 @@ public class CompressionConfig {
 
         // Check if content is not already compressed
         MessageBytes contentEncodingMB = responseHeaders.getValue("Content-Encoding");
-        if ((contentEncodingMB != null) && (contentEncodingMB.indexOf("gzip") != -1) &&
-                    (contentEncodingMB.indexOf("br") != -1)) {
+        if (contentEncodingMB != null &&
+                (contentEncodingMB.indexOf("gzip") != -1 ||
+                        contentEncodingMB.indexOf("br") != -1)) {
             return false;
         }
 

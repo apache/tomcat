@@ -62,7 +62,8 @@
       </add>
       <fix>
         Prevent Tomcat from applying gzip compression to content that is already
-        compressed with brotli compression. Patch provided by burka. (markt)
+        compressed with brotli compression. Based on a patch provided by burka.
+        (markt)
       </fix>
     </changelog>
   </subsection>
