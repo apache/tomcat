@@ -82,6 +82,10 @@
       <fix>
         Minor OpenSSL engine cleanups. (remm)
       </fix>
+      <fix>
+        NIO SSL handshake should throw an exception on overflow status, like
+        NIO2 SSL. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

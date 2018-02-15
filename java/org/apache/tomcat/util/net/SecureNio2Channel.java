@@ -320,7 +320,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                         }
                         return 1;
                     } else {
-                        throw new IOException(sm.getString("channel.nio.ssl.unexpectedStatusDuringUnwrap", handshakeStatus));
+                        throw new IOException(sm.getString("channel.nio.ssl.unexpectedStatusDuringUnwrap", handshake.getStatus()));
                     }
                     break;
                 }
