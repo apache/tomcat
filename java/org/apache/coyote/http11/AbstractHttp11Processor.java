@@ -579,12 +579,11 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
      */
     private boolean isCompressible() {
 
-        // Check if content is not already gzipped
-        MessageBytes contentEncodingMB =
-            response.getMimeHeaders().getValue("Content-Encoding");
+        // Check if content is not already compressed
+        MessageBytes contentEncodingMB = response.getMimeHeaders().getValue("Content-Encoding");
 
-        if ((contentEncodingMB != null)
-            && (contentEncodingMB.indexOf("gzip") != -1)) {
+        if ((contentEncodingMB != null) && (contentEncodingMB.indexOf("gzip") != -1) &&
+                (contentEncodingMB.indexOf("br") != -1)) {
             return false;
         }
 

@@ -58,6 +58,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.86 (violetagg)">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Prevent Tomcat from applying gzip compression to content that is already
+        compressed with brotli compression. Patch provided by burka. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.85 (violetagg)" rtext="released 2018-02-13">
   <subsection name="Catalina">
