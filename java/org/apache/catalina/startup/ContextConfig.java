@@ -342,19 +342,11 @@ public class ContextConfig implements LifecycleListener {
     protected void authenticatorConfig() {
 
         LoginConfig loginConfig = context.getLoginConfig();
-
-        SecurityConstraint constraints[] = context.findConstraints();
-        if ((constraints == null || constraints.length ==0) &&
-                !context.getPreemptiveAuthentication())  {
-            // No need for an authenticator
-            return;
-        } else {
-            if (loginConfig == null) {
-                // Security constraints present. Need an authenticator to
-                // support them.
-                loginConfig = DUMMY_LOGIN_CONFIG;
-                context.setLoginConfig(loginConfig);
-            }
+        if (loginConfig == null) {
+            // Security constraints present. Need an authenticator to
+            // support them.
+            loginConfig = DUMMY_LOGIN_CONFIG;
+            context.setLoginConfig(loginConfig);
         }
 
         // Has an authenticator been configured already?
