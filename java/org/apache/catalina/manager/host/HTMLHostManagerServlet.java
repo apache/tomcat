@@ -184,9 +184,24 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
      * @param request The Servlet request
      * @param response The Servlet response
      */
-    protected void logout(HttpServletRequest request, HttpServletResponse response) {
+    protected void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setHeader("WWW-Authenticate","Basic realm=\"Login required\"");
         request.getSession().invalidate();
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+        String javascriptToBeExecuted = "<script>" +
+          "var request = new XMLHttpRequest(); " +
+          "request.open(" +
+          "    \"GET\", \"" +
+          request.getRequestURL()+
+          "\",     true, " +
+          "    \"_\", \"_\"); " +
+          "request.setRequestHeader(" +
+          "    \"Authorization\"," +
+          "    \"Basic _:_\");" +
+          "request.send();" +
+          "</script>";
+        response.getWriter().print(javascriptToBeExecuted);
     }
 
 
