@@ -189,6 +189,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         request.getSession().invalidate();
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
+        /* Experiments with Javascript
         String javascriptToBeExecuted = "<script>" +
           "var request = new XMLHttpRequest(); " +
           "request.open(" +
@@ -202,6 +203,8 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
           "request.send();" +
           "</script>";
         response.getWriter().print(javascriptToBeExecuted);
+
+        */
     }
 
 
