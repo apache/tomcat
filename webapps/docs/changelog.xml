@@ -70,6 +70,11 @@
         NonLoginAuthenticator has to be set for it to work (if no login method
         is specified). (remm)
       </fix>
+      <fix>
+        <bug>62117</bug>: Improve error message in <code>catalina.sh</code> when
+        calling <code>kill -0 &lt;pid&gt;</code> fails. Based on a suggestion
+        from Mark Morschhaeuser. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
