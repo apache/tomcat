@@ -751,6 +751,11 @@
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- Reference.equals() implementation correctly handles sub-classes -->
+    <Class name="org.apache.naming.ServiceRef" />
+    <Pattern code="EQ_DOESNT_OVERRIDE_EQUALS" />
+  </Match>
+  <Match>
     <!-- Simpler to catch Exception than to create dummy implementations of the
          necessary exception hierarchy -->
     <Class name="org.apache.naming.factory.SendMailFactory$1" />
