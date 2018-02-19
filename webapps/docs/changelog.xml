@@ -75,6 +75,11 @@
         calling <code>kill -0 &lt;pid&gt;</code> fails. Based on a suggestion
         from Mark Morschhaeuser. (markt)
       </fix>
+      <fix>
+        <bug>62218</bug>: Correctly create a JNDI <code>ServiceRef</code> using
+        the specified interface rather than the concrete type. Based on a
+        suggestion by Ángel Álvarez Páscua. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
