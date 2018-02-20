@@ -79,7 +79,7 @@
         from Mark Morschhaeuser. (markt)
       </fix>
       <fix>
-        <bug>62218</bug>: Correctly create a JNDI <code>ServiceRef</code> using
+        <bug>62118</bug>: Correctly create a JNDI <code>ServiceRef</code> using
         the specified interface rather than the concrete type. Based on a
         suggestion by Ángel Álvarez Páscua. (markt)
       </fix>
