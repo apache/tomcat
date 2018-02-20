@@ -84,7 +84,7 @@ class Http2AsyncParser extends Http2Parser {
     }
 
     private void unRead(ByteBuffer buffer) {
-        if (buffer != null && buffer.hasRemaining()) {
+        if (buffer.hasRemaining()) {
             socketWrapper.unRead(buffer);
         }
     }
