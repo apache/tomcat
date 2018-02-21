@@ -233,7 +233,7 @@ public class RequestDumperFilter extends GenericFilter {
         }
 
         if (hResponse == null) {
-            doLog("        remoteUser", NON_HTTP_RES_MSG);
+            doLog("            status", NON_HTTP_RES_MSG);
         } else {
             doLog("            status",
                     Integer.toString(hResponse.getStatus()));

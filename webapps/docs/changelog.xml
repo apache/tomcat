@@ -83,6 +83,10 @@
         the specified interface rather than the concrete type. Based on a
         suggestion by Ángel Álvarez Páscua. (markt)
       </fix>
+      <fix>
+        Fix for <code>RequestDumperFilter</code> log attribute. Patch provided
+        by Kirill Romanov via Github. (violetagg)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
