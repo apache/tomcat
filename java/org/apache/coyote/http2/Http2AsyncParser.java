@@ -83,12 +83,6 @@ class Http2AsyncParser extends Http2Parser {
         }
     }
 
-    private void unRead(ByteBuffer buffer) {
-        if (buffer.hasRemaining()) {
-            socketWrapper.unRead(buffer);
-        }
-    }
-
     private class FrameCompletionCheck implements CompletionCheck {
 
         private final FrameCompletionHandler handler;
@@ -102,9 +96,17 @@ class Http2AsyncParser extends Http2Parser {
         @Override
         public CompletionHandlerCall callHandler(CompletionState state,
                 ByteBuffer[] buffers, int offset, int length) {
+            if (length != 2) {
+                try {
+                    throw new IllegalArgumentException();
+                } catch (IllegalArgumentException e) {
+                    error = e;
+                    return CompletionHandlerCall.DONE;
+                }
+            }
             if (!parsedFrameHeader) {
                 // The first buffer should be 9 bytes long
-                ByteBuffer frameHeaderBuffer = buffers[offset];
+                ByteBuffer frameHeaderBuffer = buffers[0];
                 if (frameHeaderBuffer.position() < 9) {
                     return CompletionHandlerCall.CONTINUE;
                 }
@@ -130,7 +132,7 @@ class Http2AsyncParser extends Http2Parser {
                 }
             }
 
-            if (buffers[offset + 1].position() < handler.payloadSize) {
+            if (buffers[1].position() < handler.payloadSize) {
                 try {
                     upgradeHandler.checkPauseState();
                 } catch (IOException e) {
@@ -234,7 +236,9 @@ class Http2AsyncParser extends Http2Parser {
                 } catch (Exception e) {
                     error = e;
                 }
-                unRead(payload);
+                if (payload.hasRemaining()) {
+                    socketWrapper.unRead(payload);
+                }
             }
             if (state == CompletionState.DONE) {
                 // The call was not completed inline, so must start reading new frames
