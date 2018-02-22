@@ -2066,16 +2066,18 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             stubField.setAccessible(true);
 
             // Clear the objTable map
-            Class<?> objectTableClass =
-                Class.forName("sun.rmi.transport.ObjectTable");
+            Class<?> objectTableClass = Class.forName("sun.rmi.transport.ObjectTable");
             Field objTableField = objectTableClass.getDeclaredField("objTable");
             objTableField.setAccessible(true);
             Object objTable = objTableField.get(null);
             if (objTable == null) {
                 return;
             }
+            Field tableLockField = objectTableClass.getDeclaredField("tableLock");
+            tableLockField.setAccessible(true);
+            Object tableLock = tableLockField.get(null);
 
-            synchronized (objTable) {
+            synchronized (tableLock) {
                 // Iterate over the values in the table
                 if (objTable instanceof Map<?,?>) {
                     Iterator<?> iter = ((Map<?,?>) objTable).values().iterator();

@@ -87,6 +87,11 @@
         Fix for <code>RequestDumperFilter</code> log attribute. Patch provided
         by Kirill Romanov via Github. (violetagg)
       </fix>
+      <fix>
+        <bug>62123</bug>: Avoid <code>ConcurrentModificationException</code>
+        when attempting to clean up application triggered RMI memory leaks on
+        web application stop. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
