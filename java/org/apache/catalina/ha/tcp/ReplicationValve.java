@@ -93,13 +93,21 @@ public class ReplicationValve
      */
     protected boolean doProcessingStats = false;
 
-    protected long totalRequestTime = 0;
-    protected long totalSendTime = 0;
-    protected long nrOfRequests = 0;
-    protected long lastSendTime = 0;
-    protected long nrOfFilterRequests = 0;
-    protected long nrOfSendRequests = 0;
-    protected long nrOfCrossContextSendRequests = 0;
+    /*
+     * Note: The statistics are volatile to ensure the concurrent updates do not
+     *       corrupt them but it is still possible that:
+     *       - some updates may be lost;
+     *       - the individual statistics may not be consistent which each other.
+     *       This is a deliberate design choice to reduce the requirement for
+     *       synchronization.
+     */
+    protected volatile long totalRequestTime = 0;
+    protected volatile long totalSendTime = 0;
+    protected volatile long nrOfRequests = 0;
+    protected volatile long lastSendTime = 0;
+    protected volatile long nrOfFilterRequests = 0;
+    protected volatile long nrOfSendRequests = 0;
+    protected volatile long nrOfCrossContextSendRequests = 0;
 
     /**
      * must primary change indicator set
@@ -354,11 +362,11 @@ public class ReplicationValve
      * reset the active statistics
      */
     public void resetStatistics() {
-        totalRequestTime = 0 ;
-        totalSendTime = 0 ;
-        lastSendTime = 0 ;
-        nrOfFilterRequests = 0 ;
-        nrOfRequests = 0 ;
+        totalRequestTime = 0;
+        totalSendTime = 0;
+        lastSendTime = 0;
+        nrOfFilterRequests = 0;
+        nrOfRequests = 0;
         nrOfSendRequests = 0;
         nrOfCrossContextSendRequests = 0;
     }
@@ -563,12 +571,11 @@ public class ReplicationValve
     protected  void updateStats(long requestTime, long clusterTime) {
         // TODO: Async requests may trigger multiple replication requests. How,
         //       if at all, should the stats handle this?
-        synchronized(this) {
-            lastSendTime=System.currentTimeMillis();
-            totalSendTime+=lastSendTime - clusterTime;
-            totalRequestTime+=lastSendTime - requestTime;
-            nrOfRequests++;
-        }
+        long currentTime = System.currentTimeMillis();
+        lastSendTime = currentTime;
+        totalSendTime += currentTime - clusterTime;
+        totalRequestTime += currentTime - requestTime;
+        nrOfRequests++;
         if(log.isInfoEnabled()) {
             if ( (nrOfRequests % 100) == 0 ) {
                  log.info(sm.getString("ReplicationValve.stats",

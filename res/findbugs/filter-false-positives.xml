@@ -259,14 +259,25 @@
   <Match>
     <!-- False positive caused by additional method syncs -->
     <Class name="org.apache.catalina.ha.session.DeltaManager" />
-     <Field name="receiverQueue" />
+    <Field name="receiverQueue" />
     <Pattern code="IS2_INCONSISTENT_SYNC" />
   </Match>
   <Match>
     <!-- False positive caused by method syncs -->
     <Class name="org.apache.catalina.ha.session.JvmRouteBinderValve" />
-     <Field name="cluster" />
+    <Field name="cluster" />
     <Pattern code="IS2_INCONSISTENT_SYNC" />
+  </Match>
+  <Match>
+    <!-- Design choice to reduce need for syncs -->
+    <Class name="org.apache.catalina.ha.tcp.ReplicationValve" />
+    <Or>
+      <Field name="nrOfCrossContextSendRequests" />
+      <Field name="nrOfFilterRequests" />
+      <Field name="nrOfRequests" />
+      <Field name="nrOfSendRequests" />
+    </Or>
+    <Pattern code="VO_VOLATILE_INCREMENT" />
   </Match>
   <Match>
     <!-- Field is only modified during Servlet load -->
