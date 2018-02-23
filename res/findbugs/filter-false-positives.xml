@@ -291,6 +291,18 @@
     <Bug code="REC" />
   </Match>
   <Match>
+    <!-- The fields are only set in setWrapper() which Tomcat calls once during
+         initialisation. All other accesses are reads. -->
+    <Or>
+      <Field name="context" />
+      <Field name="host" />
+      <Field name="mBeanServer" />
+      <Field name="oname" />
+      <Field name="wrapper" />
+    </Or>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD" />
+  </Match>
+  <Match>
     <!-- SQL construction is safe since it is from trusted config -->
     <Or>
       <Class name="org.apache.catalina.realm.DataSourceRealm" />
