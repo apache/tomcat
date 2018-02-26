@@ -73,6 +73,23 @@
         (e.g. with <code>HttpServletRequest.getSession()</code> call)
         will fail with an <code>IllegalStateException</code>.</p>
       </attribute>
+
+      <attribute name="notifyAttributeListenerOnUnchangedValue" required="false">
+        <p>If an attribute is added to the session and that attribute is already
+        present in the session under the same name will any
+        <code>HttpSessionAttributeListener</code> be notified that the attribute
+        has been replaced. If not specified, the default value of
+        <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="notifyBindingListenerOnUnchangedValue" required="false">
+        <p>If an attribute is added to the session, that attribute is already
+        present in the session under the same name and the attribute implements
+        <code>HttpSessionBindingListener</code>, will the listener be notified
+        that the attribute has been unbound and bound again. If not specified,
+        the default value of <code>false</code> will be used.</p>
+      </attribute>
+
     </attributes>
 
   </subsection>

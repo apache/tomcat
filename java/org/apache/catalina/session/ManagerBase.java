@@ -193,6 +193,10 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
     private boolean warnOnSessionAttributeFilterFailure;
 
+    private boolean notifyBindingListenerOnUnchangedValue;
+
+    private boolean notifyAttributeListenerOnUnchangedValue = true;
+
 
     // ------------------------------------------------------------ Constructors
 
@@ -208,6 +212,31 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
 
     // -------------------------------------------------------------- Properties
+
+    @Override
+    public boolean getNotifyAttributeListenerOnUnchangedValue() {
+        return notifyAttributeListenerOnUnchangedValue;
+    }
+
+
+
+    @Override
+    public void setNotifyAttributeListenerOnUnchangedValue(boolean notifyAttributeListenerOnUnchangedValue) {
+        this.notifyAttributeListenerOnUnchangedValue = notifyAttributeListenerOnUnchangedValue;
+    }
+
+
+    @Override
+    public boolean getNotifyBindingListenerOnUnchangedValue() {
+        return notifyBindingListenerOnUnchangedValue;
+    }
+
+
+    @Override
+    public void setNotifyBindingListenerOnUnchangedValue(boolean notifyBindingListenerOnUnchangedValue) {
+        this.notifyBindingListenerOnUnchangedValue = notifyBindingListenerOnUnchangedValue;
+    }
+
 
     /**
      * Obtain the regular expression used to filter session attribute based on

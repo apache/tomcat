@@ -1424,8 +1424,9 @@ public class StandardSession implements HttpSession, Session, Serializable {
         // Call the valueBound() method if necessary
         if (notify && value instanceof HttpSessionBindingListener) {
             // Don't call any notification if replacing with the same value
+            // unless configured to do so
             Object oldValue = attributes.get(name);
-            if (value != oldValue) {
+            if (value != oldValue || manager.getNotifyBindingListenerOnUnchangedValue()) {
                 event = new HttpSessionBindingEvent(getSession(), name, value);
                 try {
                     ((HttpSessionBindingListener) value).valueBound(event);
@@ -1440,14 +1441,18 @@ public class StandardSession implements HttpSession, Session, Serializable {
         Object unbound = attributes.put(name, value);
 
         // Call the valueUnbound() method if necessary
-        if (notify && (unbound instanceof HttpSessionBindingListener) && (unbound != value)) {
-            try {
-                ((HttpSessionBindingListener) unbound).valueUnbound(
-                        new HttpSessionBindingEvent(getSession(), name));
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                manager.getContext().getLogger().error(
-                        sm.getString("standardSession.bindingEvent"), t);
+        if (notify && unbound instanceof HttpSessionBindingListener) {
+            // Don't call any notification if replacing with the same value
+            // unless configured to do so
+            if (unbound != value || manager.getNotifyBindingListenerOnUnchangedValue()) {
+                try {
+                    ((HttpSessionBindingListener) unbound).valueUnbound
+                        (new HttpSessionBindingEvent(getSession(), name));
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    manager.getContext().getLogger().error
+                        (sm.getString("standardSession.bindingEvent"), t);
+                }
             }
         }
 
@@ -1468,12 +1473,14 @@ public class StandardSession implements HttpSession, Session, Serializable {
             HttpSessionAttributeListener listener = (HttpSessionAttributeListener) listeners[i];
             try {
                 if (unbound != null) {
-                    context.fireContainerEvent("beforeSessionAttributeReplaced", listener);
-                    if (event == null) {
-                        event = new HttpSessionBindingEvent(getSession(), name, unbound);
+                    if (unbound != value || manager.getNotifyAttributeListenerOnUnchangedValue()) {
+                        context.fireContainerEvent("beforeSessionAttributeReplaced", listener);
+                        if (event == null) {
+                            event = new HttpSessionBindingEvent(getSession(), name, unbound);
+                        }
+                        listener.attributeReplaced(event);
+                        context.fireContainerEvent("afterSessionAttributeReplaced", listener);
                     }
-                    listener.attributeReplaced(event);
-                    context.fireContainerEvent("afterSessionAttributeReplaced", listener);
                 } else {
                     context.fireContainerEvent("beforeSessionAttributeAdded", listener);
                     if (event == null) {
@@ -1486,7 +1493,10 @@ public class StandardSession implements HttpSession, Session, Serializable {
                 ExceptionUtils.handleThrowable(t);
                 try {
                     if (unbound != null) {
-                        context.fireContainerEvent("afterSessionAttributeReplaced", listener);
+                        if (unbound != value ||
+                                manager.getNotifyAttributeListenerOnUnchangedValue()) {
+                            context.fireContainerEvent("afterSessionAttributeReplaced", listener);
+                        }
                     } else {
                         context.fireContainerEvent("afterSessionAttributeAdded", listener);
                     }

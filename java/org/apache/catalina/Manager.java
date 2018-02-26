@@ -351,4 +351,73 @@ public interface Manager {
      *         otherwise {@code false}
      */
     public boolean willAttributeDistribute(String name, Object value);
+
+
+    /**
+     * When an attribute that is already present in the session is added again
+     * under the same name and the attribute implements {@link
+     * javax.servlet.http.HttpSessionBindingListener}, should
+     * {@link javax.servlet.http.HttpSessionBindingListener#valueUnbound(javax.servlet.http.HttpSessionBindingEvent)}
+     * be called followed by
+     * {@link javax.servlet.http.HttpSessionBindingListener#valueBound(javax.servlet.http.HttpSessionBindingEvent)}?
+     * <p>
+     * The default value is {@code false}.
+     *
+     * @return {@code true} if the listener will be notified, {@code false} if
+     *         it will not
+     */
+    public default boolean getNotifyBindingListenerOnUnchangedValue() {
+        return false;
+    }
+
+
+    /**
+     * Configure if
+     * {@link javax.servlet.http.HttpSessionBindingListener#valueUnbound(javax.servlet.http.HttpSessionBindingEvent)}
+     * be called followed by
+     * {@link javax.servlet.http.HttpSessionBindingListener#valueBound(javax.servlet.http.HttpSessionBindingEvent)}
+     * when an attribute that is already present in the session is added again
+     * under the same name and the attribute implements {@link
+     * javax.servlet.http.HttpSessionBindingListener}.
+     *
+     * @param notifyBindingListenerOnUnchangedValue {@code true} the listener
+     *                                              will be called, {@code
+     *                                              false} it will not
+     */
+    public void setNotifyBindingListenerOnUnchangedValue(
+            boolean notifyBindingListenerOnUnchangedValue);
+
+
+    /**
+     * When an attribute that is already present in the session is added again
+     * under the same name and a {@link
+     * javax.servlet.http.HttpSessionAttributeListener} is configured for the
+     * session should
+     * {@link javax.servlet.http.HttpSessionAttributeListener#attributeReplaced(javax.servlet.http.HttpSessionBindingEvent)}
+     * be called?
+     * <p>
+     * The default value is {@code true}.
+     *
+     * @return {@code true} if the listener will be notified, {@code false} if
+     *         it will not
+     */
+    public default boolean getNotifyAttributeListenerOnUnchangedValue() {
+        return true;
+    }
+
+
+    /**
+     * Configure if
+     * {@link javax.servlet.http.HttpSessionAttributeListener#attributeReplaced(javax.servlet.http.HttpSessionBindingEvent)}
+     * when an attribute that is already present in the session is added again
+     * under the same name and a {@link
+     * javax.servlet.http.HttpSessionAttributeListener} is configured for the
+     * session.
+     *
+     * @param notifyAttributeListenerOnUnchangedValue {@code true} the listener
+     *                                                will be called, {@code
+     *                                                false} it will not
+     */
+    public void setNotifyAttributeListenerOnUnchangedValue(
+            boolean notifyAttributeListenerOnUnchangedValue);
 }
