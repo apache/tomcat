@@ -282,7 +282,13 @@
   <Match>
     <!-- Field is only modified during Servlet load -->
     <Class name="org.apache.catalina.manager.host.HostManagerServlet" />
-    <Bug code="MSF" />
+    <Or>
+      <Field name="context" />
+      <Field name="installedHost" />
+      <Field name="engine" />
+      <Field name="wrapper" />
+    </Or>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD" />
   </Match>
   <Match>
     <!-- Catching exception is simpler than handling all the individual ones -->
@@ -293,6 +299,7 @@
   <Match>
     <!-- The fields are only set in setWrapper() which Tomcat calls once during
          initialisation. All other accesses are reads. -->
+    <Class name="org.apache.catalina.manager.ManagerServlet" />
     <Or>
       <Field name="context" />
       <Field name="host" />
