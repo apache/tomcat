@@ -310,6 +310,18 @@
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD" />
   </Match>
   <Match>
+    <!-- The array contents is never mutated. -->
+    <Class name="org.apache.catalina.mapper.Mapper" />
+    <Field name="hosts" />
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
+  </Match>
+  <Match>
+    <!-- The array contents is never mutated. -->
+    <Class name="org.apache.catalina.mapper.Mapper$MappedContext" />
+    <Field name="versions" />
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
+  </Match>
+  <Match>
     <!-- SQL construction is safe since it is from trusted config -->
     <Or>
       <Class name="org.apache.catalina.realm.DataSourceRealm" />
