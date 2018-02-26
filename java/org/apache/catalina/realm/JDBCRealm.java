@@ -463,9 +463,8 @@ public class JDBCRealm
      * @return the prepared statement
      * @exception SQLException if a database error occurs
      */
-    protected PreparedStatement credentials(Connection dbConnection,
-                                            String username)
-        throws SQLException {
+    protected PreparedStatement credentials(Connection dbConnection, String username)
+            throws SQLException {
 
         if (preparedCredentials == null) {
             StringBuilder sb = new StringBuilder("SELECT ");
@@ -672,9 +671,8 @@ public class JDBCRealm
      * @return the prepared statement
      * @exception SQLException if a database error occurs
      */
-    protected synchronized PreparedStatement roles(Connection dbConnection,
-            String username)
-        throws SQLException {
+    protected synchronized PreparedStatement roles(Connection dbConnection, String username)
+            throws SQLException {
 
         if (preparedRoles == null) {
             StringBuilder sb = new StringBuilder("SELECT ");
@@ -684,8 +682,7 @@ public class JDBCRealm
             sb.append(" WHERE ");
             sb.append(userNameCol);
             sb.append(" = ?");
-            preparedRoles =
-                dbConnection.prepareStatement(sb.toString());
+            preparedRoles = dbConnection.prepareStatement(sb.toString());
         }
 
         preparedRoles.setString(1, username);
