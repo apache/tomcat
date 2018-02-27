@@ -735,8 +735,7 @@ class JspDocumentParser
             startMark = new Mark(ctxt, path, locator.getLineNumber(),
                     locator.getColumnNumber());
             @SuppressWarnings("unused")
-            Node unused = new Node.Comment(
-                    new String(buf, offset, len), startMark, current);
+            Node unused = new Node.Comment(new String(buf, offset, len), startMark, current);
         }
     }
 

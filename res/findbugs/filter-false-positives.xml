@@ -732,6 +732,13 @@
     <Bug code="NP"/>
   </Match>
   <Match>
+    <!-- Yes this is a dead store. This is so the IDE warning can be suppressed.
+         The object creation has side-effects so the code is required. -->
+    <Class name="org.apache.jasper.compiler.JspDocumentParser" />
+    <Method name="comment"/>
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+  </Match>
+  <Match>
     <!-- Returning null is intentional -->
     <Class name="org.apache.jasper.compiler.JspReader"/>
     <Method name="indexOf"/>
