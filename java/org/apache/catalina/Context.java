@@ -699,8 +699,8 @@ public interface Context extends Container, ContextBind {
     public void setJarScanner(JarScanner jarScanner);
 
     /**
-     * @return the {@link Authenticator} that is used by this context or
-     * <code>null</code> if none is used.
+     * @return the {@link Authenticator} that is used by this context. This is
+     *         always non-{@code null} for a started Context
      */
     public Authenticator getAuthenticator();
 

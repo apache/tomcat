@@ -849,12 +849,7 @@ public class CoyoteAdapter implements Adapter {
             }
             if (req.getRemoteUserNeedsAuthorization()) {
                 Authenticator authenticator = request.getContext().getAuthenticator();
-                if (authenticator == null) {
-                    // No security constraints configured for the application so
-                    // no need to authorize the user. Use the CoyotePrincipal to
-                    // provide the authenticated user.
-                    request.setUserPrincipal(new CoyotePrincipal(username));
-                } else if (!(authenticator instanceof AuthenticatorBase)) {
+                if (!(authenticator instanceof AuthenticatorBase)) {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("coyoteAdapter.authorize", username));
                     }

@@ -2691,12 +2691,7 @@ public class Request implements HttpServletRequest {
                     sm.getString("coyoteRequest.alreadyAuthenticated"));
         }
 
-        Context context = getContext();
-        if (context.getAuthenticator() == null) {
-            throw new ServletException("no authenticator");
-        }
-
-        context.getAuthenticator().login(username, password, this);
+        getContext().getAuthenticator().login(username, password, this);
     }
 
     /**
