@@ -203,7 +203,7 @@ public class CompressionConfig {
             }
 
             // Check for compatible MIME-TYPE
-            String[] compressibleMimeTypes = this.compressibleMimeTypes;
+            String[] compressibleMimeTypes = getCompressibleMimeTypes();
             if (compressibleMimeTypes != null &&
                     !startsWithStringArray(compressibleMimeTypes, response.getContentType())) {
                 return false;
