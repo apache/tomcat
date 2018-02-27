@@ -53,7 +53,7 @@
         the session when it has already been added under the same name. This is
         to aid clustering scenarios where <code>setAttribute()</code> is often
         called to signal that the attribute value has been mutated and needs to
-        be replicated but it may not be required, or even desired, for the the
+        be replicated but it may not be required, or even desired, for the
         associated listeners to be triggered. The default behaviour has not been
         changed. (markt)
       </fix>
