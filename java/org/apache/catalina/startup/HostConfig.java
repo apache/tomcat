@@ -365,12 +365,7 @@ public class HostConfig implements LifecycleListener {
      *  exist
      */
     public boolean isDeployed(String name) {
-        DeployedApplication app = deployed.get(name);
-        if (app == null) {
-            return false;
-        }
-
-        return true;
+        return deployed.containsKey(name);
     }
 
 
