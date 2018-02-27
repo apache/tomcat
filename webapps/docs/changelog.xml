@@ -82,6 +82,11 @@
         when attempting to clean up application triggered RMI memory leaks on
         web application stop. (markt)
       </fix>
+      <bug>
+        Correct a regression in the fix for <bug>60276</bug> that meant that
+        compression was applied to all MIME types. Patch provided by Stefan
+        Knoblich. (markt)
+      </bug>
     </changelog>
   </subsection>
   <subsection name="Coyote">
