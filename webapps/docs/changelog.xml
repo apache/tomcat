@@ -112,11 +112,11 @@
         <code>docBase</code> and, as a result, a <code>docBase</code> under the
         <code>appBase</code> will be ignored, log a warning. (markt)
       </add>
-      <bug>
+      <fix>
         Correct a regression in the fix for <bug>60276</bug> that meant that
         compression was applied to all MIME types. Patch provided by Stefan
         Knoblich. (markt)
-      </bug>
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
