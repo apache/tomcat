@@ -107,6 +107,11 @@
         <code>path</code> attribute, log a warning that the <code>path</code>
         attribute will be ignored. (markt)
       </add>
+      <add>
+        When a deployment descriptor is deployed that references an external
+        <code>docBase</code> and, as a result, a <code>docBase</code> under the
+        <code>appBase</code> will be ignored, log a warning. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

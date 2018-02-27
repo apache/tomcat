@@ -608,6 +608,17 @@ public class HostConfig implements LifecycleListener {
                     if (docBase.getAbsolutePath().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                         isExternalWar = true;
                     }
+                    // Check that a WAR or DIR in the appBase is not 'hidden'
+                    File war = new File(host.getAppBaseFile(), cn.getBaseName() + ".war");
+                    if (war.exists()) {
+                        log.warn(sm.getString("hostConfig.deployDescriptor.hiddenWar",
+                                contextXml.getAbsolutePath(), war.getAbsolutePath()));
+                    }
+                    File dir = new File(host.getAppBaseFile(), cn.getBaseName());
+                    if (dir.exists()) {
+                        log.warn(sm.getString("hostConfig.deployDescriptor.hiddenDir",
+                                contextXml.getAbsolutePath(), dir.getAbsolutePath()));
+                    }
                 } else {
                     log.warn(sm.getString("hostConfig.deployDescriptor.localDocBaseSpecified",
                              docBase));
