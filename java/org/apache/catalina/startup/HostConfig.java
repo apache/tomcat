@@ -582,6 +582,11 @@ public class HostConfig implements LifecycleListener {
                 }
             }
 
+            if (context.getPath() != null) {
+                log.warn(sm.getString("hostConfig.deployDescriptor.path", context.getPath(),
+                        contextXml.getAbsolutePath()));
+            }
+
             Class<?> clazz = Class.forName(host.getConfigClass());
             LifecycleListener listener = (LifecycleListener) clazz.getConstructor().newInstance();
             context.addLifecycleListener(listener);

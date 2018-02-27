@@ -102,6 +102,11 @@
         when attempting to clean up application triggered RMI memory leaks on
         web application stop. (markt)
       </fix>
+      <add>
+        When a deployment descriptor is deployed that includes a
+        <code>path</code> attribute, log a warning that the <code>path</code>
+        attribute will be ignored. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
