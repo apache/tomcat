@@ -185,14 +185,19 @@ public final class HTMLManagerServlet extends ManagerServlet {
         if (path != null) {
             cn = new ContextName(path, request.getParameter("version"));
         }
+
         String deployPath = request.getParameter("deployPath");
-        ContextName deployCn = null;
-        if (deployPath != null) {
-            deployCn = new ContextName(deployPath,
-                    request.getParameter("deployVersion"));
-        }
-        String deployConfig = request.getParameter("deployConfig");
         String deployWar = request.getParameter("deployWar");
+        String deployConfig = request.getParameter("deployConfig");
+        ContextName deployCn = null;
+        if (deployPath != null && deployPath.length() > 0) {
+            deployCn = new ContextName(deployPath, request.getParameter("deployVersion"));
+        } else if (deployConfig != null && deployConfig.length() > 0) {
+            deployCn = ContextName.extractFromPath(deployConfig);
+        } else if (deployWar != null && deployWar.length() > 0) {
+            deployCn = ContextName.extractFromPath(deployWar);
+        }
+
         String tlsHostName = request.getParameter("tlsHostName");
 
         // Prepare our output writer to generate the response message

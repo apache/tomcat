@@ -311,14 +311,20 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         String command = request.getPathInfo();
         if (command == null)
             command = request.getServletPath();
-        String config = request.getParameter("config");
+
         String path = request.getParameter("path");
+        String war = request.getParameter("war");
+        String config = request.getParameter("config");
         ContextName cn = null;
         if (path != null) {
             cn = new ContextName(path, request.getParameter("version"));
+        } else if (config != null) {
+            cn = ContextName.extractFromPath(config);
+        } else if (war != null) {
+            cn = ContextName.extractFromPath(war);
         }
+
         String type = request.getParameter("type");
-        String war = request.getParameter("war");
         String tag = request.getParameter("tag");
         boolean update = false;
         if ((request.getParameter("update") != null)

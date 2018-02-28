@@ -257,14 +257,24 @@ the host and port appropriately for your installation.</p>
 <ul>
 <li><strong>path</strong> - The context path (including the leading slash)
     of the web application you are dealing with.  To select the ROOT web
-    application, specify "/".  <strong>NOTE</strong>:
-    It is not possible to perform administrative commands on the
-    Manager application itself.</li>
+    application, specify "/".
+    <br/>
+    <strong>NOTE</strong>: It is not possible to perform administrative commands
+    on the Manager application itself.
+    <br/>
+    <strong>NOTE</strong>: If the path parameter is not explicitly specified
+    then the path and the version will be derived using the standard
+    <a href="config/context.html#Naming">Context naming</a> rules from the
+    config parameter or, if the config parameter is not present, the war
+    parameter.</li>
 <li><strong>version</strong> - The version of this web application as used by
     the <a href="config/context.html">parallel deployment</a> feature. If you
     use parallel deployment wherever a path is required you must specify a
     version in addition to the path and it is the combination of path and
-    version that must be unique rather than just the path.</li>
+    version that must be unique rather than just the path.
+    <br/>
+    <strong>NOTE</strong>: If the path is not explicitly specified, the version
+    parameter is ignored.</li>
 <li><strong>war</strong> - URL of a web application archive (WAR) file, or
     pathname of a directory which contains the web application, or a
     Context configuration ".xml" file.  You can use URLs in any of the

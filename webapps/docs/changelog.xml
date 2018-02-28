@@ -144,6 +144,12 @@
   <subsection name="Web applications">
     <changelog>
       <add>
+        <bug>47467</bug>: When deploying a web application via the manager
+        application and a path is not explicitly specified, derive it from the
+        provided deployment descriptor or, if that is not present, the WAR or
+        DIR. (markt)
+      </add>
+      <add>
         <bug>48672</bug>: Add documentation for the Host Manager web
         application. Patch provided by Marek Czernek. (markt)
       </add>

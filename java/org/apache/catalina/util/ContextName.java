@@ -173,4 +173,29 @@ public final class ContextName {
     public String toString() {
         return getDisplayName();
     }
+
+
+    /**
+     * Extract the final component of the given path which is assumed to be a
+     * base name and generate a {@link ContextName} from that base name.
+     *
+     * @param path The path that ends in a base name
+     *
+     * @return the {@link ContextName} generated from the given base name
+     */
+    public static ContextName extractFromPath(String path) {
+        // Convert '\' to '/'
+        path = path.replaceAll("\\\\", "/");
+        // Remove trailing '/'. Use while just in case a value ends in ///
+        while (path.endsWith("/")) {
+            path = path.substring(0, path.length() - 1);
+        }
+
+        int lastSegment = path.lastIndexOf('/');
+        if (lastSegment > 0) {
+            path = path.substring(lastSegment + 1);
+        }
+
+        return new ContextName(path, true);
+    }
 }
