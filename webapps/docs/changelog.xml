@@ -147,6 +147,10 @@
         <bug>48672</bug>: Add documentation for the Host Manager web
         application. Patch provided by Marek Czernek. (markt)
       </add>
+      <add>
+        Add support for specifying the application version when deploying an
+        application via the Manager application HTML interface. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>

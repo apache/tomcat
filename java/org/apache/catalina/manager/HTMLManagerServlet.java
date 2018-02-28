@@ -527,14 +527,15 @@ public final class HTMLManagerServlet extends ManagerServlet {
         }
 
         // Deploy Section
-        args = new Object[7];
+        args = new Object[8];
         args[0] = smClient.getString("htmlManagerServlet.deployTitle");
         args[1] = smClient.getString("htmlManagerServlet.deployServer");
         args[2] = response.encodeURL(request.getContextPath() + "/html/deploy");
         args[3] = smClient.getString("htmlManagerServlet.deployPath");
-        args[4] = smClient.getString("htmlManagerServlet.deployConfig");
-        args[5] = smClient.getString("htmlManagerServlet.deployWar");
-        args[6] = smClient.getString("htmlManagerServlet.deployButton");
+        args[4] = smClient.getString("htmlManagerServlet.deployVersion");
+        args[5] = smClient.getString("htmlManagerServlet.deployConfig");
+        args[6] = smClient.getString("htmlManagerServlet.deployWar");
+        args[7] = smClient.getString("htmlManagerServlet.deployButton");
         writer.print(MessageFormat.format(DEPLOY_SECTION, args));
 
         args = new Object[4];
@@ -1284,12 +1285,20 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  <small>{4}</small>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"text\" name=\"deployConfig\" size=\"20\">\n" +
+        "  <input type=\"text\" name=\"deployVersion\" size=\"20\">\n" +
         " </td>\n" +
         "</tr>\n" +
         "<tr>\n" +
         " <td class=\"row-right\">\n" +
         "  <small>{5}</small>\n" +
+        " </td>\n" +
+        " <td class=\"row-left\">\n" +
+        "  <input type=\"text\" name=\"deployConfig\" size=\"20\">\n" +
+        " </td>\n" +
+        "</tr>\n" +
+        "<tr>\n" +
+        " <td class=\"row-right\">\n" +
+        "  <small>{6}</small>\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
         "  <input type=\"text\" name=\"deployWar\" size=\"40\">\n" +
@@ -1300,7 +1309,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         "  &nbsp;\n" +
         " </td>\n" +
         " <td class=\"row-left\">\n" +
-        "  <input type=\"submit\" value=\"{6}\">\n" +
+        "  <input type=\"submit\" value=\"{7}\">\n" +
         " </td>\n" +
         "</tr>\n" +
         "</table>\n" +
