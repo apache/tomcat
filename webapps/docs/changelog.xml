@@ -94,6 +94,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Work-around a known, non-specification compliant behaviour in some
+        versions of IE that can allow XSS when using the JMX proxy feature of
+        the Manager application. Based on a suggestion from Muthukumar Marikani.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.85 (violetagg)" rtext="released 2018-02-13">
   <subsection name="Catalina">
