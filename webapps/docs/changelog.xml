@@ -157,6 +157,12 @@
         Add support for specifying the application version when deploying an
         application via the Manager application HTML interface. (markt)
       </add>
+      <add>
+        Work-around a known, non-specification compliant behaviour in some
+        versions of IE that can allow XSS when using the JMX proxy feature of
+        the Manager application. Based on a suggestion from Muthukumar Marikani.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
