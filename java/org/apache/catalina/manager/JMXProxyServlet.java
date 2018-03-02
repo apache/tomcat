@@ -83,7 +83,7 @@ public class JMXProxyServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        response.setContentType("text/plain");
+        response.setContentType("text/plain;charset=" + Constants.CHARSET);
         // Stop older versions of IE thinking they know best. We set text/plain
         // in the line above for a reason. IE's behaviour is unwanted at best
         // and dangerous at worst.
