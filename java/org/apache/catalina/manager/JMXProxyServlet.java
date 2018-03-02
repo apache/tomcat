@@ -88,7 +88,6 @@ public class JMXProxyServlet extends HttpServlet {
         // in the line above for a reason. IE's behaviour is unwanted at best
         // and dangerous at worst.
         response.setHeader("X-Content-Type-Options", "nosniff");
-
         PrintWriter writer = response.getWriter();
 
         if (mBeanServer == null) {
