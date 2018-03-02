@@ -114,6 +114,12 @@
         <bug>48672</bug>: Add documentation for the Host Manager web
         application. Patch provided by Marek Czernek. (markt)
       </add>
+      <add>
+        Work-around a known, non-specification compliant behaviour in some
+        versions of IE that can allow XSS when using the JMX proxy feature of
+        the Manager application. Based on a suggestion from Muthukumar Marikani.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
