@@ -45,6 +45,12 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.7 (markt)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      Update the build script so MD5 hashes are no longer generated for releases
+      as per the change in the ASF distribution policy. (markt)
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.6 (markt)" rtext="release in progress">
   <subsection name="Catalina">
