@@ -104,6 +104,12 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      Update the build script so MD5 hashes are no longer generated for releases
+      as per the change in the ASF distribution policy. (markt)
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.85 (violetagg)" rtext="released 2018-02-13">
   <subsection name="Catalina">
