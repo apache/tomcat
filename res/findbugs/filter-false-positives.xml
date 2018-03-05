@@ -339,6 +339,15 @@
     <Bug code="IS" />
   </Match>
   <Match>
+    <!-- Sync is protecting preparedRoles, not these fields -->
+    <Class name="org.apache.catalina.realm.JDBCRealm" />
+    <Or>
+      <Field name="roleNameCol" />
+      <Field name="userRoleTable" />
+    </Or>
+    <Bug pattern="IS2_INCONSISTENT_SYNC " />
+  </Match>
+  <Match>
     <!-- roles will be initialized in addAttributeValues -->
     <Class name="org.apache.catalina.realm.JNDIRealm" />
     <Or>
@@ -346,6 +355,12 @@
       <Method name="getUserBySearch" />
     </Or>
     <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Sync is protecting authenticate90, not this field -->
+    <Class name="org.apache.catalina.realm.JNDIRealm" />
+    <Field name="userPatternFormatArray" />
+    <Bug pattern="IS2_INCONSISTENT_SYNC " />
   </Match>
   <Match>
     <!-- request.getRequestPathMB(), request.getQueryString() can be null because
