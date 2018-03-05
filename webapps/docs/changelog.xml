@@ -45,10 +45,21 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.7 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Ensure the MBean names for the <code>SSLHostConfig</code> and
+        <code>SSLHostConfigCertificate</code> are correctly formed when the
+        <code>Connector</code> is bound to a specific IP address. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
-      Update the build script so MD5 hashes are no longer generated for releases
-      as per the change in the ASF distribution policy. (markt)
+      <update>
+        Update the build script so MD5 hashes are no longer generated for
+        releases as per the change in the ASF distribution policy. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

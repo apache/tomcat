@@ -1058,8 +1058,8 @@ public abstract class AbstractEndpoint<S,U> {
     private void registerJmx(SSLHostConfig sslHostConfig) {
         ObjectName sslOname = null;
         try {
-            sslOname = new ObjectName(domain + ":type=SSLHostConfig,ThreadPool=" +
-                    getName() + ",name=" + ObjectName.quote(sslHostConfig.getHostName()));
+            sslOname = new ObjectName(domain + ":type=SSLHostConfig,ThreadPool=\"" +
+                    getName() + "\",name=" + ObjectName.quote(sslHostConfig.getHostName()));
             sslHostConfig.setObjectName(sslOname);
             try {
                 Registry.getRegistry(null, null).registerComponent(sslHostConfig, sslOname, null);
@@ -1075,8 +1075,8 @@ public abstract class AbstractEndpoint<S,U> {
             ObjectName sslCertOname = null;
             try {
                 sslCertOname = new ObjectName(domain +
-                        ":type=SSLHostConfigCertificate,ThreadPool=" + getName() +
-                        ",Host=" + ObjectName.quote(sslHostConfig.getHostName()) +
+                        ":type=SSLHostConfigCertificate,ThreadPool=\"" + getName() +
+                        "\",Host=" + ObjectName.quote(sslHostConfig.getHostName()) +
                         ",name=" + sslHostConfigCert.getType());
                 sslHostConfigCert.setObjectName(sslCertOname);
                 try {
