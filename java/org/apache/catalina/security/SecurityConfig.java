@@ -29,7 +29,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public final class SecurityConfig{
 
-    private static final Object singeltonLock = new Object();
+    private static final Object singletonLock = new Object();
     private static volatile SecurityConfig singleton = null;
 
     private static final Log log = LogFactory.getLog(SecurityConfig.class);
@@ -86,7 +86,7 @@ public final class SecurityConfig{
      */
     public static SecurityConfig newInstance(){
         if (singleton == null) {
-            synchronized (singeltonLock) {
+            synchronized (singletonLock) {
                 if (singleton == null) {
                     singleton = new SecurityConfig();
                 }
