@@ -1924,14 +1924,10 @@ public class Digester extends DefaultHandler2 {
         for (int i = 0; i < nAttributes; ++i) {
             String value = newAttrs.getValue(i);
             try {
-                String newValue = value;
-                do {
-                    value = newValue;
-                    newValue = IntrospectionUtils.replaceProperties(value, null, source);
-                    if (!value.equals(newValue)) {
-                        newAttrs.setValue(i, newValue);
-                    }
-                } while (!value.equals(newValue));
+                String newValue = IntrospectionUtils.replaceProperties(value, null, source);
+                if (value != newValue) {
+                    newAttrs.setValue(i, newValue);
+                }
             } catch (Exception e) {
                 log.warn(sm.getString("digester.failedToUpdateAttributes", newAttrs.getLocalName(i), value), e);
             }
@@ -1949,17 +1945,14 @@ public class Digester extends DefaultHandler2 {
      */
     private StringBuilder updateBodyText(StringBuilder bodyText) {
         String in = bodyText.toString();
-        String out = in;
+        String out;
         try {
-            do {
-                in = out;
-                out = IntrospectionUtils.replaceProperties(in, null, source);
-            } while (!out.equals(in));
+            out = IntrospectionUtils.replaceProperties(in, null, source);
         } catch (Exception e) {
             return bodyText; // return unchanged data
         }
 
-        if (out.equals(in)) {
+        if (out == in) {
             // No substitutions required. Don't waste memory creating
             // a new buffer
             return bodyText;
