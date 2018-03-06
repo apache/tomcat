@@ -59,6 +59,10 @@
       <fix>
         Avoid potential loop in APR/Native poller. (markt)
       </fix>
+      <update>
+        <bug>62160</bug>: Allow more flexible linked property replacement
+        using the configured property source and system properties. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
