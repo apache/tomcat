@@ -59,6 +59,10 @@
       <fix>
         Avoid potential loop in APR/Native poller. (markt)
       </fix>
+      <fix>
+        Ensure streams that are received but not processed are excluded from the
+        tracking of maximum ID of processed streams. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
