@@ -416,6 +416,16 @@
     <Bug pattern="SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" />
   </Match>
   <Match>
+    <!-- Syncs aren't intended to protect these fields -->
+    <Class name="org.apache.catalina.session.JDBCStore" />
+    <Or>
+      <Field name="dataSourceName" />
+      <Field name="sessionAppCol" />
+      <Field name="sessionIdCol" />
+    </Or>
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
+  </Match>
+  <Match>
     <!-- We can live with the threading issue. See code comment for details. -->
     <Class name="org.apache.catalina.session.ManagerBase" />
     <Method name="generateSessionId" />
