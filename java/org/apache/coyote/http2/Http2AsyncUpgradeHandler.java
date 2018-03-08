@@ -254,11 +254,19 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     }
 
 
-    protected void handleAsyncException() throws IOException {
+    private void handleAsyncException() throws IOException {
         if (applicationIOE != null) {
-            handleAppInitiatedIOException(applicationIOE);
+            IOException ioe = applicationIOE;
+            applicationIOE = null;
+            handleAppInitiatedIOException(ioe);
         } else if (error != null) {
-            throw new IOException(error);
+            Throwable error = this.error;
+            this.error = null;
+            if (error instanceof IOException) {
+                throw (IOException) error;
+            } else {
+                throw new IOException(error);
+            }
         }
     }
 
