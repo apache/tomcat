@@ -63,6 +63,10 @@
         Ensure streams that are received but not processed are excluded from the
         tracking of maximum ID of processed streams. (markt)
       </fix>
+      <fix>
+        Refactor the check for a paused connector to consistently prevent new
+        streams from being created after the connector has been paused. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

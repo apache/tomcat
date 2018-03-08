@@ -718,7 +718,8 @@ class Http2Parser {
         void swallowedPadding(int streamId, int paddingLength) throws ConnectionException, IOException;
 
         // Header frames
-        HeaderEmitter headersStart(int streamId, boolean headersEndStream) throws Http2Exception;
+        HeaderEmitter headersStart(int streamId, boolean headersEndStream)
+                throws Http2Exception, IOException;
         void headersEnd(int streamId) throws ConnectionException;
 
         // Priority frames (also headers)

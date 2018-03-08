@@ -133,11 +133,6 @@ class Http2AsyncParser extends Http2Parser {
             }
 
             if (buffers[1].position() < handler.payloadSize) {
-                try {
-                    upgradeHandler.checkPauseState();
-                } catch (IOException e) {
-                    error = e;
-                }
                 return CompletionHandlerCall.CONTINUE;
             }
 

@@ -305,8 +305,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         try {
             pingManager.sendPing(false);
 
-            checkPauseState();
-
             switch(status) {
             case OPEN_READ:
                 try {
@@ -1234,7 +1232,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     @Override
-    public HeaderEmitter headersStart(int streamId, boolean headersEndStream) throws Http2Exception {
+    public HeaderEmitter headersStart(int streamId, boolean headersEndStream)
+            throws Http2Exception, IOException {
+
+        // Check the pause state before processing headers since the pause state
+        // determines if a new stream is created or if this stream is ignored.
+        checkPauseState();
+
         if (connectionState.get().isNewStreamAllowed()) {
             Stream stream = getStream(streamId, false);
             if (stream == null) {
