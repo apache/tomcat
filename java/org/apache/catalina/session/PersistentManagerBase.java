@@ -937,8 +937,9 @@ public abstract class PersistentManagerBase extends ManagerBase
      */
     protected void processMaxActiveSwaps() {
 
-        if (!getState().isAvailable() || getMaxActiveSessions() < 0)
+        if (!getState().isAvailable() || minIdleSwap < 0 || getMaxActiveSessions() < 0) {
             return;
+        }
 
         Session sessions[] = findSessions();
 
