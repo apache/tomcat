@@ -52,6 +52,12 @@
         <code>SSLHostConfigCertificate</code> are correctly formed when the
         <code>Connector</code> is bound to a specific IP address. (markt)
       </fix>
+      <fix>
+        <bug>62168</bug>: When using the <code>PersistentManager</code> honor a
+        value of <code>-1</code> for <code>minIdleSwap</code> and do not swap
+        out sessions to keep the number of active sessions under
+        <code>maxActive</code>. Patch provided by Holger Sunke. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
