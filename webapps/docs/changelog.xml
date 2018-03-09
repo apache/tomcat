@@ -81,6 +81,11 @@
         Update the build script so MD5 hashes are no longer generated for
         releases as per the change in the ASF distribution policy. (markt)
       </update>
+      <fix>
+        <bug>62164</bug>: Switch the build script to use TLS for downloads from
+        SourceForge and Maven Central to avoid failures due to HTTP to HTTPS
+        redirects. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
