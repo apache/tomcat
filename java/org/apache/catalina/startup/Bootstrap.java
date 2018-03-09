@@ -54,7 +54,8 @@ public final class Bootstrap {
     /**
      * Daemon object used by main.
      */
-    private static Bootstrap daemon = null;
+    private static final Object daemonLock = new Object();
+    private static volatile Bootstrap daemon = null;
 
     private static final File catalinaBaseFile;
     private static final File catalinaHomeFile;
@@ -176,8 +177,7 @@ public final class Bootstrap {
             try {
                 @SuppressWarnings("unused")
                 URL url = new URL(repository);
-                repositories.add(
-                        new Repository(repository, RepositoryType.URL));
+                repositories.add(new Repository(repository, RepositoryType.URL));
                 continue;
             } catch (MalformedURLException e) {
                 // Ignore
@@ -187,14 +187,11 @@ public final class Bootstrap {
             if (repository.endsWith("*.jar")) {
                 repository = repository.substring
                     (0, repository.length() - "*.jar".length());
-                repositories.add(
-                        new Repository(repository, RepositoryType.GLOB));
+                repositories.add(new Repository(repository, RepositoryType.GLOB));
             } else if (repository.endsWith(".jar")) {
-                repositories.add(
-                        new Repository(repository, RepositoryType.JAR));
+                repositories.add(new Repository(repository, RepositoryType.JAR));
             } else {
-                repositories.add(
-                        new Repository(repository, RepositoryType.DIR));
+                repositories.add(new Repository(repository, RepositoryType.DIR));
             }
         }
 
@@ -456,22 +453,24 @@ public final class Bootstrap {
      */
     public static void main(String args[]) {
 
-        if (daemon == null) {
-            // Don't set daemon until init() has completed
-            Bootstrap bootstrap = new Bootstrap();
-            try {
-                bootstrap.init();
-            } catch (Throwable t) {
-                handleThrowable(t);
-                t.printStackTrace();
-                return;
+        synchronized (daemonLock) {
+            if (daemon == null) {
+                // Don't set daemon until init() has completed
+                Bootstrap bootstrap = new Bootstrap();
+                try {
+                    bootstrap.init();
+                } catch (Throwable t) {
+                    handleThrowable(t);
+                    t.printStackTrace();
+                    return;
+                }
+                daemon = bootstrap;
+            } else {
+                // When running as a service the call to stop will be on a new
+                // thread so make sure the correct class loader is used to
+                // prevent a range of class not found exceptions.
+                Thread.currentThread().setContextClassLoader(daemon.catalinaLoader);
             }
-            daemon = bootstrap;
-        } else {
-            // When running as a service the call to stop will be on a new
-            // thread so make sure the correct class loader is used to prevent
-            // a range of class not found exceptions.
-            Thread.currentThread().setContextClassLoader(daemon.catalinaLoader);
         }
 
         try {

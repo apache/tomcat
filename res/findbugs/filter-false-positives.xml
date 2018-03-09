@@ -462,6 +462,12 @@
     <Bug code="Dm" />
   </Match>
   <Match>
+    <!-- Dead store is deliberate to test URL validity -->
+    <Class name="org.apache.catalina.startup.Bootstrap" />
+    <Method name="createClassLoader" />
+    <Bug pattern="DLS_DEAD_LOCAL_STORE" />
+  </Match>
+  <Match>
     <!-- Failure at this point is fatal -->
     <Class name="org.apache.catalina.startup.Bootstrap" />
     <Method name="initClassLoaders" />
