@@ -110,6 +110,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        Ensure that <code>SQLWarning</code> has been cleared when connection
+        returns to the pool. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
