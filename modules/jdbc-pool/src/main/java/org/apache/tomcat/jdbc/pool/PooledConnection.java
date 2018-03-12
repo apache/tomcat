@@ -808,6 +808,15 @@ public class PooledConnection implements PooledConnectionMBean {
     }
 
     @Override
+    public void clearWarnings() {
+        try {
+            connection.clearWarnings();
+        } catch (SQLException e) {
+            log.warn("Unable to clear Warnings, connection will be closed.", e);
+        }
+    }
+
+    @Override
     public boolean isClosed() throws SQLException {
         return connection.isClosed();
     }

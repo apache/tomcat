@@ -31,6 +31,7 @@ public interface PooledConnectionMBean {
     public boolean isReleased();
 
     // java.sql.Connection
+    public void clearWarnings();
     public boolean isClosed() throws SQLException;
     public boolean getAutoCommit() throws SQLException;
     public String getCatalog() throws SQLException;
