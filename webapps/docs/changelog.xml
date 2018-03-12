@@ -116,6 +116,11 @@
         Ensure that <code>SQLWarning</code> has been cleared when connection
         returns to the pool. (kfujino)
       </fix>
+      <fix>
+        Ensure that parameters have been cleared when
+        <code>PreparedStatement</code> and/or <code>CallableStatement</code> are
+        cached. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

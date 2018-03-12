@@ -18,8 +18,8 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -158,7 +158,7 @@ public class StatementCache extends StatementDecoratorInterceptor {
         boolean process = process(this.types, method, false);
         if (process) {
             Object result = null;
-            CachedStatement statementProxy = new CachedStatement((Statement)statement,sql);
+            CachedStatement statementProxy = new CachedStatement((PreparedStatement)statement,sql);
             result = constructor.newInstance(new Object[] { statementProxy });
             statementProxy.setActualProxy(result);
             statementProxy.setConnection(proxy);
@@ -248,10 +248,10 @@ public class StatementCache extends StatementDecoratorInterceptor {
         return cache;
     }
 
-    protected class CachedStatement extends StatementDecoratorInterceptor.StatementProxy<Statement> {
+    protected class CachedStatement extends StatementDecoratorInterceptor.StatementProxy<PreparedStatement> {
         boolean cached = false;
         CacheKey key;
-        public CachedStatement(Statement parent, String sql) {
+        public CachedStatement(PreparedStatement parent, String sql) {
             super(parent, sql);
         }
 
@@ -269,6 +269,9 @@ public class StatementCache extends StatementDecoratorInterceptor {
                     if (result != null && !result.isClosed()) {
                         result.close();
                     }
+                    // clear parameter
+                    getDelegate().clearParameters();
+
                     //create a new facade
                     Object actualProxy = getConstructor().newInstance(new Object[] { proxy });
                     proxy.setActualProxy(actualProxy);
