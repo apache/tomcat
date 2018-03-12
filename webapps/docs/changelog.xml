@@ -84,6 +84,11 @@
       <add>
         Enable clearing of <code>SQLWarning</code> via JMX. (kfujino)
       </add>
+      <fix>
+        Ensure that parameters have been cleared when
+        <code>PreparedStatement</code> and/or <code>CallableStatement</code> are
+        cached. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
