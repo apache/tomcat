@@ -75,6 +75,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        Ensure that <code>SQLWarning</code> has been cleared when connection
+        returns to the pool. (kfujino)
+      </fix>
+      <add>
+        Enable clearing of <code>SQLWarning</code> via JMX. (kfujino)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
