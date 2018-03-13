@@ -61,6 +61,12 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>51195</bug>: Avoid a false positive report of a web application
+        memory leak by clearing <code>ObjectStreamClass$Caches</code> of classes
+        loaded by the web application when the web application is stopped.
+        (markt)
+      </fix>
+      <fix>
         Prevent Tomcat from applying gzip compression to content that is already
         compressed with brotli compression. Based on a patch provided by burka.
         (markt)

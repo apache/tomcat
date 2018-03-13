@@ -883,6 +883,12 @@ public class StandardContext extends ContainerBase
     private boolean renewThreadsWhenStoppingContext = true;
 
     /**
+     * Should Tomcat attempt to clear references to classes loaded by the web
+     * application class loader from the ObjectStreamClass caches?
+     */
+    private boolean clearReferencesObjectStreamClassCaches = true;
+
+    /**
      * Should the effective web.xml be logged when the context starts?
      */
     private boolean logEffectiveWebXml = false;
@@ -2950,6 +2956,23 @@ public class StandardContext extends ContainerBase
                 oldRenewThreadsWhenStoppingContext,
                 this.renewThreadsWhenStoppingContext);
     }
+
+
+    public boolean getClearReferencesObjectStreamClassCaches() {
+        return clearReferencesObjectStreamClassCaches;
+    }
+
+
+    public void setClearReferencesObjectStreamClassCaches(
+            boolean clearReferencesObjectStreamClassCaches) {
+        boolean oldClearReferencesObjectStreamClassCaches =
+                this.clearReferencesObjectStreamClassCaches;
+        this.clearReferencesObjectStreamClassCaches = clearReferencesObjectStreamClassCaches;
+        support.firePropertyChange("clearReferencesObjectStreamClassCaches",
+                oldClearReferencesObjectStreamClassCaches,
+                this.clearReferencesObjectStreamClassCaches);
+    }
+
 
     public Boolean getFailCtxIfServletStartFails() {
         return failCtxIfServletStartFails;
