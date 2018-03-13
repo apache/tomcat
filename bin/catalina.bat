@@ -222,6 +222,11 @@ if not "%LOGGING_MANAGER%" == "" goto noJuliManager
 set LOGGING_MANAGER=-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
 :noJuliManager
 
+rem Configure JAVA 9 specific start-up parameters
+set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-opens=java.base/java.lang=ALL-UNNAMED"
+set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-opens=java.base/java.io=ALL-UNNAMED"
+set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"
+
 rem Java 9 no longer supports the java.endorsed.dirs
 rem system property. Only try to use it if
 rem JAVA_ENDORSED_DIRS was explicitly set
@@ -234,10 +239,6 @@ goto doneEndorsed
 if not exist "%CATALINA_HOME%\endorsed" goto doneEndorsed
 set ENDORSED_PROP=java.endorsed.dirs
 :doneEndorsed
-
-rem Configure JAVA 9 specific start-up parameters
-set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-opens=java.base/java.lang=ALL-UNNAMED"
-set "JDK_JAVA_OPTIONS=%JDK_JAVA_OPTIONS% --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"
 
 rem ----- Execute The Requested Command ---------------------------------------
 

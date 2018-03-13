@@ -157,6 +157,7 @@ cd $CATALINA_HOME
     following when starting jsvc to avoid warnings on shutdown.</p>
 <source>...
 --add-opens=java.base/java.lang=ALL-UNNAMED \
+--add-opens=java.base/java.io=ALL-UNNAMED \
 --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED \
 ...
 </source>
