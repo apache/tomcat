@@ -48,6 +48,12 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>51195</bug>: Avoid a false positive report of a web application
+        memory leak by clearing <code>ObjectStreamClass$Caches</code> of classes
+        loaded by the web application when the web application is stopped.
+        (markt)
+      </fix>
+      <fix>
         Ensure the MBean names for the <code>SSLHostConfig</code> and
         <code>SSLHostConfigCertificate</code> are correctly formed when the
         <code>Connector</code> is bound to a specific IP address. (markt)

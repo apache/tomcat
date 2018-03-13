@@ -711,6 +711,18 @@
         not specified, the default value of <code>true</code> will be used.</p>
       </attribute>
 
+      <attribute name="clearReferencesObjectStreamClassCaches" required="false">
+        <p>If <code>true</code>, when the web application is stopped Tomcat
+        looks for <code>SoftReference</code>s to classes loaded by the web
+        application in the <code>ObjectStreamClass</code> class used for
+        serialization and clears any <code>SoftReference</code>s it finds. This
+        feature uses reflection to identify the <code>SoftReference</code>s and
+        therefore requires that the command line option
+        <code>-XaddExports:java.base/java.io=ALL-UNNAMED</code> is set
+        when running on Java 9 and above. If not specified, the default value of
+        <code>true</code> will be used.</p>
+      </attribute>
+
       <attribute name="clearReferencesRmiTargets" required="false">
         <p>If <code>true</code>, Tomcat looks for memory leaks associated with
         RMI Targets and clears any it finds. This feature uses reflection to

@@ -362,6 +362,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     private boolean clearReferencesHttpClientKeepAliveThread = true;
 
     /**
+     * Should Tomcat attempt to clear references to classes loaded by this class
+     * loader from the ObjectStreamClass caches?
+     */
+    private boolean clearReferencesObjectStreamClassCaches = true;
+
+    /**
      * Holds the class file transformers decorating this class loader. The
      * CopyOnWriteArrayList is thread safe. It is expensive on writes, but
      * those should be rare. It is very fast on reads, since synchronization
@@ -593,6 +599,17 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             boolean clearReferencesHttpClientKeepAliveThread) {
         this.clearReferencesHttpClientKeepAliveThread =
             clearReferencesHttpClientKeepAliveThread;
+    }
+
+
+    public boolean getClearReferencesObjectStreamClassCaches() {
+        return clearReferencesObjectStreamClassCaches;
+    }
+
+
+    public void setClearReferencesObjectStreamClassCaches(
+            boolean clearReferencesObjectStreamClassCaches) {
+        this.clearReferencesObjectStreamClassCaches = clearReferencesObjectStreamClassCaches;
     }
 
 
@@ -1513,6 +1530,11 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         // Stop any threads the web application started
         clearReferencesThreads();
 
+        // Clear any references retained in the serialization caches
+        if (clearReferencesObjectStreamClassCaches) {
+            clearReferencesObjectStreamClassCaches();
+        }
+
         // Check for leaks triggered by ThreadLocals loaded by this class loader
         checkThreadLocalsForLeaks();
 
@@ -2129,6 +2151,36 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             } else {
                 // Re-throw all other exceptions
                 throw e;
+            }
+        }
+    }
+
+
+    private void clearReferencesObjectStreamClassCaches() {
+        try {
+            Class<?> clazz = Class.forName("java.io.ObjectStreamClass$Caches");
+            clearCache(clazz, "localDescs");
+            clearCache(clazz, "reflectors");
+        } catch (ReflectiveOperationException | SecurityException | ClassCastException e) {
+            log.warn(sm.getString(
+                    "webappClassLoader.clearObjectStreamClassCachesFail", getContextName()), e);
+        }
+    }
+
+
+    private void clearCache(Class<?> target, String mapName)
+            throws ReflectiveOperationException, SecurityException, ClassCastException {
+        Field f = target.getDeclaredField(mapName);
+        f.setAccessible(true);
+        Map<?,?> map = (Map<?,?>) f.get(null);
+        Iterator<?> keys = map.keySet().iterator();
+        while (keys.hasNext()) {
+            Object key = keys.next();
+            if (key instanceof Reference) {
+                Object clazz = ((Reference<?>) key).get();
+                if (loadedByThisOrChild(clazz)) {
+                    keys.remove();
+                }
             }
         }
     }
