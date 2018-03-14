@@ -3049,21 +3049,31 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             Class<?> clazz = Class.forName("java.io.ObjectStreamClass$Caches");
             clearCache(clazz, "localDescs");
             clearCache(clazz, "reflectors");
-        } catch (ReflectiveOperationException e) {
-            log.warn(sm.getString(
-                    "webappClassLoader.clearObjectStreamClassCachesFail", getContextName()), e);
         } catch (SecurityException e) {
             log.warn(sm.getString(
                     "webappClassLoader.clearObjectStreamClassCachesFail", getContextName()), e);
         } catch (ClassCastException e) {
             log.warn(sm.getString(
                     "webappClassLoader.clearObjectStreamClassCachesFail", getContextName()), e);
+        } catch (IllegalArgumentException e) {
+            log.warn(sm.getString(
+                    "webappClassLoader.clearObjectStreamClassCachesFail", getContextName()), e);
+        } catch (NoSuchFieldException e) {
+            log.warn(sm.getString(
+                    "webappClassLoader.clearObjectStreamClassCachesFail", getContextName()), e);
+        } catch (IllegalAccessException e) {
+            log.warn(sm.getString(
+                    "webappClassLoader.clearObjectStreamClassCachesFail", getContextName()), e);
+        } catch (ClassNotFoundException e) {
+            log.warn(sm.getString(
+                    "webappClassLoader.clearObjectStreamClassCachesFail", getContextName()), e);
         }
     }
 
 
-    private void clearCache(Class<?> target, String mapName)
-            throws ReflectiveOperationException, SecurityException, ClassCastException {
+    private void clearCache(Class<?> target, String mapName) throws SecurityException,
+            ClassCastException, NoSuchFieldException, IllegalArgumentException,
+            IllegalAccessException {
         Field f = target.getDeclaredField(mapName);
         f.setAccessible(true);
         Map<?,?> map = (Map<?,?>) f.get(null);
