@@ -542,13 +542,18 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
      * Separate method to allow Http2AsyncUpgradeHandler to call this code
      * without synchronizing on socketWrapper since it doesn't need to.
      */
-    protected HeaderFrameBuffers doWriteHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders,
-            boolean endOfStream, int payloadSize) throws IOException {
+    protected HeaderFrameBuffers doWriteHeaders(Stream stream, int pushedStreamId,
+            MimeHeaders mimeHeaders, boolean endOfStream, int payloadSize) throws IOException {
 
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId,
-                    stream.getIdentifier(), Integer.valueOf(pushedStreamId),
-                    Boolean.valueOf(endOfStream)));
+            if (pushedStreamId == 0) {
+                log.debug(sm.getString("upgradeHandler.writeHeaders", connectionId,
+                        stream.getIdentifier()));
+            } else {
+                log.debug(sm.getString("upgradeHandler.writePushHeaders", connectionId,
+                        stream.getIdentifier(), Integer.valueOf(pushedStreamId),
+                        Boolean.valueOf(endOfStream)));
+            }
         }
 
         if (!stream.canWrite()) {
