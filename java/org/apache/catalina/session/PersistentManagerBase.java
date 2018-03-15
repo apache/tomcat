@@ -707,31 +707,7 @@ public abstract class PersistentManagerBase extends ManagerBase
             session = sessions.get(id);
 
             if (session == null) {
-                try {
-                    if (SecurityUtil.isPackageProtectionEnabled()){
-                        try {
-                            session = AccessController.doPrivileged(
-                                    new PrivilegedStoreLoad(id));
-                        } catch (PrivilegedActionException ex) {
-                            Exception e = ex.getException();
-                            log.error(sm.getString(
-                                    "persistentManager.swapInException", id),
-                                    e);
-                            if (e instanceof IOException){
-                                throw (IOException)e;
-                            } else if (e instanceof ClassNotFoundException) {
-                                throw (ClassNotFoundException)e;
-                            }
-                        }
-                    } else {
-                         session = store.load(id);
-                    }
-                } catch (ClassNotFoundException e) {
-                    String msg = sm.getString(
-                            "persistentManager.deserializeError", id);
-                    log.error(msg, e);
-                    throw new IllegalStateException(msg, e);
-                }
+                session = loadSessionFromStore(id);
 
                 if (session != null && !session.isValid()) {
                     log.error(sm.getString(
@@ -742,19 +718,7 @@ public abstract class PersistentManagerBase extends ManagerBase
                 }
 
                 if (session != null) {
-                    if(log.isDebugEnabled())
-                        log.debug(sm.getString("persistentManager.swapIn", id));
-
-                    session.setManager(this);
-                    // make sure the listeners know about it.
-                    ((StandardSession)session).tellNew();
-                    add(session);
-                    ((StandardSession)session).activate();
-                    // endAccess() to ensure timeouts happen correctly.
-                    // access() to keep access count correct or it will end up
-                    // negative
-                    session.access();
-                    session.endAccess();
+                    reactivateLoadedSession(id, session);
                 }
             }
         }
@@ -766,6 +730,56 @@ public abstract class PersistentManagerBase extends ManagerBase
 
         return session;
 
+    }
+
+    private void reactivateLoadedSession(String id, Session session) {
+        if(log.isDebugEnabled())
+            log.debug(sm.getString("persistentManager.swapIn", id));
+
+        session.setManager(this);
+        // make sure the listeners know about it.
+        ((StandardSession)session).tellNew();
+        add(session);
+        ((StandardSession)session).activate();
+        // endAccess() to ensure timeouts happen correctly.
+        // access() to keep access count correct or it will end up
+        // negative
+        session.access();
+        session.endAccess();
+    }
+
+    private Session loadSessionFromStore(String id) throws IOException {
+        try {
+            if (SecurityUtil.isPackageProtectionEnabled()){
+                return securedStoreLoad(id);
+            } else {
+                 return store.load(id);
+            }
+        } catch (ClassNotFoundException e) {
+            String msg = sm.getString(
+                    "persistentManager.deserializeError", id);
+            log.error(msg, e);
+            throw new IllegalStateException(msg, e);
+        }
+    }
+
+
+    private Session securedStoreLoad(String id) throws IOException, ClassNotFoundException {
+        try {
+            return AccessController.doPrivileged(
+                    new PrivilegedStoreLoad(id));
+        } catch (PrivilegedActionException ex) {
+            Exception e = ex.getException();
+            log.error(sm.getString(
+                    "persistentManager.swapInException", id),
+                    e);
+            if (e instanceof IOException){
+                throw (IOException)e;
+            } else if (e instanceof ClassNotFoundException) {
+                throw (ClassNotFoundException)e;
+            }
+        }
+        return null;
     }
 
 
