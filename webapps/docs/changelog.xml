@@ -85,6 +85,13 @@
       <fix>
         The OpenSSL engine SSL session will now ignore invalid accesses. (remm)
       </fix>
+      <fix>
+        <bug>62177</bug>: Correct two protocol errors with HTTP/2
+        <code>PUSH_PROMISE</code> frames. Firstly, the HTTP/2 protocol only
+        permits pushes to be sent on peer initiated requests. Secondly, pushes
+        must be sent in order of increasing stream ID. These restriction were
+        not being enforced leading to protocol errors at the client. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
