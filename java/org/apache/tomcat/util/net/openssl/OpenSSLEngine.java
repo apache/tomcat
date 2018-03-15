@@ -1078,12 +1078,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         @Override
         public byte[] getId() {
-            byte[] id;
+            byte[] id = null;
             synchronized (OpenSSLEngine.this) {
-                if (destroyed) {
-                    throw new IllegalStateException(sm.getString("engine.noSession"));
+                if (!destroyed) {
+                    id = SSL.getSessionId(ssl);
                 }
-                id = SSL.getSessionId(ssl);
             }
 
             return id;
@@ -1099,10 +1098,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // We need to multiply by 1000 as OpenSSL uses seconds and we need milliseconds.
             long creationTime = 0;
             synchronized (OpenSSLEngine.this) {
-                if (destroyed) {
-                    throw new IllegalStateException(sm.getString("engine.noSession"));
+                if (!destroyed) {
+                    creationTime = SSL.getTime(ssl);
                 }
-                creationTime = SSL.getTime(ssl);
             }
             return creationTime * 1000L;
         }
@@ -1316,10 +1314,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             String applicationProtocol = OpenSSLEngine.this.applicationProtocol;
             if (applicationProtocol == null) {
                 synchronized (OpenSSLEngine.this) {
-                    if (destroyed) {
-                        throw new IllegalStateException(sm.getString("engine.noSession"));
+                    if (!destroyed) {
+                        applicationProtocol = SSL.getNextProtoNegotiated(ssl);
                     }
-                    applicationProtocol = SSL.getNextProtoNegotiated(ssl);
                 }
                 if (applicationProtocol == null) {
                     applicationProtocol = fallbackApplicationProtocol;
@@ -1330,12 +1327,11 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     OpenSSLEngine.this.applicationProtocol = applicationProtocol = "";
                 }
             }
-            String version;
+            String version = null;
             synchronized (OpenSSLEngine.this) {
-                if (destroyed) {
-                    throw new IllegalStateException(sm.getString("engine.noSession"));
+                if (!destroyed) {
+                    version = SSL.getVersion(ssl);
                 }
-                version = SSL.getVersion(ssl);
             }
             if (applicationProtocol.isEmpty()) {
                 return version;
