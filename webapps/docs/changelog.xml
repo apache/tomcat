@@ -82,6 +82,9 @@
       <fix>
         Improve debug logging for HTTP/2 pushed streams. (markt)
       </fix>
+      <fix>
+        The OpenSSL engine SSL session will now ignore invalid accesses. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
