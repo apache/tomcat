@@ -79,6 +79,9 @@
         Refactor the check for a paused connector to consistently prevent new
         streams from being created after the connector has been paused. (markt)
       </fix>
+      <fix>
+        Improve debug logging for HTTP/2 pushed streams. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
