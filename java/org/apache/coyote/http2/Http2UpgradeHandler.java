@@ -1104,11 +1104,18 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
 
 
     void push(Request request, Stream associatedStream) throws IOException {
-        Stream pushStream  = createLocalStream(request);
+        Stream pushStream;
 
-        // TODO: Is 1k the optimal value?
-        writeHeaders(associatedStream, pushStream.getIdentifier().intValue(),
-                request.getMimeHeaders(), false, 1024);
+        // Synchronized since PUSH_PROMISE frames have to be sent in order. Once
+        // the stream has been created we need to ensure that the PUSH_PROMISE
+        // is sent before the next stream is created for a PUSH_PROMISE.
+        synchronized (socketWrapper) {
+            pushStream = createLocalStream(request);
+
+            // TODO: Is 1k the optimal value?
+            writeHeaders(associatedStream, pushStream.getIdentifier().intValue(),
+                    request.getMimeHeaders(), false, 1024);
+        }
 
         pushStream.sentPushPromise();
 

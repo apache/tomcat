@@ -581,7 +581,8 @@ public class Stream extends AbstractStream implements HeaderEmitter {
 
 
     final void push(Request request) throws IOException {
-        if (!isPushSupported()) {
+        // Can only push when supported and from a peer initiated stream
+        if (!isPushSupported() || getIdentifier().intValue() % 2 == 0) {
             return;
         }
         // Set the special HTTP/2 headers
