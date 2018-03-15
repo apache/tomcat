@@ -64,6 +64,11 @@
         out sessions to keep the number of active sessions under
         <code>maxActive</code>. Patch provided by Holger Sunke. (markt)
       </fix>
+      <fix>
+        <bug>62175</bug>: Avoid infinite recursion, when trying to validate
+        a session while loading it with <code>PersistentManager</code>.
+        (fschumacher)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -183,6 +183,12 @@ public abstract class PersistentManagerBase extends ManagerBase
      */
     private final Map<String,Object> sessionSwapInLocks = new HashMap<>();
 
+    /*
+     * Session that is currently getting swapped in to prevent loading it more
+     * than once concurrently
+     */
+    private final ThreadLocal<Session> sessionToSwapIn = new ThreadLocal<>();
+
 
     // ------------------------------------------------------------- Properties
 
@@ -707,18 +713,25 @@ public abstract class PersistentManagerBase extends ManagerBase
             session = sessions.get(id);
 
             if (session == null) {
-                session = loadSessionFromStore(id);
+                Session currentSwapInSession = sessionToSwapIn.get();
+                try {
+                    if (currentSwapInSession == null || !id.equals(currentSwapInSession.getId())) {
+                        session = loadSessionFromStore(id);
+                        sessionToSwapIn.set(session);
 
-                if (session != null && !session.isValid()) {
-                    log.error(sm.getString(
-                            "persistentManager.swapInInvalid", id));
-                    session.expire();
-                    removeSession(id);
-                    session = null;
-                }
+                        if (session != null && !session.isValid()) {
+                            log.error(sm.getString("persistentManager.swapInInvalid", id));
+                            session.expire();
+                            removeSession(id);
+                            session = null;
+                        }
 
-                if (session != null) {
-                    reactivateLoadedSession(id, session);
+                        if (session != null) {
+                            reactivateLoadedSession(id, session);
+                        }
+                    }
+                } finally {
+                    sessionToSwapIn.remove();
                 }
             }
         }

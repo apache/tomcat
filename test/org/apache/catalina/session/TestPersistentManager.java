@@ -16,13 +16,27 @@
  */
 package org.apache.catalina.session;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Host;
+import org.apache.catalina.Manager;
+import org.apache.catalina.Session;
+import org.apache.catalina.Store;
+import org.apache.catalina.connector.Connector;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.RequestFacade;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterHost;
+import org.easymock.EasyMock;
+import org.easymock.IAnswer;
 
 public class TestPersistentManager {
 
@@ -49,11 +63,97 @@ public class TestPersistentManager {
         // Given the minIdleSwap settings, this should swap one out to get below
         // the limit
         manager.processPersistenceChecks();
-        Assert.assertEquals(1,  manager.getActiveSessions());
-        Assert.assertEquals(2,  manager.getActiveSessionsFull());
+        Assert.assertEquals(1, manager.getActiveSessions());
+        Assert.assertEquals(2, manager.getActiveSessionsFull());
 
         manager.createSession(null);
-        Assert.assertEquals(2,  manager.getActiveSessions());
-        Assert.assertEquals(3,  manager.getActiveSessionsFull());
+        Assert.assertEquals(2, manager.getActiveSessions());
+        Assert.assertEquals(3, manager.getActiveSessionsFull());
+    }
+
+    @Test
+    public void testBug62175() throws Exception {
+        PersistentManager manager = new PersistentManager();
+        AtomicInteger sessionExpireCounter = new AtomicInteger();
+
+        Store mockStore = EasyMock.createNiceMock(Store.class);
+        EasyMock.expect(mockStore.load(EasyMock.anyString())).andAnswer(new IAnswer<Session>() {
+
+            @Override
+            public Session answer() throws Throwable {
+                return timedOutSession(manager, sessionExpireCounter);
+            }
+        }).anyTimes();
+
+        EasyMock.replay(mockStore);
+
+        manager.setStore(mockStore);
+
+        Host host = new TesterHost();
+
+        RequestCachingSessionListener requestCachingSessionListener = new RequestCachingSessionListener();
+
+        Context context = new TesterContext() {
+
+            @Override
+            public Object[] getApplicationLifecycleListeners() {
+                return new Object[] { requestCachingSessionListener };
+            }
+
+            @Override
+            public Manager getManager() {
+                return manager;
+            }
+        };
+        context.setParent(host);
+
+        Connector connector = EasyMock.createNiceMock(Connector.class);
+        Request req = new Request(connector) {
+            @Override
+            public Context getContext() {
+                return context;
+            }
+        };
+        req.setRequestedSessionId("invalidSession");
+        HttpServletRequest request = new RequestFacade(req);
+        EasyMock.replay(connector);
+        requestCachingSessionListener.request = request;
+
+        manager.setContext(context);
+
+        manager.start();
+
+        Assert.assertNull(request.getSession(false));
+        Assert.assertEquals(1, sessionExpireCounter.get());
+
+    }
+
+    private static class RequestCachingSessionListener implements HttpSessionListener {
+
+        private HttpServletRequest request;
+
+        @Override
+        public void sessionDestroyed(HttpSessionEvent se) {
+            request.getSession(false);
+        }
+    }
+
+    private StandardSession timedOutSession(PersistentManager manager, AtomicInteger counter) {
+        StandardSession timedOutSession = new StandardSession(manager) {
+            private static final long serialVersionUID = -5910605558747844210L;
+
+            @Override
+            public void expire() {
+                counter.incrementAndGet();
+                super.expire();
+            }
+        };
+        timedOutSession.isValid = true;
+        timedOutSession.expiring = false;
+        timedOutSession.maxInactiveInterval = 1;
+        timedOutSession.lastAccessedTime = 0;
+        timedOutSession.id = "invalidSession";
+        return timedOutSession;
     }
 }
+
