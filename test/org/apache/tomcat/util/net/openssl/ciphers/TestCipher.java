@@ -77,7 +77,6 @@ public class TestCipher {
         // OpenSSL does not include ECDH/ECDHE ciphers in all and there is no
         //         EC alias. Use aRSA.
         // OpenSSL 1.0.0 onwards does not include eNULL in all.
-        // TLS 1.3 is still i
         Set<String> availableCipherSuites =
                 TesterOpenSSL.getOpenSSLCiphersAsSet("ALL:eNULL:aRSA");
 
@@ -1109,5 +1108,12 @@ public class TestCipher {
                     "TLS_PSK_WITH_CHACHA20_POLY1305_SHA256",
                     "TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256",
                     "TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256",
-                    "TLS_RSA_PSK_WITH_CHACHA20_POLY1305_SHA256")));
+                    "TLS_RSA_PSK_WITH_CHACHA20_POLY1305_SHA256",
+                    // TLV 1.3 draft 26 - subject to change
+                    "TLS_AES_128_CCM_SHA256",
+                    "TLS_AES_128_CCM_8_SHA256",
+                    "TLS_AES_128_GCM_SHA256",
+                    "TLS_AES_256_GCM_SHA384",
+                    "TLS_CHACHA20_POLY1305_SHA256"
+                    )));
 }
