@@ -373,7 +373,7 @@ public class TesterOpenSSL {
             args.add("\"\"");
         }
         // Include the specification if provided
-        if (specification == null) {
+        if (specification != null) {
             args.add(specification);
         }
 
