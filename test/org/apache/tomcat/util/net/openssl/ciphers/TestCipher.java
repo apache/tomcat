@@ -77,14 +77,6 @@ public class TestCipher {
         //         EC alias. Use aRSA.
         // OpenSSL 1.0.0 onwards does not include eNULL in all.
         Set<String> availableCipherSuites = TesterOpenSSL.getOpenSSLCiphersAsSet("ALL:eNULL:aRSA");
-        // TODO
-        // Temporary removal of the TLS1.3 ciphers until the spec is final or an
-        // appropriate option is added to the ciphers command
-        availableCipherSuites.remove("TLS13-AES-128-GCM-SHA256+TLSv1.3");
-        availableCipherSuites.remove("TLS13-AES-128-CCM-8-SHA256+TLSv1.3");
-        availableCipherSuites.remove("TLS13-AES-128-CCM-SHA256+TLSv1.3");
-        availableCipherSuites.remove("TLS13-CHACHA20-POLY1305-SHA256+TLSv1.3");
-        availableCipherSuites.remove("TLS13-AES-256-GCM-SHA384+TLSv1.3");
 
         Set<String> expectedCipherSuites = new HashSet<>();
         for (Cipher cipher : Cipher.values()) {
@@ -432,11 +424,11 @@ public class TestCipher {
                     "RSA-PSK-CAMELLIA128-SHA256+TLSv1",
                     "RSA-PSK-CAMELLIA256-SHA384+TLSv1",
                     "RSA-PSK-CHACHA20-POLY1305+TLSv1.2",
-                    "TLS13-AES-256-GCM-SHA384+TLSv1.3",
-                    "TLS13-CHACHA20-POLY1305-SHA256+TLSv1.3",
-                    "TLS13-AES-128-GCM-SHA256+TLSv1.3",
-                    "TLS13-AES-128-CCM-8-SHA256+TLSv1.3",
-                    "TLS13-AES-128-CCM-SHA256+TLSv1.3")));
+                    "TLS_AES_128_CCM_SHA256+TLSv1.3",
+                    "TLS_AES_128_CCM_8_SHA256+TLSv1.3",
+                    "TLS_AES_128_GCM_SHA256+TLSv1.3",
+                    "TLS_AES_256_GCM_SHA384+TLSv1.3",
+                    "TLS_CHACHA20_POLY1305_SHA256+TLSv1.3")));
 
 
     /**
@@ -739,11 +731,11 @@ public class TestCipher {
                     "SRP-RSA-3DES-EDE-CBC-SHA+SSLv3",
                     "SRP-RSA-AES-128-CBC-SHA+SSLv3",
                     "SRP-RSA-AES-256-CBC-SHA+SSLv3",
-                    "TLS13-AES-256-GCM-SHA384+TLSv1.3",
-                    "TLS13-CHACHA20-POLY1305-SHA256+TLSv1.3",
-                    "TLS13-AES-128-GCM-SHA256+TLSv1.3",
-                    "TLS13-AES-128-CCM-8-SHA256+TLSv1.3",
-                    "TLS13-AES-128-CCM-SHA256+TLSv1.3")));
+                    "TLS_AES_128_CCM_SHA256+TLSv1.3",
+                    "TLS_AES_128_CCM_8_SHA256+TLSv1.3",
+                    "TLS_AES_128_GCM_SHA256+TLSv1.3",
+                    "TLS_AES_256_GCM_SHA384+TLSv1.3",
+                    "TLS_CHACHA20_POLY1305_SHA256+TLSv1.3")));
 
 
     private static JsseImpl ORACLE_JSSE_CIPHER_IMPL = new JsseImpl("Oracle",
@@ -1114,5 +1106,12 @@ public class TestCipher {
                     "TLS_PSK_WITH_CHACHA20_POLY1305_SHA256",
                     "TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256",
                     "TLS_DHE_PSK_WITH_CHACHA20_POLY1305_SHA256",
-                    "TLS_RSA_PSK_WITH_CHACHA20_POLY1305_SHA256")));
+                    "TLS_RSA_PSK_WITH_CHACHA20_POLY1305_SHA256",
+                    // TLV 1.3 draft 26 - subject to change
+                    "TLS_AES_128_CCM_SHA256",
+                    "TLS_AES_128_CCM_8_SHA256",
+                    "TLS_AES_128_GCM_SHA256",
+                    "TLS_AES_256_GCM_SHA384",
+                    "TLS_CHACHA20_POLY1305_SHA256"
+                    )));
 }

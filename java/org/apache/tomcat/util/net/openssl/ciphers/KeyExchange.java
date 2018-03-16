@@ -32,5 +32,6 @@ enum KeyExchange {
     SRP   /* SSL_kSRP   - SRP */,
     RSAPSK,
     ECDHEPSK,
-    DHEPSK;
+    DHEPSK,
+    ANY   /* TLS 1.3 */
 }

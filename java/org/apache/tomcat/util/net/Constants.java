@@ -29,6 +29,7 @@ public class Constants {
      */
     public static final String SSL_PROTO_ALL        = "all";
     public static final String SSL_PROTO_TLS        = "TLS";
+    public static final String SSL_PROTO_TLSv1_3    = "TLSv1.3";
     public static final String SSL_PROTO_TLSv1_2    = "TLSv1.2";
     public static final String SSL_PROTO_TLSv1_1    = "TLSv1.1";
     // Two different forms for TLS 1.0

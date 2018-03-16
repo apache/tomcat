@@ -2695,7 +2695,96 @@ public enum Cipher {
             null
     ),
 
-    /* Cipher 0x00FF  TLS_EMPTY_RENEGOTIATION_INFO_SCSV
+    // Cipher 0x00FF  TLS_EMPTY_RENEGOTIATION_INFO_SCSV
+
+    // TLS 1.3 ciphers (draft - v26)
+    // Cipher 1301
+    TLS_AES_128_GCM_SHA256(
+            0x1301,
+            "TLS_AES_128_GCM_SHA256",
+            KeyExchange.ANY,
+            Authentication.ANY,
+            Encryption.AES128GCM,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_3,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            128,
+            128,
+            null,
+            null
+    ),
+    // Cipher 1302
+    TLS_AES_256_GCM_SHA384(
+            0x1302,
+            "TLS_AES_256_GCM_SHA384",
+            KeyExchange.ANY,
+            Authentication.ANY,
+            Encryption.AES256GCM,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_3,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256,
+            null,
+            null
+    ),
+    // Cipher 1303
+    TLS_CHACHA20_POLY1305_SHA256(
+            0x1303,
+            "TLS_CHACHA20_POLY1305_SHA256",
+            KeyExchange.ANY,
+            Authentication.ANY,
+            Encryption.CHACHA20POLY1305,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_3,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            256,
+            256,
+            null,
+            null
+    ),
+    // Cipher 1304
+    TLS_AES_128_CCM_SHA256(
+            0x1304,
+            "TLS_AES_128_CCM_SHA256",
+            KeyExchange.ANY,
+            Authentication.ANY,
+            Encryption.AES128CCM,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_3,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            128,
+            128,
+            null,
+            null
+    ),
+    // Cipher 1305
+    TLS_AES_128_CCM_8_SHA256(
+            0x1305,
+            "TLS_AES_128_CCM_8_SHA256",
+            KeyExchange.ANY,
+            Authentication.ANY,
+            Encryption.AES128CCM8,
+            MessageDigest.AEAD,
+            Protocol.TLSv1_3,
+            false,
+            EncryptionLevel.HIGH,
+            true,
+            128,
+            128,
+            null,
+            null
+    ),
+
+    /*
      * Cipher 0x5600  TLS_FALLBACK_SCSV
      *
      * No other ciphers defined until 0xC001 below
