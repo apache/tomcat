@@ -517,6 +517,12 @@
     <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
   </Match>
   <Match>
+    <!-- Monitor only used for election -->
+    <Class name="org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator"/>
+    <Method name="startElection"/>
+    <Bug pattern="WA_NOT_IN_LOOP"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
     <Method name="memberAlive"/>
     <Bug code="DE"/>
