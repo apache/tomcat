@@ -435,11 +435,11 @@ public class TestCipher {
                     "RSA-PSK-CAMELLIA128-SHA256+TLSv1",
                     "RSA-PSK-CAMELLIA256-SHA384+TLSv1",
                     "RSA-PSK-CHACHA20-POLY1305+TLSv1.2",
-                    "TLS13-AES-256-GCM-SHA384+TLSv1.3",
-                    "TLS13-CHACHA20-POLY1305-SHA256+TLSv1.3",
-                    "TLS13-AES-128-GCM-SHA256+TLSv1.3",
-                    "TLS13-AES-128-CCM-8-SHA256+TLSv1.3",
-                    "TLS13-AES-128-CCM-SHA256+TLSv1.3")));
+                    "TLS_AES_128_CCM_SHA256+TLSv1.3",
+                    "TLS_AES_128_CCM_8_SHA256+TLSv1.3",
+                    "TLS_AES_128_GCM_SHA256+TLSv1.3",
+                    "TLS_AES_256_GCM_SHA384+TLSv1.3",
+                    "TLS_CHACHA20_POLY1305_SHA256+TLSv1.3")));
 
 
     /**
@@ -742,11 +742,11 @@ public class TestCipher {
                     "SRP-RSA-3DES-EDE-CBC-SHA+SSLv3",
                     "SRP-RSA-AES-128-CBC-SHA+SSLv3",
                     "SRP-RSA-AES-256-CBC-SHA+SSLv3",
-                    "TLS13-AES-256-GCM-SHA384+TLSv1.3",
-                    "TLS13-CHACHA20-POLY1305-SHA256+TLSv1.3",
-                    "TLS13-AES-128-GCM-SHA256+TLSv1.3",
-                    "TLS13-AES-128-CCM-8-SHA256+TLSv1.3",
-                    "TLS13-AES-128-CCM-SHA256+TLSv1.3")));
+                    "TLS_AES_128_CCM_SHA256+TLSv1.3",
+                    "TLS_AES_128_CCM_8_SHA256+TLSv1.3",
+                    "TLS_AES_128_GCM_SHA256+TLSv1.3",
+                    "TLS_AES_256_GCM_SHA384+TLSv1.3",
+                    "TLS_CHACHA20_POLY1305_SHA256+TLSv1.3")));
 
 
     private static JsseImpl ORACLE_JSSE_CIPHER_IMPL = new JsseImpl("Oracle",
