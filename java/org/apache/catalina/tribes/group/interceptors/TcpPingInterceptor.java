@@ -88,9 +88,9 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
     }
 
     @Override
-    public void stop(int svc) throws ChannelException {
+    public synchronized void stop(int svc) throws ChannelException {
         running = false;
-        if ( thread != null ) {
+        if (thread != null) {
             thread.interrupt();
             thread = null;
         }
