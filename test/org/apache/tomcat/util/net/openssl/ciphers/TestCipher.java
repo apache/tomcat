@@ -80,14 +80,6 @@ public class TestCipher {
         // TLS 1.3 is still i
         Set<String> availableCipherSuites =
                 TesterOpenSSL.getOpenSSLCiphersAsSet("ALL:eNULL:aRSA");
-        // TODO
-        // Temporary removal of the TLS1.3 ciphers until the spec is final or an
-        // appropriate option is added to the ciphers command
-        availableCipherSuites.remove("TLS13-AES-128-GCM-SHA256+TLSv1.3");
-        availableCipherSuites.remove("TLS13-AES-128-CCM-8-SHA256+TLSv1.3");
-        availableCipherSuites.remove("TLS13-AES-128-CCM-SHA256+TLSv1.3");
-        availableCipherSuites.remove("TLS13-CHACHA20-POLY1305-SHA256+TLSv1.3");
-        availableCipherSuites.remove("TLS13-AES-256-GCM-SHA384+TLSv1.3");
 
         Set<String> expectedCipherSuites = new HashSet<>();
         for (Cipher cipher : Cipher.values()) {

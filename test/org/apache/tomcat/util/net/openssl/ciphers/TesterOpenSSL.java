@@ -362,12 +362,22 @@ public class TesterOpenSSL {
 
 
     public static String getOpenSSLCiphersAsExpression(String specification) throws Exception {
-        String stdout;
-        if (specification == null) {
-            stdout = executeOpenSSLCommand("ciphers", "-v");
-        } else {
-            stdout = executeOpenSSLCommand("ciphers", "-v", specification);
+
+        List<String> args = new ArrayList<>();
+        // Standard command to list the ciphers
+        args.add("ciphers");
+        args.add("-v");
+        if (VERSION == 10101) {
+            // Need to exclude the TLSv1.3 ciphers
+            args.add("-ciphersuites");
+            args.add("\"\"");
         }
+        // Include the specification if provided
+        if (specification == null) {
+            args.add(specification);
+        }
+
+        String stdout = executeOpenSSLCommand(args.toArray(new String[args.size()]));
 
         if (stdout.length() == 0) {
             return stdout;
