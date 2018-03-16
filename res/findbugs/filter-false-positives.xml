@@ -528,6 +528,11 @@
     <Bug code="DE"/>
   </Match>
   <Match>
+    <Class name="org.apache.catalina.tribes.group.ChannelCoordinator"/>
+    <Field name="membershipService"/>
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.tribes.membership.McastServiceImpl"/>
     <Method name="stop"/>
     <Bug code="DE"/>
