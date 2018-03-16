@@ -34,7 +34,6 @@ import org.apache.catalina.tribes.util.Arrays;
 import org.apache.catalina.tribes.util.Logs;
 import org.apache.catalina.tribes.util.StringManager;
 
-
 /**
  * The channel coordinator object coordinates the membership service,
  * the sender and the receiver.
