@@ -377,7 +377,7 @@ public class TesterOpenSSL {
         if (VERSION == 10101) {
             // Need to exclude the TLSv1.3 ciphers
             args.add("-ciphersuites");
-            args.add("\"\"");
+            args.add("");
         }
         // Include the specification if provided
         if (specification != null) {
