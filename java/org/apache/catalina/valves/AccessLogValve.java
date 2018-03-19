@@ -555,7 +555,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * system default character set will be used. An empty string will be
      * treated as <code>null</code> when this property is assigned.
      */
-    protected String encoding = null;
+    protected volatile String encoding = null;
 
     /**
      * Array of AccessLogElement, they will be used to make log message.
