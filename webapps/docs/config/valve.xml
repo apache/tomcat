@@ -194,6 +194,12 @@
         </p>
       </attribute>
 
+      <attribute name="maxDays" required="false">
+        <p>The maximum number of days rotated access logs will be retained for
+           before being deleted. If not specified, the default value of
+           <code>-1</code> will be used which means never delete old files.</p>
+      </attribute>
+
       <attribute name="pattern" required="false">
         <p>A formatting layout identifying the various information fields
         from the request and response to be logged, or the word

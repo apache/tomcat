@@ -215,7 +215,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * The prefix that is added to log file filenames.
      */
-    protected String prefix = "access_log.";
+    protected volatile String prefix = "access_log.";
 
 
     /**
@@ -239,7 +239,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     /**
      * The suffix that is added to log file filenames.
      */
-    protected String suffix = "";
+    protected volatile String suffix = "";
 
 
     /**
@@ -570,7 +570,25 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      */
     protected boolean requestAttributesEnabled = false;
 
+    /**
+     * The number of days to retain the access log files before they are
+     * removed.
+     */
+    private int maxDays = -1;
+    private volatile boolean checkForOldLogs = false;
+
+
     // ------------------------------------------------------------- Properties
+
+    public int getMaxDays() {
+        return maxDays;
+    }
+
+
+    public void setMaxDays(int maxDays) {
+        this.maxDays = maxDays;
+    }
+
 
     /**
      * @return Returns the enabled.
@@ -578,6 +596,7 @@ public class AccessLogValve extends ValveBase implements AccessLog {
     public boolean getEnabled() {
         return enabled;
     }
+
 
     /**
      * {@inheritDoc}
@@ -944,6 +963,50 @@ public class AccessLogValve extends ValveBase implements AccessLog {
                 buffered) {
             writer.flush();
         }
+
+        int maxDays = this.maxDays;
+        String prefix = this.prefix;
+        String suffix = this.suffix;
+
+        if (rotatable && checkForOldLogs && maxDays > 0) {
+            long deleteIfLastModifiedBefore =
+                    System.currentTimeMillis() - (maxDays * 24L * 60 * 60 * 1000);
+            File dir = getDirectoryFile();
+            if (dir.isDirectory()) {
+                String[] oldAccessLogs = dir.list();
+
+                if (oldAccessLogs != null) {
+                    for (String oldAccessLog : oldAccessLogs) {
+                        boolean match = false;
+
+                        if (prefix != null && prefix.length() > 0) {
+                            if (!oldAccessLog.startsWith(prefix)) {
+                                continue;
+                            }
+                            match = true;
+                        }
+
+                        if (suffix != null && suffix.length() > 0) {
+                            if (!oldAccessLog.endsWith(suffix)) {
+                                continue;
+                            }
+                            match = true;
+                        }
+
+                        if (match) {
+                            File file = new File(dir, oldAccessLog);
+                            if (file.isFile() && file.lastModified() < deleteIfLastModifiedBefore) {
+                                if (!file.delete()) {
+                                    log.warn(sm.getString(
+                                            "accessLogValve.deleteFail", file.getAbsolutePath()));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            checkForOldLogs = false;
+        }
     }
 
     /**
@@ -1053,7 +1116,16 @@ public class AccessLogValve extends ValveBase implements AccessLog {
 
     }
 
+
     // -------------------------------------------------------- Private Methods
+
+    private File getDirectoryFile() {
+        File dir = new File(directory);
+        if (!dir.isAbsolute()) {
+            dir = new File(System.getProperty(Globals.CATALINA_BASE_PROP), directory);
+        }
+        return dir;
+    }
 
 
     /**
@@ -1065,12 +1137,8 @@ public class AccessLogValve extends ValveBase implements AccessLog {
      * @return the log file object
      */
     private File getLogFile(boolean useDateStamp) {
-
         // Create the directory if necessary
-        File dir = new File(directory);
-        if (!dir.isAbsolute()) {
-            dir = new File(System.getProperty(Globals.CATALINA_BASE_PROP), directory);
-        }
+        File dir = getDirectoryFile();
         if (!dir.mkdirs() && !dir.isDirectory()) {
             log.error(sm.getString("accessLogValve.openDirFail", dir));
         }
@@ -1219,6 +1287,10 @@ public class AccessLogValve extends ValveBase implements AccessLog {
             currentLogFile = null;
             log.error(sm.getString("accessLogValve.openFail", pathname), e);
         }
+        // Rotating a log file will always trigger a new file to be opened so
+        // when a new file is opened, check to see if any old files need to be
+        // removed.
+        checkForOldLogs = true;
     }
 
     /**

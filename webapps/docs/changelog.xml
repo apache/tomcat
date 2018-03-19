@@ -67,6 +67,12 @@
         (markt)
       </fix>
       <fix>
+        <bug>52688</bug>: Add support for the <code>maxDays</code> attribute to
+        the <code>AccessLogValve</code> and <code>ExtendedAccessLogValve</code>.
+        This allows the maximum number of days for which rotated access logs
+        should be retained before deletion to be defined. (markt)
+      </fix>
+      <fix>
         Prevent Tomcat from applying gzip compression to content that is already
         compressed with brotli compression. Based on a patch provided by burka.
         (markt)
