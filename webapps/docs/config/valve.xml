@@ -194,6 +194,12 @@
         </p>
       </attribute>
 
+      <attribute name="maxDays" required="false">
+        <p>The maximum number of days rotated access logs will be retained for
+           before being deleted. If not specified, the default value of
+           <code>-1</code> will be used which means never delete old files.</p>
+      </attribute>
+
       <attribute name="maxLogMessageBufferSize" required="false">
         <p>Log message buffers are usually recycled and re-used. To prevent
            excessive memory usage, if a buffer grows beyond this size it will be

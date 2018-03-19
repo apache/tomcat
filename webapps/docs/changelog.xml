@@ -54,6 +54,12 @@
         (markt)
       </fix>
       <fix>
+        <bug>52688</bug>: Add support for the <code>maxDays</code> attribute to
+        the <code>AccessLogValve</code> and <code>ExtendedAccessLogValve</code>.
+        This allows the maximum number of days for which rotated access logs
+        should be retained before deletion to be defined. (markt)
+      </fix>
+      <fix>
         Ensure the MBean names for the <code>SSLHostConfig</code> and
         <code>SSLHostConfigCertificate</code> are correctly formed when the
         <code>Connector</code> is bound to a specific IP address. (markt)
