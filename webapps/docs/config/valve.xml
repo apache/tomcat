@@ -114,100 +114,23 @@
 
     <attributes>
 
+      <attribute name="buffered" required="false">
+        <p>Flag to determine if logging will be buffered.
+           If set to <code>false</code>, then access logging will be written after each
+           request. Default value: <code>true</code>
+        </p>
+      </attribute>
+
       <attribute name="className" required="true">
         <p>Java class name of the implementation to use.  This MUST be set to
         <strong>org.apache.catalina.valves.AccessLogValve</strong> to use the
         default access log valve.</p>
       </attribute>
 
-      <attribute name="directory" required="false">
-        <p>Absolute or relative pathname of a directory in which log files
-        created by this valve will be placed.  If a relative path is
-        specified, it is interpreted as relative to $CATALINA_BASE.  If
-        no directory attribute is specified, the default value is "logs"
-        (relative to $CATALINA_BASE).</p>
-      </attribute>
-
-      <attribute name="prefix" required="false">
-        <p>The prefix added to the start of each log file's name.  If not
-        specified, the default value is "access_log".</p>
-      </attribute>
-
-      <attribute name="suffix" required="false">
-        <p>The suffix added to the end of each log file's name.  If not
-        specified, the default value is "" (a zero-length string),
-        meaning that no suffix will be added.</p>
-      </attribute>
-
-      <attribute name="fileDateFormat" required="false">
-        <p>Allows a customized timestamp in the access log file name.
-           The file is rotated whenever the formatted timestamp changes.
-           The default value is <code>.yyyy-MM-dd</code>.
-           If you wish to rotate every hour, then set this value
-           to <code>.yyyy-MM-dd.HH</code>.
-           The date format will always be localized
-           using the locale <code>en_US</code>.
+      <attribute name="condition" required="false">
+        <p>The same as <code>conditionUnless</code>. This attribute is
+           provided for backwards compatibility.
         </p>
-      </attribute>
-
-      <attribute name="rotatable" required="false">
-        <p>Flag to determine if log rotation should occur.
-           If set to <code>false</code>, then this file is never rotated and
-           <code>fileDateFormat</code> is ignored.
-           Default value: <code>true</code>
-        </p>
-      </attribute>
-
-      <attribute name="renameOnRotate" required="false">
-        <p>By default for a rotatable log the active access log file name
-           will contain the current timestamp in <code>fileDateFormat</code>.
-           During rotation the file is closed and a new file with the next
-           timestamp in the name is created and used. When setting
-           <code>renameOnRotate</code> to <code>true</code>, the timestamp
-           is no longer part of the active log file name. Only during rotation
-           the file is closed and then renamed to include the timestamp.
-           This is similar to the behavior of most log frameworks when
-           doing time based rotation.
-           Default value: <code>false</code>
-        </p>
-      </attribute>
-
-      <attribute name="pattern" required="false">
-        <p>A formatting layout identifying the various information fields
-        from the request and response to be logged, or the word
-        <code>common</code> or <code>combined</code> to select a
-        standard format.  See below for more information on configuring
-        this attribute.</p>
-      </attribute>
-
-      <attribute name="encoding" required="false">
-        <p>Character set used to write the log file. An empty string means
-        to use the system default character set. Default value: use the
-        system default character set.
-        </p>
-      </attribute>
-
-      <attribute name="locale" required="false">
-        <p>The locale used to format timestamps in the access log
-           lines. Any timestamps configured using an
-           explicit SimpleDateFormat pattern (<code>%{xxx}t</code>)
-           are formatted in this locale. By default the
-           default locale of the Java process is used. Switching the
-           locale after the AccessLogValve is initialized is not supported.
-           Any timestamps using the common log format
-           (<code>CLF</code>) are always formatted in the locale
-           <code>en_US</code>.
-        </p>
-      </attribute>
-
-      <attribute name="requestAttributesEnabled" required="false">
-        <p>Set to <code>true</code> to check for the existence of request
-        attributes (typically set by the RemoteIpValve and similar) that should
-        be used to override the values returned by the request for remote
-        address, remote host, server port and protocol. If the attributes are
-        not set, or this attribute is set to <code>false</code> then the values
-        from the request will be used. If not set, the default value of
-        <code>false</code> will be used.</p>
       </attribute>
 
       <attribute name="conditionIf" required="false">
@@ -232,16 +155,42 @@
         </p>
       </attribute>
 
-      <attribute name="condition" required="false">
-        <p>The same as <code>conditionUnless</code>. This attribute is
-           provided for backwards compatibility.
+      <attribute name="directory" required="false">
+        <p>Absolute or relative pathname of a directory in which log files
+        created by this valve will be placed.  If a relative path is
+        specified, it is interpreted as relative to $CATALINA_BASE.  If
+        no directory attribute is specified, the default value is "logs"
+        (relative to $CATALINA_BASE).</p>
+      </attribute>
+
+      <attribute name="encoding" required="false">
+        <p>Character set used to write the log file. An empty string means
+        to use the system default character set. Default value: use the
+        system default character set.
         </p>
       </attribute>
 
-      <attribute name="buffered" required="false">
-        <p>Flag to determine if logging will be buffered.
-           If set to <code>false</code>, then access logging will be written after each
-           request. Default value: <code>true</code>
+      <attribute name="fileDateFormat" required="false">
+        <p>Allows a customized timestamp in the access log file name.
+           The file is rotated whenever the formatted timestamp changes.
+           The default value is <code>.yyyy-MM-dd</code>.
+           If you wish to rotate every hour, then set this value
+           to <code>.yyyy-MM-dd.HH</code>.
+           The date format will always be localized
+           using the locale <code>en_US</code>.
+        </p>
+      </attribute>
+
+      <attribute name="locale" required="false">
+        <p>The locale used to format timestamps in the access log
+           lines. Any timestamps configured using an
+           explicit SimpleDateFormat pattern (<code>%{xxx}t</code>)
+           are formatted in this locale. By default the
+           default locale of the Java process is used. Switching the
+           locale after the AccessLogValve is initialized is not supported.
+           Any timestamps using the common log format
+           (<code>CLF</code>) are always formatted in the locale
+           <code>en_US</code>.
         </p>
       </attribute>
 
@@ -252,12 +201,63 @@
            set to larger than the typical access log message size.</p>
       </attribute>
 
+      <attribute name="pattern" required="false">
+        <p>A formatting layout identifying the various information fields
+        from the request and response to be logged, or the word
+        <code>common</code> or <code>combined</code> to select a
+        standard format.  See below for more information on configuring
+        this attribute.</p>
+      </attribute>
+
+      <attribute name="prefix" required="false">
+        <p>The prefix added to the start of each log file's name.  If not
+        specified, the default value is "access_log".</p>
+      </attribute>
+
+      <attribute name="renameOnRotate" required="false">
+        <p>By default for a rotatable log the active access log file name
+           will contain the current timestamp in <code>fileDateFormat</code>.
+           During rotation the file is closed and a new file with the next
+           timestamp in the name is created and used. When setting
+           <code>renameOnRotate</code> to <code>true</code>, the timestamp
+           is no longer part of the active log file name. Only during rotation
+           the file is closed and then renamed to include the timestamp.
+           This is similar to the behavior of most log frameworks when
+           doing time based rotation.
+           Default value: <code>false</code>
+        </p>
+      </attribute>
+
+      <attribute name="requestAttributesEnabled" required="false">
+        <p>Set to <code>true</code> to check for the existence of request
+        attributes (typically set by the RemoteIpValve and similar) that should
+        be used to override the values returned by the request for remote
+        address, remote host, server port and protocol. If the attributes are
+        not set, or this attribute is set to <code>false</code> then the values
+        from the request will be used. If not set, the default value of
+        <code>false</code> will be used.</p>
+      </attribute>
+
       <attribute name="resolveHosts" required="false">
         <p>This attribute is no longer supported. Use the connector
         attribute <code>enableLookups</code> instead.</p>
         <p>If you have <code>enableLookups</code> on the connector set to
         <code>true</code> and want to ignore it, use <b>%a</b> instead of
         <b>%h</b> in the value of <code>pattern</code>.</p>
+      </attribute>
+
+      <attribute name="rotatable" required="false">
+        <p>Flag to determine if log rotation should occur.
+           If set to <code>false</code>, then this file is never rotated and
+           <code>fileDateFormat</code> is ignored.
+           Default value: <code>true</code>
+        </p>
+      </attribute>
+
+      <attribute name="suffix" required="false">
+        <p>The suffix added to the end of each log file's name.  If not
+        specified, the default value is "" (a zero-length string),
+        meaning that no suffix will be added.</p>
       </attribute>
 
     </attributes>
