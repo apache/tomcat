@@ -154,7 +154,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
      * system default character set will be used. An empty string will be
      * treated as <code>null</code> when this property is assigned.
      */
-    protected String encoding = null;
+    protected volatile String encoding = null;
 
     // ------------------------------------------------------------- Properties
 
