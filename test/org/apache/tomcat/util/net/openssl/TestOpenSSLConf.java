@@ -39,7 +39,10 @@ public class TestOpenSSLConf extends TomcatBaseTest {
     private static final String[] ENABLED_PROTOCOLS = {"TLSv1.1"};
     private static final String[] DISABLED_PROTOCOLS = {"SSLv3", "TLSv1", "TLSv1.2"};
 
-    public SSLHostConfig initOpenSSLConfCmdCipher(String name, String value) throws Exception {
+    public SSLHostConfig initOpenSSLConfCmdCipher(String... commands) throws Exception {
+        Assert.assertNotNull(commands);
+        Assert.assertTrue("Invalid length", commands.length % 2 == 0);
+
         Tomcat tomcat = getTomcatInstance();
 
         TesterSupport.initSsl(tomcat);
@@ -53,11 +56,14 @@ public class TestOpenSSLConf extends TomcatBaseTest {
                     sslImplementation.contains("openssl"));
         }
 
-        OpenSSLConfCmd cmd = new OpenSSLConfCmd();
-        cmd.setName(name);
-        cmd.setValue(value);
         OpenSSLConf conf = new OpenSSLConf();
-        conf.addCmd(cmd);
+        for (int i = 0; i < commands.length;) {
+            OpenSSLConfCmd cmd = new OpenSSLConfCmd();
+            cmd.setName(commands[i++]);
+            cmd.setValue(commands[i++]);
+            conf.addCmd(cmd);
+        }
+
         SSLHostConfig[] sslHostConfigs = tomcat.getConnector().
                                          getProtocolHandler().findSslHostConfigs();
         Assert.assertEquals("Wrong SSLHostConfigCount", 1, sslHostConfigs.length);
@@ -72,8 +78,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
 
     @Test
     public void testOpenSSLConfCmdCipher() throws Exception {
-        SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("CipherString",
-                                                               ENABLED_CIPHER);
+        SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("CipherString", ENABLED_CIPHER);
         String[] ciphers = sslHostConfig.getEnabledCiphers();
         Assert.assertThat("Wrong HostConfig ciphers", ciphers,
                 CoreMatchers.is(EXPECTED_CIPHERS));
@@ -92,8 +97,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
         for (String protocol : ENABLED_PROTOCOLS) {
             sb.append(",").append(protocol);
         }
-        SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("Protocol",
-                                                               sb.substring(1));
+        SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("Protocol", sb.substring(1));
         String[] protocols = sslHostConfig.getEnabledProtocols();
         for (String protocol : protocols) {
             Assert.assertFalse("Protocol " + protocol + " is not allowed",
