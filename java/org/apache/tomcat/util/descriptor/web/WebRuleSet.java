@@ -498,6 +498,7 @@ public class WebRuleSet implements RuleSet {
                                "setHome", 0);
         digester.addRule(fullPrefix + "/ejb-local-ref/mapped-name",
                          new MappedNameRule());
+        digester.addCallMethod(fullPrefix + "/ejb-local-ref/lookup-name", "setLookupName", 0);
         configureInjectionRules(digester, "web-app/ejb-local-ref/");
 
         //ejb-ref
@@ -520,6 +521,7 @@ public class WebRuleSet implements RuleSet {
                                "setRemote", 0);
         digester.addRule(fullPrefix + "/ejb-ref/mapped-name",
                          new MappedNameRule());
+        digester.addCallMethod(fullPrefix + "/ejb-ref/lookup-name", "setLookupName", 0);
         configureInjectionRules(digester, "web-app/ejb-ref/");
 
         //env-entry
@@ -539,6 +541,7 @@ public class WebRuleSet implements RuleSet {
                                "setValue", 0);
         digester.addRule(fullPrefix + "/env-entry/mapped-name",
                          new MappedNameRule());
+        digester.addCallMethod(fullPrefix + "/env-entry/lookup-name", "setLookupName", 0);
         configureInjectionRules(digester, "web-app/env-entry/");
 
         //resource-env-ref
@@ -553,6 +556,7 @@ public class WebRuleSet implements RuleSet {
                 "setType", 0);
         digester.addRule(fullPrefix + "/resource-env-ref/mapped-name",
                          new MappedNameRule());
+        digester.addCallMethod(fullPrefix + "/resource-env-ref/lookup-name", "setLookupName", 0);
         configureInjectionRules(digester, "web-app/resource-env-ref/");
 
         //message-destination
@@ -573,6 +577,7 @@ public class WebRuleSet implements RuleSet {
                                "setName", 0);
         digester.addRule(fullPrefix + "/message-destination/mapped-name",
                          new MappedNameRule());
+        digester.addCallMethod(fullPrefix + "/message-destination/lookup-name", "setLookupName", 0);
 
         //message-destination-ref
         digester.addObjectCreate(fullPrefix + "/message-destination-ref",
@@ -592,6 +597,8 @@ public class WebRuleSet implements RuleSet {
                                "setUsage", 0);
         digester.addRule(fullPrefix + "/message-destination-ref/mapped-name",
                          new MappedNameRule());
+        digester.addCallMethod(fullPrefix + "/message-destination-ref/lookup-name",
+                "setLookupName", 0);
         configureInjectionRules(digester, "web-app/message-destination-ref/");
 
         //resource-ref
@@ -612,6 +619,7 @@ public class WebRuleSet implements RuleSet {
                                "setType", 0);
         digester.addRule(fullPrefix + "/resource-ref/mapped-name",
                          new MappedNameRule());
+        digester.addCallMethod(fullPrefix + "/resource-ref/lookup-name", "setLookupName", 0);
         configureInjectionRules(digester, "web-app/resource-ref/");
 
         //service-ref
@@ -671,6 +679,7 @@ public class WebRuleSet implements RuleSet {
                                "addPortName", 0);
         digester.addRule(fullPrefix + "/service-ref/mapped-name",
                          new MappedNameRule());
+        digester.addCallMethod(fullPrefix + "/service-ref/lookup-name", "setLookupName", 0);
         configureInjectionRules(digester, "web-app/service-ref/");
     }
 
