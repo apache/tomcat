@@ -112,6 +112,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Add JMX support for <code>FragmentationInterceptor</code> in order to
+        prevent warning of startup. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="jdbc-pool">
     <changelog>
       <fix>

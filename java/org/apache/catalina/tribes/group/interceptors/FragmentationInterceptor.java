@@ -43,7 +43,7 @@ import org.apache.juli.logging.LogFactory;
  * FragmentationInterceptor.maxSize=&lt;max message size&gt; - message size in bytes <b>default=1024*100 (around a tenth of a MB)</b><br>
  * @version 1.0
  */
-public class FragmentationInterceptor extends ChannelInterceptorBase {
+public class FragmentationInterceptor extends ChannelInterceptorBase implements FragmentationInterceptorMBean {
     private static final Log log = LogFactory.getLog(FragmentationInterceptor.class);
     protected static final StringManager sm = StringManager.getManager(FragmentationInterceptor.class);
 
@@ -157,19 +157,22 @@ public class FragmentationInterceptor extends ChannelInterceptorBase {
         super.heartbeat();
     }
 
-
+    @Override
     public int getMaxSize() {
         return maxSize;
     }
 
+    @Override
     public long getExpire() {
         return expire;
     }
 
+    @Override
     public void setMaxSize(int maxSize) {
         this.maxSize = maxSize;
     }
 
+    @Override
     public void setExpire(long expire) {
         this.expire = expire;
     }
