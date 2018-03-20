@@ -38,9 +38,9 @@ import org.apache.juli.logging.LogFactory;
  * and smaller messages can make it through.
  *
  * <br><b>Configuration Options</b><br>
- * OrderInterceptor.expire=&lt;milliseconds&gt; - how long do we keep the fragments in memory and wait for the rest to arrive<b>default=60,000ms -&gt; 60seconds</b>
+ * FragmentationInterceptor.expire=&lt;milliseconds&gt; - how long do we keep the fragments in memory and wait for the rest to arrive <b>default=60,000ms -&gt; 60seconds</b>
  * This setting is useful to avoid OutOfMemoryErrors<br>
- * OrderInterceptor.maxSize=&lt;max message size&gt; - message size in bytes <b>default=1024*100 (around a tenth of a MB)</b><br>
+ * FragmentationInterceptor.maxSize=&lt;max message size&gt; - message size in bytes <b>default=1024*100 (around a tenth of a MB)</b><br>
  * @version 1.0
  */
 public class FragmentationInterceptor extends ChannelInterceptorBase {
