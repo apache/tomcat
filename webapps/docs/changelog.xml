@@ -125,6 +125,9 @@
         a plain text response. Based on a suggestion from Muthukumar Marikani.
         (markt)
       </add>
+      <add>
+        Add document for <code>FragmentationInterceptor</code>. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">
