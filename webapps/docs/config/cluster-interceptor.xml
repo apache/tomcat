@@ -108,6 +108,18 @@
      </attribute>
    </attributes>
   </subsection>
+  <subsection name="org.apache.catalina.tribes.group.interceptors.FragmentationInterceptor Attributes">
+   <attributes>
+     <attribute name="expire" required="false">
+       How long do we keep the fragments in memory and wait for the rest to arrive.
+       The default is 60000 ms.
+     </attribute>
+     <attribute name="maxSize" required="false">
+       The maximum message size in bytes. If the message size exceeds this value, this interceptor fragments the message and sends them.
+       If it is less than this value, this interceptor does not fragment the message and sent in as one message. The default is 1024*100.
+     </attribute>
+   </attributes>
+  </subsection>
   <subsection name="org.apache.catalina.tribes.group.interceptors.MessageDispatchInterceptor Attributes">
    <attributes>
      <attribute name="optionFlag" required="false">
