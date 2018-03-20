@@ -1322,7 +1322,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 appendElement(sb, INDENT4, "message-destination-name",
                         md.getName());
                 appendElement(sb, INDENT4, "mapped-name", md.getProperty("mappedName"));
-                // TODO lookup-name
+                appendElement(sb, INDENT4, "lookup-name", md.getLookupName());
                 sb.append("  </message-destination>\n");
             }
             sb.append('\n');
