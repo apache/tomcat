@@ -1001,7 +1001,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
                             target.getTargetName());
                     sb.append("    </injection-target>\n");
                 }
-                // TODO lookup-name
+                appendElement(sb, INDENT4, "lookup-name", resourceEnvRef.getLookupName());
                 sb.append("  </resource-env-ref>\n");
             }
             sb.append('\n');
@@ -1027,7 +1027,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
                         target.getTargetName());
                 sb.append("    </injection-target>\n");
             }
-            // TODO lookup-name
+            appendElement(sb, INDENT4, "lookup-name", resourceRef.getLookupName());
             sb.append("  </resource-ref>\n");
         }
         sb.append('\n');
@@ -1113,7 +1113,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
                         target.getTargetName());
                 sb.append("    </injection-target>\n");
             }
-            // TODO lookup-name
+            appendElement(sb, INDENT4, "lookup-name", envEntry.getLookupName());
             sb.append("  </env-entry>\n");
         }
         sb.append('\n');
@@ -1135,7 +1135,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
                         target.getTargetName());
                 sb.append("    </injection-target>\n");
             }
-            // TODO lookup-name
+            appendElement(sb, INDENT4, "lookup-name", ejbRef.getLookupName());
             sb.append("  </ejb-ref>\n");
         }
         sb.append('\n');
@@ -1160,7 +1160,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
                             target.getTargetName());
                     sb.append("    </injection-target>\n");
                 }
-                // TODO lookup-name
+                appendElement(sb, INDENT4, "lookup-name", ejbLocalRef.getLookupName());
                 sb.append("  </ejb-local-ref>\n");
             }
             sb.append('\n');
@@ -1219,7 +1219,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
                             target.getTargetName());
                     sb.append("    </injection-target>\n");
                 }
-                // TODO lookup-name
+                appendElement(sb, INDENT4, "lookup-name", serviceRef.getLookupName());
                 sb.append("  </service-ref>\n");
             }
             sb.append('\n');
@@ -1274,7 +1274,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Encodi
                             target.getTargetName());
                     sb.append("    </injection-target>\n");
                 }
-                // TODO lookup-name
+                appendElement(sb, INDENT4, "lookup-name", mdr.getLookupName());
                 sb.append("  </message-destination-ref>\n");
             }
             sb.append('\n');
