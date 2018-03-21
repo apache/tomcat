@@ -147,6 +147,9 @@
         SourceForge and Maven Central to avoid failures due to HTTP to HTTPS
         redirects. (markt)
       </fix>
+      <add>
+        Always report the OS's umask when launching the JVM. (schultz)
+      </add>
     </changelog>
   </subsection>
 </section>

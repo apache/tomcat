@@ -298,9 +298,11 @@
     <p>The <strong>Security Lifecycle Listener</strong> performs a number of
     security checks when Tomcat starts and prevents Tomcat from starting if they
     fail. The listener is not enabled by default. To enabled it uncomment the
-    listener in $CATALINA_BASE/conf/server.xml. If the operating system supports
-    umask then the line in $CATALINA_HOME/bin/catalina.sh that obtains the umask
-    also needs to be uncommented.</p>
+    listener in $CATALINA_BASE/conf/server.xml. For Tomcat versions before 9.0.7,
+    if the operating system supports umask then the line in
+    $CATALINA_HOME/bin/catalina.sh that obtains the umask also needs to be
+    uncommented. For Tomcat 9.0.7 and later, the umask is automatically
+    passed-into Tomcat.</p>
 
     <p>This listener must only be nested within <a href="server.html">Server</a>
     elements.</p>

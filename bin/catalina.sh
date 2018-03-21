@@ -284,9 +284,8 @@ if [ -d "$CATALINA_HOME/endorsed" ]; then
     ENDORSED_PROP=java.endorsed.dirs
 fi
 
-# Uncomment the following line to make the umask available when using the
-# org.apache.catalina.security.SecurityListener
-#JAVA_OPTS="$JAVA_OPTS -Dorg.apache.catalina.security.SecurityListener.UMASK=`umask`"
+# Make the umask available when using the org.apache.catalina.security.SecurityListener
+JAVA_OPTS="$JAVA_OPTS -Dorg.apache.catalina.security.SecurityListener.UMASK=`umask`"
 
 if [ -z "$USE_NOHUP" ]; then
     if $hpux; then
