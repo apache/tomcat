@@ -1033,7 +1033,7 @@ public abstract class AbstractReplicatedMap<K,V>
                 entry.setCopy(false);
                 if ( getMapOwner()!=null ) getMapOwner().objectMadePrimary(key, entry.getValue());
 
-            } catch (Exception x) {
+            } catch (RuntimeException | ChannelException | ClassNotFoundException | IOException x) {
                 log.error(sm.getString("abstractReplicatedMap.unable.get"), x);
                 return null;
             }

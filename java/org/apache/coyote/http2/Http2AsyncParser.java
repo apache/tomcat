@@ -228,7 +228,7 @@ class Http2AsyncParser extends Http2Parser {
                             }
                         }
                     } while (continueParsing);
-                } catch (Exception e) {
+                } catch (RuntimeException | IOException | Http2Exception e) {
                     error = e;
                 }
                 if (payload.hasRemaining()) {

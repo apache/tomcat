@@ -268,7 +268,7 @@ public abstract class Compiler {
                         + " generate=" + (t4 - t3) + " validate=" + (t2 - t1));
             }
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             // Remove the generated .java file
             File file = new File(javaFileName);
             if (file.exists()) {

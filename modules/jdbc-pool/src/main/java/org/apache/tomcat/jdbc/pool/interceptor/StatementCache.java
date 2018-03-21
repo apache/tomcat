@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -293,7 +294,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                         proxy.cached = true;
                         shouldClose = false;
                     }
-                } catch (Exception x) {
+                } catch (RuntimeException | ReflectiveOperationException | SQLException x) {
                     removeStatement(proxy);
                 }
             }

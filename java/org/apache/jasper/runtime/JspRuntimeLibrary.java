@@ -489,7 +489,7 @@ public class JspRuntimeLibrary {
                 }
                 method.invoke (bean, new Object[] {tmpval});
             }
-        } catch (Exception ex) {
+        } catch (RuntimeException | ReflectiveOperationException ex) {
             Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
             ExceptionUtils.handleThrowable(thr);
             throw new JasperException ("error in invoking method", ex);
