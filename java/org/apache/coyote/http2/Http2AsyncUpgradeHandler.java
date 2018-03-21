@@ -157,18 +157,13 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     void writeHeaders(Stream stream, int pushedStreamId, MimeHeaders mimeHeaders,
             boolean endOfStream, int payloadSize) throws IOException {
         // This ensures the Stream processing thread has control of the socket.
-        ByteBuffer[] bufs = null;
         synchronized (socketWrapper) {
             AsyncHeaderFrameBuffers headerFrameBuffers = (AsyncHeaderFrameBuffers)
                     doWriteHeaders(stream, pushedStreamId, mimeHeaders, endOfStream, payloadSize);
             if (headerFrameBuffers != null) {
-                bufs = headerFrameBuffers.bufs.toArray(BYTEBUFFER_ARRAY);
-            }
-            // FIXME: look again at more optimized syncs, remove due to the need to write header frames in order with push
-            if (bufs != null) {
                 socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
                         TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE,
-                        applicationErrorCompletion, bufs);
+                        applicationErrorCompletion, headerFrameBuffers.bufs.toArray(BYTEBUFFER_ARRAY));
                 handleAsyncException();
             }
         }
