@@ -80,7 +80,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
     public void testOpenSSLConfCmdCipher() throws Exception {
         // Ensure TLSv1.3 ciphers aren't returned
         SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("CipherString", ENABLED_CIPHER,
-                "MaxProtocol", "TLSv1.2");
+                "CipherSuites", "");
         String[] ciphers = sslHostConfig.getEnabledCiphers();
         Assert.assertThat("Wrong HostConfig ciphers", ciphers,
                 CoreMatchers.is(EXPECTED_CIPHERS));
