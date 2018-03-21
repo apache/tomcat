@@ -180,7 +180,8 @@ class Http2Parser {
                 if (dest.remaining() < dataLength) {
                     swallow(streamId, dataLength, false);
                     // Client has sent more data than permitted by Window size
-                    throw new StreamException("Client sent more data than stream window allowed", Http2Error.FLOW_CONTROL_ERROR, streamId);
+                    throw new StreamException(sm.getString("http2Parser.processFrameData.window", connectionId),
+                            Http2Error.FLOW_CONTROL_ERROR, streamId);
                 }
                 input.fill(true, dest, dataLength);
                 // Process padding before sending any notifications in case
