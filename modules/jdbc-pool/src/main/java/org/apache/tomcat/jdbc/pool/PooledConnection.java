@@ -436,8 +436,7 @@ public class PooledConnection implements PooledConnectionMBean {
         else if (action == PooledConnection.VALIDATE_INIT &&
                  poolProperties.isTestOnConnect())
             return true;
-        else if (action == PooledConnection.VALIDATE_INIT &&
-                 poolProperties.getInitSQL()!=null)
+        else if (isInitializingWithInitSQL(action))
            return true;
         else
             return false;
@@ -486,7 +485,7 @@ public class PooledConnection implements PooledConnectionMBean {
             return true;
         }
 
-        if (poolProperties.getValidator() != null) {
+        if (poolProperties.getValidator() != null && !(isInitializingWithInitSQL(validateAction))) {
             if (poolProperties.getValidator().validate(connection, validateAction)) {
                 this.lastValidated = now;
                 return true;
@@ -500,7 +499,7 @@ public class PooledConnection implements PooledConnectionMBean {
 
         String query = sql;
 
-        if (validateAction == VALIDATE_INIT && poolProperties.getInitSQL() != null) {
+        if (isInitializingWithInitSQL(validateAction)) {
             query = poolProperties.getInitSQL();
         }
 
@@ -571,6 +570,10 @@ public class PooledConnection implements PooledConnectionMBean {
         }
         return false;
     } //validate
+
+    private boolean isInitializingWithInitSQL(int validateAction) {
+        return validateAction == VALIDATE_INIT && poolProperties.getInitSQL() != null;
+    }
 
     /**
      * The time limit for how long the object
