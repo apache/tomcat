@@ -75,6 +75,11 @@
         a session while loading it with <code>PersistentManager</code>.
         (fschumacher)
       </fix>
+      <fix>
+        Ensure that <code>NamingContextListener</code> instances are only
+        notified once of property changes on the associated naming resources.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
