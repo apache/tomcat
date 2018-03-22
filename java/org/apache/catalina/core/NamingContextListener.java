@@ -340,141 +340,19 @@ public class NamingContextListener
 
     // ---------------------------------------------- ContainerListener Methods
 
-
     /**
-     * Acknowledge the occurrence of the specified event.
-     * Note: Will never be called when the listener is associated to a Server,
-     * since it is not a Container.
+     * NO-OP.
      *
      * @param event ContainerEvent that has occurred
+     *
+     * @deprecated The {@link ContainerListener} interface and implementing
+     *             methods will be removed from this class for Tomcat 10
+     *             onwards.
      */
+    @Deprecated
     @Override
     public void containerEvent(ContainerEvent event) {
-
-        if (!initialized)
-            return;
-
-        // Setting the context in read/write mode
-        ContextAccessController.setWritable(getName(), token);
-
-        String type = event.getType();
-
-        if (type.equals("addEjb")) {
-
-            String ejbName = (String) event.getData();
-            if (ejbName != null) {
-                ContextEjb ejb = namingResources.findEjb(ejbName);
-                addEjb(ejb);
-            }
-
-        } else if (type.equals("addEnvironment")) {
-
-            String environmentName = (String) event.getData();
-            if (environmentName != null) {
-                ContextEnvironment env =
-                    namingResources.findEnvironment(environmentName);
-                addEnvironment(env);
-            }
-
-        } else if (type.equals("addLocalEjb")) {
-
-            String localEjbName = (String) event.getData();
-            if (localEjbName != null) {
-                ContextLocalEjb localEjb =
-                    namingResources.findLocalEjb(localEjbName);
-                addLocalEjb(localEjb);
-            }
-
-        } else if (type.equals("addResource")) {
-
-            String resourceName = (String) event.getData();
-            if (resourceName != null) {
-                ContextResource resource =
-                    namingResources.findResource(resourceName);
-                addResource(resource);
-            }
-
-        } else if (type.equals("addResourceLink")) {
-
-            String resourceLinkName = (String) event.getData();
-            if (resourceLinkName != null) {
-                ContextResourceLink resourceLink =
-                    namingResources.findResourceLink(resourceLinkName);
-                addResourceLink(resourceLink);
-            }
-
-        } else if (type.equals("addResourceEnvRef")) {
-
-            String resourceEnvRefName = (String) event.getData();
-            if (resourceEnvRefName != null) {
-                ContextResourceEnvRef resourceEnvRef =
-                    namingResources.findResourceEnvRef(resourceEnvRefName);
-                addResourceEnvRef(resourceEnvRef);
-            }
-
-        } else if (type.equals("addService")) {
-
-            String serviceName = (String) event.getData();
-            if (serviceName != null) {
-                ContextService service =
-                    namingResources.findService(serviceName);
-                addService(service);
-            }
-
-        } else if (type.equals("removeEjb")) {
-
-            String ejbName = (String) event.getData();
-            if (ejbName != null) {
-                removeEjb(ejbName);
-            }
-
-        } else if (type.equals("removeEnvironment")) {
-
-            String environmentName = (String) event.getData();
-            if (environmentName != null) {
-                removeEnvironment(environmentName);
-            }
-
-        } else if (type.equals("removeLocalEjb")) {
-
-            String localEjbName = (String) event.getData();
-            if (localEjbName != null) {
-                removeLocalEjb(localEjbName);
-            }
-
-        } else if (type.equals("removeResource")) {
-
-            String resourceName = (String) event.getData();
-            if (resourceName != null) {
-                removeResource(resourceName);
-            }
-
-        } else if (type.equals("removeResourceLink")) {
-
-            String resourceLinkName = (String) event.getData();
-            if (resourceLinkName != null) {
-                removeResourceLink(resourceLinkName);
-            }
-
-        } else if (type.equals("removeResourceEnvRef")) {
-
-            String resourceEnvRefName = (String) event.getData();
-            if (resourceEnvRefName != null) {
-                removeResourceEnvRef(resourceEnvRefName);
-            }
-
-        } else if (type.equals("removeService")) {
-
-            String serviceName = (String) event.getData();
-            if (serviceName != null) {
-                removeService(serviceName);
-            }
-
-        }
-
-        // Setting the context in read only mode
-        ContextAccessController.setReadOnly(getName());
-
+        // NO-OP
     }
 
 
