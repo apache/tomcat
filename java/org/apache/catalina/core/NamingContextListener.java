@@ -329,11 +329,12 @@ public class NamingContextListener
                 }
 
                 if (container instanceof Server) {
-                    namingResources.removePropertyChangeListener(this);
                     ContextBindings.unbindClassLoader
                     (container, container,
                             this.getClass().getClassLoader());
                 }
+
+                namingResources.removePropertyChangeListener(this);
 
                 ContextAccessController.unsetSecurityToken(getName(), container);
                 ContextAccessController.unsetSecurityToken(container, container);
