@@ -1111,10 +1111,8 @@ public class Http2UpgradeHandler extends AbstractStream implements InternalHttpU
         // is sent before the next stream is created for a PUSH_PROMISE.
         synchronized (socketWrapper) {
             pushStream = createLocalStream(request);
-
-            // TODO: Is 1k the optimal value?
             writeHeaders(associatedStream, pushStream.getIdentifier().intValue(),
-                    request.getMimeHeaders(), false, 1024);
+                    request.getMimeHeaders(), false, Constants.DEFAULT_HEADERS_FRAME_SIZE);
         }
 
         pushStream.sentPushPromise();
