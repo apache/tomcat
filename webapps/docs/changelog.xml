@@ -139,6 +139,10 @@
         <code>PreparedStatement</code> and/or <code>CallableStatement</code> are
         cached. (kfujino)
       </fix>
+      <fix>
+        Enable PoolCleaner to be started even if <code>validationQuery</code>
+        is not set. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

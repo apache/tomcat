@@ -919,7 +919,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         boolean timer = getTimeBetweenEvictionRunsMillis()>0;
         boolean result = timer && (isRemoveAbandoned() && getRemoveAbandonedTimeout()>0);
         result = result || (timer && getSuspectTimeout()>0);
-        result = result || (timer && isTestWhileIdle() && getValidationQuery()!=null);
+        result = result || (timer && isTestWhileIdle());
         result = result || (timer && getMinEvictableIdleTimeMillis()>0);
         return result;
     }
