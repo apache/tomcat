@@ -53,7 +53,7 @@
         <item name="15) CGI"                href="cgi-howto.html"/>
         <item name="16) Proxy Support"      href="proxy-howto.html"/>
         <item name="17) MBeans Descriptors"
-              href="means-descriptors-howto.html"/>
+              href="mbeans-descriptors-howto.html"/>
         <item name="18) Default Servlet"    href="default-servlet.html"/>
         <item name="19) Clustering"         href="cluster-howto.html"/>
         <item name="20) Load Balancer"      href="balancer-howto.html"/>
