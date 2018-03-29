@@ -108,6 +108,11 @@
         must be sent in order of increasing stream ID. These restriction were
         not being enforced leading to protocol errors at the client. (markt)
       </fix>
+      <add>
+        <bug>62224</bug>: Disable the <code>forkJoinCommonPoolProtection</code>
+        of the <code>JreMemoryLeakPreventionListener</code> when running on Java
+        9 and above since the underlying JRE bug has been fixed. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

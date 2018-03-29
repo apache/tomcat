@@ -212,7 +212,8 @@
         <code>java.util.concurrent.ForkJoinPool.common.threadFactory</code>
         system property. If this property is set when Tomcat starts, Tomcat will
         not over-ride it even if this protection is explicitly enabled. The
-        default is <code>true</code>.</p>
+        default is <code>true</code>.  This protection is disabled if running on
+        Java 9 onwards since the leak has been fixed for Java 9 onwards.</p>
       </attribute>
 
       <attribute name="gcDaemonProtection" required="false">
