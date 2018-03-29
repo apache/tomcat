@@ -120,6 +120,11 @@
         notified once of property changes on the associated naming resources.
         (markt)
       </fix>
+      <add>
+        <bug>62224</bug>: Disable the <code>forkJoinCommonPoolProtection</code>
+        of the <code>JreMemoryLeakPreventionListener</code> when running on Java
+        9 and above since the underlying JRE bug has been fixed. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

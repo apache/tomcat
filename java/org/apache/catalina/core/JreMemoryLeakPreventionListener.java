@@ -61,30 +61,6 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    private static final boolean IS_JAVA_7_OR_LATER;
-    private static final boolean IS_JAVA_8_OR_LATER;
-
-    static {
-        boolean isJava7OrLater;
-        try {
-            Class.forName("java.util.Objects");
-            isJava7OrLater = true;
-        } catch (ClassNotFoundException e) {
-            isJava7OrLater = false;
-        }
-        IS_JAVA_7_OR_LATER = isJava7OrLater;
-
-        boolean isJava8OrLater;
-        try {
-            Class.forName("java.util.Optional");
-            isJava8OrLater = true;
-        } catch (ClassNotFoundException e) {
-            isJava8OrLater = false;
-        }
-        IS_JAVA_8_OR_LATER = isJava8OrLater;
-
-    }
-
     private static final String FORK_JOIN_POOL_THREAD_FACTORY_PROPERTY =
             "java.util.concurrent.ForkJoinPool.common.threadFactory";
 
@@ -98,7 +74,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
      * from 1.7.0_02 onwards. Also, from 1.7.0_25 onwards, calling this method
      * requires a graphical environment and starts an AWT thread.
      */
-    private boolean appContextProtection = !IS_JAVA_7_OR_LATER;
+    private boolean appContextProtection = !JreCompat.isJre7Available();
     public boolean isAppContextProtection() { return appContextProtection; }
     public void setAppContextProtection(boolean appContextProtection) {
         this.appContextProtection = appContextProtection;
@@ -510,9 +486,12 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 }
 
                 /*
-                 * Present in Java 8 onwards
+                 * Present in Java 7 onwards
+                 * Work-around only available in Java 8.
+                 * Fixed in Java 9 (from early access build 156)
                  */
-                if (forkJoinCommonPoolProtection && IS_JAVA_8_OR_LATER) {
+                if (forkJoinCommonPoolProtection && JreCompat.isJre8Available() &&
+                        !JreCompat.isJre9Available()) {
                     // Don't override any explicitly set property
                     if (System.getProperty(FORK_JOIN_POOL_THREAD_FACTORY_PROPERTY) == null) {
                         System.setProperty(FORK_JOIN_POOL_THREAD_FACTORY_PROPERTY,

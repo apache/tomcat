@@ -225,8 +225,8 @@
         system property. If this property is set when Tomcat starts, Tomcat will
         not over-ride it even if this protection is explicitly enabled. The
         default is <code>true</code>. This protection is only used when running
-        on Java 8 onwards. The common pool does not exist in earlier
-        versions.</p>
+        on Java 8. The common pool does not exist in earlier versions and the
+        leak has been fixed for Java 9 onwards.</p>
       </attribute>
 
       <attribute name="gcDaemonProtection" required="false">
