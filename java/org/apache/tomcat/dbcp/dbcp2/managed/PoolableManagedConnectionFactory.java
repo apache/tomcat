@@ -47,6 +47,7 @@ public class PoolableManagedConnectionFactory extends PoolableConnectionFactory 
      * Create a PoolableManagedConnectionFactory and attach it to a connection pool.
      *
      * @param connFactory XAConnectionFactory
+     * @param dataSourceJmxName JMX name of the datasource
      */
     public PoolableManagedConnectionFactory(final XAConnectionFactory connFactory,
             final ObjectName dataSourceJmxName) {

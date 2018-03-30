@@ -127,7 +127,7 @@ public class TransactionRegistry {
 
     /**
      * Unregisters a destroyed connection from {@link TransactionRegistry}
-     * @param connection
+     * @param connection The connection
      */
     public synchronized void unregisterConnection(final Connection connection) {
         final Connection key = getConnectionKey(connection);
