@@ -65,6 +65,9 @@
       <allow pkg="javax.servlet.jsp"/>
     </subpackage>
   </subpackage>
+  <subpackage name="transaction">
+    <allow pkg="javax.transaction"/>
+  </subpackage>
   <subpackage name="websocket">
     <allow pkg="javax.websocket"/>
   </subpackage>

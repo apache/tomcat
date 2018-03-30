@@ -133,6 +133,9 @@
       <subpackage name="dbcp2">
         <allow pkg="org.apache.tomcat.dbcp.dbcp2"/>
         <allow pkg="org.apache.tomcat.dbcp.pool2"/>
+        <subpackage name="managed">
+          <allow pkg="javax.transaction"/>
+        </subpackage>
       </subpackage>
       <subpackage name="pool2">
         <subpackage name="impl">

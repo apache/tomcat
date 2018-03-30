@@ -164,6 +164,10 @@
       <add>
         Always report the OS's umask when launching the JVM. (schultz)
       </add>
+      <add>
+        Add managed connections package to the package renamed DBCP2 to provide
+        a complete DBCP2 in Tomcat. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
