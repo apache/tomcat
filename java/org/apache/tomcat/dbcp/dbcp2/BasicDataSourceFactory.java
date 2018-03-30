@@ -335,8 +335,21 @@ public class BasicDataSourceFactory implements ObjectFactory {
      * @return the data source instance
      * @throws Exception if an error occurs creating the data source
      */
-    public static BasicDataSource createDataSource(final Properties properties) throws Exception {
+    public BasicDataSource createDataSource(final Properties properties) throws Exception {
         final BasicDataSource dataSource = new BasicDataSource();
+        configureDataSource(dataSource, properties);
+        return dataSource;
+    }
+
+    /**
+     * Configures a {@link BasicDataSource} instance based on the
+     * given properties.
+     *
+     * @param properties the datasource configuration properties
+     * @param dataSource the data source instance
+     * @throws Exception if an error occurs creating the data source
+     */
+    public void configureDataSource(final BasicDataSource dataSource, final Properties properties) throws Exception {
         String value = null;
 
         value = properties.getProperty(PROP_DEFAULTAUTOCOMMIT);
@@ -595,9 +608,6 @@ public class BasicDataSourceFactory implements ObjectFactory {
         if (dataSource.getInitialSize() > 0) {
             dataSource.getLogWriter();
         }
-
-        // Return the configured DataSource instance
-        return dataSource;
     }
 
     /**
