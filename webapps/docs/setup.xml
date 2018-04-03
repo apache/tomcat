@@ -61,12 +61,12 @@
             administration tool and its documentation).</li>
         <li><strong>Java location</strong>: The installer will provide a default
             JRE to use to run the service. The installer uses the registry to
-            determine the base path of a Java 7 or later JRE, including the JRE
+            determine the base path of a Java 8 or later JRE, including the JRE
             installed as part of the full JDK. When running on a 64-bit
             operating system, the installer will first look for a 64-bit JRE and
             only look for a 32-bit JRE if a 64-bit JRE is not found. It is not
             mandatory to use the default JRE detected by the installer. Any
-            installed Java 7 or later JRE (32-bit or 64-bit) may be used.</li>
+            installed Java 8 or later JRE (32-bit or 64-bit) may be used.</li>
         <li><strong>Tray icon</strong>: When Tomcat is run as a service, there
             will not be any tray icon present when Tomcat is running. Note that
             when choosing to run Tomcat at the end of installation, the tray
@@ -153,7 +153,7 @@ cd $CATALINA_HOME
     -Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties \
     org.apache.catalina.startup.Bootstrap</source>
 
-    <p>When runnong on Java 9 you will need to additionally specify the
+    <p>When running on Java 9 you will need to additionally specify the
     following when starting jsvc to avoid warnings on shutdown.</p>
 <source>...
 --add-opens=java.base/java.lang=ALL-UNNAMED \

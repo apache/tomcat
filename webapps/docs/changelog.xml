@@ -129,6 +129,11 @@
         Document how the roles for an authenticated user are determined when the
         <code>CombinedRealm</code> is used. (markt)
       </add>
+      <fix>
+        <bug>62163</bug>: Correct the Tomcat Setup documentation that
+        incorrectly referred to Java 7 as the minimum version rather than Java
+        8. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Tribes">
