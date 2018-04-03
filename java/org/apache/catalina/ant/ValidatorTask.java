@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.catalina.Globals;
-import org.apache.catalina.startup.Constants;
 import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tools.ant.BuildException;
@@ -62,7 +61,6 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
 
     // --------------------------------------------------------- Public Methods
 
-
     /**
      * Execute the specified command.  This logic only performs the common
      * attribute validation required by all subclasses; it does not perform
@@ -77,7 +75,7 @@ public class ValidatorTask extends BaseRedirectorHelperTask {
             throw new BuildException("Must specify 'path'");
         }
 
-        File file = new File(path, Constants.ApplicationWebXml);
+        File file = new File(path, "WEB-INF/web.xml");
         if ((!file.exists()) || (!file.canRead())) {
             throw new BuildException("Cannot find web.xml");
         }
