@@ -77,9 +77,6 @@ myChannel.send(group,myMsg,Channel.SEND_OPTIONS_DEFAULT);]]></source>
       to explain more to you. Remember, that we are always interested in suggestions, improvements, bug fixes
       and anything that you think would help this project.
   </p>
-  <p>
-      Note: Tribes is currently built for JDK1.5, you can run on JDK1.4 by a small modifications to locks used from the <code>java.util.concurrent</code> package.
-  </p>
 </section>
 
 
