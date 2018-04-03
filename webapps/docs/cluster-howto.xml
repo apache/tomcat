@@ -148,7 +148,6 @@ should be completed:</p>
 <a href="balancer-howto.html">Load Balancing</a> chapter.</p>
 <p>Note: Remember that your session state is tracked by a cookie, so your URL must look the same from the out
    side otherwise, a new session will be created.</p>
-<p>Note: Clustering support currently requires the JDK version 1.5 or later.</p>
 <p>The Cluster module uses the Tomcat JULI logging framework, so you can configure logging
    through the regular logging.properties file. To track messages, you can enable logging on the key: <code>org.apache.catalina.tribes.MESSAGES</code></p>
 </section>
