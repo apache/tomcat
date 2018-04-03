@@ -71,6 +71,11 @@
         <code>maxActive</code>. Patch provided by Holger Sunke. (markt)
       </fix>
       <fix>
+        <bug>62172</bug>: Improve Javadoc for
+        <code>org.apache.catalina.startup.Constants</code> and ensure that the
+        constants are correctly used. (markt)
+      </fix>
+      <fix>
         <bug>62175</bug>: Avoid infinite recursion, when trying to validate
         a session while loading it with <code>PersistentManager</code>.
         (fschumacher)

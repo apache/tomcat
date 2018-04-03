@@ -830,8 +830,7 @@ public class HostConfig implements LifecycleListener {
         File xml = new File(host.getAppBaseFile(),
                 cn.getBaseName() + "/" + Constants.ApplicationContextXml);
 
-        File warTracker = new File(host.getAppBaseFile(),
-                cn.getBaseName() + "/" + Constants.WarTracker);
+        File warTracker = new File(host.getAppBaseFile(), cn.getBaseName() + Constants.WarTracker);
 
         boolean xmlInWar = false;
         try (JarFile jar = new JarFile(war)) {

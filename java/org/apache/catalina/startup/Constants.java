@@ -18,6 +18,9 @@ package org.apache.catalina.startup;
 
 /**
  * String constants for the startup package.
+ * <br>
+ * Note that some values include a leading '/' and that some do not. This is
+ * intentional based on how the values are used.
  *
  * @author Craig R. McClanahan
  */
@@ -44,6 +47,5 @@ public final class Constants {
      *
      * @see Tomcat
      */
-    public static final String NoDefaultWebXml =
-            "org/apache/catalina/startup/NO_DEFAULT_XML";
+    public static final String NoDefaultWebXml = "org/apache/catalina/startup/NO_DEFAULT_XML";
 }
