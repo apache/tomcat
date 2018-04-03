@@ -989,7 +989,8 @@
     <code>Realm</code> element that defines the CombinedRealm. Authentication
     will be attempted against each <code>Realm</code> in the order they are
     listed. Authentication against any Realm will be sufficient to authenticate
-    the user.</p>
+    the user. The authenticated user, and their associated roles, will be taken
+    from the first Realm that successfully authenticates the user.</p>
 
     <p>See the <a href="../realm-howto.html">Container-Managed Security
     Guide</a> for more information on setting up container managed security

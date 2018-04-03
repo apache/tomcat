@@ -120,6 +120,10 @@
       <add>
         Add document for <code>FragmentationInterceptor</code>. (kfujino)
       </add>
+      <add>
+        Document how the roles for an authenticated user are determined when the
+        <code>CombinedRealm</code> is used. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">
