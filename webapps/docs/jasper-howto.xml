@@ -307,7 +307,6 @@ download) to precompile a webapp:
     <mkdir dir="${webapp.path}/WEB-INF/lib"/>
 
     <javac destdir="${webapp.path}/WEB-INF/classes"
-           optimize="off"
            debug="on" failonerror="false"
            srcdir="${webapp.path}/WEB-INF/src"
            excludes="**/*.smap">
@@ -370,8 +369,7 @@ with the current web application deployment descriptor at
 <code>${webapp.path}/WEB-INF/web.xml</code>. When you want to use Java 6
 features inside your jsp's, add the following javac compiler task attributes:
 <code>source=&quot;1.6&quot; target=&quot;1.6&quot;</code>. For live
-applications you can also compile with <code>optimize=&quot;on&quot;</code> and
-without debug info <code>debug=&quot;off&quot;</code>.
+applications you can also disable debug info with <code>debug=&quot;off&quot;</code>.
 </p>
 
 <p>

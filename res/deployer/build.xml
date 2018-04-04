@@ -67,7 +67,6 @@
     <mkdir dir="${webapp.path}/WEB-INF/lib"/>
 
     <javac destdir="${webapp.path}/WEB-INF/classes"
-           optimize="off"
            debug="${compile.debug}"
            deprecation="${compile.deprecation}"
            failonerror="false"
