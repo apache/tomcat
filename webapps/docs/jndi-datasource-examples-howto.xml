@@ -517,7 +517,7 @@ Ensure that you have the <code>ocijdbc8.dll</code> or <code>.so</code> in your <
 using <code>System.loadLibrary("ocijdbc8");</code>
 </p>
 <p>
-You should next create a simple test servlet or jsp that has these
+You should next create a simple test servlet or JSP that has these
 <strong>critical lines</strong>:
 </p>
 <source><![CDATA[DriverManager.registerDriver(new
@@ -526,7 +526,7 @@ conn =
 DriverManager.getConnection("jdbc:oracle:oci8:@database","username","password");]]></source>
 <p>
 where database is of the form <code>host:port:SID</code> Now if you try to access the URL of your
-test servlet/jsp and what you get is a
+test servlet/JSP and what you get is a
 <code>ServletException</code> with a root cause of <code>java.lang.UnsatisfiedLinkError:get_env_handle</code>.
 </p>
 <p>

@@ -218,7 +218,7 @@
     </property>
 
     <property name="org.apache.jasper.Constants. JSP_PACKAGE_NAME">
-      <p>The default package name for compiled jsp pages.</p>
+      <p>The default package name for compiled JSPs.</p>
       <p>If not specified, the default value of <code>org.apache.jsp</code>
       will be used.</p>
     </property>
