@@ -358,8 +358,6 @@ public class Http11Processor extends AbstractProcessor {
                 UpgradeProtocol upgradeProtocol = protocol.getUpgradeProtocol(requestedProtocol);
                 if (upgradeProtocol != null) {
                     if (upgradeProtocol.accept(request)) {
-                        // TODO Figure out how to handle request bodies at this
-                        // point.
                         response.setStatus(HttpServletResponse.SC_SWITCHING_PROTOCOLS);
                         response.setHeader("Connection", "Upgrade");
                         response.setHeader("Upgrade", requestedProtocol);
