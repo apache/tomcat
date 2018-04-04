@@ -18,6 +18,8 @@ package javax.transaction.xa;
 
 public class XAException extends java.lang.Exception {
 
+    private static final long serialVersionUID = -8647128647842792941L;
+
     public int errorCode;
 
     public XAException() {
