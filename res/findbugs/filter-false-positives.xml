@@ -533,6 +533,11 @@
     <Bug pattern="IS2_INCONSISTENT_SYNC"/>
   </Match>
   <Match>
+    <Class name="org.apache.catalina.tribes.group.RpcChannel"/>
+    <Method name="send"/>
+    <Bug pattern="WA_NOT_IN_LOOP"/>
+  </Match>
+  <Match>
     <Class name="org.apache.catalina.tribes.membership.McastServiceImpl"/>
     <Method name="stop"/>
     <Bug code="DE"/>
@@ -563,10 +568,33 @@
     <Bug pattern="UG_SYNC_SET_UNSYNC_GET"/>
   </Match>
   <Match>
+    <Class name="org.apache.catalina.tribes.membership.MemberImpl"/>
+    <Field name="dataPkg"/>
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
+  </Match>
+  <Match>
+    <!-- Byte arrays contents are not mutated -->
+    <Class name="org.apache.catalina.tribes.membership.MemberImpl"/>
+    <Or>
+      <Field name="command"/>
+      <Field name="domain"/>
+      <Field name="host"/>
+      <Field name="payload"/>
+      <Field name="uniqueId"/>
+    </Or>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
     <!-- lock is in clone so this is safe -->
     <Class name="org.apache.catalina.tribes.membership.Membership" />
     <Method name="clone" />
     <Bug pattern="ML_SYNC_ON_FIELD_TO_GUARD_CHANGING_THAT_FIELD" />
+  </Match>
+  <Match>
+    <!-- Byte arrays contents are not mutated -->
+    <Class name="org.apache.catalina.tribes.membership.Membership" />
+    <Field name="members"/>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
   </Match>
   <Match>
     <!--  Fields are always recalculated on access -->
@@ -578,10 +606,32 @@
     <Bug pattern="SE_TRANSIENT_FIELD_NOT_RESTORED" />
   </Match>
   <Match>
+    <!-- Sync is not intended to protect access to this field -->
+    <Class name="org.apache.catalina.tribes.transport.ReplicationTransmitter"/>
+    <Field name="oname"/>
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
+  </Match>
+  <Match>
     <!-- Intentional in case thread is waiting -->
     <Class name="org.apache.catalina.tribes.transport.RxTaskPool"/>
     <Method name="returnWorker"/>
     <Bug code="NN"/>
+  </Match>
+  <Match>
+    <!-- Sync is to protect multiple against calls to connect() -->
+    <Class name="org.apache.catalina.tribes.transport.nio.NioSender"/>
+    <Or>
+      <Field name="dataChannel"/>
+      <Field name="socketChannel"/>
+      <Field name="writebuf"/>
+    </Or>
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
+  </Match>
+  <Match>
+    <!-- Byte arrays contents are not mutated -->
+    <Class name="org.apache.catalina.tribes.transport.nio.NioSender"/>
+    <Field name="current"/>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
   </Match>
   <Match>
     <Class name="org.apache.catalina.util.LifecycleBase" />
