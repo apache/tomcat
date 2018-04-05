@@ -680,6 +680,15 @@
     <Bug code="RCN"/>
   </Match>
   <Match>
+    <!-- Array contents is not mutated -->
+    <Class name="org.apache.catalina.webresources.CachedResource"/>
+    <Or>
+      <Field name="webResources"/>
+      <Field name="cachedContent"/>
+    </Or>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
     <!-- Use of synchronisation is required to make a sequence of calls in   -->
     <!-- one method appear to be atomic.                                     -->
     <Class name="org.apache.coyote.AbstractProcessorLight"/>
