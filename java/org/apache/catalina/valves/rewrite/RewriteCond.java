@@ -28,17 +28,21 @@ public class RewriteCond {
 
     public static class PatternCondition extends Condition {
         public Pattern pattern;
-        public Matcher matcher = null;
+        private ThreadLocal<Matcher> matcher = new ThreadLocal<>();
 
         @Override
         public boolean evaluate(String value, Resolver resolver) {
             Matcher m = pattern.matcher(value);
             if (m.matches()) {
-                matcher = m;
+                matcher.set(m);
                 return true;
             } else {
                 return false;
             }
+        }
+
+        public Matcher getMatcher() {
+            return matcher.get();
         }
     }
 
@@ -110,40 +114,46 @@ public class RewriteCond {
             condPattern = condPattern.substring(1);
         }
         if (condPattern.startsWith("<")) {
-            LexicalCondition condition = new LexicalCondition();
-            condition.type = -1;
-            condition.condition = condPattern.substring(1);
+            LexicalCondition ncondition = new LexicalCondition();
+            ncondition.type = -1;
+            ncondition.condition = condPattern.substring(1);
+            this.condition = ncondition;
         } else if (condPattern.startsWith(">")) {
-            LexicalCondition condition = new LexicalCondition();
-            condition.type = 1;
-            condition.condition = condPattern.substring(1);
+            LexicalCondition ncondition = new LexicalCondition();
+            ncondition.type = 1;
+            ncondition.condition = condPattern.substring(1);
+            this.condition = ncondition;
         } else if (condPattern.startsWith("=")) {
-            LexicalCondition condition = new LexicalCondition();
-            condition.type = 0;
-            condition.condition = condPattern.substring(1);
+            LexicalCondition ncondition = new LexicalCondition();
+            ncondition.type = 0;
+            ncondition.condition = condPattern.substring(1);
+            this.condition = ncondition;
         } else if (condPattern.equals("-d")) {
             ResourceCondition ncondition = new ResourceCondition();
             ncondition.type = 0;
+            this.condition = ncondition;
         } else if (condPattern.equals("-f")) {
             ResourceCondition ncondition = new ResourceCondition();
             ncondition.type = 1;
+            this.condition = ncondition;
         } else if (condPattern.equals("-s")) {
             ResourceCondition ncondition = new ResourceCondition();
             ncondition.type = 2;
+            this.condition = ncondition;
         } else {
-            PatternCondition condition = new PatternCondition();
+            PatternCondition ncondition = new PatternCondition();
             int flags = 0;
             if (isNocase()) {
                 flags |= Pattern.CASE_INSENSITIVE;
             }
-            condition.pattern = Pattern.compile(condPattern, flags);
+            ncondition.pattern = Pattern.compile(condPattern, flags);
+            this.condition = ncondition;
         }
     }
 
     public Matcher getMatcher() {
-        Object condition = this.condition.get();
         if (condition instanceof PatternCondition) {
-            return ((PatternCondition) condition).matcher;
+            return ((PatternCondition) condition).getMatcher();
         }
         return null;
     }
@@ -162,7 +172,7 @@ public class RewriteCond {
 
     protected Substitution test = null;
 
-    protected ThreadLocal<Condition> condition = new ThreadLocal<>();
+    protected Condition condition = null;
 
     /**
      * This makes the test case-insensitive, i.e., there is no difference between
@@ -187,46 +197,6 @@ public class RewriteCond {
      */
     public boolean evaluate(Matcher rule, Matcher cond, Resolver resolver) {
         String value = test.evaluate(rule, cond, resolver);
-        Condition condition = this.condition.get();
-        if (condition == null) {
-            if (condPattern.startsWith("<")) {
-                LexicalCondition ncondition = new LexicalCondition();
-                ncondition.type = -1;
-                ncondition.condition = condPattern.substring(1);
-                condition = ncondition;
-            } else if (condPattern.startsWith(">")) {
-                LexicalCondition ncondition = new LexicalCondition();
-                ncondition.type = 1;
-                ncondition.condition = condPattern.substring(1);
-                condition = ncondition;
-            } else if (condPattern.startsWith("=")) {
-                LexicalCondition ncondition = new LexicalCondition();
-                ncondition.type = 0;
-                ncondition.condition = condPattern.substring(1);
-                condition = ncondition;
-            } else if (condPattern.equals("-d")) {
-                ResourceCondition ncondition = new ResourceCondition();
-                ncondition.type = 0;
-                condition = ncondition;
-            } else if (condPattern.equals("-f")) {
-                ResourceCondition ncondition = new ResourceCondition();
-                ncondition.type = 1;
-                condition = ncondition;
-            } else if (condPattern.equals("-s")) {
-                ResourceCondition ncondition = new ResourceCondition();
-                ncondition.type = 2;
-                condition = ncondition;
-            } else {
-                PatternCondition ncondition = new PatternCondition();
-                int flags = 0;
-                if (isNocase()) {
-                    flags |= Pattern.CASE_INSENSITIVE;
-                }
-                ncondition.pattern = Pattern.compile(condPattern, flags);
-                condition = ncondition;
-            }
-            this.condition.set(condition);
-        }
         if (positive) {
             return condition.evaluate(value, resolver);
         } else {
