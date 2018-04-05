@@ -105,14 +105,12 @@ public class RxTaskPool {
                 //if ( idle.size() < minThreads && !idle.contains(worker)) idle.add(worker);
                 if ( idle.size() < maxTasks && !idle.contains(worker)) idle.add(worker); //let max be the upper limit
                 else {
-                    worker.setDoRun(false);
-                    synchronized (worker){worker.notify();}
+                    worker.close();
                 }
-                mutex.notify();
+                mutex.notifyAll();
             }
-        }else {
-            worker.setDoRun(false);
-            synchronized (worker){worker.notify();}
+        } else {
+            worker.close();
         }
     }
 

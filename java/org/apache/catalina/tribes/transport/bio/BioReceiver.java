@@ -130,9 +130,9 @@ public class BioReceiver extends ReceiverBase implements Runnable {
                 if ( doListen() ) throw x;
             }
             if ( !doListen() ) {
-                task.setDoRun(false);
                 task.serviceSocket(null,null);
                 getExecutor().execute(task);
+                task.close();
                 break; //regular shutdown
             }
             if ( socket == null ) continue;

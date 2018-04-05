@@ -26,6 +26,7 @@ public abstract class AbstractRxTask implements Runnable
 
     private ListenCallback callback;
     private RxTaskPool pool;
+    @Deprecated
     private boolean doRun = true;
     private int options;
     protected boolean useBufferPool = true;
@@ -46,6 +47,14 @@ public abstract class AbstractRxTask implements Runnable
         this.callback = callback;
     }
 
+    /**
+     * Sets doRun field which is unused.
+     *
+     * @param doRun New value
+     *
+     * @deprecated Will be removed in Tomcat 10
+     */
+    @Deprecated
     public void setDoRun(boolean doRun) {
         this.doRun = doRun;
     }
@@ -62,14 +71,20 @@ public abstract class AbstractRxTask implements Runnable
         return callback;
     }
 
+    /**
+     * Gets doRun field which is unused.
+     *
+     * @return Current field value
+     *
+     * @deprecated Will be removed in Tomcat 10
+     */
+    @Deprecated
     public boolean isDoRun() {
         return doRun;
     }
 
-    public void close()
-    {
+    public void close() {
         doRun = false;
-        notify();
     }
 
     public void setUseBufferPool(boolean usebufpool) {
