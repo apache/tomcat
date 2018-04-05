@@ -218,7 +218,6 @@ public class ChannelData implements ChannelMessage {
         XByteBuffer.toBytes(message.getLength(),data,offset);
         offset += 4; //message.length
         System.arraycopy(message.getBytesDirect(),0,data,offset,message.getLength());
-        offset += message.getLength(); //message data
         return data;
     }
 
