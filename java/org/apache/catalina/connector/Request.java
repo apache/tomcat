@@ -1522,6 +1522,9 @@ public class Request implements HttpServletRequest {
     private void notifyAttributeAssigned(String name, Object value,
             Object oldValue) {
         Context context = getContext();
+        if (context == null) {
+            return;
+        }
         Object listeners[] = context.getApplicationEventListeners();
         if ((listeners == null) || (listeners.length == 0)) {
             return;
