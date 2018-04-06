@@ -1565,6 +1565,9 @@ implements HttpServletRequest {
      */
     private void notifyAttributeAssigned(String name, Object value,
             Object oldValue) {
+        if (context == null) {
+            return;
+        }
         Object listeners[] = context.getApplicationEventListeners();
         if ((listeners == null) || (listeners.length == 0)) {
             return;

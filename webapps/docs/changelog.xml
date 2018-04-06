@@ -130,6 +130,11 @@
         of the <code>JreMemoryLeakPreventionListener</code> when running on Java
         9 and above since the underlying JRE bug has been fixed. (markt)
       </add>
+      <fix>
+        <bug>62263</bug>: Avoid a <code>NullPointerException</code> when the
+        <code>RemoteIpValve</code> processes a request for which no Context can
+        be found. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
