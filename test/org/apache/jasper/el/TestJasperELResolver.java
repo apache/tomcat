@@ -19,6 +19,7 @@ package org.apache.jasper.el;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.el.ELResolver;
 import javax.servlet.jsp.el.ImplicitObjectELResolver;
@@ -61,7 +62,7 @@ public class TestJasperELResolver {
         Assert.assertEquals(9 + count,
                 ((ELResolver[])getField("resolvers", resolver)).length);
         Assert.assertEquals(Integer.valueOf(9 + count),
-                getField("size", resolver));
+                Integer.valueOf(((AtomicInteger) getField("resolversSize", resolver)).get()));
     }
 
     private static final Object getField(String name, Object target)
