@@ -46,11 +46,13 @@
 -->
 <section name="Tomcat 9.0.8 (markt)" rtext="in development">
   <subsection name="Coyote">
-    <fix>
-      Correct off-by-one error in thread pool that allowed thread pools to
-      increase in size to one more than the configured limit. Patch provided by
-      usc. (markt)
-    </fix>
+    <changelog>
+      <fix>
+        Correct off-by-one error in thread pool that allowed thread pools to
+        increase in size to one more than the configured limit. Patch provided
+        by usc. (markt)
+      </fix>
+    </changelog>
   </subsection>
 </section>
 <section name="Tomcat 9.0.7 (markt)" rtext="release in progress">
