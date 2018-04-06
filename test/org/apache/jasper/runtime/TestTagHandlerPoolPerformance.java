@@ -16,6 +16,9 @@
  */
 package org.apache.jasper.runtime;
 
+import java.util.function.IntConsumer;
+import java.util.function.Supplier;
+
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.Tag;
 
@@ -24,6 +27,7 @@ import org.junit.Test;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.unittest.TesterThreadedPerformance;
 import org.apache.tomcat.unittest.tags.Bug53545;
 
 
@@ -39,51 +43,45 @@ public class TestTagHandlerPoolPerformance extends TomcatBaseTest {
         tagHandlerPool.init(w.getServlet().getServletConfig());
 
         for (int i = 1; i < 9; i++) {
-            doTestConcurrency(tagHandlerPool, i);
+            TesterThreadedPerformance test = new TesterThreadedPerformance(
+                    i, 5000000, new TestInstanceSupplier(tagHandlerPool));
+            long duration = test.doTest();
+            System.out.println(i + " threads completed in " + duration + "ns");
         }
     }
 
 
-    private void doTestConcurrency(TagHandlerPool tagHandlerPool, int threadCount) throws Exception {
-        long start = System.nanoTime();
-
-        Thread[] threads = new Thread[threadCount];
-
-        for (int i = 0; i < threadCount; i++) {
-            threads[i] = new Thread(new TagHandlerPoolRunnable(tagHandlerPool));
-        }
-
-        for (int i = 0; i < threadCount; i++) {
-            threads[i].start();
-        }
-
-        for (int i = 0; i < threadCount; i++) {
-            threads[i].join();
-        }
-
-        long duration = System.nanoTime() - start;
-
-        System.out.println(threadCount + " threads completed in " + duration + "ns");
-    }
-
-
-    private class TagHandlerPoolRunnable implements Runnable {
+    private static class TestInstanceSupplier implements Supplier<IntConsumer> {
 
         private final TagHandlerPool tagHandlerPool;
 
-        private TagHandlerPoolRunnable(TagHandlerPool tagHandlerPool) {
+        public TestInstanceSupplier(TagHandlerPool tagHandlerPool) {
+            this.tagHandlerPool = tagHandlerPool;
+        }
+
+
+        @Override
+        public IntConsumer get() {
+            return new TestInstance(tagHandlerPool);
+        }
+    }
+
+
+    private static class TestInstance implements IntConsumer {
+
+        private final TagHandlerPool tagHandlerPool;
+
+        public TestInstance(TagHandlerPool tagHandlerPool) {
             this.tagHandlerPool = tagHandlerPool;
         }
 
         @Override
-        public void run() {
+        public void accept(int value) {
             try {
-                for (int i = 0; i < 500000; i++) {
-                    Tag t = tagHandlerPool.get(Bug53545.class);
-                    tagHandlerPool.reuse(t);
-                }
+                Tag t = tagHandlerPool.get(Bug53545.class);
+                tagHandlerPool.reuse(t);
             } catch (JspException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
     }
