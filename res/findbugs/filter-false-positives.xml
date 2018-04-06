@@ -824,7 +824,16 @@
          silence an Eclipse warning -->
     <Class name="org.apache.jasper.compiler.ELFunctionMapper"/>
     <Method name="map"/>
-    <Bug code="DLS"/>
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+  </Match>
+  <Match>
+    <!-- Sync is not protecting these fields -->
+    <Class name="org.apache.jasper.compiler.JspConfig"/>
+    <Or>
+      <Field name="defaultDeferedSyntaxAllowedAsLiteral" />
+      <Field name="defaultIsELIgnored" />
+    </Or>
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
   </Match>
   <Match>
     <!-- NPE is not possible -->
@@ -836,7 +845,10 @@
     <!-- Yes this is a dead store. This is so the IDE warning can be suppressed.
          The object creation has side-effects so the code is required. -->
     <Class name="org.apache.jasper.compiler.JspDocumentParser" />
-    <Method name="comment"/>
+    <Or>
+      <Method name="comment"/>
+      <Method name="processChars"/>
+    </Or>
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
   <Match>
@@ -867,6 +879,12 @@
       <Method name="setValue" />
     </Or>
     <Bug code="NP" />
+  </Match>
+  <Match>
+    <!-- Array contents are not mutated -->
+    <Class name="org.apache.jasper.el.JasperELResolver"/>
+    <Field name="resolvers" />
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
   </Match>
   <Match>
     <!-- base null is handled by this resolver -->

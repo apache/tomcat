@@ -89,7 +89,7 @@ public class JspServletWrapper {
     private long available = 0L;
     private final ServletConfig config;
     private final Options options;
-    private boolean firstTime = true;
+    private volatile boolean firstTime = true;
     /** Whether the servlet needs reloading on next access */
     private volatile boolean reload = true;
     private final boolean isTagFile;

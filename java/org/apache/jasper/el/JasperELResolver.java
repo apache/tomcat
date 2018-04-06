@@ -18,6 +18,7 @@
 package org.apache.jasper.el;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.el.ArrayELResolver;
 import javax.el.BeanELResolver;
@@ -41,15 +42,14 @@ public class JasperELResolver extends CompositeELResolver {
 
     private static final int STANDARD_RESOLVERS_COUNT = 9;
 
-    private int size;
-    private ELResolver[] resolvers;
+    private AtomicInteger resolversSize = new AtomicInteger(0);
+    private volatile ELResolver[] resolvers;
     private final int appResolversSize;
 
     public JasperELResolver(List<ELResolver> appResolvers,
             ELResolver streamResolver) {
         appResolversSize = appResolvers.size();
         resolvers = new ELResolver[appResolversSize + STANDARD_RESOLVERS_COUNT];
-        size = 0;
 
         add(new ImplicitObjectELResolver());
         for (ELResolver appResolver : appResolvers) {
@@ -69,6 +69,8 @@ public class JasperELResolver extends CompositeELResolver {
     public synchronized void add(ELResolver elResolver) {
         super.add(elResolver);
 
+        int size = resolversSize.get();
+
         if (resolvers.length > size) {
             resolvers[size] = elResolver;
         } else {
@@ -78,7 +80,7 @@ public class JasperELResolver extends CompositeELResolver {
 
             resolvers = nr;
         }
-        size ++;
+        resolversSize.incrementAndGet();
     }
 
     @Override
@@ -106,6 +108,7 @@ public class JasperELResolver extends CompositeELResolver {
             start = 1;
         }
 
+        int size = resolversSize.get();
         for (int i = start; i < size; i++) {
             result = resolvers[i].getValue(context, base, property);
             if (context.isPropertyResolved()) {
@@ -143,6 +146,7 @@ public class JasperELResolver extends CompositeELResolver {
         // skip collection (map, resource, list, and array) resolvers
         index += 4;
         // call bean and the rest of resolvers
+        int size = resolversSize.get();
         for (int i = index; i < size; i++) {
             result = resolvers[i].invoke(
                     context, base, targetMethod, paramTypes, params);
