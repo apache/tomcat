@@ -1284,6 +1284,12 @@
     <Bug code="Nm" />
   </Match>
   <Match>
+    <!-- Monitor is used for a single condition. No need for loop. -->
+    <Class name="org.apache.tomcat.util.threads.InlineExecutorService" />
+    <Method name="awaitTermination" />
+    <Bug pattern="WA_NOT_IN_LOOP" />
+  </Match>
+  <Match>
     <!-- Object creation will trigger input processing. -->
     <Class name="org.apache.tomcat.websocket.WsWebSocketContainer" />
     <Method name="connectToServer" />
