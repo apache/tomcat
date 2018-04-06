@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.juli.logging;
 
 import java.util.logging.ConsoleHandler;
@@ -24,27 +23,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Hardcoded java.util.logging commons-logging implementation.
+ * Hard-coded java.util.logging commons-logging implementation.
  */
 class DirectJDKLog implements Log {
     // no reason to hide this - but good reasons to not hide
     public final Logger logger;
 
-    /** Alternate config reader and console format
-     */
+    // Alternate config reader and console format
     private static final String SIMPLE_FMT="java.util.logging.SimpleFormatter";
-    private static final String SIMPLE_CFG="org.apache.juli.JdkLoggerConfig"; //doesn't exist
     private static final String FORMATTER="org.apache.juli.formatter";
 
     static {
-        if( System.getProperty("java.util.logging.config.class") ==null  &&
-                System.getProperty("java.util.logging.config.file") ==null ) {
+        if (System.getProperty("java.util.logging.config.class") == null  &&
+                System.getProperty("java.util.logging.config.file") == null) {
             // default configuration - it sucks. Let's override at least the
             // formatter for the console
-            try {
-                Class.forName(SIMPLE_CFG).getConstructor().newInstance();
-            } catch( Throwable t ) {
-            }
             try {
                 Formatter fmt= (Formatter) Class.forName(System.getProperty(
                         FORMATTER, SIMPLE_FMT)).getConstructor().newInstance();
@@ -57,7 +50,7 @@ class DirectJDKLog implements Log {
                         handler.setFormatter(fmt);
                     }
                 }
-            } catch( Throwable t ) {
+            } catch (Throwable t) {
                 // maybe it wasn't included - the ugly default will be used.
             }
 
