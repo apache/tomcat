@@ -52,6 +52,11 @@
         <code>RemoteIpValve</code> processes a request for which no Context can
         be found. (markt)
       </fix>
+      <add>
+        <bug>62258</bug>: Don't trigger the standard error page mechanism when
+        the error has caused the connection to the client to be closed as no-one
+        will ever see the error page. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -17,6 +17,7 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
@@ -31,6 +32,7 @@ import org.apache.catalina.connector.ClientAbortException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
+import org.apache.coyote.ActionCode;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -162,10 +164,16 @@ final class StandardHostValve extends ValveBase {
 
             // Look for (and render if found) an application level error page
             if (response.isErrorReportRequired()) {
-                if (t != null) {
-                    throwable(request, response, t);
-                } else {
-                    status(request, response);
+                // If an error has occurred that prevents further I/O, don't waste time
+                // producing an error report that will never be read
+                AtomicBoolean result = new AtomicBoolean(false);
+                response.getCoyoteResponse().action(ActionCode.IS_IO_ALLOWED, result);
+                if (result.get()) {
+                    if (t != null) {
+                        throwable(request, response, t);
+                    } else {
+                        status(request, response);
+                    }
                 }
             }
 
