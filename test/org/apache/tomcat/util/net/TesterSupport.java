@@ -50,6 +50,9 @@ import org.apache.catalina.core.AprLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.jni.Library;
+import org.apache.tomcat.jni.LibraryNotFoundError;
+import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
@@ -67,12 +70,37 @@ public final class TesterSupport {
     public static final String JKS_KEY_PASS = "tomcatpass";
     public static final String LOCALHOST_CERT_PEM = SSL_DIR + "localhost-cert.pem";
     public static final String LOCALHOST_KEY_PEM = SSL_DIR + "localhost-key.pem";
+    public static final boolean OPENSSL_AVAILABLE;
+    public static final int OPENSSL_VERSION;
 
     public static final String ROLE = "testrole";
 
     private static String clientAuthExpectedIssuer = null;
     private static String lastUsage = "NONE";
     private static Principal[] lastRequestedIssuers = new Principal[0];
+
+    static {
+        boolean available = false;
+        int version = 0;
+        try {
+            Library.initialize(null);
+            available = true;
+            version = SSL.version();
+            Library.terminate();
+        } catch (Exception | LibraryNotFoundError ex) {
+            // Ignore
+        }
+        OPENSSL_AVAILABLE = available;
+        OPENSSL_VERSION = version;
+    }
+
+    public static boolean isOpensslAvailable() {
+        return OPENSSL_AVAILABLE;
+    }
+
+    public static int getOpensslVersion() {
+        return OPENSSL_VERSION;
+    }
 
     public static void initSsl(Tomcat tomcat) {
         initSsl(tomcat, LOCALHOST_JKS, null, null);
