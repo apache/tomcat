@@ -35,11 +35,20 @@ import org.apache.tomcat.util.net.TesterSupport;
 public class TestOpenSSLConf extends TomcatBaseTest {
 
     private static final String ENABLED_CIPHER = "AES256-SHA256";
-    private static final String[] EXPECTED_CIPHERS = {"AES256-SHA256"};
+    private static final String[] EXPECTED_CIPHERS = {ENABLED_CIPHER};
     private static final String[] ENABLED_PROTOCOLS = {"TLSv1.1"};
-    private static final String[] DISABLED_PROTOCOLS = {"SSLv3", "TLSv1", "TLSv1.2", "TLSv1.3"};
+    private static final String[] DISABLED_PROTOCOLS = {"SSLv3", "TLSv1", "TLSv1.2"};
+    private static final String[] DISABLED_PROTOCOLS_TLS13 = {"TLSv1.3"};
+    // Test behavior needs to adjust for OpenSSL 1.1.1-pre3 and above
+    private static final int OPENSSL_TLS13_SUPPORT_MIN_VERSION = 0x10101003;
 
-    public SSLHostConfig initOpenSSLConfCmdCipher(String... commands) throws Exception {
+    private static int OPENSSL_VERSION = TesterSupport.getOpensslVersion();;
+
+    private static boolean hasTLS13() {
+        return OPENSSL_VERSION >= OPENSSL_TLS13_SUPPORT_MIN_VERSION;
+    }
+
+    public SSLHostConfig initOpenSSLConfCmd(String... commands) throws Exception {
         Assert.assertNotNull(commands);
         Assert.assertTrue("Invalid length", commands.length % 2 == 0);
 
@@ -78,9 +87,15 @@ public class TestOpenSSLConf extends TomcatBaseTest {
 
     @Test
     public void testOpenSSLConfCmdCipher() throws Exception {
-        // Ensure TLSv1.3 ciphers aren't returned
-        SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("CipherString", ENABLED_CIPHER,
-                "CipherSuites", "");
+        log.info("Found OpenSSL version 0x" + Integer.toHexString(OPENSSL_VERSION));
+        SSLHostConfig sslHostConfig;
+        if (hasTLS13()) {
+            // Ensure TLSv1.3 ciphers aren't returned
+            sslHostConfig = initOpenSSLConfCmd("CipherString", ENABLED_CIPHER,
+                                               "CipherSuites", "");
+        } else {
+            sslHostConfig = initOpenSSLConfCmd("CipherString", ENABLED_CIPHER);
+        }
         String[] ciphers = sslHostConfig.getEnabledCiphers();
         Assert.assertThat("Wrong HostConfig ciphers", ciphers,
                 CoreMatchers.is(EXPECTED_CIPHERS));
@@ -91,15 +106,23 @@ public class TestOpenSSLConf extends TomcatBaseTest {
 
     @Test
     public void testOpenSSLConfCmdProtocol() throws Exception {
+        log.info("Found OpenSSL version 0x" + Integer.toHexString(OPENSSL_VERSION));
         Set<String> disabledProtocols = new HashSet<>(Arrays.asList(DISABLED_PROTOCOLS));
         StringBuilder sb = new StringBuilder();
         for (String protocol : DISABLED_PROTOCOLS) {
             sb.append(",").append("-").append(protocol);
         }
+        if (hasTLS13()) {
+            // Also disable TLSv1.3
+            for (String protocol : DISABLED_PROTOCOLS_TLS13) {
+                sb.append(",").append("-").append(protocol);
+                disabledProtocols.add(protocol);
+            }
+        }
         for (String protocol : ENABLED_PROTOCOLS) {
             sb.append(",").append(protocol);
         }
-        SSLHostConfig sslHostConfig = initOpenSSLConfCmdCipher("Protocol", sb.substring(1));
+        SSLHostConfig sslHostConfig = initOpenSSLConfCmd("Protocol", sb.substring(1));
         String[] protocols = sslHostConfig.getEnabledProtocols();
         for (String protocol : protocols) {
             Assert.assertFalse("Protocol " + protocol + " is not allowed",
