@@ -19,6 +19,7 @@ package org.apache.catalina.connector;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -156,4 +157,58 @@ public class TestOutputBuffer extends TomcatBaseTest{
             w.write("OK");
         }
     }
+
+
+    @Test
+    public void testUtf8SurrogateBody() throws Exception {
+        // Create test data. This is carefully constructed to trigger the edge
+        // case. Small variations may cause the test to miss the edge case.
+        StringBuffer sb = new StringBuffer();
+        sb.append("a");
+
+        for (int i = 0x10000; i < 0x11000; i++) {
+            char[] chars = Character.toChars(i);
+            sb.append(chars);
+        }
+        String data = sb.toString();
+
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("", TEMP_DIR);
+        Tomcat.addServlet(root, "Test", new Utf8WriteChars(data));
+        root.addServletMappingDecoded("/test", "Test");
+
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        getUrl("http://localhost:" + getPort() + "/test", bc, null);
+
+        bc.setCharset(StandardCharsets.UTF_8);
+        Assert.assertEquals(data, bc.toString());
+    }
+
+
+    private static class Utf8WriteChars extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final char[] chars;
+
+        public Utf8WriteChars(String data) {
+            chars = data.toCharArray();
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            resp.setCharacterEncoding("UTF-8");
+            resp.setContentType("text/plain");
+            Writer w = resp.getWriter();
+
+            for (int i = 0; i < chars.length; i++) {
+                w.write(chars[i]);
+            }
+        }
+    }
+
 }

@@ -62,6 +62,12 @@
         type="javax.sql.XADataSource"</code>. Patch provided by Masafumi Miura.
         (csutherl)
       </fix>
+      <fix>
+        Fix a rare edge case that is unlikely to occur in real usage. This edge
+        case meant that writing long streams of UTF-8 characters to the HTTP
+        response that consisted almost entirely of surrogate pairs could result
+        in one surrogate pair being dropped. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

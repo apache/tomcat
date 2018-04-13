@@ -431,6 +431,16 @@ public class OutputBuffer extends Writer {
             }
             if (from.remaining() > 0) {
                 flushByteBuffer();
+            } else if (conv.isUndeflow() && bb.limit() > bb.capacity() - 4) {
+                // Handle an edge case. There are no more chars to write at the
+                // moment but there is a leftover character in the converter
+                // which must be part of a surrogate pair. The byte buffer does
+                // not have enough space left to output the bytes for this pair
+                // once it is complete )it will require 4 bytes) so flush now to
+                // prevent the bytes for the leftover char and the rest of the
+                // surrogate pair yet to be written from being lost.
+                // See TestOutputBuffer#testUtf8SurrogateBody()
+                flushByteBuffer();
             }
         }
 
