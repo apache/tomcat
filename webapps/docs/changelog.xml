@@ -57,6 +57,11 @@
         the error has caused the connection to the client to be closed as no-one
         will ever see the error page. (markt)
       </add>
+      <fix>
+        Register MBean when DataSource Resource <code>
+        type="javax.sql.XADataSource"</code>. Patch provided by Masafumi Miura.
+        (csutherl)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
