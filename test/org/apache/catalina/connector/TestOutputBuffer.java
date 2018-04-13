@@ -19,7 +19,6 @@ package org.apache.catalina.connector;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -32,6 +31,7 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestOutputBuffer extends TomcatBaseTest{
@@ -178,7 +178,7 @@ public class TestOutputBuffer extends TomcatBaseTest{
         ByteChunk bc = new ByteChunk();
         getUrl("http://localhost:" + getPort() + "/test", bc, null);
 
-        bc.setCharset(StandardCharsets.UTF_8);
+        bc.setCharset(B2CConverter.UTF_8);
         Assert.assertEquals(data, bc.toString());
     }
 
