@@ -58,6 +58,11 @@
         response that consisted almost entirely of surrogate pairs could result
         in one surrogate pair being dropped. (markt)
       </fix>
+      <fix>
+        Register MBean when DataSource Resource <code>
+        type="javax.sql.XADataSource"</code>. Patch provided by Masafumi Miura.
+        (csutherl)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
