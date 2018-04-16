@@ -982,7 +982,8 @@ public class NamingContextListener
             logger.error(sm.getString("naming.bindFailed", e));
         }
 
-        if ("javax.sql.DataSource".equals(ref.getClassName()) &&
+        if (("javax.sql.DataSource".equals(ref.getClassName())  ||
+            "javax.sql.XADataSource".equals(ref.getClassName())) &&
                 resource.getSingleton()) {
             try {
                 ObjectName on = createObjectName(resource);
