@@ -42,7 +42,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
     // Test behavior needs to adjust for OpenSSL 1.1.1-pre3 and above
     private static final int OPENSSL_TLS13_SUPPORT_MIN_VERSION = 0x10101003;
 
-    private static int OPENSSL_VERSION = TesterSupport.getOpensslVersion();;
+    private static int OPENSSL_VERSION = TesterSupport.getOpensslVersion();
 
     private static boolean hasTLS13() {
         return OPENSSL_VERSION >= OPENSSL_TLS13_SUPPORT_MIN_VERSION;
