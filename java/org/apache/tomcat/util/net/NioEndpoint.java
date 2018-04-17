@@ -442,6 +442,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 // whether or not to return the key to the cache.
                 // We do NOT want to do this more than once - see BZ
                 // 57340 / 57943.
+                if (log.isDebugEnabled()) {
+                    log.debug("Socket: [" + socket + "] closed");
+                }
                 if (running && !paused) {
                     if (!nioChannels.push(socket)) {
                         socket.free();
