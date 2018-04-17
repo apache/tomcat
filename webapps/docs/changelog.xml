@@ -77,6 +77,11 @@
         increase in size to one more than the configured limit. Patch provided
         by usc. (markt)
       </fix>
+      <fix>
+        Prevent unexpected TLS handshake failures caused by errors during a
+        previous handshake that were not correctly cleaned-up when using the NIO
+        or NIO2 connector with the <code>OpenSSLImplementation</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

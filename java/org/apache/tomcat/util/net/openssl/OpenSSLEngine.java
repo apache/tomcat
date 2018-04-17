@@ -630,6 +630,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         // NOTE: Calling a fake read is necessary before calling pendingReadableBytesInSSL because
         // SSL_pending will return 0 if OpenSSL has not started the current TLS record
         // See https://www.openssl.org/docs/manmaster/ssl/SSL_pending.html
+        clearLastError();
         int lastPrimingReadResult = SSL.readFromSSL(ssl, EMPTY_ADDR, 0); // priming read
         // check if SSL_read returned <= 0. In this case we need to check the error and see if it was something
         // fatal.
@@ -884,6 +885,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private void handshake() throws SSLException {
         currentHandshake = SSL.getHandshakeCount(ssl);
+        clearLastError();
         int code = SSL.doHandshake(ssl);
         if (code <= 0) {
             checkLastError();
@@ -902,6 +904,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     }
 
     private synchronized void renegotiate() throws SSLException {
+        clearLastError();
         int code = SSL.renegotiate(ssl);
         if (code <= 0) {
             checkLastError();
@@ -931,6 +934,20 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
         }
     }
+
+
+    /*
+     * Many calls to SSL methods do not check the last error. Those that do
+     * check the last error need to ensure that any previously ignored error is
+     * cleared prior to the method call else errors may be falsely reported.
+     *
+     * TODO: Check last error after every call to an SSL method and respond
+     *       appropriately.
+     */
+    private void clearLastError() {
+        SSL.getLastErrorNumber();
+    }
+
 
     private static long memoryAddress(ByteBuffer buf) {
         return Buffer.address(buf);
