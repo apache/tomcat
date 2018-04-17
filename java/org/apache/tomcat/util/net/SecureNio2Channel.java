@@ -397,7 +397,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("channel.nio.ssl.sniHostName", hostName));
+            log.debug(sm.getString("channel.nio.ssl.sniHostName", sc, hostName));
         }
 
         sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers,
