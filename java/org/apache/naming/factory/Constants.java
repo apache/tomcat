@@ -38,7 +38,7 @@ public final class Constants {
     public static final String DEFAULT_HANDLER_FACTORY = Package + ".HandlerFactory";
 
     public static final String DBCP_DATASOURCE_FACTORY =
-            "org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory";
+            "org.apache.tomcat.dbcp.dbcp.BasicDataSourceFactory";
 
     public static final String OPENEJB_EJB_FACTORY = Package + ".OpenEjbFactory";
 
