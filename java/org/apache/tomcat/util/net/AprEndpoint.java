@@ -2470,9 +2470,15 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
             if (to.isDirect() && to.remaining() >= limit) {
                 to.limit(to.position() + limit);
                 nRead = fillReadBuffer(block, to);
+                if (log.isDebugEnabled()) {
+                    log.debug("Socket: [" + this + "], Read direct from socket: [" + nRead + "]");
+                }
             } else {
                 // Fill the read buffer as best we can.
                 nRead = fillReadBuffer(block);
+                if (log.isDebugEnabled()) {
+                    log.debug("Socket: [" + this + "], Read into buffer: [" + nRead + "]");
+                }
 
                 // Fill as much of the remaining byte array as possible with the
                 // data that was just read
