@@ -61,19 +61,19 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
+        <bug>62316</bug>: Correct a regression in some refactoring that
+        broke the default factory for JDBC datasources. (markt)
+      </fix>
+      <fix>
         Fix a rare edge case that is unlikely to occur in real usage. This edge
         case meant that writing long streams of UTF-8 characters to the HTTP
         response that consisted almost entirely of surrogate pairs could result
         in one surrogate pair being dropped. (markt)
       </fix>
       <fix>
-        Register MBean when DataSource Resource <code>
-        type="javax.sql.XADataSource"</code>. Patch provided by Masafumi Miura.
-        (csutherl)
-      </fix>
-      <fix>
-        Correct a regression in some refactoring that broke the default factory
-        for JDBC datasoucres. (markt)
+        Register MBean when DataSource Resource
+        <code>type="javax.sql.XADataSource"</code>.
+        Patch provided by Masafumi Miura. (csutherl)
       </fix>
     </changelog>
   </subsection>  
