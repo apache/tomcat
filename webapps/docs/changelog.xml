@@ -84,6 +84,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <update>
+        Update the Eclipse Compiler for Java to 4.7.3a. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.7 (markt)" rtext="2018-04-07">
   <subsection name="Catalina">
