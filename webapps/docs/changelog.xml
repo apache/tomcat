@@ -89,6 +89,15 @@
       <update>
         Update the Eclipse Compiler for Java to 4.7.3a. (markt)
       </update>
+      <update>
+        Allow <code>9</code> to be used to specify Java 9 as the compiler source
+        and/or compiler target for JSP compilation. The Early Access value of
+        <code>1.9</code> is still supported. (markt) 
+      </update>
+      <add>
+        Add support for specifing Java 10 (with the value <code>10</code>) as
+        the compiler source and/or compiler target for JSP compilation. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
