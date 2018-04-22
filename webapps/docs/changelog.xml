@@ -83,6 +83,10 @@
         Enable ECJ version 4.7 and later to be used as a drop in replacement for
         the ECJ version that ships with Apache Tomcat. (markt)
       </fix>
+      <fix>
+        Enable Java 10 to be specified as a JSP source and/or target if a newer
+        ECJ version is used. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

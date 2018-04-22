@@ -375,6 +375,10 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             } else if(opt.equals("9") || opt.equals("1.9")) {
                 settings.put(CompilerOptions.OPTION_Source,
                              JDT_JAVA_9_VERSION);
+            } else if(opt.equals("10")) {
+                // Constant not available in latest ECJ version that runs on
+                // Java 7
+                settings.put(CompilerOptions.OPTION_Source, "10");
             } else {
                 log.warn("Unknown source VM " + opt + " ignored.");
                 settings.put(CompilerOptions.OPTION_Source,
@@ -426,6 +430,11 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                              JDT_JAVA_9_VERSION);
                 settings.put(CompilerOptions.OPTION_Compliance,
                              JDT_JAVA_9_VERSION);
+            } else if(opt.equals("10")) {
+                // Constant not available in latest ECJ version that runs on
+                // Java 7
+                settings.put(CompilerOptions.OPTION_TargetPlatform, "10");
+                settings.put(CompilerOptions.OPTION_Compliance, "10");
             } else {
                 log.warn("Unknown target VM " + opt + " ignored.");
                 settings.put(CompilerOptions.OPTION_TargetPlatform,
