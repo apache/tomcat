@@ -77,6 +77,14 @@
       </fix>
     </changelog>
   </subsection>  
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Enable ECJ version 4.7 and later to be used as a drop in replacement for
+        the ECJ version that ships with Apache Tomcat. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.86 (violetagg)" rtext="released 2018-04-13">
   <subsection name="Catalina">

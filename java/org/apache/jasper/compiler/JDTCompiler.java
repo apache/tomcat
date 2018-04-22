@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -61,6 +62,33 @@ import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
  * @author Remy Maucherat
  */
 public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
+
+    private static final String JDT_JAVA_9_VERSION;
+
+    static {
+        // The constant for Java 9 changed between 4.6 and 4.7 in a way that is
+        // not backwards compatible. Need to figure out which version is in use
+        // so the correct constant value is used.
+
+        String jdtJava9Version = null;
+
+        Class<?> clazz = CompilerOptions.class;
+
+        for (Field field : clazz.getFields()) {
+            if ("VERSION_9".equals(field.getName())) {
+                // 4.7 onwards: CompilerOptions.VERSION_9
+                jdtJava9Version = "9";
+                break;
+            }
+        }
+
+        if (jdtJava9Version == null) {
+            // 4.6 and earlier: CompilerOptions.VERSION_1_9
+            jdtJava9Version = "1.9";
+        }
+
+        JDT_JAVA_9_VERSION = jdtJava9Version;
+    }
 
     private final Log log = LogFactory.getLog(JDTCompiler.class); // must not be static
 
@@ -343,9 +371,10 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             } else if(opt.equals("1.8")) {
                 settings.put(CompilerOptions.OPTION_Source,
                              CompilerOptions.VERSION_1_8);
-            } else if(opt.equals("1.9")) {
+            // Support old format that was used in EA implementation as well
+            } else if(opt.equals("9") || opt.equals("1.9")) {
                 settings.put(CompilerOptions.OPTION_Source,
-                             "1.9"); // CompilerOptions.VERSION_1_9
+                             JDT_JAVA_9_VERSION);
             } else {
                 log.warn("Unknown source VM " + opt + " ignored.");
                 settings.put(CompilerOptions.OPTION_Source,
@@ -392,11 +421,11 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                              CompilerOptions.VERSION_1_8);
                 settings.put(CompilerOptions.OPTION_Compliance,
                         CompilerOptions.VERSION_1_8);
-            } else if(opt.equals("1.9")) {
+            } else if(opt.equals("9") || opt.equals("1.9")) {
                 settings.put(CompilerOptions.OPTION_TargetPlatform,
-                            "1.9"); // CompilerOptions.VERSION_1_9
+                             JDT_JAVA_9_VERSION);
                 settings.put(CompilerOptions.OPTION_Compliance,
-                        "1.9"); // CompilerOptions.VERSION_1_9
+                             JDT_JAVA_9_VERSION);
             } else {
                 log.warn("Unknown target VM " + opt + " ignored.");
                 settings.put(CompilerOptions.OPTION_TargetPlatform,
