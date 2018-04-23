@@ -34,14 +34,14 @@ public final class ConstantClass extends Constant {
 
 
     /**
-     * Initialize instance from file data.
+     * Constructs an instance from file data.
      *
-     * @param file Input stream
-     * @throws IOException
+     * @param dataInput Input stream
+     * @throws IOException if an I/O error occurs reading from the given {@code dataInput}.
      */
-    ConstantClass(final DataInput file) throws IOException {
+    ConstantClass(final DataInput dataInput) throws IOException {
         super(Const.CONSTANT_Class);
-        this.name_index = file.readUnsignedShort();
+        this.name_index = dataInput.readUnsignedShort();
     }
 
 

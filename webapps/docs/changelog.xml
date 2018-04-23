@@ -63,6 +63,10 @@
         type="javax.sql.XADataSource"</code>. Patch provided by Masafumi Miura.
         (csutherl)
       </fix>
+      <add>
+        Update the internal fork of Apache Commons BCEL to r1829827 to add early
+        access Java 11 support to the annotation scanning code. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
