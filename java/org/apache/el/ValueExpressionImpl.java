@@ -118,8 +118,14 @@ public final class ValueExpressionImpl extends ValueExpression implements
      */
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof ValueExpressionImpl && obj.hashCode() == this
-                .hashCode());
+        if (!(obj instanceof ValueExpressionImpl)) {
+            return false;
+        }
+        if (obj.hashCode() != this.hashCode()) {
+            return false;
+        }
+
+        return this.getNode().equals(((ValueExpressionImpl) obj).getNode());
     }
 
     /*
