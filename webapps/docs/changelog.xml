@@ -72,6 +72,11 @@
         Update the internal fork of Apache Commons BCEL to r1829827 to add early
         access Java 11 support to the annotation scanning code. (markt)
       </add>
+      <fix>
+        <bug>62309</bug>: Fix a <code>SecurityException</code> when using JASPIC
+        under a <code>SecurityManager</code> when authentication is not
+        mandatory. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

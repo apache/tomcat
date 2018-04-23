@@ -1913,7 +1913,7 @@ public class Request implements HttpServletRequest {
      * @param principal The user Principal
      */
     public void setUserPrincipal(final Principal principal) {
-        if (Globals.IS_SECURITY_ENABLED) {
+        if (Globals.IS_SECURITY_ENABLED && principal != null) {
             if (subject == null) {
                 final HttpSession session = getSession(false);
                 if (session == null) {
