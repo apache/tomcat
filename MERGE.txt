@@ -49,7 +49,7 @@ GIT
 Updates from Git are applied manually via patch files. Patch files are generated
 using:
 git diff <last SHA1>:<sub-tree> HEAD:<sub-tree> > temp.patch
-The more recently merged SHA1 for the component below should be updated after
+The most recently merged SHA1 for the component below should be updated after
 the patch file has been applied and committed
 
 FileUpload
