@@ -58,6 +58,8 @@ public class PerMessageDeflate implements Transformation {
     private volatile boolean skipDecompression = false;
     private volatile ByteBuffer writeBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
     private volatile boolean firstCompressedFrameWritten = false;
+    // Flag to track if a message is completely empty
+    private volatile boolean emptyMessage = true;
 
     static PerMessageDeflate negotiate(List<List<Parameter>> preferences, boolean isServer) {
         // Accept the first preference that the endpoint is able to support
@@ -315,9 +317,6 @@ public class PerMessageDeflate implements Transformation {
     public List<MessagePart> sendMessagePart(List<MessagePart> uncompressedParts) {
         List<MessagePart> allCompressedParts = new ArrayList<>();
 
-        // Flag to track if a message is completely empty
-        boolean emptyMessage = true;
-
         for (MessagePart uncompressedPart : uncompressedParts) {
             byte opCode = uncompressedPart.getOpCode();
             boolean emptyPart = uncompressedPart.getPayload().limit() == 0;
@@ -343,7 +342,7 @@ public class PerMessageDeflate implements Transformation {
                 int flush = (uncompressedPart.isFin() ? Deflater.SYNC_FLUSH : Deflater.NO_FLUSH);
                 boolean deflateRequired = true;
 
-                while(deflateRequired) {
+                while (deflateRequired) {
                     ByteBuffer compressedPayload = writeBuffer;
 
                     int written = deflater.deflate(compressedPayload.array(),
@@ -450,6 +449,7 @@ public class PerMessageDeflate implements Transformation {
 
     private void startNewMessage() {
         firstCompressedFrameWritten = false;
+        emptyMessage = true;
         if (isServer && !serverContextTakeover || !isServer && !clientContextTakeover) {
             deflater.reset();
         }

@@ -109,6 +109,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>62301</bug>: Correct a regression in the fix for <bug>61491</bug>
+        that didn't correctly handle a final empty message part in all
+        circumstances when using <code>PerMessageDeflate</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.7 (markt)" rtext="2018-04-07">
   <subsection name="Catalina">
