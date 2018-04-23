@@ -102,6 +102,11 @@
         Add support for specifing Java 10 (with the value <code>10</code>) as
         the compiler source and/or compiler target for JSP compilation. (markt)
       </add>
+      <fix>
+        <bug>62287</bug>: Do not rely on hash codes to test instances of
+        <code>ValueExpressionImpl</code> for equality. Patch provided by Mark
+        Struberg. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
