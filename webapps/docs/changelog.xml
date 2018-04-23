@@ -73,6 +73,11 @@
         access Java 11 support to the annotation scanning code. (markt)
       </add>
       <fix>
+        <bug>62297</bug>: Enable the <code>CrawlerSessionManagerValve</code> to
+        correctly handle bots that crawl multiple hosts and/or web applications
+        when the Valve is configured on a Host or an Engine. (fschumacher)
+      </fix>
+      <fix>
         <bug>62309</bug>: Fix a <code>SecurityException</code> when using JASPIC
         under a <code>SecurityManager</code> when authentication is not
         mandatory. (markt)

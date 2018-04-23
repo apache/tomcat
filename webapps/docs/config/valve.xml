@@ -1820,6 +1820,13 @@
         </p>
       </attribute>
 
+      <attribute name="contextAware" required="false">
+        <p>Flag to use the context name together with the client IP to
+        identify the session to re-use. Can be combined with <code>hostAware</code>.
+        Default value: <code>true</code>
+        </p>
+      </attribute>
+
       <attribute name="crawlerIps" required="false">
         <p>Regular expression (using <code>java.util.regex</code>) that client
         IP is matched against to determine if a request is from a web crawler.
@@ -1831,6 +1838,13 @@
         agent HTTP request header is matched against to determine if a request
         is from a web crawler. If not set, the default of
         <code>.*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*</code> is used.</p>
+      </attribute>
+
+      <attribute name="hostAware" required="false">
+        <p>Flag to use the configured host together with the client IP to
+        identify the session to re-use. Can be combined with <code>contextAware</code>.
+        Default value: <code>true</code>
+        </p>
       </attribute>
 
       <attribute name="sessionInactiveInterval" required="false">

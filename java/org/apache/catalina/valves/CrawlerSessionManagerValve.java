@@ -27,6 +27,8 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 
+import org.apache.catalina.Context;
+import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -44,8 +46,8 @@ public class CrawlerSessionManagerValve extends ValveBase implements HttpSession
 
     private static final Log log = LogFactory.getLog(CrawlerSessionManagerValve.class);
 
-    private final Map<String, String> clientIpSessionId = new ConcurrentHashMap<>();
-    private final Map<String, String> sessionIdClientIp = new ConcurrentHashMap<>();
+    private final Map<String, String> clientIdSessionId = new ConcurrentHashMap<>();
+    private final Map<String, String> sessionIdClientId = new ConcurrentHashMap<>();
 
     private String crawlerUserAgents = ".*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*";
     private Pattern uaPattern = null;
@@ -54,6 +56,10 @@ public class CrawlerSessionManagerValve extends ValveBase implements HttpSession
     private Pattern ipPattern = null;
 
     private int sessionInactiveInterval = 60;
+
+    private boolean isHostAware = true;
+
+    private boolean isContextAware = true;
 
 
     /**
@@ -134,7 +140,27 @@ public class CrawlerSessionManagerValve extends ValveBase implements HttpSession
 
 
     public Map<String, String> getClientIpSessionId() {
-        return clientIpSessionId;
+        return clientIdSessionId;
+    }
+
+
+    public boolean isHostAware() {
+        return isHostAware;
+    }
+
+
+    public void setHostAware(boolean isHostAware) {
+        this.isHostAware = isHostAware;
+    }
+
+
+    public boolean isContextAware() {
+        return isContextAware;
+    }
+
+
+    public void setContextAware(boolean isContextAware) {
+        this.isContextAware = isContextAware;
     }
 
 
@@ -152,9 +178,10 @@ public class CrawlerSessionManagerValve extends ValveBase implements HttpSession
         boolean isBot = false;
         String sessionId = null;
         String clientIp = request.getRemoteAddr();
+        String clientIdentifier = getClientIdentifier(request.getHost(), request.getContext(), clientIp);
 
         if (log.isDebugEnabled()) {
-            log.debug(request.hashCode() + ": ClientIp=" + clientIp + ", RequestedSessionId="
+            log.debug(request.hashCode() + ": ClientIdentifier=" + clientIdentifier + ", RequestedSessionId="
                     + request.getRequestedSessionId());
         }
 
@@ -194,7 +221,7 @@ public class CrawlerSessionManagerValve extends ValveBase implements HttpSession
 
             // If this is a bot, is the session ID known?
             if (isBot) {
-                sessionId = clientIpSessionId.get(clientIp);
+                sessionId = clientIdSessionId.get(clientIdentifier);
                 if (sessionId != null) {
                     request.setRequestedSessionId(sessionId);
                     if (log.isDebugEnabled()) {
@@ -211,8 +238,8 @@ public class CrawlerSessionManagerValve extends ValveBase implements HttpSession
                 // Has bot just created a session, if so make a note of it
                 HttpSession s = request.getSession(false);
                 if (s != null) {
-                    clientIpSessionId.put(clientIp, s.getId());
-                    sessionIdClientIp.put(s.getId(), clientIp);
+                    clientIdSessionId.put(clientIdentifier, s.getId());
+                    sessionIdClientId.put(s.getId(), clientIdentifier);
                     // #valueUnbound() will be called on session expiration
                     s.setAttribute(this.getClass().getName(), this);
                     s.setMaxInactiveInterval(sessionInactiveInterval);
@@ -231,11 +258,23 @@ public class CrawlerSessionManagerValve extends ValveBase implements HttpSession
     }
 
 
+    private String getClientIdentifier(Host host, Context context, String clientIp) {
+        StringBuilder result = new StringBuilder(clientIp);
+        if (isHostAware) {
+            result.append('-').append(host.getName());
+        }
+        if (isContextAware) {
+            result.append(context.getName());
+        }
+        return result.toString();
+    }
+
+
     @Override
     public void valueUnbound(HttpSessionBindingEvent event) {
-        String clientIp = sessionIdClientIp.remove(event.getSession().getId());
-        if (clientIp != null) {
-            clientIpSessionId.remove(clientIp);
+        String clientIdentifier = sessionIdClientId.remove(event.getSession().getId());
+        if (clientIdentifier != null) {
+            clientIdSessionId.remove(clientIdentifier);
         }
     }
 }
