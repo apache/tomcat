@@ -59,26 +59,27 @@ public abstract class Constant {
     /**
      * Read one constant from the given input, the type depends on a tag byte.
      *
-     * @param input Input stream
+     * @param dataInput Input stream
      * @return Constant object
+     * @throws IOException if an I/O error occurs reading from the given {@code dataInput}.
+     * @throws ClassFormatException if the next byte is not recognized
      */
-    static Constant readConstant(final DataInput input) throws IOException,
-            ClassFormatException {
-        final byte b = input.readByte(); // Read tag byte
+    static Constant readConstant(final DataInput dataInput) throws IOException, ClassFormatException {
+        final byte b = dataInput.readByte(); // Read tag byte
         int skipSize;
         switch (b) {
             case Const.CONSTANT_Class:
-                return new ConstantClass(input);
+                return new ConstantClass(dataInput);
             case Const.CONSTANT_Integer:
-                return new ConstantInteger(input);
+                return new ConstantInteger(dataInput);
             case Const.CONSTANT_Float:
-                return new ConstantFloat(input);
+                return new ConstantFloat(dataInput);
             case Const.CONSTANT_Long:
-                return new ConstantLong(input);
+                return new ConstantLong(dataInput);
             case Const.CONSTANT_Double:
-                return new ConstantDouble(input);
+                return new ConstantDouble(dataInput);
             case Const.CONSTANT_Utf8:
-                return ConstantUtf8.getInstance(input);
+                return ConstantUtf8.getInstance(dataInput);
             case Const.CONSTANT_String:
             case Const.CONSTANT_MethodType:
             case Const.CONSTANT_Module:
@@ -92,16 +93,16 @@ public abstract class Constant {
             case Const.CONSTANT_Methodref:
             case Const.CONSTANT_InterfaceMethodref:
             case Const.CONSTANT_NameAndType:
+            case Const.CONSTANT_Dynamic:
             case Const.CONSTANT_InvokeDynamic:
                 skipSize = 4; // unsigned short, unsigned short
                 break;
             default:
                 throw new ClassFormatException("Invalid byte tag in constant pool: " + b);
         }
-        Utility.skipFully(input, skipSize);
+        Utility.skipFully(dataInput, skipSize);
         return null;
     }
-
 
     @Override
     public String toString() {

@@ -68,6 +68,10 @@
         response that consisted almost entirely of surrogate pairs could result
         in one surrogate pair being dropped. (markt)
       </fix>
+      <add>
+        Update the internal fork of Apache Commons BCEL to r1829827 to add early
+        access Java 11 support to the annotation scanning code. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
