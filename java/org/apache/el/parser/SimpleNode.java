@@ -179,10 +179,10 @@ public abstract class SimpleNode extends ELSupport implements Node {
             return false;
         }
         SimpleNode other = (SimpleNode) obj;
-        if (!Arrays.equals(children, other.children)) {
+        if (id != other.id) {
             return false;
         }
-        if (id != other.id) {
+        if (!Arrays.equals(children, other.children)) {
             return false;
         }
         if (image == null) {
