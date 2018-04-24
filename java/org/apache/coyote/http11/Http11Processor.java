@@ -648,8 +648,7 @@ public class Http11Processor extends AbstractProcessor {
             response.setStatus(400);
             setErrorState(ErrorState.CLOSE_CLEAN, null);
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("http11processor.request.prepare")+
-                          " host header missing");
+                log.debug(sm.getString("http11processor.request.noHostHeader"));
             }
         }
 
