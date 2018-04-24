@@ -182,14 +182,14 @@ public abstract class SimpleNode extends ELSupport implements Node {
         if (id != other.id) {
             return false;
         }
-        if (!Arrays.equals(children, other.children)) {
-            return false;
-        }
         if (image == null) {
             if (other.image != null) {
                 return false;
             }
         } else if (!image.equals(other.image)) {
+            return false;
+        }
+        if (!Arrays.equals(children, other.children)) {
             return false;
         }
         return true;
