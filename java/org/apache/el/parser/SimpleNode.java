@@ -179,9 +179,6 @@ public abstract class SimpleNode extends ELSupport implements Node {
             return false;
         }
         SimpleNode other = (SimpleNode) obj;
-        if (!Arrays.equals(children, other.children)) {
-            return false;
-        }
         if (id != other.id) {
             return false;
         }
@@ -190,6 +187,9 @@ public abstract class SimpleNode extends ELSupport implements Node {
                 return false;
             }
         } else if (!image.equals(other.image)) {
+            return false;
+        }
+        if (!Arrays.equals(children, other.children)) {
             return false;
         }
         return true;
