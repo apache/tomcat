@@ -44,10 +44,12 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collector;
 
 import javax.management.ObjectName;
 
@@ -1661,14 +1663,15 @@ public class HostConfig implements LifecycleListener {
         }
 
         // Need ordered set of names
-        SortedSet<String> sortedAppNames = new TreeSet<>();
-        sortedAppNames.addAll(deployed.keySet());
+        SortedSet<ContextName> sortedAppNames = deployed.keySet().stream().
+                map(name -> new ContextName(name, false)).
+                collect(Collector.of((Supplier<SortedSet<ContextName>>) TreeSet::new, SortedSet::add,
+                        (left, right) -> { left.addAll(right); return left; }));
+        Iterator<ContextName> iter = sortedAppNames.iterator();
 
-        Iterator<String> iter = sortedAppNames.iterator();
-
-        ContextName previous = new ContextName(iter.next(), false);
+        ContextName previous = iter.next();
         do {
-            ContextName current = new ContextName(iter.next(), false);
+            ContextName current = iter.next();
 
             if (current.getPath().equals(previous.getPath())) {
                 // Current and previous are same path - current will always

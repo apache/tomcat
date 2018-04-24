@@ -17,12 +17,13 @@
 package org.apache.catalina.util;
 
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 /**
  * Utility class to manage context names so there is one place where the
  * conversions between baseName, path and version take place.
  */
-public final class ContextName {
+public final class ContextName implements Comparable {
     public static final String ROOT_NAME = "ROOT";
     private static final String VERSION_MARKER = "##";
     private static final String FWD_SLASH_REPLACEMENT = "#";
@@ -172,6 +173,65 @@ public final class ContextName {
     @Override
     public String toString() {
         return getDisplayName();
+    }
+
+    /**
+     * Compares this context name with another object
+     *
+     * <p>If the argument is not a {@code ContextName} the result is
+     * {@literal 1}.</p>
+     *
+     * <p>Otherwise different aspects of the context name are compared</p>
+     *
+     * <p>If the context path is different the result is equal to the
+     * comparison of the paths.</p>
+     * <p>If the version is equal to the other context name the result is
+     * {@literal 0}.</p>
+     * <p>If both versions are a common version identifier like
+     * {@literal “x.y.z.…”} individual parts of the version number are
+     * compared and the first difference determines the result.</p>
+     * <p>Otherwise the context names are compared literally.</p>
+     */
+    @Override
+    public int compareTo(Object o) {
+        if (!(o instanceof ContextName)) {
+            return 1;
+        }
+
+        ContextName other = (ContextName) o;
+
+        int pathResult = path.compareTo(other.path);
+        if (pathResult != 0) {
+            return pathResult;
+        }
+
+        if (version.equals(other.version)) {
+            return 0;
+        }
+
+        Pattern versionPattern = Pattern.compile("(\\d+\\.)*\\d+");
+        if (versionPattern.matcher(version).matches() &&
+                versionPattern.matcher(other.version).matches()) {
+            String[] versionTokens = version.split("\\.");
+            String[] otherVersionTokens = other.version.split("\\.");
+
+            int i = 0;
+            while (versionTokens.length > i && otherVersionTokens.length > i) {
+                Integer versionPart = Integer.parseInt(versionTokens[i]);
+                Integer otherVersionPart = Integer.parseInt(otherVersionTokens[i]);
+
+                int partResult = versionPart.compareTo(otherVersionPart);
+                if (partResult != 0) {
+                    return partResult;
+                }
+
+                i ++;
+            }
+
+            return 0;
+        } else {
+            return name.compareTo(other.name);
+        }
     }
 
 

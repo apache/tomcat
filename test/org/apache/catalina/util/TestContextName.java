@@ -45,6 +45,9 @@ public class TestContextName {
     private ContextName cn20;
     private ContextName cn21;
     private ContextName cn22;
+    private ContextName cn23;
+    private ContextName cn24;
+    private ContextName cn25;
 
     @Before
     public void setUp() throws Exception {
@@ -70,6 +73,9 @@ public class TestContextName {
         cn20 = new ContextName("/ROOT##A", false);
         cn21 = new ContextName("foo.war", false);
         cn22 = new ContextName("foo.war", true);
+        cn23 = new ContextName("foo##1.0.0", false);
+        cn24 = new ContextName("foo##1.2.3", false);
+        cn25 = new ContextName("foo##1.2.12", false);
     }
 
     @Test
@@ -226,6 +232,24 @@ public class TestContextName {
         doTestConstructorString(cn20);
         doTestConstructorString(cn21);
         doTestConstructorString(cn22);
+    }
+
+    @SuppressWarnings("EqualsWithItself")
+    @Test
+    public void testCompareTo() {
+        Assert.assertEquals(0, cn23.compareTo(cn23));
+        Assert.assertEquals(-1, cn23.compareTo(cn24));
+        Assert.assertEquals(-1, cn23.compareTo(cn25));
+        Assert.assertEquals(1, cn24.compareTo(cn23));
+        Assert.assertEquals(0, cn24.compareTo(cn24));
+        Assert.assertEquals(-1, cn24.compareTo(cn25));
+        Assert.assertEquals(1, cn25.compareTo(cn23));
+        Assert.assertEquals(1, cn25.compareTo(cn24));
+        Assert.assertEquals(0, cn25.compareTo(cn25));
+
+        Assert.assertEquals(-4, cn23.compareTo(cn13));
+        Assert.assertEquals(-4, cn24.compareTo(cn13));
+        Assert.assertEquals(-4, cn25.compareTo(cn13));
     }
 
     private void doTestConstructorString(ContextName src) {
