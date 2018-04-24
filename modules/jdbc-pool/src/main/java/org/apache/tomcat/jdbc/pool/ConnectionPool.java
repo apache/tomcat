@@ -899,7 +899,18 @@ public class ConnectionPool {
         if (!con.validate(action)) return true;
         if (!terminateTransaction(con)) return true;
         if (con.isMaxAgeExpired()) return true;
-        else return false;
+        try{
+            /*   mysql-drive close the connection while IOException occur. if testOnReturn is false
+             *   the connection will have been returned to the pool and may have
+             *   been borrowed by another thread
+            */
+            boolean isUnderlyingConnectionClosed = con.getConnection().isClosed();
+            if(isUnderlyingConnectionClosed) return true;
+        }catch (SQLException ignore){
+            return true;
+        }
+
+        return false;
     }
 
     /**
