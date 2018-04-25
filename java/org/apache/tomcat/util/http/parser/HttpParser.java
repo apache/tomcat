@@ -46,6 +46,11 @@ public class HttpParser {
     private static final boolean[] IS_HTTP_PROTOCOL = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_ALPHA = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_NUMERIC = new boolean[ARRAY_SIZE];
+    private static final boolean[] IS_UNRESERVED = new boolean[ARRAY_SIZE];
+    private static final boolean[] IS_SUBDELIM = new boolean[ARRAY_SIZE];
+    private static final boolean[] IS_USERINFO = new boolean[ARRAY_SIZE];
+    private static final boolean[] IS_ABSOLUTEPATH = new boolean[ARRAY_SIZE];
+    private static final boolean[] IS_QUERY = new boolean[ARRAY_SIZE];
 
     static {
         for (int i = 0; i < ARRAY_SIZE; i++) {
@@ -93,6 +98,40 @@ public class HttpParser {
 
             if (i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z') {
                 IS_ALPHA[i] = true;
+            }
+
+            if (IS_ALPHA[i] || IS_NUMERIC[i] || i == '-' || i == '.' || i == '_' || i == '~') {
+                IS_UNRESERVED[i] = true;
+            }
+
+            if (i == '!' || i == '$' || i == '&' || i == '\'' || i == '(' || i == ')' || i == '*' || i == '+' ||
+                    i == ',' || i == ';' || i == '=') {
+                IS_SUBDELIM[i] = true;
+            }
+
+            // userinfo    = *( unreserved / pct-encoded / sub-delims / ":" )
+            if (IS_UNRESERVED[i] || i == '%' || IS_SUBDELIM[i] || i == ':') {
+                IS_USERINFO[i] = true;
+            }
+
+            /*
+             * absolute-path  = 1*( "/" segment )
+             * segment        = *pchar
+             * pchar          = unreserved / pct-encoded / sub-delims / ":" / "@"
+             *
+             * Note pchar allows everything userinfo allows plus "@"
+             */
+            if (IS_USERINFO[i] || i == '@' || i == '/') {
+                IS_ABSOLUTEPATH[i] = true;
+            }
+
+            /*
+             * query          = *( pchar / "/" / "?" )
+             *
+             * Note query allows everything absolute-path allows plus "?"
+             */
+            if (IS_ABSOLUTEPATH[i] || i == '?') {
+                IS_QUERY[i] = true;
             }
         }
     }
@@ -190,6 +229,39 @@ public class HttpParser {
         // ones
         try {
             return IS_NUMERIC[c];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return false;
+        }
+    }
+
+
+    public static boolean isUserInfo(int c) {
+        // Fast for valid user info characters, slower for some incorrect
+        // ones
+        try {
+            return IS_USERINFO[c];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return false;
+        }
+    }
+
+
+    public static boolean isAbsolutePath(int c) {
+        // Fast for valid user info characters, slower for some incorrect
+        // ones
+        try {
+            return IS_ABSOLUTEPATH[c];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return false;
+        }
+    }
+
+
+    public static boolean isQuery(int c) {
+        // Fast for valid user info characters, slower for some incorrect
+        // ones
+        try {
+            return IS_QUERY[c];
         } catch (ArrayIndexOutOfBoundsException ex) {
             return false;
         }

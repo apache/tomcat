@@ -670,7 +670,33 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * Returns true if the buffer starts with the specified string.
+     * Returns true if the buffer starts with the specified string when tested
+     * in a case sensitive manner.
+     *
+     * @param s the string
+     * @param pos The position
+     *
+     * @return <code>true</code> if the start matches
+     */
+    public boolean startsWith(String s, int pos) {
+        byte[] b = buff;
+        int len = s.length();
+        if (b == null || len + pos > end - start) {
+            return false;
+        }
+        int off = start + pos;
+        for (int i = 0; i < len; i++) {
+            if (b[off++] != s.charAt(i)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * Returns true if the buffer starts with the specified string when tested
+     * in a case insensitive manner.
      *
      * @param s the string
      * @param pos The position
