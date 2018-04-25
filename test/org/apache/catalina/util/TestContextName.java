@@ -238,13 +238,13 @@ public class TestContextName {
     @Test
     public void testCompareTo() {
         Assert.assertEquals(0, cn23.compareTo(cn23));
-        Assert.assertEquals(-1, cn23.compareTo(cn24));
-        Assert.assertEquals(-1, cn23.compareTo(cn25));
-        Assert.assertEquals(1, cn24.compareTo(cn23));
+        Assert.assertEquals(-2, cn23.compareTo(cn24));
+        Assert.assertEquals(-2, cn23.compareTo(cn25));
+        Assert.assertEquals(2, cn24.compareTo(cn23));
         Assert.assertEquals(0, cn24.compareTo(cn24));
-        Assert.assertEquals(-1, cn24.compareTo(cn25));
-        Assert.assertEquals(1, cn25.compareTo(cn23));
-        Assert.assertEquals(1, cn25.compareTo(cn24));
+        Assert.assertEquals(-9, cn24.compareTo(cn25));
+        Assert.assertEquals(2, cn25.compareTo(cn23));
+        Assert.assertEquals(9, cn25.compareTo(cn24));
         Assert.assertEquals(0, cn25.compareTo(cn25));
 
         Assert.assertEquals(-4, cn23.compareTo(cn13));

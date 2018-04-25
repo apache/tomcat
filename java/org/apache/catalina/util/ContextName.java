@@ -34,6 +34,7 @@ public final class ContextName implements Comparable {
     private final String path;
     private final String version;
     private final String name;
+    private String versionCode;
 
 
     /**
@@ -84,6 +85,8 @@ public final class ContextName implements Comparable {
             tmp2 = baseName;
         }
 
+        buildVersionCode();
+
         if (ROOT_NAME.equals(tmp2)) {
             path = "";
         } else {
@@ -118,6 +121,8 @@ public final class ContextName implements Comparable {
             this.version = version;
         }
 
+        buildVersionCode();
+
         // Name is path + version
         if ("".equals(this.version)) {
             name = this.path;
@@ -138,6 +143,25 @@ public final class ContextName implements Comparable {
             tmp.append(this.version);
         }
         this.baseName = tmp.toString();
+    }
+
+    /**
+     * Build a condensed string of common version numbers, e.g. 1.2.34
+     *
+     * This converts individual components of a version number into UTF-16
+     * code points and concatenates them into a string. This string can be
+     * used for comparison later on.
+     */
+    private void buildVersionCode() {
+        if (VERSION_PATTERN.matcher(version).matches()) {
+            StringBuilder versionCodeBuilder = new StringBuilder();
+            for (String versionPart : VERSION_DOT_PATTERN.split(version)) {
+                versionCodeBuilder.append(Character.toChars(Integer.valueOf(versionPart)));
+            }
+            versionCode = versionCodeBuilder.toString();
+        } else {
+            versionCode = null;
+        }
     }
 
     public String getBaseName() {
@@ -207,32 +231,11 @@ public final class ContextName implements Comparable {
             return pathResult;
         }
 
-        if (version.equals(other.version)) {
-            return 0;
+        if (versionCode != null && other.versionCode != null) {
+            return versionCode.compareTo(other.versionCode);
         }
 
-        if (VERSION_PATTERN.matcher(version).matches() &&
-                VERSION_PATTERN.matcher(other.version).matches()) {
-            String[] versionTokens = VERSION_DOT_PATTERN.split(version);
-            String[] otherVersionTokens = VERSION_DOT_PATTERN.split(other.version);
-
-            int i = 0;
-            while (versionTokens.length > i && otherVersionTokens.length > i) {
-                Integer versionPart = Integer.parseInt(versionTokens[i]);
-                Integer otherVersionPart = Integer.parseInt(otherVersionTokens[i]);
-
-                int partResult = versionPart.compareTo(otherVersionPart);
-                if (partResult != 0) {
-                    return partResult;
-                }
-
-                i ++;
-            }
-
-            return 0;
-        } else {
-            return name.compareTo(other.name);
-        }
+        return version.compareTo(other.version);
     }
 
 
