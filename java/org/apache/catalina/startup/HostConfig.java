@@ -39,17 +39,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.function.Supplier;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collector;
 
 import javax.management.ObjectName;
 
@@ -1663,10 +1660,10 @@ public class HostConfig implements LifecycleListener {
         }
 
         // Need ordered set of names
-        SortedSet<ContextName> sortedAppNames = deployed.keySet().stream().
-                map(name -> new ContextName(name, false)).
-                collect(Collector.of((Supplier<SortedSet<ContextName>>) TreeSet::new, SortedSet::add,
-                        (left, right) -> { left.addAll(right); return left; }));
+        TreeSet<ContextName> sortedAppNames = new TreeSet<>();
+        for (String name : deployed.keySet()) {
+            sortedAppNames.add(new ContextName(name, false));
+        }
         Iterator<ContextName> iter = sortedAppNames.iterator();
 
         ContextName previous = iter.next();
