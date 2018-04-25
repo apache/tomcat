@@ -95,6 +95,24 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     // ------------------------------------------------ HTTP specific properties
     // ------------------------------------------ managed in the ProtocolHandler
 
+    private String relaxedPathChars = null;
+    public String getRelaxedPathChars() {
+        return relaxedPathChars;
+    }
+    public void setRelaxedPathChars(String relaxedPathChars) {
+        this.relaxedPathChars = relaxedPathChars;
+    }
+
+
+    private String relaxedQueryChars = null;
+    public String getRelaxedQueryChars() {
+        return relaxedQueryChars;
+    }
+    public void setRelaxedQueryChars(String relaxedQueryChars) {
+        this.relaxedQueryChars = relaxedQueryChars;
+    }
+
+
     private boolean allowHostHeaderMismatch = false;
     /**
      * Will Tomcat accept an HTTP 1.1 request where the host header does not

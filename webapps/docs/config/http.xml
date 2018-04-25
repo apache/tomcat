@@ -558,6 +558,32 @@
       <code>true</code> which will cause the request to be rejected.</p>
     </attribute>
 
+    <attribute name="relaxedPathChars" required="false">
+      <p>The <a href="https://tools.ietf.org/rfc/rfc7230.txt">HTTP/1.1
+      specification</a> requires that certain characters are %nn encoded when
+      used in URI paths. Unfortunately, many user agents including all the major
+      browsers are not compliant with this specification and use these
+      characters in unencoded form. To prevent Tomcat rejecting such requests,
+      this attribute may be used to specify the additional characters to allow.
+      If not specified, no addtional characters will be allowed. The value may
+      be any combination of the following characters:
+      <code>&quot; &lt; &gt; [ \ ] ^ ` { | }</code> . Any other characters
+      present in the value will be ignored.</p>
+    </attribute>
+
+    <attribute name="relaxedQueryChars" required="false">
+      <p>The <a href="https://tools.ietf.org/rfc/rfc7230.txt">HTTP/1.1
+      specification</a> requires that certain characters are %nn encoded when
+      used in URI query strings. Unfortunately, many user agents including all
+      the major browsers are not compliant with this specification and use these
+      characters in unencoded form. To prevent Tomcat rejecting such requests,
+      this attribute may be used to specify the additional characters to allow.
+      If not specified, no addtional characters will be allowed. The value may
+      be any combination of the following characters:
+      <code>&quot; &lt; &gt; [ \ ] ^ ` { | }</code> . Any other characters
+      present in the value will be ignored.</p>
+    </attribute>
+
     <attribute name="restrictedUserAgents" required="false">
       <p>The value is a regular expression (using <code>java.util.regex</code>)
       matching the <code>user-agent</code> header of HTTP clients for which

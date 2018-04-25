@@ -36,21 +36,24 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class HttpParser {
 
+    private static final StringManager sm = StringManager.getManager(HttpParser.class);
+
     private static final int ARRAY_SIZE = 128;
 
     private static final boolean[] IS_CONTROL = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_SEPARATOR = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_TOKEN = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_HEX = new boolean[ARRAY_SIZE];
-    private static final boolean[] IS_NOT_REQUEST_TARGET = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_HTTP_PROTOCOL = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_ALPHA = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_NUMERIC = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_UNRESERVED = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_SUBDELIM = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_USERINFO = new boolean[ARRAY_SIZE];
-    private static final boolean[] IS_ABSOLUTEPATH = new boolean[ARRAY_SIZE];
-    private static final boolean[] IS_QUERY = new boolean[ARRAY_SIZE];
+    private static final boolean[] IS_RELAXABLE = new boolean[ARRAY_SIZE];
+
+    private static final HttpParser DEFAULT;
+
 
     static {
         for (int i = 0; i < ARRAY_SIZE; i++) {
@@ -77,15 +80,6 @@ public class HttpParser {
                 IS_HEX[i] = true;
             }
 
-            // Not valid for request target.
-            // Combination of multiple rules from RFC7230 and RFC 3986. Must be
-            // ASCII, no controls plus a few additional characters excluded
-            if (IS_CONTROL[i] || i > 127 ||
-                    i == ' ' || i == '\"' || i == '#' || i == '<' || i == '>' || i == '\\' ||
-                    i == '^' || i == '`'  || i == '{' || i == '|' || i == '}') {
-                IS_NOT_REQUEST_TARGET[i] = true;
-            }
-
             // Not valid for HTTP protocol
             // "HTTP/" DIGIT "." DIGIT
             if (i == 'H' || i == 'T' || i == 'P' || i == '/' || i == '.' || (i >= '0' && i <= '9')) {
@@ -104,14 +98,43 @@ public class HttpParser {
                 IS_UNRESERVED[i] = true;
             }
 
-            if (i == '!' || i == '$' || i == '&' || i == '\'' || i == '(' || i == ')' || i == '*' || i == '+' ||
-                    i == ',' || i == ';' || i == '=') {
+            if (i == '!' || i == '$' || i == '&' || i == '\'' || i == '(' || i == ')' || i == '*' ||
+                    i == '+' || i == ',' || i == ';' || i == '=') {
                 IS_SUBDELIM[i] = true;
             }
 
             // userinfo    = *( unreserved / pct-encoded / sub-delims / ":" )
             if (IS_UNRESERVED[i] || i == '%' || IS_SUBDELIM[i] || i == ':') {
                 IS_USERINFO[i] = true;
+            }
+
+            // The characters that are normally not permitted for which the
+            // restrictions may be relaxed when used in the path and/or query
+            // string
+            if (i == '\"' || i == '<' || i == '>' || i == '[' || i == '\\' || i == ']' ||
+                    i == '^' || i == '`'  || i == '{' || i == '|' || i == '}') {
+                IS_RELAXABLE[i] = true;
+            }
+        }
+
+        DEFAULT = new HttpParser(null, null);
+    }
+
+
+    private final boolean[] IS_NOT_REQUEST_TARGET = new boolean[ARRAY_SIZE];
+    private final boolean[] IS_ABSOLUTEPATH_RELAXED = new boolean[ARRAY_SIZE];
+    private final boolean[] IS_QUERY_RELAXED = new boolean[ARRAY_SIZE];
+
+
+    public HttpParser(String relaxedPathChars, String relaxedQueryChars) {
+        for (int i = 0; i < ARRAY_SIZE; i++) {
+            // Not valid for request target.
+            // Combination of multiple rules from RFC7230 and RFC 3986. Must be
+            // ASCII, no controls plus a few additional characters excluded
+            if (IS_CONTROL[i] || i > 127 ||
+                    i == ' ' || i == '\"' || i == '#' || i == '<' || i == '>' || i == '\\' ||
+                    i == '^' || i == '`'  || i == '{' || i == '|' || i == '}') {
+                IS_NOT_REQUEST_TARGET[i] = true;
             }
 
             /*
@@ -122,7 +145,7 @@ public class HttpParser {
              * Note pchar allows everything userinfo allows plus "@"
              */
             if (IS_USERINFO[i] || i == '@' || i == '/') {
-                IS_ABSOLUTEPATH[i] = true;
+                IS_ABSOLUTEPATH_RELAXED[i] = true;
             }
 
             /*
@@ -130,14 +153,47 @@ public class HttpParser {
              *
              * Note query allows everything absolute-path allows plus "?"
              */
-            if (IS_ABSOLUTEPATH[i] || i == '?') {
-                IS_QUERY[i] = true;
+            if (IS_ABSOLUTEPATH_RELAXED[i] || i == '?') {
+                IS_QUERY_RELAXED[i] = true;
             }
+        }
+
+        relax(IS_ABSOLUTEPATH_RELAXED, relaxedPathChars);
+        relax(IS_QUERY_RELAXED, relaxedQueryChars);
+    }
+
+
+    public boolean isNotRequestTargetRelaxed(int c) {
+        // Fast for valid request target characters, slower for some incorrect
+        // ones
+        try {
+            return IS_NOT_REQUEST_TARGET[c];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return true;
         }
     }
 
 
-    private static final StringManager sm = StringManager.getManager(HttpParser.class);
+    public boolean isAbsolutePathRelaxed(int c) {
+        // Fast for valid user info characters, slower for some incorrect
+        // ones
+        try {
+            return IS_ABSOLUTEPATH_RELAXED[c];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return false;
+        }
+    }
+
+
+    public boolean isQueryRelaxed(int c) {
+        // Fast for valid user info characters, slower for some incorrect
+        // ones
+        try {
+            return IS_QUERY_RELAXED[c];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return false;
+        }
+    }
 
 
     public static String unquote(String input) {
@@ -192,13 +248,7 @@ public class HttpParser {
 
 
     public static boolean isNotRequestTarget(int c) {
-        // Fast for valid request target characters, slower for some incorrect
-        // ones
-        try {
-            return IS_NOT_REQUEST_TARGET[c];
-        } catch (ArrayIndexOutOfBoundsException ex) {
-            return true;
-        }
+        return DEFAULT.isNotRequestTargetRelaxed(c);
     }
 
 
@@ -246,25 +296,24 @@ public class HttpParser {
     }
 
 
-    public static boolean isAbsolutePath(int c) {
+    private static boolean isRelaxable(int c) {
         // Fast for valid user info characters, slower for some incorrect
         // ones
         try {
-            return IS_ABSOLUTEPATH[c];
+            return IS_RELAXABLE[c];
         } catch (ArrayIndexOutOfBoundsException ex) {
             return false;
         }
     }
 
 
+    public static boolean isAbsolutePath(int c) {
+        return DEFAULT.isAbsolutePathRelaxed(c);
+    }
+
+
     public static boolean isQuery(int c) {
-        // Fast for valid user info characters, slower for some incorrect
-        // ones
-        try {
-            return IS_QUERY[c];
-        } catch (ArrayIndexOutOfBoundsException ex) {
-            return false;
-        }
+        return DEFAULT.isQueryRelaxed(c);
     }
 
 
@@ -773,11 +822,26 @@ public class HttpParser {
         }
     }
 
+
+    private void relax(boolean[] flags, String relaxedChars) {
+        if (relaxedChars != null && relaxedChars.length() > 0) {
+            char[] chars = relaxedChars.toCharArray();
+            for (char c : chars) {
+                if (isRelaxable(c)) {
+                    flags[c] = true;
+                    IS_NOT_REQUEST_TARGET[c] = false;
+                }
+            }
+        }
+    }
+
+
     private enum AllowsEnd {
         NEVER,
         FIRST,
         ALWAYS
     }
+
 
     private enum DomainParseState {
         NEW(       true, false, false,  AllowsEnd.NEVER,  AllowsEnd.NEVER, " at the start of"),
