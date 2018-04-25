@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 public final class ContextName implements Comparable {
     public static final String ROOT_NAME = "ROOT";
     private static final String VERSION_MARKER = "##";
+    private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+\\.)*\\d+");
     private static final String FWD_SLASH_REPLACEMENT = "#";
 
     private final String baseName;
@@ -209,9 +210,8 @@ public final class ContextName implements Comparable {
             return 0;
         }
 
-        Pattern versionPattern = Pattern.compile("(\\d+\\.)*\\d+");
-        if (versionPattern.matcher(version).matches() &&
-                versionPattern.matcher(other.version).matches()) {
+        if (VERSION_PATTERN.matcher(version).matches() &&
+                VERSION_PATTERN.matcher(other.version).matches()) {
             String[] versionTokens = version.split("\\.");
             String[] otherVersionTokens = other.version.split("\\.");
 
