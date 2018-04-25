@@ -48,6 +48,7 @@ public class TestContextName {
     private ContextName cn23;
     private ContextName cn24;
     private ContextName cn25;
+    private ContextName cn26;
 
     @Before
     public void setUp() throws Exception {
@@ -76,6 +77,7 @@ public class TestContextName {
         cn23 = new ContextName("foo##1.0.0", false);
         cn24 = new ContextName("foo##1.2.3", false);
         cn25 = new ContextName("foo##1.2.12", false);
+        cn26 = new ContextName("foo##10.1.0", false);
     }
 
     @Test
@@ -246,6 +248,9 @@ public class TestContextName {
         Assert.assertEquals(2, cn25.compareTo(cn23));
         Assert.assertEquals(9, cn25.compareTo(cn24));
         Assert.assertEquals(0, cn25.compareTo(cn25));
+        Assert.assertEquals(9, cn26.compareTo(cn23));
+        Assert.assertEquals(9, cn26.compareTo(cn24));
+        Assert.assertEquals(0, cn26.compareTo(cn26));
 
         Assert.assertEquals(-4, cn23.compareTo(cn13));
         Assert.assertEquals(-4, cn24.compareTo(cn13));
