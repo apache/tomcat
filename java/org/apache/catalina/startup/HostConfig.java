@@ -1656,13 +1656,14 @@ public class HostConfig implements LifecycleListener {
      * now unused (have no active sessions) and undeploy any that are found.
      */
     public synchronized void checkUndeploy() {
+        if (deployed.size() < 2) {
+            return;
+        }
+
         // Need ordered set of names
         SortedSet<String> sortedAppNames = new TreeSet<>();
         sortedAppNames.addAll(deployed.keySet());
 
-        if (sortedAppNames.size() < 2) {
-            return;
-        }
         Iterator<String> iter = sortedAppNames.iterator();
 
         ContextName previous = new ContextName(iter.next(), false);
