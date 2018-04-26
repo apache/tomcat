@@ -1124,7 +1124,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    private static enum State {
+    private enum State {
         OPEN,
         STREAM_WRITING,
         WRITER_WRITING,

@@ -247,7 +247,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     }
 
 
-    private static enum XFrameOption {
+    private enum XFrameOption {
         DENY("DENY"),
         SAME_ORIGIN("SAMEORIGIN"),
         ALLOW_FROM("ALLOW-FROM");

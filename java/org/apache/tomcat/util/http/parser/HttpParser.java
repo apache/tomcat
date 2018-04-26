@@ -806,7 +806,7 @@ public class HttpParser {
     }
 
 
-    private static enum DomainParseState {
+    private enum DomainParseState {
         NEW(     true, false, false, false, false, false),
         ALPHA(   true,  true,  true,  true,  true,  true),
         NUMERIC( true,  true,  true,  true,  true,  true),

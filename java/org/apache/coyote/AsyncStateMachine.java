@@ -135,7 +135,7 @@ public class AsyncStateMachine<S> {
     private static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    private static enum AsyncState {
+    private enum AsyncState {
         DISPATCHED      (false, false, false, false),
         STARTING        (true,  true,  false, false),
         STARTED         (true,  true,  false, false),

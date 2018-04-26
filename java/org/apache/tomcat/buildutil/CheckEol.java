@@ -115,7 +115,7 @@ public class CheckEol extends Task {
         }
     }
 
-    private static enum Mode {
+    private enum Mode {
         LF, CRLF
     }
 
