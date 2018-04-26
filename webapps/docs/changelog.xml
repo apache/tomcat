@@ -85,7 +85,7 @@
         when the Valve is configured on a Host or an Engine. (fschumacher)
       </fix>
     </changelog>
-  </subsection>  
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>

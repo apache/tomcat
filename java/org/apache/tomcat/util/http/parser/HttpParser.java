@@ -690,45 +690,50 @@ public class HttpParser {
         int h16Size = 0;
         int pos = 1;
         boolean parsedDoubleColon = false;
-        boolean previousWasColon = false;
+        int precedingColonsCount = 0;
 
         do {
             c = reader.read();
-            if (h16Count == 0 && previousWasColon && c != ':') {
+            if (h16Count == 0 && precedingColonsCount == 1 && c != ':') {
                 // Can't start with a single :
                 throw new IllegalArgumentException();
             }
             if (HttpParser.isHex(c)) {
                 if (h16Size == 0) {
                     // Start of a new h16 block
-                    previousWasColon = false;
+                    precedingColonsCount = 0;
                     h16Count++;
-                    reader.mark(4);
                 }
                 h16Size++;
                 if (h16Size > 4) {
                     throw new IllegalArgumentException();
                 }
             } else if (c == ':') {
-                if (previousWasColon) {
-                    // End of ::
-                    if (parsedDoubleColon) {
-                        // Only allowed one :: sequence
-                        throw new IllegalArgumentException();
-                    }
-                    parsedDoubleColon = true;
-                    previousWasColon = false;
-                    // :: represents at least one h16 block
-                    h16Count++;
+                if (precedingColonsCount >=2 ) {
+                    // ::: is not allowed
+                    throw new IllegalArgumentException();
                 } else {
-                    previousWasColon = true;
+                    if(precedingColonsCount == 1) {
+                        // End of ::
+                        if (parsedDoubleColon ) {
+                            // Only allowed one :: sequence
+                            throw new IllegalArgumentException();
+                        }
+                        parsedDoubleColon = true;
+                        // :: represents at least one h16 block
+                        h16Count++;
+                    }
+                    precedingColonsCount++;
+                    // mark if the next symbol is hex before the actual read
+                    reader.mark(4);
                 }
                 h16Size = 0;
             } else if (c == ']') {
-                if (previousWasColon) {
+                if (precedingColonsCount == 1) {
                     // Can't end on a single ':'
                     throw new IllegalArgumentException();
                 }
+                pos++;
                 break;
             } else if (c == '.') {
                 if (h16Count == 7 || h16Count < 7 && parsedDoubleColon) {
@@ -754,9 +759,12 @@ public class HttpParser {
 
         c = reader.read();
         if (c == ':') {
-            return pos + 1;
+            return pos;
         } else {
-            return -1;
+            if(c == -1) {
+                return -1;
+            }
+            throw new IllegalArgumentException();
         }
     }
 
