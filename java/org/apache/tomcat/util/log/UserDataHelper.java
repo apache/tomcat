@@ -131,7 +131,7 @@ public class UserDataHelper {
     }
 
 
-    private static enum Config {
+    private enum Config {
         NONE,
         DEBUG_ALL,
         INFO_THEN_DEBUG,
@@ -141,7 +141,7 @@ public class UserDataHelper {
     /**
      * Log mode for the next log message.
      */
-    public static enum Mode {
+    public enum Mode {
         DEBUG,
         INFO_THEN_DEBUG,
         INFO

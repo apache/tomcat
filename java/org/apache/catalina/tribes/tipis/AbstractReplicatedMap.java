@@ -1634,7 +1634,7 @@ public abstract class AbstractReplicatedMap<K,V>
         this.accessTimeout = accessTimeout;
     }
 
-    private static enum State {
+    private enum State {
         NEW(false),
         STATETRANSFERRED(false),
         INITIALIZED(true),

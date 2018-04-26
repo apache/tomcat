@@ -857,14 +857,14 @@ public class SSLHostConfig implements Serializable {
 
     // ----------------------------------------------------------- Inner classes
 
-    public static enum Type {
+    public enum Type {
         JSSE,
         OPENSSL,
         EITHER
     }
 
 
-    public static enum CertificateVerification {
+    public enum CertificateVerification {
         NONE,
         OPTIONAL_NO_CA,
         OPTIONAL,
