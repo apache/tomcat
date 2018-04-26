@@ -1045,6 +1045,12 @@
     <Bug pattern="SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" />
   </Match>
   <Match>
+    <!-- Array elements are not mutated -->
+    <Class name="org.apache.tomcat.jdbc.pool.PoolProperties" />
+    <Field name="interceptors" />
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
+  </Match>
+  <Match>
     <!-- The name isn't great but it is part of the public API now -->
     <Class name="org.apache.tomcat.jdbc.pool.TrapException" />
     <Bug pattern="NM_CLASS_NOT_EXCEPTION" />
