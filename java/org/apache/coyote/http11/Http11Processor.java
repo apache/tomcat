@@ -87,6 +87,9 @@ public class Http11Processor extends AbstractProcessor {
     protected final Http11OutputBuffer outputBuffer;
 
 
+    private final HttpParser httpParser;
+
+
     /**
      * Tracks how many internal filters are in the filter library so they
      * are skipped when looking for pluggable filters.
@@ -224,12 +227,15 @@ public class Http11Processor extends AbstractProcessor {
     public Http11Processor(int maxHttpHeaderSize, boolean allowHostHeaderMismatch,
             boolean rejectIllegalHeaderName, AbstractEndpoint<?> endpoint, int maxTrailerSize,
             Set<String> allowedTrailerHeaders, int maxExtensionSize, int maxSwallowSize,
-            Map<String,UpgradeProtocol> httpUpgradeProtocols, boolean sendReasonPhrase) {
+            Map<String,UpgradeProtocol> httpUpgradeProtocols, boolean sendReasonPhrase,
+            String relaxedPathChars, String relaxedQueryChars) {
 
         super(endpoint);
         userDataHelper = new UserDataHelper(log);
 
-        inputBuffer = new Http11InputBuffer(request, maxHttpHeaderSize,rejectIllegalHeaderName);
+        httpParser = new HttpParser(relaxedPathChars, relaxedQueryChars);
+
+        inputBuffer = new Http11InputBuffer(request, maxHttpHeaderSize, rejectIllegalHeaderName, httpParser);
         request.setInputBuffer(inputBuffer);
 
         outputBuffer = new Http11OutputBuffer(response, maxHttpHeaderSize, sendReasonPhrase);
@@ -1146,7 +1152,7 @@ public class Http11Processor extends AbstractProcessor {
         // Validate the characters in the URI. %nn decoding will be checked at
         // the point of decoding.
         for (int i = uriBC.getStart(); i < uriBC.getEnd(); i++) {
-            if (!HttpParser.isAbsolutePath(uriB[i])) {
+            if (!httpParser.isAbsolutePathRelaxed(uriB[i])) {
                 response.setStatus(400);
                 setErrorState(ErrorState.CLOSE_CLEAN, null);
                 if (log.isDebugEnabled()) {
