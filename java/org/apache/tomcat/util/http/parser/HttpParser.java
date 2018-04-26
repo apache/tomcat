@@ -616,31 +616,31 @@ public class HttpParser {
 
 
     /**
-     * @return If inIPv6 us false, the position of ':' that separates the host
+     * @return If inIPv6 is false, the position of ':' that separates the host
      *         from the port or -1 if it is not present. If inIPv6 is true, the
      *         number of characters read
      */
     static int readHostIPv4(Reader reader, boolean inIPv6) throws IOException {
-        int octect = -1;
-        int octectCount = 1;
+        int octet = -1;
+        int octetCount = 1;
         int c;
         int pos = 0;
 
         do {
             c = reader.read();
             if (c == '.') {
-                if (octect > -1 && octect < 256) {
+                if (octet > -1 && octet < 256) {
                     // Valid
-                    octectCount++;
-                    octect = -1;
+                    octetCount++;
+                    octet = -1;
                 } else {
                     throw new IllegalArgumentException();
                 }
             } else if (isNumeric(c)) {
-                if (octect == -1) {
-                    octect = c - '0';
+                if (octet == -1) {
+                    octet = c - '0';
                 } else {
-                    octect = octect * 10 + c - '0';
+                    octet = octet * 10 + c - '0';
                 }
             } else if (c == ':') {
                 break;
@@ -664,10 +664,10 @@ public class HttpParser {
             pos++;
         } while (true);
 
-        if (octectCount != 4) {
+        if (octetCount != 4) {
             throw new IllegalArgumentException();
         }
-        if (octect < 0 || octect > 255) {
+        if (octet < 0 || octet > 255) {
             throw new IllegalArgumentException();
         }
 
