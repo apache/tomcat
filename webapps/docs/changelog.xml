@@ -77,6 +77,11 @@
         under a <code>SecurityManager</code> when authentication is not
         mandatory. (markt)
       </fix>
+      <add>
+        Enable strict validation of the provided host name and port for all
+        connectors. Requests with invalid host names and/or ports will be
+        rejected with a 400 response. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

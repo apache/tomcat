@@ -49,7 +49,6 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.Ascii;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
@@ -186,12 +185,6 @@ public class Http11Processor extends AbstractProcessor {
      *       compatibility
      */
     protected String[] compressableMimeTypes;
-
-
-    /**
-     * Host name (used to avoid useless B2C conversion on the host name).
-     */
-    protected char[] hostNameC = new char[0];
 
 
     /**
@@ -1428,66 +1421,22 @@ public class Http11Processor extends AbstractProcessor {
         }
     }
 
+
     /**
-     * Parse host.
+     * {@inheritDoc}
+     * <p>
+     * This implementation provides the server name from the default host and
+     * the server port from the local port.
      */
-    private void parseHost(MessageBytes valueMB) {
+    @Override
+    protected void populateHost() {
+        // No host information (HTTP/1.0)
+        // Ensure the local port field is populated before using it.
+        request.action(ActionCode.REQ_LOCALPORT_ATTRIBUTE, request);
+        request.setServerPort(request.getLocalPort());
 
-        if (valueMB == null || valueMB.isNull()) {
-            // HTTP/1.0
-            // If no host header, use the port info from the endpoint
-            // The host will be obtained lazily from the socket if required
-            // using ActionCode#REQ_LOCAL_NAME_ATTRIBUTE
-            request.setServerPort(endpoint.getPort());
-            return;
-        }
-
-        ByteChunk valueBC = valueMB.getByteChunk();
-        byte[] valueB = valueBC.getBytes();
-        int valueL = valueBC.getLength();
-        int valueS = valueBC.getStart();
-        int colonPos = -1;
-        if (hostNameC.length < valueL) {
-            hostNameC = new char[valueL];
-        }
-
-        boolean ipv6 = (valueB[valueS] == '[');
-        boolean bracketClosed = false;
-        for (int i = 0; i < valueL; i++) {
-            char b = (char) valueB[i + valueS];
-            hostNameC[i] = b;
-            if (b == ']') {
-                bracketClosed = true;
-            } else if (b == ':') {
-                if (!ipv6 || bracketClosed) {
-                    colonPos = i;
-                    break;
-                }
-            }
-        }
-
-        if (colonPos < 0) {
-            request.serverName().setChars(hostNameC, 0, valueL);
-        } else {
-            request.serverName().setChars(hostNameC, 0, colonPos);
-
-            int port = 0;
-            int mult = 1;
-            for (int i = valueL - 1; i > colonPos; i--) {
-                int charValue = HexUtils.getDec(valueB[i + valueS]);
-                if (charValue == -1 || charValue > 9) {
-                    // Invalid character
-                    // 400 - Bad request
-                    response.setStatus(400);
-                    setErrorState(ErrorState.CLOSE_CLEAN, null);
-                    break;
-                }
-                port = port + (charValue * mult);
-                mult = 10 * mult;
-            }
-            request.setServerPort(port);
-        }
-
+        // request.serverName() will be set to the default host name by the
+        // mapper
     }
 
 
