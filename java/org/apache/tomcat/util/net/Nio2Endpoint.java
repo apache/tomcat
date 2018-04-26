@@ -1110,6 +1110,15 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     return CompletionState.NOT_DONE;
                 }
             }
+            if (!socketBufferHandler.isWriteBufferEmpty()) {
+                // First flush the main buffer as needed
+                try {
+                    doWrite(true);
+                } catch (IOException e) {
+                    handler.failed(e, attachment);
+                    return CompletionState.ERROR;
+                }
+            }
             OperationState<A> state = new OperationState<>(srcs, offset, length, block, timeout, unit, attachment, check, handler);
             GatherWriteCompletionHandler<A> completion = new GatherWriteCompletionHandler<>();
             Nio2Endpoint.startInline();
