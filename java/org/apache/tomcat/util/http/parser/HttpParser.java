@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.http.parser;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -69,6 +70,8 @@ public class HttpParser {
     private static final boolean[] IS_HEX = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_NOT_REQUEST_TARGET = new boolean[ARRAY_SIZE];
     private static final boolean[] IS_HTTP_PROTOCOL = new boolean[ARRAY_SIZE];
+    private static final boolean[] IS_ALPHA = new boolean[ARRAY_SIZE];
+    private static final boolean[] IS_NUMERIC = new boolean[ARRAY_SIZE];
     private static final boolean[] REQUEST_TARGET_ALLOW = new boolean[ARRAY_SIZE];
 
     static {
@@ -144,6 +147,14 @@ public class HttpParser {
             if (i == 'H' || i == 'T' || i == 'P' || i == '/' || i == '.' || (i >= '0' && i <= '9')) {
                 IS_HTTP_PROTOCOL[i] = true;
             }
+
+            if (i >= '0' && i <= '9') {
+                IS_NUMERIC[i] = true;
+            }
+
+            if (i >= 'a' && i <= 'z' || i >= 'A' && i <= 'Z') {
+                IS_ALPHA[i] = true;
+            }
         }
     }
 
@@ -167,7 +178,7 @@ public class HttpParser {
 
         Map<String,String> result = new HashMap<String,String>();
 
-        if (skipConstant(input, "Digest") != SkipConstantResult.FOUND) {
+        if (skipConstant(input, "Digest") != SkipResult.FOUND) {
             return null;
         }
         // All field names are valid tokens
@@ -176,7 +187,7 @@ public class HttpParser {
             return null;
         }
         while (!field.equals("")) {
-            if (skipConstant(input, "=") != SkipConstantResult.FOUND) {
+            if (skipConstant(input, "=") != SkipResult.FOUND) {
                 return null;
             }
             String value = null;
@@ -217,7 +228,7 @@ public class HttpParser {
             }
             result.put(field, value);
 
-            if (skipConstant(input, ",") == SkipConstantResult.NOT_FOUND) {
+            if (skipConstant(input, ",") == SkipResult.NOT_FOUND) {
                 return null;
             }
             field = readToken(input);
@@ -238,7 +249,7 @@ public class HttpParser {
             return null;
         }
 
-        if (skipConstant(input, "/") == SkipConstantResult.NOT_FOUND) {
+        if (skipConstant(input, "/") == SkipResult.NOT_FOUND) {
             return null;
         }
 
@@ -251,15 +262,15 @@ public class HttpParser {
         LinkedHashMap<String,String> parameters =
                 new LinkedHashMap<String,String>();
 
-        SkipConstantResult lookForSemiColon = skipConstant(input, ";");
-        if (lookForSemiColon == SkipConstantResult.NOT_FOUND) {
+        SkipResult lookForSemiColon = skipConstant(input, ";");
+        if (lookForSemiColon == SkipResult.NOT_FOUND) {
             return null;
         }
-        while (lookForSemiColon == SkipConstantResult.FOUND) {
+        while (lookForSemiColon == SkipResult.FOUND) {
             String attribute = readToken(input);
 
             String value = "";
-            if (skipConstant(input, "=") == SkipConstantResult.FOUND) {
+            if (skipConstant(input, "=") == SkipResult.FOUND) {
                 value = readTokenOrQuotedString(input, true);
             }
 
@@ -268,7 +279,7 @@ public class HttpParser {
             }
 
             lookForSemiColon = skipConstant(input, ";");
-            if (lookForSemiColon == SkipConstantResult.NOT_FOUND) {
+            if (lookForSemiColon == SkipResult.NOT_FOUND) {
                 return null;
             }
         }
@@ -350,9 +361,30 @@ public class HttpParser {
     }
 
 
+    public static boolean isAlpha(int c) {
+        // Fast for valid alpha characters, slower for some incorrect
+        // ones
+        try {
+            return IS_ALPHA[c];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return false;
+        }
+    }
+
+
+    public static boolean isNumeric(int c) {
+        // Fast for valid numeric characters, slower for some incorrect
+        // ones
+        try {
+            return IS_NUMERIC[c];
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            return false;
+        }
+    }
+
+
     // Skip any LWS and return the next char
-    private static int skipLws(StringReader input, boolean withReset)
-            throws IOException {
+    private static int skipLws(Reader input, boolean withReset) throws IOException {
 
         if (withReset) {
             input.mark(1);
@@ -372,25 +404,25 @@ public class HttpParser {
         return c;
     }
 
-    private static SkipConstantResult skipConstant(StringReader input,
-            String constant) throws IOException {
+    private static SkipResult skipConstant(Reader input, String constant)
+            throws IOException {
         int len = constant.length();
 
         int c = skipLws(input, false);
 
         for (int i = 0; i < len; i++) {
             if (i == 0 && c == -1) {
-                return SkipConstantResult.EOF;
+                return SkipResult.EOF;
             }
             if (c != constant.charAt(i)) {
                 input.skip(-(i + 1));
-                return SkipConstantResult.NOT_FOUND;
+                return SkipResult.NOT_FOUND;
             }
             if (i != (len - 1)) {
                 c = input.read();
             }
         }
-        return SkipConstantResult.FOUND;
+        return SkipResult.FOUND;
     }
 
     /**
@@ -398,7 +430,7 @@ public class HttpParser {
      *          available to read or <code>null</code> if data other than a
      *          token was found
      */
-    private static String readToken(StringReader input) throws IOException {
+    private static String readToken(Reader input) throws IOException {
         StringBuilder result = new StringBuilder();
 
         int c = skipLws(input, false);
@@ -422,8 +454,7 @@ public class HttpParser {
      *         quoted string was found or null if the end of data was reached
      *         before the quoted string was terminated
      */
-    private static String readQuotedString(StringReader input,
-            boolean returnQuoted) throws IOException {
+    private static String readQuotedString(Reader input, boolean returnQuoted) throws IOException {
 
         int c = skipLws(input, false);
 
@@ -458,8 +489,8 @@ public class HttpParser {
         return result.toString();
     }
 
-    private static String readTokenOrQuotedString(StringReader input,
-            boolean returnQuoted) throws IOException {
+    private static String readTokenOrQuotedString(Reader input, boolean returnQuoted)
+            throws IOException {
 
         // Go back so first non-LWS character is available to be read again
         int c = skipLws(input, true);
@@ -483,8 +514,7 @@ public class HttpParser {
      *         quoted token was found or null if the end of data was reached
      *         before a quoted token was terminated
      */
-    private static String readQuotedToken(StringReader input)
-            throws IOException {
+    private static String readQuotedToken(Reader input) throws IOException {
 
         StringBuilder result = new StringBuilder();
         boolean quoted = false;
@@ -535,8 +565,7 @@ public class HttpParser {
      * @return  the sequence of LHEX (minus any surrounding quotes) if any was
      *          found, or <code>null</code> if data other LHEX was found
      */
-    private static String readLhex(StringReader input)
-            throws IOException {
+    private static String readLhex(Reader input) throws IOException {
 
         StringBuilder result = new StringBuilder();
         boolean quoted = false;
@@ -579,9 +608,262 @@ public class HttpParser {
         }
     }
 
-    private static enum SkipConstantResult {
+    private static enum SkipResult {
         FOUND,
         NOT_FOUND,
         EOF
+    }
+
+
+    /**
+     * @return If inIPv6 us false, the position of ':' that separates the host
+     *         from the port or -1 if it is not present. If inIPv6 is true, the
+     *         number of characters read
+     */
+    static int readHostIPv4(Reader reader, boolean inIPv6) throws IOException {
+        int octect = -1;
+        int octectCount = 1;
+        int c;
+        int pos = 0;
+
+        do {
+            c = reader.read();
+            if (c == '.') {
+                if (octect > -1 && octect < 256) {
+                    // Valid
+                    octectCount++;
+                    octect = -1;
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if (isNumeric(c)) {
+                if (octect == -1) {
+                    octect = c - '0';
+                } else {
+                    octect = octect * 10 + c - '0';
+                }
+            } else if (c == ':') {
+                break;
+            } else if (c == -1) {
+                if (inIPv6) {
+                    throw new IllegalArgumentException();
+                } else {
+                    pos = -1;
+                    break;
+                }
+            } else if (c == ']') {
+                if (inIPv6) {
+                    pos++;
+                    break;
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else {
+                throw new IllegalArgumentException();
+            }
+            pos++;
+        } while (true);
+
+        if (octectCount != 4) {
+            throw new IllegalArgumentException();
+        }
+        if (octect < 0 || octect > 255) {
+            throw new IllegalArgumentException();
+        }
+
+        return pos;
+    }
+
+
+    /**
+     * @return The position of ':' that separates the host from the port or -1
+     *         if it is not present
+     */
+    static int readHostIPv6(Reader reader) throws IOException {
+        // Must start with '['
+        int c = reader.read();
+        if (c != '[') {
+            throw new IllegalArgumentException();
+        }
+
+        int h16Count = 0;
+        int h16Size = 0;
+        int pos = 1;
+        boolean parsedDoubleColon = false;
+        boolean previousWasColon = false;
+
+        do {
+            c = reader.read();
+            if (h16Count == 0 && previousWasColon && c != ':') {
+                // Can't start with a single :
+                throw new IllegalArgumentException();
+            }
+            if (HttpParser.isHex(c)) {
+                if (h16Size == 0) {
+                    // Start of a new h16 block
+                    previousWasColon = false;
+                    h16Count++;
+                    reader.mark(4);
+                }
+                h16Size++;
+                if (h16Size > 4) {
+                    throw new IllegalArgumentException();
+                }
+            } else if (c == ':') {
+                if (previousWasColon) {
+                    // End of ::
+                    if (parsedDoubleColon) {
+                        // Only allowed one :: sequence
+                        throw new IllegalArgumentException();
+                    }
+                    parsedDoubleColon = true;
+                    previousWasColon = false;
+                    // :: represents at least one h16 block
+                    h16Count++;
+                } else {
+                    previousWasColon = true;
+                }
+                h16Size = 0;
+            } else if (c == ']') {
+                if (previousWasColon) {
+                    // Can't end on a single ':'
+                    throw new IllegalArgumentException();
+                }
+                break;
+            } else if (c == '.') {
+                if (h16Count == 7 || h16Count < 7 && parsedDoubleColon) {
+                    reader.reset();
+                    pos -= h16Size;
+                    pos += readHostIPv4(reader, true);
+                    h16Count++;
+                    break;
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else {
+                throw new IllegalArgumentException();
+            }
+            pos++;
+        } while (true);
+
+        if (h16Count > 8) {
+            throw new IllegalArgumentException();
+        } else if (h16Count != 8 && !parsedDoubleColon) {
+            throw new IllegalArgumentException();
+        }
+
+        c = reader.read();
+        if (c == ':') {
+            return pos + 1;
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * @return The position of ':' that separates the host from the port or -1
+     *         if it is not present
+     */
+    static int readHostDomainName(Reader reader) throws IOException {
+        DomainParseState state = DomainParseState.NEW;
+        int pos = 0;
+
+        while (state.mayContinue()) {
+            state = state.next(reader.read());
+            pos++;
+        }
+
+        if (DomainParseState.COLON == state) {
+            // State identifies the state of the previous character
+            return pos - 1;
+        } else {
+            return -1;
+        }
+    }
+
+
+    /**
+     * Skips all characters until EOF or the specified target is found. Normally
+     * used to skip invalid input until the next separator.
+     */
+    static SkipResult skipUntil(Reader input, int c, char target) throws IOException {
+        while (c != -1 && c != target) {
+            c = input.read();
+        }
+        if (c == -1) {
+            return SkipResult.EOF;
+        } else {
+            return SkipResult.FOUND;
+        }
+    }
+
+
+    private static enum DomainParseState {
+        NEW(     true, false, false, false, false, false),
+        ALPHA(   true,  true,  true,  true,  true,  true),
+        NUMERIC( true,  true,  true,  true,  true,  true),
+        PERIOD(  true, false, false, false,  true,  true),
+        HYPHEN(  true,  true,  true, false, false, false),
+        COLON(  false, false, false, false, false, false),
+        END(    false, false, false, false, false, false);
+
+        private final boolean mayContinue;
+        private final boolean allowsNumeric;
+        private final boolean allowsHyphen;
+        private final boolean allowsPeriod;
+        private final boolean allowsColon;
+        private final boolean allowsEnd;
+
+        private DomainParseState(boolean mayContinue, boolean allowsNumeric, boolean allowsHyphen,
+                boolean allowsPeriod, boolean allowsColon, boolean allowsEnd) {
+            this.mayContinue = mayContinue;
+            this.allowsNumeric = allowsNumeric;
+            this.allowsHyphen = allowsHyphen;
+            this.allowsPeriod = allowsPeriod;
+            this.allowsColon = allowsColon;
+            this.allowsEnd = allowsEnd;
+        }
+
+        public boolean mayContinue() {
+            return mayContinue;
+        }
+
+        public DomainParseState next(int c) {
+            if (HttpParser.isAlpha(c)) {
+                return ALPHA;
+            } else if (HttpParser.isNumeric(c)) {
+                if (allowsNumeric) {
+                    return NUMERIC;
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if (c == '.') {
+                if (allowsPeriod) {
+                    return PERIOD;
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if (c == ':') {
+                if (allowsColon) {
+                    return COLON;
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if (c == -1) {
+                if (allowsEnd) {
+                    return END;
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else if (c == '-') {
+                if (allowsHyphen) {
+                    return HYPHEN;
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            } else {
+                throw new IllegalArgumentException();
+            }
+        }
     }
 }
