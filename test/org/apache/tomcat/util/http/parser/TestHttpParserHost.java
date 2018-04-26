@@ -48,7 +48,7 @@ public class TestHttpParserHost {
 
     @Parameters(name="{index}: host {1}")
     public static Collection<Object[]> inputs() {
-        List<Object[]> result = new ArrayList<>();
+        List<Object[]> result = new ArrayList<Object[]>();
         // IPv4 - valid
         result.add(new Object[] { TestType.IPv4, "127.0.0.1", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv4, "127.0.0.1:8080", Integer.valueOf(9), null} );
