@@ -627,8 +627,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
 
         Non2xxResponseClient client = new Non2xxResponseClient(useExpectation);
         client.setPort(getPort());
-        client.doResourceRequest("GET http://localhost:" + getPort()
-                + "/echo HTTP/1.1", "HelloWorld");
+        client.doResourceRequest("GET /echo HTTP/1.1", "HelloWorld");
         Assert.assertTrue(client.isResponse403());
         Assert.assertTrue(client.checkConnectionHeader());
     }
@@ -859,6 +858,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
                 throws Exception {
             StringBuilder requestHead = new StringBuilder();
             requestHead.append(resourceUri).append(CRLF);
+            requestHead.append("host: localhost:" + getPort() + CRLF);
 
             if (useExpectation) {
                 requestHead.append(HEADER_EXPECT).append(CRLF);
