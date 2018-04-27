@@ -234,7 +234,13 @@ public class InternalAprInputBuffer extends AbstractInputBuffer<Long> {
                 end = pos;
             } else if ((buf[pos] == Constants.QUESTION) && (questionPos == -1)) {
                 questionPos = pos;
+            } else if (questionPos != -1 && !HttpParser.isQuery(buf[pos])) {
+                // %nn decoding will be checked at the point of decoding
+                throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget"));
             } else if (HttpParser.isNotRequestTarget(buf[pos])) {
+                // This is a general check that aims to catch problems early
+                // Detailed checking of each part of the request target will
+                // happen in AbstractHttp11Processor#prepareRequest()
                 throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget"));
             }
 
