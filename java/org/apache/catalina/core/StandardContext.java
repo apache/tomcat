@@ -940,7 +940,23 @@ public class StandardContext extends ContainerBase
     private boolean dispatchersUseEncodedPaths = true;
 
 
+    private boolean allowMultipleLeadingForwardSlashInPath = false;
+
+
     // ----------------------------------------------------- Context Properties
+
+    @Override
+    public void setAllowMultipleLeadingForwardSlashInPath(
+            boolean allowMultipleLeadingForwardSlashInPath) {
+        this.allowMultipleLeadingForwardSlashInPath = allowMultipleLeadingForwardSlashInPath;
+    }
+
+
+    @Override
+    public boolean getAllowMultipleLeadingForwardSlashInPath() {
+        return allowMultipleLeadingForwardSlashInPath;
+    }
+
 
     @Override
     public void setDispatchersUseEncodedPaths(boolean dispatchersUseEncodedPaths) {

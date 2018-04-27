@@ -84,6 +84,14 @@
         correctly handle bots that crawl multiple hosts and/or web applications
         when the Valve is configured on a Host or an Engine. (fschumacher)
       </fix>
+      <add>
+        Collapse multiple leading <code>/</code> characters to a single
+        <code>/</code> in the return value of
+        <code>HttpServletRequest#getContextPath()</code> to avoid issues if the
+        value is used with <code>HttpServletResponse#sendRedirect()</code>. This
+        behaviour is enabled by default and configurable via the new Context
+        attribute <code>allowMultipleLeadingForwardSlashInPath</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

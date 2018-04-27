@@ -737,4 +737,12 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void setDispatchersUseEncodedPaths(boolean dispatchersUseEncodedPaths) { /* NO-OP */ }
     @Override
     public boolean getDispatchersUseEncodedPaths() { return true; }
+
+    @Override
+    public void setAllowMultipleLeadingForwardSlashInPath(
+            boolean allowMultipleLeadingForwardSlashInPath) {
+        // NO-OP
+    }
+    @Override
+    public boolean getAllowMultipleLeadingForwardSlashInPath() { return false; }
 }

@@ -269,6 +269,24 @@
         The default is <code>false</code></p>
       </attribute>
 
+      <attribute name="allowMultipleLeadingForwardSlashInPath" required="false">
+        <p>Tomcat normalises sequences of multiple <code>/</code> characters in
+        a URI to a single <code>/</code>. This is for consistencuy with the
+        behaviour of file systems as URIs are often translated to file system
+        paths. As a result, the return value of
+        <code>HttpServletRequest#getContextPath()</code> is expected to start
+        with multiple <code>/</code> characters for some URIs. This will cause
+        problems if this value is used directly with
+        <code>HttpServletResponse#sendRedirect()</code> as redirect paths that
+        start with <code>//</code> are treated as protocol relative redirects.
+        To avoid potential issues, Tomcat will collapse multiple leading
+        <code>/</code> characters at the start of the return value for
+        <code>HttpServletRequest#getContextPath()</code> to a single
+        <code>/</code>. This attribute has a default value of <code>false</code>
+        which enables the collapsing of multiple <code>/</code> characters. To
+        disable this behaviour, set this attribute to <code>true</code>.</p>
+      </attribute>
+
       <attribute name="altDDName" required="false">
         <p>The absolute path to the alternative deployment descriptor for this
         context. This overrides the default deployment descriptor located at
