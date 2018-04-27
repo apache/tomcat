@@ -74,7 +74,8 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
                 String[] request = new String[1];
                 request[0] =
-                    "GET http://localhost:8080/test HTTP/1.1" + CRLF +
+                    "GET /test HTTP/1.1" + CRLF +
+                    "host: localhost:8080" + CRLF +
                     "X-Bug48839: abcd" + CRLF +
                     "\tefgh" + CRLF +
                     "Connection: close" + CRLF +
@@ -282,7 +283,8 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
 
                 String[] request = new String[1];
                 request[0] =
-                    "GET http://localhost:8080/test HTTP/1.1" + CRLF +
+                    "GET /test HTTP/1.1" + CRLF +
+                    "host: localhost:8080" + CRLF +
                     headerLine + CRLF +
                     "X-Bug51557: abcd" + CRLF +
                     "Connection: close" + CRLF +
@@ -415,7 +417,8 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
                 String[] request = new String[1];
                 request[0] =
                     newLines +
-                    "GET http://localhost:8080/test HTTP/1.1" + CRLF +
+                    "GET /test HTTP/1.1" + CRLF +
+                    "host: localhost:8080" + CRLF +
                     "X-Bug48839: abcd" + CRLF +
                     "\tefgh" + CRLF +
                     "Connection: close" + CRLF +
@@ -481,8 +484,9 @@ public class TestInternalInputBuffer extends TomcatBaseTest {
                 connect();
 
                 String[] request = new String[2];
-                request[0] = "GET http://localhost:8080/test HTTP/1.1" + CR;
+                request[0] = "GET /test HTTP/1.1" + CR;
                 request[1] = LF +
+                        "host: localhost:8080" + CRLF +
                         "Connection: close" + CRLF +
                         CRLF;
 
