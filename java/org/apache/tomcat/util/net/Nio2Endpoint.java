@@ -1086,7 +1086,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         try {
                             state.wait(unit.toMillis(timeout));
                             if (state.state == CompletionState.PENDING) {
-                                handler.failed(new SocketTimeoutException(), attachment);
                                 return CompletionState.ERROR;
                             }
                         } catch (InterruptedException e) {
@@ -1154,7 +1153,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         try {
                             state.wait(unit.toMillis(timeout));
                             if (state.state == CompletionState.PENDING) {
-                                handler.failed(new SocketTimeoutException(), attachment);
                                 return CompletionState.ERROR;
                             }
                         } catch (InterruptedException e) {
