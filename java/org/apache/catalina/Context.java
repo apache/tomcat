@@ -1843,4 +1843,24 @@ public interface Context extends Container, ContextBind {
      * @return The default response body encoding
      */
     public String getResponseCharacterEncoding();
+
+    /**
+     * Configure if, when returning a context path from {@link
+     * javax.servlet.http.HttpServletRequest#getContextPath()}, the return value
+     * is allowed to contain multiple leading '/' characters.
+     *
+     * @param allowMultipleLeadingForwardSlashInPath The new value for the flag
+     */
+    public void setAllowMultipleLeadingForwardSlashInPath(
+            boolean allowMultipleLeadingForwardSlashInPath);
+
+    /**
+     * When returning a context path from {@link
+     * javax.servlet.http.HttpServletRequest#getContextPath()}, is it allowed to
+     * contain multiple leading '/' characters?
+     *
+     * @return <code>true</code> if multiple leading '/' characters are allowed,
+     *         otherwise <code>false</code>
+     */
+    public boolean getAllowMultipleLeadingForwardSlashInPath();
 }

@@ -1266,4 +1266,12 @@ public class TesterContext implements Context {
     public void setResponseCharacterEncoding(String encoding) { /* NO-OP */ }
     @Override
     public String getResponseCharacterEncoding() { return null; }
+
+    @Override
+    public void setAllowMultipleLeadingForwardSlashInPath(
+            boolean allowMultipleLeadingForwardSlashInPath) {
+        // NO-OP
+    }
+    @Override
+    public boolean getAllowMultipleLeadingForwardSlashInPath() { return false; }
 }

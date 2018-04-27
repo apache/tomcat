@@ -806,7 +806,23 @@ public class StandardContext extends ContainerBase
 
     private String responseEncoding = null;
 
+    private boolean allowMultipleLeadingForwardSlashInPath = false;
+
+
     // ----------------------------------------------------- Context Properties
+
+    @Override
+    public void setAllowMultipleLeadingForwardSlashInPath(
+            boolean allowMultipleLeadingForwardSlashInPath) {
+        this.allowMultipleLeadingForwardSlashInPath = allowMultipleLeadingForwardSlashInPath;
+    }
+
+
+    @Override
+    public boolean getAllowMultipleLeadingForwardSlashInPath() {
+        return allowMultipleLeadingForwardSlashInPath;
+    }
+
 
     @Override
     public String getRequestCharacterEncoding() {
