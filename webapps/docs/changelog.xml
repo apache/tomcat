@@ -106,6 +106,9 @@
         browsers) that do not correctly %nn encode URI paths and query strings
         as required by RFC 7230 and RFC 3986. (markt)
       </add>
+      <fix>
+        Fix sync for NIO2 async IO blocking read/writes. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
