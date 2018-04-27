@@ -837,6 +837,7 @@ public class TestRequest extends TomcatBaseTest {
 
         // No file system docBase required
         Context ctx = tomcat.addContext(deployPath, null);
+        ctx.setAllowMultipleLeadingForwardSlashInPath(true);
 
         Tomcat.addServlet(ctx, "servlet", new Bug56501Servlet());
         ctx.addServletMapping("/*", "servlet");
