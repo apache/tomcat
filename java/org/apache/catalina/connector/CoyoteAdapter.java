@@ -687,6 +687,13 @@ public class CoyoteAdapter implements Adapter {
         int proxyPort = connector.getProxyPort();
         if (proxyPort != 0) {
             req.setServerPort(proxyPort);
+        } else if (req.getServerPort() == -1) {
+            // Not explicitly set. Use default ports based on the scheme
+            if (req.scheme().equals("https")) {
+                req.setServerPort(443);
+            } else {
+                req.setServerPort(80);
+            }
         }
         if (proxyName != null) {
             req.serverName().setString(proxyName);
