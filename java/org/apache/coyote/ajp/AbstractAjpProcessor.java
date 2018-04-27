@@ -39,7 +39,6 @@ import org.apache.coyote.Response;
 import org.apache.coyote.http11.upgrade.servlet31.HttpUpgradeHandler;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.HttpMessages;
 import org.apache.tomcat.util.http.MimeHeaders;
@@ -163,12 +162,6 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
      * Body message.
      */
     protected MessageBytes bodyBytes = MessageBytes.newInstance();
-
-
-    /**
-     * Host name (used to avoid useless B2C conversion on the host name).
-     */
-    protected char[] hostNameC = new char[0];
 
 
     /**
@@ -990,74 +983,20 @@ public abstract class AbstractAjpProcessor<S> extends AbstractProcessor<S> {
 
 
     /**
-     * Parse host.
+     * {@inheritDoc}
+     * <p>
+     * This implementation populates the server name and port from the local
+     * name and port provided by the AJP message.
      */
-    protected void parseHost(MessageBytes valueMB) {
-
-        if (valueMB == null || valueMB.isNull()) {
-            // HTTP/1.0
-            request.setServerPort(request.getLocalPort());
-            try {
-                request.serverName().duplicate(request.localName());
-            } catch (IOException e) {
-                response.setStatus(400);
-                setErrorState(ErrorState.CLOSE_CLEAN, e);
-            }
-            return;
-        }
-
-        ByteChunk valueBC = valueMB.getByteChunk();
-        byte[] valueB = valueBC.getBytes();
-        int valueL = valueBC.getLength();
-        int valueS = valueBC.getStart();
-        int colonPos = -1;
-        if (hostNameC.length < valueL) {
-            hostNameC = new char[valueL];
-        }
-
-        boolean ipv6 = (valueB[valueS] == '[');
-        boolean bracketClosed = false;
-        for (int i = 0; i < valueL; i++) {
-            char b = (char) valueB[i + valueS];
-            hostNameC[i] = b;
-            if (b == ']') {
-                bracketClosed = true;
-            } else if (b == ':') {
-                if (!ipv6 || bracketClosed) {
-                    colonPos = i;
-                    break;
-                }
-            }
-        }
-
-        if (colonPos < 0) {
-            if (request.scheme().equalsIgnoreCase("https")) {
-                // 443 - Default HTTPS port
-                request.setServerPort(443);
-            } else {
-                // 80 - Default HTTTP port
-                request.setServerPort(80);
-            }
-            request.serverName().setChars(hostNameC, 0, valueL);
-        } else {
-
-            request.serverName().setChars(hostNameC, 0, colonPos);
-
-            int port = 0;
-            int mult = 1;
-            for (int i = valueL - 1; i > colonPos; i--) {
-                int charValue = HexUtils.getDec(valueB[i + valueS]);
-                if (charValue == -1) {
-                    // Invalid character
-                    // 400 - Bad request
-                    response.setStatus(400);
-                    setErrorState(ErrorState.CLOSE_CLEAN, null);
-                    break;
-                }
-                port = port + (charValue * mult);
-                mult = 10 * mult;
-            }
-            request.setServerPort(port);
+    @Override
+    protected void populateHost() {
+        // No host information (HTTP/1.0)
+        request.setServerPort(request.getLocalPort());
+        try {
+            request.serverName().duplicate(request.localName());
+        } catch (IOException e) {
+            response.setStatus(400);
+            setErrorState(ErrorState.CLOSE_CLEAN, e);
         }
     }
 
