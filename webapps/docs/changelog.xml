@@ -72,12 +72,6 @@
         Update the internal fork of Apache Commons BCEL to r1829827 to add early
         access Java 11 support to the annotation scanning code. (markt)
       </add>
-      <add>
-        <bug>62273</bug>: Implement configuration options to work-around
-        specification non-compliant user agents (including all the major
-        browsers) that do not correctly %nn encode URI paths and query strings
-        as required by RFC 7230 and RFC 3986. (markt)
-      </add>
       <fix>
         <bug>62297</bug>: Enable the <code>CrawlerSessionManagerValve</code> to
         correctly handle bots that crawl multiple hosts and/or web applications
@@ -102,6 +96,12 @@
         previous handshake that were not correctly cleaned-up when using the NIO
         or NIO2 connector with the <code>OpenSSLImplementation</code>. (markt)
       </fix>
+      <add>
+        <bug>62273</bug>: Implement configuration options to work-around
+        specification non-compliant user agents (including all the major
+        browsers) that do not correctly %nn encode URI paths and query strings
+        as required by RFC 7230 and RFC 3986. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
