@@ -45,6 +45,29 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     // ------------------------------------------------ HTTP specific properties
     // ------------------------------------------ managed in the ProtocolHandler
 
+    private boolean allowHostHeaderMismatch = true;
+    /**
+     * Will Tomcat accept an HTTP 1.1 request where the host header does not
+     * agree with the host specified (if any) in the request line?
+     *
+     * @return {@code true} if Tomcat will allow such requests, otherwise
+     *         {@code false}
+     */
+    public boolean getAllowHostHeaderMismatch() {
+        return allowHostHeaderMismatch;
+    }
+    /**
+     * Will Tomcat accept an HTTP 1.1 request where the host header does not
+     * agree with the host specified (if any) in the request line?
+     *
+     * @param allowHostHeaderMismatch {@code true} to allow such requests,
+     *                                {@code false} to reject them with a 400
+     */
+    public void setAllowHostHeaderMismatch(boolean allowHostHeaderMismatch) {
+        this.allowHostHeaderMismatch = allowHostHeaderMismatch;
+    }
+
+
     private boolean rejectIllegalHeaderName = false;
     /**
      * If an HTTP request is received that contains an illegal header name (i.e.
@@ -329,5 +352,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         processor.setMaxSavePostSize(getMaxSavePostSize());
         processor.setServer(getServer());
         processor.setMaxCookieCount(getMaxCookieCount());
+        processor.setAllowHostHeaderMismatch(getAllowHostHeaderMismatch());
     }
 }

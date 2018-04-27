@@ -263,6 +263,33 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     protected HttpUpgradeHandler httpUpgradeHandler = null;
 
 
+    private boolean allowHostHeaderMismatch = true;
+
+
+    /**
+     * Will Tomcat accept an HTTP 1.1 request where the host header does not
+     * agree with the host specified (if any) in the request line?
+     *
+     * @return {@code true} if Tomcat will allow such requests, otherwise
+     *         {@code false}
+     */
+    public boolean getAllowHostHeaderMismatch() {
+        return allowHostHeaderMismatch;
+    }
+
+
+    /**
+     * Will Tomcat accept an HTTP 1.1 request where the host header does not
+     * agree with the host specified (if any) in the request line?
+     *
+     * @param allowHostHeaderMismatch {@code true} to allow such requests,
+     *                                {@code false} to reject them with a 400
+     */
+    public void setAllowHostHeaderMismatch(boolean allowHostHeaderMismatch) {
+        this.allowHostHeaderMismatch = allowHostHeaderMismatch;
+    }
+
+
     public AbstractHttp11Processor(AbstractEndpoint<S> endpoint) {
         super(endpoint);
         userDataHelper = new UserDataHelper(getLog());
@@ -1322,6 +1349,30 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             }
         }
 
+
+        // Check host header
+        MessageBytes hostValueMB = null;
+        try {
+            hostValueMB = headers.getUniqueValue("host");
+        } catch (IllegalArgumentException iae) {
+            // Multiple Host headers are not permitted
+            // 400 - Bad request
+            response.setStatus(400);
+            setErrorState(ErrorState.CLOSE_CLEAN, null);
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("http11processor.request.multipleHosts"));
+            }
+        }
+        if (http11 && hostValueMB == null) {
+            // 400 - Bad request
+            response.setStatus(400);
+            setErrorState(ErrorState.CLOSE_CLEAN, null);
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("http11processor.request.prepare")+
+                          " host header missing");
+            }
+        }
+
         // Check for a full URI (including protocol://host:port/)
         ByteChunk uriBC = request.requestURI().getByteChunk();
         if (uriBC.startsWithIgnoreCase("http", 0)) {
@@ -1330,21 +1381,56 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             int uriBCStart = uriBC.getStart();
             int slashPos = -1;
             if (pos != -1) {
+                pos += 3;
                 byte[] uriB = uriBC.getBytes();
-                slashPos = uriBC.indexOf('/', pos + 3);
+                slashPos = uriBC.indexOf('/', pos);
+                int atPos = uriBC.indexOf('@', pos);
                 if (slashPos == -1) {
                     slashPos = uriBC.getLength();
                     // Set URI as "/"
                     request.requestURI().setBytes
-                        (uriB, uriBCStart + pos + 1, 1);
+                        (uriB, uriBCStart + pos - 2, 1);
                 } else {
                     request.requestURI().setBytes
                         (uriB, uriBCStart + slashPos,
                          uriBC.getLength() - slashPos);
                 }
-                MessageBytes hostMB = headers.setValue("host");
-                hostMB.setBytes(uriB, uriBCStart + pos + 3,
-                                slashPos - pos - 3);
+                // Skip any user info
+                if (atPos != -1) {
+                    pos = atPos + 1;
+                }
+                if (http11) {
+                    // Missing host header is illegal but handled above
+                    if (hostValueMB != null) {
+                        // Any host in the request line must be consistent with
+                        // the Host header
+                        if (!hostValueMB.getByteChunk().equals(
+                                uriB, uriBCStart + pos, slashPos - pos)) {
+                            if (allowHostHeaderMismatch) {
+                                // The requirements of RFC 2616 are being
+                                // applied. If the host header and the request
+                                // line do not agree, the request line takes
+                                // precedence
+                                hostValueMB = headers.setValue("host");
+                                hostValueMB.setBytes(uriB, uriBCStart + pos, slashPos - pos);
+                            } else {
+                                // The requirements of RFC 7230 are being
+                                // applied. If the host header and the request
+                                // line do not agree, trigger a 400 response.
+                                response.setStatus(400);
+                                setErrorState(ErrorState.CLOSE_CLEAN, null);
+                                if (getLog().isDebugEnabled()) {
+                                    getLog().debug(sm.getString("http11processor.request.inconsistentHosts"));
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // Not HTTP/1.1 - no Host header so generate one since
+                    // Tomcat internals assume it is set
+                    hostValueMB = headers.setValue("host");
+                    hostValueMB.setBytes(uriB, uriBCStart + pos, slashPos - pos);
+                }
             }
 
         }
@@ -1391,20 +1477,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
             }
         }
 
-        MessageBytes valueMB = headers.getValue("host");
-
-        // Check host header
-        if (http11 && (valueMB == null)) {
-            // 400 - Bad request
-            response.setStatus(400);
-            setErrorState(ErrorState.CLOSE_CLEAN, null);
-            if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("http11processor.request.prepare")+
-                          " host header missing");
-            }
-        }
-
-        parseHost(valueMB);
+        parseHost(hostValueMB);
 
         if (!contentDelimitation) {
             // If there's no content length
