@@ -2125,6 +2125,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         // No file system docBase required
         Context ctx = tomcat.addContext(contextPath, null);
+        ctx.setAllowMultipleLeadingForwardSlashInPath(true);
 
         DispatchingGenericServlet dispatch = new DispatchingGenericServlet();
         Wrapper wrapper = Tomcat.addServlet(ctx, "dispatch", dispatch);
