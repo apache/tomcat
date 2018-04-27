@@ -278,6 +278,11 @@ public class Utf8Decoder extends CharsetDecoder {
                 outRemaining--;
             } else {
                 if (outRemaining < 2) {
+                    // Encoded with 4 bytes. inIndex currently points
+                    // to the final byte. Move it back to first byte.
+                    inIndex -= 3;
+                    in.position(inIndex - in.arrayOffset());
+                    out.position(outIndex - out.arrayOffset());
                     return CoderResult.OVERFLOW;
                 }
                 cArr[outIndex++] = (char) ((jchar >> 0xA) + 0xD7C0);
