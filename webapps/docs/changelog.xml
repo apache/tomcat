@@ -82,6 +82,10 @@
         under a <code>SecurityManager</code> when authentication is not
         mandatory. (markt)
       </fix>
+      <fix>
+        <bug>62329</bug>: Correctly list resources in JAR files when directories
+        do not have dedicated entries. Patch provided by Meelis Müür. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -133,15 +133,12 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
             }
 
             for (String name : getArchiveEntries(false).keySet()) {
-                if (name.length() > pathInJar.length() &&
-                        name.startsWith(pathInJar)) {
+                if (name.length() > pathInJar.length() && name.startsWith(pathInJar)) {
                     int nextSlash = name.indexOf('/', pathInJar.length());
-                    if (nextSlash == -1 || nextSlash == name.length() - 1) {
-                        if (name.startsWith(pathInJar)) {
-                            result.add(webAppMount + '/' +
-                                    name.substring(getInternalPath().length()));
-                        }
+                    if (nextSlash != -1 && nextSlash != name.length() - 1) {
+                        name = name.substring(0, nextSlash + 1);
                     }
+                    result.add(webAppMount + '/' + name.substring(getInternalPath().length()));
                 }
             }
         } else {
