@@ -716,11 +716,15 @@
     </property>
 
     <property name="tomcat.util.http.parser.HttpParser. requestTargetAllow">
+      <p><i>This system property is deprecated. Use the
+      <code>relaxedPathChars</code> and <code>relaxedQueryChars</code>
+      attributes of the Connector instead. These attributes permit a wider range
+      of characters to be configured as valid.</i></p>
       <p>A string comprised of characters the server should allow even when they are not encoded.
       These characters would normally result in a 400 status.</p>
       <p>The acceptable characters for this property are: <code>|</code>, <code>{</code>
       , and <code>}</code></p>
-      <p><strong>WARNING</strong>: Use of this option will expose the server to CVE-2016-6816.
+      <p><strong>WARNING</strong>: Use of this option may expose the server to CVE-2016-6816.
       </p>
       <p>If not specified, the default value of <code>null</code> will be used.</p>
     </property>

@@ -267,7 +267,8 @@ public class Http11NioProtocol extends AbstractHttp11JsseProtocol<NioChannel> {
                     proto.getMaxHttpHeaderSize(), proto.getRejectIllegalHeaderName(),
                     (NioEndpoint)proto.endpoint, proto.getMaxTrailerSize(),
                     proto.getAllowedTrailerHeadersAsSet(), proto.getMaxExtensionSize(),
-                    proto.getMaxSwallowSize());
+                    proto.getMaxSwallowSize(), proto.getRelaxedPathChars(),
+                    proto.getRelaxedQueryChars());
             processor.setAdapter(proto.adapter);
             processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
             processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());

@@ -26,6 +26,7 @@ import org.apache.coyote.ActionCode;
 import org.apache.coyote.http11.filters.BufferedInputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.JIoEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -52,11 +53,15 @@ public class Http11Processor extends AbstractHttp11Processor<Socket> {
 
     public Http11Processor(int headerBufferSize, boolean rejectIllegalHeaderName,
             JIoEndpoint endpoint, int maxTrailerSize, Set<String> allowedTrailerHeaders,
-            int maxExtensionSize, int maxSwallowSize) {
+            int maxExtensionSize, int maxSwallowSize, String relaxedPathChars,
+            String relaxedQueryChars) {
 
         super(endpoint);
         
-        inputBuffer = new InternalInputBuffer(request, headerBufferSize, rejectIllegalHeaderName);
+        httpParser = new HttpParser(relaxedPathChars, relaxedQueryChars);
+
+        inputBuffer = new InternalInputBuffer(request, headerBufferSize, rejectIllegalHeaderName,
+                httpParser);
         request.setInputBuffer(inputBuffer);
 
         outputBuffer = new InternalOutputBuffer(response, headerBufferSize);

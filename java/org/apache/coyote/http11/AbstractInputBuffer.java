@@ -22,6 +22,7 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.SocketWrapper;
 import org.apache.tomcat.util.res.StringManager;
@@ -108,6 +109,9 @@ public abstract class AbstractInputBuffer<S> implements InputBuffer{
 
 
     protected boolean rejectIllegalHeaderName;
+
+
+    protected HttpParser httpParser;
 
 
     // ------------------------------------------------------------- Properties

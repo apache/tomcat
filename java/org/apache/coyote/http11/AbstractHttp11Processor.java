@@ -267,6 +267,9 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
     private boolean allowHostHeaderMismatch = true;
 
 
+    protected HttpParser httpParser;
+
+
     /**
      * Will Tomcat accept an HTTP 1.1 request where the host header does not
      * agree with the host specified (if any) in the request line?
@@ -1475,7 +1478,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         // Validate the characters in the URI. %nn decoding will be checked at
         // the point of decoding.
         for (int i = uriBC.getStart(); i < uriBC.getEnd(); i++) {
-            if (!HttpParser.isAbsolutePath(uriB[i])) {
+            if (!httpParser.isAbsolutePathRelaxed(uriB[i])) {
                 response.setStatus(400);
                 setErrorState(ErrorState.CLOSE_CLEAN, null);
                 if (getLog().isDebugEnabled()) {

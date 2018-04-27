@@ -111,6 +111,12 @@
         contains multiple <code>Host</code> headers is rejected with a 400
         response. (markt)
       </fix>
+      <add>
+        <bug>62273</bug>: Implement configuration options to work-around
+        specification non-compliant user agents (including all the major
+        browsers) that do not correctly %nn encode URI paths and query strings
+        as required by RFC 7230 and RFC 3986. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -302,7 +302,8 @@ public class Http11AprProtocol extends AbstractHttp11Protocol<Long> {
                     proto.getMaxHttpHeaderSize(), proto.getRejectIllegalHeaderName(),
                     (AprEndpoint)proto.endpoint, proto.getMaxTrailerSize(),
                     proto.getAllowedTrailerHeadersAsSet(), proto.getMaxExtensionSize(),
-                    proto.getMaxSwallowSize());
+                    proto.getMaxSwallowSize(), proto.getRelaxedPathChars(),
+                    proto.getRelaxedQueryChars());
             processor.setAdapter(proto.adapter);
             processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());
             processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());

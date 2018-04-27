@@ -35,6 +35,7 @@ import org.apache.tomcat.jni.SSLSocket;
 import org.apache.tomcat.jni.Sockaddr;
 import org.apache.tomcat.jni.Socket;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.AprEndpoint;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -62,11 +63,15 @@ public class Http11AprProcessor extends AbstractHttp11Processor<Long> {
 
     public Http11AprProcessor(int headerBufferSize, boolean rejectIllegalHeaderName,
             AprEndpoint endpoint, int maxTrailerSize, Set<String> allowedTrailerHeaders,
-            int maxExtensionSize, int maxSwallowSize) {
+            int maxExtensionSize, int maxSwallowSize, String relaxedPathChars,
+            String relaxedQueryChars) {
 
         super(endpoint);
 
-        inputBuffer = new InternalAprInputBuffer(request, headerBufferSize, rejectIllegalHeaderName);
+        httpParser = new HttpParser(relaxedPathChars, relaxedQueryChars);
+
+        inputBuffer = new InternalAprInputBuffer(request, headerBufferSize, rejectIllegalHeaderName,
+                httpParser);
         request.setInputBuffer(inputBuffer);
 
         outputBuffer = new InternalAprOutputBuffer(response, headerBufferSize);
