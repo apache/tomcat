@@ -139,15 +139,12 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
             Iterator<String> entries = getArchiveEntries(false).keySet().iterator();
             while (entries.hasNext()) {
                 String name = entries.next();
-                if (name.length() > pathInJar.length() &&
-                        name.startsWith(pathInJar)) {
+                if (name.length() > pathInJar.length() && name.startsWith(pathInJar)) {
                     int nextSlash = name.indexOf('/', pathInJar.length());
-                    if (nextSlash == -1 || nextSlash == name.length() - 1) {
-                        if (name.startsWith(pathInJar)) {
-                            result.add(webAppMount + '/' +
-                                    name.substring(getInternalPath().length()));
-                        }
+                    if (nextSlash != -1 && nextSlash != name.length() - 1) {
+                        name = name.substring(0, nextSlash + 1);
                     }
+                    result.add(webAppMount + '/' + name.substring(getInternalPath().length()));
                 }
             }
         } else {
