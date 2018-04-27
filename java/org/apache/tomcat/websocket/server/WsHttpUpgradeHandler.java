@@ -147,22 +147,14 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                 try {
                     return wsFrame.notifyDataAvailable();
                 } catch (WsIOException ws) {
-                    CloseReason cr = ws.getCloseReason();
-                    close(cr);
-                    // If the close was abnormal, close the socket.
-                    // Don't wait for a close response from the client that
-                    // might never arrive.
-                    if (cr.getCloseCode() == CloseCodes.CLOSED_ABNORMALLY) {
-                        return SocketState.CLOSED;
-                    }
+                    close(ws.getCloseReason());
                 } catch (IOException ioe) {
                     onError(ioe);
                     CloseReason cr = new CloseReason(
                             CloseCodes.CLOSED_ABNORMALLY, ioe.getMessage());
                     close(cr);
-                    return SocketState.CLOSED;
                 }
-                break;
+                return SocketState.CLOSED;
             case OPEN_WRITE:
                 wsRemoteEndpointServer.onWritePossible(false);
                 break;

@@ -136,6 +136,10 @@
         that didn't correctly handle a final empty message part in all
         circumstances when using <code>PerMessageDeflate</code>. (markt)
       </fix>
+      <fix>
+        <bug>62332</bug>: Ensure WebSocket connections are closed after an I/O
+        error is experienced reading from the client. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
