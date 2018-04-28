@@ -104,10 +104,6 @@ public abstract class SimpleHttpClient {
         port = thePort;
     }
 
-    public int getPort() {
-        return port;
-    }
-
     public void setRequest(String[] theRequest) {
         request = theRequest;
     }

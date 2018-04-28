@@ -845,7 +845,7 @@ public class TestAbstractHttp11Processor extends TomcatBaseTest {
     }
 
 
-    private static class Non2xxResponseClient extends SimpleHttpClient {
+    private class Non2xxResponseClient extends SimpleHttpClient {
         private static final String HEADER_EXPECT = "Expect: 100-continue";
         private static final String HEADER_CONNECTION = "Connection: close";
         private boolean useExpectation;
