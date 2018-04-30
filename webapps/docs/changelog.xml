@@ -116,7 +116,7 @@
         attribute <code>allowMultipleLeadingForwardSlashInPath</code>. (markt)
       </add>
       <fix>
-        Improve handing of overflow in the UTF-8 decoder with supplementary
+        Improve handling of overflow in the UTF-8 decoder with supplementary
         characters. (markt)
       </fix>
     </changelog>
