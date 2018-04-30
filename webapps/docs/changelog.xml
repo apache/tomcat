@@ -57,6 +57,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <update>
+        Use NIO2 API for websockets writes. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.8 (markt)" rtext="release in progress">
   <subsection name="Catalina">
