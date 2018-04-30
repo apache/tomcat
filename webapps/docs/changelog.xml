@@ -119,6 +119,11 @@
         request, reset the stream to inform the client that the remaining
         request body is not required. (markt)
       </fix>
+      <fix>
+        <bug>63312</bug>: Correct a regression in the error page handling that
+        prevented error pages from issuing redirects or taking other action that
+        required the response status code to be changed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
