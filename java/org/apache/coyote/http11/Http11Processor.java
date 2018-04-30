@@ -571,7 +571,6 @@ public class Http11Processor extends AbstractProcessor {
         }
         MessageBytes protocolMB = request.protocol();
         if (protocolMB.equals(Constants.HTTP_11)) {
-            http11 = true;
             protocolMB.setString(Constants.HTTP_11);
         } else if (protocolMB.equals(Constants.HTTP_10)) {
             http11 = false;
