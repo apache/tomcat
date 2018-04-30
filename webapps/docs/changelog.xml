@@ -45,6 +45,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.9 (markt)" rtext="in development">
+  <section name="Coyote">
+    <changelog>
+      Correct a regression in the error page handling that prevented error pages
+      from issuing redirects or taking other action that required the response
+      status code to be changed. (markt)
+    </changelog>
+  </section>
 </section>
 <section name="Tomcat 9.0.8 (markt)" rtext="release in progress">
   <subsection name="Catalina">

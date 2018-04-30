@@ -409,6 +409,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                             pos - parsingRequestLineStart);
                 } else if (!HttpParser.isToken(chr)) {
                     byteBuffer.position(byteBuffer.position() - 1);
+                    // Avoid unknown protocol triggering an additional error
+                    request.protocol().setString(Constants.HTTP_11);
                     throw new IllegalArgumentException(sm.getString("iib.invalidmethod"));
                 }
             }
@@ -459,9 +461,13 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 } else if (chr == Constants.QUESTION && parsingRequestLineQPos == -1) {
                     parsingRequestLineQPos = pos;
                 } else if (parsingRequestLineQPos != -1 && !httpParser.isQueryRelaxed(chr)) {
+                    // Avoid unknown protocol triggering an additional error
+                    request.protocol().setString(Constants.HTTP_11);
                     // %nn decoding will be checked at the point of decoding
                     throw new IllegalArgumentException(sm.getString("iib.invalidRequestTarget"));
                 } else if (httpParser.isNotRequestTargetRelaxed(chr)) {
+                    // Avoid unknown protocol triggering an additional error
+                    request.protocol().setString(Constants.HTTP_11);
                     // This is a general check that aims to catch problems early
                     // Detailed checking of each part of the request target will
                     // happen in Http11Processor#prepareRequest()
