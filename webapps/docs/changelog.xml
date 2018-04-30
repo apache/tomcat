@@ -52,6 +52,9 @@
       from issuing redirects or taking other action that required the response
       status code to be changed. (markt)
       </fix>
+      <fix>
+        Consistent exception propagation for NIO2 SSL close. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>

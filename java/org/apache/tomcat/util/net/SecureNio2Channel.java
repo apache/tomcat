@@ -146,30 +146,41 @@ public class SecureNio2Channel extends Nio2Channel  {
 
     private class FutureFlush implements Future<Boolean> {
         private Future<Integer> integer;
+        private Exception e = null;
         protected FutureFlush() {
-            integer = sc.write(netOutBuffer);
+            try {
+                integer = sc.write(netOutBuffer);
+            } catch (IllegalStateException e) {
+                this.e = e;
+            }
         }
         @Override
         public boolean cancel(boolean mayInterruptIfRunning) {
-            return integer.cancel(mayInterruptIfRunning);
+            return (e != null) ? true : integer.cancel(mayInterruptIfRunning);
         }
         @Override
         public boolean isCancelled() {
-            return integer.isCancelled();
+            return (e != null) ? true : integer.isCancelled();
         }
         @Override
         public boolean isDone() {
-            return integer.isDone();
+            return (e != null) ? true : integer.isDone();
         }
         @Override
         public Boolean get() throws InterruptedException,
                 ExecutionException {
+            if (e != null) {
+                throw new ExecutionException(e);
+            }
             return Boolean.valueOf(integer.get().intValue() >= 0);
         }
         @Override
         public Boolean get(long timeout, TimeUnit unit)
                 throws InterruptedException, ExecutionException,
                 TimeoutException {
+            if (e != null) {
+                throw new ExecutionException(e);
+            }
             return Boolean.valueOf(integer.get(timeout, unit).intValue() >= 0);
         }
     }
