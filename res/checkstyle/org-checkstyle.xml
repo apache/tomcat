@@ -23,7 +23,7 @@
   <!-- 'Standard Checks' in the Checkstyle documentation:                    -->
   <!-- http://checkstyle.sourceforge.net/config_coding.html                  -->
 
-  <!-- Specific checks for javax.* packages -->
+  <!-- Specific checks for org.* packages -->
 
   <module name="TreeWalker">
     <!-- Cache what has passed checkstyle -->
