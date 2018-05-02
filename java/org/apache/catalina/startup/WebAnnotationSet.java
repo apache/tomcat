@@ -47,6 +47,8 @@ import org.apache.tomcat.util.res.StringManager;
 public class WebAnnotationSet {
 
     private static final String SEPARATOR = "/";
+    private static final String MAPPED_NAME_PROPERTY = "mappedName";
+
 
     /**
      * The string resources for this package.
@@ -335,7 +337,7 @@ public class WebAnnotationSet {
             resource.setName(name);
             resource.setType(type);
             resource.setDescription(annotation.description());
-            resource.setProperty("mappedName", annotation.mappedName());
+            resource.setProperty(MAPPED_NAME_PROPERTY, annotation.mappedName());
             resource.setLookupName(annotation.lookup());
 
             context.getNamingResources().addEnvironment(resource);
@@ -376,7 +378,7 @@ public class WebAnnotationSet {
             }
 
             resource.setScope(annotation.shareable() ? "Shareable" : "Unshareable");
-            resource.setProperty("mappedName", annotation.mappedName());
+            resource.setProperty(MAPPED_NAME_PROPERTY, annotation.mappedName());
             resource.setDescription(annotation.description());
             resource.setLookupName(annotation.lookup());
 
@@ -408,7 +410,7 @@ public class WebAnnotationSet {
 
             resource.setName(name);
             resource.setType(type);
-            resource.setProperty("mappedName", annotation.mappedName());
+            resource.setProperty(MAPPED_NAME_PROPERTY, annotation.mappedName());
             resource.setDescription(annotation.description());
             resource.setLookupName(annotation.lookup());
 
