@@ -29,7 +29,7 @@ public class TesterServletWithAnnotations extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    @Resource(mappedName = "1")
+    @Resource
     private int envEntry1;
 
     private int envEntry2;
@@ -38,7 +38,7 @@ public class TesterServletWithAnnotations extends HttpServlet {
 
     private int envEntry4;
 
-    @Resource(name = "envEntry5", mappedName = "5")
+    @Resource(name = "envEntry5")
     private int envEntry5;
 
     private int envEntry6;
@@ -59,17 +59,17 @@ public class TesterServletWithAnnotations extends HttpServlet {
         this.envEntry2 = envEntry2;
     }
 
-    @Resource(mappedName = "3")
+    @Resource
     public void setEnvEntry3(int envEntry3) {
         this.envEntry3 = envEntry3;
     }
 
-    @Resource(mappedName = "4")
+    @Resource
     public void setEnvEntry4(int envEntry4) {
         this.envEntry4 = envEntry4;
     }
 
-    @Resource(name = "envEntry6", mappedName = "6")
+    @Resource(name = "envEntry6")
     public void setEnvEntry6(int envEntry6) {
         this.envEntry6 = envEntry6;
     }
