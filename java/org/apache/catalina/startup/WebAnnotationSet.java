@@ -329,13 +329,13 @@ public class WebAnnotationSet {
                 type.equals("java.lang.Long") ||
                 type.equals("java.lang.Float")) {
 
-            // env-ref element
+            // env-entry element
             ContextEnvironment resource = new ContextEnvironment();
 
             resource.setName(name);
             resource.setType(type);
             resource.setDescription(annotation.description());
-            resource.setValue(annotation.mappedName());
+            resource.setProperty("mappedName", annotation.mappedName());
             resource.setLookupName(annotation.lookup());
 
             context.getNamingResources().addEnvironment(resource);
