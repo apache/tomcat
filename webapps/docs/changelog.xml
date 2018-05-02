@@ -45,6 +45,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.9 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Treat the <code>&lt;mapped-name&gt;</code> element of a
+        <code>&lt;env-entry&gt;</code> in web.xml in the same way as the
+        <code>mappedName</code> element of the equivalent <code>@Resource</code>
+        annotation. Both now attempt to set the <code>mappedName</code> property
+        of the resource. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
