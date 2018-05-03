@@ -907,7 +907,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         boolean notify = false;
                         readPending.release();
                         if (state.block == BlockingMode.BLOCK && currentState != CompletionState.INLINE) {
-                            state.state = currentState;
                             notify = true;
                         } else {
                             state.state = currentState;
@@ -917,6 +916,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         }
                         if (notify) {
                             synchronized (state) {
+                                state.state = currentState;
                                 state.notify();
                             }
                         }
@@ -939,7 +939,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 readPending.release();
                 readPending.release();
                 if (state.block == BlockingMode.BLOCK) {
-                    state.state = Nio2Endpoint.isInline() ? CompletionState.ERROR : CompletionState.DONE;
                     notify = true;
                 } else {
                     state.state = Nio2Endpoint.isInline() ? CompletionState.ERROR : CompletionState.DONE;
@@ -953,6 +952,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 }
                 if (notify) {
                     synchronized (state) {
+                        state.state = Nio2Endpoint.isInline() ? CompletionState.ERROR : CompletionState.DONE;
                         state.notify();
                     }
                 }
@@ -985,7 +985,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         boolean notify = false;
                         writePending.release();
                         if (state.block == BlockingMode.BLOCK && currentState != CompletionState.INLINE) {
-                            state.state = currentState;
                             notify = true;
                         } else {
                             state.state = currentState;
@@ -995,6 +994,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                         }
                         if (notify) {
                             synchronized (state) {
+                                state.state = currentState;
                                 state.notify();
                             }
                         }
@@ -1016,7 +1016,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 boolean notify = false;
                 writePending.release();
                 if (state.block == BlockingMode.BLOCK) {
-                    state.state = Nio2Endpoint.isInline() ? CompletionState.ERROR : CompletionState.DONE;
                     notify = true;
                 } else {
                     state.state = Nio2Endpoint.isInline() ? CompletionState.ERROR : CompletionState.DONE;
@@ -1026,6 +1025,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                 }
                 if (notify) {
                     synchronized (state) {
+                        state.state = Nio2Endpoint.isInline() ? CompletionState.ERROR : CompletionState.DONE;
                         state.notify();
                     }
                 }
