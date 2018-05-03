@@ -33,9 +33,6 @@ import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.SendfileState;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
-import org.apache.tomcat.util.net.SocketWrapperBase.CompletionCheck;
-import org.apache.tomcat.util.net.SocketWrapperBase.CompletionHandlerCall;
-import org.apache.tomcat.util.net.SocketWrapperBase.CompletionState;
 
 public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
 
@@ -307,7 +304,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 ByteUtil.set31Bits(header, 5, sendfile.stream.getIdentifier().intValue());
                 sendfile.mappedBuffer.limit(sendfile.mappedBuffer.position() + frameSize);
                 socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                        TimeUnit.MILLISECONDS, sendfile, COMPLETE_WRITE_WITH_COMPLETION,
+                        TimeUnit.MILLISECONDS, sendfile, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION,
                         new SendfileCompletionHandler(), ByteBuffer.wrap(header), sendfile.mappedBuffer);
                 try {
                     handleAsyncException();
@@ -320,19 +317,6 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             return SendfileState.DONE;
         }
     }
-
-    private static final CompletionCheck COMPLETE_WRITE_WITH_COMPLETION = new CompletionCheck() {
-        @Override
-        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
-                int offset, int length) {
-            for (int i = 0; i < length; i++) {
-                if (buffers[offset + i].remaining() > 0) {
-                    return CompletionHandlerCall.CONTINUE;
-                }
-            }
-            return CompletionHandlerCall.DONE;
-        }
-    };
 
     protected class SendfileCompletionHandler implements CompletionHandler<Long, SendfileData> {
         @Override
@@ -381,7 +365,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 ByteUtil.set31Bits(header, 5, sendfile.stream.getIdentifier().intValue());
                 sendfile.mappedBuffer.limit(sendfile.mappedBuffer.position() + frameSize);
                 socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(),
-                        TimeUnit.MILLISECONDS, sendfile, COMPLETE_WRITE_WITH_COMPLETION,
+                        TimeUnit.MILLISECONDS, sendfile, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION,
                         this, ByteBuffer.wrap(header), sendfile.mappedBuffer);
                 try {
                     handleAsyncException();

@@ -868,6 +868,23 @@ public abstract class SocketWrapperBase<E> {
     };
 
     /**
+     * This utility CompletionCheck will cause the write to fully write
+     * all remaining data. The completion handler will then be called.
+     */
+    public static final CompletionCheck COMPLETE_WRITE_WITH_COMPLETION = new CompletionCheck() {
+        @Override
+        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
+                int offset, int length) {
+            for (int i = 0; i < length; i++) {
+                if (buffers[offset + i].remaining() > 0) {
+                    return CompletionHandlerCall.CONTINUE;
+                }
+            }
+            return CompletionHandlerCall.DONE;
+        }
+    };
+
+    /**
      * This utility CompletionCheck will cause the completion handler
      * to be called once some data has been read. If the operation
      * completes inline, the completion handler will not be called.

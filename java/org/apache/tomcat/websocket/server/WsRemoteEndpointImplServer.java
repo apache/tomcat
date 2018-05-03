@@ -32,9 +32,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.net.SocketWrapperBase.BlockingMode;
-import org.apache.tomcat.util.net.SocketWrapperBase.CompletionCheck;
-import org.apache.tomcat.util.net.SocketWrapperBase.CompletionHandlerCall;
-import org.apache.tomcat.util.net.SocketWrapperBase.CompletionState;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.Transformation;
 import org.apache.tomcat.websocket.WsRemoteEndpointImplBase;
@@ -92,19 +89,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 timeout = getSendTimeout();
             }
             socketWrapper.write(block ? BlockingMode.BLOCK : BlockingMode.SEMI_BLOCK, timeout,
-                    TimeUnit.MILLISECONDS, null,
-                    new CompletionCheck() {
-                        @Override
-                        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
-                                int offset, int length) {
-                            for (int i = 0; i < length; i++) {
-                                if (buffers[offset + i].remaining() > 0) {
-                                    return CompletionHandlerCall.CONTINUE;
-                                }
-                            }
-                            return CompletionHandlerCall.DONE;
-                        }
-                    },
+                    TimeUnit.MILLISECONDS, null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION,
                     new CompletionHandler<Long, Void>() {
                         @Override
                         public void completed(Long result, Void attachment) {
