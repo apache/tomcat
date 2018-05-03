@@ -291,7 +291,7 @@ public class DefaultInstanceManager implements InstanceManager {
     InvocationTargetException, NamingException {
 
         List<AnnotationCacheEntry> annotations = null;
-        Set<String> injectionsMatchedToSetter = new HashSet<>();
+        Set<String> injectionsMatchedToSetter = new HashSet<String>();
 
         while (clazz != null) {
             AnnotationCacheEntry[] annotationsArray = annotationCache.get(clazz);
