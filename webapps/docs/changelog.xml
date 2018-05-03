@@ -72,6 +72,9 @@
       <fix>
         Consistent exception propagation for NIO2 SSL close. (remm)
       </fix>
+      <fix>
+        Followup sync fix for NIO2 async IO blocking read/writes. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
