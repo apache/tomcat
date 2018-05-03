@@ -54,6 +54,12 @@
         annotation. Both now attempt to set the <code>mappedName</code> property
         of the resource. (markt)
       </fix>
+      <fix>
+        Correct the processing of resources with
+        <code>&lt;injection-target&gt;</code>s defined in web.xml. First look
+        for a match using JavaBean property names and then, only if a match is
+        not found, look for a match using fields. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
