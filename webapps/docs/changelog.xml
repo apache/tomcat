@@ -92,7 +92,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.8 (markt)" rtext="release in progress">
+<section name="Tomcat 9.0.8 (markt)" rtext="2018-05-03">
   <subsection name="Catalina">
     <changelog>
       <fix>
