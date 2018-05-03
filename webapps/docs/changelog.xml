@@ -60,6 +60,13 @@
         for a match using JavaBean property names and then, only if a match is
         not found, look for a match using fields. (markt)
       </fix>
+      <fix>
+        When restoring a saved request with a request body after FORM
+        authentication, ensure that calls to the <code>HttpServletRequest</code>
+        methods <code>getRequestURI()</code>, <code>getQueryString()</code> and
+        <code>getProtocol()</code> are not corrupted by the processing of the
+        saved request body. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

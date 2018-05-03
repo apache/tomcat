@@ -611,6 +611,18 @@ public class FormAuthenticator
         }
 
         request.getCoyoteRequest().method().setString(method);
+        // The method, URI, queryString and protocol are normally stored as
+        // bytes in the HttpInputBuffer and converted lazily to String. At this
+        // point, the method has already been set as String in the line above
+        // but the URI, queryString and protocol are still in byte form in the
+        // HttpInputBuffer. Processing the saved request body will overwrite
+        // these bytes. Configuring the HttpInputBuffer to retain these bytes as
+        // it would in a normal request would require some invasive API changes.
+        // Therefore force the conversion to String now so the correct values
+        // are presented if the application requests them.
+        request.getRequestURI();
+        request.getQueryString();
+        request.getProtocol();
 
         return true;
     }
@@ -702,6 +714,4 @@ public class FormAuthenticator
         }
         return sb.toString();
     }
-
-
 }
