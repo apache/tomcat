@@ -1161,8 +1161,6 @@ public class Http11Processor extends AbstractProcessor {
     @Override
     protected final void setRequestBody(ByteChunk body) {
         InputFilter savedBody = new SavedRequestInputFilter(body);
-        savedBody.setRequest(request);
-
         Http11InputBuffer internalBuffer = (Http11InputBuffer) request.getInputBuffer();
         internalBuffer.addActiveFilter(savedBody);
     }
