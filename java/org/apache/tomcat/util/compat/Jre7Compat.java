@@ -86,4 +86,14 @@ class Jre7Compat extends JreCompat {
     public int jarFileRuntimeMajorVersion() {
         return RUNTIME_MAJOR_VERSION;
     }
+
+
+    @Override
+    public boolean isCommonsAnnotations1_1Available() {
+        // True for all Java versions from 7 upwards
+        // Java 7 and Java 8 include it.
+        // Java 9 onwards does not include it and in that case the version
+        // supplied by Tomcat will be used so it will still be available.
+        return true;
+    }
 }

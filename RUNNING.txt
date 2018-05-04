@@ -38,6 +38,11 @@ Running With JRE 6 Or Later
       You may also use a full Java Development Kit (JDK) rather than just
       a JRE.
 
+(1.3) When running on Java 6, the Common Annotations 1.0 implementation
+      provided by the JRE will be used. To use the Common Annotations 1.1
+      provided by Tomcat, use the endorsed mechanism of the JVM. The
+      default configuration defines JARs located in
+      "$CATALINA_HOME/endorsed" as endorsed.
 
 (2) Download and Install Apache Tomcat
 
