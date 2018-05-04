@@ -17,6 +17,7 @@
 package org.apache.catalina.util;
 
 import java.util.Locale;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -26,8 +27,9 @@ import java.util.regex.Pattern;
 public final class ContextName implements Comparable {
     public static final String ROOT_NAME = "ROOT";
     private static final String VERSION_MARKER = "##";
-    private static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+\\.)*\\d+");
+    private static final Pattern VERSION_PATTERN = Pattern.compile("(?:\\d+\\.)*\\d+");
     private static final Pattern VERSION_DOT_PATTERN = Pattern.compile("\\.");
+    private static final Pattern VERSION_SUFFIX_PATTERN = Pattern.compile("((?:\\d+\\.)*\\d+)[.\\-](.*)");
     private static final String FWD_SLASH_REPLACEMENT = "#";
 
     private final String baseName;
@@ -35,6 +37,7 @@ public final class ContextName implements Comparable {
     private final String version;
     private final String name;
     private String versionCode;
+    private String versionSuffix;
 
 
     /**
@@ -160,7 +163,19 @@ public final class ContextName implements Comparable {
             }
             versionCode = versionCodeBuilder.toString();
         } else {
-            versionCode = null;
+            Matcher matcher = VERSION_SUFFIX_PATTERN.matcher(version);
+            if (matcher.matches()) {
+                String version = matcher.group(1);
+                String suffix = matcher.group(2);
+                StringBuilder versionCodeBuilder = new StringBuilder();
+                for (String versionPart : VERSION_DOT_PATTERN.split(version)) {
+                    versionCodeBuilder.append(Character.toChars(Integer.valueOf(versionPart)));
+                }
+                versionCode = versionCodeBuilder.toString();
+                versionSuffix = suffix;
+            } else {
+                versionCode = null;
+            }
         }
     }
 
@@ -232,7 +247,17 @@ public final class ContextName implements Comparable {
         }
 
         if (versionCode != null && other.versionCode != null) {
-            return versionCode.compareTo(other.versionCode);
+            int versionResult = versionCode.compareTo(other.versionCode);
+
+            if (versionResult == 0) {
+                if (versionSuffix == null && other.versionSuffix != null) {
+                    return 1;
+                } else if (versionSuffix != null && other.versionSuffix == null) {
+                    return -1;
+                }
+            }
+
+            return versionResult;
         }
 
         return version.compareTo(other.version);

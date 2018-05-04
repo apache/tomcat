@@ -20,6 +20,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+
 
 public class TestContextName {
 
@@ -49,6 +52,9 @@ public class TestContextName {
     private ContextName cn24;
     private ContextName cn25;
     private ContextName cn26;
+    private ContextName cn27;
+    private ContextName cn28;
+    private ContextName cn29;
 
     @Before
     public void setUp() throws Exception {
@@ -75,9 +81,12 @@ public class TestContextName {
         cn21 = new ContextName("foo.war", false);
         cn22 = new ContextName("foo.war", true);
         cn23 = new ContextName("foo##1.0.0", false);
-        cn24 = new ContextName("foo##1.2.3", false);
-        cn25 = new ContextName("foo##1.2.12", false);
-        cn26 = new ContextName("foo##10.1.0", false);
+        cn24 = new ContextName("foo##1.2.beta2", false);
+        cn25 = new ContextName("foo##1.2.3.pre4", false);
+        cn26 = new ContextName("foo##1.2.3-SNAPSHOT", false);
+        cn27 = new ContextName("foo##1.2.3", false);
+        cn28 = new ContextName("foo##1.2.12", false);
+        cn29 = new ContextName("foo##10.1.0", false);
     }
 
     @Test
@@ -236,25 +245,30 @@ public class TestContextName {
         doTestConstructorString(cn22);
     }
 
-    @SuppressWarnings("EqualsWithItself")
+    @SuppressWarnings("unchecked")
     @Test
     public void testCompareTo() {
-        Assert.assertEquals(0, cn23.compareTo(cn23));
-        Assert.assertEquals(-2, cn23.compareTo(cn24));
-        Assert.assertEquals(-2, cn23.compareTo(cn25));
-        Assert.assertEquals(2, cn24.compareTo(cn23));
-        Assert.assertEquals(0, cn24.compareTo(cn24));
-        Assert.assertEquals(-9, cn24.compareTo(cn25));
-        Assert.assertEquals(2, cn25.compareTo(cn23));
-        Assert.assertEquals(9, cn25.compareTo(cn24));
-        Assert.assertEquals(0, cn25.compareTo(cn25));
-        Assert.assertEquals(9, cn26.compareTo(cn23));
-        Assert.assertEquals(9, cn26.compareTo(cn24));
-        Assert.assertEquals(0, cn26.compareTo(cn26));
+        ArrayList<ContextName> contextNames = new ArrayList<>();
+        contextNames.add(cn23);
+        contextNames.add(cn25);
+        contextNames.add(cn27);
+        contextNames.add(cn24);
+        contextNames.add(cn23);
+        contextNames.add(cn26);
+        contextNames.add(cn24);
+        contextNames.add(cn28);
+        contextNames.add(cn29);
+        contextNames.sort(Comparator.naturalOrder());
 
-        Assert.assertEquals(-4, cn23.compareTo(cn13));
-        Assert.assertEquals(-4, cn24.compareTo(cn13));
-        Assert.assertEquals(-4, cn25.compareTo(cn13));
+        Assert.assertEquals(contextNames.get(0), cn23);
+        Assert.assertEquals(contextNames.get(1), cn23);
+        Assert.assertEquals(contextNames.get(2), cn24);
+        Assert.assertEquals(contextNames.get(3), cn24);
+        Assert.assertEquals(contextNames.get(4), cn25);
+        Assert.assertEquals(contextNames.get(5), cn26);
+        Assert.assertEquals(contextNames.get(6), cn27);
+        Assert.assertEquals(contextNames.get(7), cn28);
+        Assert.assertEquals(contextNames.get(8), cn29);
     }
 
     private void doTestConstructorString(ContextName src) {
