@@ -69,6 +69,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Consistent exception propagation for NIO2 SSL close. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.31 (markt)" rtext="2018-05-03">
   <subsection name="Catalina">
