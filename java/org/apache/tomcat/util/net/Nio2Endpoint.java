@@ -847,6 +847,13 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
 
         @Override
+        public boolean isWritePending() {
+            synchronized (writeCompletionHandler) {
+                return writePending.availablePermits() == 0;
+            }
+        }
+
+        @Override
         public boolean hasAsyncIO() {
             return true;
         }
@@ -879,6 +886,72 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
             private volatile long nBytes = 0;
             private volatile CompletionState state = CompletionState.PENDING;
+        }
+
+        @Override
+        public <A> CompletionState read(ByteBuffer[] dsts, int offset, int length,
+                BlockingMode block, long timeout, TimeUnit unit, A attachment,
+                CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
+            IOException ioe = getError();
+            if (ioe != null) {
+                handler.failed(ioe, attachment);
+                return CompletionState.ERROR;
+            }
+            if (timeout == -1) {
+                timeout = getNio2ReadTimeout();
+            }
+            if (block != BlockingMode.NON_BLOCK) {
+                try {
+                    if (!readPending.tryAcquire(timeout, unit)) {
+                        handler.failed(new SocketTimeoutException(), attachment);
+                        return CompletionState.ERROR;
+                    }
+                } catch (InterruptedException e) {
+                    handler.failed(e, attachment);
+                    return CompletionState.ERROR;
+                }
+            } else {
+                if (!readPending.tryAcquire()) {
+                    return CompletionState.NOT_DONE;
+                }
+            }
+            OperationState<A> state = new OperationState<>(dsts, offset, length, block, timeout, unit, attachment, check, handler);
+            ScatterReadCompletionHandler<A> completion = new ScatterReadCompletionHandler<>();
+            Nio2Endpoint.startInline();
+            long nBytes = 0;
+            if (!socketBufferHandler.isReadBufferEmpty()) {
+                // There is still data inside the main read buffer, use it to fill out the destination buffers
+                synchronized (readCompletionHandler) {
+                    // Note: It is not necessary to put this code in the completion handler
+                    socketBufferHandler.configureReadBufferForRead();
+                    for (int i = 0; i < length && !socketBufferHandler.isReadBufferEmpty(); i++) {
+                        nBytes += transfer(socketBufferHandler.getReadBuffer(), dsts[offset + i]);
+                    }
+                }
+                if (nBytes > 0) {
+                    completion.completed(Long.valueOf(nBytes), state);
+                }
+            }
+            if (nBytes == 0) {
+                getSocket().read(dsts, offset, length, timeout, unit, state, completion);
+            }
+            Nio2Endpoint.endInline();
+            if (block == BlockingMode.BLOCK) {
+                synchronized (state) {
+                    if (state.state == CompletionState.PENDING) {
+                        try {
+                            state.wait(unit.toMillis(timeout));
+                            if (state.state == CompletionState.PENDING) {
+                                return CompletionState.ERROR;
+                            }
+                        } catch (InterruptedException e) {
+                            handler.failed(new SocketTimeoutException(), attachment);
+                            return CompletionState.ERROR;
+                        }
+                    }
+                }
+            }
+            return state.state;
         }
 
         private class ScatterReadCompletionHandler<A> implements CompletionHandler<Long, OperationState<A>> {
@@ -959,6 +1032,66 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             }
         }
 
+        @Override
+        public <A> CompletionState write(ByteBuffer[] srcs, int offset, int length,
+                BlockingMode block, long timeout, TimeUnit unit, A attachment,
+                CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
+            IOException ioe = getError();
+            if (ioe != null) {
+                handler.failed(ioe, attachment);
+                return CompletionState.ERROR;
+            }
+            if (timeout == -1) {
+                timeout = getNio2WriteTimeout();
+            }
+            if (block != BlockingMode.NON_BLOCK) {
+                try {
+                    if (!writePending.tryAcquire(timeout, unit)) {
+                        handler.failed(new SocketTimeoutException(), attachment);
+                        return CompletionState.ERROR;
+                    }
+                } catch (InterruptedException e) {
+                    handler.failed(e, attachment);
+                    return CompletionState.ERROR;
+                }
+            } else {
+                if (!writePending.tryAcquire()) {
+                    return CompletionState.NOT_DONE;
+                }
+            }
+            if (!socketBufferHandler.isWriteBufferEmpty()) {
+                // First flush the main buffer as needed
+                try {
+                    doWrite(true);
+                } catch (IOException e) {
+                    handler.failed(e, attachment);
+                    return CompletionState.ERROR;
+                }
+            }
+            OperationState<A> state = new OperationState<>(srcs, offset, length, block, timeout, unit, attachment, check, handler);
+            GatherWriteCompletionHandler<A> completion = new GatherWriteCompletionHandler<>();
+            Nio2Endpoint.startInline();
+            // It should be less necessary to check the buffer state as it is easy to flush before
+            getSocket().write(srcs, offset, length, timeout, unit, state, completion);
+            Nio2Endpoint.endInline();
+            if (block == BlockingMode.BLOCK) {
+                synchronized (state) {
+                    if (state.state == CompletionState.PENDING) {
+                        try {
+                            state.wait(unit.toMillis(timeout));
+                            if (state.state == CompletionState.PENDING) {
+                                return CompletionState.ERROR;
+                            }
+                        } catch (InterruptedException e) {
+                            handler.failed(new SocketTimeoutException(), attachment);
+                            return CompletionState.ERROR;
+                        }
+                    }
+                }
+            }
+            return state.state;
+        }
+
         private class GatherWriteCompletionHandler<A> implements CompletionHandler<Long, OperationState<A>> {
             @Override
             public void completed(Long nBytes, OperationState<A> state) {
@@ -1030,139 +1163,6 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
                     }
                 }
             }
-        }
-
-        @Override
-        public <A> CompletionState read(ByteBuffer[] dsts, int offset, int length,
-                BlockingMode block, long timeout, TimeUnit unit, A attachment,
-                CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
-            IOException ioe = getError();
-            if (ioe != null) {
-                handler.failed(ioe, attachment);
-                return CompletionState.ERROR;
-            }
-            if (timeout == -1) {
-                timeout = getNio2ReadTimeout();
-            }
-            if (block != BlockingMode.NON_BLOCK) {
-                try {
-                    if (!readPending.tryAcquire(timeout, unit)) {
-                        handler.failed(new SocketTimeoutException(), attachment);
-                        return CompletionState.ERROR;
-                    }
-                } catch (InterruptedException e) {
-                    handler.failed(e, attachment);
-                    return CompletionState.ERROR;
-                }
-            } else {
-                if (!readPending.tryAcquire()) {
-                    return CompletionState.NOT_DONE;
-                }
-            }
-            OperationState<A> state = new OperationState<>(dsts, offset, length, block, timeout, unit, attachment, check, handler);
-            ScatterReadCompletionHandler<A> completion = new ScatterReadCompletionHandler<>();
-            Nio2Endpoint.startInline();
-            long nBytes = 0;
-            if (!socketBufferHandler.isReadBufferEmpty()) {
-                // There is still data inside the main read buffer, use it to fill out the destination buffers
-                synchronized (readCompletionHandler) {
-                    // Note: It is not necessary to put this code in the completion handler
-                    socketBufferHandler.configureReadBufferForRead();
-                    for (int i = 0; i < length && !socketBufferHandler.isReadBufferEmpty(); i++) {
-                        nBytes += transfer(socketBufferHandler.getReadBuffer(), dsts[offset + i]);
-                    }
-                }
-                if (nBytes > 0) {
-                    completion.completed(Long.valueOf(nBytes), state);
-                }
-            }
-            if (nBytes == 0) {
-                getSocket().read(dsts, offset, length, timeout, unit, state, completion);
-            }
-            Nio2Endpoint.endInline();
-            if (block == BlockingMode.BLOCK) {
-                synchronized (state) {
-                    if (state.state == CompletionState.PENDING) {
-                        try {
-                            state.wait(unit.toMillis(timeout));
-                            if (state.state == CompletionState.PENDING) {
-                                return CompletionState.ERROR;
-                            }
-                        } catch (InterruptedException e) {
-                            handler.failed(new SocketTimeoutException(), attachment);
-                            return CompletionState.ERROR;
-                        }
-                    }
-                }
-            }
-            return state.state;
-        }
-
-        @Override
-        public boolean isWritePending() {
-            synchronized (writeCompletionHandler) {
-                return writePending.availablePermits() == 0;
-            }
-        }
-
-        @Override
-        public <A> CompletionState write(ByteBuffer[] srcs, int offset, int length,
-                BlockingMode block, long timeout, TimeUnit unit, A attachment,
-                CompletionCheck check, CompletionHandler<Long, ? super A> handler) {
-            IOException ioe = getError();
-            if (ioe != null) {
-                handler.failed(ioe, attachment);
-                return CompletionState.ERROR;
-            }
-            if (timeout == -1) {
-                timeout = getNio2WriteTimeout();
-            }
-            if (block != BlockingMode.NON_BLOCK) {
-                try {
-                    if (!writePending.tryAcquire(timeout, unit)) {
-                        handler.failed(new SocketTimeoutException(), attachment);
-                        return CompletionState.ERROR;
-                    }
-                } catch (InterruptedException e) {
-                    handler.failed(e, attachment);
-                    return CompletionState.ERROR;
-                }
-            } else {
-                if (!writePending.tryAcquire()) {
-                    return CompletionState.NOT_DONE;
-                }
-            }
-            if (!socketBufferHandler.isWriteBufferEmpty()) {
-                // First flush the main buffer as needed
-                try {
-                    doWrite(true);
-                } catch (IOException e) {
-                    handler.failed(e, attachment);
-                    return CompletionState.ERROR;
-                }
-            }
-            OperationState<A> state = new OperationState<>(srcs, offset, length, block, timeout, unit, attachment, check, handler);
-            GatherWriteCompletionHandler<A> completion = new GatherWriteCompletionHandler<>();
-            Nio2Endpoint.startInline();
-            // It should be less necessary to check the buffer state as it is easy to flush before
-            getSocket().write(srcs, offset, length, timeout, unit, state, completion);
-            Nio2Endpoint.endInline();
-            if (block == BlockingMode.BLOCK) {
-                synchronized (state) {
-                    if (state.state == CompletionState.PENDING) {
-                        try {
-                            state.wait(unit.toMillis(timeout));
-                            if (state.state == CompletionState.PENDING) {
-                                return CompletionState.ERROR;
-                            }
-                        } catch (InterruptedException e) {
-                            handler.failed(new SocketTimeoutException(), attachment);
-                            return CompletionState.ERROR;
-                        }
-                    }
-                }
-            }
-            return state.state;
         }
 
         /* Callers of this method must:
