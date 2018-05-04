@@ -80,6 +80,12 @@
         <code>getProtocol()</code> are not corrupted by the processing of the
         saved request body. (markt)
       </fix>
+      <fix>
+        <bug>62353</bug>: Correct a regression introduced in Tomcat 7.0.86.
+        Restore the ability for Tomcat 7 to run on Java 6 where Common
+        Annotations 1.0 is available. Document the requirement to use the Java
+        endorsed mechanism to use Common Annotations 1.1. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
