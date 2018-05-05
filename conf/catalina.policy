@@ -172,14 +172,6 @@ grant {
     permission java.lang.RuntimePermission
      "accessClassInPackage.org.apache.jasper.runtime.*";
 
-    // The cookie code needs these.
-    permission java.util.PropertyPermission
-     "org.apache.catalina.STRICT_SERVLET_COMPLIANCE", "read";
-    permission java.util.PropertyPermission
-     "org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING", "read";
-    permission java.util.PropertyPermission
-     "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR", "read";
-
     // Applications using WebSocket need to be able to access these packages
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.tomcat.websocket";
     permission java.lang.RuntimePermission "accessClassInPackage.org.apache.tomcat.websocket.server";

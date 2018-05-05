@@ -17,6 +17,8 @@
 package javax.servlet.http;
 
 import java.io.Serializable;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.util.BitSet;
 import java.util.Locale;
@@ -54,19 +56,66 @@ import java.util.ResourceBundle;
 public class Cookie implements Cloneable, Serializable {
 
     private static final CookieNameValidator validation;
+
     static {
+        boolean strictServletCompliance;
         boolean strictNaming;
-        String prop = System.getProperty("org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING");
-        if (prop != null) {
-            strictNaming = Boolean.parseBoolean(prop);
+        boolean allowSlash;
+        String propStrictNaming;
+        String propFwdSlashIsSeparator;
+
+        if (System.getSecurityManager() == null) {
+            strictServletCompliance = Boolean.getBoolean(
+                    "org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
+            propStrictNaming = System.getProperty(
+                    "org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING");
+            propFwdSlashIsSeparator = System.getProperty(
+                    "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
         } else {
-            strictNaming = Boolean.getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
+            strictServletCompliance = AccessController.doPrivileged(
+                    new PrivilegedAction<Boolean>() {
+                        @Override
+                        public Boolean run() {
+                            return Boolean.valueOf(System.getProperty(
+                                    "org.apache.catalina.STRICT_SERVLET_COMPLIANCE"));
+                        }
+                    }
+                ).booleanValue();
+            propStrictNaming = AccessController.doPrivileged(
+                    new PrivilegedAction<String>() {
+                        @Override
+                        public String run() {
+                            return System.getProperty(
+                                    "org.apache.tomcat.util.http.ServerCookie.STRICT_NAMING");
+                        }
+                    }
+                );
+            propFwdSlashIsSeparator = AccessController.doPrivileged(
+                    new PrivilegedAction<String>() {
+                        @Override
+                        public String run() {
+                            return System.getProperty(
+                                    "org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
+                        }
+                    }
+                );
+        }
+
+        if (propStrictNaming == null) {
+            strictNaming = strictServletCompliance;
+        } else {
+            strictNaming = Boolean.parseBoolean(propStrictNaming);
+        }
+
+        if (propFwdSlashIsSeparator == null) {
+            allowSlash = !strictServletCompliance;
+        } else {
+            allowSlash = !Boolean.parseBoolean(propFwdSlashIsSeparator);
         }
 
         if (strictNaming) {
-            validation = new RFC2109Validator();
-        }
-        else {
+            validation = new RFC2109Validator(allowSlash);
+        } else {
             validation = new RFC6265Validator();
         }
     }
@@ -428,15 +477,8 @@ class RFC6265Validator extends CookieNameValidator {
 }
 
 class RFC2109Validator extends RFC6265Validator {
-    RFC2109Validator() {
+    RFC2109Validator(boolean allowSlash) {
         // special treatment to allow for FWD_SLASH_IS_SEPARATOR property
-        boolean allowSlash;
-        String prop = System.getProperty("org.apache.tomcat.util.http.ServerCookie.FWD_SLASH_IS_SEPARATOR");
-        if (prop != null) {
-            allowSlash = !Boolean.parseBoolean(prop);
-        } else {
-            allowSlash = !Boolean.getBoolean("org.apache.catalina.STRICT_SERVLET_COMPLIANCE");
-        }
         if (allowSlash) {
             allowed.set('/');
         }
