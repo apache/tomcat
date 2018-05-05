@@ -174,10 +174,6 @@ grant {
 
     // Precompiled JSPs need access to these system properties.
     permission java.util.PropertyPermission
-     "org.apache.jasper.runtime.BodyContentImpl.BUFFER_SIZE", "read";
-    permission java.util.PropertyPermission
-     "org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER", "read";
-    permission java.util.PropertyPermission
      "org.apache.el.parser.COERCE_TO_ZERO", "read";
 
     // The cookie code needs these.

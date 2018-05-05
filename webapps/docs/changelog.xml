@@ -87,11 +87,12 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
-        <bug>62350</bug>: Amend <code>catalina.policy</code> file to allow
-        reading system property
-        <code>org.apache.jasper.runtime.BodyContentImpl.BUFFER_SIZE</code>
-        when running under a SecurityManager. This is a follow-up to
-        the fix for <bug>43925</bug>. (kkolinko)
+        <bug>62350</bug>: Refactor
+        <code>org.apache.jasper.runtime.BodyContentImpl</code> so a
+        <code>SecurityException</code> is not thrown when running under a
+        SecurityManger and additional permissions are not required in the
+        <code>catalina.policy</code> file. This is a follow-up to the fix for
+        <bug>43925</bug>. (kkolinko/markt)
       </fix>
     </changelog>
   </subsection>
