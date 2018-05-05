@@ -39,20 +39,15 @@ public final class SecurityClassLoad {
             // Ensure XMLInputFactory is loaded with Tomcat's class loader
             loader.loadClass( basePackage + "compiler.EncodingDetector");
 
+            loader.loadClass( basePackage + "runtime.JspContextWrapper");
             loader.loadClass( basePackage + "runtime.JspFactoryImpl$PrivilegedGetPageContext");
             loader.loadClass( basePackage + "runtime.JspFactoryImpl$PrivilegedReleasePageContext");
-
+            loader.loadClass( basePackage + "runtime.JspFragmentHelper");
             loader.loadClass( basePackage + "runtime.JspRuntimeLibrary");
-
+            loader.loadClass( basePackage + "runtime.PageContextImpl");
+            loader.loadClass( basePackage + "runtime.ProtectedFunctionMapper");
             loader.loadClass( basePackage + "runtime.ServletResponseWrapperInclude");
             loader.loadClass( basePackage + "runtime.TagHandlerPool");
-            loader.loadClass( basePackage + "runtime.JspFragmentHelper");
-
-            loader.loadClass( basePackage + "runtime.ProtectedFunctionMapper");
-
-            loader.loadClass( basePackage + "runtime.PageContextImpl");
-
-            loader.loadClass( basePackage + "runtime.JspContextWrapper");
 
             // Trigger loading of class and reading of property
             SecurityUtil.isPackageProtectionEnabled();
