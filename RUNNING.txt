@@ -40,9 +40,16 @@ Running With JRE 6 Or Later
 
 (1.3) When running on Java 6, the Common Annotations 1.0 implementation
       provided by the JRE will be used. To use the Common Annotations 1.1
-      provided by Tomcat, use the endorsed mechanism of the JVM. The
-      default configuration defines JARs located in
+      provided by Tomcat, use the Endorsed Standards Override mechanism
+      of the JVM. The default configuration defines JARs located in
       "$CATALINA_HOME/endorsed" as endorsed.
+
+      Note: Java 6 includes a subset of Common Annotations 1.0 classes.
+
+      The only known difference between versions 1.0 and 1.1 of those
+      classes is introduction of "lookup" element on Resource annotation.
+
+      Majority of web applications will not notice the difference.
 
 (2) Download and Install Apache Tomcat
 
