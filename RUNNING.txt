@@ -32,6 +32,9 @@ Running With JRE 6 Or Later
       release version 6 or later, from
       http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
+      NOTE:  Java WebSocket API (JSR-356) is supported only when running
+      with Java 7 or later.
+
 (1.2) Install the JRE according to the instructions included with the
       release.
 
@@ -44,7 +47,7 @@ Running With JRE 6 Or Later
       of the JVM. The default configuration defines JARs located in
       "$CATALINA_HOME/endorsed" as endorsed.
 
-      Note: Java 6 includes a subset of Common Annotations 1.0 classes.
+      NOTE:  Java 6 includes a subset of Common Annotations 1.0 classes.
 
       The only known difference between versions 1.0 and 1.1 of those
       classes is introduction of "lookup" element on Resource annotation.
