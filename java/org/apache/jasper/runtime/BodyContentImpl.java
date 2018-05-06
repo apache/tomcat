@@ -21,6 +21,8 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.BodyContent;
@@ -39,13 +41,40 @@ import org.apache.jasper.Constants;
  */
 public class BodyContentImpl extends BodyContent {
 
-    private static final boolean LIMIT_BUFFER =
-            Boolean.parseBoolean(System.getProperty(
-                    "org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER", "false"));
+    private static final boolean LIMIT_BUFFER;
+    private static final int TAG_BUFFER_SIZE;
 
-    private static final int TAG_BUFFER_SIZE =
-            Integer.getInteger("org.apache.jasper.runtime.BodyContentImpl.BUFFER_SIZE",
+    static {
+        if (System.getSecurityManager() == null) {
+            LIMIT_BUFFER = Boolean.parseBoolean(System.getProperty(
+                    "org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER", "false"));
+            TAG_BUFFER_SIZE = Integer.getInteger(
+                    "org.apache.jasper.runtime.BodyContentImpl.BUFFER_SIZE",
                     Constants.DEFAULT_TAG_BUFFER_SIZE).intValue();
+        } else {
+            LIMIT_BUFFER = AccessController.doPrivileged(
+                    new PrivilegedAction<Boolean>() {
+                        @Override
+                        public Boolean run() {
+                            return Boolean.valueOf(System.getProperty(
+                                    "org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER",
+                                    "false"));
+                        }
+                    }
+            ).booleanValue();
+            TAG_BUFFER_SIZE = AccessController.doPrivileged(
+                    new PrivilegedAction<Integer>() {
+                        @Override
+                        public Integer run() {
+                            return Integer.getInteger(
+                                    "org.apache.jasper.runtime.BodyContentImpl.BUFFER_SIZE",
+                                    Constants.DEFAULT_TAG_BUFFER_SIZE);
+                        }
+                    }
+            ).intValue();
+        }
+    }
+
 
     private char[] cb;
     private int nextChar;
