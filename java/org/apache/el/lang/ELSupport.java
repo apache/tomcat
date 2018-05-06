@@ -42,23 +42,18 @@ public class ELSupport {
 
     private static final Long ZERO = Long.valueOf(0L);
 
-    private static final boolean IS_SECURITY_ENABLED =
-            (System.getSecurityManager() != null);
-
     protected static final boolean COERCE_TO_ZERO;
 
     static {
         String coerceToZeroStr;
-        if (IS_SECURITY_ENABLED) {
+        if (System.getSecurityManager() != null) {
             coerceToZeroStr = AccessController.doPrivileged(
                     new PrivilegedAction<String>(){
                         @Override
                         public String run() {
                             return System.getProperty(
-                                    "org.apache.el.parser.COERCE_TO_ZERO",
-                                    "false");
+                                    "org.apache.el.parser.COERCE_TO_ZERO", "false");
                         }
-
                     }
             );
         } else {
