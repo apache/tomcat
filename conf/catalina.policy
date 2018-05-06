@@ -172,10 +172,6 @@ grant {
     permission java.lang.RuntimePermission
      "accessClassInPackage.org.apache.jasper.runtime.*";
 
-    // Precompiled JSPs need access to these system properties.
-    permission java.util.PropertyPermission
-     "org.apache.el.parser.COERCE_TO_ZERO", "read";
-
     // The cookie code needs these.
     permission java.util.PropertyPermission
      "org.apache.catalina.STRICT_SERVLET_COMPLIANCE", "read";
