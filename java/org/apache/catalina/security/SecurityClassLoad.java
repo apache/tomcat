@@ -191,7 +191,9 @@ public final class SecurityClassLoad {
         clazz.newInstance();
         loader.loadClass(basePackage + "util.http.HttpMessages");
         loader.loadClass(basePackage + "util.http.parser.HttpParser");
-        loader.loadClass(basePackage + "util.http.parser.HttpParser$SkipConstantResult");
+        loader.loadClass(basePackage + "util.http.parser.HttpParser$AllowsEnd");
+        loader.loadClass(basePackage + "util.http.parser.HttpParser$DomainParseState");
+        loader.loadClass(basePackage + "util.http.parser.HttpParser$SkipResult");
         loader.loadClass(basePackage + "util.http.parser.MediaType");
         loader.loadClass(basePackage + "util.http.parser.MediaTypeCache");
         // jni

@@ -81,6 +81,10 @@
         saved request body. (markt)
       </fix>
       <fix>
+        Fix startup failure when running under SecurityManager, a regression
+        from the fix for bug <bug>62273</bug>. (kkolinko)
+      </fix>
+      <fix>
         <bug>62353</bug>: Correct a regression introduced in Tomcat 7.0.86.
         Restore the ability for Tomcat 7 to run on Java 6 where Common
         Annotations 1.0 is available. Document the requirement to use the Java
