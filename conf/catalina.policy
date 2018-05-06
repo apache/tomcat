@@ -168,8 +168,9 @@ grant {
      "accessClassInPackage.org.apache.jasper.runtime.*";
 
     // Precompiled JSPs need access to these system properties.
-    permission java.util.PropertyPermission
-     "org.apache.jasper.runtime.BodyContentImpl.BUFFER_SIZE", "read";
+
+    // The following two permissions are no longer needed since Tomcat 7.0.88
+    // They are here for historic reasons. There is no harm in keeping them.
     permission java.util.PropertyPermission
      "org.apache.jasper.runtime.BodyContentImpl.LIMIT_BUFFER", "read";
     permission java.util.PropertyPermission
