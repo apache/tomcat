@@ -368,13 +368,13 @@ public class McastService
                                     soTimeout,
                                     this,
                                     this,
-                                    Boolean.parseBoolean(properties.getProperty("localLoopbackDisabled","false")));
-        String value = properties.getProperty("recoveryEnabled","true");
+                                    Boolean.parseBoolean(properties.getProperty("localLoopbackDisabled")));
+        String value = properties.getProperty("recoveryEnabled");
         boolean recEnabled = Boolean.parseBoolean(value);
         impl.setRecoveryEnabled(recEnabled);
-        int recCnt = Integer.parseInt(properties.getProperty("recoveryCounter","10"));
+        int recCnt = Integer.parseInt(properties.getProperty("recoveryCounter"));
         impl.setRecoveryCounter(recCnt);
-        long recSlpTime = Long.parseLong(properties.getProperty("recoverySleepTime","5000"));
+        long recSlpTime = Long.parseLong(properties.getProperty("recoverySleepTime"));
         impl.setRecoverySleepTime(recSlpTime);
         impl.setChannel(channel);
 
