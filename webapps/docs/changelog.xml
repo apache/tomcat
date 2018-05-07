@@ -103,6 +103,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Tribes">
+    <changelog>
+      <fix>
+        Ensure that the correct default value is returned when retrieve unset
+        properties in <code>McastService</code>. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.8 (markt)" rtext="2018-05-03">
   <subsection name="Catalina">

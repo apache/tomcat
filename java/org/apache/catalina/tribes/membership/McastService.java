@@ -94,11 +94,7 @@ public class McastService
      */
     public McastService() {
         //default values
-        properties.setProperty("mcastPort","45564");
-        properties.setProperty("mcastAddress","228.0.0.4");
-        properties.setProperty("memberDropTime","3000");
-        properties.setProperty("mcastFrequency","500");
-
+        setDefaults(this.properties);
     }
 
     /**
@@ -122,6 +118,7 @@ public class McastService
         hasProperty(properties,"mcastFrequency");
         hasProperty(properties,"tcpListenPort");
         hasProperty(properties,"tcpListenHost");
+        setDefaults(properties);
         this.properties = properties;
     }
 
@@ -609,6 +606,26 @@ public class McastService
     @Override
     public void setChannel(Channel channel) {
         this.channel = channel;
+    }
+
+    protected void setDefaults(Properties properties) {
+        // default values
+        if (properties.getProperty("mcastPort") == null)
+            properties.setProperty("mcastPort","45564");
+        if (properties.getProperty("mcastAddress") == null)
+            properties.setProperty("mcastAddress","228.0.0.4");
+        if (properties.getProperty("memberDropTime") == null)
+            properties.setProperty("memberDropTime","3000");
+        if (properties.getProperty("mcastFrequency") == null)
+            properties.setProperty("mcastFrequency","500");
+        if (properties.getProperty("recoveryCounter") == null)
+            properties.setProperty("recoveryCounter", "10");
+        if (properties.getProperty("recoveryEnabled") == null)
+            properties.setProperty("recoveryEnabled", "true");
+        if (properties.getProperty("recoverySleepTime") == null)
+            properties.setProperty("recoverySleepTime", "5000");
+        if (properties.getProperty("localLoopbackDisabled") == null)
+            properties.setProperty("localLoopbackDisabled", "false");
     }
 
     /**
