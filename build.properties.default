@@ -210,3 +210,11 @@ findbugs.home=${base.path}/findbugs-${findbugs.version}
 findbugs.lib=${findbugs.home}/lib
 findbugs.jar=${findbugs.lib}/findbugs-ant.jar
 findbugs.loc=${base-sf.loc}/project/findbugs/findbugs/${findbugs.version}/findbugs-${findbugs.version}.tar.gz
+
+# ----- SAAJ API, used by Code Signing for releases -----
+# ----- No longer part of JRE from Java 11 onwards  -----
+# ----- CDDL Licensed                               -----
+saaj-api.version=1.3.5
+saaj-api.home=${base.path}/saaj-api-${saaj-api.version}
+saaj-api.loc=${base-maven.loc}/javax/xml/soap/saaj-api/${saaj-api.version}/saaj-api-${saaj-api.version}.jar
+saaj-api.jar=${saaj-api.home}/saaj-api-${saaj-api.version}.jar

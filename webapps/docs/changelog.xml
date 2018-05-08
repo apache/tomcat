@@ -111,6 +111,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Ensure that Apache Tomcat may be built from source with Java 11. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.8 (markt)" rtext="2018-05-03">
   <subsection name="Catalina">

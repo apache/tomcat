@@ -200,6 +200,7 @@
   <!-- Classpaths -->
   <path id="compile.classpath">
     <pathelement location="${jdt.jar}"/>
+    <pathelement location="${saaj-api.jar}"/>
   </path>
 
   <path id="tomcat.classpath">
@@ -2628,6 +2629,13 @@ skip.installer property in build.properties" />
       <param name="sourcefile.2" value="${jdt.loc.2}"/>
       <param name="destfile" value="${jdt.jar}"/>
       <param name="destdir" value="${jdt.home}"/>
+    </antcall>
+
+    <!-- Download SAAJ API -->
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${saaj-api.loc}"/>
+      <param name="destfile" value="${saaj-api.jar}"/>
+      <param name="destdir" value="${saaj-api.home}"/>
     </antcall>
 
   </target>
