@@ -106,6 +106,10 @@
         Annotations 1.0 is available. Document the requirement to use the Java
         endorsed mechanism to use Common Annotations 1.1. (markt)
       </fix>
+      <scode>
+        Refactor the <code>org.apache.naming</code> package to reduce duplicate
+        code. Duplicate code identified by the Simian tool. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Jasper">
