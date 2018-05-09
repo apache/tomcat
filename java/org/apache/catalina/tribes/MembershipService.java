@@ -18,6 +18,7 @@
 package org.apache.catalina.tribes;
 
 
+
 /**
  * MembershipService Interface<br>
  * The <code>MembershipService</code> interface is the membership component
@@ -156,4 +157,9 @@ public interface MembershipService {
      */
     public void setChannel(Channel channel);
 
+    /**
+     * Get the MembershipProvider
+     * @return MembershipProvider
+     */
+    public MembershipProvider getMembershipProvider();
 }

@@ -28,6 +28,7 @@ import org.apache.catalina.tribes.ChannelException;
 import org.apache.catalina.tribes.ChannelMessage;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
+import org.apache.catalina.tribes.MembershipProvider;
 import org.apache.catalina.tribes.MembershipService;
 import org.apache.catalina.tribes.MessageListener;
 import org.apache.catalina.tribes.io.ChannelData;
@@ -46,7 +47,7 @@ import org.apache.juli.logging.LogFactory;
  * If a node fails to send out a heartbeat, the node will be dismissed.
  */
 public class McastService
-        implements MembershipService,MembershipListener,MessageListener, McastServiceMBean {
+        extends MembershipServiceBase implements MessageListener, McastServiceMBean {
 
     private static final Log log = LogFactory.getLog(McastService.class);
 
@@ -56,17 +57,10 @@ public class McastService
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
     /**
-     * The implementation specific properties
-     */
-    protected Properties properties = new Properties();
-    /**
      * A handle to the actual low level implementation
      */
     protected McastServiceImpl impl;
-    /**
-     * A membership listener delegate (should be the cluster :)
-     */
-    protected volatile MembershipListener listener;
+
     /**
      * A message listener delegate for broadcasts
      */
@@ -81,8 +75,6 @@ public class McastService
     protected byte[] payload;
 
     protected byte[] domain;
-
-    private Channel channel;
 
     /**
      * the ObjectName of this McastService.
@@ -120,14 +112,6 @@ public class McastService
         hasProperty(properties,"tcpListenHost");
         setDefaults(properties);
         this.properties = properties;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Properties getProperties() {
-        return properties;
     }
 
     /**
@@ -291,16 +275,6 @@ public class McastService
         if ( properties.getProperty(name)==null) throw new IllegalArgumentException(sm.getString("mcastService.missing.property", name));
     }
 
-    /**
-     * Start broadcasting and listening to membership pings
-     * @throws java.lang.Exception if a IO error occurs
-     */
-    @Override
-    public void start() throws java.lang.Exception {
-        start(MembershipService.MBR_RX);
-        start(MembershipService.MBR_TX);
-    }
-
     @Override
     public void start(int level) throws java.lang.Exception {
         hasProperty(properties,"mcastPort");
@@ -409,104 +383,12 @@ public class McastService
         }
     }
 
-
-    /**
-     * Return all the members by name
-     */
-    @Override
-    public String[] getMembersByName() {
-        Member[] currentMembers = getMembers();
-        String [] membernames ;
-        if(currentMembers != null) {
-            membernames = new String[currentMembers.length];
-            for (int i = 0; i < currentMembers.length; i++) {
-                membernames[i] = currentMembers[i].toString() ;
-            }
-        } else
-            membernames = new String[0] ;
-        return membernames ;
-    }
-
-    /**
-     * Return the member by name
-     */
-    @Override
-    public Member findMemberByName(String name) {
-        Member[] currentMembers = getMembers();
-        for (int i = 0; i < currentMembers.length; i++) {
-            if (name.equals(currentMembers[i].toString()))
-                return currentMembers[i];
-        }
-        return null;
-    }
-
-    /**
-     * has members?
-     */
-    @Override
-    public boolean hasMembers() {
-       if ( impl == null || impl.membership == null ) return false;
-       return impl.membership.hasMembers();
-    }
-
-    @Override
-    public Member getMember(Member mbr) {
-        if ( impl == null || impl.membership == null ) return null;
-        return impl.membership.getMember(mbr);
-    }
-
-    /**
-     * Return all the members
-     */
-    protected static final Member[]EMPTY_MEMBERS = new Member[0];
-    @Override
-    public Member[] getMembers() {
-        if ( impl == null || impl.membership == null ) return EMPTY_MEMBERS;
-        return impl.membership.getMembers();
-    }
-    /**
-     * Add a membership listener, this version only supports one listener per service,
-     * so calling this method twice will result in only the second listener being active.
-     * @param listener The listener
-     */
-    @Override
-    public void setMembershipListener(MembershipListener listener) {
-        this.listener = listener;
-    }
-
     public void setMessageListener(MessageListener listener) {
         this.msglistener = listener;
     }
 
     public void removeMessageListener() {
         this.msglistener = null;
-    }
-    /**
-     * Remove the membership listener
-     */
-    @Override
-    public void removeMembershipListener(){
-        listener = null;
-    }
-
-    @Override
-    public void memberAdded(Member member) {
-        MembershipListener listener = this.listener;
-        if (listener != null) {
-            listener.memberAdded(member);
-        }
-    }
-
-    /**
-     * Callback from the impl when a new member has been received
-     * @param member The member
-     */
-    @Override
-    public void memberDisappeared(Member member) {
-        MembershipListener listener = this.listener;
-        if (listener != null) {
-            listener.memberDisappeared(member);
-        }
     }
 
     @Override
@@ -599,13 +481,8 @@ public class McastService
     }
 
     @Override
-    public Channel getChannel() {
-        return channel;
-    }
-
-    @Override
-    public void setChannel(Channel channel) {
-        this.channel = channel;
+    public MembershipProvider getMembershipProvider() {
+        return impl;
     }
 
     protected void setDefaults(Properties properties) {
