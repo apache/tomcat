@@ -71,6 +71,12 @@
         JNDI resources that are defined with injection targets but no value are
         now treated as if the resource is not defined. (markt)
       </fix>
+      <fix>
+        Ensure that JNDI names used for <code>&lt;lookup-name&gt;</code> entries
+        in web.xml and for <code>lookup</code> elements of
+        <code>@Resource</code> annotations specify a name with an explicit
+        <code>java:</code> namespace. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
