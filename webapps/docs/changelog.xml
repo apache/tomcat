@@ -77,6 +77,10 @@
         <code>@Resource</code> annotations specify a name with an explicit
         <code>java:</code> namespace. (markt)
       </fix>
+      <scode>
+        Refactor the <code>org.apache.naming</code> package to reduce duplicate
+        code. Duplicate code identified by the Simian tool. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">

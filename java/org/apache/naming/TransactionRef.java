@@ -14,32 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.naming;
-
-import javax.naming.Context;
-import javax.naming.Reference;
 
 /**
  * Represents a reference address to a transaction.
  *
  * @author Remy Maucherat
  */
-public class TransactionRef extends Reference {
+public class TransactionRef extends AbstractRef {
 
     private static final long serialVersionUID = 1L;
 
-    // -------------------------------------------------------------- Constants
 
     /**
      * Default factory for this reference.
      */
     public static final String DEFAULT_FACTORY =
-        org.apache.naming.factory.Constants.DEFAULT_TRANSACTION_FACTORY;
-
-
-    // ----------------------------------------------------------- Constructors
+            org.apache.naming.factory.Constants.DEFAULT_TRANSACTION_FACTORY;
 
 
     /**
@@ -61,33 +52,8 @@ public class TransactionRef extends Reference {
     }
 
 
-    // ----------------------------------------------------- Instance Variables
-
-
-    // ------------------------------------------------------ Reference Methods
-
-
-    /**
-     * Retrieves the class name of the factory of the object to which this
-     * reference refers.
-     */
     @Override
-    public String getFactoryClassName() {
-        String factory = super.getFactoryClassName();
-        if (factory != null) {
-            return factory;
-        } else {
-            factory = System.getProperty(Context.OBJECT_FACTORIES);
-            if (factory != null) {
-                return null;
-            } else {
-                return DEFAULT_FACTORY;
-            }
-        }
+    protected String getDefaultFactoryClassName() {
+        return DEFAULT_FACTORY;
     }
-
-
-    // ------------------------------------------------------------- Properties
-
-
 }
