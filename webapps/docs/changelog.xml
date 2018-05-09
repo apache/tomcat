@@ -109,6 +109,9 @@
         Ensure that the correct default value is returned when retrieve unset
         properties in <code>McastService</code>. (kfujino)
       </fix>
+      <add>
+        Make <code>MembershipService</code> more easily extensible. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
