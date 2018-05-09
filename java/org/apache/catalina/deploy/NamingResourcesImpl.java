@@ -262,6 +262,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
             }
         }
 
+        // Entries with injection targets but no value are effectively ignored
+        if (environment.getInjectionTargets() != null && environment.getInjectionTargets().size() > 0 &&
+                (environment.getValue() == null || environment.getValue().length() == 0)) {
+            return;
+        }
+
         if (!checkResourceType(environment)) {
             throw new IllegalArgumentException(sm.getString(
                     "namingResources.resourceTypeFail", environment.getName(),
