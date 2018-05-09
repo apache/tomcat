@@ -67,6 +67,10 @@
         <code>getProtocol()</code> are not corrupted by the processing of the
         saved request body. (markt)
       </fix>
+      <fix>
+        JNDI resources that are defined with injection targets but no value are
+        now treated as if the resource is not defined. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
