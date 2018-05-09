@@ -114,7 +114,7 @@ public abstract class MembershipServiceBase implements MembershipService, Member
         MembershipListener listener = this.listener;
         if (listener != null) listener.memberDisappeared(member);
     }
- 
+
     @Override
     public void broadcast(ChannelMessage message) throws ChannelException {
         // no-op
