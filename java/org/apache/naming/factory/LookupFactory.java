@@ -45,7 +45,7 @@ public class LookupFactory implements ObjectFactory {
 
         @Override
         protected Set<String> initialValue() {
-            return new HashSet<>();
+            return new HashSet<String>();
         }
     };
 
