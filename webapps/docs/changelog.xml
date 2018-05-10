@@ -110,6 +110,10 @@
         Refactor the <code>org.apache.naming</code> package to reduce duplicate
         code. Duplicate code identified by the Simian tool. (markt)
       </scode>
+      <fix>
+        <bug>50019</bug>: Add support for <code>&lt;lookup-name&gt;</code>.
+        Based on a patch by Gurkan Erdogdu. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
