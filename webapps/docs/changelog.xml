@@ -114,6 +114,10 @@
         <bug>50019</bug>: Add support for <code>&lt;lookup-name&gt;</code>.
         Based on a patch by Gurkan Erdogdu. (markt)
       </fix>
+      <fix>
+        <bug>60490</bug>: Various formatting and layout improvements for the
+        <code>ErrorReportValve</code>. Patch provided by Michael Osipov. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
