@@ -20,6 +20,7 @@ package org.apache.tomcat.jdbc.pool;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -311,7 +312,9 @@ public class PooledConnection implements PooledConnectionMBean {
         Properties properties = PoolUtilities.clone(poolProperties.getDbProperties());
         if (usr != null) properties.setProperty(PROP_USER, usr);
         if (pwd != null) properties.setProperty(PROP_PASSWORD, pwd);
-
+        if (log.isDebugEnabled()) {
+			debugProperties("Database properties",properties);
+		}
         try {
             if (driver==null) {
                 connection = DriverManager.getConnection(driverURL, properties);
@@ -339,6 +342,23 @@ public class PooledConnection implements PooledConnectionMBean {
         }
     }
 
+	private void debugProperties(String description, Properties properties) {
+		StringBuilder sb = new StringBuilder();
+		Enumeration<?> propertyNames = properties.propertyNames();
+		while (propertyNames.hasMoreElements()){
+			Object propertyName = propertyNames.nextElement();
+			if (propertyName instanceof String){
+				String sPropertyName = (String) propertyName;
+				sb.append(sPropertyName).append("=").append(
+						sPropertyName.equalsIgnoreCase(PROP_PASSWORD)?"********":properties.getProperty(sPropertyName)
+				).append(", ");
+			} else {
+				sb.append(propertyName).append("=<???>, ");
+			}
+		}
+		log.debug(description+": {"+sb.toString()+"}");
+	}
+    
     /**
      *
      * @return true if connect() was called successfully and disconnect has not yet been called
