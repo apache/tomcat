@@ -70,6 +70,7 @@ import org.apache.tomcat.util.descriptor.web.ContextResourceEnvRef;
 import org.apache.tomcat.util.descriptor.web.ContextResourceLink;
 import org.apache.tomcat.util.descriptor.web.ContextService;
 import org.apache.tomcat.util.descriptor.web.ContextTransaction;
+import org.apache.tomcat.util.descriptor.web.MessageDestinationRef;
 import org.apache.tomcat.util.descriptor.web.ResourceBase;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
@@ -444,6 +445,19 @@ public class NamingContextListener
                     addLocalEjb(ejb);
                 }
             }
+        } else if (name.equals("messageDestinationRef")) {
+            if (oldValue != null) {
+                MessageDestinationRef mdr = (MessageDestinationRef) oldValue;
+                if (mdr.getName() != null) {
+                    removeMessageDestinationRef(mdr.getName());
+                }
+            }
+            if (newValue != null) {
+                MessageDestinationRef mdr = (MessageDestinationRef) newValue;
+                if (mdr.getName() != null) {
+                    addMessageDestinationRef(mdr);
+                }
+            }
         } else if (name.equals("resource")) {
             if (oldValue != null) {
                 ContextResource resource = (ContextResource) oldValue;
@@ -559,6 +573,12 @@ public class NamingContextListener
         ContextEjb[] ejbs = namingResources.findEjbs();
         for (i = 0; i < ejbs.length; i++) {
             addEjb(ejbs[i]);
+        }
+
+        // Message Destination References
+        MessageDestinationRef[] mdrs = namingResources.findMessageDestinationRefs();
+        for (i = 0; i < mdrs.length; i++) {
+            addMessageDestinationRef(mdrs[i]);
         }
 
         // WebServices references
@@ -801,10 +821,24 @@ public class NamingContextListener
     /**
      * Set the specified local EJBs in the naming context.
      *
-     * @param localEjb the EJB descriptor (unused)
+     * @param localEjb the local EJB descriptor (unused)
      */
     public void addLocalEjb(ContextLocalEjb localEjb) {
         // NO-OP
+        // No factory in org.apache.naming.factory
+        // No reference in org.apache.naming
+    }
+
+
+    /**
+     * Set the specified message destination refs in the naming context.
+     *
+     * @param mdr the message destination ref descriptor (unused)
+     */
+    public void addMessageDestinationRef(MessageDestinationRef mdr) {
+        // NO-OP
+        // No factory in org.apache.naming.factory
+        // No reference in org.apache.naming
     }
 
 
@@ -825,18 +859,16 @@ public class NamingContextListener
             }
             if (wsdlURL == null) {
                 try {
-                    wsdlURL = ((Context) container).
-                                                    getServletContext().
-                                                    getResource(service.getWsdlfile());
+                    wsdlURL = ((Context) container).getServletContext().getResource(
+                            service.getWsdlfile());
                 } catch (MalformedURLException e) {
                     // Ignore and carry on
                 }
             }
             if (wsdlURL == null) {
                 try {
-                    wsdlURL = ((Context) container).
-                                                    getServletContext().
-                                                    getResource("/" + service.getWsdlfile());
+                    wsdlURL = ((Context) container).getServletContext().getResource(
+                            "/" + service.getWsdlfile());
                     log.debug("  Changing service ref wsdl file for /"
                                 + service.getWsdlfile());
                 } catch (MalformedURLException e) {
@@ -859,18 +891,16 @@ public class NamingContextListener
             }
             if (jaxrpcURL == null) {
                 try {
-                    jaxrpcURL = ((Context) container).
-                                                    getServletContext().
-                                                    getResource(service.getJaxrpcmappingfile());
+                    jaxrpcURL = ((Context) container).getServletContext().getResource(
+                            service.getJaxrpcmappingfile());
                 } catch (MalformedURLException e) {
                     // Ignore and carry on
                 }
             }
             if (jaxrpcURL == null) {
                 try {
-                    jaxrpcURL = ((Context) container).
-                                                    getServletContext().
-                                                    getResource("/" + service.getJaxrpcmappingfile());
+                    jaxrpcURL = ((Context) container).getServletContext().getResource(
+                            "/" + service.getJaxrpcmappingfile());
                     log.debug("  Changing service ref jaxrpc file for /"
                                 + service.getJaxrpcmappingfile());
                 } catch (MalformedURLException e) {
@@ -884,9 +914,8 @@ public class NamingContextListener
         }
 
         // Create a reference to the resource.
-        Reference ref = new ServiceRef
-            (service.getName(), service.getInterface(), service.getServiceqname(),
-             service.getWsdlfile(), service.getJaxrpcmappingfile());
+        Reference ref = new ServiceRef(service.getName(), service.getInterface(),
+                service.getServiceqname(), service.getWsdlfile(), service.getJaxrpcmappingfile());
         // Adding the additional port-component-ref, if any
         Iterator<String> portcomponent = service.getServiceendpoints();
         while (portcomponent.hasNext()) {
@@ -1069,7 +1098,7 @@ public class NamingContextListener
 
 
     /**
-     * Set the specified EJBs in the naming context.
+     * Remove the specified EJB from the naming context.
      *
      * @param name the name of the EJB which should be removed
      */
@@ -1085,7 +1114,7 @@ public class NamingContextListener
 
 
     /**
-     * Set the specified environment entries in the naming context.
+     * Remove the specified environment entry from the naming context.
      *
      * @param name the name of the environment entry which should be removed
      */
@@ -1101,7 +1130,7 @@ public class NamingContextListener
 
 
     /**
-     * Set the specified local EJBs in the naming context.
+     * Remove the specified local EJB from the naming context.
      *
      * @param name the name of the EJB which should be removed
      */
@@ -1117,7 +1146,24 @@ public class NamingContextListener
 
 
     /**
-     * Set the specified web services in the naming context.
+     * Remove the specified message destination ref from the naming context.
+     *
+     * @param name the name of the message destination ref which should be
+     *             removed
+     */
+    public void removeMessageDestinationRef(String name) {
+
+        try {
+            envCtx.unbind(name);
+        } catch (NamingException e) {
+            log.error(sm.getString("naming.unbindFailed", e));
+        }
+
+    }
+
+
+    /**
+     * Remove the specified web service from the naming context.
      *
      * @param name the name of the web service which should be removed
      */
@@ -1133,7 +1179,7 @@ public class NamingContextListener
 
 
     /**
-     * Set the specified resources in the naming context.
+     * Remove the specified resource from the naming context.
      *
      * @param name the name of the resource which should be removed
      */
@@ -1154,9 +1200,11 @@ public class NamingContextListener
 
 
     /**
-     * Set the specified resources in the naming context.
+     * Remove the specified resource environment reference from the naming
+     * context.
      *
-     * @param name the name of the resource reference which should be removed
+     * @param name the name of the resource environment reference which should
+     *             be removed
      */
     public void removeResourceEnvRef(String name) {
 
@@ -1170,7 +1218,7 @@ public class NamingContextListener
 
 
     /**
-     * Set the specified resources in the naming context.
+     * Remove the specified resource link from the naming context.
      *
      * @param name the name of the resource link which should be removed
      */
