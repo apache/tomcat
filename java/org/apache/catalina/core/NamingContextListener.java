@@ -53,6 +53,7 @@ import org.apache.naming.ContextAccessController;
 import org.apache.naming.ContextBindings;
 import org.apache.naming.EjbRef;
 import org.apache.naming.HandlerRef;
+import org.apache.naming.LookupRef;
 import org.apache.naming.NamingContext;
 import org.apache.naming.ResourceEnvRef;
 import org.apache.naming.ResourceLinkRef;
@@ -69,6 +70,7 @@ import org.apache.tomcat.util.descriptor.web.ContextResourceEnvRef;
 import org.apache.tomcat.util.descriptor.web.ContextResourceLink;
 import org.apache.tomcat.util.descriptor.web.ContextService;
 import org.apache.tomcat.util.descriptor.web.ContextTransaction;
+import org.apache.tomcat.util.descriptor.web.ResourceBase;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -680,86 +682,89 @@ public class NamingContextListener
      */
     public void addEnvironment(ContextEnvironment env) {
 
-        Object value = null;
-        // Instantiating a new instance of the correct object type, and
-        // initializing it.
-        String type = env.getType();
-        try {
-            if (type.equals("java.lang.String")) {
-                value = env.getValue();
-            } else if (type.equals("java.lang.Byte")) {
-                if (env.getValue() == null) {
-                    value = Byte.valueOf((byte) 0);
-                } else {
-                    value = Byte.decode(env.getValue());
-                }
-            } else if (type.equals("java.lang.Short")) {
-                if (env.getValue() == null) {
-                    value = Short.valueOf((short) 0);
-                } else {
-                    value = Short.decode(env.getValue());
-                }
-            } else if (type.equals("java.lang.Integer")) {
-                if (env.getValue() == null) {
-                    value = Integer.valueOf(0);
-                } else {
-                    value = Integer.decode(env.getValue());
-                }
-            } else if (type.equals("java.lang.Long")) {
-                if (env.getValue() == null) {
-                    value = Long.valueOf(0);
-                } else {
-                    value = Long.decode(env.getValue());
-                }
-            } else if (type.equals("java.lang.Boolean")) {
-                value = Boolean.valueOf(env.getValue());
-            } else if (type.equals("java.lang.Double")) {
-                if (env.getValue() == null) {
-                    value = Double.valueOf(0);
-                } else {
-                    value = Double.valueOf(env.getValue());
-                }
-            } else if (type.equals("java.lang.Float")) {
-                if (env.getValue() == null) {
-                    value = Float.valueOf(0);
-                } else {
-                    value = Float.valueOf(env.getValue());
-                }
-            } else if (type.equals("java.lang.Character")) {
-                if (env.getValue() == null) {
-                    value = Character.valueOf((char) 0);
-                } else {
-                    if (env.getValue().length() == 1) {
-                        value = Character.valueOf(env.getValue().charAt(0));
+        Object value = lookForLookupRef(env);
+
+        if (value == null) {
+            // Instantiating a new instance of the correct object type, and
+            // initializing it.
+            String type = env.getType();
+            try {
+                if (type.equals("java.lang.String")) {
+                    value = env.getValue();
+                } else if (type.equals("java.lang.Byte")) {
+                    if (env.getValue() == null) {
+                        value = Byte.valueOf((byte) 0);
                     } else {
-                        throw new IllegalArgumentException();
+                        value = Byte.decode(env.getValue());
+                    }
+                } else if (type.equals("java.lang.Short")) {
+                    if (env.getValue() == null) {
+                        value = Short.valueOf((short) 0);
+                    } else {
+                        value = Short.decode(env.getValue());
+                    }
+                } else if (type.equals("java.lang.Integer")) {
+                    if (env.getValue() == null) {
+                        value = Integer.valueOf(0);
+                    } else {
+                        value = Integer.decode(env.getValue());
+                    }
+                } else if (type.equals("java.lang.Long")) {
+                    if (env.getValue() == null) {
+                        value = Long.valueOf(0);
+                    } else {
+                        value = Long.decode(env.getValue());
+                    }
+                } else if (type.equals("java.lang.Boolean")) {
+                    value = Boolean.valueOf(env.getValue());
+                } else if (type.equals("java.lang.Double")) {
+                    if (env.getValue() == null) {
+                        value = Double.valueOf(0);
+                    } else {
+                        value = Double.valueOf(env.getValue());
+                    }
+                } else if (type.equals("java.lang.Float")) {
+                    if (env.getValue() == null) {
+                        value = Float.valueOf(0);
+                    } else {
+                        value = Float.valueOf(env.getValue());
+                    }
+                } else if (type.equals("java.lang.Character")) {
+                    if (env.getValue() == null) {
+                        value = Character.valueOf((char) 0);
+                    } else {
+                        if (env.getValue().length() == 1) {
+                            value = Character.valueOf(env.getValue().charAt(0));
+                        } else {
+                            throw new IllegalArgumentException();
+                        }
+                    }
+                } else {
+                    value = constructEnvEntry(env.getType(), env.getValue());
+                    if (value == null) {
+                        log.error(sm.getString(
+                                "naming.invalidEnvEntryType", env.getName()));
                     }
                 }
-            } else {
-                value = constructEnvEntry(env.getType(), env.getValue());
-                if (value == null) {
-                    log.error(sm.getString(
-                            "naming.invalidEnvEntryType", env.getName()));
-                }
+            } catch (NumberFormatException e) {
+                log.error(sm.getString("naming.invalidEnvEntryValue", env.getName()));
+            } catch (IllegalArgumentException e) {
+                log.error(sm.getString("naming.invalidEnvEntryValue", env.getName()));
             }
-        } catch (NumberFormatException e) {
-            log.error(sm.getString("naming.invalidEnvEntryValue", env.getName()));
-        } catch (IllegalArgumentException e) {
-            log.error(sm.getString("naming.invalidEnvEntryValue", env.getName()));
         }
 
         // Binding the object to the appropriate name
         if (value != null) {
             try {
-                if (log.isDebugEnabled())
-                    log.debug("  Adding environment entry " + env.getName());
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("naming.addEnvEntry", env.getName()));
+                }
                 createSubcontexts(envCtx, env.getName());
                 envCtx.bind(env.getName(), value);
             } catch (NamingException e) {
                 log.error(sm.getString("naming.invalidEnvEntryValue", e));
             }
         }
-
     }
 
 
@@ -996,15 +1001,16 @@ public class NamingContextListener
             StringRefAddr refAddr = new StringRefAddr(paramName, paramValue);
             ref.add(refAddr);
         }
+
         try {
-            if (log.isDebugEnabled())
-                log.debug("  Adding resource env ref " + resourceEnvRef.getName());
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("naming.addResourceEnvRef", resourceEnvRef.getName()));
+            }
             createSubcontexts(envCtx, resourceEnvRef.getName());
             envCtx.bind(resourceEnvRef.getName(), ref);
         } catch (NamingException e) {
             log.error(sm.getString("naming.bindFailed", e));
         }
-
     }
 
 
@@ -1194,4 +1200,17 @@ public class NamingContextListener
     }
 
 
+    /**
+     * Gets look up reference from resource if exist.
+     *
+     * @param resourceBase resource base object
+     * @return lookup ref
+     */
+    private LookupRef lookForLookupRef(ResourceBase resourceBase) {
+        String lookupName = resourceBase.getLookupName();
+        if ((lookupName != null && !lookupName.equals(""))) {
+            return new LookupRef(resourceBase.getType(), lookupName);
+        }
+        return null;
+    }
 }

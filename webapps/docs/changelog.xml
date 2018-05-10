@@ -77,6 +77,10 @@
         <code>@Resource</code> annotations specify a name with an explicit
         <code>java:</code> namespace. (markt)
       </fix>
+      <fix>
+        Partial fix for <bug>50019</bug>: Add support for
+        <code>&lt;lookup-name&gt;</code> with environment entries. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -86,4 +86,94 @@
     <env-entry-type>java.lang.Integer</env-entry-type>
     <env-entry-value>66</env-entry-value>
   </env-entry>
+
+  <servlet>
+    <servlet-name>injection</servlet-name>
+    <servlet-class>org.apache.naming.TesterInjectionServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>injection</servlet-name>
+    <url-pattern>/injection</url-pattern>
+  </servlet-mapping>
+
+  <env-entry>
+    <env-entry-name>env-entry/basic</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <env-entry-value>basic-value</env-entry-value>
+  </env-entry>
+
+  <env-entry>
+    <env-entry-name>env-entry/valid</env-entry-name>
+    <env-entry-type>org.apache.naming.TesterEnvEntry</env-entry-type>
+    <env-entry-value>valid</env-entry-value>
+  </env-entry>
+
+  <env-entry>
+    <env-entry-name>env-entry/invalid</env-entry-name>
+    <env-entry-type>org.apache.naming.TesterEnvEntry</env-entry-type>
+    <env-entry-value>invalid</env-entry-value>
+  </env-entry>
+
+  <env-entry>
+    <env-entry-name>env-entry/injectField</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <env-entry-value>inject-value-1</env-entry-value>
+    <injection-target>
+      <injection-target-class>org.apache.naming.TesterInjectionServlet</injection-target-class>
+      <injection-target-name>property1</injection-target-name>
+    </injection-target>
+  </env-entry>
+
+  <env-entry>
+    <env-entry-name>env-entry/injectProperty</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <env-entry-value>inject-value-2</env-entry-value>
+    <injection-target>
+      <injection-target-class>org.apache.naming.TesterInjectionServlet</injection-target-class>
+      <injection-target-name>property2</injection-target-name>
+    </injection-target>
+  </env-entry>
+
+  <env-entry>
+    <env-entry-name>env-entry/injectFieldNoType</env-entry-name>
+    <env-entry-value>inject-value-3</env-entry-value>
+    <injection-target>
+      <injection-target-class>org.apache.naming.TesterInjectionServlet</injection-target-class>
+      <injection-target-name>property3</injection-target-name>
+    </injection-target>
+  </env-entry>
+
+  <env-entry>
+    <env-entry-name>env-entry/injectNoValue</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <injection-target>
+      <injection-target-class>org.apache.naming.TesterInjectionServlet</injection-target-class>
+      <injection-target-name>property4</injection-target-name>
+    </injection-target>
+  </env-entry>
+
+  <env-entry>
+    <env-entry-name>env-entry/lookup</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <lookup-name>java:comp/env/env-entry/basic</lookup-name>
+  </env-entry>
+
+  <env-entry>
+    <env-entry-name>env-entry/circular1</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <lookup-name>java:comp/env/env-entry/circular2</lookup-name>
+  </env-entry>
+
+  <env-entry>
+    <env-entry-name>env-entry/circular2</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type>
+    <lookup-name>java:comp/env/env-entry/circular1</lookup-name>
+  </env-entry>
+
+  <env-entry>
+    <env-entry-name>env-entry/lookup-invalid</env-entry-name>
+    <env-entry-type>java.lang.Integer</env-entry-type>
+    <lookup-name>java:comp/env/env-entry/basic</lookup-name>
+  </env-entry>
+
 </web-app>

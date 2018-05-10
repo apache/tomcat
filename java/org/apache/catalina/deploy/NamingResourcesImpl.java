@@ -24,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -262,10 +263,20 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
             }
         }
 
+        List<InjectionTarget> injectionTargets = environment.getInjectionTargets();
+        String value = environment.getValue();
+        String lookupName = environment.getLookupName();
+
         // Entries with injection targets but no value are effectively ignored
-        if (environment.getInjectionTargets() != null && environment.getInjectionTargets().size() > 0 &&
-                (environment.getValue() == null || environment.getValue().length() == 0)) {
+        if (injectionTargets != null && injectionTargets.size() > 0 &&
+                (value == null || value.length() == 0)) {
             return;
+        }
+
+        // Entries with lookup-name and value are an error (EE.5.4.1.3)
+        if (value != null && value.length() > 0 && lookupName != null && lookupName.length() > 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("namingResources.envEntryLookupValue", environment.getName()));
         }
 
         if (!checkResourceType(environment)) {
