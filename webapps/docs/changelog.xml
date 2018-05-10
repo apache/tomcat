@@ -78,10 +78,8 @@
         <code>java:</code> namespace. (markt)
       </fix>
       <fix>
-        Partial fix for <bug>50019</bug>: Add support for
-        <code>&lt;lookup-name&gt;</code> with environment entries, EJB
-        references, resource references and resource environment references.
-        (markt)
+        <bug>50019</bug>: Add support for <code>&lt;lookup-name&gt;</code>.
+        Based on a patch by Gurkan Erdogdu. (markt)
       </fix>
     </changelog>
   </subsection>
