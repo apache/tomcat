@@ -313,8 +313,8 @@ public class PooledConnection implements PooledConnectionMBean {
         if (usr != null) properties.setProperty(PROP_USER, usr);
         if (pwd != null) properties.setProperty(PROP_PASSWORD, pwd);
         if (log.isDebugEnabled()) {
-			debugProperties("Database properties",properties);
-		}
+            debugProperties("Database properties",properties);
+        }
         try {
             if (driver==null) {
                 connection = DriverManager.getConnection(driverURL, properties);
@@ -342,22 +342,22 @@ public class PooledConnection implements PooledConnectionMBean {
         }
     }
 
-	private void debugProperties(String description, Properties properties) {
-		StringBuilder sb = new StringBuilder();
-		Enumeration<?> propertyNames = properties.propertyNames();
-		while (propertyNames.hasMoreElements()){
-			Object propertyName = propertyNames.nextElement();
-			if (propertyName instanceof String){
-				String sPropertyName = (String) propertyName;
-				sb.append(sPropertyName).append("=").append(
-						sPropertyName.equalsIgnoreCase(PROP_PASSWORD)?"********":properties.getProperty(sPropertyName)
-				).append(", ");
-			} else {
-				sb.append(propertyName).append("=<???>, ");
-			}
-		}
-		log.debug(description+": {"+sb.toString()+"}");
-	}
+    private void debugProperties(String description, Properties properties) {
+        StringBuilder sb = new StringBuilder();
+        Enumeration<?> propertyNames = properties.propertyNames();
+        while (propertyNames.hasMoreElements()){
+            Object propertyName = propertyNames.nextElement();
+            if (propertyName instanceof String){
+                String sPropertyName = (String) propertyName;
+                sb.append(sPropertyName).append("=").append(
+                        sPropertyName.equalsIgnoreCase(PROP_PASSWORD)?"********":properties.getProperty(sPropertyName)
+                ).append(", ");
+            } else {
+                sb.append(propertyName).append("=<???>, ");
+            }
+        }
+        log.debug(description+": {"+sb.toString()+"}");
+    }
     
     /**
      *
