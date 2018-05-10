@@ -654,24 +654,27 @@ public class NamingContextListener
      */
     public void addEjb(ContextEjb ejb) {
 
-        // Create a reference to the EJB.
-        Reference ref = new EjbRef
-            (ejb.getType(), ejb.getHome(), ejb.getRemote(), ejb.getLink());
-        // Adding the additional parameters, if any
-        Iterator<String> params = ejb.listProperties();
-        while (params.hasNext()) {
-            String paramName = params.next();
-            String paramValue = (String) ejb.getProperty(paramName);
-            StringRefAddr refAddr = new StringRefAddr(paramName, paramValue);
-            ref.add(refAddr);
+        Reference ref = lookForLookupRef(ejb);
+
+        if (ref == null) {
+            // Create a reference to the EJB.
+            ref = new EjbRef(ejb.getType(), ejb.getHome(), ejb.getRemote(), ejb.getLink());
+            // Adding the additional parameters, if any
+            Iterator<String> params = ejb.listProperties();
+            while (params.hasNext()) {
+                String paramName = params.next();
+                String paramValue = (String) ejb.getProperty(paramName);
+                StringRefAddr refAddr = new StringRefAddr(paramName, paramValue);
+                ref.add(refAddr);
+            }
         }
+
         try {
             createSubcontexts(envCtx, ejb.getName());
             envCtx.bind(ejb.getName(), ref);
         } catch (NamingException e) {
             log.error(sm.getString("naming.bindFailed", e));
         }
-
     }
 
 
@@ -944,23 +947,25 @@ public class NamingContextListener
      */
     public void addResource(ContextResource resource) {
 
-        // Create a reference to the resource.
-        Reference ref = new ResourceRef
-            (resource.getType(), resource.getDescription(),
-             resource.getScope(), resource.getAuth(),
-             resource.getSingleton());
-        // Adding the additional parameters, if any
-        Iterator<String> params = resource.listProperties();
-        while (params.hasNext()) {
-            String paramName = params.next();
-            String paramValue = (String) resource.getProperty(paramName);
-            StringRefAddr refAddr = new StringRefAddr(paramName, paramValue);
-            ref.add(refAddr);
+        Reference ref = lookForLookupRef(resource);
+
+        if (ref == null) {
+            // Create a reference to the resource.
+            ref = new ResourceRef(resource.getType(), resource.getDescription(),
+                    resource.getScope(), resource.getAuth(), resource.getSingleton());
+            // Adding the additional parameters, if any
+            Iterator<String> params = resource.listProperties();
+            while (params.hasNext()) {
+                String paramName = params.next();
+                String paramValue = (String) resource.getProperty(paramName);
+                StringRefAddr refAddr = new StringRefAddr(paramName, paramValue);
+                ref.add(refAddr);
+            }
         }
+
         try {
             if (log.isDebugEnabled()) {
-                log.debug("  Adding resource ref "
-                             + resource.getName() + "  " + ref);
+                log.debug("  Adding resource ref " + resource.getName() + "  " + ref);
             }
             createSubcontexts(envCtx, resource.getName());
             envCtx.bind(resource.getName(), ref);
@@ -991,15 +996,19 @@ public class NamingContextListener
      */
     public void addResourceEnvRef(ContextResourceEnvRef resourceEnvRef) {
 
-        // Create a reference to the resource env.
-        Reference ref = new ResourceEnvRef(resourceEnvRef.getType());
-        // Adding the additional parameters, if any
-        Iterator<String> params = resourceEnvRef.listProperties();
-        while (params.hasNext()) {
-            String paramName = params.next();
-            String paramValue = (String) resourceEnvRef.getProperty(paramName);
-            StringRefAddr refAddr = new StringRefAddr(paramName, paramValue);
-            ref.add(refAddr);
+        Reference ref = lookForLookupRef(resourceEnvRef);
+
+        if (ref == null) {
+            // Create a reference to the resource env.
+            ref = new ResourceEnvRef(resourceEnvRef.getType());
+            // Adding the additional parameters, if any
+            Iterator<String> params = resourceEnvRef.listProperties();
+            while (params.hasNext()) {
+                String paramName = params.next();
+                String paramValue = (String) resourceEnvRef.getProperty(paramName);
+                StringRefAddr refAddr = new StringRefAddr(paramName, paramValue);
+                ref.add(refAddr);
+            }
         }
 
         try {

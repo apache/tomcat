@@ -215,6 +215,15 @@ public class NamingResourcesImpl extends LifecycleMBeanBase
      */
     public void addEjb(ContextEjb ejb) {
 
+        // Entries with lookup-name and ejb-link are an error (EE.5.5.2 / EE.5.5.3)
+        String ejbLink = ejb.getLink();
+        String lookupName = ejb.getLookupName();
+
+        if (ejbLink != null && ejbLink.length() > 0 && lookupName != null && lookupName.length() > 0) {
+            throw new IllegalArgumentException(
+                    sm.getString("namingResources.ejbLookupLink", ejb.getName()));
+        }
+
         if (entries.contains(ejb.getName())) {
             return;
         } else {

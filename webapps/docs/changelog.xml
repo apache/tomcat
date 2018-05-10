@@ -79,7 +79,9 @@
       </fix>
       <fix>
         Partial fix for <bug>50019</bug>: Add support for
-        <code>&lt;lookup-name&gt;</code> with environment entries. (markt)
+        <code>&lt;lookup-name&gt;</code> with environment entries, EJB
+        references, resource references and resource environment references.
+        (markt)
       </fix>
     </changelog>
   </subsection>
