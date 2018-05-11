@@ -711,6 +711,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
 
         if (parsingHeader) {
             if (byteBuffer.limit() >= headerBufferSize) {
+                if (parsingRequestLine) {
+                    // Avoid unknown protocol triggering an additional error
+                    request.protocol().setString(Constants.HTTP_11);
+                }
                 throw new IllegalArgumentException(sm.getString("iib.requestheadertoolarge.error"));
             }
         } else {
