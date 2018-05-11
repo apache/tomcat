@@ -1130,6 +1130,32 @@
 
   </subsection>
 
+  <subsection name="Authenticated User Realm - org.apache.catalina.realm.AuthenticatedUserRealm">
+
+    <p><strong>AuthenticatedUserRealm</strong> is intended for use with
+    Authenticator implementations (SSLAuthenticator, SpnegoAuthenticator) that
+    authenticate the user as well as obtain the user credentials. An
+    authenticated Principal is always created from the user name presented to
+    without further validation.</p>
+    <p><strong>Note:</strong> It is unsafe to use this Realm with Authenticator
+    implementations that do not validate the provided credentials.</p>
+
+    <p>The AuthenticatedUserRealm implementation supports the following
+    additional attributes.</p>
+
+    <attributes>
+
+      <attribute name="transportGuaranteeRedirectStatus" required="false">
+        <p>The HTTP status code to use when the container needs to issue an HTTP
+           redirect to meet the requirements of a configured transport
+           guarantee. The provided status code is not validated. If not
+           specified, the default value of <code>302</code> is used.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
 </section>
 
 

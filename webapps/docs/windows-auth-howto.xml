@@ -175,8 +175,10 @@ com.sun.security.jgss.krb5.accept {
   </ul>
   <p>The SPNEGO authenticator will work with any <a href="config/realm.html">
   Realm</a> but if used with the JNDI Realm, by default the JNDI Realm will use
-  the user&apos;s delegated credentials to connect to the Active Directory.
-  </p>
+  the user&apos;s delegated credentials to connect to the Active Directory. If
+  only the authenticated user name is required then the AuthenticatedUserRealm
+  may be used that will simply return a Principal based on the authenticated
+  user name that does not have any roles.</p>
   <p>The above steps have been tested on a Tomcat server running Windows Server
   2008 R2 64-bit Standard with an Oracle 1.6.0_24 64-bit JDK.</p>
   </subsection>

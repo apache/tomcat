@@ -81,6 +81,10 @@
         <bug>50019</bug>: Add support for <code>&lt;lookup-name&gt;</code>.
         Based on a patch by Gurkan Erdogdu. (markt)
       </fix>
+      <add>
+        Add the <code>AuthenticatedUserRealm</code> for use with CLIENT-CERT and
+        SPNEGO when just the authenticated user name is required. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
