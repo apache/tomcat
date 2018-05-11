@@ -92,6 +92,11 @@
       <fix>
         Consistent exception propagation for NIO2 SSL close. (remm)
       </fix>
+      <fix>
+        Log an error message if the AJP connector detects the the reverse proxy
+        is sending AJP messages that are too large for the configured
+        <code>packetSize</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
