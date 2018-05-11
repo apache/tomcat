@@ -1226,7 +1226,12 @@ public class DeltaManager extends ClusterManagerBase{
         counterReceive_EVT_SESSION_DELTA++;
         byte[] delta = msg.getSession();
         DeltaSession session = (DeltaSession) findSession(msg.getSessionID());
-        if (session != null) {
+        if (session == null) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("deltaManager.receiveMessage.delta.unknown",
+                        getName(), msg.getSessionID()));
+            }
+        } else {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("deltaManager.receiveMessage.delta",
                         getName(), msg.getSessionID()));
@@ -1292,7 +1297,6 @@ public class DeltaManager extends ClusterManagerBase{
                     getName(), msg.getSessionID()));
         }
         DeltaSession session = (DeltaSession) createEmptySession();
-        session.setManager(this);
         session.setValid(true);
         session.setPrimarySession(false);
         session.setCreationTime(msg.getTimestamp());
@@ -1301,7 +1305,6 @@ public class DeltaManager extends ClusterManagerBase{
         session.setMaxInactiveInterval(getContext().getSessionTimeout() * 60, false);
         session.access();
         session.setId(msg.getSessionID(), notifySessionListenersOnReplication);
-        session.resetDeltaRequest();
         session.endAccess();
 
     }

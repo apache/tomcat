@@ -110,6 +110,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Remove duplicate calls when creating a replicated session to reduce the
+        time taken to create the session and thereby reduce the chances of a
+        subsequent session update message being ignored because the session does
+        not yet exist. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="WebSocket">
     <changelog>
       <update>
