@@ -74,13 +74,13 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
      * Input stream.
      */
     protected InputStream input;
-    
-    
+
+
     /**
      * Output stream.
      */
     protected OutputStream output;
-    
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -199,7 +199,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                     getAdapter().log(request, response, 0);
                 }
             }
-            
+
             if (isAsync() && !getErrorState().isError()) {
                 break;
             }
@@ -224,7 +224,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
             recycle(false);
         }
-        
+
         rp.setStage(org.apache.coyote.Constants.STAGE_ENDED);
 
         if (isAsync() && !getErrorState().isError() && !endpoint.isPaused()) {
@@ -234,7 +234,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             output = null;
             return SocketState.CLOSED;
         }
-        
+
     }
 
     @Override
@@ -316,7 +316,7 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
                 throw new IOException(sm.getString("ajpprocessor.failedread"));
             }
         }
-        
+
         return true;
 
     }
@@ -380,10 +380,10 @@ public class AjpProcessor extends AbstractAjpProcessor<Socket> {
             if (messageLength > buf.length) {
                 // Message too long for the buffer
                 // Need to trigger a 400 response
-                throw new IllegalArgumentException(sm.getString(
-                        "ajpprocessor.header.tooLong",
-                        Integer.valueOf(messageLength),
-                        Integer.valueOf(buf.length)));
+                String msg = sm.getString("ajpprocessor.header.tooLong",
+                        Integer.valueOf(messageLength), Integer.valueOf(buf.length));
+                getLog().error(msg);
+                throw new IllegalArgumentException(msg);
             }
             read(buf, headerLength, messageLength);
             return true;

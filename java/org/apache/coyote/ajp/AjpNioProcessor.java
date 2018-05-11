@@ -90,7 +90,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
         // Setting up the socket
         this.socketWrapper = socket;
-        
+
         long soTimeout = endpoint.getSoTimeout();
         boolean cping = false;
 
@@ -294,7 +294,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
     @Override
     protected void output(byte[] src, int offset, int length)
             throws IOException {
-        
+
         KeyAttachment att =
                 (KeyAttachment) socketWrapper.getSocket().getAttachment();
         if ( att == null ) throw new IOException("Key must be cancelled");
@@ -307,9 +307,9 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         while (written < length) {
             int toWrite = Math.min(length - written, writeBuffer.remaining());
             writeBuffer.put(src, offset + written, toWrite);
-            
+
             writeBuffer.flip();
-    
+
             long writeTimeout = att.getWriteTimeout();
             Selector selector = null;
             try {
@@ -320,7 +320,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             try {
                 thisTime = pool.write(writeBuffer, socketWrapper.getSocket(),
                         selector, writeTimeout, true);
-            } finally { 
+            } finally {
                 writeBuffer.clear();
                 if ( selector != null ) pool.put(selector);
             }
@@ -338,7 +338,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         int read = 0;
         int res = 0;
         boolean block = blockFirstRead;
-        
+
         while (read < n) {
             res = readSocket(buf, read + pos, n - read, block);
             if (res > 0) {
@@ -377,7 +377,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
                         selector, att.getTimeout());
             } catch ( EOFException eof ) {
                 nRead = -1;
-            } finally { 
+            } finally {
                 if ( selector != null ) pool.put(selector);
             }
         } else {
@@ -406,7 +406,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
 
         first = false;
         bodyMessage.reset();
-        
+
         readMessage(bodyMessage, true);
 
         // No data received.
@@ -443,7 +443,7 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
         if (bytesRead == 0) {
             return 0;
         }
-        
+
         int messageLength = message.processHeader(true);
         if (messageLength < 0) {
             // Invalid AJP header signature
@@ -458,10 +458,10 @@ public class AjpNioProcessor extends AbstractAjpProcessor<NioChannel> {
             if (messageLength > buf.length) {
                 // Message too long for the buffer
                 // Need to trigger a 400 response
-                throw new IllegalArgumentException(sm.getString(
-                        "ajpprocessor.header.tooLong",
-                        Integer.valueOf(messageLength),
-                        Integer.valueOf(buf.length)));
+                String msg = sm.getString("ajpprocessor.header.tooLong",
+                        Integer.valueOf(messageLength), Integer.valueOf(buf.length));
+                getLog().error(msg);
+                throw new IllegalArgumentException(msg);
             }
             bytesRead += read(buf, headerLength, messageLength, true);
             return bytesRead;

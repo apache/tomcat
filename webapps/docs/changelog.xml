@@ -72,6 +72,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Log an error message if the AJP connector detects the the reverse proxy
+        is sending AJP messages that are too large for the configured
+        <code>packetSize</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.88 (violetagg)" rtext="released 2018-05-11">
   <subsection name="Catalina">

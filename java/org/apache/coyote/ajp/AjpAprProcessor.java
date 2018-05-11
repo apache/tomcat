@@ -286,9 +286,9 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
     protected void output(byte[] src, int offset, int length)
             throws IOException {
         outputBuffer.put(src, offset, length);
-        
+
         long socketRef = socketWrapper.getSocket().longValue();
-        
+
         if (outputBuffer.position() > 0) {
             if ((socketRef != 0) && Socket.sendbb(socketRef, 0, outputBuffer.position()) < 0) {
                 // There are no re-tries so clear the buffer to prevent a
@@ -435,10 +435,11 @@ public class AjpAprProcessor extends AbstractAjpProcessor<Long> {
             if (messageLength > message.getBuffer().length) {
                 // Message too long for the buffer
                 // Need to trigger a 400 response
-                throw new IllegalArgumentException(sm.getString(
-                        "ajpprocessor.header.tooLong",
+                String msg = sm.getString("ajpprocessor.header.tooLong",
                         Integer.valueOf(messageLength),
-                        Integer.valueOf(message.getBuffer().length)));
+                        Integer.valueOf(message.getBuffer().length));
+                getLog().error(msg);
+                throw new IllegalArgumentException(msg);
             }
             read(messageLength);
             inputBuffer.get(message.getBuffer(), headerLength, messageLength);
