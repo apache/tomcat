@@ -844,28 +844,26 @@ public class HttpParser {
 
 
     private enum DomainParseState {
-        NEW(       true, false, false,  AllowsEnd.NEVER,  AllowsEnd.NEVER, " at the start of"),
-        ALL_ALPHA( true,  true,  true, AllowsEnd.ALWAYS, AllowsEnd.ALWAYS, " after a letter in"),
-        ALPHA(     true,  true,  true,  AllowsEnd.FIRST,  AllowsEnd.FIRST, " after a letter in"),
-        NUMERIC(   true,  true,  true,  AllowsEnd.FIRST,  AllowsEnd.FIRST, " after a number in"),
-        PERIOD(    true, false, false,  AllowsEnd.NEVER,  AllowsEnd.NEVER, " after a period in"),
-        HYPHEN(    true,  true, false,  AllowsEnd.NEVER,  AllowsEnd.NEVER, " after a hypen in"),
-        COLON(    false, false, false,  AllowsEnd.NEVER,  AllowsEnd.NEVER, " after a colon in"),
-        END(      false, false, false,  AllowsEnd.NEVER,  AllowsEnd.NEVER, " at the end of");
+        NEW(       true, false, false,  AllowsEnd.NEVER, " at the start of"),
+        ALL_ALPHA( true,  true,  true, AllowsEnd.ALWAYS, " after a letter in"),
+        ALPHA(     true,  true,  true,  AllowsEnd.FIRST, " after a letter in"),
+        NUMERIC(   true,  true,  true,  AllowsEnd.FIRST, " after a number in"),
+        PERIOD(    true, false, false,  AllowsEnd.NEVER, " after a period in"),
+        HYPHEN(    true,  true, false,  AllowsEnd.NEVER, " after a hypen in"),
+        COLON(    false, false, false,  AllowsEnd.NEVER, " after a colon in"),
+        END(      false, false, false,  AllowsEnd.NEVER, " at the end of");
 
         private final boolean mayContinue;
         private final boolean allowsHyphen;
         private final boolean allowsPeriod;
-        private final AllowsEnd allowsColon;
         private final AllowsEnd allowsEnd;
         private final String errorLocation;
 
         private DomainParseState(boolean mayContinue, boolean allowsHyphen, boolean allowsPeriod,
-                AllowsEnd allowsColon, AllowsEnd allowsEnd, String errorLocation) {
+                AllowsEnd allowsEnd, String errorLocation) {
             this.mayContinue = mayContinue;
             this.allowsHyphen = allowsHyphen;
             this.allowsPeriod = allowsPeriod;
-            this.allowsColon = allowsColon;
             this.allowsEnd = allowsEnd;
             this.errorLocation = errorLocation;
         }
@@ -891,8 +889,8 @@ public class HttpParser {
                             Character.toString((char) c), errorLocation));
                 }
             } else if (c == ':') {
-                if (allowsColon == AllowsEnd.ALWAYS ||
-                        allowsColon == AllowsEnd.FIRST && segmentIndex == 0) {
+                if (allowsEnd == AllowsEnd.ALWAYS ||
+                        allowsEnd == AllowsEnd.FIRST && segmentIndex == 0) {
                     return COLON;
                 } else {
                     throw new IllegalArgumentException(sm.getString("http.invalidCharacterDomain",

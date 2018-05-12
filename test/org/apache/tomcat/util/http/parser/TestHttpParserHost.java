@@ -91,6 +91,7 @@ public class TestHttpParserHost {
         result.add(new Object[] { TestType.IPv4, "123", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv4, "123:8080", Integer.valueOf(3), null} );
         result.add(new Object[] { TestType.IPv4, "myapp-t.mydomain.com", Integer.valueOf(-1), null} );
+        result.add(new Object[] { TestType.IPv4, "myapp-t.my-domain.com", Integer.valueOf(-1), null} );
         // Domain Name - invalid
         result.add(new Object[] { TestType.IPv4, ".", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, ".:8080", Integer.valueOf(-1), IAE} );
@@ -202,6 +203,7 @@ public class TestHttpParserHost {
 
             }
         } catch (Exception e) {
+            e.printStackTrace();
             exceptionClass = e.getClass();
         }
         Assert.assertEquals(input, expectedResult.intValue(), result);
