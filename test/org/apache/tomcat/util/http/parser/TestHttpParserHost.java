@@ -112,6 +112,7 @@ public class TestHttpParserHost {
         result.add(new Object[] { TestType.IPv4, "0.0.0.0com", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "foo.bar.0com", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "foo.bar.0com:8080", Integer.valueOf(-1), IAE} );
+        result.add(new Object[] { TestType.IPv4, "myapp-t.my-domain.c-om", Integer.valueOf(-1), IAE} );
         // IPv6 - valid
         result.add(new Object[] { TestType.IPv6, "[::1]", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv6, "[::1]:8080", Integer.valueOf(5), null} );
@@ -203,7 +204,6 @@ public class TestHttpParserHost {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
             exceptionClass = e.getClass();
         }
         Assert.assertEquals(input, expectedResult.intValue(), result);

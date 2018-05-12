@@ -901,8 +901,14 @@ public class HttpParser {
                         allowsEnd == AllowsEnd.FIRST && segmentIndex == 0) {
                     return END;
                 } else {
-                    throw new IllegalArgumentException(sm.getString("http.invalidCharacterDomain",
-                            Character.toString((char) c), errorLocation));
+                    String msg;
+                    if (allowsEnd == AllowsEnd.NEVER) {
+                        msg = sm.getString("http.invalidSegmentEndState", this.name());
+                    } else {
+                        // allowsEnd == AllowsEnd.FIRST && segmentIndex > 0
+                        msg = sm.getString("http.invalidEndState", this.name());
+                    }
+                    throw new IllegalArgumentException(msg);
                 }
             } else if (c == '-') {
                 if (allowsHyphen) {
