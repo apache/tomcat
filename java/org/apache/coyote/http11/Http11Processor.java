@@ -73,8 +73,6 @@ public class Http11Processor extends AbstractProcessor {
     private static final StringManager sm = StringManager.getManager(Http11Processor.class);
 
 
-    private final UserDataHelper userDataHelper;
-
     /**
      * Input.
      */
@@ -231,7 +229,6 @@ public class Http11Processor extends AbstractProcessor {
             String relaxedPathChars, String relaxedQueryChars) {
 
         super(endpoint);
-        userDataHelper = new UserDataHelper(log);
 
         httpParser = new HttpParser(relaxedPathChars, relaxedQueryChars);
 
