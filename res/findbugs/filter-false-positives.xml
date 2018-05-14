@@ -1007,6 +1007,20 @@
     <Bug pattern="VO_VOLATILE_INCREMENT" />
   </Match>
   <Match>
+    <!-- Fields do not need to be sync'd for toString() -->
+    <Class name="org.apache.tomcat.dbcp.pool2.impl.SoftReferenceObjectPool" />
+    <Or>
+      <Field name="createCount"/>
+      <Field name="numActive"/>
+    </Or>
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
+  </Match>
+  <Match>
+    <!-- Public API is a design decision of Commons -->
+    <Class name="org.apache.tomcat.dbcp.pool2.impl.SoftReferenceObjectPool" />
+    <Bug pattern="PS_PUBLIC_SEMAPHORES" />
+  </Match>
+  <Match>
     <!-- Return value is ignored but a null result will trigger an exception -->
     <Class name="org.apache.tomcat.jdbc.pool.ConnectionPool$ConnectionFuture" />
     <Method name="get" />
@@ -1064,6 +1078,12 @@
       <Method name="prepare" />
     </Or>
     <Bug code="VO" />
+  </Match>
+  <Match>
+    <!-- Fields are used by native code. Tomcat doesn't use them but they are
+         part of the public API. -->
+    <Class name="org.apache.tomcat.jni.Sockaddr" />
+    <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD" />
   </Match>
   <Match>
     <Class name="org.apache.tomcat.util.IntrospectionUtils" />
