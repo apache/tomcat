@@ -109,6 +109,9 @@
         Relax Host validation by removing the requirement that the final
         component of a FQDN must be alphabetic. (markt)
       </fix>
+      <fix>
+        <bug>62371</bug>: Improve logging of Host validation failures. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

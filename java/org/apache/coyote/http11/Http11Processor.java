@@ -73,8 +73,6 @@ public class Http11Processor extends AbstractProcessor {
 
     private final AbstractHttp11Protocol<?> protocol;
 
-    private final UserDataHelper userDataHelper;
-
     /**
      * Input.
      */
@@ -150,8 +148,6 @@ public class Http11Processor extends AbstractProcessor {
     public Http11Processor(AbstractHttp11Protocol<?> protocol, Adapter adapter) {
         super(adapter);
         this.protocol = protocol;
-
-        userDataHelper = new UserDataHelper(log);
 
         httpParser = new HttpParser(protocol.getRelaxedPathChars(),
                 protocol.getRelaxedQueryChars());
