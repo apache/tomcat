@@ -124,6 +124,10 @@
         <code>catalina.policy</code> file. This is a follow-up to the fix for
         <bug>43925</bug>. (kkolinko/markt)
       </fix>
+      <fix>
+        Enable JspC from Tomcat 9 to work with Maven JspC compiler plug-ins
+        written for Tomcat 8.5.x. Patch provided by Pavel Cibulka. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

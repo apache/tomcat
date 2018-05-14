@@ -459,6 +459,17 @@ public class JspC extends Task implements Options {
         this.trimSpaces = TrimSpacesOption.valueOf(ts);
     }
 
+    /*
+     * Backwards compatibility with 8.5.x
+     */
+    public void setTrimSpaces(boolean trimSpaces) {
+        if (trimSpaces) {
+            setTrimSpaces(TrimSpacesOption.TRUE);
+        } else {
+            setTrimSpaces(TrimSpacesOption.FALSE);
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
