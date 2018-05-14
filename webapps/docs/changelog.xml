@@ -105,6 +105,10 @@
         is sending AJP messages that are too large for the configured
         <code>packetSize</code>. (markt)
       </fix>
+      <fix>
+        Relax Host validation by removing the requirement that the final
+        component of a FQDN must be alphabetic. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
