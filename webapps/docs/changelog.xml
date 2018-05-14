@@ -79,6 +79,9 @@
         is sending AJP messages that are too large for the configured
         <code>packetSize</code>. (markt)
       </fix>
+      <fix>
+        <bug>62371</bug>: Improve logging of Host validation failures. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>

@@ -25,6 +25,7 @@ import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.parser.Host;
+import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.net.AbstractEndpoint;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.SocketStatus;
@@ -56,6 +57,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
      */
     private ErrorState errorState = ErrorState.NONE;
 
+    protected final UserDataHelper userDataHelper;
 
     /**
      * Intended for use by the Upgrade sub-classes that have no need to
@@ -63,6 +65,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
      */
     protected AbstractProcessor() {
         // NOOP
+        userDataHelper = null;
     }
 
     public AbstractProcessor(AbstractEndpoint<S> endpoint) {
@@ -72,6 +75,7 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
         response = new Response();
         response.setHook(this);
         request.setResponse(response);
+        userDataHelper = new UserDataHelper(getLog());
     }
 
 
@@ -240,8 +244,23 @@ public abstract class AbstractProcessor<S> implements ActionHook, Processor<S> {
 
         } catch (IllegalArgumentException e) {
             // IllegalArgumentException indicates that the host name is invalid
+            UserDataHelper.Mode logMode = userDataHelper.getNextMode();
+            if (logMode != null) {
+                String message = sm.getString("abstractProcessor.hostInvalid", valueMB.toString());
+                switch (logMode) {
+                    case INFO_THEN_DEBUG:
+                        message += sm.getString("abstractProcessor.fallToDebug");
+                        //$FALL-THROUGH$
+                    case INFO:
+                        getLog().info(message, e);
+                        break;
+                    case DEBUG:
+                        getLog().debug(message, e);
+                }
+            }
+
             response.setStatus(400);
-            setErrorState(ErrorState.CLOSE_CLEAN, null);
+            setErrorState(ErrorState.CLOSE_CLEAN, e);
         }
     }
 
