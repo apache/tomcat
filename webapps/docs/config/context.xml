@@ -811,6 +811,13 @@
         default value of <code>true</code> will be used.</p>
       </attribute>
 
+      <attribute name="skipMemoryLeakChecksOnJvmShutdown" required="false">
+        <p>If <code>true</code>, Tomcat will not perform the usual memory leak
+        checks when the web applicaiton is stopped if that web application is
+        stopped as part of a JVM shutdown. If not specified, the default value
+        of <code>false</code> will be used.</p>
+      </attribute>
+
       <attribute name="unloadDelay" required="false">
         <p>Number of ms that the container will wait for servlets to unload.
         If not specified, the default value is <code>2000</code> ms.</p>

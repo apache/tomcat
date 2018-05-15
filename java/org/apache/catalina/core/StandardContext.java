@@ -743,6 +743,12 @@ public class StandardContext extends ContainerBase
     private boolean clearReferencesObjectStreamClassCaches = true;
 
     /**
+     * Should Tomcat skip the memory leak checks when the web application is
+     * stopped as part of the process of shutting down the JVM?
+     */
+    private boolean skipMemoryLeakChecksOnJvmShutdown = false;
+
+    /**
      * Should the effective web.xml be logged when the context starts?
      */
     private boolean logEffectiveWebXml = false;
@@ -2688,6 +2694,16 @@ public class StandardContext extends ContainerBase
         support.firePropertyChange("clearReferencesObjectStreamClassCaches",
                 oldClearReferencesObjectStreamClassCaches,
                 this.clearReferencesObjectStreamClassCaches);
+    }
+
+
+    public boolean getSkipMemoryLeakChecksOnJvmShutdown() {
+        return skipMemoryLeakChecksOnJvmShutdown;
+    }
+
+
+    public void setSkipMemoryLeakChecksOnJvmShutdown(boolean skipMemoryLeakChecksOnJvmShutdown) {
+        this.skipMemoryLeakChecksOnJvmShutdown = skipMemoryLeakChecksOnJvmShutdown;
     }
 
 
@@ -4951,6 +4967,8 @@ public class StandardContext extends ContainerBase
                         getClearReferencesHttpClientKeepAliveThread());
                 setClassLoaderProperty("clearReferencesObjectStreamClassCaches",
                         getClearReferencesObjectStreamClassCaches());
+                setClassLoaderProperty("skipMemoryLeakChecksOnJvmShutdown",
+                        getSkipMemoryLeakChecksOnJvmShutdown());
 
                 // By calling unbindThread and bindThread in a row, we setup the
                 // current Thread CCL to be the webapp classloader

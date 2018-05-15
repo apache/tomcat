@@ -368,6 +368,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     private boolean clearReferencesObjectStreamClassCaches = true;
 
     /**
+     * Should Tomcat skip the memory leak checks when the web application is
+     * stopped as part of the process of shutting down the JVM?
+     */
+    private boolean skipMemoryLeakChecksOnJvmShutdown = false;
+
+    /**
      * Holds the class file transformers decorating this class loader. The
      * CopyOnWriteArrayList is thread safe. It is expensive on writes, but
      * those should be rare. It is very fast on reads, since synchronization
@@ -610,6 +616,16 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     public void setClearReferencesObjectStreamClassCaches(
             boolean clearReferencesObjectStreamClassCaches) {
         this.clearReferencesObjectStreamClassCaches = clearReferencesObjectStreamClassCaches;
+    }
+
+
+    public boolean getSkipMemoryLeakChecksOnJvmShutdown() {
+        return skipMemoryLeakChecksOnJvmShutdown;
+    }
+
+
+    public void setSkipMemoryLeakChecksOnJvmShutdown(boolean skipMemoryLeakChecksOnJvmShutdown) {
+        this.skipMemoryLeakChecksOnJvmShutdown = skipMemoryLeakChecksOnJvmShutdown;
     }
 
 
@@ -1523,6 +1539,21 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      * Clear references.
      */
     protected void clearReferences() {
+
+        // If the JVM is shutting down, skip the memory leak checks
+        if (skipMemoryLeakChecksOnJvmShutdown
+            && !resources.getContext().getParent().getState().isAvailable()) {
+            // During reloading / redeployment the parent is expected to be
+            // available. Parent is not available so this might be a JVM
+            // shutdown.
+            try {
+                Thread dummyHook = new Thread();
+                Runtime.getRuntime().addShutdownHook(dummyHook);
+                Runtime.getRuntime().removeShutdownHook(dummyHook);
+            } catch (IllegalStateException ise) {
+                return;
+            }
+        }
 
         // De-register any remaining JDBC drivers
         clearReferencesJdbc();
