@@ -1173,6 +1173,12 @@
     <Bug code="ES" />
   </Match>
   <Match>
+    <!-- Write to static field is intentional -->
+    <Class name="org.apache.tomcat.util.digester.Digester"/>
+    <Method name="&lt;init&gt;"/>
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
+  </Match>
+  <Match>
     <!-- Fall-through expected -->
     <Class name="org.apache.tomcat.util.http.LegacyCookieProcessor" />
     <Method name="processCookieHeader"/>
@@ -1316,6 +1322,15 @@
     <Class name="org.apache.tomcat.util.net.SecureNio2Channel" />
     <Method name="processSNI"/>
     <Bug code="SF" />
+  </Match>
+  <Match>
+    <!-- Array elements are not modified after assignment -->
+    <Class name="org.apache.tomcat.util.net.openssl.OpenSSLEngine" />
+    <Or>
+      <Field name="peerCerts"/>
+      <Field name="x509PeerCerts"/>
+    </Or>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
   </Match>
   <Match>
     <!-- No performance issue as there is no DNS resolution -->
