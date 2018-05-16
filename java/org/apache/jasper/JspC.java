@@ -112,6 +112,7 @@ public class JspC extends Task implements Options {
     protected static final String SWITCH_URI_ROOT = "-uriroot";
     protected static final String SWITCH_FILE_WEBAPP = "-webapp";
     protected static final String SWITCH_WEBAPP_INC = "-webinc";
+    protected static final String SWITCH_WEBAPP_FRG = "-webfrg";
     protected static final String SWITCH_WEBAPP_XML = "-webxml";
     protected static final String SWITCH_WEBAPP_XML_ENCODING = "-webxmlencoding";
     protected static final String SWITCH_ADD_WEBAPP_XML_MAPPINGS = "-addwebxmlmappings";
@@ -133,6 +134,7 @@ public class JspC extends Task implements Options {
     protected static final String SHOW_SUCCESS ="-s";
     protected static final String LIST_ERRORS = "-l";
     protected static final int INC_WEBXML = 10;
+    protected static final int FRG_WEBXML = 15;
     protected static final int ALL_WEBXML = 20;
     protected static final int DEFAULT_DIE_LEVEL = 1;
     protected static final int NO_DIE_LEVEL = 0;
@@ -940,10 +942,33 @@ public class JspC extends Task implements Options {
 
     /**
      * File where we generate a web.xml fragment with the class definitions.
+     * @deprecated Will be removed in Tomcat 10.
+     *             Use {@link #setWebXmlInclude(String)}
      */
+    @Deprecated
     public void setWebXmlFragment( String s ) {
         webxmlFile=resolveFile(s).getAbsolutePath();
         webxmlLevel=INC_WEBXML;
+    }
+
+    /**
+     * File where we generate configuration with the class definitions to be
+     * included in a web.xml file.
+     * @param s New value
+     */
+    public void setWebXmlInclude( String s ) {
+        webxmlFile=resolveFile(s).getAbsolutePath();
+        webxmlLevel=INC_WEBXML;
+    }
+
+    /**
+     * File where we generate a complete web-fragment.xml with the class
+     * definitions.
+     * @param s New value
+     */
+    public void setWebFragmentXml( String s ) {
+        webxmlFile=resolveFile(s).getAbsolutePath();
+        webxmlLevel=FRG_WEBXML;
     }
 
     /**
@@ -1482,6 +1507,9 @@ public class JspC extends Task implements Options {
             if (webxmlLevel >= ALL_WEBXML) {
                 mapout.write(Localizer.getMessage("jspc.webxml.header"));
                 mapout.flush();
+            } else if (webxmlLevel >= FRG_WEBXML) {
+                    mapout.write(Localizer.getMessage("jspc.webfrg.header", webxmlEncoding));
+                    mapout.flush();
             } else if ((webxmlLevel>= INC_WEBXML) && !addWebXmlMappings) {
                 mapout.write(Localizer.getMessage("jspc.webinc.header"));
                 mapout.flush();
@@ -1500,6 +1528,8 @@ public class JspC extends Task implements Options {
                 mappingout.writeTo(mapout);
                 if (webxmlLevel >= ALL_WEBXML) {
                     mapout.write(Localizer.getMessage("jspc.webxml.footer"));
+                } else if (webxmlLevel >= FRG_WEBXML) {
+                        mapout.write(Localizer.getMessage("jspc.webfrg.footer"));
                 } else if ((webxmlLevel >= INC_WEBXML) && !addWebXmlMappings) {
                     mapout.write(Localizer.getMessage("jspc.webinc.footer"));
                 }
