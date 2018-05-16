@@ -296,7 +296,7 @@ download) to precompile a webapp:
     <jasper
              validateXml="false"
              uriroot="${webapp.path}"
-             webXmlFragment="${webapp.path}/WEB-INF/generated_web.xml"
+             webXmlInclude="${webapp.path}/WEB-INF/generated_web.xml"
              outputDir="${webapp.path}/WEB-INF/src" />
 
   </target>

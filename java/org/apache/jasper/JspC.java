@@ -341,6 +341,11 @@ public class JspC extends Task implements Options {
                 if (webxmlFile != null) {
                     webxmlLevel = INC_WEBXML;
                 }
+            } else if (tok.equals(SWITCH_WEBAPP_FRG)) {
+                webxmlFile = nextArg();
+                if (webxmlFile != null) {
+                    webxmlLevel = FRG_WEBXML;
+                }
             } else if (tok.equals(SWITCH_WEBAPP_XML)) {
                 webxmlFile = nextArg();
                 if (webxmlFile != null) {
