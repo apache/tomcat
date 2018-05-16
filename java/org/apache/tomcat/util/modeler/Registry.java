@@ -91,7 +91,8 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * The <code>MBeanServer</code> instance that we will use to register
      * management beans.
      */
-    private MBeanServer server = null;
+    private volatile MBeanServer server = null;
+    private final Object serverLock = new Object();
 
     /**
      * The set of ManagedBean instances for the beans this registry
@@ -367,7 +368,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         String type=null;
         MBeanInfo info=null;
         try {
-            info=server.getMBeanInfo(oname);
+            info = getMBeanServer().getMBeanInfo(oname);
         } catch (Exception e) {
             log.info( "Can't find metadata for object" + oname );
             return null;
@@ -394,7 +395,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     {
         MBeanInfo info=null;
         try {
-            info=server.getMBeanInfo(oname);
+            info = getMBeanServer().getMBeanInfo(oname);
         } catch (Exception e) {
             log.info( "Can't find metadata " + oname );
             return null;
@@ -429,18 +430,22 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
      * <code>MBeanServer</code> instance.
      * @return the MBean server
      */
-    public synchronized MBeanServer getMBeanServer() {
+    public MBeanServer getMBeanServer() {
         if (server == null) {
-            long t1 = System.currentTimeMillis();
-            if (MBeanServerFactory.findMBeanServer(null).size() > 0) {
-                server = MBeanServerFactory.findMBeanServer(null).get(0);
-                if (log.isDebugEnabled()) {
-                    log.debug("Using existing MBeanServer " + (System.currentTimeMillis() - t1));
-                }
-            } else {
-                server = ManagementFactory.getPlatformMBeanServer();
-                if (log.isDebugEnabled()) {
-                    log.debug("Creating MBeanServer" + (System.currentTimeMillis() - t1));
+            synchronized (serverLock) {
+                if (server == null) {
+                    long t1 = System.currentTimeMillis();
+                    if (MBeanServerFactory.findMBeanServer(null).size() > 0) {
+                        server = MBeanServerFactory.findMBeanServer(null).get(0);
+                        if (log.isDebugEnabled()) {
+                            log.debug("Using existing MBeanServer " + (System.currentTimeMillis() - t1));
+                        }
+                    } else {
+                        server = ManagementFactory.getPlatformMBeanServer();
+                        if (log.isDebugEnabled()) {
+                            log.debug("Creating MBeanServer" + (System.currentTimeMillis() - t1));
+                        }
+                    }
                 }
             }
         }
@@ -719,10 +724,10 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
     // -------------------- Registration  --------------------
 
     @Override
-    public ObjectName preRegister(MBeanServer server,
-                                  ObjectName name) throws Exception
-    {
-        this.server=server;
+    public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
+        synchronized (serverLock) {
+            this.server = server;
+        }
         return name;
     }
 
