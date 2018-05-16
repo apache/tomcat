@@ -123,6 +123,10 @@
   </subsection>
   <subsection name="Jasper">
     <changelog>
+      <add>
+        <bug>50234</bug>: Add the capability to generate a web-fragment.xml file
+        to JspC. (markt)
+      </add>
       <fix>
         <bug>62350</bug>: Refactor
         <code>org.apache.jasper.runtime.BodyContentImpl</code> so a
