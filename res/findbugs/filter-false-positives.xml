@@ -280,6 +280,12 @@
     <Pattern code="VO_VOLATILE_INCREMENT" />
   </Match>
   <Match>
+    <!-- Thread never executed so empty run method not an issue -->
+    <Class name="org.apache.catalina.loader.WebappClassLoaderBase" />
+    <Method name="clearReferences" />
+    <Bug pattern="DM_USELESS_THREAD" />
+  </Match>
+  <Match>
     <!-- Field is only modified during Servlet load -->
     <Class name="org.apache.catalina.manager.host.HostManagerServlet" />
     <Or>
