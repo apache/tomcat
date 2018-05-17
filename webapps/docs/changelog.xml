@@ -123,6 +123,10 @@
       <fix>
         <bug>62371</bug>: Improve logging of Host validation failures. (markt)
       </fix>
+      <fix>
+        Fix a couple of unlikely edge cases in the shutting down of the
+        APR/native connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -1092,6 +1092,11 @@
     <Bug pattern="UUF_UNUSED_PUBLIC_OR_PROTECTED_FIELD" />
   </Match>
   <Match>
+    <!-- Field is populated by JNI code -->
+    <Class name="org.apache.tomcat.jni.Sockaddr" />
+    <Bug pattern="UWF_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD"/>
+  </Match>
+  <Match>
     <Class name="org.apache.tomcat.util.IntrospectionUtils" />
     <Method name="findMethod"/>
     <Bug code="NP" />
@@ -1245,19 +1250,20 @@
     <Bug code="MF" />
   </Match>
   <Match>
-    <!-- JSSE vs APR attribute names. More confusing to change one of them -->
-    <Class name="org.apache.tomcat.util.net.AprEndpoint"/>
-    <Or>
-      <Method name="getSSLProtocol"/>
-      <Method name="setSSLProtocol"/>
-    </Or>
-    <Bug code="Nm"/>
-  </Match>
-  <Match>
     <!-- See wait() call in destroy() -->
     <Class name="org.apache.tomcat.util.net.AprEndpoint$Poller"/>
     <Method name="run"/>
     <Bug code="NN" />
+  </Match>
+  <Match>
+    <!-- There is only a single wait in run() when the poller is idle -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint$Poller"/>
+    <Or>
+      <Method name="add"/>
+      <Method name="close"/>
+      <Method name="stop"/>
+    </Or>
+    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
   </Match>
   <Match>
     <Class name="org.apache.tomcat.util.net.AprEndpoint$Sendfile"/>
@@ -1268,6 +1274,15 @@
       <!-- notify() is called from add() -->
       <Bug code="UW" />
     </Or>
+  </Match>
+  <Match>
+    <!-- There is only a single wait in run() when the poller is idle -->
+    <Class name="org.apache.tomcat.util.net.AprEndpoint$Sendfile"/>
+    <Or>
+      <Method name="add"/>
+      <Method name="stop"/>
+    </Or>
+    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
   </Match>
   <Match>
     <!-- Sync is there to protect referenced object not field -->

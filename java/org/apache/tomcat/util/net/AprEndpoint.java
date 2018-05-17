@@ -682,20 +682,13 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             // Start poller thread
             poller = new Poller();
             poller.init();
-            Thread pollerThread = new Thread(poller, getName() + "-Poller");
-            pollerThread.setPriority(threadPriority);
-            pollerThread.setDaemon(true);
-            pollerThread.start();
+            poller.start();
 
             // Start sendfile thread
             if (getUseSendfile()) {
                 sendfile = new Sendfile();
                 sendfile.init();
-                Thread sendfileThread =
-                        new Thread(sendfile, getName() + "-Sendfile");
-                sendfileThread.setPriority(threadPriority);
-                sendfileThread.setDaemon(true);
-                sendfileThread.start();
+                sendfile.start();
             }
 
             startAcceptorThreads();
@@ -753,6 +746,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             connections.clear();
             if (getUseSendfile()) {
                 try {
+                    sendfile.stop();
                     sendfile.destroy();
                 } catch (Exception e) {
                     // Ignore
@@ -1278,7 +1272,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         private AtomicInteger connectionCount = new AtomicInteger(0);
         public int getConnectionCount() { return connectionCount.get(); }
 
-
+        private volatile Thread pollerThread;
         private volatile boolean pollerRunning = true;
 
         /**
@@ -1348,12 +1342,22 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         }
 
 
+        protected void start() {
+            pollerThread = new Thread(poller, getName() + "-Poller");
+            pollerThread.setPriority(threadPriority);
+            pollerThread.setDaemon(true);
+            pollerThread.start();
+        }
+
+
         /*
          * This method is synchronized so that it is not possible for a socket
          * to be added to the Poller's addList once this method has completed.
          */
         protected synchronized void stop() {
             pollerRunning = false;
+            // In case the poller thread is in the idle wait
+            this.notify();
         }
 
 
@@ -1361,14 +1365,20 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
          * Destroy the poller.
          */
         protected synchronized void destroy() {
-            // Wait for pollerTime before doing anything, so that the poller
-            // threads exit, otherwise parallel destruction of sockets which are
-            // still in the poller can cause problems
-            try {
-                this.notify();
-                this.wait(pollerCount * pollTime / 1000);
-            } catch (InterruptedException e) {
-                // Ignore
+            // Wait for the poller thread to exit, otherwise parallel
+            // destruction of sockets which are still in the poller can cause
+            // problems.
+            int loops = pollerCount * 50;
+            while (loops > 0 && pollerThread.isAlive()) {
+                try {
+                    this.wait(pollTime / 1000);
+                } catch (InterruptedException e) {
+                    // Ignore
+                }
+                loops--;
+            }
+            if (pollerThread.isAlive()) {
+                log.warn(sm.getString("endpoint.pollerThreadStop"));
             }
             // Close all sockets in the close queue
             SocketInfo info = closeList.get();
@@ -1441,6 +1451,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 // Add socket to the list. Newly added sockets will wait
                 // at most for pollTime before being polled.
                 if (addList.add(socket, timeout, flags)) {
+                    // In case the poller thread is in the idle wait
                     this.notify();
                 }
             }
@@ -1474,6 +1485,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
          */
         private synchronized void close(long socket) {
             closeList.add(socket, 0, 0);
+            // In case the poller thread is in the idle wait
             this.notify();
         }
 
@@ -1578,7 +1590,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                             // with no processing since the notify() call in
                             // add()/close() would have no effect since it
                             // happened before this sync block was entered
-                            if (addList.size() < 1 && closeList.size() < 1) {
+                            if (pollerRunning && addList.size() < 1 && closeList.size() < 1) {
                                 this.wait(10000);
                             }
                         }
@@ -1921,6 +1933,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
         protected ArrayList<SendfileData> addS;
 
+        private volatile Thread sendfileThread;
         private volatile boolean sendfileRunning = true;
 
         /**
@@ -1948,22 +1961,40 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             addS = new ArrayList<>();
         }
 
+        protected void start() {
+            sendfileThread = new Thread(sendfile, getName() + "-Sendfile");
+            sendfileThread.setPriority(threadPriority);
+            sendfileThread.setDaemon(true);
+            sendfileThread.start();
+        }
+
+        protected void stop() {
+            sendfileRunning = false;
+
+            // Wait for the sendfile thread to exit, otherwise parallel
+            // destruction of sockets which are still in the poller can cause
+            // problems.
+            int loops = 50;
+            while (loops > 0 && sendfileThread.isAlive()) {
+                try {
+                    this.wait(pollTime / 1000);
+                } catch (InterruptedException e) {
+                    // Ignore
+                }
+                loops--;
+            }
+            if (sendfileThread.isAlive()) {
+                log.warn(sm.getString("endpoint.sendfileThreadStop"));
+            }
+
+            // In case the sendfile thread is in the idle wait
+            this.notify();
+        }
+
         /**
          * Destroy the poller.
          */
         protected void destroy() {
-            sendfileRunning = false;
-            // Wait for polltime before doing anything, so that the poller threads
-            // exit, otherwise parallel destruction of sockets which are still
-            // in the poller can cause problems
-            try {
-                synchronized (this) {
-                    this.notify();
-                    this.wait(pollTime / 1000);
-                }
-            } catch (InterruptedException e) {
-                // Ignore
-            }
             // Close any socket remaining in the add queue
             for (int i = (addS.size() - 1); i >= 0; i--) {
                 SendfileData data = addS.get(i);
