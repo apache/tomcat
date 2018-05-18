@@ -1328,6 +1328,24 @@
     <Bug code="ML"/>
   </Match>
   <Match>
+    <!-- Single condition so no need for wait to be in loop -->
+    <Class name="org.apache.tomcat.util.net.Nio2Endpoint$Nio2SocketWrapper"/>
+    <Or>
+      <Method name="read"/>
+      <Method name="write"/>
+    </Or>
+    <Bug pattern="WA_NOT_IN_LOOP" />
+  </Match>
+  <Match>
+    <!-- Single wait so no need for notifyAll() -->
+    <Class name="org.apache.tomcat.util.net.Nio2Endpoint$Nio2SocketWrapper$VectoredIOCompletionHandler"/>
+    <Or>
+      <Method name="completed"/>
+      <Method name="failed"/>
+    </Or>
+    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL " />
+  </Match>
+  <Match>
     <Class name="org.apache.tomcat.util.net.SecureNioChannel"/>
     <Method name="rehandshake"/>
     <Bug code="DE" />
@@ -1380,6 +1398,12 @@
     <Class name="org.apache.tomcat.websocket.server.WsHttpUpgradeHandler" />
     <Method name="upgradeDispatch"/>
     <Bug code="SF" />
+  </Match>
+  <Match>
+    <!-- The array contents is never mutated. -->
+    <Class name="org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer" />
+    <Field name="buffers" />
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
   </Match>
 
   <!-- Example code -->
