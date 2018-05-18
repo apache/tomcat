@@ -74,8 +74,8 @@ public class Cache {
         if (cacheEntry == null) {
             // Local copy to ensure consistency
             int objectMaxSizeBytes = getObjectMaxSizeBytes();
-            CachedResource newCacheEntry =
-                    new CachedResource(this, root, path, getTtl(), objectMaxSizeBytes);
+            CachedResource newCacheEntry = new CachedResource(this, root, path, getTtl(),
+                    objectMaxSizeBytes, useClassLoaderResources);
 
             // Concurrent callers will end up with the same CachedResource
             // instance
@@ -134,8 +134,8 @@ public class Cache {
         if (cacheEntry == null) {
             // Local copy to ensure consistency
             int objectMaxSizeBytes = getObjectMaxSizeBytes();
-            CachedResource newCacheEntry =
-                    new CachedResource(this, root, path, getTtl(), objectMaxSizeBytes);
+            CachedResource newCacheEntry = new CachedResource(this, root, path, getTtl(),
+                    objectMaxSizeBytes, useClassLoaderResources);
 
             // Concurrent callers will end up with the same CachedResource
             // instance

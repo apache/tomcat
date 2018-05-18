@@ -96,6 +96,11 @@
         <bug>62343</bug>: Make CORS filter defaults more secure. This is the fix
         for CVE-2018-8014. (markt)
       </fix>
+      <fix>
+        Ensure that the web application resources implementation does not
+        incorrectly cache results for resources that are only visible as class
+        loader resources. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
