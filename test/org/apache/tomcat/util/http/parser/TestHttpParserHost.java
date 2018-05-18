@@ -123,6 +123,7 @@ public class TestHttpParserHost {
         result.add(new Object[] { TestType.IPv4, "myapp-t.my-domain.com:8080", Integer.valueOf(21), null} );
         result.add(new Object[] { TestType.IPv4, "myapp-t.my-domain.c-om", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv4, "myapp-t.my-domain.c-om:8080", Integer.valueOf(22), null} );
+        result.add(new Object[] { TestType.IPv4, "gateway.demo-ilt-latest-demo:9000", Integer.valueOf(28), null} );
         // Domain Name - invalid
         result.add(new Object[] { TestType.IPv4, ".", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, ".:8080", Integer.valueOf(-1), IAE} );
