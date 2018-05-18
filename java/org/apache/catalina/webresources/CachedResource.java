@@ -41,6 +41,7 @@ public class CachedResource implements WebResource {
     private final String webAppPath;
     private final long ttl;
     private final int objectMaxSizeBytes;
+    private final boolean usesClassLoaderResources;
 
     private volatile WebResource webResource;
     private volatile WebResource[] webResources;
@@ -57,15 +58,27 @@ public class CachedResource implements WebResource {
 
 
     public CachedResource(Cache cache, StandardRoot root, String path, long ttl,
-            int objectMaxSizeBytes) {
+            int objectMaxSizeBytes, boolean usesClassLoaderResources) {
         this.cache = cache;
         this.root = root;
         this.webAppPath = path;
         this.ttl = ttl;
         this.objectMaxSizeBytes = objectMaxSizeBytes;
+        this.usesClassLoaderResources = usesClassLoaderResources;
     }
 
     protected boolean validateResource(boolean useClassLoaderResources) {
+        // It is possible that some resources will only be visible for a given
+        // value of useClassLoaderResources. Therefore, if the lookup is made
+        // with a different value of useClassLoaderResources than was used when
+        // creating the cache entry, invalidate the entry. This should have
+        // minimal performance impact as it would be unusual for a resource to
+        // be looked up both as a static resource and as a class loader
+        // resource.
+        if (usesClassLoaderResources != useClassLoaderResources) {
+            return false;
+        }
+
         long now = System.currentTimeMillis();
 
         if (webResource == null) {
