@@ -101,6 +101,12 @@
         incorrectly cache results for resources that are only visible as class
         loader resources. (markt)
       </fix>
+      <fix>
+        <bug>62387</bug>: Do not log a warning message if the file based
+        persistent session store fails to delete the file for a session when the
+        session is invalidated because the file has not been created yet.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

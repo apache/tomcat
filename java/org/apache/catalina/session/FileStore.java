@@ -265,7 +265,7 @@ public final class FileStore extends StoreBase {
                              id, file.getAbsolutePath()));
         }
 
-        if (!file.delete()) {
+        if (file.exists() && !file.delete()) {
             throw new IOException(sm.getString("fileStore.deleteSessionFailed", file));
         }
     }
