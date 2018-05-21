@@ -1456,6 +1456,12 @@
   <!-- Test code -->
   <Match>
     <!-- Code is deliberately unused -->
+    <Class name="javax.el.TestImportHandler" />
+    <Method name="testImportPackage01_57574"/>
+    <Bug pattern="UC_USELESS_OBJECT"/>
+  </Match>
+  <Match>
+    <!-- Code is deliberately unused -->
     <Or>
       <Class name="javax.servlet.http.TestCookie" />
       <Class name="javax.servlet.http.TestCookieStrict" />
@@ -1472,6 +1478,12 @@
     <Class name="org.apache.catalina.core.TestApplicationSessionCookieConfig$CustomContext" />
     <Method name="getState"/>
     <Bug code="UG" />
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.connector.TestCoyoteAdapter$AsyncServlet"/>
+    <Field name="t"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
   </Match>
   <Match>
     <!-- Return value of latch is intentionally ignored -->
