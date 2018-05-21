@@ -181,6 +181,15 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changlog>
+      <fix>
+        <bug>62395</bug>: Clarify the meaning of the connector attribute
+        <code>minSpareThreads</code> in the documentation web application.
+        (markt)
+      </fix>
+    </changlog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <fix>

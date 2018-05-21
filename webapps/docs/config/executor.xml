@@ -97,7 +97,7 @@
       <p>(int) The max number of active threads in this pool, default is <code>200</code></p>
     </attribute>
     <attribute name="minSpareThreads" required="false">
-      <p>(int) The minimum number of threads always kept alive, default is <code>25</code></p>
+      <p>(int) The minimum number of threads (idle and active) always kept alive, default is <code>25</code></p>
     </attribute>
     <attribute name="maxIdleTime" required="false">
       <p>(int) The number of milliseconds before an idle thread shutsdown, unless the number of active threads are less
