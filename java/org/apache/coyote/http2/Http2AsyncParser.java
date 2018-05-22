@@ -104,9 +104,9 @@ class Http2AsyncParser extends Http2Parser {
         @Override
         public CompletionHandlerCall callHandler(CompletionState state,
                 ByteBuffer[] buffers, int offset, int length) {
-            if (length != 2) {
+            if (offset != 0 || length != 2) {
                 try {
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException(sm.getString("http2Parser.invalidBuffers"));
                 } catch (IllegalArgumentException e) {
                     error = e;
                     return CompletionHandlerCall.DONE;
