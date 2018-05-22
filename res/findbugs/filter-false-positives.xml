@@ -1847,6 +1847,12 @@
     <Bug pattern="ODR_OPEN_DATABASE_RESOURCE" />
   </Match>
   <Match>
+    <!-- Statics used to work around API limitations -->
+    <Class name="org.apache.tomcat.jdbc.test.TestValidationQueryTimeout" />
+    <Field name="isTimeoutSet" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
+  </Match>
+  <Match>
     <Class name="org.apache.tomcat.jdbc.test.TwoDataSources" />
     <Method name="testTwoDataSources" />
     <Or>
@@ -1962,11 +1968,18 @@
       <Method name="testDuplicate01" />
       <Method name="testEgMailingList04" />
       <Method name="testEgMailingList05" />
-      <Method name="testPrefixOneOfTwo" />
-      <Method name="testPrefixTwoOfTwo" />
-      <Method name="testQuote1" />
       <Method name="testQuote2" />
     </Or>
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+  </Match>
+  <Match>
+    <!-- Exception thrown so return value ignored -->
+    <Class name="org.apache.tomcat.websocket.server.TestUriTemplate" />
+    <Or>
+      <Method name="testPrefixOneOfTwo" />
+      <Method name="testPrefixTwoOfTwo" />
+      <Method name="testQuote1" />
+    </Or>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
   </Match>
 </FindBugsFilter>
