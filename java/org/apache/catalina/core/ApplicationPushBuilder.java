@@ -23,6 +23,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -195,7 +196,7 @@ public class ApplicationPushBuilder implements PushBuilder {
 
     @Override
     public PushBuilder method(String method) {
-        String upperMethod = method.trim().toUpperCase();
+        String upperMethod = method.trim().toUpperCase(Locale.ENGLISH);
         if (DISALLOWED_METHODS.contains(upperMethod) || upperMethod.length() == 0) {
             throw new IllegalArgumentException(
                     sm.getString("applicationPushBuilder.methodInvalid", upperMethod));
@@ -370,7 +371,6 @@ public class ApplicationPushBuilder implements PushBuilder {
         coyoteRequest.action(ActionCode.PUSH_REQUEST, pushTarget);
 
         // Reset for next call to this method
-        pushTarget = null;
         path = null;
         headers.remove("if-none-match");
         headers.remove("if-modified-since");
