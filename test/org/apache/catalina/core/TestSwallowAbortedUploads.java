@@ -318,9 +318,9 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        private int status = 200;
+        private final int status;
 
-        public void setStatus(int status) {
+        public AbortedPOSTServlet(int status) {
             this.status = status;
         }
 
@@ -353,10 +353,8 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
 
             Tomcat tomcat = getTomcatInstance();
             context = tomcat.addContext("", TEMP_DIR);
-            AbortedPOSTServlet servlet = new AbortedPOSTServlet();
-            servlet.setStatus(status);
-            Tomcat.addServlet(context, servletName,
-                              servlet);
+            AbortedPOSTServlet servlet = new AbortedPOSTServlet(status);
+            Tomcat.addServlet(context, servletName, servlet);
             context.addServletMappingDecoded(URI, servletName);
             context.setSwallowAbortedUploads(swallow);
 
