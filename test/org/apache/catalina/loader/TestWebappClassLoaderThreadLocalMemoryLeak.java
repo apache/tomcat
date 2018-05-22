@@ -196,8 +196,7 @@ public class TestWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest {
                     "org.apache.tomcat.unittest." + name, classBytes, 0,
                     offset, cl.getClass().getProtectionDomain());
             // Make sure we can create an instance
-            Object obj = lpClass.getConstructor().newInstance();
-            obj.toString();
+            lpClass.getConstructor().newInstance();
         }
     }
 }
