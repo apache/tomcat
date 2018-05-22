@@ -31,7 +31,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -74,8 +73,7 @@ public class TestTomcat extends TomcatBaseTest {
         @Override
         public void doGet(HttpServletRequest req, HttpServletResponse res)
                 throws IOException {
-            HttpSession s = req.getSession(true);
-            s.getId();
+            req.getSession(true);
             res.getWriter().write("Hello world");
         }
     }
