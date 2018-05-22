@@ -1711,10 +1711,46 @@
     <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME"/>
   </Match>
   <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.coyote.http11.filters.TestChunkedInputFilter$BodyReadServlet"/>
+    <Or>
+      <Field name="countRead"/>
+      <Field name="exceptionDuringRead"/>
+    </Or>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.coyote.http11.filters.TestChunkedInputFilter$EchoHeaderServlet"/>
+    <Field name="exceptionDuringRead"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.coyote.http11.TestHttp11Processor"/>
+    <Field name="bug55772IsSecondRequest"/>
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
     <!-- Result is negated to compare result when order is reversed -->
     <Class name="org.apache.el.TestELEvaluation" />
     <Method name="compareBoth" />
     <Bug pattern="RV_NEGATING_RESULT_OF_COMPARETO" />
+  </Match>
+  <Match>
+    <!-- Performance test so results ignored -->
+    <Class name="org.apache.jasper.compiler.TesterValidator" />
+    <Method name="doTestBug53867" />
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
+  </Match>
+  <Match>
+    <!-- Test is single threaded. Syncs not required. -->
+    <Class name="org.apache.jasper.util.FastRemovalDequeue" />
+    <Or>
+      <Field name="first" />
+      <Field name="last" />
+    </Or>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
   </Match>
   <Match>
     <!-- Use of statics is unavoidable in all cases -->
