@@ -35,7 +35,7 @@ import org.apache.tomcat.jdbc.pool.interceptor.QueryTimeoutInterceptor;
 
 public class TestValidationQueryTimeout extends DefaultTestCase {
 
-    private static int TIMEOUT = 10;
+    private static final int TIMEOUT = 10;
     private static boolean isTimeoutSet;
     private static final String longQuery = "select * from test as A, test as B, test as C, test as D, test as E";
 
@@ -54,7 +54,6 @@ public class TestValidationQueryTimeout extends DefaultTestCase {
         this.datasource.setValidationQuery("SELECT 1");
         this.datasource.setValidationQueryTimeout(TIMEOUT);
 
-        TIMEOUT = 10;
         isTimeoutSet = false;
     }
 
@@ -93,9 +92,6 @@ public class TestValidationQueryTimeout extends DefaultTestCase {
         Connection con = this.datasource.getConnection();
         Assert.assertTrue(isTimeoutSet);
 
-        // increase the expected timeout to 30, which is what we set for the interceptor
-        TIMEOUT = 30;
-
         // now create a statement, make sure the query timeout is set by the interceptor
         Statement st = con.createStatement();
         Assert.assertEquals(interceptorTimeout, st.getQueryTimeout());
@@ -109,7 +105,6 @@ public class TestValidationQueryTimeout extends DefaultTestCase {
         con.close();
 
         // pull another connection and check it
-        TIMEOUT = 10;
         isTimeoutSet = false;
         Connection con2 = this.datasource.getConnection();
         Assert.assertTrue(isTimeoutSet);
