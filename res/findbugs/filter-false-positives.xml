@@ -1475,11 +1475,6 @@
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
   <Match>
-    <Class name="org.apache.catalina.core.TestApplicationSessionCookieConfig$CustomContext" />
-    <Method name="getState"/>
-    <Bug code="UG" />
-  </Match>
-  <Match>
     <!-- Deliberate hack for the purposes of the test -->
     <Class name="org.apache.catalina.connector.TestCoyoteAdapter$AsyncServlet"/>
     <Field name="t"/>
@@ -1490,6 +1485,76 @@
     <Class name="org.apache.catalina.connector.TestSendFile"/>
     <Method name="testBug60409"/>
     <Bug pattern="RV_RETURN_VALUE_IGNORED"/>
+  </Match>
+  <Match>
+    <Class name="org.apache.catalina.core.TestApplicationSessionCookieConfig$CustomContext" />
+    <Method name="getState"/>
+    <Bug code="UG" />
+  </Match>
+  <Match>
+    <!-- Dead store is deliberate -->
+    <Or>
+      <Class name="org.apache.catalina.core.TestAsyncContextImpl$AsyncDispatchUrlWithSpacesServlet"/>
+      <Class name="org.apache.catalina.core.TestAsyncContextImpl$ForwardDispatchUrlWithSpacesServlet"/>
+    </Or>
+    <Method name="doGet"/>
+    <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Or>
+      <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49528Servlet"/>
+      <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug49567Servlet"/>
+    </Or>
+    <Field name="result"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextImpl$Bug53843ServletA"/>
+    <Field name="isAsyncWhenExpected"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestAsyncContextImpl$AsyncISEServlet"/>
+    <Field name="asyncContext"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Hard-coded absolute path is intentional -->
+    <Class name="org.apache.catalina.core.TestStandardContext"/>
+    <Method name="testBug57556b"/>
+    <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.core.TestStandardContext$Bug51376Servlet"/>
+    <Field name="destroyOk"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.filters.TestRemoteIpFilter$MockHttpServlet"/>
+    <Field name="request"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.startup.TesterServletWithAnnotations"/>
+    <Or>
+      <Field name="envEntry2"/>
+      <Field name="envEntry3"/>
+      <Field name="envEntry4"/>
+      <Field name="envEntry6"/>
+    </Or>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.startup.TesterServletWithLifeCycleMethods"/>
+    <Field name="result"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
   </Match>
   <Match>
     <!-- Return value of latch is intentionally ignored -->
@@ -1514,6 +1579,12 @@
   <Match>
     <Class name="org.apache.catalina.startup.TestTomcatClassLoader$ClassLoaderReport"/>
     <Bug code="Se"/>
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.startup.TestTomcat$CustomContextConfig"/>
+    <Field name="used"/>
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>
     <Class name="org.apache.catalina.tribes.demos.EchoRpcTest" />
@@ -1605,6 +1676,12 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.valves.TestStuckThreadDetectionValve$StuckingServlet"/>
+    <Field name="wasInterrupted"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
     <!-- Concrete Map type not affected -->
     <Class name="org.apache.catalina.util.TestParameterMap" />
     <Method name="testEntrySetImmutabilityAfterLocked" />
@@ -1620,6 +1697,18 @@
     </Or>
     <Method name="testNoArgConstructor" />
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
+  </Match>
+  <Match>
+    <!-- Return value ignored as this is a performance test -->
+    <Class name="org.apache.catalina.webresources.TestAbstractFileResourceSetPerformance" />
+    <Method name="testFileNameFiltering" />
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT"/>
+  </Match>
+  <Match>
+    <!-- Use of hard-coded path is deliberate -->
+    <Class name="org.apache.catalina.webresources.TestStandardRoot" />
+    <Method name="&lt;clinit&gt;" />
+    <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME"/>
   </Match>
   <Match>
     <!-- Result is negated to compare result when order is reversed -->
