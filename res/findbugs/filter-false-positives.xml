@@ -1750,7 +1750,25 @@
       <Field name="first" />
       <Field name="last" />
     </Or>
-    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
+    <Bug pattern="IS2_INCONSISTENT_SYNC" />
+  </Match>
+  <Match>
+    <!-- Field set via injection-->
+    <Class name="org.apache.naming.TesterInjectionServlet" />
+    <Or>
+      <Field name="property1" />
+      <Field name="property3" />
+    </Or>
+    <Bug pattern="UWF_NULL_FIELD" />
+  </Match>
+  <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.naming.TesterInjectionServlet" />
+    <Or>
+      <Field name="property2"/>
+      <Field name="property2a"/>
+    </Or>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
   </Match>
   <Match>
     <!-- Use of statics is unavoidable in all cases -->
@@ -1858,6 +1876,38 @@
     <Bug code="RR" />
   </Match>
   <Match>
+    <!-- Path is designed to test edge cases and does not have to exist-->
+    <Class name="org.apache.tomcat.util.buf.TesterUriUtilBase" />
+    <Or>
+      <Method name="testBuildJarUrl01"/>
+      <Method name="testBuildJarUrl02"/>
+      <Method name="testBuildJarUrl03"/>
+      <Method name="performanceTestBuildJarUrl"/>
+    </Or>
+    <Bug pattern="DMI_HARDCODED_ABSOLUTE_FILENAME"/>
+  </Match>
+  <Match>
+    <!-- Return value ignored as this is a performance test -->
+    <Class name="org.apache.tomcat.util.http.parser.TesterParserPerformance" />
+    <Or>
+      <Method name="doLookupTest" />
+      <Method name="doLookupTestCheck" />
+    </Or>
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
+  </Match>
+  <Match>
+    <!-- Object not used as this is a performance test -->
+    <Class name="org.apache.tomcat.util.http.TesterParametersPerformance" />
+    <Method name="doCreateString" />
+    <Bug pattern="UC_USELESS_OBJECT" />
+  </Match>
+  <Match>
+    <!-- Return value ignored because an exception is expected -->
+    <Class name="org.apache.tomcat.util.net.TestTLSClientHelloExtractor" />
+    <Method name="doTestInputMalformed" />
+    <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
+  </Match>
+  <Match>
     <Class name="org.apache.tomcat.util.threads.TestLimitLatch" />
     <Or>
       <Method name="waitForThreadToStop" />
@@ -1889,12 +1939,33 @@
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.TestWsSubprotocols$SubProtocolsEndpoint" />
+    <Field name="subprotocols" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.TestWsWebSocketContainer$ConstantTxEndpoint" />
+    <Or>
+      <Field name="exception" />
+      <Field name="running" />
+      <Field name="timeout" />
+    </Or>
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
     <!-- Code is deliberately unused -->
     <Class name="org.apache.tomcat.websocket.server.TestUriTemplate" />
     <Or>
       <Method name="testBasicPrefix" />
-      <Method name="testQuote2" />
       <Method name="testDuplicate01" />
+      <Method name="testEgMailingList04" />
+      <Method name="testEgMailingList05" />
+      <Method name="testPrefixOneOfTwo" />
+      <Method name="testPrefixTwoOfTwo" />
+      <Method name="testQuote1" />
+      <Method name="testQuote2" />
     </Or>
     <Bug pattern="DLS_DEAD_LOCAL_STORE"/>
   </Match>
