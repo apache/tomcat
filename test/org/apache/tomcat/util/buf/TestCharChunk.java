@@ -86,7 +86,7 @@ public class TestCharChunk {
     }
 
 
-    public class Sink implements CharOutputChannel {
+    public static class Sink implements CharOutputChannel {
 
         @Override
         public void realWriteChars(char[] cbuf, int off, int len) throws IOException {

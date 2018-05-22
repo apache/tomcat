@@ -49,7 +49,7 @@ public class TestOneLineFormatterPerformance {
     }
 
 
-    private class StringFormatImpl implements DateFormat {
+    private static class StringFormatImpl implements DateFormat {
 
         @Override
         public String format(long timestamp) {
@@ -58,7 +58,7 @@ public class TestOneLineFormatterPerformance {
     }
 
 
-    private class DateFormatCacheImpl implements DateFormat {
+    private static class DateFormatCacheImpl implements DateFormat {
 
         private final DateFormatCache cache;
 

@@ -845,7 +845,7 @@ public class TestRequest extends TomcatBaseTest {
         Assert.assertEquals(expected, resultPath);
     }
 
-    private class Bug56501Servlet extends HttpServlet {
+    private static class Bug56501Servlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 
@@ -957,7 +957,7 @@ public class TestRequest extends TomcatBaseTest {
     }
 
 
-    private class Bug61264GetReaderServlet extends HttpServlet {
+    private static class Bug61264GetReaderServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 

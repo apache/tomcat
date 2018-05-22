@@ -305,7 +305,7 @@ public class TestUpgrade extends TomcatBaseTest {
         }
 
 
-        private class EchoListener implements ReadListener, WriteListener {
+        private static class EchoListener implements ReadListener, WriteListener {
 
             private final ServletInputStream sis;
             private final ServletOutputStream sos;

@@ -197,7 +197,7 @@ public class TestSlowQueryReport extends DefaultTestCase {
     }
 
 
-    public class ClientListener implements NotificationListener {
+    public static class ClientListener implements NotificationListener {
         AtomicInteger notificationCount = new AtomicInteger(0);
         @Override
         public void handleNotification(Notification notification,

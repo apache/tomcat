@@ -70,7 +70,7 @@ public class TesterAsyncTiming {
             }
         }
 
-        private class SemaphoreSendHandler implements SendHandler {
+        private static class SemaphoreSendHandler implements SendHandler {
 
             private final Semaphore semaphore;
 

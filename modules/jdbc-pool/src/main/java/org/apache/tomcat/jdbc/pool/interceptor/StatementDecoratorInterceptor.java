@@ -267,7 +267,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         }
     }
 
-    protected class ResultSetProxy implements InvocationHandler {
+    protected static class ResultSetProxy implements InvocationHandler {
 
         private Object st;
         private Object delegate;

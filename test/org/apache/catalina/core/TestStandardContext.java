@@ -899,7 +899,7 @@ public class TestStandardContext extends TomcatBaseTest {
                 .isAvailable());
     }
 
-    private class FailingStartupServlet extends HttpServlet {
+    private static class FailingStartupServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 

@@ -463,7 +463,7 @@ public class TestBasicAuthParser {
      * for BASIC Authentication.
      * Note: only used internally, so no need to validate arguments.
      */
-    private final class BasicAuthHeader {
+    private static final class BasicAuthHeader {
 
         private  final String HTTP_AUTH = "authorization: ";
         private  final byte[] HEADER =

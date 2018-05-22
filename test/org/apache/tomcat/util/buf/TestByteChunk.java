@@ -189,7 +189,7 @@ public class TestByteChunk {
     }
 
 
-    public class Sink implements ByteOutputChannel {
+    public static class Sink implements ByteOutputChannel {
 
         @Override
         public void realWriteBytes(byte[] cbuf, int off, int len) throws IOException {

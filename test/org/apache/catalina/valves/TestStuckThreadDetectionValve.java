@@ -139,7 +139,7 @@ public class TestStuckThreadDetectionValve extends TomcatBaseTest {
         Assert.assertTrue(result.toString().startsWith("OK"));
     }
 
-    private class StuckingServlet extends HttpServlet {
+    private static class StuckingServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
         private final long delay;

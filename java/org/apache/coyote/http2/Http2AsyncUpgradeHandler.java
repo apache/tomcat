@@ -418,7 +418,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     }
 
 
-    private class AsyncHeaderFrameBuffers implements HeaderFrameBuffers {
+    private static class AsyncHeaderFrameBuffers implements HeaderFrameBuffers {
 
         int payloadSize;
 

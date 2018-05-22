@@ -104,7 +104,7 @@ public class TestWebappClassLoaderExecutorMemoryLeak extends TomcatBaseTest {
             resp.getWriter().flush();
         }
 
-        class Task implements Runnable {
+        static class Task implements Runnable {
 
             String _id;
 
