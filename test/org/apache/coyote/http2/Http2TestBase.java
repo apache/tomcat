@@ -1156,7 +1156,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
             int count = 128 * 1024;
             // Two bytes per entry
-            resp.setContentLengthLong(count * 2);
+            resp.setContentLengthLong(count * 2L);
 
             OutputStream os = resp.getOutputStream();
             byte[] data = new byte[2];
