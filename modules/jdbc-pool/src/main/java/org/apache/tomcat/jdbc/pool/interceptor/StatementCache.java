@@ -262,7 +262,6 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     }
 
     protected class CachedStatement extends StatementDecoratorInterceptor.StatementProxy<PreparedStatement> {
-        boolean cached = false;
         CacheKey key;
         public CachedStatement(PreparedStatement parent, String sql) {
             super(parent, sql);
@@ -291,7 +290,6 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
                     proxy.setConnection(getConnection());
                     proxy.setConstructor(getConstructor());
                     if (cacheStatement(proxy)) {
-                        proxy.cached = true;
                         shouldClose = false;
                     }
                 } catch (RuntimeException | ReflectiveOperationException | SQLException x) {

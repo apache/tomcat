@@ -19,14 +19,11 @@ package org.apache.tomcat.jdbc.test;
 import java.sql.Connection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 public class TestTimeout extends DefaultTestCase {
-
-    AtomicInteger counter = new AtomicInteger(0);
 
     @Test
     public void testCheckoutTimeout() throws Exception {

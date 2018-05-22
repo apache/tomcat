@@ -73,7 +73,6 @@ public class TestAsyncQueue {
     protected class OfferThread extends Thread {
         Object item = null;
         long delay = 5000;
-        volatile boolean offered = false;
         public OfferThread(Object i, long d) {
             this.item = i;
             this.delay = d;
@@ -87,7 +86,6 @@ public class TestAsyncQueue {
             } catch (Exception ignore){
                 // Ignore
             }
-            offered = true;
             TestAsyncQueue.this.queue.offer(item);
         }
     }
