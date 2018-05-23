@@ -19,7 +19,7 @@ package org.apache.catalina.util;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.apache.catalina.tribes.util.StringManager;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * A class representing a CIDR netmask.
