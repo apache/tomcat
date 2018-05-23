@@ -52,7 +52,6 @@ echo Service will try to guess them from the registry.
 goto okJavaHome
 :gotJreHome
 if not exist "%JRE_HOME%\bin\java.exe" goto noJavaHome
-if not exist "%JRE_HOME%\bin\javaw.exe" goto noJavaHome
 goto okJavaHome
 :gotJdkHome
 if not exist "%JAVA_HOME%\bin\javac.exe" goto noJavaHome
