@@ -92,6 +92,11 @@
         usually performed during web application stop if that stop is triggered
         by a JVM shutdown. (markt)
       </fix>
+      <add>
+        <bug>51497</bug>: Add an option, <code>ipv6Canonical</code>, to the
+        <code>AccessLogValve</code> that causes IPv6 addresses to be output in
+        canonical form defined by RFC 5952. (ognjen/markt)
+      </add>
       <fix>
         <bug>62343</bug>: Make CORS filter defaults more secure. This is the fix
         for CVE-2018-8014. (markt)
