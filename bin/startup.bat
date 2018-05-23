@@ -53,6 +53,6 @@ shift
 goto setArgs
 :doneSetArgs
 
-call "%EXECUTABLE%" start %CMD_LINE_ARGS%
+call "%EXECUTABLE%" run %CMD_LINE_ARGS%
 
 :end
