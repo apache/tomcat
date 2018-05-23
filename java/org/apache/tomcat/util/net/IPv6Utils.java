@@ -28,14 +28,14 @@ public class IPv6Utils {
 
     /**
      * <p>Convert IPv6 address into RFC 5952 form.
-     * E.g. 2001:db8:0:1:0:0:0:1 -> 2001:db8:0:1::1</p>
+     * E.g. 2001:db8:0:1:0:0:0:1 -&gt; 2001:db8:0:1::1</p>
      *
      * <p>Method is null safe, and if IPv4 address or host name is passed to the
      * method it is returned without any processing.</p>
      *
-     * <p>Method also supports IPv4 in IPv6 (e.g. 0:0:0:0:0:ffff:192.0.2.1 ->
+     * <p>Method also supports IPv4 in IPv6 (e.g. 0:0:0:0:0:ffff:192.0.2.1 -&gt;
      * ::ffff:192.0.2.1), and zone ID (e.g. fe80:0:0:0:f0f0:c0c0:1919:1234%4
-     * -> fe80::f0f0:c0c0:1919:1234%4).</p>
+     * -&gt; fe80::f0f0:c0c0:1919:1234%4).</p>
      *
      * <p>The behaviour of this method is undefined if an invalid IPv6 address
      * is passed in as input.</p>
@@ -221,7 +221,7 @@ public class IPv6Utils {
     /**
      * Heuristic check if string might be an IPv6 address.
      *
-     * @param address Any string or null
+     * @param input Any string or null
      * @return true, if input string contains only hex digits and at least two colons, before '.' or '%' character
      */
     static boolean mayBeIPv6Address(String input) {
