@@ -400,7 +400,7 @@ class JspReader {
      * Skip until the given string is matched in the stream.
      * When returned, the context is positioned past the end of the match.
      *
-     * @param s The String to match.
+     * @param limit The String to match.
      * @return A non-null <code>Mark</code> instance (positioned immediately
      *         before the search string) if found, <strong>null</strong>
      *         otherwise.
@@ -439,7 +439,7 @@ class JspReader {
      * chars initially escaped by a '\' and any EL expressions.
      * When returned, the context is positioned past the end of the match.
      *
-     * @param s The String to match.
+     * @param limit    The String to match.
      * @param ignoreEL <code>true</code> if something that looks like EL should
      *                 not be treated as EL.
      * @return A non-null <code>Mark</code> instance (positioned immediately

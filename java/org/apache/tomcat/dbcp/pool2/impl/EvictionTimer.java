@@ -66,9 +66,9 @@ class EvictionTimer {
 
     /**
      * Add the specified eviction task to the timer. Tasks that are added with a
-     * call to this method *must* call {@link #cancel(TimerTask)} to cancel the
-     * task to prevent memory and/or thread leaks in application server
-     * environments.
+     * call to this method *must* call {@link #cancel(TimerTask,long,TimeUnit)}
+     * to cancel the task to prevent memory and/or thread leaks in application
+     * server environments.
      * @param task      Task to be scheduled
      * @param delay     Delay in milliseconds before task is executed
      * @param period    Time in milliseconds between executions

@@ -622,7 +622,7 @@ public class Cookie {
 
     /**
      * Custom implementation that skips many of the safety checks in
-     * {@link javax.nio.ByteBuffer}.
+     * {@link java.nio.ByteBuffer}.
      */
     private static class ByteBuffer {
 

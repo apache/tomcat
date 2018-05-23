@@ -258,7 +258,7 @@ public final class SecurityUtil{
      * Perform work as a particular <code>Subject</code>. Here the work
      * will be granted to a <code>null</code> subject.
      *
-     * @param methodName the method to apply the security restriction
+     * @param method the method to apply the security restriction
      * @param targetObject the <code>Servlet</code> on which the method will
      *  be called.
      * @param targetArguments <code>Object</code> array contains the

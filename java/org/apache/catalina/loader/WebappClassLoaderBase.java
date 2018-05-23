@@ -344,7 +344,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     private boolean clearReferencesStopTimerThreads = false;
 
     /**
-     * Should Tomcat call {@link org.apache.juli.logging.LogFactory#release()}
+     * Should Tomcat call
+     * {@link org.apache.juli.logging.LogFactory#release(ClassLoader)}
      * when the class loader is stopped? If not specified, the default value
      * of <code>true</code> is used. Changing the default setting is likely to
      * lead to memory leaks and other issues.

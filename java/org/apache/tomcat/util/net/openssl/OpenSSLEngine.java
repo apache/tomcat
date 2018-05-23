@@ -173,7 +173,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * @param fallbackApplicationProtocol the fallback application protocol
      * @param clientMode {@code true} if this is used for clients, {@code false}
      * otherwise
-     * @param sessionContext the {@link OpenSslSessionContext} this
+     * @param sessionContext the {@link OpenSSLSessionContext} this
      * {@link SSLEngine} belongs to.
      * @param alpn {@code true} if alpn should be used, {@code false}
      * otherwise
@@ -192,7 +192,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
      * @param fallbackApplicationProtocol the fallback application protocol
      * @param clientMode {@code true} if this is used for clients, {@code false}
      * otherwise
-     * @param sessionContext the {@link OpenSslSessionContext} this
+     * @param sessionContext the {@link OpenSSLSessionContext} this
      * {@link SSLEngine} belongs to.
      * @param alpn {@code true} if alpn should be used, {@code false}
      * otherwise

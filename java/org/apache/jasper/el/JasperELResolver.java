@@ -158,8 +158,8 @@ public class JasperELResolver extends CompositeELResolver {
         return null;
     }
 
-    /**
-     * Copied from {@link org.apache.el.lang.ELSupport#coerceToString(Object)}.
+    /*
+     * Copied from org.apache.el.lang.ELSupport#coerceToString(ELContext,Object)
      */
     private static final String coerceToString(final Object obj) {
         if (obj == null) {

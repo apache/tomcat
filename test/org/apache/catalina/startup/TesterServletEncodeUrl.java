@@ -32,13 +32,6 @@ public class TesterServletEncodeUrl extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Almost minimal processing for a servlet.
-     *
-     * @param nextUrl The url the caller would like to go to next. If
-     *                supplied, put an encoded url into the returned
-     *                html page as a hyperlink.
-     */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {

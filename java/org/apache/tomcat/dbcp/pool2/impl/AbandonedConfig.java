@@ -232,9 +232,10 @@ public class AbandonedConfig {
     }
 
     /**
-     * If the pool implements {@link UsageTracking}, should the pool record a
-     * stack trace every time a method is called on a pooled object and retain
-     * the most recent stack trace to aid debugging of abandoned objects?
+     * If the pool implements
+     * {@link org.apache.tomcat.dbcp.pool2.UsageTracking}, should the pool
+     * record a stack trace every time a method is called on a pooled object and
+     * retain the most recent stack trace to aid debugging of abandoned objects?
      */
     private boolean useUsageTracking = false;
 

@@ -274,7 +274,6 @@ public class ELParser {
      * {@link #skipUntilEL()}.
      *
      * @param input Non-EL input to be escaped
-     * @param isDeferredSyntaxAllowedAsLiteral
      *
      * @return The escaped version of the input
      */

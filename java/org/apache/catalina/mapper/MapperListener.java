@@ -448,13 +448,9 @@ public class MapperListener extends LifecycleMBeanBase
         }
     }
 
-    /**
+    /*
      * Populate <code>wrappers</code> list with information for registration of
      * mappings for this wrapper in this context.
-     *
-     * @param context
-     * @param wrapper
-     * @param list
      */
     private void prepareWrapperMappingInfo(Context context, Wrapper wrapper,
             List<WrapperMappingInfo> wrappers) {

@@ -40,7 +40,7 @@ public class JavaClass {
      * @param superclass_name Name of this class's superclass.
      * @param access_flags Access rights defined by bit flags
      * @param constant_pool Array of constants
-     * @param interfaces Implemented interfaces
+     * @param interface_names Implemented interfaces
      * @param runtimeVisibleAnnotations "RuntimeVisibleAnnotations" attribute defined on the Class, or null
      */
     JavaClass(final String class_name, final String superclass_name,

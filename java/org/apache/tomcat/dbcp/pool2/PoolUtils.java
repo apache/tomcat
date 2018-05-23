@@ -1594,7 +1594,7 @@ public final class PoolUtils {
          * @param erodingFactor
          *            erosion factor - determines the frequency of erosion
          *            events
-         * @see #factor
+         * @see #erodingFactor
          */
         protected ErodingKeyedObjectPool(final KeyedObjectPool<K, V> keyedPool,
                 final ErodingFactor erodingFactor) {

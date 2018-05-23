@@ -193,8 +193,6 @@ public class CorsFilter extends GenericFilter {
      * This method returns the parameter's value if it exists, or defaultValue
      * if not.
      *
-     * @param filterConfig  The configuration for the filter
-     *
      * @param name          The parameter's name
      *
      * @param defaultValue  The default value to return if the parameter does
@@ -203,7 +201,7 @@ public class CorsFilter extends GenericFilter {
      * @return The parameter's value or the default value if the parameter does
      *         not exist
      */
-    private String getInitParameter(String name, String defaultValue){
+    private String getInitParameter(String name, String defaultValue) {
 
         String value = getInitParameter(name);
         if (value != null) {
