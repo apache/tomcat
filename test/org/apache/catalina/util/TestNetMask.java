@@ -62,6 +62,8 @@ public final class TestNetMask {
         result.add(new Object[] { "ae31::27:ef2:1/129", null, Boolean.FALSE, null });
 
         // IPv4
+        result.add(new Object[] { "1.2.3.4", "1.2.3.4", Boolean.TRUE, Boolean.TRUE });
+
         result.add(new Object[] { "1.2.3.4/32", "1.2.3.3", Boolean.TRUE, Boolean.FALSE });
         result.add(new Object[] { "1.2.3.4/32", "1.2.3.4", Boolean.TRUE, Boolean.TRUE });
         result.add(new Object[] { "1.2.3.4/32", "1.2.3.5", Boolean.TRUE, Boolean.FALSE });
@@ -77,6 +79,8 @@ public final class TestNetMask {
         result.add(new Object[] { "10.0.0.0/22", "10.0.4.0", Boolean.TRUE, Boolean.FALSE });
 
         // IPv6
+        result.add(new Object[] { "::5:1", "::5:1", Boolean.TRUE, Boolean.TRUE });
+
         result.add(new Object[] { "::5:1/128", "::4:ffff", Boolean.TRUE, Boolean.FALSE });
         result.add(new Object[] { "::5:1/128", "::5:1", Boolean.TRUE, Boolean.TRUE });
         result.add(new Object[] { "::5:1/128", "::5:2", Boolean.TRUE, Boolean.FALSE });
@@ -90,6 +94,9 @@ public final class TestNetMask {
         result.add(new Object[] { "a::5:1/42", "a::0", Boolean.TRUE, Boolean.TRUE });
         result.add(new Object[] { "a::5:1/42", "a:0:3f:ffff:ffff:ffff:ffff:ffff", Boolean.TRUE, Boolean.TRUE });
         result.add(new Object[] { "a::5:1/42", "a:0:40::", Boolean.TRUE, Boolean.FALSE });
+
+        // Mixed
+        result.add(new Object[] { "10.0.0.0/22", "::1", Boolean.TRUE, Boolean.FALSE });
 
         return result;
     }
@@ -124,5 +131,7 @@ public final class TestNetMask {
         }
 
         Assert.assertEquals(matches, Boolean.valueOf(netMask.matches(inetAddress)));
+
+        Assert.assertEquals(mask, netMask.toString());
     }
 }
