@@ -652,10 +652,9 @@ public class RemoteIpFilter extends GenericFilter {
 
     protected static final String INTERNAL_PROXIES_PARAMETER = "internalProxies";
 
-    /**
-     * Logger
-     */
-    private static final Log log = LogFactory.getLog(RemoteIpFilter.class);
+    // Log must be non-static as loggers are created per class-loader and this
+    // Filter may be used in multiple class loaders
+    private final Log log = LogFactory.getLog(RemoteIpFilter.class);
 
     protected static final String PROTOCOL_HEADER_PARAMETER = "protocolHeader";
 
