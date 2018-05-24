@@ -112,6 +112,11 @@
         session is invalidated because the file has not been created yet.
         (markt)
       </fix>
+      <fix>
+        Make all loggers associated with Tomcat provided Filters non-static to
+        ensure that log messages are not lost when a web application is
+        reloaded. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
