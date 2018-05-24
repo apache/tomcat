@@ -97,6 +97,12 @@
         <code>AccessLogValve</code> that causes IPv6 addresses to be output in
         canonical form defined by RFC 5952. (ognjen/markt)
       </add>
+      <add>
+        <bug>51953</bug>: Add the <code>RemoteCIDRFilter</code> and
+        <code>RemoteCIDRValve</code> that can be used to allow/deny requests
+        based on IPv4 and/or IPv6 client address where the IP ranges are defined
+        using CIDR notation. Based on a patch by Francis Galiegue. (markt)
+      </add>
       <fix>
         <bug>62343</bug>: Make CORS filter defaults more secure. This is the fix
         for CVE-2018-8014. (markt)

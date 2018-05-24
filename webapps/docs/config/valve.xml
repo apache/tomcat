@@ -647,7 +647,7 @@
     header. This is useful in combination with the context attribute
     <code>preemptiveAuthentication="true"</code>.</p>
 
-    <p><strong>Note:</strong> This filter processes the value returned by
+    <p><strong>Note:</strong> This valve processes the value returned by
     method <code>ServletRequest.getRemoteHost()</code>. To allow the method
     to return proper host names, you have to enable "DNS lookups" feature on
     a <strong>Connector</strong>.</p>
@@ -714,6 +714,100 @@
 
     </attributes>
 
+  </subsection>
+
+</subsection>
+
+<subsection name="Remote CIDR Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Remote CIDR Valve</strong> allows you to compare the
+      IP address of the client that submitted this request against one or more
+      netmasks following the CIDR notation, and either allow the request to
+      continue or refuse to process the request from this client. IPv4 and
+      IPv6 are both fully supported. A Remote CIDR Valve can be associated
+      with any Catalina container (<a href="engine.html">Engine</a>,
+      <a href="host.html">Host</a>, or <a href="context.html">Context</a>), and
+      must accept any request presented to this container for processing before
+      it will be passed on.
+    </p>
+
+    <p>This valve mimicks Apache's <code>Order</code>,
+      <code>Allow from</code> and <code>Deny from</code> directives,
+      with the following limitations:
+    </p>
+
+    <ul>
+      <li><code>Order</code> will always be <code>allow, deny</code>;</li>
+      <li>dotted quad notations for netmasks are not supported (that is, you
+        cannot write <code>192.168.1.0/255.255.255.0</code>, you must write
+        <code>192.168.1.0/24</code>;
+      </li>
+      <li>shortcuts, like <code>10.10.</code>, which is equivalent to
+        <code>10.10.0.0/16</code>, are not supported;
+      </li>
+      <li>as the valve name says, this is a CIDR only valve,
+        therefore subdomain notations like <code>.mydomain.com</code> are not
+        supported either.
+      </li>
+    </ul>
+
+    <p>Some more features of this valve are:
+    </p>
+
+    <ul>
+      <li>if you omit the CIDR prefix, this valve becomes a single IP
+        valve;</li>
+      <li>unlike the <a href="#Remote_Host_Valve">Remote Host Valve</a>,
+      it can handle IPv6 addresses in condensed form (<code>::1</code>,
+      <code>fe80::/71</code>, etc).</li>
+    </ul>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Remote CIDR Valve</strong> supports the following
+      configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+          <strong>org.apache.catalina.valves.RemoteCIDRValve</strong>.</p>
+      </attribute>
+
+      <attribute name="allow" required="false">
+        <p>A comma-separated list of IPv4 or IPv6 netmasks or addresses
+          that the remote client&apos;s IP address is matched against.
+          If this attribute is specified, the remote address MUST match
+          for this request to be accepted. If this attribute is not specified,
+          all requests will be accepted UNLESS the remote IP is matched by a
+          netmask in the <code>deny</code> attribute.
+        </p>
+      </attribute>
+
+      <attribute name="deny" required="false">
+        <p>A comma-separated list of IPv4 or IPv6 netmasks or addresses
+          that the remote client&apos;s IP address is matched against.
+          If this attribute is specified, the remote address MUST NOT match
+          for this request to be accepted. If this attribute is not specified,
+          request acceptance is governed solely by the <code>accept</code>
+          attribute.
+        </p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+  <subsection name="Example">
+    <p>To allow access only for the clients connecting from localhost:</p>
+    <pre>
+      &lt;Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+      allow="127.0.0.1, ::1"/&gt;
+    </pre>
   </subsection>
 
 </subsection>
@@ -1013,7 +1107,6 @@
 
 
 </section>
-
 
 <section name="Single Sign On Valve">
 
