@@ -1100,6 +1100,108 @@ FINE: Request "/docs/config/manager.html" with response status "200"
 
 </section>
 
+<section name="Remote CIDR Filter">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Remote CIDR Filter</strong> allows you to compare the
+      IP address of the client that submitted this request against one or more
+      netmasks following the CIDR notation, and either allow the request to
+      continue or refuse to process the request from this client. IPv4 and
+      IPv6 are both fully supported.
+    </p>
+
+    <p>This filter mimicks Apache httpd's <code>Order</code>,
+      <code>Allow from</code> and <code>Deny from</code> directives,
+      with the following limitations:
+    </p>
+
+    <ul>
+      <li><code>Order</code> will always be <code>allow, deny</code>;</li>
+      <li>dotted quad notations for netmasks are not supported (that is, you
+        cannot write <code>192.168.1.0/255.255.255.0</code>, you must write
+        <code>192.168.1.0/24</code>;
+      </li>
+      <li>shortcuts, like <code>10.10.</code>, which is equivalent to
+        <code>10.10.0.0/16</code>, are not supported;
+      </li>
+      <li>as the filter name says, this is a CIDR only filter,
+        therefore subdomain notations like <code>.mydomain.com</code> are not
+        supported either.
+      </li>
+    </ul>
+
+    <p>Some more features of this filter are:
+    </p>
+
+    <ul>
+      <li>if you omit the CIDR prefix, this filter becomes a single IP
+      filter;</li>
+      <li>unlike the <a href="#Remote_Host_Filter">Remote Host Filter</a>,
+      it can handle IPv6 addresses in condensed form (<code>::1</code>,
+      <code>fe80::/71</code>, etc).</li>
+    </ul>
+
+  </subsection>
+
+  <subsection name="Filter Class Name">
+
+    <p>The filter class name for the Remote Address Filter is
+      <strong><code>org.apache.catalina.filters.RemoteCIDRFilter</code>
+      </strong>.</p>
+
+  </subsection>
+
+  <subsection name="Initialisation parameters">
+
+    <p>The <strong>Remote CIDR Filter</strong> supports the following
+      initialisation parameters:</p>
+
+    <attributes>
+
+      <attribute name="allow" required="false">
+        <p>A comma-separated list of IPv4 or IPv6 netmasks or addresses
+          that the remote client&apos;s IP address is matched against.
+          If this attribute is specified, the remote address MUST match
+          for this request to be accepted. If this attribute is not specified,
+          all requests will be accepted UNLESS the remote IP is matched by a
+          netmask in the <code>deny</code> attribute.
+        </p>
+      </attribute>
+
+      <attribute name="deny" required="false">
+        <p>A comma-separated list of IPv4 or IPv6 netmasks or addresses
+          that the remote client&apos;s IP address is matched against.
+          If this attribute is specified, the remote address MUST NOT match
+          for this request to be accepted. If this attribute is not specified,
+          request acceptance is governed solely by the <code>accept</code>
+          attribute.
+        </p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+  <subsection name="Example">
+    <p>To allow access only for the clients connecting from localhost:</p>
+    <pre>
+      &lt;filter>
+      &lt;filter-name>Remote CIDR Filter&lt;/filter-name>
+      &lt;filter-class>org.apache.catalina.filters.RemoteCIDRFilter&lt;/filter-class>
+      &lt;init-param>
+      &lt;param-name>allow&lt;/param-name>
+      &lt;param-value>127.0.0.0/8, ::1&lt;/param-value>
+      &lt;/init-param>
+      &lt;/filter>
+      &lt;filter-mapping>
+      &lt;filter-name>Remote CIDR Filter&lt;/filter-name>
+      &lt;url-pattern>/*&lt;/url-pattern>
+      &lt;/filter-mapping>
+    </pre>
+  </subsection>
+
+</section>
 
 <section name="Remote IP Filter">
 
