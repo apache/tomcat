@@ -50,23 +50,12 @@ import org.apache.tomcat.util.res.StringManager;
  * restarted!
  *
  * <p>
- * Add this Valve to your host definition at conf/server.xml .
- *
- * Since 5.5.10 as direct cluster valve:<br>
+ * Add this Valve to your cluster definition at conf/server.xml .
  *
  * <pre>
  *  &lt;Cluster&gt;
  *  &lt;Valve className=&quot;org.apache.catalina.ha.session.JvmRouteBinderValve&quot; /&gt;
  *  &lt;/Cluster&gt;
- * </pre>
- *
- * <br>
- * Before 5.5.10 as Host element:<br>
- *
- * <pre>
- *  &lt;Host&gt;
- *  &lt;Valve className=&quot;org.apache.catalina.ha.session.JvmRouteBinderValve&quot; /&gt;
- *  &lt;/Host&gt;
  * </pre>
  *
  * <em>A Trick:</em><br>
