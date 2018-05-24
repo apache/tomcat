@@ -94,6 +94,11 @@
         incorrectly cache results for resources that are only visible as class
         loader resources. (markt)
       </fix>
+      <fix>
+        Make all loggers associated with Tomcat provided Filters non-static to
+        ensure that log messages are not lost when a web application is
+        reloaded. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

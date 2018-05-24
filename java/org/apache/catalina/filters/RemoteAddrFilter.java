@@ -33,18 +33,11 @@ import org.apache.juli.logging.LogFactory;
  * @author Craig R. McClanahan
  *
  */
-
 public final class RemoteAddrFilter extends RequestFilter {
 
-    // ----------------------------------------------------- Instance Variables
-    private static final Log log = LogFactory.getLog(RemoteAddrFilter.class);
-
-
-    // ------------------------------------------------------------- Properties
-
-
-
-    // --------------------------------------------------------- Public Methods
+    // Log must be non-static as loggers are created per class-loader and this
+    // Filter may be used in multiple class loaders
+    private final Log log = LogFactory.getLog(RemoteAddrFilter.class);
 
 
     /**

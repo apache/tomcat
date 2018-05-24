@@ -54,8 +54,9 @@ import org.apache.juli.logging.LogFactory;
  */
 public class SetCharacterEncodingFilter extends FilterBase {
 
-    private static final Log log =
-        LogFactory.getLog(SetCharacterEncodingFilter.class);
+    // Log must be non-static as loggers are created per class-loader and this
+    // Filter may be used in multiple class loaders
+    private final Log log = LogFactory.getLog(SetCharacterEncodingFilter.class);
 
 
     // ----------------------------------------------------- Instance Variables

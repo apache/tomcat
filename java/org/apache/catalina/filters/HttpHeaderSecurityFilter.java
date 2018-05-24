@@ -36,7 +36,9 @@ import org.apache.juli.logging.LogFactory;
  */
 public class HttpHeaderSecurityFilter extends FilterBase {
 
-    private static final Log log = LogFactory.getLog(HttpHeaderSecurityFilter.class);
+    // Log must be non-static as loggers are created per class-loader and this
+    // Filter may be used in multiple class loaders
+    private final Log log = LogFactory.getLog(HttpHeaderSecurityFilter.class);
 
     // HSTS
     private static final String HSTS_HEADER_NAME = "Strict-Transport-Security";
