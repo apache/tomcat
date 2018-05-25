@@ -341,10 +341,4 @@ public class TestAuthorizationDigest {
         Map<String,String> result = Authorization.parseAuthorizationDigest(input);
         Assert.assertNull(result);
     }
-
-    @Test
-    public void testCoverage() {
-        // Here to add code coverage of default constructor
-        Assert.assertNotNull(new Authorization());
-    }
 }

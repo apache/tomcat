@@ -51,6 +51,12 @@ public class Authorization {
 
     }
 
+
+    private Authorization() {
+        // Utility class. Hide default constructor.
+    }
+
+
     /**
      * Parses an HTTP Authorization header for DIGEST authentication as per RFC
      * 2617 section 3.2.2.
