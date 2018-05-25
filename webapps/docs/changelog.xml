@@ -123,6 +123,10 @@
         ensure that log messages are not lost when a web application is
         reloaded. (markt)
       </fix>
+      <fix>
+        Correct the manifest for the annotations-api.jar. The JAR implements the
+        Common Annotations API 1.3 and the manifest should reflect that. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

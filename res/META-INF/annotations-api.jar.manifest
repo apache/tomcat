@@ -2,10 +2,10 @@ Manifest-version: 1.0
 X-Compile-Source-JDK: @source.jdk@
 X-Compile-Target-JDK: @target.jdk@
 
-Name: javax/servlet/
-Specification-Title: Java API for Servlets (Annotations)
-Specification-Version: 3.0
-Specification-Vendor: Sun Microsystems, Inc.
-Implementation-Title: javax.servlet
-Implementation-Version: 3.0.@servlet.revision@
+Name: javax/annotation/
+Implementation-Title: javax.annotation
 Implementation-Vendor: Apache Software Foundation
+Implementation-Version: 1.3.@annotation.revision@
+Specification-Title: Common Annotations
+Specification-Vendor: Oracle Corporation
+Specification-Version: 1.3

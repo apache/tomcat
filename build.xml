@@ -50,6 +50,8 @@
   <property name="websocket.revision" value="FR" />
   <!-- MR B but this was first 1.1 release so use FR -->
   <property name="jaspic.revision" value="FR" />
+  <!-- MR 3 but this was first 1.3 release so use FR -->
+  <property name="annotation.revision" value="FR" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
@@ -690,8 +692,6 @@
 
   </target>
 
-
-
   <target name="build-manifests" unless="manifests.uptodate"
           depends="build-prepare">
     <!-- Filtering tokens for JAR manifests-->
@@ -702,6 +702,7 @@
     <filter token="el.revision" value="${el.revision}"/>
     <filter token="websocket.revision" value="${websocket.revision}"/>
     <filter token="jaspic.revision" value="${jaspic.revision}"/>
+    <filter token="annotation.revision" value="${annotation.revision}"/>
 
     <mkdir dir="${tomcat.manifests}" />
     <copy todir="${tomcat.manifests}" overwrite="yes" filtering="yes"
