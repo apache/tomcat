@@ -50,7 +50,7 @@
   <property name="websocket.revision" value="FR" />
   <!-- MR B but this was first 1.1 release so use FR -->
   <property name="jaspic.revision" value="FR" />
-  <!-- MR 3 but this was first 1.3 release so use FR -->
+  <!-- MR 2 but this was first 1.2 release so use FR -->
   <property name="annotation.revision" value="FR" />
 
   <!-- Release artifact base names -->
@@ -711,7 +711,7 @@
   </target>
 
   <target name="package" depends="compile,build-manifests" >
-    <!-- Common Annotations 1.0 JAR File -->
+    <!-- Common Annotations 1.2 JAR File -->
     <jarIt jarfile="${annotations-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.annotations-api"
@@ -2455,7 +2455,7 @@ skip.installer property in build.properties" />
 
     <mkdir dir="${tomcat.src.jars}" />
 
-    <!-- Common Annotations 1.0 JAR File -->
+    <!-- Common Annotations 1.2 JAR File -->
     <jarIt jarfile="${annotations-api-src.jar}"
       filesDir="java"
       filesId="files.annotations-api"
