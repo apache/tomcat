@@ -49,6 +49,8 @@
   <property name="jsp.revision" value="FR" />
   <property name="el.revision" value="FR" />
   <property name="websocket.revision" value="FR" />
+  <!-- MR 1 but this was first 1.1 release so use FR -->
+  <property name="annotation.revision" value="FR" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
@@ -707,7 +709,6 @@
     </javac>
   </target>
 
-
   <target name="build-manifests" unless="manifests.uptodate"
           depends="build-prepare">
     <!-- Filtering tokens for JAR manifests-->
@@ -717,6 +718,7 @@
     <filter token="jsp.revision" value="${jsp.revision}"/>
     <filter token="el.revision" value="${el.revision}"/>
     <filter token="websocket.revision" value="${websocket.revision}"/>
+    <filter token="annotation.revision" value="${annotation.revision}"/>
 
     <mkdir dir="${tomcat.manifests}" />
     <copy todir="${tomcat.manifests}" overwrite="yes" filtering="yes"
@@ -728,7 +730,7 @@
   </target>
 
   <target name="package" depends="compile,build-manifests,package-java7" >
-    <!-- Common Annotations 1.0 JAR File -->
+    <!-- Common Annotations 1.1 JAR File -->
     <jarIt jarfile="${annotations-api.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.annotations-api"
@@ -2487,7 +2489,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
     <mkdir dir="${tomcat.src.jars}" />
 
-    <!-- Common Annotations 1.0 JAR File -->
+    <!-- Common Annotations 1.1 JAR File -->
     <jarIt jarfile="${annotations-api-src.jar}"
       filesDir="java"
       filesId="files.annotations-api"
