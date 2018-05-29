@@ -48,6 +48,15 @@ public interface CatalinaCluster extends Cluster {
     public void send(ClusterMessage msg, Member dest);
 
     /**
+     * Sends a message with the specified sendOptions to a specific member in the cluster.
+     *
+     * @param msg ClusterMessage
+     * @param dest Member
+     * @param sendOptions sendOptions
+     */
+    public void send(ClusterMessage msg, Member dest, int sendOptions);
+
+    /**
      * @return <code>true</code> if the cluster has members.
      */
     public boolean hasMembers();

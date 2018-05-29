@@ -704,6 +704,27 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         }
     }
 
+    @Override
+    public void send(ClusterMessage msg, Member dest, int sendOptions) {
+        try {
+            msg.setAddress(getLocalMember());
+            if (dest != null) {
+                if (!getLocalMember().equals(dest)) {
+                    channel.send(new Member[] {dest}, msg, sendOptions);
+                } else
+                    log.error(sm.getString("simpleTcpCluster.unableSend.localMember", msg));
+            } else {
+                Member[] destmembers = channel.getMembers();
+                if (destmembers.length>0)
+                    channel.send(destmembers,msg, sendOptions);
+                else if (log.isDebugEnabled())
+                    log.debug("No members in cluster, ignoring message:"+msg);
+            }
+        } catch (Exception x) {
+            log.error(sm.getString("simpleTcpCluster.sendFailed"), x);
+        }
+    }
+
     /**
      * New cluster member is registered
      *

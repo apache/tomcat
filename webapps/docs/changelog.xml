@@ -192,6 +192,9 @@
         subsequent session update message being ignored because the session does
         not yet exist. (markt)
       </fix>
+      <add>
+        Add the method to send a message with a specified sendOptions. (kfujino)
+      </add>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
