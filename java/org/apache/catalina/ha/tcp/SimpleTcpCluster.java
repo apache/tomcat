@@ -683,10 +683,6 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
         try {
             msg.setAddress(getLocalMember());
             int sendOptions = channelSendOptions;
-            if (msg instanceof SessionMessage
-                    && ((SessionMessage)msg).getEventType() == SessionMessage.EVT_ALL_SESSION_DATA) {
-                sendOptions = Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK;
-            }
             if (dest != null) {
                 if (!getLocalMember().equals(dest)) {
                     channel.send(new Member[] {dest}, msg, sendOptions);
