@@ -218,3 +218,14 @@ saaj-api.version=1.3.5
 saaj-api.home=${base.path}/saaj-api-${saaj-api.version}
 saaj-api.loc=${base-maven.loc}/javax/xml/soap/saaj-api/${saaj-api.version}/saaj-api-${saaj-api.version}.jar
 saaj-api.jar=${saaj-api.home}/saaj-api-${saaj-api.version}.jar
+
+# ----- bnd & bndlib, version 4.0.0 or later  -----
+# ----- provides OSGI metadata for JARs       -----
+bnd.version=4.0.0
+bnd.home=${base.path}/bnd-${bnd.version}
+bnd.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.bnd-${bnd.version}.jar
+bnd.jar=${bnd.home}/biz.aQute.bnd-${bnd.version}.jar
+
+bndlib.home=${base.path}/bndlib-${bnd.version}
+bndlib.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bndlib/${bnd.version}/biz.aQute.bndlib-${bnd.version}.jar
+bndlib.jar=${bndlib.home}/biz.aQute.bndlib-${bnd.version}.jar

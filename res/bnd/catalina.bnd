@@ -1,0 +1,46 @@
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+Bundle-Name: tomcat-catalina
+Bundle-SymbolicName: org.apache.tomcat-catalina
+Bundle-Version: @VERSION@
+Export-Package: \
+    org.apache.catalina.authenticator,\
+    org.apache.catalina.authenticator.jaspic,\
+    org.apache.catalina.connector,\
+    org.apache.catalina.core,\
+    org.apache.catalina.deploy,\
+    org.apache.catalina.filters,\
+    org.apache.catalina.loader,\
+    org.apache.catalina.manager,\
+    org.apache.catalina.manager.host,\
+    org.apache.catalina.mapper,\
+    org.apache.catalina.mbeans,\
+    org.apache.catalina.realm,\
+    org.apache.catalina.security,\
+    org.apache.catalina.servlets,\
+    org.apache.catalina.session,\
+    org.apache.catalina.ssi,\
+    org.apache.catalina.startup,\
+    org.apache.catalina.users,\
+    org.apache.catalina.util,\
+    org.apache.catalina.valves,\
+    org.apache.catalina.valves.rewrite,\
+    org.apache.catalina.webresources,\
+    org.apache.naming,\
+    org.apache.naming.factory,\
+    org.apache.naming.java,\
+    org.apache.catalina.webresources.war,\
+    org.apache.catalina.manager.util,\
+    org.apache.catalina
