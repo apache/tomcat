@@ -33,6 +33,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.ha.ClusterManager;
 import org.apache.catalina.ha.ClusterMessage;
 import org.apache.catalina.session.ManagerBase;
+import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.io.ReplicationStream;
 import org.apache.juli.logging.Log;
@@ -1429,7 +1430,8 @@ public class DeltaManager extends ClusterManagerBase{
             log.debug(sm.getString("deltaManager.createMessage.allSessionData", getName()));
         }
         counterSend_EVT_ALL_SESSION_DATA++;
-        cluster.send(newmsg, sender);
+        int sendOptions = Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK;
+        cluster.send(newmsg, sender, sendOptions);
     }
 
     @Override
