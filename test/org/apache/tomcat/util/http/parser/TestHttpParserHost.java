@@ -220,6 +220,25 @@ public class TestHttpParserHost {
         Class<? extends Exception> exceptionClass = null;
         int result = -1;
         try {
+            result = Host.parse(input);
+        } catch (Exception e) {
+            exceptionClass = e.getClass();
+        }
+        Assert.assertEquals(input, expectedResult.intValue(), result);
+        if (expectedException == null) {
+            Assert.assertNull(input, exceptionClass);
+        } else {
+            Assert.assertNotNull(exceptionClass);
+            Assert.assertTrue(input, expectedException.isAssignableFrom(exceptionClass));
+        }
+    }
+
+
+    @Test
+    public void testHostType() {
+        Class<? extends Exception> exceptionClass = null;
+        int result = -1;
+        try {
             StringReader sr = new StringReader(input);
             switch(testType) {
                 case IPv4:
