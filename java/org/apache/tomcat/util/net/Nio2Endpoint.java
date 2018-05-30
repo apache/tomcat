@@ -1117,7 +1117,12 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             if (block) {
                 try {
                     integer = getSocket().read(to);
-                    nRead = integer.get(toNio2Timeout(getReadTimeout()), TimeUnit.MILLISECONDS).intValue();
+                    long timeout = getReadTimeout();
+                    if (timeout > 0) {
+                        nRead = integer.get(timeout, TimeUnit.MILLISECONDS).intValue();
+                    } else {
+                        nRead = integer.get().intValue();
+                    }
                 } catch (ExecutionException e) {
                     if (e.getCause() instanceof IOException) {
                         throw (IOException) e.getCause();
@@ -1229,8 +1234,15 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             try {
                 do {
                     integer = getSocket().write(from);
-                    if (integer.get(toNio2Timeout(getWriteTimeout()), TimeUnit.MILLISECONDS).intValue() < 0) {
-                        throw new EOFException(sm.getString("iob.failedwrite"));
+                    long timeout = getWriteTimeout();
+                    if (timeout > 0) {
+                        if (integer.get(timeout, TimeUnit.MILLISECONDS).intValue() < 0) {
+                            throw new EOFException(sm.getString("iob.failedwrite"));
+                        }
+                    } else {
+                        if (integer.get().intValue() < 0) {
+                            throw new EOFException(sm.getString("iob.failedwrite"));
+                        }
                     }
                 } while (from.hasRemaining());
             } catch (ExecutionException e) {
