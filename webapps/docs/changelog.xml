@@ -165,6 +165,10 @@
         Correctly handle a digest authorization header when the user name
         contains an escaped character. (markt)
       </fix>
+      <fix>
+        Correctly handle a digest authorization header when one of the hex
+        field values ends the header with in an invalid character. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
