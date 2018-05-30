@@ -580,32 +580,40 @@ public class HttpParser {
 
         // Should be no more than 3 decimal places
         StringBuilder value = new StringBuilder(5);
-        int decimalPlacesRead = 0;
+        int decimalPlacesRead = -1;
+
         if (c == '0' || c == '1') {
             value.append((char) c);
             c = input.read();
-            if (c == '.') {
-                value.append('.');
-            } else if (c < '0' || c > '9') {
-                decimalPlacesRead = 3;
-            }
+
             while (true) {
-                c = input.read();
-                if (c >= '0' && c <= '9') {
+                if (decimalPlacesRead == -1 && c == '.') {
+                    value.append('.');
+                    decimalPlacesRead = 0;
+                } else if (decimalPlacesRead > -1 && c >= '0' && c <= '9') {
                     if (decimalPlacesRead < 3) {
                         value.append((char) c);
                         decimalPlacesRead++;
                     }
-                } else if (c == delimiter || c == 9 || c == 32 || c == -1) {
-                    break;
                 } else {
-                    // Malformed. Use quality of zero so it is dropped and skip until
-                    // EOF or the next delimiter
-                    skipUntil(input, c, delimiter);
-                    return 0;
+                    break;
                 }
+                c = input.read();
             }
         } else {
+            // Malformed. Use quality of zero so it is dropped and skip until
+            // EOF or the next delimiter
+            skipUntil(input, c, delimiter);
+            return 0;
+        }
+
+        if (c == 9 || c == 32) {
+            skipLws(input);
+            c = input.read();
+        }
+
+        // Must be at delimiter or EOF
+        if (c != delimiter && c != -1) {
             // Malformed. Use quality of zero so it is dropped and skip until
             // EOF or the next delimiter
             skipUntil(input, c, delimiter);

@@ -169,6 +169,10 @@
         Correctly handle a digest authorization header when one of the hex
         field values ends the header with in an invalid character. (markt)
       </fix>
+      <fix>
+        Correctly handle an invalid quality value in an
+        <code>Accept-Language</code> header. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
