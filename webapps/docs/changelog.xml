@@ -161,6 +161,10 @@
       <fix>
         Add missing handshake timeout for NIO2. (remm)
       </fix>
+      <fix>
+        Correctly handle a digest authorization header when the user name
+        contains an escaped character. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
