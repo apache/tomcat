@@ -409,7 +409,7 @@ public class HttpParser {
                 if (returnQuoted) {
                     result.append('\\');
                 }
-                result.append(c);
+                result.append((char) c);
             } else {
                 result.append((char) c);
             }
