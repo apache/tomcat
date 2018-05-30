@@ -219,6 +219,16 @@ public class TestAuthorizationDigest {
     }
 
     @Test
+    public void testEmptyQop() throws Exception {
+        String header = "Digest qop=";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = Authorization.parseAuthorizationDigest(input);
+        Assert.assertNull(result);
+    }
+
+    @Test
     public void testNonTokenQop() throws Exception {
         String header = "Digest qop=au{th";
 
@@ -333,6 +343,28 @@ public class TestAuthorizationDigest {
     }
 
     @Test
+    public void testParseAuthParamBEscaped() throws Exception {
+        // Test for HttpParser.readTokenOrQuotedString()
+        // auth-param = token "=" ( token | quoted-string )
+        String header = "Digest a=\"b\\\"b\"";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = Authorization.parseAuthorizationDigest(input);
+        Assert.assertEquals("b\"b", result.get("a"));
+    }
+
+    @Test
+    public void testQuotedStringNoQuotes() throws Exception {
+        String header = "Digest username=a";
+
+        StringReader input = new StringReader(header);
+
+        Map<String,String> result = Authorization.parseAuthorizationDigest(input);
+        Assert.assertNull(result);
+    }
+
+    @Test
     public void testNotDigest() throws Exception {
         String header = "SomethingElse a=b";
 
@@ -341,4 +373,6 @@ public class TestAuthorizationDigest {
         Map<String,String> result = Authorization.parseAuthorizationDigest(input);
         Assert.assertNull(result);
     }
+
+
 }

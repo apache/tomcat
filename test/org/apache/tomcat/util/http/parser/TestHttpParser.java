@@ -25,4 +25,121 @@ public class TestHttpParser {
     public void testTokenDel() {
         Assert.assertFalse("DEL is not a token", HttpParser.isToken(127));
     }
+
+
+    @Test
+    public void testAbsolutePathRelaxedLargeInvalid() {
+        HttpParser httpParser = new HttpParser(null, null);
+        Assert.assertFalse(httpParser.isAbsolutePathRelaxed(Integer.MAX_VALUE));
+    }
+
+
+    @Test
+    public void testAbsolutePathRelaxed01() {
+        HttpParser httpParser = new HttpParser(null, null);
+        Assert.assertFalse(httpParser.isAbsolutePathRelaxed('{'));
+    }
+
+
+    @Test
+    public void testAbsolutePathRelaxed02() {
+        HttpParser httpParser = new HttpParser("{", null);
+        Assert.assertTrue(httpParser.isAbsolutePathRelaxed('{'));
+    }
+
+
+    @Test
+    public void testAbsolutePathRelaxed03() {
+        HttpParser httpParser = new HttpParser(null, "{");
+        Assert.assertFalse(httpParser.isAbsolutePathRelaxed('{'));
+    }
+
+
+    @Test
+    public void testAbsolutePathRelaxed04() {
+        HttpParser httpParser = new HttpParser("\u1000", null);
+        Assert.assertFalse(httpParser.isAbsolutePathRelaxed('{'));
+    }
+
+
+    @Test
+    public void testAbsolutePathRelaxed05() {
+        HttpParser httpParser = new HttpParser("", null);
+        Assert.assertFalse(httpParser.isAbsolutePathRelaxed('{'));
+    }
+
+
+    @Test
+    public void testQueryRelaxedLargeInvalid() {
+        HttpParser httpParser = new HttpParser(null, null);
+        Assert.assertFalse(httpParser.isQueryRelaxed(Integer.MAX_VALUE));
+    }
+
+
+    @Test
+    public void testRequestTargetLargeInvalid() {
+        Assert.assertTrue(HttpParser.isNotRequestTarget(Integer.MAX_VALUE));
+    }
+
+
+    @Test
+    public void testHttpProtocolLargeInvalid() {
+        Assert.assertFalse(HttpParser.isHttpProtocol(Integer.MAX_VALUE));
+    }
+
+
+    @Test
+    public void testUserInfoLargeInvalid() {
+        Assert.assertFalse(HttpParser.isUserInfo(Integer.MAX_VALUE));
+    }
+
+
+    @Test
+    public void testAbsolutePathLargeInvalid() {
+        Assert.assertFalse(HttpParser.isAbsolutePath(Integer.MAX_VALUE));
+    }
+
+
+    @Test
+    public void testQueryLargeInvalid() {
+        Assert.assertFalse(HttpParser.isQuery(Integer.MAX_VALUE));
+    }
+
+
+    @Test
+    public void testUnquoteNull() {
+        Assert.assertNull(HttpParser.unquote(null));
+    }
+
+
+    @Test
+    public void testUnquoteShort() {
+        String shortText = "a";
+        Assert.assertEquals(shortText, HttpParser.unquote(shortText));
+    }
+
+
+    @Test
+    public void testUnquoteUnquoted() {
+        String shortText = "abcde";
+        Assert.assertEquals(shortText, HttpParser.unquote(shortText));
+    }
+
+
+    @Test
+    public void testUnquoteEscaped() {
+        // Note: Test string is also Java escaped
+        String shortText = "\"ab\\\"ab\"";
+        String result = "ab\"ab";
+        Assert.assertEquals(result, HttpParser.unquote(shortText));
+    }
+
+
+    @Test
+    public void testUnquoteUnquotedEscaped() {
+        // Note: Test string is also Java escaped
+        String shortText = "ab\\\"ab";
+        String result = "ab\"ab";
+        Assert.assertEquals(result, HttpParser.unquote(shortText));
+    }
 }
