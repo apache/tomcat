@@ -128,6 +128,9 @@
       <fix>
         <bug>62371</bug>: Improve logging of Host validation failures. (markt)
       </fix>
+      <fix>
+        Add missing handshake timeout for NIO2. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
