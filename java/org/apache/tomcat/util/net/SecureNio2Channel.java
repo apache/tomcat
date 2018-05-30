@@ -255,10 +255,11 @@ public class SecureNio2Channel extends Nio2Channel  {
                         return 0;
                     } else {
                         if (async) {
-                            sc.write(netOutBuffer, socket, handshakeWriteCompletionHandler);
+                            sc.write(netOutBuffer, Nio2Endpoint.toNio2Timeout(endpoint.getConnectionTimeout()),
+                                    TimeUnit.MILLISECONDS, socket, handshakeWriteCompletionHandler);
                         } else {
                             try {
-                                sc.write(netOutBuffer).get(endpoint.getConnectionTimeout(),
+                                sc.write(netOutBuffer).get(Nio2Endpoint.toNio2Timeout(endpoint.getConnectionTimeout()),
                                         TimeUnit.MILLISECONDS);
                             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                                 throw new IOException(sm.getString("channel.nio.ssl.handshakeError"));
@@ -289,10 +290,11 @@ public class SecureNio2Channel extends Nio2Channel  {
                     if (handshakeStatus != HandshakeStatus.NEED_UNWRAP || netOutBuffer.remaining() > 0) {
                         //should actually return OP_READ if we have NEED_UNWRAP
                         if (async) {
-                            sc.write(netOutBuffer, socket, handshakeWriteCompletionHandler);
+                            sc.write(netOutBuffer, Nio2Endpoint.toNio2Timeout(endpoint.getConnectionTimeout()),
+                                    TimeUnit.MILLISECONDS, socket, handshakeWriteCompletionHandler);
                         } else {
                             try {
-                                sc.write(netOutBuffer).get(endpoint.getConnectionTimeout(),
+                                sc.write(netOutBuffer).get(Nio2Endpoint.toNio2Timeout(endpoint.getConnectionTimeout()),
                                         TimeUnit.MILLISECONDS);
                             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                                 throw new IOException(sm.getString("channel.nio.ssl.handshakeError"));
@@ -317,10 +319,11 @@ public class SecureNio2Channel extends Nio2Channel  {
                         }
                         //read more data
                         if (async) {
-                            sc.read(netInBuffer, socket, handshakeReadCompletionHandler);
+                            sc.read(netInBuffer, Nio2Endpoint.toNio2Timeout(endpoint.getConnectionTimeout()),
+                                    TimeUnit.MILLISECONDS, socket, handshakeReadCompletionHandler);
                         } else {
                             try {
-                                int read = sc.read(netInBuffer).get(endpoint.getConnectionTimeout(),
+                                int read = sc.read(netInBuffer).get(Nio2Endpoint.toNio2Timeout(endpoint.getConnectionTimeout()),
                                         TimeUnit.MILLISECONDS).intValue();
                                 if (read == -1) {
                                     throw new EOFException();
@@ -563,7 +566,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         sslEngine.closeOutbound();
 
         try {
-            if (!flush().get(endpoint.getConnectionTimeout(),
+            if (!flush().get(Nio2Endpoint.toNio2Timeout(endpoint.getConnectionTimeout()),
                     TimeUnit.MILLISECONDS).booleanValue()) {
                 throw new IOException(sm.getString("channel.nio.ssl.remainingDataDuringClose"));
             }
@@ -584,7 +587,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         netOutBuffer.flip();
         //if there is data to be written
         try {
-            if (!flush().get(endpoint.getConnectionTimeout(),
+            if (!flush().get(Nio2Endpoint.toNio2Timeout(endpoint.getConnectionTimeout()),
                     TimeUnit.MILLISECONDS).booleanValue()) {
                 throw new IOException(sm.getString("channel.nio.ssl.remainingDataDuringClose"));
             }

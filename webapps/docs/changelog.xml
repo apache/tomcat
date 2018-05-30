@@ -158,6 +158,9 @@
         Fix a couple of unlikely edge cases in the shutting down of the
         APR/native connector. (markt)
       </fix>
+      <fix>
+        Add missing handshake timeout for NIO2. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
