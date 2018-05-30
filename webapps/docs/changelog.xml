@@ -101,6 +101,10 @@
       <fix>
         <bug>62371</bug>: Improve logging of Host validation failures. (markt)
       </fix>
+      <fix>
+        Correctly handle a digest authorization header when the user name
+        contains an escaped character. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
