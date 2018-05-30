@@ -337,38 +337,36 @@ public class HttpParser {
     }
 
 
-    // Skip any LWS and return the next char
-    static int skipLws(Reader input, boolean withReset) throws IOException {
+    // Skip any LWS and position to read the next character. The next character
+    // is returned as being able to 'peek()' it allows a small optimisation in
+    // some cases.
+    static int skipLws(Reader input) throws IOException {
 
-        if (withReset) {
-            input.mark(1);
-        }
+        input.mark(1);
         int c = input.read();
 
         while (c == 32 || c == 9 || c == 10 || c == 13) {
-            if (withReset) {
-                input.mark(1);
-            }
+            input.mark(1);
             c = input.read();
         }
 
-        if (withReset) {
-            input.reset();
-        }
+        input.reset();
         return c;
     }
 
     static SkipResult skipConstant(Reader input, String constant) throws IOException {
         int len = constant.length();
 
-        int c = skipLws(input, false);
+        skipLws(input);
+        input.mark(len);
+        int c = input.read();
 
         for (int i = 0; i < len; i++) {
             if (i == 0 && c == -1) {
                 return SkipResult.EOF;
             }
             if (c != constant.charAt(i)) {
-                input.skip(-(i + 1));
+                input.reset();
                 return SkipResult.NOT_FOUND;
             }
             if (i != (len - 1)) {
@@ -386,14 +384,18 @@ public class HttpParser {
     static String readToken(Reader input) throws IOException {
         StringBuilder result = new StringBuilder();
 
-        int c = skipLws(input, false);
+        skipLws(input);
+        input.mark(1);
+        int c = input.read();
 
         while (c != -1 && isToken(c)) {
             result.append((char) c);
+            input.mark(1);
             c = input.read();
         }
-        // Skip back so non-token character is available for next read
-        input.skip(-1);
+        // Use mark(1)/reset() rather than skip(-1) since skip() is a NOP
+        // once the end of the String has been reached.
+        input.reset();
 
         if (c != -1 && result.length() == 0) {
             return null;
@@ -409,7 +411,8 @@ public class HttpParser {
      */
     static String readQuotedString(Reader input, boolean returnQuoted) throws IOException {
 
-        int c = skipLws(input, false);
+        skipLws(input);
+        int c = input.read();
 
         if (c != '"') {
             return null;
@@ -445,8 +448,8 @@ public class HttpParser {
     static String readTokenOrQuotedString(Reader input, boolean returnQuoted)
             throws IOException {
 
-        // Go back so first non-LWS character is available to be read again
-        int c = skipLws(input, true);
+        // Peek at next character to enable correct method to be called
+        int c = skipLws(input);
 
         if (c == '"') {
             return readQuotedString(input, returnQuoted);
@@ -472,7 +475,9 @@ public class HttpParser {
         StringBuilder result = new StringBuilder();
         boolean quoted = false;
 
-        int c = skipLws(input, false);
+        skipLws(input);
+        input.mark(1);
+        int c = input.read();
 
         if (c == '"') {
             quoted = true;
@@ -481,10 +486,12 @@ public class HttpParser {
         } else {
             result.append((char) c);
         }
+        input.mark(1);
         c = input.read();
 
         while (c != -1 && isToken(c)) {
             result.append((char) c);
+            input.mark(1);
             c = input.read();
         }
 
@@ -493,8 +500,9 @@ public class HttpParser {
                 return null;
             }
         } else {
-            // Skip back so non-token character is available for next read
-            input.skip(-1);
+            // Use mark(1)/reset() rather than skip(-1) since skip() is a NOP
+            // once the end of the String has been reached.
+            input.reset();
         }
 
         if (c != -1 && result.length() == 0) {
@@ -523,7 +531,9 @@ public class HttpParser {
         StringBuilder result = new StringBuilder();
         boolean quoted = false;
 
-        int c = skipLws(input, false);
+        skipLws(input);
+        input.mark(1);
+        int c = input.read();
 
         if (c == '"') {
             quoted = true;
@@ -535,6 +545,7 @@ public class HttpParser {
             }
             result.append((char) c);
         }
+        input.mark(1);
         c = input.read();
 
         while (c != -1 && isHex(c)) {
@@ -542,6 +553,7 @@ public class HttpParser {
                 c -= ('A' - 'a');
             }
             result.append((char) c);
+            input.mark(1);
             c = input.read();
         }
 
@@ -550,8 +562,9 @@ public class HttpParser {
                 return null;
             }
         } else {
-            // Skip back so non-hex character is available for next read
-            input.skip(-1);
+            // Use mark(1)/reset() rather than skip(-1) since skip() is a NOP
+            // once the end of the String has been reached.
+            input.reset();
         }
 
         if (c != -1 && result.length() == 0) {
@@ -562,7 +575,8 @@ public class HttpParser {
     }
 
     static double readWeight(Reader input, char delimiter) throws IOException {
-        int c = skipLws(input, false);
+        skipLws(input);
+        int c = input.read();
         if (c == -1 || c == delimiter) {
             // No q value just whitespace
             return 1;
@@ -572,7 +586,8 @@ public class HttpParser {
             return 0;
         }
         // RFC 7231 does not allow whitespace here but be tolerant
-        c = skipLws(input, false);
+        skipLws(input);
+        c = input.read();
         if (c != '=') {
             // Malformed. Use quality of zero so it is dropped.
             skipUntil(input, c, delimiter);
@@ -580,7 +595,8 @@ public class HttpParser {
         }
 
         // RFC 7231 does not allow whitespace here but be tolerant
-        c = skipLws(input, false);
+        skipLws(input);
+        c = input.read();
 
         // Should be no more than 3 decimal places
         StringBuilder value = new StringBuilder(5);
