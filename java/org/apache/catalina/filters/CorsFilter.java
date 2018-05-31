@@ -1060,7 +1060,7 @@ public class CorsFilter extends GenericFilter {
 
     // ------------------------------------------------ Configuration Defaults
     /**
-     * By default, all origins are allowed to make requests.
+     * By default, no origins are allowed to make requests.
      */
     public static final String DEFAULT_ALLOWED_ORIGINS = "";
 
@@ -1076,7 +1076,7 @@ public class CorsFilter extends GenericFilter {
     public static final String DEFAULT_PREFLIGHT_MAXAGE = "1800";
 
     /**
-     * By default, support credentials is turned on.
+     * By default, support credentials is disabled.
      */
     public static final String DEFAULT_SUPPORTS_CREDENTIALS = "false";
 
