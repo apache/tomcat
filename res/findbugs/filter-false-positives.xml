@@ -833,6 +833,12 @@
     <Bug code="DE" />
   </Match>
   <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.valves.TestStuckThreadDetectionValve$StickingServlet"/>
+    <Field name="wasInterrupted"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
     <Class name="org.apache.naming.resources.ResourceAttributes" />
     <Or>
       <Field name="format"/>
