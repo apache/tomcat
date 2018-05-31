@@ -645,6 +645,7 @@ public class PojoMethodMapping {
                                     "pojoMethodMapping.decodePathParamFail",
                                     valueString, pathParam.getType()), e);
                     params = new Object[] { de };
+                    break;
                 }
                 params[entry.getKey().intValue()] = value;
             }
