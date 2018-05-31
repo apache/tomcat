@@ -231,6 +231,10 @@
         <code>minSpareThreads</code> in the documentation web application.
         (markt)
       </fix>
+      <fix>
+        Correct the documentation for the <code>allowHostHeaderMismatch</code>
+        attribute of the standard HTTP Connector implementations. (markt)
+      </fix>
     </changlog>
   </subsection>
   <subsection name="Tribes">
