@@ -1178,6 +1178,12 @@
     <Bug pattern="DMI_ENTRY_SETS_MAY_REUSE_ENTRY_OBJECTS" />
   </Match>
   <Match>
+    <!-- Deliberate hack for the purposes of the test -->
+    <Class name="org.apache.catalina.valves.TestStuckThreadDetectionValve$StickingServlet"/>
+    <Field name="wasInterrupted"/>
+    <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
     <!-- Code is deliberately unused -->
     <Or>
       <Class name="org.apache.catalina.webresources.AbstractTestFileResourceSet" />
