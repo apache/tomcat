@@ -217,6 +217,11 @@
       <update>
         Use NIO2 API for websockets writes. (remm)
       </update>
+      <fix>
+        When decoding of path parameter failed, make sure to throw
+        <code>DecodeException</code> instead of throwing
+        <code>ArrayIndexOutOfBoundsException</code>. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
