@@ -130,7 +130,7 @@
         specified to enable access to resource from any origin. Otherwise, a
         whitelist of comma separated origins can be provided. Eg: <code>
         http://www.w3.org, https://www.apache.org</code>.
-        <strong>Defaults:</strong> <code>*</code> (Any origin is allowed to
+        <strong>Defaults:</strong> The empty String. (No origin is allowed to
         access the resource).</p>
       </attribute>
       <attribute name="cors.allowed.methods" required="false">
@@ -171,7 +171,7 @@
         <code>Access-Control-Allow-Credentials</code> header in a pre-flight
         response. It helps browser determine whether or not an actual request
         can be made using credentials. <strong>Defaults:</strong>
-        <code>true</code></p>
+        <code>false</code></p>
       </attribute>
       <attribute name="cors.request.decorate" required="false">
         <p>A flag to control if CORS specific attributes should be added to
