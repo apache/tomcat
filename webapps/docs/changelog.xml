@@ -173,6 +173,9 @@
         Correctly handle an invalid quality value in an
         <code>Accept-Language</code> header. (markt)
       </fix>
+      <docs>
+        <bug>62423</bug>: Fix SSL docs CRL attribute typo. (remm)
+      </docs>
     </changelog>
   </subsection>
   <subsection name="Jasper">

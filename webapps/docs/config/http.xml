@@ -1164,7 +1164,7 @@
       lists for the certificate authorities. The format is PEM-encoded. If not
       defined, client certificates will not be checked against a certificate
       revocation list (unless an OpenSSL based connector is used and
-      <strong>certificateRevocationPath</strong> is defined). Relative paths
+      <strong>certificateRevocationListPath</strong> is defined). Relative paths
       will be resolved against <code>$CATALINA_BASE</code>. JSSE based
       connectors may also specify a URL for this attribute.</p>
     </attribute>
@@ -1576,7 +1576,7 @@
     </attribute>
 
     <attribute name="crlFile" required="false">
-      <p>This is an alias for the <code>certificateRevocationFile</code>
+      <p>This is an alias for the <code>certificateRevocationListFile</code>
       attribute of the default
       <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
@@ -1732,13 +1732,13 @@
     </attribute>
 
     <attribute name="SSLCARevocationFile" required="false">
-      <p>This is an alias for the <code>certificateRevocationFile</code>
+      <p>This is an alias for the <code>certificateRevocationListFile</code>
       attribute of the default
       <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
 
     <attribute name="SSLCARevocationPath" required="false">
-      <p>This is an alias for the <code>certificateRevocationPath</code>
+      <p>This is an alias for the <code>certificateRevocationListPath</code>
       attribute of the default
       <a href="#SSL_Support_-_SSLHostConfig">SSLHostConfig</a> element.</p>
     </attribute>
