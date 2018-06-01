@@ -74,7 +74,7 @@ public class WsServerContainer extends WsWebSocketContainer
 
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
-    private static final Log log = LogFactory.getLog(WsServerContainer.class);
+    private final Log log = LogFactory.getLog(WsServerContainer.class);
 
     private static final CloseReason AUTHENTICATED_HTTP_SESSION_CLOSED =
             new CloseReason(CloseCodes.VIOLATED_POLICY,

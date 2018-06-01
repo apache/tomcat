@@ -56,8 +56,6 @@ import org.apache.tomcat.InstanceManager;
  */
 public class JspRuntimeLibrary {
     
-    private static final Log log = LogFactory.getLog(JspRuntimeLibrary.class);
-
     /**
      * Returns the value of the javax.servlet.error.exception request
      * attribute value, if present, otherwise the value of the
@@ -1004,6 +1002,7 @@ public class JspRuntimeLibrary {
             tag.release();
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
+            Log log = LogFactory.getLog(JspRuntimeLibrary.class);
             log.warn("Error processing release on tag instance of "
                     + tag.getClass().getName(), t);
         }
@@ -1012,6 +1011,7 @@ public class JspRuntimeLibrary {
         } catch (Exception e) {
             Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
             ExceptionUtils.handleThrowable(t);
+            Log log = LogFactory.getLog(JspRuntimeLibrary.class);
             log.warn("Error processing preDestroy on tag instance of "
                     + tag.getClass().getName(), t);
         }

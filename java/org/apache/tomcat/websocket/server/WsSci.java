@@ -46,8 +46,7 @@ public class WsSci implements ServletContainerInitializer {
 
     private static boolean logMessageWritten = false;
 
-    private static final Log log =
-            LogFactory.getLog(WsSci.class);
+    private final Log log = LogFactory.getLog(WsSci.class);
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
 

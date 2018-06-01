@@ -52,7 +52,7 @@ import org.apache.juli.logging.LogFactory;
 public abstract class PersistentManagerBase extends ManagerBase
         implements DistributedManager {
 
-    private static final Log log = LogFactory.getLog(PersistentManagerBase.class);
+    private final Log log = LogFactory.getLog(PersistentManagerBase.class);
 
     // ---------------------------------------------------- Security Classes
 

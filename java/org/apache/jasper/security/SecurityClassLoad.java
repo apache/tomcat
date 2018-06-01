@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,6 +18,9 @@
 
 package org.apache.jasper.security;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+
 /**
  * Static class used to preload java classes when using the
  * Java SecurityManager so that the defineClassInPackage
@@ -27,9 +30,6 @@ package org.apache.jasper.security;
  */
 
 public final class SecurityClassLoad {
-
-    private static final org.apache.juli.logging.Log log=
-        org.apache.juli.logging.LogFactory.getLog( SecurityClassLoad.class );
 
     public static void securityClassLoad(ClassLoader loader){
 
@@ -46,7 +46,7 @@ public final class SecurityClassLoad {
 
             loader.loadClass( basePackage +
                 "runtime.JspRuntimeLibrary");
-            
+
             loader.loadClass( basePackage +
                 "runtime.ServletResponseWrapperInclude");
             loader.loadClass( basePackage +
@@ -61,16 +61,17 @@ public final class SecurityClassLoad {
             loadAnonymousInnerClasses(loader, basePackage + "runtime.PageContextImpl");
 
             loader.loadClass( basePackage +
-                "runtime.JspContextWrapper");   
+                "runtime.JspContextWrapper");
 
             // Trigger loading of class and reading of property
             SecurityUtil.isPackageProtectionEnabled();
-            
+
             loader.loadClass( basePackage +
                 "servlet.JspServletWrapper");
 
             loadAnonymousInnerClasses(loader, "runtime.JspWriterImpl");
         } catch (ClassNotFoundException ex) {
+            Log log = LogFactory.getLog(SecurityClassLoad.class);
             log.error("SecurityClassLoad", ex);
         }
     }
