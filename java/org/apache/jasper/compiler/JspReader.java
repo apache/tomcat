@@ -52,7 +52,7 @@ class JspReader {
     /**
      * Logger.
      */
-    private final Log log = LogFactory.getLog(JspReader.class);
+    private final Log log = LogFactory.getLog(JspReader.class); // must not be static
 
     /**
      * The current spot in the file.

@@ -40,7 +40,7 @@ import org.apache.juli.logging.LogFactory;
 public class JspFactoryImpl extends JspFactory {
 
     // Logger
-    private final Log log = LogFactory.getLog(JspFactoryImpl.class);
+    private final Log log = LogFactory.getLog(JspFactoryImpl.class); // must not be static
 
     private static final String SPEC_VERSION = "2.2";
     private static final boolean USE_POOL = 

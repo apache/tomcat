@@ -59,7 +59,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     public static final String BLOCKING_SEND_TIMEOUT_PROPERTY =
             "org.apache.tomcat.websocket.BLOCKING_SEND_TIMEOUT";
 
-    private final Log log = LogFactory.getLog(WsRemoteEndpointImplBase.class);
+    private final Log log = LogFactory.getLog(WsRemoteEndpointImplBase.class); // must not be static
 
     private final StateMachine stateMachine = new StateMachine();
 

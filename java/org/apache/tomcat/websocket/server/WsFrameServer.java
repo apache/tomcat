@@ -29,7 +29,7 @@ import org.apache.tomcat.websocket.WsSession;
 
 public class WsFrameServer extends WsFrameBase {
 
-    private final Log log = LogFactory.getLog(WsFrameServer.class);
+    private final Log log = LogFactory.getLog(WsFrameServer.class); // must not be static
     private static final StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final AbstractServletInputStream sis;

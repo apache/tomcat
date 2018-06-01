@@ -78,7 +78,7 @@ import org.apache.tomcat.util.scan.JarFactory;
 
 public class TldLocationsCache {
 
-    private final Log log = LogFactory.getLog(TldLocationsCache.class);
+    private final Log log = LogFactory.getLog(TldLocationsCache.class); // must not be static
 
     private static final String KEY = TldLocationsCache.class.getName();
 

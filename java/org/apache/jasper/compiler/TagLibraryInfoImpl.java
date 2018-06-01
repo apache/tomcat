@@ -65,7 +65,7 @@ import org.apache.juli.logging.LogFactory;
 class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
 
     // Logger
-    private final Log log = LogFactory.getLog(TagLibraryInfoImpl.class);
+    private final Log log = LogFactory.getLog(TagLibraryInfoImpl.class); // must not be static
 
     private JspCompilationContext ctxt;
     

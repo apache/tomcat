@@ -59,7 +59,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
     private static final long serialVersionUID = 1L;
 
-    private final Log log = LogFactory.getLog(AbstractReplicatedMap.class);
+    private final Log log = LogFactory.getLog(AbstractReplicatedMap.class); // must not be static
 
     /**
      * The default initial capacity - MUST be a power of two.

@@ -61,7 +61,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class StandardJarScanner implements JarScanner {
 
-    private final Log log = LogFactory.getLog(StandardJarScanner.class);
+    private final Log log = LogFactory.getLog(StandardJarScanner.class); // must not be static
 
     private static final Set<String> defaultJarsToSkip = new HashSet<String>();
 

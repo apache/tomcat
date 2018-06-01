@@ -44,7 +44,7 @@ public class WebXml {
     private static final String FILE_PROTOCOL = "file:";
     private static final String WEB_XML = "/WEB-INF/web.xml";
 
-    private final Log log = LogFactory.getLog(WebXml.class);
+    private final Log log = LogFactory.getLog(WebXml.class); // must not be static
             
     private InputStream stream;
     private InputSource source;

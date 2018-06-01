@@ -65,7 +65,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class LazyReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
     private static final long serialVersionUID = 1L;
-    private final Log log = LogFactory.getLog(LazyReplicatedMap.class);
+    private final Log log = LogFactory.getLog(LazyReplicatedMap.class); // must not be static
 
 
 //------------------------------------------------------------------------------    

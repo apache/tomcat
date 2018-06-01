@@ -58,7 +58,7 @@ public class ReplicatedMap<K,V> extends AbstractReplicatedMap<K,V> {
 
     private static final long serialVersionUID = 1L;
 
-    private final Log log = LogFactory.getLog(ReplicatedMap.class);
+    private final Log log = LogFactory.getLog(ReplicatedMap.class); // must not be static
 
     //--------------------------------------------------------------------------
     //              CONSTRUCTORS / DESTRUCTORS

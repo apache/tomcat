@@ -32,7 +32,7 @@ import org.apache.tomcat.util.res.StringManager;
 public abstract class SessionIdGeneratorBase extends LifecycleBase
         implements SessionIdGenerator {
 
-    private final Log log = LogFactory.getLog(SessionIdGeneratorBase.class);
+    private final Log log = LogFactory.getLog(SessionIdGeneratorBase.class); // must not be static
 
 
     private static final StringManager sm =

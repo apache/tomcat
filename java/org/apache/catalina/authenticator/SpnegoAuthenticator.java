@@ -57,7 +57,7 @@ import org.ietf.jgss.Oid;
  */
 public class SpnegoAuthenticator extends AuthenticatorBase {
 
-    private final Log log = LogFactory.getLog(SpnegoAuthenticator.class);
+    private final Log log = LogFactory.getLog(SpnegoAuthenticator.class); // must not be static
     
     private String loginConfigName = Constants.DEFAULT_LOGIN_MODULE_NAME;
     public String getLoginConfigName() {
