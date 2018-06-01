@@ -35,7 +35,7 @@ import org.apache.juli.logging.LogFactory;
 public class UTF8Reader
     extends Reader {
 
-    private final Log log = LogFactory.getLog(UTF8Reader.class);
+    private final Log log = LogFactory.getLog(UTF8Reader.class); // must not be static
 
     // debugging
 

@@ -64,7 +64,7 @@ public class WsSession implements Session {
     private static final StringManager sm = StringManager.getManager(WsSession.class);
     private static AtomicLong ids = new AtomicLong(0);
 
-    private final Log log = LogFactory.getLog(WsSession.class);
+    private final Log log = LogFactory.getLog(WsSession.class); // must not be static
 
     private final Endpoint localEndpoint;
     private final WsRemoteEndpointImplBase wsRemoteEndpoint;

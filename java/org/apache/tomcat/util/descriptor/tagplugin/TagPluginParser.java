@@ -38,7 +38,7 @@ import org.xml.sax.SAXException;
  */
 @SuppressWarnings("deprecation")
 public class TagPluginParser {
-    private final Log log = LogFactory.getLog(TagPluginParser.class);
+    private final Log log = LogFactory.getLog(TagPluginParser.class); // must not be static
     private static final String PREFIX = "tag-plugins/tag-plugin";
     private final Digester digester;
     private final Map<String, String> plugins = new HashMap<>();

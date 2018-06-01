@@ -1052,7 +1052,7 @@ public class ExpiresFilter extends FilterBase {
 
     // Log must be non-static as loggers are created per class-loader and this
     // Filter may be used in multiple class loaders
-    private final Log log = LogFactory.getLog(ExpiresFilter.class);
+    private final Log log = LogFactory.getLog(ExpiresFilter.class); // must not be static
 
     private static final String PARAMETER_EXPIRES_BY_TYPE = "ExpiresByType";
 

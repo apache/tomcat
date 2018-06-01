@@ -55,7 +55,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     protected static final SendResult SENDRESULT_OK = new SendResult();
 
-    private final Log log = LogFactory.getLog(WsRemoteEndpointImplBase.class);
+    private final Log log = LogFactory.getLog(WsRemoteEndpointImplBase.class); // must not be static
 
     private final StateMachine stateMachine = new StateMachine();
 

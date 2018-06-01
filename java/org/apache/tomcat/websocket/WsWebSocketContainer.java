@@ -87,7 +87,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     private volatile AsynchronousChannelGroup asynchronousChannelGroup = null;
     private final Object asynchronousChannelGroupLock = new Object();
 
-    private final Log log = LogFactory.getLog(WsWebSocketContainer.class);
+    private final Log log = LogFactory.getLog(WsWebSocketContainer.class); // must not be static
     private final Map<Endpoint, Set<WsSession>> endpointSessionMap =
             new HashMap<>();
     private final Map<WsSession,WsSession> sessions = new ConcurrentHashMap<>();

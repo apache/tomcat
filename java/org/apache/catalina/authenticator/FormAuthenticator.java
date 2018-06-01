@@ -52,7 +52,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
 public class FormAuthenticator
     extends AuthenticatorBase {
 
-    private final Log log = LogFactory.getLog(FormAuthenticator.class);
+    private final Log log = LogFactory.getLog(FormAuthenticator.class); // must not be static
 
 
     // ----------------------------------------------------- Instance Variables

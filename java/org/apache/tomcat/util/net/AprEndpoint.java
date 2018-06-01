@@ -1008,7 +1008,7 @@ public class AprEndpoint extends AbstractEndpoint<Long> implements SNICallBack {
      */
     protected class Acceptor extends AbstractEndpoint.Acceptor {
 
-        private final Log log = LogFactory.getLog(AprEndpoint.Acceptor.class);
+        private final Log log = LogFactory.getLog(AprEndpoint.Acceptor.class); // must not be static
 
         @Override
         public void run() {

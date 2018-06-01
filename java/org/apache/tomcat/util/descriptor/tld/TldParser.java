@@ -36,7 +36,7 @@ import org.xml.sax.SAXException;
  * Parses a Tag Library Descriptor.
  */
 public class TldParser {
-    private final Log log = LogFactory.getLog(TldParser.class);
+    private final Log log = LogFactory.getLog(TldParser.class); // must not be static
     private final Digester digester;
 
     public TldParser(boolean namespaceAware, boolean validation,

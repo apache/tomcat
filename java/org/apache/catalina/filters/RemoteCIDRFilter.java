@@ -46,7 +46,7 @@ public final class RemoteCIDRFilter extends FilterBase {
     /**
      * Our logger
      */
-    private final Log log = LogFactory.getLog(RemoteCIDRFilter.class);
+    private final Log log = LogFactory.getLog(RemoteCIDRFilter.class); // must not be static
 
     /**
      * The list of allowed {@link NetMask}s

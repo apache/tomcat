@@ -35,7 +35,7 @@ import org.apache.juli.logging.LogFactory;
 @Deprecated
 public class UCSReader extends Reader {
 
-    private final Log log = LogFactory.getLog(UCSReader.class);
+    private final Log log = LogFactory.getLog(UCSReader.class); // must not be static
 
     //
     // Constants
