@@ -61,7 +61,7 @@ public abstract class AbstractReplicatedMap<K,V>
 
     protected static final StringManager sm = StringManager.getManager(AbstractReplicatedMap.class);
 
-    private final Log log = LogFactory.getLog(AbstractReplicatedMap.class);
+    private final Log log = LogFactory.getLog(AbstractReplicatedMap.class); // must not be static
 
     /**
      * The default initial capacity - MUST be a power of two.

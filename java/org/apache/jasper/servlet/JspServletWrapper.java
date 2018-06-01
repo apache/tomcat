@@ -80,7 +80,7 @@ public class JspServletWrapper {
     }
 
     // Logger
-    private final Log log = LogFactory.getLog(JspServletWrapper.class);
+    private final Log log = LogFactory.getLog(JspServletWrapper.class); // must not be static
 
     private Servlet theServlet;
     private final String jspUri;

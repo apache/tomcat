@@ -159,7 +159,7 @@ public class SmapUtil {
     // Installation logic (from Robert Field, JSR-045 spec lead)
     private static class SDEInstaller {
 
-        private final Log log = LogFactory.getLog(SDEInstaller.class);
+        private final Log log = LogFactory.getLog(SDEInstaller.class); // must not be static
 
         static final String nameSDE = "SourceDebugExtension";
 

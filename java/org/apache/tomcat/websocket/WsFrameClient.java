@@ -30,7 +30,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 public class WsFrameClient extends WsFrameBase {
 
-    private final Log log = LogFactory.getLog(WsFrameClient.class);
+    private final Log log = LogFactory.getLog(WsFrameClient.class); // must not be static
     private static final StringManager sm = StringManager.getManager(WsFrameClient.class);
 
     private final AsyncChannelWrapper channel;

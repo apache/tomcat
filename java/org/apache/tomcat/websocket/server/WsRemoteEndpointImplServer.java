@@ -44,7 +44,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
     private static final StringManager sm =
             StringManager.getManager(WsRemoteEndpointImplServer.class);
-    private final Log log = LogFactory.getLog(WsRemoteEndpointImplServer.class);
+    private final Log log = LogFactory.getLog(WsRemoteEndpointImplServer.class); // must not be static
 
     private final SocketWrapperBase<?> socketWrapper;
     private final WsWriteTimeout wsWriteTimeout;

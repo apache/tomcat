@@ -38,7 +38,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class BackupManager extends ClusterManagerBase
         implements MapOwner, DistributedManager {
 
-    private final Log log = LogFactory.getLog(BackupManager.class);
+    private final Log log = LogFactory.getLog(BackupManager.class); // must not be static
 
     /**
      * The string manager for this package.

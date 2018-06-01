@@ -45,7 +45,7 @@ import org.apache.tomcat.util.security.MD5Encoder;
  */
 public class DigestAuthenticator extends AuthenticatorBase {
 
-    private final Log log = LogFactory.getLog(DigestAuthenticator.class);
+    private final Log log = LogFactory.getLog(DigestAuthenticator.class); // must not be static
 
 
     // -------------------------------------------------------------- Constants

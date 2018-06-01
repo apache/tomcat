@@ -64,7 +64,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     private static final StringManager sm =
         StringManager.getManager(Constants.PACKAGE_NAME);
 
-    private final Log log = LogFactory.getLog(WebXml.class);
+    private final Log log = LogFactory.getLog(WebXml.class); // must not be static
 
     /**
      * Global defaults are overridable but Servlets and Servlet mappings need to

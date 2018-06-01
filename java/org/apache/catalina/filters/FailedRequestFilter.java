@@ -45,7 +45,7 @@ public class FailedRequestFilter extends FilterBase {
 
     // Log must be non-static as loggers are created per class-loader and this
     // Filter may be used in multiple class loaders
-    private final Log log = LogFactory.getLog(FailedRequestFilter.class);
+    private final Log log = LogFactory.getLog(FailedRequestFilter.class); // must not be static
 
     @Override
     protected Log getLogger() {

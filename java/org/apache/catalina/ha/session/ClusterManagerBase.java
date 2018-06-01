@@ -35,7 +35,7 @@ import org.apache.juli.logging.LogFactory;
 
 public abstract class ClusterManagerBase extends ManagerBase implements ClusterManager {
 
-    private final Log log = LogFactory.getLog(ClusterManagerBase.class);
+    private final Log log = LogFactory.getLog(ClusterManagerBase.class); // must not be static
 
     /**
      * A reference to the cluster

@@ -25,7 +25,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 abstract class ConnectionSettingsBase<T extends Throwable> {
 
-    private final Log log = LogFactory.getLog(ConnectionSettingsBase.class);
+    private final Log log = LogFactory.getLog(ConnectionSettingsBase.class); // must not be static
     private final StringManager sm = StringManager.getManager(ConnectionSettingsBase.class);
 
     private final String connectionId;

@@ -61,7 +61,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    private final Log log = LogFactory.getLog(ApplicationFilterConfig.class);
+    private final Log log = LogFactory.getLog(ApplicationFilterConfig.class); // must not be static
 
     /**
      * Empty String collection to serve as the basis for empty enumerations.

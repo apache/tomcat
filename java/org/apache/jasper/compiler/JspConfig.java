@@ -39,7 +39,7 @@ import org.apache.juli.logging.LogFactory;
 public class JspConfig {
 
     // Logger
-    private final Log log = LogFactory.getLog(JspConfig.class);
+    private final Log log = LogFactory.getLog(JspConfig.class); // must not be static
 
     private Vector<JspPropertyGroup> jspProperties = null;
     private final ServletContext ctxt;

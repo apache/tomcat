@@ -31,7 +31,7 @@ import org.xml.sax.SAXParseException;
 
 public class WebXmlParser {
 
-    private final Log log = LogFactory.getLog(WebXmlParser.class);
+    private final Log log = LogFactory.getLog(WebXmlParser.class); // must not be static
 
     /**
      * The string resources for this package.

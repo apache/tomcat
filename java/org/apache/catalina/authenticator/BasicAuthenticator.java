@@ -45,7 +45,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
  */
 public class BasicAuthenticator extends AuthenticatorBase {
 
-    private final Log log = LogFactory.getLog(BasicAuthenticator.class);
+    private final Log log = LogFactory.getLog(BasicAuthenticator.class); // must not be static
 
     private Charset charset = StandardCharsets.ISO_8859_1;
     private String charsetString = null;

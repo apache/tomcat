@@ -37,7 +37,7 @@ public final class RemoteHostFilter extends RequestFilter {
 
     // Log must be non-static as loggers are created per class-loader and this
     // Filter may be used in multiple class loaders
-    private final Log log = LogFactory.getLog(RemoteHostFilter.class);
+    private final Log log = LogFactory.getLog(RemoteHostFilter.class); // must not be static
 
 
     /**
