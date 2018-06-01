@@ -92,9 +92,10 @@ import org.apache.tomcat.util.http.MimeHeaders;
  * <td>10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|
  *     169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|
  *     172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}|
- *     172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}
+ *     172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}|
+ *     0:0:0:0:0:0:0:1
  *     <br>
- * By default, 10/8, 192.168/16, 169.254/16, 127/8 and 172.16/12 are allowed.</td>
+ * By default, 10/8, 192.168/16, 169.254/16, 127/8, 172.16/12, and ::1 are allowed.</td>
  * </tr>
  * <tr>
  * <td>proxiesHeader</td>
@@ -412,7 +413,8 @@ public class RemoteIpValve extends ValveBase {
             "127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" +
             "172\\.1[6-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
             "172\\.2[0-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
-            "172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}");
+            "172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
+            "0:0:0:0:0:0:0:1");
 
     /**
      * @see #setProtocolHeader(String)
@@ -754,7 +756,7 @@ public class RemoteIpValve extends ValveBase {
      * Regular expression that defines the internal proxies.
      * </p>
      * <p>
-     * Default value : 10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254.\d{1,3}.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}
+     * Default value : 10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254.\d{1,3}.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|0:0:0:0:0:0:0:1
      * </p>
      * @param internalProxies The proxy regular expression
      */

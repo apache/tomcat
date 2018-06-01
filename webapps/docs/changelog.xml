@@ -132,6 +132,11 @@
         becoming associated with a web application class loader causing log
         messages to be lost if the web application is stopped. (markt)
       </fix>
+      <add>
+        <bug>62389</bug>: Add the IPv6 loopback address to the default
+        <code>internalProxies</code> regular expression. Patch by Craig Andrews.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
