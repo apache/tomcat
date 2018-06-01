@@ -46,7 +46,7 @@ import org.apache.tomcat.websocket.WsSession;
  */
 public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
 
-    private static final Log log = LogFactory.getLog(WsHttpUpgradeHandler.class);
+    private final Log log = LogFactory.getLog(WsHttpUpgradeHandler.class);
     private static final StringManager sm = StringManager.getManager(WsHttpUpgradeHandler.class);
 
     private final ClassLoader applicationClassLoader;

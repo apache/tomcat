@@ -36,7 +36,6 @@ import org.xml.sax.ext.EntityResolver2;
  */
 public class DigesterFactory {
 
-    private static final Log log = LogFactory.getLog(DigesterFactory.class);
     private static final StringManager sm =
             StringManager.getManager(Constants.PACKAGE_NAME);
 
@@ -150,6 +149,7 @@ public class DigesterFactory {
             location = CLASS_JSP_CONTEXT.getResource("resources/" + name);
         }
         if (location == null) {
+            Log log = LogFactory.getLog(DigesterFactory.class);
             log.warn(sm.getString("digesterFactory.missingSchema", name));
             return null;
         }

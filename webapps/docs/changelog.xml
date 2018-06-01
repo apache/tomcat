@@ -127,6 +127,11 @@
         Correct the manifest for the annotations-api.jar. The JAR implements the
         Common Annotations API 1.3 and the manifest should reflect that. (markt)
       </fix>
+      <fix>
+        Switch to non-static loggers where there is a possibility of a logger
+        becoming associated with a web application class loader causing log
+        messages to be lost if the web application is stopped. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

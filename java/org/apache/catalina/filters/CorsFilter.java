@@ -79,7 +79,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class CorsFilter extends GenericFilter {
 
     private static final long serialVersionUID = 1L;
-    private static final Log log = LogFactory.getLog(CorsFilter.class);
+    private final Log log = LogFactory.getLog(CorsFilter.class);
     private static final StringManager sm = StringManager.getManager(CorsFilter.class);
 
 

@@ -90,7 +90,7 @@ import org.apache.tomcat.util.res.StringManager;
 public abstract class AuthenticatorBase extends ValveBase
         implements Authenticator, RegistrationListener {
 
-    private static final Log log = LogFactory.getLog(AuthenticatorBase.class);
+    private final Log log = LogFactory.getLog(AuthenticatorBase.class);
 
     /**
      * "Expires" header always set to Date(1), so generate once only

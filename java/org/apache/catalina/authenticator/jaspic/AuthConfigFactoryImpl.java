@@ -40,7 +40,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
-    private static final Log log = LogFactory.getLog(AuthConfigFactoryImpl.class);
+    private final Log log = LogFactory.getLog(AuthConfigFactoryImpl.class);
     private static final StringManager sm = StringManager.getManager(AuthConfigFactoryImpl.class);
 
     private static final String CONFIG_PATH = "conf/jaspic-providers.xml";

@@ -26,8 +26,6 @@ import org.apache.juli.logging.LogFactory;
  */
 public final class SecurityClassLoad {
 
-    private static final Log log = LogFactory.getLog(SecurityClassLoad.class);
-
     public static void securityClassLoad(ClassLoader loader){
 
         if( System.getSecurityManager() == null ){
@@ -54,6 +52,7 @@ public final class SecurityClassLoad {
 
             loader.loadClass( basePackage + "servlet.JspServletWrapper");
         } catch (ClassNotFoundException ex) {
+            Log log = LogFactory.getLog(SecurityClassLoad.class);
             log.error("SecurityClassLoad", ex);
         }
     }

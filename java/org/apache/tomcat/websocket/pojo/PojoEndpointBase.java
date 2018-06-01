@@ -39,7 +39,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class PojoEndpointBase extends Endpoint {
 
-    private static final Log log = LogFactory.getLog(PojoEndpointBase.class);
+    private final Log log = LogFactory.getLog(PojoEndpointBase.class);
     private static final StringManager sm = StringManager.getManager(PojoEndpointBase.class);
 
     private Object pojo;

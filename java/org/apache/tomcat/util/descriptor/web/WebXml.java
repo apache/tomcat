@@ -64,7 +64,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     private static final StringManager sm =
         StringManager.getManager(Constants.PACKAGE_NAME);
 
-    private static final Log log = LogFactory.getLog(WebXml.class);
+    private final Log log = LogFactory.getLog(WebXml.class);
 
     /**
      * Global defaults are overridable but Servlets and Servlet mappings need to
@@ -1945,7 +1945,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         return true;
     }
 
-    private static <T extends ResourceBase> boolean mergeResourceMap(
+    private <T extends ResourceBase> boolean mergeResourceMap(
             Map<String, T> fragmentResources, Map<String, T> mainResources,
             Map<String, T> tempResources, WebXml fragment) {
         for (T resource : fragmentResources.values()) {
@@ -1973,7 +1973,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         return true;
     }
 
-    private static <T> boolean mergeMap(Map<String,T> fragmentMap,
+    private <T> boolean mergeMap(Map<String,T> fragmentMap,
             Map<String,T> mainMap, Map<String,T> tempMap, WebXml fragment,
             String mapName) {
         for (Entry<String, T> entry : fragmentMap.entrySet()) {
@@ -2166,7 +2166,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     }
 
 
-    private static boolean mergeLifecycleCallback(
+    private boolean mergeLifecycleCallback(
             Map<String, String> fragmentMap, Map<String, String> tempMap,
             WebXml fragment, String mapName) {
         for (Entry<String, String> entry : fragmentMap.entrySet()) {
@@ -2199,17 +2199,22 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
      */
     public static Set<WebXml> orderWebFragments(WebXml application,
             Map<String,WebXml> fragments, ServletContext servletContext) {
+        return application.orderWebFragments(fragments, servletContext);
+    }
+
+
+    private Set<WebXml> orderWebFragments(Map<String,WebXml> fragments,
+            ServletContext servletContext) {
 
         Set<WebXml> orderedFragments = new LinkedHashSet<>();
 
-        boolean absoluteOrdering =
-            (application.getAbsoluteOrdering() != null);
+        boolean absoluteOrdering = getAbsoluteOrdering() != null;
         boolean orderingPresent = false;
 
         if (absoluteOrdering) {
             orderingPresent = true;
             // Only those fragments listed should be processed
-            Set<String> requestedOrder = application.getAbsoluteOrdering();
+            Set<String> requestedOrder = getAbsoluteOrdering();
 
             for (String requestedName : requestedOrder) {
                 if (WebXml.ORDER_OTHERS.equals(requestedName)) {

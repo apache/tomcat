@@ -41,7 +41,7 @@ import org.xml.sax.SAXException;
 public class JasperInitializer implements ServletContainerInitializer {
 
     private static final String MSG = "org.apache.jasper.servlet.JasperInitializer";
-    private static final Log log = LogFactory.getLog(JasperInitializer.class);
+    private final Log log = LogFactory.getLog(JasperInitializer.class);
 
     /**
      * Preload classes required at runtime by a JSP servlet so that

@@ -53,7 +53,7 @@ import org.xml.sax.SAXException;
  * Scans for and loads Tag Library Descriptors contained in a web application.
  */
 public class TldScanner {
-    private static final Log log = LogFactory.getLog(TldScanner.class);
+    private final Log log = LogFactory.getLog(TldScanner.class);
     private static final String MSG = "org.apache.jasper.servlet.TldScanner";
     private static final String TLD_EXT = ".tld";
     private static final String WEB_INF = "/WEB-INF/";
