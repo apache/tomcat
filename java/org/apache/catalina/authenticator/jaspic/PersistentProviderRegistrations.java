@@ -43,7 +43,6 @@ import org.xml.sax.SAXException;
  */
 final class PersistentProviderRegistrations {
 
-    private static final Log log = LogFactory.getLog(PersistentProviderRegistrations.class);
     private static final StringManager sm =
             StringManager.getManager(PersistentProviderRegistrations.class);
 
@@ -138,7 +137,11 @@ final class PersistentProviderRegistrations {
             }
             writer.write("</jaspic-providers>\n");
         } catch (IOException e) {
-            configFileNew.delete();
+            if (!configFileNew.delete()) {
+                Log log = LogFactory.getLog(PersistentProviderRegistrations.class);
+                log.warn(sm.getString("persistentProviderRegistrations.deleteFail",
+                        configFileNew.getAbsolutePath()));
+            }
             throw new SecurityException(e);
         }
 
@@ -158,6 +161,7 @@ final class PersistentProviderRegistrations {
 
         // Remove the old file
         if (configFileOld.exists() && !configFileOld.delete()) {
+            Log log = LogFactory.getLog(PersistentProviderRegistrations.class);
             log.warn(sm.getString("persistentProviderRegistrations.deleteFail",
                     configFileOld.getAbsolutePath()));
         }

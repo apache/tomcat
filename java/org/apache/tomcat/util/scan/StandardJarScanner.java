@@ -61,7 +61,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class StandardJarScanner implements JarScanner {
 
-    private static final Log log = LogFactory.getLog(StandardJarScanner.class);
+    private final Log log = LogFactory.getLog(StandardJarScanner.class);
 
     /**
      * The string resources for this package.
@@ -411,7 +411,7 @@ public class StandardJarScanner implements JarScanner {
     }
 
 
-    private static void processManifest(Jar jar, boolean isWebapp,
+    private void processManifest(Jar jar, boolean isWebapp,
             Deque<URL> classPathUrlsToProcess) throws IOException {
 
         // Not processed for web application JARs nor if the caller did not

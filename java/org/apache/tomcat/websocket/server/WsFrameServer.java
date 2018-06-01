@@ -33,7 +33,7 @@ import org.apache.tomcat.websocket.WsSession;
 
 public class WsFrameServer extends WsFrameBase {
 
-    private static final Log log = LogFactory.getLog(WsFrameServer.class);
+    private final Log log = LogFactory.getLog(WsFrameServer.class);
     private static final StringManager sm = StringManager.getManager(WsFrameServer.class);
 
     private final SocketWrapperBase<?> socketWrapper;

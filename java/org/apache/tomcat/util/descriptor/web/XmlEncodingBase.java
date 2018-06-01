@@ -31,8 +31,8 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class XmlEncodingBase {
 
-    private static final Log log = LogFactory.getLog(XmlEncodingBase.class);
     private static final StringManager sm = StringManager.getManager(XmlEncodingBase.class);
+    private static Log log = LogFactory.getLog(XmlEncodingBase.class);
     private Charset charset = StandardCharsets.UTF_8;
 
 

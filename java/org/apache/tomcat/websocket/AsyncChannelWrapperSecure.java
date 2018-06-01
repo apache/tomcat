@@ -48,7 +48,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
 
-    private static final Log log =
+    private final Log log =
             LogFactory.getLog(AsyncChannelWrapperSecure.class);
     private static final StringManager sm =
             StringManager.getManager(AsyncChannelWrapperSecure.class);
