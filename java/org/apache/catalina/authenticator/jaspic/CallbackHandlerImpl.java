@@ -39,7 +39,6 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class CallbackHandlerImpl implements CallbackHandler {
 
-    private final Log log = LogFactory.getLog(CallbackHandlerImpl.class); // must not be static
     private static final StringManager sm = StringManager.getManager(CallbackHandlerImpl.class);
 
     private static CallbackHandler instance;
@@ -82,6 +81,9 @@ public class CallbackHandlerImpl implements CallbackHandler {
                     GroupPrincipalCallback gpc = (GroupPrincipalCallback) callback;
                     groups = gpc.getGroups();
                 } else {
+                    // This is a singleton so need to get correct Logger for
+                    // current TCCL
+                    Log log = LogFactory.getLog(CallbackHandlerImpl.class);
                     log.error(sm.getString("callbackHandlerImpl.jaspicCallbackMissing",
                             callback.getClass().getName()));
                 }
