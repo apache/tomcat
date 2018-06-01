@@ -18,6 +18,7 @@ package org.apache.jasper.servlet;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.scan.JarFactory;
@@ -94,6 +96,9 @@ public class TestTldScanner extends TomcatBaseTest {
     @Test
     public void testBug57647() throws Exception {
         TldScanner scanner = EasyMock.createMock(TldScanner.class);
+        Field f = TldScanner.class.getDeclaredField("log");
+        f.setAccessible(true);
+        f.set(scanner, LogFactory.getLog(TldScanner.class));
         Constructor<TldScanner.TldScannerCallback> constructor =
                 TldScanner.TldScannerCallback.class.getDeclaredConstructor(TldScanner.class);
         constructor.setAccessible(true);
