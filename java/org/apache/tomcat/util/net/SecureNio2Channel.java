@@ -371,7 +371,8 @@ public class SecureNio2Channel extends Nio2Channel  {
         // an optimisation for the typical case so we don't create an
         // SNIExtractor only to discover there is no data to process
         if (netInBuffer.position() == 0) {
-            sc.read(netInBuffer, socket, handshakeReadCompletionHandler);
+            sc.read(netInBuffer, Nio2Endpoint.toNio2Timeout(endpoint.getConnectionTimeout()),
+                    TimeUnit.MILLISECONDS, socket, handshakeReadCompletionHandler);
             return 1;
         }
 
@@ -386,7 +387,8 @@ public class SecureNio2Channel extends Nio2Channel  {
                     Integer.toString(newLimit)));
 
             netInBuffer = ByteBufferUtils.expand(netInBuffer, newLimit);
-            sc.read(netInBuffer, socket, handshakeReadCompletionHandler);
+            sc.read(netInBuffer, Nio2Endpoint.toNio2Timeout(endpoint.getConnectionTimeout()),
+                    TimeUnit.MILLISECONDS, socket, handshakeReadCompletionHandler);
             return 1;
         }
 
@@ -403,7 +405,8 @@ public class SecureNio2Channel extends Nio2Channel  {
             clientRequestedCiphers = extractor.getClientRequestedCiphers();
             break;
         case NEED_READ:
-            sc.read(netInBuffer, socket, handshakeReadCompletionHandler);
+            sc.read(netInBuffer, Nio2Endpoint.toNio2Timeout(endpoint.getConnectionTimeout()),
+                    TimeUnit.MILLISECONDS, socket, handshakeReadCompletionHandler);
             return 1;
         case UNDERFLOW:
             // Unable to buffer enough data to read SNI extension data
