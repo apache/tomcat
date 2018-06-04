@@ -46,7 +46,8 @@ import org.apache.juli.logging.LogFactory;
  * This valve proceeds as follows:
  * </p>
  * <p>
- * If the incoming <code>request.getRemoteAddr()</code> matches the valve's list of internal proxies :
+ * If the incoming <code>request.getRemoteAddr()</code> matches the valve's list
+ * of internal or trusted proxies:
  * <ul>
  * <li>Loop on the comma delimited list of IPs and hostnames passed by the preceding load balancer or proxy in the given request's Http
  * header named <code>$remoteIpHeader</code> (default value <code>x-forwarded-for</code>). Values are processed in right-to-left order.</li>
@@ -579,9 +580,11 @@ public class RemoteIpValve extends ValveBase {
         final String originalScheme = request.getScheme();
         final boolean originalSecure = request.isSecure();
         final int originalServerPort = request.getServerPort();
+        boolean isInternal = internalProxies != null &&
+                internalProxies.matcher(originalRemoteAddr).matches();
 
-        if (internalProxies !=null &&
-                internalProxies.matcher(originalRemoteAddr).matches()) {
+        if (isInternal || (trustedProxies != null &&
+                trustedProxies.matcher(originalRemoteAddr).matches())) {
             String remoteIp = null;
             // In java 6, proxiesHeaderValue should be declared as a java.util.Deque
             LinkedList<String> proxiesHeaderValue = new LinkedList<String>();
@@ -597,11 +600,14 @@ public class RemoteIpValve extends ValveBase {
 
             String[] remoteIpHeaderValue = commaDelimitedListToStringArray(concatRemoteIpHeaderValue.toString());
             int idx;
+            if (!isInternal) {
+                proxiesHeaderValue.addFirst(originalRemoteAddr);
+            }
             // loop on remoteIpHeaderValue to find the first trusted remote ip and to build the proxies chain
             for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
                 remoteIp = currentRemoteIp;
-                if (internalProxies.matcher(currentRemoteIp).matches()) {
+                if (internalProxies !=null && internalProxies.matcher(currentRemoteIp).matches()) {
                     // do nothing, internalProxies IPs are not appended to the
                 } else if (trustedProxies != null &&
                         trustedProxies.matcher(currentRemoteIp).matches()) {
