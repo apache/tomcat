@@ -661,6 +661,15 @@ public class HttpParser {
             } else if (isNumeric(c)) {
                 if (octet == -1) {
                     octet = c - '0';
+                } else if (octet == 0) {
+                    // Leading zero in non-zero octet. Not valid (ambiguous).
+                    if (inIPv6) {
+                        throw new IllegalArgumentException(sm.getString("http.invalidLeadingZero"));
+                    } else {
+                        // Could be a host/FQDN
+                        reader.reset();
+                        return readHostDomainName(reader);
+                    }
                 } else {
                     octet = octet * 10 + c - '0';
                 }

@@ -186,6 +186,11 @@
       <docs>
         <bug>62423</bug>: Fix SSL docs CRL attribute typo. (remm)
       </docs>
+      <fix>
+        Improve IPv6 validation by ensuring that IPv4-Mapped IPv6 addresses do
+        not contain leading zeros in the IPv4 part. Based on a patch by Katya
+        Stoycheva. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

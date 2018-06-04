@@ -54,17 +54,19 @@ public class TestHttpParserHost {
         result.add(new Object[] { TestType.IPv4, "127.0.0.1:8080", Integer.valueOf(9), null} );
         result.add(new Object[] { TestType.IPv4, "0.0.0.0", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv4, "0.0.0.0:8080", Integer.valueOf(7), null} );
-        result.add(new Object[] { TestType.IPv4, "0", Integer.valueOf(-1), null} );
         // IPv4 - invalid
         result.add(new Object[] { TestType.IPv4, ".0.0.0", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "0.0.0.", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "0..0.0", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv4, "0]", Integer.valueOf(-1), IAE} );
         // Domain Name - valid
+        result.add(new Object[] { TestType.IPv4, "0", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv4, "0.0", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv4, "0.0:8080", Integer.valueOf(3), null} );
         result.add(new Object[] { TestType.IPv4, "0.0.0", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv4, "0.0.0:8080", Integer.valueOf(5), null} );
+        result.add(new Object[] { TestType.IPv4, "0.00.0.0", Integer.valueOf(-1), null} );
+        result.add(new Object[] { TestType.IPv4, "0.00.0.0:8080", Integer.valueOf(8), null} );
         result.add(new Object[] { TestType.IPv4, "256.0.0.0", Integer.valueOf(-1), null} );
         result.add(new Object[] { TestType.IPv4, "256.0.0.0:8080", Integer.valueOf(9), null} );
         result.add(new Object[] { TestType.IPv4, "0.256.0.0", Integer.valueOf(-1), null} );
@@ -190,6 +192,7 @@ public class TestHttpParserHost {
                 Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv6, "[1234:5678:90AB:CDEF:1234:5678:90AB:CDEF",
                 Integer.valueOf(-1), IAE} );
+        result.add(new Object[] { TestType.IPv6, "[::127.00.0.1]", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv6, "[0::0::127.0.0.1]", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv6, "[0:0:G:0:0:0:127.0.0.1]", Integer.valueOf(-1), IAE} );
         result.add(new Object[] { TestType.IPv6, "[00000:0:0:0:0:0:127.0.0.1]", Integer.valueOf(-1), IAE} );
