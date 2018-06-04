@@ -191,6 +191,10 @@
         not contain leading zeros in the IPv4 part. Based on a patch by Katya
         Stoycheva. (markt)
       </fix>
+      <fix>
+        Fix <code>NullPointerException</code> thrown from <code>
+        replaceSystemProperties()</code> when trying to log messages. (csutherl)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

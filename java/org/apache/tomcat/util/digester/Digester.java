@@ -84,6 +84,7 @@ public class Digester extends DefaultHandler2 {
 
     protected static IntrospectionUtils.PropertySource propertySource;
     private static boolean propertySourceSet = false;
+    protected static final StringManager sm = StringManager.getManager(Digester.class);
 
     static {
         String className = System.getProperty("org.apache.tomcat.util.digester.PROPERTY_SOURCE");
@@ -309,7 +310,6 @@ public class Digester extends DefaultHandler2 {
      * The Log to which most logging calls will be made.
      */
     protected Log log = LogFactory.getLog(Digester.class);
-    protected static final StringManager sm = StringManager.getManager(Digester.class);
 
     /**
      * The Log to which all SAX event related logging calls will be made.
