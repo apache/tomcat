@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.valves;
 
 import java.io.IOException;
@@ -42,6 +41,8 @@ public class TestRemoteIpValve {
         private String scheme;
         private boolean secure;
         private int serverPort;
+        private String forwardedFor;
+        private String forwardedBy;
 
         public String getRemoteAddr() {
             return remoteAddr;
@@ -63,6 +64,14 @@ public class TestRemoteIpValve {
             return secure;
         }
 
+        public String getForwardedFor() {
+            return forwardedFor;
+        }
+
+        public String getForwardedBy() {
+            return forwardedBy;
+        }
+
         @Override
         public void invoke(Request request, Response response) throws IOException, ServletException {
             this.remoteHost = request.getRemoteHost();
@@ -70,6 +79,8 @@ public class TestRemoteIpValve {
             this.scheme = request.getScheme();
             this.secure = request.isSecure();
             this.serverPort = request.getServerPort();
+            this.forwardedFor = request.getHeader("x-forwarded-for");
+            this.forwardedBy = request.getHeader("x-forwarded-by");
         }
     }
 
@@ -167,10 +178,10 @@ public class TestRemoteIpValve {
         remoteIpValve.invoke(request, null);
 
         // VERIFY
-        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        String actualXForwardedFor = remoteAddrAndHostTrackerValve.getForwardedFor();
         Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
-        String actualXForwardedBy = request.getHeader("x-forwarded-by");
+        String actualXForwardedBy = remoteAddrAndHostTrackerValve.getForwardedBy();
         Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
@@ -290,10 +301,10 @@ public class TestRemoteIpValve {
         remoteIpValve.invoke(request, null);
 
         // VERIFY
-        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        String actualXForwardedFor = remoteAddrAndHostTrackerValve.getForwardedFor();
         Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
-        String actualXForwardedBy = request.getHeader("x-forwarded-by");
+        String actualXForwardedBy = remoteAddrAndHostTrackerValve.getForwardedBy();
         Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
@@ -331,7 +342,7 @@ public class TestRemoteIpValve {
         remoteIpValve.invoke(request, null);
 
         // VERIFY
-        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        String actualXForwardedFor = remoteAddrAndHostTrackerValve.getForwardedFor();
         Assert.assertNull("all proxies are internal, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = request.getHeader("x-forwarded-by");
@@ -374,10 +385,10 @@ public class TestRemoteIpValve {
         remoteIpValve.invoke(request, null);
 
         // VERIFY
-        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        String actualXForwardedFor = remoteAddrAndHostTrackerValve.getForwardedFor();
         Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
 
-        String actualXForwardedBy = request.getHeader("x-forwarded-by");
+        String actualXForwardedBy = remoteAddrAndHostTrackerValve.getForwardedBy();
         Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
@@ -420,7 +431,7 @@ public class TestRemoteIpValve {
 
         // VERIFY
         // client ip
-        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        String actualXForwardedFor = remoteAddrAndHostTrackerValve.getForwardedFor();
         Assert.assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = request.getHeader("x-forwarded-by");
@@ -485,7 +496,7 @@ public class TestRemoteIpValve {
 
         // VERIFY
         // client ip
-        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        String actualXForwardedFor = remoteAddrAndHostTrackerValve.getForwardedFor();
         Assert.assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = request.getHeader("x-forwarded-by");
@@ -550,10 +561,10 @@ public class TestRemoteIpValve {
 
         // VERIFY
         // client ip
-        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        String actualXForwardedFor = remoteAddrAndHostTrackerValve.getForwardedFor();
         Assert.assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
 
-        String actualXForwardedBy = request.getHeader("x-forwarded-by");
+        String actualXForwardedBy = remoteAddrAndHostTrackerValve.getForwardedBy();
         Assert.assertNull("no intermediate trusted proxy", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
@@ -615,7 +626,7 @@ public class TestRemoteIpValve {
 
         // VERIFY
         // client ip
-        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        String actualXForwardedFor = remoteAddrAndHostTrackerValve.getForwardedFor();
         Assert.assertNull("no intermediate non-trusted proxy, x-forwarded-for must be null", actualXForwardedFor);
 
         String actualXForwardedBy = request.getHeader("x-forwarded-by");
@@ -715,10 +726,10 @@ public class TestRemoteIpValve {
         remoteIpValve.invoke(request, null);
 
         // VERIFY
-        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        String actualXForwardedFor = remoteAddrAndHostTrackerValve.getForwardedFor();
         Assert.assertEquals("ip/host before untrusted-proxy must appear in x-forwarded-for", "140.211.11.130, proxy1", actualXForwardedFor);
 
-        String actualXForwardedBy = request.getHeader("x-forwarded-by");
+        String actualXForwardedBy = remoteAddrAndHostTrackerValve.getForwardedBy();
         Assert.assertEquals("ip/host after untrusted-proxy must appear in  x-forwarded-by", "proxy2", actualXForwardedBy);
 
         String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
