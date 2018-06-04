@@ -137,6 +137,12 @@
         <code>internalProxies</code> regular expression. Patch by Craig Andrews.
         (markt)
       </add>
+      <fix>
+        In the <code>RemoteIpValve</code> and <code>RemoteIpFilter</code>,
+        correctly handle the case when the request passes through one or more
+        <code>trustedProxies</code> but no <code>internalProxies</code>. Based
+        on a patch by zhanhb. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

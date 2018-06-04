@@ -67,7 +67,8 @@ import org.apache.juli.logging.LogFactory;
  * This servlet filter proceeds as follows:
  * </p>
  * <p>
- * If the incoming <code>request.getRemoteAddr()</code> matches the servlet filter's list of internal proxies :
+ * If the incoming <code>request.getRemoteAddr()</code> matches the servlet
+ * filter's list of internal or trusted proxies:
  * </p>
  * <ul>
  * <li>Loop on the comma delimited list of IPs and hostnames passed by the preceding load balancer or proxy in the given request's Http
@@ -761,8 +762,11 @@ public class RemoteIpFilter extends GenericFilter {
 
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-        if (internalProxies != null &&
-                internalProxies.matcher(request.getRemoteAddr()).matches()) {
+        boolean isInternal = internalProxies != null &&
+                internalProxies.matcher(request.getRemoteAddr()).matches();
+
+        if (isInternal || (trustedProxies != null &&
+                trustedProxies.matcher(request.getRemoteAddr()).matches())) {
             String remoteIp = null;
             // In java 6, proxiesHeaderValue should be declared as a java.util.Deque
             LinkedList<String> proxiesHeaderValue = new LinkedList<>();
@@ -778,11 +782,14 @@ public class RemoteIpFilter extends GenericFilter {
 
             String[] remoteIpHeaderValue = commaDelimitedListToStringArray(concatRemoteIpHeaderValue.toString());
             int idx;
+            if (!isInternal) {
+                proxiesHeaderValue.addFirst(request.getRemoteAddr());
+            }
             // loop on remoteIpHeaderValue to find the first trusted remote ip and to build the proxies chain
             for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
                 remoteIp = currentRemoteIp;
-                if (internalProxies.matcher(currentRemoteIp).matches()) {
+                if (internalProxies !=null && internalProxies.matcher(currentRemoteIp).matches()) {
                     // do nothing, internalProxies IPs are not appended to the
                 } else if (trustedProxies != null &&
                         trustedProxies.matcher(currentRemoteIp).matches()) {

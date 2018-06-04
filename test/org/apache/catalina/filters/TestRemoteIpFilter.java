@@ -348,6 +348,75 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     }
 
     @Test
+    public void testInvokeAllProxiesAreTrustedEmptyInternal() throws Exception {
+
+        // PREPARE
+        RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("internalProxies", "");
+        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
+        filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
+        filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
+
+        filterDef.setFilter(remoteIpFilter);
+        MockHttpServletRequest request = new MockHttpServletRequest();
+
+        request.setRemoteAddr("proxy3");
+        request.setRemoteHost("remote-host-original-value");
+        request.setHeader("x-forwarded-for", "140.211.11.130, proxy1, proxy2");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        String actualXForwardedFor = actualRequest.getHeader("x-forwarded-for");
+        Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
+
+        String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2, proxy3", actualXForwardedBy);
+
+        String actualRemoteAddr = actualRequest.getRemoteAddr();
+        Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+
+        String actualRemoteHost = actualRequest.getRemoteHost();
+        Assert.assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+    }
+
+    @Test
+    public void testInvokeAllProxiesAreTrustedUnusedInternal() throws Exception {
+
+        // PREPARE
+        RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("trustedProxies", "proxy1|proxy2|proxy3");
+        filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
+        filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
+
+        filterDef.setFilter(remoteIpFilter);
+        MockHttpServletRequest request = new MockHttpServletRequest();
+
+        request.setRemoteAddr("proxy3");
+        request.setRemoteHost("remote-host-original-value");
+        request.setHeader("x-forwarded-for", "140.211.11.130, proxy1, proxy2");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        String actualXForwardedFor = actualRequest.getHeader("x-forwarded-for");
+        Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
+
+        String actualXForwardedBy = actualRequest.getHeader("x-forwarded-by");
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2, proxy3", actualXForwardedBy);
+
+        String actualRemoteAddr = actualRequest.getRemoteAddr();
+        Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+
+        String actualRemoteHost = actualRequest.getRemoteHost();
+        Assert.assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+    }
+
+    @Test
     public void testInvokeAllProxiesAreTrustedAndRemoteAddrMatchRegexp() throws Exception {
 
         // PREPARE

@@ -203,6 +203,87 @@ public class TestRemoteIpValve {
     }
 
     @Test
+    public void testInvokeAllProxiesAreTrustedEmptyInternal() throws Exception {
+
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setInternalProxies("");
+        remoteIpValve.setTrustedProxies("proxy1|proxy2|proxy3");
+        remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+        remoteIpValve.setProxiesHeader("x-forwarded-by");
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+
+        Request request = new MockRequest();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        request.setRemoteAddr("proxy3");
+        request.setRemoteHost("remote-host-original-value");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("140.211.11.130, proxy1, proxy2");
+
+        // TEST
+        remoteIpValve.invoke(request, null);
+
+        // VERIFY
+        String actualXForwardedFor = remoteAddrAndHostTrackerValve.getForwardedFor();
+        Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
+
+        String actualXForwardedBy = remoteAddrAndHostTrackerValve.getForwardedBy();
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2, proxy3", actualXForwardedBy);
+
+        String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
+        Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+
+        String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
+        Assert.assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+
+        String actualPostInvokeRemoteAddr = request.getRemoteAddr();
+        Assert.assertEquals("postInvoke remoteAddr", "proxy3", actualPostInvokeRemoteAddr);
+
+        String actualPostInvokeRemoteHost = request.getRemoteHost();
+        Assert.assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
+    }
+
+    @Test
+    public void testInvokeAllProxiesAreTrustedUnusedInternal() throws Exception {
+
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setTrustedProxies("proxy1|proxy2|proxy3");
+        remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+        remoteIpValve.setProxiesHeader("x-forwarded-by");
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+
+        Request request = new MockRequest();
+        request.setCoyoteRequest(new org.apache.coyote.Request());
+        request.setRemoteAddr("proxy3");
+        request.setRemoteHost("remote-host-original-value");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for").setString("140.211.11.130, proxy1, proxy2");
+
+        // TEST
+        remoteIpValve.invoke(request, null);
+
+        // VERIFY
+        String actualXForwardedFor = remoteAddrAndHostTrackerValve.getForwardedFor();
+        Assert.assertNull("all proxies are trusted, x-forwarded-for must be null", actualXForwardedFor);
+
+        String actualXForwardedBy = remoteAddrAndHostTrackerValve.getForwardedBy();
+        Assert.assertEquals("all proxies are trusted, they must appear in x-forwarded-by", "proxy1, proxy2, proxy3", actualXForwardedBy);
+
+        String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
+        Assert.assertEquals("remoteAddr", "140.211.11.130", actualRemoteAddr);
+
+        String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
+        Assert.assertEquals("remoteHost", "140.211.11.130", actualRemoteHost);
+
+        String actualPostInvokeRemoteAddr = request.getRemoteAddr();
+        Assert.assertEquals("postInvoke remoteAddr", "proxy3", actualPostInvokeRemoteAddr);
+
+        String actualPostInvokeRemoteHost = request.getRemoteHost();
+        Assert.assertEquals("postInvoke remoteAddr", "remote-host-original-value", actualPostInvokeRemoteHost);
+    }
+
+    @Test
     public void testInvokeAllProxiesAreTrustedOrInternal() throws Exception {
 
         // PREPARE
