@@ -572,13 +572,17 @@ public class RemoteIpValve extends ValveBase {
         final int originalServerPort = request.getServerPort();
         final String originalProxiesHeader = request.getHeader(proxiesHeader);
         final String originalRemoteIpHeader = request.getHeader(remoteIpHeader);
+        boolean isInternal;
 
-        if (internalProxies !=null &&
-                internalProxies.matcher(originalRemoteAddr).matches()) {
+        if ((isInternal = (internalProxies !=null &&
+                internalProxies.matcher(originalRemoteAddr).matches())) || 
+                (trustedProxies != null &&
+                        trustedProxies.matcher(originalRemoteAddr).matches())) {
             String remoteIp = null;
             // In java 6, proxiesHeaderValue should be declared as a java.util.Deque
             LinkedList<String> proxiesHeaderValue = new LinkedList<>();
             StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
+            if (!isInternal) proxiesHeaderValue.addFirst(originalRemoteAddr);
 
             for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
                 if (concatRemoteIpHeaderValue.length() > 0) {
@@ -594,7 +598,7 @@ public class RemoteIpValve extends ValveBase {
             for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
                 remoteIp = currentRemoteIp;
-                if (internalProxies.matcher(currentRemoteIp).matches()) {
+                if (internalProxies !=null && internalProxies.matcher(currentRemoteIp).matches()) {
                     // do nothing, internalProxies IPs are not appended to the
                 } else if (trustedProxies != null &&
                         trustedProxies.matcher(currentRemoteIp).matches()) {
