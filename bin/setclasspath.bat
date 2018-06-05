@@ -36,7 +36,6 @@ goto exit
 rem Check if we have a usable JDK
 if "%JAVA_HOME%" == "" goto noJavaHome
 if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHome
-if not exist "%JAVA_HOME%\bin\javaw.exe" goto noJavaHome
 if not exist "%JAVA_HOME%\bin\jdb.exe" goto noJavaHome
 if not exist "%JAVA_HOME%\bin\javac.exe" goto noJavaHome
 set "JRE_HOME=%JAVA_HOME%"
@@ -55,7 +54,6 @@ set "JRE_HOME=%JAVA_HOME%"
 :gotJreHome
 rem Check if we have a usable JRE
 if not exist "%JRE_HOME%\bin\java.exe" goto noJreHome
-if not exist "%JRE_HOME%\bin\javaw.exe" goto noJreHome
 goto okJava
 
 :noJreHome
