@@ -292,7 +292,7 @@
       </add>
       <fix>
         <bug>62391</bug>: Remove references to <code>javaw.exe</code> as this
-        file is not required by Tomcat and the references prevent the use if the
+        file is not required by Tomcat and the references prevent the use of the
         Server JRE. (markt)
       </fix>
     </changelog>
