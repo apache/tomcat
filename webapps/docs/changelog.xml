@@ -238,6 +238,12 @@
       <add>
         Add the method to send a message with a specified sendOptions. (kfujino)
       </add>
+      <fix>
+        When sending the <code>GET_ALL_SESSIONS</code> message, make sure that
+        sends with asynchronous option in order to avoid ack timeout. Waiting to
+        receive the <code>ALL_SESSION_DATA</code> message should be done with
+        <code>waitForSendAllSessions</code> instead of ACK. (kfujino)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">

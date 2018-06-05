@@ -747,7 +747,7 @@ public class DeltaManager extends ClusterManagerBase{
                 synchronized(receivedMessageQueue) {
                      receiverQueue = true ;
                 }
-                cluster.send(msg, mbr);
+                cluster.send(msg, mbr, Channel.SEND_OPTIONS_ASYNCHRONOUS);
                 if (log.isInfoEnabled())
                     log.info(sm.getString("deltaManager.waitForSessionState",
                             getName(), mbr, Integer.valueOf(getStateTransferTimeout())));
