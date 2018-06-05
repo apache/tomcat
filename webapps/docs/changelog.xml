@@ -233,6 +233,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        <bug>62391</bug>: Remove references to <code>javaw.exe</code> as this
+        file is not required by Tomcat and the references prevent the use of the
+        Server JRE. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 8.5.31 (markt)" rtext="2018-05-03">
   <subsection name="Catalina">
