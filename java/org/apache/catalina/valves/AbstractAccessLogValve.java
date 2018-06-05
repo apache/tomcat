@@ -809,7 +809,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     /**
      * write local IP address - %A
      */
-    protected class LocalAddrElement implements AccessLogElement {
+    protected static class LocalAddrElement implements AccessLogElement {
 
         private final String localAddrValue;
 
