@@ -26,7 +26,7 @@ import org.apache.tomcat.unittest.TesterRequest;
 
 public class TestResponsePerformance extends LoggingBaseTest {
 
-    private final int ITERATIONS = 100000;
+    private static final int ITERATIONS = 100000;
 
     @Test
     public void testToAbsolutePerformance() throws Exception {

@@ -99,10 +99,10 @@ public class FileHandler extends Handler {
 
     private static final ExecutorService DELETE_FILES_SERVICE =
             Executors.newSingleThreadExecutor(new ThreadFactory() {
+                private static final String NAME_PREFIX = "FileHandlerLogFilesCleaner-";
                 private final boolean isSecurityEnabled;
                 private final ThreadGroup group;
                 private final AtomicInteger threadNumber = new AtomicInteger(1);
-                private final String namePrefix = "FileHandlerLogFilesCleaner-";
 
                 {
                     SecurityManager s = System.getSecurityManager();
@@ -131,7 +131,7 @@ public class FileHandler extends Handler {
                                     .setContextClassLoader(getClass().getClassLoader());
                         }
                         Thread t = new Thread(group, r,
-                                namePrefix + threadNumber.getAndIncrement());
+                                NAME_PREFIX + threadNumber.getAndIncrement());
                         t.setDaemon(true);
                         return t;
                     } finally {

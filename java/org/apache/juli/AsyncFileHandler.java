@@ -147,7 +147,6 @@ public class AsyncFileHandler extends FileHandler {
     }
 
     protected static class LoggerThread extends Thread {
-        protected final boolean run = true;
         public LoggerThread() {
             this.setDaemon(true);
             this.setName("AsyncFileHandlerWriter-" + System.identityHashCode(this));
@@ -155,7 +154,7 @@ public class AsyncFileHandler extends FileHandler {
 
         @Override
         public void run() {
-            while (run) {
+            while (true) {
                 try {
                     LogEntry entry = queue.poll(LOGGER_SLEEP_TIME, TimeUnit.MILLISECONDS);
                     if (entry != null) {

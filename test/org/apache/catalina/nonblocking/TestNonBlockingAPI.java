@@ -408,7 +408,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
 
     public static class DataWriter implements BytesStreamer {
-        final int max = 5;
+        private static final int MAX = 5;
         int count = 0;
         long delay = 0;
         byte[] b = "WANTMORE".getBytes(StandardCharsets.ISO_8859_1);
@@ -420,12 +420,12 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         @Override
         public int getLength() {
-            return b.length * max;
+            return b.length * MAX;
         }
 
         @Override
         public int available() {
-            if (count < max) {
+            if (count < MAX) {
                 return b.length;
             } else {
                 return 0;
@@ -434,7 +434,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         @Override
         public byte[] next() {
-            if (count < max) {
+            if (count < MAX) {
                 if (count > 0)
                     try {
                         if (delay > 0)
@@ -442,7 +442,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                     } catch (Exception x) {
                     }
                 count++;
-                if (count < max)
+                if (count < MAX)
                     return b;
                 else
                     return f;

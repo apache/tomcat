@@ -265,7 +265,7 @@ public class TestStandardContext extends TomcatBaseTest {
     }
 
     private static class FailingLifecycleListener implements LifecycleListener {
-        private final String failEvent = Lifecycle.CONFIGURE_START_EVENT;
+        private static final String failEvent = Lifecycle.CONFIGURE_START_EVENT;
         private boolean fail = true;
         protected void setFail(boolean fail) {
             this.fail = fail;

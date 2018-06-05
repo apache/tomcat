@@ -465,9 +465,8 @@ public class TestBasicAuthParser {
      */
     private static final class BasicAuthHeader {
 
-        private  final String HTTP_AUTH = "authorization: ";
-        private  final byte[] HEADER =
-                HTTP_AUTH.getBytes(StandardCharsets.ISO_8859_1);
+        private static final byte[] HEADER =
+                "authorization: ".getBytes(StandardCharsets.ISO_8859_1);
         private ByteChunk authHeader;
         private int initialOffset = 0;
 

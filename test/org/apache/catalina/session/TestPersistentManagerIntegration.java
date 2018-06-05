@@ -41,7 +41,7 @@ import org.apache.catalina.valves.PersistentValve;
 
 public class TestPersistentManagerIntegration extends TomcatBaseTest {
 
-    private final String ACTIVITY_CHECK = "org.apache.catalina.session.StandardSession.ACTIVITY_CHECK";
+    private static final String ACTIVITY_CHECK = "org.apache.catalina.session.StandardSession.ACTIVITY_CHECK";
 
     private String oldActivityCheck;
 
