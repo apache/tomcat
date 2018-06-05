@@ -17,6 +17,7 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -79,8 +80,9 @@ import org.apache.tomcat.util.res.StringManager;
 public class CorsFilter extends GenericFilter {
 
     private static final long serialVersionUID = 1L;
-    private final Log log = LogFactory.getLog(CorsFilter.class); // must not be static
     private static final StringManager sm = StringManager.getManager(CorsFilter.class);
+
+    private transient Log log = LogFactory.getLog(CorsFilter.class); // must not be static
 
 
     /**
@@ -909,7 +911,19 @@ public class CorsFilter extends GenericFilter {
     }
 
 
+    /*
+     * Log objects are not Serializable but this Filter is because it extends
+     * GenericFilter. Tomcat won't serialize a Filter but in case something else
+     * does...
+     */
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        log = LogFactory.getLog(CorsFilter.class);
+    }
+
+
     // -------------------------------------------------- CORS Response Headers
+
     /**
      * The Access-Control-Allow-Origin header indicates whether a resource can
      * be shared based by returning the value of the Origin request header in

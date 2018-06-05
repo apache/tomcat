@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
 
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -61,7 +61,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
     static final StringManager sm =
         StringManager.getManager(Constants.Package);
 
-    private final Log log = LogFactory.getLog(ApplicationFilterConfig.class); // must not be static
+    private transient Log log = LogFactory.getLog(ApplicationFilterConfig.class); // must not be static
 
     /**
      * Empty String collection to serve as the basis for empty enumerations.
@@ -403,4 +403,14 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         }
 
     }
+
+
+    /*
+     * Log objects are not Serializable.
+     */
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        log = LogFactory.getLog(ApplicationFilterConfig.class);
+    }
+
 }

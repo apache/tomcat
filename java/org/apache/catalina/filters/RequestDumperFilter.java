@@ -17,6 +17,7 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
@@ -66,7 +67,7 @@ public class RequestDumperFilter extends GenericFilter {
 
     // Log must be non-static as loggers are created per class-loader and this
     // Filter may be used in multiple class loaders
-    private final Log log = LogFactory.getLog(RequestDumperFilter.class); // must not be static
+    private transient Log log = LogFactory.getLog(RequestDumperFilter.class);
 
 
     /**
@@ -263,6 +264,18 @@ public class RequestDumperFilter extends GenericFilter {
         }
         return ts.dateString;
     }
+
+
+    /*
+     * Log objects are not Serializable but this Filter is because it extends
+     * GenericFilter. Tomcat won't serialize a Filter but in case something else
+     * does...
+     */
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        log = LogFactory.getLog(RequestDumperFilter.class);
+    }
+
 
     private static final class Timestamp {
         private final Date date = new Date(0);

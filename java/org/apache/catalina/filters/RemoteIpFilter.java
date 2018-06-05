@@ -17,6 +17,7 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -656,7 +657,7 @@ public class RemoteIpFilter extends GenericFilter {
 
     // Log must be non-static as loggers are created per class-loader and this
     // Filter may be used in multiple class loaders
-    private final Log log = LogFactory.getLog(RemoteIpFilter.class); // must not be static
+    private transient Log log = LogFactory.getLog(RemoteIpFilter.class);
 
     protected static final String PROTOCOL_HEADER_PARAMETER = "protocolHeader";
 
@@ -1180,5 +1181,16 @@ public class RemoteIpFilter extends GenericFilter {
         } else {
             this.trustedProxies = Pattern.compile(trustedProxies);
         }
+    }
+
+
+    /*
+     * Log objects are not Serializable but this Filter is because it extends
+     * GenericFilter. Tomcat won't serialize a Filter but in case something else
+     * does...
+     */
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        log = LogFactory.getLog(RemoteIpFilter.class);
     }
 }
