@@ -40,8 +40,7 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEn
 
 public class TestWsPingPongMessages extends WebSocketBaseTest {
 
-    ByteBuffer applicationData =
-            ByteBuffer.wrap(new String("mydata").getBytes(StandardCharsets.UTF_8));
+    ByteBuffer applicationData = ByteBuffer.wrap("mydata".getBytes(StandardCharsets.UTF_8));
 
     @Test
     public void testPingPongMessages() throws Exception {

@@ -179,6 +179,12 @@
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
   </Match>
   <Match>
+    <!-- Use of new String() is deliberate -->
+    <Class name="org.apache.catalina.core.StandardContext" />
+    <Method name="setResponseCharacterEncoding" />
+    <Bug pattern="DM_STRING_CTOR" />
+  </Match>
+  <Match>
     <!-- Have to trigger GC for leak detection to work. Clearly documented -->
     <Class name="org.apache.catalina.core.StandardHost" />
     <Method name="findReloadedContextMemoryLeaks" />
