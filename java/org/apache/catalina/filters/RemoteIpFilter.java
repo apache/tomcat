@@ -112,7 +112,7 @@ import org.apache.juli.logging.LogFactory;
  * {@link java.util.regex.Pattern java.util.regex})</td>
  * <td>10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|
  *     169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|
- *     0:0:0:0:0:0:0:1
+ *     0:0:0:0:0:0:0:1|::1
  *     <br>
  * By default, 10/8, 192.168/16, 169.254/16, 127/8 and 0:0:0:0:0:0:0:1 are allowed.</td>
  * </tr>
@@ -722,7 +722,7 @@ public class RemoteIpFilter implements Filter {
             "192\\.168\\.\\d{1,3}\\.\\d{1,3}|" +
             "169\\.254\\.\\d{1,3}\\.\\d{1,3}|" +
             "127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" +
-            "0:0:0:0:0:0:0:1");
+            "0:0:0:0:0:0:0:1|::1");
 
     /**
      * @see #setProtocolHeader(String)
