@@ -138,6 +138,13 @@
         not contain leading zeros in the IPv4 part. Based on a patch by Katya
         Stoycheva. (markt)
       </fix>
+      <fix>
+        <bug>62080</bug>: Ensure that all reads of the current thread's context
+        class loader made by the UEL API and implementation are performed via a
+        <code>PrivilegedAction</code> to ensure that a
+        <code>SecurityException</code> is not triggered when running under a
+        <code>SecurityManager</code>. (mark)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
