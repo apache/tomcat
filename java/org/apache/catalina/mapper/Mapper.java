@@ -1545,7 +1545,7 @@ public final class Mapper {
      * wild card host names from the external to internal form.
      */
     private static String renameWildcardHost(String hostName) {
-        if (hostName.startsWith("*.")) {
+        if (hostName != null && hostName.startsWith("*.")) {
             return hostName.substring(1);
         } else {
             return hostName;
