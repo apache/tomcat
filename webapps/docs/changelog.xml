@@ -143,6 +143,11 @@
         <code>trustedProxies</code> but no <code>internalProxies</code>. Based
         on a patch by zhanhb. (markt)
       </fix>
+      <fix>
+        Correct the logic in <code>MBeanFactory.removeConnector()</code> to
+        ensure that the correct Connector is removed when there are multiple
+        Connectors using different addresses but the same port. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

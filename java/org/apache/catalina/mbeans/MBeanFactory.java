@@ -18,6 +18,7 @@
 package org.apache.catalina.mbeans;
 
 import java.io.File;
+import java.net.InetAddress;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -685,29 +686,32 @@ public class MBeanFactory {
         ObjectName oname = new ObjectName(name);
         Service service = getService(oname);
         String port = oname.getKeyProperty("port");
-        //String address = oname.getKeyProperty("address");
+        String address = ObjectName.unquote(oname.getKeyProperty("address"));
 
         Connector conns[] = service.findConnectors();
 
         for (int i = 0; i < conns.length; i++) {
-            String connAddress = String.valueOf(conns[i].getProperty("address"));
+            String connAddress = null;
+            Object objConnAddress = conns[i].getProperty("address");
+            if (objConnAddress != null) {
+                connAddress = ((InetAddress) objConnAddress).getHostAddress();
+            }
             String connPort = ""+conns[i].getPort();
 
-            // if (((address.equals("null")) &&
-            if ((connAddress==null) && port.equals(connPort)) {
-                service.removeConnector(conns[i]);
-                conns[i].destroy();
-                break;
-            }
-            // } else if (address.equals(connAddress))
-            if (port.equals(connPort)) {
-                // Remove this component from its parent component
+            if (address == null) {
+                // Don't combine this with outer if or we could get an NPE in
+                // 'else if' below
+                if (connAddress == null && port.equals(connPort)) {
+                    service.removeConnector(conns[i]);
+                    conns[i].destroy();
+                    break;
+                }
+            } else if (address.equals(connAddress) && port.equals(connPort)) {
                 service.removeConnector(conns[i]);
                 conns[i].destroy();
                 break;
             }
         }
-
     }
 
 
