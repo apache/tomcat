@@ -320,24 +320,19 @@ public final class IntrospectionUtils {
         return methods;
     }
 
-    @SuppressWarnings("null") // Neither params nor methodParams can be null
-                              // when comparing their lengths
+    @SuppressWarnings("null") // params cannot be null when comparing lengths
     public static Method findMethod(Class<?> c, String name,
             Class<?> params[]) {
         Method methods[] = findMethods(c);
-        if (methods == null)
-            return null;
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].getName().equals(name)) {
                 Class<?> methodParams[] = methods[i].getParameterTypes();
-                if (methodParams == null)
-                    if (params == null || params.length == 0)
-                        return methods[i];
-                if (params == null)
-                    if (methodParams == null || methodParams.length == 0)
-                        return methods[i];
-                if (params.length != methodParams.length)
+                if (params == null && methodParams.length == 0) {
+                    return methods[i];
+                }
+                if (params.length != methodParams.length) {
                     continue;
+                }
                 boolean found = true;
                 for (int j = 0; j < params.length; j++) {
                     if (params[j] != methodParams[j]) {
@@ -345,8 +340,9 @@ public final class IntrospectionUtils {
                         break;
                     }
                 }
-                if (found)
+                if (found) {
                     return methods[i];
+                }
             }
         }
         return null;
