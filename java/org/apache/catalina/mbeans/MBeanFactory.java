@@ -686,7 +686,10 @@ public class MBeanFactory {
         ObjectName oname = new ObjectName(name);
         Service service = getService(oname);
         String port = oname.getKeyProperty("port");
-        String address = ObjectName.unquote(oname.getKeyProperty("address"));
+        String address = oname.getKeyProperty("address");
+        if (address != null) {
+            address = ObjectName.unquote(address);
+        }
 
         Connector conns[] = service.findConnectors();
 
