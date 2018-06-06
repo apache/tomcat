@@ -101,7 +101,7 @@ public abstract class ExpressionFactory {
     public static ExpressionFactory newInstance(Properties properties) {
         ExpressionFactory result = null;
 
-        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
+        ClassLoader tccl = Util.getContextClassLoader();
 
         CacheValue cacheValue;
         Class<?> clazz;

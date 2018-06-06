@@ -210,6 +210,13 @@
         to JspC. (markt)
       </add>
       <fix>
+        <bug>62080</bug>: Ensure that all reads of the current thread's context
+        class loader made by the UEL API and implementation are performed via a
+        <code>PrivilegedAction</code> to ensure that a
+        <code>SecurityException</code> is not triggered when running under a
+        <code>SecurityManager</code>. (mark)
+      </fix>
+      <fix>
         <bug>62350</bug>: Refactor
         <code>org.apache.jasper.runtime.BodyContentImpl</code> so a
         <code>SecurityException</code> is not thrown when running under a
