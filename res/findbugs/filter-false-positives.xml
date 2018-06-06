@@ -103,7 +103,7 @@
     because o.a.t.util.buf.MessageBytes.toString() can return NULL -->
     <Class name="org.apache.catalina.authenticator.FormAuthenticator"/>
     <Or>
-      <Method name="authenticate"/>
+      <Method name="doAuthenticate"/>
       <Method name="matchRequest"/>
     </Or>
     <Bug code="RCN"/>
