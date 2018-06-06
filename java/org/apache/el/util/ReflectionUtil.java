@@ -19,6 +19,8 @@ package org.apache.el.util;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,10 +59,10 @@ public class ReflectionUtil {
         if (c == null) {
             if (name.endsWith("[]")) {
                 String nc = name.substring(0, name.length() - 2);
-                c = Class.forName(nc, true, Thread.currentThread().getContextClassLoader());
+                c = Class.forName(nc, true, getContextClassLoader());
                 c = Array.newInstance(c, 0).getClass();
             } else {
-                c = Class.forName(name, true, Thread.currentThread().getContextClassLoader());
+                c = Class.forName(name, true, getContextClassLoader());
             }
         }
         return c;
@@ -475,6 +477,28 @@ public class ReflectionUtil {
         }
         return null;
     }
+
+
+    private static ClassLoader getContextClassLoader() {
+        ClassLoader tccl;
+        if (System.getSecurityManager() != null) {
+            PrivilegedAction<ClassLoader> pa = new PrivilegedGetTccl();
+            tccl = AccessController.doPrivileged(pa);
+        } else {
+            tccl = Thread.currentThread().getContextClassLoader();
+        }
+
+        return tccl;
+    }
+
+
+    private static class PrivilegedGetTccl implements PrivilegedAction<ClassLoader> {
+        @Override
+        public ClassLoader run() {
+            return Thread.currentThread().getContextClassLoader();
+        }
+    }
+
 
     /*
      * This class duplicates code in javax.el.Util. When making changes keep
