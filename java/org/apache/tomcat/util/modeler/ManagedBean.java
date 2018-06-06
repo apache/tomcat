@@ -466,18 +466,15 @@ public class ManagedBean implements java.io.Serializable {
         Method m = null;
 
         AttributeInfo attrInfo = attributes.get(aname);
-        if (attrInfo == null)
+        if (attrInfo == null) {
             throw new AttributeNotFoundException(" Cannot find attribute " + aname);
+        }
 
         // Look up the actual operation to be used
         String setMethod = attrInfo.getSetMethod();
-        if (setMethod == null)
-            throw new AttributeNotFoundException("Cannot find attribute " + aname + " set method name");
-
         String argType=attrInfo.getType();
 
-        Class<?> signature[] =
-            new Class[] { BaseModelMBean.getAttributeClass( argType ) };
+        Class<?> signature[] = new Class[] { BaseModelMBean.getAttributeClass( argType ) };
 
         Object object = null;
         NoSuchMethodException exception = null;
@@ -496,10 +493,10 @@ public class ManagedBean implements java.io.Serializable {
                 exception = e;
             }
         }
-        if (exception != null)
+        if (exception != null) {
             throw new ReflectionException(exception,
-                                          "Cannot find setter method " + setMethod +
-                    " " + resource);
+                    "Cannot find setter method " + setMethod + " " + resource);
+        }
 
         return m;
     }

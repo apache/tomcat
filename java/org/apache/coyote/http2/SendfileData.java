@@ -25,7 +25,6 @@ class SendfileData {
     // Note: a mapped buffer is a special construct with an underlying file
     // that doesn't need to be closed
     MappedByteBuffer mappedBuffer;
-    int frameSize;
     long left;
     int streamReservation;
     int connectionReservation;
