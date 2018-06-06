@@ -1487,6 +1487,12 @@
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
   </Match>
   <Match>
+    <!-- ByteChunk.toString() can return null -->
+    <Class name="org.apache.catalina.connector.TestRequest"/>
+    <Method name="doBug56501"/>
+    <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
+  </Match>
+  <Match>
     <!-- Return value of latch is intentionally ignored -->
     <Class name="org.apache.catalina.connector.TestSendFile"/>
     <Method name="testBug60409"/>
@@ -1538,6 +1544,12 @@
     <Class name="org.apache.catalina.core.TestStandardContext$Bug51376Servlet"/>
     <Field name="destroyOk"/>
     <Bug pattern="MSF_MUTABLE_SERVLET_FIELD"/>
+  </Match>
+  <Match>
+    <!-- ByteChunk.toString() can return null -->
+    <Class name="org.apache.catalina.core.TestStandardContextAliases"/>
+    <Method name="testDirContextAliases"/>
+    <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
   </Match>
   <Match>
     <!-- Deliberate hack for the purposes of the test -->
