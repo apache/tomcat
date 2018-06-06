@@ -434,8 +434,6 @@ public class ManagedBean implements java.io.Serializable {
             throw new AttributeNotFoundException(" Cannot find attribute " + aname + " for " + resource);
 
         String getMethod = attrInfo.getGetMethod();
-        if (getMethod == null)
-            throw new AttributeNotFoundException("Cannot find attribute " + aname + " get method name");
 
         Object object = null;
         NoSuchMethodException exception = null;
@@ -445,7 +443,7 @@ public class ManagedBean implements java.io.Serializable {
         } catch (NoSuchMethodException e) {
             exception = e;
         }
-        if (m== null && resource != null) {
+        if (m == null && resource != null) {
             try {
                 object = resource;
                 m = object.getClass().getMethod(getMethod, NO_ARGS_PARAM_SIG);
@@ -454,9 +452,10 @@ public class ManagedBean implements java.io.Serializable {
                 exception = e;
             }
         }
-        if (exception != null)
+        if (exception != null) {
             throw new ReflectionException(exception,
                                           "Cannot find getter method " + getMethod);
+        }
 
         return m;
     }
