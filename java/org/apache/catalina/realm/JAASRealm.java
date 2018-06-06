@@ -538,6 +538,7 @@ public class JAASRealm extends RealmBase {
                 log.debug(sm.getString("jaasRealm.userPrincipalFailure"));
                 log.debug(sm.getString("jaasRealm.rolePrincipalFailure"));
             }
+            return null;
         } else {
             if (roles.size() == 0) {
                 if (log.isDebugEnabled()) {

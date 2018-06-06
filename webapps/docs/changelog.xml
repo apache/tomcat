@@ -148,6 +148,11 @@
         ensure that the correct Connector is removed when there are multiple
         Connectors using different addresses but the same port. (markt)
       </fix>
+      <fix>
+        Make <code>JAASRealm</code> mis-configuration more obvious by requiring
+        the authenticated Subject to include at least one Principal of a type
+        specified by <code>userClassNames</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
