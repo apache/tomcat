@@ -53,7 +53,7 @@ Tomcat Connectors products in Bugzilla.
 Excited yet? This section will guide you through providing a patch to the
 committers of the project for review and acceptance.
 
-##### Chose Your Method of Submission
+##### Choose Your Method of Submission
 
 You can provide a patch in one of the following ways (in order of preference):
 
