@@ -87,13 +87,13 @@ committers to learn how to do this are found
 [here](http://www.apache.org/dev/contributors.html#svnbasics). However, in the
 interest of a fast ramp up, the short version is below. Note that the root of
 the SVN repository is
-[tomcat/trunk](http://svn.apache.org/repos/asf/tomcat/trunk),
+[tomcat/trunk](https://svn.apache.org/repos/asf/tomcat/trunk),
 but you can clone specific versions too, such as
-[tc8.5.x](http://svn.apache.org/repos/asf/tomcat/tc8.5.x/trunk/) or even tags (
-[TOMCAT_8_5_15](http://svn.apache.org/repos/asf/tomcat/tc8.5.x/tags/TOMCAT_8_5_15/)).
+[tc8.5.x](https://svn.apache.org/repos/asf/tomcat/tc8.5.x/trunk/) or even tags (
+[TOMCAT_8_5_15](https://svn.apache.org/repos/asf/tomcat/tc8.5.x/tags/TOMCAT_8_5_15/)).
 
 ```
-$ svn co http://svn.apache.org/repos/asf/tomcat/trunk/
+$ svn co https://svn.apache.org/repos/asf/tomcat/trunk/
 ```
 
 ##### Github
