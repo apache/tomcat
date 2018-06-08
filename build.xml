@@ -3034,10 +3034,11 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
 
   <target name="add-osgi" if="${addOSGi}" >
     <echo message="add-osgi ${jarfile} ${addOSGi}"></echo>
-    <bndwrap output="${jarfile}" definitions="${tomcat.bnd}" >
+    <bndwrap output="${jarfile}.bnd" definitions="${tomcat.bnd}" >
       <fileset file="${jarfile}"  />
     </bndwrap>
-    <delete file="${jarfile}.bak" />
+    <delete file="${jarfile}" />
+    <move file="${jarfile}.bnd" tofile="${jarfile}" />
   </target>
 
   <!-- Macro, used to create checksum and signature files  -->
