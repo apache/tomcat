@@ -273,6 +273,10 @@
         <code>DecodeException</code> instead of throwing
         <code>ArrayIndexOutOfBoundsException</code>. (kfujino)
       </fix>
+      <fix>
+        Improve the handling of exceptions during TLS handshakes for the
+        WebSocket client. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

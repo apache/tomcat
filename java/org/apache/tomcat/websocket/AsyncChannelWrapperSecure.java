@@ -410,9 +410,9 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                         }
                     }
                 }
-            } catch (SSLException | InterruptedException |
-                    ExecutionException e) {
+            } catch (Exception e) {
                 hFuture.fail(e);
+                return;
             }
 
             hFuture.complete(null);
