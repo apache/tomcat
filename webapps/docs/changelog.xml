@@ -303,6 +303,15 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="jdbc-pool">
+    <changelog>
+      <fix>
+        When <code>logValidationErrors</code> is set to true, the connection
+        validation error is logged as <code>SEVERE</code> instead of
+        <code>WARNING</code>. (kfujino)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
