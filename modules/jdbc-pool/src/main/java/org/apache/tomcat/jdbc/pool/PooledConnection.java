@@ -546,7 +546,7 @@ public class PooledConnection implements PooledConnectionMBean {
             return true;
         } catch (Exception ex) {
             if (getPoolProperties().getLogValidationErrors()) {
-                log.warn("SQL Validation error", ex);
+                log.error("SQL Validation error", ex);
             } else if (log.isDebugEnabled()) {
                 log.debug("Unable to validate object:",ex);
             }
