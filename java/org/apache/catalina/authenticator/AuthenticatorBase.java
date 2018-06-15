@@ -19,12 +19,14 @@ package org.apache.catalina.authenticator;
 import java.io.IOException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
@@ -91,12 +93,25 @@ public abstract class AuthenticatorBase extends ValveBase
         implements Authenticator, RegistrationListener {
 
     private final Log log = LogFactory.getLog(AuthenticatorBase.class); // must not be static
-
+    
+    /**
+     * Date format object for setting Expires header
+     */
+    private static final DateFormat RFC1123_FORMAT;
+    
+    /**
+     * Pattern following the RFC1123
+     */
+    private static final String RFC1123_PATTERN = "EEE, dd MMM yyyy HH:mm:ss z";
+    
+	static {
+		RFC1123_FORMAT = new SimpleDateFormat(RFC1123_PATTERN, Locale.US);
+		RFC1123_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT"));
+	}
     /**
      * "Expires" header always set to Date(1), so generate once only
      */
-    private static final String DATE_ONE =
-            (new SimpleDateFormat(FastHttpDateFormat.RFC1123_DATE, Locale.US)).format(new Date(1));
+	private static final String DATE_ONE = RFC1123_FORMAT.format(new Date(1));
 
     /**
      * The string manager for this package.
