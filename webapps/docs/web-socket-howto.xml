@@ -110,10 +110,21 @@
      <li><code>org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD</code></li>
    </ul>
    <p>The default truststore password is <code>changeit</code>.</p>
-   <p>If the <code>org.apache.tomcat.websocket.SSL_CONTEXT</code> property is
-      set then the <code>org.apache.tomcat.websocket.SSL_TRUSTSTORE</code> and
-      <code>org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD</code> properties
-      will be ignored.</p>
+
+<p>If the <code>org.apache.tomcat.websocket.SSL_CONTEXT</code> property is
+   set then the <code>org.apache.tomcat.websocket.SSL_TRUSTSTORE</code> and
+   <code>org.apache.tomcat.websocket.SSL_TRUSTSTORE_PWD</code> properties
+   will be ignored.</p>
+
+<p>For secure server end points, host name verification is enabled by default.
+   To bypass this verification (not recommended), it is necessary to provide a
+   custom <code>SSLContext</code> via the
+   <code>org.apache.tomcat.websocket.SSL_CONTEXT</code> user property. The
+   custom <code>SSLContext</code> must be configured with a custom
+   <code>TrustManager</code> that extends
+   <code>javax.net.ssl.X509ExtendedTrustManager</code>. The desired verification
+   (or lack of verification) can then be controlled by appropriate
+   implementations of the individual abstract methods.</p>
 
 <p>When using the WebSocket client to connect to server endpoints, the number of
    HTTP redirects that the client will follow is controlled by the
