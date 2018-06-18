@@ -325,6 +325,11 @@
         file is not required by Tomcat and the references prevent the use of the
         Server JRE. (markt)
       </fix>
+      <update>
+        Update the packaged version of the Tomcat Native Library to 1.2.17 to
+        pick up the latest Windows binaries built with APR 1.6.3 and OpenSSL
+        1.0.2o. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
