@@ -18,7 +18,7 @@ package org.apache.tomcat.dbcp.pool2.impl;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.TimerTask;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -44,9 +44,6 @@ class EvictionTimer {
     /** Executor instance */
     private static ScheduledThreadPoolExecutor executor; //@GuardedBy("EvictionTimer.class")
 
-    /** Static usage count tracker */
-    private static int usageCount; //@GuardedBy("EvictionTimer.class")
-
     /** Prevent instantiation */
     private EvictionTimer() {
         // Hide the default constructor
@@ -66,19 +63,22 @@ class EvictionTimer {
 
     /**
      * Add the specified eviction task to the timer. Tasks that are added with a
-     * call to this method *must* call {@link #cancel(TimerTask,long,TimeUnit)}
+     * call to this method *must* call {@link #cancel(BaseGenericObjectPool.Evictor,long,TimeUnit)}
      * to cancel the task to prevent memory and/or thread leaks in application
      * server environments.
      * @param task      Task to be scheduled
      * @param delay     Delay in milliseconds before task is executed
      * @param period    Time in milliseconds between executions
      */
-    static synchronized void schedule(final Runnable task, final long delay, final long period) {
+    static synchronized void schedule(
+            final BaseGenericObjectPool<?>.Evictor task, final long delay, final long period) {
         if (null == executor) {
             executor = new ScheduledThreadPoolExecutor(1, new EvictorThreadFactory());
+            executor.setRemoveOnCancelPolicy(true);
         }
-        usageCount++;
-        executor.scheduleWithFixedDelay(task, delay, period, TimeUnit.MILLISECONDS);
+        final ScheduledFuture<?> scheduledFuture =
+                executor.scheduleWithFixedDelay(task, delay, period, TimeUnit.MILLISECONDS);
+        task.setScheduledFuture(scheduledFuture);
     }
 
     /**
@@ -90,10 +90,10 @@ class EvictionTimer {
      *                  terminate?
      * @param unit      The units for the specified timeout
      */
-    static synchronized void cancel(final TimerTask task, final long timeout, final TimeUnit unit) {
+    static synchronized void cancel(
+            final BaseGenericObjectPool<?>.Evictor task, final long timeout, final TimeUnit unit) {
         task.cancel();
-        usageCount--;
-        if (usageCount == 0) {
+        if (executor.getQueue().size() == 0) {
             executor.shutdown();
             try {
                 executor.awaitTermination(timeout, unit);

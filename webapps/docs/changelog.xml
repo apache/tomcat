@@ -334,6 +334,10 @@
         pick up the latest Windows binaries built with APR 1.6.3 and OpenSSL
         1.0.2o. (markt)
       </update>
+      <update>
+        <bug>62458</bug>: Update the internal fork of Commons Pool to dfef97b
+        (2018-06-18) to pick up some bug fixes and enhancements. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

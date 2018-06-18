@@ -40,6 +40,5 @@ public interface EvictionPolicy<T> {
      * @return <code>true</code> if the object should be evicted, otherwise
      *             <code>false</code>
      */
-    boolean evict(EvictionConfig config, PooledObject<T> underTest,
-            int idleCount);
+    boolean evict(EvictionConfig config, PooledObject<T> underTest, int idleCount);
 }

@@ -200,7 +200,7 @@ public class AbandonedConfig {
      * @see #getRequireFullStackTrace()
      * @since 2.5
      */
-    public void setRequireFullStackTrace(boolean requireFullStackTrace) {
+    public void setRequireFullStackTrace(final boolean requireFullStackTrace) {
         this.requireFullStackTrace = requireFullStackTrace;
     }
 

@@ -23,10 +23,12 @@ package org.apache.tomcat.dbcp.pool2.impl;
  * <p>
  * This class is not thread-safe; it is only intended to be used to provide
  * attributes used when creating a pool.
+ * </p>
  *
+ * @param <T> Type of element pooled.
  * @since 2.0
  */
-public class GenericObjectPoolConfig extends BaseObjectPoolConfig {
+public class GenericObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
 
     /**
      * The default value for the {@code maxTotal} configuration attribute.
@@ -133,10 +135,11 @@ public class GenericObjectPoolConfig extends BaseObjectPoolConfig {
         this.minIdle = minIdle;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public GenericObjectPoolConfig clone() {
+    public GenericObjectPoolConfig<T> clone() {
         try {
-            return (GenericObjectPoolConfig) super.clone();
+            return (GenericObjectPoolConfig<T>) super.clone();
         } catch (final CloneNotSupportedException e) {
             throw new AssertionError(); // Can't happen
         }

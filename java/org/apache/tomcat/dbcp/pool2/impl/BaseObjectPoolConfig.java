@@ -24,10 +24,12 @@ import org.apache.tomcat.dbcp.pool2.BaseObject;
  * defined by the public constants.
  * <p>
  * This class is not thread-safe.
+ * </p>
  *
+ * @param <T> Type of element pooled.
  * @since 2.0
  */
-public abstract class BaseObjectPoolConfig extends BaseObject implements Cloneable {
+public abstract class BaseObjectPoolConfig<T> extends BaseObject implements Cloneable {
 
     /**
      * The default value for the {@code lifo} configuration attribute.
@@ -159,9 +161,7 @@ public abstract class BaseObjectPoolConfig extends BaseObject implements Cloneab
      * @see GenericObjectPool#getEvictionPolicyClassName()
      * @see GenericKeyedObjectPool#getEvictionPolicyClassName()
      */
-    public static final String DEFAULT_EVICTION_POLICY_CLASS_NAME =
-            "org.apache.tomcat.dbcp.pool2.impl.DefaultEvictionPolicy";
-
+    public static final String DEFAULT_EVICTION_POLICY_CLASS_NAME = DefaultEvictionPolicy.class.getName();
 
     private boolean lifo = DEFAULT_LIFO;
 
@@ -180,6 +180,8 @@ public abstract class BaseObjectPoolConfig extends BaseObject implements Cloneab
 
     private int numTestsPerEvictionRun =
             DEFAULT_NUM_TESTS_PER_EVICTION_RUN;
+
+    private EvictionPolicy<T> evictionPolicy = null; // Only 2.6.0 applications set this
 
     private String evictionPolicyClassName = DEFAULT_EVICTION_POLICY_CLASS_NAME;
 
@@ -553,6 +555,21 @@ public abstract class BaseObjectPoolConfig extends BaseObject implements Cloneab
     }
 
     /**
+     * Get the value for the {@code evictionPolicyClass} configuration
+     * attribute for pools created with this configuration instance.
+     *
+     * @return  The current setting of {@code evictionPolicyClass} for this
+     *          configuration instance
+     *
+     * @see GenericObjectPool#getEvictionPolicy()
+     * @see GenericKeyedObjectPool#getEvictionPolicy()
+     * @since 2.6.0
+     */
+    public EvictionPolicy<T> getEvictionPolicy() {
+        return evictionPolicy;
+    }
+
+    /**
      * Get the value for the {@code evictionPolicyClassName} configuration
      * attribute for pools created with this configuration instance.
      *
@@ -564,6 +581,21 @@ public abstract class BaseObjectPoolConfig extends BaseObject implements Cloneab
      */
     public String getEvictionPolicyClassName() {
         return evictionPolicyClassName;
+    }
+
+    /**
+     * Set the value for the {@code evictionPolicyClass} configuration
+     * attribute for pools created with this configuration instance.
+     *
+     * @param evictionPolicy The new setting of
+     *        {@code evictionPolicyClass} for this configuration instance
+     *
+     * @see GenericObjectPool#getEvictionPolicy()
+     * @see GenericKeyedObjectPool#getEvictionPolicy()
+     * @since 2.6.0
+     */
+    public void setEvictionPolicy(final EvictionPolicy<T> evictionPolicy) {
+        this.evictionPolicy = evictionPolicy;
     }
 
     /**

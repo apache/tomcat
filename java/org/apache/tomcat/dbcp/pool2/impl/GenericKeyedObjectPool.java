@@ -85,7 +85,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
      * @param factory the factory to be used to create entries
      */
     public GenericKeyedObjectPool(final KeyedPooledObjectFactory<K,T> factory) {
-        this(factory, new GenericKeyedObjectPoolConfig());
+        this(factory, new GenericKeyedObjectPoolConfig<T>());
     }
 
     /**
@@ -98,8 +98,8 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
      *                  the configuration object will not be reflected in the
      *                  pool.
      */
-    public GenericKeyedObjectPool(final KeyedPooledObjectFactory<K,T> factory,
-            final GenericKeyedObjectPoolConfig config) {
+    public GenericKeyedObjectPool(final KeyedPooledObjectFactory<K, T> factory,
+            final GenericKeyedObjectPoolConfig<T> config) {
 
         super(config, ONAME_BASE, config.getJmxNamePrefix());
 
@@ -111,8 +111,6 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
         this.fairness = config.getFairness();
 
         setConfig(config);
-
-        startEvictor(getTimeBetweenEvictionRunsMillis());
     }
 
     /**
@@ -237,7 +235,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
      *
      * @see GenericKeyedObjectPoolConfig
      */
-    public void setConfig(final GenericKeyedObjectPoolConfig conf) {
+    public void setConfig(final GenericKeyedObjectPoolConfig<T> conf) {
         setLifo(conf.getLifo());
         setMaxIdlePerKey(conf.getMaxIdlePerKey());
         setMaxTotalPerKey(conf.getMaxTotalPerKey());
@@ -251,11 +249,16 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
         setTestWhileIdle(conf.getTestWhileIdle());
         setNumTestsPerEvictionRun(conf.getNumTestsPerEvictionRun());
         setMinEvictableIdleTimeMillis(conf.getMinEvictableIdleTimeMillis());
-        setSoftMinEvictableIdleTimeMillis(
-                conf.getSoftMinEvictableIdleTimeMillis());
-        setTimeBetweenEvictionRunsMillis(
-                conf.getTimeBetweenEvictionRunsMillis());
-        setEvictionPolicyClassName(conf.getEvictionPolicyClassName());
+        setSoftMinEvictableIdleTimeMillis(conf.getSoftMinEvictableIdleTimeMillis());
+        setTimeBetweenEvictionRunsMillis(conf.getTimeBetweenEvictionRunsMillis());
+        final EvictionPolicy<T> policy = conf.getEvictionPolicy();
+        if (policy == null) {
+            // Use the class name (pre-2.6.0 compatible)
+            setEvictionPolicyClassName(conf.getEvictionPolicyClassName());
+        } else {
+            // Otherwise, use the class (2.6.0 feature)
+            setEvictionPolicy(policy);
+        }
         setEvictorShutdownTimeoutMillis(conf.getEvictorShutdownTimeoutMillis());
     }
 
@@ -470,14 +473,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
                     "Returned object not currently part of this pool");
         }
 
-        synchronized(p) {
-            final PooledObjectState state = p.getState();
-            if (state != PooledObjectState.ALLOCATED) {
-                throw new IllegalStateException(
-                        "Object has already been returned to this pool or is invalid");
-            }
-            p.markReturning(); // Keep from being marked abandoned (once GKOP does this)
-        }
+        markReturningState(p);
 
         final long activeTime = p.getActiveTimeMillis();
 
@@ -489,13 +485,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
                     } catch (final Exception e) {
                         swallowException(e);
                     }
-                    if (objectDeque.idleObjects.hasTakeWaiters()) {
-                        try {
-                            addObject(key);
-                        } catch (final Exception e) {
-                            swallowException(e);
-                        }
-                    }
+                    whenWaitersAddObject(key, objectDeque.idleObjects);
                     return;
                 }
             }
@@ -509,13 +499,7 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
                 } catch (final Exception e) {
                     swallowException(e);
                 }
-                if (objectDeque.idleObjects.hasTakeWaiters()) {
-                    try {
-                        addObject(key);
-                    } catch (final Exception e) {
-                        swallowException(e);
-                    }
-                }
+                whenWaitersAddObject(key, objectDeque.idleObjects);
                 return;
             }
 
@@ -555,6 +539,20 @@ public class GenericKeyedObjectPool<K,T> extends BaseGenericObjectPool<T>
         }
     }
 
+    /**
+     * Whether there is at least one thread waiting on this deque, add an pool object.
+     * @param key
+     * @param idleObjects
+     */
+    private void whenWaitersAddObject(final K key, LinkedBlockingDeque<PooledObject<T>> idleObjects) {
+        if (idleObjects.hasTakeWaiters()) {
+            try {
+                addObject(key);
+            } catch (final Exception e) {
+                swallowException(e);
+            }
+        }
+    }
 
     /**
      * {@inheritDoc}

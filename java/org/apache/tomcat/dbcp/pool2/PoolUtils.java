@@ -201,7 +201,7 @@ public final class PoolUtils {
     }
 
     /**
-     * Call <code>addObject()</code> on <code>pool</code> <code>count</code>
+     * Calls {@link ObjectPool#addObject()} on <code>pool</code> <code>count</code>
      * number of times.
      *
      * @param pool
@@ -225,7 +225,7 @@ public final class PoolUtils {
     }
 
     /**
-     * Call <code>addObject(Object)</code> on <code>keyedPool</code> with
+     * Calls {@link KeyedObjectPool#addObject(Object)} on <code>keyedPool</code> with
      * <code>key</code> <code>count</code> number of times.
      *
      * @param keyedPool
@@ -257,7 +257,7 @@ public final class PoolUtils {
     }
 
     /**
-     * Call <code>addObject(Object)</code> on <code>keyedPool</code> with each
+     * Calls {@link KeyedObjectPool#addObject(Object)} on <code>keyedPool</code> with each
      * key in <code>keys</code> for <code>count</code> number of times. This has
      * the same effect as calling {@link #prefill(KeyedObjectPool, Object, int)}
      * for each key in the <code>keys</code> collection.
@@ -550,7 +550,7 @@ public final class PoolUtils {
     }
 
     /**
-     * Get the <code>Timer</code> for checking keyedPool's idle count.
+     * Gets the <code>Timer</code> for checking keyedPool's idle count.
      *
      * @return the {@link Timer} for checking keyedPool's idle count.
      */
@@ -639,6 +639,7 @@ public final class PoolUtils {
      */
     private static final class KeyedObjectPoolMinIdleTimerTask<K, V> extends
             TimerTask {
+
         /** Minimum number of idle instances. Not the same as pool.getMinIdle(). */
         private final int minIdle;
 
@@ -649,7 +650,7 @@ public final class PoolUtils {
         private final KeyedObjectPool<K, V> keyedPool;
 
         /**
-         * Create a new KeyedObjecPoolMinIdleTimerTask.
+         * Creates a new KeyedObjecPoolMinIdleTimerTask.
          *
          * @param keyedPool
          *            keyed object pool
@@ -735,7 +736,7 @@ public final class PoolUtils {
         private final ObjectPool<T> pool;
 
         /**
-         * Create a new SynchronizedObjectPool wrapping the given pool.
+         * Creates a new SynchronizedObjectPool wrapping the given pool.
          *
          * @param pool
          *            the ObjectPool to be "wrapped" in a synchronized
@@ -912,7 +913,7 @@ public final class PoolUtils {
         private final KeyedObjectPool<K, V> keyedPool;
 
         /**
-         * Create a new SynchronizedKeyedObjectPool wrapping the given pool
+         * Creates a new SynchronizedKeyedObjectPool wrapping the given pool
          *
          * @param keyedPool
          *            KeyedObjectPool to wrap
@@ -1118,6 +1119,7 @@ public final class PoolUtils {
      */
     private static final class SynchronizedPooledObjectFactory<T> implements
             PooledObjectFactory<T> {
+
         /** Synchronization lock */
         private final WriteLock writeLock = new ReentrantReadWriteLock().writeLock();
 
@@ -1125,7 +1127,7 @@ public final class PoolUtils {
         private final PooledObjectFactory<T> factory;
 
         /**
-         * Create a SynchronizedPoolableObjectFactory wrapping the given
+         * Creates a SynchronizedPoolableObjectFactory wrapping the given
          * factory.
          *
          * @param factory
@@ -1234,6 +1236,7 @@ public final class PoolUtils {
      */
     private static final class SynchronizedKeyedPooledObjectFactory<K, V>
             implements KeyedPooledObjectFactory<K, V> {
+
         /** Synchronization lock */
         private final WriteLock writeLock = new ReentrantReadWriteLock().writeLock();
 
@@ -1241,7 +1244,7 @@ public final class PoolUtils {
         private final KeyedPooledObjectFactory<K, V> keyedFactory;
 
         /**
-         * Create a SynchronizedKeyedPoolableObjectFactory wrapping the given
+         * Creates a SynchronizedKeyedPoolableObjectFactory wrapping the given
          * factory.
          *
          * @param keyedFactory
@@ -1358,7 +1361,7 @@ public final class PoolUtils {
         private transient volatile int idleHighWaterMark;
 
         /**
-         * Create a new ErodingFactor with the given erosion factor.
+         * Creates a new ErodingFactor with the given erosion factor.
          *
          * @param factor
          *            erosion factor
@@ -1418,6 +1421,7 @@ public final class PoolUtils {
      * @param <T> type of objects in the pool
      */
     private static class ErodingObjectPool<T> implements ObjectPool<T> {
+
         /** Underlying object pool */
         private final ObjectPool<T> pool;
 
@@ -1425,7 +1429,7 @@ public final class PoolUtils {
         private final ErodingFactor factor;
 
         /**
-         * Create an ErodingObjectPool wrapping the given pool using the
+         * Creates an ErodingObjectPool wrapping the given pool using the
          * specified erosion factor.
          *
          * @param pool
@@ -1563,6 +1567,7 @@ public final class PoolUtils {
      */
     private static class ErodingKeyedObjectPool<K, V> implements
             KeyedObjectPool<K, V> {
+
         /** Underlying pool */
         private final KeyedObjectPool<K, V> keyedPool;
 
@@ -1570,7 +1575,7 @@ public final class PoolUtils {
         private final ErodingFactor erodingFactor;
 
         /**
-         * Create an ErodingObjectPool wrapping the given pool using the
+         * Creates an ErodingObjectPool wrapping the given pool using the
          * specified erosion factor.
          *
          * @param keyedPool
@@ -1586,7 +1591,7 @@ public final class PoolUtils {
         }
 
         /**
-         * Create an ErodingObjectPool wrapping the given pool using the
+         * Creates an ErodingObjectPool wrapping the given pool using the
          * specified erosion factor.
          *
          * @param keyedPool
@@ -1776,6 +1781,7 @@ public final class PoolUtils {
      */
     private static final class ErodingPerKeyKeyedObjectPool<K, V> extends
             ErodingKeyedObjectPool<K, V> {
+
         /** Erosion factor - same for all pools */
         private final float factor;
 
@@ -1783,7 +1789,7 @@ public final class PoolUtils {
         private final Map<K, ErodingFactor> factors = Collections.synchronizedMap(new HashMap<K, ErodingFactor>());
 
         /**
-         * Create a new ErordingPerKeyKeyedObjectPool decorating the given keyed
+         * Creates a new ErordingPerKeyKeyedObjectPool decorating the given keyed
          * pool with the specified erosion factor.
          *
          * @param keyedPool
