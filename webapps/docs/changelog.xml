@@ -211,6 +211,9 @@
         Fix <code>NullPointerException</code> thrown from <code>
         replaceSystemProperties()</code> when trying to log messages. (csutherl)
       </fix>
+      <fix>
+        Avoid unnecessary processing of async timeouts. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

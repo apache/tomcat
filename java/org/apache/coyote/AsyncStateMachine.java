@@ -18,6 +18,7 @@ package org.apache.coyote;
 
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.res.StringManager;
@@ -189,6 +190,7 @@ class AsyncStateMachine {
 
     private volatile AsyncState state = AsyncState.DISPATCHED;
     private volatile long lastAsyncStart = 0;
+    private AtomicLong generation = new AtomicLong(0);
     // Need this to fire listener on complete
     private AsyncContextCallback asyncCtxt = null;
     private final AbstractProcessor processor;
@@ -234,8 +236,13 @@ class AsyncStateMachine {
         return lastAsyncStart;
     }
 
+    long getCurrentGeneration() {
+        return generation.get();
+    }
+
     synchronized void asyncStart(AsyncContextCallback asyncCtxt) {
         if (state == AsyncState.DISPATCHED) {
+            generation.incrementAndGet();
             state = AsyncState.STARTING;
             this.asyncCtxt = asyncCtxt;
             lastAsyncStart = System.currentTimeMillis();
