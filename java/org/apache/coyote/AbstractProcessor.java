@@ -52,6 +52,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     protected Adapter adapter;
     protected final AsyncStateMachine asyncStateMachine;
     private volatile long asyncTimeout = -1;
+    private volatile long asyncTimeoutGeneration = 0;
     protected final AbstractEndpoint<?> endpoint;
     protected final Request request;
     protected final Response response;
@@ -612,7 +613,14 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     private void doTimeoutAsync() {
         // Avoid multiple timeouts
         setAsyncTimeout(-1);
+        asyncTimeoutGeneration = asyncStateMachine.getCurrentGeneration();
         processSocketEvent(SocketEvent.TIMEOUT, true);
+    }
+
+
+    @Override
+    public boolean checkAsyncTimeoutGeneration() {
+        return asyncTimeoutGeneration == asyncStateMachine.getCurrentGeneration();
     }
 
 

@@ -94,4 +94,10 @@ public abstract class UpgradeProcessorBase extends AbstractProcessorLight implem
     public void timeoutAsync(long now) {
         // NO-OP
     }
+
+
+    @Override
+    public boolean checkAsyncTimeoutGeneration() {
+        return false;
+    }
 }
