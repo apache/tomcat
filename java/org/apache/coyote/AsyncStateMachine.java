@@ -190,7 +190,7 @@ class AsyncStateMachine {
 
     private volatile AsyncState state = AsyncState.DISPATCHED;
     private volatile long lastAsyncStart = 0;
-    private AtomicLong generation = new AtomicLong(0);
+    private final AtomicLong generation = new AtomicLong(0);
     // Need this to fire listener on complete
     private AsyncContextCallback asyncCtxt = null;
     private final AbstractProcessor processor;
