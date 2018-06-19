@@ -1274,7 +1274,7 @@ public class AjpProcessor extends AbstractProcessor {
 
     /**
      * @deprecated Unused. Will be removed in Tomcat 9. Use
-     *             {@link #doWrite(ByteBuffer)}
+     *             {@link #writeData(ByteBuffer)}
      */
     @Deprecated
     private void writeData(ByteChunk chunk) throws IOException {

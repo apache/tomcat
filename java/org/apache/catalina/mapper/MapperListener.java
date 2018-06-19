@@ -454,7 +454,7 @@ public class MapperListener extends LifecycleMBeanBase
      *
      * @param context
      * @param wrapper
-     * @param list
+     * @param wrappers
      */
     private void prepareWrapperMappingInfo(Context context, Wrapper wrapper,
             List<WrapperMappingInfo> wrappers) {

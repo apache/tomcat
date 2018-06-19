@@ -203,7 +203,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     }
 
     /**
-     * {@link ForkJoinPool#commonPool()} creates a thread pool that, by default,
+     * {@link ForkJoinPool} creates a thread pool that, by default,
      * creates threads that retain references to the thread context class
      * loader.
      */

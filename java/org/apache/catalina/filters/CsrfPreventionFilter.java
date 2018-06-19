@@ -173,7 +173,6 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
          * Return the specified URL with the nonce added to the query string.
          *
          * @param url URL to be modified
-         * @param nonce The nonce to add
          */
         private String addNonce(String url) {
 
