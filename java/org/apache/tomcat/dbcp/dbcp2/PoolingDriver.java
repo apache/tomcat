@@ -61,6 +61,9 @@ public class PoolingDriver implements Driver {
 
     /**
      * For unit testing purposes.
+     *
+     * @param accessToUnderlyingConnectionAllowed
+     *            Do {@link DelegatingConnection}s created by this driver permit access to the delegate?
      */
     protected PoolingDriver(final boolean accessToUnderlyingConnectionAllowed) {
         this.accessToUnderlyingConnectionAllowed = accessToUnderlyingConnectionAllowed;

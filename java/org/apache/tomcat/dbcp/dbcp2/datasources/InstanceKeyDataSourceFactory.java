@@ -287,17 +287,40 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
     }
 
     /**
+     * @param className
+     *            The class name to test.
+     *
      * @return true if and only if className is the value returned from getClass().getName().toString()
      */
     protected abstract boolean isCorrectClass(String className);
 
     /**
      * Creates an instance of the subclass and sets any properties contained in the Reference.
+     *
+     * @param ref
+     *            The properties to be set on the created DataSource
+     *
+     * @return A configured DataSource of the appropriate type.
+     *
+     * @throws ClassNotFoundException
+     *            If a class cannot be found during the deserialization of a configuration parameter.
+     * @throws IOException
+     *            If an I/O error occurs during the deserialization of a configuration parameter.
      */
     protected abstract InstanceKeyDataSource getNewInstance(Reference ref) throws IOException, ClassNotFoundException;
 
     /**
-     * Sets some properties saved within a Reference
+     * Deserializes the provided byte array to create an object.
+     *
+     * @param data
+     *            Data to deserialize to create the configuration parameter.
+     *
+     * @return The Object created by deserializing the data.
+     *
+     * @throws ClassNotFoundException
+     *            If a class cannot be found during the deserialization of a configuration parameter.
+     * @throws IOException
+     *            If an I/O error occurs during the deserialization of a configuration parameter.
      */
     protected static final Object deserialize(final byte[] data) throws IOException, ClassNotFoundException {
         ObjectInputStream in = null;

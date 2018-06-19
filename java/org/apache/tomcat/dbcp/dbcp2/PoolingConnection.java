@@ -121,6 +121,8 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *
      * @param sql
      *            the SQL string used to define the statement
+     *
+     * @return the PStmtKey created for the given arguments.
      */
     protected PStmtKey createKey(final String sql) {
         String catalog = null;
@@ -149,6 +151,8 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *            the SQL string used to define the statement
      * @param columnIndexes
      *            column indexes
+     *
+     * @return the PStmtKey created for the given arguments.
      */
     protected PStmtKey createKey(final String sql, final int columnIndexes[]) {
         String catalog = null;
@@ -169,6 +173,8 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *            result set type
      * @param resultSetConcurrency
      *            result set concurrency
+     *
+     * @return the PStmtKey created for the given arguments.
      */
     protected PStmtKey createKey(final String sql, final int resultSetType, final int resultSetConcurrency) {
         String catalog = null;
@@ -191,6 +197,8 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *            result set concurrency
      * @param resultSetHoldability
      *            result set holdability
+     *
+     * @return the PStmtKey created for the given arguments.
      */
     protected PStmtKey createKey(final String sql, final int resultSetType, final int resultSetConcurrency,
             final int resultSetHoldability) {
@@ -216,6 +224,8 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *            result set holdability
      * @param stmtType
      *            statement type
+     *
+     * @return the PStmtKey created for the given arguments.
      */
     protected PStmtKey createKey(final String sql, final int resultSetType, final int resultSetConcurrency,
             final int resultSetHoldability, final StatementType stmtType) {
@@ -240,6 +250,8 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *            result set concurrency
      * @param stmtType
      *            statement type
+     *
+     * @return the PStmtKey created for the given arguments.
      */
     protected PStmtKey createKey(final String sql, final int resultSetType, final int resultSetConcurrency,
             final StatementType stmtType) {
@@ -259,6 +271,8 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *            the SQL string used to define the statement
      * @param stmtType
      *            statement type
+     *
+     * @return the PStmtKey created for the given arguments.
      */
     protected PStmtKey createKey(final String sql, final StatementType stmtType) {
         String catalog = null;
@@ -277,6 +291,8 @@ public class PoolingConnection extends DelegatingConnection<Connection>
      *            the SQL string used to define the statement
      * @param columnNames
      *            column names
+     *
+     * @return the PStmtKey created for the given arguments.
      */
     protected PStmtKey createKey(final String sql, final String columnNames[]) {
         String catalog = null;
@@ -331,6 +347,10 @@ public class PoolingConnection extends DelegatingConnection<Connection>
 
     /**
      * Normalizes the given SQL statement, producing a canonical form that is semantically equivalent to the original.
+     *
+     * @param sql The statement to be normalized.
+     *
+     * @return The canonical form of the supplied SQL statement.
      */
     protected String normalizeSQL(final String sql) {
         return sql.trim();
