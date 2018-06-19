@@ -66,10 +66,10 @@ DBCP
 ----
 DBCP2
 Sub-tree
-/commons/proper/dbcp/trunk/src/main/java/org/apache/commons/dbcp2
-/commons/proper/dbcp/trunk/src/main/resources/org/apache/commons/dbcp2
+src/main/java/org/apache/commons/dbcp2
+src/main/resources/org/apache/commons/dbcp2
 The SHA1 ID for the most recent commit to be merged to Tomcat is:
-8a71764a895b234bd1fc76553835ef4c974f22e1
+d7aa662fbbb99e536ae28c47d0c4e1d51e39d5b9
 
 Pool2
 Sub-tree

@@ -23,28 +23,38 @@ import java.util.Properties;
 /**
  * A {@link Driver}-based implementation of {@link ConnectionFactory}.
  *
- * @author Rodney Waldhoff
  * @since 2.0
  */
 public class DriverConnectionFactory implements ConnectionFactory {
-    public DriverConnectionFactory(final Driver driver, final String connectUri, final Properties props) {
-        _driver = driver;
-        _connectUri = connectUri;
-        _props = props;
+
+    private final String connectionString;
+    private final Driver driver;
+    private final Properties properties;
+
+    /**
+     * Constructs a connection factory for a given Driver.
+     *
+     * @param driver
+     *            The Driver.
+     * @param connectString
+     *            The connection string.
+     * @param properties
+     *            The connection properties.
+     */
+    public DriverConnectionFactory(final Driver driver, final String connectString, final Properties properties) {
+        this.driver = driver;
+        this.connectionString = connectString;
+        this.properties = properties;
     }
 
     @Override
     public Connection createConnection() throws SQLException {
-        return _driver.connect(_connectUri,_props);
+        return driver.connect(connectionString, properties);
     }
-
-    private final Driver _driver;
-    private final String _connectUri;
-    private final Properties _props;
 
     @Override
     public String toString() {
-        return this.getClass().getName() + " [" + String.valueOf(_driver) + ";" +
-                String.valueOf(_connectUri) + ";"  + String.valueOf(_props) + "]";
+        return this.getClass().getName() + " [" + String.valueOf(driver) + ";" + String.valueOf(connectionString) + ";"
+                + String.valueOf(properties) + "]";
     }
 }

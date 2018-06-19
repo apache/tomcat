@@ -30,107 +30,120 @@ import java.util.logging.Logger;
 
 import org.apache.tomcat.dbcp.pool2.ObjectPool;
 
-
 /**
- * A {@link Driver} implementation that obtains
- * {@link Connection}s from a registered
- * {@link ObjectPool}.
+ * A {@link Driver} implementation that obtains {@link Connection}s from a registered {@link ObjectPool}.
  *
- * @author Rodney Waldhoff
- * @author Dirk Verbeeck
  * @since 2.0
  */
 public class PoolingDriver implements Driver {
-    /**
-     * Register myself with the {@link DriverManager}.
-     */
+
+    /** Register myself with the {@link DriverManager}. */
     static {
         try {
             DriverManager.registerDriver(new PoolingDriver());
-        } catch(final Exception e) {
+        } catch (final Exception e) {
+            // ignore
         }
     }
 
-    /**
-     * The map of registered pools.
-     */
-    protected static final HashMap<String,ObjectPool<? extends Connection>> pools =
-            new HashMap<>();
+    /** The map of registered pools. */
+    protected static final HashMap<String, ObjectPool<? extends Connection>> pools = new HashMap<>();
 
-    /**
-     * Controls access to the underlying connection
-     */
+    /** Controls access to the underlying connection */
     private final boolean accessToUnderlyingConnectionAllowed;
 
+    /**
+     * Constructs a new driver with <code>accessToUnderlyingConnectionAllowed</code> enabled.
+     */
     public PoolingDriver() {
         this(true);
     }
 
     /**
      * For unit testing purposes.
-     * @param accessToUnderlyingConnectionAllowed The new flag
      */
     protected PoolingDriver(final boolean accessToUnderlyingConnectionAllowed) {
         this.accessToUnderlyingConnectionAllowed = accessToUnderlyingConnectionAllowed;
     }
 
-
     /**
      * Returns the value of the accessToUnderlyingConnectionAllowed property.
      *
-     * @return <code>true</code> if access to the underlying is allowed,
-     *  <code>false</code> otherwise.
+     * @return true if access to the underlying is allowed, false otherwise.
      */
     protected boolean isAccessToUnderlyingConnectionAllowed() {
         return accessToUnderlyingConnectionAllowed;
     }
 
-    public synchronized ObjectPool<? extends Connection> getConnectionPool(final String name)
-            throws SQLException {
+    /**
+     * Gets the connection pool for the given name.
+     *
+     * @param name
+     *            The pool name
+     * @return The pool
+     * @throws SQLException
+     *             Thrown when the named pool is not registered.
+     */
+    public synchronized ObjectPool<? extends Connection> getConnectionPool(final String name) throws SQLException {
         final ObjectPool<? extends Connection> pool = pools.get(name);
         if (null == pool) {
-            throw new SQLException("Pool not registered.");
+            throw new SQLException("Pool not registered: " + name);
         }
         return pool;
     }
 
-    public synchronized void registerPool(final String name,
-            final ObjectPool<? extends Connection> pool) {
-        pools.put(name,pool);
+    /**
+     * Registers a named pool.
+     *
+     * @param name
+     *            The pool name.
+     * @param pool
+     *            The pool.
+     */
+    public synchronized void registerPool(final String name, final ObjectPool<? extends Connection> pool) {
+        pools.put(name, pool);
     }
 
+    /**
+     * Closes a named pool.
+     *
+     * @param name
+     *            The pool name.
+     * @throws SQLException
+     *             Thrown when a problem is caught closing the pool.
+     */
     public synchronized void closePool(final String name) throws SQLException {
+        @SuppressWarnings("resource")
         final ObjectPool<? extends Connection> pool = pools.get(name);
         if (pool != null) {
             pools.remove(name);
             try {
                 pool.close();
-            }
-            catch (final Exception e) {
+            } catch (final Exception e) {
                 throw new SQLException("Error closing pool " + name, e);
             }
         }
     }
 
-    public synchronized String[] getPoolNames(){
+    /**
+     * Gets the pool names.
+     *
+     * @return the pool names.
+     */
+    public synchronized String[] getPoolNames() {
         final Set<String> names = pools.keySet();
         return names.toArray(new String[names.size()]);
     }
 
     @Override
     public boolean acceptsURL(final String url) throws SQLException {
-        try {
-            return url.startsWith(URL_PREFIX);
-        } catch(final NullPointerException e) {
-            return false;
-        }
+        return url == null ? false : url.startsWith(URL_PREFIX);
     }
 
     @Override
     public Connection connect(final String url, final Properties info) throws SQLException {
-        if(acceptsURL(url)) {
-            final ObjectPool<? extends Connection> pool =
-                getConnectionPool(url.substring(URL_PREFIX_LEN));
+        if (acceptsURL(url)) {
+            final ObjectPool<? extends Connection> pool = getConnectionPool(url.substring(URL_PREFIX_LEN));
 
             try {
                 final Connection conn = pool.borrowObject();
@@ -138,13 +151,13 @@ public class PoolingDriver implements Driver {
                     return null;
                 }
                 return new PoolGuardConnectionWrapper(pool, conn);
-            } catch(final SQLException e) {
+            } catch (final SQLException e) {
                 throw e;
-            } catch(final NoSuchElementException e) {
+            } catch (final NoSuchElementException e) {
                 throw new SQLException("Cannot get a connection, pool error: " + e.getMessage(), e);
-            } catch(final RuntimeException e) {
+            } catch (final RuntimeException e) {
                 throw e;
-            } catch(final Exception e) {
+            } catch (final Exception e) {
                 throw new SQLException("Cannot get a connection, general error: " + e.getMessage(), e);
             }
         }
@@ -159,24 +172,23 @@ public class PoolingDriver implements Driver {
     /**
      * Invalidates the given connection.
      *
-     * @param conn connection to invalidate
-     * @throws SQLException if the connection is not a
-     * <code>PoolGuardConnectionWrapper</code> or an error occurs invalidating
-     * the connection
+     * @param conn
+     *            connection to invalidate
+     * @throws SQLException
+     *             if the connection is not a <code>PoolGuardConnectionWrapper</code> or an error occurs invalidating
+     *             the connection
      */
     public void invalidateConnection(final Connection conn) throws SQLException {
         if (conn instanceof PoolGuardConnectionWrapper) { // normal case
             final PoolGuardConnectionWrapper pgconn = (PoolGuardConnectionWrapper) conn;
             @SuppressWarnings("unchecked")
-            final
-            ObjectPool<Connection> pool = (ObjectPool<Connection>) pgconn.pool;
+            final ObjectPool<Connection> pool = (ObjectPool<Connection>) pgconn.pool;
             try {
                 pool.invalidateObject(pgconn.getDelegateInternal());
+            } catch (final Exception e) {
+                // Ignore.
             }
-            catch (final Exception e) {
-            }
-        }
-        else {
+        } else {
             throw new SQLException("Invalid connection class");
         }
     }
@@ -202,7 +214,7 @@ public class PoolingDriver implements Driver {
     }
 
     /** My URL prefix */
-    protected static final String URL_PREFIX = "jdbc:apache:commons:dbcp:";
+    public static final String URL_PREFIX = "jdbc:apache:commons:dbcp:";
     protected static final int URL_PREFIX_LEN = URL_PREFIX.length();
 
     // version numbers
@@ -210,16 +222,15 @@ public class PoolingDriver implements Driver {
     protected static final int MINOR_VERSION = 0;
 
     /**
-     * PoolGuardConnectionWrapper is a Connection wrapper that makes sure a
-     * closed connection cannot be used anymore.
+     * PoolGuardConnectionWrapper is a Connection wrapper that makes sure a closed connection cannot be used anymore.
+     *
      * @since 2.0
      */
     private class PoolGuardConnectionWrapper extends DelegatingConnection<Connection> {
 
         private final ObjectPool<? extends Connection> pool;
 
-        PoolGuardConnectionWrapper(final ObjectPool<? extends Connection> pool,
-                final Connection delegate) {
+        PoolGuardConnectionWrapper(final ObjectPool<? extends Connection> pool, final Connection delegate) {
             super(delegate);
             this.pool = pool;
         }
