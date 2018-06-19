@@ -297,7 +297,7 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
 
         if (poolStatements) {
             conn = new PoolingConnection(conn);
-            final GenericKeyedObjectPoolConfig config = new GenericKeyedObjectPoolConfig();
+            final GenericKeyedObjectPoolConfig<DelegatingPreparedStatement> config = new GenericKeyedObjectPoolConfig<>();
             config.setMaxTotalPerKey(-1);
             config.setBlockWhenExhausted(false);
             config.setMaxWaitMillis(0);
