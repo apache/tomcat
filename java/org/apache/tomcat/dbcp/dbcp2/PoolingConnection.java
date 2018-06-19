@@ -322,11 +322,11 @@ public class PoolingConnection extends DelegatingConnection<Connection>
             final PreparedStatement statement = (PreparedStatement) key.createStatement(getDelegate());
             @SuppressWarnings({"rawtypes", "unchecked" }) // Unable to find way to avoid this
             final PoolablePreparedStatement pps = new PoolablePreparedStatement(statement, key, pstmtPool, this);
-            return new DefaultPooledObject<DelegatingPreparedStatement>(pps);
+            return new DefaultPooledObject<>(pps);
         }
         final CallableStatement statement = (CallableStatement) key.createStatement(getDelegate());
         final PoolableCallableStatement pcs = new PoolableCallableStatement(statement, key, pstmtPool, this);
-        return new DefaultPooledObject<DelegatingPreparedStatement>(pcs);
+        return new DefaultPooledObject<>(pcs);
     }
 
     /**

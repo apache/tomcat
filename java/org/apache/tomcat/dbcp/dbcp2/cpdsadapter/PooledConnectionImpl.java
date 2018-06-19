@@ -339,13 +339,13 @@ class PooledConnectionImpl
             @SuppressWarnings({"rawtypes", "unchecked" }) // Unable to find way to avoid this
             final PoolablePreparedStatement pps = new PoolablePreparedStatement(statement, key, pStmtPool,
                     delegatingConnection);
-            return new DefaultPooledObject<DelegatingPreparedStatement>(pps);
+            return new DefaultPooledObject<>(pps);
         }
         final CallableStatement statement = (CallableStatement) key.createStatement(connection);
         @SuppressWarnings("unchecked")
         final PoolableCallableStatement pcs = new PoolableCallableStatement(statement, key, pStmtPool,
                 (DelegatingConnection<Connection>) delegatingConnection);
-        return new DefaultPooledObject<DelegatingPreparedStatement>(pcs);
+        return new DefaultPooledObject<>(pcs);
     }
 
     /**

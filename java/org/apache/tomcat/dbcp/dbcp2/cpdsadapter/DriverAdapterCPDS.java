@@ -182,7 +182,7 @@ public class DriverAdapterCPDS implements ConnectionPoolDataSource, Referenceabl
         }
         KeyedObjectPool<PStmtKey, DelegatingPreparedStatement> stmtPool = null;
         if (isPoolPreparedStatements()) {
-            final GenericKeyedObjectPoolConfig config = new GenericKeyedObjectPoolConfig();
+            final GenericKeyedObjectPoolConfig<DelegatingPreparedStatement> config = new GenericKeyedObjectPoolConfig<>();
             config.setMaxTotalPerKey(Integer.MAX_VALUE);
             config.setBlockWhenExhausted(false);
             config.setMaxWaitMillis(0);

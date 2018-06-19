@@ -71,7 +71,7 @@ public class PoolableManagedConnectionFactory extends PoolableConnectionFactory 
         initializeConnection(conn);
         if (getPoolStatements()) {
             conn = new PoolingConnection(conn);
-            final GenericKeyedObjectPoolConfig config = new GenericKeyedObjectPoolConfig();
+            final GenericKeyedObjectPoolConfig<DelegatingPreparedStatement> config = new GenericKeyedObjectPoolConfig<>();
             config.setMaxTotalPerKey(-1);
             config.setBlockWhenExhausted(false);
             config.setMaxWaitMillis(0);
@@ -96,6 +96,6 @@ public class PoolableManagedConnectionFactory extends PoolableConnectionFactory 
         final PoolableManagedConnection pmc = new PoolableManagedConnection(transactionRegistry, conn, getPool(),
                 getDisconnectionSqlCodes(), isFastFailValidation());
         pmc.setCacheState(getCacheState());
-        return new DefaultPooledObject<PoolableConnection>(pmc);
+        return new DefaultPooledObject<>(pmc);
     }
 }
