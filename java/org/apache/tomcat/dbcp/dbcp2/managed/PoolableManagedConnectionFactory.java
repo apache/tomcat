@@ -63,7 +63,7 @@ public class PoolableManagedConnectionFactory extends PoolableConnectionFactory 
      * PoolableManagedConnection if statement pooling is enabled.
      */
     @Override
-    synchronized public PooledObject<PoolableConnection> makeObject() throws Exception {
+    public synchronized PooledObject<PoolableConnection> makeObject() throws Exception {
         Connection conn = getConnectionFactory().createConnection();
         if (conn == null) {
             throw new IllegalStateException("Connection factory returned null from createConnection");
