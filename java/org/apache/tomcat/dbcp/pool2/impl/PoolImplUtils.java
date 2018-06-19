@@ -32,84 +32,115 @@ class PoolImplUtils {
     /**
      * Identifies the concrete type of object that an object factory creates.
      *
-     * @param factory The factory to examine
+     * @param factoryClass
+     *            The factory to examine
      *
      * @return the type of object the factory creates
      */
     @SuppressWarnings("rawtypes")
-    static Class<?> getFactoryType(final Class<? extends PooledObjectFactory> factory) {
-        return (Class<?>) getGenericType(PooledObjectFactory.class, factory);
-    }
-
-
-    /**
-     * Obtain the concrete type used by an implementation of an interface that
-     * uses a generic type.
-     *
-     * @param type  The interface that defines a generic type
-     * @param clazz The class that implements the interface with a concrete type
-     * @param <T>   The interface type
-     *
-     * @return concrete type used by the implementation
-     */
-    private static <T> Object getGenericType(final Class<T> type,
-            final Class<? extends T> clazz) {
-
-        // Look to see if this class implements the generic interface
-
-        // Get all the interfaces
-        final Type[] interfaces = clazz.getGenericInterfaces();
-        for (final Type iface : interfaces) {
-            // Only need to check interfaces that use generics
-            if (iface instanceof ParameterizedType) {
-                final ParameterizedType pi = (ParameterizedType) iface;
-                // Look for the generic interface
-                if (pi.getRawType() instanceof Class) {
-                    if (type.isAssignableFrom((Class<?>) pi.getRawType())) {
-                        return getTypeParameter(
-                                clazz, pi.getActualTypeArguments()[0]);
+    static Class<?> getFactoryType(final Class<? extends PooledObjectFactory> factoryClass) {
+        final Class<PooledObjectFactory> type = PooledObjectFactory.class;
+        final Object genericType = getGenericType(type, factoryClass);
+        if (genericType instanceof Integer) {
+            // POOL-324 org.apache.commons.pool2.impl.GenericObjectPool.getFactoryType() throws
+            // java.lang.ClassCastException
+            //
+            // A bit hackish, but we must handle cases when getGenericType() does not return a concrete types.
+            final ParameterizedType pi = getParameterizedType(type, factoryClass);
+            if (pi != null) {
+                final Type[] bounds = ((TypeVariable) pi.getActualTypeArguments()[((Integer) genericType).intValue()]).getBounds();
+                if (bounds != null && bounds.length > 0) {
+                    final Type bound0 = bounds[0];
+                    if (bound0 instanceof Class) {
+                        return (Class<?>) bound0;
                     }
                 }
             }
+            // last resort: Always return a Class
+            return Object.class;
+        }
+        return (Class<?>) genericType;
+    }
+
+    /**
+     * Obtains the concrete type used by an implementation of an interface that uses a generic type.
+     *
+     * @param type
+     *            The interface that defines a generic type
+     * @param clazz
+     *            The class that implements the interface with a concrete type
+     * @param <T>
+     *            The interface type
+     *
+     * @return concrete type used by the implementation
+     */
+    private static <T> Object getGenericType(final Class<T> type, final Class<? extends T> clazz) {
+        if (type == null || clazz == null) {
+            // Error will be logged further up the call stack
+            return null;
+        }
+
+        // Look to see if this class implements the generic interface
+        final ParameterizedType pi = getParameterizedType(type, clazz);
+        if (pi != null) {
+            return getTypeParameter(clazz, pi.getActualTypeArguments()[0]);
         }
 
         // Interface not found on this class. Look at the superclass.
         @SuppressWarnings("unchecked")
-        final
-        Class<? extends T> superClazz =
-                (Class<? extends T>) clazz.getSuperclass();
+        final Class<? extends T> superClass = (Class<? extends T>) clazz.getSuperclass();
 
-        final Object result = getGenericType(type, superClazz);
+        final Object result = getGenericType(type, superClass);
         if (result instanceof Class<?>) {
-            // Superclass implements interface and defines explicit type for
-            // generic
+            // Superclass implements interface and defines explicit type for generic
             return result;
         } else if (result instanceof Integer) {
-            // Superclass implements interface and defines unknown type for
-            // generic
+            // Superclass implements interface and defines unknown type for generic
             // Map that unknown type to the generic types defined in this class
-            final ParameterizedType superClassType =
-                    (ParameterizedType) clazz.getGenericSuperclass();
-            return getTypeParameter(clazz,
-                    superClassType.getActualTypeArguments()[
-                            ((Integer) result).intValue()]);
+            final ParameterizedType superClassType = (ParameterizedType) clazz.getGenericSuperclass();
+            return getTypeParameter(clazz, superClassType.getActualTypeArguments()[((Integer) result).intValue()]);
         } else {
             // Error will be logged further up the call stack
             return null;
         }
     }
 
+    /**
+     * Gets the matching parameterized type or null.
+     * @param type
+     *            The interface that defines a generic type
+     * @param clazz
+     *            The class that implements the interface with a concrete type
+     * @param <T>
+     *            The interface type
+     */
+    private static <T> ParameterizedType getParameterizedType(final Class<T> type, final Class<? extends T> clazz) {
+        for (final Type iface : clazz.getGenericInterfaces()) {
+            // Only need to check interfaces that use generics
+            if (iface instanceof ParameterizedType) {
+                final ParameterizedType pi = (ParameterizedType) iface;
+                // Look for the generic interface
+                if (pi.getRawType() instanceof Class) {
+                    if (type.isAssignableFrom((Class<?>) pi.getRawType())) {
+                        return pi;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
     /**
-     * For a generic parameter, return either the Class used or if the type
-     * is unknown, the index for the type in definition of the class
+     * For a generic parameter, return either the Class used or if the type is unknown, the index for the type in
+     * definition of the class
      *
-     * @param clazz defining class
-     * @param argType the type argument of interest
+     * @param clazz
+     *            defining class
+     * @param argType
+     *            the type argument of interest
      *
-     * @return An instance of {@link Class} representing the type used by the
-     *         type parameter or an instance of {@link Integer} representing
-     *         the index for the type in the definition of the defining class
+     * @return An instance of {@link Class} representing the type used by the type parameter or an instance of
+     *         {@link Integer} representing the index for the type in the definition of the defining class
      */
     private static Object getTypeParameter(final Class<?> clazz, final Type argType) {
         if (argType instanceof Class<?>) {

@@ -69,8 +69,9 @@ package org.apache.tomcat.dbcp.pool2;
  * @since 2.0
  */
 public interface PooledObjectFactory<T> {
+
   /**
-   * Create an instance that can be served by the pool and wrap it in a
+   * Creates an instance that can be served by the pool and wrap it in a
    * {@link PooledObject} to be managed by the pool.
    *
    * @return a {@code PooledObject} wrapping an instance that can be served by the pool
@@ -112,7 +113,7 @@ public interface PooledObjectFactory<T> {
   boolean validateObject(PooledObject<T> p);
 
   /**
-   * Reinitialize an instance to be returned by the pool.
+   * Reinitializes an instance to be returned by the pool.
    *
    * @param p a {@code PooledObject} wrapping the instance to be activated
    *
@@ -124,7 +125,7 @@ public interface PooledObjectFactory<T> {
   void activateObject(PooledObject<T> p) throws Exception;
 
   /**
-   * Uninitialize an instance to be returned to the idle object pool.
+   * Uninitializes an instance to be returned to the idle object pool.
    *
    * @param p a {@code PooledObject} wrapping the instance to be passivated
    *

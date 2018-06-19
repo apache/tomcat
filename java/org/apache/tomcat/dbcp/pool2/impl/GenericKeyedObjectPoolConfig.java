@@ -23,10 +23,12 @@ package org.apache.tomcat.dbcp.pool2.impl;
  * <p>
  * This class is not thread-safe; it is only intended to be used to provide
  * attributes used when creating a pool.
+ * </p>
  *
+ * @param <T> Type of element pooled.
  * @since 2.0
  */
-public class GenericKeyedObjectPoolConfig extends BaseObjectPoolConfig {
+public class GenericKeyedObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
 
     /**
      * The default value for the {@code maxTotalPerKey} configuration attribute.
@@ -171,10 +173,11 @@ public class GenericKeyedObjectPoolConfig extends BaseObjectPoolConfig {
         this.maxIdlePerKey = maxIdlePerKey;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public GenericKeyedObjectPoolConfig clone() {
+    public GenericKeyedObjectPoolConfig<T> clone() {
         try {
-            return (GenericKeyedObjectPoolConfig) super.clone();
+            return (GenericKeyedObjectPoolConfig<T>) super.clone();
         } catch (final CloneNotSupportedException e) {
             throw new AssertionError(); // Can't happen
         }

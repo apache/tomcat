@@ -26,13 +26,16 @@ import java.io.PrintWriter;
  */
 public class NoOpCallStack implements CallStack {
 
+    /**
+     * Singleton instance.
+     */
     public static final CallStack INSTANCE = new NoOpCallStack();
 
     private NoOpCallStack() {
     }
 
     @Override
-    public boolean printStackTrace(PrintWriter writer) {
+    public boolean printStackTrace(final PrintWriter writer) {
         return false;
     }
 

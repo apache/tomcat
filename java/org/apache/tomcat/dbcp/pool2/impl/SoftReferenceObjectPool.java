@@ -78,7 +78,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Borrow an object from the pool. If there are no idle instances available
+     * Borrows an object from the pool. If there are no idle instances available
      * in the pool, the configured factory's
      * {@link PooledObjectFactory#makeObject()} method is invoked to create a
      * new instance.
@@ -243,7 +243,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Create an object, and place it into the pool. addObject() is useful for
+     * Creates an object, and places it into the pool. addObject() is useful for
      * "pre-loading" a pool with idle objects.
      * <p>
      * Before being added to the pool, the newly created instance is
@@ -313,7 +313,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Return the number of instances currently borrowed from this pool.
+     * Returns the number of instances currently borrowed from this pool.
      *
      * @return the number of instances currently borrowed from this pool
      */
@@ -345,7 +345,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Close this pool, and free any resources associated with it. Invokes
+     * Closes this pool, and frees any resources associated with it. Invokes
      * {@link #clear()} to destroy and remove instances in the pool.
      * <p>
      * Calling {@link #addObject} or {@link #borrowObject} after invoking this
@@ -382,7 +382,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Find the PooledSoftReference in allReferences that points to obj.
+     * Finds the PooledSoftReference in allReferences that points to obj.
      *
      * @param obj returning object
      * @return PooledSoftReference wrapping a soft reference to obj
@@ -399,7 +399,7 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
     }
 
     /**
-     * Destroy a {@code PooledSoftReference} and remove it from the idle and all
+     * Destroys a {@code PooledSoftReference} and removes it from the idle and all
      * references pools.
      *
      * @param toDestroy PooledSoftReference to destroy

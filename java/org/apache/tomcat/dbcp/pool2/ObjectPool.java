@@ -56,6 +56,7 @@ import java.util.NoSuchElementException;
  * @since 2.0
  */
 public interface ObjectPool<T> extends Closeable {
+
     /**
      * Obtains an instance from this pool.
      * <p>
@@ -88,7 +89,7 @@ public interface ObjectPool<T> extends Closeable {
             IllegalStateException;
 
     /**
-     * Return an instance to the pool. By contract, <code>obj</code>
+     * Returns an instance to the pool. By contract, <code>obj</code>
      * <strong>must</strong> have been obtained using {@link #borrowObject()} or
      * a related method as defined in an implementation or sub-interface.
      *
@@ -122,7 +123,7 @@ public interface ObjectPool<T> extends Closeable {
     void invalidateObject(T obj) throws Exception;
 
     /**
-     * Create an object using the {@link PooledObjectFactory factory} or other
+     * Creates an object using the {@link PooledObjectFactory factory} or other
      * implementation dependent mechanism, passivate it, and then place it in
      * the idle object pool. <code>addObject</code> is useful for "pre-loading"
      * a pool with idle objects. (Optional operation).
@@ -138,7 +139,7 @@ public interface ObjectPool<T> extends Closeable {
             UnsupportedOperationException;
 
     /**
-     * Return the number of instances currently idle in this pool. This may be
+     * Returns the number of instances currently idle in this pool. This may be
      * considered an approximation of the number of objects that can be
      * {@link #borrowObject borrowed} without creating any new instances.
      * Returns a negative value if this information is not available.
@@ -147,7 +148,7 @@ public interface ObjectPool<T> extends Closeable {
     int getNumIdle();
 
     /**
-     * Return the number of instances currently borrowed from this pool. Returns
+     * Returns the number of instances currently borrowed from this pool. Returns
      * a negative value if this information is not available.
      * @return the number of instances currently borrowed from this pool.
      */
@@ -166,7 +167,7 @@ public interface ObjectPool<T> extends Closeable {
     void clear() throws Exception, UnsupportedOperationException;
 
     /**
-     * Close this pool, and free any resources associated with it.
+     * Closes this pool, and free any resources associated with it.
      * <p>
      * Calling {@link #addObject} or {@link #borrowObject} after invoking this
      * method on a pool will cause them to throw an {@link IllegalStateException}.

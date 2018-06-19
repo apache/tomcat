@@ -34,169 +34,204 @@ import java.util.Map;
  * @since 2.0
  */
 public interface GenericKeyedObjectPoolMXBean<K> {
+
     // Expose getters for configuration settings
+
     /**
      * See {@link GenericKeyedObjectPool#getBlockWhenExhausted()}
      * @return See {@link GenericKeyedObjectPool#getBlockWhenExhausted()}
      */
     boolean getBlockWhenExhausted();
+
     /**
      * See {@link GenericKeyedObjectPool#getFairness()}
      * @return See {@link GenericKeyedObjectPool#getFairness()}
      */
     boolean getFairness();
+
     /**
      * See {@link GenericKeyedObjectPool#getLifo()}
      * @return See {@link GenericKeyedObjectPool#getLifo()}
      */
     boolean getLifo();
+
     /**
      * See {@link GenericKeyedObjectPool#getMaxIdlePerKey()}
      * @return See {@link GenericKeyedObjectPool#getMaxIdlePerKey()}
      */
     int getMaxIdlePerKey();
+
     /**
      * See {@link GenericKeyedObjectPool#getMaxTotal()}
      * @return See {@link GenericKeyedObjectPool#getMaxTotal()}
      */
     int getMaxTotal();
+
     /**
      * See {@link GenericKeyedObjectPool#getMaxTotalPerKey()}
      * @return See {@link GenericKeyedObjectPool#getMaxTotalPerKey()}
      */
     int getMaxTotalPerKey();
+
     /**
      * See {@link GenericKeyedObjectPool#getMaxWaitMillis()}
      * @return See {@link GenericKeyedObjectPool#getMaxWaitMillis()}
      */
     long getMaxWaitMillis();
+
     /**
      * See {@link GenericKeyedObjectPool#getMinEvictableIdleTimeMillis()}
      * @return See {@link GenericKeyedObjectPool#getMinEvictableIdleTimeMillis()}
      */
     long getMinEvictableIdleTimeMillis();
+
     /**
      * See {@link GenericKeyedObjectPool#getMinIdlePerKey()}
      * @return See {@link GenericKeyedObjectPool#getMinIdlePerKey()}
      */
     int getMinIdlePerKey();
+
     /**
      * See {@link GenericKeyedObjectPool#getNumActive()}
      * @return See {@link GenericKeyedObjectPool#getNumActive()}
      */
     int getNumActive();
+
     /**
      * See {@link GenericKeyedObjectPool#getNumIdle()}
      * @return See {@link GenericKeyedObjectPool#getNumIdle()}
      */
     int getNumIdle();
+
     /**
      * See {@link GenericKeyedObjectPool#getNumTestsPerEvictionRun()}
      * @return See {@link GenericKeyedObjectPool#getNumTestsPerEvictionRun()}
      */
     int getNumTestsPerEvictionRun();
+
     /**
      * See {@link GenericKeyedObjectPool#getTestOnCreate()}
      * @return See {@link GenericKeyedObjectPool#getTestOnCreate()}
      * @since 2.2
      */
     boolean getTestOnCreate();
+
     /**
      * See {@link GenericKeyedObjectPool#getTestOnBorrow()}
      * @return See {@link GenericKeyedObjectPool#getTestOnBorrow()}
      */
     boolean getTestOnBorrow();
+
     /**
      * See {@link GenericKeyedObjectPool#getTestOnReturn()}
      * @return See {@link GenericKeyedObjectPool#getTestOnReturn()}
      */
     boolean getTestOnReturn();
+
     /**
      * See {@link GenericKeyedObjectPool#getTestWhileIdle()}
      * @return See {@link GenericKeyedObjectPool#getTestWhileIdle()}
      */
     boolean getTestWhileIdle();
+
     /**
      * See {@link GenericKeyedObjectPool#getTimeBetweenEvictionRunsMillis()}
      * @return See {@link GenericKeyedObjectPool#getTimeBetweenEvictionRunsMillis()}
      */
     long getTimeBetweenEvictionRunsMillis();
+
     /**
      * See {@link GenericKeyedObjectPool#isClosed()}
      * @return See {@link GenericKeyedObjectPool#isClosed()}
      */
     boolean isClosed();
+
     // Expose getters for monitoring attributes
+
     /**
      * See {@link GenericKeyedObjectPool#getNumActivePerKey()}
      * @return See {@link GenericKeyedObjectPool#getNumActivePerKey()}
      */
     Map<String,Integer> getNumActivePerKey();
+
     /**
      * See {@link GenericKeyedObjectPool#getBorrowedCount()}
      * @return See {@link GenericKeyedObjectPool#getBorrowedCount()}
      */
     long getBorrowedCount();
+
     /**
      * See {@link GenericKeyedObjectPool#getReturnedCount()}
      * @return See {@link GenericKeyedObjectPool#getReturnedCount()}
      */
     long getReturnedCount();
+
     /**
      * See {@link GenericKeyedObjectPool#getCreatedCount()}
      * @return See {@link GenericKeyedObjectPool#getCreatedCount()}
      */
     long getCreatedCount();
+
     /**
      * See {@link GenericKeyedObjectPool#getDestroyedCount()}
      * @return See {@link GenericKeyedObjectPool#getDestroyedCount()}
      */
     long getDestroyedCount();
+
     /**
      * See {@link GenericKeyedObjectPool#getDestroyedByEvictorCount()}
      * @return See {@link GenericKeyedObjectPool#getDestroyedByEvictorCount()}
      */
     long getDestroyedByEvictorCount();
+
     /**
      * See {@link GenericKeyedObjectPool#getDestroyedByBorrowValidationCount()}
      * @return See {@link GenericKeyedObjectPool#getDestroyedByBorrowValidationCount()}
      */
     long getDestroyedByBorrowValidationCount();
+
     /**
      * See {@link GenericKeyedObjectPool#getMeanActiveTimeMillis()}
      * @return See {@link GenericKeyedObjectPool#getMeanActiveTimeMillis()}
      */
     long getMeanActiveTimeMillis();
+
     /**
      * See {@link GenericKeyedObjectPool#getMeanIdleTimeMillis()}
      * @return See {@link GenericKeyedObjectPool#getMeanIdleTimeMillis()}
      */
     long getMeanIdleTimeMillis();
+
     /**
      * See {@link GenericKeyedObjectPool#getMaxBorrowWaitTimeMillis()}
      * @return See {@link GenericKeyedObjectPool#getMaxBorrowWaitTimeMillis()}
      */
     long getMeanBorrowWaitTimeMillis();
+
     /**
      * See {@link GenericKeyedObjectPool#getMaxBorrowWaitTimeMillis()}
      * @return See {@link GenericKeyedObjectPool#getMaxBorrowWaitTimeMillis()}
      */
     long getMaxBorrowWaitTimeMillis();
+
     /**
      * See {@link GenericKeyedObjectPool#getCreationStackTrace()}
      * @return See {@link GenericKeyedObjectPool#getCreationStackTrace()}
      */
     String getCreationStackTrace();
+
     /**
      * See {@link GenericKeyedObjectPool#getNumWaiters()}
      * @return See {@link GenericKeyedObjectPool#getNumWaiters()}
      */
     int getNumWaiters();
+
     /**
      * See {@link GenericKeyedObjectPool#getNumWaitersByKey()}
      * @return See {@link GenericKeyedObjectPool#getNumWaitersByKey()}
      */
     Map<String,Integer> getNumWaitersByKey();
+
     /**
      * See {@link GenericKeyedObjectPool#listAllObjects()}
      * @return See {@link GenericKeyedObjectPool#listAllObjects()}

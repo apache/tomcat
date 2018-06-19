@@ -32,7 +32,7 @@ import java.util.Deque;
 public interface PooledObject<T> extends Comparable<PooledObject<T>> {
 
     /**
-     * Obtain the underlying object that is wrapped by this instance of
+     * Obtains the underlying object that is wrapped by this instance of
      * {@link PooledObject}.
      *
      * @return The wrapped object
@@ -40,7 +40,7 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
     T getObject();
 
     /**
-     * Obtain the time (using the same basis as
+     * Obtains the time (using the same basis as
      * {@link System#currentTimeMillis()}) that this object was created.
      *
      * @return The creation time for the wrapped object
@@ -48,7 +48,7 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
     long getCreateTime();
 
     /**
-     * Obtain the time in milliseconds that this object last spent in the
+     * Obtains the time in milliseconds that this object last spent in the
      * active state (it may still be active in which case subsequent calls will
      * return an increased value).
      *
@@ -57,7 +57,7 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
     long getActiveTimeMillis();
 
     /**
-     * Obtain the time in milliseconds that this object last spend in the
+     * Obtains the time in milliseconds that this object last spend in the
      * idle state (it may still be idle in which case subsequent calls will
      * return an increased value).
      *
@@ -66,21 +66,21 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
     long getIdleTimeMillis();
 
     /**
-     * Obtain the time the wrapped object was last borrowed.
+     * Obtains the time the wrapped object was last borrowed.
      *
      * @return The time the object was last borrowed
      */
     long getLastBorrowTime();
 
     /**
-     * Obtain the time the wrapped object was last returned.
+     * Obtains the time the wrapped object was last returned.
      *
      * @return The time the object was last returned
      */
     long getLastReturnTime();
 
     /**
-     * Return an estimate of the last time this object was used.  If the class
+     * Returns an estimate of the last time this object was used.  If the class
      * of the pooled object implements {@link TrackedUse}, what is returned is
      * the maximum of {@link TrackedUse#getLastUsed()} and
      * {@link #getLastBorrowTime()}; otherwise this method gives the same
@@ -118,7 +118,7 @@ public interface PooledObject<T> extends Comparable<PooledObject<T>> {
     String toString();
 
     /**
-     * Attempt to place the pooled object in the
+     * Attempts to place the pooled object in the
      * {@link PooledObjectState#EVICTION} state.
      *
      * @return <code>true</code> if the object was placed in the
