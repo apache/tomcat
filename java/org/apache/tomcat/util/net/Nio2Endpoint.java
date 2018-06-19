@@ -842,7 +842,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
 
         @Override
         public boolean isClosed() {
-            return closed || !getSocket().isOpen();
+            return !getSocket().isOpen();
         }
 
 
