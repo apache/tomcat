@@ -40,7 +40,7 @@ public class PStmtKeyCPDS extends PStmtKey {
 
     public PStmtKeyCPDS(final String sql, final int resultSetType, final int resultSetConcurrency,
             final int resultSetHoldability) {
-        super(sql, resultSetType, resultSetConcurrency);
+        super(sql, null, resultSetType, resultSetConcurrency, resultSetHoldability);
     }
 
     public PStmtKeyCPDS(final String sql, final int columnIndexes[]) {
