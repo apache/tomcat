@@ -997,6 +997,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         private volatile SendfileData sendfileData = null;
         private volatile long lastRead = System.currentTimeMillis();
         private volatile long lastWrite = lastRead;
+        private volatile boolean closed = false;
 
         public NioSocketWrapper(NioChannel channel, NioEndpoint endpoint) {
             super(channel, endpoint);
@@ -1132,13 +1133,14 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         @Override
         public void close() throws IOException {
+            closed = true;
             getSocket().close();
         }
 
 
         @Override
         public boolean isClosed() {
-            return !getSocket().isOpen();
+            return closed || !getSocket().isOpen();
         }
 
 
