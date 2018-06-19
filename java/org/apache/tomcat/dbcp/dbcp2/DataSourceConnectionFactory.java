@@ -24,29 +24,64 @@ import javax.sql.DataSource;
 /**
  * A {@link DataSource}-based implementation of {@link ConnectionFactory}.
  *
- * @author Rodney Waldhoff
  * @since 2.0
  */
 public class DataSourceConnectionFactory implements ConnectionFactory {
-    public DataSourceConnectionFactory(final DataSource source) {
-        this(source,null,null);
+
+    private final DataSource dataSource;
+
+    private final String userName;
+
+    private final char[] userPassword;
+
+    /**
+     * Constructs an instance for the given DataSource.
+     *
+     * @param dataSource
+     *            The DataSource for this factory.
+     */
+    public DataSourceConnectionFactory(final DataSource dataSource) {
+        this(dataSource, null, (char[]) null);
     }
 
-    public DataSourceConnectionFactory(final DataSource source, final String uname, final String passwd) {
-        _source = source;
-        _uname = uname;
-        _passwd = passwd;
+    /**
+     * Constructs an instance for the given DataSource.
+     *
+     * @param dataSource
+     *            The DataSource for this factory.
+     * @param userName
+     *            The user name.
+     * @param userPassword
+     *            The user password.
+     * @since 2.4.0
+     */
+    public DataSourceConnectionFactory(final DataSource dataSource, final String userName, final char[] userPassword) {
+        this.dataSource = dataSource;
+        this.userName = userName;
+        this.userPassword = userPassword;
+    }
+
+    /**
+     * Constructs an instance for the given DataSource.
+     *
+     * @param dataSource
+     *            The DataSource for this factory.
+     * @param userName
+     *            The user name.
+     * @param password
+     *            The user password.
+     */
+    public DataSourceConnectionFactory(final DataSource dataSource, final String userName, final String password) {
+        this.dataSource = dataSource;
+        this.userName = userName;
+        this.userPassword = Utils.toCharArray(password);
     }
 
     @Override
     public Connection createConnection() throws SQLException {
-        if(null == _uname && null == _passwd) {
-            return _source.getConnection();
+        if (null == userName && null == userPassword) {
+            return dataSource.getConnection();
         }
-        return _source.getConnection(_uname,_passwd);
+        return dataSource.getConnection(userName, Utils.toString(userPassword));
     }
-
-    private final String _uname;
-    private final String _passwd;
-    private final DataSource _source;
 }

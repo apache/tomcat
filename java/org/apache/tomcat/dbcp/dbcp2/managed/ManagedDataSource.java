@@ -19,6 +19,7 @@ package org.apache.tomcat.dbcp.dbcp2.managed;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Objects;
 
 import org.apache.tomcat.dbcp.dbcp2.PoolingDataSource;
 import org.apache.tomcat.dbcp.pool2.ObjectPool;
@@ -26,45 +27,43 @@ import org.apache.tomcat.dbcp.pool2.ObjectPool;
 /**
  * The ManagedDataSource is a PoolingDataSource that creates ManagedConnections.
  *
- * @author Dain Sundstrom
- * @param <C> The kind of {@link Connection} to manage.
+ * @param <C>
+ *            The kind of {@link Connection} to manage.
  * @since 2.0
  */
 public class ManagedDataSource<C extends Connection> extends PoolingDataSource<C> {
     private TransactionRegistry transactionRegistry;
 
     /**
-     * Creates a ManagedDataSource which obtains connections from the specified pool and
-     * manages them using the specified transaction registry.  The TransactionRegistry must
-     * be the transaction registry obtained from the XAConnectionFactory used to create
-     * the connection pool.  If not, an error will occur when attempting to use the connection
-     * in a global transaction because the XAResource object associated with the connection
-     * will be unavailable.
+     * Creates a ManagedDataSource which obtains connections from the specified pool and manages them using the
+     * specified transaction registry. The TransactionRegistry must be the transaction registry obtained from the
+     * XAConnectionFactory used to create the connection pool. If not, an error will occur when attempting to use the
+     * connection in a global transaction because the XAResource object associated with the connection will be
+     * unavailable.
      *
-     * @param pool the connection pool
-     * @param transactionRegistry the transaction registry obtained from the
-     * XAConnectionFactory used to create the connection pool object factory
+     * @param pool
+     *            the connection pool
+     * @param transactionRegistry
+     *            the transaction registry obtained from the XAConnectionFactory used to create the connection pool
+     *            object factory
      */
-    public ManagedDataSource(final ObjectPool<C> pool,
-            final TransactionRegistry transactionRegistry) {
+    public ManagedDataSource(final ObjectPool<C> pool, final TransactionRegistry transactionRegistry) {
         super(pool);
         this.transactionRegistry = transactionRegistry;
     }
 
     /**
-     * Sets the transaction registry from the XAConnectionFactory used to create the pool.
-     * The transaction registry can only be set once using either a connector or this setter
-     * method.
-     * @param transactionRegistry the transaction registry acquired from the XAConnectionFactory
-     * used to create the pool
+     * Sets the transaction registry from the XAConnectionFactory used to create the pool. The transaction registry can
+     * only be set once using either a connector or this setter method.
+     *
+     * @param transactionRegistry
+     *            the transaction registry acquired from the XAConnectionFactory used to create the pool
      */
     public void setTransactionRegistry(final TransactionRegistry transactionRegistry) {
-        if(this.transactionRegistry != null) {
+        if (this.transactionRegistry != null) {
             throw new IllegalStateException("TransactionRegistry already set");
         }
-        if(transactionRegistry == null) {
-            throw new NullPointerException("TransactionRegistry is null");
-        }
+        Objects.requireNonNull(transactionRegistry, "transactionRegistry is null");
 
         this.transactionRegistry = transactionRegistry;
     }
@@ -78,7 +77,6 @@ public class ManagedDataSource<C extends Connection> extends PoolingDataSource<C
             throw new IllegalStateException("TransactionRegistry has not been set");
         }
 
-        final Connection connection = new ManagedConnection<>(getPool(), transactionRegistry, isAccessToUnderlyingConnectionAllowed());
-        return connection;
+        return new ManagedConnection<>(getPool(), transactionRegistry, isAccessToUnderlyingConnectionAllowed());
     }
 }

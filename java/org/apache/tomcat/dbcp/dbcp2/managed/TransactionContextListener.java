@@ -20,14 +20,16 @@ package org.apache.tomcat.dbcp.dbcp2.managed;
 /**
  * A listener for transaction completion events.
  *
- * @author Dain Sundstrom
  * @since 2.0
  */
 public interface TransactionContextListener {
     /**
      * Occurs after the transaction commits or rolls back.
-     * @param transactionContext the transaction context that completed
-     * @param commited true if the transaction committed; false otherwise
+     *
+     * @param transactionContext
+     *            the transaction context that completed
+     * @param commited
+     *            true if the transaction committed; false otherwise
      */
     void afterCompletion(TransactionContext transactionContext, boolean commited);
 }

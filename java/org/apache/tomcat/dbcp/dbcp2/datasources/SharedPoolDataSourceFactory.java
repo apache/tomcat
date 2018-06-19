@@ -22,13 +22,11 @@ import javax.naming.Reference;
 
 /**
  * A JNDI ObjectFactory which creates <code>SharedPoolDataSource</code>s
+ *
  * @since 2.0
  */
-public class SharedPoolDataSourceFactory
-    extends InstanceKeyDataSourceFactory
-{
-    private static final String SHARED_POOL_CLASSNAME =
-        SharedPoolDataSource.class.getName();
+public class SharedPoolDataSourceFactory extends InstanceKeyDataSourceFactory {
+    private static final String SHARED_POOL_CLASSNAME = SharedPoolDataSource.class.getName();
 
     @Override
     protected boolean isCorrectClass(final String className) {
@@ -40,10 +38,8 @@ public class SharedPoolDataSourceFactory
         final SharedPoolDataSource spds = new SharedPoolDataSource();
         final RefAddr ra = ref.get("maxTotal");
         if (ra != null && ra.getContent() != null) {
-            spds.setMaxTotal(
-                Integer.parseInt(ra.getContent().toString()));
+            spds.setMaxTotal(Integer.parseInt(ra.getContent().toString()));
         }
         return spds;
     }
 }
-

@@ -24,9 +24,6 @@ import java.util.Properties;
 /**
  * A {@link DriverManager}-based implementation of {@link ConnectionFactory}.
  *
- * @author Rodney Waldhoff
- * @author Ignacio J. Ortega
- * @author Dirk Verbeeck
  * @since 2.0
  */
 public class DriverManagerConnectionFactory implements ConnectionFactory {
@@ -40,57 +37,62 @@ public class DriverManagerConnectionFactory implements ConnectionFactory {
         DriverManager.getDrivers();
     }
 
-
     /**
      * Constructor for DriverManagerConnectionFactory.
-     * @param connectUri a database url of the form
-     * <code> jdbc:<em>subprotocol</em>:<em>subname</em></code>
+     *
+     * @param connectionUri
+     *            a database url of the form <code> jdbc:<em>subprotocol</em>:<em>subname</em></code>
      * @since 2.2
      */
-    public DriverManagerConnectionFactory(final String connectUri) {
-        _connectUri = connectUri;
-        _props = new Properties();
+    public DriverManagerConnectionFactory(final String connectionUri) {
+        this.connectionUri = connectionUri;
+        this.propeties = new Properties();
     }
 
     /**
      * Constructor for DriverManagerConnectionFactory.
-     * @param connectUri a database url of the form
-     * <code> jdbc:<em>subprotocol</em>:<em>subname</em></code>
-     * @param props a list of arbitrary string tag/value pairs as
-     * connection arguments; normally at least a "user" and "password"
-     * property should be included.
+     *
+     * @param connectionUri
+     *            a database url of the form <code> jdbc:<em>subprotocol</em>:<em>subname</em></code>
+     * @param properties
+     *            a list of arbitrary string tag/value pairs as connection arguments; normally at least a "user" and
+     *            "password" property should be included.
      */
-    public DriverManagerConnectionFactory(final String connectUri, final Properties props) {
-        _connectUri = connectUri;
-        _props = props;
+    public DriverManagerConnectionFactory(final String connectionUri, final Properties properties) {
+        this.connectionUri = connectionUri;
+        this.propeties = properties;
     }
 
     /**
      * Constructor for DriverManagerConnectionFactory.
-     * @param connectUri a database url of the form
-     * <code>jdbc:<em>subprotocol</em>:<em>subname</em></code>
-     * @param uname the database user
-     * @param passwd the user's password
+     *
+     * @param connectionUri
+     *            a database url of the form <code>jdbc:<em>subprotocol</em>:<em>subname</em></code>
+     * @param userName
+     *            the database user
+     * @param userPassword
+     *            the user's password
      */
-    public DriverManagerConnectionFactory(final String connectUri, final String uname, final String passwd) {
-        _connectUri = connectUri;
-        _uname = uname;
-        _passwd = passwd;
+    public DriverManagerConnectionFactory(final String connectionUri, final String userName,
+            final String userPassword) {
+        this.connectionUri = connectionUri;
+        this.userName = userName;
+        this.userPassword = userPassword;
     }
 
     @Override
     public Connection createConnection() throws SQLException {
-        if(null == _props) {
-            if(_uname == null && _passwd == null) {
-                return DriverManager.getConnection(_connectUri);
+        if (null == propeties) {
+            if (userName == null && userPassword == null) {
+                return DriverManager.getConnection(connectionUri);
             }
-            return DriverManager.getConnection(_connectUri,_uname,_passwd);
+            return DriverManager.getConnection(connectionUri, userName, userPassword);
         }
-        return DriverManager.getConnection(_connectUri,_props);
+        return DriverManager.getConnection(connectionUri, propeties);
     }
 
-    private String _connectUri = null;
-    private String _uname = null;
-    private String _passwd = null;
-    private Properties _props = null;
+    private final String connectionUri;
+    private String userName;
+    private String userPassword;
+    private Properties propeties;
 }

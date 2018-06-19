@@ -30,22 +30,18 @@ import org.apache.tomcat.dbcp.dbcp2.PoolableConnectionFactory;
 import org.apache.tomcat.dbcp.dbcp2.PoolingDataSource;
 
 /**
- * <p>BasicManagedDataSource is an extension of BasicDataSource which
- * creates ManagedConnections.  This data source can create either
- * full two-phase-commit XA connections or one-phase-commit
- * local connections.  Both types of connections are committed or
- * rolled back as part of the global transaction (a.k.a. XA
- * transaction or JTA Transaction), but only XA connections can be
- * recovered in the case of a system crash.
+ * <p>
+ * BasicManagedDataSource is an extension of BasicDataSource which creates ManagedConnections. This data source can
+ * create either full two-phase-commit XA connections or one-phase-commit local connections. Both types of connections
+ * are committed or rolled back as part of the global transaction (a.k.a. XA transaction or JTA Transaction), but only
+ * XA connections can be recovered in the case of a system crash.
  * </p>
- * <p>BasicManagedDataSource adds the TransactionManager and XADataSource
- * properties.  The TransactionManager property is required and is
- * used to enlist connections in global transactions.  The XADataSource
- * is optional and if set is the class name of the XADataSource class
- * for a two-phase-commit JDBC driver.  If the XADataSource property
- * is set, the driverClassName is ignored and a DataSourceXAConnectionFactory
- * is created. Otherwise, a standard DriverConnectionFactory is created
- * and wrapped with a LocalXAConnectionFactory.
+ * <p>
+ * BasicManagedDataSource adds the TransactionManager and XADataSource properties. The TransactionManager property is
+ * required and is used to enlist connections in global transactions. The XADataSource is optional and if set is the
+ * class name of the XADataSource class for a two-phase-commit JDBC driver. If the XADataSource property is set, the
+ * driverClassName is ignored and a DataSourceXAConnectionFactory is created. Otherwise, a standard
+ * DriverConnectionFactory is created and wrapped with a LocalXAConnectionFactory.
  * </p>
  *
  * @see BasicDataSource
@@ -53,13 +49,17 @@ import org.apache.tomcat.dbcp.dbcp2.PoolingDataSource;
  * @since 2.0
  */
 public class BasicManagedDataSource extends BasicDataSource {
+
     /** Transaction Registry */
     private TransactionRegistry transactionRegistry;
+
     /** Transaction Manager */
     private transient TransactionManager transactionManager;
-    /** XA datasource class name */
+
+    /** XA data source class name */
     private String xaDataSource;
-    /** XA datasource instance */
+
+    /** XA data source instance */
     private XADataSource xaDataSourceInstance;
 
     /**
@@ -72,14 +72,17 @@ public class BasicManagedDataSource extends BasicDataSource {
     }
 
     /**
-     * <p>Sets the XADataSource instance used by the XAConnectionFactory.</p>
      * <p>
-     * Note: this method currently has no effect once the pool has been
-     * initialized.  The pool is initialized the first time one of the
-     * following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code></p>
+     * Sets the XADataSource instance used by the XAConnectionFactory.
+     * </p>
+     * <p>
+     * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
+     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
+     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * </p>
      *
-     * @param xaDataSourceInstance XADataSource instance
+     * @param xaDataSourceInstance
+     *            XADataSource instance
      */
     public synchronized void setXaDataSourceInstance(final XADataSource xaDataSourceInstance) {
         this.xaDataSourceInstance = xaDataSourceInstance;
@@ -88,6 +91,7 @@ public class BasicManagedDataSource extends BasicDataSource {
 
     /**
      * Gets the required transaction manager property.
+     *
      * @return the transaction manager used to enlist connections
      */
     public TransactionManager getTransactionManager() {
@@ -96,6 +100,7 @@ public class BasicManagedDataSource extends BasicDataSource {
 
     /**
      * Gets the transaction registry.
+     *
      * @return the transaction registry associating XAResources with managed connections
      */
     protected synchronized TransactionRegistry getTransactionRegistry() {
@@ -104,7 +109,9 @@ public class BasicManagedDataSource extends BasicDataSource {
 
     /**
      * Sets the required transaction manager property.
-     * @param transactionManager the transaction manager used to enlist connections
+     *
+     * @param transactionManager
+     *            the transaction manager used to enlist connections
      */
     public void setTransactionManager(final TransactionManager transactionManager) {
         this.transactionManager = transactionManager;
@@ -112,6 +119,7 @@ public class BasicManagedDataSource extends BasicDataSource {
 
     /**
      * Gets the optional XADataSource class name.
+     *
      * @return the optional XADataSource class name
      */
     public synchronized String getXADataSource() {
@@ -120,7 +128,9 @@ public class BasicManagedDataSource extends BasicDataSource {
 
     /**
      * Sets the optional XADataSource class name.
-     * @param xaDataSource the optional XADataSource class name
+     *
+     * @param xaDataSource
+     *            the optional XADataSource class name
      */
     public synchronized void setXADataSource(final String xaDataSource) {
         this.xaDataSource = xaDataSource;
@@ -132,10 +142,12 @@ public class BasicManagedDataSource extends BasicDataSource {
             throw new SQLException("Transaction manager must be set before a connection can be created");
         }
 
-        // If xa data source is not specified a DriverConnectionFactory is created and wrapped with a LocalXAConnectionFactory
+        // If xa data source is not specified a DriverConnectionFactory is created and wrapped with a
+        // LocalXAConnectionFactory
         if (xaDataSource == null) {
             final ConnectionFactory connectionFactory = super.createConnectionFactory();
-            final XAConnectionFactory xaConnectionFactory = new LocalXAConnectionFactory(getTransactionManager(), connectionFactory);
+            final XAConnectionFactory xaConnectionFactory = new LocalXAConnectionFactory(getTransactionManager(),
+                    connectionFactory);
             transactionRegistry = xaConnectionFactory.getTransactionRegistry();
             return xaConnectionFactory;
         }
@@ -159,15 +171,16 @@ public class BasicManagedDataSource extends BasicDataSource {
         }
 
         // finally, create the XAConnectionFactory using the XA data source
-        final XAConnectionFactory xaConnectionFactory = new DataSourceXAConnectionFactory(getTransactionManager(), xaDataSourceInstance, getUsername(), getPassword());
+        final XAConnectionFactory xaConnectionFactory = new DataSourceXAConnectionFactory(getTransactionManager(),
+                xaDataSourceInstance, getUsername(), getPassword());
         transactionRegistry = xaConnectionFactory.getTransactionRegistry();
         return xaConnectionFactory;
     }
 
     @Override
     protected DataSource createDataSourceInstance() throws SQLException {
-        final PoolingDataSource<PoolableConnection> pds =
-                new ManagedDataSource<>(getConnectionPool(), transactionRegistry);
+        final PoolingDataSource<PoolableConnection> pds = new ManagedDataSource<>(getConnectionPool(),
+                transactionRegistry);
         pds.setAccessToUnderlyingConnectionAllowed(isAccessToUnderlyingConnectionAllowed());
         return pds;
     }
@@ -175,16 +188,18 @@ public class BasicManagedDataSource extends BasicDataSource {
     /**
      * Creates the PoolableConnectionFactory and attaches it to the connection pool.
      *
-     * @param driverConnectionFactory JDBC connection factory created by {@link #createConnectionFactory()}
-     * @throws SQLException if an error occurs creating the PoolableConnectionFactory
+     * @param driverConnectionFactory
+     *            JDBC connection factory created by {@link #createConnectionFactory()}
+     * @throws SQLException
+     *             if an error occurs creating the PoolableConnectionFactory
      */
     @Override
-    protected PoolableConnectionFactory createPoolableConnectionFactory(
-            final ConnectionFactory driverConnectionFactory) throws SQLException {
+    protected PoolableConnectionFactory createPoolableConnectionFactory(final ConnectionFactory driverConnectionFactory)
+            throws SQLException {
         PoolableConnectionFactory connectionFactory = null;
         try {
-            connectionFactory = new PoolableManagedConnectionFactory(
-                    (XAConnectionFactory) driverConnectionFactory, getRegisteredJmxName());
+            connectionFactory = new PoolableManagedConnectionFactory((XAConnectionFactory) driverConnectionFactory,
+                    getRegisteredJmxName());
             connectionFactory.setValidationQuery(getValidationQuery());
             connectionFactory.setValidationQueryTimeout(getValidationQueryTimeout());
             connectionFactory.setConnectionInitSql(getConnectionInitSqls());
@@ -194,8 +209,7 @@ public class BasicManagedDataSource extends BasicDataSource {
             connectionFactory.setDefaultCatalog(getDefaultCatalog());
             connectionFactory.setCacheState(getCacheState());
             connectionFactory.setPoolStatements(isPoolPreparedStatements());
-            connectionFactory.setMaxOpenPreparedStatements(
-                    getMaxOpenPreparedStatements());
+            connectionFactory.setMaxOpenPreparedStatements(getMaxOpenPreparedStatements());
             connectionFactory.setMaxConnLifetimeMillis(getMaxConnLifetimeMillis());
             connectionFactory.setRollbackOnReturn(getRollbackOnReturn());
             connectionFactory.setEnableAutoCommitOnReturn(getEnableAutoCommitOnReturn());

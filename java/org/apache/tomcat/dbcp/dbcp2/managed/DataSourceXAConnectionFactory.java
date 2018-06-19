@@ -19,6 +19,7 @@ package org.apache.tomcat.dbcp.dbcp2.managed;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Objects;
 
 import javax.sql.ConnectionEvent;
 import javax.sql.ConnectionEventListener;
@@ -28,74 +29,111 @@ import javax.sql.XADataSource;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
 
+import org.apache.tomcat.dbcp.dbcp2.Utils;
+
 /**
  * An implementation of XAConnectionFactory which uses a real XADataSource to obtain connections and XAResources.
  *
- * @author Dain Sundstrom
  * @since 2.0
  */
 public class DataSourceXAConnectionFactory implements XAConnectionFactory {
     private final TransactionRegistry transactionRegistry;
     private final XADataSource xaDataSource;
-    private String username;
-    private String password;
+    private String userName;
+    private char[] userPassword;
 
     /**
-     * Creates an DataSourceXAConnectionFactory which uses the specified XADataSource to create database
-     * connections.  The connections are enlisted into transactions using the specified transaction manager.
+     * Creates an DataSourceXAConnectionFactory which uses the specified XADataSource to create database connections.
+     * The connections are enlisted into transactions using the specified transaction manager.
      *
-     * @param transactionManager the transaction manager in which connections will be enlisted
-     * @param xaDataSource the data source from which connections will be retrieved
+     * @param transactionManager
+     *            the transaction manager in which connections will be enlisted
+     * @param xaDataSource
+     *            the data source from which connections will be retrieved
      */
     public DataSourceXAConnectionFactory(final TransactionManager transactionManager, final XADataSource xaDataSource) {
-        this(transactionManager, xaDataSource, null, null);
+        this(transactionManager, xaDataSource, null, (char[]) null);
     }
 
     /**
-     * Creates an DataSourceXAConnectionFactory which uses the specified XADataSource to create database
-     * connections.  The connections are enlisted into transactions using the specified transaction manager.
+     * Creates an DataSourceXAConnectionFactory which uses the specified XADataSource to create database connections.
+     * The connections are enlisted into transactions using the specified transaction manager.
      *
-     * @param transactionManager the transaction manager in which connections will be enlisted
-     * @param xaDataSource the data source from which connections will be retrieved
-     * @param username the username used for authenticating new connections or null for unauthenticated
-     * @param password the password used for authenticating new connections
+     * @param transactionManager
+     *            the transaction manager in which connections will be enlisted
+     * @param xaDataSource
+     *            the data source from which connections will be retrieved
+     * @param userName
+     *            the user name used for authenticating new connections or null for unauthenticated
+     * @param userPassword
+     *            the password used for authenticating new connections
      */
-    public DataSourceXAConnectionFactory(final TransactionManager transactionManager, final XADataSource xaDataSource, final String username, final String password) {
-        if (transactionManager == null) {
-            throw new NullPointerException("transactionManager is null");
-        }
-        if (xaDataSource == null) {
-            throw new NullPointerException("xaDataSource is null");
-        }
-
+    public DataSourceXAConnectionFactory(final TransactionManager transactionManager, final XADataSource xaDataSource,
+            final String userName, final char[] userPassword) {
+        Objects.requireNonNull(transactionManager, "transactionManager is null");
+        Objects.requireNonNull(xaDataSource, "xaDataSource is null");
         this.transactionRegistry = new TransactionRegistry(transactionManager);
         this.xaDataSource = xaDataSource;
-        this.username = username;
-        this.password = password;
+        this.userName = userName;
+        this.userPassword = userPassword;
     }
 
     /**
-     * Gets the username used to authenticate new connections.
+     * Creates an DataSourceXAConnectionFactory which uses the specified XADataSource to create database connections.
+     * The connections are enlisted into transactions using the specified transaction manager.
+     *
+     * @param transactionManager
+     *            the transaction manager in which connections will be enlisted
+     * @param xaDataSource
+     *            the data source from which connections will be retrieved
+     * @param userName
+     *            the user name used for authenticating new connections or null for unauthenticated
+     * @param userPassword
+     *            the password used for authenticating new connections
+     */
+    public DataSourceXAConnectionFactory(final TransactionManager transactionManager, final XADataSource xaDataSource,
+            final String userName, final String userPassword) {
+        this(transactionManager, xaDataSource, userName, Utils.toCharArray(userPassword));
+    }
+
+    /**
+     * Gets the user name used to authenticate new connections.
+     *
      * @return the user name or null if unauthenticated connections are used
      */
     public String getUsername() {
-        return username;
+        return userName;
     }
 
     /**
-     * Sets the username used to authenticate new connections.
-     * @param username the username used for authenticating the connection or null for unauthenticated
+     * Sets the user name used to authenticate new connections.
+     *
+     * @param userName
+     *            the user name used for authenticating the connection or null for unauthenticated
      */
-    public void setUsername(final String username) {
-        this.username = username;
+    public void setUsername(final String userName) {
+        this.userName = userName;
     }
 
     /**
      * Sets the password used to authenticate new connections.
-     * @param password the password used for authenticating the connection or null for unauthenticated
+     *
+     * @param userPassword
+     *            the password used for authenticating the connection or null for unauthenticated.
+     * @since 2.4.0
      */
-    public void setPassword(final String password) {
-        this.password = password;
+    public void setPassword(final char[] userPassword) {
+        this.userPassword = userPassword;
+    }
+
+    /**
+     * Sets the password used to authenticate new connections.
+     *
+     * @param userPassword
+     *            the password used for authenticating the connection or null for unauthenticated
+     */
+    public void setPassword(final String userPassword) {
+        this.userPassword = Utils.toCharArray(userPassword);
     }
 
     @Override
@@ -107,10 +145,10 @@ public class DataSourceXAConnectionFactory implements XAConnectionFactory {
     public Connection createConnection() throws SQLException {
         // create a new XAConnection
         XAConnection xaConnection;
-        if (username == null) {
+        if (userName == null) {
             xaConnection = xaDataSource.getXAConnection();
         } else {
-            xaConnection = xaDataSource.getXAConnection(username, password);
+            xaConnection = xaDataSource.getXAConnection(userName, Utils.toString(userPassword));
         }
 
         // get the real connection and XAResource from the connection
@@ -142,7 +180,6 @@ public class DataSourceXAConnectionFactory implements XAConnectionFactory {
                 connectionClosed(event);
             }
         });
-
 
         return connection;
     }
