@@ -338,7 +338,7 @@
         Ensure that Apache Tomcat may be built from source with Java 11. (markt)
       </fix>
       <add>
-        <bug>52381</bug>: Add OSGi metadata to JAR files, (markt)
+        <bug>52381</bug>: Add OSGi metadata to JAR files. (markt)
       </add>
       <fix>
         <bug>62391</bug>: Remove references to <code>javaw.exe</code> as this
