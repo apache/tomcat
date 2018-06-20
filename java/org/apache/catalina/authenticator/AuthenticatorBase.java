@@ -22,9 +22,7 @@ package org.apache.catalina.authenticator;
 import java.io.IOException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -45,7 +43,7 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.realm.GenericPrincipal;
-import org.apache.catalina.util.DateTool;
+import org.apache.catalina.util.ConcurrentDateFormat;
 import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.catalina.util.StandardSessionIdGenerator;
 import org.apache.catalina.valves.ValveBase;
@@ -199,9 +197,7 @@ public abstract class AuthenticatorBase extends ValveBase
     /**
      * "Expires" header always set to Date(1), so generate once only
      */
-    private static final String DATE_ONE =
-        (new SimpleDateFormat(DateTool.HTTP_RESPONSE_DATE_HEADER,
-                              Locale.US)).format(new Date(1));
+    private static final String DATE_ONE = ConcurrentDateFormat.formatRfc1123(new Date(1));
 
 
     // ------------------------------------------------------------- Properties
