@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
@@ -95,8 +96,12 @@ public abstract class AuthenticatorBase extends ValveBase
     /**
      * "Expires" header always set to Date(1), so generate once only
      */
-    private static final String DATE_ONE =
-            (new SimpleDateFormat(FastHttpDateFormat.RFC1123_DATE, Locale.US)).format(new Date(1));
+    private static final String DATE_ONE;
+    static {
+        SimpleDateFormat format = new SimpleDateFormat(FastHttpDateFormat.RFC1123_DATE, Locale.US);
+        format.setTimeZone(TimeZone.getTimeZone("GMT"));
+        DATE_ONE = format.format(new Date(1));
+    }
 
     /**
      * The string manager for this package.

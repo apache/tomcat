@@ -44,6 +44,17 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues do not "pop up" wrt. others).
 -->
+<section name="Tomcat 9.0.10 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>62476</bug>: Use GMT timezone for the value of
+        <code>Expires</code> header as required by HTTP specification
+        (RFC 7231, 7234). (kkolinko)
+      </fix>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 9.0.9 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
