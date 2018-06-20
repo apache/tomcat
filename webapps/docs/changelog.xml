@@ -300,7 +300,7 @@
     </changelog>
   </subsection>
   <subsection name="Web applications">
-    <changlog>
+    <changelog>
       <fix>
         <bug>62395</bug>: Clarify the meaning of the connector attribute
         <code>minSpareThreads</code> in the documentation web application.
@@ -310,7 +310,7 @@
         Correct the documentation for the <code>allowHostHeaderMismatch</code>
         attribute of the standard HTTP Connector implementations. (markt)
       </fix>
-    </changlog>
+    </changelog>
   </subsection>
   <subsection name="Tribes">
     <changelog>
