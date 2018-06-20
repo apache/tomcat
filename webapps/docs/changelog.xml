@@ -135,6 +135,11 @@
         the authenticated Subject to include at least one Principal of a type
         specified by <code>userClassNames</code>. (markt)
       </fix>
+      <fix>
+        <bug>62476</bug>: Use GMT timezone for the value of
+        <code>Expires</code> header as required by HTTP specification
+        (RFC 7231, 7234). (kkolinko)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
