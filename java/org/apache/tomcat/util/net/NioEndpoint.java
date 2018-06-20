@@ -582,6 +582,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                         // since it won't have been counted down when the socket
                         // closed.
                         socket.socketWrapper.getEndpoint().countDownConnection();
+                        ((NioSocketWrapper) socket.socketWrapper).closed = true;
                     } else {
                         final NioSocketWrapper socketWrapper = (NioSocketWrapper) key.attachment();
                         if (socketWrapper != null) {
@@ -765,6 +766,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 }
                 if (ka != null) {
                     countDownConnection();
+                    ka.closed = true;
                 }
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
@@ -1080,6 +1082,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         private volatile SendfileData sendfileData = null;
         private volatile long lastRead = System.currentTimeMillis();
         private volatile long lastWrite = lastRead;
+        private volatile boolean closed = false;
 
         public NioSocketWrapper(NioChannel channel, NioEndpoint endpoint) {
             super(channel, endpoint);
@@ -1221,7 +1224,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
         @Override
         public boolean isClosed() {
-            return !getSocket().isOpen();
+            return closed || !getSocket().isOpen();
         }
 
 
