@@ -76,7 +76,7 @@
         <param name="pom" value="${tomcat.pom.path}/@{pom}"/>
         <param name="src" value="@{src}"/>
         <param name="src.skip" value="@{src.skip}"/>
-        <param name="maven.deploy.version" value="9.0.10-dev"/>
+        <param name="maven.deploy.version" value="9.0.11-dev"/>
       </antcall>
     </sequential>
   </macrodef>
