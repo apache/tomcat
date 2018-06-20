@@ -55,7 +55,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 9.0.9 (markt)" rtext="in development">
+<section name="Tomcat 9.0.9 (markt)" rtext="not released">
   <subsection name="Catalina">
     <changelog>
       <fix>
