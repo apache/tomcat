@@ -51,11 +51,11 @@
     <p>The following external specifications have provisions which
     partially define the correct behavior of the default servlet:</p>
     <ul>
-    <li><a href="http://jcp.org/aboutJava/communityprocess/final/jsr340/index.html">
+    <li><a href="https://jcp.org/aboutJava/communityprocess/final/jsr340/index.html">
         Servlet Specification</a> (Version 4.0)</li>
-    <li><a href="http://www.rfc-editor.org/rfc/rfc2046.txt">Multipurpose
+    <li><a href="https://www.rfc-editor.org/rfc/rfc2046.txt">Multipurpose
         Internet Mail Extensions (MIME) Part Two: Media Types</a></li>
-    <li><a href="http://www.rfc-editor.org/rfc/rfc2616.txt">Hypertext
+    <li><a href="https://www.rfc-editor.org/rfc/rfc2616.txt">Hypertext
         Transfer Protocol &#x2013; HTTP/1.1</a></li>
     </ul>
 

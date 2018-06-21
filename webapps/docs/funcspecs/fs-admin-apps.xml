@@ -180,12 +180,12 @@
     <ul>
     <li><a href="http://www.oracle.com/technetwork/java/javase/overview/index.html">
         Java Standard Edition</a> (Version 1.2 or later)</li>
-    <li><a href="http://www.jcp.org/jsr/detail/154.jsp">Servlet 2.4</a>
+    <li><a href="https://www.jcp.org/jsr/detail/154.jsp">Servlet 2.4</a>
         (supported natively by Tomcat 5)</li>
-    <li><a href="http://www.jcp.org/jsr/detail/152.jsp">JavaServer Pages 2.0</a>
+    <li><a href="https://www.jcp.org/jsr/detail/152.jsp">JavaServer Pages 2.0</a>
         (supported natively by Tomcat 5)</li>
-    <li><a href="http://jakarta.apache.org/taglibs/doc/standard-doc/intro.html">JavaServer Pages Standard Tag Library 1.0 (Jakarta Taglibs-Standard 1.0.3)</a></li>
-    <li><a href="http://struts.apache.org/">Struts Framework</a>
+    <li><a href="https://jakarta.apache.org/taglibs/doc/standard-doc/intro.html">JavaServer Pages Standard Tag Library 1.0 (Jakarta Taglibs-Standard 1.0.3)</a></li>
+    <li><a href="https://struts.apache.org/">Struts Framework</a>
         (Version 1.0) - MVC Framework for Web Applications</li>
     <li><strong>TO BE DETERMINED</strong> - Application for hosting SOAP
         based web services</li>

@@ -46,7 +46,7 @@ HTTP server and you require SSI support.  Typically this is done
 during development when you don't want to run a web server like Apache.</p>
 
 <p>Tomcat SSI support implements the same SSI directives as Apache.  See the
-<a href="http://httpd.apache.org/docs/howto/ssi.html#basicssidirectives">
+<a href="https://httpd.apache.org/docs/howto/ssi.html#basicssidirectives">
 Apache Introduction to SSI</a> for information on using SSI directives.</p>
 
 <p>SSI support is available as a servlet and as a filter. You should use one
@@ -190,7 +190,7 @@ is used to assign a value to a user-defined variable.
 </ul>
 <p>
 See the
-<a href="http://httpd.apache.org/docs/howto/ssi.html#basicssidirectives">
+<a href="https://httpd.apache.org/docs/howto/ssi.html#basicssidirectives">
 Apache Introduction to SSI</a> for more information on using SSI directives.</p>
 </section>
 

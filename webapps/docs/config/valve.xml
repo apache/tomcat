@@ -322,7 +322,7 @@
     headers, cookies, session or request attributes and special
     timestamp formats.
     It is modeled after the
-    <a href="http://httpd.apache.org/">Apache HTTP Server</a> log configuration
+    <a href="https://httpd.apache.org/">Apache HTTP Server</a> log configuration
     syntax. Each of them can be used multiple times with different <code>xxx</code> keys:
     </p>
     <ul>
@@ -373,7 +373,7 @@
     <a href="#Proxies_Support">Proxies Support</a> and the
     <a href="../proxy-howto.html">Proxy How-To</a>. For reverse proxies that
     use mod_jk, see the <a
-    href="http://tomcat.apache.org/connectors-doc/generic_howto/proxy.html">generic
+    href="https://tomcat.apache.org/connectors-doc/generic_howto/proxy.html">generic
     proxy</a> documentation. For other reverse proxies, consult their
     documentation.</p>
   </subsection>
@@ -392,7 +392,7 @@
     difference to the standard <code>AccessLogValve</code> is that
     <code>ExtendedAccessLogValve</code> creates log files which
     conform to the Working Draft for the
-    <a href="http://www.w3.org/TR/WD-logfile.html">Extended Log File Format</a>
+    <a href="https://www.w3.org/TR/WD-logfile.html">Extended Log File Format</a>
     defined by the W3C.</p>
 
   </subsection>
@@ -426,7 +426,7 @@
     <code>cs</code> for "client to server", <code>sc</code> for
     "server to client" or <code>x</code> for "application specific".
     Furthermore some tokens are completed by an additional selector.
-    See the <a href="http://www.w3.org/TR/WD-logfile.html">W3C specification</a>
+    See the <a href="https://www.w3.org/TR/WD-logfile.html">W3C specification</a>
     for more information about the format.</p>
 
     <p>The following format tokens are supported:</p>
@@ -898,7 +898,7 @@
   <subsection name="Introduction">
 
     <p>Tomcat port of
-    <a href="http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>,
+    <a href="https://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>,
     this valve replaces the apparent client remote IP address and hostname for
     the request with the IP address list presented by a proxy or a load balancer
     via a request headers (e.g. &quot;X-Forwarded-For&quot;).</p>

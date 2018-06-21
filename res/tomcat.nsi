@@ -219,11 +219,11 @@ Section "Core" SecTomcatCore
   FileSeek $ServiceInstallLog 0 END
 
   InstallRetry:
-  FileWrite $ServiceInstallLog '"$INSTDIR\bin\$TomcatServiceFileName" //IS//$TomcatServiceName --DisplayName "Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName" --Description "Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\$TomcatServiceFileName" --Jvm "$JvmDll" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
+  FileWrite $ServiceInstallLog '"$INSTDIR\bin\$TomcatServiceFileName" //IS//$TomcatServiceName --DisplayName "Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName" --Description "Apache Tomcat @VERSION@ Server - https://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\$TomcatServiceFileName" --Jvm "$JvmDll" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
   FileWrite $ServiceInstallLog "$\r$\n"
   ClearErrors
   DetailPrint "Installing $TomcatServiceName service"
-  nsExec::ExecToStack '"$INSTDIR\bin\$TomcatServiceFileName" //IS//$TomcatServiceName --DisplayName "Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName" --Description "Apache Tomcat @VERSION@ Server - http://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\$TomcatServiceFileName" --Jvm "$JvmDll" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
+  nsExec::ExecToStack '"$INSTDIR\bin\$TomcatServiceFileName" //IS//$TomcatServiceName --DisplayName "Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName" --Description "Apache Tomcat @VERSION@ Server - https://tomcat.apache.org/" --LogPath "$INSTDIR\logs" --Install "$INSTDIR\bin\$TomcatServiceFileName" --Jvm "$JvmDll" --StartPath "$INSTDIR" --StopPath "$INSTDIR"'
   Pop $0
   Pop $1
   StrCmp $0 "0" InstallOk
@@ -1121,7 +1121,7 @@ Function createShortcuts
   SetOutPath "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName"
 
   CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName\Tomcat Home Page.lnk" \
-                 "http://tomcat.apache.org/"
+                 "https://tomcat.apache.org/"
 
   CreateShortCut "$SMPROGRAMS\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName\Welcome.lnk" \
                  "http://127.0.0.1:$TomcatPortHttp/"

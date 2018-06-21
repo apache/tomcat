@@ -157,7 +157,7 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
                 if (maxSwallowSizeExceeded && swallowed > maxSwallowSize) {
                     // Note: We do not fail early so the client has a chance to
                     // read the response before the connection is closed. See:
-                    // http://httpd.apache.org/docs/2.0/misc/fin_wait_2.html#appendix
+                    // https://httpd.apache.org/docs/2.0/misc/fin_wait_2.html#appendix
                     throw new IOException(sm.getString("inputFilter.maxSwallow"));
                 }
             } else { // errors are handled higher up.

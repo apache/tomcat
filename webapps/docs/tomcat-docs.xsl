@@ -31,7 +31,7 @@
 
   <!-- Defined parameters (overrideable) -->
   <xsl:param    name="home-name"           select="'The Tomcat Project'"/>
-  <xsl:param    name="home-href"           select="'http://tomcat.apache.org/'"/>
+  <xsl:param    name="home-href"           select="'https://tomcat.apache.org/'"/>
   <xsl:param    name="home-logo"           select="'/images/tomcat.png'"/>
   <xsl:param    name="home-stylesheet"     select="'/images/docs-stylesheet.css'"/>
   <xsl:param    name="apache-logo"         select="'/images/asf-logo.svg'"/>
@@ -43,11 +43,11 @@
   <xsl:param    name="build-date"          select="'MMM d yyyy'"/>
   <xsl:param    name="build-date-iso-8601" select="'yyyy-MM-dd'"/>
   <xsl:param    name="year"                select="'yyyy'"/>
-  <xsl:param    name="buglink"             select="'http://bz.apache.org/bugzilla/show_bug.cgi?id='"/>
-  <xsl:param    name="revlink"             select="'http://svn.apache.org/viewvc?view=rev&amp;rev='"/>
-  <xsl:param    name="doclink"             select="'http://tomcat.apache.org/tomcat-9.0-doc'"/>
-  <xsl:param    name="sylink"              select="'http://tomcat.apache.org/security-9.html'"/>
-  <xsl:param    name="dllink"              select="'http://tomcat.apache.org/download-90.cgi'"/>
+  <xsl:param    name="buglink"             select="'https://bz.apache.org/bugzilla/show_bug.cgi?id='"/>
+  <xsl:param    name="revlink"             select="'https://svn.apache.org/viewvc?view=rev&amp;rev='"/>
+  <xsl:param    name="doclink"             select="'https://tomcat.apache.org/tomcat-9.0-doc'"/>
+  <xsl:param    name="sylink"              select="'https://tomcat.apache.org/security-9.html'"/>
+  <xsl:param    name="dllink"              select="'https://tomcat.apache.org/download-90.cgi'"/>
   <xsl:param    name="sitedir"             select="''"/>
   <xsl:param    name="filename"            select="'-'"/>
 
@@ -115,7 +115,7 @@
       document.addEventListener("DOMContentLoaded", (function() {
         var commentsDiv = document.getElementById("comments_thread");
         var commentsShortname = "tomcat";
-        var commentsIdentifier = "http://tomcat.apache.org/" +
+        var commentsIdentifier = "https://tomcat.apache.org/" +
           thisScript.getAttribute("data-comments-identifier") + ".html";
 
         (function(w, d) {
@@ -157,7 +157,7 @@
           <xsl:value-of select="$relative-path"/><xsl:value-of select="$apache-logo"/>
         </xsl:variable>
         <div class="asfLogo noPrint">
-          <a href="http://www.apache.org/" target="_blank"><img src="{$src}" alt="The Apache Software Foundation" style="width: 266px; height: 83px;"/></a>
+          <a href="https://www.apache.org/" target="_blank"><img src="{$src}" alt="The Apache Software Foundation" style="width: 266px; height: 83px;"/></a>
         </div>
         <h1><xsl:value-of select="$project/title"/></h1>
         <div class="versionInfo">
@@ -198,9 +198,9 @@
                     <strong>Notice: </strong>This comments section collects your suggestions
                     on improving documentation for Apache Tomcat.<br/><br/>
                     If you have trouble and need help, read
-                    <a href="http://tomcat.apache.org/findhelp.html">Find Help</a> page
+                    <a href="https://tomcat.apache.org/findhelp.html">Find Help</a> page
                     and ask your question on the tomcat-users
-                    <a href="http://tomcat.apache.org/lists.html">mailing list</a>.
+                    <a href="https://tomcat.apache.org/lists.html">mailing list</a>.
                     Do not ask such questions here. This is not a Q&amp;A section.<br/><br/>
                     The Apache Comments System is explained <a href="{$commentslink}">here</a>.
                     Comments may be removed by our moderators if they are either

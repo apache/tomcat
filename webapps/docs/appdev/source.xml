@@ -85,7 +85,7 @@ is discussed below.  All of these components exist under a top level
 <li><strong>web/WEB-INF/</strong> - The special configuration files required
     for your application, including the web application deployment descriptor
     (<code>web.xml</code>, defined in the
-    <a href="http://wiki.apache.org/tomcat/Specifications">Servlet Specification</a>),
+    <a href="https://wiki.apache.org/tomcat/Specifications">Servlet Specification</a>),
     tag library descriptors for custom tag libraries
     you have created, and other resource files you wish to include within
     your web application.  Even though this directory appears to be a

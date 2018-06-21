@@ -63,7 +63,7 @@ directory into which you installed the JDK release.
 
 <p>
 Download a binary distribution of Ant 1.9.5 or later from
-<a href="http://ant.apache.org/bindownload.cgi">here</a>.
+<a href="https://ant.apache.org/bindownload.cgi">here</a>.
 </p>
 
 <p>
@@ -87,11 +87,11 @@ available, which will be used to actually perform the build.
 
   <p>
   Tomcat SVN repository URL:
-  <a href="http://svn.apache.org/repos/asf/tomcat/trunk/">http://svn.apache.org/repos/asf/tomcat/trunk/</a>
+  <a href="https://svn.apache.org/repos/asf/tomcat/trunk/">https://svn.apache.org/repos/asf/tomcat/trunk/</a>
   </p>
   <p>
   Tomcat source packages:
-  <download>http://tomcat.apache.org/download-<version-major/>0.cgi</download>.
+  <download>https://tomcat.apache.org/download-<version-major/>0.cgi</download>.
   </p>
 
   <p>

@@ -1202,7 +1202,7 @@ for the <em>Ant</em> (version 1.4 or later) build tool.  In order to use these
 commands, you must perform the following setup operations:</p>
 <ul>
 <li>Download the binary distribution of Ant from
-    <a href="http://ant.apache.org">http://ant.apache.org</a>.
+    <a href="https://ant.apache.org">https://ant.apache.org</a>.
     You must use version <strong>1.4</strong> or later.</li>
 <li>Install the Ant distribution in a convenient directory (called
     ANT_HOME in the remainder of these instructions).</li>
@@ -1376,7 +1376,7 @@ in which you can specify
 its full set of attributes, but <code>input</code>, <code>inputstring</code> and
 <code>inputencoding</code> that, even if accepted, are not used because they have
 no meaning in this context.
-Refer to <a href="http://ant.apache.org">ant manual</a> for details on
+Refer to <a href="https://ant.apache.org">ant manual</a> for details on
 <code>&lt;redirector&gt;</code> element attributes.
 </p>
 

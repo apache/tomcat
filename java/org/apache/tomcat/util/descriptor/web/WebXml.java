@@ -315,7 +315,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
     // servlet-mapping
     // Note: URLPatterns from web.xml may be URL encoded
-    //       (http://svn.apache.org/r285186)
+    //       (https://svn.apache.org/r285186)
     private final Map<String,String> servletMappings = new HashMap<>();
     private final Set<String> servletMappingNames = new HashSet<>();
     public void addServletMapping(String urlPattern, String servletName) {

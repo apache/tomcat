@@ -56,7 +56,7 @@ Tomcat 7.x and Tomcat 8.x as they are using different versions of
 Apache Commons DBCP library.</b>  You will most likely need to modify older
 JNDI resource configurations to match the syntax in the example below in order
 to make them work in Tomcat <version-major/>.
-See <a href="http://tomcat.apache.org/migration.html">Tomcat Migration Guide</a>
+See <a href="https://tomcat.apache.org/migration.html">Tomcat Migration Guide</a>
 for details.
 </p>
 
@@ -113,7 +113,7 @@ a <code>ServletContextListener</code>.
 
 <p>The default database connection pool implementation in Apache Tomcat
 relies on the libraries from the
-<a href="http://commons.apache.org/">Apache Commons</a> project.
+<a href="https://commons.apache.org/">Apache Commons</a> project.
 The following libraries are used:
 </p>
 
@@ -133,7 +133,7 @@ packages have been renamed to avoid interfering with applications.
 
 <subsection name="Installation">
 
-<p>See the <a href="http://commons.apache.org/dbcp/configuration.html">
+<p>See the <a href="https://commons.apache.org/dbcp/configuration.html">
 DBCP documentation</a> for a complete list of configuration parameters.
 </p>
 
@@ -172,7 +172,7 @@ removed and recycled, add one or both of the following attributes to the
 <code>removeAbandonedOnMaintenance</code> has no effect unless pool
 maintenance is enabled by setting <code>timeBetweenEvictionRunsMillis</code>
 to a positive value.  See the
-<a href="http://commons.apache.org/dbcp/configuration.html">
+<a href="https://commons.apache.org/dbcp/configuration.html">
 DBCP documentation</a> for full documentation on these attributes.
 </p>
 
@@ -202,12 +202,12 @@ The default is <code>false</code>.
 <subsection name="MySQL DBCP Example">
 
 <h5>0. Introduction</h5>
-<p>Versions of <a href="http://www.mysql.com/products/mysql/index.html">MySQL</a> and JDBC
+<p>Versions of <a href="https://www.mysql.com/products/mysql/index.html">MySQL</a> and JDBC
 drivers that have been reported to work:
 </p>
 <ul>
 <li>MySQL 3.23.47, MySQL 3.23.47 using InnoDB,, MySQL 3.23.58,  MySQL 4.0.1alpha</li>
-<li><a href="http://www.mysql.com/products/connector-j">Connector/J</a> 3.0.11-stable (the official JDBC Driver)</li>
+<li><a href="https://www.mysql.com/products/connector-j">Connector/J</a> 3.0.11-stable (the official JDBC Driver)</li>
 <li><a href="http://mmmysql.sourceforge.net">mm.mysql</a> 2.0.14 (an old 3rd party JDBC Driver)</li>
 </ul>
 
@@ -333,7 +333,7 @@ select id, foo, bar from testdata
 <p>That JSP page makes use of
 <a href="http://www.oracle.com/technetwork/java/index-jsp-135995.html">JSTL</a>'s
 SQL and Core taglibs. You can get it from
-<a href="http://tomcat.apache.org/taglibs/standard/">Apache Tomcat Taglibs - Standard Tag Library</a>
+<a href="https://tomcat.apache.org/taglibs/standard/">Apache Tomcat Taglibs - Standard Tag Library</a>
 project &#x2014; just make sure you get a 1.1.x or later release. Once you have
 JSTL, copy <code>jstl.jar</code> and <code>standard.jar</code> to your web app's
 <code>WEB-INF/lib</code> directory.

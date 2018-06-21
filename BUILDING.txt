@@ -21,7 +21,7 @@
 
 This subproject contains the source code for Tomcat @VERSION_MAJOR_MINOR@, a container that
 implements the Servlet 4.0, JSP 2.3, EL 3.0, WebSocket 1.1 and JASPIC 1.1
-specifications from the Java Community Process <http://www.jcp.org/>.
+specifications from the Java Community Process <https://www.jcp.org/>.
 
 Note: If you just need to run Apache Tomcat, it is not necessary to build
 it. You may simply download a binary distribution. It is cross-platform.
@@ -56,7 +56,7 @@ source distribution, do the following:
       See Apache Commons DBCP project web site for more details on
       available versions of the library and its requirements,
 
-        http://commons.apache.org/dbcp/
+        https://commons.apache.org/dbcp/
 
  3. Install the JDK according to the instructions included with the release.
 
@@ -71,7 +71,7 @@ source distribution, do the following:
 
  2. Download a binary distribution of Ant from:
 
-        http://ant.apache.org/bindownload.cgi
+        https://ant.apache.org/bindownload.cgi
 
  3. Unpack the binary distribution into a convenient location so that the
     Ant release resides in its own directory (conventionally named
@@ -99,11 +99,11 @@ package.
 
  *  Tomcat SVN repository URL:
 
-        http://svn.apache.org/repos/asf/tomcat/tc@VERSION_MAJOR_MINOR@.x/trunk/
+        https://svn.apache.org/repos/asf/tomcat/tc@VERSION_MAJOR_MINOR@.x/trunk/
 
  *  Source packages can be downloaded from:
 
-        http://tomcat.apache.org/download-@VERSION_MAJOR@0.cgi
+        https://tomcat.apache.org/download-@VERSION_MAJOR@0.cgi
 
 The location where the source has been placed will be further referred as
 ${tomcat.source}.

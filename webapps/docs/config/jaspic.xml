@@ -158,9 +158,9 @@
 
     <p>A sample configuration for using this module with Tomcat would look like
     this:</p>
-<source><![CDATA[<jaspic-providers xmlns="http://tomcat.apache.org/xml"
+<source><![CDATA[<jaspic-providers xmlns="https://tomcat.apache.org/xml"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://tomcat.apache.org/xml jaspic-providers.xsd"
+                  xsi:schemaLocation="https://tomcat.apache.org/xml jaspic-providers.xsd"
                   version="1.0">
   <provider name="google-oauth"
             className="org.apache.catalina.authenticator.jaspic.SimpleAuthConfigProvider"

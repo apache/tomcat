@@ -51,7 +51,7 @@ are available at
 <subsection name="Tomcat">
 
 <p>Binary downloads of the <strong>Tomcat</strong> server are available from
-<a href="http://tomcat.apache.org/">http://tomcat.apache.org/</a>.
+<a href="https://tomcat.apache.org/">https://tomcat.apache.org/</a>.
 This manual assumes you are using the most recent release
 of Tomcat <version-major/>.  Detailed instructions for downloading and installing
 Tomcat are available <a href="../setup.html">here</a>.</p>
@@ -68,7 +68,7 @@ own <code>CATALINA_BASE</code> configured.</p>
 <subsection name="Ant">
 
 <p>Binary downloads of the <strong>Ant</strong> build tool are available from
-<a href="http://ant.apache.org/">http://ant.apache.org/</a>.
+<a href="https://ant.apache.org/">https://ant.apache.org/</a>.
 This manual assumes you are using Ant 1.8 or later.  The instructions may
 also be compatible with other versions, but this has not been tested.</p>
 

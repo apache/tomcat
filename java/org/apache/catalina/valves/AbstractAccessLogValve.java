@@ -59,7 +59,7 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * <p>Abstract implementation of the <b>Valve</b> interface that generates a web
  * server access log with the detailed line contents matching a configurable
  * pattern. The syntax of the available patterns is similar to that supported by
- * the <a href="http://httpd.apache.org/">Apache HTTP Server</a>
+ * the <a href="https://httpd.apache.org/">Apache HTTP Server</a>
  * <code>mod_log_config</code> module.</p>
  *
  * <p>Patterns for the logged message may include constant text or any of the
@@ -109,7 +109,7 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * There is also support to write information from the cookie, incoming
  * header, the Session or something else in the ServletRequest.<br>
  * It is modeled after the
- * <a href="http://httpd.apache.org/">Apache HTTP Server</a> log configuration
+ * <a href="https://httpd.apache.org/">Apache HTTP Server</a> log configuration
  * syntax:</p>
  * <ul>
  * <li><code>%{xxx}i</code> for incoming headers

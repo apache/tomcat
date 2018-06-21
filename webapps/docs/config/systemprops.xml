@@ -580,7 +580,7 @@
       <code>javax.sql.DataSource</code>. If not specified the default of
       <code>org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory</code> is used
       which is a package renamed (to avoid conflicts) copy of
-      <a href="http://commons.apache.org/dbcp">Apache Commons DBCP</a>.</p>
+      <a href="https://commons.apache.org/dbcp">Apache Commons DBCP</a>.</p>
     </property>
 
     <property name="javax.mail.Session.Factory">

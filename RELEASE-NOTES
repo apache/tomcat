@@ -134,7 +134,7 @@ the check.
 ==============================
 Viewing the Tomcat Change Log:
 ==============================
-The full change log is available from http://tomcat.apache.org and is also
+The full change log is available from https://tomcat.apache.org and is also
 included in the documentation web application.
 
 
@@ -170,4 +170,4 @@ software:
 When all else fails:
 ====================
 See the FAQ
-http://tomcat.apache.org/faq/
+https://tomcat.apache.org/faq/

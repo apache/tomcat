@@ -36,7 +36,7 @@
 <section name="Introduction">
 
   <p>The <strong>JDBC Connection Pool <code>org.apache.tomcat.jdbc.pool</code></strong>
-  is a replacement or an alternative to the <a href="http://commons.apache.org/dbcp/">Apache Commons DBCP</a>
+  is a replacement or an alternative to the <a href="https://commons.apache.org/dbcp/">Apache Commons DBCP</a>
   connection pool.</p>
 
   <p>So why do we need a new connection pool?</p>
@@ -752,7 +752,7 @@
 </section>
 
 <section name="Code Example">
-  <p>Other examples of Tomcat configuration for JDBC usage can be found <a href="http://tomcat.apache.org/tomcat-8.0-doc/jndi-datasource-examples-howto.html">in the Tomcat documentation</a>. </p>
+  <p>Other examples of Tomcat configuration for JDBC usage can be found <a href="https://tomcat.apache.org/tomcat-8.0-doc/jndi-datasource-examples-howto.html">in the Tomcat documentation</a>. </p>
   <subsection name="Plain Ol' Java">
     <p>Here is a simple example of how to create and use a data source.</p>
 <source><![CDATA[  import java.sql.Connection;
@@ -959,7 +959,7 @@
 
 <section name="Building">
   <p>We build the JDBC pool code with 1.6, but it is backwards compatible down to 1.5 for runtime environment. For unit test, we use 1.6 and higher</p>
-  <p>Other examples of Tomcat configuration for JDBC usage can be found <a href="http://tomcat.apache.org/tomcat-8.0-doc/jndi-datasource-examples-howto.html">in the Tomcat documentation</a>. </p>
+  <p>Other examples of Tomcat configuration for JDBC usage can be found <a href="https://tomcat.apache.org/tomcat-8.0-doc/jndi-datasource-examples-howto.html">in the Tomcat documentation</a>. </p>
   <subsection name="Building from source">
     <p>Building is pretty simple. The pool has a dependency on <code>tomcat-juli.jar</code> and in case you want the <code>SlowQueryReportJmx</code></p>
 <source><![CDATA[  javac -classpath tomcat-juli.jar \
@@ -968,7 +968,7 @@
         org/apache/tomcat/jdbc/pool/interceptor/*.java \
         org/apache/tomcat/jdbc/pool/jmx/*.java]]></source>
     <p>
-       A build file can be found in the Tomcat <a href="http://svn.apache.org/viewvc/tomcat/trunk/modules/jdbc-pool/">source repository</a>.
+       A build file can be found in the Tomcat <a href="https://svn.apache.org/viewvc/tomcat/trunk/modules/jdbc-pool/">source repository</a>.
     </p>
     <p>
       As a convenience, a build file is also included where a simple build command will generate all files needed.

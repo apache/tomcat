@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 <project name="Apache Tomcat Documentation"
-        href="http://tomcat.apache.org/">
+        href="https://tomcat.apache.org/">
 
     <title>Apache Tomcat 9</title>
 
@@ -29,7 +29,7 @@
 
     <menu name="Links">
         <item name="Docs Home"             href="index.html"/>
-        <item name="FAQ"                   href="http://wiki.apache.org/tomcat/FAQ" />
+        <item name="FAQ"                   href="https://wiki.apache.org/tomcat/FAQ" />
         <item name="User Comments"         href="#comments_section"/>
     </menu>
 
@@ -88,13 +88,13 @@
         <item name="WebSocket 1.1 Javadocs"
               href="websocketapi/index.html"/>
         <item name="JK 1.2 Documentation"
-              href="http://tomcat.apache.org/connectors-doc/"/>
+              href="https://tomcat.apache.org/connectors-doc/"/>
     </menu>
 
     <menu name="Apache Tomcat Development">
         <item name="Building"              href="building.html"/>
         <item name="Changelog"             href="changelog.html"/>
-        <item name="Status"                href="http://wiki.apache.org/tomcat/TomcatVersions"/>
+        <item name="Status"                href="https://wiki.apache.org/tomcat/TomcatVersions"/>
         <item name="Developers"            href="developers.html"/>
         <item name="Architecture"          href="architecture/index.html" />
         <item name="Functional Specs."     href="funcspecs/index.html"/>

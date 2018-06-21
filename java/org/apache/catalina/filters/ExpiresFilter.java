@@ -47,7 +47,7 @@ import org.apache.juli.logging.LogFactory;
 /**
  * <p>
  * ExpiresFilter is a Java Servlet API port of <a
- * href="http://httpd.apache.org/docs/2.2/mod/mod_expires.html">Apache
+ * href="https://httpd.apache.org/docs/2.2/mod/mod_expires.html">Apache
  * mod_expires</a> to add '{@code Expires}' and
  * '{@code Cache-Control: max-age=}' headers to HTTP response according to its
  * '{@code Content-Type}'.
@@ -55,7 +55,7 @@ import org.apache.juli.logging.LogFactory;
  *
  * <p>
  * Following documentation is inspired by <a
- * href="http://httpd.apache.org/docs/2.2/mod/mod_expires.html">mod_expires</a>
+ * href="https://httpd.apache.org/docs/2.2/mod/mod_expires.html">mod_expires</a>
  * </p>
  * <h1>Summary</h1>
  * <p>
@@ -75,7 +75,7 @@ import org.apache.juli.logging.LogFactory;
  * To modify {@code Cache-Control} directives other than {@code max-age} (see
  * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9" >RFC
  * 2616 section 14.9</a>), you can use other servlet filters or <a
- * href="http://httpd.apache.org/docs/2.2/mod/mod_headers.html" >Apache Httpd
+ * href="https://httpd.apache.org/docs/2.2/mod/mod_headers.html" >Apache Httpd
  * mod_headers</a> module.
  * </p>
  * <h1>Filter Configuration</h1><h2>Basic configuration to add

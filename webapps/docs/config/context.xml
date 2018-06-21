@@ -50,7 +50,7 @@
   unpacked contents, as described in the Servlet Specification (version
   2.2 or later).  For more information about web application archives,
   you can download the
-  <a href="http://wiki.apache.org/tomcat/Specifications">Servlet
+  <a href="https://wiki.apache.org/tomcat/Specifications">Servlet
   Specification</a>, and review the Tomcat
   <a href="../appdev/index.html">Application Developer's Guide</a>.</p>
 
@@ -707,7 +707,7 @@
 
         <p>Please note that setting this to <code>true</code> has some side
         effects, including the disabling of JSP reloading in a running server:
-        see <a href="http://bz.apache.org/bugzilla/show_bug.cgi?id=37668">
+        see <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=37668">
         Bugzilla 37668</a>.</p>
 
         <p>Please note that setting this flag to true in applications that are
@@ -1315,7 +1315,7 @@
     <p>Shared Data Source Example:</p>
     <p><strong>Warning:</strong> This feature works only if the global DataSource
 supports <code>getConnection(username, password)</code> method.
-<a href="http://commons.apache.org/dbcp/">Apache Commons DBCP</a> pool that
+<a href="https://commons.apache.org/dbcp/">Apache Commons DBCP</a> pool that
 Tomcat uses by default does not support it. See its Javadoc for
 <code>BasicDataSource</code> class.
 <a href="../jdbc-pool.html">Apache Tomcat JDBC pool</a> does support it,

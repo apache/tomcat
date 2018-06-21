@@ -56,7 +56,7 @@ import org.apache.juli.logging.LogFactory;
  * </p>
  * <p>
  * Most of the design of this Servlet Filter is a port of <a
- * href="http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>, this servlet filter replaces the apparent client remote
+ * href="https://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>, this servlet filter replaces the apparent client remote
  * IP address and hostname for the request with the IP address list presented by a proxy or a load balancer via a request headers (e.g.
  * "X-Forwarded-For").
  * </p>
@@ -171,7 +171,7 @@ import org.apache.juli.logging.LogFactory;
  * <strong>Regular expression vs. IP address blocks:</strong> <code>mod_remoteip</code> allows to use address blocks (e.g.
  * <code>192.168/16</code>) to configure <code>RemoteIPInternalProxy</code> and <code>RemoteIPTrustedProxy</code> ; as the JVM doesn't have a
  * library similar to <a
- * href="http://apr.apache.org/docs/apr/1.3/group__apr__network__io.html#gb74d21b8898b7c40bf7fd07ad3eb993d">apr_ipsubnet_test</a>, we rely on
+ * href="https://apr.apache.org/docs/apr/1.3/group__apr__network__io.html#gb74d21b8898b7c40bf7fd07ad3eb993d">apr_ipsubnet_test</a>, we rely on
  * regular expressions.
  * </p>
  * <hr>

@@ -43,7 +43,7 @@ Running With JRE 8 Or Later
 
 (2.1) Download a binary distribution of Tomcat from:
 
-      http://tomcat.apache.org/
+      https://tomcat.apache.org/
 
 (2.2) Unpack the binary distribution so that it resides in its own
       directory (conventionally named "apache-tomcat-[version]").
@@ -203,7 +203,7 @@ launches Java directly and does not use the script files.
 (4.3) Further information about configuring and running Tomcat can be found in
       the documentation included here, as well as on the Tomcat web site:
 
-      http://tomcat.apache.org/
+      https://tomcat.apache.org/
 
 
 (5) Shut Down Tomcat
@@ -393,32 +393,32 @@ For further reading:
 
     * Documentation for APR/Native library in the Tomcat User's Guide
 
-      http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/apr.html
+      https://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/apr.html
 
     * Documentation for the HTTP and AJP protocol connectors in the Tomcat
       Configuration Reference
 
-      http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/config/http.html
+      https://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/config/http.html
 
-      http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/config/ajp.html
+      https://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/config/ajp.html
 
  - Apache Tomcat Native project home
 
-      http://tomcat.apache.org/native-doc/
+      https://tomcat.apache.org/native-doc/
 
  - Other projects
 
     * OpenSSL
 
-      http://openssl.org/
+      https://www.openssl.org/
 
     * Apache Portable Runtime
 
-      http://apr.apache.org/
+      https://apr.apache.org/
 
     * Apache HTTP Server
 
-      http://httpd.apache.org/
+      https://httpd.apache.org/
 
 To disable Apache Tomcat Native library:
 
@@ -449,17 +449,17 @@ For further reading:
 
  - Apache Commons Daemon project
 
-      http://commons.apache.org/daemon/
+      https://commons.apache.org/daemon/
 
  - Apache Tomcat documentation
 
     * Installing Apache Tomcat
 
-      http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/setup.html
+      https://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/setup.html
 
     * Windows service HOW-TO
 
-      http://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/windows-service-howto.html
+      https://tomcat.apache.org/tomcat-@VERSION_MAJOR_MINOR@-doc/windows-service-howto.html
 
 The binary files of Apache Commons Daemon in Apache Tomcat distributions
 for Windows are named:

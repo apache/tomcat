@@ -68,7 +68,7 @@
       <p>The TCP/IP port number on which this server waits for a shutdown
       command. Set to <code>-1</code> to disable the shutdown port.</p>
       <p>Note: Disabling the shutdown port works well when Tomcat is started
-      using <a href="http://commons.apache.org/daemon/">Apache Commons Daemon</a>
+      using <a href="https://commons.apache.org/daemon/">Apache Commons Daemon</a>
       (running as a service on Windows or with jsvc on un*xes). It cannot be
       used when running Tomcat with the standard shell scripts though, as it
       will prevent shutdown.bat|.sh and catalina.bat|.sh from stopping it

@@ -223,7 +223,7 @@ com.sun.security.jgss.krb5.accept {
   <subsection name="References">
   <p>Correctly configuring Kerberos authentication can be tricky. The following
   references may prove helpful. Advice is also always available from the
-  <a href="http://tomcat.apache.org/lists.html#tomcat-users">Tomcat users
+  <a href="https://tomcat.apache.org/lists.html#tomcat-users">Tomcat users
   mailing list</a>.</p>
   <ol>
   <li><a href="http://www.adopenstatic.com/cs/blogs/ken/archive/2006/10/19/512.aspx">
@@ -298,7 +298,7 @@ com.sun.security.jgss.krb5.accept {
   They are:</p>
   <ol>
   <li>Configure IIS as a reverse proxy for Tomcat (see the
-  <a href="http://tomcat.apache.org/connectors-doc/webserver_howto/iis.html">
+  <a href="https://tomcat.apache.org/connectors-doc/webserver_howto/iis.html">
   IIS Web Server How-To)</a>.</li>
   <li>Configure IIS to use Windows authentication</li>
   <li>Configure Tomcat to use the authentication user information from IIS by
@@ -324,7 +324,7 @@ com.sun.security.jgss.krb5.accept {
   authentication. They are:</p>
   <ol>
   <li>Configure httpd as a reverse proxy for Tomcat (see the
-  <a href="http://tomcat.apache.org/connectors-doc/webserver_howto/apache.html">
+  <a href="https://tomcat.apache.org/connectors-doc/webserver_howto/apache.html">
   Apache httpd Web Server How-To)</a>.</li>
   <li>Configure httpd to use Windows authentication</li>
   <li>Configure Tomcat to use the authentication user information from httpd by

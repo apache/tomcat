@@ -35,7 +35,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
 
 /**
  * <p>
- * Tomcat port of <a href="http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>, this valve replaces the apparent
+ * Tomcat port of <a href="https://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>, this valve replaces the apparent
  * client remote IP address and hostname for the request with the IP address list presented by a proxy or a load balancer via a request
  * headers (e.g. "X-Forwarded-For").
  * </p>
@@ -152,7 +152,7 @@ import org.apache.tomcat.util.http.MimeHeaders;
  * <strong>Regular expression vs. IP address blocks:</strong> <code>mod_remoteip</code> allows to use address blocks (e.g.
  * <code>192.168/16</code>) to configure <code>RemoteIPInternalProxy</code> and <code>RemoteIPTrustedProxy</code> ; as Tomcat doesn't have a
  * library similar to <a
- * href="http://apr.apache.org/docs/apr/1.3/group__apr__network__io.html#gb74d21b8898b7c40bf7fd07ad3eb993d">apr_ipsubnet_test</a>,
+ * href="https://apr.apache.org/docs/apr/1.3/group__apr__network__io.html#gb74d21b8898b7c40bf7fd07ad3eb993d">apr_ipsubnet_test</a>,
  * <code>RemoteIpValve</code> uses regular expression to configure <code>internalProxies</code> and <code>trustedProxies</code> in the same
  * fashion as {@link RequestFilterValve} does.
  * </p>

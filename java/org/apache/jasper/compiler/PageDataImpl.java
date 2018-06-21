@@ -214,7 +214,7 @@ class PageDataImpl extends PageData implements TagConstants {
                         continue;
                     }
 
-                    // Bugzilla 35252: http://bz.apache.org/bugzilla/show_bug.cgi?id=35252
+                    // Bugzilla 35252: https://bz.apache.org/bugzilla/show_bug.cgi?id=35252
                     if(rootAttrs.getIndex(qName) == -1) {
                         rootAttrs.addAttribute(attrs.getURI(i),
                                                attrs.getLocalName(i),

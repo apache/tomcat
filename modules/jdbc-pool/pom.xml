@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
 
   <name>jdbc-pool</name>
-  <url>http://people.apache.org/~fhanik/jdbc-pool/</url>
+  <url>https://people.apache.org/~fhanik/jdbc-pool/</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -56,7 +56,7 @@
   <scm>
     <connection>scm:svn:https://svn.apache.org/repos/asf/tomcat/trunk/modules/jdbc-pool</connection>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/tomcat/trunk/modules/jdbc-pool</developerConnection>
-    <url>http://svn.apache.org/viewvc/tomcat/trunk/modules/jdbc-pool</url>
+    <url>https://svn.apache.org/viewvc/tomcat/trunk/modules/jdbc-pool</url>
   </scm>
 
   <dependencies>

@@ -384,14 +384,14 @@ To update the service parameters, you need to use the <b>//US//</b> parameter.
 </p>
 
 <source>Update the service named 'Tomcat<version-major/>'
-C:\> tomcat<version-major/> //US//Tomcat<version-major/> --Description="Apache Tomcat Server - http://tomcat.apache.org/ " ^
+C:\> tomcat<version-major/> //US//Tomcat<version-major/> --Description="Apache Tomcat Server - https://tomcat.apache.org/ " ^
      --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bootstrap.jar</source>
 
 <p>If you gave the service an optional name, you need to specify it like this:
 </p>
 
 <source>Update the service named 'MyService'
-C:\> tomcat<version-major/> //US//MyService --Description="Apache Tomcat Server - http://tomcat.apache.org/ " ^
+C:\> tomcat<version-major/> //US//MyService --Description="Apache Tomcat Server - https://tomcat.apache.org/ " ^
      --Startup=auto --Classpath=%JAVA_HOME%\lib\tools.jar;%CATALINA_HOME%\bin\bootstrap.jar</source>
 
 </section>

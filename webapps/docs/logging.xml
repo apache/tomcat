@@ -37,7 +37,7 @@
   <section name="Introduction">
     <p>
       The internal logging for Apache Tomcat uses JULI, a packaged renamed fork
-      of <a href="http://commons.apache.org/logging">Apache Commons Logging</a>
+      of <a href="https://commons.apache.org/logging">Apache Commons Logging</a>
       that is hard-coded to use the <code>java.util.logging</code> framework.
       This ensures that Tomcat&apos;s internal logging and any web application
       logging will remain independent, even if a web application uses Apache

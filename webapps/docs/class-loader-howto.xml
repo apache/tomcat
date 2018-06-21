@@ -107,7 +107,7 @@ loaders as it is initialized:</p>
         <em>$CATALINA_HOME/bin</em>. It is useful in certain logging
         configurations</p></li>
     <li><p><em>$CATALINA_HOME/bin/commons-daemon.jar</em> &#8212; The classes
-        from <a href="http://commons.apache.org/daemon/">Apache Commons
+        from <a href="https://commons.apache.org/daemon/">Apache Commons
         Daemon</a> project.
         This JAR file is not present in the <code>CLASSPATH</code> built by
         <code>catalina.bat</code>|<code>.sh</code> scripts, but is referenced

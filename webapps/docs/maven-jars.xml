@@ -36,8 +36,8 @@
 <section name="Using Tomcat libraries With Maven">
     <subsection name="Tomcat Snapshots">
       Tomcat snapshots are located in the
-      <a href="http://repository.apache.org/content/repositories/snapshots/org/apache/tomcat/">Apache Snapshot Repository</a>.
-      The official URL is <source>http://repository.apache.org/content/repositories/snapshots/org/apache/tomcat/</source>
+      <a href="https://repository.apache.org/content/repositories/snapshots/org/apache/tomcat/">Apache Snapshot Repository</a>.
+      The official URL is <source>https://repository.apache.org/content/repositories/snapshots/org/apache/tomcat/</source>
       <p>
         Snapshots are done periodically, not on a regular basis, but when changes happen and the Tomcat team deems a new snapshot might
         useful.
@@ -46,10 +46,10 @@
     <subsection name="Tomcat Releases">
       <p>
         Stable releases are published to the
-        <a href="http://repo2.maven.org/maven2/org/apache/tomcat/">Central
+        <a href="https://repo2.maven.org/maven2/org/apache/tomcat/">Central
         Maven Repositories</a>. The URL for this is
       </p>
-      <source>http://repo2.maven.org/maven2/org/apache/tomcat/</source>
+      <source>https://repo2.maven.org/maven2/org/apache/tomcat/</source>
     </subsection>
 
 </section>
