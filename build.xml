@@ -1757,11 +1757,13 @@
     <copy todir="${tomcat.dist}" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
       <fileset dir=".">
-        <include name="INSTALLING.txt"/>
         <include name="LICENSE"/>
         <include name="NOTICE"/>
         <include name="RELEASE-NOTES"/>
         <include name="RUNNING.txt"/>
+        <include name="README.md"/>
+        <include name="BUILDING.txt" />
+        <include name="CONTRIBUTING.md"/>
       </fileset>
     </copy>
 
@@ -2267,10 +2269,11 @@ skip.installer property in build.properties" />
         <include name="temp/**"/>
         <include name="LICENSE"/>
         <include name="NOTICE"/>
-        <include name="README.txt"/>
+        <include name="README.md"/>
         <include name="RELEASE-NOTES"/>
         <include name="RUNNING.txt"/>
-        <include name="BENCHMARKS.txt"/>
+        <include name="BUILDING.txt" />
+        <include name="CONTRIBUTING.md"/>
         <exclude name="bin/service.bat"/>
         <exclude name="bin/x64/"/>
         <exclude name="bin/*.exe"/>
@@ -2300,10 +2303,11 @@ skip.installer property in build.properties" />
         <include name="temp/**"/>
         <include name="LICENSE"/>
         <include name="NOTICE"/>
-        <include name="README.txt"/>
+        <include name="README.md"/>
         <include name="RELEASE-NOTES"/>
         <include name="RUNNING.txt"/>
-        <include name="BENCHMARKS.txt"/>
+        <include name="BUILDING.txt" />
+        <include name="CONTRIBUTING.md"/>
         <exclude name="bin/x64/"/>
       </zipfileset>
 
@@ -2322,10 +2326,11 @@ skip.installer property in build.properties" />
         <include name="temp/**"/>
         <include name="LICENSE"/>
         <include name="NOTICE"/>
-        <include name="README.txt"/>
+        <include name="README.md"/>
         <include name="RELEASE-NOTES"/>
         <include name="RUNNING.txt"/>
-        <include name="BENCHMARKS.txt"/>
+        <include name="BUILDING.txt" />
+        <include name="CONTRIBUTING.md"/>
         <exclude name="bin/x64/"/>
         <exclude name="bin/*.dll"/>
         <exclude name="bin/tomcat${version.major}.exe"/>
@@ -2353,7 +2358,7 @@ skip.installer property in build.properties" />
       <zipfileset dir="${tomcat.deployer}" prefix="${final.name}-deployer" includes="**" />
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="LICENSE" />
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="NOTICE" />
-      <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="README.txt" />
+      <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="README.md" />
       <zipfileset dir="${tomcat.dist}" prefix="${final.name}-deployer" includes="RELEASE-NOTES" />
     </zip>
 
@@ -2381,28 +2386,15 @@ skip.installer property in build.properties" />
         <include name="work/**" />
         <include name="LICENSE" />
         <include name="NOTICE" />
-        <include name="README.txt" />
+        <include name="README.md" />
         <include name="RELEASE-NOTES" />
         <include name="RUNNING.txt" />
-        <include name="BENCHMARKS.txt" />
-        <exclude name="bin/catalina.sh" />
-        <exclude name="bin/ciphers.sh" />
-        <exclude name="bin/configtest.sh" />
-        <exclude name="bin/daemon.sh" />
-        <exclude name="bin/digest.sh" />
-        <exclude name="bin/jasper.sh" />
-        <exclude name="bin/jspc.sh" />
-        <exclude name="bin/service.bat"/>
-        <exclude name="bin/setclasspath.sh" />
-        <exclude name="bin/startup.sh" />
-        <exclude name="bin/shutdown.sh" />
-        <exclude name="bin/tool-wrapper.sh" />
-        <exclude name="bin/tool-wrapper-using-launcher.sh" />
-        <exclude name="bin/shutdown-using-launcher.sh" />
-        <exclude name="bin/startup-using-launcher.sh" />
-        <exclude name="bin/version.sh" />
+        <include name="BUILDING.txt" />
+        <include name="CONTRIBUTING.md"/>
         <exclude name="conf/**" />
         <exclude name="src/**" />
+        <exclude name="bin/service.bat"/>
+        <exclude name="bin/*.sh"/>
         <exclude name="bin/x64/"/>
         <exclude name="bin/*.exe"/>
         <exclude name="bin/*.dll"/>
@@ -2410,21 +2402,7 @@ skip.installer property in build.properties" />
       <!-- These need to be added after the bin directory is added else the  -->
       <!-- bin directory will pick up the wrong permissions.                 -->
       <tarfileset dir="${tomcat.dist}" dirmode="750" filemode="750" prefix="${final.name}">
-        <include name="bin/catalina.sh" />
-        <include name="bin/ciphers.sh" />
-        <include name="bin/configtest.sh" />
-        <include name="bin/daemon.sh" />
-        <include name="bin/digest.sh" />
-        <include name="bin/jasper.sh" />
-        <include name="bin/jspc.sh" />
-        <include name="bin/setclasspath.sh" />
-        <include name="bin/startup.sh" />
-        <include name="bin/shutdown.sh" />
-        <include name="bin/tool-wrapper.sh" />
-        <include name="bin/tool-wrapper-using-launcher.sh" />
-        <include name="bin/shutdown-using-launcher.sh" />
-        <include name="bin/startup-using-launcher.sh" />
-        <include name="bin/version.sh" />
+        <include name="bin/*.sh" />
       </tarfileset>
     </tar>
 
@@ -2447,7 +2425,7 @@ skip.installer property in build.properties" />
       <tarfileset dir="${tomcat.dist}" prefix="${final.name}-deployer">
         <include name="LICENSE" />
         <include name="NOTICE" />
-        <include name="README.txt" />
+        <include name="README.md" />
         <include name="RELEASE-NOTES" />
       </tarfileset>
       <tarfileset dir="${tomcat.deployer}" prefix="${final.name}-deployer">
@@ -2470,7 +2448,7 @@ skip.installer property in build.properties" />
       <tarfileset dir="${tomcat.dist}" prefix="tomcat-${version.major.minor}-doc">
         <include name="LICENSE" />
         <include name="NOTICE" />
-        <include name="README.txt" />
+        <include name="README.md" />
       </tarfileset>
       <tarfileset dir="${tomcat.dist}/webapps/docs" prefix="tomcat-${version.major.minor}-doc">
         <include name="**" />
