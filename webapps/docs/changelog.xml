@@ -45,6 +45,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.11 (markt)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Support building with Java 9+ while preserving the Java 8 compatibility
+        at runtime (requires Ant 1.9.8 or later). (ebourg)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.10 (markt)" rtext="release in progress">
   <subsection name="Catalina">
