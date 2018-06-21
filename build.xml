@@ -2378,6 +2378,7 @@ skip.installer property in build.properties" />
         <include name="RUNNING.txt" />
         <include name="BENCHMARKS.txt" />
         <exclude name="bin/catalina.sh" />
+        <exclude name="bin/ciphers.sh" />
         <exclude name="bin/configtest.sh" />
         <exclude name="bin/daemon.sh" />
         <exclude name="bin/digest.sh" />
@@ -2402,6 +2403,7 @@ skip.installer property in build.properties" />
       <!-- bin directory will pick up the wrong permissions.                 -->
       <tarfileset dir="${tomcat.dist}" dirmode="750" filemode="750" prefix="${final.name}">
         <include name="bin/catalina.sh" />
+        <include name="bin/ciphers.sh" />
         <include name="bin/configtest.sh" />
         <include name="bin/daemon.sh" />
         <include name="bin/digest.sh" />
