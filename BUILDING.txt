@@ -443,8 +443,8 @@ as for the property "test.name".
  6. Optional support is provided for the Cobertura code coverage tool.
 
 NOTE: Cobertura is licensed under GPL v2 with parts of it being under
-      Apache License v1.1. See http://cobertura.sf.net for details. Using it
-      during Tomcat build is optional and is off by default.
+      Apache License v1.1. See https://cobertura.github.io/cobertura/ for details.
+      Using it during Tomcat build is optional and is off by default.
 
  Cobertura can be enabled using the following properties:
 
