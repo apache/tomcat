@@ -44,6 +44,16 @@
   They eventually become mixed with the numbered issues. (I.e., numbered
   issues do not "pop up" wrt. others).
 -->
+<section name="Tomcat 8.5.33 (markt)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Support building with Java 9+ while preserving the Java 7 compatibility
+        at runtime (requires Ant 1.9.8 or later). (ebourg)
+      </update>
+    </changelog>
+  </subsection>
+</section>
 <section name="Tomcat 8.5.32 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
