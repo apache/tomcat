@@ -2015,7 +2015,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <link href="../elapi"/>
       <link href="../websocketapi"/>
       <link href="http://docs.oracle.com/javase/7/docs/api/"/>
-      <link href="http://commons.apache.org/proper/commons-io/javadocs/api-release/"/>
+      <link href="https://commons.apache.org/proper/commons-io/javadocs/api-release/"/>
       <link href="http://docs.oracle.com/javaee/6/api/"/>
       <sourcepath>
         <path location="${tomcat.dist}/src/java"/>

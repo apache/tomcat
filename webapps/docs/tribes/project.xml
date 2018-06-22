@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 <project name="Apache Tribes Documentation - Top Level Directory"
-        href="http://tomcat.apache.org/">
+        href="https://tomcat.apache.org/">
 
     <title>Apache Tribes - The Tomcat Cluster Communication Module</title>
 
@@ -28,7 +28,7 @@
     <menu name="Links">
         <item name="Docs Home"             href="../index.html"/>
         <item name="Tribes Docs Home"      href="introduction.html"/>
-        <item name="FAQ"                   href="http://wiki.apache.org/tomcat/FAQ" />
+        <item name="FAQ"                   href="https://wiki.apache.org/tomcat/FAQ" />
         <item name="User Comments"         href="#comments_section"/>
     </menu>
 

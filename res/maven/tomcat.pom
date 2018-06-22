@@ -21,7 +21,7 @@
   <artifactId>tomcat</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
   <description>Binary distribution of Apache Tomcat</description>
-  <url>http://tomcat.apache.org/</url>
+  <url>https://tomcat.apache.org/</url>
   <packaging>pom</packaging>
   <licenses>
     <license>

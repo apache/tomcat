@@ -19,7 +19,7 @@ limitations under the License.
 <%
 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy");
 request.setAttribute("year", sdf.format(new java.util.Date()));
-request.setAttribute("tomcatUrl", "http://tomcat.apache.org/");
+request.setAttribute("tomcatUrl", "https://tomcat.apache.org/");
 request.setAttribute("tomcatDocUrl", "/docs/");
 request.setAttribute("tomcatExamplesUrl", "/examples/");
 %>
@@ -38,7 +38,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                 <span id="nav-hosts"><a href="${tomcatDocUrl}">Documentation</a></span>
                 <span id="nav-config"><a href="${tomcatDocUrl}config/">Configuration</a></span>
                 <span id="nav-examples"><a href="${tomcatExamplesUrl}">Examples</a></span>
-                <span id="nav-wiki"><a href="http://wiki.apache.org/tomcat/FrontPage">Wiki</a></span>
+                <span id="nav-wiki"><a href="https://wiki.apache.org/tomcat/FrontPage">Wiki</a></span>
                 <span id="nav-lists"><a href="${tomcatUrl}lists.html">Mailing Lists</a></span>
                 <span id="nav-help"><a href="${tomcatUrl}findhelp.html">Find Help</a></span>
                 <br class="separator" />
@@ -96,8 +96,8 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                 </div>
                 <div class="col25">
                     <div class="container">
-                        <p><a href="http://wiki.apache.org/tomcat/Specifications">Servlet Specifications</a></p>
-                        <p><a href="http://wiki.apache.org/tomcat/TomcatVersions">Tomcat Versions</a></p>
+                        <p><a href="https://wiki.apache.org/tomcat/Specifications">Servlet Specifications</a></p>
+                        <p><a href="https://wiki.apache.org/tomcat/TomcatVersions">Tomcat Versions</a></p>
                     </div>
                 </div>
                 <br class="separator" />
@@ -123,14 +123,14 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                         <h3>Documentation</h3>
                         <h4><a href="${tomcatDocUrl}">Tomcat 7.0 Documentation</a></h4>
                         <h4><a href="${tomcatDocUrl}config/">Tomcat 7.0 Configuration</a></h4>
-                        <h4><a href="http://wiki.apache.org/tomcat/FrontPage">Tomcat Wiki</a></h4>
+                        <h4><a href="https://wiki.apache.org/tomcat/FrontPage">Tomcat Wiki</a></h4>
                         <p>Find additional important configuration information in:</p>
                         <pre>$CATALINA_HOME/RUNNING.txt</pre>
                         <p>Developers may be interested in:</p>
                         <ul>
-                            <li><a href="http://tomcat.apache.org/bugreport.html">Tomcat 7.0 Bug Database</a></li>
+                            <li><a href="https://tomcat.apache.org/bugreport.html">Tomcat 7.0 Bug Database</a></li>
                             <li><a href="${tomcatDocUrl}api/index.html">Tomcat 7.0 JavaDocs</a></li>
-                            <li><a href="http://svn.apache.org/repos/asf/tomcat/tc7.0.x/">Tomcat 7.0 SVN Repository</a></li>
+                            <li><a href="https://svn.apache.org/repos/asf/tomcat/tc7.0.x/">Tomcat 7.0 SVN Repository</a></li>
                         </ul>
                     </div>
                 </div>
@@ -187,7 +187,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                             <li><a href="${tomcatUrl}getinvolved.html">Overview</a></li>
                             <li><a href="${tomcatUrl}svn.html">SVN Repositories</a></li>
                             <li><a href="${tomcatUrl}lists.html">Mailing Lists</a></li>
-                            <li><a href="http://wiki.apache.org/tomcat/FrontPage">Wiki</a></li>
+                            <li><a href="https://wiki.apache.org/tomcat/FrontPage">Wiki</a></li>
                         </ul>
                     </div>
                 </div>
@@ -197,8 +197,8 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                         <ul>
                             <li><a href="${tomcatUrl}contact.html">Contact</a></li>
                             <li><a href="${tomcatUrl}legal.html">Legal</a></li>
-                            <li><a href="http://www.apache.org/foundation/sponsorship.html">Sponsorship</a></li>
-                            <li><a href="http://www.apache.org/foundation/thanks.html">Thanks</a></li>
+                            <li><a href="https://www.apache.org/foundation/sponsorship.html">Sponsorship</a></li>
+                            <li><a href="https://www.apache.org/foundation/thanks.html">Thanks</a></li>
                         </ul>
                     </div>
                 </div>
@@ -208,7 +208,7 @@ request.setAttribute("tomcatExamplesUrl", "/examples/");
                         <ul>
                             <li><a href="${tomcatUrl}whoweare.html">Who We Are</a></li>
                             <li><a href="${tomcatUrl}heritage.html">Heritage</a></li>
-                            <li><a href="http://www.apache.org">Apache Home</a></li>
+                            <li><a href="https://www.apache.org">Apache Home</a></li>
                             <li><a href="${tomcatUrl}resources.html">Resources</a></li>
                         </ul>
                     </div>

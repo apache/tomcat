@@ -70,7 +70,7 @@ The following is a quick step by step guide.
 
 <p>
 Download a binary distribution of Ant 1.8.2 or later from
-<a href="http://ant.apache.org/bindownload.cgi">here</a>.
+<a href="https://ant.apache.org/bindownload.cgi">here</a>.
 </p>
 
 <p>
@@ -94,11 +94,11 @@ available, which will be used to actually perform the build.
 
   <p>
   Tomcat 7.0 SVN repository URL:
-  <a href="http://svn.apache.org/repos/asf/tomcat/tc7.0.x/trunk/">http://svn.apache.org/repos/asf/tomcat/tc7.0.x/trunk/</a>
+  <a href="https://svn.apache.org/repos/asf/tomcat/tc7.0.x/trunk/">https://svn.apache.org/repos/asf/tomcat/tc7.0.x/trunk/</a>
   </p>
   <p>
   Tomcat source packages:
-  <a href="http://tomcat.apache.org/download-70.cgi">http://tomcat.apache.org/download-70.cgi</a>.
+  <a href="https://tomcat.apache.org/download-70.cgi">https://tomcat.apache.org/download-70.cgi</a>.
   </p>
 
   <p>

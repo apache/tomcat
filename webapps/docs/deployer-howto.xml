@@ -62,7 +62,7 @@
             There are a number of ways to perform deployment that rely on
             the Manager web application. Apache Tomcat provides tasks
             for Apache Ant build tool.
-            <a href="http://tomcat.apache.org/maven-plugin.html">Apache Tomcat Maven Plugin</a>
+            <a href="https://tomcat.apache.org/maven-plugin.html">Apache Tomcat Maven Plugin</a>
             project provides integration with Apache Maven.
             There is also a tool called the Client Deployer, which can be
             used from a command line and provides additional functionality

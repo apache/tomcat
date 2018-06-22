@@ -29,7 +29,7 @@
 
   <!-- Defined parameters (overrideable) -->
   <xsl:param    name="home-name"           select="'The Tomcat Project'"/>
-  <xsl:param    name="home-href"           select="'http://tomcat.apache.org/'"/>
+  <xsl:param    name="home-href"           select="'https://tomcat.apache.org/'"/>
   <xsl:param    name="home-logo"           select="'/images/tomcat.png'"/>
   <xsl:param    name="printer-logo"        select="'/images/printer.gif'"/>
   <xsl:param    name="apache-logo"         select="'/images/asf-logo.svg'"/>
@@ -42,11 +42,11 @@
   <xsl:param    name="year"                select="'yyyy'"/>
   <xsl:param    name="void-image"          select="'/images/void.gif'"/>
   <xsl:param    name="project-menu"        select="'menu'"/>
-  <xsl:param    name="buglink"             select="'http://bz.apache.org/bugzilla/show_bug.cgi?id='"/>
-  <xsl:param    name="revlink"             select="'http://svn.apache.org/viewvc?view=rev&amp;rev='"/>
-  <xsl:param    name="doclink"             select="'http://tomcat.apache.org/tomcat-7.0-doc'"/>
-  <xsl:param    name="sylink"              select="'http://tomcat.apache.org/security-7.html'"/>
-  <xsl:param    name="dllink"              select="'http://tomcat.apache.org/download-70.cgi'"/>
+  <xsl:param    name="buglink"             select="'https://bz.apache.org/bugzilla/show_bug.cgi?id='"/>
+  <xsl:param    name="revlink"             select="'https://svn.apache.org/viewvc?view=rev&amp;rev='"/>
+  <xsl:param    name="doclink"             select="'https://tomcat.apache.org/tomcat-7.0-doc'"/>
+  <xsl:param    name="sylink"              select="'https://tomcat.apache.org/security-7.html'"/>
+  <xsl:param    name="dllink"              select="'https://tomcat.apache.org/download-70.cgi'"/>
   <xsl:param    name="sitedir"             select="''"/>
   <xsl:param    name="filename"            select="'-'"/>
   <!-- Defined variables (non-overrideable) -->

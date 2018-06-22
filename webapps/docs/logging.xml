@@ -37,7 +37,7 @@
   <section name="Introduction">
     <p>
       Logging in Apache Tomcat is implemented with the help of
-      <a href="http://commons.apache.org/logging">Apache Commons Logging</a>
+      <a href="https://commons.apache.org/logging">Apache Commons Logging</a>
       library. That library is a thin wrapper above different logging
       frameworks. It provides Tomcat with the ability to log
       hierarchically across various log levels without the need to rely on a

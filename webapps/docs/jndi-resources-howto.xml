@@ -290,7 +290,7 @@ public class MyBean {
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="http://wiki.apache.org/tomcat/Specifications">Servlet
+    <a href="https://wiki.apache.org/tomcat/Specifications">Servlet
     Specification</a> for details.</p>
 
   <h5>3.  Code Your Application's Use Of This Resource</h5>
@@ -540,7 +540,7 @@ public class MyBean2 {
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="http://wiki.apache.org/tomcat/Specifications">Servlet
+    <a href="https://wiki.apache.org/tomcat/Specifications">Servlet
     Specification</a> for details.</p>
 
     <h5>2.  Code Your Application's Use Of This Resource</h5>
@@ -664,7 +664,7 @@ Transport.send(message);]]></source>
 
     <p><strong>NOTE</strong> - The default data source support in Tomcat
     is based on the <strong>DBCP</strong> connection pool from the
-    <a href="http://commons.apache.org/">Commons</a>
+    <a href="https://commons.apache.org/">Commons</a>
     project.  However, it is possible to use any other connection pool
     that implements <code>javax.sql.DataSource</code>, by writing your
     own custom resource factory, as described
@@ -709,7 +709,7 @@ Transport.send(message);]]></source>
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="http://wiki.apache.org/tomcat/Specifications">Servlet
+    <a href="https://wiki.apache.org/tomcat/Specifications">Servlet
     Specification</a> for details.</p>
 
     <h5>3.  Code Your Application's Use Of This Resource</h5>
@@ -1005,7 +1005,7 @@ public class MyBeanFactory implements ObjectFactory {
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="http://wiki.apache.org/tomcat/Specifications">Servlet
+    <a href="https://wiki.apache.org/tomcat/Specifications">Servlet
     Specification</a> for details.</p>
 
   <h4>3.  Code Your Application's Use Of This Resource</h4>
