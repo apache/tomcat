@@ -227,7 +227,7 @@ of the new compiler by configuring the compiler attribute as explained above.
 override the default configuration by re-defining the JSP Servlet in
 <code>/WEB-INF/web.xml</code>. However, this may cause problems if you attempt
 to deploy the application on another container as the JSP Servlet class may
-not be recognised. You can work-around this problem by using the Tomact specific
+not be recognised. You can work-around this problem by using the Tomcat specific
 <code>/WEB-INF/tomcat-web.xml</code> deployment descriptor. The format is
 identical to <code>/WEB-INF/web.xml</code>. It will override any default
 settings but not those in <code>/WEB-INF/web.xml</code>. Since it is Tomcat

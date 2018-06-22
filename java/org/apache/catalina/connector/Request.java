@@ -176,7 +176,7 @@ public class Request implements HttpServletRequest {
     // ----------------------------------------------------- Variables
 
     /**
-     * @deprecated Unused. This will be removed in Tomact 10.
+     * @deprecated Unused. This will be removed in Tomcat 10.
      */
     @Deprecated
     protected static final TimeZone GMT_ZONE = TimeZone.getTimeZone("GMT");

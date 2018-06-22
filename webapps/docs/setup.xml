@@ -94,7 +94,7 @@
             </ul>
             By using <code>/C=...</code> along with <code>/S</code> and
             <code>/D=</code> it is possible to perform fully configured
-            unattended installs of Apache Tomact.
+            unattended installs of Apache Tomcat.
         </li>
         <li>Refer to the
             <a href="windows-service-howto.html">Windows Service HOW-TO</a>
