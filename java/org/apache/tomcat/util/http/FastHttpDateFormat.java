@@ -163,7 +163,7 @@ public final class FastHttpDateFormat {
     /**
      * Try to parse the given date as a HTTP date.
      * @param value The HTTP date
-     * @return the date as a long or <code>-1<code> if the value cannot be
+     * @return the date as a long or <code>-1</code> if the value cannot be
      *         parsed
      */
     public static final long parseDate(String value) {
