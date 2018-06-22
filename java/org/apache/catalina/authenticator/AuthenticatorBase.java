@@ -19,7 +19,6 @@ package org.apache.catalina.authenticator;
 import java.io.IOException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
-import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -55,7 +54,6 @@ import org.apache.catalina.authenticator.jaspic.MessageInfoImpl;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.realm.GenericPrincipal;
-import org.apache.catalina.util.ConcurrentDateFormat;
 import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.catalina.util.StandardSessionIdGenerator;
 import org.apache.catalina.valves.ValveBase;
@@ -65,6 +63,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -93,7 +92,7 @@ public abstract class AuthenticatorBase extends ValveBase
     /**
      * "Expires" header always set to Date(1), so generate once only
      */
-    private static final String DATE_ONE = ConcurrentDateFormat.formatRfc1123(new Date(1));
+    private static final String DATE_ONE = FastHttpDateFormat.formatDate(1);
 
     /**
      * The string manager for this package.

@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.11 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <scode>
+        Refactor HTTP date creation and parsing to reduce code duplication,
+        reduce the use of ThreadLocals and to increase the use of caching.
+        (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
