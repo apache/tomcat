@@ -47,7 +47,7 @@ to authenticate themselves.  If you are not utilizing these features, you can
 safely skip this document.</p>
 
 <p>For fundamental background information about container managed security,
-see the <a href="http://wiki.apache.org/tomcat/Specifications">Servlet
+see the <a href="https://wiki.apache.org/tomcat/Specifications">Servlet
 Specification (Version 2.4)</a>, Section 12.</p>
 
 <p>For information about utilizing the <em>Single Sign On</em> feature of
@@ -726,7 +726,7 @@ scope of this document, because it is unique to each directory server
 implementation.  In the examples below, we will assume that you are using a
 distribution of the OpenLDAP directory server (version 2.0.11 or later), which
 can be downloaded from
-<a href="http://www.openldap.org">http://www.openldap.org</a>.  Assume that
+<a href="https://www.openldap.org">https://www.openldap.org</a>.  Assume that
 your <code>slapd.conf</code> file contains the following settings
 (among others):</p>
 <source>database ldbm
@@ -1032,7 +1032,7 @@ provided as part of the standard Java SE API.</p>
 practically any conceivable security realm with Tomcat's CMA. </p>
         <p>JAASRealm is prototype for Tomcat of the JAAS-based
 J2EE authentication framework for J2EE v1.4, based on the <a
- href="http://www.jcp.org/en/jsr/detail?id=196">JCP Specification
+ href="https://www.jcp.org/en/jsr/detail?id=196">JCP Specification
 Request 196</a> to enhance container-managed security and promote
 'pluggable' authentication mechanisms whose implementations would be
 container-independent.

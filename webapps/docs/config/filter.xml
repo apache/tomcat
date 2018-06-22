@@ -99,7 +99,7 @@
 <section name="CORS Filter">
   <subsection name="Introduction">
     <p>This filter is an implementation of W3C's CORS (Cross-Origin Resource
-    Sharing) <a href="http://www.w3.org/TR/cors/">specification</a>, which is a
+    Sharing) <a href="https://www.w3.org/TR/cors/">specification</a>, which is a
     mechanism that enables cross-origin requests.</p>
     <p>The filter works by adding required <code>Access-Control-*</code> headers
     to HttpServletResponse object. The filter also protects against HTTP
@@ -125,11 +125,11 @@
     <p>The CORS Filter supports following initialisation parameters:</p>
     <attributes>
       <attribute name="cors.allowed.origins" required="false">
-        <p>A list of <a href="http://tools.ietf.org/html/rfc6454">origins</a>
+        <p>A list of <a href="https://tools.ietf.org/html/rfc6454">origins</a>
         that are allowed to access the resource. A <code>*</code> can be
         specified to enable access to resource from any origin. Otherwise, a
         whitelist of comma separated origins can be provided. Eg: <code>
-        http://www.w3.org, https://www.apache.org</code>.
+        https://www.w3.org, https://www.apache.org</code>.
         <strong>Defaults:</strong> The empty String. (No origin is allowed to
         access the resource).</p>
       </attribute>
@@ -471,7 +471,7 @@ HTTP/1.1 200 OK
 
     <p>
     ExpiresFilter is a Java Servlet API port of <a
-    href="http://httpd.apache.org/docs/2.2/mod/mod_expires.html">Apache
+    href="https://httpd.apache.org/docs/2.2/mod/mod_expires.html">Apache
     mod_expires</a>.
     This filter controls the setting of the <code>Expires</code> HTTP header and the
     <code>max-age</code> directive of the <code>Cache-Control</code> HTTP header in
@@ -488,9 +488,9 @@ HTTP/1.1 200 OK
     </p>
     <p>
     To modify <code>Cache-Control</code> directives other than <code>max-age</code> (see
-    <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9" >RFC
+    <a href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9" >RFC
     2616 section 14.9</a>), you can use other servlet filters or <a
-    href="http://httpd.apache.org/docs/2.2/mod/mod_headers.html" >Apache Httpd
+    href="https://httpd.apache.org/docs/2.2/mod/mod_headers.html" >Apache Httpd
     mod_headers</a> module.
     </p>
 
@@ -882,7 +882,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         <p>Will an HTTP Strict Transport Security (HSTS) header
         (<code>Strict-Transport-Security</code>) be set on the response for
         secure requests. Any HSTS header already present will be replaced. See
-        <a href="http://tools.ietf.org/html/rfc6797">RFC 6797</a> for further
+        <a href="https://tools.ietf.org/html/rfc6797">RFC 6797</a> for further
         details of HSTS. If not specified, the default value of
         <code>true</code> will be used.</p>
       </attribute>
@@ -1208,7 +1208,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
   <subsection name="Introduction">
 
     <p>Tomcat port of
-    <a href="http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>,
+    <a href="https://httpd.apache.org/docs/trunk/mod/mod_remoteip.html">mod_remoteip</a>,
     this filter replaces the apparent client remote IP address and hostname for
     the request with the IP address list presented by a proxy or a load balancer
     via a request headers (e.g. &quot;X-Forwarded-For&quot;).</p>

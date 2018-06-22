@@ -48,7 +48,7 @@ help.</p>
 
 <p>In the course of reading these documents, you will run across a number of
 terms; some specific to Tomcat, and others defined by the
-<a href="http://wiki.apache.org/tomcat/Specifications">Servlet and
+<a href="https://wiki.apache.org/tomcat/Specifications">Servlet and
 JSP specifications</a>.</p>
 
 <ul>
@@ -118,21 +118,21 @@ only to earlier versions.</p>
     to fully read the relevant documentation as it will save you much time
     and effort. There's nothing like scouring the web only to find out that
     the answer was right in front of you all along!</li>
-<li><a href="http://wiki.apache.org/tomcat/FAQ">Tomcat FAQ</a></li>
-<li><a href="http://wiki.apache.org/tomcat/">Tomcat WIKI</a></li>
+<li><a href="https://wiki.apache.org/tomcat/FAQ">Tomcat FAQ</a></li>
+<li><a href="https://wiki.apache.org/tomcat/">Tomcat WIKI</a></li>
 <li>Tomcat FAQ at <a href="http://www.jguru.com/faq/home.jsp?topic=Tomcat">jGuru</a></li>
 <li>Tomcat mailing list archives - numerous sites archive the Tomcat mailing
     lists. Since the links change over time, clicking here will search
-    <a href="http://www.google.com/search?q=tomcat+mailing+list+archives">Google</a>.
+    <a href="https://www.google.com/search?q=tomcat+mailing+list+archives">Google</a>.
     </li>
 <li>The TOMCAT-USER mailing list, which you can subscribe to
-    <a href="http://tomcat.apache.org/lists.html">here</a>. If you don't
+    <a href="https://tomcat.apache.org/lists.html">here</a>. If you don't
     get a reply, then there's a good chance that your question was probably
     answered in the list archives or one of the FAQs.  Although questions
     about web application development in general are sometimes asked and
     answered, please focus your questions on Tomcat-specific issues.</li>
 <li>The TOMCAT-DEV mailing list, which you can subscribe to
-    <a href="http://tomcat.apache.org/lists.html">here</a>.  This list is
+    <a href="https://tomcat.apache.org/lists.html">here</a>.  This list is
     <strong>reserved</strong> for discussions about the development of Tomcat
     itself.  Questions about Tomcat configuration, and the problems you run
     into while developing and running applications, will normally be more

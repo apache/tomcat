@@ -37,7 +37,7 @@
 <section name="Introduction">
 
 <p>Tomcat <version-major-minor/> uses the Jasper 2 JSP Engine to implement
-the <a href="http://wiki.apache.org/tomcat/Specifications">JavaServer Pages 2.3</a>
+the <a href="https://wiki.apache.org/tomcat/Specifications">JavaServer Pages 2.3</a>
 specification.</p>
 
 <p>Jasper 2 has been redesigned to significantly improve performance over
@@ -98,7 +98,7 @@ classpath is created dynamically based on the current web application.</li>
 <li><strong>compiler</strong> - Which compiler Ant should use to compile JSP
 pages. The valid values for this are the same as for the compiler attribute of
 Ant&apos;s
-<a href="http://ant.apache.org/manual/Tasks/javac.html#compilervalues">javac</a>
+<a href="https://ant.apache.org/manual/Tasks/javac.html#compilervalues">javac</a>
 task. If the value is not set, then the default Eclipse JDT Java compiler will
 be used instead of using Ant. There is no default value. If this attribute is
 set then <code>setenv.[sh|bat]</code> should be used to add

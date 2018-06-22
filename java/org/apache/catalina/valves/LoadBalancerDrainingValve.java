@@ -56,7 +56,7 @@ import org.apache.catalina.util.SessionConfig;
  * authentication valves, as the redirection should take place before an
  * authentication valve would save a request to a protected resource.</p>
  *
- * @see <a href="http://tomcat.apache.org/connectors-doc/generic_howto/loadbalancers.html">Load
+ * @see <a href="https://tomcat.apache.org/connectors-doc/generic_howto/loadbalancers.html">Load
  *      balancer documentation</a>
  */
 public class LoadBalancerDrainingValve

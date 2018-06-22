@@ -34,18 +34,18 @@
 
 <section name="Overview">
 <p>Tomcat provides support for WebSocket as defined by
-   <a href="http://tools.ietf.org/html/rfc6455">RFC 6455</a>.</p>
+   <a href="https://tools.ietf.org/html/rfc6455">RFC 6455</a>.</p>
 </section>
 
 <section name="Application development">
 <p>Tomcat implements the Java WebSocket 1.1 API defined by <a
-   href="http://www.jcp.org/en/jsr/detail?id=356">JSR-356</a>.</p>
+   href="https://www.jcp.org/en/jsr/detail?id=356">JSR-356</a>.</p>
 
 <p>There are several example applications that demonstrate how the WebSocket API
    can be used. You will need to look at both the client side <a
-   href="http://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/websocket/">
+   href="https://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/websocket/">
    HTML</a> and the server side <a
-   href="http://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/WEB-INF/classes/websocket/">
+   href="https://svn.apache.org/viewvc/tomcat/trunk/webapps/examples/WEB-INF/classes/websocket/">
    code</a>.</p>
 </section>
 

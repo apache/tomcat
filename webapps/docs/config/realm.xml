@@ -882,7 +882,7 @@
 
     <p>JAASRealm is prototype for Tomcat of the JAAS-based J2EE authentication
     framework for J2EE v1.4, based on the <a
-    href="http://www.jcp.org/en/jsr/detail?id=196">JCP Specification Request
+    href="https://www.jcp.org/en/jsr/detail?id=196">JCP Specification Request
     196</a> to enhance container-managed security and promote 'pluggable'
     authentication mechanisms whose implementations would be
     container-independent.</p>

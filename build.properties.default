@@ -89,8 +89,8 @@ compile.debug=true
 # Do not pass -deprecation (-Xlint:deprecation) flag to javac
 compile.deprecation=false
 
-base-apache.loc.1=http://www.apache.org/dyn/closer.lua?action=download&filename=
-base-apache.loc.2=http://archive.apache.org/dist
+base-apache.loc.1=https://www.apache.org/dyn/closer.lua?action=download&filename=
+base-apache.loc.2=https://archive.apache.org/dist
 base-commons.loc.1=${base-apache.loc.1}/commons
 base-commons.loc.2=${base-apache.loc.2}/commons
 base-tomcat.loc.1=${base-apache.loc.1}/tomcat

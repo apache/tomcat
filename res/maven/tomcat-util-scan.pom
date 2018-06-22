@@ -24,7 +24,7 @@
     Common code shared by Catalina and Jasper for scanning JARS and processing
     XML descriptors
   </description>
-  <url>http://tomcat.apache.org/</url>
+  <url>https://tomcat.apache.org/</url>
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>

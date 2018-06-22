@@ -118,7 +118,7 @@
           style="${basedir}/doc/package.xsl"
           excludes="build.xml"
           includes="jdbc-pool.xml">
-      <param name="relative-path" expression="http://tomcat.apache.org/tomcat-6.0-doc"/>
+      <param name="relative-path" expression="https://tomcat.apache.org/tomcat-6.0-doc"/>
       <param name="apache-logo" expression="/images/asf-logo.svg"/>
     </xslt>
     <move tofile="${basedir}/src/main/java/org/apache/tomcat/jdbc/pool/package.html"
@@ -240,7 +240,7 @@
           style="${tomcat.xsl.dest}"
           excludes="build.xml project.xml"
           includes="*.xml">
-      <param name="relative-path" expression="http://tomcat.apache.org/tomcat-6.0-doc"/>
+      <param name="relative-path" expression="https://tomcat.apache.org/tomcat-6.0-doc"/>
       <param name="apache-logo" expression="/images/asf-logo.svg"/>
     </xslt>
   </target>

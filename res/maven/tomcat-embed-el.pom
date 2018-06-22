@@ -21,7 +21,7 @@
   <artifactId>tomcat-embed-el</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
   <description>Core Tomcat implementation</description>
-  <url>http://tomcat.apache.org/</url>
+  <url>https://tomcat.apache.org/</url>
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>

@@ -36,7 +36,7 @@
   <section name="Introduction">
 
   <p>
-      Tomcat can use the <a href="http://apr.apache.org/">Apache Portable Runtime</a> to
+      Tomcat can use the <a href="https://apr.apache.org/">Apache Portable Runtime</a> to
       provide superior scalability, performance, and better integration with native server
       technologies. The Apache Portable Runtime is a highly portable library that is at
       the heart of Apache HTTP Server 2.x. APR has many uses, including access to advanced IO
@@ -68,11 +68,11 @@
 
     <p>
       Windows binaries are provided for tcnative-1, which is a statically compiled .dll which includes
-      OpenSSL and APR. It can be downloaded from <a href="http://tomcat.apache.org/download-native.cgi">here</a>
+      OpenSSL and APR. It can be downloaded from <a href="https://tomcat.apache.org/download-native.cgi">here</a>
       as 32bit or AMD x86-64 binaries.
       In security conscious production environments, it is recommended to use separate shared dlls
       for OpenSSL, APR, and libtcnative-1, and update them as needed according to security bulletins.
-      Windows OpenSSL binaries are linked from the <a href="http://www.openssl.org">Official OpenSSL
+      Windows OpenSSL binaries are linked from the <a href="https://www.openssl.org">Official OpenSSL
       website</a> (see related/binaries).
     </p>
 

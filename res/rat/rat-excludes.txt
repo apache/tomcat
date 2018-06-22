@@ -15,7 +15,7 @@
 
 
   This is excludes file for Apache RAT tool run by ASF Buildbot,
-  http://creadur.apache.org/rat/
+  https://creadur.apache.org/rat/
 
   The following files are excluded:
 

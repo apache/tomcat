@@ -21,7 +21,7 @@
   <artifactId>tomcat-util</artifactId>
   <version>@MAVEN.DEPLOY.VERSION@</version>
   <description>Common code shared by multiple Tomcat components</description>
-  <url>http://tomcat.apache.org/</url>
+  <url>https://tomcat.apache.org/</url>
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>

@@ -81,7 +81,7 @@
  * </p>
  * <p>
  * Please see the FileUpload
- * <a href="http://commons.apache.org/fileupload/using.html" target="_top">User Guide</a>
+ * <a href="https://commons.apache.org/fileupload/using.html" target="_top">User Guide</a>
  * for further details and examples of how to use this package.
  * </p>
  */

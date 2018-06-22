@@ -26,7 +26,7 @@ import javax.xml.stream.XMLStreamReader;
 
 /*
  * The BoM detection is derived from:
- * http://svn.us.apache.org/viewvc/tomcat/trunk/java/org/apache/jasper/xmlparser/XMLEncodingDetector.java?annotate=1742248
+ * https://svn.us.apache.org/viewvc/tomcat/trunk/java/org/apache/jasper/xmlparser/XMLEncodingDetector.java?annotate=1742248
  *
  * The prolog is always at least as specific as the BOM therefore any encoding
  * specified in the prolog should take priority over the BOM.
