@@ -77,7 +77,10 @@ This method works if you want to submit a patch (like you would do for SVN), but
 the difference in using the sources distribution and a VCS is that you have to
 manually generate the patch file by using diff. If this is what you want, you
 can download the sources from the "Source Code Distributions" section of the
-[Download Page](https://tomcat.apache.org/download-90.cgi).
+Download Page. There is one such page for every major Tomcat version:
+- [Tomcat 9](https://tomcat.apache.org/download-90.cgi).
+- [Tomcat 8](https://tomcat.apache.org/download-80.cgi).
+- [Tomcat 7](https://tomcat.apache.org/download-70.cgi).
 
 ###### SVN
 
