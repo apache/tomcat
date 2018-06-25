@@ -2706,10 +2706,10 @@ skip.installer property in build.properties" />
       <param name="destdir" value="${cglib.home}"/>
     </antcall>
 
-    <antcall target="downloadzip">
+    <antcall target="downloadfile">
       <param name="sourcefile" value="${objenesis.loc}"/>
       <param name="destfile" value="${objenesis.jar}"/>
-      <param name="destdir" value="${base.path}"/>
+      <param name="destdir" value="${objenesis.home}"/>
     </antcall>
 
   </target>

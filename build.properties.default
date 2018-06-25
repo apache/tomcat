@@ -189,7 +189,7 @@ cglib.loc=${base-sf.loc}/cglib/cglib-nodep-${cglib.version}.jar
 objenesis.version=1.2
 objenesis.home=${base.path}/objenesis-${objenesis.version}
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
-objenesis.loc=https://bintray.com/easymock/distributions/download_file?file_path=objenesis-${objenesis.version}-bin.zip
+objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
 # ----- Checkstyle, version 6.16 or later -----
 checkstyle.version=6.17
