@@ -206,8 +206,7 @@ cobertura.loc=${base-sf.loc}/cobertura/cobertura-2.1.1-bin.tar.gz
 # ----- Findbugs -----
 findbugs.version=3.0.1
 findbugs.home=${base.path}/findbugs-${findbugs.version}
-findbugs.lib=${findbugs.home}/lib
-findbugs.jar=${findbugs.lib}/findbugs-ant.jar
+findbugs.jar=${findbugs.home}/lib/findbugs-ant.jar
 findbugs.loc=${base-sf.loc}/project/findbugs/findbugs/${findbugs.version}/findbugs-${findbugs.version}.tar.gz
 
 # ----- SAAJ API, used by Code Signing for releases -----
