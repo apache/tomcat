@@ -1557,12 +1557,12 @@
       </and>
     </condition>
     <condition property="cobertura.disabled" value="true">
-        <and>
-          <istrue value="${test.cobertura}"/>
-          <not>
-            <equals arg1="1" arg2="${test.threads}"/>
-          </not>
-        </and>
+      <and>
+        <istrue value="${test.cobertura}"/>
+        <not>
+          <equals arg1="1" arg2="${test.threads}"/>
+        </not>
+      </and>
     </condition>
   </target>
 
