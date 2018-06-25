@@ -108,9 +108,9 @@ public class TestSocketServer extends AbstractJniTest {
         while (Socket.recv(clientSocket, buf, 0, 1) == 1) {
         }
         long wait = System.nanoTime() - start;
-        Assert.assertFalse("Socket.timeoutSet failed (<1s) [" + wait + "]",
+        Assert.assertFalse("Socket.timeoutSet failed (<1s) [" + wait + "] +-[" + ERROR_MARGIN + "]",
                 wait < 1000000000 - ERROR_MARGIN);
-        Assert.assertFalse("Socket.timeoutSet failed (>2s) [" + wait + "]",
+        Assert.assertFalse("Socket.timeoutSet failed (>2s) [" + wait + "] +-[" + ERROR_MARGIN + "]",
                 wait > 2000000000 + ERROR_MARGIN);
 
         client.countDown();
@@ -137,8 +137,8 @@ public class TestSocketServer extends AbstractJniTest {
         while (Socket.recv(clientSocket, buf, 0, 1) == 1) {
         }
         long wait = System.nanoTime() - start;
-        Assert.assertFalse("non_blocking client Socket.APR_SO_NONBLOCK failed (>2ms)",
-                wait > 2000000 + ERROR_MARGIN);
+        Assert.assertFalse("non_blocking client Socket.APR_SO_NONBLOCK failed (>2ms) [" + wait +
+                "] +-[" + ERROR_MARGIN + "]", wait > 2000000 + ERROR_MARGIN);
 
         client.countDown();
         client.join();
@@ -162,8 +162,8 @@ public class TestSocketServer extends AbstractJniTest {
         while (Socket.recv(clientSocket, buf, 0, 1) == 1) {
         }
         long wait = System.nanoTime() - start;
-        Assert.assertFalse("non_blocking client Socket.APR_SO_NONBLOCK failed (>1ms)",
-                wait > 1000000 + ERROR_MARGIN);
+        Assert.assertFalse("non_blocking client Socket.APR_SO_NONBLOCK failed (>1ms) [" + wait +
+                "] +-[" + ERROR_MARGIN + "]", wait > 1000000 + ERROR_MARGIN);
 
         /* Configure for blocking */
         Socket.optSet(clientSocket, Socket.APR_SO_NONBLOCK, 0);
@@ -172,8 +172,8 @@ public class TestSocketServer extends AbstractJniTest {
         while (Socket.recv(clientSocket, buf, 0, 1) == 1) {
         }
         wait = System.nanoTime() - start;
-        Assert.assertFalse("non_blocking client Socket.APR_SO_NONBLOCK false failed",
-                wait < 1000000 - ERROR_MARGIN);
+        Assert.assertFalse("non_blocking client Socket.APR_SO_NONBLOCK false failed (<1ms) [" +
+                wait + "] +-[" + ERROR_MARGIN + "]", wait < 1000000 - ERROR_MARGIN);
 
         client.countDown();
         client.join();
@@ -195,8 +195,8 @@ public class TestSocketServer extends AbstractJniTest {
         }
         long wait = System.nanoTime() - start;
         Assert.assertTrue("Timeout failed", ok);
-        Assert.assertFalse("non_blocking accept Socket.APR_SO_NONBLOCK failed ([" + wait + "]>1ms)",
-                wait > 1000000 + ERROR_MARGIN);
+        Assert.assertFalse("non_blocking accept Socket.APR_SO_NONBLOCK failed (>1ms) [" + wait +
+                "] +-[" + ERROR_MARGIN + "]", wait > 1000000 + ERROR_MARGIN);
     }
 
 
