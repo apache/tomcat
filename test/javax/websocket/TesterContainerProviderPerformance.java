@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import org.apache.tomcat.unittest.TesterThreadedPerformance;
 
-public class TestContainerProviderPerformance {
+public class TesterContainerProviderPerformance {
 
     @Test
     public void testGetWebSocketContainer() throws Exception {
