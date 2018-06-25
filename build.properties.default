@@ -201,7 +201,6 @@ checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 cobertura.version=2.1.1
 cobertura.home=${base.path}/cobertura-${cobertura.version}
 cobertura.jar=${cobertura.home}/cobertura-${cobertura.version}.jar
-cobertura.lib=${cobertura.home}/lib
 cobertura.loc=${base-sf.loc}/cobertura/cobertura-2.1.1-bin.tar.gz
 
 # ----- Findbugs -----
