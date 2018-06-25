@@ -2694,10 +2694,10 @@ skip.installer property in build.properties" />
       <param name="destdir" value="${hamcrest.home}"/>
     </antcall>
 
-    <antcall target="downloadzip">
+    <antcall target="downloadfile">
       <param name="sourcefile" value="${easymock.loc}"/>
       <param name="destfile" value="${easymock.jar}"/>
-      <param name="destdir" value="${base.path}"/>
+      <param name="destdir" value="${easymock.home}"/>
     </antcall>
 
     <antcall target="downloadfile">
