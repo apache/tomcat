@@ -519,6 +519,15 @@
                  type="org.apache.catalina.Realm"/>
     </operation>
 
+    <operation   name="isLocked"
+          description="Determine if the specified user is locked"
+               impact="ACTION"
+           returnType="boolean">
+      <parameter name="username"
+                 description="User to test for being locked"
+                 type="java.lang.String"/>
+    </operation>
+
     <operation   name="unlock"
           description="Unlock the specified user"
                impact="ACTION"
