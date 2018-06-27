@@ -51,6 +51,21 @@
         Support building with Java 9+ while preserving the Java 7 compatibility
         at runtime (requires Ant 1.9.8 or later). (ebourg)
       </update>
+      <update>
+        Update WSDL4J library to version 1.6.3 (from 1.6.2). (kkolinko)
+      </update>
+      <update>
+        Update JUnit library to version 4.12 (from 4.11). (kkolinko)
+      </update>
+      <update>
+        Downgrade CGLib library used for testing with EasyMock to version
+        2.2.2 (from 2.2.3) as version 2.2.3 is not available from Maven Central.
+        (markt/kkolinko)
+      </update>
+      <add>
+        Implement checksum checks when downloading dependencies that are used
+        to build Tomcat. (kkolinko)
+      </add>
     </changelog>
   </subsection>
 </section>
