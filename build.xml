@@ -2970,7 +2970,7 @@ skip.installer property in build.properties" />
     <verifyChecksum
       enabled="${checksum.enabled}"
       algorithm="${checksum.algorithm}" value="${checksum.value}"
-      file="${temp.file}.tar.gz" name="${sourcefile.1}" />
+      file="${temp.file}.tar.gz" name="${sourcefile}" />
 
     <gunzip src="${temp.file}.tar.gz" dest="${temp.file}.tar"/>
     <untar src="${temp.file}.tar" dest="${base.path}"/>
