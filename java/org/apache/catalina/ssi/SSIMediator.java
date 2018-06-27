@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
 
 import org.apache.catalina.util.Strftime;
 import org.apache.catalina.util.URLEncoder;
@@ -52,6 +53,7 @@ public class SSIMediator {
     protected final long lastModifiedDate;
     protected Strftime strftime;
     protected final SSIConditionalState conditionalState = new SSIConditionalState();
+    protected  int lastMatchCount = 0;
 
 
     public SSIMediator(SSIExternalResolver ssiExternalResolver,
@@ -330,6 +332,26 @@ public class SSIMediator {
             setVariableValue("LAST_MODIFIED", null);
             ssiExternalResolver.setVariableValue(className + ".LAST_MODIFIED",
                     retVal);
+        }
+    }
+
+
+    protected void clearMatchGroups() {
+        for (int i = 1; i <= lastMatchCount; i++) {
+            setVariableValue(Integer.toString(i), "");
+        }
+        lastMatchCount = 0;
+    }
+
+
+    protected void populateMatchGroups(Matcher matcher) {
+        lastMatchCount = matcher.groupCount();
+        // $0 is not used
+        if (lastMatchCount == 0) {
+            return;
+        }
+        for (int i = 1; i <= lastMatchCount; i++) {
+            setVariableValue(Integer.toString(i), matcher.group(i));
         }
     }
 }

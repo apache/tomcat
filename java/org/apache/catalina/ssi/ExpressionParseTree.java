@@ -20,6 +20,7 @@ package org.apache.catalina.ssi;
 import java.text.ParseException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 /**
@@ -368,11 +369,14 @@ public class ExpressionParseTree {
                     val2.charAt(val2Len - 1) == '/') {
                 // Treat as a regular expression
                 String expr = val2.substring(1, val2Len - 1);
+                ssiMediator.clearMatchGroups();
                 try {
                     Pattern pattern = Pattern.compile(expr);
                     // Regular expressions will only ever be used with EqualNode
                     // so return zero for equal and non-zero for not equal
-                    if (pattern.matcher(val1).find()) {
+                    Matcher matcher = pattern.matcher(val1);
+                    if (matcher.find()) {
+                        ssiMediator.populateMatchGroups(matcher);
                         return 0;
                     } else {
                         return -1;

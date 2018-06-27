@@ -51,6 +51,10 @@
         Make the <code>isLocked()</code> method of the <code>LockOutRealm</code>
         public and expose the method via JMX. (markt)
       </add>
+      <add>
+        <bug>53387</bug>: Add support for regular expression capture groups to
+        the SSI servlet and filter. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
