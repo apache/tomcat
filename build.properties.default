@@ -123,6 +123,11 @@ wsdl4j-lib.loc=${base-maven.loc}/wsdl4j/wsdl4j/${wsdl4j-lib.version}/wsdl4j-${ws
 
 # ----- Eclipse JDT, version 4.7 or later -----#
 # See https://wiki.apache.org/tomcat/JDTCoreBatchCompiler before updating
+#
+# Checksum is from "SHA512 Checksums for 4.7.3a" link at
+# http://download.eclipse.org/eclipse/downloads/drops4/R-4.7.3a-201803300640/
+# http://download.eclipse.org/eclipse/downloads/drops4/R-4.7.3a-201803300640/checksum/eclipse-4.7.3a-SUMSSHA512
+#
 jdt.version=4.7.3a
 jdt.release=R-4.7.3a-201803300640
 jdt.checksum.enabled=true
