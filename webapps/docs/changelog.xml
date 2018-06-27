@@ -78,6 +78,11 @@
       <update>
         Update JUnit library to version 4.12 (from 4.11). (kkolinko)
       </update>
+      <update>
+        Downgrade CGLib library used for testing with EasyMock to version
+        2.2.2 (from 2.2.3) as version 2.2.3 is not available from Maven Central.
+        (markt)
+      </update>
       <add>
         Implement checksum checks when downloading dependencies that are used
         to build Tomcat. (kkolinko)
