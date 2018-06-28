@@ -55,6 +55,12 @@
         <bug>53387</bug>: Add support for regular expression capture groups to
         the SSI servlet and filter. (markt)
       </add>
+      <fix>
+        <bug>53411</bug>: Improve the handling of HTTP requests that do not
+        explicitly specify a host name when no default host is configured. Also
+        improve the tracking of changes to the default host as hosts are added
+        and removed while Tomcat is running. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

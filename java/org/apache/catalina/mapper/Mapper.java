@@ -692,12 +692,14 @@ public final class Mapper {
                     MappingData mappingData) throws IOException {
 
         if (host.isNull()) {
+            if (defaultHostName == null) {
+                return;
+            }
             host.getCharChunk().append(defaultHostName);
         }
         host.toChars();
         uri.toChars();
-        internalMap(host.getCharChunk(), uri.getCharChunk(), version,
-                mappingData);
+        internalMap(host.getCharChunk(), uri.getCharChunk(), version, mappingData);
     }
 
 

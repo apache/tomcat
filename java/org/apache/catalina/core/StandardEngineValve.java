@@ -19,13 +19,11 @@ package org.apache.catalina.core;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.Host;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
-import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Valve that implements the default basic behavior for the
@@ -42,15 +40,6 @@ final class StandardEngineValve extends ValveBase {
     public StandardEngineValve() {
         super(true);
     }
-
-
-    // ----------------------------------------------------- Instance Variables
-
-    /**
-     * The string manager for this package.
-     */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
 
 
     // --------------------------------------------------------- Public Methods
@@ -73,10 +62,8 @@ final class StandardEngineValve extends ValveBase {
         // Select the Host to be used for this Request
         Host host = request.getHost();
         if (host == null) {
-            response.sendError
-                (HttpServletResponse.SC_BAD_REQUEST,
-                 sm.getString("standardEngine.noHost",
-                              request.getServerName()));
+            // HTTP 0.9 or HTTP 1.0 request without a host when no default host
+            // is defined. This is handled by the CoyoteAdapter.
             return;
         }
         if (request.isAsyncSupported()) {
@@ -85,6 +72,5 @@ final class StandardEngineValve extends ValveBase {
 
         // Ask this Host to process this request
         host.getPipeline().getFirst().invoke(request, response);
-
     }
 }
