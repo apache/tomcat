@@ -90,6 +90,9 @@ base-maven.loc=https://repo.maven.apache.org/maven2
 # - logkit
 # - servletapi
 commons-logging.version=1.1.3
+commons-logging-src.checksum.enabled=true
+commons-logging-src.checksum.algorithm=MD5|SHA-1
+commons-logging-src.checksum.value=e8e197d628436490886d17cffa108fe3|95f0805de0be927c42f5f6eb14b643cb37e7caad
 commons-logging.home=${base.path}/commons-logging-${commons-logging.version}
 commons-logging-src.loc.1=${base-commons.loc.1}/logging/source/commons-logging-${commons-logging.version}-src.tar.gz
 commons-logging-src.loc.2=${base-commons.loc.2}/logging/source/commons-logging-${commons-logging.version}-src.tar.gz
@@ -97,36 +100,54 @@ commons-logging-src.tar.gz=${commons-logging.home}/commons-logging-${commons-log
 
 # ----- Avalon Framework (required by commons logging) -----
 avalon-framework.version=4.1.5
+avalon-framework.checksum.enabled=true
+avalon-framework.checksum.algorithm=MD5|SHA-1
+avalon-framework.checksum.value=71a0db38cac8809aeea73645064bae1a|3532aaf90b552ed1e1e1e29392b77b3b1980d8a8
 avalon-framework.home=${base.path}/avalon-framework-${avalon-framework.version}
 avalon-framework.loc=${base-maven.loc}/avalon-framework/avalon-framework/${avalon-framework.version}/avalon-framework-${avalon-framework.version}.jar
 avalon-framework.jar=${avalon-framework.home}/avalon-framework-${avalon-framework.version}.jar
 
 # ----- log4j (required by commons logging) -----
 log4j.version=1.2.17
+log4j.checksum.enabled=true
+log4j.checksum.algorithm=MD5|SHA-1
+log4j.checksum.value=04a41f0a068986f0f73485cf507c0f40|5af35056b4d257e4b64b9e8069c0746e8b08629f
 log4j.home=${base.path}/log4j-${log4j.version}
 log4j.loc=${base-maven.loc}/log4j/log4j/${log4j.version}/log4j-${log4j.version}.jar
 log4j.jar=${log4j.home}/log4j-${log4j.version}.jar
 
 # ----- logkit (required by commons logging) -----
 logkit.version=1.0.1
+logkit.checksum.enabled=true
+logkit.checksum.algorithm=MD5|SHA-1
+logkit.checksum.value=32240100a5c15d53f00392fae4b0aab7|aaf5649b523c5ffc925e746074979150bb74bfdc
 logkit.home=${base.path}/logkit-${logkit.version}
 logkit.loc=${base-maven.loc}/logkit/logkit/${logkit.version}/logkit-${logkit.version}.jar
 logkit.jar=${logkit.home}/logkit-${logkit.version}.jar
 
 # ----- servletapi (required by commons logging) -----
 servletapi.version=2.3
+servletapi.checksum.enabled=true
+servletapi.checksum.algorithm=MD5|SHA-1
+servletapi.checksum.value=c097f777c6fd453277c6891b3bb4dc09|0137a24e9f62973f01f16dd23fc1b5a9964fd9ef
 servletapi.home=${base.path}/servletapi-${servletapi.version}
 servletapi.loc=${base-maven.loc}/servletapi/servletapi/${servletapi.version}/servletapi-${servletapi.version}.jar
 servletapi.jar=${servletapi.home}/servletapi-${servletapi.version}.jar
 
 # ----- Webservices - JAX RPC -----
 jaxrpc-lib.version=1.1-rc4
+jaxrpc-lib.checksum.enabled=true
+jaxrpc-lib.checksum.algorithm=MD5|SHA-1
+jaxrpc-lib.checksum.value=4bebba22a4cdb9f68e16c45129770333|fe9371d33dc3e1646d4d13bde19614283eb998b1
 jaxrpc-lib.home=${base.path}/jaxrpc-${jaxrpc-lib.version}
 jaxrpc-lib.loc=${base-maven.loc}/geronimo-spec/geronimo-spec-jaxrpc/${jaxrpc-lib.version}/geronimo-spec-jaxrpc-${jaxrpc-lib.version}.jar
 jaxrpc-lib.jar=${jaxrpc-lib.home}/geronimo-spec-jaxrpc-${jaxrpc-lib.version}.jar
 
 # ----- Webservices - WSDL4J -----
 wsdl4j-lib.version=1.6.2
+wsdl4j-lib.checksum.enabled=true
+wsdl4j-lib.checksum.algorithm=MD5|SHA-1
+wsdl4j-lib.checksum.value=2608a8ea3f07b0c08de8a7d3d0d3fc09|dec1669fb6801b7328e01ad72fc9e10b69ea06c1
 wsdl4j-lib.home=${base.path}/wsdl4j-${wsdl4j-lib.version}
 wsdl4j-lib.loc=${base-maven.loc}/wsdl4j/wsdl4j/${wsdl4j-lib.version}/wsdl4j-${wsdl4j-lib.version}.jar
 wsdl4j-lib.jar=${wsdl4j-lib.home}/wsdl4j-${wsdl4j-lib.version}.jar
@@ -135,6 +156,9 @@ wsdl4j-lib.jar=${wsdl4j-lib.home}/wsdl4j-${wsdl4j-lib.version}.jar
 # See https://wiki.apache.org/tomcat/JDTCoreBatchCompiler before updating
 jdt.version=4.4.2
 jdt.release=R-4.4.2-201502041700
+jdt.checksum.enabled=true
+jdt.checksum.algorithm=SHA-512
+jdt.checksum.value=ba79ccc8cf3a3340f2181ebe04eb0606954ba393c1e0182b3adf4ebcda045c3ee7846958ee2266d19209c9ec74aa8db042a0b3bec9fce4f47c387562ff1e4f00
 jdt.home=${base.path}/ecj-${jdt.version}
 jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 # The download will be moved to the archive area eventually. We are taking care of that in advance.
@@ -143,6 +167,12 @@ jdt.loc.2=http://download.eclipse.org/eclipse/downloads/drops4/${jdt.release}/ec
 
 # ----- Tomcat native library -----
 tomcat-native.version=1.2.17
+tomcat-native.src.checksum.enabled=true
+tomcat-native.src.checksum.algorithm=SHA-512
+tomcat-native.src.checksum.value=8fa946855fd14525ec0abe7b09975bbd34d6127352e90730a8afb77e16cd91715417e812a40017fee65939a9ce95faf39a9193222f441cda0ad2eb7f690e77b9
+tomcat-native.win.checksum.enabled=true
+tomcat-native.win.checksum.algorithm=SHA-512
+tomcat-native.win.checksum.value=2955209b39707949b080f13c09edcad08a13faf5545f7890e2ac493ccbc66d09e152a39b4fa6ac40fe3de6b209b305608db3db8dcf24dda94567b417f55a5f49
 tomcat-native.home=${base.path}/tomcat-native-${tomcat-native.version}
 tomcat-native.tar.gz=${tomcat-native.home}/tomcat-native.tar.gz
 tomcat-native.loc.1=${base-tomcat.loc.1}/tomcat-connectors/native/${tomcat-native.version}/source/tomcat-native-${tomcat-native.version}-src.tar.gz
@@ -152,18 +182,27 @@ tomcat-native.win.2=${base-tomcat.loc.2}/tomcat-connectors/native/${tomcat-nativ
 
 # ----- Commons DBCP, version 1.1 or later -----
 commons-dbcp.version=1.4
+commons-dbcp-src.checksum.enabled=true
+commons-dbcp-src.checksum.algorithm=SHA-256
+commons-dbcp-src.checksum.value=f5f10846e79fc71121fe7402c61d71575506b01b59e719e974ebc4d99e6df283
 commons-dbcp.home=${base.path}/commons-dbcp-${commons-dbcp.version}-src
 commons-dbcp-src.loc.1=${base-commons.loc.1}/dbcp/source/commons-dbcp-${commons-dbcp.version}-src.tar.gz
 commons-dbcp-src.loc.2=${base-commons.loc.2}/dbcp/source/commons-dbcp-${commons-dbcp.version}-src.tar.gz
 
 # ----- Commons Pool, version 1.1 or later -----
 commons-pool.version=1.5.7
+commons-pool-src.checksum.enabled=true
+commons-pool-src.checksum.algorithm=MD5|SHA-1
+commons-pool-src.checksum.value=fcec4e996efda82ec8643dd2aeb63c7c|58a3f48601b70f7a7db1da47907d53b43949d0a4
 commons-pool.home=${base.path}/commons-pool-${commons-pool.version}-src
 commons-pool-src.loc.1=${base-commons.loc.1}/pool/source/commons-pool-${commons-pool.version}-src.tar.gz
 commons-pool-src.loc.2=${base-commons.loc.2}/pool/source/commons-pool-${commons-pool.version}-src.tar.gz
 
 # ----- NSIS, version 3.0 or later -----
 nsis.version=3.03
+nsis.checksum.enabled=true
+nsis.checksum.algorithm=MD5|SHA-1
+nsis.checksum.value=d4919dc089ec256a7264e97ada299b64|ea69aa8d538916c9e8630dfd0106b063f7bb5d46
 nsis.home=${base.path}/nsis-${nsis.version}
 nsis.exe=${nsis.home}/makensis.exe
 nsis.arch.dir=x86-unicode/
@@ -176,6 +215,20 @@ nsis.loc=${base-sf.loc}/nsis/nsis-${nsis.version}.zip
 
 # ----- Commons Daemon, version 1.1.0 or later -----
 commons-daemon.version=1.1.0
+
+# checksum for commons-daemon-1.1.0-bin.tar.gz
+commons-daemon.bin.checksum.enabled=true
+commons-daemon.bin.checksum.algorithm=SHA-512
+commons-daemon.bin.checksum.value=43c33e52e0be11e73370083500592ee9df0431c3166dbc7ed95794cabb462ac2a140e3eb4bbe2a0b99882bb93d9244ff534f13e4933c13e7a31a37e58e0c8e1d
+
+# checksums for commons-daemon-1.1.0-native-src.tar.gz, commons-daemon-1.1.0-bin-windows.zip
+commons-daemon.native.src.checksum.enabled=true
+commons-daemon.native.src.checksum.algorithm=SHA-512
+commons-daemon.native.src.checksum.value=3443f1c95a4b267c4387a9ac7c79315422a51e896c0bcea48fbe959bc301094770aa8065b2388a84760a3e07e5d1753c2b351336fb2d3a8c996ee14d32088f6e
+commons-daemon.native.win.checksum.enabled=true
+commons-daemon.native.win.checksum.algorithm=SHA-512
+commons-daemon.native.win.checksum.value=10cda04d9a44286cb67107fdb9d20958013f075cad4accba048801f3677765c334dc16f6901e1d2e4a9df5a2c702797370de63393568df6fceb9e7902421f9ea
+
 commons-daemon.home=${base.path}/commons-daemon-${commons-daemon.version}
 commons-daemon.jar=${commons-daemon.home}/commons-daemon-${commons-daemon.version}.jar
 commons-daemon.native.win.home=${commons-daemon.home}/windows
@@ -191,30 +244,45 @@ commons-daemon.native.win.loc.2=${base-commons.loc.2}/daemon/binaries/windows/co
 
 # ----- JUnit Unit Test Suite, version 4.11 or later -----
 junit.version=4.11
+junit.checksum.enabled=true
+junit.checksum.algorithm=MD5|SHA-1
+junit.checksum.value=3c42be5ea7cbf3635716abbb429cb90d|4e031bb61df09069aeb2bffb4019e7a5034a4ee0
 junit.home=${base.path}/junit-${junit.version}
 junit.jar=${junit.home}/junit-${junit.version}.jar
 junit.loc=${base-maven.loc}/junit/junit/${junit.version}/junit-${junit.version}.jar
 
 # ----- Hamcrest Library, used by JUnit, version 1.3 or later ----
 hamcrest.version=1.3
+hamcrest.checksum.enabled=true
+hamcrest.checksum.algorithm=MD5|SHA-1
+hamcrest.checksum.value=6393363b47ddcbba82321110c3e07519|42a25dc3219429f0e5d060061f71acb49bf010a0
 hamcrest.home=${base.path}/hamcrest-${hamcrest.version}
 hamcrest.jar=${hamcrest.home}/hamcrest-core-${hamcrest.version}.jar
 hamcrest.loc=${base-maven.loc}/org/hamcrest/hamcrest-core/${hamcrest.version}/hamcrest-core-${hamcrest.version}.jar
 
 # ----- EasyMock, version 3.2 or later -----
 easymock.version=3.2
+easymock.checksum.enabled=true
+easymock.checksum.algorithm=MD5|SHA-1
+easymock.checksum.value=2d914151580d6749ba0921be7eda705a|9794114433b4788b5d6498164311ecb3a25ff262
 easymock.home=${base.path}/easymock-${easymock.version}
 easymock.loc=${base-sf.loc}/easymock/easymock-${easymock.version}.zip
 easymock.jar=${easymock.home}/easymock-${easymock.version}.jar
 
 # ----- cglib, used by EasyMock, version 2.2 or later -----
 cglib.version=2.2.3
+cglib.checksum.enabled=true
+cglib.checksum.algorithm=MD5|SHA-1
+cglib.checksum.value=694815351007f966c14ea093ec838323|6a4af5d9112066a5baf235fd55d5876969bc813c
 cglib.home=${base.path}/cglib-${cglib.version}
 cglib.loc=${base-sf.loc}/cglib/cglib-nodep-${cglib.version}.jar
 cglib.jar=${cglib.home}/cglib-nodep-${cglib.version}.jar
 
 # ----- objenesis, used by EasyMock, version 1.2 or later -----
 objenesis.version=1.2
+objenesis.checksum.enabled=true
+objenesis.checksum.algorithm=SHA-1
+objenesis.checksum.value=2359e04aca6f4f171f92ff77489d1669043dd536
 objenesis.home=${base.path}/objenesis-${objenesis.version}
 objenesis.loc=https://bintray.com/easymock/distributions/download_file?file_path=objenesis-${objenesis.version}-bin.zip
 objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
@@ -222,6 +290,9 @@ objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 # ----- Checkstyle, version 6.0 or later -----
 # Limited to 6.1.1 since that is the latest release that supports Java 6
 checkstyle.version=6.1.1
+checkstyle.checksum.enabled=true
+checkstyle.checksum.algorithm=MD5|SHA-1
+checkstyle.checksum.value=bfbbd909c0b9c6724434421a202e0912|aeb92ff49b80c958fd29f5e8f349f8b5fd4342bd
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.loc=${base-sf.loc}/checkstyle/checkstyle/${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
@@ -238,6 +309,9 @@ dojo-js.jar=${dojo-js.home}/dojo/dojo.js
 
 # ----- Cobertura code coverage tool -----
 cobertura.version=2.0.3
+cobertura.checksum.enabled=true
+cobertura.checksum.algorithm=MD5|SHA-1
+cobertura.checksum.value=63a8c5b3f5c1226fcc52cc9c9ea2a812|705d23e5a8815aff3bc4adafd7f3001b578b5acf
 cobertura.home=${base.path}/cobertura-${cobertura.version}
 cobertura.jar=${cobertura.home}/cobertura-${cobertura.version}.jar
 cobertura.lib=${cobertura.home}/lib

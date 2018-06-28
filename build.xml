@@ -1565,30 +1565,45 @@
       <param name="sourcefile.2" value="${commons-logging-src.loc.2}"/>
       <param name="destfile" value="${commons-logging-src.tar.gz}"/>
       <param name="destdir" value="${commons-logging.home}"/>
+      <param name="checksum.enabled" value="${commons-logging-src.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${commons-logging-src.checksum.algorithm}"/>
+      <param name="checksum.value" value="${commons-logging-src.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${avalon-framework.loc}"/>
       <param name="destfile" value="${avalon-framework.jar}"/>
       <param name="destdir" value="${avalon-framework.home}"/>
+      <param name="checksum.enabled" value="${avalon-framework.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${avalon-framework.checksum.algorithm}"/>
+      <param name="checksum.value" value="${avalon-framework.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${log4j.loc}"/>
       <param name="destfile" value="${log4j.jar}"/>
       <param name="destdir" value="${log4j.home}"/>
+      <param name="checksum.enabled" value="${log4j.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${log4j.checksum.algorithm}"/>
+      <param name="checksum.value" value="${log4j.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${logkit.loc}"/>
       <param name="destfile" value="${logkit.jar}"/>
       <param name="destdir" value="${logkit.home}"/>
+      <param name="checksum.enabled" value="${logkit.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${logkit.checksum.algorithm}"/>
+      <param name="checksum.value" value="${logkit.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${servletapi.loc}"/>
       <param name="destfile" value="${servletapi.jar}"/>
       <param name="destdir" value="${servletapi.home}"/>
+      <param name="checksum.enabled" value="${servletapi.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${servletapi.checksum.algorithm}"/>
+      <param name="checksum.value" value="${servletapi.checksum.value}"/>
     </antcall>
 
   </target>
@@ -1705,12 +1720,18 @@
       <param name="sourcefile" value="${jaxrpc-lib.loc}"/>
       <param name="destfile" value="${jaxrpc-lib.jar}"/>
       <param name="destdir" value="${jaxrpc-lib.home}"/>
+      <param name="checksum.enabled" value="${jaxrpc-lib.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${jaxrpc-lib.checksum.algorithm}"/>
+      <param name="checksum.value" value="${jaxrpc-lib.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${wsdl4j-lib.loc}"/>
       <param name="destfile" value="${wsdl4j-lib.jar}"/>
       <param name="destdir" value="${wsdl4j-lib.home}"/>
+      <param name="checksum.enabled" value="${wsdl4j-lib.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${wsdl4j-lib.checksum.algorithm}"/>
+      <param name="checksum.value" value="${wsdl4j-lib.checksum.value}"/>
     </antcall>
 
     <copy file="${jaxrpc-lib.jar}"
@@ -2608,6 +2629,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="sourcefile" value="${checkstyle.loc}"/>
       <param name="destfile" value="${checkstyle.jar}"/>
       <param name="destdir" value="${base.path}"/>
+      <param name="checksum.enabled" value="${checkstyle.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${checkstyle.checksum.algorithm}"/>
+      <param name="checksum.value" value="${checkstyle.checksum.value}"/>
     </antcall>
 
   </target>
@@ -2620,6 +2644,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="sourcefile.1" value="${commons-daemon.bin.loc.1}"/>
       <param name="sourcefile.2" value="${commons-daemon.bin.loc.2}"/>
       <param name="destfile" value="${commons-daemon.jar}"/>
+      <param name="checksum.enabled" value="${commons-daemon.bin.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${commons-daemon.bin.checksum.algorithm}"/>
+      <param name="checksum.value" value="${commons-daemon.bin.checksum.value}"/>
     </antcall>
 
     <!-- Download src and build Tomcat DBCP bundle -->
@@ -2627,11 +2654,17 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="sourcefile.1" value="${commons-pool-src.loc.1}"/>
       <param name="sourcefile.2" value="${commons-pool-src.loc.2}"/>
       <param name="destfile" value="${commons-pool.home}/build.xml" />
+      <param name="checksum.enabled" value="${commons-pool-src.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${commons-pool-src.checksum.algorithm}"/>
+      <param name="checksum.value" value="${commons-pool-src.checksum.value}"/>
     </antcall>
     <antcall target="downloadgz-2">
       <param name="sourcefile.1" value="${commons-dbcp-src.loc.1}"/>
       <param name="sourcefile.2" value="${commons-dbcp-src.loc.2}"/>
       <param name="destfile" value="${commons-dbcp.home}/build.xml" />
+      <param name="checksum.enabled" value="${commons-dbcp-src.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${commons-dbcp-src.checksum.algorithm}"/>
+      <param name="checksum.value" value="${commons-dbcp-src.checksum.value}"/>
     </antcall>
     <mkdir dir="${tomcat-dbcp.home}"/>
     <!-- Rebuild dbcp only if built jars do not exist -->
@@ -2652,6 +2685,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="sourcefile.2" value="${jdt.loc.2}"/>
       <param name="destfile" value="${jdt.jar}"/>
       <param name="destdir" value="${jdt.home}"/>
+      <param name="checksum.enabled" value="${jdt.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${jdt.checksum.algorithm}"/>
+      <param name="checksum.value" value="${jdt.checksum.value}"/>
     </antcall>
   </target>
 
@@ -2662,30 +2698,45 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="sourcefile" value="${junit.loc}"/>
       <param name="destfile" value="${junit.jar}"/>
       <param name="destdir" value="${junit.home}"/>
+      <param name="checksum.enabled" value="${junit.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${junit.checksum.algorithm}"/>
+      <param name="checksum.value" value="${junit.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${hamcrest.loc}"/>
       <param name="destfile" value="${hamcrest.jar}"/>
       <param name="destdir" value="${hamcrest.home}"/>
+      <param name="checksum.enabled" value="${hamcrest.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${hamcrest.checksum.algorithm}"/>
+      <param name="checksum.value" value="${hamcrest.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadzip">
       <param name="sourcefile" value="${easymock.loc}"/>
       <param name="destfile" value="${easymock.jar}"/>
       <param name="destdir" value="${base.path}"/>
+      <param name="checksum.enabled" value="${easymock.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${easymock.checksum.algorithm}"/>
+      <param name="checksum.value" value="${easymock.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadfile">
       <param name="sourcefile" value="${cglib.loc}"/>
       <param name="destfile" value="${cglib.jar}"/>
       <param name="destdir" value="${cglib.home}"/>
+      <param name="checksum.enabled" value="${cglib.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${cglib.checksum.algorithm}"/>
+      <param name="checksum.value" value="${cglib.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadzip">
       <param name="sourcefile" value="${objenesis.loc}"/>
       <param name="destfile" value="${objenesis.jar}"/>
       <param name="destdir" value="${base.path}"/>
+      <param name="checksum.enabled" value="${objenesis.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${objenesis.checksum.algorithm}"/>
+      <param name="checksum.value" value="${objenesis.checksum.value}"/>
     </antcall>
 
   </target>
@@ -2697,6 +2748,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <antcall target="downloadgz">
       <param name="sourcefile" value="${cobertura.loc}"/>
       <param name="destfile" value="${cobertura.jar}"/>
+      <param name="checksum.enabled" value="${cobertura.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${cobertura.checksum.algorithm}"/>
+      <param name="checksum.value" value="${cobertura.checksum.value}"/>
     </antcall>
 
   </target>
@@ -2709,6 +2763,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="sourcefile.2" value="${tomcat-native.loc.2}"/>
       <param name="destfile" value="${tomcat-native.tar.gz}"/>
       <param name="destdir" value="${tomcat-native.home}"/>
+      <param name="checksum.enabled" value="${tomcat-native.src.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${tomcat-native.src.checksum.algorithm}"/>
+      <param name="checksum.value" value="${tomcat-native.src.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadzip-2">
@@ -2716,6 +2773,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="sourcefile.2" value="${tomcat-native.win.2}"/>
       <param name="destfile" value="${tomcat-native.home}/LICENSE"/>
       <param name="destdir" value="${tomcat-native.home}"/>
+      <param name="checksum.enabled" value="${tomcat-native.win.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${tomcat-native.win.checksum.algorithm}"/>
+      <param name="checksum.value" value="${tomcat-native.win.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadfile-2">
@@ -2723,6 +2783,9 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="sourcefile.2" value="${commons-daemon.native.src.loc.2}"/>
       <param name="destfile" value="${commons-daemon.native.src.tgz}"/>
       <param name="destdir" value="${commons-daemon.home}"/>
+      <param name="checksum.enabled" value="${commons-daemon.native.src.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${commons-daemon.native.src.checksum.algorithm}"/>
+      <param name="checksum.value" value="${commons-daemon.native.src.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadzip-2">
@@ -2730,12 +2793,18 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="sourcefile.2" value="${commons-daemon.native.win.loc.2}"/>
       <param name="destfile" value="${commons-daemon.native.win.mgr.exe}"/>
       <param name="destdir" value="${commons-daemon.native.win.home}"/>
+      <param name="checksum.enabled" value="${commons-daemon.native.win.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${commons-daemon.native.win.checksum.algorithm}"/>
+      <param name="checksum.value" value="${commons-daemon.native.win.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadzip">
       <param name="sourcefile" value="${nsis.loc}"/>
       <param name="destfile" value="${nsis.exe}"/>
       <param name="destdir" value="${nsis.home}/.."/>
+      <param name="checksum.enabled" value="${nsis.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${nsis.checksum.algorithm}"/>
+      <param name="checksum.value" value="${nsis.checksum.value}"/>
     </antcall>
 
   </target>
@@ -2811,12 +2880,108 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <available file="${destfile}" property="exist"/>
   </target>
 
+  <macrodef name="verifyChecksum">
+    <attribute name="file" />
+    <attribute name="name" default="@{file}"/>
+    <attribute name="enabled" />
+    <attribute name="algorithm" />
+    <attribute name="value" />
+    <sequential>
+      <local name="name" />
+      <basename property="name" file="@{name}" />
+
+      <local name="value.md5" />
+      <local name="value.sha1" />
+      <local name="value.sha256" />
+      <local name="value.sha512" />
+      <local name="check.success" />
+      <local name="check.message" />
+      <fail message="Unknown algorithm: @{algorithm}">
+        <condition>
+          <and>
+            <equals arg1="@{enabled}" arg2="true" />
+            <not>
+              <or>
+                <equals arg1="@{algorithm}" arg2="MD5" />
+                <equals arg1="@{algorithm}" arg2="MD5|SHA-1" />
+                <equals arg1="@{algorithm}" arg2="SHA-1" />
+                <equals arg1="@{algorithm}" arg2="SHA-256" />
+                <equals arg1="@{algorithm}" arg2="SHA-512" />
+              </or>
+            </not>
+          </and>
+        </condition>
+      </fail>
+
+      <!-- Compute checksums -->
+      <checksum file="@{file}" property="value.md5" algorithm="MD5" />
+      <checksum file="@{file}" property="value.sha1" algorithm="SHA-1" />
+      <checksum file="@{file}" property="value.sha256" algorithm="SHA-256" />
+      <checksum file="@{file}" property="value.sha512" algorithm="SHA-512" />
+
+      <!-- Check actual checksum value -->
+      <condition property="check.success">
+        <or>
+          <not>
+            <equals arg1="@{enabled}" arg2="true" />
+          </not>
+          <and>
+            <equals arg1="@{algorithm}" arg2="MD5" />
+            <equals arg1="@{value}" arg2="${value.md5}" />
+          </and>
+          <and>
+            <equals arg1="@{algorithm}" arg2="SHA-1" />
+            <equals arg1="@{value}" arg2="${value.sha1}" />
+          </and>
+          <and>
+            <equals arg1="@{algorithm}" arg2="MD5|SHA-1" />
+            <equals arg1="@{value}" arg2="${value.md5}|${value.sha1}" />
+          </and>
+          <and>
+            <equals arg1="@{algorithm}" arg2="SHA-256" />
+            <equals arg1="@{value}" arg2="${value.sha256}" />
+          </and>
+          <and>
+            <equals arg1="@{algorithm}" arg2="SHA-512" />
+            <equals arg1="@{value}" arg2="${value.sha512}" />
+          </and>
+        </or>
+      </condition>
+      <fail unless="check.success">
+  Checksum check failure for ${name} (@{file}).
+  Algorithm: @{algorithm}
+  Expected value: @{value}
+  Actual values:
+  SHA-512: ${value.sha512}
+  SHA-256: ${value.sha256}
+  SHA-1: ${value.sha1}
+  MD5: ${value.md5}
+      </fail>
+
+      <condition property="check.message" value="WARNING: Checksum verification is disabled for ${name}">
+        <not>
+          <equals arg1="@{enabled}" arg2="true" />
+        </not>
+      </condition>
+      <condition property="check.message" value="Checksum check for ${name}, algorithm @{algorithm}: OK">
+        <equals arg1="@{enabled}" arg2="true" />
+      </condition>
+
+      <echo level="info" message="${check.message}" />
+    </sequential>
+  </macrodef>
+
   <target name="downloadgz" unless="exist" depends="setproxy,testexist">
     <!-- Download and extract the package -->
     <local name="temp.file"/>
     <mkdir dir="${base.path}"/>
     <tempfile property="temp.file" destdir="${base.path}" prefix="download-"/>
     <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${temp.file}.tar.gz" />
+    <verifyChecksum
+      enabled="${checksum.enabled}"
+      algorithm="${checksum.algorithm}" value="${checksum.value}"
+      file="${temp.file}.tar.gz" name="${sourcefile}" />
+
     <gunzip src="${temp.file}.tar.gz" dest="${temp.file}.tar"/>
     <untar src="${temp.file}.tar" dest="${base.path}"/>
     <delete file="${temp.file}.tar"/>
@@ -2836,6 +3001,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="sourcefile" value="${sourcefile.2}" />
       <param name="destfile" value="${temp.file}.tar.gz" />
     </antcall>
+
+    <verifyChecksum
+      enabled="${checksum.enabled}"
+      algorithm="${checksum.algorithm}" value="${checksum.value}"
+      file="${temp.file}.tar.gz" name="${sourcefile.1}" />
+
     <gunzip src="${temp.file}.tar.gz" dest="${temp.file}.tar"/>
     <untar src="${temp.file}.tar" dest="${base.path}"/>
     <delete file="${temp.file}.tar"/>
@@ -2848,6 +3019,11 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <mkdir dir="${base.path}"/>
     <tempfile property="temp.file" destdir="${base.path}" prefix="download-" suffix=".zip"/>
     <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${temp.file}"/>
+    <verifyChecksum
+      enabled="${checksum.enabled}"
+      algorithm="${checksum.algorithm}" value="${checksum.value}"
+      file="${temp.file}" name="${sourcefile}" />
+
     <mkdir dir="${destdir}"/>
     <unzip src="${temp.file}" dest="${destdir}"/>
     <delete file="${temp.file}"/>
@@ -2866,6 +3042,12 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <param name="sourcefile" value="${sourcefile.2}" />
       <param name="destfile" value="${temp.file}" />
     </antcall>
+
+    <verifyChecksum
+      enabled="${checksum.enabled}"
+      algorithm="${checksum.algorithm}" value="${checksum.value}"
+      file="${temp.file}" name="${sourcefile.1}" />
+
     <mkdir dir="${destdir}" />
     <unzip src="${temp.file}" dest="${destdir}"/>
     <delete file="${temp.file}"/>
@@ -2877,6 +3059,11 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <mkdir dir="${base.path}"/>
     <tempfile property="temp.file" destdir="${base.path}" prefix="download-" suffix=".tmp"/>
     <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${temp.file}"/>
+    <verifyChecksum
+      enabled="${checksum.enabled}"
+      algorithm="${checksum.algorithm}" value="${checksum.value}"
+      file="${temp.file}" name="${destfile}" />
+
     <mkdir dir="${destdir}"/>
     <move file="${temp.file}" tofile="${destfile}"/>
   </target>
@@ -2899,6 +3086,11 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
 
     <available file="${temp.file}" property="exist"/>
     <fail unless="exist" message="Failed to download [${destfile}]. All download sources are unavailable." />
+
+    <verifyChecksum
+      enabled="${checksum.enabled}"
+      algorithm="${checksum.algorithm}" value="${checksum.value}"
+      file="${temp.file}" name="${destfile}" />
 
     <mkdir dir="${destdir}"/>
     <move file="${temp.file}" tofile="${destfile}"/>
