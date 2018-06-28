@@ -266,7 +266,7 @@ public class MapperListener extends LifecycleMBeanBase
 
         boolean found = false;
 
-        if (defaultHost != null && defaultHost.length() >0) {
+        if (defaultHost != null && defaultHost.length() > 0) {
             Container[] containers = engine.findChildren();
 
             for (Container container : containers) {
@@ -286,11 +286,10 @@ public class MapperListener extends LifecycleMBeanBase
             }
         }
 
-        if(found) {
+        if (found) {
             mapper.setDefaultHostName(defaultHost);
         } else {
-            log.warn(sm.getString("mapperListener.unknownDefaultHost",
-                    defaultHost, service));
+            log.error(sm.getString("mapperListener.unknownDefaultHost", defaultHost, service));
         }
     }
 
@@ -308,6 +307,10 @@ public class MapperListener extends LifecycleMBeanBase
                 registerContext((Context) container);
             }
         }
+
+        // Default host may have changed
+        findDefaultHost();
+
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.registerHost",
                     host.getName(), domain, service));
@@ -323,6 +326,9 @@ public class MapperListener extends LifecycleMBeanBase
         String hostname = host.getName();
 
         mapper.removeHost(hostname);
+
+        // Default host may have changed
+        findDefaultHost();
 
         if(log.isDebugEnabled()) {
             log.debug(sm.getString("mapperListener.unregisterHost", hostname,
