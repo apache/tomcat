@@ -64,6 +64,10 @@
         reduce the use of ThreadLocals and to increase the use of caching.
         (markt)
       </scode>
+      <fix>
+        <bug>56676</bug>: Add a default location for the native library, as
+        bin/native, which the testsuite already uses. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
