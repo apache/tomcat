@@ -870,6 +870,16 @@
         value is set to false. Default value is <code>-1</code> (unlimited).</p>
       </attribute>
 
+      <attribute name="useInheritedChannel" required="false">
+        <p>(bool)Defines if this connector should inherit an inetd/systemd network socket.
+        Only one connector can inherit a network socket. This can option can be
+        used to automatcially start Tomcat once a connection request is made to
+        the systemd super daemon's port.
+        The default value is <code>false</code>. See the JavaDoc
+        for the <code>java.nio.channels.spi.SelectorProvider</code> class for
+        more details.</p>
+      </attribute>
+
       <attribute name="command-line-options" required="false">
         <p>The following command line options are available for the NIO
         connector:<br/>

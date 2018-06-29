@@ -74,6 +74,11 @@
         <bug>56676</bug>: Add a default location for the native library, as
         ${catalina.home}/bin, which the testsuite already uses. (remm)
       </fix>
+      <update>
+        <bug>60560</bug>: Add support for using an inherited channel to
+        the NIO connector. Based on a patch submitted by Thomas Meyer with
+        testing and suggestions by Coty Sutherland. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
