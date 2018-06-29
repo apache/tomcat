@@ -572,13 +572,13 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     AbstractHttp11Protocol<?> http11Protoocol = (AbstractHttp11Protocol<?>) protocol;
                     if (tlsHostName == null || tlsHostName.length() == 0) {
                         found = true;
-                        http11Protoocol.reloadSsslHostConfigs();
+                        http11Protoocol.reloadSslHostConfigs();
                     } else {
                         SSLHostConfig[] sslHostConfigs = http11Protoocol.findSslHostConfigs();
                         for (SSLHostConfig sslHostConfig : sslHostConfigs) {
                             if (sslHostConfig.getHostName().equalsIgnoreCase(tlsHostName)) {
                                 found = true;
-                                http11Protoocol.reloadSsslHostConfig(tlsHostName);
+                                http11Protoocol.reloadSslHostConfig(tlsHostName);
                             }
                         }
                     }

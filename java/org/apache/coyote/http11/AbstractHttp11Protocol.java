@@ -549,12 +549,12 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
 
-    public void reloadSsslHostConfigs() {
+    public void reloadSslHostConfigs() {
         getEndpoint().reloadSslHostConfigs();
     }
 
 
-    public void reloadSsslHostConfig(String hostName) {
+    public void reloadSslHostConfig(String hostName) {
         getEndpoint().reloadSslHostConfig(hostName);
     }
 
