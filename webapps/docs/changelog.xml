@@ -45,6 +45,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 8.5.33 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        <bug>60560</bug>: Add support for using an inherited channel to
+        the NIO connector. Based on a patch submitted by Thomas Meyer with
+        testing and suggestions by Coty Sutherland. (remm)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>

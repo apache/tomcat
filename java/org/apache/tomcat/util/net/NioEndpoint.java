@@ -26,6 +26,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CancelledKeyException;
+import java.nio.channels.Channel;
 import java.nio.channels.FileChannel;
 import java.nio.channels.NetworkChannel;
 import java.nio.channels.SelectionKey;
@@ -125,6 +126,13 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
 
     /**
+     * Use System.inheritableChannel to obtain channel from stdin/stdout.
+     */
+    private boolean useInheritedChannel = false;
+    public void setUseInheritedChannel(boolean useInheritedChannel) { this.useInheritedChannel = useInheritedChannel; }
+    public boolean getUseInheritedChannel() { return useInheritedChannel; }
+
+    /**
      * Priority of the poller threads.
      */
     private int pollerThreadPriority = Thread.NORM_PRIORITY;
@@ -204,10 +212,21 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     @Override
     public void bind() throws Exception {
 
-        serverSock = ServerSocketChannel.open();
-        socketProperties.setProperties(serverSock.socket());
-        InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
-        serverSock.socket().bind(addr,getAcceptCount());
+        if (!getUseInheritedChannel()) {
+            serverSock = ServerSocketChannel.open();
+            socketProperties.setProperties(serverSock.socket());
+            InetSocketAddress addr = (getAddress()!=null?new InetSocketAddress(getAddress(),getPort()):new InetSocketAddress(getPort()));
+            serverSock.socket().bind(addr,getAcceptCount());
+        } else {
+            // Retrieve the channel provided by the OS
+            Channel ic = System.inheritedChannel();
+            if (ic instanceof ServerSocketChannel) {
+                serverSock = (ServerSocketChannel) ic;
+            }
+            if (serverSock == null) {
+                throw new IllegalArgumentException(sm.getString("endpoint.init.bind.inherited"));
+            }
+        }
         serverSock.configureBlocking(true); //mimic APR behavior
 
         // Initialize thread count defaults for acceptor, poller
@@ -309,9 +328,11 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         if (running) {
             stop();
         }
-        // Close server socket
-        serverSock.socket().close();
-        serverSock.close();
+        if (!getUseInheritedChannel()) {
+            // Close server socket
+            serverSock.socket().close();
+            serverSock.close();
+        }
         serverSock = null;
         destroySsl();
         super.unbind();
