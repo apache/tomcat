@@ -81,14 +81,7 @@ public class ConfigFileLoader {
         }
 
         // File didn't work so try URI.
-        // Using resolve() enables the code to handle relative paths that did
-        // not point to a file
-        URI uri;
-        if (CATALINA_BASE_URI != null) {
-            uri = CATALINA_BASE_URI.resolve(location);
-        } else {
-            uri = URI.create(location);
-        }
+        URI uri = getURI(location);
 
         // Obtain the input stream we need
         try {
@@ -97,5 +90,18 @@ public class ConfigFileLoader {
         } catch (IllegalArgumentException e) {
             throw new IOException(sm.getString("configFileLoader.cannotObtainURL", location), e);
         }
+    }
+
+
+    public static URI getURI(String location) {
+        // Using resolve() enables the code to handle relative paths that did
+        // not point to a file
+        URI uri;
+        if (CATALINA_BASE_URI != null) {
+            uri = CATALINA_BASE_URI.resolve(location);
+        } else {
+            uri = URI.create(location);
+        }
+        return uri;
     }
 }

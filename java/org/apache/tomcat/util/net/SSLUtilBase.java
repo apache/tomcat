@@ -19,9 +19,12 @@ package org.apache.tomcat.util.net;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.security.DomainLoadStoreParameter;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -126,17 +129,22 @@ public abstract class SSLUtilBase implements SSLUtil {
             } else {
                 ks = KeyStore.getInstance(type, provider);
             }
-            if(!("PKCS11".equalsIgnoreCase(type) ||
-                    "".equalsIgnoreCase(path)) ||
-                    "NONE".equalsIgnoreCase(path)) {
-                istream = ConfigFileLoader.getInputStream(path);
-            }
+            if ("DKS".equalsIgnoreCase(type)) {
+                URI uri = ConfigFileLoader.getURI(path);
+                ks.load(new DomainLoadStoreParameter(uri, Collections.emptyMap()));
+            } else {
+                if(!("PKCS11".equalsIgnoreCase(type) ||
+                        "".equalsIgnoreCase(path)) ||
+                        "NONE".equalsIgnoreCase(path)) {
+                    istream = ConfigFileLoader.getInputStream(path);
+                }
 
-            char[] storePass = null;
-            if (pass != null && !"".equals(pass)) {
-                storePass = pass.toCharArray();
+                char[] storePass = null;
+                if (pass != null && !"".equals(pass)) {
+                    storePass = pass.toCharArray();
+                }
+                ks.load(istream, storePass);
             }
-            ks.load(istream, storePass);
         } catch (FileNotFoundException fnfe) {
             throw fnfe;
         } catch (IOException ioe) {
