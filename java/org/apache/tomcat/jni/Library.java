@@ -36,9 +36,8 @@ public final class Library {
         boolean loaded = false;
         StringBuilder err = new StringBuilder();
         File binLib = new File(System.getProperty("catalina.home"), "bin");
-        File nativeLib = new File(binLib, "native");
         for (int i = 0; i < NAMES.length; i++) {
-            File library = new File(nativeLib, System.mapLibraryName(NAMES[i]));
+            File library = new File(binLib, System.mapLibraryName(NAMES[i]));
             try {
                 System.load(library.getPath());
                 loaded = true;

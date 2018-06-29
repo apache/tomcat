@@ -79,7 +79,7 @@
   <property name="test.temp"             value="${tomcat.output}/test-tmp"/>
   <property name="test.basedir"          value="${tomcat.build}"/>
   <property name="test.reports"          value="${test.basedir}/logs"/>
-  <property name="test.apr.loc"          value="${test.basedir}/bin/native"/>
+  <property name="test.apr.loc"          value="${test.basedir}/bin"/>
   <!-- base directory for jdbc-pool -->
   <property name="tomcat.jdbc.dir"       value="${basedir}/modules/jdbc-pool"/>
   <!-- build output directory for jdbc-pool -->
