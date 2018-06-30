@@ -915,6 +915,18 @@ Connector[HTTP/1.1-8443]-_default_
 
 </subsection>
 
+<subsection name="Reload TLS configuration">
+
+<source>http://localhost:8080/manager/text/sslReload?tlsHostName=name</source>
+
+<p>Reload the TLS configuration files (the certificate and key files, this does
+not trigger a re-parsing of server.xml). To reload the files for all hosts don't
+specify the <code>tlsHostName</code> parameter.</p>
+
+<source><![CDATA[OK - Reloaded TLS configuration for [_default_]]]></source>
+
+</subsection>
+
 <subsection name="Thread Dump">
 
 <source>http://localhost:8080/manager/text/threaddump</source>

@@ -54,6 +54,15 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        <bug>61565</bug>: Add the ability to trigger a reloading of TLS host
+        configuration (certificate and key files, server.xml is not re-parsed)
+        via the Manager web application. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
