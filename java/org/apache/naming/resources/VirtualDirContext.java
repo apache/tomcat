@@ -212,7 +212,8 @@ public class VirtualDirContext extends FileDirContext {
                     }
                 }
             }
-            if (name.startsWith(path + "/")) {
+            path += "/";
+            if (name.startsWith(path)) {
                 String res = name.substring(path.length());
                 for (String resourcesDir : dirList) {
                     file = new File(resourcesDir, res);
