@@ -18,7 +18,7 @@
 # This script creates the directory structure required for running Tomcat 
 # in a separate directory by pointing $CATALINA_BASE to it. It copies the
 # conf directory from $CATALINA_HOME, and creates empty directories for
-# bin, logs, temp, and work.
+# bin, logs, temp, webapps, and work.
 #
 # If the file $CATALINA_HOME/bin/setenv.sh exists then it is copied to
 # the target directory as well.
@@ -36,18 +36,18 @@ HOME_DIR="$(dirname $(dirname $0))"
 
 if [ -d ${BASE_TGT} ]; then
   # target directory exists
-  echo directory exists
+  echo "Target directory exists"
 
     # exit if target directory is not empty
     [ "$(ls -A ${BASE_TGT})" ] && \
-        echo "target directory is not empty" && \
+        echo "Target directory is not empty" && \
         exit 1
 else 
     # create the target directory
     mkdir -p ${BASE_TGT}
 fi
 
-for dir in bin logs temp work; 
+for dir in bin logs temp webapps work; 
 do 
     # copy directory with permissions and delete contents if any
     cp -a "${HOME_DIR}/${dir}" "${BASE_TGT}/${dir}"
@@ -59,6 +59,10 @@ cp -a "${HOME_DIR}/conf" "${BASE_TGT}/"
 
 # copy setenv.sh if exists
 [ -f "${HOME_DIR}/bin/setenv.sh" ] && \
-    cp -p "${HOME_DIR}/bin/setenv.sh" "${BASE_TGT}/bin/"
+    cp "${HOME_DIR}/bin/setenv.sh" "${BASE_TGT}/bin/"
 
-echo created CATALINA_BASE directory at $BASE_TGT
+echo "Created CATALINA_BASE directory at $BASE_TGT"
+
+echo "Attention: The ports in server.xml might be bound by a "
+echo "           different instance. Each instance must bind "
+echo "           to a unique host:port combination."
