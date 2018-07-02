@@ -67,6 +67,11 @@
         stopping after the first error. Based on a patch provided by Marc Pompl.
         (markt)
       </fix>
+      <add>
+        <bug>53492</bug>: Make the Java file generation process multi-threaded.
+        By default, one thread will be used per core. Based on a patch by Dan
+        Fabulich. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
