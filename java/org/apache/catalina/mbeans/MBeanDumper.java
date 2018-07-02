@@ -17,7 +17,6 @@
 package org.apache.catalina.mbeans;
 
 import java.lang.reflect.Array;
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.management.JMRuntimeException;
@@ -49,9 +48,7 @@ public class MBeanDumper {
     public static String dumpBeans(MBeanServer mbeanServer, Set<ObjectName> names)
     {
         StringBuilder buf = new StringBuilder();
-        Iterator<ObjectName> it=names.iterator();
-        while( it.hasNext()) {
-            ObjectName oname=it.next();
+        for (ObjectName oname : names) {
             buf.append("Name: ");
             buf.append(oname.toString());
             buf.append(CRLF);

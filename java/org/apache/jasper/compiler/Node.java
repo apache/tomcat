@@ -17,7 +17,6 @@
 package org.apache.jasper.compiler;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -2386,9 +2385,7 @@ abstract class Node implements TagConstants {
          * @throws JasperException if an error occurs while visiting a node
          */
         public void visit(Visitor v) throws JasperException {
-            Iterator<Node> iter = list.iterator();
-            while (iter.hasNext()) {
-                Node n = iter.next();
+            for (Node n : list) {
                 n.accept(v);
             }
         }

@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -97,9 +96,7 @@ public class Txt2Html
         int count = 0;
 
         // Step through each file and convert.
-        Iterator<FileSet> iter = filesets.iterator();
-        while( iter.hasNext() ) {
-            FileSet fs = iter.next();
+        for (FileSet fs : filesets) {
             DirectoryScanner ds = fs.getDirectoryScanner(getProject());
             File basedir = ds.getBasedir();
             String[] files = ds.getIncludedFiles();

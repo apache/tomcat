@@ -19,7 +19,6 @@ package org.apache.jasper.compiler;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Vector;
 
 import javax.servlet.ServletContext;
@@ -255,10 +254,7 @@ public class JspConfig {
         JspPropertyGroup bufferMatch = null;
         JspPropertyGroup errorOnUndeclaredNamespaceMatch = null;
 
-        Iterator<JspPropertyGroup> iter = jspProperties.iterator();
-        while (iter.hasNext()) {
-
-            JspPropertyGroup jpg = iter.next();
+        for (JspPropertyGroup jpg : jspProperties) {
             JspProperty jp = jpg.getJspProperty();
 
             // (arrays will be the same length)
@@ -404,10 +400,7 @@ public class JspConfig {
             uriExtension = uri.substring(index+1);
         }
 
-        Iterator<JspPropertyGroup> iter = jspProperties.iterator();
-        while (iter.hasNext()) {
-
-            JspPropertyGroup jpg = iter.next();
+        for (JspPropertyGroup jpg : jspProperties) {
 
             String extension = jpg.getExtension();
             String path = jpg.getPath();

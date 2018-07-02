@@ -20,7 +20,6 @@ package org.apache.catalina.ha.backend;
 
 /* for MBean to read ready and busy */
 
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.management.MBeanServer;
@@ -58,9 +57,7 @@ public class CollectedInfo {
         String onStr = "*:type=ThreadPool,*";
         ObjectName objectName = new ObjectName(onStr);
         Set<ObjectInstance> set = mBeanServer.queryMBeans(objectName, null);
-        Iterator<ObjectInstance> iterator = set.iterator();
-        while (iterator.hasNext()) {
-            ObjectInstance oi = iterator.next();
+        for (ObjectInstance oi : set) {
             objName = oi.getObjectName();
             String name = objName.getKeyProperty("name");
 

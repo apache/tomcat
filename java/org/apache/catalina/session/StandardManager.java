@@ -29,7 +29,6 @@ import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.servlet.ServletContext;
 
@@ -306,10 +305,8 @@ public class StandardManager extends ManagerBase {
                 }
                 // Write the number of active sessions, followed by the details
                 oos.writeObject(Integer.valueOf(sessions.size()));
-                Iterator<Session> elements = sessions.values().iterator();
-                while (elements.hasNext()) {
-                    StandardSession session =
-                        (StandardSession) elements.next();
+                for (Session s : sessions.values()) {
+                    StandardSession session = (StandardSession) s;
                     list.add(session);
                     session.passivate();
                     session.writeObjectData(oos);
@@ -321,9 +318,7 @@ public class StandardManager extends ManagerBase {
         if (log.isDebugEnabled()) {
             log.debug("Expiring " + list.size() + " persisted sessions");
         }
-        Iterator<StandardSession> expires = list.iterator();
-        while (expires.hasNext()) {
-            StandardSession session = expires.next();
+        for (StandardSession session : list) {
             try {
                 session.expire(false);
             } catch (Throwable t) {

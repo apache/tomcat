@@ -21,7 +21,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.channels.NetworkChannel;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -226,9 +225,7 @@ public abstract class AbstractJsseEndpoint<S> extends AbstractEndpoint<S> {
             candidateCiphers.retainAll(serverCiphers);
         }
 
-        Iterator<Cipher> candidateIter = candidateCiphers.iterator();
-        while (candidateIter.hasNext()) {
-            Cipher candidate = candidateIter.next();
+        for (Cipher candidate : candidateCiphers) {
             for (SSLHostConfigCertificate certificate : certificates) {
                 if (certificate.getType().isCompatibleWith(candidate.getAu())) {
                     return certificate;

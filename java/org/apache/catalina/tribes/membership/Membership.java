@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.apache.catalina.tribes.Member;
 
@@ -209,9 +208,7 @@ public class Membership implements Cloneable {
             }
 
             ArrayList<Member> list = null;
-            Iterator<MbrEntry> i = map.values().iterator();
-            while (i.hasNext()) {
-                MbrEntry entry = i.next();
+            for (MbrEntry entry : map.values()) {
                 if (entry.hasExpired(maxtime)) {
                     if (list == null) {
                         // Only need a list when members are expired (smaller gc)

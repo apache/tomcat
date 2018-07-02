@@ -369,10 +369,8 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         Selector selector = this.selector.getAndSet(null);
         if (selector == null) return;
         try {
-            Iterator<SelectionKey> it = selector.keys().iterator();
             // look at each key in the selected set
-            while (it.hasNext()) {
-                SelectionKey key = it.next();
+            for (SelectionKey key : selector.keys()) {
                 key.channel().close();
                 key.attach(null);
                 key.cancel();

@@ -27,7 +27,6 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.jasper.JasperException;
@@ -124,9 +123,7 @@ public class SmapUtil {
         smapInfo[1] = g.getString();
 
         int count = 2;
-        Iterator<Map.Entry<String,SmapStratum>> iter = map.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<String,SmapStratum> entry = iter.next();
+        for (Map.Entry<String, SmapStratum> entry : map.entrySet()) {
             String innerClass = entry.getKey();
             s = entry.getValue();
             s.optimizeLineSection();

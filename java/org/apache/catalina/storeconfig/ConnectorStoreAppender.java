@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.catalina.connector.Connector;
@@ -75,9 +74,7 @@ public class ConnectorStoreAppender extends StoreAppender {
         List<String> propertyKeys = getPropertyKeys(connector);
         // Create blank instance
         Object bean2 = new Connector(protocol);//defaultInstance(bean);
-        Iterator<String> propertyIterator = propertyKeys.iterator();
-        while (propertyIterator.hasNext()) {
-            String key = propertyIterator.next();
+        for (String key : propertyKeys) {
             Object value = IntrospectionUtils.getProperty(bean, key);
             if (desc.isTransientAttribute(key)) {
                 continue; // Skip the specified exceptions

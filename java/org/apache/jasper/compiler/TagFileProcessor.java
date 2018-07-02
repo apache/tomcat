@@ -19,7 +19,6 @@ package org.apache.jasper.compiler;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Vector;
 
@@ -595,10 +594,8 @@ class TagFileProcessor {
                     try {
                         Object tagIns = tagClazz.getConstructor().newInstance();
                         if (tagIns instanceof JspSourceDependent) {
-                            Iterator<Entry<String,Long>> iter = ((JspSourceDependent)
-                                    tagIns).getDependants().entrySet().iterator();
-                            while (iter.hasNext()) {
-                                Entry<String,Long> entry = iter.next();
+                            for (Entry<String, Long> entry : ((JspSourceDependent)
+                                    tagIns).getDependants().entrySet()) {
                                 parentPageInfo.addDependant(entry.getKey(),
                                         entry.getValue());
                             }
@@ -702,9 +699,7 @@ class TagFileProcessor {
      *            If non-null, remove only the class file with with this name.
      */
     public void removeProtoTypeFiles(String classFileName) {
-        Iterator<Compiler> iter = tempVector.iterator();
-        while (iter.hasNext()) {
-            Compiler c = iter.next();
+        for (Compiler c : tempVector) {
             if (classFileName == null) {
                 c.removeGeneratedClassFiles();
             } else if (classFileName.equals(c.getCompilationContext()

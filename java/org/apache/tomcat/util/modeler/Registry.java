@@ -26,7 +26,6 @@ import java.lang.management.ManagementFactory;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.management.DynamicMBean;
@@ -258,9 +257,7 @@ public class Registry implements RegistryMBean, MBeanRegistration  {
         if( mbeans==null ) {
             return;
         }
-        Iterator<ObjectName> itr = mbeans.iterator();
-        while(itr.hasNext()) {
-            ObjectName current = itr.next();
+        for (ObjectName current : mbeans) {
             try {
                 if(current == null) {
                     continue;

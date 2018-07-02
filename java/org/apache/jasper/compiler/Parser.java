@@ -19,7 +19,6 @@ package org.apache.jasper.compiler;
 import java.io.CharArrayWriter;
 import java.io.FileNotFoundException;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.servlet.jsp.tagext.TagAttributeInfo;
 import javax.servlet.jsp.tagext.TagFileInfo;
@@ -387,9 +386,7 @@ class Parser implements TagConstants {
      */
     private void addInclude(Node parent, Collection<String> files) throws JasperException {
         if (files != null) {
-            Iterator<String> iter = files.iterator();
-            while (iter.hasNext()) {
-                String file = iter.next();
+            for (String file : files) {
                 AttributesImpl attrs = new AttributesImpl();
                 attrs.addAttribute("", "file", "file", "CDATA", file);
 

@@ -21,7 +21,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.AccessController;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.servlet.jsp.tagext.TagFileInfo;
 import javax.servlet.jsp.tagext.TagInfo;
@@ -239,14 +238,12 @@ class JspDocumentParser
      */
     private void addInclude(Node parent, Collection<String> files) throws SAXException {
         if (files != null) {
-            Iterator<String> iter = files.iterator();
-            while (iter.hasNext()) {
-                String file = iter.next();
+            for (String file : files) {
                 AttributesImpl attrs = new AttributesImpl();
                 attrs.addAttribute("", "file", "file", "CDATA", file);
 
                 // Create a dummy Include directive node
-                    Node includeDir =
+                Node includeDir =
                         new Node.IncludeDirective(attrs, null, // XXX
     parent);
                 processIncludeDirective(file, includeDir);

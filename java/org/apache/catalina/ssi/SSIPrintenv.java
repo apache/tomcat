@@ -19,7 +19,7 @@ package org.apache.catalina.ssi;
 
 import java.io.PrintWriter;
 import java.util.Collection;
-import java.util.Iterator;
+
 /**
  * Implements the Server-side #printenv command
  *
@@ -40,9 +40,7 @@ public class SSIPrintenv implements SSICommand {
             writer.write(errorMessage);
         } else {
             Collection<String> variableNames = ssiMediator.getVariableNames();
-            Iterator<String> iter = variableNames.iterator();
-            while (iter.hasNext()) {
-                String variableName = iter.next();
+            for (String variableName : variableNames) {
                 String variableValue = ssiMediator
                         .getVariableValue(variableName);
                 //This shouldn't happen, since all the variable names must

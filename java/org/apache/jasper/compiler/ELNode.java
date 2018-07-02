@@ -207,9 +207,7 @@ abstract class ELNode {
          * @throws JasperException if an error occurs while visiting a node
          */
         public void visit(Visitor v) throws JasperException {
-            Iterator<ELNode> iter = list.iterator();
-            while (iter.hasNext()) {
-                ELNode n = iter.next();
+            for (ELNode n : list) {
                 n.accept(v);
             }
         }
@@ -226,9 +224,7 @@ abstract class ELNode {
          * @return true if the expression contains a ${...}
          */
         public boolean containsEL() {
-            Iterator<ELNode> iter = list.iterator();
-            while (iter.hasNext()) {
-                ELNode n = iter.next();
+            for (ELNode n : list) {
                 if (n instanceof Root) {
                     return true;
                 }
