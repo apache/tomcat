@@ -81,6 +81,15 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <add>
+        <bug>53492</bug>: Make the Java file generation process multi-threaded.
+        By default, one thread will be used per core. Based on a patch by Dan
+        Fabulich. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
