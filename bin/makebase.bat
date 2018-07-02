@@ -13,7 +13,7 @@
 :: See the License for the specific language governing permissions and
 :: limitations under the License.
 
-:: This script creates the directory structure required for running Tomcat 
+:: This script creates the directory structure required for running Tomcat
 :: in a separate directory by pointing %CATALINA_BASE% to it. It copies the
 :: conf directory from %CATALINA_HOME%, and creates empty directories for
 :: bin, lib, logs, temp, webapps, and work.
@@ -46,7 +46,7 @@ if exist %BASE_TGT% (
         echo "Target directory is not empty"
         goto :EOF
     )
-) else ( 
+) else (
     :: create the target directory
     mkdir %BASE_TGT%
 )

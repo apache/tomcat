@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This script creates the directory structure required for running Tomcat 
+# This script creates the directory structure required for running Tomcat
 # in a separate directory by pointing $CATALINA_BASE to it. It copies the
 # conf directory from $CATALINA_HOME, and creates empty directories for
 # bin, lib, logs, temp, webapps, and work.
@@ -44,13 +44,13 @@ if [ -d ${BASE_TGT} ]; then
     [ "$(ls -A ${BASE_TGT})" ] && \
         echo "Target directory is not empty" && \
         exit 1
-else 
+else
     # create the target directory
     mkdir -p ${BASE_TGT}
 fi
 
-for dir in bin lib logs temp webapps work; 
-do 
+for dir in bin lib logs temp webapps work;
+do
     # copy directory with permissions and delete contents if any
     mkdir "${BASE_TGT}/${dir}"
 done
