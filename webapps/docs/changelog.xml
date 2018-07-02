@@ -58,6 +58,17 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 7.0.91 (violetagg)">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>53011</bug>: When pre-compiling with JspC, report all compilation
+        errors rather than stopping after the first error. A new option
+        <code>-failFast</code> can be used to restore the previous behaviour of
+        stopping after the first error. Based on a patch provided by Marc Pompl.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 7.0.90 (violetagg)">
   <subsection name="Catalina">
