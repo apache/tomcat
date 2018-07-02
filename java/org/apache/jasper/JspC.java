@@ -40,6 +40,11 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.servlet.jsp.JspFactory;
 import javax.servlet.jsp.tagext.TagLibraryInfo;
@@ -140,6 +145,7 @@ public class JspC extends Task implements Options {
     protected static final String SWITCH_NO_STRICT_QUOTE_ESCAPING = "-no-strictQuoteEscaping";
     protected static final String SWITCH_QUOTE_ATTRIBUTE_EL = "-quoteAttributeEL";
     protected static final String SWITCH_NO_QUOTE_ATTRIBUTE_EL = "-no-quoteAttributeEL";
+    protected static final String SWITCH_THREAD_COUNT = "-threadCount";
     protected static final String SHOW_SUCCESS ="-s";
     protected static final String LIST_ERRORS = "-l";
     protected static final int INC_WEBXML = 10;
@@ -234,6 +240,9 @@ public class JspC extends Task implements Options {
      * is UTF-8.  Added per bugzilla 19622.
      */
     protected String javaEncoding = "UTF-8";
+
+    /** The number of threads to use; default is one per core */
+    protected int threadCount = Runtime.getRuntime().availableProcessors();
 
     // Generation of web.xml fragments
     protected String webxmlFile;
@@ -408,6 +417,8 @@ public class JspC extends Task implements Options {
                 setQuoteAttributeEL(true);
             } else if (tok.equals(SWITCH_NO_QUOTE_ATTRIBUTE_EL)) {
                 setQuoteAttributeEL(false);
+            } else if (tok.equals(SWITCH_THREAD_COUNT)) {
+                setThreadCount(nextArg());
             } else {
                 if (tok.startsWith("-")) {
                     throw new JasperException("Unrecognized option: " + tok +
@@ -952,6 +963,31 @@ public class JspC extends Task implements Options {
         return quoteAttributeEL;
     }
 
+    public int getThreadCount() {
+        return threadCount;
+    }
+
+    public void setThreadCount(String threadCount) {
+        if (threadCount == null) {
+            return;
+        }
+        int newThreadCount;
+        try {
+            if (threadCount.endsWith("C")) {
+                double factor = Double.parseDouble(threadCount.substring(0, threadCount.length() - 1));
+                newThreadCount = (int) (factor * Runtime.getRuntime().availableProcessors());
+            } else {
+                newThreadCount = Integer.parseInt(threadCount);
+            }
+        } catch (NumberFormatException e) {
+            throw new BuildException("Couldn't parse thread count: " + threadCount);
+        }
+        if (newThreadCount < 1) {
+            throw new BuildException("There must be at least one thread: " + newThreadCount);
+        }
+        this.threadCount = newThreadCount;
+    }
+
     public void setListErrors( boolean b ) {
         listErrors = b;
     }
@@ -1255,9 +1291,8 @@ public class JspC extends Task implements Options {
         return result.toString();
     }
 
-    protected void processFile(String file)
-        throws JasperException
-    {
+    protected void processFile(String file) throws JasperException {
+
         if (log.isDebugEnabled()) {
             log.debug("Processing file: " + file);
         }
@@ -1388,29 +1423,25 @@ public class JspC extends Task implements Options {
 
         try {
             if (uriRoot == null) {
-                if( pages.size() == 0 ) {
-                    throw new JasperException(
-                        Localizer.getMessage("jsp.error.jspc.missingTarget"));
+                if (pages.size() == 0) {
+                    throw new JasperException(Localizer.getMessage("jsp.error.jspc.missingTarget"));
                 }
-                String firstJsp = pages.get( 0 );
-                File firstJspF = new File( firstJsp );
+                String firstJsp = pages.get(0);
+                File firstJspF = new File(firstJsp);
                 if (!firstJspF.exists()) {
-                    throw new JasperException(
-                        Localizer.getMessage("jspc.error.fileDoesNotExist",
-                                             firstJsp));
+                    throw new JasperException(Localizer.getMessage(
+                            "jspc.error.fileDoesNotExist", firstJsp));
                 }
-                locateUriRoot( firstJspF );
+                locateUriRoot(firstJspF);
             }
 
             if (uriRoot == null) {
-                throw new JasperException(
-                    Localizer.getMessage("jsp.error.jspc.no_uriroot"));
+                throw new JasperException(Localizer.getMessage("jsp.error.jspc.no_uriroot"));
             }
 
             File uriRootF = new File(uriRoot);
             if (!uriRootF.isDirectory()) {
-                throw new JasperException(
-                    Localizer.getMessage("jsp.error.jspc.uriroot_not_dir"));
+                throw new JasperException(Localizer.getMessage("jsp.error.jspc.uriroot_not_dir"));
             }
 
             if (loader == null) {
@@ -1430,6 +1461,10 @@ public class JspC extends Task implements Options {
             int errorCount = 0;
             long start = System.currentTimeMillis();
 
+            ExecutorService threadPool = Executors.newFixedThreadPool(threadCount);
+            ExecutorCompletionService<Void> service = new ExecutorCompletionService<>(threadPool);
+            int pageCount = pages.size();
+
             for (String nextjsp : pages) {
                 File fjsp = new File(nextjsp);
                 if (!fjsp.isAbsolute()) {
@@ -1437,9 +1472,8 @@ public class JspC extends Task implements Options {
                 }
                 if (!fjsp.exists()) {
                     if (log.isWarnEnabled()) {
-                        log.warn
-                            (Localizer.getMessage
-                             ("jspc.error.fileDoesNotExist", fjsp.toString()));
+                        log.warn(Localizer.getMessage(
+                                "jspc.error.fileDoesNotExist", fjsp.toString()));
                     }
                     continue;
                 }
@@ -1450,19 +1484,38 @@ public class JspC extends Task implements Options {
                 if (nextjsp.startsWith("." + File.separatorChar)) {
                     nextjsp = nextjsp.substring(2);
                 }
+                service.submit(new ProcessFile(nextjsp));
+            }
+            JasperException reportableError = null;
+            for (int i = 0; i < pageCount; i++) {
                 try {
-                    processFile(nextjsp);
-                } catch (JasperException e) {
+                    service.take().get();
+                } catch (ExecutionException e) {
                     if (failFast) {
-                        throw e;
+                        // Generation is not interruptible so any tasks that
+                        // have started will complete.
+                        List<Runnable> notExecuted = threadPool.shutdownNow();
+                        i += notExecuted.size();
+                        Throwable t = e.getCause();
+                        if (t instanceof JasperException) {
+                            reportableError = (JasperException) t;
+                        } else {
+                            reportableError = new JasperException(t);
+                        }
+                    } else {
+                        errorCount++;
+                        log.error(e.getMessage());
                     }
-                    errorCount++;
-                    log.error(nextjsp + ":" + e.getMessage());
+                } catch (InterruptedException e) {
+                    // Ignore
                 }
+            }
+            if (reportableError != null) {
+                throw reportableError;
             }
 
             long time = System.currentTimeMillis() - start;
-            String msg = Localizer.getMessage("jspc.compilation.result",
+            String msg = Localizer.getMessage("jspc.generation.result",
                     Integer.toString(errorCount), Long.toString(time));
             if (failOnError && errorCount > 0) {
                 throw new BuildException(msg);
@@ -1780,6 +1833,21 @@ public class JspC extends Task implements Options {
         } catch (IOException ex) {
             fos.close();
             throw ex;
+        }
+    }
+
+
+    private class ProcessFile implements Callable<Void> {
+        private final String file;
+
+        private ProcessFile(String file) {
+            this.file = file;
+        }
+
+        @Override
+        public Void call() throws Exception {
+            processFile(file);
+            return null;
         }
     }
 }
