@@ -16,10 +16,12 @@
 :: This script creates the directory structure required for running Tomcat 
 :: in a separate directory by pointing %CATALINA_BASE% to it. It copies the
 :: conf directory from %CATALINA_HOME%, and creates empty directories for
-:: logs, temp, webapps, and work.
+:: bin, lib, logs, temp, webapps, and work.
 ::
 :: If the file %CATALINA_HOME%/bin/setenv.sh exists then it is copied to
 :: the target directory as well.
+::
+:: Usage: makebase <path-to-target-directory>
 
 @echo off
 
@@ -49,8 +51,10 @@ if exist %BASE_TGT% (
     mkdir %BASE_TGT%
 )
 
-:: create empty directories for bin, logs, temp, webapps, and work
-mkdir %BASE_TGT%\bin %BASE_TGT%\logs %BASE_TGT%\temp %BASE_TGT%\webapps %BASE_TGT%\work
+:: create empty directories for bin, lib, logs, temp, webapps, and work
+for %%d in (bin, lib, logs, temp, webapps, work) do (
+    mkdir "%BASE_TGT%\%%d"
+)
 
 :: copy conf directory
 robocopy %HOME_DIR%\conf %BASE_TGT%\conf > nul
@@ -60,8 +64,8 @@ robocopy %HOME_DIR%\bin %BASE_TGT%\bin setenv.bat > nul
 
 echo "Created CATALINA_BASE directory at $BASE_TGT"
 
-echo "Attention: The ports in server.xml might be bound by a "
-echo "           different instance. Each instance must bind "
-echo "           to a unique host:port combination."
+echo "Attention: The ports in conf/server.xml might be bound by a "
+echo "           different instance. Please review your config files "
+echo "           and update them where necessary."
 
 :EOF

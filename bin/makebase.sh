@@ -18,10 +18,12 @@
 # This script creates the directory structure required for running Tomcat 
 # in a separate directory by pointing $CATALINA_BASE to it. It copies the
 # conf directory from $CATALINA_HOME, and creates empty directories for
-# bin, logs, temp, webapps, and work.
+# bin, lib, logs, temp, webapps, and work.
 #
 # If the file $CATALINA_HOME/bin/setenv.sh exists then it is copied to
 # the target directory as well.
+#
+# Usage: makebase <path-to-target-directory>
 
 # first arg is the target directory
 BASE_TGT=$1
@@ -47,11 +49,10 @@ else
     mkdir -p ${BASE_TGT}
 fi
 
-for dir in bin logs temp webapps work; 
+for dir in bin lib logs temp webapps work; 
 do 
     # copy directory with permissions and delete contents if any
-    cp -a "${HOME_DIR}/${dir}" "${BASE_TGT}/${dir}"
-    rm -fr "${BASE_TGT}/${dir}"/*
+    mkdir "${BASE_TGT}/${dir}"
 done
 
 # copy conf directory recursively and preserve permissions
@@ -63,6 +64,6 @@ cp -a "${HOME_DIR}/conf" "${BASE_TGT}/"
 
 echo "Created CATALINA_BASE directory at $BASE_TGT"
 
-echo "Attention: The ports in server.xml might be bound by a "
-echo "           different instance. Each instance must bind "
-echo "           to a unique host:port combination."
+echo "Attention: The ports in conf/server.xml might be bound by a "
+echo "           different instance. Please review your config files "
+echo "           and update them where necessary."
