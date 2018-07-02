@@ -65,6 +65,10 @@
         that caused request failures for some requests when using the
         <code>VirtualDirContext</code>. (markt)
       </fix>
+      <fix>
+        Delete reference to removed class that prevented Tomcat from starting
+        when running under a security manager. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
