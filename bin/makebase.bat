@@ -29,7 +29,7 @@ set BASE_TGT=%1
 
 if %BASE_TGT%.==. (
     rem target directory not provided; exit
-    echo "Usage: makebase <path-to-target-directory>"
+    echo Usage: makebase <path-to-target-directory>
     goto :EOF
 )
 
@@ -38,11 +38,11 @@ set HOME_DIR=%CURR_DIR%..\
 
 if exist %BASE_TGT% (
   rem target directory exists
-  echo "Target directory exists"
+  echo Target directory exists
 
     rem exit if target directory is not empty
     for /F %%i in ('dir /b "%BASE_TGT%\*.*"') do (
-        echo "Target directory is not empty"
+        echo Target directory is not empty
         goto :EOF
     )
 ) else (
@@ -61,10 +61,10 @@ robocopy %HOME_DIR%\conf %BASE_TGT%\conf > nul
 rem copy setenv.bat if exists
 robocopy %HOME_DIR%\bin %BASE_TGT%\bin setenv.bat > nul
 
-echo "Created CATALINA_BASE directory at %BASE_TGT%"
+echo Created CATALINA_BASE directory at %BASE_TGT%
 
-echo "Attention: The ports in conf/server.xml might be bound by a "
-echo "           different instance. Please review your config files "
-echo "           and update them where necessary."
+echo Attention: The ports in conf/server.xml might be bound by a
+echo            different instance. Please review your config files
+echo            and update them where necessary.
 
 :EOF
