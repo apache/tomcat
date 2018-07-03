@@ -24,8 +24,6 @@ rem the target directory as well.
 rem
 rem Usage: makebase <path-to-target-directory>
 
-@echo off
-
 rem first arg is the target directory
 set BASE_TGT=%1
 
