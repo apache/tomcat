@@ -65,7 +65,7 @@ public final class Mapper {
     /**
      * Default host name.
      */
-    private String defaultHostName = null;
+    private volatile String defaultHostName = null;
     private volatile MappedHost defaultHost = null;
 
 
@@ -692,6 +692,7 @@ public final class Mapper {
                     MappingData mappingData) throws IOException {
 
         if (host.isNull()) {
+            String defaultHostName = this.defaultHostName;
             if (defaultHostName == null) {
                 return;
             }
