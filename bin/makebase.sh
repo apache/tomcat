@@ -25,6 +25,25 @@
 #
 # Usage: makebase <path-to-target-directory>
 
+# resolve links - $0 may be a softlink
+PRG="$0"
+
+while [ -h "$PRG" ]; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG=`dirname "$PRG"`/"$link"
+  fi
+done
+
+# Get standard environment variables
+PRGDIR=`dirname "$PRG"`
+
+# Only set CATALINA_HOME if not already set
+[ -z "$CATALINA_HOME" ] && CATALINA_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
+
 # first arg is the target directory
 BASE_TGT=$1
 
@@ -33,8 +52,6 @@ if [ -z ${BASE_TGT} ]; then
     echo "Usage: makebase <path-to-target-directory>"
     exit 1
 fi
-
-HOME_DIR="$(dirname $(dirname $0))"
 
 if [ -d ${BASE_TGT} ]; then
   # target directory exists
@@ -56,11 +73,11 @@ do
 done
 
 # copy conf directory recursively and preserve permissions
-cp -a "${HOME_DIR}/conf" "${BASE_TGT}/"
+cp -a "${CATALINA_HOME}/conf" "${BASE_TGT}/"
 
 # copy setenv.sh if exists
-[ -f "${HOME_DIR}/bin/setenv.sh" ] && \
-    cp "${HOME_DIR}/bin/setenv.sh" "${BASE_TGT}/bin/"
+[ -f "${CATALINA_HOME}/bin/setenv.sh" ] && \
+    cp "${CATALINA_HOME}/bin/setenv.sh" "${BASE_TGT}/bin/"
 
 echo "Created CATALINA_BASE directory at $BASE_TGT"
 
