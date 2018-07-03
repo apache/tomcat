@@ -63,7 +63,7 @@ robocopy %HOME_DIR%\bin %BASE_TGT%\bin setenv.bat > nul
 
 echo Created CATALINA_BASE directory at %BASE_TGT%
 
-echo Attention: The ports in conf/server.xml might be bound by a
+echo Attention: The ports in conf\server.xml might be bound by a
 echo            different instance. Please review your config files
 echo            and update them where necessary.
 
