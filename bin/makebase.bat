@@ -24,6 +24,24 @@ rem the target directory as well.
 rem
 rem Usage: makebase <path-to-target-directory>
 
+setlocal
+
+rem Guess CATALINA_HOME if not defined
+set "CURRENT_DIR=%cd%"
+if not "%CATALINA_HOME%" == "" goto gotHome
+set "CATALINA_HOME=%CURRENT_DIR%"
+if exist "%CATALINA_HOME%\bin\catalina.bat" goto okHome
+cd ..
+set "CATALINA_HOME=%cd%"
+cd "%CURRENT_DIR%"
+:gotHome
+
+if exist "%CATALINA_HOME%\bin\catalina.bat" goto okHome
+echo The CATALINA_HOME environment variable is not defined correctly
+echo This environment variable is needed to run this program
+goto EOF
+:okHome
+
 rem first arg is the target directory
 set BASE_TGT=%1
 
@@ -32,9 +50,6 @@ if %BASE_TGT%.==. (
     echo Usage: makebase ^<path-to-target-directory^>
     goto :EOF
 )
-
-set CURR_DIR=%~dp0
-set HOME_DIR=%CURR_DIR%..\
 
 if exist %BASE_TGT% (
   rem target directory exists
@@ -56,10 +71,10 @@ for %%d in (bin, lib, logs, temp, webapps, work) do (
 )
 
 rem copy conf directory
-robocopy %HOME_DIR%\conf %BASE_TGT%\conf > nul
+robocopy %CATALINA_HOME%\conf %BASE_TGT%\conf > nul
 
 rem copy setenv.bat if exists
-robocopy %HOME_DIR%\bin %BASE_TGT%\bin setenv.bat > nul
+robocopy %CATALINA_HOME%\bin %BASE_TGT%\bin setenv.bat > nul
 
 echo Created CATALINA_BASE directory at %BASE_TGT%
 
