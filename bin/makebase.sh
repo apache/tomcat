@@ -68,7 +68,7 @@ fi
 
 for dir in bin lib logs temp webapps work;
 do
-    # copy directory with permissions and delete contents if any
+    # create empty directories
     mkdir "${BASE_TGT}/${dir}"
 done
 

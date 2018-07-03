@@ -65,7 +65,7 @@ if exist %BASE_TGT% (
     mkdir %BASE_TGT%
 )
 
-rem create empty directories for bin, lib, logs, temp, webapps, and work
+rem create empty directories
 for %%d in (bin, lib, logs, temp, webapps, work) do (
     mkdir "%BASE_TGT%\%%d"
 )
