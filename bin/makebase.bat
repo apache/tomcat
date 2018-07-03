@@ -29,7 +29,7 @@ set BASE_TGT=%1
 
 if %BASE_TGT%.==. (
     rem target directory not provided; exit
-    echo Usage: makebase <path-to-target-directory>
+    echo Usage: makebase ^<path-to-target-directory^>
     goto :EOF
 )
 
