@@ -112,7 +112,7 @@ cygwin=false
 darwin=false
 os400=false
 hpux=false
-case "`uname`" in
+case "$(uname)" in
 CYGWIN*) cygwin=true;;
 Darwin*) darwin=true;;
 OS400*) os400=true;;
@@ -123,20 +123,20 @@ esac
 PRG="$0"
 
 while [ -h "$PRG" ]; do
-  ls=`ls -ld "$PRG"`
-  link=`expr "$ls" : '.*-> \(.*\)$'`
+  ls=$(ls -ld "$PRG")
+  link=$(expr "$ls" : '.*-> \(.*\)$')
   if expr "$link" : '/.*' > /dev/null; then
     PRG="$link"
   else
-    PRG=`dirname "$PRG"`/"$link"
+    PRG=$(dirname "$PRG")/"$link"
   fi
 done
 
 # Get standard environment variables
-PRGDIR=`dirname "$PRG"`
+PRGDIR=$(dirname "$PRG")
 
 # Only set CATALINA_HOME if not already set
-[ -z "$CATALINA_HOME" ] && CATALINA_HOME=`cd "$PRGDIR/.." >/dev/null; pwd`
+[ -z "$CATALINA_HOME" ] && CATALINA_HOME=$(cd "$PRGDIR/.." >/dev/null; pwd)
 
 # Copy CATALINA_BASE from CATALINA_HOME if not already set
 [ -z "$CATALINA_BASE" ] && CATALINA_BASE="$CATALINA_HOME"
@@ -153,11 +153,11 @@ fi
 
 # For Cygwin, ensure paths are in UNIX format before anything is touched
 if $cygwin; then
-  [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
-  [ -n "$JRE_HOME" ] && JRE_HOME=`cygpath --unix "$JRE_HOME"`
-  [ -n "$CATALINA_HOME" ] && CATALINA_HOME=`cygpath --unix "$CATALINA_HOME"`
-  [ -n "$CATALINA_BASE" ] && CATALINA_BASE=`cygpath --unix "$CATALINA_BASE"`
-  [ -n "$CLASSPATH" ] && CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
+  [ -n "$JAVA_HOME" ] && JAVA_HOME=$(cygpath --unix "$JAVA_HOME")
+  [ -n "$JRE_HOME" ] && JRE_HOME=$(cygpath --unix "$JRE_HOME")
+  [ -n "$CATALINA_HOME" ] && CATALINA_HOME=$(cygpath --unix "$CATALINA_HOME")
+  [ -n "$CATALINA_BASE" ] && CATALINA_BASE=$(cygpath --unix "$CATALINA_BASE")
+  [ -n "$CLASSPATH" ] && CLASSPATH=$(cygpath --path --unix "$CLASSPATH")
 fi
 
 # Ensure that neither CATALINA_HOME nor CATALINA_BASE contains a colon
@@ -228,19 +228,19 @@ fi
 
 # Bugzilla 37848: When no TTY is available, don't output to console
 have_tty=0
-if [ "`tty`" != "not a tty" ]; then
+if [ "$(tty)" != "not a tty" ]; then
     have_tty=1
 fi
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
-  JAVA_HOME=`cygpath --absolute --windows "$JAVA_HOME"`
-  JRE_HOME=`cygpath --absolute --windows "$JRE_HOME"`
-  CATALINA_HOME=`cygpath --absolute --windows "$CATALINA_HOME"`
-  CATALINA_BASE=`cygpath --absolute --windows "$CATALINA_BASE"`
-  CATALINA_TMPDIR=`cygpath --absolute --windows "$CATALINA_TMPDIR"`
-  CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
-  [ -n "$JAVA_ENDORSED_DIRS" ] && JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
+  JAVA_HOME=$(cygpath --absolute --windows "$JAVA_HOME")
+  JRE_HOME=$(cygpath --absolute --windows "$JRE_HOME")
+  CATALINA_HOME=$(cygpath --absolute --windows "$CATALINA_HOME")
+  CATALINA_BASE=$(cygpath --absolute --windows "$CATALINA_BASE")
+  CATALINA_TMPDIR=$(cygpath --absolute --windows "$CATALINA_TMPDIR")
+  CLASSPATH=$(cygpath --path --windows "$CLASSPATH")
+  [ -n "$JAVA_ENDORSED_DIRS" ] && JAVA_ENDORSED_DIRS=$(cygpath --path --windows "$JAVA_ENDORSED_DIRS")
 fi
 
 if [ -z "$JSSE_OPTS" ] ; then
@@ -285,7 +285,7 @@ if [ -d "$CATALINA_HOME/endorsed" ]; then
 fi
 
 # Make the umask available when using the org.apache.catalina.security.SecurityListener
-JAVA_OPTS="$JAVA_OPTS -Dorg.apache.catalina.security.SecurityListener.UMASK=`umask`"
+JAVA_OPTS="$JAVA_OPTS -Dorg.apache.catalina.security.SecurityListener.UMASK=$(umask)"
 
 if [ -z "$USE_NOHUP" ]; then
     if $hpux; then
@@ -407,7 +407,7 @@ elif [ "$1" = "start" ] ; then
       if [ -s "$CATALINA_PID" ]; then
         echo "Existing PID file found during start."
         if [ -r "$CATALINA_PID" ]; then
-          PID=`cat "$CATALINA_PID"`
+          PID=$(cat "$CATALINA_PID")
           ps -p $PID >/dev/null 2>&1
           if [ $? -eq 0 ] ; then
             echo "Tomcat appears to still be running with PID $PID. Start aborted."
@@ -500,7 +500,7 @@ elif [ "$1" = "stop" ] ; then
   if [ ! -z "$CATALINA_PID" ]; then
     if [ -f "$CATALINA_PID" ]; then
       if [ -s "$CATALINA_PID" ]; then
-        kill -0 `cat "$CATALINA_PID"` >/dev/null 2>&1
+        kill -0 $(cat "$CATALINA_PID") >/dev/null 2>&1
         if [ $? -gt 0 ]; then
           echo "PID file found but either no matching process was found or the current user does not have permission to stop the process. Stop aborted."
           exit 1
@@ -526,14 +526,14 @@ elif [ "$1" = "stop" ] ; then
   if [ $? != 0 ]; then
     if [ ! -z "$CATALINA_PID" ]; then
       echo "The stop command failed. Attempting to signal the process to stop through OS signal."
-      kill -15 `cat "$CATALINA_PID"` >/dev/null 2>&1
+      kill -15 $(cat "$CATALINA_PID") >/dev/null 2>&1
     fi
   fi
 
   if [ ! -z "$CATALINA_PID" ]; then
     if [ -f "$CATALINA_PID" ]; then
       while [ $SLEEP -ge 0 ]; do
-        kill -0 `cat "$CATALINA_PID"` >/dev/null 2>&1
+        kill -0 $(cat "$CATALINA_PID") >/dev/null 2>&1
         if [ $? -gt 0 ]; then
           rm -f "$CATALINA_PID" >/dev/null 2>&1
           if [ $? != 0 ]; then
@@ -557,9 +557,9 @@ elif [ "$1" = "stop" ] ; then
             echo "PID file was not removed."
           fi
           echo "To aid diagnostics a thread dump has been written to standard out."
-          kill -3 `cat "$CATALINA_PID"`
+          kill -3 $(cat "$CATALINA_PID")
         fi
-        SLEEP=`expr $SLEEP - 1 `
+        SLEEP=$(expr $SLEEP - 1)
       done
     fi
   fi
@@ -570,11 +570,11 @@ elif [ "$1" = "stop" ] ; then
       echo "Kill failed: \$CATALINA_PID not set"
     else
       if [ -f "$CATALINA_PID" ]; then
-        PID=`cat "$CATALINA_PID"`
+        PID=$(cat "$CATALINA_PID")
         echo "Killing Tomcat with the PID: $PID"
         kill -9 $PID
         while [ $KILL_SLEEP_INTERVAL -ge 0 ]; do
-            kill -0 `cat "$CATALINA_PID"` >/dev/null 2>&1
+            kill -0 $(cat "$CATALINA_PID") >/dev/null 2>&1
             if [ $? -gt 0 ]; then
                 rm -f "$CATALINA_PID" >/dev/null 2>&1
                 if [ $? != 0 ]; then
@@ -590,7 +590,7 @@ elif [ "$1" = "stop" ] ; then
             if [ $KILL_SLEEP_INTERVAL -gt 0 ]; then
                 sleep 1
             fi
-            KILL_SLEEP_INTERVAL=`expr $KILL_SLEEP_INTERVAL - 1 `
+            KILL_SLEEP_INTERVAL=$(expr $KILL_SLEEP_INTERVAL - 1)
         done
         if [ $KILL_SLEEP_INTERVAL -lt 0 ]; then
             echo "Tomcat has not been killed completely yet. The process might be waiting on some system call or might be UNINTERRUPTIBLE."
