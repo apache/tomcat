@@ -260,7 +260,7 @@ case "$1" in
       exit $?
     ;;
     *       )
-      echo "Unknown command: \`$1'"
+      echo "Unknown command: '$1'"
       echo "Usage: $PROGRAM ( commands ... )"
       echo "commands:"
       echo "  run               Start Tomcat without detaching from console"
