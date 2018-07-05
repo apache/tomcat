@@ -1468,8 +1468,10 @@
       that is running Tomcat. If your <code>keystoreType</code> doesn't need a
       file use <code>""</code> (empty string) or <code>NONE</code> for this
       parameter.  Relative paths will be resolved against
-      <code>$CATALINA_BASE</code>.  A URL may also be used for this attribute.
-      </p>
+      <code>$CATALINA_BASE</code>.  A URI may also be used for this attribute.
+      When using a domain keystore (<code>keystoreType</code> of
+      <code>DKS</code>), this parameter should be the URI to the domain
+      keystore.</p>
     </attribute>
 
     <attribute name="certificateKeystorePassword" required="false">
