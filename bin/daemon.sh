@@ -18,20 +18,22 @@
 # -----------------------------------------------------------------------------
 # Commons Daemon wrapper script.
 # -----------------------------------------------------------------------------
-#
+
 # resolve links - $0 may be a softlink
-ARG0="$0"
-while [ -h "$ARG0" ]; do
-  ls=`ls -ld "$ARG0"`
+PRG="$0"
+
+while [ -h "$PRG" ]; do
+  ls=`ls -ld "$PRG"`
   link=`expr "$ls" : '.*-> \(.*\)$'`
   if expr "$link" : '/.*' > /dev/null; then
-    ARG0="$link"
+    PRG="$link"
   else
-    ARG0="`dirname $ARG0`/$link"
+    PRG=`dirname "$PRG"`/"$link"
   fi
 done
-DIRNAME="`dirname $ARG0`"
-PROGRAM="`basename $ARG0`"
+
+DIRNAME="`dirname "$PRG"`"
+PROGRAM="`basename "$PRG"`"
 while [ ".$1" != . ]
 do
   case "$1" in
@@ -100,10 +102,10 @@ if [ -z "$JAVA_HOME" ]; then
         if expr "$link" : '/.*' > /dev/null; then
             JAVA_BIN="$link"
         else
-            JAVA_BIN="`dirname $JAVA_BIN`/$link"
+            JAVA_BIN="`dirname "$JAVA_BIN"`/$link"
         fi
     done
-    test -x "$JAVA_BIN" && JAVA_HOME="`dirname $JAVA_BIN`"
+    test -x "$JAVA_BIN" && JAVA_HOME="`dirname "$JAVA_BIN"`"
     test ".$JAVA_HOME" != . && JAVA_HOME=`cd "$JAVA_HOME/.." >/dev/null; pwd`
 else
     JAVA_BIN="$JAVA_HOME/bin/java"
