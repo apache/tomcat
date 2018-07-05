@@ -58,7 +58,7 @@ if [ -d ${BASE_TGT} ]; then
   echo "Target directory exists"
 
     # exit if target directory is not empty
-    [ "$(ls -A ${BASE_TGT})" ] && \
+    [ "`ls -A ${BASE_TGT}`" ] && \
         echo "Target directory is not empty" && \
         exit 1
 else
