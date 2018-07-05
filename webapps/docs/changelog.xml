@@ -111,10 +111,6 @@
         Implement checksum checks when downloading dependencies that are used
         to build Tomcat. (kkolinko)
       </add>
-      <scode>
-        Update the shell scripts to consistently use <code>$(...)</code> rather
-        than <code>`...`</code>. (markt)
-      </scode>
     </changelog>
   </subsection>
 </section>
