@@ -16,8 +16,13 @@
  */
 package org.apache.tomcat.util.compat;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.security.KeyStore.LoadStoreParameter;
+import java.util.Collections;
+import java.util.Map;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
@@ -27,15 +32,19 @@ class Jre8Compat extends JreCompat {
     private static final int RUNTIME_MAJOR_VERSION = 8;
 
     private static final Method setUseCipherSuitesOrderMethod;
+    private static final Constructor<?> domainLoadStoreParameterConstructor;
 
 
     static {
         Method m1 = null;
+        Constructor<?> c2 = null;
         try {
             // The class is Java6+...
-            Class<?> c1 = Class.forName("javax.net.ssl.SSLParameters");
+            Class<?> clazz1 = Class.forName("javax.net.ssl.SSLParameters");
             // ...but this method is Java8+
-            m1 = c1.getMethod("setUseCipherSuitesOrder", boolean.class);
+            m1 = clazz1.getMethod("setUseCipherSuitesOrder", boolean.class);
+            Class<?> clazz2 = Class.forName("java.security.DomainLoadStoreParameter");
+            c2 = clazz2.getConstructor(URI.class, Map.class);
         } catch (SecurityException e) {
             // Should never happen
         } catch (NoSuchMethodException e) {
@@ -44,6 +53,7 @@ class Jre8Compat extends JreCompat {
             // Should never happen
         }
         setUseCipherSuitesOrderMethod = m1;
+        domainLoadStoreParameterConstructor = c2;
     }
 
 
@@ -65,6 +75,18 @@ class Jre8Compat extends JreCompat {
         } catch (IllegalAccessException e) {
             throw new UnsupportedOperationException(e);
         } catch (InvocationTargetException e) {
+            throw new UnsupportedOperationException(e);
+        }
+    }
+
+
+    @Override
+    public LoadStoreParameter getDomainLoadStoreParameter(URI uri) {
+        try {
+            return (LoadStoreParameter) domainLoadStoreParameterConstructor.newInstance(
+                    uri, Collections.EMPTY_MAP);
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException |
+                InvocationTargetException e) {
             throw new UnsupportedOperationException(e);
         }
     }

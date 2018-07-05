@@ -244,7 +244,8 @@ public class JSSEUtil extends SSLUtilBase {
             }
 
             Key k = ks.getKey(keyAlias, keyPassArray);
-            if (k != null && "PKCS#8".equalsIgnoreCase(k.getFormat())) {
+            if (k != null && !"DKS".equalsIgnoreCase(certificate.getCertificateKeystoreType()) &&
+                    "PKCS#8".equalsIgnoreCase(k.getFormat())) {
                 // Switch to in-memory key store
                 String provider = certificate.getCertificateKeystoreProvider();
                 if (provider == null) {

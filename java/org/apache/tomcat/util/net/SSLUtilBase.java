@@ -19,6 +19,7 @@ package org.apache.tomcat.util.net;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,6 +28,7 @@ import java.util.Set;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -126,17 +128,22 @@ public abstract class SSLUtilBase implements SSLUtil {
             } else {
                 ks = KeyStore.getInstance(type, provider);
             }
-            if(!("PKCS11".equalsIgnoreCase(type) ||
-                    "".equalsIgnoreCase(path)) ||
-                    "NONE".equalsIgnoreCase(path)) {
-                istream = ConfigFileLoader.getInputStream(path);
-            }
+            if ("DKS".equalsIgnoreCase(type)) {
+                URI uri = ConfigFileLoader.getURI(path);
+                ks.load(JreCompat.getInstance().getDomainLoadStoreParameter(uri));
+            } else {
+                if(!("PKCS11".equalsIgnoreCase(type) ||
+                        "".equalsIgnoreCase(path)) ||
+                        "NONE".equalsIgnoreCase(path)) {
+                    istream = ConfigFileLoader.getInputStream(path);
+                }
 
-            char[] storePass = null;
-            if (pass != null && !"".equals(pass)) {
-                storePass = pass.toCharArray();
+                char[] storePass = null;
+                if (pass != null && !"".equals(pass)) {
+                    storePass = pass.toCharArray();
+                }
+                ks.load(istream, storePass);
             }
-            ks.load(istream, storePass);
         } catch (FileNotFoundException fnfe) {
             throw fnfe;
         } catch (IOException ioe) {

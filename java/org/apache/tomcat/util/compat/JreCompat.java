@@ -18,8 +18,10 @@ package org.apache.tomcat.util.compat;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.KeyStore.LoadStoreParameter;
 import java.util.Deque;
 import java.util.jar.JarFile;
 
@@ -80,6 +82,12 @@ public class JreCompat {
     @SuppressWarnings("unused")
     public void setUseServerCipherSuitesOrder(SSLEngine engine, boolean useCipherSuitesOrder) {
         throw new UnsupportedOperationException(sm.getString("jreCompat.noServerCipherSuiteOrder"));
+    }
+
+
+    @SuppressWarnings("unused")
+    public LoadStoreParameter getDomainLoadStoreParameter(URI uri) {
+        throw new UnsupportedOperationException(sm.getString("jreCompat.noDomainLoadStoreParameter"));
     }
 
 
