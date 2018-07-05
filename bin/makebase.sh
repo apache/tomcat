@@ -47,23 +47,23 @@ PRGDIR=`dirname "$PRG"`
 # first arg is the target directory
 BASE_TGT=$1
 
-if [ -z $BASE_TGT ]; then
+if [ -z "$BASE_TGT" ]; then
     # target directory not provided; exit
     echo "Usage: makebase <path-to-target-directory>"
     exit 1
 fi
 
-if [ -d $BASE_TGT ]; then
+if [ -d "$BASE_TGT" ]; then
   # target directory exists
   echo "Target directory exists"
 
     # exit if target directory is not empty
-    [ "`ls -A $BASE_TGT`" ] && \
+    [ "`ls -A "$BASE_TGT"`" ] && \
         echo "Target directory is not empty" && \
         exit 1
 else
     # create the target directory
-    mkdir -p $BASE_TGT
+    mkdir -p "$BASE_TGT"
 fi
 
 for dir in bin lib logs temp webapps work;
