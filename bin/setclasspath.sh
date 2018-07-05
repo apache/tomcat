@@ -61,14 +61,14 @@ fi
 # If we're running under jdb, we need a full jdk.
 if [ "$1" = "debug" ] ; then
   if [ "$os400" = "true" ]; then
-    if [ ! -x "$JAVA_HOME"/bin/java -o ! -x "$JAVA_HOME"/bin/javac ]; then
+    if [ ! -x "$JAVA_HOME"/bin/java ] || [ ! -x "$JAVA_HOME"/bin/javac ]; then
       echo "The JAVA_HOME environment variable is not defined correctly"
       echo "This environment variable is needed to run this program"
       echo "NB: JAVA_HOME should point to a JDK not a JRE"
       exit 1
     fi
   else
-    if [ ! -x "$JAVA_HOME"/bin/java -o ! -x "$JAVA_HOME"/bin/jdb -o ! -x "$JAVA_HOME"/bin/javac ]; then
+    if [ ! -x "$JAVA_HOME"/bin/java ] || [ ! -x "$JAVA_HOME"/bin/jdb ] || [ ! -x "$JAVA_HOME"/bin/javac ]; then
       echo "The JAVA_HOME environment variable is not defined correctly"
       echo "This environment variable is needed to run this program"
       echo "NB: JAVA_HOME should point to a JDK not a JRE"
