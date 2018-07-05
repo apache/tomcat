@@ -56,7 +56,7 @@ if exist %BASE_TGT% (
   echo Target directory exists
 
     rem exit if target directory is not empty
-    for /F %%i in ('dir /b "%BASE_TGT%\*.*"') do (
+    for /F %%i in ('dir /b %BASE_TGT%\*.*') do (
         echo Target directory is not empty
         goto :EOF
     )
@@ -67,7 +67,7 @@ if exist %BASE_TGT% (
 
 rem create empty directories
 for %%d in (bin, lib, logs, temp, webapps, work) do (
-    mkdir "%BASE_TGT%\%%d"
+    mkdir %BASE_TGT%\%%d
 )
 
 rem copy conf directory
