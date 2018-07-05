@@ -47,37 +47,37 @@ PRGDIR=`dirname "$PRG"`
 # first arg is the target directory
 BASE_TGT=$1
 
-if [ -z ${BASE_TGT} ]; then
+if [ -z $BASE_TGT ]; then
     # target directory not provided; exit
     echo "Usage: makebase <path-to-target-directory>"
     exit 1
 fi
 
-if [ -d ${BASE_TGT} ]; then
+if [ -d $BASE_TGT ]; then
   # target directory exists
   echo "Target directory exists"
 
     # exit if target directory is not empty
-    [ "`ls -A ${BASE_TGT}`" ] && \
+    [ "`ls -A $BASE_TGT`" ] && \
         echo "Target directory is not empty" && \
         exit 1
 else
     # create the target directory
-    mkdir -p ${BASE_TGT}
+    mkdir -p $BASE_TGT
 fi
 
 for dir in bin lib logs temp webapps work;
 do
     # create empty directories
-    mkdir "${BASE_TGT}/${dir}"
+    mkdir "$BASE_TGT/$dir"
 done
 
 # copy conf directory recursively and preserve permissions
-cp -a "${CATALINA_HOME}/conf" "${BASE_TGT}/"
+cp -a "$CATALINA_HOME/conf" "$BASE_TGT/"
 
 # copy setenv.sh if exists
-[ -f "${CATALINA_HOME}/bin/setenv.sh" ] && \
-    cp "${CATALINA_HOME}/bin/setenv.sh" "${BASE_TGT}/bin/"
+[ -f "$CATALINA_HOME/bin/setenv.sh" ] && \
+    cp "$CATALINA_HOME/bin/setenv.sh" "$BASE_TGT/bin/"
 
 echo "Created CATALINA_BASE directory at $BASE_TGT"
 
