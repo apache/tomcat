@@ -45,13 +45,13 @@ goto EOF
 rem first arg is the target directory
 set BASE_TGT=%1
 
-if %BASE_TGT%.==. (
+if "%BASE_TGT%."==. (
     rem target directory not provided; exit
     echo Usage: makebase ^<path-to-target-directory^>
     goto :EOF
 )
 
-if exist %BASE_TGT% (
+if exist "%BASE_TGT%" (
   rem target directory exists
   echo Target directory exists
 
@@ -62,7 +62,7 @@ if exist %BASE_TGT% (
     )
 ) else (
     rem create the target directory
-    mkdir %BASE_TGT%
+    mkdir "%BASE_TGT%"
 )
 
 rem create empty directories
@@ -71,12 +71,12 @@ for %%d in (bin, lib, logs, temp, webapps, work) do (
 )
 
 rem copy conf directory
-robocopy %CATALINA_HOME%\conf %BASE_TGT%\conf > nul
+robocopy "%CATALINA_HOME%\conf" "%BASE_TGT%\conf" > nul
 
 rem copy setenv.bat if exists
-robocopy %CATALINA_HOME%\bin %BASE_TGT%\bin setenv.bat > nul
+robocopy "%CATALINA_HOME%\bin" "%BASE_TGT%\bin" setenv.bat > nul
 
-echo Created CATALINA_BASE directory at %BASE_TGT%
+echo Created CATALINA_BASE directory at "%BASE_TGT%"
 
 echo Attention: The ports in conf\server.xml might be bound by a
 echo            different instance. Please review your config files
