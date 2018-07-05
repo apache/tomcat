@@ -79,6 +79,10 @@
         the NIO connector. Based on a patch submitted by Thomas Meyer with
         testing and suggestions by Coty Sutherland. (remm)
       </update>
+      <fix>
+        <bug>62507</bug>: Ensure that JSSE based TLS connectors work correctly
+        with a DKS keystore. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
