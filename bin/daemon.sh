@@ -168,7 +168,7 @@ if [ "$cygwin" = "false" ]; then
     MAX_FD_LIMIT=`ulimit -H -n`
     if [ "$?" -eq 0 ]; then
         # Darwin does not allow RLIMIT_INFINITY on file soft limit
-        if [ "$darwin" = "true" -a "$MAX_FD_LIMIT" = "unlimited" ]; then
+        if [ "$darwin" = "true" ] && [ "$MAX_FD_LIMIT" = "unlimited" ]; then
             MAX_FD_LIMIT=`/usr/sbin/sysctl -n kern.maxfilesperproc`
         fi
         test ".$MAX_FD" = ".maximum" && MAX_FD="$MAX_FD_LIMIT"
