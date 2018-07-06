@@ -37,7 +37,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.AccessController;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -75,6 +74,7 @@ import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 import org.apache.tomcat.util.security.PrivilegedGetTccl;
@@ -868,18 +868,7 @@ public class DefaultServlet extends HttpServlet {
             List<PrecompressedResource> precompressedResources =
                     getAvailablePrecompressedResources(path);
             if (!precompressedResources.isEmpty()) {
-                Collection<String> varyHeaders = response.getHeaders("Vary");
-                boolean addRequired = true;
-                for (String varyHeader : varyHeaders) {
-                    if ("*".equals(varyHeader) ||
-                            "accept-encoding".equalsIgnoreCase(varyHeader)) {
-                        addRequired = false;
-                        break;
-                    }
-                }
-                if (addRequired) {
-                    response.addHeader("Vary", "accept-encoding");
-                }
+                ResponseUtil.addVaryFieldName(response, "accept-encoding");
                 PrecompressedResource bestResource =
                         getBestPrecompressedResource(request, precompressedResources);
                 if (bestResource != null) {

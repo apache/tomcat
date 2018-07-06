@@ -83,6 +83,11 @@
         <bug>62507</bug>: Ensure that JSSE based TLS connectors work correctly
         with a DKS keystore. (markt)
       </fix>
+      <fix>
+        Refactor code that adds an additional header name to the
+        <code>Vary</code> HTTP response header to use a common utility method
+        that addresses several additional edge cases. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

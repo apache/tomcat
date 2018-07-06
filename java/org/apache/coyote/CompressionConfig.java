@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.http.ResponseUtil;
 
 public class CompressionConfig {
 
@@ -212,17 +213,7 @@ public class CompressionConfig {
 
         // If processing reaches this far, the response might be compressed.
         // Therefore, set the Vary header to keep proxies happy
-        MessageBytes vary = responseHeaders.getValue("Vary");
-        if (vary == null) {
-            // Add a new Vary header
-            responseHeaders.setValue("Vary").setString("Accept-Encoding");
-        } else if (vary.equals("*")) {
-            // No action required
-        } else {
-            // Merge into current header
-            responseHeaders.setValue("Vary").setString(vary.getString() + ",Accept-Encoding");
-        }
-
+        ResponseUtil.addVaryFieldName(responseHeaders, "accept-encoding");
 
         // Check if browser support gzip encoding
         MessageBytes acceptEncodingMB = request.getMimeHeaders().getValue("accept-encoding");
