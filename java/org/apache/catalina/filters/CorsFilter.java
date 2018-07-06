@@ -148,6 +148,10 @@ public class CorsFilter extends GenericFilter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
 
+        // For any request that passes through this filter, the response (and the
+        // associated headers) will depend on the origin.
+        ResponseUtil.addVaryFieldName(response, CorsFilter.REQUEST_HEADER_ORIGIN);
+
         // Determines the CORS request type.
         CorsFilter.CORSRequestType requestType = checkRequestType(request);
 
@@ -289,9 +293,6 @@ public class CorsFilter extends GenericFilter {
                     CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_EXPOSE_HEADERS,
                     exposedHeadersString);
         }
-
-        // Indicate the response depends on the origin
-        ResponseUtil.addVaryFieldName(response, CorsFilter.REQUEST_HEADER_ORIGIN);
 
         // Forward the request down the filter chain.
         filterChain.doFilter(request, response);
