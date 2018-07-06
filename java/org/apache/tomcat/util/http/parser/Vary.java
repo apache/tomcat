@@ -43,12 +43,12 @@ public class Vary {
                 break;
             }
 
-            int c = HttpParser.skipLws(input);
-            if (c == -1) {
+            SkipResult skipResult = HttpParser.skipConstant(input, ",");
+            if (skipResult == SkipResult.EOF) {
                 // EOF
                 result.add(fieldName.toLowerCase(Locale.ENGLISH));
                 break;
-            } else if (c == ',') {
+            } else if (skipResult == SkipResult.FOUND) {
                 result.add(fieldName.toLowerCase(Locale.ENGLISH));
                 continue;
             } else {
