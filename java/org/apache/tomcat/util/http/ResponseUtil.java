@@ -18,8 +18,11 @@ package org.apache.tomcat.util.http;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -36,8 +39,19 @@ public class ResponseUtil {
     }
 
 
+    public static void addVaryFieldName(MimeHeaders headers, String name) {
+        addVaryFieldName(new HeaderAdapter(headers), name);
+    }
+
+
     public static void addVaryFieldName(HttpServletResponse response, String name) {
-        Collection<String> varyHeaders = response.getHeaders(VARY_HEADER);
+        addVaryFieldName(new ResponseAdapter(response), name);
+    }
+
+
+    private static void addVaryFieldName(Adapter adapter, String name) {
+
+        Collection<String> varyHeaders = adapter.getHeaders(VARY_HEADER);
 
         // Short-cut if only * has been set
         if (varyHeaders.size() == 1 && varyHeaders.iterator().next().trim().equals(VARY_ALL)) {
@@ -47,13 +61,13 @@ public class ResponseUtil {
 
         // Short-cut if no headers have been set
         if (varyHeaders.size() == 0) {
-            response.addHeader(VARY_HEADER, name);
+            adapter.addHeader(VARY_HEADER, name);
             return;
         }
 
         // Short-cut if "*" is added
         if (VARY_ALL.equals(name.trim())) {
-            response.setHeader(VARY_HEADER, VARY_ALL);
+            adapter.setHeader(VARY_HEADER, VARY_ALL);
             return;
         }
 
@@ -75,7 +89,7 @@ public class ResponseUtil {
 
         if (fieldNames.contains(VARY_ALL)) {
             // '*' has been added without removing other values. Optimise.
-            response.setHeader(VARY_HEADER, VARY_ALL);
+            adapter.setHeader(VARY_HEADER, VARY_ALL);
             return;
         }
 
@@ -88,6 +102,69 @@ public class ResponseUtil {
             varyHeader.append(',');
             varyHeader.append(fieldName);
         }
-        response.setHeader(VARY_HEADER, varyHeader.toString());
+        adapter.setHeader(VARY_HEADER, varyHeader.toString());
+    }
+
+
+    private static interface Adapter {
+
+        Collection<String> getHeaders(String name);
+
+        void setHeader(String name, String value);
+
+        void addHeader(String name, String value);
+    }
+
+
+    private static final class HeaderAdapter implements Adapter {
+        private final MimeHeaders headers;
+
+        public HeaderAdapter(MimeHeaders headers) {
+            this.headers = headers;
+        }
+
+        @Override
+        public Collection<String> getHeaders(String name) {
+            Enumeration<String> values = headers.values(name);
+            List<String> result = new ArrayList<>();
+            while (values.hasMoreElements()) {
+                result.add(values.nextElement());
+            }
+            return result;
+        }
+
+        @Override
+        public void setHeader(String name, String value) {
+            headers.setValue(name).setString(value);
+        }
+
+        @Override
+        public void addHeader(String name, String value) {
+            headers.addValue(name).setString(value);
+        }
+    }
+
+
+    private static final class ResponseAdapter implements Adapter {
+        private final HttpServletResponse response;
+
+        public ResponseAdapter(HttpServletResponse response) {
+            this.response = response;
+        }
+
+        @Override
+        public Collection<String> getHeaders(String name) {
+            return response.getHeaders(name);
+        }
+
+        @Override
+        public void setHeader(String name, String value) {
+            response.setHeader(name, value);
+        }
+
+        @Override
+        public void addHeader(String name, String value) {
+            response.addHeader(name, value);
+        }
     }
 }

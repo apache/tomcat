@@ -179,4 +179,39 @@ public class TestResponseUtil {
         }
         Assert.assertEquals(expected, result);
     }
+
+
+    @Test
+    public void testMimeHeadersAddAllWithNone() {
+        MimeHeaders mh = new MimeHeaders();
+        Set<String> expected = new HashSet<>();
+        expected.add("*");
+        doTestAddVaryFieldName(mh, "*", expected);
+    }
+
+
+    @Test
+    public void testMimeHeadersAddValidWithValidHeaders() {
+        MimeHeaders mh = new MimeHeaders();
+        mh.addValue("vary").setString("foo");
+        mh.addValue("vary").setString("bar");
+        Set<String> expected = new HashSet<>();
+        expected.add("bar");
+        expected.add("foo");
+        expected.add("too");
+        doTestAddVaryFieldName(mh, "too", expected);
+    }
+
+    private void doTestAddVaryFieldName(MimeHeaders mh, String fieldName,
+            Set<String> expected) {
+        ResponseUtil.addVaryFieldName(mh, fieldName);
+        // There will now only be one Vary header
+        String resultHeader = mh.getHeader("vary");
+        Set<String> result = new HashSet<>();
+        // Deliberately do not use Vary.parseVary as it will skip invalid values.
+        for (String value : resultHeader.split(",")) {
+            result.add(value.trim());
+        }
+        Assert.assertEquals(expected, result);
+    }
 }
