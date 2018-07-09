@@ -53,6 +53,18 @@ if [ -z "$BASE_TGT" ]; then
     exit 1
 fi
 
+COPY_WEBAPPS=false
+
+# parse args
+while [ "$1" != "" ]; do
+    case $1 in
+        -w | --webapps)
+            COPY_WEBAPPS=true
+            ;;
+    esac
+    shift
+done
+
 if [ -d "$BASE_TGT" ]; then
   # target directory exists
   echo "Target directory exists"
@@ -66,14 +78,21 @@ else
     mkdir -p "$BASE_TGT"
 fi
 
-for dir in bin lib logs temp webapps work;
+for dir in bin conf lib logs temp webapps work;
 do
     # create empty directories
     mkdir "$BASE_TGT/$dir"
 done
 
-# copy conf directory recursively and preserve permissions
-cp -a "$CATALINA_HOME/conf" "$BASE_TGT/"
+if [ "$COPY_WEBAPPS" = true ]; then 
+    echo "Copying webapps"
+    cp -r "$CATALINA_HOME/webapps" "$BASE_TGT/"
+    # copy conf directory recursively
+    cp -r "$CATALINA_HOME/conf" "$BASE_TGT/"
+else 
+    # copy conf directory without subdirectories and suppress warning
+    cp "${CATALINA_HOME}/conf"/* "$BASE_TGT/conf" 2> /dev/null
+fi
 
 # copy setenv.sh if exists
 [ -f "$CATALINA_HOME/bin/setenv.sh" ] && \
@@ -83,4 +102,4 @@ echo "Created CATALINA_BASE directory at $BASE_TGT"
 
 echo "Attention: The ports in conf/server.xml might be bound by a "
 echo "           different instance. Please review your config files "
-echo "           and update them where necessary."
+echo "           and update them as necessary."
