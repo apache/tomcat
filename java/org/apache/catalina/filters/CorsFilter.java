@@ -303,8 +303,7 @@ public class CorsFilter extends GenericFilter {
         List<String> accessControlRequestHeaders = new LinkedList<>();
         if (accessControlRequestHeadersHeader != null &&
                 !accessControlRequestHeadersHeader.trim().isEmpty()) {
-            String[] headers = accessControlRequestHeadersHeader.trim().split(
-                    ",");
+            String[] headers = accessControlRequestHeadersHeader.trim().split(",");
             for (String header : headers) {
                 accessControlRequestHeaders.add(header.trim().toLowerCase(Locale.ENGLISH));
             }
