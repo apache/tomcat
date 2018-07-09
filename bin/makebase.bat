@@ -51,6 +51,18 @@ if %BASE_TGT%.==. (
     goto :EOF
 )
 
+set COPY_WEBAPPS=false
+
+rem parse args
+for %%a in (%*) do (
+   if "%%~a"=="--webapps" (
+       set COPY_WEBAPPS=true
+   )
+   if "%%~a"=="-w" (
+       set COPY_WEBAPPS=true
+   )
+)
+
 if exist %BASE_TGT% (
   rem target directory exists
   echo Target directory exists
@@ -66,12 +78,19 @@ if exist %BASE_TGT% (
 )
 
 rem create empty directories
-for %%d in (bin, lib, logs, temp, webapps, work) do (
+for %%d in (bin, conf, lib, logs, temp, webapps, work) do (
     mkdir %BASE_TGT%\%%d
 )
 
-rem copy conf directory
-robocopy %CATALINA_HOME%\conf %BASE_TGT%\conf > nul
+if "%COPY_WEBAPPS%" == "true" (
+    echo Copying webapps
+    robocopy %CATALINA_HOME%\webapps %BASE_TGT%\webapps /E > nul
+    rem copy conf directory recursively
+    robocopy %CATALINA_HOME%\conf %BASE_TGT%\conf /E > nul
+) else (
+    rem copy conf directory without subdirectories and suppress warning
+    robocopy %CATALINA_HOME%\conf %BASE_TGT%\conf > nul
+)
 
 rem copy setenv.bat if exists
 robocopy %CATALINA_HOME%\bin %BASE_TGT%\bin setenv.bat > nul
