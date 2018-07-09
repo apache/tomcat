@@ -55,13 +55,15 @@ public class TestVary {
 
     @Test
     public void testEmptyString() throws IOException {
-        doTestVary("", Collections.emptySet());
+        Set<String> s = Collections.emptySet();
+        doTestVary("", s);
     }
 
 
     @Test
     public void testSingleInvalid() throws IOException {
-        doTestVary("{{{", Collections.emptySet());
+        Set<String> s = Collections.emptySet();
+        doTestVary("{{{", s);
     }
 
 
