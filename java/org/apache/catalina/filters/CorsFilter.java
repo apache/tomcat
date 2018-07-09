@@ -421,9 +421,7 @@ public class CorsFilter extends GenericFilter {
         // Access-Control-Allow-Credentials header with the case-sensitive
         // string "true" as value.
         if (supportsCredentials) {
-            response.addHeader(
-                    CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS,
-                    "true");
+            response.addHeader(CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
         }
 
         // If the list of exposed headers is not empty add one or more
