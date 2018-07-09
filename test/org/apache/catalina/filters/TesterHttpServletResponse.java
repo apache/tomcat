@@ -22,6 +22,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -199,7 +200,7 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     @Override
     public Collection<String> getHeaderNames() { return null; }
     @Override
-    public Collection<String> getHeaders(String name) { return null; }
+    public Collection<String> getHeaders(String name) { return Collections.emptyList(); }
     public String getMessage() { return null; }
     public void reset(@SuppressWarnings("unused") int status,
             @SuppressWarnings("unused") String message) {/* NOOP */}

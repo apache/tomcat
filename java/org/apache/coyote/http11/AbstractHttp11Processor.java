@@ -47,6 +47,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
+import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.log.UserDataHelper;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -1673,18 +1674,7 @@ public abstract class AbstractHttp11Processor<S> extends AbstractProcessor<S> {
         }
         // If it might be compressed, set the Vary header
         if (isCompressible) {
-            // Make Proxies happy via Vary (from mod_deflate)
-            MessageBytes vary = headers.getValue("Vary");
-            if (vary == null) {
-                // Add a new Vary header
-                headers.setValue("Vary").setString("Accept-Encoding");
-            } else if (vary.equals("*")) {
-                // No action required
-            } else {
-                // Merge into current header
-                headers.setValue("Vary").setString(
-                        vary.getString() + ",Accept-Encoding");
-            }
+            ResponseUtil.addVaryFieldName(headers, "accept-encoding");
         }
 
         // Add date header unless application has already set one (e.g. in a

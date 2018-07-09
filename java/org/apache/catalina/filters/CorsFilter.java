@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -313,8 +314,7 @@ public class CorsFilter implements Filter {
         }
 
         // Indicate the response depends on the origin
-        response.addHeader(CorsFilter.REQUEST_HEADER_VARY,
-                CorsFilter.REQUEST_HEADER_ORIGIN);
+        ResponseUtil.addVaryFieldName(response, CorsFilter.REQUEST_HEADER_ORIGIN);
 
         // Forward the request down the filter chain.
         filterChain.doFilter(request, response);
@@ -1008,7 +1008,10 @@ public class CorsFilter implements Filter {
     /**
      * The Vary header indicates allows disabling proxy caching by indicating
      * the the response depends on the origin.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 10
      */
+    @Deprecated
     public static final String REQUEST_HEADER_VARY = "Vary";
 
     /**
