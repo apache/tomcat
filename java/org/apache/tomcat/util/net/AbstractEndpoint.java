@@ -125,7 +125,7 @@ public abstract class AbstractEndpoint<S> {
     }
 
     protected enum BindState {
-        UNBOUND, BOUND_ON_INIT, BOUND_ON_START
+        UNBOUND, BOUND_ON_INIT, BOUND_ON_START, SOCKET_CLOSED_ON_STOP
     }
 
     public abstract static class Acceptor implements Runnable {
@@ -239,7 +239,8 @@ public abstract class AbstractEndpoint<S> {
         if (key == null || key.length() == 0) {
             throw new IllegalArgumentException(sm.getString("endpoint.noSslHostName"));
         }
-        if (bindState != BindState.UNBOUND && isSSLEnabled()) {
+        if (bindState != BindState.UNBOUND && bindState != BindState.SOCKET_CLOSED_ON_STOP &&
+                isSSLEnabled()) {
             sslHostConfig.setConfigType(getSslConfigType());
             try {
                 createSSLContext(sslHostConfig);
@@ -1199,7 +1200,7 @@ public abstract class AbstractEndpoint<S> {
 
     public final void stop() throws Exception {
         stopInternal();
-        if (bindState == BindState.BOUND_ON_START) {
+        if (bindState == BindState.BOUND_ON_START || bindState == BindState.SOCKET_CLOSED_ON_STOP) {
             unbind();
             bindState = BindState.UNBOUND;
         }
@@ -1282,5 +1283,32 @@ public abstract class AbstractEndpoint<S> {
             return MAX_ERROR_DELAY;
         }
     }
+
+
+    /**
+     * Close the server socket (to prevent further connections) if the server
+     * socket was originally bound on {@link #start()} (rather than on
+     * {@link #init()}).
+     *
+     * @see #getBindOnInit()
+     */
+    public final void closeServerSocketGraceful() {
+        if (bindState == BindState.BOUND_ON_START) {
+            bindState = BindState.SOCKET_CLOSED_ON_STOP;
+            try {
+                doCloseServerSocket();
+            } catch (IOException ioe) {
+                getLog().warn(sm.getString("endpoint.serverSocket.closeFailed", getName()), ioe);
+            }
+        }
+    }
+
+
+    /**
+     * Actually close the server socket but don't perform any other clean-up.
+     *
+     * @throws IOException If an error occurs closing the socket
+     */
+    protected abstract void doCloseServerSocket() throws IOException;
 }
 

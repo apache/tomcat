@@ -470,6 +470,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
                             "standardService.connector.pauseFailed",
                             connector), e);
                 }
+                // Close server socket if bound on start
+                // Note: test is in AbstractEndpoint
+                connector.getProtocolHandler().closeServerSocketGraceful();
             }
         }
 

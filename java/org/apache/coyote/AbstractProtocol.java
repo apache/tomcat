@@ -667,6 +667,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
     }
 
 
+    @Override
+    public void closeServerSocketGraceful() {
+        endpoint.closeServerSocketGraceful();
+    }
+
+
     // ------------------------------------------- Connection handler base class
 
     protected static class ConnectionHandler<S> implements AbstractEndpoint.Handler<S> {
