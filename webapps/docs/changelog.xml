@@ -58,6 +58,11 @@
         (markt)
       </fix>
       <fix>
+        Refactor code that adds an additional header name to the
+        <code>Vary</code> HTTP response header to use a common utility method
+        that addresses several additional edge cases. (markt)
+      </fix>
+      <fix>
         <bug>62515</bug>: When a connector is configured (via setting
         <code>bindOnInit</code> to <code>false</code>) to bind/unbind the server
         socket during start/stop, close the socket earlier in the stop process
