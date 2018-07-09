@@ -61,6 +61,11 @@
         improve the tracking of changes to the default host as hosts are added
         and removed while Tomcat is running. (markt)
       </fix>
+      <fix>
+        Ensure that the HTTP Vary header is set correctly when using the CORS
+        filter and improve the cacheability of requests that pass through the
+        COPRS filter. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
