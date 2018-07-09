@@ -458,6 +458,9 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         synchronized (connectorsLock) {
             for (Connector connector: connectors) {
                 connector.pause();
+                // Close server socket if bound on start
+                // Note: test is in AbstractEndpoint
+                connector.getProtocolHandler().closeServerSocketGraceful();
             }
         }
 

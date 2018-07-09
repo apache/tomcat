@@ -92,7 +92,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
     /**
      * Server socket "pointer".
      */
-    protected long serverSock = 0;
+    protected volatile long serverSock = 0;
 
 
     /**
@@ -774,11 +774,7 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
             serverSockPool = 0;
         }
 
-        // Close server socket if it was initialised
-        if (serverSock != 0) {
-            Socket.close(serverSock);
-            serverSock = 0;
-        }
+        doCloseServerSocket();
 
         if (sslContext != 0) {
             Long ctx = Long.valueOf(sslContext);
@@ -796,6 +792,16 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
         }
 
         getHandler().recycle();
+    }
+
+
+    @Override
+    protected void doCloseServerSocket() {
+        // Close server socket if it was initialised
+        if (serverSock != 0) {
+            Socket.close(serverSock);
+            serverSock = 0;
+        }
     }
 
 

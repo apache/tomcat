@@ -70,7 +70,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
     /**
      * Server socket "pointer".
      */
-    private AsynchronousServerSocketChannel serverSock = null;
+    private volatile AsynchronousServerSocketChannel serverSock = null;
 
     /**
      * Allows detecting if a completion handler completes inline.
@@ -227,15 +227,23 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
         if (running) {
             stop();
         }
-        // Close server socket
-        serverSock.close();
-        serverSock = null;
+        doCloseServerSocket();
         destroySsl();
         super.unbind();
         // Unlike other connectors, the thread pool is tied to the server socket
         shutdownExecutor();
         if (getHandler() != null) {
             getHandler().recycle();
+        }
+    }
+
+
+    @Override
+    protected void doCloseServerSocket() throws IOException {
+        // Close server socket
+        if (serverSock != null) {
+            serverSock.close();
+            serverSock = null;
         }
     }
 

@@ -88,6 +88,14 @@
         <code>Vary</code> HTTP response header to use a common utility method
         that addresses several additional edge cases. (markt)
       </fix>
+      <fix>
+        <bug>62515</bug>: When a connector is configured (via setting
+        <code>bindOnInit</code> to <code>false</code>) to bind/unbind the server
+        socket during start/stop, close the socket earlier in the stop process
+        so new connections do not sit in the TCP backlog during the shutdown
+        process only to be dropped as stop completes. In this scenario new
+        connections will now be refused immediately. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

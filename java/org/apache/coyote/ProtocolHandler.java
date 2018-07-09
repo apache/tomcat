@@ -101,6 +101,14 @@ public interface ProtocolHandler {
 
 
     /**
+     * Close the server socket (to prevent further connections) if the server
+     * socket was bound on {@link #start()} (rather than on {@link #init()}
+     * but do not perform any further shutdown.
+     */
+    public void closeServerSocketGraceful();
+
+
+    /**
      * Requires APR/native library
      *
      * @return <code>true</code> if this Protocol Handler requires the

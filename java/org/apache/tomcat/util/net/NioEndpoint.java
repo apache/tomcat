@@ -85,7 +85,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
     /**
      * Server socket "pointer".
      */
-    private ServerSocketChannel serverSock = null;
+    private volatile ServerSocketChannel serverSock = null;
 
     /**
      *
@@ -328,12 +328,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         if (running) {
             stop();
         }
-        if (!getUseInheritedChannel()) {
-            // Close server socket
-            serverSock.socket().close();
-            serverSock.close();
-        }
-        serverSock = null;
+        doCloseServerSocket();
         destroySsl();
         super.unbind();
         if (getHandler() != null ) {
@@ -343,6 +338,17 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         if (log.isDebugEnabled()) {
             log.debug("Destroy completed for "+new InetSocketAddress(getAddress(),getPort()));
         }
+    }
+
+
+    @Override
+    protected void doCloseServerSocket() throws IOException {
+        if (!getUseInheritedChannel() && serverSock != null) {
+            // Close server socket
+            serverSock.socket().close();
+            serverSock.close();
+        }
+        serverSock = null;
     }
 
 
