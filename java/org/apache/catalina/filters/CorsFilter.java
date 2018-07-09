@@ -152,6 +152,16 @@ public class CorsFilter extends GenericFilter {
         // associated headers) will depend on the origin.
         ResponseUtil.addVaryFieldName(response, CorsFilter.REQUEST_HEADER_ORIGIN);
 
+        if ("OPTIONS".equals(request.getMethod())) {
+            // For any OPTIONS request, the response will vary based on the
+            // value or absence of the following headers. Hence they need be be
+            // included in the Vary header.
+            ResponseUtil.addVaryFieldName(response,
+                    CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
+            ResponseUtil.addVaryFieldName(response,
+                    CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS);
+        }
+
         // Determines the CORS request type.
         CorsFilter.CORSRequestType requestType = checkRequestType(request);
 
