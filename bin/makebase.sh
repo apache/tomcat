@@ -84,12 +84,12 @@ do
     mkdir "$BASE_TGT/$dir"
 done
 
-if [ "$COPY_WEBAPPS" = true ]; then 
+if [ "$COPY_WEBAPPS" = true ]; then
     echo "Copying webapps"
     cp -r "$CATALINA_HOME/webapps" "$BASE_TGT/"
     # copy conf directory recursively
     cp -r "$CATALINA_HOME/conf" "$BASE_TGT/"
-else 
+else
     # copy conf directory without subdirectories and suppress warning
     cp "${CATALINA_HOME}/conf"/* "$BASE_TGT/conf" 2> /dev/null
 fi
