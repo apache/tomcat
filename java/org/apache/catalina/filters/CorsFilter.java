@@ -493,8 +493,7 @@ public class CorsFilter extends GenericFilter {
         }
 
         if (corsRequestType == null) {
-            throw new IllegalArgumentException(
-                    sm.getString("corsFilter.nullRequestType"));
+            throw new IllegalArgumentException(sm.getString("corsFilter.nullRequestType"));
         }
 
         switch (corsRequestType) {
