@@ -522,7 +522,7 @@ public class HttpParser {
         return c;
     }
 
-    private static SkipResult skipConstant(Reader input, String constant)
+    static SkipResult skipConstant(Reader input, String constant)
             throws IOException {
         int len = constant.length();
 
@@ -550,7 +550,7 @@ public class HttpParser {
      *          available to read or <code>null</code> if data other than a
      *          token was found
      */
-    private static String readToken(Reader input) throws IOException {
+    static String readToken(Reader input) throws IOException {
         StringBuilder result = new StringBuilder();
 
         skipLws(input);
@@ -743,7 +743,7 @@ public class HttpParser {
         }
     }
 
-    private static enum SkipResult {
+    static enum SkipResult {
         FOUND,
         NOT_FOUND,
         EOF
