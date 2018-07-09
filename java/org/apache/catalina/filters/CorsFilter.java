@@ -315,8 +315,7 @@ public class CorsFilter implements Filter {
         List<String> accessControlRequestHeaders = new LinkedList<>();
         if (accessControlRequestHeadersHeader != null &&
                 !accessControlRequestHeadersHeader.trim().isEmpty()) {
-            String[] headers = accessControlRequestHeadersHeader.trim().split(
-                    ",");
+            String[] headers = accessControlRequestHeadersHeader.trim().split(",");
             for (String header : headers) {
                 accessControlRequestHeaders.add(header.trim().toLowerCase(Locale.ENGLISH));
             }
@@ -386,8 +385,7 @@ public class CorsFilter implements Filter {
 
         if (log.isDebugEnabled()) {
             // Debug so no need for i18n
-            StringBuilder message =
-                    new StringBuilder("Invalid CORS request; Origin=");
+            StringBuilder message = new StringBuilder("Invalid CORS request; Origin=");
             message.append(origin);
             message.append(";Method=");
             message.append(method);
@@ -435,9 +433,7 @@ public class CorsFilter implements Filter {
         // Access-Control-Allow-Credentials header with the case-sensitive
         // string "true" as value.
         if (supportsCredentials) {
-            response.addHeader(
-                    CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS,
-                    "true");
+            response.addHeader(CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
         }
 
         // If the list of exposed headers is not empty add one or more
@@ -511,13 +507,11 @@ public class CorsFilter implements Filter {
             final HttpServletRequest request,
             final CORSRequestType corsRequestType) {
         if (request == null) {
-            throw new IllegalArgumentException(
-                    sm.getString("corsFilter.nullRequest"));
+            throw new IllegalArgumentException(sm.getString("corsFilter.nullRequest"));
         }
 
         if (corsRequestType == null) {
-            throw new IllegalArgumentException(
-                    sm.getString("corsFilter.nullRequestType"));
+            throw new IllegalArgumentException(sm.getString("corsFilter.nullRequestType"));
         }
 
         switch (corsRequestType) {
@@ -533,8 +527,7 @@ public class CorsFilter implements Filter {
             break;
         case ACTUAL:
             request.setAttribute(
-                    CorsFilter.HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST,
-                    Boolean.TRUE);
+                    CorsFilter.HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST, Boolean.TRUE);
             request.setAttribute(CorsFilter.HTTP_REQUEST_ATTRIBUTE_ORIGIN,
                     request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN));
             request.setAttribute(
