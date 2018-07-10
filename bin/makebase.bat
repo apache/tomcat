@@ -22,7 +22,7 @@ rem
 rem If the file %CATALINA_HOME%/bin/setenv.sh exists then it is copied to
 rem the target directory as well.
 rem
-rem Usage: makebase <path-to-target-directory>
+rem Usage: makebase <path-to-target-directory> [-w | --webapps]
 
 setlocal
 

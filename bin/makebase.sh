@@ -23,7 +23,7 @@
 # If the file $CATALINA_HOME/bin/setenv.sh exists then it is copied to
 # the target directory as well.
 #
-# Usage: makebase <path-to-target-directory>
+# Usage: makebase <path-to-target-directory> [-w | --webapps]
 
 # resolve links - $0 may be a softlink
 PRG="$0"
