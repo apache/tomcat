@@ -44,5 +44,4 @@ public class ServerinfoTask extends AbstractCatalinaTask {
         execute("/serverinfo");
 
     }
-
 }
