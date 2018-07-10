@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.tomcat.util.res.StringManager;
-
 /**
  * Representation of an Context element
  *
@@ -32,9 +30,6 @@ import org.apache.tomcat.util.res.StringManager;
 public class ResourceBase implements Serializable, Injectable {
 
     private static final long serialVersionUID = 1L;
-
-    private static final StringManager sm = StringManager.getManager(ResourceBase.class);
-
 
     // ------------------------------------------------------------- Properties
 
@@ -89,14 +84,9 @@ public class ResourceBase implements Serializable, Injectable {
     }
 
     public void setLookupName(String lookupName) {
-        // EE.5.3.3: Must explicitly use java: namespace
         if (lookupName == null || lookupName.length() == 0) {
             this.lookupName = null;
             return;
-        }
-        if (!lookupName.startsWith("java:")) {
-            throw new IllegalArgumentException(
-                    sm.getString("resourceBase.lookupNotJava", lookupName));
         }
         this.lookupName = lookupName;
     }
