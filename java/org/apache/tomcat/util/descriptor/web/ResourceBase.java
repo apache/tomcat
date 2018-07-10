@@ -91,14 +91,9 @@ public class ResourceBase implements Serializable, Injectable {
     }
 
     public void setLookupName(String lookupName) {
-        // EE.5.3.3: Must explicitly use java: namespace
         if (lookupName == null || lookupName.length() == 0) {
             this.lookupName = null;
             return;
-        }
-        if (!lookupName.startsWith("java:")) {
-            throw new IllegalArgumentException(
-                    sm.getString("resourceBase.lookupNotJava", lookupName));
         }
         this.lookupName = lookupName;
     }
