@@ -132,14 +132,28 @@ public abstract class SSLUtilBase implements SSLUtil {
                 URI uri = ConfigFileLoader.getURI(path);
                 ks.load(JreCompat.getInstance().getDomainLoadStoreParameter(uri));
             } else {
+                // Some key store types (e.g. hardware) expect the InputStream
+                // to be null
                 if(!("PKCS11".equalsIgnoreCase(type) ||
                         "".equalsIgnoreCase(path)) ||
                         "NONE".equalsIgnoreCase(path)) {
                     istream = ConfigFileLoader.getInputStream(path);
                 }
 
+                // The digester cannot differentiate between null and "".
+                // Unfortunately, some key stores behave differently with null
+                // and "".
+                // JKS key stores treat null and "" interchangeably.
+                // PKCS12 key stores (Java 8 onwards) don't return the cert if
+                // null is used.
+                // Key stores that do not use passwords expect null
+                // Therefore:
+                // - generally use null if pass is null or ""
+                // - for JKS or PKCS12 only use null if pass is null
+                //   (because JKS will auto-switch to PKCS12)
                 char[] storePass = null;
-                if (pass != null && !"".equals(pass)) {
+                if (pass != null && (!"".equals(pass) ||
+                        "JKS".equalsIgnoreCase(type) || "PKCS12".equalsIgnoreCase(type))) {
                     storePass = pass.toCharArray();
                 }
                 ks.load(istream, storePass);

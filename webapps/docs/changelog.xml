@@ -83,6 +83,10 @@
         process only to be dropped as stop completes. In this scenario new
         connections will now be refused immediately. (markt)
       </fix>
+      <fix>
+        <bug>62526</bug>: Correctly handle PKCS12 format key stores when the key
+        store password is configured to be the empty string. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
